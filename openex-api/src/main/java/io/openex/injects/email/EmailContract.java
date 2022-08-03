@@ -51,7 +51,7 @@ public class EmailContract extends Contractor {
         ContractConfig contractConfig = getConfig();
         HashMap<String, String> choices = new HashMap<>();
         choices.put("none", "-");
-        choices.put("manual", "The animation team can validate the player reaction");
+        choices.put("manual", "The animation team can validate the audience reaction");
         // choices.put("document", "Each audience should upload a document");
         // choices.put("text", "Each audience should submit a text response");
         ContractSelect expectationSelect = ContractSelect

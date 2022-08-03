@@ -221,7 +221,7 @@ const Dashboard = () => {
     R.groupBy(R.path(['inject_expectation_inject', 'inject_type'])),
     R.toPairs,
     R.map((n) => ({
-      name: tPick(injectTypesMap && injectTypesMap[a.inject_type]?.label),
+      name: tPick(injectTypesMap && injectTypesMap[n[0]]?.label),
       data: n[1].map((i) => ({
         x: i.inject_expectation_updated_at,
         y: i.inject_expectation_score,

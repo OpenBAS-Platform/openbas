@@ -72,6 +72,20 @@ class AnimationMenu extends Component {
           </MenuItem>
           <MenuItem
             component={Link}
+            to={`/admin/exercises/${exerciseId}/animation/validations`}
+            selected={
+              location.pathname
+              === `/admin/exercises/${exerciseId}/animation/validations`
+            }
+            classes={{ root: classes.item }}
+          >
+            <ListItemIcon>
+              <FactCheckOutlined />
+            </ListItemIcon>
+            <ListItemText primary={t('Validations')} />
+          </MenuItem>
+          <MenuItem
+            component={Link}
             to={`/admin/exercises/${exerciseId}/animation/chat`}
             selected={
               location.pathname
@@ -84,21 +98,6 @@ class AnimationMenu extends Component {
               <ForumOutlined />
             </ListItemIcon>
             <ListItemText primary={t('Chat')} />
-          </MenuItem>
-          <MenuItem
-            component={Link}
-            to={`/admin/exercises/${exerciseId}/animation/validations`}
-            selected={
-              location.pathname
-              === `/admin/exercises/${exerciseId}/animation/validations`
-            }
-            classes={{ root: classes.item }}
-            disabled={true}
-          >
-            <ListItemIcon>
-              <FactCheckOutlined />
-            </ListItemIcon>
-            <ListItemText primary={t('Validations')} />
           </MenuItem>
         </MenuList>
       </Drawer>

@@ -10,6 +10,7 @@ import io.openex.injects.email.model.EmailContent;
 import io.openex.injects.email.service.EmailService;
 import io.openex.model.Expectation;
 import io.openex.model.expectation.DocumentExpectation;
+import io.openex.model.expectation.ManualExpectation;
 import io.openex.model.expectation.TextExpectation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -96,6 +97,7 @@ public class EmailExecutor extends Injector {
         return switch (content.getExpectationType()) {
             case "document" -> List.of(new DocumentExpectation(content.getExpectationScore()));
             case "text" -> List.of(new TextExpectation(content.getExpectationScore()));
+            case "manual" -> List.of(new ManualExpectation(content.getExpectationScore()));
             default -> List.of();
         };
     }

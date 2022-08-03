@@ -851,7 +851,7 @@ class InjectDefinition extends Component {
                     .map(([k, v]) => (
                       <MenuItem key={k} value={k}>
                         <ListItemText>
-                          {field.expectation ? t(v) : v}
+                          {field.expectation ? t(v || 'Unknown') : v}
                         </ListItemText>
                       </MenuItem>
                     ))}
@@ -861,7 +861,9 @@ class InjectDefinition extends Component {
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
-                  renderValue={(v) => (field.expectation ? t(field.choices[v]) : field.choices[v])
+                  renderValue={(v) => (field.expectation
+                    ? t(field.choices[v] || 'Unknown')
+                    : field.choices[v])
                   }
                   name={field.key}
                   fullWidth={true}
@@ -873,7 +875,7 @@ class InjectDefinition extends Component {
                     .map(([k, v]) => (
                       <MenuItem key={k} value={k}>
                         <ListItemText>
-                          {field.expectation ? t(v) : v}
+                          {field.expectation ? t(v || 'Unknown') : v}
                         </ListItemText>
                       </MenuItem>
                     ))}
@@ -909,7 +911,7 @@ class InjectDefinition extends Component {
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
-                  renderValue={(v) => (field.expectation ? t(choices[v]) : choices[v])
+                  renderValue={(v) => (field.expectation ? t(choices[v] || 'Unknown') : choices[v])
                   }
                   name={field.key}
                   fullWidth={true}
@@ -920,7 +922,7 @@ class InjectDefinition extends Component {
                     .map(([k, v]) => (
                       <MenuItem key={k} value={k}>
                         <ListItemText>
-                          {field.expectation ? t(v) : v}
+                          {field.expectation ? t(v || 'Unknown') : v}
                         </ListItemText>
                       </MenuItem>
                     ))}

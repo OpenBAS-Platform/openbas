@@ -6,11 +6,11 @@ import {
 } from '@mui/icons-material';
 import { useFormatter } from '../components/i18n';
 
-const useSearchAnFilter = (schema, defaultSortKey, searchColumns) => {
+const useSearchAnFilter = (schema, defaultSortKey, searchColumns, orderAsc = true, tagSuffix = '') => {
   const { t } = useFormatter();
   const [order, setOrder] = useState({
     sortBy: `${schema ? `${schema}_` : ''}${defaultSortKey}`,
-    orderAsc: true,
+    orderAsc,
   });
   const [keyword, setKeyword] = useState('');
   const [tags, setTags] = useState([]);
@@ -65,7 +65,7 @@ const useSearchAnFilter = (schema, defaultSortKey, searchColumns) => {
         R.filter(
           (n) => tags.length === 0
               || R.any(
-                (filter) => R.includes(filter, n[`${schema}_tags`] || []),
+                (filter) => R.includes(filter, n[`${schema}${tagSuffix}_tags`] || []),
                 R.pluck('id', tags),
               ),
         ),

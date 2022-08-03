@@ -452,6 +452,7 @@ const i18n = {
         'Score des types de stimuli dans le temps',
       'The animation team can validate the audience reaction':
         "L'équipe d'animation peut valider la réaction de l'audience",
+      'No description': 'Aucune description',
     },
     en: {
       openex_email: 'Email',
