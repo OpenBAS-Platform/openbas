@@ -6,7 +6,11 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { useDispatch } from 'react-redux';
-import { EmojiEventsOutlined } from '@mui/icons-material';
+import { EmojiEventsOutlined, RowingOutlined } from '@mui/icons-material';
+import * as R from 'ramda';
+import Tooltip from '@mui/material/Tooltip';
+import Chip from '@mui/material/Chip';
+import { Link } from 'react-router-dom';
 import SearchFilter from '../../../components/SearchFilter';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
@@ -18,6 +22,7 @@ import { fetchTags } from '../../../actions/Tag';
 import TagsFilter from '../../../components/TagsFilter';
 import ItemTags from '../../../components/ItemTags';
 import { fetchDocuments } from '../../../actions/Document';
+import { fetchExercises } from '../../../actions/Exercise';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -56,6 +61,13 @@ const useStyles = makeStyles((theme) => ({
   icon: {
     color: theme.palette.primary.main,
   },
+  exercise: {
+    fontSize: 12,
+    height: 20,
+    float: 'left',
+    marginRight: 7,
+    width: 120,
+  },
 }));
 
 const headerStyles = {
@@ -67,7 +79,7 @@ const headerStyles = {
   },
   challenge_name: {
     float: 'left',
-    width: '30%',
+    width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -85,7 +97,7 @@ const headerStyles = {
   },
   challenge_exercises: {
     float: 'left',
-    width: '10%',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -99,7 +111,7 @@ const headerStyles = {
 const inlineStyles = {
   challenge_name: {
     float: 'left',
-    width: '30%',
+    width: '25%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -123,7 +135,7 @@ const inlineStyles = {
   },
   challenge_exercises: {
     float: 'left',
-    width: '10%',
+    width: '20%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -146,11 +158,13 @@ const Challenges = () => {
   const searchColumns = ['name', 'content', 'category'];
   const filtering = useSearchAnFilter('challenge', 'name', searchColumns);
   // Fetching data
-  const { challenges, documentsMap } = useHelper((helper) => ({
+  const { challenges, documentsMap, exercisesMap } = useHelper((helper) => ({
+    exercisesMap: helper.getExercisesMap(),
     challenges: helper.getChallenges(),
     documentsMap: helper.getDocumentsMap(),
   }));
   useDataLoader(() => {
+    dispatch(fetchExercises());
     dispatch(fetchChallenges());
     dispatch(fetchTags());
     dispatch(fetchDocuments());
@@ -264,7 +278,25 @@ const Challenges = () => {
                       className={classes.bodyItem}
                       style={inlineStyles.challenge_exercises}
                     >
-                      {challenge.challenge_exercises}
+                      {R.take(3, challenge.challenge_exercises).map((e) => {
+                        const exercise = exercisesMap[e] || {};
+                        return (
+                          <Tooltip
+                            key={exercise.exercise_id}
+                            title={exercise.exercise_name}
+                          >
+                            <Chip
+                              icon={<RowingOutlined style={{ fontSize: 12 }} />}
+                              classes={{ root: classes.exercise }}
+                              variant="outlined"
+                              label={exercise.exercise_name}
+                              component={Link}
+                              clickable={true}
+                              to={`/admin/exercises/${exercise.exercise_id}`}
+                            />
+                          </Tooltip>
+                        );
+                      })}
                     </div>
                     <div
                       className={classes.bodyItem}
@@ -279,10 +311,7 @@ const Challenges = () => {
                 }
               />
               <ListItemSecondaryAction>
-                <ChallengePopover
-                  challenge={challenge}
-                  documents={docs}
-                />
+                <ChallengePopover challenge={challenge} documents={docs} />
               </ListItemSecondaryAction>
             </ListItem>
           );

@@ -453,6 +453,7 @@ const Injects = () => {
           classes={{ paper: classes.drawerPaper }}
           onClose={() => setSelectedInject(null)}
           elevation={1}
+          disableEnforceFocus={true}
         >
           <InjectDefinition
             injectId={selectedInject}
