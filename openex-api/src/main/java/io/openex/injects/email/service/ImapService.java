@@ -173,7 +173,7 @@ public class ImapService {
     private List<String> computeParticipants(Message message) throws Exception {
         List<String> from = Arrays.stream(message.getFrom()).map(addr -> (((InternetAddress) addr).getAddress())).toList();
         List<String> recipients = Arrays.stream(message.getAllRecipients()).map(addr -> (((InternetAddress) addr).getAddress())).toList();
-        return Stream.concat(from.stream(), recipients.stream()).filter(recipient -> !recipient.equals(username)).distinct().toList();
+        return Stream.concat(from.stream(), recipients.stream()).map(String::toLowerCase).filter(recipient -> !recipient.equals(username)).distinct().toList();
     }
 
     private void parseMessages(Message[] messages, Boolean isSent) throws Exception {

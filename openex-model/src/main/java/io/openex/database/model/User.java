@@ -213,7 +213,7 @@ public class User implements Base, OAuth2User {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email.toLowerCase();
     }
 
     public String getLang() {
