@@ -430,9 +430,9 @@ const i18n = {
       'Distribution of expectations by audience':
         'Distribution des attendus par audience',
       'Distribution of expectations by inject type':
-        "Distribution des attendus par type d'inject",
+        'Distribution des attendus par type de stimuli',
       'Distribution of expected total score by inject type':
-        "Distribution du score total attendu par type d'inject",
+        'Distribution du score total attendu par type de stimuli',
       '-': 'Aucun',
       'Each audience should upload a document':
         'Chaque audience doit uploader un document',
@@ -453,6 +453,13 @@ const i18n = {
       'The animation team can validate the audience reaction':
         "L'équipe d'animation peut valider la réaction de l'audience",
       'No description': 'Aucune description',
+      'Only injects with manual validation':
+        'Seulement les stimulis avec validation manuelle',
+      'Pending reading': 'Lecture en attente',
+      'Pending submission': 'Soumission en attente',
+      'Pending validation': 'Validation en attente',
+      Validate: 'Valider',
+      Validated: 'Validé',
     },
     en: {
       openex_email: 'Email',

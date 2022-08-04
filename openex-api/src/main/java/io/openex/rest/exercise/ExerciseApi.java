@@ -435,6 +435,15 @@ public class ExerciseApi extends RestBehavior {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         return injectExpectationRepository.findAllForExercise(exercise.getId()).stream().toList();
     }
+    @PutMapping("/api/exercises/{exerciseId}/expectations/{expectationId}")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public InjectExpectation updateInjectExpectation(@PathVariable String exerciseId, @PathVariable String expectationId, @Valid @RequestBody ExpectationUpdateInput input) {
+        InjectExpectation injectExpectation = injectExpectationRepository.findById(expectationId).orElseThrow();
+        injectExpectation.setResult("VALIDATED");
+        injectExpectation.setScore(input.getScore());
+        injectExpectation.setUpdatedAt(now());
+        return injectExpectationRepository.save(injectExpectation);
+    }
     // endregion
 
     // region import/export

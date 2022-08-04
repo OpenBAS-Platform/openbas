@@ -239,7 +239,6 @@ public class MediaApi extends RestBehavior {
     public MediaReader observerArticles(@PathVariable String exerciseId, @PathVariable String mediaId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Media media = mediaRepository.findById(mediaId).orElseThrow();
-        // Fulfill visible article expectations
         MediaReader mediaReader = new MediaReader(media, exercise);
         List<Article> publishedArticles = exercise.getArticlesForMedia(media);
         List<Article> articles = enrichArticleWithVirtualPublication(exercise, publishedArticles);
@@ -292,6 +291,8 @@ public class MediaApi extends RestBehavior {
             expectationExecutions.forEach(injectExpectationExecution -> {
                 injectExpectationExecution.setUser(user);
                 injectExpectationExecution.setResult(Instant.now().toString());
+                injectExpectationExecution.setScore(injectExpectationExecution.getExpectedScore());
+                injectExpectationExecution.setUpdatedAt(Instant.now());
                 injectExpectationExecutionRepository.save(injectExpectationExecution);
             });
         }

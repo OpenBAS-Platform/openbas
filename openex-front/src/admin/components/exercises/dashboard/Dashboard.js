@@ -199,15 +199,29 @@ const Dashboard = () => {
       })),
     },
   ];
+  let cumulation = 0;
   const audiencesScores = R.pipe(
     R.filter((n) => n.inject_expectation_result !== null),
     R.groupBy(R.prop('inject_expectation_audience')),
     R.toPairs,
+    R.map((n) => {
+      cumulation = 0;
+      return [
+        n[0],
+        R.pipe(
+          R.sortWith([R.ascend(R.prop('inject_expectation_updated_at'))]),
+          R.map((i) => {
+            cumulation += i.inject_expectation_score;
+            return R.assoc('inject_expectation_cumulated_score', cumulation, i);
+          }),
+        )(n[1]),
+      ];
+    }),
     R.map((n) => ({
       name: audiencesMap[n[0]]?.audience_name,
       data: n[1].map((i) => ({
         x: i.inject_expectation_updated_at,
-        y: i.inject_expectation_score,
+        y: i.inject_expectation_cumulated_score,
       })),
     })),
   )(injectExpectations);
@@ -220,11 +234,24 @@ const Dashboard = () => {
     )),
     R.groupBy(R.path(['inject_expectation_inject', 'inject_type'])),
     R.toPairs,
+    R.map((n) => {
+      cumulation = 0;
+      return [
+        n[0],
+        R.pipe(
+          R.sortWith([R.ascend(R.prop('inject_expectation_updated_at'))]),
+          R.map((i) => {
+            cumulation += i.inject_expectation_score;
+            return R.assoc('inject_expectation_cumulated_score', cumulation, i);
+          }),
+        )(n[1]),
+      ];
+    }),
     R.map((n) => ({
       name: tPick(injectTypesMap && injectTypesMap[n[0]]?.label),
       data: n[1].map((i) => ({
         x: i.inject_expectation_updated_at,
-        y: i.inject_expectation_score,
+        y: i.inject_expectation_cumulated_score,
       })),
     })),
   )(injectExpectations);
