@@ -19,6 +19,7 @@ import {
   ControlPointOutlined,
   DeleteOutlined,
   EmojiEventsOutlined,
+  HelpOutlineOutlined,
 } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import IconButton from '@mui/material/IconButton';
@@ -29,6 +30,11 @@ import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import Slide from '@mui/material/Slide';
+import { DialogActions } from '@mui/material';
 import inject18n from '../../../../components/i18n';
 import { fetchInjectAudiences, updateInject } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
@@ -53,6 +59,11 @@ import InjectAddArticles from './InjectAddArticles';
 import MediaIcon from '../../medias/MediaIcon';
 import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 const styles = (theme) => ({
   header: {
@@ -333,6 +344,7 @@ class InjectDefinition extends Component {
       challengesIds: props.inject.inject_content?.challenges || [],
       challengesSortBy: 'challenge_name',
       challengesOrderAsc: true,
+      openVariables: false,
     };
   }
 
@@ -347,6 +359,14 @@ class InjectDefinition extends Component {
 
   toggleAll() {
     this.setState({ allAudiences: !this.state.allAudiences });
+  }
+
+  handleOpenVariables() {
+    this.setState({ openVariables: true });
+  }
+
+  handleCloseVariables() {
+    this.setState({ openVariables: false });
   }
 
   handleAddAudiences(audiencesIds) {
@@ -1032,6 +1052,7 @@ class InjectDefinition extends Component {
       challengesOrderAsc,
       challengesSortBy,
       challengesIds,
+      openVariables,
     } = this.state;
     const injectType = R.head(
       injectTypes.filter((i) => i.contract_id === inject.inject_contract),
@@ -1630,12 +1651,22 @@ class InjectDefinition extends Component {
                     </List>
                   </div>
                 )}
-                <Typography
-                  variant="h2"
-                  style={{ marginTop: hasAudiences ? 30 : 0 }}
-                >
-                  {t('Inject data')}
-                </Typography>
+                <div style={{ marginTop: hasAudiences ? 30 : 0 }}>
+                  <div style={{ float: 'left' }}>
+                    <Typography variant="h2">{t('Inject data')}</Typography>
+                  </div>
+                  <div style={{ float: 'right' }}>
+                    <Button
+                      color="primary"
+                      variant="outlined"
+                      onClick={this.handleOpenVariables.bind(this)}
+                      startIcon={<HelpOutlineOutlined />}
+                    >
+                      {t('Available variables')}
+                    </Button>
+                  </div>
+                  <div className="clearfix" />
+                </div>
                 <div style={{ marginTop: -15 }}>
                   {this.renderFields(
                     injectType.fields
@@ -1879,6 +1910,56 @@ class InjectDefinition extends Component {
             )}
           </Form>
         </div>
+        <Dialog
+          TransitionComponent={Transition}
+          open={openVariables}
+          onClose={this.handleCloseVariables.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
+          PaperProps={{ elevation: 1 }}
+        >
+          <DialogTitle>{t('Available variables')}</DialogTitle>
+          <DialogContent>
+            <List>
+              {injectType.variables.map((variable) => (
+                <div>
+                  <ListItem key={variable.key} divider={true} dense={true}>
+                    <ListItemText
+                      primary={
+                        variable.children && variable.children.length > 0
+                          ? variable.key
+                          : `\${${variable.key}}`
+                      }
+                      secondary={t(variable.label)}
+                    />
+                  </ListItem>
+                  {variable.children && variable.children.length > 0 && (
+                    <List component="div" disablePadding>
+                      {variable.children.map((variableChild) => (
+                        <ListItem
+                          key={variableChild.key}
+                          divider={true}
+                          dense={true}
+                          sx={{ pl: 4 }}
+                        >
+                          <ListItemText
+                            primary={`\${${variableChild.key}}`}
+                            secondary={t(variableChild.label)}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  )}
+                </div>
+              ))}
+            </List>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleCloseVariables.bind(this)}>
+              {t('Close')}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }

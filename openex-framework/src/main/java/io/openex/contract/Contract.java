@@ -113,7 +113,7 @@ public class Contract {
         variables.add(variable(AUDIENCES, "List of audience name for the injection", String, Multiple));
         // Direct uris
         variables.add(variable(PLAYER_URI, "Player interface platform link", String, One));
-        variables.add(variable(CHALLENGES_URI, "Player interface platform link", String, One));
+        variables.add(variable(CHALLENGES_URI, "Challenges interface platform link", String, One));
         variables.add(variable(SCOREBOARD_URI, "Scoreboard interface platform link", String, One));
         return variables;
     }
