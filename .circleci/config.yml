@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   slack: circleci/slack@4.8.3
+  ms-teams: opub/ms-teams-orb@1.0.3
 jobs:
   build_frontend:
     working_directory: ~/openex
@@ -27,7 +28,9 @@ jobs:
           command: cp -a openex openex_docker && cp -a openex openex_musl
       - slack/notify:
           event: fail
-          template: basic_fail_1                 
+          template: basic_fail_1
+      - ms-teams/report:
+          webhook_url: https://filigranio.webhook.office.com/webhookb2/3dd2b30f-affe-4606-af16-9d06b2d504a1@f2a29c7e-5230-41d3-b5d1-4b6e2c4e6b7c/CircleCI/54fcc0fd3a4c4f90bf90d6c934fa02ae/c83dc43d-f2b7-46c7-b606-a1ae391318cc
       - persist_to_workspace:
           root: ~/
           paths:
@@ -47,7 +50,9 @@ jobs:
           command: mvn install -DskipTests -Pdev
       - slack/notify:
           event: fail
-          template: basic_fail_1              
+          template: basic_fail_1
+      - ms-teams/report:
+          webhook_url: https://filigranio.webhook.office.com/webhookb2/3dd2b30f-affe-4606-af16-9d06b2d504a1@f2a29c7e-5230-41d3-b5d1-4b6e2c4e6b7c/CircleCI/54fcc0fd3a4c4f90bf90d6c934fa02ae/c83dc43d-f2b7-46c7-b606-a1ae391318cc                  
       - persist_to_workspace:
           root: ~/
           paths:
@@ -66,7 +71,9 @@ jobs:
           command: mvn install -DskipTests -Pdev
       - slack/notify:
           event: fail
-          template: basic_fail_1          
+          template: basic_fail_1
+      - ms-teams/report:
+          webhook_url: https://filigranio.webhook.office.com/webhookb2/3dd2b30f-affe-4606-af16-9d06b2d504a1@f2a29c7e-5230-41d3-b5d1-4b6e2c4e6b7c/CircleCI/54fcc0fd3a4c4f90bf90d6c934fa02ae/c83dc43d-f2b7-46c7-b606-a1ae391318cc                 
       - persist_to_workspace:
           root: ~/
           paths:
@@ -93,7 +100,9 @@ jobs:
           command: scp "openex-$(date '+%Y%m%d').tar.gz" git-9qdBths0@openex.io:/dns/io/openex/releases/
       - slack/notify:
           event: fail
-          template: basic_fail_1          
+          template: basic_fail_1
+      - ms-teams/report:
+          webhook_url: https://filigranio.webhook.office.com/webhookb2/3dd2b30f-affe-4606-af16-9d06b2d504a1@f2a29c7e-5230-41d3-b5d1-4b6e2c4e6b7c/CircleCI/54fcc0fd3a4c4f90bf90d6c934fa02ae/c83dc43d-f2b7-46c7-b606-a1ae391318cc          
 
   package_rolling_musl:
     working_directory: ~/openex_musl
@@ -114,7 +123,9 @@ jobs:
           command: scp "openex-$(date '+%Y%m%d')_musl.tar.gz" git-9qdBths0@openex.io:/dns/io/openex/releases/
       - slack/notify:
           event: fail
-          template: basic_fail_1                 
+          template: basic_fail_1
+      - ms-teams/report:
+          webhook_url: https://filigranio.webhook.office.com/webhookb2/3dd2b30f-affe-4606-af16-9d06b2d504a1@f2a29c7e-5230-41d3-b5d1-4b6e2c4e6b7c/CircleCI/54fcc0fd3a4c4f90bf90d6c934fa02ae/c83dc43d-f2b7-46c7-b606-a1ae391318cc          
       
   deploy_demo:
     working_directory: ~/openex
@@ -146,7 +157,9 @@ jobs:
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
       - slack/notify:
           event: fail
-          template: basic_fail_1          
+          template: basic_fail_1
+      - ms-teams/report:
+          webhook_url: https://filigranio.webhook.office.com/webhookb2/3dd2b30f-affe-4606-af16-9d06b2d504a1@f2a29c7e-5230-41d3-b5d1-4b6e2c4e6b7c/CircleCI/54fcc0fd3a4c4f90bf90d6c934fa02ae/c83dc43d-f2b7-46c7-b606-a1ae391318cc          
 
 
   deploy_reference:
@@ -179,7 +192,9 @@ jobs:
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
       - slack/notify:
           event: fail
-          template: basic_fail_1          
+          template: basic_fail_1
+      - ms-teams/report:
+          webhook_url: https://filigranio.webhook.office.com/webhookb2/3dd2b30f-affe-4606-af16-9d06b2d504a1@f2a29c7e-5230-41d3-b5d1-4b6e2c4e6b7c/CircleCI/54fcc0fd3a4c4f90bf90d6c934fa02ae/c83dc43d-f2b7-46c7-b606-a1ae391318cc          
       
   deploy_lab:
     working_directory: ~/openex
@@ -211,7 +226,9 @@ jobs:
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
       - slack/notify:
           event: fail
-          template: basic_fail_1          
+          template: basic_fail_1
+      - ms-teams/report:
+          webhook_url: https://filigranio.webhook.office.com/webhookb2/3dd2b30f-affe-4606-af16-9d06b2d504a1@f2a29c7e-5230-41d3-b5d1-4b6e2c4e6b7c/CircleCI/54fcc0fd3a4c4f90bf90d6c934fa02ae/c83dc43d-f2b7-46c7-b606-a1ae391318cc          
 
   deploy_testing:
     working_directory: ~/openex
@@ -243,7 +260,9 @@ jobs:
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
       - slack/notify:
           event: fail
-          template: basic_fail_1          
+          template: basic_fail_1
+      - ms-teams/report:
+          webhook_url: https://filigranio.webhook.office.com/webhookb2/3dd2b30f-affe-4606-af16-9d06b2d504a1@f2a29c7e-5230-41d3-b5d1-4b6e2c4e6b7c/CircleCI/54fcc0fd3a4c4f90bf90d6c934fa02ae/c83dc43d-f2b7-46c7-b606-a1ae391318cc          
 
   docker_build_platform:
     working_directory: ~/openex_docker
@@ -279,7 +298,9 @@ jobs:
           no_output_timeout: 30m
       - slack/notify:
           event: fail
-          template: basic_fail_1          
+          template: basic_fail_1
+      - ms-teams/report:
+          webhook_url: https://filigranio.webhook.office.com/webhookb2/3dd2b30f-affe-4606-af16-9d06b2d504a1@f2a29c7e-5230-41d3-b5d1-4b6e2c4e6b7c/CircleCI/54fcc0fd3a4c4f90bf90d6c934fa02ae/c83dc43d-f2b7-46c7-b606-a1ae391318cc          
 
   docker_build_platform_rolling:
     working_directory: ~/openex_docker
@@ -317,7 +338,9 @@ jobs:
           no_output_timeout: 30
       - slack/notify:
           event: fail
-          template: basic_fail_1   
+          template: basic_fail_1
+      - ms-teams/report:
+          webhook_url: https://filigranio.webhook.office.com/webhookb2/3dd2b30f-affe-4606-af16-9d06b2d504a1@f2a29c7e-5230-41d3-b5d1-4b6e2c4e6b7c/CircleCI/54fcc0fd3a4c4f90bf90d6c934fa02ae/c83dc43d-f2b7-46c7-b606-a1ae391318cc          
                  
   notify_rolling:
     docker:
@@ -326,6 +349,8 @@ jobs:
       - slack/notify:
           event: pass
           template: basic_success_1
+      - ms-teams/report:
+          webhook_url: https://filigranio.webhook.office.com/webhookb2/3dd2b30f-affe-4606-af16-9d06b2d504a1@f2a29c7e-5230-41d3-b5d1-4b6e2c4e6b7c/CircleCI/54fcc0fd3a4c4f90bf90d6c934fa02ae/c83dc43d-f2b7-46c7-b606-a1ae391318cc          
 
   notify:
     docker:
@@ -334,6 +359,8 @@ jobs:
       - slack/notify:
           event: pass
           template: basic_success_1
+      - ms-teams/report:
+          webhook_url: https://filigranio.webhook.office.com/webhookb2/3dd2b30f-affe-4606-af16-9d06b2d504a1@f2a29c7e-5230-41d3-b5d1-4b6e2c4e6b7c/CircleCI/54fcc0fd3a4c4f90bf90d6c934fa02ae/c83dc43d-f2b7-46c7-b606-a1ae391318cc          
 
 workflows:
   openex:
