@@ -19,6 +19,7 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchAudiences } from '../../../../actions/Audience';
 import ResultsMenu from '../ResultsMenu';
 import {
+  colors,
   horizontalBarsChartOptions,
   lineChartOptions,
 } from '../../../../utils/Charts';
@@ -26,6 +27,10 @@ import Empty from '../../../../components/Empty';
 import { fetchInjects, fetchInjectTypes } from '../../../../actions/Inject';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import { fetchExerciseInjectExpectations } from '../../../../actions/Exercise';
+import { fetchPlayers } from '../../../../actions/User';
+import { fetchOrganizations } from '../../../../actions/Organization';
+import { fetchExerciseCommunications } from '../../../../actions/Communication';
+import { resolveUserName } from '../../../../utils/String';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -95,13 +100,19 @@ const Dashboard = () => {
     audiencesMap,
     injectExpectations,
     injectsMap,
+    usersMap,
+    organizationsMap,
+    communications,
   } = useHelper((helper) => {
     return {
       exercise: helper.getExercise(exerciseId),
       audiences: helper.getExerciseAudiences(exerciseId),
       audiencesMap: helper.getAudiencesMap(),
       injects: helper.getExerciseInjects(exerciseId),
+      communications: helper.getExerciseCommunications(exerciseId),
       injectsMap: helper.getInjectsMap(),
+      usersMap: helper.getUsersMap(),
+      organizationsMap: helper.getOrganizationsMap(),
       injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
       challengesMap: helper.getChallengesMap(),
       injectTypesMap: helper.getInjectTypesMapByType(),
@@ -113,7 +124,54 @@ const Dashboard = () => {
     dispatch(fetchInjects(exerciseId));
     dispatch(fetchExerciseChallenges(exerciseId));
     dispatch(fetchExerciseInjectExpectations(exerciseId));
+    dispatch(fetchPlayers(exerciseId));
+    dispatch(fetchExerciseCommunications(exerciseId));
+    dispatch(fetchOrganizations());
   });
+  const mapIndexed = R.addIndex(R.map);
+  const audiencesColors = R.pipe(
+    mapIndexed((a, index) => [
+      a.audience_id,
+      colors(theme.palette.mode === 'dark' ? 400 : 600)[index],
+    ]),
+    R.fromPairs,
+  )(audiences);
+  const sortedAudiencesByInjectsNumber = R.pipe(
+    R.filter((n) => n.inject_sent_at !== null),
+    R.sortWith([R.descend(R.prop('audience_injects_number'))]),
+    R.take(10),
+  )(audiences || []);
+  const injectsByAudienceData = [
+    {
+      name: t('Number of injects'),
+      data: sortedAudiencesByInjectsNumber.map((a) => ({
+        x: a.audience_name,
+        y: a.audience_injects_number,
+        fillColor: audiencesColors[a.audience_id],
+      })),
+    },
+  ];
+  const injectsByType = R.pipe(
+    R.filter((n) => n.inject_sent_at !== null),
+    R.groupBy(R.prop('inject_type')),
+    R.toPairs,
+    R.map((n) => ({
+      inject_type: n[0],
+      number: n[1].length,
+    })),
+    R.sortWith([R.descend(R.prop('number'))]),
+  )(injects);
+  const injectsByInjectTypeData = [
+    {
+      name: t('Number of injects'),
+      data: injectsByType.map((a) => ({
+        x: tPick(injectTypesMap && injectTypesMap[a.inject_type]?.label),
+        y: a.number,
+        fillColor:
+          injectTypesMap && injectTypesMap[a.inject_type]?.config?.color,
+      })),
+    },
+  ];
   const injectTypesWithScore = R.pipe(
     R.filter(
       (n) => n.inject_type === 'openex_challenge'
@@ -177,10 +235,11 @@ const Dashboard = () => {
   )(audiences || []);
   const expectationsByAudienceData = [
     {
-      name: t('Total expected score'),
+      name: t('Number of expectations'),
       data: sortedAudiencesByExpectation.map((a) => ({
         x: a.audience_name,
         y: a.audience_injects_expectations_number,
+        fillColor: audiencesColors[a.audience_id],
       })),
     },
   ];
@@ -196,6 +255,7 @@ const Dashboard = () => {
       data: sortedAudiencesByExpectedScore.map((a) => ({
         x: a.audience_name,
         y: a.audience_injects_expectations_total_expected_score,
+        fillColor: audiencesColors[a.audience_id],
       })),
     },
   ];
@@ -219,6 +279,7 @@ const Dashboard = () => {
     }),
     R.map((n) => ({
       name: audiencesMap[n[0]]?.audience_name,
+      color: audiencesColors[n[0]],
       data: n[1].map((i) => ({
         x: i.inject_expectation_updated_at,
         y: i.inject_expectation_cumulated_score,
@@ -249,12 +310,118 @@ const Dashboard = () => {
     }),
     R.map((n) => ({
       name: tPick(injectTypesMap && injectTypesMap[n[0]]?.label),
+      color: injectTypesMap && injectTypesMap[n[0]]?.config?.color,
       data: n[1].map((i) => ({
         x: i.inject_expectation_updated_at,
         y: i.inject_expectation_cumulated_score,
       })),
     })),
   )(injectExpectations);
+  const injectsTotalScores = R.pipe(
+    R.filter((n) => n.inject_expectation_result !== null),
+    R.groupBy(R.prop('inject_expectation_inject')),
+    R.toPairs,
+    R.map((n) => ({
+      ...injectsMap[n[0]],
+      inject_total_score: R.sum(R.map((o) => o.inject_expectation_score, n[1])),
+    })),
+  )(injectExpectations);
+  const sortedInjectsByTotalScore = R.pipe(
+    R.sortWith([R.descend(R.prop('inject_total_score'))]),
+    R.take(10),
+  )(injectsTotalScores || []);
+  const totalScoreByInjectData = [
+    {
+      name: t('Total score'),
+      data: sortedInjectsByTotalScore.map((i) => ({
+        x: i.inject_title,
+        y: i.inject_total_score,
+      })),
+    },
+  ];
+  const audiencesTotalScores = R.pipe(
+    R.filter((n) => n.inject_expectation_result !== null),
+    R.groupBy(R.prop('inject_expectation_audience')),
+    R.toPairs,
+    R.map((n) => ({
+      ...audiencesMap[n[0]],
+      audience_total_score: R.sum(
+        R.map((o) => o.inject_expectation_score, n[1]),
+      ),
+    })),
+  )(injectExpectations);
+  const sortedAudiencesByTotalScore = R.pipe(
+    R.sortWith([R.descend(R.prop('audience_total_score'))]),
+    R.take(10),
+  )(audiencesTotalScores || []);
+  const totalScoreByAudienceData = [
+    {
+      name: t('Total score'),
+      data: sortedAudiencesByTotalScore.map((a) => ({
+        x: a.audience_name,
+        y: a.audience_total_score,
+      })),
+    },
+  ];
+  const organizationsTotalScores = R.pipe(
+    R.filter(
+      (n) => n.inject_expectation_result !== null
+        && n.inject_expectation_user !== null,
+    ),
+    R.map((n) => R.assoc(
+      'inject_expectation_user',
+      usersMap[n.inject_expectation_user] || {},
+      n,
+    )),
+    R.groupBy(R.path(['inject_expectation_user', 'user_organization'])),
+    R.toPairs,
+    R.map((n) => ({
+      ...organizationsMap[n[0]],
+      organization_total_score: R.sum(
+        R.map((o) => o.inject_expectation_score, n[1]),
+      ),
+    })),
+  )(injectExpectations);
+  const sortedOrganizationsByTotalScore = R.pipe(
+    R.sortWith([R.descend(R.prop('organization_total_score'))]),
+    R.take(10),
+  )(organizationsTotalScores || []);
+  const totalScoreByOrganizationData = [
+    {
+      name: t('Total score'),
+      data: sortedOrganizationsByTotalScore.map((o) => ({
+        x: o.organization_name,
+        y: o.organization_total_score,
+      })),
+    },
+  ];
+  const usersTotalScores = R.pipe(
+    R.filter(
+      (n) => n.inject_expectation_result !== null
+        && n.inject_expectation_user !== null,
+    ),
+    R.groupBy(R.prop('inject_expectation_user')),
+    R.toPairs,
+    R.map((n) => ({
+      ...usersMap[n[0]],
+      user_total_score: R.sum(R.map((o) => o.inject_expectation_score, n[1])),
+    })),
+  )(injectExpectations);
+  const sortedUsersByTotalScore = R.pipe(
+    R.sortWith([R.descend(R.prop('user_total_score'))]),
+    R.take(10),
+  )(usersTotalScores || []);
+  const totalScoreByUserData = [
+    {
+      name: t('Total score'),
+      data: sortedUsersByTotalScore.map((u) => ({
+        x: resolveUserName(u),
+        y: u.user_total_score,
+      })),
+    },
+  ];
+
+  console.log(injects);
   return (
     <div className={classes.container}>
       <ResultsMenu exerciseId={exerciseId} />
@@ -307,7 +474,51 @@ const Dashboard = () => {
         {t('Exercise definition and scenario')}
       </Typography>
       <Grid container={true} spacing={3} style={{ marginTop: -10 }}>
-        <Grid item={true} xs={3}>
+        <Grid item={true} xs={6}>
+          <Typography variant="h4">
+            {t('Distribution of injects by type')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            {injectsByType.length > 0 ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={injectsByInjectTypeData}
+                type="bar"
+                width="100%"
+                height={50 + injectsByType.length * 50}
+              />
+            ) : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
+            )}
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={6}>
+          <Typography variant="h4">
+            {t('Distribution of injects by audience')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            {sortedAudiencesByInjectsNumber.length > 0 ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={injectsByAudienceData}
+                type="bar"
+                width="100%"
+                height={50 + sortedAudiencesByInjectsNumber.length * 50}
+              />
+            ) : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
+            )}
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={3} style={{ marginTop: 30 }}>
           <Typography variant="h4">
             {t('Distribution of expectations by inject type')}
           </Typography>
@@ -321,11 +532,15 @@ const Dashboard = () => {
                 height={50 + injectTypesWithScore.length * 50}
               />
             ) : (
-              <Empty message={t('Exercise has no started yet')} />
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
             )}
           </Paper>
         </Grid>
-        <Grid item={true} xs={3}>
+        <Grid item={true} xs={3} style={{ marginTop: 30 }}>
           <Typography variant="h4">
             {t('Distribution of expected total score by inject type')}
           </Typography>
@@ -339,24 +554,22 @@ const Dashboard = () => {
                 height={50 + injectTypesWithScore.length * 50}
               />
             ) : (
-              <Empty message={t('Exercise has not started yet')} />
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
             )}
           </Paper>
         </Grid>
-        <Grid item={true} xs={3}>
+        <Grid item={true} xs={3} style={{ marginTop: 30 }}>
           <Typography variant="h4">
             {t('Distribution of expectations by audience')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
             {sortedAudiencesByExpectation.length > 0 ? (
               <Chart
-                options={horizontalBarsChartOptions(
-                  theme,
-                  false,
-                  null,
-                  null,
-                  true,
-                )}
+                options={horizontalBarsChartOptions(theme)}
                 series={expectationsByAudienceData}
                 type="bar"
                 width="100%"
@@ -367,20 +580,14 @@ const Dashboard = () => {
             )}
           </Paper>
         </Grid>
-        <Grid item={true} xs={3}>
+        <Grid item={true} xs={3} style={{ marginTop: 30 }}>
           <Typography variant="h4">
             {t('Distribution of expected total score by audience')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
             {sortedAudiencesByExpectedScore.length > 0 ? (
               <Chart
-                options={horizontalBarsChartOptions(
-                  theme,
-                  false,
-                  null,
-                  null,
-                  true,
-                )}
+                options={horizontalBarsChartOptions(theme)}
                 series={expectedScoreByAudienceData}
                 type="bar"
                 width="100%"
@@ -392,6 +599,10 @@ const Dashboard = () => {
           </Paper>
         </Grid>
       </Grid>
+      <Typography variant="h1" style={{ marginTop: 60 }}>
+        {t('Exercise data')}
+      </Typography>
+      <Grid container={true} spacing={3} style={{ marginTop: -10 }}></Grid>
       <Typography variant="h1" style={{ marginTop: 60 }}>
         {t('Exercise results')}
       </Typography>
@@ -409,7 +620,7 @@ const Dashboard = () => {
                   nsdt,
                   null,
                   undefined,
-                  true,
+                  false,
                 )}
                 series={audiencesScores}
                 type="line"
@@ -417,7 +628,11 @@ const Dashboard = () => {
                 height={350}
               />
             ) : (
-              <Empty message={t('Exercise has not started yet')} />
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
             )}
           </Paper>
         </Grid>
@@ -434,7 +649,7 @@ const Dashboard = () => {
                   nsdt,
                   null,
                   undefined,
-                  true,
+                  false,
                 )}
                 series={injectsTypesScores}
                 type="line"
@@ -442,7 +657,105 @@ const Dashboard = () => {
                 height={350}
               />
             ) : (
-              <Empty message={t('Exercise has not started yet')} />
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
+            )}
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={3} style={{ marginTop: 30 }}>
+          <Typography variant="h4">
+            {t('Distribution of total score by audience')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            {audiencesTotalScores.length > 0 ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={totalScoreByAudienceData}
+                type="bar"
+                width="100%"
+                height={50 + audiencesTotalScores.length * 50}
+              />
+            ) : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
+            )}
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={3} style={{ marginTop: 30 }}>
+          <Typography variant="h4">
+            {t('Distribution of total score by organization')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            {organizationsTotalScores.length > 0 ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={totalScoreByOrganizationData}
+                type="bar"
+                width="100%"
+                height={50 + organizationsTotalScores.length * 50}
+              />
+            ) : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
+            )}
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={3} style={{ marginTop: 30 }}>
+          <Typography variant="h4">
+            {t('Distribution of total score by player')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            {usersTotalScores.length > 0 ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={totalScoreByUserData}
+                type="bar"
+                width="100%"
+                height={50 + usersTotalScores.length * 50}
+              />
+            ) : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
+            )}
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={3} style={{ marginTop: 30 }}>
+          <Typography variant="h4">
+            {t('Distribution of total score by inject')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            {injectsTotalScores.length > 0 ? (
+              <Chart
+                options={horizontalBarsChartOptions(
+                  theme,
+                  false,
+                  null,
+                  null,
+                  true,
+                )}
+                series={totalScoreByInjectData}
+                type="bar"
+                width="100%"
+                height={50 + injectsTotalScores.length * 50}
+              />
+            ) : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
             )}
           </Paper>
         </Grid>

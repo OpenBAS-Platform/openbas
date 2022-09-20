@@ -360,7 +360,7 @@ const Injects = () => {
                 classes={{ root: classes.item }}
                 divider={true}
                 button={true}
-                disabled={isDisabled}
+                disabled={!injectContract || isDisabled}
                 onClick={() => setSelectedInject(inject.inject_id)}
               >
                 <ListItemIcon style={{ paddingTop: 5 }}>
@@ -438,7 +438,7 @@ const Injects = () => {
                     injectTypesMap={injectTypesMap}
                     tagsMap={tagsMap}
                     setSelectedInject={setSelectedInject}
-                    isDisabled={isDisabled}
+                    isDisabled={!injectContract || isDisabled}
                   />
                 </ListItemSecondaryAction>
               </ListItem>

@@ -1,6 +1,6 @@
 import * as C from '@mui/material/colors';
 
-const colors = (temp) => [
+export const colors = (temp) => [
   C.red[temp],
   C.pink[temp],
   C.purple[temp],
@@ -20,6 +20,25 @@ const colors = (temp) => [
   C.brown[temp],
   C.grey[temp],
   C.blueGrey[temp],
+  C.red[temp + 100],
+  C.pink[temp + 100],
+  C.purple[temp + 100],
+  C.deepPurple[temp + 100],
+  C.indigo[temp + 100],
+  C.blue[temp + 100],
+  C.lightBlue[temp + 100],
+  C.cyan[temp + 100],
+  C.teal[temp + 100],
+  C.green[temp + 100],
+  C.lightGreen[temp + 100],
+  C.lime[temp + 100],
+  C.yellow[temp + 100],
+  C.amber[temp + 100],
+  C.orange[temp + 100],
+  C.deepOrange[temp + 100],
+  C.brown[temp + 100],
+  C.grey[temp + 100],
+  C.blueGrey[temp + 100],
 ];
 
 export const lineChartOptions = (

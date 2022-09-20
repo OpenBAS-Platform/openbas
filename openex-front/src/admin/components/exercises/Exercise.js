@@ -49,7 +49,7 @@ import useDataLoader from '../../../utils/ServerSideEvent';
 import { fetchAudiences } from '../../../actions/Audience';
 import Empty from '../../../components/Empty';
 import Countdown from '../../../components/Countdown';
-import { horizontalBarsChartOptions } from '../../../utils/Charts';
+import { colors, horizontalBarsChartOptions } from '../../../utils/Charts';
 import { usePermissions } from '../../../utils/Exercise';
 import { Transition } from '../../../utils/Environment';
 import ExerciseDatePopover from './ExerciseDatePopover';
@@ -198,6 +198,14 @@ const Exercise = () => {
       'exercise_mail_from',
     ]),
   )(exercise);
+  const mapIndexed = R.addIndex(R.map);
+  const audiencesColors = R.pipe(
+    mapIndexed((a, index) => [
+      a.audience_id,
+      colors(theme.palette.mode === 'dark' ? 400 : 600)[index],
+    ]),
+    R.fromPairs,
+  )(audiences);
   const topAudiences = R.pipe(
     R.sortWith([R.descend(R.prop('audience_injects_number'))]),
     R.take(6),
@@ -208,6 +216,7 @@ const Exercise = () => {
       data: topAudiences.map((a) => ({
         x: a.audience_name,
         y: a.audience_injects_number,
+        fillColor: audiencesColors[a.audience_id],
       })),
     },
   ];

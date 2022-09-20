@@ -195,12 +195,9 @@ export const storeHelper = (state) => ({
   getExerciseAudiences: (id) => entities('audiences', state).filter((i) => i.audience_exercise === id),
   getExerciseArticles: (id) => entities('articles', state).filter((i) => i.article_exercise === id),
   getExerciseInjects: (id) => entities('injects', state).filter((i) => i.inject_exercise === id),
-  getExerciseCommunications: (id) => {
-    const injectsIds = entities('injects', state)
-      .filter((i) => i.inject_exercise === id)
-      .map((i) => i.inject_id);
-    return entities('communications', state).filter((i) => injectsIds.includes(i.communication_inject));
-  },
+  getExerciseCommunications: (id) => entities('communications', state).filter(
+    (i) => i.communication_exercise === id,
+  ),
   getExerciseTechnicalInjectsPerType: (id) => {
     const typesWithNoAudiences = R.uniq(
       entities('inject_types', state)

@@ -446,7 +446,22 @@ const i18n = {
       'Exercise definition and scenario':
         "Définition de l'exercice et scénario",
       'Exercise results': "Résultats de l'exercice",
-      'Exercise has not started yet': "L'exercice n'a pas encore commencé",
+      'Exercise data': "Données de l'exercice",
+      'Distribution of total score by audience':
+        'Distribution du score total par audience',
+      'Distribution of total score by organization':
+        'Distribution du score total par organisation',
+      'Number of expectations': "Nombre d'attendus",
+      'Total expected score': 'Score total attendu',
+      'Distribution of total score by player':
+        'Distribution du score total par joueur',
+      'Distribution of total score by inject':
+        'Distribution du score total par stimuli',
+      'Distribution of injects by type': 'Distribution des stimulis par type',
+      'Distribution of injects by audience':
+        'Distribution des stimulis par audience',
+      'No data to display or the exercise has not started yet':
+        "Aucune donnée disponible ou l'exercice n'a pas encore commencé",
       'Back to administration': "Retour à l'administration",
       'Audiences scores over time': 'Score des audiences dans le temps',
       'Inject types scores over time':

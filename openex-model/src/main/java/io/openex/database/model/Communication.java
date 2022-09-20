@@ -189,6 +189,11 @@ public class Communication implements Base {
         this.to = to;
     }
 
+    @JsonProperty("communication_exercise")
+    public String getExercise() {
+        return this.inject.getExercise().getId();
+    }
+
     @JsonIgnore
     @Override
     public boolean isUserHasAccess(User user) {
