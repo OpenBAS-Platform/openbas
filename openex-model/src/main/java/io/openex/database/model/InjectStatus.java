@@ -96,6 +96,11 @@ public class InjectStatus implements Base {
         this.date = date;
     }
 
+    @SuppressWarnings("unused")
+    public Integer getExecutionTime() {
+        return executionTime;
+    }
+
     public void setExecutionTime(Integer executionTime) {
         this.executionTime = executionTime;
     }
