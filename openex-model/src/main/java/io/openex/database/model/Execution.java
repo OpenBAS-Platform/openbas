@@ -1,5 +1,6 @@
 package io.openex.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Instant;
@@ -36,6 +37,7 @@ public class Execution {
         this.stopTime = now();
     }
 
+    @JsonIgnore
     public boolean isSynchronous() {
         return asyncId == null;
     }
@@ -54,6 +56,10 @@ public class Execution {
             LOGGER.log(Level.SEVERE, context.getMessage(), context.getException());
         }
         this.traces.add(context);
+    }
+
+    public void setTraces(List<ExecutionTrace> traces) {
+        this.traces = traces;
     }
 
     @JsonProperty("execution_time")
