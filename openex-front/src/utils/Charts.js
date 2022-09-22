@@ -48,6 +48,7 @@ export const lineChartOptions = (
   yFormatter = null,
   tickAmount = undefined,
   distributed = false,
+  dataLabels = false,
 ) => ({
   chart: {
     type: 'line',
@@ -61,7 +62,7 @@ export const lineChartOptions = (
     mode: theme.palette.mode,
   },
   dataLabels: {
-    enabled: true,
+    enabled: dataLabels,
   },
   colors: distributed
     ? colors(theme.palette.mode === 'dark' ? 400 : 600)
@@ -87,6 +88,9 @@ export const lineChartOptions = (
       horizontal: 5,
       vertical: 20,
     },
+  },
+  stroke: {
+    curve: 'smooth',
   },
   tooltip: {
     theme: theme.palette.mode,

@@ -29,8 +29,8 @@ import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import { fetchExerciseInjectExpectations } from '../../../../actions/Exercise';
 import { fetchPlayers } from '../../../../actions/User';
 import { fetchOrganizations } from '../../../../actions/Organization';
-import { fetchExerciseCommunications } from '../../../../actions/Communication';
 import { resolveUserName } from '../../../../utils/String';
+import { fetchExerciseCommunications } from '../../../../actions/Communication';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -102,6 +102,7 @@ const Dashboard = () => {
     injectsMap,
     usersMap,
     organizationsMap,
+    organizations,
     communications,
   } = useHelper((helper) => {
     return {
@@ -109,13 +110,14 @@ const Dashboard = () => {
       audiences: helper.getExerciseAudiences(exerciseId),
       audiencesMap: helper.getAudiencesMap(),
       injects: helper.getExerciseInjects(exerciseId),
-      communications: helper.getExerciseCommunications(exerciseId),
       injectsMap: helper.getInjectsMap(),
       usersMap: helper.getUsersMap(),
+      organizations: helper.getOrganizations(),
       organizationsMap: helper.getOrganizationsMap(),
       injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
       challengesMap: helper.getChallengesMap(),
       injectTypesMap: helper.getInjectTypesMapByType(),
+      communications: helper.getExerciseCommunications(exerciseId),
     };
   });
   useDataLoader(() => {
@@ -136,8 +138,14 @@ const Dashboard = () => {
     ]),
     R.fromPairs,
   )(audiences);
+  const organizationsColors = R.pipe(
+    mapIndexed((o, index) => [
+      o.organization_id,
+      colors(theme.palette.mode === 'dark' ? 400 : 600)[index],
+    ]),
+    R.fromPairs,
+  )(organizations);
   const sortedAudiencesByInjectsNumber = R.pipe(
-    R.filter((n) => n.inject_sent_at !== null),
     R.sortWith([R.descend(R.prop('audience_injects_number'))]),
     R.take(10),
   )(audiences || []);
@@ -260,6 +268,117 @@ const Dashboard = () => {
     },
   ];
   let cumulation = 0;
+  const audiencesInjects = R.pipe(
+    R.map((n) => {
+      cumulation = 0;
+      return R.assoc(
+        'audience_injects',
+        R.pipe(
+          R.map((i) => injectsMap[i]),
+          R.filter((i) => i && i.inject_sent_at !== null),
+          R.sortWith([R.ascend(R.prop('inject_sent_at'))]),
+          R.map((i) => {
+            cumulation += 1;
+            return R.assoc('inject_cumulated_number', cumulation, i);
+          }),
+        )(n.audience_injects),
+        n,
+      );
+    }),
+    R.map((a) => ({
+      name: a.audience_name,
+      color: audiencesColors[a.audience_id],
+      data: a.audience_injects.map((i) => ({
+        x: i.inject_sent_at,
+        y: i.inject_cumulated_number,
+      })),
+    })),
+  )(audiences);
+  const audiencesCommunications = R.pipe(
+    R.map((n) => {
+      cumulation = 0;
+      return R.assoc(
+        'audience_communications',
+        R.pipe(
+          R.sortWith([R.ascend(R.prop('communication_received_at'))]),
+          R.map((i) => {
+            cumulation += 1;
+            return R.assoc('communication_cumulated_number', cumulation, i);
+          }),
+        )(n.audience_communications),
+        n,
+      );
+    }),
+    R.map((a) => ({
+      name: a.audience_name,
+      color: audiencesColors[a.audience_id],
+      data: a.audience_communications.map((c) => ({
+        x: c.communication_received_at,
+        y: c.communication_cumulated_number,
+      })),
+    })),
+  )(audiences);
+  const sortedAudiencesByCommunicationNumber = R.pipe(
+    R.map((a) => R.assoc(
+      'audience_communications_number',
+      a.audience_communications.length,
+      a,
+    )),
+    R.sortWith([R.descend(R.prop('audience_communications_number'))]),
+    R.take(10),
+  )(audiences || []);
+  const totalMailsByAudienceData = [
+    {
+      name: t('Total mails'),
+      data: sortedAudiencesByCommunicationNumber.map((a) => ({
+        x: a.audience_name,
+        y: a.audience_communications_number,
+        fillColor: audiencesColors[a.audience_id],
+      })),
+    },
+  ];
+  const sortedInjectsByCommunicationNumber = R.pipe(
+    R.sortWith([R.descend(R.prop('inject_communications_number'))]),
+    R.take(10),
+  )(injects || []);
+  const totalMailsByInjectData = [
+    {
+      name: t('Total mails'),
+      data: sortedInjectsByCommunicationNumber.map((i) => ({
+        x: i.inject_title,
+        y: i.inject_communications_number,
+      })),
+    },
+  ];
+  const communicationsUsers = R.uniq(
+    R.flatten(
+      R.map(
+        (n) => R.map((u) => usersMap[u], n.communication_users),
+        communications,
+      ),
+    ),
+  );
+  const sortedUsersByCommunicationNumber = R.pipe(
+    R.map((n) => R.assoc(
+      'user_communications_number',
+      R.filter(
+        (c) => n && R.includes(n.user_id, c.communication_users),
+        communications,
+      ).length,
+      n,
+    )),
+    R.sortWith([R.descend(R.prop('user_communications_number'))]),
+    R.take(10),
+  )(communicationsUsers);
+  const totalMailsByUserData = [
+    {
+      name: t('Total mails'),
+      data: sortedUsersByCommunicationNumber.map((u) => ({
+        x: resolveUserName(u),
+        y: u.user_communications_number,
+      })),
+    },
+  ];
   const audiencesScores = R.pipe(
     R.filter((n) => n.inject_expectation_result !== null),
     R.groupBy(R.prop('inject_expectation_audience')),
@@ -360,6 +479,7 @@ const Dashboard = () => {
       data: sortedAudiencesByTotalScore.map((a) => ({
         x: a.audience_name,
         y: a.audience_total_score,
+        fillColor: audiencesColors[a.audience_id],
       })),
     },
   ];
@@ -392,6 +512,7 @@ const Dashboard = () => {
       data: sortedOrganizationsByTotalScore.map((o) => ({
         x: o.organization_name,
         y: o.organization_total_score,
+        fillColor: organizationsColors[o.organization_id],
       })),
     },
   ];
@@ -420,8 +541,6 @@ const Dashboard = () => {
       })),
     },
   ];
-
-  console.log(injects);
   return (
     <div className={classes.container}>
       <ResultsMenu exerciseId={exerciseId} />
@@ -602,7 +721,128 @@ const Dashboard = () => {
       <Typography variant="h1" style={{ marginTop: 60 }}>
         {t('Exercise data')}
       </Typography>
-      <Grid container={true} spacing={3} style={{ marginTop: -10 }}></Grid>
+      <Grid container={true} spacing={3} style={{ marginTop: -10 }}>
+        <Grid item={true} xs={6}>
+          <Typography variant="h4">{t('Sent injects over time')}</Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            {audiencesInjects.length > 0 ? (
+              <Chart
+                options={lineChartOptions(
+                  theme,
+                  true,
+                  nsdt,
+                  null,
+                  undefined,
+                  false,
+                )}
+                series={audiencesInjects}
+                type="line"
+                width="100%"
+                height={350}
+              />
+            ) : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
+            )}
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={6}>
+          <Typography variant="h4">{t('Sent mails over time')}</Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            {audiencesCommunications.length > 0 ? (
+              <Chart
+                options={lineChartOptions(
+                  theme,
+                  true,
+                  nsdt,
+                  null,
+                  undefined,
+                  false,
+                )}
+                series={audiencesCommunications}
+                type="line"
+                width="100%"
+                height={350}
+              />
+            ) : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
+            )}
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+          <Typography variant="h4">
+            {t('Distribution of mails by audience')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            {audiences.length > 0 ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={totalMailsByAudienceData}
+                type="bar"
+                width="100%"
+                height={50 + audiences.length * 50}
+              />
+            ) : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
+            )}
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+          <Typography variant="h4">
+            {t('Distribution of mails by player')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            {communicationsUsers.length > 0 ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={totalMailsByUserData}
+                type="bar"
+                width="100%"
+                height={50 + communicationsUsers.length * 50}
+              />
+            ) : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
+            )}
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+          <Typography variant="h4">
+            {t('Distribution of mails by inject')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            {sortedInjectsByCommunicationNumber.length > 0 ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={totalMailsByInjectData}
+                type="bar"
+                width="100%"
+                height={50 + sortedInjectsByCommunicationNumber.length * 50}
+              />
+            ) : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
+            )}
+          </Paper>
+        </Grid>
+      </Grid>
       <Typography variant="h1" style={{ marginTop: 60 }}>
         {t('Exercise results')}
       </Typography>
@@ -621,6 +861,7 @@ const Dashboard = () => {
                   null,
                   undefined,
                   false,
+                  true,
                 )}
                 series={audiencesScores}
                 type="line"
@@ -650,6 +891,7 @@ const Dashboard = () => {
                   null,
                   undefined,
                   false,
+                  true,
                 )}
                 series={injectsTypesScores}
                 type="line"

@@ -460,6 +460,12 @@ const i18n = {
       'Distribution of injects by type': 'Distribution des stimulis par type',
       'Distribution of injects by audience':
         'Distribution des stimulis par audience',
+      'Distribution of mails by audience':
+        'Distribution des mails par audience',
+      'Distribution of mails by player': 'Distribution des mails par joueur',
+      'Distribution of mails by inject': 'Distribution des mails par stimuli',
+      'Sent injects over time': 'Stimulis envoyés dans le temps',
+      'Sent mails over time': 'Emails envoyés dans le temps',
       'No data to display or the exercise has not started yet':
         "Aucune donnée disponible ou l'exercice n'a pas encore commencé",
       'Back to administration': "Retour à l'administration",

@@ -194,6 +194,13 @@ public class Audience implements Base {
     public void setInjectExpectations(List<InjectExpectation> injectExpectations) {
         this.injectExpectations = injectExpectations;
     }
+    
+    @JsonProperty("audience_communications")
+    public List<Communication> getCommunications() {
+        return getInjects().stream().flatMap(inject -> inject.getCommunications().stream())
+                .distinct()
+                .toList();
+    }
 
     @Override
     public boolean equals(Object o) {
