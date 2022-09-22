@@ -16,11 +16,14 @@ public class Execution {
 
     private static final Logger LOGGER = Logger.getLogger(Execution.class.getName());
 
+    @JsonProperty("execution_start")
+    private Instant startTime;
+
     @JsonProperty("execution_stop")
     private Instant stopTime;
 
-    @JsonProperty("execution_start")
-    private Instant startTime;
+    @JsonProperty("execution_async_id")
+    private String asyncId;
 
     @JsonProperty("execution_traces")
     private List<ExecutionTrace> traces = new ArrayList<>();
@@ -31,6 +34,10 @@ public class Execution {
 
     public void stop() {
         this.stopTime = now();
+    }
+
+    public boolean isSynchronous() {
+        return asyncId == null;
     }
 
     public static Execution executionError(String identifier, String message) {
@@ -64,28 +71,20 @@ public class Execution {
         }
     }
 
-    public Instant getStopTime() {
-        return stopTime;
+    public String getAsyncId() {
+        return asyncId;
     }
 
-    public void setStopTime(Instant stopTime) {
-        this.stopTime = stopTime;
+    public void setAsyncId(String asyncId) {
+        this.asyncId = asyncId;
     }
 
     public Instant getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Instant startTime) {
-        this.startTime = startTime;
-    }
-
     public List<ExecutionTrace> getTraces() {
         return traces;
-    }
-
-    public void setTraces(List<ExecutionTrace> traces) {
-        this.traces = traces;
     }
 
     @Override

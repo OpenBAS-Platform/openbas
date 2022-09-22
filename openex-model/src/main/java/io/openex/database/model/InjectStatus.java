@@ -25,6 +25,10 @@ public class InjectStatus implements Base {
     @JsonProperty("status_name")
     private String name;
 
+    @Column(name = "status_async_id")
+    @JsonProperty("status_async_id")
+    private String asyncId;
+
     @Column(name = "status_reporting")
     @Convert(converter = ExecutionConverter.class)
     @JsonProperty("status_reporting")
@@ -46,10 +50,15 @@ public class InjectStatus implements Base {
     // region transient
     public static InjectStatus fromExecution(Execution execution, Inject inject) {
         InjectStatus injectStatus = new InjectStatus();
+        injectStatus.setAsyncId(execution.getAsyncId());
         injectStatus.setInject(inject);
         injectStatus.setDate(now());
-        injectStatus.setExecutionTime(execution.getExecutionTime());
-        injectStatus.setName(execution.getStatus().name());
+        if (execution.isSynchronous()) {
+            injectStatus.setExecutionTime(execution.getExecutionTime());
+            injectStatus.setName(execution.getStatus().name());
+        } else {
+            injectStatus.setName(ExecutionStatus.PENDING.name());
+        }
         injectStatus.setReporting(execution);
         return injectStatus;
     }
@@ -87,12 +96,16 @@ public class InjectStatus implements Base {
         this.date = date;
     }
 
-    public Integer getExecutionTime() {
-        return executionTime;
-    }
-
     public void setExecutionTime(Integer executionTime) {
         this.executionTime = executionTime;
+    }
+
+    public String getAsyncId() {
+        return asyncId;
+    }
+
+    public void setAsyncId(String asyncId) {
+        this.asyncId = asyncId;
     }
 
     public Inject getInject() {
