@@ -3,6 +3,7 @@ import * as R from 'ramda';
 import * as PropTypes from 'prop-types';
 import withStyles from '@mui/styles/withStyles';
 import Chip from '@mui/material/Chip';
+import CircularProgress from '@mui/material/CircularProgress';
 import inject18n from '../../../../components/i18n';
 
 const styles = () => ({
@@ -72,6 +73,13 @@ class InjectStatus extends Component {
             style={inlineStyles.red}
             label={t('Error')}
           />
+        );
+      case 'PENDING':
+        return (
+            <div>
+              <Chip classes={{ root: style }} style={inlineStyles.grey} label={t('Pending')}/>
+              <CircularProgress size={10} thickness={1}/>
+          </div>
         );
       default:
         return (

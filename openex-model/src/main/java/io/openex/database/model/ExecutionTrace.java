@@ -42,6 +42,10 @@ public class ExecutionTrace {
         this.exception = e;
     }
 
+    public static ExecutionTrace traceInfo(String identifier, String message) {
+        return new ExecutionTrace(ExecutionStatus.INFO, identifier, List.of(), message, null);
+    }
+
     public static ExecutionTrace traceSuccess(String identifier, String message) {
         return new ExecutionTrace(ExecutionStatus.SUCCESS, identifier, List.of(), message, null);
     }
@@ -56,14 +60,6 @@ public class ExecutionTrace {
 
     public static ExecutionTrace traceError(String identifier, String message) {
         return new ExecutionTrace(ExecutionStatus.ERROR, identifier, List.of(), message, null);
-    }
-
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
     }
 
     public ExecutionStatus getStatus() {
