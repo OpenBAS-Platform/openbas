@@ -1,9 +1,7 @@
 package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.helper.MonoIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -13,68 +11,39 @@ import java.util.Objects;
 import static java.time.Instant.now;
 
 @Entity
-@Table(name = "answers")
+@Table(name = "lessons_templates")
 @EntityListeners(ModelBaseListener.class)
-public class Answer implements Base {
+public class LessonsTemplate implements Base {
     @Id
-    @Column(name = "answer_id")
+    @Column(name = "lessons_template_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonProperty("objective_id")
+    @JsonProperty("lessons_template_id")
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "answer_poll")
-    @JsonSerialize(using = MonoIdDeserializer.class)
-    @JsonProperty("answer_poll")
-    private Poll poll;
-
-    @Column(name = "answer_content")
-    @JsonProperty("answer_content")
-    private String content;
-
-    @Column(name = "answer_evaluation")
-    @JsonProperty("answer_evaluation")
-    private Long evaluation;
-
-    @Column(name = "answer_created_at")
-    @JsonProperty("answer_created_at")
+    @Column(name = "lessons_template_created_at")
+    @JsonProperty("lessons_template_created_at")
     private Instant created = now();
 
-    @Column(name = "answer_updated_at")
-    @JsonProperty("answer_updated_at")
+    @Column(name = "lessons_template_updated_at")
+    @JsonProperty("lessons_template_updated_at")
     private Instant updated = now();
 
+    @Column(name = "lessons_template_name")
+    @JsonProperty("lessons_template_name")
+    private String name;
+
+    @Column(name = "lessons_template_description")
+    @JsonProperty("lessons_template_description")
+    private String description;
+
+    @Override
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public Poll getPoll() {
-        return poll;
-    }
-
-    public void setPoll(Poll poll) {
-        this.poll = poll;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Long getEvaluation() {
-        return evaluation;
-    }
-
-    public void setEvaluation(Long evaluation) {
-        this.evaluation = evaluation;
     }
 
     public Instant getCreated() {
@@ -93,9 +62,20 @@ public class Answer implements Base {
         this.updated = updated;
     }
 
-    @Override
-    public boolean isUserHasAccess(User user) {
-        return getPoll().isUserHasAccess(user);
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

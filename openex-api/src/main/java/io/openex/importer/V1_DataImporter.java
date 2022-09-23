@@ -34,7 +34,6 @@ public class V1_DataImporter implements Importer {
     private ExerciseRepository exerciseRepository;
     private AudienceRepository audienceRepository;
     private ObjectiveRepository objectiveRepository;
-    private PollRepository pollRepository;
     private InjectRepository injectRepository;
     private OrganizationRepository organizationRepository;
     private UserRepository userRepository;
@@ -63,11 +62,6 @@ public class V1_DataImporter implements Importer {
     @Autowired
     public void setDocumentService(FileService documentService) {
         this.documentService = documentService;
-    }
-
-    @Autowired
-    public void setPollRepository(PollRepository pollRepository) {
-        this.pollRepository = pollRepository;
     }
 
     @Autowired
@@ -358,17 +352,6 @@ public class V1_DataImporter implements Importer {
             objective.setExercise(exercise);
             Objective savedObjective = objectiveRepository.save(objective);
             baseIds.put(id, savedObjective);
-        });
-
-        // ------------ Handling polls
-        Iterator<JsonNode> exercisePolls = importNode.get("exercise_polls").elements();
-        exercisePolls.forEachRemaining(nodePoll -> {
-            String id = nodePoll.get("poll_id").textValue();
-            Poll poll = new Poll();
-            poll.setQuestion(nodePoll.get("poll_question").textValue());
-            poll.setExercise(exercise);
-            Poll savedPoll = pollRepository.save(poll);
-            baseIds.put(id, savedPoll);
         });
 
         // ------------ Handling injects

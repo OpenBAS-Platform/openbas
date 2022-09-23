@@ -121,10 +121,6 @@ public class Exercise implements Base {
     private List<Log> logs = new ArrayList<>();
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Poll> polls = new ArrayList<>();
-
-    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonProperty("exercise_pauses")
     @JsonSerialize(using = MultiIdDeserializer.class)
     private List<Pause> pauses = new ArrayList<>();
@@ -224,11 +220,6 @@ public class Exercise implements Base {
     @JsonProperty("exercise_logs_number")
     public long getLogsNumber() {
         return getLogs().size();
-    }
-
-    @JsonProperty("exercise_answers_number")
-    public long getAnswersNumber() {
-        return getPolls().stream().mapToLong(Poll::getAnswersNumber).sum();
     }
 
     @JsonProperty("exercise_communications_number")
@@ -423,14 +414,6 @@ public class Exercise implements Base {
 
     public void setLogs(List<Log> logs) {
         this.logs = logs;
-    }
-
-    public List<Poll> getPolls() {
-        return polls;
-    }
-
-    public void setPolls(List<Poll> polls) {
-        this.polls = polls;
     }
 
     public List<Document> getDocuments() {

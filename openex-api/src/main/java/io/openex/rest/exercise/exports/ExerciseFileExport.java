@@ -20,9 +20,6 @@ public class ExerciseFileExport {
     @JsonProperty("exercise_objectives")
     private List<Objective> objectives = new ArrayList<>();
 
-    @JsonProperty("exercise_polls")
-    private List<Poll> polls = new ArrayList<>();
-
     @JsonProperty("exercise_users")
     private List<User> users = new ArrayList<>();
 
@@ -92,14 +89,6 @@ public class ExerciseFileExport {
 
     public void setInjects(List<Inject> injects) {
         this.injects = injects;
-    }
-
-    public List<Poll> getPolls() {
-        return polls;
-    }
-
-    public void setPolls(List<Poll> polls) {
-        this.polls = polls;
     }
 
     public List<Tag> getTags() {
