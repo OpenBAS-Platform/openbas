@@ -474,10 +474,6 @@ public class ExerciseApi extends RestBehavior {
         List<Objective> objectives = exercise.getObjectives();
         importExport.setObjectives(objectives);
         objectMapper.addMixIn(Objective.class, ExerciseExportMixins.Objective.class);
-        // Polls
-        List<Poll> polls = exercise.getPolls();
-        importExport.setPolls(polls);
-        objectMapper.addMixIn(Poll.class, ExerciseExportMixins.Poll.class);
         // Audiences
         List<Audience> audiences = exercise.getAudiences();
         importExport.setAudiences(audiences);

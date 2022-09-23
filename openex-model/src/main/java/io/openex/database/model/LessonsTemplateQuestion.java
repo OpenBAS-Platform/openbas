@@ -4,58 +4,48 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
-import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import static java.time.Instant.now;
 
 @Entity
-@Table(name = "polls")
+@Table(name = "lessons_template_questions")
 @EntityListeners(ModelBaseListener.class)
-public class Poll implements Base {
+public class LessonsTemplateQuestion implements Base {
     @Id
-    @Column(name = "poll_id")
+    @Column(name = "lessons_template_question_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonProperty("poll_id")
+    @JsonProperty("lessons_template_question_id")
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "poll_exercise")
+    @JoinColumn(name = "lessons_template_question_category")
     @JsonSerialize(using = MonoIdDeserializer.class)
-    @JsonProperty("poll_exercise")
-    private Exercise exercise;
+    @JsonProperty("lessons_template_question_category")
+    private LessonsTemplateCategory category;
 
-    @Column(name = "poll_question")
-    @JsonProperty("poll_question")
-    private String question;
-
-    @Column(name = "poll_created_at")
-    @JsonProperty("poll_created_at")
+    @Column(name = "lessons_template_question_created_at")
+    @JsonProperty("lessons_template_question_created_at")
     private Instant created = now();
 
-    @Column(name = "poll_updated_at")
-    @JsonProperty("poll_updated_at")
+    @Column(name = "lessons_template_question_updated_at")
+    @JsonProperty("lessons_template_question_updated_at")
     private Instant updated = now();
 
-    @OneToMany(mappedBy = "poll", fetch = FetchType.LAZY)
-    @JsonSerialize(using = MultiIdDeserializer.class)
-    @JsonProperty("poll_answers")
-    private List<Answer> answers = new ArrayList<>();
+    @Column(name = "lessons_template_question_content")
+    @JsonProperty("lessons_template_question_content")
+    private String content;
 
-    // region transient
-    @JsonProperty("poll_answers_number")
-    public long getAnswersNumber() {
-        return getAnswers().size();
-    }
-    // endregion
+    @Column(name = "lessons_template_question_explanation")
+    @JsonProperty("lessons_template_question_explanation")
+    private String explanation;
 
+    @Override
     public String getId() {
         return id;
     }
@@ -64,20 +54,12 @@ public class Poll implements Base {
         this.id = id;
     }
 
-    public Exercise getExercise() {
-        return exercise;
+    public LessonsTemplateCategory getCategory() {
+        return category;
     }
 
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
-    }
-
-    public String getQuestion() {
-        return question;
-    }
-
-    public void setQuestion(String question) {
-        this.question = question;
+    public void setCategory(LessonsTemplateCategory category) {
+        this.category = category;
     }
 
     public Instant getCreated() {
@@ -96,17 +78,20 @@ public class Poll implements Base {
         this.updated = updated;
     }
 
-    public List<Answer> getAnswers() {
-        return answers;
+    public String getContent() {
+        return content;
     }
 
-    public void setAnswers(List<Answer> answers) {
-        this.answers = answers;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    @Override
-    public boolean isUserHasAccess(User user) {
-        return getExercise().isUserHasAccess(user);
+    public String getExplanation() {
+        return explanation;
+    }
+
+    public void setExplanation(String explanation) {
+        this.explanation = explanation;
     }
 
     @Override
