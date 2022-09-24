@@ -157,44 +157,44 @@ export const challengesReader = new schema.Entity(
 export const injectexpectation = new schema.Entity(
   'injectexpectations',
   {},
-  { idAttribute: 'inject_expectation_id' },
+  { idAttribute: 'injectexpectation_id' },
 );
 export const arrayOfInjectexpectations = new schema.Array(injectexpectation);
 
 export const lessonsTemplate = new schema.Entity(
-  'lessons_templates',
+  'lessonstemplates',
   {},
-  { idAttribute: 'lessons_template_id' },
+  { idAttribute: 'lessonstemplate_id' },
 );
 export const arrayOfLessonsTemplates = new schema.Array(lessonsTemplate);
 
 export const lessonsTemplateCategory = new schema.Entity(
-  'lessons_template_categories',
+  'lessonstemplatecategorys',
   {},
-  { idAttribute: 'lessons_template_category_id' },
+  { idAttribute: 'lessonstemplatecategory_id' },
 );
 export const arrayOfLessonsTemplateCategories = new schema.Array(
   lessonsTemplateCategory,
 );
 
 export const lessonsTemplateQuestion = new schema.Entity(
-  'lessons_template_questions',
+  'lessonstemplatequestions',
   {},
-  { idAttribute: 'lessons_template_question_id' },
+  { idAttribute: 'lessonstemplatequestion_id' },
 );
 export const arrayOfLessonsTemplateQuestions = new schema.Array(
   lessonsTemplateQuestion,
 );
 
 export const lessonsCategory = new schema.Entity(
-  'lessons_categories',
+  'lessonscategorys',
   {},
   { idAttribute: 'lessons_category_id' },
 );
 export const arrayOfLessonsCategories = new schema.Array(lessonsCategory);
 
 export const lessonsQuestion = new schema.Entity(
-  'lessons_questions',
+  'lessonsquestions',
   {},
   { idAttribute: 'lessons_question_id' },
 );
@@ -336,14 +336,15 @@ export const storeHelper = (state) => ({
   getExerciseChallenges: (id) => entities('challenges', state).filter((c) => c.challenge_exercises.includes(id)),
   getChallengesMap: () => maps('challenges', state),
   // lessons templates
-  getLessonsTemplate: (id) => entity(id, 'lessons_templates', state),
-  getLessonsTemplates: () => entities('lessons_templates', state),
-  getLessonsTemplatesMap: () => maps('lessons_templates', state),
-  getLessonsTemplateCategories: (id) => entities('lessons_template_categories', state).filter(
+  getLessonsTemplate: (id) => entity(id, 'lessonstemplates', state),
+  getLessonsTemplates: () => entities('lessonstemplates', state),
+  getLessonsTemplatesMap: () => maps('lessonstemplates', state),
+  getLessonsTemplateCategories: (id) => entities('lessonstemplatecategorys', state).filter(
     (c) => c.lessons_template_category_template === id,
   ),
-  getLessonsTemplateQuestionsMap: () => maps('lessons_template_questions', state),
-  getLessonsTemplateCategoryQuestions: (id) => entities('lessons_template_questions', state).filter(
+  getLessonsTemplateQuestions: () => entities('lessonstemplatequestions', state),
+  getLessonsTemplateQuestionsMap: () => maps('lessonstemplatequestions', state),
+  getLessonsTemplateCategoryQuestions: (id) => entities('lessonstemplatequestions', state).filter(
     (c) => c.lessons_template_question_category === id,
   ),
 });

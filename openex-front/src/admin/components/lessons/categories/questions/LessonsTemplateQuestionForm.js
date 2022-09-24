@@ -1,16 +1,19 @@
 import React from 'react';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
-import { TextField } from '../../../../components/TextField';
-import { useFormatter } from '../../../../components/i18n';
+import { TextField } from '../../../../../components/TextField';
+import { useFormatter } from '../../../../../components/i18n';
 
-const LessonsTemplateCategoryForm = (props) => {
+const LessonsTemplateQuestionForm = (props) => {
   const { t } = useFormatter();
   const { onSubmit, handleClose, initialValues, editing } = props;
   // Functions
   const validate = (values) => {
     const errors = {};
-    const requiredFields = ['lessons_template_category_name', 'lessons_template_category_order'];
+    const requiredFields = [
+      'lessons_template_question_content',
+      'lessons_template_question_order',
+    ];
     requiredFields.forEach((field) => {
       if (!values[field]) {
         errors[field] = t('This field is required.');
@@ -30,23 +33,23 @@ const LessonsTemplateCategoryForm = (props) => {
       validate={validate}
     >
       {({ handleSubmit, submitting, errors }) => (
-        <form id="lessonsTemplateCategoryForm" onSubmit={handleSubmit}>
+        <form id="lessonsTemplateQuestionForm" onSubmit={handleSubmit}>
           <TextField
             variant="standard"
-            name="lessons_template_category_name"
+            name="lessons_template_question_content"
             fullWidth={true}
-            label={t('Name')}
+            label={t('Content')}
           />
           <TextField
             variant="standard"
-            name="lessons_template_category_description"
+            name="lessons_template_question_explanation"
             fullWidth={true}
-            label={t('Description')}
+            label={t('Explanation')}
             style={{ marginTop: 20 }}
           />
           <TextField
             variant="standard"
-            name="lessons_template_category_order"
+            name="lessons_template_question_order"
             fullWidth={true}
             label={t('Order')}
             type="number"
@@ -74,4 +77,4 @@ const LessonsTemplateCategoryForm = (props) => {
   );
 };
 
-export default LessonsTemplateCategoryForm;
+export default LessonsTemplateQuestionForm;

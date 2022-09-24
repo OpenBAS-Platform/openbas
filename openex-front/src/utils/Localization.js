@@ -408,8 +408,17 @@ const i18n = {
       'Update the lessons learned category':
         "Modifier une catégorie de retour d'expérience",
       'Create a new media pressure': 'Créer une nouvelle pression médiatique',
+      'Create a new lessons learned question':
+        "Créer une nouvelle question de retour d'expérience",
       'Create a new lessons learned category':
         "Créer une catégorie de retour d'expérience",
+      'Do you want to delete this lessons learned question?':
+        "Souhaitez-vous supprimer cette question de retour d'expérience ?",
+      'Update the lessons learned question':
+        "Modifier la question de retour d'expérience",
+      'Objective achievement evaluation':
+        "Evaluation de l'atteinte de l'objectif",
+      Explanation: 'Explication',
       Category: 'Catégorie',
       'Create a new challenge': 'Créer un nouveau challenge',
       'Create a new lessons learned template':

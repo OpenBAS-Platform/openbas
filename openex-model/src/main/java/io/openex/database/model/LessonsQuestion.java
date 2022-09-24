@@ -23,7 +23,7 @@ public class LessonsQuestion implements Base {
     @Column(name = "lessons_question_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonProperty("lessons_question_id")
+    @JsonProperty("lessonsquestion_id")
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)

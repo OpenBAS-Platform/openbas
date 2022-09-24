@@ -13,6 +13,7 @@ import {
   FactCheckOutlined,
   MailOutlined,
   ForumOutlined,
+  NoteAltOutlined,
 } from '@mui/icons-material';
 import inject18n from '../../../components/i18n';
 
@@ -83,6 +84,20 @@ class AnimationMenu extends Component {
               <FactCheckOutlined />
             </ListItemIcon>
             <ListItemText primary={t('Validations')} />
+          </MenuItem>
+          <MenuItem
+            component={Link}
+            to={`/admin/exercises/${exerciseId}/animation/logs`}
+            selected={
+              location.pathname
+              === `/admin/exercises/${exerciseId}/animation/logs`
+            }
+            classes={{ root: classes.item }}
+          >
+            <ListItemIcon>
+              <NoteAltOutlined />
+            </ListItemIcon>
+            <ListItemText primary={t('Exercise logs')} />
           </MenuItem>
           <MenuItem
             component={Link}

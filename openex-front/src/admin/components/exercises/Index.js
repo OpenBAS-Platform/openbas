@@ -15,6 +15,7 @@ import Challenges from './challenges/Challenges';
 import Timeline from './timeline/Timeline';
 import Mails from './mails/Mails';
 import MailsInject from './mails/Inject';
+import Logs from './logs/Logs';
 import Chat from './chat/Chat';
 import Validations from './validations/Validations';
 import Dryrun from './controls/Dryrun';
@@ -106,6 +107,11 @@ const Index = () => {
             exact
             path="/admin/exercises/:exerciseId/animation/mails/:injectId"
             render={errorWrapper(MailsInject)}
+          />
+          <Route
+            exact
+            path="/admin/exercises/:exerciseId/animation/logs"
+            render={errorWrapper(Logs)}
           />
           <Route
             exact

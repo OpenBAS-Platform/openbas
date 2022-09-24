@@ -52,3 +52,35 @@ export const deleteLessonsTemplateCategory = (lessonsTemplateId, lessonsTemplate
     lessonsTemplateCategoryId,
   )(dispatch);
 };
+
+export const fetchLessonsTemplateQuestions = (lessonsTemplateId) => (dispatch) => {
+  const uri = `/api/lessons_templates/${lessonsTemplateId}/lessons_template_questions`;
+  return getReferential(
+    schema.arrayOfLessonsTemplateQuestions,
+    uri,
+  )(dispatch);
+};
+
+export const updateLessonsTemplateQuestion = (
+  lessonsTemplateId,
+  lessonsTemplateCategoryId,
+  lessonsTemplateQuestionId,
+  data,
+) => (dispatch) => {
+  const uri = `/api/lessons_templates/${lessonsTemplateId}/lessons_template_categories/${lessonsTemplateCategoryId}/lessons_template_questions/${lessonsTemplateQuestionId}`;
+  return putReferential(schema.lessonsTemplateQuestion, uri, data)(dispatch);
+};
+
+export const addLessonsTemplateQuestion = (lessonsTemplateId, lessonsTemplateCategoryId, data) => (dispatch) => {
+  const uri = `/api/lessons_templates/${lessonsTemplateId}/lessons_template_categories/${lessonsTemplateCategoryId}/lessons_template_questions`;
+  return postReferential(schema.lessonsTemplateQuestion, uri, data)(dispatch);
+};
+
+export const deleteLessonsTemplateQuestion = (lessonsTemplateId, lessonsTemplateCategoryId, lessonsTemplateQuestionId) => (dispatch) => {
+  const uri = `/api/lessons_templates/${lessonsTemplateId}/lessons_template_categories/${lessonsTemplateCategoryId}/lessons_template_questions/${lessonsTemplateQuestionId}`;
+  return delReferential(
+    uri,
+    'lessons_template_questions',
+    lessonsTemplateQuestionId,
+  )(dispatch);
+};

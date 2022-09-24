@@ -161,12 +161,12 @@ const LessonsTemplates = () => {
         {sortedLessonsTemplates.map((lessonsTemplate) => {
           return (
             <ListItem
-              key={lessonsTemplate.lessons_template_id}
+              key={lessonsTemplate.lessonstemplate_id}
               classes={{ root: classes.item }}
               divider={true}
               button={true}
               component={Link}
-              to={`/admin/lessons/${lessonsTemplate.lessons_template_id}`}
+              to={`/admin/lessons/${lessonsTemplate.lessonstemplate_id}`}
             >
               <ListItemIcon>
                 <SchoolOutlined color="primary" />

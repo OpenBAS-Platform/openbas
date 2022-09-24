@@ -170,7 +170,7 @@ const Validations = () => {
       .indexOf(keyword.toLowerCase()) !== -1;
   const sort = R.sortWith([R.descend(R.prop('inject_expectation_created_at'))]);
   const sortedInjectExpectations = R.pipe(
-    R.uniqBy(R.prop('inject_expectation_id')),
+    R.uniqBy(R.prop('injectexpectation_id')),
     R.map((n) => R.assoc(
       'inject_expectation_inject',
       injectsMap[n.inject_expectation_inject] || {},
@@ -180,7 +180,7 @@ const Validations = () => {
       ? !['openex_challenge', 'openex_media'].includes(
         n.inject_expectation_inject?.inject_type,
       )
-      : n.inject_expectation_id !== null)),
+      : n.injectexpectation_id !== null)),
     R.filter(
       (n) => tags.length === 0
         || R.any(
@@ -594,7 +594,7 @@ const Validations = () => {
                 expectation_score:
                   currentExpectation?.inject_expectation_expected_score,
               }}
-              onSubmit={(data) => submit(currentExpectation?.inject_expectation_id, data)
+              onSubmit={(data) => submit(currentExpectation?.injectexpectation_id, data)
               }
               validate={validate}
               mutators={{

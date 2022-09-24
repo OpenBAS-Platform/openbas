@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
+import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -23,7 +24,7 @@ public class LessonsTemplateCategory implements Base {
     @Column(name = "lessons_template_category_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonProperty("lessons_template_category_id")
+    @JsonProperty("lessonstemplatecategory_id")
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -52,8 +53,9 @@ public class LessonsTemplateCategory implements Base {
     @JsonProperty("lessons_template_category_order")
     private int order;
 
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-    @JsonIgnore
+    @OneToMany(mappedBy = "category", fetch = FetchType.EAGER)
+    @JsonProperty("lessons_template_category_questions")
+    @JsonSerialize(using = MultiIdDeserializer.class)
     private List<LessonsTemplateQuestion> questions = new ArrayList<>();
 
     @Override
