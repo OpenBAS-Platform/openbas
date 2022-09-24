@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
+import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -53,7 +54,8 @@ public class LessonsCategory implements Base {
     private int order;
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonProperty("lessons_category_questions")
+    @JsonSerialize(using = MultiIdDeserializer.class)
     private List<LessonsQuestion> questions = new ArrayList<>();
 
     @Override

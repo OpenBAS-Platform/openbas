@@ -32,11 +32,11 @@ export const entitiesInitializer = Immutable({
     challenges: Immutable({}),
     articles: Immutable({}),
     injectexpectations: Immutable({}),
-    lessons_templates: Immutable({}),
-    lessons_template_categories: Immutable({}),
-    lessons_template_questions: Immutable({}),
-    lessons_categories: Immutable({}),
-    lessons_questions: Immutable({}),
+    lessonstemplates: Immutable({}),
+    lessonstemplatecategorys: Immutable({}),
+    lessonstemplatequestions: Immutable({}),
+    lessonscategorys: Immutable({}),
+    lessonsquestions: Immutable({}),
   }),
 });
 

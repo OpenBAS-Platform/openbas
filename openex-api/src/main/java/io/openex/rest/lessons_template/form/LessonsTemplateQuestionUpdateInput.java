@@ -15,6 +15,9 @@ public class LessonsTemplateQuestionUpdateInput {
     @JsonProperty("lessons_template_question_explanation")
     private String explanation;
 
+    @JsonProperty("lessons_template_question_order")
+    private int order;
+
     public String getContent() {
         return content;
     }
@@ -29,5 +32,13 @@ public class LessonsTemplateQuestionUpdateInput {
 
     public void setExplanation(String explanation) {
         this.explanation = explanation;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
     }
 }
