@@ -23,8 +23,9 @@ import TopMenuOrganizations from './TopMenuOrganizations';
 import TopMenuDocuments from './TopMenuDocuments';
 import TopMenuMedias from '../medias/TopMenuMedias';
 import TopMenuIntegrations from './TopMenuIntegrations';
+import TopMenuChallenges from './TopMenuChallenges';
+import TopMenuLessons from './TopMenuLessons';
 import ImportUploader from '../exercises/ImportUploader';
-import TopMenuChallenges from '../challenges/TopMenuChallenges';
 import TopMenuMedia from './TopMenuMedia';
 
 const styles = (theme) => ({
@@ -125,6 +126,7 @@ class TopBar extends Component {
             {location.pathname.includes('/admin/challenges') && (
               <TopMenuChallenges />
             )}
+            {location.pathname.includes('/admin/lessons') && <TopMenuLessons />}
             {location.pathname.includes('/admin/integrations') && (
               <TopMenuIntegrations />
             )}

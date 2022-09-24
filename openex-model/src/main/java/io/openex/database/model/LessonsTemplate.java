@@ -1,11 +1,14 @@
 package io.openex.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.audit.ModelBaseListener;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static java.time.Instant.now;
@@ -36,6 +39,10 @@ public class LessonsTemplate implements Base {
     @Column(name = "lessons_template_description")
     @JsonProperty("lessons_template_description")
     private String description;
+
+    @OneToMany(mappedBy = "template", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<LessonsTemplateCategory> categories = new ArrayList<>();
 
     @Override
     public String getId() {
@@ -76,6 +83,14 @@ public class LessonsTemplate implements Base {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<LessonsTemplateCategory> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<LessonsTemplateCategory> categories) {
+        this.categories = categories;
     }
 
     @Override

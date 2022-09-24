@@ -31,6 +31,7 @@ public class V2_54__LessonsLearned extends BaseJavaMigration {
                     lessons_template_category_updated_at timestamp not null default now(),
                     lessons_template_category_name varchar(255) not null,
                     lessons_template_category_description text,
+                    lessons_template_category_order int not null,
                     lessons_template_category_template varchar(255) not null constraint fk_lessons_template_category_template references lessons_templates on delete cascade
                 );
                 CREATE INDEX idx_lessons_template_categories on lessons_template_categories (lessons_template_category_id);
@@ -41,6 +42,7 @@ public class V2_54__LessonsLearned extends BaseJavaMigration {
                     lessons_template_question_updated_at timestamp not null default now(),
                     lessons_template_question_content text not null,
                     lessons_template_question_explanation text,
+                    lessons_template_question_order int not null,
                     lessons_template_question_category varchar(255) not null constraint fk_lessons_template_question_category references lessons_template_categories on delete cascade
                 );
                 CREATE INDEX idx_lessons_template_questions on lessons_template_questions (lessons_template_question_id);
@@ -53,6 +55,7 @@ public class V2_54__LessonsLearned extends BaseJavaMigration {
                     lessons_category_updated_at timestamp not null default now(),
                     lessons_category_name varchar(255) not null,
                     lessons_category_description text,
+                    lessons_category_order int not null,
                     lessons_category_exercise varchar(255) not null constraint fk_lessons_category_exercise references exercises on delete cascade
                 );
                 CREATE INDEX idx_lessons_categories on lessons_categories (lessons_category_id);
@@ -63,6 +66,7 @@ public class V2_54__LessonsLearned extends BaseJavaMigration {
                     lessons_question_updated_at timestamp not null default now(),
                     lessons_question_content text not null,
                     lessons_question_explanation text,
+                    lessons_question_order int not null,
                     lessons_question_category varchar(255) not null constraint fk_lessons_question_category references lessons_categories on delete cascade
                 );
                 CREATE INDEX idx_lessons_questions on lessons_questions (lessons_question_id);

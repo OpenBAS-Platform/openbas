@@ -86,16 +86,6 @@ export const evaluation = new schema.Entity(
 );
 export const arrayOfEvaluations = new schema.Array(evaluation);
 
-export const poll = new schema.Entity('polls', {}, { idAttribute: 'poll_id' });
-export const arrayOfPolls = new schema.Array(poll);
-
-export const answer = new schema.Entity(
-  'answers',
-  {},
-  { idAttribute: 'answer_id' },
-);
-export const arrayOfAnswers = new schema.Array(answer);
-
 export const comcheck = new schema.Entity(
   'comchecks',
   {},
@@ -171,6 +161,45 @@ export const injectexpectation = new schema.Entity(
 );
 export const arrayOfInjectexpectations = new schema.Array(injectexpectation);
 
+export const lessonsTemplate = new schema.Entity(
+  'lessons_templates',
+  {},
+  { idAttribute: 'lessons_template_id' },
+);
+export const arrayOfLessonsTemplates = new schema.Array(lessonsTemplate);
+
+export const lessonsTemplateCategory = new schema.Entity(
+  'lessons_template_categories',
+  {},
+  { idAttribute: 'lessons_template_category_id' },
+);
+export const arrayOfLessonsTemplateCategories = new schema.Array(
+  lessonsTemplateCategory,
+);
+
+export const lessonsTemplateQuestion = new schema.Entity(
+  'lessons_template_questions',
+  {},
+  { idAttribute: 'lessons_template_question_id' },
+);
+export const arrayOfLessonsTemplateQuestions = new schema.Array(
+  lessonsTemplateQuestion,
+);
+
+export const lessonsCategory = new schema.Entity(
+  'lessons_categories',
+  {},
+  { idAttribute: 'lessons_category_id' },
+);
+export const arrayOfLessonsCategories = new schema.Array(lessonsCategory);
+
+export const lessonsQuestion = new schema.Entity(
+  'lessons_questions',
+  {},
+  { idAttribute: 'lessons_question_id' },
+);
+export const arrayOfLessonsQuestions = new schema.Array(lessonsQuestion);
+
 token.define({ token_user: user });
 user.define({ user_organization: organization });
 
@@ -219,7 +248,6 @@ export const storeHelper = (state) => ({
   },
   getExerciseObjectives: (id) => entities('objectives', state).filter((o) => o.objective_exercise === id),
   getExerciseLogs: (id) => entities('logs', state).filter((l) => l.log_exercise === id),
-  getExercisePolls: (id) => entities('polls', state).filter((o) => o.poll_exercise === id),
   // dryrun
   getDryrun: (id) => entity(id, 'dryruns', state),
   getDryrunInjects: (id) => entities('dryinjects', state).filter((i) => i.dryinject_dryrun === id),
@@ -307,6 +335,17 @@ export const storeHelper = (state) => ({
   getChallenges: () => entities('challenges', state),
   getExerciseChallenges: (id) => entities('challenges', state).filter((c) => c.challenge_exercises.includes(id)),
   getChallengesMap: () => maps('challenges', state),
+  // lessons templates
+  getLessonsTemplate: (id) => entity(id, 'lessons_templates', state),
+  getLessonsTemplates: () => entities('lessons_templates', state),
+  getLessonsTemplatesMap: () => maps('lessons_templates', state),
+  getLessonsTemplateCategories: (id) => entities('lessons_template_categories', state).filter(
+    (c) => c.lessons_template_category_template === id,
+  ),
+  getLessonsTemplateQuestionsMap: () => maps('lessons_template_questions', state),
+  getLessonsTemplateCategoryQuestions: (id) => entities('lessons_template_questions', state).filter(
+    (c) => c.lessons_template_question_category === id,
+  ),
 });
 
 export const tagsConverter = (tag_ids, tagsMap) => (tag_ids ?? [])
