@@ -781,13 +781,13 @@ const Dashboard = () => {
             {t('Distribution of mails by audience')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            {audiences.length > 0 ? (
+            {sortedAudiencesByCommunicationNumber.length > 0 ? (
               <Chart
                 options={horizontalBarsChartOptions(theme)}
                 series={totalMailsByAudienceData}
                 type="bar"
                 width="100%"
-                height={50 + audiences.length * 50}
+                height={50 + sortedAudiencesByCommunicationNumber.length * 50}
               />
             ) : (
               <Empty

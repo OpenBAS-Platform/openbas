@@ -410,6 +410,7 @@ const i18n = {
       'Create a new media pressure': 'Créer une nouvelle pression médiatique',
       'Create a new lessons learned question':
         "Créer une nouvelle question de retour d'expérience",
+      'Participative lessons learned': "Retour d'expérience participatif",
       'Create a new lessons learned category':
         "Créer une catégorie de retour d'expérience",
       'Do you want to delete this lessons learned question?':
@@ -418,6 +419,8 @@ const i18n = {
         "Modifier la question de retour d'expérience",
       'Objective achievement evaluation':
         "Evaluation de l'atteinte de l'objectif",
+      'Crisis intensity (injects by hour)':
+        'Intensité de la crise (stimulis par heure)',
       Explanation: 'Explication',
       Category: 'Catégorie',
       'Create a new challenge': 'Créer un nouveau challenge',
