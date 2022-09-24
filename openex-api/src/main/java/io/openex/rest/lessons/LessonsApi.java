@@ -57,23 +57,25 @@ public class LessonsApi extends RestBehavior {
     public Iterable<LessonsCategory> applyExerciseLessonsTemplate(@PathVariable String exerciseId, @PathVariable String lessonsTemplateId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         LessonsTemplate lessonsTemplate = lessonsTemplateRepository.findById(lessonsTemplateId).orElseThrow();
-        List<LessonsCategory> lessonsCategories = lessonsTemplate.getCategories().stream().map(lessonsTemplateCategory -> {
+        List<LessonsTemplateCategory> lessonsTemplateCategories = lessonsTemplate.getCategories().stream().toList();
+        for (LessonsTemplateCategory lessonsTemplateCategory : lessonsTemplateCategories) {
             LessonsCategory lessonsCategory = new LessonsCategory();
             lessonsCategory.setExercise(exercise);
             lessonsCategory.setName(lessonsTemplateCategory.getName());
             lessonsCategory.setDescription(lessonsTemplateCategory.getDescription());
+            lessonsCategory.setOrder(lessonsTemplateCategory.getOrder());
+            lessonsCategoryRepository.save(lessonsCategory);
             List<LessonsQuestion> lessonsQuestions = lessonsTemplateCategory.getQuestions().stream().map(lessonsTemplateQuestion -> {
-               LessonsQuestion lessonsQuestion = new LessonsQuestion();
-               lessonsQuestion.setCategory(lessonsCategory);
-               lessonsQuestion.setContent(lessonsTemplateQuestion.getContent());
-               lessonsQuestion.setExplanation(lessonsTemplateQuestion.getExplanation());
-               return lessonsQuestion;
+                LessonsQuestion lessonsQuestion = new LessonsQuestion();
+                lessonsQuestion.setCategory(lessonsCategory);
+                lessonsQuestion.setContent(lessonsTemplateQuestion.getContent());
+                lessonsQuestion.setExplanation(lessonsTemplateQuestion.getExplanation());
+                lessonsQuestion.setOrder(lessonsTemplateQuestion.getOrder());
+                return lessonsQuestion;
             }).toList();
-            lessonsCategory.setQuestions(lessonsQuestions);
-            return lessonsCategory;
-        }).toList();
-        lessonsCategoryRepository.saveAll(lessonsCategories);
-        return lessonsCategories;
+            lessonsQuestionRepository.saveAll(lessonsQuestions);
+        }
+        return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId));
     }
 
     @PostMapping("/api/exercises/{exerciseId}/lessons_categories")

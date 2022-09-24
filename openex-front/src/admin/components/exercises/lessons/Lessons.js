@@ -10,6 +10,7 @@ import {
   ContactMailOutlined,
   FlagOutlined,
   ContentPasteGoOutlined,
+  HelpOutlined,
 } from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
@@ -28,9 +29,9 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
 import Chart from 'react-apexcharts';
 import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
 import CreateObjective from './CreateObjective';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -47,8 +48,13 @@ import { areaChartOptions } from '../../../../utils/Charts';
 import CreateLessonsCategory from './categories/CreateLessonsCategory';
 import {
   applyLessonsTemplate,
+  fetchLessonsCategories,
+  fetchLessonsQuestions,
   fetchLessonsTemplates,
 } from '../../../../actions/Lessons';
+import CreateLessonsQuestion from './categories/questions/CreateLessonsQuestion';
+import LessonsQuestionPopover from './categories/questions/LessonsQuestionPopover';
+import LessonsCategoryPopover from './categories/LessonsCategoryPopover';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -83,6 +89,12 @@ const useStyles = makeStyles((theme) => ({
     overflow: 'hidden',
     height: '100%',
   },
+  paperPadding: {
+    position: 'relative',
+    padding: '20px 20px 0 20px',
+    overflow: 'hidden',
+    height: '100%',
+  },
   paperChart: {
     position: 'relative',
     padding: '0 20px 0 0',
@@ -109,24 +121,33 @@ const Lessons = () => {
   const { t, nsdt } = useFormatter();
   const [selectedObjective, setSelectedObjective] = useState(null);
   const [openApplyTemplate, setOpenApplyTemplate] = useState(false);
-  const [templateValue, setTemplateValue] = useState('female');
+  const [templateValue, setTemplateValue] = useState(null);
   const handleChange = (event) => {
     setTemplateValue(event.target.value);
   };
   // Fetching data
   const { exerciseId } = useParams();
-  const { exercise, objectives, injects, lessonsTemplates } = useHelper(
-    (helper) => {
-      return {
-        exercise: helper.getExercise(exerciseId),
-        objectives: helper.getExerciseObjectives(exerciseId),
-        injects: helper.getExerciseInjects(exerciseId),
-        lessonsTemplates: helper.getLessonsTemplates(),
-      };
-    },
-  );
+  const {
+    exercise,
+    objectives,
+    injects,
+    lessonsCategories,
+    lessonsQuestions,
+    lessonsTemplates,
+  } = useHelper((helper) => {
+    return {
+      exercise: helper.getExercise(exerciseId),
+      objectives: helper.getExerciseObjectives(exerciseId),
+      injects: helper.getExerciseInjects(exerciseId),
+      lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
+      lessonsQuestions: helper.getExerciseLessonsQuestions(exerciseId),
+      lessonsTemplates: helper.getLessonsTemplates(),
+    };
+  });
   useDataLoader(() => {
     dispatch(fetchLessonsTemplates());
+    dispatch(fetchLessonsCategories(exerciseId));
+    dispatch(fetchLessonsQuestions(exerciseId));
     dispatch(fetchObjectives(exerciseId));
     dispatch(fetchInjects(exerciseId));
   });
@@ -157,6 +178,13 @@ const Lessons = () => {
       data: injectsData,
     },
   ];
+  const sortCategories = R.sortWith([
+    R.ascend(R.prop('lessons_template_category_order')),
+  ]);
+  const sortQuestions = R.sortWith([
+    R.ascend(R.prop('lessons_template_question_order')),
+  ]);
+  const sortedCategories = sortCategories(lessonsCategories);
   return (
     <div className={classes.container}>
       <ResultsMenu exerciseId={exerciseId} />
@@ -205,7 +233,91 @@ const Lessons = () => {
         </Grid>
       </Grid>
       <br />
-      <Grid container={true} spacing={3} style={{ marginTop: -10 }}>
+      <Grid container={true} spacing={3}>
+        <Grid item={true} xs={4}>
+          <Typography variant="h4">{t('Details')}</Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
+            <Grid container={true} spacing={3}>
+              <Grid item={true} xs={6}>
+                <Typography variant="h3">{t('Start date')}</Typography>n hours
+              </Grid>
+              <Grid item={true} xs={6}>
+                <Typography variant="h3">{t('End date')}</Typography>n players
+              </Grid>
+              <Grid item={true} xs={6}>
+                <Typography variant="h3">{t('Duration')}</Typography>n hours
+              </Grid>
+              <Grid item={true} xs={6}>
+                <Typography variant="h3">{t('Audience')}</Typography>n players
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={4}>
+          <Typography variant="h4">{t('Parameters')}</Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
+            <Grid container={true} spacing={3}>
+              <Grid item={true} xs={6}>
+                <Typography variant="h3">
+                  {t('Anonymize questionnaire')}
+                </Typography>
+              </Grid>
+              <Grid item={true} xs={6}>
+                <Typography variant="h3">{t('Questionnaire mode')}</Typography>
+              </Grid>
+              <Grid item={true} xs={6}>
+                <Typography variant="h3">{t('Security')}</Typography>
+              </Grid>
+              <Grid item={true} xs={6}>
+                <Typography variant="h3">{t('Content')}</Typography>
+                <Button
+                  startIcon={<ContentPasteGoOutlined />}
+                  color="primary"
+                  variant="contained"
+                  onClick={() => setOpenApplyTemplate(true)}
+                >
+                  {t('Apply a template')}
+                </Button>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={4}>
+          <Typography variant="h4">{t('Control')}</Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
+            <Alert severity="info">
+              {t(
+                'Sending the questionnaire will send an email to each player with a unique to access and fill it.',
+              )}
+            </Alert>
+            <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
+              <Grid item={true} xs={6}>
+                <Typography variant="h3">{t('Campaign')}</Typography>
+                <Button
+                  startIcon={<ContentPasteGoOutlined />}
+                  color="success"
+                  variant="contained"
+                  onClick={() => setOpenApplyTemplate(true)}
+                >
+                  {t('Send the questionnaire')}
+                </Button>
+              </Grid>
+              <Grid item={true} xs={6}>
+                <Typography variant="h3">{t('Dangerous zone')}</Typography>
+                <Button
+                  startIcon={<ContentPasteGoOutlined />}
+                  color="error"
+                  variant="contained"
+                  onClick={() => setOpenApplyTemplate(true)}
+                >
+                  {t('Reset answers')}
+                </Button>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+      </Grid>
+      <Grid container={true} spacing={3} style={{ marginTop: 30 }}>
         <Grid item={true} xs={6}>
           <Typography variant="h4" style={{ float: 'left' }}>
             {t('Objectives')}
@@ -289,22 +401,83 @@ const Lessons = () => {
           </Paper>
         </Grid>
       </Grid>
-      <br />
       <div style={{ marginTop: 40 }}>
-        <Typography variant="h2" style={{ float: 'left' }}>
-          {t('Participative lessons learned')}
-        </Typography>
-        <div style={{ float: 'right', marginTop: -5 }}>
-          <Button
-            startIcon={<ContentPasteGoOutlined />}
-            color="secondary"
-            variant="outlined"
-            onClick={() => setOpenApplyTemplate(true)}
-          >
-            {t('Apply a template')}
-          </Button>
-        </div>
-        <div className="clearfix" />
+        {sortedCategories.map((category) => {
+          const questions = sortQuestions(
+            lessonsQuestions.filter(
+              (n) => n.lessons_question_category === category.lessonscategory_id,
+            ),
+          );
+          return (
+            <div style={{ marginTop: 70 }}>
+              <Typography variant="h2" style={{ float: 'left' }}>
+                {category.lessons_category_name}
+              </Typography>
+              <LessonsCategoryPopover
+                exerciseId={exerciseId}
+                lessonsCategory={category}
+              />
+              <div className="clearfix" />
+              <Grid
+                key={category.lessonscategory_id}
+                container={true}
+                spacing={3}
+              >
+                <Grid item={true} xs={4} style={{ marginTop: -10 }}>
+                  <Typography variant="h4">{t('Questions')}</Typography>
+                  <Paper variant="outlined" classes={{ root: classes.paper }}>
+                    <List style={{ padding: 0 }}>
+                      {questions.map((question) => (
+                        <ListItem
+                          key={question.lessonsquestion_id}
+                          divider={true}
+                        >
+                          <ListItemIcon>
+                            <HelpOutlined />
+                          </ListItemIcon>
+                          <ListItemText
+                            style={{ width: '50%' }}
+                            primary={question.lessons_question_content}
+                            secondary={
+                              question.lessons_question_explanation
+                              || t('No explanation')
+                            }
+                          />
+                          <ListItemSecondaryAction>
+                            <LessonsQuestionPopover
+                              exerciseId={exerciseId}
+                              lessonsCategoryId={category.lessonscategory_id}
+                              lessonsQuestion={question}
+                            />
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                      ))}
+                      <CreateLessonsQuestion
+                        inline={true}
+                        exerciseId={exerciseId}
+                        lessonsCategoryId={category.lessonscategory_id}
+                      />
+                    </List>
+                  </Paper>
+                </Grid>
+                <Grid item={true} xs={2} style={{ marginTop: -10 }}>
+                  <Typography variant="h4">
+                    {t('Targeted audiences')}
+                  </Typography>
+                  <Paper variant="outlined" classes={{ root: classes.paper }}>
+                    &nbsp;
+                  </Paper>
+                </Grid>
+                <Grid item={true} xs={6} style={{ marginTop: -10 }}>
+                  <Typography variant="h4">{t('Results')}</Typography>
+                  <Paper variant="outlined" classes={{ root: classes.paper }}>
+                    &nbsp;
+                  </Paper>
+                </Grid>
+              </Grid>
+            </div>
+          );
+        })}
       </div>
       <Dialog
         TransitionComponent={Transition}
@@ -334,11 +507,14 @@ const Lessons = () => {
       >
         <DialogTitle>{t('Apply a lessons learned template')}</DialogTitle>
         <DialogContent>
-          <FormControl>
-            <FormLabel id="controlled-radio-buttons-group">
-              {t('Lessons learned template to apply')}
-            </FormLabel>
+          <Alert severity="info">
+            {t(
+              'Applying a template will add all categories and questions of the selected template to this exercise.',
+            )}
+          </Alert>
+          <FormControl style={{ margin: '10px 0 0 5px', width: '100%' }}>
             <RadioGroup
+              style={{ width: '100%' }}
               aria-labelledby="controlled-radio-buttons-group"
               name="template"
               value={templateValue}
@@ -347,9 +523,27 @@ const Lessons = () => {
               {lessonsTemplates.map((template) => {
                 return (
                   <FormControlLabel
+                    style={{
+                      width: '100%',
+                      borderBottom: `1px solid ${theme.palette.background.paper}`,
+                    }}
                     value={template.lessonstemplate_id}
                     control={<Radio />}
-                    label={template.lessons_template_name}
+                    label={
+                      <div
+                        style={{
+                          margin: '15px 0 15px 10px',
+                        }}
+                      >
+                        <Typography variant="h4">
+                          {template.lessons_template_name}
+                        </Typography>
+                        <Typography variant="body2">
+                          {template.lessons_template_description
+                            || t('No description')}
+                        </Typography>
+                      </div>
+                    }
                   />
                 );
               })}
@@ -363,15 +557,13 @@ const Lessons = () => {
             >
               {t('Cancel')}
             </Button>
-            {isExerciseUpdatable(exercise, true) && (
-              <Button
-                color="secondary"
-                onClick={applyTemplate}
-                disabled={templateValue === null}
-              >
-                {t('Apply')}
-              </Button>
-            )}
+            <Button
+              color="secondary"
+              onClick={applyTemplate}
+              disabled={templateValue === null}
+            >
+              {t('Apply')}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

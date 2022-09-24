@@ -201,6 +201,9 @@ const i18n = {
         'Aucun stimuli à envoyer dans cette plateforme.',
       'Before starting the exercise, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.':
         "Avant de démarrer l'exercice, vous pouvez lancer une vérification pour valider les adresses emails et une simulation pour envoyer les stimulis à l'équipe d'animation.",
+      'Applying a template will add all categories and questions of the selected template to this exercise.':
+        'Appliquer un template va ajouter toutes les catégories et questions du template sélectionné à cet exercice.',
+      'Apply a template': 'Appliquer un template',
       'Auto assign': 'Auto assignation',
       'Auto observer': 'Auto observateur',
       'Auto planner': 'Auto planificateur',
@@ -410,7 +413,7 @@ const i18n = {
       'Create a new media pressure': 'Créer une nouvelle pression médiatique',
       'Create a new lessons learned question':
         "Créer une nouvelle question de retour d'expérience",
-      'Participative lessons learned': "Retour d'expérience participatif",
+      'Collaborative lessons learned': "Retour d'expérience collaboratif",
       'Create a new lessons learned category':
         "Créer une catégorie de retour d'expérience",
       'Do you want to delete this lessons learned question?':
@@ -421,6 +424,10 @@ const i18n = {
         "Evaluation de l'atteinte de l'objectif",
       'Crisis intensity (injects by hour)':
         'Intensité de la crise (stimulis par heure)',
+      'Apply a lessons learned template':
+        "Appliquer un template de retour d'expérience",
+      'No explanation': 'Aucune explication',
+      Apply: 'Appliquer',
       Explanation: 'Explication',
       Category: 'Catégorie',
       'Create a new challenge': 'Créer un nouveau challenge',

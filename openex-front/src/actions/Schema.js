@@ -189,14 +189,14 @@ export const arrayOfLessonsTemplateQuestions = new schema.Array(
 export const lessonsCategory = new schema.Entity(
   'lessonscategorys',
   {},
-  { idAttribute: 'lessons_category_id' },
+  { idAttribute: 'lessonscategory_id' },
 );
 export const arrayOfLessonsCategories = new schema.Array(lessonsCategory);
 
 export const lessonsQuestion = new schema.Entity(
   'lessonsquestions',
   {},
-  { idAttribute: 'lessons_question_id' },
+  { idAttribute: 'lessonsquestion_id' },
 );
 export const arrayOfLessonsQuestions = new schema.Array(lessonsQuestion);
 
@@ -248,6 +248,12 @@ export const storeHelper = (state) => ({
   },
   getExerciseObjectives: (id) => entities('objectives', state).filter((o) => o.objective_exercise === id),
   getExerciseLogs: (id) => entities('logs', state).filter((l) => l.log_exercise === id),
+  getExerciseLessonsCategories: (id) => entities('lessonscategorys', state).filter(
+    (l) => l.lessons_category_exercise === id,
+  ),
+  getExerciseLessonsQuestions: (id) => entities('lessonsquestions', state).filter(
+    (l) => l.lessons_question_exercise === id,
+  ),
   // dryrun
   getDryrun: (id) => entity(id, 'dryruns', state),
   getDryrunInjects: (id) => entities('dryinjects', state).filter((i) => i.dryinject_dryrun === id),

@@ -24,7 +24,7 @@ public class LessonsCategory implements Base {
     @Column(name = "lessons_category_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonProperty("lessons_category_id")
+    @JsonProperty("lessonscategory_id")
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)

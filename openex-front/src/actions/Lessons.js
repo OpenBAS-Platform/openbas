@@ -109,3 +109,23 @@ export const applyLessonsTemplate = (exerciseId, lessonsTemplateId) => (dispatch
   const uri = `/api/exercises/${exerciseId}/lessons_apply_template/${lessonsTemplateId}`;
   return postReferential(schema.arrayOfLessonsCategories, uri, {})(dispatch);
 };
+
+export const fetchLessonsQuestions = (exerciseId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/lessons_questions`;
+  return getReferential(schema.arrayOfLessonsQuestions, uri)(dispatch);
+};
+
+export const updateLessonsQuestion = (exerciseId, lessonsCategoryId, lessonsQuestionId, data) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}/lessons_questions/${lessonsQuestionId}`;
+  return putReferential(schema.lessonsQuestion, uri, data)(dispatch);
+};
+
+export const addLessonsQuestion = (exerciseId, lessonsCategoryId, data) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}/lessons_questions`;
+  return postReferential(schema.lessonsQuestion, uri, data)(dispatch);
+};
+
+export const deleteLessonsQuestion = (exerciseId, lessonsCategoryId, lessonsQuestionId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}/lessons_questions/${lessonsQuestionId}`;
+  return delReferential(uri, 'lessonsquestions', lessonsQuestionId)(dispatch);
+};

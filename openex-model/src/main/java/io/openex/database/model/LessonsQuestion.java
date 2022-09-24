@@ -1,5 +1,6 @@
 package io.openex.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
 
 @Entity
 @Table(name = "lessons_questions")
@@ -57,9 +59,16 @@ public class LessonsQuestion implements Base {
             joinColumns = @JoinColumn(name = "lessons_question_id"),
             inverseJoinColumns = @JoinColumn(name = "audience_id"))
     @JsonSerialize(using = MultiIdDeserializer.class)
-    @JsonProperty("lessons_questions_audiences")
+    @JsonProperty("lessons_question_audiences")
     private List<Audience> audiences = new ArrayList<>();
-    
+
+    // region transient
+    @JsonProperty("lessons_question_exercise")
+    public String getExercise() {
+        return getCategory().getExercise().getId();
+    }
+    // endregion
+
     @Override
     public String getId() {
         return id;
