@@ -48,7 +48,7 @@ export const deleteLessonsTemplateCategory = (lessonsTemplateId, lessonsTemplate
   const uri = `/api/lessons_templates/${lessonsTemplateId}/lessons_template_categories/${lessonsTemplateCategoryId}`;
   return delReferential(
     uri,
-    'lessons_template_categories',
+    'lessonstemplatecategorys',
     lessonsTemplateCategoryId,
   )(dispatch);
 };
@@ -80,7 +80,27 @@ export const deleteLessonsTemplateQuestion = (lessonsTemplateId, lessonsTemplate
   const uri = `/api/lessons_templates/${lessonsTemplateId}/lessons_template_categories/${lessonsTemplateCategoryId}/lessons_template_questions/${lessonsTemplateQuestionId}`;
   return delReferential(
     uri,
-    'lessons_template_questions',
+    'lessonstemplatequestions',
     lessonsTemplateQuestionId,
   )(dispatch);
+};
+
+export const fetchLessonsCategories = (exerciseId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/lessons_categories`;
+  return getReferential(schema.arrayOfLessonsCategories, uri)(dispatch);
+};
+
+export const updateLessonsCategory = (exerciseId, lessonsCategoryId, data) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}`;
+  return putReferential(schema.lessonsCategory, uri, data)(dispatch);
+};
+
+export const addLessonsCategory = (exerciseId, data) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/lessons_categories`;
+  return postReferential(schema.lessonsCategory, uri, data)(dispatch);
+};
+
+export const deleteLessonsCategory = (exerciseId, lessonsCategoryId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}`;
+  return delReferential(uri, 'lessonscategorys', lessonsCategoryId)(dispatch);
 };

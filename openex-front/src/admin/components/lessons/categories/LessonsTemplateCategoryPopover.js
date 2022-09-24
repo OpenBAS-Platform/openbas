@@ -60,7 +60,7 @@ const LessonsTemplateCategoryPopover = ({
     return dispatch(
       updateLessonsTemplateCategory(
         lessonsTemplateId,
-        lessonsTemplateCategory.lessons_template_category_id,
+        lessonsTemplateCategory.lessonstemplatecategory_id,
         data,
       ),
     ).then(() => handleCloseEdit());
@@ -75,7 +75,7 @@ const LessonsTemplateCategoryPopover = ({
     dispatch(
       deleteLessonsTemplateCategory(
         lessonsTemplateId,
-        lessonsTemplateCategory.lessons_template_category_id,
+        lessonsTemplateCategory.lessonstemplatecategory_id,
       ),
     ).then(() => handleCloseDelete());
   };

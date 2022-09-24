@@ -175,8 +175,6 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
       )}
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button
-          variant="contained"
-          color="secondary"
           onClick={handleClose}
           style={{ marginRight: isExerciseUpdatable(exercise, true) ? 10 : 0 }}
           disabled={submitting}
@@ -185,8 +183,7 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
         </Button>
         {isExerciseUpdatable(exercise, true) && (
           <Button
-            variant="contained"
-            color="primary"
+            color="secondary"
             onClick={submitEvaluation}
             disabled={submitting}
           >
