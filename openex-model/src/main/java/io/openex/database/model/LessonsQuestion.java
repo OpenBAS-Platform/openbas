@@ -48,6 +48,10 @@ public class LessonsQuestion implements Base {
     @JsonProperty("lessons_question_explanation")
     private String explanation;
 
+    @Column(name = "lessons_question_order")
+    @JsonProperty("lessons_question_order")
+    private int order;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "lessons_questions_audiences",
             joinColumns = @JoinColumn(name = "lessons_question_id"),
@@ -103,6 +107,14 @@ public class LessonsQuestion implements Base {
 
     public void setExplanation(String explanation) {
         this.explanation = explanation;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
     }
 
     public List<Audience> getAudiences() {

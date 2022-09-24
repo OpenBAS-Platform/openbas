@@ -1,5 +1,6 @@
 package io.openex.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
@@ -8,6 +9,8 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static java.time.Instant.now;
@@ -44,6 +47,14 @@ public class LessonsTemplateCategory implements Base {
     @Column(name = "lessons_template_category_description")
     @JsonProperty("lessons_template_category_description")
     private String description;
+
+    @Column(name = "lessons_template_category_order")
+    @JsonProperty("lessons_template_category_order")
+    private int order;
+
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<LessonsTemplateQuestion> questions = new ArrayList<>();
 
     @Override
     public String getId() {
@@ -92,6 +103,22 @@ public class LessonsTemplateCategory implements Base {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    public List<LessonsTemplateQuestion> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<LessonsTemplateQuestion> questions) {
+        this.questions = questions;
     }
 
     @Override

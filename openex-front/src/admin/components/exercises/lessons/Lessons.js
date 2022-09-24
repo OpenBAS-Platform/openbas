@@ -47,8 +47,6 @@ import ItemTags from '../../../../components/ItemTags';
 import LogForm from './LogForm';
 import { Transition } from '../../../../utils/Environment';
 import ObjectiveEvaluations from './ObjectiveEvaluations';
-import CreatePoll from './CreatePoll';
-import PollPopover from './PollPopover';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import ResultsMenu from '../ResultsMenu';
 
@@ -108,13 +106,12 @@ const Lessons = () => {
   const bottomRef = useRef(null);
   // Fetching data
   const { exerciseId } = useParams();
-  const { exercise, objectives, logs, polls, usersMap } = useHelper(
+  const { exercise, objectives, logs, usersMap } = useHelper(
     (helper) => {
       return {
         exercise: helper.getExercise(exerciseId),
         objectives: helper.getExerciseObjectives(exerciseId),
         logs: helper.getExerciseLogs(exerciseId),
-        polls: helper.getExercisePolls(exerciseId),
         usersMap: helper.getUsersMap(),
       };
     },
@@ -256,54 +253,6 @@ const Lessons = () => {
               </List>
             ) : (
               <Empty message={t('No objectives in this exercise.')} />
-            )}
-          </Paper>
-        </Grid>
-        <Grid item={true} xs={6}>
-          <Typography variant="h4" style={{ float: 'left' }}>
-            {t('Polls')}
-          </Typography>
-          {isExerciseUpdatable(exercise, true) && (
-            <CreatePoll exerciseId={exerciseId} />
-          )}
-          <div className="clearfix" />
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            {polls.length > 0 ? (
-              <List style={{ padding: 0 }}>
-                {polls.map((poll) => (
-                  <ListItem key={poll.poll_id} divider={true}>
-                    <ListItemIcon>
-                      <BallotOutlined />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={poll.poll_question}
-                      style={{ width: '60%' }}
-                    />
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        width: '20%',
-                        marginRight: 1,
-                      }}
-                    >
-                      <Box sx={{ width: '100%', mr: 1 }}>
-                        <LinearProgress variant="determinate" value={50} />
-                      </Box>
-                      <Box sx={{ minWidth: 35 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          50%
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <ListItemSecondaryAction>
-                      <PollPopover exerciseId={exerciseId} poll={poll} />
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-              </List>
-            ) : (
-              <Empty message={t('No polls in this exercise.')} />
             )}
           </Paper>
         </Grid>

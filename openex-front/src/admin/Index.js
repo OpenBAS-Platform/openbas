@@ -19,6 +19,8 @@ import IndexSettings from './components/settings/Index';
 import useDataLoader from '../utils/ServerSideEvent';
 import { useHelper } from '../store';
 import Challenges from './components/challenges/Challenges';
+import LessonsTemplates from './components/lessons/LessonsTemplates';
+import IndexLessonsTemplate from './components/lessons/Index';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
-    padding: '24px 24px 24px 204px',
+    padding: '24px 24px 24px 214px',
     minWidth: 0,
   },
   message: {
@@ -89,6 +91,15 @@ const Index = () => {
             exact
             path="/admin/challenges"
             render={errorWrapper(Challenges)}
+          />
+          <Route
+            exact
+            path="/admin/lessons"
+            render={errorWrapper(LessonsTemplates)}
+          />
+          <Route
+              path="/admin/lessons/:lessonsTemplateId"
+              render={errorWrapper(IndexLessonsTemplate)}
           />
           <Route
             exact

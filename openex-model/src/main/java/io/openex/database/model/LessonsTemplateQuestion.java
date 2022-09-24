@@ -45,6 +45,10 @@ public class LessonsTemplateQuestion implements Base {
     @JsonProperty("lessons_template_question_explanation")
     private String explanation;
 
+    @Column(name = "lessons_template_question_order")
+    @JsonProperty("lessons_template_question_order")
+    private int order;
+
     @Override
     public String getId() {
         return id;
@@ -92,6 +96,14 @@ public class LessonsTemplateQuestion implements Base {
 
     public void setExplanation(String explanation) {
         this.explanation = explanation;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
     }
 
     @Override

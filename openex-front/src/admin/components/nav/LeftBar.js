@@ -19,6 +19,7 @@ import {
   SettingsOutlined,
   DomainOutlined,
   EmojiEventsOutlined,
+  SchoolOutlined,
 } from '@mui/icons-material';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import { connect } from 'react-redux';
@@ -27,7 +28,7 @@ import inject18n from '../../../components/i18n';
 const styles = (theme) => ({
   drawerPaper: {
     minHeight: '100vh',
-    width: 180,
+    width: 190,
     background: 0,
     backgroundColor: theme.palette.background.nav,
   },
@@ -175,6 +176,21 @@ const LeftBar = ({ location, classes, userAdmin, t }) => (
         <ListItemText
           classes={{ primary: classes.menuItemText }}
           primary={t('Challenges')}
+        />
+      </MenuItem>
+      <MenuItem
+        component={Link}
+        to="/admin/lessons"
+        selected={location.pathname.includes('/admin/lessons')}
+        dense={true}
+        classes={{ root: classes.menuItem }}
+      >
+        <ListItemIcon style={{ minWidth: 30 }}>
+          <SchoolOutlined fontSize="small" color="primary" />
+        </ListItemIcon>
+        <ListItemText
+          classes={{ primary: classes.menuItemText }}
+          primary={t('Lessons learned')}
         />
       </MenuItem>
     </MenuList>

@@ -13,8 +13,6 @@ export const entitiesInitializer = Immutable({
     exercises: Immutable({}),
     objectives: Immutable({}),
     evaluations: Immutable({}),
-    polls: Immutable({}),
-    answers: Immutable({}),
     comchecks: Immutable({}),
     comcheckstatuses: Immutable({}),
     mediareaders: Immutable({}),
@@ -34,6 +32,11 @@ export const entitiesInitializer = Immutable({
     challenges: Immutable({}),
     articles: Immutable({}),
     injectexpectations: Immutable({}),
+    lessons_templates: Immutable({}),
+    lessons_template_categories: Immutable({}),
+    lessons_template_questions: Immutable({}),
+    lessons_categories: Immutable({}),
+    lessons_questions: Immutable({}),
   }),
 });
 

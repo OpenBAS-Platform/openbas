@@ -403,9 +403,21 @@ const i18n = {
         'Souhaitez-vous supprimer cette pression médiatique ?',
       'Do you want to delete this challenge?':
         'Souhaitez-vous supprimer ce challenge ?',
+      'Do you want to delete this lessons learned category?':
+        "Souhaitez-vous supprimer cette catégorie de retour d'expérience ?",
+      'Update the lessons learned category':
+        "Modifier une catégorie de retour d'expérience",
       'Create a new media pressure': 'Créer une nouvelle pression médiatique',
+      'Create a new lessons learned category':
+        "Créer une catégorie de retour d'expérience",
       Category: 'Catégorie',
       'Create a new challenge': 'Créer un nouveau challenge',
+      'Create a new lessons learned template':
+        "Créer un nouveau template de retour d'expérience",
+      'Update the lessons learned template':
+        "Modifier le template de retour d'expérience",
+      'Do you want to delete this lessons learned template?':
+        "Souhaitez-vous supprimer ce template de retour d'expérience ?",
       Media: 'Média',
       Author: 'Auteur',
       'Max number of attempts': "Nombre maximum d'essais",
