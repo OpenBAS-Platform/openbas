@@ -200,7 +200,7 @@ const i18n = {
       'No injects to send in this platform.':
         'Aucun stimuli à envoyer dans cette plateforme.',
       'Before starting the exercise, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.':
-        "Avant de démarrer l'exercice, vous pouvez lancer une vérification pour valider les adresses emails et une simulation pour envoyer les stimulis à l'équipe d'timeline.",
+        "Avant de démarrer l'exercice, vous pouvez lancer une vérification pour valider les adresses emails et une simulation pour envoyer les stimulis à l'équipe d'animation.",
       'Auto assign': 'Auto assignation',
       'Auto observer': 'Auto observateur',
       'Auto planner': 'Auto planificateur',

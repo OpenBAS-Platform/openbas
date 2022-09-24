@@ -9,6 +9,7 @@ import {
   BallotOutlined,
   ContactMailOutlined,
   FlagOutlined,
+  ContentPasteGoOutlined,
 } from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
@@ -23,7 +24,13 @@ import * as R from 'ramda';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import Chart from 'react-apexcharts';
+import Button from '@mui/material/Button';
 import CreateObjective from './CreateObjective';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -38,6 +45,10 @@ import ResultsMenu from '../ResultsMenu';
 import { fetchInjects } from '../../../../actions/Inject';
 import { areaChartOptions } from '../../../../utils/Charts';
 import CreateLessonsCategory from './categories/CreateLessonsCategory';
+import {
+  applyLessonsTemplate,
+  fetchLessonsTemplates,
+} from '../../../../actions/Lessons';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -97,19 +108,31 @@ const Lessons = () => {
   const theme = useTheme();
   const { t, nsdt } = useFormatter();
   const [selectedObjective, setSelectedObjective] = useState(null);
+  const [openApplyTemplate, setOpenApplyTemplate] = useState(false);
+  const [templateValue, setTemplateValue] = useState('female');
+  const handleChange = (event) => {
+    setTemplateValue(event.target.value);
+  };
   // Fetching data
   const { exerciseId } = useParams();
-  const { exercise, objectives, injects } = useHelper((helper) => {
-    return {
-      exercise: helper.getExercise(exerciseId),
-      objectives: helper.getExerciseObjectives(exerciseId),
-      injects: helper.getExerciseInjects(exerciseId),
-    };
-  });
+  const { exercise, objectives, injects, lessonsTemplates } = useHelper(
+    (helper) => {
+      return {
+        exercise: helper.getExercise(exerciseId),
+        objectives: helper.getExerciseObjectives(exerciseId),
+        injects: helper.getExerciseInjects(exerciseId),
+        lessonsTemplates: helper.getLessonsTemplates(),
+      };
+    },
+  );
   useDataLoader(() => {
+    dispatch(fetchLessonsTemplates());
     dispatch(fetchObjectives(exerciseId));
     dispatch(fetchInjects(exerciseId));
   });
+  const applyTemplate = () => {
+    return dispatch(applyLessonsTemplate(exerciseId, templateValue)).then(() => setOpenApplyTemplate(false));
+  };
   const sortedObjectives = R.sortWith(
     [R.ascend(R.prop('objective_priority'))],
     objectives,
@@ -271,7 +294,16 @@ const Lessons = () => {
         <Typography variant="h2" style={{ float: 'left' }}>
           {t('Participative lessons learned')}
         </Typography>
-        <CreateLessonsCategory exerciseId={exerciseId} />
+        <div style={{ float: 'right', marginTop: -5 }}>
+          <Button
+            startIcon={<ContentPasteGoOutlined />}
+            color="secondary"
+            variant="outlined"
+            onClick={() => setOpenApplyTemplate(true)}
+          >
+            {t('Apply a template')}
+          </Button>
+        </div>
         <div className="clearfix" />
       </div>
       <Dialog
@@ -291,6 +323,59 @@ const Lessons = () => {
           />
         </DialogContent>
       </Dialog>
+      <Dialog
+        TransitionComponent={Transition}
+        keepMounted={false}
+        open={openApplyTemplate}
+        onClose={() => setOpenApplyTemplate(false)}
+        fullWidth={true}
+        maxWidth="md"
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogTitle>{t('Apply a lessons learned template')}</DialogTitle>
+        <DialogContent>
+          <FormControl>
+            <FormLabel id="controlled-radio-buttons-group">
+              {t('Lessons learned template to apply')}
+            </FormLabel>
+            <RadioGroup
+              aria-labelledby="controlled-radio-buttons-group"
+              name="template"
+              value={templateValue}
+              onChange={handleChange}
+            >
+              {lessonsTemplates.map((template) => {
+                return (
+                  <FormControlLabel
+                    value={template.lessonstemplate_id}
+                    control={<Radio />}
+                    label={template.lessons_template_name}
+                  />
+                );
+              })}
+            </RadioGroup>
+          </FormControl>
+          <div className="clearfix" />
+          <div style={{ float: 'right', marginTop: 20 }}>
+            <Button
+              onClick={() => setOpenApplyTemplate(false)}
+              style={{ marginRight: 10 }}
+            >
+              {t('Cancel')}
+            </Button>
+            {isExerciseUpdatable(exercise, true) && (
+              <Button
+                color="secondary"
+                onClick={applyTemplate}
+                disabled={templateValue === null}
+              >
+                {t('Apply')}
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+      <CreateLessonsCategory exerciseId={exerciseId} />
     </div>
   );
 };
