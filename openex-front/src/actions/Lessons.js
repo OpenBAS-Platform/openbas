@@ -104,3 +104,8 @@ export const deleteLessonsCategory = (exerciseId, lessonsCategoryId) => (dispatc
   const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}`;
   return delReferential(uri, 'lessonscategorys', lessonsCategoryId)(dispatch);
 };
+
+export const applyLessonsTemplate = (exerciseId, lessonsTemplateId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/lessons_apply_template/${lessonsTemplateId}`;
+  return postReferential(schema.arrayOfLessonsCategories, uri, {})(dispatch);
+};
