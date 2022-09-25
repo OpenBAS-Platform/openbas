@@ -12,10 +12,7 @@ import io.openex.rest.exercise.exports.ExerciseExportMixins;
 import io.openex.rest.exercise.exports.ExerciseFileExport;
 import io.openex.rest.exercise.form.*;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.service.DryrunService;
-import io.openex.service.FileService;
-import io.openex.service.ImportService;
-import io.openex.service.InjectService;
+import io.openex.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
@@ -382,6 +379,8 @@ public class ExerciseApi extends RestBehavior {
             // Reset injects outcome, communications and expectations
             injectRepository.saveAll(injectRepository.findAllForExercise(exerciseId)
                     .stream().peek(Inject::clean).toList());
+            // Delete exercise transient files (communications, ...)
+            fileService.deleteDirectory(exerciseId);
         }
         // In case of manual start
         if (SCHEDULED.equals(exercise.getStatus()) && RUNNING.equals(status)) {
@@ -426,6 +425,16 @@ public class ExerciseApi extends RestBehavior {
         exercise.getInjects().forEach(injectDoc -> communications.addAll(injectDoc.getCommunications()));
         return communications;
     }
+
+    @GetMapping("/api/communications/attachment")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
+    public void downloadAttachment(@RequestParam String file, HttpServletResponse response) throws IOException {
+        FileContainer fileContainer = fileService.getFileContainer(file).orElseThrow();
+        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileContainer.getName());
+        response.addHeader(HttpHeaders.CONTENT_TYPE, fileContainer.getContentType());
+        response.setStatus(HttpServletResponse.SC_OK);
+        fileContainer.getInputStream().transferTo(response.getOutputStream());
+    }
     // endregion
 
     // region expectation
@@ -435,6 +444,7 @@ public class ExerciseApi extends RestBehavior {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         return injectExpectationRepository.findAllForExercise(exercise.getId()).stream().toList();
     }
+
     @PutMapping("/api/exercises/{exerciseId}/expectations/{expectationId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public InjectExpectation updateInjectExpectation(@PathVariable String exerciseId, @PathVariable String expectationId, @Valid @RequestBody ExpectationUpdateInput input) {

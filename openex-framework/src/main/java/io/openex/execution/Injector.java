@@ -7,7 +7,7 @@ import io.openex.database.model.*;
 import io.openex.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openex.database.repository.DocumentRepository;
 import io.openex.database.repository.InjectExpectationRepository;
-import io.openex.model.*;
+import io.openex.model.Expectation;
 import io.openex.model.expectation.ChallengeExpectation;
 import io.openex.model.expectation.MediaExpectation;
 import io.openex.service.FileService;
@@ -69,11 +69,11 @@ public abstract class Injector {
     }
 
     private Execution execute(ExecutableInject executableInject) {
-        Execution execution = new Execution();
+        Execution execution = new Execution(executableInject.isRuntime());
         try {
             // Inject contract must exist
             Contract contract = executableInject.getContract();
-            boolean isScheduledInject = !executableInject.isTestingInject();
+            boolean isScheduledInject = !executableInject.isDirect();
             // Inject contract must be exposed
             if (!contract.getConfig().isExpose()) {
                 throw new UnsupportedOperationException("Inject is not activated for execution");
@@ -105,11 +105,7 @@ public abstract class Injector {
         return execution;
     }
 
-    public Execution executeInRange(ExecutableInject executableInject) {
-        return execute(executableInject);
-    }
-
-    public Execution executeDirectly(ExecutableInject executableInject) {
+    public Execution executeInjection(ExecutableInject executableInject) {
         return execute(executableInject);
     }
 
@@ -127,9 +123,20 @@ public abstract class Injector {
         return mapper.treeToValue(content, converter);
     }
 
-    public List<DataAttachment> resolveAttachments(Execution execution, List<Document> documents) {
+    public List<DataAttachment> resolveAttachments(Execution execution, ExecutableInject injection, List<Document> documents) {
         List<DataAttachment> resolved = new ArrayList<>();
-        for (Document attachment : documents) {
+        // Add attachments from direct configuration
+        injection.getDirectAttachments().forEach(doc -> {
+            try {
+                byte[] content = IOUtils.toByteArray(doc.getInputStream());
+                resolved.add(new DataAttachment(doc.getName(), doc.getOriginalFilename(), content, doc.getContentType()));
+            } catch (Exception e) {
+                String message = "Error getting direct attachment " + doc.getName();
+                execution.addTrace(traceError(getClass().getSimpleName(), message, e));
+            }
+        });
+        // Add attachments from configuration
+        documents.forEach(attachment -> {
             String documentId = attachment.getId();
             Optional<Document> askedDocument = documentRepository.findById(documentId);
             try {
@@ -140,10 +147,10 @@ public abstract class Injector {
             } catch (Exception e) {
                 // Can't fetch the attachments, ignore
                 String docInfo = askedDocument.map(Document::getName).orElse(documentId);
-                String message = "Error getting document " + docInfo;
+                String message = "Error getting doc attachment " + docInfo;
                 execution.addTrace(traceError(getClass().getSimpleName(), message, e));
             }
-        }
+        });
         return resolved;
     }
     // endregion

@@ -4,6 +4,7 @@ import Button from '@mui/material/Button';
 import { useFormatter } from '../../../../components/i18n';
 import { TextField } from '../../../../components/TextField';
 import { EnrichedTextField } from '../../../../components/EnrichedTextField';
+import FileField from '../../../../components/FileField';
 
 const CommunicationForm = ({ onSubmit, handleClose, initialValues }) => {
   const { t } = useFormatter();
@@ -46,19 +47,17 @@ const CommunicationForm = ({ onSubmit, handleClose, initialValues }) => {
             fullWidth={true}
             style={{ marginTop: 20, height: 250 }}
           />
+          <FileField
+              variant="standard"
+              type="file"
+              name="communication_file"
+              label={t('File')}
+          />
           <div style={{ float: 'right', marginTop: 20 }}>
-            <Button
-              onClick={handleClose}
-              style={{ marginRight: 10 }}
-              disabled={submitting}
-            >
+            <Button onClick={handleClose} style={{ marginRight: 10 }} disabled={submitting}>
               {t('Cancel')}
             </Button>
-            <Button
-              color="secondary"
-              type="submit"
-              disabled={pristine || submitting}
-            >
+            <Button color="secondary" type="submit" disabled={pristine || submitting}>
               {t('Send')}
             </Button>
           </div>

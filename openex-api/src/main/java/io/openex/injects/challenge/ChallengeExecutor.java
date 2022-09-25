@@ -65,7 +65,6 @@ public class ChallengeExecutor extends Injector {
     @Override
     public List<Expectation> process(Execution execution, ExecutableInject injection, Contract contract) {
         try {
-            boolean storeInImap = !injection.isTestingInject();
             ChallengeContent content = contentConvert(injection, ChallengeContent.class);
             List<Challenge> challenges = fromIterable(challengeRepository.findAllById(content.getChallenges()));
             if (contract.getId().equals(CHALLENGE_PUBLISH)) {
@@ -79,7 +78,7 @@ public class ChallengeExecutor extends Injector {
                 List<ExecutionContext> users = injection.getUsers();
                 List<Document> documents = injection.getInject().getDocuments().stream()
                         .filter(InjectDocument::isAttached).map(InjectDocument::getDocument).toList();
-                List<DataAttachment> attachments = resolveAttachments(execution, documents);
+                List<DataAttachment> attachments = resolveAttachments(execution, injection, documents);
                 String message = content.buildMessage(injection.getInject(), imapEnabled);
                 boolean encrypted = content.isEncrypted();
                 users.stream().parallel().forEach(userInjectContext -> {
@@ -92,7 +91,7 @@ public class ChallengeExecutor extends Injector {
                         userInjectContext.put("challenges", challengeVariables);
                         // Send the email.
                         emailService.sendEmail(execution, userInjectContext, replyTo, content.getInReplyTo(), encrypted,
-                                content.getSubject(), message, attachments, storeInImap);
+                                content.getSubject(), message, attachments);
                     } catch (Exception e) {
                         execution.addTrace(traceError("email", e.getMessage(), e));
                     }

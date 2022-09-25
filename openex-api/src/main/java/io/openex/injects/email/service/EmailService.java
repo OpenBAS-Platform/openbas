@@ -51,7 +51,7 @@ public class EmailService {
     }
 
     private void storeMessageImap(Execution execution, MimeMessage mimeMessage) {
-        if (imapEnabled) {
+        if (execution.isRuntime() && imapEnabled) {
             for (int i = 0; i < 3; i++) {
                 try {
                     imapService.storeSentMessage(mimeMessage);
@@ -91,7 +91,7 @@ public class EmailService {
     }
 
     public void sendEmail(Execution execution, List<ExecutionContext> usersContext, String from, String inReplyTo,
-                          String subject, String message, List<DataAttachment> attachments, boolean storeInImap) throws Exception {
+                          String subject, String message, List<DataAttachment> attachments) throws Exception {
         MimeMessage mimeMessage = buildMimeMessage(from, inReplyTo, subject, message, attachments);
         List<InternetAddress> recipients = new ArrayList<>();
         for (ExecutionContext userContext : usersContext) {
@@ -103,13 +103,11 @@ public class EmailService {
         List<String> userIds = usersContext.stream().map(c -> c.getUser().getId()).toList();
         execution.addTrace(traceSuccess("email", "Mail sent to " + emails, userIds));
         // Store message in Imap after sending
-        if (storeInImap) {
-            storeMessageImap(execution, mimeMessage);
-        }
+        storeMessageImap(execution, mimeMessage);
     }
 
     public void sendEmail(Execution execution, ExecutionContext userContext, String from, String inReplyTo,
-                          boolean mustBeEncrypted, String subject, String message, List<DataAttachment> attachments, boolean storeInImap) throws Exception {
+                          boolean mustBeEncrypted, String subject, String message, List<DataAttachment> attachments) throws Exception {
         String email = userContext.getUser().getEmail();
         String contextualSubject = buildContextualContent(subject, userContext);
         String contextualBody = buildContextualContent(message, userContext);
@@ -148,8 +146,6 @@ public class EmailService {
         List<String> userIds = List.of(userContext.getUser().getId());
         execution.addTrace(traceSuccess("email", "Mail sent to " + email, userIds));
         // Store message in Imap after sending
-        if (storeInImap) {
-            storeMessageImap(execution, mimeMessage);
-        }
+        storeMessageImap(execution, mimeMessage);
     }
 }

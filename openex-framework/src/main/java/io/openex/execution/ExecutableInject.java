@@ -4,7 +4,9 @@ import io.openex.contract.Contract;
 import io.openex.database.model.Audience;
 import io.openex.database.model.Inject;
 import io.openex.database.model.Injection;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExecutableInject {
@@ -13,24 +15,22 @@ public class ExecutableInject {
     private final Injection source;
     private final List<ExecutionContext> users;
     private final List<Audience> audiences;
-    private final boolean testingInject;
+    private final boolean runtime;
+    private final boolean direct;
+    private List<MultipartFile> directAttachments = new ArrayList<>();
 
-    public ExecutableInject(boolean testing, Inject inject, Contract contract, List<Audience> audiences, List<ExecutionContext> users) {
-        this.testingInject = testing;
-        this.source = inject;
+    public ExecutableInject(boolean runtime, boolean direct, Injection source, Inject inject, Contract contract, List<Audience> audiences, List<ExecutionContext> users) {
+        this.runtime = runtime;
+        this.direct = direct;
+        this.source = source;
         this.inject = inject;
         this.contract = contract;
         this.users = users;
         this.audiences = audiences;
     }
 
-    public ExecutableInject(boolean testing, Injection source, Inject inject, Contract contract, List<Audience> audiences, List<ExecutionContext> users) {
-        this.testingInject = testing;
-        this.source = source;
-        this.inject = inject;
-        this.contract = contract;
-        this.users = users;
-        this.audiences = audiences;
+    public ExecutableInject(boolean runtime, boolean direct, Inject inject, Contract contract, List<Audience> audiences, List<ExecutionContext> users) {
+        this(runtime, direct, inject, inject, contract, audiences, users);
     }
 
     public Inject getInject() {
@@ -53,7 +53,23 @@ public class ExecutableInject {
         return users;
     }
 
-    public boolean isTestingInject() {
-        return testingInject;
+    public boolean isDirect() {
+        return direct;
+    }
+
+    public List<MultipartFile> getDirectAttachments() {
+        return directAttachments;
+    }
+
+    public void setDirectAttachments(List<MultipartFile> directAttachments) {
+        this.directAttachments = directAttachments;
+    }
+
+    public void addDirectAttachment(MultipartFile file) {
+        this.directAttachments.add(file);
+    }
+
+    public boolean isRuntime() {
+        return runtime;
     }
 }

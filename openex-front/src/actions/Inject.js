@@ -61,9 +61,13 @@ export const tryInject = (injectId) => (dispatch) => {
   return getReferential(null, uri, null)(dispatch);
 };
 
-export const executeInject = (exerciseId, data) => (dispatch) => {
+export const executeInject = (exerciseId, values, files) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/inject`;
-  return postReferential(schema.injectStatus, uri, data)(dispatch);
+  const formData = new FormData();
+  formData.append('file', files && files.length > 0 ? files[0] : null);
+  const blob = new Blob([JSON.stringify(values)], { type: 'application/json' });
+  formData.append('input', blob);
+  return postReferential(schema.injectStatus, uri, formData)(dispatch);
 };
 
 export const fetchInjectTypes = () => (dispatch) => getReferential(schema.arrayOfInjectTypes, '/api/inject_types')(dispatch);

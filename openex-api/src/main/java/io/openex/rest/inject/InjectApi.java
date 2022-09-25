@@ -16,6 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
@@ -113,9 +114,9 @@ public class InjectApi extends RestBehavior {
         if (contract == null) {
             throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
         }
-        ExecutableInject injection = new ExecutableInject(true, inject, contract, List.of(), userInjectContexts);
+        ExecutableInject injection = new ExecutableInject(false, true, inject, contract, List.of(), userInjectContexts);
         Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
-        Execution execution = executor.executeDirectly(injection);
+        Execution execution = executor.executeInjection(injection);
         return InjectStatus.fromExecution(execution, inject);
     }
 
@@ -214,7 +215,9 @@ public class InjectApi extends RestBehavior {
 
     @PostMapping("/api/exercises/{exerciseId}/inject")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public InjectStatus executeInject(@PathVariable String exerciseId, @Valid @RequestBody DirectInjectInput input) {
+    public InjectStatus executeInject(@PathVariable String exerciseId,
+                                      @Valid @RequestPart("input") DirectInjectInput input,
+                                      @RequestPart("file") Optional<MultipartFile> file) {
         Inject inject = input.toInject();
         Contract contract = contractService.resolveContract(inject);
         if (contract == null) {
@@ -226,9 +229,10 @@ public class InjectApi extends RestBehavior {
         Iterable<User> users = userRepository.findAllById(input.getUserIds());
         List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
                 .map(user -> new ExecutionContext(openExConfig, user, inject, "Direct execution")).toList();
-        ExecutableInject injection = new ExecutableInject(false, inject, contract, List.of(), userInjectContexts);
+        ExecutableInject injection = new ExecutableInject(true, true, inject, contract, List.of(), userInjectContexts);
+        file.ifPresent(injection::addDirectAttachment);
         Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
-        Execution execution = executor.executeDirectly(injection);
+        Execution execution = executor.executeInjection(injection);
         return InjectStatus.fromExecution(execution, inject);
     }
 
@@ -259,7 +263,7 @@ public class InjectApi extends RestBehavior {
         injectStatus.setDate(now());
         injectStatus.setName(input.getStatus());
         injectStatus.setExecutionTime(0);
-        Execution execution = new Execution();
+        Execution execution = new Execution(false);
         execution.addTrace(traceSuccess(currentUser().getId(), input.getMessage()));
         execution.stop();
         injectStatus.setReporting(execution);

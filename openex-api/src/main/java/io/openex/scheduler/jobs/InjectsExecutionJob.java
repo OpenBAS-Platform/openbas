@@ -87,10 +87,10 @@ public class InjectsExecutionJob implements Job {
                     Contract contract = executableInject.getContract();
                     Execution execution;
                     if (contract == null) {
-                        execution = executionError("injector", "Inject is not available for execution");
+                        execution = executionError(executableInject.isRuntime(), "injector", "Inject is not available for execution");
                     } else {
                         Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
-                        execution = executor.executeInRange(executableInject);
+                        execution = executor.executeInjection(executableInject);
                     }
                     // Report inject execution
                     if (source instanceof Inject) {

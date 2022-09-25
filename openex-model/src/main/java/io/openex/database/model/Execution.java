@@ -17,6 +17,9 @@ public class Execution {
 
     private static final Logger LOGGER = Logger.getLogger(Execution.class.getName());
 
+    @JsonProperty("execution_runtime")
+    private boolean runtime;
+
     @JsonProperty("execution_start")
     private Instant startTime;
 
@@ -30,7 +33,20 @@ public class Execution {
     private List<ExecutionTrace> traces = new ArrayList<>();
 
     public Execution() {
+        // Default constructor for serialization
+    }
+
+    public Execution(boolean runtime) {
+        this.runtime = runtime;
         this.startTime = now();
+    }
+
+    public void setRuntime(boolean runtime) {
+        this.runtime = runtime;
+    }
+
+    public boolean isRuntime() {
+        return runtime;
     }
 
     public void stop() {
@@ -42,8 +58,8 @@ public class Execution {
         return asyncId == null;
     }
 
-    public static Execution executionError(String identifier, String message) {
-        Execution execution = new Execution();
+    public static Execution executionError(boolean runtime, String identifier, String message) {
+        Execution execution = new Execution(runtime);
         execution.addTrace(traceError(identifier, message, null));
         execution.stop();
         return execution;

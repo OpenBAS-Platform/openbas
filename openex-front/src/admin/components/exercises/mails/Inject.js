@@ -110,7 +110,7 @@ const Inject = () => {
       },
       inject_users: topic.communication_users,
     };
-    return dispatch(executeInject(exerciseId, inputValues)).then(() => handleCloseReply());
+    return dispatch(executeInject(exerciseId, inputValues, data.communication_file)).then(() => handleCloseReply());
   };
   if (inject && communications) {
     // Group communication by subject

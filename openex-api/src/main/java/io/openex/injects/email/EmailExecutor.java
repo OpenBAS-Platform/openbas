@@ -38,18 +38,18 @@ public class EmailExecutor extends Injector {
         this.emailService = emailService;
     }
 
-    private void sendMulti(Execution execution, List<ExecutionContext> users, String replyTo, String inReplyTo, String subject, String message, List<DataAttachment> attachments, boolean storeInImap) {
+    private void sendMulti(Execution execution, List<ExecutionContext> users, String replyTo, String inReplyTo, String subject, String message, List<DataAttachment> attachments) {
         try {
-            emailService.sendEmail(execution, users, replyTo, inReplyTo, subject, message, attachments, storeInImap);
+            emailService.sendEmail(execution, users, replyTo, inReplyTo, subject, message, attachments);
         } catch (Exception e) {
             execution.addTrace(traceError("email", e.getMessage(), e));
         }
     }
 
-    private void sendSingle(Execution execution, List<ExecutionContext> users, String replyTo, String inReplyTo, boolean mustBeEncrypted, String subject, String message, List<DataAttachment> attachments, boolean storeInImap) {
+    private void sendSingle(Execution execution, List<ExecutionContext> users, String replyTo, String inReplyTo, boolean mustBeEncrypted, String subject, String message, List<DataAttachment> attachments) {
         users.stream().parallel().forEach(user -> {
             try {
-                emailService.sendEmail(execution, user, replyTo, inReplyTo, mustBeEncrypted, subject, message, attachments, storeInImap);
+                emailService.sendEmail(execution, user, replyTo, inReplyTo, mustBeEncrypted, subject, message, attachments);
             } catch (Exception e) {
                 execution.addTrace(traceError("email", e.getMessage(), e));
             }
@@ -65,11 +65,10 @@ public class EmailExecutor extends Injector {
 
     @Override
     public List<Expectation> process(Execution execution, ExecutableInject injection, Contract contract) throws Exception {
-        boolean storeInImap = !injection.isTestingInject();
         Inject inject = injection.getInject();
         EmailContent content = contentConvert(injection, EmailContent.class);
         List<Document> documents = inject.getDocuments().stream().filter(InjectDocument::isAttached).map(InjectDocument::getDocument).toList();
-        List<DataAttachment> attachments = resolveAttachments(execution, documents);
+        List<DataAttachment> attachments = resolveAttachments(execution, injection, documents);
         String inReplyTo = content.getInReplyTo();
         String subject = content.getSubject();
         String message = content.buildMessage(inject, imapEnabled);
@@ -81,18 +80,14 @@ public class EmailExecutor extends Injector {
         }
         // If a doc upload is required, add the doc uri variable
         if (content.getExpectationType().equals("document")) {
-            users = users.stream().peek(context ->
-                    context.put("document_uri", buildDocumentUri(context, inject)))
-                    .toList();
+            users = users.stream().peek(context -> context.put("document_uri", buildDocumentUri(context, inject))).toList();
         }
         Exercise exercise = injection.getSource().getExercise();
         String replyTo = exercise.getReplyTo();
         //noinspection SwitchStatementWithTooFewBranches
         switch (contract.getId()) {
-            case EMAIL_GLOBAL ->
-                    sendMulti(execution, users, replyTo, inReplyTo, subject, message, attachments, storeInImap);
-            default ->
-                    sendSingle(execution, users, replyTo, inReplyTo, mustBeEncrypted, subject, message, attachments, storeInImap);
+            case EMAIL_GLOBAL -> sendMulti(execution, users, replyTo, inReplyTo, subject, message, attachments);
+            default -> sendSingle(execution, users, replyTo, inReplyTo, mustBeEncrypted, subject, message, attachments);
         }
         return switch (content.getExpectationType()) {
             case "document" -> List.of(new DocumentExpectation(content.getExpectationScore()));

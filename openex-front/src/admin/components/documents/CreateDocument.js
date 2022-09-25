@@ -39,9 +39,7 @@ const CreateDocument = (props) => {
     )(data);
     const formData = new FormData();
     formData.append('file', data.document_file[0]);
-    const blob = new Blob([JSON.stringify(inputValues)], {
-      type: 'application/json',
-    });
+    const blob = new Blob([JSON.stringify(inputValues)], { type: 'application/json' });
     formData.append('input', blob);
     return props.addDocument(formData).then((result) => {
       if (result.result) {

@@ -9,12 +9,15 @@ import io.openex.database.repository.CommunicationRepository;
 import io.openex.database.repository.InjectRepository;
 import io.openex.database.repository.SettingRepository;
 import io.openex.database.repository.UserRepository;
+import io.openex.service.FileService;
+import org.apache.commons.mail.util.MimeMessageParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.activation.DataSource;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -64,6 +67,16 @@ public class ImapService {
     private InjectRepository injectRepository;
     private CommunicationRepository communicationRepository;
     private SettingRepository settingRepository;
+    private FileService fileService;
+
+    public ImapService(Environment env) throws Exception {
+        initStore(env);
+    }
+
+    @Autowired
+    public void setFileService(FileService fileService) {
+        this.fileService = fileService;
+    }
 
     @Autowired
     public void setSettingRepository(SettingRepository settingRepository) {
@@ -83,10 +96,6 @@ public class ImapService {
     @Autowired
     public void setCommunicationRepository(CommunicationRepository communicationRepository) {
         this.communicationRepository = communicationRepository;
-    }
-
-    public ImapService(Environment env) throws Exception {
-        initStore(env);
     }
 
     private void initStore(Environment env) throws Exception {
@@ -176,6 +185,16 @@ public class ImapService {
         return Stream.concat(from.stream(), recipients.stream()).map(String::toLowerCase).filter(recipient -> !recipient.equals(username)).distinct().toList();
     }
 
+    private Inject injectResolver(String content, String contentHtml) {
+        Matcher matcher = content.length() > 10
+                ? INJECT_ID_PATTERN.matcher(content) : INJECT_ID_PATTERN.matcher(contentHtml);
+        if (matcher.find()) {
+            String injectId = matcher.group(1);
+            return injectRepository.findById(injectId).orElse(null);
+        }
+        return null;
+    }
+
     private void parseMessages(Message[] messages, Boolean isSent) throws Exception {
         for (Message message : messages) {
             MimeMessage mimeMessage = (MimeMessage) message;
@@ -184,21 +203,10 @@ public class ImapService {
             if (!messageAlreadyAvailable) {
                 String content = getTextFromMessage(message);
                 String contentHtml = getHtmlFromMessage(message);
+                Inject inject = injectResolver(content, contentHtml);
                 List<String> participants = computeParticipants(message);
                 List<User> users = userRepository.findAllByEmailIn(participants);
-                if (users.size() > 0) {
-                    // Look for inject id in content
-                    Inject inject = null;
-                    Matcher matcher = null;
-                    if (content.length() > 10) {
-                        matcher = INJECT_ID_PATTERN.matcher(content);
-                    } else {
-                        matcher = INJECT_ID_PATTERN.matcher(contentHtml);
-                    }
-                    if (matcher.find()) {
-                        String injectId = matcher.group(1);
-                        inject = injectRepository.findById(injectId).orElse(null);
-                    }
+                if (inject != null && users.size() > 0) {
                     String subject = message.getSubject();
                     String from = String.valueOf(Arrays.stream(message.getFrom()).toList().get(0));
                     String to = String.valueOf(Arrays.stream(message.getAllRecipients()).toList());
@@ -217,14 +225,26 @@ public class ImapService {
                     communication.setAnimation(isSent);
                     communication.setFrom(from);
                     communication.setTo(to);
-                    if (inject != null) {
-                        inject.setUpdatedAt(now());
-                    }
                     try {
-                        communicationRepository.save(communication);
-                        if (inject != null) {
-                            injectRepository.save(inject);
+                        // Save the communication
+                        Communication comm = communicationRepository.save(communication);
+                        // Update inject for real time
+                        inject.setUpdatedAt(now());
+                        injectRepository.save(inject);
+                        // Upload attachments in communication
+                        final MimeMessageParser mimeParser = new MimeMessageParser(mimeMessage).parse();
+                        final List<DataSource> attachmentList = mimeParser.getAttachmentList();
+                        final List<String> uploads = new ArrayList<>();
+                        String exerciseId = inject.getExercise().getId();
+                        for (DataSource dataSource : attachmentList) {
+                            final String fileName = dataSource.getName();
+                            String path = "/" + exerciseId + "/communications/" + comm.getId();
+                            String uploadName = fileService.uploadStream(path, fileName, dataSource.getInputStream());
+                            uploads.add(uploadName);
                         }
+                        // Add attachment in the communication
+                        comm.setAttachments(uploads.toArray(String[]::new));
+                        communicationRepository.save(comm);
                     } catch (Exception e) {
                         LOGGER.log(Level.SEVERE, e.getMessage(), e);
                     }

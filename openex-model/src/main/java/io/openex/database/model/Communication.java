@@ -6,9 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -53,6 +52,11 @@ public class Communication implements Base {
     @Column(name = "communication_content_html")
     @JsonProperty("communication_content_html")
     private String contentHtml;
+
+    @Type(type = "io.openex.database.converter.PostgreSqlStringArrayType")
+    @Column(name = "communication_attachments", columnDefinition = "text[]")
+    @JsonProperty("communication_attachments")
+    private String[] attachments;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "communication_inject")
@@ -187,6 +191,14 @@ public class Communication implements Base {
 
     public void setTo(String to) {
         this.to = to;
+    }
+
+    public String[] getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(String[] attachments) {
+        this.attachments = attachments;
     }
 
     @JsonProperty("communication_exercise")
