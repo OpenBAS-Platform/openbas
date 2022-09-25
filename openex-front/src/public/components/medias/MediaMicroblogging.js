@@ -98,9 +98,7 @@ const MediaMicroblogging = ({ mediaReader }) => {
       )}
       {articles.map((article) => {
         const docs = article.article_documents
-          .map((d) => (documentsMap[d.document_id]
-            ? documentsMap[d.document_id]
-            : undefined))
+          .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
           .filter((d) => d !== undefined)
           .filter(
             (d) => d.document_type.includes('image/')

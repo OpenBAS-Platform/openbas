@@ -33,7 +33,6 @@ public class MediaApi extends RestBehavior {
 
     private ExerciseRepository exerciseRepository;
     private ArticleRepository articleRepository;
-    private ArticleDocumentRepository articleDocumentRepository;
     private MediaRepository mediaRepository;
     private DocumentRepository documentRepository;
     private InjectExpectationRepository injectExpectationExecutionRepository;
@@ -41,11 +40,6 @@ public class MediaApi extends RestBehavior {
     @Autowired
     public void setArticleRepository(ArticleRepository articleRepository) {
         this.articleRepository = articleRepository;
-    }
-
-    @Autowired
-    public void setArticleDocumentRepository(ArticleDocumentRepository articleDocumentRepository) {
-        this.articleDocumentRepository = articleDocumentRepository;
     }
 
     @Autowired
@@ -158,16 +152,12 @@ public class MediaApi extends RestBehavior {
         article.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
         Article savedArticle = articleRepository.save(article);
         List<String> articleDocuments = input.getDocuments();
-        List<ArticleDocument> finalArticleDocuments = new ArrayList<>();
-        articleDocuments.forEach(articleDcoument -> {
-            Optional<Document> doc = documentRepository.findById(articleDcoument);
+        List<Document> finalArticleDocuments = new ArrayList<>();
+        articleDocuments.forEach(articleDocument -> {
+            Optional<Document> doc = documentRepository.findById(articleDocument);
             if (doc.isPresent()) {
-                ArticleDocument articleDocument = new ArticleDocument();
-                articleDocument.setArticle(article);
                 Document document = doc.get();
-                articleDocument.setDocument(document);
-                articleDocumentRepository.save(articleDocument);
-                finalArticleDocuments.add(articleDocument);
+                finalArticleDocuments.add(document);
                 // If Document not yet linked directly to the exercise, attached it
                 if (!document.getExercises().contains(exercise)) {
                     exercise.getDocuments().add(document);
@@ -185,27 +175,22 @@ public class MediaApi extends RestBehavior {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Article article = articleRepository.findById(articleId).orElseThrow();
         List<String> newDocumentsIds = input.getDocuments();
-        List<String> currentDocumentIds = article.getDocuments().stream().map(document -> document.getDocument().getId()).toList();
+        List<String> currentDocumentIds = article.getDocuments().stream().map(Document::getId).toList();
         article.setMedia(mediaRepository.findById(input.getMediaId()).orElseThrow());
         article.setUpdateAttributes(input);
         // Original List
-        List<ArticleDocument> articleDocuments = new ArrayList<>(article.getDocuments());
+        List<Document> articleDocuments = new ArrayList<>(article.getDocuments());
         // region Set documents
         // To delete
-        article.getDocuments().stream().filter(articleDoc -> !newDocumentsIds.contains(articleDoc.getDocument().getId())).forEach(articleDoc -> {
-            articleDocuments.remove(articleDoc);
-            articleDocumentRepository.delete(articleDoc);
-        });
+        article.getDocuments().stream()
+                .filter(articleDoc -> !newDocumentsIds.contains(articleDoc.getId()))
+                .forEach(articleDocuments::remove);
         // To add
         newDocumentsIds.stream().filter(doc -> !currentDocumentIds.contains(doc)).forEach(in -> {
             Optional<Document> doc = documentRepository.findById(in);
             if (doc.isPresent()) {
-                ArticleDocument articleDocument = new ArticleDocument();
-                articleDocument.setArticle(article);
                 Document document = doc.get();
-                articleDocument.setDocument(document);
-                articleDocumentRepository.save(articleDocument);
-                articleDocuments.add(articleDocument);
+                articleDocuments.add(document);
                 // If Document not yet linked directly to the exercise, attached it
                 if (!document.getExercises().contains(exercise)) {
                     exercise.getDocuments().add(document);
@@ -229,7 +214,6 @@ public class MediaApi extends RestBehavior {
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @DeleteMapping("/api/exercises/{exerciseId}/articles/{articleId}")
     public void deleteArticle(@PathVariable String articleId) {
-        articleDocumentRepository.deleteDocumentsFromArticle(articleId);
         articleRepository.deleteById(articleId);
     }
     // endregion

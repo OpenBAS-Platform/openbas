@@ -43,17 +43,11 @@ public class DocumentApi extends RestBehavior {
     private ExerciseRepository exerciseRepository;
     private InjectService injectService;
     private InjectDocumentRepository injectDocumentRepository;
-    private ArticleDocumentRepository articleDocumentRepository;
     private ChallengeRepository challengeRepository;
 
     @Autowired
     public void setInjectDocumentRepository(InjectDocumentRepository injectDocumentRepository) {
         this.injectDocumentRepository = injectDocumentRepository;
-    }
-
-    @Autowired
-    public void setArticleDocumentRepository(ArticleDocumentRepository articleDocumentRepository) {
-        this.articleDocumentRepository = articleDocumentRepository;
     }
 
     @Autowired
@@ -202,8 +196,7 @@ public class DocumentApi extends RestBehavior {
                 .map(Article::getMedia)
                 .flatMap(media -> media.getLogos().stream());
         Stream<Document> articlesDocs = exercise.getArticles().stream()
-                .flatMap(article -> article.getDocuments().stream())
-                .map(ArticleDocument::getDocument);
+                .flatMap(article -> article.getDocuments().stream());
         List<String> challenges = exercise.getInjects().stream()
                 .filter(inject -> inject.getContract().equals(CHALLENGE_PUBLISH))
                 .filter(inject -> inject.getContent() != null)
@@ -255,7 +248,6 @@ public class DocumentApi extends RestBehavior {
     @DeleteMapping("/api/documents/{documentId}")
     public void deleteDocument(@PathVariable String documentId) {
         injectDocumentRepository.deleteDocumentFromAllReferences(documentId);
-        articleDocumentRepository.deleteDocumentFromAllReferences(documentId);
         List<Document> documents = documentRepository.removeById(documentId);
         documents.forEach(document -> {
             try {

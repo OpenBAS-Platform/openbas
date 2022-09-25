@@ -84,9 +84,15 @@ public class ExerciseApi extends RestBehavior {
     private DryrunService dryrunService;
     private FileService fileService;
     private InjectService injectService;
+    private ChallengeService challengeService;
     // endregion
 
     // region setters
+    @Autowired
+    public void setChallengeService(ChallengeService challengeService) {
+        this.challengeService = challengeService;
+    }
+
     @Autowired
     public void setInjectService(InjectService injectService) {
         this.injectService = injectService;
@@ -459,8 +465,10 @@ public class ExerciseApi extends RestBehavior {
     // region import/export
     @GetMapping("/api/exercises/{exerciseId}/export")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public void exerciseExport(@PathVariable String exerciseId, @RequestParam(required = false) boolean isWithPlayers, HttpServletResponse response) throws IOException {
+    public void exerciseExport(@PathVariable String exerciseId, @RequestParam(required = false) boolean isWithPlayers,
+                               HttpServletResponse response) throws IOException {
         // Setup the mapper for export
+        List<String> documentIds = new ArrayList<>();
         ObjectMapper objectMapper = mapper.copy();
         if (!isWithPlayers) {
             objectMapper.addMixIn(ExerciseFileExport.class, ExerciseExportMixins.ExerciseFileExport.class);
@@ -470,14 +478,10 @@ public class ExerciseApi extends RestBehavior {
         importExport.setVersion(1);
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         objectMapper.addMixIn(Exercise.class, ExerciseExportMixins.Exercise.class);
-        // Build the response
-        String zipName = (exercise.getName() + "_" + now().toString()) + "_" + (isWithPlayers ? "(with_players)" : "(no_players)") + ".zip";
-        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
-        response.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip");
-        response.setStatus(HttpServletResponse.SC_OK);
         // Build the export
         importExport.setExercise(exercise);
         importExport.setDocuments(exercise.getDocuments());
+        documentIds.addAll(exercise.getDocuments().stream().map(Document::getId).toList());
         objectMapper.addMixIn(Document.class, ExerciseExportMixins.Document.class);
         List<Tag> exerciseTags = new ArrayList<>(exercise.getTags());
         // Objectives
@@ -507,19 +511,37 @@ public class ExerciseApi extends RestBehavior {
         importExport.setInjects(injects);
         objectMapper.addMixIn(Inject.class, ExerciseExportMixins.Inject.class);
         // Documents
-        List<String> documentIds = exercise.getDocuments().stream().map(Document::getId).toList();
         exerciseTags.addAll(exercise.getDocuments().stream().flatMap(doc -> doc.getTags().stream()).toList());
+        // Articles / Medias
+        List<Article> articles = exercise.getArticles();
+        importExport.setArticles(articles);
+        objectMapper.addMixIn(Article.class, ExerciseExportMixins.Article.class);
+        List<Media> medias = articles.stream().map(Article::getMedia).distinct().toList();
+        documentIds.addAll(medias.stream().flatMap(media -> media.getLogos().stream()).map(Document::getId).toList());
+        importExport.setMedias(medias);
+        objectMapper.addMixIn(Media.class, ExerciseExportMixins.Media.class);
+        // Challenges
+        List<Challenge> challenges = fromIterable(challengeService.getExerciseChallenges(exerciseId));
+        importExport.setChallenges(challenges);
+        documentIds.addAll(challenges.stream().flatMap(challenge -> challenge.getDocuments().stream()).map(Document::getId).toList());
+        objectMapper.addMixIn(Challenge.class, ExerciseExportMixins.Challenge.class);
+        exerciseTags.addAll(challenges.stream().flatMap(challenge -> challenge.getTags().stream()).toList());
         // Tags
         importExport.setTags(exerciseTags.stream().distinct().toList());
         objectMapper.addMixIn(Tag.class, ExerciseExportMixins.Tag.class);
-        // Build the zip
+        // Build the response
+        String zipName = (exercise.getName() + "_" + now().toString()) + "_" + (isWithPlayers ? "(with_players)" : "(no_players)") + ".zip";
+        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
+        response.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip");
+        response.setStatus(HttpServletResponse.SC_OK);
         ZipOutputStream zipExport = new ZipOutputStream(response.getOutputStream());
         ZipEntry zipEntry = new ZipEntry(exercise.getName() + ".json");
         zipEntry.setComment(EXPORT_ENTRY_EXERCISE);
         zipExport.putNextEntry(zipEntry);
         zipExport.write(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(importExport));
         zipExport.closeEntry();
-        documentIds.forEach(docId -> {
+        // Add the documents
+        documentIds.stream().distinct().forEach(docId -> {
             Document doc = documentRepository.findById(docId).orElseThrow();
             Optional<InputStream> docStream = fileService.getFile(doc);
             if (docStream.isPresent()) {

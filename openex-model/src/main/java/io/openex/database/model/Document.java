@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MultiIdDeserializer;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -63,10 +61,6 @@ public class Document implements Base {
     @OneToMany(mappedBy = "document", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<InjectDocument> injectDocuments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "document", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<ArticleDocument> articleDocuments = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -130,14 +124,6 @@ public class Document implements Base {
 
     public void setInjectDocuments(List<InjectDocument> injectDocuments) {
         this.injectDocuments = injectDocuments;
-    }
-
-    public List<ArticleDocument> getArticleDocuments() {
-        return articleDocuments;
-    }
-
-    public void setArticleDocuments(List<ArticleDocument> articleDocuments) {
-        this.articleDocuments = articleDocuments;
     }
 
     @Override

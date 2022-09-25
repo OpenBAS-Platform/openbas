@@ -137,9 +137,7 @@ const Articles = () => {
       <Grid container={true} spacing={3}>
         {sortedArticles.map((article) => {
           const docs = article.article_documents
-            .map((d) => (documentsMap[d.document_id]
-              ? documentsMap[d.document_id]
-              : undefined))
+            .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
             .filter((d) => d !== undefined);
           const images = docs.filter((d) => d.document_type.includes('image/'));
           const videos = docs.filter((d) => d.document_type.includes('video/'));

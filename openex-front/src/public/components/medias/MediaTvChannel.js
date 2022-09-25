@@ -58,7 +58,7 @@ const MediaTvChannel = ({ mediaReader }) => {
   const logo = isDark ? media.media_logo_dark : media.media_logo_light;
   const firstArticle = R.head(articles) || null;
   const firstArticleVideos = (firstArticle?.article_documents || [])
-    .map((d) => (documentsMap[d.document_id] ? documentsMap[d.document_id] : undefined))
+    .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
     .filter((d) => d !== undefined)
     .filter((d) => d.document_type.includes('video/'));
   let firstArticleColumns = 12;
@@ -182,9 +182,7 @@ const MediaTvChannel = ({ mediaReader }) => {
           <Grid item={true} xs={4}>
             {headArticles.map((article, index) => {
               const videos = article.article_documents
-                .map((d) => (documentsMap[d.document_id]
-                  ? documentsMap[d.document_id]
-                  : undefined))
+                .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
                 .filter((d) => d !== undefined)
                 .filter((d) => d.document_type.includes('video/'));
               let columns = 12;
@@ -267,9 +265,7 @@ const MediaTvChannel = ({ mediaReader }) => {
       <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
         {otherArticles.map((article) => {
           const videos = article.article_documents
-            .map((d) => (documentsMap[d.document_id]
-              ? documentsMap[d.document_id]
-              : undefined))
+            .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
             .filter((d) => d !== undefined)
             .filter((d) => d.document_type.includes('video/'));
           let columns = 12;

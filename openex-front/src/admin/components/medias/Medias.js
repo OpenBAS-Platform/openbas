@@ -188,7 +188,7 @@ const Medias = () => {
             <ListItemIcon>
               <MediaIcon
                 type={media.media_type}
-                tooltip={t(media.media_type)}
+                tooltip={t(media.media_type || 'Unknown')}
               />
             </ListItemIcon>
             <ListItemText

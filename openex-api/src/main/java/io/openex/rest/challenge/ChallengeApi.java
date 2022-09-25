@@ -1,10 +1,8 @@
 package io.openex.rest.challenge;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openex.database.model.*;
 import io.openex.database.model.ChallengeFlag.FLAG_TYPE;
 import io.openex.database.repository.*;
-import io.openex.injects.challenge.model.ChallengeContent;
 import io.openex.rest.challenge.form.ChallengeCreateInput;
 import io.openex.rest.challenge.form.ChallengeTryInput;
 import io.openex.rest.challenge.form.ChallengeUpdateInput;
@@ -12,6 +10,7 @@ import io.openex.rest.challenge.response.ChallengeInformation;
 import io.openex.rest.challenge.response.ChallengeResult;
 import io.openex.rest.challenge.response.ChallengesReader;
 import io.openex.rest.helper.RestBehavior;
+import io.openex.service.ChallengeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,13 +23,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.helper.StreamHelper.fromIterable;
 import static io.openex.helper.UserHelper.ANONYMOUS;
 import static io.openex.helper.UserHelper.currentUser;
-import static io.openex.injects.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 
 @RestController
 public class ChallengeApi extends RestBehavior {
@@ -40,17 +37,17 @@ public class ChallengeApi extends RestBehavior {
     private TagRepository tagRepository;
     private DocumentRepository documentRepository;
     private ExerciseRepository exerciseRepository;
-    private InjectRepository injectRepository;
     private InjectExpectationRepository injectExpectationRepository;
+    private ChallengeService challengeService;
+
+    @Autowired
+    public void setChallengeService(ChallengeService challengeService) {
+        this.challengeService = challengeService;
+    }
 
     @Autowired
     public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
         this.injectExpectationRepository = injectExpectationRepository;
-    }
-
-    @Autowired
-    public void setInjectRepository(InjectRepository injectRepository) {
-        this.injectRepository = injectRepository;
     }
 
     @Autowired
@@ -78,18 +75,10 @@ public class ChallengeApi extends RestBehavior {
         this.exerciseRepository = exerciseRepository;
     }
 
-    private Challenge enrichChallengeWithExercises(Challenge challenge) {
-        List<Inject> injects = fromIterable(injectRepository
-                .findAllForChallengeId("%" + challenge.getId() + "%"));
-        List<String> exerciseIds = injects.stream().map(i -> i.getExercise().getId()).distinct().toList();
-        challenge.setExerciseIds(exerciseIds);
-        return challenge;
-    }
-
     @GetMapping("/api/challenges")
     public Iterable<Challenge> challenges() {
         return fromIterable(challengeRepository.findAll()).stream()
-                .map(this::enrichChallengeWithExercises).toList();
+                .map(challengeService::enrichChallengeWithExercises).toList();
     }
 
     @PreAuthorize("isPlanner()")
@@ -115,7 +104,7 @@ public class ChallengeApi extends RestBehavior {
             challengeFlags.add(challengeFlag);
         });
         Challenge saveChallenge = challengeRepository.save(challenge);
-        return enrichChallengeWithExercises(saveChallenge);
+        return challengeService.enrichChallengeWithExercises(saveChallenge);
     }
 
     @PreAuthorize("isPlanner()")
@@ -140,21 +129,7 @@ public class ChallengeApi extends RestBehavior {
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     @GetMapping("/api/exercises/{exerciseId}/challenges")
     public Iterable<Challenge> exerciseChallenges(@PathVariable String exerciseId) {
-        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        List<String> challenges = exercise.getInjects().stream()
-                .filter(inject -> inject.getContract().equals(CHALLENGE_PUBLISH))
-                .filter(inject -> inject.getContent() != null)
-                .flatMap(inject -> {
-                    try {
-                        ChallengeContent content = mapper.treeToValue(inject.getContent(), ChallengeContent.class);
-                        return content.getChallenges().stream();
-                    } catch (JsonProcessingException e) {
-                        return Stream.empty();
-                    }
-                })
-                .distinct().toList();
-        return fromIterable(challengeRepository.findAllById(challenges)).stream()
-                .map(this::enrichChallengeWithExercises).toList();
+        return challengeService.getExerciseChallenges(exerciseId);
     }
 
     @GetMapping("/api/player/challenges/{exerciseId}")

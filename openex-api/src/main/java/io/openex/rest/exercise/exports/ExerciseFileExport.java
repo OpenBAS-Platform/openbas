@@ -35,6 +35,15 @@ public class ExerciseFileExport {
     @JsonProperty("exercise_documents")
     private List<Document> documents = new ArrayList<>();
 
+    @JsonProperty("exercise_medias")
+    private List<Media> medias = new ArrayList<>();
+
+    @JsonProperty("exercise_articles")
+    private List<Article> articles = new ArrayList<>();
+
+    @JsonProperty("exercise_challenges")
+    private List<Challenge> challenges = new ArrayList<>();
+
     public int getVersion() {
         return version;
     }
@@ -105,5 +114,29 @@ public class ExerciseFileExport {
 
     public void setDocuments(List<Document> documents) {
         this.documents = documents;
+    }
+
+    public List<Article> getArticles() {
+        return articles;
+    }
+
+    public void setArticles(List<Article> articles) {
+        this.articles = articles;
+    }
+
+    public List<Challenge> getChallenges() {
+        return challenges;
+    }
+
+    public void setChallenges(List<Challenge> challenges) {
+        this.challenges = challenges;
+    }
+
+    public List<Media> getMedias() {
+        return medias;
+    }
+
+    public void setMedias(List<Media> medias) {
+        this.medias = medias;
     }
 }

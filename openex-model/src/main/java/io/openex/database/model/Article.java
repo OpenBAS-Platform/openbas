@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
-import io.openex.helper.MultiModelDeserializer;
+import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -71,11 +71,13 @@ public class Article implements Base {
     @JsonProperty("article_media")
     private Media media;
 
-    // CascadeType.ALL is required here because of complex relationships
-    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "articles_documents",
+            joinColumns = @JoinColumn(name = "article_id"),
+            inverseJoinColumns = @JoinColumn(name = "document_id"))
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("article_documents")
-    @JsonSerialize(using = MultiModelDeserializer.class)
-    private List<ArticleDocument> documents = new ArrayList<>();
+    private List<Document> documents = new ArrayList<>();
 
     @JsonIgnore
     @Override
@@ -156,11 +158,11 @@ public class Article implements Base {
         this.comments = comments;
     }
 
-    public List<ArticleDocument> getDocuments() {
+    public List<Document> getDocuments() {
         return documents;
     }
 
-    public void setDocuments(List<ArticleDocument> documents) {
+    public void setDocuments(List<Document> documents) {
         this.documents = documents;
     }
 

@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -13,4 +14,6 @@ public interface ChallengeRepository extends CrudRepository<Challenge, String>, 
 
     @NotNull
     Optional<Challenge> findById(@NotNull String id);
+
+    List<Challenge> findByNameIgnoreCase(String name);
 }

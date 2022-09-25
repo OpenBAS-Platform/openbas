@@ -120,6 +120,50 @@ public class ExerciseExportMixins {
     })
     public static class Tag {
     }
+
+    @JsonIncludeProperties(value = {
+            "media_id",
+            "media_type",
+            "media_name",
+            "media_description",
+            "media_mode",
+            "media_primary_color_dark",
+            "media_primary_color_light",
+            "media_secondary_color_dark",
+            "media_secondary_color_light",
+            "media_logo_dark",
+            "media_logo_light",
+    })
+    public static class Media {
+    }
+
+    @JsonIncludeProperties(value = {
+            "article_id",
+            "article_name",
+            "article_content",
+            "article_author",
+            "article_shares",
+            "article_likes",
+            "article_comments",
+            "article_media",
+            "article_documents",
+            "article_exercise",
+    })
+    public static class Article {
+    }
+    @JsonIncludeProperties(value = {
+            "challenge_id",
+            "challenge_name",
+            "challenge_category",
+            "challenge_content",
+            "challenge_score",
+            "challenge_max_attempts",
+            "challenge_flags",
+            "challenge_tags",
+            "challenge_documents",
+    })
+    public static class Challenge {
+    }
 }
 
 
