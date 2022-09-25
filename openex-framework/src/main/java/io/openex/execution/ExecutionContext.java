@@ -17,6 +17,7 @@ public class ExecutionContext extends HashMap<String, Object> {
     public static final String PLAYER_URI = "player_uri";
     public static final String CHALLENGES_URI = "challenges_uri";
     public static final String SCOREBOARD_URI = "scoreboard_uri";
+    public static final String LESSONS_URI = "lessons_uri";
 
     private ExecutionContext(User user, Exercise exercise, List<String> audiences) {
         User protectUser = new User();
@@ -37,6 +38,7 @@ public class ExecutionContext extends HashMap<String, Object> {
         this.put(PLAYER_URI, config.getBaseUrl() + "/private/" + exerciseId + queryParams);
         this.put(CHALLENGES_URI, config.getBaseUrl() + "/challenges/" + exerciseId + queryParams);
         this.put(SCOREBOARD_URI, config.getBaseUrl() + "/scoreboard/" + exerciseId + queryParams);
+        this.put(LESSONS_URI, config.getBaseUrl() + "/lessons/" + exerciseId + queryParams);
     }
 
     public ExecutionContext(User user, Exercise exercise, String audience) {

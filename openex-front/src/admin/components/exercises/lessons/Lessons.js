@@ -12,12 +12,14 @@ import {
   ContentPasteGoOutlined,
   HelpOutlined,
   CastForEducationOutlined,
+  DeleteSweepOutlined,
 } from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import Switch from '@mui/material/Switch';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -35,6 +37,8 @@ import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
 import CreateObjective from './CreateObjective';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -51,9 +55,12 @@ import { areaChartOptions } from '../../../../utils/Charts';
 import CreateLessonsCategory from './categories/CreateLessonsCategory';
 import {
   applyLessonsTemplate,
+  deleteLessonsCategory,
+  emptyLessonsCategories,
   fetchLessonsCategories,
   fetchLessonsQuestions,
   fetchLessonsTemplates,
+  resetLessonsAnswers,
   updateLessonsCategoryAudiences,
 } from '../../../../actions/Lessons';
 import CreateLessonsQuestion from './categories/questions/CreateLessonsQuestion';
@@ -62,6 +69,7 @@ import LessonsCategoryPopover from './categories/LessonsCategoryPopover';
 import LessonsCategoryAddAudiences from './categories/LessonsCategoryAddAudiences';
 import { fetchAudiences } from '../../../../actions/Audience';
 import { truncate } from '../../../../utils/String';
+import { updateExerciseLessons } from '../../../../actions/Exercise';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -131,6 +139,8 @@ const Lessons = () => {
   const { t, nsdt } = useFormatter();
   const [selectedObjective, setSelectedObjective] = useState(null);
   const [openApplyTemplate, setOpenApplyTemplate] = useState(false);
+  const [openResetAnswers, setOpenResetAnswers] = useState(false);
+  const [openEmptyLessons, setOpenEmptyLessons] = useState(false);
   const [templateValue, setTemplateValue] = useState(null);
   const handleChange = (event) => {
     setTemplateValue(event.target.value);
@@ -166,6 +176,19 @@ const Lessons = () => {
   });
   const applyTemplate = () => {
     return dispatch(applyLessonsTemplate(exerciseId, templateValue)).then(() => setOpenApplyTemplate(false));
+  };
+  const resetAnswers = () => {
+    return dispatch(resetLessonsAnswers(exerciseId)).then(() => setOpenResetAnswers(false));
+  };
+  const emptyLessons = () => {
+    return dispatch(emptyLessonsCategories(exerciseId)).then(() => setOpenEmptyLessons(false));
+  };
+  const toggleAnonymize = () => {
+    return dispatch(
+      updateExerciseLessons(exerciseId, {
+        exercise_lessons_anonymized: !exercise.exercise_lessons_anonymized,
+      }),
+    );
   };
   const sortedObjectives = R.sortWith(
     [R.ascend(R.prop('objective_priority'))],
@@ -293,25 +316,46 @@ const Lessons = () => {
           <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
-                <Typography variant="h3">
-                  {t('Anonymize questionnaire')}
-                </Typography>
-              </Grid>
-              <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Questionnaire mode')}</Typography>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={exercise.exercise_lessons_anonymized}
+                      onChange={toggleAnonymize}
+                      name="anonymized"
+                    />
+                  }
+                  label={t('Anonymize answers')}
+                />
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h3">{t('Security')}</Typography>
+                <Typography variant="h3">
+                  {t('Sender email address')}
+                </Typography>
+                {exercise.exercise_mail_from}
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h3">{t('Content')}</Typography>
+                <Typography variant="h3">{t('Template')}</Typography>
                 <Button
                   startIcon={<ContentPasteGoOutlined />}
                   color="primary"
                   variant="contained"
                   onClick={() => setOpenApplyTemplate(true)}
                 >
-                  {t('Apply a template')}
+                  {t('Apply')}
+                </Button>
+              </Grid>
+              <Grid item={true} xs={6}>
+                <Typography variant="h3">
+                  {t('Categories and questions')}
+                </Typography>
+                <Button
+                  startIcon={<DeleteSweepOutlined />}
+                  color="error"
+                  variant="contained"
+                  onClick={() => setOpenEmptyLessons(true)}
+                >
+                  {t('Empty')}
                 </Button>
               </Grid>
             </Grid>
@@ -327,25 +371,25 @@ const Lessons = () => {
             </Alert>
             <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
               <Grid item={true} xs={6}>
-                <Typography variant="h3">{t('Campaign')}</Typography>
+                <Typography variant="h3">{t('Questionnaire')}</Typography>
                 <Button
                   startIcon={<ContentPasteGoOutlined />}
                   color="success"
                   variant="contained"
                   onClick={() => setOpenApplyTemplate(true)}
                 >
-                  {t('Send the questionnaire')}
+                  {t('Send')}
                 </Button>
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h3">{t('Dangerous zone')}</Typography>
+                <Typography variant="h3">{t('Answers')}</Typography>
                 <Button
                   startIcon={<ContentPasteGoOutlined />}
                   color="error"
                   variant="contained"
-                  onClick={() => setOpenApplyTemplate(true)}
+                  onClick={() => setOpenResetAnswers(true)}
                 >
-                  {t('Reset answers')}
+                  {t('Reset')}
                 </Button>
               </Grid>
             </Grid>
@@ -637,6 +681,48 @@ const Lessons = () => {
             </Button>
           </div>
         </DialogContent>
+      </Dialog>
+      <Dialog
+        open={openResetAnswers}
+        TransitionComponent={Transition}
+        onClose={() => setOpenResetAnswers(false)}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t('Do you want to reset lessons learned answers?')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenResetAnswers(false)}>
+            {t('Cancel')}
+          </Button>
+          <Button color="secondary" onClick={resetAnswers}>
+            {t('Reset')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openEmptyLessons}
+        TransitionComponent={Transition}
+        onClose={() => setOpenEmptyLessons(false)}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t(
+              'Do you want to empty lessons learned categories and questions?',
+            )}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEmptyLessons(false)}>
+            {t('Cancel')}
+          </Button>
+          <Button color="secondary" onClick={emptyLessons}>
+            {t('Empty')}
+          </Button>
+        </DialogActions>
       </Dialog>
       <CreateLessonsCategory exerciseId={exerciseId} />
     </div>

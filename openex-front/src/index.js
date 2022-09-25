@@ -5,6 +5,8 @@ import ReactDOM from 'react-dom';
 import './resources/css/main.css';
 import './resources/css/leaflet.css';
 import 'react-mde/lib/styles/css/react-mde-all.css';
+import './resources/css/CKEditorDark.css';
+import './resources/css/CKEditorLight.css';
 import App from './app';
 
 ReactDOM.render(

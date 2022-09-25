@@ -329,6 +329,14 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
+    @PutMapping("/api/exercises/{exerciseId}/lessons")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Exercise updateExerciseLessons(@PathVariable String exerciseId, @Valid @RequestBody ExerciseLessonsInput input) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        exercise.setLessonsAnonymized(input.getLessonsAnonymized());
+        return exerciseRepository.save(exercise);
+    }
+
     @DeleteMapping("/api/exercises/{exerciseId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public void deleteExercise(@PathVariable String exerciseId) {

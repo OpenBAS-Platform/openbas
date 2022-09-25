@@ -1,4 +1,4 @@
-:root {
+html[data-theme="light"],body[data-theme="light"] {
   /* Overrides the border radius setting in the theme. */
   --ck-border-radius: 4px !important;
 
@@ -26,7 +26,7 @@
   --ck-color-button-default-active-background: #b2b2b2 !important;
   --ck-color-button-default-active-shadow: transparent !important;
   --ck-color-button-default-disabled-background: var(
-          --ck-custom-background
+    --ck-custom-background
   ) !important;
 
   --ck-color-button-on-background: var(--ck-custom-foreground) !important;
@@ -34,7 +34,7 @@
   --ck-color-button-on-active-background: #b2b2b2 !important;
   --ck-color-button-on-active-shadow: transparent !important;
   --ck-color-button-on-disabled-background: var(
-          --ck-custom-foreground
+    --ck-custom-foreground
   ) !important;
 
   --ck-color-button-action-background: hsl(168, 76%, 42%) !important;
@@ -55,7 +55,7 @@
   /* -- Overrides the default .ck-splitbutton class colors. ----------------------------------- */
 
   --ck-color-split-button-hover-background: var(
-          --ck-color-button-default-hover-background
+    --ck-color-button-default-hover-background
   ) !important;
   --ck-color-split-button-hover-border: var(--ck-custom-foreground) !important;
 
@@ -71,18 +71,18 @@
   /* -- Overrides the default .ck-labeled-field-view class colors. ---------------------------- */
 
   --ck-color-labeled-field-label-background: var(
-          --ck-custom-background
+    --ck-custom-background
   ) !important;
 
   /* -- Overrides the default .ck-list class colors. ------------------------------------------ */
 
   --ck-color-list-background: var(--ck-custom-background) !important;
   --ck-color-list-button-hover-background: var(
-          --ck-color-base-foreground
+    --ck-color-base-foreground
   ) !important;
   --ck-color-list-button-on-background: var(--ck-color-base-active) !important;
   --ck-color-list-button-on-background-focus: var(
-          --ck-color-base-active-focus
+    --ck-color-base-active-focus
   ) !important;
   --ck-color-list-button-on-text: var(--ck-color-base-background) !important;
 
@@ -111,7 +111,7 @@
   --ck-color-widget-blurred-border: hsl(0, 0%, 87%) !important;
   --ck-color-widget-hover-border: #00b1ff !important;
   --ck-color-widget-editable-focus-background: var(
-          --ck-custom-white
+    --ck-custom-white
   ) !important;
 
   /* -- Overrides the default colors used by the ckeditor5-link package. ---------------------- */

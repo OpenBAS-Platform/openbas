@@ -1,4 +1,4 @@
-:root {
+html[data-theme="dark"],body[data-theme="dark"] {
   --ck-z-default: 10555 !important;
   --ck-z-modal: calc(var(--ck-z-default) + 999) !important;
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import * as PropTypes from 'prop-types';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import themeDark from './ThemeDark';
@@ -14,7 +14,9 @@ const AppThemeProvider = (props) => {
     const rawUserTheme = me?.user_theme ?? 'default';
     return rawUserTheme !== 'default' ? rawUserTheme : rawPlatformTheme;
   });
-
+  useEffect(() => {
+    document.body.setAttribute('data-theme', theme);
+  });
   let muiTheme = createTheme(themeDark());
   if (theme === 'light') {
     muiTheme = createTheme(themeLight());

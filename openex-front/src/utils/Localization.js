@@ -420,18 +420,29 @@ const i18n = {
         "Souhaitez-vous supprimer cette question de retour d'expérience ?",
       'Update the lessons learned question':
         "Modifier la question de retour d'expérience",
+      Answers: 'Réponses',
+      'Categories and questions': 'Catégories et questions',
+      Empty: 'Vider',
       'Objective achievement evaluation':
         "Evaluation de l'atteinte de l'objectif",
       'Crisis intensity (injects by hour)':
         'Intensité de la crise (stimulis par heure)',
       'Apply a lessons learned template':
         "Appliquer un template de retour d'expérience",
+      'Questionnaire mode': 'Mode du questionnaire',
+      'Anonymize answers': 'Anonymiser les réponses',
       'No explanation': 'Aucune explication',
       'Add target audiences in this lessons learned category':
         "Ajouter des audiences cibles à cette catégorie de retour d'expérience",
       'Sending the questionnaire will emit an email to each player with a unique link to access and fill it.':
         'Envoyer le questionnaire va émettre un email à chaque joueur avec un lien unique pour y accéder et le remplir.',
+      'Do you want to empty lessons learned categories and questions?':
+        "Souhaitez-vous vider les catégories et les questions de retour d'expérience ?",
+      'Do you want to reset lessons learned answers?':
+        "Souhaitez-vous réinitialiser les réponses du retour d'expérience ?",
+      Reset: 'Réinitialiser',
       Campaign: 'Campagne',
+      Duration: 'Durée',
       'Send the questionnaire': 'Envoyer le questionnaire',
       'Reset answers': 'Réinitialiser les réponses',
       hours: 'heures',

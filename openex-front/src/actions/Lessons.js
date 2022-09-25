@@ -134,3 +134,13 @@ export const deleteLessonsQuestion = (exerciseId, lessonsCategoryId, lessonsQues
   const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}/lessons_questions/${lessonsQuestionId}`;
   return delReferential(uri, 'lessonsquestions', lessonsQuestionId)(dispatch);
 };
+
+export const resetLessonsAnswers = (exerciseId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/lessons_answers_reset`;
+  return postReferential(schema.arrayOfLessonsCategories, uri, {})(dispatch);
+};
+
+export const emptyLessonsCategories = (exerciseId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/lessons_empty`;
+  return postReferential(schema.arrayOfLessonsCategories, uri, {})(dispatch);
+};
