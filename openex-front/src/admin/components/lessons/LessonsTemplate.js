@@ -30,8 +30,9 @@ const useStyles = makeStyles(() => ({
     paddingBottom: 50,
   },
   paper: {
-    padding: 20,
-    marginBottom: 40,
+    position: 'relative',
+    padding: 0,
+    overflow: 'hidden',
     height: '100%',
   },
 }));
@@ -77,27 +78,22 @@ const LessonsTemplate = () => {
               item={true}
               xs={6}
               key={category.lessonstemplatecategory_id}
+              style={{ marginBottom: 40 }}
             >
+              <Typography variant="h2" style={{ float: 'left' }}>
+                {category.lessons_template_category_name}
+              </Typography>
+              <LessonsTemplateCategoryPopover
+                lessonsTemplateId={lessonsTemplateId}
+                lessonsTemplateCategory={category}
+              />
+              <Typography variant="h3" style={{ float: 'right' }}>
+                {category.lessons_template_category_description
+                  || t('No description')}
+              </Typography>
+              <div className="clearfix" />
               <Paper variant="outlined" classes={{ root: classes.paper }}>
-                <Typography variant="h2" style={{ float: 'left' }}>
-                  {category.lessons_template_category_name}
-                </Typography>
-                <CreateLessonsTemplateQuestion
-                  lessonsTemplateId={lessonsTemplateId}
-                  lessonsTemplateCategoryId={
-                    category.lessonstemplatecategory_id
-                  }
-                />
-                <LessonsTemplateCategoryPopover
-                  lessonsTemplateId={lessonsTemplateId}
-                  lessonsTemplateCategory={category}
-                />
-                <div className="clearfix" />
-                <Typography variant="subtitle">
-                  {category.lessons_template_category_description
-                    || t('No description')}
-                </Typography>
-                <List>
+                <List style={{ padding: 0 }}>
                   {sortedLessonsTemplateQuestions.map((question) => {
                     return (
                       <ListItem divider={true} button={false}>
@@ -123,6 +119,13 @@ const LessonsTemplate = () => {
                       </ListItem>
                     );
                   })}
+                  <CreateLessonsTemplateQuestion
+                    lessonsTemplateId={lessonsTemplateId}
+                    lessonsTemplateCategoryId={
+                      category.lessonstemplatecategory_id
+                    }
+                    inline={true}
+                  />
                 </List>
               </Paper>
             </Grid>

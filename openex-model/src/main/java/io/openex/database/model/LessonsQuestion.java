@@ -54,14 +54,6 @@ public class LessonsQuestion implements Base {
     @JsonProperty("lessons_question_order")
     private int order;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "lessons_questions_audiences",
-            joinColumns = @JoinColumn(name = "lessons_question_id"),
-            inverseJoinColumns = @JoinColumn(name = "audience_id"))
-    @JsonSerialize(using = MultiIdDeserializer.class)
-    @JsonProperty("lessons_question_audiences")
-    private List<Audience> audiences = new ArrayList<>();
-
     // region transient
     @JsonProperty("lessons_question_exercise")
     public String getExercise() {
@@ -126,14 +118,6 @@ public class LessonsQuestion implements Base {
         this.order = order;
     }
 
-    public List<Audience> getAudiences() {
-        return audiences;
-    }
-
-    public void setAudiences(List<Audience> audiences) {
-        this.audiences = audiences;
-    }
-    
     @Override
     public boolean isUserHasAccess(User user) {
         return getCategory().getExercise().isUserHasAccess(user);

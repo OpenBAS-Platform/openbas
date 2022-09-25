@@ -95,6 +95,11 @@ export const updateLessonsCategory = (exerciseId, lessonsCategoryId, data) => (d
   return putReferential(schema.lessonsCategory, uri, data)(dispatch);
 };
 
+export const updateLessonsCategoryAudiences = (exerciseId, lessonsCategoryId, data) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}/audiences`;
+  return putReferential(schema.lessonsCategory, uri, data)(dispatch);
+};
+
 export const addLessonsCategory = (exerciseId, data) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/lessons_categories`;
   return postReferential(schema.lessonsCategory, uri, data)(dispatch);

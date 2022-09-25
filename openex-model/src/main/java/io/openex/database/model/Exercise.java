@@ -91,6 +91,10 @@ public class Exercise implements Base {
     @JsonProperty("exercise_logo_light")
     private Document logoLight;
 
+    @Column(name = "exercise_lessons_anonymized")
+    @JsonProperty("exercise_lessons_anonymized")
+    private boolean lessonsAnonymized = false;
+
     @Column(name = "exercise_created_at")
     @JsonProperty("exercise_created_at")
     private Instant createdAt = now();
@@ -310,6 +314,14 @@ public class Exercise implements Base {
 
     public void setSubtitle(String subtitle) {
         this.subtitle = subtitle;
+    }
+
+    public boolean isLessonsAnonymized() {
+        return lessonsAnonymized;
+    }
+
+    public void setLessonsAnonymized(boolean lessonsAnonymized) {
+        this.lessonsAnonymized = lessonsAnonymized;
     }
 
     public Optional<Instant> getStart() {

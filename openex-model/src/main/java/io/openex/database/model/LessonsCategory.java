@@ -53,6 +53,14 @@ public class LessonsCategory implements Base {
     @JsonProperty("lessons_category_order")
     private int order;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "lessons_categories_audiences",
+            joinColumns = @JoinColumn(name = "lessons_category_id"),
+            inverseJoinColumns = @JoinColumn(name = "audience_id"))
+    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonProperty("lessons_category_audiences")
+    private List<Audience> audiences = new ArrayList<>();
+
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     @JsonProperty("lessons_category_questions")
     @JsonSerialize(using = MultiIdDeserializer.class)
@@ -113,6 +121,14 @@ public class LessonsCategory implements Base {
 
     public void setOrder(int order) {
         this.order = order;
+    }
+
+    public List<Audience> getAudiences() {
+        return audiences;
+    }
+
+    public void setAudiences(List<Audience> audiences) {
+        this.audiences = audiences;
     }
 
     public List<LessonsQuestion> getQuestions() {

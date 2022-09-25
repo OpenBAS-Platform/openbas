@@ -11,6 +11,7 @@ import {
   FlagOutlined,
   ContentPasteGoOutlined,
   HelpOutlined,
+  CastForEducationOutlined,
 } from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
@@ -32,6 +33,8 @@ import FormControl from '@mui/material/FormControl';
 import Chart from 'react-apexcharts';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
+import Chip from '@mui/material/Chip';
+import Tooltip from '@mui/material/Tooltip';
 import CreateObjective from './CreateObjective';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -51,10 +54,14 @@ import {
   fetchLessonsCategories,
   fetchLessonsQuestions,
   fetchLessonsTemplates,
+  updateLessonsCategoryAudiences,
 } from '../../../../actions/Lessons';
 import CreateLessonsQuestion from './categories/questions/CreateLessonsQuestion';
 import LessonsQuestionPopover from './categories/questions/LessonsQuestionPopover';
 import LessonsCategoryPopover from './categories/LessonsCategoryPopover';
+import LessonsCategoryAddAudiences from './categories/LessonsCategoryAddAudiences';
+import { fetchAudiences } from '../../../../actions/Audience';
+import { truncate } from '../../../../utils/String';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -112,6 +119,9 @@ const useStyles = makeStyles((theme) => ({
   heading: {
     display: 'flex',
   },
+  chip: {
+    margin: '0 10px 10px 0',
+  },
 }));
 
 const Lessons = () => {
@@ -131,6 +141,7 @@ const Lessons = () => {
     exercise,
     objectives,
     injects,
+    audiencesMap,
     lessonsCategories,
     lessonsQuestions,
     lessonsTemplates,
@@ -139,6 +150,7 @@ const Lessons = () => {
       exercise: helper.getExercise(exerciseId),
       objectives: helper.getExerciseObjectives(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
+      audiencesMap: helper.getAudiencesMap(),
       lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
       lessonsQuestions: helper.getExerciseLessonsQuestions(exerciseId),
       lessonsTemplates: helper.getLessonsTemplates(),
@@ -150,6 +162,7 @@ const Lessons = () => {
     dispatch(fetchLessonsQuestions(exerciseId));
     dispatch(fetchObjectives(exerciseId));
     dispatch(fetchInjects(exerciseId));
+    dispatch(fetchAudiences(exerciseId));
   });
   const applyTemplate = () => {
     return dispatch(applyLessonsTemplate(exerciseId, templateValue)).then(() => setOpenApplyTemplate(false));
@@ -185,6 +198,16 @@ const Lessons = () => {
     R.ascend(R.prop('lessons_template_question_order')),
   ]);
   const sortedCategories = sortCategories(lessonsCategories);
+  const getHoursDiff = (startDate, endDate) => {
+    const msInHour = 1000 * 60 * 60;
+    return Math.round(Math.abs(endDate - startDate) / msInHour);
+  };
+  const handleUpdateAudiences = (lessonsCategoryId, audiencesIds) => {
+    const data = { lessons_category_audiences: audiencesIds };
+    return dispatch(
+      updateLessonsCategoryAudiences(exerciseId, lessonsCategoryId, data),
+    );
+  };
   return (
     <div className={classes.container}>
       <ResultsMenu exerciseId={exerciseId} />
@@ -239,16 +262,28 @@ const Lessons = () => {
           <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
-                <Typography variant="h3">{t('Start date')}</Typography>n hours
+                <Typography variant="h3">{t('Start date')}</Typography>
+                {nsdt(exercise.exercise_start_date)}
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h3">{t('End date')}</Typography>n players
+                <Typography variant="h3">{t('End date')}</Typography>
+                {nsdt(exercise.exercise_end_date)}
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h3">{t('Duration')}</Typography>n hours
+                <Typography variant="h3">{t('Duration')}</Typography>
+                {getHoursDiff(
+                  exercise.exercise_start_date
+                    ? new Date(exercise.exercise_start_date)
+                    : new Date(),
+                  exercise.exercise_end_date
+                    ? new Date(exercise.exercise_end_date)
+                    : new Date(),
+                )}{' '}
+                {t('hours')}
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h3">{t('Audience')}</Typography>n players
+                <Typography variant="h3">{t('Audience')}</Typography>
+                {exercise.exercise_users_number} {t('players')}
               </Grid>
             </Grid>
           </Paper>
@@ -287,7 +322,7 @@ const Lessons = () => {
           <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
             <Alert severity="info">
               {t(
-                'Sending the questionnaire will send an email to each player with a unique to access and fill it.',
+                'Sending the questionnaire will emit an email to each player with a unique link to access and fill it.',
               )}
             </Alert>
             <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
@@ -425,7 +460,11 @@ const Lessons = () => {
               >
                 <Grid item={true} xs={4} style={{ marginTop: -10 }}>
                   <Typography variant="h4">{t('Questions')}</Typography>
-                  <Paper variant="outlined" classes={{ root: classes.paper }}>
+                  <Paper
+                    variant="outlined"
+                    classes={{ root: classes.paper }}
+                    style={{ marginTop: 14 }}
+                  >
                     <List style={{ padding: 0 }}>
                       {questions.map((question) => (
                         <ListItem
@@ -460,15 +499,47 @@ const Lessons = () => {
                     </List>
                   </Paper>
                 </Grid>
-                <Grid item={true} xs={2} style={{ marginTop: -10 }}>
-                  <Typography variant="h4">
+                <Grid item={true} xs={3} style={{ marginTop: -10 }}>
+                  <Typography variant="h4" style={{ float: 'left' }}>
                     {t('Targeted audiences')}
                   </Typography>
-                  <Paper variant="outlined" classes={{ root: classes.paper }}>
-                    &nbsp;
+                  <LessonsCategoryAddAudiences
+                    exerciseId={exerciseId}
+                    lessonsCategoryId={category.lessonscategory_id}
+                    lessonsCategoryAudiencesIds={
+                      category.lessons_category_audiences
+                    }
+                    handleUpdateAudiences={handleUpdateAudiences}
+                  />
+                  <div className="clearfix" />
+                  <Paper
+                    variant="outlined"
+                    classes={{ root: classes.paperPadding }}
+                  >
+                    {category.lessons_category_audiences.map((audienceId) => {
+                      const audience = audiencesMap[audienceId];
+                      return (
+                        <Tooltip title={audience?.audience_name || ''}>
+                          <Chip
+                            key={audienceId}
+                            onDelete={() => handleUpdateAudiences(
+                              category.lessonscategory_id,
+                              R.filter(
+                                (n) => n !== audienceId,
+                                category.lessons_category_audiences,
+                              ),
+                            )
+                            }
+                            label={truncate(audience?.audience_name || '', 30)}
+                            icon={<CastForEducationOutlined />}
+                            classes={{ root: classes.chip }}
+                          />
+                        </Tooltip>
+                      );
+                    })}
                   </Paper>
                 </Grid>
-                <Grid item={true} xs={6} style={{ marginTop: -10 }}>
+                <Grid item={true} xs={5} style={{ marginTop: -10 }}>
                   <Typography variant="h4">{t('Results')}</Typography>
                   <Paper variant="outlined" classes={{ root: classes.paper }}>
                     &nbsp;

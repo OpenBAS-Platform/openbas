@@ -27,8 +27,8 @@ Transition.displayName = 'TransitionSlide';
 
 const useStyles = makeStyles(() => ({
   button: {
-    float: 'right',
-    margin: '-12px -5px 0 0',
+    float: 'left',
+    margin: '-15px 5px 0 0',
   },
 }));
 

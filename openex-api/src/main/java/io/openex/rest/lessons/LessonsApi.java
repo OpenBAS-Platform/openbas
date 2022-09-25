@@ -1,13 +1,11 @@
 package io.openex.rest.lessons;
 
 import io.openex.database.model.*;
-import io.openex.database.repository.ExerciseRepository;
-import io.openex.database.repository.LessonsCategoryRepository;
-import io.openex.database.repository.LessonsQuestionRepository;
-import io.openex.database.repository.LessonsTemplateRepository;
+import io.openex.database.repository.*;
 import io.openex.database.specification.LessonsCategorySpecification;
 import io.openex.database.specification.LessonsQuestionSpecification;
 import io.openex.rest.helper.RestBehavior;
+import io.openex.rest.inject.form.InjectAudiencesInput;
 import io.openex.rest.lessons.form.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,12 +14,14 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+import static io.openex.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
 
 @RestController
 public class LessonsApi extends RestBehavior {
 
     private ExerciseRepository exerciseRepository;
+    private AudienceRepository audienceRepository;
     private LessonsTemplateRepository lessonsTemplateRepository;
     private LessonsCategoryRepository lessonsCategoryRepository;
     private LessonsQuestionRepository lessonsQuestionRepository;
@@ -29,6 +29,11 @@ public class LessonsApi extends RestBehavior {
     @Autowired
     public void setExerciseRepository(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
+    }
+
+    @Autowired
+    public void setAudienceRepository(AudienceRepository audienceRepository) {
+        this.audienceRepository = audienceRepository;
     }
 
     @Autowired
@@ -101,6 +106,15 @@ public class LessonsApi extends RestBehavior {
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public void deleteExerciseLessonsCategory(@PathVariable String lessonsCategoryId) {
         lessonsCategoryRepository.deleteById(lessonsCategoryId);
+    }
+
+    @PutMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/audiences")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public LessonsCategory updateExerciseLessonsCategoryAudiences(@PathVariable String exerciseId, @PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsCategoryAudiencesInput input) {
+        LessonsCategory lessonsCategory = lessonsCategoryRepository.findById(lessonsCategoryId).orElseThrow();
+        Iterable<Audience> lessonsCategoryAudiences = audienceRepository.findAllById(input.getAudienceIds());
+        lessonsCategory.setAudiences(fromIterable(lessonsCategoryAudiences));
+        return lessonsCategoryRepository.save(lessonsCategory);
     }
 
     @GetMapping("/api/exercises/{exerciseId}/lessons_questions")

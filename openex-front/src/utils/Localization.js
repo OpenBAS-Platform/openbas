@@ -427,7 +427,16 @@ const i18n = {
       'Apply a lessons learned template':
         "Appliquer un template de retour d'expérience",
       'No explanation': 'Aucune explication',
+      'Add target audiences in this lessons learned category':
+        "Ajouter des audiences cibles à cette catégorie de retour d'expérience",
+      'Sending the questionnaire will emit an email to each player with a unique link to access and fill it.':
+        'Envoyer le questionnaire va émettre un email à chaque joueur avec un lien unique pour y accéder et le remplir.',
+      Campaign: 'Campagne',
+      'Send the questionnaire': 'Envoyer le questionnaire',
+      'Reset answers': 'Réinitialiser les réponses',
+      hours: 'heures',
       Apply: 'Appliquer',
+      players: 'joueurs',
       Explanation: 'Explication',
       Category: 'Catégorie',
       'Create a new challenge': 'Créer un nouveau challenge',
