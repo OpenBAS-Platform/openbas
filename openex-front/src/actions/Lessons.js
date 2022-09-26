@@ -151,7 +151,7 @@ export const sendLessons = (exerciseId, data) => (dispatch) => {
 };
 
 export const fetchLessonsAnswers = (exerciseId) => (dispatch) => {
-  const uri = `/api/exercises${exerciseId}/lessons_answers`;
+  const uri = `/api/exercises/${exerciseId}/lessons_answers`;
   return getReferential(schema.arrayOfLessonsAnswers, uri)(dispatch);
 };
 

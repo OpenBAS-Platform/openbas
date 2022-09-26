@@ -239,7 +239,7 @@ public class LessonsApi extends RestBehavior {
         executor.executeInjection(injection);
     }
 
-    @GetMapping("/api/lessons/{exerciseId}/lessons_answers")
+    @GetMapping("/api/exercises/{exerciseId}/lessons_answers")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     public List<LessonsAnswer> exerciseLessonsAnswers(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
         return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream()

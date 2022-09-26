@@ -229,7 +229,7 @@ const LessonsPlayer = () => {
                               <SliderField
                                 name={`${question.lessonsquestion_id}_score`}
                                 min={0}
-                                max={10}
+                                max={100}
                               />
                             </Grid>
                             <Grid item={true} xs={3}>

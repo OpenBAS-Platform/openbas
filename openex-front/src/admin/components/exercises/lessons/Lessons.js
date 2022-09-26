@@ -57,6 +57,7 @@ import CreateLessonsCategory from './categories/CreateLessonsCategory';
 import {
   applyLessonsTemplate,
   emptyLessonsCategories,
+  fetchLessonsAnswers,
   fetchLessonsCategories,
   fetchLessonsQuestions,
   fetchLessonsTemplates,
@@ -69,9 +70,10 @@ import LessonsQuestionPopover from './categories/questions/LessonsQuestionPopove
 import LessonsCategoryPopover from './categories/LessonsCategoryPopover';
 import LessonsCategoryAddAudiences from './categories/LessonsCategoryAddAudiences';
 import { fetchAudiences } from '../../../../actions/Audience';
-import { truncate } from '../../../../utils/String';
+import { resolveUserName, truncate } from '../../../../utils/String';
 import { updateExerciseLessons } from '../../../../actions/Exercise';
 import SendLessonsForm from './SendLessonsForm';
+import { fetchPlayers } from '../../../../actions/User';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -144,6 +146,7 @@ const Lessons = () => {
   const [openResetAnswers, setOpenResetAnswers] = useState(false);
   const [openEmptyLessons, setOpenEmptyLessons] = useState(false);
   const [openSendLessons, setOpenSendLessons] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [templateValue, setTemplateValue] = useState(null);
   const handleChange = (event) => {
     setTemplateValue(event.target.value);
@@ -157,7 +160,9 @@ const Lessons = () => {
     audiencesMap,
     lessonsCategories,
     lessonsQuestions,
+    lessonsAnswers,
     lessonsTemplates,
+    usersMap,
   } = useHelper((helper) => {
     return {
       exercise: helper.getExercise(exerciseId),
@@ -166,16 +171,20 @@ const Lessons = () => {
       audiencesMap: helper.getAudiencesMap(),
       lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
       lessonsQuestions: helper.getExerciseLessonsQuestions(exerciseId),
+      lessonsAnswers: helper.getExerciseLessonsAnswers(exerciseId),
       lessonsTemplates: helper.getLessonsTemplates(),
+      usersMap: helper.getUsersMap(),
     };
   });
   useDataLoader(() => {
     dispatch(fetchLessonsTemplates());
     dispatch(fetchLessonsCategories(exerciseId));
     dispatch(fetchLessonsQuestions(exerciseId));
+    dispatch(fetchLessonsAnswers(exerciseId));
     dispatch(fetchObjectives(exerciseId));
     dispatch(fetchInjects(exerciseId));
     dispatch(fetchAudiences(exerciseId));
+    dispatch(fetchPlayers());
   });
   const applyTemplate = () => {
     return dispatch(applyLessonsTemplate(exerciseId, templateValue)).then(() => setOpenApplyTemplate(false));
@@ -237,6 +246,38 @@ const Lessons = () => {
   const handleSubmitSendLessons = (data) => {
     return dispatch(sendLessons(exerciseId, data));
   };
+  const consolidatedAnswers = R.pipe(
+    R.groupBy(R.prop('lessons_answer_question')),
+    R.toPairs,
+    R.map((n) => {
+      let totalScore = 0;
+      return [
+        n[0],
+        {
+          score: Math.round(
+            R.pipe(
+              R.map((o) => {
+                totalScore += o.lessons_answer_score;
+                return totalScore;
+              }),
+              R.sum,
+            )(n[1]) / n[1].length,
+          ),
+          number: n[1].length,
+          comments: R.filter(
+            (o) => o.lessons_answer_positive !== null
+              || o.lessons_answer_negative !== null,
+            n[1],
+          ).length,
+        },
+      ];
+    }),
+    R.fromPairs,
+  )(lessonsAnswers);
+  const answers = R.groupBy(R.prop('lessons_answer_question'), lessonsAnswers);
+  const selectedQuestionAnswers = selectedQuestion
+    ? answers[selectedQuestion.lessonsquestion_id]
+    : [];
   return (
     <div className={classes.container}>
       <ResultsMenu exerciseId={exerciseId} />
@@ -551,6 +592,63 @@ const Lessons = () => {
                     </List>
                   </Paper>
                 </Grid>
+                <Grid item={true} xs={5} style={{ marginTop: -10 }}>
+                  <Typography variant="h4">{t('Results')}</Typography>
+                  <Paper
+                    variant="outlined"
+                    classes={{ root: classes.paper }}
+                    style={{ marginTop: 14 }}
+                  >
+                    <List style={{ padding: 0 }}>
+                      {questions.map((question) => {
+                        const consolidatedAnswer = consolidatedAnswers[
+                          question.lessonsquestion_id
+                        ] || { score: 0, number: 0, comments: 0 };
+                        return (
+                          <ListItem
+                            key={question.lessonsquestion_id}
+                            divider={true}
+                            button={true}
+                            onClick={() => setSelectedQuestion(question)}
+                          >
+                            <ListItemText
+                              style={{ width: '50%' }}
+                              primary={`${consolidatedAnswer.number} ${t(
+                                'answers',
+                              )}`}
+                              secondary={`${t('of which')} ${
+                                consolidatedAnswer.comments
+                              } ${t('contain comments')}`}
+                            />
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                width: '30%',
+                                marginRight: 1,
+                              }}
+                            >
+                              <Box sx={{ width: '100%', mr: 1 }}>
+                                <LinearProgress
+                                  variant="determinate"
+                                  value={consolidatedAnswer.score}
+                                />
+                              </Box>
+                              <Box sx={{ minWidth: 35 }}>
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  {consolidatedAnswer.score}%
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  </Paper>
+                </Grid>
                 <Grid item={true} xs={3} style={{ marginTop: -10 }}>
                   <Typography variant="h4" style={{ float: 'left' }}>
                     {t('Targeted audiences')}
@@ -591,12 +689,6 @@ const Lessons = () => {
                         </Tooltip>
                       );
                     })}
-                  </Paper>
-                </Grid>
-                <Grid item={true} xs={5} style={{ marginTop: -10 }}>
-                  <Typography variant="h4">{t('Results')}</Typography>
-                  <Paper variant="outlined" classes={{ root: classes.paper }}>
-                    &nbsp;
                   </Paper>
                 </Grid>
               </Grid>
@@ -760,6 +852,63 @@ const Lessons = () => {
             handleClose={() => setOpenSendLessons(false)}
           />
         </DialogContent>
+      </Dialog>
+      <Dialog
+        open={selectedQuestion !== null}
+        TransitionComponent={Transition}
+        onClose={() => setSelectedQuestion(null)}
+        PaperProps={{ elevation: 1 }}
+        maxWidth="ld"
+        fullWidth={true}
+      >
+        <DialogTitle>{selectedQuestion?.lessons_question_content}</DialogTitle>
+        <DialogContent style={{ paddingTop: 20 }}>
+          {selectedQuestionAnswers.map((answer) => (
+            <div
+              key={answer.lessonsanswer_id}
+              style={{
+                marginBottom: 70,
+                borderBottom: `1px solid ${theme.palette.background.paper}`,
+                paddingBottom: 10,
+              }}
+            >
+              <Grid container={true} spacing={3}>
+                <Grid item={true} xs={3} style={{ marginTop: -10 }}>
+                  <Typography variant="h4">{t('User')}</Typography>
+                  {exercise.exercise_lessons_anonymized
+                    ? t('Anonymized')
+                    : resolveUserName(usersMap[answer.lessons_answer_user])}
+                </Grid>
+                <Grid item={true} xs={3} style={{ marginTop: -10 }}>
+                  <Typography variant="h4" style={{ marginBottom: 20 }}>
+                    {t('Score')}
+                  </Typography>
+                  <div style={{ width: '80%' }}>
+                    <LinearProgress
+                      variant="determinate"
+                      value={answer.lessons_answer_score}
+                    />
+                  </div>
+                </Grid>
+                <Grid item={true} xs={3} style={{ marginTop: -10 }}>
+                  <Typography variant="h4">{t('What worked well')}</Typography>
+                  {answer.lessons_answer_positive}
+                </Grid>
+                <Grid item={true} xs={3} style={{ marginTop: -10 }}>
+                  <Typography variant="h4">
+                    {t("What didn't work well")}
+                  </Typography>
+                  {answer.lessons_answer_negative}
+                </Grid>
+              </Grid>
+            </div>
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSelectedQuestion(null)}>
+            {t('Close')}
+          </Button>
+        </DialogActions>
       </Dialog>
       <CreateLessonsCategory exerciseId={exerciseId} />
     </div>
