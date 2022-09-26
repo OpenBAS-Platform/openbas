@@ -382,6 +382,7 @@ const i18n = {
       'Update the log': "Modifier l'entrée",
       'Create a new user': 'Créer un nouvel utilisateur',
       'Dryrun recipients': 'Destinataires de la simulation',
+      'Create a new report': 'Créer un nouveau rapport',
       token: 'Token du compte',
       status: 'Statut',
       'Inject documents': 'Documents du stimuli',

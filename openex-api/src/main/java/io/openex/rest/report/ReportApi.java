@@ -1,6 +1,5 @@
 package io.openex.rest.report;
 
-import io.openex.config.OpenExConfig;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
 import io.openex.database.specification.ReportSpecification;

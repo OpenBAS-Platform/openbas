@@ -9,8 +9,14 @@ import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 public class ReportCreateInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("lessons_category_name")
+    @JsonProperty("report_name")
     private String name;
+
+    @JsonProperty("report_description")
+    private String description;
+
+    @JsonProperty("report_general_information")
+    private boolean generalInformationn;
 
     @JsonProperty("report_stats_definition")
     private boolean statsDefinition;
@@ -39,6 +45,22 @@ public class ReportCreateInput {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isGeneralInformationn() {
+        return generalInformationn;
+    }
+
+    public void setGeneralInformationn(boolean generalInformationn) {
+        this.generalInformationn = generalInformationn;
     }
 
     public boolean isStatsDefinition() {

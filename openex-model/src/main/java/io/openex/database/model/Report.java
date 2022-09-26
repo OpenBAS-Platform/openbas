@@ -41,6 +41,14 @@ public class Report implements Base {
     @JsonProperty("report_name")
     private String name;
 
+    @Column(name = "report_description")
+    @JsonProperty("report_description")
+    private String description;
+
+    @Column(name = "report_general_information")
+    @JsonProperty("report_general_information")
+    private boolean generalInformation;
+
     @Column(name = "report_stats_definition")
     @JsonProperty("report_stats_definition")
     private boolean statsDefinition;
