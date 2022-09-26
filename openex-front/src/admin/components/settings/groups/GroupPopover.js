@@ -404,7 +404,7 @@ class GroupPopover extends Component {
                       <Chip
                         key={userId}
                         onDelete={this.removeUser.bind(this, userId)}
-                        label={truncate(resolveUserName(user), 22)}
+                        label={user ? truncate(resolveUserName(user), 22) : '-'}
                         avatar={<Avatar src={userGravatar} size={32} />}
                         classes={{ root: classes.chip }}
                       />
