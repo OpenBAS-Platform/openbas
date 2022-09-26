@@ -6,7 +6,12 @@ import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import { lightBlue } from '@mui/material/colors';
 import IconButton from '@mui/material/IconButton';
-import { ExpandLess, ExpandMore, AttachFileRounded, ReplyOutlined } from '@mui/icons-material';
+import {
+  ExpandLess,
+  ExpandMore,
+  AttachFileRounded,
+  ReplyOutlined,
+} from '@mui/icons-material';
 import parse from 'html-react-parser';
 import DOMPurify from 'dompurify';
 import Button from '@mui/material/Button';
@@ -162,18 +167,24 @@ const Communication = (props) => {
             {expand ? content : truncate(content, limit)}
           </div>
         )}
-        {hasAttachment && <div style={{ marginTop: 10 }}>
-               {communication.communication_attachments.map((a) => {
-                 return <a href={`/api/communications/attachment?file=${a}`}>
-                     <Button variant="contained" style={{ marginRight: 10, fontSize: 10 }}
-                         startIcon={<AttachFileRounded style={{ fontSize: 14 }} />}
-                         color="secondary">
-                         {a.substring(a.lastIndexOf('/') + 1)}
-                     </Button>
-                   </a>;
-               })}
-           </div>
-        }
+        {hasAttachment && (
+          <div style={{ marginTop: 10 }}>
+            {communication.communication_attachments.map((a) => {
+              return (
+                <a href={`/api/communications/attachment?file=${a}`}>
+                  <Button
+                    variant="contained"
+                    style={{ marginRight: 10, fontSize: 10 }}
+                    startIcon={<AttachFileRounded style={{ fontSize: 14 }} />}
+                    color="secondary"
+                  >
+                    {a.substring(a.lastIndexOf('/') + 1)}
+                  </Button>
+                </a>
+              );
+            })}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

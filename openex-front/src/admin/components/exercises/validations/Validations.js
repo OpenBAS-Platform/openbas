@@ -239,9 +239,7 @@ const Validations = () => {
         <List>
           {Object.keys(groupedExpectation).map((injectId) => {
             const inject = injectsMap[injectId] || {};
-            const injectContract = inject
-              ? injectTypesMap[inject.inject_contract]
-              : {};
+            const injectContract = injectTypesMap[inject.inject_contract] || {};
             return (
               <div>
                 <ListItem
@@ -289,9 +287,8 @@ const Validations = () => {
                       (audienceId) => {
                         const audience = audiencesMap[audienceId] || {};
                         return (
-                          <div>
+                          <div key={audience.audience_id}>
                             <ListItem
-                              key={audience.audience_id}
                               divider={true}
                               sx={{ pl: 4 }}
                               classes={{ root: classes.item }}

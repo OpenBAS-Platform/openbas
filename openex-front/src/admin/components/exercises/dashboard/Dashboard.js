@@ -126,7 +126,7 @@ const Dashboard = () => {
     dispatch(fetchInjects(exerciseId));
     dispatch(fetchExerciseChallenges(exerciseId));
     dispatch(fetchExerciseInjectExpectations(exerciseId));
-    dispatch(fetchPlayers(exerciseId));
+    dispatch(fetchPlayers());
     dispatch(fetchExerciseCommunications(exerciseId));
     dispatch(fetchOrganizations());
   });
@@ -210,7 +210,7 @@ const Dashboard = () => {
   const sortedInjectTypesWithScoreByNumber = R.pipe(
     R.sortWith([R.descend(R.prop('number'))]),
     R.take(10),
-  )(injectTypesWithScore || []);
+  )(injectTypesWithScore);
   const expectationsByInjectTypeData = [
     {
       name: t('Number of expectations'),
@@ -225,7 +225,7 @@ const Dashboard = () => {
   const sortedInjectTypesWithScoreByScore = R.pipe(
     R.sortWith([R.descend(R.prop('score'))]),
     R.take(10),
-  )(injectTypesWithScore || []);
+  )(injectTypesWithScore);
   const expectedScoreByInjectTypeData = [
     {
       name: t('Total expected score'),
@@ -505,7 +505,7 @@ const Dashboard = () => {
   const sortedOrganizationsByTotalScore = R.pipe(
     R.sortWith([R.descend(R.prop('organization_total_score'))]),
     R.take(10),
-  )(organizationsTotalScores || []);
+  )(organizationsTotalScores);
   const totalScoreByOrganizationData = [
     {
       name: t('Total score'),
@@ -531,7 +531,7 @@ const Dashboard = () => {
   const sortedUsersByTotalScore = R.pipe(
     R.sortWith([R.descend(R.prop('user_total_score'))]),
     R.take(10),
-  )(usersTotalScores || []);
+  )(usersTotalScores);
   const totalScoreByUserData = [
     {
       name: t('Total score'),
@@ -573,7 +573,7 @@ const Dashboard = () => {
               <CastForEducationOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
             <div className={classes.title}>{t('Audiences')}</div>
-            <div className={classes.number}>{audiences.length}</div>
+            <div className={classes.number}>{(audiences || []).length}</div>
           </Paper>
         </Grid>
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>

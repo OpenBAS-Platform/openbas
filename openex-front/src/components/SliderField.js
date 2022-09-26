@@ -18,6 +18,8 @@ const renderSliderField = ({ input, step, min, max, onSliderChange }) => (
       }
       input.onChange(newValue);
     }}
+    valueLabelDisplay="auto"
+    marks={true}
   />
 );
 

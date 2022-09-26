@@ -218,10 +218,10 @@ const Lessons = () => {
     },
   ];
   const sortCategories = R.sortWith([
-    R.ascend(R.prop('lessons_template_category_order')),
+    R.ascend(R.prop('lessons_category_order')),
   ]);
   const sortQuestions = R.sortWith([
-    R.ascend(R.prop('lessons_template_question_order')),
+    R.ascend(R.prop('lessons_question_order')),
   ]);
   const sortedCategories = sortCategories(lessonsCategories);
   const getHoursDiff = (startDate, endDate) => {
@@ -500,7 +500,7 @@ const Lessons = () => {
             ),
           );
           return (
-            <div style={{ marginTop: 70 }}>
+            <div key={category.lessonscategory_id} style={{ marginTop: 70 }}>
               <Typography variant="h2" style={{ float: 'left' }}>
                 {category.lessons_category_name}
               </Typography>
@@ -509,11 +509,7 @@ const Lessons = () => {
                 lessonsCategory={category}
               />
               <div className="clearfix" />
-              <Grid
-                key={category.lessonscategory_id}
-                container={true}
-                spacing={3}
-              >
+              <Grid container={true} spacing={3}>
                 <Grid item={true} xs={4} style={{ marginTop: -10 }}>
                   <Typography variant="h4">{t('Questions')}</Typography>
                   <Paper
@@ -575,9 +571,11 @@ const Lessons = () => {
                     {category.lessons_category_audiences.map((audienceId) => {
                       const audience = audiencesMap[audienceId];
                       return (
-                        <Tooltip title={audience?.audience_name || ''}>
+                        <Tooltip
+                          key={audienceId}
+                          title={audience?.audience_name || ''}
+                        >
                           <Chip
-                            key={audienceId}
                             onDelete={() => handleUpdateAudiences(
                               category.lessonscategory_id,
                               R.filter(
@@ -650,6 +648,7 @@ const Lessons = () => {
               {lessonsTemplates.map((template) => {
                 return (
                   <FormControlLabel
+                    key={template.lessonstemplate_id}
                     style={{
                       width: '100%',
                       borderBottom: `1px solid ${theme.palette.background.paper}`,
@@ -744,7 +743,7 @@ const Lessons = () => {
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
-        <DialogTitle>{t('Send a new comcheck')}</DialogTitle>
+        <DialogTitle>{t('Send the lessons learned questionnaire')}</DialogTitle>
         <DialogContent style={{ overflowX: 'hidden' }}>
           <SendLessonsForm
             onSubmit={handleSubmitSendLessons}

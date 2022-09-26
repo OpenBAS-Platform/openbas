@@ -321,6 +321,16 @@ const i18n = {
       'Add tags to this exercise': 'Ajouter des tags à cet exercice',
       'No comcheck in this exercise.': 'Aucune vérification dans cet exercice',
       'There is nothing to see here...': "Il n'y a rien à voir ici...",
+      'Send the lessons learned questionnaire':
+        "Envoyer le questionnaire de retour d'expérience",
+      'Comment (optional)': 'Commentaire (optionnel)',
+      "What didn't work well": "Ce qui n'a pas bien fonctionné",
+      'What worked well': 'Ce qui a bien fonctionné',
+      'Global evaluation': 'Evaluation globale',
+      'Your overall evaluation about this question.':
+        'Votre évaluation générale à propos de cette question.',
+      'Do you want to submit your answers? You will not be able to change them later.':
+        'Souhaitez-vous soumettre vos réponses ? Vous ne pourrez pas les changer plus tard.',
       Check: 'Vérification',
       Preview: 'Aperçu',
       None: 'Aucune',
