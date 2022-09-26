@@ -10,9 +10,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static java.time.Instant.now;
 
@@ -65,6 +63,13 @@ public class LessonsCategory implements Base {
     @JsonProperty("lessons_category_questions")
     @JsonSerialize(using = MultiIdDeserializer.class)
     private List<LessonsQuestion> questions = new ArrayList<>();
+
+    // region transient
+    @JsonProperty("lessons_category_users")
+    public List<String> getUsers() {
+        return getAudiences().stream().flatMap(audience -> audience.getUsers().stream().map(User::getId)).toList();
+    }
+    // endregion
 
     @Override
     public String getId() {

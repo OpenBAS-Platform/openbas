@@ -309,7 +309,7 @@ const Lessons = () => {
             </div>
             <div className={classes.title}>{t('Poll replies')}</div>
             <div className={classes.number}>
-              {exercise.exercise_answers_number}
+              {exercise.exercise_lessons_answers_number}
             </div>
           </Paper>
         </Grid>

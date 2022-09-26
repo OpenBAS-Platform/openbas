@@ -150,6 +150,11 @@ public class Exercise implements Base {
     @JsonProperty("exercise_articles")
     private List<Article> articles = new ArrayList<>();
 
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
+    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonProperty("exercise_lessons_categories")
+    private List<LessonsCategory> lessonsCategories = new ArrayList<>();
+
     // region transient
     @JsonProperty("exercise_injects_statistics")
     public Map<String, Long> getInjectStatistics() {
@@ -163,6 +168,12 @@ public class Exercise implements Base {
         stats.put("total_future", injects.stream().filter(Inject::isFutureInject).count());
         stats.put("total_progress", total > 0 ? (executed * 100 / total) : 0);
         return stats;
+    }
+
+    @JsonProperty("exercise_lessons_answers_number")
+    public Long getLessonsAnswersNumbers() {
+        return getLessonsCategories().stream().flatMap(lessonsCategory -> lessonsCategory.getQuestions()
+                .stream().flatMap(lessonsQuestion -> lessonsQuestion.getAnswers().stream())).count();
     }
 
     private List<User> getUsersByType(Grant.GRANT_TYPE... types) {
@@ -454,6 +465,14 @@ public class Exercise implements Base {
 
     public void setArticles(List<Article> articles) {
         this.articles = articles;
+    }
+
+    public List<LessonsCategory> getLessonsCategories() {
+        return lessonsCategories;
+    }
+
+    public void setLessonsCategories(List<LessonsCategory> lessonsCategories) {
+        this.lessonsCategories = lessonsCategories;
     }
 
     @Override

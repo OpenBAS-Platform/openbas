@@ -87,14 +87,15 @@ const LessonsPlayer = () => {
       ),
     };
   });
+  const finalUserId = userId && userId !== 'null' ? userId : me?.user_id;
   // Pass the full exercise because the exercise is never loaded in the store at this point
   const permissions = usePermissions(exerciseId, exercise);
   useEffect(() => {
     dispatch(fetchMe());
     dispatch(fetchPlayerExercise(exerciseId, userId));
-    dispatch(fetchPlayerLessonsCategories(exerciseId, userId || me.user_id));
-    dispatch(fetchPlayerLessonsQuestions(exerciseId, userId || me.user_id));
-    dispatch(fetchPlayerLessonsAnswers(exerciseId, userId || me.user_id));
+    dispatch(fetchPlayerLessonsCategories(exerciseId, finalUserId));
+    dispatch(fetchPlayerLessonsQuestions(exerciseId, finalUserId));
+    dispatch(fetchPlayerLessonsAnswers(exerciseId, finalUserId));
   }, []);
   const validate = (values) => {
     const errors = {};
@@ -131,7 +132,7 @@ const LessonsPlayer = () => {
       }),
     ).then(() => {
       setOpenValidate(false);
-      dispatch(fetchPlayerLessonsAnswers(exerciseId, userId || me.user_id));
+      dispatch(fetchPlayerLessonsAnswers(exerciseId, finalUserId));
     });
   };
   const sortCategories = R.sortWith([
@@ -140,7 +141,12 @@ const LessonsPlayer = () => {
   const sortQuestions = R.sortWith([
     R.ascend(R.prop('lessons_question_order')),
   ]);
-  const sortedCategories = sortCategories(lessonsCategories);
+  const sortedCategories = sortCategories(
+    R.filter(
+      (n) => n.lessons_category_users.includes(finalUserId),
+      lessonsCategories,
+    ),
+  );
   const initialValues = R.pipe(
     R.map((n) => ({
       [`${n.lessons_answer_question}_score`]: n.lessons_answer_score,
@@ -157,7 +163,7 @@ const LessonsPlayer = () => {
             color="secondary"
             variant="outlined"
             component={Link}
-            to={`/lessons/${exerciseId}?user=${userId}&preview=true`}
+            to={`/lessons/${exerciseId}?user=${finalUserId}&preview=true`}
             style={{ position: 'absolute', top: 20, right: 20 }}
           >
             {t('Switch to preview mode')}

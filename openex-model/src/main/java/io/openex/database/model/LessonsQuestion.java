@@ -54,6 +54,11 @@ public class LessonsQuestion implements Base {
     @JsonProperty("lessons_question_order")
     private int order;
 
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
+    @JsonProperty("lessons_question_answers")
+    @JsonSerialize(using = MultiIdDeserializer.class)
+    private List<LessonsAnswer> answers = new ArrayList<>();
+
     // region transient
     @JsonProperty("lessons_question_exercise")
     public String getExercise() {
@@ -116,6 +121,14 @@ public class LessonsQuestion implements Base {
 
     public void setOrder(int order) {
         this.order = order;
+    }
+
+    public List<LessonsAnswer> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(List<LessonsAnswer> answers) {
+        this.answers = answers;
     }
 
     @Override
