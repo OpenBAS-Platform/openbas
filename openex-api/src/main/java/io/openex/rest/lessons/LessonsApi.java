@@ -192,7 +192,7 @@ public class LessonsApi extends RestBehavior {
 
     @PostMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public LessonsQuestion createExerciseLessonsQuestion(@PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsAnswerCreateInput input) {
+    public LessonsQuestion createExerciseLessonsQuestion(@PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsQuestionCreateInput input) {
         LessonsCategory lessonsCategory = lessonsCategoryRepository.findById(lessonsCategoryId).orElseThrow();
         LessonsQuestion lessonsQuestion = new LessonsQuestion();
         lessonsQuestion.setUpdateAttributes(input);

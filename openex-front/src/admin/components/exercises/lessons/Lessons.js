@@ -275,7 +275,7 @@ const Lessons = () => {
     R.fromPairs,
   )(lessonsAnswers);
   const answers = R.groupBy(R.prop('lessons_answer_question'), lessonsAnswers);
-  const selectedQuestionAnswers = selectedQuestion
+  const selectedQuestionAnswers = selectedQuestion && answers[selectedQuestion.lessonsquestion_id]
     ? answers[selectedQuestion.lessonsquestion_id]
     : [];
   return (

@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CreateLessonsQuestion = (props) => {
-  const { onCreate, inline, lessonsId, lessonsCategoryId } = props;
+  const { onCreate, inline, exerciseId, lessonsCategoryId } = props;
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
@@ -41,7 +41,7 @@ const CreateLessonsQuestion = (props) => {
   const handleClose = () => setOpen(false);
   const onSubmit = (data) => {
     return dispatch(
-      addLessonsQuestion(lessonsId, lessonsCategoryId, data),
+      addLessonsQuestion(exerciseId, lessonsCategoryId, data),
     ).then((result) => {
       if (result.result) {
         if (onCreate) {
