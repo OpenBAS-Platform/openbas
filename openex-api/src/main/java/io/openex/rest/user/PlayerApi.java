@@ -3,6 +3,7 @@ package io.openex.rest.user;
 import io.openex.config.SessionManager;
 import io.openex.database.model.Communication;
 import io.openex.database.model.Inject;
+import io.openex.database.model.Organization;
 import io.openex.database.model.User;
 import io.openex.database.repository.*;
 import io.openex.rest.helper.RestBehavior;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.util.List;
 
 import static io.openex.helper.DatabaseHelper.updateRelation;
 import static io.openex.helper.StreamHelper.fromIterable;
@@ -64,17 +66,31 @@ public class PlayerApi extends RestBehavior {
         this.userRepository = userRepository;
     }
 
+
     @GetMapping("/api/players")
+    @Transactional(rollbackOn = Exception.class)
     @PreAuthorize("isObserver()")
     public Iterable<User> players() {
+        List<User> players;
+        User currentUser = currentUser();
+        if (currentUser.isAdmin()) {
+            players = fromIterable(userRepository.findAll());
+        } else {
+            User local = userRepository.findById(currentUser.getId()).orElseThrow();
+            List<String> organizationIds = local.getGroups().stream()
+                    .flatMap(group -> group.getOrganizations().stream())
+                    .map(Organization::getId)
+                    .toList();
+            players = userRepository.usersAccessibleFromOrganizations(organizationIds);
+        }
         Iterable<Inject> injects = injectRepository.findAll();
-        return fromIterable(userRepository.findAll()).stream()
-                .peek(user -> user.resolveInjects(injects)).toList();
+        return players.stream().peek(user -> user.resolveInjects(injects)).toList();
     }
 
     @GetMapping("/api/player/{userId}/communications")
     @PreAuthorize("isPlanner()")
     public Iterable<Communication> playerCommunications(@PathVariable String userId) {
+        checkUserAccess(userRepository, userId);
         return communicationRepository.findByUser(userId);
     }
 
@@ -82,6 +98,7 @@ public class PlayerApi extends RestBehavior {
     @PostMapping("/api/players")
     @PreAuthorize("isPlanner()")
     public User createPlayer(@Valid @RequestBody CreatePlayerInput input) {
+        checkOrganizationAccess(userRepository, input.getOrganizationId());
         User user = new User();
         user.setUpdateAttributes(input);
         user.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
@@ -94,8 +111,9 @@ public class PlayerApi extends RestBehavior {
     @PutMapping("/api/players/{userId}")
     @PreAuthorize("isPlanner()")
     public User updatePlayer(@PathVariable String userId, @Valid @RequestBody UpdatePlayerInput input) {
+        checkUserAccess(userRepository, userId);
         User user = userRepository.findById(userId).orElseThrow();
-        if (!currentUser().isAdmin() && user.isManager()) {
+        if (!currentUser().isAdmin() && user.isManager() && !currentUser().getId().equals(userId)) {
             throw new UnsupportedOperationException("You dont have the right to update this user");
         }
         user.setUpdateAttributes(input);
@@ -107,6 +125,7 @@ public class PlayerApi extends RestBehavior {
     @DeleteMapping("/api/players/{userId}")
     @PreAuthorize("isPlanner()")
     public void deletePlayer(@PathVariable String userId) {
+        checkUserAccess(userRepository, userId);
         User user = userRepository.findById(userId).orElseThrow();
         if (!currentUser().isAdmin() && user.isManager()) {
             throw new UnsupportedOperationException("You dont have the right to delete this user");

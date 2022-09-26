@@ -363,10 +363,7 @@ class Groups extends Component {
                         '-'
                       )}
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.group_default_exercise_planner}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.group_default_exercise_planner}>
                       {group.group_default_exercise_planner ? (
                         <Tooltip
                           title={t(
@@ -379,10 +376,7 @@ class Groups extends Component {
                         '-'
                       )}
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.group_users_number}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.group_users_number}>
                       {group.group_users_number}
                     </div>
                   </div>

@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
+import io.openex.database.model.Organization;
 import io.openex.database.model.User;
 import io.openex.database.repository.UserRepository;
 import io.openex.rest.exception.InputValidationException;
 import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -30,13 +31,6 @@ public class RestBehavior {
 
     @Resource
     protected ObjectMapper mapper;
-
-    private UserRepository userRepository;
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     // Build the mapping between json specific name and the actual database field name
     private Map<String, String> buildJsonMappingFields(MethodArgumentNotValidException ex) {
@@ -105,7 +99,7 @@ public class RestBehavior {
     }
 
     // --- Open media access
-    public User impersonateUser(String userId) {
+    public User impersonateUser(UserRepository userRepository, String userId) {
         User user = currentUser();
         if (user.getId().equals(ANONYMOUS)) {
             user = userRepository.findById(userId).orElseThrow();
@@ -114,5 +108,38 @@ public class RestBehavior {
             }
         }
         return user;
+    }
+
+    public void checkUserAccess(UserRepository userRepository, String userId) {
+        User askedUser = userRepository.findById(userId).orElseThrow();
+        if (askedUser.getOrganization() != null) {
+            User currentUser = currentUser();
+            if (!currentUser.isAdmin()) {
+                User local = userRepository.findById(currentUser.getId()).orElseThrow();
+                List<String> localOrganizationIds = local.getGroups().stream()
+                        .flatMap(group -> group.getOrganizations().stream())
+                        .map(Organization::getId)
+                        .toList();
+                if (!localOrganizationIds.contains(askedUser.getOrganization().getId())) {
+                    throw new UnsupportedOperationException("User is restricted");
+                }
+            }
+        }
+    }
+
+    public void checkOrganizationAccess(UserRepository userRepository, String organizationId) {
+        if (organizationId != null) {
+            User currentUser = currentUser();
+            if (!currentUser.isAdmin()) {
+                User local = userRepository.findById(currentUser.getId()).orElseThrow();
+                List<String> localOrganizationIds = local.getGroups().stream()
+                        .flatMap(group -> group.getOrganizations().stream())
+                        .map(Organization::getId)
+                        .toList();
+                if (!localOrganizationIds.contains(organizationId)) {
+                    throw new UnsupportedOperationException("User is restricted");
+                }
+            }
+        }
     }
 }

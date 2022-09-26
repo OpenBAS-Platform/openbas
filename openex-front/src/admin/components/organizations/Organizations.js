@@ -343,7 +343,7 @@ class Organizations extends Component {
             </ListItem>
           ))}
         </List>
-        <CreateOrganization />
+        { this.props.userAdmin && <CreateOrganization /> }
       </div>
     );
   }
@@ -358,9 +358,11 @@ Organizations.propTypes = {
 
 const select = (state) => {
   const helper = storeHelper(state);
+  const user = helper.getMe();
   return {
     organizations: helper.getOrganizations(),
     tagsMap: helper.getTagsMap(),
+    userAdmin: user?.user_admin,
   };
 };
 

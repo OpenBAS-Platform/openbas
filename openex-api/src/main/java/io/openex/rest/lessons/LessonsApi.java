@@ -15,7 +15,6 @@ import io.openex.injects.email.model.EmailContent;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.lessons.form.*;
 import io.openex.service.ContractService;
-import org.simpleframework.xml.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,6 +44,12 @@ public class LessonsApi extends RestBehavior {
     private LessonsAnswerRepository lessonsAnswerRepository;
     private ContractService contractService;
     private ApplicationContext context;
+    private UserRepository userRepository;
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Autowired
     public void setExerciseRepository(ExerciseRepository exerciseRepository) {
@@ -250,7 +255,7 @@ public class LessonsApi extends RestBehavior {
 
     @GetMapping("/api/player/lessons/{exerciseId}/lessons_categories")
     public List<LessonsCategory> playerLessonsCategories(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
-        final User user = userId.map(this::impersonateUser).orElse(currentUser());
+        final User user = userId.map(id -> impersonateUser(userRepository, id)).orElse(currentUser());
         if (user.getId().equals(ANONYMOUS)) {
             throw new UnsupportedOperationException("User must be logged or dynamic player is required");
         }
@@ -259,7 +264,7 @@ public class LessonsApi extends RestBehavior {
 
     @GetMapping("/api/player/lessons/{exerciseId}/lessons_questions")
     public List<LessonsQuestion> playerLessonsQuestions(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
-        final User user = userId.map(this::impersonateUser).orElse(currentUser());
+        final User user = userId.map(id -> impersonateUser(userRepository, id)).orElse(currentUser());
         if (user.getId().equals(ANONYMOUS)) {
             throw new UnsupportedOperationException("User must be logged or dynamic player is required");
         }
@@ -269,7 +274,7 @@ public class LessonsApi extends RestBehavior {
 
     @GetMapping("/api/player/lessons/{exerciseId}/lessons_answers")
     public List<LessonsAnswer> playerLessonsAnswers(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
-        final User user = userId.map(this::impersonateUser).orElse(currentUser());
+        final User user = userId.map(id -> impersonateUser(userRepository, id)).orElse(currentUser());
         if (user.getId().equals(ANONYMOUS)) {
             throw new UnsupportedOperationException("User must be logged or dynamic player is required");
         }
@@ -281,7 +286,7 @@ public class LessonsApi extends RestBehavior {
 
     @PostMapping("/api/player/lessons/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}/lessons_answers")
     public LessonsAnswer createExerciseLessonsQuestion(@PathVariable String lessonsQuestionId, @Valid @RequestBody LessonsAnswerCreateInput input, @RequestParam Optional<String> userId) {
-        final User user = userId.map(this::impersonateUser).orElse(currentUser());
+        final User user = userId.map(id -> impersonateUser(userRepository, id)).orElse(currentUser());
         if (user.getId().equals(ANONYMOUS)) {
             throw new UnsupportedOperationException("User must be logged or dynamic player is required");
         }

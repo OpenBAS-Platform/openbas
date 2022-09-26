@@ -1,17 +1,12 @@
 package io.openex.rest.group;
 
 import io.openex.database.audit.BaseEvent;
-import io.openex.database.model.Exercise;
-import io.openex.database.model.Grant;
-import io.openex.database.model.Group;
-import io.openex.database.model.User;
-import io.openex.database.repository.ExerciseRepository;
-import io.openex.database.repository.GrantRepository;
-import io.openex.database.repository.GroupRepository;
-import io.openex.database.repository.UserRepository;
+import io.openex.database.model.*;
+import io.openex.database.repository.*;
 import io.openex.rest.group.form.GroupCreateInput;
 import io.openex.rest.group.form.GroupGrantInput;
 import io.openex.rest.group.form.GroupUpdateUsersInput;
+import io.openex.rest.group.form.OrganizationGrantInput;
 import io.openex.rest.helper.RestBehavior;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -35,9 +30,15 @@ public class GroupApi extends RestBehavior {
 
     private ExerciseRepository exerciseRepository;
     private GrantRepository grantRepository;
+    private OrganizationRepository organizationRepository;
     private GroupRepository groupRepository;
     private UserRepository userRepository;
     private ApplicationEventPublisher appPublisher;
+
+    @Autowired
+    public void setOrganizationRepository(OrganizationRepository organizationRepository) {
+        this.organizationRepository = organizationRepository;
+    }
 
     @Autowired
     public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
@@ -125,6 +126,26 @@ public class GroupApi extends RestBehavior {
         exercise.getGrants().add(savedGrant);
         exerciseRepository.save(exercise);
         return savedGrant;
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    @RolesAllowed(ROLE_ADMIN)
+    @PostMapping("/api/groups/{groupId}/organizations")
+    public Group groupOrganization(@PathVariable String groupId, @Valid @RequestBody OrganizationGrantInput input) {
+        // Resolve dependencies
+        Group group = groupRepository.findById(groupId).orElseThrow();
+        Organization organization = organizationRepository.findById(input.getOrganizationId()).orElseThrow();
+        group.getOrganizations().add(organization);
+        return groupRepository.save(group);
+    }
+
+    @RolesAllowed(ROLE_ADMIN)
+    @DeleteMapping("/api/groups/{groupId}/organizations/{organizationId}")
+    public Group deleteGroupOrganization(@PathVariable String groupId, @PathVariable String organizationId) {
+        Group group = groupRepository.findById(groupId).orElseThrow();
+        Organization organization = organizationRepository.findById(organizationId).orElseThrow();
+        group.getOrganizations().remove(organization);
+        return groupRepository.save(group);
     }
 
     @RolesAllowed(ROLE_ADMIN)

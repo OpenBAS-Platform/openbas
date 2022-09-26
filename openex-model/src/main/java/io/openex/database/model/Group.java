@@ -55,6 +55,14 @@ public class Group implements Base {
     @JsonProperty("group_users")
     private List<User> users = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "groups_organizations",
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "organization_id"))
+    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonProperty("group_organizations")
+    private List<Organization> organizations = new ArrayList<>();
+
     // region transient
     @JsonProperty("group_default_exercise_planner")
     public boolean isDefaultExercisePlanner() {
@@ -113,6 +121,14 @@ public class Group implements Base {
 
     public void setDefaultUserAssignation(boolean defaultUserAssignation) {
         this.defaultUserAssignation = defaultUserAssignation;
+    }
+
+    public List<Organization> getOrganizations() {
+        return organizations;
+    }
+
+    public void setOrganizations(List<Organization> organizations) {
+        this.organizations = organizations;
     }
 
     public List<Grant.GRANT_TYPE> getExercisesDefaultGrants() {

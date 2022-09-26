@@ -1,12 +1,13 @@
 package io.openex.database.repository;
 
 import io.openex.database.model.User;
-import javax.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,9 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
     Optional<User> findByEmail(String email);
 
     List<User> findAllByEmailIn(List<String> emails);
+
+    @Query("select user from User user where user.organization is null or user.organization.id in :organizationIds")
+    List<User> usersAccessibleFromOrganizations(@Param("organizationIds") List<String> organizationIds);
 
     @Override
     @Query("select count(distinct u) from User u " +

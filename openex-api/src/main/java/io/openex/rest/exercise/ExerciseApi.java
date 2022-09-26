@@ -601,7 +601,7 @@ public class ExerciseApi extends RestBehavior {
 
     @GetMapping("/api/player/exercises/{exerciseId}")
     public PublicExercise playerExercise(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
-        final User user = userId.map(this::impersonateUser).orElse(currentUser());
+        final User user = userId.map(id -> impersonateUser(userRepository, id)).orElse(currentUser());
         if (user.getId().equals(ANONYMOUS)) {
             throw new UnsupportedOperationException("User must be logged or dynamic player is required");
         }

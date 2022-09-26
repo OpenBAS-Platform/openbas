@@ -36,6 +36,12 @@ public class MediaApi extends RestBehavior {
     private MediaRepository mediaRepository;
     private DocumentRepository documentRepository;
     private InjectExpectationRepository injectExpectationExecutionRepository;
+    private UserRepository userRepository;
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Autowired
     public void setArticleRepository(ArticleRepository articleRepository) {
@@ -234,7 +240,7 @@ public class MediaApi extends RestBehavior {
     public MediaReader playerArticles(@PathVariable String exerciseId, @PathVariable String mediaId,
                                       @RequestParam Optional<String> userId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        final User user = userId.map(this::impersonateUser).orElse(currentUser());
+        final User user = userId.map(id -> impersonateUser(userRepository, id)).orElse(currentUser());
         if (user.getId().equals(ANONYMOUS)) {
             throw new UnsupportedOperationException("User must be logged or dynamic player is required");
         }
