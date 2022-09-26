@@ -4,6 +4,7 @@ import io.openex.config.OpenExConfig;
 import io.openex.contract.Contract;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
+import io.openex.database.specification.LessonsAnswerSpecification;
 import io.openex.database.specification.LessonsCategorySpecification;
 import io.openex.database.specification.LessonsQuestionSpecification;
 import io.openex.execution.ExecutableInject;
@@ -14,6 +15,7 @@ import io.openex.injects.email.model.EmailContent;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.lessons.form.*;
 import io.openex.service.ContractService;
+import org.simpleframework.xml.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,6 +42,7 @@ public class LessonsApi extends RestBehavior {
     private LessonsTemplateRepository lessonsTemplateRepository;
     private LessonsCategoryRepository lessonsCategoryRepository;
     private LessonsQuestionRepository lessonsQuestionRepository;
+    private LessonsAnswerRepository lessonsAnswerRepository;
     private ContractService contractService;
     private ApplicationContext context;
 
@@ -66,6 +69,11 @@ public class LessonsApi extends RestBehavior {
     @Autowired
     public void setLessonsQuestionRepository(LessonsQuestionRepository lessonsQuestionRepository) {
         this.lessonsQuestionRepository = lessonsQuestionRepository;
+    }
+
+    @Autowired
+    public void setLessonsAnswerRepository(LessonsAnswerRepository lessonsAnswerRepository) {
+        this.lessonsAnswerRepository = lessonsAnswerRepository;
     }
 
     @Autowired
@@ -123,12 +131,12 @@ public class LessonsApi extends RestBehavior {
     @PostMapping("/api/exercises/{exerciseId}/lessons_answers_reset")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Iterable<LessonsCategory> resetExerciseLessonsAnswers(@PathVariable String exerciseId) {
-        List<LessonsCategory> lessonsCategories = lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream().toList();
-        for (LessonsCategory lessonsCategory : lessonsCategories) {
-
-        }
-        lessonsCategories = lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream().toList();
-        return lessonsCategories;
+        List<LessonsAnswer> lessonsAnswers = lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream()
+                .flatMap(lessonsCategory -> lessonsQuestionRepository.findAll(LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()
+                        .flatMap(lessonsQuestion -> lessonsAnswerRepository.findAll(LessonsAnswerSpecification.fromQuestion(lessonsQuestion.getId())).stream()))
+                .toList();
+        lessonsAnswerRepository.deleteAll(lessonsAnswers);
+        return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream().toList();
     }
 
     @PostMapping("/api/exercises/{exerciseId}/lessons_empty")
@@ -167,8 +175,8 @@ public class LessonsApi extends RestBehavior {
     @GetMapping("/api/exercises/{exerciseId}/lessons_questions")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Iterable<LessonsQuestion> exerciseLessonsQuestions(@PathVariable String exerciseId) {
-        return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream().
-                flatMap(lessonsCategory -> lessonsQuestionRepository.findAll(LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()).toList();
+        return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream()
+                .flatMap(lessonsCategory -> lessonsQuestionRepository.findAll(LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()).toList();
     }
 
     @GetMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions")
@@ -179,7 +187,7 @@ public class LessonsApi extends RestBehavior {
 
     @PostMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public LessonsQuestion createExerciseLessonsQuestion(@PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsQuestionCreateInput input) {
+    public LessonsQuestion createExerciseLessonsQuestion(@PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsAnswerCreateInput input) {
         LessonsCategory lessonsCategory = lessonsCategoryRepository.findById(lessonsCategoryId).orElseThrow();
         LessonsQuestion lessonsQuestion = new LessonsQuestion();
         lessonsQuestion.setUpdateAttributes(input);
@@ -223,12 +231,21 @@ public class LessonsApi extends RestBehavior {
         }
         inject.setType(contract.getConfig().getType());
         inject.setExercise(exercise);
-        List<ExecutionContext> userInjectContexts = lessonsCategories.stream()
-                .flatMap(lessonsCategory -> lessonsCategory.getAudiences().stream().flatMap(audience -> audience.getUsers().stream())).distinct()
+        List<ExecutionContext> userInjectContexts = lessonsCategories.stream().flatMap(lessonsCategory -> lessonsCategory.getAudiences().stream()
+                        .flatMap(audience -> audience.getUsers().stream())).distinct()
                 .map(user -> new ExecutionContext(openExConfig, user, inject, "Direct execution")).toList();
         ExecutableInject injection = new ExecutableInject(true, true, inject, contract, List.of(), userInjectContexts);
         Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
         executor.executeInjection(injection);
+    }
+
+    @GetMapping("/api/lessons/{exerciseId}/lessons_answers")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
+    public List<LessonsAnswer> exerciseLessonsAnswers(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
+        return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream()
+                .flatMap(lessonsCategory -> lessonsQuestionRepository.findAll(LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()
+                        .flatMap(lessonsQuestion -> lessonsAnswerRepository.findAll(LessonsAnswerSpecification.fromQuestion(lessonsQuestion.getId())).stream()))
+                .toList();
     }
 
     @GetMapping("/api/player/lessons/{exerciseId}/lessons_categories")
@@ -246,7 +263,35 @@ public class LessonsApi extends RestBehavior {
         if (user.getId().equals(ANONYMOUS)) {
             throw new UnsupportedOperationException("User must be logged or dynamic player is required");
         }
-        return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream().
-                flatMap(lessonsCategory -> lessonsQuestionRepository.findAll(LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()).toList();
+        return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream()
+                .flatMap(lessonsCategory -> lessonsQuestionRepository.findAll(LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()).toList();
+    }
+
+    @GetMapping("/api/player/lessons/{exerciseId}/lessons_answers")
+    public List<LessonsAnswer> playerLessonsAnswers(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
+        final User user = userId.map(this::impersonateUser).orElse(currentUser());
+        if (user.getId().equals(ANONYMOUS)) {
+            throw new UnsupportedOperationException("User must be logged or dynamic player is required");
+        }
+        return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream()
+                .flatMap(lessonsCategory -> lessonsQuestionRepository.findAll(LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()
+                        .flatMap(lessonsQuestion -> lessonsAnswerRepository.findAll(LessonsAnswerSpecification.fromQuestion(lessonsQuestion.getId())).stream()))
+                .toList();
+    }
+
+    @PostMapping("/api/player/lessons/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}/lessons_answers")
+    public LessonsAnswer createExerciseLessonsQuestion(@PathVariable String lessonsQuestionId, @Valid @RequestBody LessonsAnswerCreateInput input, @RequestParam Optional<String> userId) {
+        final User user = userId.map(this::impersonateUser).orElse(currentUser());
+        if (user.getId().equals(ANONYMOUS)) {
+            throw new UnsupportedOperationException("User must be logged or dynamic player is required");
+        }
+        LessonsQuestion lessonsQuestion = lessonsQuestionRepository.findById(lessonsQuestionId).orElseThrow();
+        LessonsAnswer lessonsAnswer = new LessonsAnswer();
+        lessonsAnswer.setQuestion(lessonsQuestion);
+        lessonsAnswer.setScore(input.getScore());
+        lessonsAnswer.setPositive(input.getPositive());
+        lessonsAnswer.setNegative(input.getNegative());
+        lessonsAnswer.setUser(user);
+        return lessonsAnswerRepository.save(lessonsAnswer);
     }
 }

@@ -37,6 +37,7 @@ export const entitiesInitializer = Immutable({
     lessonstemplatequestions: Immutable({}),
     lessonscategorys: Immutable({}),
     lessonsquestions: Immutable({}),
+    lessonsanswers: Immutable({}),
   }),
 });
 

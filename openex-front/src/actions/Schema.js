@@ -200,6 +200,13 @@ export const lessonsQuestion = new schema.Entity(
 );
 export const arrayOfLessonsQuestions = new schema.Array(lessonsQuestion);
 
+export const lessonsAnswer = new schema.Entity(
+  'lessonsanswers',
+  {},
+  { idAttribute: 'lessonsanswer_id' },
+);
+export const arrayOfLessonsAnswers = new schema.Array(lessonsAnswer);
+
 token.define({ token_user: user });
 user.define({ user_organization: organization });
 
@@ -253,6 +260,10 @@ export const storeHelper = (state) => ({
   ),
   getExerciseLessonsQuestions: (id) => entities('lessonsquestions', state).filter(
     (l) => l.lessons_question_exercise === id,
+  ),
+  getExerciseUserLessonsAnswers: (exerciseId, userId) => entities('lessonsanswers', state).filter(
+    (l) => l.lessons_answer_exercise === exerciseId
+        && l.lessons_answer_user === userId,
   ),
   // dryrun
   getDryrun: (id) => entity(id, 'dryruns', state),

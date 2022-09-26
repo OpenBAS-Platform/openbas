@@ -20,7 +20,7 @@ public class LessonsAnswer implements Base {
     @Column(name = "lessons_answer_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonProperty("lessons_answer_id")
+    @JsonProperty("lessonsanswer_id")
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -119,6 +119,13 @@ public class LessonsAnswer implements Base {
     public void setScore(Integer score) {
         this.score = score;
     }
+
+    // region transient
+    @JsonProperty("lessons_answer_exercise")
+    public String getExercise() {
+        return getQuestion().getCategory().getExercise().getId();
+    }
+    // endregion
 
     @Override
     public boolean isUserHasAccess(User user) {

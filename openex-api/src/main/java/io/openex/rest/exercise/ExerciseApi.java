@@ -78,6 +78,9 @@ public class ExerciseApi extends RestBehavior {
     private ImportService importService;
     private InjectRepository injectRepository;
     private InjectExpectationRepository injectExpectationRepository;
+    private LessonsCategoryRepository lessonsCategoryRepository;
+    private LessonsQuestionRepository lessonsQuestionRepository;
+    private LessonsAnswerRepository lessonsAnswerRepository;
     // endregion
 
     // region services
@@ -176,6 +179,21 @@ public class ExerciseApi extends RestBehavior {
     @Autowired
     public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
         this.injectExpectationRepository = injectExpectationRepository;
+    }
+
+    @Autowired
+    public void setLessonsCategoryRepository(LessonsCategoryRepository lessonsCategoryRepository) {
+        this.lessonsCategoryRepository = lessonsCategoryRepository;
+    }
+
+    @Autowired
+    public void setLessonsQuestionRepository(LessonsQuestionRepository lessonsQuestionRepository) {
+        this.lessonsQuestionRepository = lessonsQuestionRepository;
+    }
+
+    @Autowired
+    public void setLessonsAnswerRepository(LessonsAnswerRepository lessonsAnswerRepository) {
+        this.lessonsAnswerRepository = lessonsAnswerRepository;
     }
     // endregion
 
@@ -393,6 +411,12 @@ public class ExerciseApi extends RestBehavior {
             // Reset injects outcome, communications and expectations
             injectRepository.saveAll(injectRepository.findAllForExercise(exerciseId)
                     .stream().peek(Inject::clean).toList());
+            // Reset lessons learned answers
+            List<LessonsAnswer> lessonsAnswers = lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream()
+                    .flatMap(lessonsCategory -> lessonsQuestionRepository.findAll(LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()
+                            .flatMap(lessonsQuestion -> lessonsAnswerRepository.findAll(LessonsAnswerSpecification.fromQuestion(lessonsQuestion.getId())).stream()))
+                    .toList();
+            lessonsAnswerRepository.deleteAll(lessonsAnswers);
             // Delete exercise transient files (communications, ...)
             fileService.deleteDirectory(exerciseId);
         }

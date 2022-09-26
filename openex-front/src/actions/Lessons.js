@@ -150,6 +150,11 @@ export const sendLessons = (exerciseId, data) => (dispatch) => {
   return postReferential(schema.arrayOfLessonsCategories, uri, data)(dispatch);
 };
 
+export const fetchLessonsAnswers = (exerciseId) => (dispatch) => {
+  const uri = `/api/exercises${exerciseId}/lessons_answers`;
+  return getReferential(schema.arrayOfLessonsAnswers, uri)(dispatch);
+};
+
 export const fetchPlayerLessonsCategories = (exerciseId, userId) => (dispatch) => {
   const uri = `/api/player/lessons/${exerciseId}/lessons_categories?userId=${userId}`;
   return getReferential(schema.arrayOfLessonsCategories, uri)(dispatch);
@@ -158,4 +163,14 @@ export const fetchPlayerLessonsCategories = (exerciseId, userId) => (dispatch) =
 export const fetchPlayerLessonsQuestions = (exerciseId, userId) => (dispatch) => {
   const uri = `/api/player/lessons/${exerciseId}/lessons_questions?userId=${userId}`;
   return getReferential(schema.arrayOfLessonsQuestions, uri)(dispatch);
+};
+
+export const fetchPlayerLessonsAnswers = (exerciseId, userId) => (dispatch) => {
+  const uri = `/api/player/lessons/${exerciseId}/lessons_answers?userId=${userId}`;
+  return getReferential(schema.arrayOfLessonsAnswers, uri)(dispatch);
+};
+
+export const addLessonsAnswers = (exerciseId, lessonsCategoryId, lessonsQuestionId, data) => (dispatch) => {
+  const uri = `/api/player/lessons/${exerciseId}/lessons_categories/${lessonsCategoryId}/lessons_questions/${lessonsQuestionId}/lessons_answers`;
+  return postReferential(schema.arrayOfLessonsAnswers, uri, data)(dispatch);
 };

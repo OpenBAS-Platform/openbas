@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
@@ -9,10 +9,6 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogActions from '@mui/material/DialogActions';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
 import { useFormatter } from '../../../components/i18n';
@@ -22,12 +18,10 @@ import Loader from '../../../components/Loader';
 import Empty from '../../../components/Empty';
 import logo from '../../../resources/images/logo.png';
 import {
-  addLessonsAnswers,
-  fetchPlayerLessonsAnswers,
-  fetchPlayerLessonsCategories,
-  fetchPlayerLessonsQuestions,
+  fetchLessonsCategories,
+  fetchLessonsQuestions,
 } from '../../../actions/Lessons';
-import { fetchPlayerExercise } from '../../../actions/Exercise';
+import { fetchExercise } from '../../../actions/Exercise';
 import { SliderField } from '../../../components/SliderField';
 import { TextField } from '../../../components/TextField';
 
@@ -71,30 +65,22 @@ const LessonsPlayer = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
-  const { exerciseId } = useParams();
-  const [openValidate, setOpenValidate] = useState(false);
   const [userId] = useQueryParameter(['user']);
-  const { me, exercise, lessonsCategories, lessonsQuestions, lessonsAnswers } = useHelper((helper) => {
-    const currentUser = helper.getMe();
-    return {
-      me: currentUser,
+  const { exerciseId } = useParams();
+  const { exercise, lessonsCategories, lessonsQuestions } = useHelper(
+    (helper) => ({
       exercise: helper.getExercise(exerciseId),
       lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
       lessonsQuestions: helper.getExerciseLessonsQuestions(exerciseId),
-      lessonsAnswers: helper.getExerciseUserLessonsAnswers(
-        exerciseId,
-        userId && userId !== 'null' ? userId : currentUser?.user_id,
-      ),
-    };
-  });
+    }),
+  );
   // Pass the full exercise because the exercise is never loaded in the store at this point
   const permissions = usePermissions(exerciseId, exercise);
   useEffect(() => {
     dispatch(fetchMe());
-    dispatch(fetchPlayerExercise(exerciseId, userId));
-    dispatch(fetchPlayerLessonsCategories(exerciseId, userId || me.user_id));
-    dispatch(fetchPlayerLessonsQuestions(exerciseId, userId || me.user_id));
-    dispatch(fetchPlayerLessonsAnswers(exerciseId, userId || me.user_id));
+    dispatch(fetchExercise(exerciseId));
+    dispatch(fetchLessonsCategories(exerciseId));
+    dispatch(fetchLessonsQuestions(exerciseId));
   }, []);
   const validate = (values) => {
     const errors = {};
@@ -110,30 +96,7 @@ const LessonsPlayer = () => {
     });
     return errors;
   };
-  const submitForm = (data) => {
-    return Promise.all(
-      lessonsQuestions.map((question) => {
-        const answerData = {
-          lessons_answer_score: data[`${question.lessonsquestion_id}_score`],
-          lessons_answer_positive:
-            data[`${question.lessonsquestion_id}_positive`],
-          lessons_answer_negative:
-            data[`${question.lessonsquestion_id}_nagative`],
-        };
-        return dispatch(
-          addLessonsAnswers(
-            exerciseId,
-            question.lessons_question_category,
-            question.lessonsquestion_id,
-            answerData,
-          ),
-        );
-      }),
-    ).then(() => {
-      setOpenValidate(false);
-      dispatch(fetchPlayerLessonsAnswers(exerciseId, userId || me.user_id));
-    });
-  };
+  const submitForm = () => {};
   const sortCategories = R.sortWith([
     R.ascend(R.prop('lessons_category_order')),
   ]);
@@ -141,14 +104,7 @@ const LessonsPlayer = () => {
     R.ascend(R.prop('lessons_question_order')),
   ]);
   const sortedCategories = sortCategories(lessonsCategories);
-  const initialValues = R.pipe(
-    R.map((n) => ({
-      [`${n.lessons_answer_question}_score`]: n.lessons_answer_score,
-      [`${n.lessons_answer_question}_positive`]: n.lessons_answer_positive,
-      [`${n.lessons_answer_question}_negative`]: n.lessons_answer_negative,
-    })),
-    R.mergeAll,
-  )(lessonsAnswers);
+  const initialValues = {};
   if (exercise) {
     return (
       <div className={classes.root}>
@@ -157,10 +113,10 @@ const LessonsPlayer = () => {
             color="secondary"
             variant="outlined"
             component={Link}
-            to={`/lessons/${exerciseId}?user=${userId}&preview=true`}
+            to={`/lessons/${exerciseId}?user=${userId}&preview=false`}
             style={{ position: 'absolute', top: 20, right: 20 }}
           >
-            {t('Switch to preview mode')}
+            {t('Switch to player mode')}
           </Button>
         )}
         {permissions.isLoggedIn && permissions.canRead && (
@@ -211,7 +167,7 @@ const LessonsPlayer = () => {
           onSubmit={submitForm}
           validate={validate}
         >
-          {({ handleSubmit, submitting, errors }) => (
+          {({ handleSubmit }) => (
             <form id="lessonsAnswersForm" onSubmit={handleSubmit}>
               {sortedCategories.map((category) => {
                 const questions = sortQuestions(
@@ -271,7 +227,6 @@ const LessonsPlayer = () => {
                                 )}
                               </Typography>
                               <SliderField
-                                disabled={lessonsAnswers.length > 0}
                                 name={`${question.lessonsquestion_id}_score`}
                                 min={0}
                                 max={10}
@@ -282,7 +237,6 @@ const LessonsPlayer = () => {
                                 {t('What worked well')}
                               </Typography>
                               <TextField
-                                disabled={lessonsAnswers.length > 0}
                                 style={{ marginTop: 10 }}
                                 name={`${question.lessonsquestion_id}_positive`}
                                 label={t('Comment (optional)')}
@@ -296,7 +250,6 @@ const LessonsPlayer = () => {
                                 {t("What didn't work well")}
                               </Typography>
                               <TextField
-                                disabled={lessonsAnswers.length > 0}
                                 style={{ marginTop: 10 }}
                                 name={`${question.lessonsquestion_id}_negative`}
                                 label={t('Comment (optional)')}
@@ -313,49 +266,10 @@ const LessonsPlayer = () => {
                 );
               })}
               <div style={{ margin: '50px auto', textAlign: 'center' }}>
-                <Button
-                  color="secondary"
-                  variant="contained"
-                  onClick={() => setOpenValidate(true)}
-                  disabled={
-                    lessonsAnswers.length > 0
-                    || submitting
-                    || Object.keys(errors).length > 0
-                  }
-                  size="large"
-                >
+                <Button color="secondary" variant="contained" disabled={true}>
                   {t('Submit')}
                 </Button>
               </div>
-              <Dialog
-                open={openValidate}
-                TransitionComponent={Transition}
-                onClose={() => setOpenValidate(false)}
-                PaperProps={{ elevation: 1 }}
-              >
-                <DialogContent>
-                  <DialogContentText>
-                    {t(
-                      'Do you want to submit your answers? You will not be able to change them later.',
-                    )}
-                  </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                  <Button
-                    onClick={() => setOpenValidate(false)}
-                    disabled={submitting}
-                  >
-                    {t('Cancel')}
-                  </Button>
-                  <Button
-                    color="secondary"
-                    onClick={handleSubmit}
-                    disabled={submitting || Object.keys(errors).length > 0}
-                  >
-                    {t('Submit')}
-                  </Button>
-                </DialogActions>
-              </Dialog>
             </form>
           )}
         </Form>
