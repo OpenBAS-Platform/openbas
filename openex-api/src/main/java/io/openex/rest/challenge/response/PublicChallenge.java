@@ -1,10 +1,11 @@
 package io.openex.rest.challenge.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openex.database.model.*;
+import io.openex.database.model.Challenge;
+import io.openex.database.model.Document;
+import io.openex.database.model.Tag;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 public class PublicChallenge {
@@ -25,16 +26,16 @@ public class PublicChallenge {
     private Integer score;
 
     @JsonProperty("challenge_flags")
-    private List<PublicChallengeFlag> flags = new ArrayList<>();
+    private List<PublicChallengeFlag> flags;
 
     @JsonProperty("challenge_max_attempts")
     private Integer maxAttempts;
 
     @JsonProperty("challenge_tags")
-    private List<String> tags = new ArrayList<>();
+    private List<String> tags;
 
     @JsonProperty("challenge_documents")
-    private List<String> documents = new ArrayList<>();
+    private List<String> documents;
 
     @JsonProperty("challenge_virtual_publication")
     private Instant virtualPublication;

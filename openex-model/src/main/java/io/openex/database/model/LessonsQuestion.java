@@ -1,6 +1,5 @@
 package io.openex.database.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static java.time.Instant.now;
-import static java.util.Optional.ofNullable;
 
 @Entity
 @Table(name = "lessons_questions")

@@ -43,9 +43,21 @@ public class V1_DataImporter implements Importer {
     private ChallengeRepository challengeRepository;
     private MediaRepository mediaRepository;
     private ArticleRepository articleRepository;
+    private LessonsCategoryRepository lessonsCategoryRepository;
+    private LessonsQuestionRepository lessonsQuestionRepository;
     // endregion
 
     // region setter
+    @Autowired
+    public void setLessonsQuestionRepository(LessonsQuestionRepository lessonsQuestionRepository) {
+        this.lessonsQuestionRepository = lessonsQuestionRepository;
+    }
+
+    @Autowired
+    public void setLessonsCategoryRepository(LessonsCategoryRepository lessonsCategoryRepository) {
+        this.lessonsCategoryRepository = lessonsCategoryRepository;
+    }
+
     @Autowired
     public void setArticleRepository(ArticleRepository articleRepository) {
         this.articleRepository = articleRepository;
@@ -406,19 +418,6 @@ public class V1_DataImporter implements Importer {
             baseIds.put(id, savedAudience);
         });
 
-        // ------------ Handling objectives
-        Iterator<JsonNode> exerciseObjectives = importNode.get("exercise_objectives").elements();
-        exerciseObjectives.forEachRemaining(nodeObjective -> {
-            String id = nodeObjective.get("objective_id").textValue();
-            Objective objective = new Objective();
-            objective.setTitle(nodeObjective.get("objective_title").textValue());
-            objective.setDescription(nodeObjective.get("objective_description").textValue());
-            objective.setPriority((short) nodeObjective.get("objective_priority").asInt(0));
-            objective.setExercise(exercise);
-            Objective savedObjective = objectiveRepository.save(objective);
-            baseIds.put(id, savedObjective);
-        });
-
         // ------------ Handling challenges
         Stream<JsonNode> challengesStream = resolveJsonElements(importNode, "exercise_challenges");
         challengesStream.forEach(nodeChallenge -> {
@@ -438,7 +437,7 @@ public class V1_DataImporter implements Importer {
                 // Documents
                 List<Document> challengeDocuments = resolveJsonIds(nodeChallenge, "challenge_documents")
                         .stream().map(docId -> (Document) baseIds.get(docId))
-                        .filter(Objects::nonNull) // TODO Find why
+                        .filter(Objects::nonNull)
                         .toList();
                 challenge.setDocuments(challengeDocuments);
                 // Flags
@@ -508,7 +507,7 @@ public class V1_DataImporter implements Importer {
             // Documents
             List<Document> articleDocuments = resolveJsonIds(nodeArticle, "article_documents")
                     .stream().map(docId -> (Document) baseIds.get(docId))
-                    .filter(Objects::nonNull) // TODO Find why
+                    .filter(Objects::nonNull)
                     .toList();
             article.setDocuments(articleDocuments);
             String articleMediaId = nodeArticle.get("article_media").textValue();
@@ -516,6 +515,50 @@ public class V1_DataImporter implements Importer {
             article.setMedia(articleMedia);
             Article savedArticle = articleRepository.save(article);
             baseIds.put(id, savedArticle);
+        });
+
+        // ------------ Handling objectives
+        Iterator<JsonNode> exerciseObjectives = importNode.get("exercise_objectives").elements();
+        exerciseObjectives.forEachRemaining(nodeObjective -> {
+            String id = nodeObjective.get("objective_id").textValue();
+            Objective objective = new Objective();
+            objective.setTitle(nodeObjective.get("objective_title").textValue());
+            objective.setDescription(nodeObjective.get("objective_description").textValue());
+            objective.setPriority((short) nodeObjective.get("objective_priority").asInt(0));
+            objective.setExercise(exercise);
+            Objective savedObjective = objectiveRepository.save(objective);
+            baseIds.put(id, savedObjective);
+        });
+
+        // ------------ Handling lessons
+        Iterator<JsonNode> exerciseLessonsCategories = importNode.get("exercise_lessons_categories").elements();
+        exerciseLessonsCategories.forEachRemaining(nodeLessonCategory -> {
+            String id = nodeLessonCategory.get("lessonscategory_id").textValue();
+            LessonsCategory lessonsCategory = new LessonsCategory();
+            lessonsCategory.setName(nodeLessonCategory.get("lessons_category_name").textValue());
+            lessonsCategory.setDescription(nodeLessonCategory.get("lessons_category_description").textValue());
+            lessonsCategory.setOrder(nodeLessonCategory.get("lessons_category_order").intValue());
+            lessonsCategory.setExercise(exercise);
+            List<Audience> lessonsCategoryAudiences = resolveJsonIds(nodeLessonCategory, "lessons_category_audiences")
+                    .stream().map(audienceId -> (Audience) baseIds.get(audienceId))
+                    .filter(Objects::nonNull)
+                    .toList();
+            lessonsCategory.setAudiences(lessonsCategoryAudiences);
+            LessonsCategory savedLessonsCategory = lessonsCategoryRepository.save(lessonsCategory);
+            baseIds.put(id, savedLessonsCategory);
+        });
+        Stream<JsonNode> exerciseLessonsQuestions = resolveJsonElements(importNode, "exercise_lessons_questions");
+        exerciseLessonsQuestions.forEach(nodeLessonQuestion -> {
+            String id = nodeLessonQuestion.get("lessonsquestion_id").textValue();
+            String categoryId = nodeLessonQuestion.get("lessons_question_category").asText();
+            LessonsCategory lessonsCategory = (LessonsCategory)baseIds.get(categoryId);
+            LessonsQuestion lessonsQuestion = new LessonsQuestion();
+            lessonsQuestion.setContent(nodeLessonQuestion.get("lessons_question_content").asText());
+            lessonsQuestion.setExplanation(nodeLessonQuestion.get("lessons_question_explanation").asText());
+            lessonsQuestion.setOrder(nodeLessonQuestion.get("lessons_question_order").intValue());
+            lessonsQuestion.setCategory(lessonsCategory);
+            LessonsQuestion savedLessonsQuestion = lessonsQuestionRepository.save(lessonsQuestion);
+            baseIds.put(id, savedLessonsQuestion);
         });
 
         // ------------ Handling injects

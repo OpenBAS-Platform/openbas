@@ -26,7 +26,7 @@ const ImportUploader = (props) => {
     formData.append('file', file);
     dispatch(importingExercise(formData)).then(() => {
       setUpload(null);
-      history.push('/exercises');
+      history.push('/admin/exercises');
     });
   };
   return (

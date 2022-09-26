@@ -44,6 +44,12 @@ public class ExerciseFileExport {
     @JsonProperty("exercise_challenges")
     private List<Challenge> challenges = new ArrayList<>();
 
+    @JsonProperty("exercise_lessons_categories")
+    private List<LessonsCategory> lessonsCategories = new ArrayList<>();
+
+    @JsonProperty("exercise_lessons_questions")
+    private List<LessonsQuestion> lessonsQuestions = new ArrayList<>();
+
     public int getVersion() {
         return version;
     }
@@ -138,5 +144,21 @@ public class ExerciseFileExport {
 
     public void setMedias(List<Media> medias) {
         this.medias = medias;
+    }
+
+    public List<LessonsCategory> getLessonsCategories() {
+        return lessonsCategories;
+    }
+
+    public void setLessonsCategories(List<LessonsCategory> lessonsCategories) {
+        this.lessonsCategories = lessonsCategories;
+    }
+
+    public List<LessonsQuestion> getLessonsQuestions() {
+        return lessonsQuestions;
+    }
+
+    public void setLessonsQuestions(List<LessonsQuestion> lessonsQuestions) {
+        this.lessonsQuestions = lessonsQuestions;
     }
 }

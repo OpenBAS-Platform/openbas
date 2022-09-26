@@ -520,12 +520,21 @@ public class ExerciseApi extends RestBehavior {
         List<Objective> objectives = exercise.getObjectives();
         importExport.setObjectives(objectives);
         objectMapper.addMixIn(Objective.class, ExerciseExportMixins.Objective.class);
+        // Lessons categories
+        List<LessonsCategory> lessonsCategories = exercise.getLessonsCategories();
+        importExport.setLessonsCategories(lessonsCategories);
+        objectMapper.addMixIn(LessonsCategory.class, ExerciseExportMixins.LessonsCategory.class);
+        // Lessons questions
+        List<LessonsQuestion> lessonsQuestions = lessonsCategories.stream()
+                .flatMap(category -> category.getQuestions().stream()).toList();
+        importExport.setLessonsQuestions(lessonsQuestions);
+        objectMapper.addMixIn(LessonsQuestion.class, ExerciseExportMixins.LessonsQuestion.class);
         // Audiences
         List<Audience> audiences = exercise.getAudiences();
         importExport.setAudiences(audiences);
         objectMapper.addMixIn(Audience.class, isWithPlayers ? ExerciseExportMixins.Audience.class : ExerciseExportMixins.EmptyAudience.class);
         exerciseTags.addAll(audiences.stream().flatMap(audience -> audience.getTags().stream()).toList());
-        if (isWithPlayers) {
+        if (isWithPlayers)  {
             // players
             List<User> players = audiences.stream().flatMap(audience -> audience.getUsers().stream()).distinct().toList();
             exerciseTags.addAll(players.stream().flatMap(user -> user.getTags().stream()).toList());

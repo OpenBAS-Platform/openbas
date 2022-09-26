@@ -164,6 +164,27 @@ public class ExerciseExportMixins {
     })
     public static class Challenge {
     }
+
+    @JsonIncludeProperties(value = {
+            "lessonscategory_id",
+            "lessons_category_name",
+            "lessons_category_description",
+            "lessons_category_order",
+            "lessons_category_questions",
+            "lessons_category_audiences",
+    })
+    public static class LessonsCategory {
+    }
+
+    @JsonIncludeProperties(value = {
+            "lessonsquestion_id",
+            "lessons_question_category",
+            "lessons_question_content",
+            "lessons_question_explanation",
+            "lessons_question_order",
+    })
+    public static class LessonsQuestion {
+    }
 }
 
 
