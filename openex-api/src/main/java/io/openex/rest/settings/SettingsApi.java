@@ -12,7 +12,6 @@ import io.openex.rest.settings.response.PlatformSetting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,10 +27,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static io.openex.helper.StreamHelper.fromIterable;
-import static io.openex.helper.UserHelper.currentUser;
 import static io.openex.database.model.Setting.SETTING_KEYS.*;
 import static io.openex.database.model.User.ROLE_ADMIN;
+import static io.openex.helper.StreamHelper.fromIterable;
+import static io.openex.helper.UserHelper.currentUser;
 import static java.util.Optional.ofNullable;
 
 @RestController
@@ -39,7 +38,6 @@ public class SettingsApi extends RestBehavior {
 
     private SettingRepository settingRepository;
     private ApplicationContext context;
-    private Environment env;
 
     @Resource
     private OpenExConfig openExConfig;
@@ -54,19 +52,19 @@ public class SettingsApi extends RestBehavior {
         this.settingRepository = settingRepository;
     }
 
-    @Autowired
-    public void setEnv(Environment env) {
-        this.env = env;
-    }
-
     private List<OAuthProvider> buildProviders() {
         try {
             OAuth2ClientProperties properties = context.getBean(OAuth2ClientProperties.class);
-            Map<String, OAuth2ClientProperties.Provider> providers = properties.getProvider();
-            return providers.keySet().stream()
-                    .map(s -> {
-                        String providerLogin = env.getProperty("openex.provider." + s + ".login", "Login with " + s);
-                        return new OAuthProvider(s, "/oauth2/authorization/" + s, providerLogin);
+            Map<String, OAuth2ClientProperties.Registration> providers = properties.getRegistration();
+            return providers.entrySet().stream()
+                    .map(entry -> {
+                        String uri = "/oauth2/authorization/" + entry.getKey();
+                        String clientName = entry.getValue().getClientName();
+                        // In case of missing name configuration, generate a generic name
+                        if (clientName == null) {
+                            clientName = "Login with " + entry.getKey();
+                        }
+                        return new OAuthProvider(entry.getKey(), uri, clientName);
                     })
                     .toList();
         } catch (Exception e) {
