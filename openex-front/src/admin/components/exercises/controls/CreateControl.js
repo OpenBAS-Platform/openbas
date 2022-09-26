@@ -149,7 +149,7 @@ class CreateControl extends Component {
                 comcheck_subject: t('[${exercise.name}] Communication check'),
                 comcheck_message: `${t('Hello')},<br /><br />${t(
                   'This is a communication check before the beginning of the exercise. Please click on the following link'
-                    + ' in order to confirm you successfully received this message: ${comcheck.url}',
+                    + ' in order to confirm you successfully received this message: <a href="${comcheck.url}">${comcheck.url}</a>.',
                 )}<br /><br />${t('Best regards')},<br />${t(
                   'The exercise control team',
                 )}`,

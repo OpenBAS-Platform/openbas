@@ -7,17 +7,17 @@ import io.openex.database.model.InjectExpectation;
 public class ChallengeInformation {
 
     @JsonProperty("challenge_detail")
-    private final Challenge challenge;
+    private final PublicChallenge challenge;
 
     @JsonProperty("challenge_expectation")
     private final InjectExpectation expectation;
 
     public ChallengeInformation(Challenge challenge, InjectExpectation expectation) {
-        this.challenge = challenge;
+        this.challenge = new PublicChallenge(challenge);
         this.expectation = expectation;
     }
 
-    public Challenge getChallenge() {
+    public PublicChallenge getChallenge() {
         return challenge;
     }
 

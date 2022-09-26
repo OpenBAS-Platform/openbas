@@ -63,3 +63,8 @@ export const importingExercise = (data) => (dispatch) => {
   const uri = '/api/exercises/import';
   return postReferential(null, uri, data)(dispatch);
 };
+
+export const fetchPlayerExercise = (exerciseId, userId) => (dispatch) => {
+  const uri = `/api/player/exercises/${exerciseId}?userId=${userId}`;
+  return getReferential(schema.exercise, uri)(dispatch);
+};

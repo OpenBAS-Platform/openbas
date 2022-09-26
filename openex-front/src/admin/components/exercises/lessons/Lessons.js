@@ -13,6 +13,7 @@ import {
   HelpOutlined,
   CastForEducationOutlined,
   DeleteSweepOutlined,
+  VisibilityOutlined,
 } from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
@@ -21,7 +22,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Switch from '@mui/material/Switch';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import LinearProgress from '@mui/material/LinearProgress';
 import * as R from 'ramda';
@@ -55,12 +56,12 @@ import { areaChartOptions } from '../../../../utils/Charts';
 import CreateLessonsCategory from './categories/CreateLessonsCategory';
 import {
   applyLessonsTemplate,
-  deleteLessonsCategory,
   emptyLessonsCategories,
   fetchLessonsCategories,
   fetchLessonsQuestions,
   fetchLessonsTemplates,
   resetLessonsAnswers,
+  sendLessons,
   updateLessonsCategoryAudiences,
 } from '../../../../actions/Lessons';
 import CreateLessonsQuestion from './categories/questions/CreateLessonsQuestion';
@@ -70,6 +71,7 @@ import LessonsCategoryAddAudiences from './categories/LessonsCategoryAddAudience
 import { fetchAudiences } from '../../../../actions/Audience';
 import { truncate } from '../../../../utils/String';
 import { updateExerciseLessons } from '../../../../actions/Exercise';
+import SendLessonsForm from './SendLessonsForm';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -141,6 +143,7 @@ const Lessons = () => {
   const [openApplyTemplate, setOpenApplyTemplate] = useState(false);
   const [openResetAnswers, setOpenResetAnswers] = useState(false);
   const [openEmptyLessons, setOpenEmptyLessons] = useState(false);
+  const [openSendLessons, setOpenSendLessons] = useState(false);
   const [templateValue, setTemplateValue] = useState(null);
   const handleChange = (event) => {
     setTemplateValue(event.target.value);
@@ -230,6 +233,9 @@ const Lessons = () => {
     return dispatch(
       updateLessonsCategoryAudiences(exerciseId, lessonsCategoryId, data),
     );
+  };
+  const handleSubmitSendLessons = (data) => {
+    return dispatch(sendLessons(exerciseId, data));
   };
   return (
     <div className={classes.container}>
@@ -329,12 +335,6 @@ const Lessons = () => {
                 />
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h3">
-                  {t('Sender email address')}
-                </Typography>
-                {exercise.exercise_mail_from}
-              </Grid>
-              <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Template')}</Typography>
                 <Button
                   startIcon={<ContentPasteGoOutlined />}
@@ -343,6 +343,18 @@ const Lessons = () => {
                   onClick={() => setOpenApplyTemplate(true)}
                 >
                   {t('Apply')}
+                </Button>
+              </Grid>
+              <Grid item={true} xs={6}>
+                <Typography variant="h3">{t('Check')}</Typography>
+                <Button
+                  startIcon={<VisibilityOutlined />}
+                  color="secondary"
+                  variant="contained"
+                  component={Link}
+                  to={`/lessons/${exerciseId}?preview=true`}
+                >
+                  {t('Preview')}
                 </Button>
               </Grid>
               <Grid item={true} xs={6}>
@@ -376,7 +388,7 @@ const Lessons = () => {
                   startIcon={<ContentPasteGoOutlined />}
                   color="success"
                   variant="contained"
-                  onClick={() => setOpenApplyTemplate(true)}
+                  onClick={() => setOpenSendLessons(true)}
                 >
                   {t('Send')}
                 </Button>
@@ -723,6 +735,32 @@ const Lessons = () => {
             {t('Empty')}
           </Button>
         </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openSendLessons}
+        TransitionComponent={Transition}
+        onClose={() => setOpenSendLessons(false)}
+        fullWidth={true}
+        maxWidth="md"
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogTitle>{t('Send a new comcheck')}</DialogTitle>
+        <DialogContent style={{ overflowX: 'hidden' }}>
+          <SendLessonsForm
+            onSubmit={handleSubmitSendLessons}
+            initialValues={{
+              // eslint-disable-next-line no-template-curly-in-string
+              subject: t('[${exercise.name}] Lessons learned questionnaire'),
+              body: `${t('Hello')},<br /><br />${t(
+                // eslint-disable-next-line no-template-curly-in-string
+                'We would like thank your for your participation in this exercise. You are kindly requested to fill this lessons learned questionnaire: <a href="${lessons_uri}">${lessons_uri}</a>.',
+              )}<br /><br />${t('Best regards')},<br />${t(
+                'The exercise control team',
+              )}`,
+            }}
+            handleClose={() => setOpenSendLessons(false)}
+          />
+        </DialogContent>
       </Dialog>
       <CreateLessonsCategory exerciseId={exerciseId} />
     </div>

@@ -308,8 +308,12 @@ const i18n = {
       Reports: 'Rapports',
       '[${exercise.name}] Communication check':
         '[${exercise.name}] Vérification des moyens de communication',
-      'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message: ${comcheck.url}':
-        "Ceci est une vérification des moyens de communication avant le début de l'exercice. Merci de bien vouloir cliquer sur le lien ci-dessous afin de confirmer que vous avez reçu ce message avec succès : ${comcheck.url}",
+      'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message: <a href="${comcheck.url}">${comcheck.url}</a>.':
+        'Ceci est une vérification des moyens de communication avant le début de l\'exercice. Merci de bien vouloir cliquer sur le lien ci-dessous afin de confirmer que vous avez reçu ce message avec succès : <a href="${comcheck.url}">${comcheck.url}</a>.',
+      'We would like thank your for your participation in this exercise. You are kindly requested to fill this lessons learned questionnaire: <a href="${lessons_uri}">${lessons_uri}</a>.':
+        "Nous souhaitons vous remercier pour votre participation à l'exercice. Vous êtes cordialement invités à remplir le formulaire de retour d'expérience : <a href=\"${lessons_uri}\">${lessons_uri}</a>.",
+      '[${exercise.name}] Lessons learned questionnaire':
+        "[${exercise.name}] Questionnaire de retour d'expérience",
       'Best regards': 'Bien cordialement',
       'The exercise control team': "L'équipe d'animation de l'exercice",
       'Do you want to launch a new dryrun?':
@@ -317,6 +321,8 @@ const i18n = {
       'Add tags to this exercise': 'Ajouter des tags à cet exercice',
       'No comcheck in this exercise.': 'Aucune vérification dans cet exercice',
       'There is nothing to see here...': "Il n'y a rien à voir ici...",
+      Check: 'Vérification',
+      Preview: 'Aperçu',
       None: 'Aucune',
       message: 'Message',
       Pending: 'En attente',

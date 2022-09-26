@@ -3,6 +3,7 @@ package io.openex.rest.challenge.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.Challenge;
 import io.openex.database.model.Exercise;
+import io.openex.rest.exercise.response.PublicExercise;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +14,14 @@ public class ChallengesReader {
     private String id;
 
     @JsonProperty("exercise_information")
-    private Exercise exercise;
+    private PublicExercise exercise;
 
     @JsonProperty("exercise_challenges")
     private List<ChallengeInformation> exerciseChallenges = new ArrayList<>();
 
     public ChallengesReader(Exercise exercise) {
         this.id = exercise.getId();
-        this.exercise = exercise;
+        this.exercise = new PublicExercise(exercise);
     }
 
     public String getId() {
@@ -31,11 +32,11 @@ public class ChallengesReader {
         this.id = id;
     }
 
-    public Exercise getExercise() {
+    public PublicExercise getExercise() {
         return exercise;
     }
 
-    public void setExercise(Exercise exercise) {
+    public void setExercise(PublicExercise exercise) {
         this.exercise = exercise;
     }
 

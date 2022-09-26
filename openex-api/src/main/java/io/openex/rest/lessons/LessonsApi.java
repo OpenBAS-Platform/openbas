@@ -22,8 +22,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 import static io.openex.helper.StreamHelper.fromIterable;
+import static io.openex.helper.UserHelper.ANONYMOUS;
 import static io.openex.helper.UserHelper.currentUser;
 import static java.time.Instant.now;
 
@@ -205,31 +207,46 @@ public class LessonsApi extends RestBehavior {
     public void sendExerciseLessons(@PathVariable String exerciseId, @Valid @RequestBody LessonsSendInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         List<LessonsCategory> lessonsCategories = lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream().toList();
-        for (LessonsCategory lessonsCategory : lessonsCategories) {
-            List<Audience> audiences = lessonsCategory.getAudiences().stream().toList();
-            for (Audience audience : audiences) {
-                EmailContent emailContent = new EmailContent();
-                emailContent.setSubject(input.getSubject());
-                emailContent.setBody(input.getBody());
-                Inject inject = new Inject();
-                inject.setTitle("Lessons learned campaign");
-                inject.setDescription("Direct inject for lessons learned questionnaire");
-                inject.setContent(mapper.valueToTree(emailContent));
-                inject.setContract(EmailContract.EMAIL_DEFAULT);
-                inject.setUser(currentUser());
-                inject.setDirect(true);
-                Contract contract = contractService.resolveContract(inject);
-                if (contract == null) {
-                    throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
-                }
-                inject.setType(contract.getConfig().getType());
-                inject.setExercise(exercise);
-                List<ExecutionContext> userInjectContexts = audience.getUsers().stream()
-                        .map(user -> new ExecutionContext(openExConfig, user, inject, "Direct execution")).toList();
-                ExecutableInject injection = new ExecutableInject(true, true, inject, contract, List.of(), userInjectContexts);
-                Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
-                executor.executeInjection(injection);
-            }
+        EmailContent emailContent = new EmailContent();
+        emailContent.setSubject(input.getSubject());
+        emailContent.setBody(input.getBody());
+        Inject inject = new Inject();
+        inject.setTitle("Lessons learned campaign");
+        inject.setDescription("Direct inject for lessons learned questionnaire");
+        inject.setContent(mapper.valueToTree(emailContent));
+        inject.setContract(EmailContract.EMAIL_DEFAULT);
+        inject.setUser(currentUser());
+        inject.setDirect(true);
+        Contract contract = contractService.resolveContract(inject);
+        if (contract == null) {
+            throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
         }
+        inject.setType(contract.getConfig().getType());
+        inject.setExercise(exercise);
+        List<ExecutionContext> userInjectContexts = lessonsCategories.stream()
+                .flatMap(lessonsCategory -> lessonsCategory.getAudiences().stream().flatMap(audience -> audience.getUsers().stream())).distinct()
+                .map(user -> new ExecutionContext(openExConfig, user, inject, "Direct execution")).toList();
+        ExecutableInject injection = new ExecutableInject(true, true, inject, contract, List.of(), userInjectContexts);
+        Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
+        executor.executeInjection(injection);
+    }
+
+    @GetMapping("/api/player/lessons/{exerciseId}/lessons_categories")
+    public List<LessonsCategory> playerLessonsCategories(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
+        final User user = userId.map(this::impersonateUser).orElse(currentUser());
+        if (user.getId().equals(ANONYMOUS)) {
+            throw new UnsupportedOperationException("User must be logged or dynamic player is required");
+        }
+        return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId));
+    }
+
+    @GetMapping("/api/player/lessons/{exerciseId}/lessons_questions")
+    public List<LessonsQuestion> playerLessonsQuestions(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
+        final User user = userId.map(this::impersonateUser).orElse(currentUser());
+        if (user.getId().equals(ANONYMOUS)) {
+            throw new UnsupportedOperationException("User must be logged or dynamic player is required");
+        }
+        return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream().
+                flatMap(lessonsCategory -> lessonsQuestionRepository.findAll(LessonsQuestionSpecification.fromCategory(lessonsCategory.getId())).stream()).toList();
     }
 }

@@ -4,13 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.database.model.*;
 import io.openex.database.model.Exercise.STATUS;
 import io.openex.database.repository.*;
-import io.openex.database.specification.ComcheckSpecification;
-import io.openex.database.specification.DryRunSpecification;
-import io.openex.database.specification.ExerciseLogSpecification;
+import io.openex.database.specification.*;
 import io.openex.rest.exception.InputValidationException;
 import io.openex.rest.exercise.exports.ExerciseExportMixins;
 import io.openex.rest.exercise.exports.ExerciseFileExport;
 import io.openex.rest.exercise.form.*;
+import io.openex.rest.exercise.response.PublicExercise;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +41,7 @@ import static io.openex.database.model.Exercise.STATUS.*;
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.helper.StreamHelper.fromIterable;
+import static io.openex.helper.UserHelper.ANONYMOUS;
 import static io.openex.helper.UserHelper.currentUser;
 import static io.openex.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
 import static io.openex.service.ImportService.EXPORT_ENTRY_EXERCISE;
@@ -573,6 +573,16 @@ public class ExerciseApi extends RestBehavior {
     @RolesAllowed(ROLE_ADMIN)
     public void exerciseImport(@RequestPart("file") MultipartFile file) throws Exception {
         importService.handleFileImport(file);
+    }
+
+    @GetMapping("/api/player/exercises/{exerciseId}")
+    public PublicExercise playerExercise(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
+        final User user = userId.map(this::impersonateUser).orElse(currentUser());
+        if (user.getId().equals(ANONYMOUS)) {
+            throw new UnsupportedOperationException("User must be logged or dynamic player is required");
+        }
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        return new PublicExercise(exercise);
     }
     // endregion
 }

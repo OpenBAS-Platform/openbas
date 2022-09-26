@@ -162,7 +162,7 @@ const inlineStyles = {
   },
 };
 
-const ChallengePlayer = () => {
+const ChallengesPlayer = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
@@ -577,4 +577,4 @@ const ChallengePlayer = () => {
   return <Loader />;
 };
 
-export default ChallengePlayer;
+export default ChallengesPlayer;
