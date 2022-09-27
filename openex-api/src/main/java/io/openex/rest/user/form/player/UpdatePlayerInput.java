@@ -26,6 +26,9 @@ public class UpdatePlayerInput {
     @JsonProperty("user_pgp_key")
     private String pgpKey;
 
+    @JsonProperty("user_country")
+    private String country;
+
     @JsonProperty("user_phone")
     private String phone;
 
@@ -89,6 +92,14 @@ public class UpdatePlayerInput {
 
     public void setPhone2(String phone2) {
         this.phone2 = phone2;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 
     public List<String> getTagIds() {

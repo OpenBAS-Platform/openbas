@@ -19,6 +19,7 @@ import PasswordForm from './PasswordForm';
 import { useFormatter } from '../../../components/i18n';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
+import { countryOption } from '../../../utils/Countries';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -71,6 +72,12 @@ const Index = () => {
           ? data.user_organization.id
           : data.user_organization,
       ),
+      R.assoc(
+        'user_country',
+        data.user_country && data.user_country.id
+          ? data.user_country.id
+          : data.user_country,
+      ),
     )(data);
     return dispatch(updateMeProfile(inputValues));
   };
@@ -87,11 +94,13 @@ const Index = () => {
     : null;
   const initialValues = R.pipe(
     R.assoc('user_organization', userOrganization),
+    R.assoc('user_country', countryOption(user.user_country)),
     R.pick([
       'user_firstname',
       'user_lastname',
       'user_email',
       'user_organization',
+      'user_country',
       'user_phone',
       'user_phone2',
       'user_pgp_key',

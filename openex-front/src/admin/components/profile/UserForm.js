@@ -7,6 +7,7 @@ import { Select } from '../../../components/Select';
 import { TextField } from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
 import OrganizationField from '../../../components/OrganizationField';
+import CountryField from '../../../components/CountryField';
 
 class UserForm extends Component {
   validate(values) {
@@ -59,6 +60,11 @@ class UserForm extends Component {
             />
             <OrganizationField
               name="user_organization"
+              values={values}
+              setFieldValue={form.mutators.setValue}
+            />
+            <CountryField
+              name="user_country"
               values={values}
               setFieldValue={form.mutators.setValue}
             />

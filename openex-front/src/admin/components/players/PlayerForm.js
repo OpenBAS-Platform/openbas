@@ -6,6 +6,7 @@ import { TextField } from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
 import TagField from '../../../components/TagField';
 import OrganizationField from '../../../components/OrganizationField';
+import CountryField from '../../../components/CountryField';
 
 class PlayerForm extends Component {
   validate(values) {
@@ -59,6 +60,11 @@ class PlayerForm extends Component {
             />
             <OrganizationField
               name="user_organization"
+              values={values}
+              setFieldValue={form.mutators.setValue}
+            />
+            <CountryField
+              name="user_country"
               values={values}
               setFieldValue={form.mutators.setValue}
             />

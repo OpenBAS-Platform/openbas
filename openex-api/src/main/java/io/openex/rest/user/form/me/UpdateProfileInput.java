@@ -31,6 +31,9 @@ public class UpdateProfileInput {
     @JsonProperty("user_theme")
     private String theme;
 
+    @JsonProperty("user_country")
+    private String country;
+
     public String getEmail() {
         return email;
     }
@@ -74,4 +77,12 @@ public class UpdateProfileInput {
     public String getTheme() { return theme; }
 
     public void setTheme(String theme) { this.theme = theme; }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
 }

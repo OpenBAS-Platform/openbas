@@ -23,6 +23,9 @@ public class CreatePlayerInput {
     @JsonProperty("user_organization")
     private String organizationId;
 
+    @JsonProperty("user_country")
+    private String country;
+
     @JsonProperty("user_tags")
     private List<String> tagIds = new ArrayList<>();
 
@@ -56,6 +59,14 @@ public class CreatePlayerInput {
 
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 
     public List<String> getTagIds() {

@@ -19,6 +19,7 @@ import PlayerForm from './PlayerForm';
 import inject18n from '../../../components/i18n';
 import { storeHelper, tagsConverter } from '../../../actions/Schema';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
+import { countryOption } from '../../../utils/Countries';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -61,6 +62,12 @@ class PlayerPopover extends Component {
         data.user_organization && data.user_organization.id
           ? data.user_organization.id
           : data.user_organization,
+      ),
+      R.assoc(
+        'user_country',
+        data.user_country && data.user_country.id
+          ? data.user_country.id
+          : data.user_country,
       ),
       R.assoc('user_tags', R.pluck('id', data.user_tags)),
     )(data);
@@ -126,6 +133,7 @@ class PlayerPopover extends Component {
     const userTags = tagsConverter(user.user_tags, tagsMap);
     const initialValues = R.pipe(
       R.assoc('user_organization', userOrganization),
+      R.assoc('user_country', countryOption(user.user_country)),
       R.assoc('user_tags', userTags),
       R.pick([
         'user_firstname',
@@ -134,6 +142,7 @@ class PlayerPopover extends Component {
         'user_organization',
         'user_phone',
         'user_phone2',
+        'user_country',
         'user_pgp_key',
         'user_tags',
       ]),

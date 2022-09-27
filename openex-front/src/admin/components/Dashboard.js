@@ -27,15 +27,17 @@ import inject18n from '../../components/i18n';
 import Countdown from '../../components/Countdown';
 import { fetchStatistics } from '../../actions/Application';
 import { fetchExercises } from '../../actions/Exercise';
+import { fetchPlayers } from '../../actions/User';
 import { fetchNextInjects } from '../../actions/Inject';
 import { fetchTags } from '../../actions/Tag';
 import { fetchOrganizations } from '../../actions/Organization';
 import { storeHelper } from '../../actions/Schema';
 import ItemNumberDifference from '../../components/ItemNumberDifference';
 import Empty from '../../components/Empty';
-import { horizontalBarsChartOptions } from '../../utils/Charts';
+import { colors, horizontalBarsChartOptions } from '../../utils/Charts';
 import InjectIcon from './exercises/injects/InjectIcon';
 import ProgressBarCountdown from '../../components/ProgressBarCountdown';
+import { computeLevel } from '../../utils/Countries';
 
 const styles = (theme) => ({
   root: {
@@ -126,6 +128,7 @@ const Dashboard = (props) => {
     props.fetchExercises();
     props.fetchTags();
     props.fetchNextInjects();
+    props.fetchPlayers();
   }, []);
   const {
     classes,
@@ -136,8 +139,17 @@ const Dashboard = (props) => {
     organizations,
     theme,
     injects,
+    users,
   } = props;
   const exercises = Object.values(exercisesMap);
+  const mapIndexed = R.addIndex(R.map);
+  const organizationsColors = R.pipe(
+    mapIndexed((o, index) => [
+      o.organization_id,
+      colors(theme.palette.mode === 'dark' ? 400 : 600)[index],
+    ]),
+    R.fromPairs,
+  )(organizations);
   const topOrganizations = R.pipe(
     R.sortWith([R.descend(R.prop('organization_injects_number'))]),
     R.take(7),
@@ -145,14 +157,30 @@ const Dashboard = (props) => {
   const distributionChartData = [
     {
       name: t('Number of injects'),
-      data: topOrganizations.map((a) => ({
-        x: a.organization_name,
-        y: a.organization_injects_number,
+      data: topOrganizations.map((o) => ({
+        x: o.organization_name,
+        y: o.organization_injects_number,
+        fillColor: organizationsColors[o.organization_id],
       })),
     },
   ];
   const maxInjectsNumber = Math.max(
     ...topOrganizations.map((a) => a.organization_injects_number),
+  );
+  const usersByLocation = R.pipe(
+    R.filter((n) => n.user_country !== null),
+    R.groupBy(R.prop('user_country')),
+    R.toPairs,
+    R.map((n) => ({ country: n[0], number: n[1].length })),
+  )(users);
+  const min = Math.min(...R.pluck('number', usersByLocation));
+  const max = Math.max(...R.pluck('number', usersByLocation));
+  const usersByLocationLevels = R.indexBy(
+    R.prop('country'),
+    R.map(
+      (n) => R.assoc('level', computeLevel(n.number, min, max), n),
+      usersByLocation,
+    ),
   );
   return (
     <div className={classes.root}>
@@ -391,7 +419,11 @@ const Dashboard = (props) => {
         <Grid item={true} xs={6}>
           <Typography variant="h4">{t('Players distribution')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paperMap }}>
-            <MiniMap center={[48.8566969, 2.3514616]} zoom={2} />
+            <MiniMap
+              center={[48.8566969, 2.3514616]}
+              zoom={2}
+              usersByLocationLevels={usersByLocationLevels}
+            />
           </Paper>
         </Grid>
       </Grid>
@@ -408,6 +440,7 @@ Dashboard.propTypes = {
   fetchTags: PropTypes.func,
   fetchNextInjects: PropTypes.func,
   injects: PropTypes.array,
+  users: PropTypes.array,
   statistics: PropTypes.object,
 };
 
@@ -418,6 +451,7 @@ const select = (state) => {
     organizations: helper.getOrganizations(),
     statistics: helper.getStatistics(),
     injects: helper.getNextInjects(),
+    users: helper.getUsers(),
   };
 };
 
@@ -428,6 +462,7 @@ export default R.compose(
     fetchTags,
     fetchOrganizations,
     fetchNextInjects,
+    fetchPlayers,
   }),
   inject18n,
   withTheme,

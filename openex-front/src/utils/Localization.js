@@ -28,6 +28,7 @@ const i18n = {
       Results: 'Résultats',
       Medias: 'Médias',
       Submit: 'Soumettre',
+      Country: 'Pays',
       'Available variables': 'Variables disponibles',
       'Flag is correct! It has been successfully submitted.':
         'Le flag est correct! Il a été soumis avec succès.',

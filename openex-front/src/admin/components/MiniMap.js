@@ -3,8 +3,9 @@ import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import withTheme from '@mui/styles/withTheme';
 import withStyles from '@mui/styles/withStyles';
-import { MapContainer, TileLayer } from 'react-leaflet';
+import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import { connect } from 'react-redux';
+import countries from '../../resources/geo/countries.json';
 import { storeHelper } from '../../actions/Schema';
 import Loader from '../../components/Loader';
 
@@ -18,11 +19,35 @@ const styles = () => ({
   },
 });
 
+const colors = [
+  '#fff59d',
+  '#ffe082',
+  '#ffb300',
+  '#ffb74d',
+  '#fb8c00',
+  '#d95f00',
+  '#e64a19',
+  '#f44336',
+  '#d32f2f',
+  '#b71c1c',
+];
+
 const MiniMap = (props) => {
-  const { parameters, center, zoom, theme } = props;
+  const { parameters, center, zoom, theme, usersByLocationLevels } = props;
   if (R.isEmpty(parameters) || R.isNil(parameters)) {
     return <Loader variant="inElement" />;
   }
+  const getStyle = (feature) => {
+    if (usersByLocationLevels[feature.properties.ISO3]) {
+      const country = usersByLocationLevels[feature.properties.ISO3];
+      return {
+        color: country.level ? colors[country.level] : colors[5],
+        weight: 1,
+        fillOpacity: props.theme.palette.mode === 'light' ? 0.5 : 0.1,
+      };
+    }
+    return { fillOpacity: 0, color: 'none' };
+  };
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <MapContainer
@@ -40,6 +65,7 @@ const MiniMap = (props) => {
               : parameters.map_tile_server_dark
           }
         />
+        <GeoJSON data={countries} style={getStyle} />
       </MapContainer>
     </div>
   );
