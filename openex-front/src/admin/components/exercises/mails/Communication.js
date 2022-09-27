@@ -171,7 +171,7 @@ const Communication = (props) => {
           <div style={{ marginTop: 10 }}>
             {communication.communication_attachments.map((a) => {
               return (
-                <a href={`/api/communications/attachment?file=${a}`}>
+                <a key={a} href={`/api/communications/attachment?file=${a}`}>
                   <Button
                     variant="contained"
                     style={{ marginRight: 10, fontSize: 10 }}

@@ -251,7 +251,7 @@ const DashboardDefinitionStatistics = ({
   const sortedAudiencesByTotalScore = R.pipe(
     R.sortWith([R.descend(R.prop('audience_total_score'))]),
     R.take(10),
-  )(audiencesTotalScores || []);
+  )(audiencesTotalScores);
   const totalScoreByAudienceData = [
     {
       name: t('Total score'),

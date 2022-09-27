@@ -246,7 +246,7 @@ const Validations = () => {
                   <ListItemIcon style={{ paddingTop: 5 }}>
                     <InjectIcon
                       tooltip={t(inject.inject_type || 'Unknown')}
-                      config={injectContract?.config}
+                      config={injectContract.config}
                       type={inject.inject_type}
                       size="small"
                     />
