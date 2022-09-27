@@ -108,7 +108,10 @@ const i18n = {
       Parameters: 'Paramètres',
       'Default theme': 'Thème par défaut',
       'Default language': 'Langue par défaut',
+      'Do you want to trigger this inject now?':
+        'Souhaitez-vous déclencher ce stimuli maintenant ?',
       Administrator: 'Administrateur',
+      'Trigger now': 'Déclencher maintenant',
       Automatic: 'Automatique',
       'Passwords do no match': 'Les mots de passe ne correspondent pas',
       'Update the user password': "Modifier le mot de passe de l'utilisateur",

@@ -25,11 +25,15 @@ import {
   tryInject,
   updateInjectActivation,
   injectDone,
+  updateInjectTrigger,
 } from '../../../../actions/Inject';
 import InjectForm from './InjectForm';
 import inject18n from '../../../../components/i18n';
 import { splitDuration } from '../../../../utils/Time';
-import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import {
+  isExerciseReadOnly,
+  secondsFromToNow,
+} from '../../../../utils/Exercise';
 import { tagsConverter } from '../../../../actions/Schema';
 
 const Transition = React.forwardRef((props, ref) => (
@@ -60,6 +64,7 @@ class InjectPopover extends Component {
       openDisable: false,
       openDone: false,
       openResult: false,
+      openTrigger: false,
       injectResult: null,
     };
   }
@@ -216,6 +221,32 @@ class InjectPopover extends Component {
     this.handlePopoverClose();
   }
 
+  handleOpenTrigger() {
+    this.setState({
+      openTrigger: true,
+    });
+    this.handlePopoverClose();
+  }
+
+  handleCloseTrigger() {
+    this.setState({
+      openTrigger: false,
+    });
+  }
+
+  submitTrigger() {
+    this.props.updateInjectTrigger(
+      this.props.exerciseId,
+      this.props.inject.inject_id,
+      {
+        inject_depends_duration: secondsFromToNow(
+          this.props.exercise.exercise_start_date,
+        ),
+      },
+    );
+    this.handleCloseTrigger();
+  }
+
   render() {
     const {
       t,
@@ -281,6 +312,14 @@ class InjectPopover extends Component {
               disabled={isDisabled}
             >
               {t('Mark as done')}
+            </MenuItem>
+          )}
+          {inject.inject_type !== 'openex_manual' && (
+            <MenuItem
+              onClick={this.handleOpenTrigger.bind(this)}
+              disabled={isDisabled || exercise.exercise_status !== 'RUNNING'}
+            >
+              {t('Trigger now')}
             </MenuItem>
           )}
           {inject.inject_type !== 'openex_manual' && (
@@ -433,6 +472,26 @@ class InjectPopover extends Component {
           </DialogActions>
         </Dialog>
         <Dialog
+          TransitionComponent={Transition}
+          open={this.state.openTrigger}
+          onClose={this.handleCloseTrigger.bind(this)}
+          PaperProps={{ elevation: 1 }}
+        >
+          <DialogContent>
+            <DialogContentText>
+              {t('Do you want to trigger this inject now?')}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleCloseTrigger.bind(this)}>
+              {t('Cancel')}
+            </Button>
+            <Button color="secondary" onClick={this.submitTrigger.bind(this)}>
+              {t('Trigger')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
           open={this.state.openResult}
           TransitionComponent={Transition}
           onClose={this.handleCloseResult.bind(this)}
@@ -516,6 +575,7 @@ InjectPopover.propTypes = {
   deleteInject: PropTypes.func,
   injectTypesMap: PropTypes.object,
   updateInjectActivation: PropTypes.func,
+  updateInjectTrigger: PropTypes.func,
   injectDone: PropTypes.func,
   setSelectedInject: PropTypes.func,
   isDisabled: PropTypes.bool,
@@ -527,6 +587,7 @@ export default R.compose(
     deleteInject,
     tryInject,
     updateInjectActivation,
+    updateInjectTrigger,
     injectDone,
   }),
   inject18n,

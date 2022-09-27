@@ -210,7 +210,8 @@ public class InjectApi extends RestBehavior {
         inject.setDependsOn(resolveOptionalRelation(input.getDependsOn(), injectRepository));
         inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
         inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
-        inject.setDocuments(fromIterable(documentRepository.findAllById(input.getDocuments())));
+        List<InjectDocument> injectDocuments = inject.getDocuments();
+        inject.setDocuments(injectDocuments);
         return injectRepository.save(inject);
     }
 
@@ -250,6 +251,16 @@ public class InjectApi extends RestBehavior {
     public Inject updateInjectActivation(@PathVariable String exerciseId, @PathVariable String injectId, @Valid @RequestBody InjectUpdateActivationInput input) {
         Inject inject = injectRepository.findById(injectId).orElseThrow();
         inject.setEnabled(input.isEnabled());
+        inject.setUpdatedAt(now());
+        return injectRepository.save(inject);
+    }
+
+    @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/trigger")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Inject updateInjectActivation(@PathVariable String exerciseId, @PathVariable String injectId, @Valid @RequestBody InjectUpdateTriggerInput input) {
+        Inject inject = injectRepository.findById(injectId).orElseThrow();
+        inject.setDependsDuration(input.getDependsDuration());
+        inject.setUpdatedAt(now());
         return injectRepository.save(inject);
     }
 
