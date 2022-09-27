@@ -237,12 +237,12 @@ const LessonsPlayer = () => {
                     {questions.map((question) => {
                       return (
                         <Paper
+                          key={question.lessonsquestion_id}
                           variant="outlined"
                           classes={{ root: classes.paper }}
                           style={{ marginTop: 14 }}
                         >
                           <Grid
-                            key={question.lessonsquestion_id}
                             container={true}
                             spacing={3}
                             style={{ marginTop: -10 }}

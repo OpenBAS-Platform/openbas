@@ -43,7 +43,7 @@ public class InjectInput {
     private String city;
 
     @JsonProperty("inject_tags")
-    private List<String> tagIds;
+    private List<String> tagIds = new ArrayList<>();;
 
     public String getTitle() {
         return title;

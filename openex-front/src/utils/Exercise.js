@@ -68,3 +68,12 @@ export const usePermissions = (exerciseId, fullExercise = null) => {
     isLoggedIn: !R.isEmpty(logged),
   };
 };
+
+export const secondsFromToNow = (date) => {
+  if (!date) {
+    return 0;
+  }
+  const timestamp = Math.floor(new Date(date).getTime() / 1000);
+  const now = Math.floor(Date.now() / 1000);
+  return now - timestamp;
+};

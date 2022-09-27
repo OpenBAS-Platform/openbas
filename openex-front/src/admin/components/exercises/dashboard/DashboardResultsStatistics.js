@@ -227,7 +227,7 @@ const DashboardDefinitionStatistics = ({
   const sortedInjectsByTotalScore = R.pipe(
     R.sortWith([R.descend(R.prop('inject_total_score'))]),
     R.take(10),
-  )(injectsTotalScores || []);
+  )(injectsTotalScores);
   const totalScoreByInjectData = [
     {
       name: t('Total score'),

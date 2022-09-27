@@ -210,6 +210,7 @@ public class InjectApi extends RestBehavior {
         inject.setDependsOn(resolveOptionalRelation(input.getDependsOn(), injectRepository));
         inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
         inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        inject.setDocuments(fromIterable(documentRepository.findAllById(input.getDocuments())));
         return injectRepository.save(inject);
     }
 

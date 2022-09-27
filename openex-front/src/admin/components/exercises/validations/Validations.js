@@ -241,12 +241,8 @@ const Validations = () => {
             const inject = injectsMap[injectId] || {};
             const injectContract = injectTypesMap[inject.inject_contract] || {};
             return (
-              <div>
-                <ListItem
-                  key={inject.inject_id}
-                  divider={true}
-                  classes={{ root: classes.item }}
-                >
+              <div key={inject.inject_id}>
+                <ListItem divider={true} classes={{ root: classes.item }}>
                   <ListItemIcon style={{ paddingTop: 5 }}>
                     <InjectIcon
                       tooltip={t(inject.inject_type || 'Unknown')}

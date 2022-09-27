@@ -26,6 +26,7 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
 import { exportData } from '../../../../utils/Environment';
 import AnimationMenu from '../AnimationMenu';
+import CreateQuickInject from '../injects/CreateQuickInject';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -402,6 +403,7 @@ const Mails = () => {
           );
         })}
       </List>
+      <CreateQuickInject exercise={exercise} />
     </div>
   );
 };

@@ -36,7 +36,7 @@ import DialogContent from '@mui/material/DialogContent';
 import Slide from '@mui/material/Slide';
 import { DialogActions } from '@mui/material';
 import inject18n from '../../../../components/i18n';
-import { fetchInjectAudiences, updateInject } from '../../../../actions/Inject';
+import { addInject } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchMedias, fetchExerciseArticles } from '../../../../actions/Media';
 import { fetchChallenges } from '../../../../actions/Challenge';
@@ -45,12 +45,14 @@ import { storeHelper } from '../../../../actions/Schema';
 import AudiencePopover from '../audiences/AudiencePopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddAudiences from './InjectAddAudiences';
-import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import {
+  isExerciseReadOnly,
+  secondsFromToNow,
+} from '../../../../utils/Exercise';
 import { TextField } from '../../../../components/TextField';
 import { SwitchField } from '../../../../components/SwitchField';
 import { EnrichedTextField } from '../../../../components/EnrichedTextField';
 import InjectAddDocuments from './InjectAddDocuments';
-import Loader from '../../../../components/Loader';
 import DocumentType from '../../documents/DocumentType';
 import DocumentPopover from '../../documents/DocumentPopover';
 import { Select } from '../../../../components/Select';
@@ -59,6 +61,8 @@ import InjectAddArticles from './InjectAddArticles';
 import MediaIcon from '../../medias/MediaIcon';
 import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
+
+const EMAIL_CONTRACT = '138ad8f8-32f8-4a22-8114-aaa12322bd09';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -327,21 +331,21 @@ const inlineStyles = {
   },
 };
 
-class InjectDefinition extends Component {
+class QuickInject extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      allAudiences: props.inject.inject_all_audiences,
-      audiencesIds: props.inject.inject_audiences,
-      documents: props.inject.inject_documents,
+      allAudiences: false,
+      audiencesIds: [],
+      documents: [],
       audiencesSortBy: 'audience_name',
       audiencesOrderAsc: true,
       documentsSortBy: 'document_name',
       documentsOrderAsc: true,
-      articlesIds: props.inject.inject_content?.articles || [],
+      articlesIds: [],
       articlesSortBy: 'article_name',
       articlesOrderAsc: true,
-      challengesIds: props.inject.inject_content?.challenges || [],
+      challengesIds: [],
       challengesSortBy: 'challenge_name',
       challengesOrderAsc: true,
       openVariables: false,
@@ -349,9 +353,8 @@ class InjectDefinition extends Component {
   }
 
   componentDidMount() {
-    const { exerciseId, injectId } = this.props;
+    const { exerciseId } = this.props;
     this.props.fetchDocuments();
-    this.props.fetchInjectAudiences(exerciseId, injectId);
     this.props.fetchExerciseArticles(exerciseId);
     this.props.fetchMedias();
     this.props.fetchChallenges();
@@ -569,9 +572,9 @@ class InjectDefinition extends Component {
   }
 
   onSubmit(data) {
-    const { inject, injectTypes } = this.props;
+    const { injectTypes, exercise } = this.props;
     const injectType = R.head(
-      injectTypes.filter((i) => i.contract_id === inject.inject_contract),
+      injectTypes.filter((i) => i.contract_id === EMAIL_CONTRACT),
     );
     const hasArticles = injectType.fields
       .map((f) => f.key)
@@ -638,27 +641,24 @@ class InjectDefinition extends Component {
       });
     const { allAudiences, audiencesIds, documents } = this.state;
     const values = {
-      inject_title: inject.inject_title,
-      inject_contract: inject.inject_contract,
-      inject_description: inject.inject_description,
-      inject_tags: inject.inject_tags,
-      inject_depends_duration: inject.inject_depends_duration,
-      inject_depends_from_another: inject.inject_depends_from_another,
+      inject_title: finalData.subject,
+      inject_contract: EMAIL_CONTRACT,
+      inject_depends_duration: secondsFromToNow(exercise.exercise_start_date),
       inject_content: finalData,
       inject_all_audiences: allAudiences,
       inject_audiences: audiencesIds,
       inject_documents: documents,
     };
     return this.props
-      .updateInject(this.props.exerciseId, this.props.inject.inject_id, values)
+      .addInject(this.props.exerciseId, values)
       .then(() => this.props.handleClose());
   }
 
   validate(values) {
-    const { t, injectTypes, inject } = this.props;
+    const { t, injectTypes } = this.props;
     const errors = {};
     const injectType = R.head(
-      injectTypes.filter((i) => i.contract_id === inject.inject_contract),
+      injectTypes.filter((i) => i.contract_id === EMAIL_CONTRACT),
     );
     if (injectType && Array.isArray(injectType.fields)) {
       injectType.fields
@@ -967,9 +967,9 @@ class InjectDefinition extends Component {
   }
 
   resetDefaultvalues(setFieldValue, builtInFields) {
-    const { inject, injectTypes } = this.props;
+    const { injectTypes } = this.props;
     const injectType = R.head(
-      injectTypes.filter((i) => i.contract_id === inject.inject_contract),
+      injectTypes.filter((i) => i.contract_id === EMAIL_CONTRACT),
     );
     injectType.fields
       .filter((f) => !builtInFields.includes(f.key) && !f.expectation)
@@ -1023,7 +1023,6 @@ class InjectDefinition extends Component {
       t,
       classes,
       handleClose,
-      inject,
       exerciseId,
       exercise,
       injectTypes,
@@ -1035,9 +1034,6 @@ class InjectDefinition extends Component {
       mediasMap,
       challengesMap,
     } = this.props;
-    if (!inject) {
-      return <Loader variant="inElement" />;
-    }
     const {
       allAudiences,
       audiencesIds,
@@ -1055,7 +1051,7 @@ class InjectDefinition extends Component {
       openVariables,
     } = this.state;
     const injectType = R.head(
-      injectTypes.filter((i) => i.contract_id === inject.inject_contract),
+      injectTypes.filter((i) => i.contract_id === EMAIL_CONTRACT),
     );
     const audiences = audiencesIds
       .map((a) => audiencesMap[a])
@@ -1119,7 +1115,7 @@ class InjectDefinition extends Component {
     const expectations = injectType.fields.filter(
       (f) => f.expectation === true,
     );
-    const initialValues = { ...inject.inject_content };
+    const initialValues = {};
     // Enrich initialValues with default contract value
     const builtInFields = [
       'audiences',
@@ -1127,19 +1123,17 @@ class InjectDefinition extends Component {
       'challenges',
       'attachments',
     ];
-    if (inject.inject_content === null) {
-      injectType.fields
-        .filter((f) => !builtInFields.includes(f.key))
-        .forEach((field) => {
-          if (!initialValues[field.key]) {
-            if (field.cardinality && field.cardinality === '1') {
-              initialValues[field.key] = R.head(field.defaultValue);
-            } else {
-              initialValues[field.key] = field.defaultValue;
-            }
+    injectType.fields
+      .filter((f) => !builtInFields.includes(f.key))
+      .forEach((field) => {
+        if (!initialValues[field.key]) {
+          if (field.cardinality && field.cardinality === '1') {
+            initialValues[field.key] = R.head(field.defaultValue);
+          } else {
+            initialValues[field.key] = field.defaultValue;
           }
-        });
-    }
+        }
+      });
     // Specific processing for some field
     injectType.fields
       .filter((f) => !builtInFields.includes(f.key))
@@ -1213,7 +1207,7 @@ class InjectDefinition extends Component {
             <CloseRounded fontSize="small" color="primary" />
           </IconButton>
           <Typography variant="h6" classes={{ root: classes.title }}>
-            {inject.inject_title}
+            {t('Quick inject definition')}
           </Typography>
           <div className="clearfix" />
         </div>
@@ -1903,7 +1897,7 @@ class InjectDefinition extends Component {
                     type="submit"
                     disabled={submitting || isExerciseReadOnly(exercise)}
                   >
-                    {t('Update')}
+                    {t('Send')}
                   </Button>
                 </div>
               </form>
@@ -1965,18 +1959,16 @@ class InjectDefinition extends Component {
   }
 }
 
-InjectDefinition.propTypes = {
+QuickInject.propTypes = {
   t: PropTypes.func,
   nsdt: PropTypes.func,
   exerciseId: PropTypes.string,
   exercise: PropTypes.object,
-  injectId: PropTypes.string,
-  inject: PropTypes.object,
   fetchInjectAudiences: PropTypes.func,
   fetchExerciseArticles: PropTypes.func,
   fetchMedias: PropTypes.func,
   fetchChallenges: PropTypes.func,
-  updateInject: PropTypes.func,
+  addInject: PropTypes.func,
   handleClose: PropTypes.func,
   injectTypes: PropTypes.array,
   fetchDocuments: PropTypes.func,
@@ -1984,17 +1976,14 @@ InjectDefinition.propTypes = {
   tagsMap: PropTypes.object,
 };
 
-const select = (state, ownProps) => {
+const select = (state) => {
   const helper = storeHelper(state);
-  const { injectId } = ownProps;
-  const inject = helper.getInject(injectId);
   const documentsMap = helper.getDocumentsMap();
   const audiencesMap = helper.getAudiencesMap();
   const mediasMap = helper.getMediasMap();
   const articlesMap = helper.getArticlesMap();
   const challengesMap = helper.getChallengesMap();
   return {
-    inject,
     documentsMap,
     audiencesMap,
     articlesMap,
@@ -2005,13 +1994,12 @@ const select = (state, ownProps) => {
 
 export default R.compose(
   connect(select, {
-    fetchInjectAudiences,
-    updateInject,
     fetchDocuments,
     fetchExerciseArticles,
     fetchMedias,
     fetchChallenges,
+    addInject,
   }),
   inject18n,
   withStyles(styles),
-)(InjectDefinition);
+)(QuickInject);
