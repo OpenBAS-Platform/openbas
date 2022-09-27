@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import {
@@ -8,20 +7,12 @@ import {
   SpeakerNotesOutlined,
   BallotOutlined,
   ContactMailOutlined,
-  FlagOutlined,
   ContentPasteGoOutlined,
-  HelpOutlined,
-  CastForEducationOutlined,
   DeleteSweepOutlined,
   VisibilityOutlined,
 } from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import Switch from '@mui/material/Switch';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { Link, useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -33,26 +24,18 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
-import Chart from 'react-apexcharts';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
-import Chip from '@mui/material/Chip';
-import Tooltip from '@mui/material/Tooltip';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
-import CreateObjective from './CreateObjective';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchObjectives } from '../../../../actions/Objective';
-import Empty from '../../../../components/Empty';
-import ObjectivePopover from './ObjectivePopover';
 import { Transition } from '../../../../utils/Environment';
 import ObjectiveEvaluations from './ObjectiveEvaluations';
-import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import ResultsMenu from '../ResultsMenu';
 import { fetchInjects } from '../../../../actions/Inject';
-import { areaChartOptions } from '../../../../utils/Charts';
 import CreateLessonsCategory from './categories/CreateLessonsCategory';
 import {
   applyLessonsTemplate,
@@ -63,17 +46,14 @@ import {
   fetchLessonsTemplates,
   resetLessonsAnswers,
   sendLessons,
-  updateLessonsCategoryAudiences,
 } from '../../../../actions/Lessons';
-import CreateLessonsQuestion from './categories/questions/CreateLessonsQuestion';
-import LessonsQuestionPopover from './categories/questions/LessonsQuestionPopover';
-import LessonsCategoryPopover from './categories/LessonsCategoryPopover';
-import LessonsCategoryAddAudiences from './categories/LessonsCategoryAddAudiences';
 import { fetchAudiences } from '../../../../actions/Audience';
-import { resolveUserName, truncate } from '../../../../utils/String';
+import { resolveUserName } from '../../../../utils/String';
 import { updateExerciseLessons } from '../../../../actions/Exercise';
 import SendLessonsForm from './SendLessonsForm';
 import { fetchPlayers } from '../../../../actions/User';
+import LessonsObjectives from './LessonsObjectives';
+import LessonsCategories from './LessonsCategories';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -202,82 +182,17 @@ const Lessons = () => {
       }),
     );
   };
-  const sortedObjectives = R.sortWith(
-    [R.ascend(R.prop('objective_priority'))],
-    objectives,
-  );
-  const injectsData = R.pipe(
-    R.filter((n) => n.inject_sent_at !== null),
-    R.map((n) => {
-      const date = new Date(n.inject_sent_at);
-      date.setHours(0, 0, 0, 0);
-      return R.assoc('inject_sent_at_date', date.toISOString(), n);
-    }),
-    R.groupBy(R.prop('inject_sent_at_date')),
-    R.toPairs,
-    R.map((n) => ({
-      x: n[0],
-      y: n[1].length,
-    })),
-  )(injects);
-  const chartData = [
-    {
-      name: t('Number of inject'),
-      data: injectsData,
-    },
-  ];
-  const sortCategories = R.sortWith([
-    R.ascend(R.prop('lessons_category_order')),
-  ]);
-  const sortQuestions = R.sortWith([
-    R.ascend(R.prop('lessons_question_order')),
-  ]);
-  const sortedCategories = sortCategories(lessonsCategories);
-  const getHoursDiff = (startDate, endDate) => {
-    const msInHour = 1000 * 60 * 60;
-    return Math.round(Math.abs(endDate - startDate) / msInHour);
-  };
-  const handleUpdateAudiences = (lessonsCategoryId, audiencesIds) => {
-    const data = { lessons_category_audiences: audiencesIds };
-    return dispatch(
-      updateLessonsCategoryAudiences(exerciseId, lessonsCategoryId, data),
-    );
-  };
   const handleSubmitSendLessons = (data) => {
     return dispatch(sendLessons(exerciseId, data));
   };
-  const consolidatedAnswers = R.pipe(
-    R.groupBy(R.prop('lessons_answer_question')),
-    R.toPairs,
-    R.map((n) => {
-      let totalScore = 0;
-      return [
-        n[0],
-        {
-          score: Math.round(
-            R.pipe(
-              R.map((o) => {
-                totalScore += o.lessons_answer_score;
-                return totalScore;
-              }),
-              R.sum,
-            )(n[1]) / n[1].length,
-          ),
-          number: n[1].length,
-          comments: R.filter(
-            (o) => o.lessons_answer_positive !== null
-              || o.lessons_answer_negative !== null,
-            n[1],
-          ).length,
-        },
-      ];
-    }),
-    R.fromPairs,
-  )(lessonsAnswers);
   const answers = R.groupBy(R.prop('lessons_answer_question'), lessonsAnswers);
   const selectedQuestionAnswers = selectedQuestion && answers[selectedQuestion.lessonsquestion_id]
     ? answers[selectedQuestion.lessonsquestion_id]
     : [];
+  const getHoursDiff = (startDate, endDate) => {
+    const msInHour = 1000 * 60 * 60;
+    return Math.round(Math.abs(endDate - startDate) / msInHour);
+  };
   return (
     <div className={classes.container}>
       <ResultsMenu exerciseId={exerciseId} />
@@ -449,253 +364,21 @@ const Lessons = () => {
           </Paper>
         </Grid>
       </Grid>
-      <Grid container={true} spacing={3} style={{ marginTop: 30 }}>
-        <Grid item={true} xs={6}>
-          <Typography variant="h4" style={{ float: 'left' }}>
-            {t('Objectives')}
-          </Typography>
-          {isExerciseUpdatable(exercise, true) && (
-            <CreateObjective exerciseId={exerciseId} />
-          )}
-          <div className="clearfix" />
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            {sortedObjectives.length > 0 ? (
-              <List style={{ padding: 0 }}>
-                {sortedObjectives.map((objective) => (
-                  <ListItem
-                    key={objective.objective_id}
-                    divider={true}
-                    button={true}
-                    onClick={() => setSelectedObjective(objective.objective_id)}
-                  >
-                    <ListItemIcon>
-                      <FlagOutlined />
-                    </ListItemIcon>
-                    <ListItemText
-                      style={{ width: '50%' }}
-                      primary={objective.objective_title}
-                      secondary={objective.objective_description}
-                    />
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        width: '30%',
-                        marginRight: 1,
-                      }}
-                    >
-                      <Box sx={{ width: '100%', mr: 1 }}>
-                        <LinearProgress
-                          variant="determinate"
-                          value={objective.objective_score}
-                        />
-                      </Box>
-                      <Box sx={{ minWidth: 35 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          {objective.objective_score}%
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <ListItemSecondaryAction>
-                      <ObjectivePopover
-                        exercise={exercise}
-                        objective={objective}
-                      />
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-              </List>
-            ) : (
-              <Empty message={t('No objectives in this exercise.')} />
-            )}
-          </Paper>
-        </Grid>
-        <Grid item={true} xs={6}>
-          <Typography variant="h4">
-            {t('Crisis intensity (injects by hour)')}
-          </Typography>
-          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            {injectsData.length > 0 ? (
-              <Chart
-                options={areaChartOptions(theme, true, nsdt, null, undefined)}
-                series={chartData}
-                type="area"
-                width="100%"
-                height={350}
-              />
-            ) : (
-              <Empty
-                message={t(
-                  'No data to display or the exercise has not started yet',
-                )}
-              />
-            )}
-          </Paper>
-        </Grid>
-      </Grid>
-      <div style={{ marginTop: 40 }}>
-        {sortedCategories.map((category) => {
-          const questions = sortQuestions(
-            lessonsQuestions.filter(
-              (n) => n.lessons_question_category === category.lessonscategory_id,
-            ),
-          );
-          return (
-            <div key={category.lessonscategory_id} style={{ marginTop: 70 }}>
-              <Typography variant="h2" style={{ float: 'left' }}>
-                {category.lessons_category_name}
-              </Typography>
-              <LessonsCategoryPopover
-                exerciseId={exerciseId}
-                lessonsCategory={category}
-              />
-              <div className="clearfix" />
-              <Grid container={true} spacing={3}>
-                <Grid item={true} xs={4} style={{ marginTop: -10 }}>
-                  <Typography variant="h4">{t('Questions')}</Typography>
-                  <Paper
-                    variant="outlined"
-                    classes={{ root: classes.paper }}
-                    style={{ marginTop: 14 }}
-                  >
-                    <List style={{ padding: 0 }}>
-                      {questions.map((question) => (
-                        <ListItem
-                          key={question.lessonsquestion_id}
-                          divider={true}
-                        >
-                          <ListItemIcon>
-                            <HelpOutlined />
-                          </ListItemIcon>
-                          <ListItemText
-                            style={{ width: '50%' }}
-                            primary={question.lessons_question_content}
-                            secondary={
-                              question.lessons_question_explanation
-                              || t('No explanation')
-                            }
-                          />
-                          <ListItemSecondaryAction>
-                            <LessonsQuestionPopover
-                              exerciseId={exerciseId}
-                              lessonsCategoryId={category.lessonscategory_id}
-                              lessonsQuestion={question}
-                            />
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                      ))}
-                      <CreateLessonsQuestion
-                        inline={true}
-                        exerciseId={exerciseId}
-                        lessonsCategoryId={category.lessonscategory_id}
-                      />
-                    </List>
-                  </Paper>
-                </Grid>
-                <Grid item={true} xs={5} style={{ marginTop: -10 }}>
-                  <Typography variant="h4">{t('Results')}</Typography>
-                  <Paper
-                    variant="outlined"
-                    classes={{ root: classes.paper }}
-                    style={{ marginTop: 14 }}
-                  >
-                    <List style={{ padding: 0 }}>
-                      {questions.map((question) => {
-                        const consolidatedAnswer = consolidatedAnswers[
-                          question.lessonsquestion_id
-                        ] || { score: 0, number: 0, comments: 0 };
-                        return (
-                          <ListItem
-                            key={question.lessonsquestion_id}
-                            divider={true}
-                            button={true}
-                            onClick={() => setSelectedQuestion(question)}
-                          >
-                            <ListItemText
-                              style={{ width: '50%' }}
-                              primary={`${consolidatedAnswer.number} ${t(
-                                'answers',
-                              )}`}
-                              secondary={`${t('of which')} ${
-                                consolidatedAnswer.comments
-                              } ${t('contain comments')}`}
-                            />
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                width: '30%',
-                                marginRight: 1,
-                              }}
-                            >
-                              <Box sx={{ width: '100%', mr: 1 }}>
-                                <LinearProgress
-                                  variant="determinate"
-                                  value={consolidatedAnswer.score}
-                                />
-                              </Box>
-                              <Box sx={{ minWidth: 35 }}>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                >
-                                  {consolidatedAnswer.score}%
-                                </Typography>
-                              </Box>
-                            </Box>
-                          </ListItem>
-                        );
-                      })}
-                    </List>
-                  </Paper>
-                </Grid>
-                <Grid item={true} xs={3} style={{ marginTop: -10 }}>
-                  <Typography variant="h4" style={{ float: 'left' }}>
-                    {t('Targeted audiences')}
-                  </Typography>
-                  <LessonsCategoryAddAudiences
-                    exerciseId={exerciseId}
-                    lessonsCategoryId={category.lessonscategory_id}
-                    lessonsCategoryAudiencesIds={
-                      category.lessons_category_audiences
-                    }
-                    handleUpdateAudiences={handleUpdateAudiences}
-                  />
-                  <div className="clearfix" />
-                  <Paper
-                    variant="outlined"
-                    classes={{ root: classes.paperPadding }}
-                  >
-                    {category.lessons_category_audiences.map((audienceId) => {
-                      const audience = audiencesMap[audienceId];
-                      return (
-                        <Tooltip
-                          key={audienceId}
-                          title={audience?.audience_name || ''}
-                        >
-                          <Chip
-                            onDelete={() => handleUpdateAudiences(
-                              category.lessonscategory_id,
-                              R.filter(
-                                (n) => n !== audienceId,
-                                category.lessons_category_audiences,
-                              ),
-                            )
-                            }
-                            label={truncate(audience?.audience_name || '', 30)}
-                            icon={<CastForEducationOutlined />}
-                            classes={{ root: classes.chip }}
-                          />
-                        </Tooltip>
-                      );
-                    })}
-                  </Paper>
-                </Grid>
-              </Grid>
-            </div>
-          );
-        })}
-      </div>
+      <br /><br />
+      <LessonsObjectives
+        objectives={objectives}
+        injects={injects}
+        setSelectedObjective={setSelectedObjective}
+        exercise={exercise}
+      />
+      <LessonsCategories
+        exerciseId={exerciseId}
+        lessonsCategories={lessonsCategories}
+        lessonsAnswers={lessonsAnswers}
+        setSelectedQuestion={setSelectedQuestion}
+        lessonsQuestions={lessonsQuestions}
+        audiencesMap={audiencesMap}
+      />
       <Dialog
         TransitionComponent={Transition}
         keepMounted={false}

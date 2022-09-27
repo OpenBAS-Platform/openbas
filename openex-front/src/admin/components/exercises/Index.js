@@ -26,6 +26,7 @@ import Reports from './reports/Reports';
 import { errorWrapper } from '../../../components/Error';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
+import Report from './reports/Report';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -137,6 +138,11 @@ const Index = () => {
             exact
             path="/admin/exercises/:exerciseId/results/reports"
             render={errorWrapper(Reports)}
+          />
+          <Route
+            exact
+            path="/admin/exercises/:exerciseId/results/reports/:reportId"
+            render={errorWrapper(Report)}
           />
         </Switch>
       </div>

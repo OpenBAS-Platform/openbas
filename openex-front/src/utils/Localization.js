@@ -383,6 +383,9 @@ const i18n = {
       'Create a new user': 'Créer un nouvel utilisateur',
       'Dryrun recipients': 'Destinataires de la simulation',
       'Create a new report': 'Créer un nouveau rapport',
+      'Do you want to delete this report?':
+        'Souhaitez-vous supprimer ce rapport ?',
+      'Update the report': 'Modifier le rapport',
       token: 'Token du compte',
       status: 'Statut',
       'Inject documents': 'Documents du stimuli',

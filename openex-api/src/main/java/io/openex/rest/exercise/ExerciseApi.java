@@ -293,7 +293,6 @@ public class ExerciseApi extends RestBehavior {
         if (imapEnabled) {
             exercise.setReplyTo(imapUsername);
         }
-
         // Find automatic groups to grants
         List<Group> groups = fromIterable(groupRepository.findAll());
         List<Grant> grants = groups.stream().filter(group -> group.getExercisesDefaultGrants().size() > 0).flatMap(group -> group.getExercisesDefaultGrants().stream().map(s -> Tuples.of(group, s))).map(tuple -> {

@@ -7,19 +7,23 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import { ChevronRightOutlined, SchoolOutlined } from '@mui/icons-material';
+import {
+  ChevronRightOutlined,
+  ContentPasteOutlined,
+} from '@mui/icons-material';
 import SearchFilter from '../../../../components/SearchFilter';
-import { fetchLessonsTemplates } from '../../../../actions/Lessons';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
+import { useFormatter } from '../../../../components/i18n';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import ResultsMenu from '../ResultsMenu';
 import CreateReport from './CreateReport';
+import { fetchReports } from '../../../../actions/Report';
 
 const useStyles = makeStyles((theme) => ({
   container: {
     margin: '10px 0 50px 0',
-    padding: '0 100px 0 0',
+    padding: '0 200px 0 0',
   },
   parameters: {
     marginTop: -10,
@@ -100,6 +104,7 @@ const Reports = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
+  const { t } = useFormatter();
   const { exerciseId } = useParams();
   // Filter and sort hook
   const searchColumns = ['name', 'description'];
@@ -109,7 +114,7 @@ const Reports = () => {
     reports: helper.getExerciseReports(exerciseId),
   }));
   useDataLoader(() => {
-    dispatch(fetchLessonsTemplates());
+    dispatch(fetchReports(exerciseId));
   });
   const sortedReports = filtering.filterAndSort(reports);
   return (
@@ -166,25 +171,25 @@ const Reports = () => {
               divider={true}
               button={true}
               component={Link}
-              to={`/admin/reports/${report.report_id}`}
+              to={`/admin/exercises/${exerciseId}/results/reports/${report.report_id}`}
             >
               <ListItemIcon>
-                <SchoolOutlined color="primary" />
+                <ContentPasteOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary={
                   <div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.lessons_template_name}
+                      style={inlineStyles.report_name}
                     >
                       {report.report_name}
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.lessons_template_description}
+                      style={inlineStyles.report_description}
                     >
-                      {report.report_description}
+                      {report.report_description || t('No description')}
                     </div>
                   </div>
                 }
@@ -196,7 +201,7 @@ const Reports = () => {
           );
         })}
       </List>
-      <CreateReport />
+      <CreateReport exerciseId={exerciseId} />
     </div>
   );
 };

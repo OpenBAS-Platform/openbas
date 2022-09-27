@@ -16,7 +16,7 @@ public class ReportCreateInput {
     private String description;
 
     @JsonProperty("report_general_information")
-    private boolean generalInformationn;
+    private boolean generalInformation;
 
     @JsonProperty("report_stats_definition")
     private boolean statsDefinition;
@@ -55,12 +55,12 @@ public class ReportCreateInput {
         this.description = description;
     }
 
-    public boolean isGeneralInformationn() {
-        return generalInformationn;
+    public boolean isGeneralInformation() {
+        return generalInformation;
     }
 
-    public void setGeneralInformationn(boolean generalInformationn) {
-        this.generalInformationn = generalInformationn;
+    public void setGeneralInformation(boolean generalInformation) {
+        this.generalInformation = generalInformation;
     }
 
     public boolean isStatsDefinition() {

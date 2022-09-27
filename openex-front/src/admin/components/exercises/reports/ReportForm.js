@@ -4,11 +4,11 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import { TextField } from '../../../../components/TextField';
 import { useFormatter } from '../../../../components/i18n';
-import { SwitchField } from '../../../../components/SwitchField';
+import { CheckboxField } from '../../../../components/CheckboxField';
 
 const ReportForm = (props) => {
   const { t } = useFormatter();
-  const { onSubmit, handleClose, initialValues, editing } = props;
+  const { onSubmit, handleClose, initialValues, editing, handleOpenDelete } = props;
   // Functions
   const validate = (values) => {
     const errors = {};
@@ -44,58 +44,69 @@ const ReportForm = (props) => {
             name="report_description"
             fullWidth={true}
             label={t('Description')}
-            style={{ marginTop: 20 }}
+            style={{ marginTop: 20, marginBottom: 10 }}
           />
           <Grid container={true} spacing={3} style={{ marginTop: -10 }}>
             <Grid item={true} xs={6}>
-              <SwitchField
+              <CheckboxField
                 name="report_general_information"
                 label={t('General information')}
               />
             </Grid>
             <Grid item={true} xs={6}>
-              <SwitchField
+              <CheckboxField
                 name="report_stats_definition"
-                label={t('General information')}
+                label={t('Exercise definition statistics')}
               />
             </Grid>
             <Grid item={true} xs={6}>
-              <SwitchField
+              <CheckboxField
                 name="report_stats_definition_score"
-                label={t('General information')}
+                label={t('Exercise definition scores')}
               />
             </Grid>
             <Grid item={true} xs={6}>
-              <SwitchField
+              <CheckboxField
                 name="report_stats_data"
-                label={t('General information')}
+                label={t('Exercise data statistics')}
               />
             </Grid>
             <Grid item={true} xs={6}>
-              <SwitchField
+              <CheckboxField
                 name="report_stats_results"
-                label={t('General information')}
+                label={t('Exercise results statistics')}
               />
             </Grid>
             <Grid item={true} xs={6}>
-              <SwitchField
+              <CheckboxField
                 name="report_lessons_objectives"
-                label={t('General information')}
+                label={t('Lessons learned objectives')}
               />
             </Grid>
             <Grid item={true} xs={6}>
-              <SwitchField
+              <CheckboxField
                 name="report_lessons_stats"
-                label={t('General information')}
+                label={t('Lessons learned statistics')}
               />
             </Grid>
             <Grid item={true} xs={6}>
-              <SwitchField
+              <CheckboxField
                 name="report_lessons_details"
-                label={t('General information')}
+                label={t('Lessons learned details')}
               />
             </Grid>
           </Grid>
+          {editing && (
+            <div style={{ float: 'left', marginTop: 20 }}>
+              <Button
+                color="error"
+                onClick={handleOpenDelete}
+                disabled={submitting}
+              >
+                {t('Delete')}
+              </Button>
+            </div>
+          )}
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button
               onClick={handleClose}

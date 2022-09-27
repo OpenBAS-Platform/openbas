@@ -65,6 +65,10 @@ public class Report implements Base {
     @JsonProperty("report_stats_results")
     private boolean statsResults;
 
+    @Column(name = "report_lessons_objectives")
+    @JsonProperty("report_lessons_objectives")
+    private boolean lessonsObjectives;
+
     @Column(name = "report_lessons_stats")
     @JsonProperty("report_lessons_stats")
     private boolean lessonsStats;
@@ -114,6 +118,22 @@ public class Report implements Base {
         this.name = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isGeneralInformation() {
+        return generalInformation;
+    }
+
+    public void setGeneralInformation(boolean generalInformation) {
+        this.generalInformation = generalInformation;
+    }
+
     public boolean isStatsDefinition() {
         return statsDefinition;
     }
@@ -144,6 +164,14 @@ public class Report implements Base {
 
     public void setStatsResults(boolean statsResults) {
         this.statsResults = statsResults;
+    }
+
+    public boolean isLessonsObjectives() {
+        return lessonsObjectives;
+    }
+
+    public void setLessonsObjectives(boolean lessonsObjectives) {
+        this.lessonsObjectives = lessonsObjectives;
     }
 
     public boolean isLessonsStats() {

@@ -75,10 +75,9 @@ class ResultsMenu extends Component {
           <MenuItem
             component={Link}
             to={`/admin/exercises/${exerciseId}/results/reports`}
-            selected={
-              location.pathname
-              === `/admin/exercises/${exerciseId}/results/reports`
-            }
+            selected={location.pathname.includes(
+              `/admin/exercises/${exerciseId}/results/reports`,
+            )}
             dense={false}
             classes={{ root: classes.item }}
           >

@@ -5,6 +5,7 @@ import {
   postReferential,
   putReferential,
 } from '../utils/Action';
+import * as Constants from '../constants/ActionTypes';
 
 // region players
 export const fetchPlayers = () => (dispatch) => getReferential(schema.arrayOfUsers, '/api/players')(dispatch);
@@ -26,6 +27,8 @@ export const updateUserPassword = (userId, password) => (dispatch) => putReferen
 })(dispatch);
 
 export const updateUser = (userId, data) => (dispatch) => putReferential(schema.user, `/api/users/${userId}`, data)(dispatch);
+
+export const localUpdateUser = (data) => (dispatch) => dispatch({ type: Constants.DATA_UPDATE_SUCCESS, payload: data });
 
 export const deleteUser = (userId) => (dispatch) => delReferential(`/api/users/${userId}`, 'users', userId)(dispatch);
 // endregion

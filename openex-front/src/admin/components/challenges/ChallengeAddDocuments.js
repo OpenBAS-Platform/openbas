@@ -17,7 +17,7 @@ import withStyles from '@mui/styles/withStyles';
 import { ListItemIcon } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import SearchFilter from '../../../components/SearchFilter';
-import challenge18n from '../../../components/i18n';
+import inject18n from '../../../components/i18n';
 import { storeHelper } from '../../../actions/Schema';
 import { fetchDocuments } from '../../../actions/Document';
 import CreateDocument from '../documents/CreateDocument';
@@ -269,6 +269,6 @@ const select = (state) => {
 
 export default R.compose(
   connect(select, { fetchDocuments }),
-  challenge18n,
+  inject18n,
   withStyles(styles),
 )(ChallengeAddDocuments);

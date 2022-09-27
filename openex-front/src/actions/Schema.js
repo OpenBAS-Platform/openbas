@@ -276,6 +276,8 @@ export const storeHelper = (state) => ({
         && l.lessons_answer_user === userId,
   ),
   getExerciseReports: (exerciseId) => entities('reports', state).filter((l) => l.report_exercise === exerciseId),
+  // report
+  getReport: (id) => entity(id, 'reports', state),
   // dryrun
   getDryrun: (id) => entity(id, 'dryruns', state),
   getDryrunInjects: (id) => entities('dryinjects', state).filter((i) => i.dryinject_dryrun === id),

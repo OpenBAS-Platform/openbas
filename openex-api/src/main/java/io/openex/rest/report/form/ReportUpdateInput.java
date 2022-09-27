@@ -7,6 +7,7 @@ import javax.validation.constraints.NotBlank;
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
 public class ReportUpdateInput {
+
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("report_name")
     private String name;
@@ -15,7 +16,7 @@ public class ReportUpdateInput {
     private String description;
 
     @JsonProperty("report_general_information")
-    private boolean generalInformationn;
+    private boolean generalInformation;
 
     @JsonProperty("report_stats_definition")
     private boolean statsDefinition;
@@ -54,12 +55,12 @@ public class ReportUpdateInput {
         this.description = description;
     }
 
-    public boolean isGeneralInformationn() {
-        return generalInformationn;
+    public boolean isGeneralInformation() {
+        return generalInformation;
     }
 
-    public void setGeneralInformationn(boolean generalInformationn) {
-        this.generalInformationn = generalInformationn;
+    public void setGeneralInformation(boolean generalInformation) {
+        this.generalInformation = generalInformation;
     }
 
     public boolean isStatsDefinition() {
