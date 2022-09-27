@@ -63,6 +63,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 /**/.antMatchers("/api/player/**").permitAll()
                 /**/.antMatchers("/api/settings").permitAll()
                 /**/.antMatchers("/api/login").permitAll()
+                /**/.antMatchers("/api/reset/**").permitAll()
                 /**/.antMatchers("/api/**").authenticated()
                 .and()
                 .logout()

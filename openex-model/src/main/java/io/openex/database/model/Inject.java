@@ -148,9 +148,6 @@ public class Inject implements Base, Injection {
 
     // region transient
     @Transient
-    private boolean direct = false;
-
-    @Transient
     public String getHeader() {
         return ofNullable(getExercise()).map(Exercise::getHeader).orElse("");
     }
@@ -246,14 +243,6 @@ public class Inject implements Base, Injection {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public boolean isDirect() {
-        return direct;
-    }
-
-    public void setDirect(boolean direct) {
-        this.direct = direct;
     }
 
     public Instant getCreatedAt() {

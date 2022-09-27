@@ -1,7 +1,7 @@
 package io.openex.injects.email.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openex.database.model.Inject;
+import io.openex.execution.ExecutableInject;
 import org.springframework.util.StringUtils;
 
 import java.util.Objects;
@@ -58,24 +58,21 @@ public class EmailContent {
         this.encrypted = encrypted;
     }
 
-    public String buildMessage(Inject inject, boolean imapEnabled) {
+    public String buildMessage(ExecutableInject injection, boolean imapEnabled) {
         // String footer = inject.getFooter();
-        String header = inject.getHeader();
+        String header = injection.getInject().getHeader();
         StringBuilder data = new StringBuilder();
         if (StringUtils.hasLength(header)) {
             data.append(HEADER_DIV).append(header).append(END_DIV);
         }
         data.append(START_DIV).append(body).append(END_DIV);
-        // if (StringUtils.hasLength(footer)) {
-        //    data.append(FOOTER_DIV).append(footer).append(END_DIV);
-        // }
         // If imap is enable we need to inject the id marker
-        if (imapEnabled && !inject.isDirect()) {
+        if (injection.isRuntime() && imapEnabled) {
             data.append(START_DIV)
                     .append("<br/><br/><br/><br/>")
                     .append("---------------------------------------------------------------------------------<br/>")
                     .append("OpenEx internal information, do not remove!<br/>")
-                    .append("[inject_id=").append(inject.getId()).append("]<br/>")
+                    .append("[inject_id=").append(injection.getInject().getId()).append("]<br/>")
                     .append("---------------------------------------------------------------------------------<br/>")
                     .append(END_DIV);
         }

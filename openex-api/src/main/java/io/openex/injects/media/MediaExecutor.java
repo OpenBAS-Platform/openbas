@@ -79,7 +79,7 @@ public class MediaExecutor extends Injector {
                     List<Document> documents = injection.getInject().getDocuments().stream()
                             .filter(InjectDocument::isAttached).map(InjectDocument::getDocument).toList();
                     List<DataAttachment> attachments = resolveAttachments(execution, injection, documents);
-                    String message = content.buildMessage(injection.getInject(), imapEnabled);
+                    String message = content.buildMessage(injection, imapEnabled);
                     boolean encrypted = content.isEncrypted();
                     users.stream().parallel().forEach(userInjectContext -> {
                         try {

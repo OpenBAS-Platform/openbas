@@ -1,26 +1,17 @@
 package io.openex.rest.lessons;
 
-import io.openex.config.OpenExConfig;
-import io.openex.contract.Contract;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
 import io.openex.database.specification.LessonsAnswerSpecification;
 import io.openex.database.specification.LessonsCategorySpecification;
 import io.openex.database.specification.LessonsQuestionSpecification;
-import io.openex.execution.ExecutableInject;
-import io.openex.execution.ExecutionContext;
-import io.openex.execution.Injector;
-import io.openex.injects.email.EmailContract;
-import io.openex.injects.email.model.EmailContent;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.lessons.form.*;
-import io.openex.service.ContractService;
+import io.openex.service.MailingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
@@ -32,19 +23,19 @@ import static java.time.Instant.now;
 
 @RestController
 public class LessonsApi extends RestBehavior {
-
-    @Resource
-    private OpenExConfig openExConfig;
-
     private ExerciseRepository exerciseRepository;
     private AudienceRepository audienceRepository;
     private LessonsTemplateRepository lessonsTemplateRepository;
     private LessonsCategoryRepository lessonsCategoryRepository;
     private LessonsQuestionRepository lessonsQuestionRepository;
     private LessonsAnswerRepository lessonsAnswerRepository;
-    private ContractService contractService;
-    private ApplicationContext context;
     private UserRepository userRepository;
+    private MailingService mailingService;
+
+    @Autowired
+    public void setMailingService(MailingService mailingService) {
+        this.mailingService = mailingService;
+    }
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -79,16 +70,6 @@ public class LessonsApi extends RestBehavior {
     @Autowired
     public void setLessonsAnswerRepository(LessonsAnswerRepository lessonsAnswerRepository) {
         this.lessonsAnswerRepository = lessonsAnswerRepository;
-    }
-
-    @Autowired
-    public void setContractService(ContractService contractService) {
-        this.contractService = contractService;
-    }
-
-    @Autowired
-    public void setContext(ApplicationContext context) {
-        this.context = context;
     }
 
     @GetMapping("/api/exercises/{exerciseId}/lessons_categories")
@@ -220,28 +201,9 @@ public class LessonsApi extends RestBehavior {
     public void sendExerciseLessons(@PathVariable String exerciseId, @Valid @RequestBody LessonsSendInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         List<LessonsCategory> lessonsCategories = lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId)).stream().toList();
-        EmailContent emailContent = new EmailContent();
-        emailContent.setSubject(input.getSubject());
-        emailContent.setBody(input.getBody());
-        Inject inject = new Inject();
-        inject.setTitle("Lessons learned campaign");
-        inject.setDescription("Direct inject for lessons learned questionnaire");
-        inject.setContent(mapper.valueToTree(emailContent));
-        inject.setContract(EmailContract.EMAIL_DEFAULT);
-        inject.setUser(currentUser());
-        inject.setDirect(true);
-        Contract contract = contractService.resolveContract(inject);
-        if (contract == null) {
-            throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
-        }
-        inject.setType(contract.getConfig().getType());
-        inject.setExercise(exercise);
-        List<ExecutionContext> userInjectContexts = lessonsCategories.stream().flatMap(lessonsCategory -> lessonsCategory.getAudiences().stream()
-                        .flatMap(audience -> audience.getUsers().stream())).distinct()
-                .map(user -> new ExecutionContext(openExConfig, user, inject, "Direct execution")).toList();
-        ExecutableInject injection = new ExecutableInject(true, true, inject, contract, List.of(), userInjectContexts);
-        Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
-        executor.executeInjection(injection);
+        List<User> users = lessonsCategories.stream().flatMap(lessonsCategory -> lessonsCategory.getAudiences().stream()
+                .flatMap(audience -> audience.getUsers().stream())).distinct().toList();
+        mailingService.sendEmail(input.getSubject(), input.getBody(), users, Optional.of(exercise));
     }
 
     @GetMapping("/api/exercises/{exerciseId}/lessons_answers")

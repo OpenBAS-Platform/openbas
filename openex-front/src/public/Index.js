@@ -8,6 +8,7 @@ import { errorWrapper } from '../components/Error';
 import Media from './components/medias/Media';
 import Challenges from './components/challenges/Challenges';
 import Lessons from './components/lessons/Lessons';
+import Reset from './components/login/Reset';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,19 +38,10 @@ const Index = () => {
     <div className={classes.root}>
       <main className={classes.content}>
         <Switch>
-          <Route
-            exact
-            path="/comcheck/:statusId"
-            render={errorWrapper(Comcheck)}
-          />
-          <Route
-            path="/medias/:exerciseId/:mediaId"
-            render={errorWrapper(Media)}
-          />
-          <Route
-            path="/challenges/:exerciseId"
-            render={errorWrapper(Challenges)}
-          />
+          <Route exact path="/comcheck/:statusId" render={errorWrapper(Comcheck)}/>
+          <Route exact path="/reset" render={errorWrapper(Reset)}/>
+          <Route path="/medias/:exerciseId/:mediaId" render={errorWrapper(Media)}/>
+          <Route path="/challenges/:exerciseId" render={errorWrapper(Challenges)}/>
           <Route path="/lessons/:exerciseId" render={errorWrapper(Lessons)} />
           <Route component={Login} />
         </Switch>

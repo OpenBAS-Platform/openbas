@@ -36,6 +36,9 @@ public class OpenExConfig {
     @JsonProperty("auth_kerberos_enable")
     private boolean authKerberosEnable;
 
+    @JsonProperty("default_mailer")
+    private String defaultMailer;
+
     @JsonIgnore
     private String cookieName = "openex_token";
 
@@ -139,5 +142,13 @@ public class OpenExConfig {
 
     public void setAuthKerberosEnable(boolean authKerberosEnable) {
         this.authKerberosEnable = authKerberosEnable;
+    }
+
+    public String getDefaultMailer() {
+        return defaultMailer;
+    }
+
+    public void setDefaultMailer(String defaultMailer) {
+        this.defaultMailer = defaultMailer;
     }
 }

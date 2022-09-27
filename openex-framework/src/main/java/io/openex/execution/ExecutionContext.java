@@ -33,12 +33,14 @@ public class ExecutionContext extends HashMap<String, Object> {
 
     public ExecutionContext(OpenExConfig config, User user, Injection injection, List<String> audiences) {
         this(user, injection.getExercise(), audiences);
-        String exerciseId = injection.getExercise().getId();
-        String queryParams = "?user=" + user.getId() + "&inject=" + injection.getId();
-        this.put(PLAYER_URI, config.getBaseUrl() + "/private/" + exerciseId + queryParams);
-        this.put(CHALLENGES_URI, config.getBaseUrl() + "/challenges/" + exerciseId + queryParams);
-        this.put(SCOREBOARD_URI, config.getBaseUrl() + "/scoreboard/" + exerciseId + queryParams);
-        this.put(LESSONS_URI, config.getBaseUrl() + "/lessons/" + exerciseId + queryParams);
+        if (injection.getExercise() != null) {
+            String exerciseId = injection.getExercise().getId();
+            String queryParams = "?user=" + user.getId() + "&inject=" + injection.getId();
+            this.put(PLAYER_URI, config.getBaseUrl() + "/private/" + exerciseId + queryParams);
+            this.put(CHALLENGES_URI, config.getBaseUrl() + "/challenges/" + exerciseId + queryParams);
+            this.put(SCOREBOARD_URI, config.getBaseUrl() + "/scoreboard/" + exerciseId + queryParams);
+            this.put(LESSONS_URI, config.getBaseUrl() + "/lessons/" + exerciseId + queryParams);
+        }
     }
 
     public ExecutionContext(User user, Exercise exercise, String audience) {

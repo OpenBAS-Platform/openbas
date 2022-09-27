@@ -15,6 +15,7 @@ import {
 import LoginForm from './LoginForm';
 import inject18n from '../../../components/i18n';
 import { storeHelper } from '../../../actions/Schema';
+import Reset from './Reset';
 
 const styles = () => ({
   container: {
@@ -36,13 +37,9 @@ const Login = (props) => {
   const { classes, parameters, t } = props;
   const { auth_openid_enable: isOpenId, auth_local_enable: isLocal } = parameters;
   const { platform_providers: providers } = parameters;
-  const [dimension, setDimension] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
-  const updateWindowDimensions = () => {
-    setDimension({ width: window.innerWidth, height: window.innerHeight });
-  };
+  const [reset, setReset] = useState(false);
+  const [dimension, setDimension] = useState({ width: window.innerWidth, height: window.innerHeight });
+  const updateWindowDimensions = () => setDimension({ width: window.innerWidth, height: window.innerHeight });
   useEffect(() => {
     window.addEventListener('resize', updateWindowDimensions);
     return () => window.removeEventListener('resize', updateWindowDimensions);
@@ -62,11 +59,15 @@ const Login = (props) => {
   return (
     <div className={classes.container} style={{ marginTop }}>
       <img src={`/${logo}`} alt="logo" className={classes.logo} />
-      {isLocal && (
+      {isLocal && !reset && (
         <Paper variant="outlined">
           <LoginForm onSubmit={onSubmit} />
+          <div style={{ marginBottom: 10 }}>
+            <a onClick={() => setReset(true)}>{t('I forgot my password')}</a>
+          </div>
         </Paper>
       )}
+      {isLocal && reset && <Reset onCancel={() => setReset(false)}/>}
       {isOpenId
         && (providers ?? []).map((provider) => (
           <div key={provider.provider_name}>

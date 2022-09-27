@@ -275,6 +275,7 @@ export const useFormatter = () => {
   };
   return {
     t: translate,
+    locale: intl.locale ?? intl.defaultLocale,
     tPick: (label) => (label ? label[intl.locale] ?? label[intl.defaultLocale] : ''),
     n: formatNumber,
     b: formatBytes,

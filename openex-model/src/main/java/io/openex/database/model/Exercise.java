@@ -77,7 +77,7 @@ public class Exercise implements Base {
 
     @Column(name = "exercise_mail_from")
     @JsonProperty("exercise_mail_from")
-    private String replyTo = "planners@openex.io";
+    private String replyTo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_logo_dark")

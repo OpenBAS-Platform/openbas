@@ -1,6 +1,7 @@
 package io.openex.rest.exercise;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openex.config.OpenExConfig;
 import io.openex.database.model.*;
 import io.openex.database.model.Exercise.STATUS;
 import io.openex.database.repository.*;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.util.function.Tuples;
 
+import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -61,6 +63,9 @@ public class ExerciseApi extends RestBehavior {
 
     @Value("${openex.mail.imap.username}")
     private String imapUsername;
+
+    @Resource
+    private OpenExConfig openExConfig;
     // endregion
 
     // region repositories
@@ -292,6 +297,8 @@ public class ExerciseApi extends RestBehavior {
         exercise.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         if (imapEnabled) {
             exercise.setReplyTo(imapUsername);
+        } else {
+            exercise.setReplyTo(openExConfig.getDefaultMailer());
         }
         // Find automatic groups to grants
         List<Group> groups = fromIterable(groupRepository.findAll());

@@ -20,6 +20,29 @@ export const updateParameters = (data) => (dispatch) => {
   )(dispatch);
 };
 
+export const askReset = (username, locale) => (dispatch) => {
+  const data = { login: username, lang: locale };
+  return postReferential(schema.user, '/api/reset', data)(dispatch);
+};
+
+export const resetPassword = (token, values) => (dispatch) => {
+  const data = { password: values.password, password_validation: values.password_validation };
+  const ref = postReferential(schema.user, `/api/reset/${token}`, data)(dispatch);
+  return ref.then((finalData) => {
+    if (finalData[FORM_ERROR]) {
+      return finalData;
+    }
+    return dispatch({
+      type: Constants.IDENTITY_LOGIN_SUCCESS,
+      payload: finalData,
+    });
+  });
+};
+
+export const validateResetToken = (token) => (dispatch) => {
+  return getReferential(null, `/api/reset/${token}`)(dispatch);
+};
+
 export const askToken = (username, password) => (dispatch) => {
   const data = { login: username, password };
   const ref = postReferential(schema.user, '/api/login', data)(dispatch);

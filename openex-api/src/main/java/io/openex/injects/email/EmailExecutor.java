@@ -71,7 +71,7 @@ public class EmailExecutor extends Injector {
         List<DataAttachment> attachments = resolveAttachments(execution, injection, documents);
         String inReplyTo = content.getInReplyTo();
         String subject = content.getSubject();
-        String message = content.buildMessage(inject, imapEnabled);
+        String message = content.buildMessage(injection, imapEnabled);
         boolean mustBeEncrypted = content.isEncrypted();
         // Resolve the attachments only once
         List<ExecutionContext> users = injection.getUsers();
@@ -83,7 +83,7 @@ public class EmailExecutor extends Injector {
             users = users.stream().peek(context -> context.put("document_uri", buildDocumentUri(context, inject))).toList();
         }
         Exercise exercise = injection.getSource().getExercise();
-        String replyTo = exercise.getReplyTo();
+        String replyTo = exercise != null ? exercise.getReplyTo() : openExConfig.getDefaultMailer();
         //noinspection SwitchStatementWithTooFewBranches
         switch (contract.getId()) {
             case EMAIL_GLOBAL -> sendMulti(execution, users, replyTo, inReplyTo, subject, message, attachments);
