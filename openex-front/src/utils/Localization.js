@@ -51,6 +51,8 @@ const i18n = {
       'added an entry on': 'a ajouté une entrée le',
       'This file type is not accepted here.':
         "Ce type de fichier n'est pas accepté ici",
+      'Distribution of score by audience (in % of expectations)':
+        'Distribution du score par audience (en % des attendus)',
       Name: 'Nom',
       Subtitle: 'Sous-titre',
       'Start date': 'Date de début',
@@ -88,8 +90,13 @@ const i18n = {
       'Do you want to delete this organization?':
         'Souhaitez-vous supprimer cette organisation ?',
       'Mail sent to': 'Mail envoyé à',
+      'Audiences scores over time (in % of expectations)':
+        'Score des audience dans le temps (en % des attendus)',
+      'Distribution of total score by inject type':
+        'Distribution du score total par type de stimuli',
       on: 'le',
       Manual: 'Manuel',
+      'Total score': 'Score total',
       'Media entries': 'Entrées de média',
       Parameters: 'Paramètres',
       'Default theme': 'Thème par défaut',

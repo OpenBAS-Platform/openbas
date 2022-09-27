@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import Chart from 'react-apexcharts';
 import { useFormatter } from '../../../../components/i18n';
 import {
+  areaChartOptions,
   colors,
   horizontalBarsChartOptions,
   lineChartOptions,
@@ -85,6 +86,23 @@ const DashboardDataStatistics = ({
     ]),
     R.fromPairs,
   )(audiences);
+  const injectsOverTime = R.pipe(
+    R.filter((i) => i && i.inject_sent_at !== null),
+    R.sortWith([R.ascend(R.prop('inject_sent_at'))]),
+    R.map((i) => {
+      cumulation += 1;
+      return R.assoc('inject_cumulated_number', cumulation, i);
+    }),
+  )(injects);
+  const injectsData = [
+    {
+      name: t('Number of injects'),
+      data: injectsOverTime.map((i) => ({
+        x: i.inject_sent_at,
+        y: i.inject_cumulated_number,
+      })),
+    },
+  ];
   const audiencesInjects = R.pipe(
     R.map((n) => {
       cumulation = 0;
@@ -111,6 +129,22 @@ const DashboardDataStatistics = ({
       })),
     })),
   )(audiences);
+  const communicationsOverTime = R.pipe(
+    R.sortWith([R.ascend(R.prop('communication_received_at'))]),
+    R.map((i) => {
+      cumulation += 1;
+      return R.assoc('communication_cumulated_number', cumulation, i);
+    }),
+  )(communications);
+  const communicationsData = [
+    {
+      name: t('Total mails'),
+      data: communicationsOverTime.map((c) => ({
+        x: c.communication_received_at,
+        y: c.communication_cumulated_number,
+      })),
+    },
+  ];
   const audiencesCommunications = R.pipe(
     R.map((n) => {
       cumulation = 0;
@@ -201,6 +235,26 @@ const DashboardDataStatistics = ({
       <Grid item={true} xs={6}>
         <Typography variant="h4">{t('Sent injects over time')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+          {injectsOverTime.length > 0 ? (
+            <Chart
+              options={areaChartOptions(theme, true, nsdt, null, undefined)}
+              series={injectsData}
+              type="area"
+              width="100%"
+              height={350}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
+              )}
+            />
+          )}
+        </Paper>
+      </Grid>
+      <Grid item={true} xs={6}>
+        <Typography variant="h4">{t('Sent injects over time')}</Typography>
+        <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {audiencesInjects.length > 0 ? (
             <Chart
               options={lineChartOptions(
@@ -225,7 +279,27 @@ const DashboardDataStatistics = ({
           )}
         </Paper>
       </Grid>
-      <Grid item={true} xs={6}>
+      <Grid item={true} xs={6} style={{ marginTop: 30 }}>
+        <Typography variant="h4">{t('Sent mails over time')}</Typography>
+        <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+          {communicationsOverTime.length > 0 ? (
+            <Chart
+              options={areaChartOptions(theme, true, nsdt, null, undefined)}
+              series={communicationsData}
+              type="area"
+              width="100%"
+              height={350}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
+              )}
+            />
+          )}
+        </Paper>
+      </Grid>
+      <Grid item={true} xs={6} style={{ marginTop: 30 }}>
         <Typography variant="h4">{t('Sent mails over time')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {audiencesCommunications.length > 0 ? (

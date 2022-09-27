@@ -51,6 +51,12 @@ class CreatePlayer extends Component {
           ? data.user_organization.id
           : data.user_organization,
       ),
+      R.assoc(
+        'user_country',
+        data.user_country && data.user_country.id
+          ? data.user_country.id
+          : data.user_country,
+      ),
       R.assoc('user_tags', R.pluck('id', data.user_tags)),
     )(data);
     return this.props.addPlayer(inputValues).then((result) => {

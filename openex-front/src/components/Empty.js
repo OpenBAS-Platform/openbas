@@ -6,6 +6,7 @@ const Empty = ({ message }) => (
       display: 'table',
       height: '100%',
       width: '100%',
+      padding: '30px 0 30px 0',
     }}
   >
     <span
