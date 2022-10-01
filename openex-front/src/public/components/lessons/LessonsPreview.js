@@ -228,6 +228,7 @@ const LessonsPlayer = () => {
                               </Typography>
                               <SliderField
                                 name={`${question.lessonsquestion_id}_score`}
+                                step={10}
                                 min={0}
                                 max={100}
                               />

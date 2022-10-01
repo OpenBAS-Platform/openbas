@@ -279,6 +279,7 @@ const LessonsPlayer = () => {
                               <SliderField
                                 disabled={lessonsAnswers.length > 0}
                                 name={`${question.lessonsquestion_id}_score`}
+                                step={10}
                                 min={0}
                                 max={100}
                               />
