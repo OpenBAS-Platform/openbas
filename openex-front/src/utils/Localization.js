@@ -60,6 +60,7 @@ const i18n = {
         "Ce type de fichier n'est pas accepté ici",
       'Distribution of score by audience (in % of expectations)':
         'Distribution du score par audience (en % des attendus)',
+      'Select all': 'Sélectionner tout',
       Name: 'Nom',
       Subtitle: 'Sous-titre',
       'Start date': 'Date de début',

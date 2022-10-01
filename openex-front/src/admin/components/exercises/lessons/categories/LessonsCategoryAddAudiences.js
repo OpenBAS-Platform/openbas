@@ -95,6 +95,17 @@ class LessonsCategoryAddAudiences extends Component {
     });
   }
 
+  addAllAudiences() {
+    const { lessonsCategoryAudiencesIds, audiences } = this.props;
+    const audiencesToAdd = R.pipe(
+      R.map((n) => n.audience_id),
+      R.filter((n) => !lessonsCategoryAudiencesIds.includes(n)),
+    )(audiences);
+    this.setState({
+      audiencesIds: audiencesToAdd,
+    });
+  }
+
   removeAudience(audienceId) {
     this.setState({
       audiencesIds: R.filter((u) => u !== audienceId, this.state.audiencesIds),
@@ -171,7 +182,18 @@ class LessonsCategoryAddAudiences extends Component {
           }}
         >
           <DialogTitle>
-            {t('Add target audiences in this lessons learned category')}
+            <div style={{ float: 'left' }}>
+              {t('Add target audiences in this lessons learned category')}
+            </div>
+            <div style={{ float: 'right', marginTop: -4 }}>
+              <Button
+                onClick={this.addAllAudiences.bind(this)}
+                variant="outlined"
+                color="warning"
+              >
+                {t('Select all')}
+              </Button>
+            </div>
           </DialogTitle>
           <DialogContent>
             <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
