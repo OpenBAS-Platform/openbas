@@ -215,7 +215,7 @@ public class Exercise implements Base {
 
     @JsonProperty("exercise_users_number")
     public long usersNumber() {
-        return getAudiences().stream().mapToLong(audience -> audience.getUsers().size()).sum();
+        return getAudiences().stream().flatMap(audience -> audience.getUsers().stream()).distinct().count();
     }
 
     @JsonProperty("exercise_players")
