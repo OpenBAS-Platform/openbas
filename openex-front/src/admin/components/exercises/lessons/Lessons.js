@@ -126,6 +126,7 @@ const Lessons = () => {
   const [openResetAnswers, setOpenResetAnswers] = useState(false);
   const [openEmptyLessons, setOpenEmptyLessons] = useState(false);
   const [openSendLessons, setOpenSendLessons] = useState(false);
+  const [openAnonymize, setOpenAnonymize] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [templateValue, setTemplateValue] = useState(null);
   const handleChange = (event) => {
@@ -180,8 +181,9 @@ const Lessons = () => {
       updateExerciseLessons(exerciseId, {
         exercise_lessons_anonymized: !exercise.exercise_lessons_anonymized,
       }),
-    );
+    ).then(() => setOpenAnonymize(false));
   };
+
   const handleSubmitSendLessons = (data) => {
     return dispatch(sendLessons(exerciseId, data));
   };
@@ -282,8 +284,9 @@ const Lessons = () => {
                 <FormControlLabel
                   control={
                     <Switch
+                      disabled={exercise.exercise_lessons_anonymized}
                       checked={exercise.exercise_lessons_anonymized}
-                      onChange={toggleAnonymize}
+                      onChange={() => setOpenAnonymize(true)}
                       name="anonymized"
                     />
                   }
@@ -364,7 +367,8 @@ const Lessons = () => {
           </Paper>
         </Grid>
       </Grid>
-      <br /><br />
+      <br />
+      <br />
       <LessonsObjectives
         objectives={objectives}
         injects={injects}
@@ -590,6 +594,29 @@ const Lessons = () => {
         <DialogActions>
           <Button onClick={() => setSelectedQuestion(null)}>
             {t('Close')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openAnonymize}
+        TransitionComponent={Transition}
+        onClose={() => setOpenAnonymize(false)}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t('Do you want to anonymize lessons learned questionnaire?')}
+          </DialogContentText>
+          <Alert severity="warning" style={{ marginTop: 10 }}>
+            {t('You will not be able to change this setting later.')}
+          </Alert>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEmptyLessons(false)}>
+            {t('Cancel')}
+          </Button>
+          <Button color="secondary" onClick={toggleAnonymize}>
+            {t('Anonymize')}
           </Button>
         </DialogActions>
       </Dialog>

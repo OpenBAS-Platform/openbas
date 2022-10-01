@@ -8,10 +8,10 @@ const i18n = {
       Password: 'Mot de passe',
       'Password validation': 'Validation du mot de passe',
       'Change your password': 'Changer votre mot de passe',
-      'I forgot my password': 'J\'ai oublié mon mot de passe',
+      'I forgot my password': "J'ai oublié mon mot de passe",
       'Send reset code': 'Envoyer le code',
       'Enter code': 'Entrer le code',
-      'Back to login': 'Retour à l\'identification',
+      'Back to login': "Retour à l'identification",
       'Sign in': "S'identifier",
       Continue: 'Continuer',
       Dashboard: 'Tableau de bord',
@@ -61,6 +61,10 @@ const i18n = {
       'Distribution of score by audience (in % of expectations)':
         'Distribution du score par audience (en % des attendus)',
       'Select all': 'Sélectionner tout',
+      'Do you want to anonymize lessons learned questionnaire?':
+        "Souhaitez-vous anonymiser le questionnaire de retour d'expérience ?",
+      'You will not be able to change this setting later.':
+        'Vous ne serez plus en mesure de modifier ce paramètre après.',
       Name: 'Nom',
       Subtitle: 'Sous-titre',
       'Start date': 'Date de début',
@@ -71,6 +75,7 @@ const i18n = {
       Reply: 'Répondre',
       newspaper: 'Journal',
       tv: 'Chaîne de télévision',
+      Anonymize: 'Anonymiser',
       microblogging: 'Microblogging',
       'Targeted players': 'Joueurs ciblés',
       'Inject details': 'Détails du stimuli',
