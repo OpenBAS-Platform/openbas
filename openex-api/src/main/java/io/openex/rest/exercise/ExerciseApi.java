@@ -446,6 +446,10 @@ public class ExerciseApi extends RestBehavior {
         if (RUNNING.equals(exercise.getStatus()) && PAUSED.equals(status)) {
             exercise.setCurrentPause(Instant.now());
         }
+        // Cancelation
+        if (RUNNING.equals(exercise.getStatus()) && CANCELED.equals(status)) {
+            exercise.setEnd(now());
+        }
         exercise.setUpdatedAt(now());
         exercise.setStatus(status);
         return exerciseRepository.save(exercise);

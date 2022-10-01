@@ -114,6 +114,7 @@ public class InjectsExecutionJob implements Job {
             exerciseRepository.saveAll(mustBeFinishedExercises.stream()
                     .peek(exercise -> {
                         exercise.setStatus(Exercise.STATUS.FINISHED);
+                        exercise.setEnd(now());
                         exercise.setUpdatedAt(now());
                     }).toList());
         } catch (Exception e) {
