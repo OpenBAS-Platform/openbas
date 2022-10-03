@@ -53,6 +53,6 @@ public class AppConfig {
                         .license(new License().name("Apache 2.0").url("https://www.openex.io/")))
                 .externalDocs(new ExternalDocumentation()
                         .description("OpenEx documentation")
-                        .url("https://luatix.notion.site/OpenEx-Public-Knowledge-Base-bbc835446e9140999d6f2e10d96c2ee0"));
+                        .url("https://filigran.notion.site/OpenEx-Public-Knowledge-Base-bbc835446e9140999d6f2e10d96c2ee0"));
     }
 }
