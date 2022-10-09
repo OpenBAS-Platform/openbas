@@ -65,6 +65,7 @@ const i18n = {
         "Souhaitez-vous anonymiser le questionnaire de retour d'expérience ?",
       'You will not be able to change this setting later.':
         'Vous ne serez plus en mesure de modifier ce paramètre après.',
+      Stop: 'Arrêter',
       Name: 'Nom',
       Subtitle: 'Sous-titre',
       'Start date': 'Date de début',

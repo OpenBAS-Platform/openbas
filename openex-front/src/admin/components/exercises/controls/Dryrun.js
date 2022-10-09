@@ -364,7 +364,10 @@ const Dryrun = () => {
                 divider={true}
               >
                 <ListItemIcon style={{ paddingTop: 5 }}>
-                  <InjectIcon type={dryinject.dryinject_inject.inject_type} />
+                  <InjectIcon
+                    type={dryinject.dryinject_inject.inject_type}
+                    disabled={!dryinject.inject_enabled}
+                  />
                 </ListItemIcon>
                 <ListItemText
                   primary={

@@ -346,6 +346,7 @@ const Mails = () => {
                   tooltip={t(inject.inject_type)}
                   config={injectContract?.config}
                   type={inject.inject_type}
+                  disabled={!inject.inject_enabled}
                 />
               </ListItemIcon>
               <ListItemText

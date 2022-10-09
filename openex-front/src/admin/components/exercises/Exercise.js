@@ -290,7 +290,7 @@ const Exercise = () => {
             disabled={permissions.readOnlyBypassStatus}
             onClick={() => setOpenChangeStatus('CANCELED')}
           >
-            {t('Cancel')}
+            {t('Stop')}
           </Button>
         );
       case 'FINISHED':
@@ -314,7 +314,7 @@ const Exercise = () => {
             color="error"
             disabled={true}
           >
-            {t('Cancel')}
+            {t('Stop')}
           </Button>
         );
     }

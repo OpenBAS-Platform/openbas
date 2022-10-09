@@ -17,7 +17,7 @@ import {
 import Airbus from '../../../../resources/images/contracts/airbus.png';
 import CustomTooltip from '../../../../components/CustomTooltip';
 
-const iconSelector = (type, variant, fontSize, done) => {
+const iconSelector = (type, variant, fontSize, done, disabled) => {
   let style;
   switch (variant) {
     case 'inline':
@@ -33,14 +33,19 @@ const iconSelector = (type, variant, fontSize, done) => {
         margin: 0,
       };
   }
-
+  let color = null;
+  if (done) {
+    color = '#4caf50';
+  } else if (disabled) {
+    color = '#7a7a7a';
+  }
   switch (type) {
     case 'openex_email':
       return (
         <EmailOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#4caf50' : '#cddc39' }}
+          sx={{ color: color || '#cddc39' }}
         />
       );
     case 'openex_ovh_sms':
@@ -48,7 +53,7 @@ const iconSelector = (type, variant, fontSize, done) => {
         <SmsOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#4caf50' : '#9c27b0' }}
+          sx={{ color: color || '#9c27b0' }}
         />
       );
     case 'openex_manual':
@@ -56,7 +61,7 @@ const iconSelector = (type, variant, fontSize, done) => {
         <NotificationsActiveOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#4caf50' : '#009688' }}
+          sx={{ color: color || '#009688' }}
         />
       );
     case 'openex_mastodon':
@@ -64,7 +69,7 @@ const iconSelector = (type, variant, fontSize, done) => {
         <Mastodon
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#4caf50' : '#ad1457' }}
+          sx={{ color: color || '#ad1457' }}
         />
       );
     case 'openex_lade':
@@ -83,7 +88,7 @@ const iconSelector = (type, variant, fontSize, done) => {
         <SpeakerNotesOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#4caf50' : '#f44336' }}
+          sx={{ color: color || '#f44336' }}
         />
       );
     case 'openex_twitter':
@@ -91,7 +96,7 @@ const iconSelector = (type, variant, fontSize, done) => {
         <Twitter
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#4caf50' : '#2196f3' }}
+          sx={{ color: color || '#2196f3' }}
         />
       );
     case 'openex_http':
@@ -99,7 +104,7 @@ const iconSelector = (type, variant, fontSize, done) => {
         <ApiOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#4caf50' : '#00bcd4' }}
+          sx={{ color: color || '#00bcd4' }}
         />
       );
     case 'openex_media':
@@ -125,16 +130,16 @@ const iconSelector = (type, variant, fontSize, done) => {
 
 class InjectIcon extends Component {
   render() {
-    const { type, size, variant, tooltip, done } = this.props;
+    const { type, size, variant, tooltip, done, disabled } = this.props;
     const fontSize = size || 'medium';
     if (tooltip) {
       return (
         <CustomTooltip title={tooltip}>
-          {iconSelector(type, variant, fontSize, done)}
+          {iconSelector(type, variant, fontSize, done, disabled)}
         </CustomTooltip>
       );
     }
-    return iconSelector(type, variant, fontSize, done);
+    return iconSelector(type, variant, fontSize, done, disabled);
   }
 }
 

@@ -248,6 +248,7 @@ const Validations = () => {
                       tooltip={t(inject.inject_type || 'Unknown')}
                       config={injectContract.config}
                       type={inject.inject_type}
+                      disabled={!inject.inject_enabled}
                       size="small"
                     />
                   </ListItemIcon>

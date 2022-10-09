@@ -344,6 +344,7 @@ const Dashboard = (props) => {
                         <InjectIcon
                           type={inject.inject_type}
                           variant="inline"
+                          disabled={!inject.inject_enabled}
                         />
                       </ListItemIcon>
                       <ListItemText

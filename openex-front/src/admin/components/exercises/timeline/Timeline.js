@@ -307,6 +307,7 @@ const Timeline = () => {
                             type={inject.inject_type}
                             tooltip={inject.inject_title}
                             done={inject.inject_status !== null}
+                            disabled={!inject.inject_enabled}
                             size="small"
                           />
                         ))}
@@ -419,7 +420,7 @@ const Timeline = () => {
                       classes={{ root: classes.item }}
                       divider={true}
                       button={true}
-                      disabled={isDisabled}
+                      disabled={isDisabled || !inject.inject_enabled}
                       onClick={() => setSelectedInject(inject.inject_id)}
                     >
                       <ListItemIcon>
