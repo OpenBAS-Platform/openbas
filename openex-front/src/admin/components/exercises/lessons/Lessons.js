@@ -185,7 +185,7 @@ const Lessons = () => {
   };
 
   const handleSubmitSendLessons = (data) => {
-    return dispatch(sendLessons(exerciseId, data));
+    return dispatch(sendLessons(exerciseId, data)).then(() => setOpenSendLessons(false));
   };
   const answers = R.groupBy(R.prop('lessons_answer_question'), lessonsAnswers);
   const selectedQuestionAnswers = selectedQuestion && answers[selectedQuestion.lessonsquestion_id]
@@ -413,7 +413,7 @@ const Lessons = () => {
         <DialogContent>
           <Alert severity="info">
             {t(
-              'Applying a template will add all categories and questions of the selected template to this exercise.',
+              'Applying a template will add all categories and questions of the selectedtemplate to this exercise.',
             )}
           </Alert>
           <FormControl style={{ margin: '10px 0 0 5px', width: '100%' }}>
