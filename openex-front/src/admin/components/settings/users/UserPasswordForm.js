@@ -10,10 +10,10 @@ class UserPasswordForm extends Component {
     const { t } = this.props;
     const errors = {};
     if (
-      !values.user_plain_password
-      || values.user_plain_password !== values.password_confirmation
+      !values.password
+      || values.password !== values.password_validation
     ) {
-      errors.user_plain_password = t('Passwords do no match');
+      errors.password = t('Passwords do no match');
     }
     return errors;
   }
@@ -30,14 +30,14 @@ class UserPasswordForm extends Component {
           <form id="passwordForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"
-              name="user_plain_password"
+              name="password"
               fullWidth={true}
               type="password"
               label={t('Password')}
             />
             <TextField
               variant="standard"
-              name="password_confirmation"
+              name="password_validation"
               fullWidth={true}
               type="password"
               label={t('Confirmation')}

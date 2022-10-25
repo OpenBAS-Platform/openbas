@@ -22,9 +22,7 @@ export const fetchUsers = () => (dispatch) => getReferential(schema.arrayOfUsers
 
 export const addUser = (data) => (dispatch) => postReferential(schema.user, '/api/users', data)(dispatch);
 
-export const updateUserPassword = (userId, password) => (dispatch) => putReferential(schema.user, `/api/users/${userId}/password`, {
-  user_plain_password: password,
-})(dispatch);
+export const updateUserPassword = (userId, data) => (dispatch) => putReferential(schema.user, `/api/users/${userId}/password`, data)(dispatch);
 
 export const updateUser = (userId, data) => (dispatch) => putReferential(schema.user, `/api/users/${userId}`, data)(dispatch);
 
