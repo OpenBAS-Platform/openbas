@@ -30,7 +30,7 @@ jobs:
           event: fail
           template: basic_fail_1
       - ms-teams/report:
-          webhook_url: 
+          webhook_url: $MS_TEAMS_WEBHOOK_URL
       - persist_to_workspace:
           root: ~/
           paths:
