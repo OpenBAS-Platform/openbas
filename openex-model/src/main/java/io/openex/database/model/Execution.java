@@ -41,6 +41,7 @@ public class Execution {
         this.startTime = now();
     }
 
+    @SuppressWarnings("unused")
     public void setRuntime(boolean runtime) {
         this.runtime = runtime;
     }
@@ -66,7 +67,8 @@ public class Execution {
     }
 
     public void addTrace(ExecutionTrace context) {
-        if (context.getStatus().equals(ExecutionStatus.SUCCESS)) {
+        ExecutionStatus status = context.getStatus();
+        if (status.equals(ExecutionStatus.SUCCESS) || status.equals(ExecutionStatus.INFO)) {
             LOGGER.log(Level.INFO, context.getMessage());
         } else {
             LOGGER.log(Level.SEVERE, context.getMessage(), context.getException());
