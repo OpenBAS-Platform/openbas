@@ -810,13 +810,9 @@ class InjectDefinition extends Component {
                                     fullWidth={true}
                                     label={t('Value')}
                                     style={{ marginRight: 20 }}
-                                    disabled={isExerciseReadOnly(exercise)}
-                                  >
+                                    disabled={isExerciseReadOnly(exercise)}>
                                     {attachedDocs.map((doc) => (
-                                      <MenuItem
-                                        key={doc.document_id}
-                                        value={doc.document_id}
-                                      >
+                                      <MenuItem key={doc.document_id} value={doc.document_id}>
                                         <ListItemText>
                                           {doc.document_name}
                                         </ListItemText>
@@ -864,8 +860,7 @@ class InjectDefinition extends Component {
                   name={field.key}
                   fullWidth={true}
                   style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
-                >
+                  disabled={isExerciseReadOnly(exercise)}>
                   {Object.entries(field.choices)
                     .sort((a, b) => a[1].localeCompare(b[1]))
                     .map(([k, v]) => (
@@ -931,8 +926,8 @@ class InjectDefinition extends Component {
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
-                  renderValue={(v) => (field.expectation ? t(choices[v] || 'Unknown') : choices[v])
-                  }
+                  renderValue={(v) => (field.expectation ? t(choices[v] || 'Unknown') : choices[v])}
+                  disabled={isExerciseReadOnly(exercise)}
                   name={field.key}
                   fullWidth={true}
                   style={{ marginTop: 20 }}

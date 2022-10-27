@@ -39,7 +39,7 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>, St
 
     @Query(value = "select e.* from exercises e " +
             "left join injects as inject on e.exercise_id = inject.inject_exercise " +
-            "left join injects_statuses as status on inject.inject_id = status.status_inject " +
+            "left join injects_statuses as status on inject.inject_id = status.status_inject and status.status_name != 'PENDING'" +
             "where e.exercise_status = 'RUNNING' group by e.exercise_id having count(status) = count(inject);", nativeQuery = true)
     List<Exercise> thatMustBeFinished();
 }
