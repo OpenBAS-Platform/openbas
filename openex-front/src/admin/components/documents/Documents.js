@@ -35,8 +35,6 @@ import DocumentType from './DocumentType';
 import { FIVE_SECONDS } from '../../../utils/Time';
 import { exportData } from '../../../utils/Environment';
 
-const interval$ = interval(FIVE_SECONDS);
-
 const styles = (theme) => ({
   parameters: {
     marginTop: -10,
@@ -180,9 +178,6 @@ class Documents extends Component {
     this.props.fetchDocuments();
     this.props.fetchTags();
     this.props.fetchExercises();
-    this.subscription = interval$.subscribe(() => {
-      this.props.fetchDocuments();
-    });
   }
 
   handleSearch(value) {
@@ -362,17 +357,12 @@ class Documents extends Component {
                     >
                       {document.document_description}
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.document_exercises}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.document_exercises}>
                       {R.take(3, document.document_exercises).map((e) => {
-                        const exercise = exercisesMap[e] || {};
+                        const exercise = exercisesMap[e];
+                        if (exercise === undefined) return <div/>;
                         return (
-                          <Tooltip
-                            key={exercise.exercise_id}
-                            title={exercise.exercise_name}
-                          >
+                          <Tooltip key={exercise.exercise_id} title={exercise.exercise_name}>
                             <Chip
                               icon={<RowingOutlined style={{ fontSize: 12 }} />}
                               classes={{ root: classes.exercise }}

@@ -68,6 +68,11 @@ public class DryInject implements Base, Injection {
         return id;
     }
 
+    @Override
+    public boolean isUserHasAccess(User user) {
+        return getExercise().isUserHasAccess(user);
+    }
+
     public void setId(String id) {
         this.id = id;
     }

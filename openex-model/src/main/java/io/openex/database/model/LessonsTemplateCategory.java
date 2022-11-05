@@ -1,6 +1,5 @@
 package io.openex.database.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
@@ -61,6 +60,11 @@ public class LessonsTemplateCategory implements Base {
     @Override
     public String getId() {
         return id;
+    }
+
+    @Override
+    public boolean isUserHasAccess(User user) {
+        return template.isUserHasAccess(user);
     }
 
     public void setId(String id) {

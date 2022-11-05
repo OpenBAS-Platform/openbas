@@ -63,6 +63,11 @@ public class Setting implements Base {
         return id;
     }
 
+    @Override
+    public boolean isUserHasAccess(User user) {
+        return user.isAdmin();
+    }
+
     public void setId(String id) {
         this.id = id;
     }

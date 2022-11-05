@@ -111,7 +111,7 @@ public class Audience implements Base {
     @JsonIgnore
     @Override
     public boolean isUserHasAccess(User user) {
-        return getExercise().isUserHasAccess(user);
+        return exercise.isUserHasAccess(user);
     }
     // endregion
 

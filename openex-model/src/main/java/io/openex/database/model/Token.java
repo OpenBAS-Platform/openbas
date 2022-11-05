@@ -66,6 +66,11 @@ public class Token implements Base {
     }
 
     @Override
+    public boolean isUserHasAccess(User user) {
+        return this.user.equals(user);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;

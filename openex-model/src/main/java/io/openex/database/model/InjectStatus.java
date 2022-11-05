@@ -68,6 +68,11 @@ public class InjectStatus implements Base {
         return id;
     }
 
+    @Override
+    public boolean isUserHasAccess(User user) {
+        return inject.isUserHasAccess(user);
+    }
+
     public void setId(String id) {
         this.id = id;
     }

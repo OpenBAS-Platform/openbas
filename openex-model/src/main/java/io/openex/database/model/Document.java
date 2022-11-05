@@ -12,9 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static io.openex.helper.UserHelper.currentUser;
-
-
 @Entity
 @Table(name = "documents")
 @EntityListeners(ModelBaseListener.class)
@@ -111,7 +108,7 @@ public class Document implements Base {
     }
 
     public List<Exercise> getExercises() {
-        return exercises.stream().filter(exercise -> exercise.isUserHasAccess(currentUser())).toList();
+        return exercises;
     }
 
     public void setExercises(List<Exercise> exercises) {
@@ -124,6 +121,11 @@ public class Document implements Base {
 
     public void setInjectDocuments(List<InjectDocument> injectDocuments) {
         this.injectDocuments = injectDocuments;
+    }
+
+    @Override
+    public boolean isUserHasAccess(User user) {
+        return exercises.stream().anyMatch(exercise -> exercise.isUserHasAccess(user));
     }
 
     @Override

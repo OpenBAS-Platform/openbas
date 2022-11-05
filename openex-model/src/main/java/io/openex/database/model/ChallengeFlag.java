@@ -58,6 +58,11 @@ public class ChallengeFlag implements Base {
         return id;
     }
 
+    @Override
+    public boolean isUserHasAccess(User user) {
+        return challenge.isUserHasAccess(user);
+    }
+
     public void setId(String id) {
         this.id = id;
     }

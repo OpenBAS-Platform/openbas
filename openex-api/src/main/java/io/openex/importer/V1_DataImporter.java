@@ -551,7 +551,7 @@ public class V1_DataImporter implements Importer {
         exerciseLessonsQuestions.forEach(nodeLessonQuestion -> {
             String id = nodeLessonQuestion.get("lessonsquestion_id").textValue();
             String categoryId = nodeLessonQuestion.get("lessons_question_category").asText();
-            LessonsCategory lessonsCategory = (LessonsCategory)baseIds.get(categoryId);
+            LessonsCategory lessonsCategory = (LessonsCategory) baseIds.get(categoryId);
             LessonsQuestion lessonsQuestion = new LessonsQuestion();
             lessonsQuestion.setContent(nodeLessonQuestion.get("lessons_question_content").asText());
             lessonsQuestion.setExplanation(nodeLessonQuestion.get("lessons_question_explanation").asText());
@@ -567,10 +567,21 @@ public class V1_DataImporter implements Importer {
         importInjects(baseIds, exercise, injectsNoParent.toList());
     }
 
-    private record BaseHolder(String id) implements Base {
+    private static class BaseHolder implements Base {
+        private String id;
+
+        public BaseHolder(String id) {
+            this.id = id;
+        }
+
         @Override
         public String getId() {
             return id;
+        }
+
+        @Override
+        public void setId(String id) {
+            this.id = id;
         }
     }
 }

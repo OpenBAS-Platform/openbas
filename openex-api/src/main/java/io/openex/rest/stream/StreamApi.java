@@ -1,5 +1,8 @@
 package io.openex.rest.stream;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openex.database.audit.BaseEvent;
 import io.openex.database.model.User;
 import io.openex.rest.helper.RestBehavior;
@@ -19,7 +22,10 @@ import reactor.util.function.Tuples;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import static io.openex.database.audit.ModelBaseListener.DATA_DELETE;
 import static io.openex.helper.UserHelper.currentUser;
 import static java.time.Instant.now;
 
@@ -29,23 +35,42 @@ public class StreamApi extends RestBehavior {
     public static final String EVENT_TYPE_MESSAGE = "message";
     public static final String EVENT_TYPE_PING = "ping";
     public static final String X_ACCEL_BUFFERING = "X-Accel-Buffering";
+    private static final Logger LOGGER = Logger.getLogger(StreamApi.class.getName());
     private final Map<String, Tuple2<User, FluxSink<Object>>> consumers = new HashMap<>();
+
+    private void sendStreamEvent(FluxSink<Object> flux, BaseEvent event) {
+        // Serialize the instance now for lazy session decoupling
+        event.setInstanceData(mapper.valueToTree(event.getInstance()));
+        ServerSentEvent<BaseEvent> message = ServerSentEvent.builder(event)
+                .event(EVENT_TYPE_MESSAGE).build();
+        flux.next(message);
+    }
 
     @EventListener
     public void listenDatabaseUpdate(BaseEvent event) {
         consumers.entrySet().stream()
                 .parallel().forEach(entry -> {
-                    // String currentSessionId = entry.getKey();
                     Tuple2<User, FluxSink<Object>> tupleFlux = entry.getValue();
                     User listener = tupleFlux.getT1();
-                    // boolean isValidSession = !currentSessionId.equals(event.getSessionId());
-                    // TODO @Sam filter event and broadcast events when necessary
-                    if (event.isUserObserver(listener)) {
-                        // Serialize the instance now for lazy session decoupling
-                        event.setInstanceData(mapper.valueToTree(event.getInstance()));
-                        ServerSentEvent<BaseEvent> message = ServerSentEvent.builder(event)
-                                .event(EVENT_TYPE_MESSAGE).build();
-                        tupleFlux.getT2().next(message);
+                    FluxSink<Object> fluxSink = tupleFlux.getT2();
+                    boolean isCurrentObserver = event.isUserObserver(listener);
+                    if (!isCurrentObserver) {
+                        // If user as no visibility, we can send a "delete" userEvent with only the internal id
+                        try {
+                            String propertyId = event.getInstance().getClass().getDeclaredField("id")
+                                    .getAnnotation(JsonProperty.class).value();
+                            ObjectNode deleteNode = mapper.createObjectNode();
+                            deleteNode.set(propertyId, mapper.convertValue(event.getInstance().getId(), JsonNode.class));
+                            BaseEvent userEvent = event.clone();
+                            userEvent.setInstanceData(deleteNode);
+                            userEvent.setType(DATA_DELETE);
+                            sendStreamEvent(fluxSink, userEvent);
+                        } catch (Exception e) {
+                            String simpleName = event.getInstance().getClass().getSimpleName();
+                            LOGGER.log(Level.WARNING, "Class " + simpleName + " cant be streamed", e);
+                        }
+                    } else {
+                        sendStreamEvent(fluxSink, event);
                     }
                 });
     }

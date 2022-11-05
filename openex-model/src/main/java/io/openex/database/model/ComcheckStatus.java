@@ -78,6 +78,11 @@ public class ComcheckStatus implements Base {
         return id;
     }
 
+    @Override
+    public boolean isUserHasAccess(User user) {
+        return comcheck.isUserHasAccess(user);
+    }
+
     public void setId(String id) {
         this.id = id;
     }

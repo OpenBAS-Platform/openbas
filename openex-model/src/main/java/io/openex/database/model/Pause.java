@@ -39,6 +39,11 @@ public class Pause implements Base {
         return id;
     }
 
+    @Override
+    public boolean isUserHasAccess(User user) {
+        return exercise.isUserHasAccess(user);
+    }
+
     public void setId(String id) {
         this.id = id;
     }

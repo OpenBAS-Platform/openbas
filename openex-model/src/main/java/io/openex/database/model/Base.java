@@ -7,6 +7,8 @@ import javax.persistence.Transient;
 public interface Base {
     String getId();
 
+    void setId(String id);
+
     default boolean isUserHasAccess(User user) {
         return user.isAdmin();
     }

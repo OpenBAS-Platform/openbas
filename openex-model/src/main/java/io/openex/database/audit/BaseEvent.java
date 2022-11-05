@@ -9,23 +9,18 @@ import io.openex.database.model.User;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
-public class BaseEvent {
+public class BaseEvent implements Cloneable {
 
     @JsonIgnore
     private final String sessionId;
-
-    @JsonProperty("event_type")
-    private String type;
-
-    @JsonProperty("attribute_id")
-    private String attributeId;
-
-    @JsonProperty("attribute_schema")
-    private String schema;
-
     @JsonIgnore
     private final Base instance;
-
+    @JsonProperty("event_type")
+    private String type;
+    @JsonProperty("attribute_id")
+    private String attributeId;
+    @JsonProperty("attribute_schema")
+    private String schema;
     @JsonProperty("instance")
     private JsonNode instanceData;
 
@@ -86,5 +81,14 @@ public class BaseEvent {
     @JsonIgnore
     public boolean isUserObserver(User listener) {
         return instance.isUserHasAccess(listener);
+    }
+
+    @Override
+    public BaseEvent clone() {
+        try {
+            return (BaseEvent) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

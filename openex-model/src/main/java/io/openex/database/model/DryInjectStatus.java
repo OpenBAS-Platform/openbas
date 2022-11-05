@@ -61,6 +61,11 @@ public class DryInjectStatus implements Base {
         return id;
     }
 
+    @Override
+    public boolean isUserHasAccess(User user) {
+        return dryInject.isUserHasAccess(user);
+    }
+
     public void setId(String id) {
         this.id = id;
     }
