@@ -15,7 +15,6 @@ import {
   RowingOutlined,
 } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import { interval } from 'rxjs';
 import Chip from '@mui/material/Chip';
 import { Link } from 'react-router-dom';
 import { CSVLink } from 'react-csv';
@@ -32,7 +31,6 @@ import { storeHelper } from '../../../actions/Schema';
 import CreateDocument from './CreateDocument';
 import DocumentPopover from './DocumentPopover';
 import DocumentType from './DocumentType';
-import { FIVE_SECONDS } from '../../../utils/Time';
 import { exportData } from '../../../utils/Environment';
 
 const styles = (theme) => ({
