@@ -38,6 +38,7 @@ public class ExerciseSimple {
     public static ExerciseSimple fromExercise(Exercise exercise) {
         ExerciseSimple simple = new ExerciseSimple();
         BeanUtils.copyProperties(exercise, simple);
+        simple.setStart(exercise.getStart().orElse(null));
         return simple;
     }
 
