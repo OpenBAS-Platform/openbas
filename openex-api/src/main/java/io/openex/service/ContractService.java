@@ -30,7 +30,7 @@ public class ContractService {
     // Build the contracts every minute
     @Scheduled(fixedDelay = 60000, initialDelay = 0)
     public void buildContracts() {
-        baseContracts.forEach(helper -> {
+        baseContracts.stream().parallel().forEach(helper -> {
             try {
                 Map<String, Contract> contractInstances = helper.contracts()
                         .stream().collect(Collectors.toMap(Contract::getId, Function.identity()));
