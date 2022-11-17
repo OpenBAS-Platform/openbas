@@ -77,7 +77,7 @@ public class Challenge implements Base {
     private List<Document> documents = new ArrayList<>();
 
     @Transient
-    private List<String> exerciseIds;
+    private List<String> exerciseIds = new ArrayList<>();
 
     @Transient
     private Instant virtualPublication;
