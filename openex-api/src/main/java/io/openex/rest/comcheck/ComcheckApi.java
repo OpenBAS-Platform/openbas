@@ -48,7 +48,6 @@ public class ComcheckApi extends RestBehavior {
 
     @Transactional(rollbackOn = Exception.class)
     @GetMapping("/api/comcheck/{comcheckStatusId}")
-    @PreAuthorize("isExerciseObserver(#exerciseId)")
     public ComcheckStatus checkValidation(@PathVariable String comcheckStatusId) {
         ComcheckStatus comcheckStatus = comcheckStatusRepository.findById(comcheckStatusId).orElseThrow();
         Comcheck comcheck = comcheckStatus.getComcheck();
