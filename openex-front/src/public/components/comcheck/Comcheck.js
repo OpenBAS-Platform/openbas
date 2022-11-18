@@ -61,11 +61,11 @@ const Comcheck = () => {
     window.addEventListener('resize', updateWindowDimensions);
     return () => window.removeEventListener('resize', updateWindowDimensions);
   });
-  const comcheckHeight = 200;
+  const comcheckHeight = 400;
   const marginTop = dimension.height / 2 - comcheckHeight / 2 - 200;
   return (
     <div className={classes.container} style={{ marginTop }}>
-      <img src={logo} alt="logo" className={classes.logo} />
+      <img src={`/${logo}`} alt="logo" className={classes.logo} />
       <Paper variant="outlined">
         <AppBar color="primary" position="relative" className={classes.appBar}>
           <Toolbar>
