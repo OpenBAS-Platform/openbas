@@ -77,7 +77,7 @@ const Comcheck = () => {
           &nbsp;
           <strong>
             {status?.comcheckstatus_receive_date
-              ? t('successfull')
+              ? t('successful')
               : t('failed')}
           </strong>
           .

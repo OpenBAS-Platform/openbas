@@ -372,7 +372,7 @@ const i18n = {
       'No media pressure entry in this media yet.':
         'Encore aucune entrée de pression médiatique dans ce média.',
       'Your communication check is': 'Votre test de communication est',
-      successfull: 'un succès',
+      successful: 'un succès',
       answers: 'réponses',
       'of which': 'dont',
       'contain comments': 'contiennent des commentaires',
