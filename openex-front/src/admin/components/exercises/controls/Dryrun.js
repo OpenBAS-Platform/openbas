@@ -362,11 +362,12 @@ const Dryrun = () => {
                 key={dryinject.dryinject_id}
                 classes={{ root: classes.item }}
                 divider={true}
+                disabled={!dryinject.dryinject_inject.inject_enabled}
               >
                 <ListItemIcon style={{ paddingTop: 5 }}>
                   <InjectIcon
                     type={dryinject.dryinject_inject.inject_type}
-                    disabled={!dryinject.inject_enabled}
+                    disabled={!dryinject.dryinject_inject.inject_enabled}
                   />
                 </ListItemIcon>
                 <ListItemText

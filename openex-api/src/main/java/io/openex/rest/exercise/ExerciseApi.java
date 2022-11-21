@@ -79,6 +79,7 @@ public class ExerciseApi extends RestBehavior {
     private ExerciseRepository exerciseRepository;
     private LogRepository exerciseLogRepository;
     private DryRunRepository dryRunRepository;
+    private DryInjectRepository dryInjectRepository;
     private ComcheckRepository comcheckRepository;
     private ImportService importService;
     private InjectRepository injectRepository;
@@ -169,6 +170,11 @@ public class ExerciseApi extends RestBehavior {
     @Autowired
     public void setDryRunRepository(DryRunRepository dryRunRepository) {
         this.dryRunRepository = dryRunRepository;
+    }
+
+    @Autowired
+    public void setDryInjectRepository(DryInjectRepository dryInjectRepository) {
+        this.dryInjectRepository = dryInjectRepository;
     }
 
     @Autowired
@@ -266,7 +272,7 @@ public class ExerciseApi extends RestBehavior {
     @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}/dryinjects")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     public List<DryInject> dryrunInjects(@PathVariable String exerciseId, @PathVariable String dryrunId) {
-        return dryrun(exerciseId, dryrunId).getInjects();
+        return dryInjectRepository.findAll(DryInjectSpecification.fromDryRun(dryrunId));
     }
     // endregion
 
@@ -544,7 +550,7 @@ public class ExerciseApi extends RestBehavior {
         importExport.setAudiences(audiences);
         objectMapper.addMixIn(Audience.class, isWithPlayers ? ExerciseExportMixins.Audience.class : ExerciseExportMixins.EmptyAudience.class);
         exerciseTags.addAll(audiences.stream().flatMap(audience -> audience.getTags().stream()).toList());
-        if (isWithPlayers)  {
+        if (isWithPlayers) {
             // players
             List<User> players = audiences.stream().flatMap(audience -> audience.getUsers().stream()).distinct().toList();
             exerciseTags.addAll(players.stream().flatMap(user -> user.getTags().stream()).toList());

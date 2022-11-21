@@ -360,7 +360,7 @@ const Injects = () => {
                 classes={{ root: classes.item }}
                 divider={true}
                 button={true}
-                disabled={!injectContract || isDisabled}
+                disabled={!injectContract || isDisabled || !inject.inject_enabled}
                 onClick={() => setSelectedInject(inject.inject_id)}
               >
                 <ListItemIcon style={{ paddingTop: 5 }}>
@@ -368,7 +368,7 @@ const Injects = () => {
                     tooltip={t(inject.inject_type)}
                     config={injectContract?.config}
                     type={inject.inject_type}
-                    disabled={!inject.inject_enabled}
+                    disabled={!injectContract || isDisabled || !inject.inject_enabled}
                   />
                 </ListItemIcon>
                 <ListItemText

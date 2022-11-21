@@ -38,7 +38,7 @@ public class DryInject implements Base, Injection {
     @JsonProperty("dryinject_dryrun")
     private Dryrun run;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dryinject_inject")
     @JsonProperty("dryinject_inject")
     private Inject inject;
