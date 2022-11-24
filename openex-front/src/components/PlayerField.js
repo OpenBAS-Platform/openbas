@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
 import * as R from 'ramda';
-import { LabelOutlined } from '@mui/icons-material';
+import { PersonOutlined } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import withStyles from '@mui/styles/withStyles';
 import { connect } from 'react-redux';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import TagForm from '../admin/components/settings/tags/TagForm';
-import { fetchTags, addTag } from '../actions/Tag';
+import PlayerForm from '../admin/components/players/PlayerForm';
+import { addPlayer, fetchPlayers } from '../actions/User';
+import { fetchOrganizations } from '../actions/Organization';
 import { Autocomplete } from './Autocomplete';
 import inject18n from './i18n';
 import { storeHelper } from '../actions/Schema';
+import { resolveUserName } from '../utils/String';
 
 const styles = () => ({
   icon: {
@@ -28,39 +30,39 @@ const styles = () => ({
   },
 });
 
-class TagField extends Component {
+class PlayerField extends Component {
   constructor(props) {
     super(props);
-    this.state = { tagCreation: false, tagInput: '' };
+    this.state = { userCreation: false, userInput: '' };
   }
 
   componentDidMount() {
-    this.props.fetchTags();
+    this.props.fetchPlayers();
+    this.props.fetchOrganizations();
   }
 
-  handleOpenTagCreation() {
-    this.setState({ tagCreation: true });
+  handleOpenUserCreation() {
+    this.setState({ userCreation: true });
   }
 
-  handleCloseTagCreation() {
-    this.setState({ tagCreation: false });
+  handleCloseUserCreation() {
+    this.setState({ userCreation: false });
   }
 
   onSubmit(data) {
     const { name, setFieldValue, values } = this.props;
-    this.props.addTag(data).then((result) => {
+    this.props.addPlayer(data).then((result) => {
       if (result.result) {
-        const newTag = result.entities.tags[result.result];
-        const tags = R.append(
+        const newUser = result.entities.users[result.result];
+        const users = R.append(
           {
-            id: newTag.tag_id,
-            label: newTag.tag_name,
-            color: newTag.tag_color,
+            id: newUser.user_id,
+            label: resolveUserName(newUser),
           },
           values[name],
         );
-        setFieldValue(name, tags);
-        return this.handleCloseTagCreation();
+        setFieldValue(name, users);
+        return this.handleCloseUserCreation();
       }
       return result;
     });
@@ -70,21 +72,21 @@ class TagField extends Component {
     const {
       t,
       name,
-      tags,
+      users,
       classes,
       onKeyDown,
       style,
       label,
       placeholder,
-      userAdmin,
+      organizations,
+      noMargin,
     } = this.props;
-    const tagsOptions = R.map(
+    const usersOptions = R.map(
       (n) => ({
-        id: n.tag_id,
-        label: n.tag_name,
-        color: n.tag_color,
+        id: n.user_id,
+        label: resolveUserName(n),
       }),
-      tags,
+      users,
     );
     return (
       <div>
@@ -92,37 +94,39 @@ class TagField extends Component {
           variant="standard"
           size="small"
           name={name}
+          noMargin={noMargin}
           fullWidth={true}
           multiple={true}
           label={label}
           placeholder={placeholder}
-          options={tagsOptions}
+          options={usersOptions}
           style={style}
-          openCreate={userAdmin ? this.handleOpenTagCreation.bind(this) : null}
+          openCreate={this.handleOpenUserCreation.bind(this)}
           onKeyDown={onKeyDown}
           renderOption={(props, option) => (
             <Box component="li" {...props}>
-              <div className={classes.icon} style={{ color: option.color }}>
-                <LabelOutlined />
+              <div className={classes.icon}>
+                <PersonOutlined />
               </div>
               <div className={classes.text}>{option.label}</div>
             </Box>
           )}
           classes={{ clearIndicator: classes.autoCompleteIndicator }}
         />
-        {userAdmin && <Dialog
-          open={this.state.tagCreation}
-          onClose={this.handleCloseTagCreation.bind(this)}
-          PaperProps={{ elevation: 1 }}
+        <Dialog
+          open={this.state.userCreation}
+          onClose={this.handleCloseUserCreation.bind(this)}
         >
-          <DialogTitle>{t('Create a new tag')}</DialogTitle>
+          <DialogTitle>{t('Create a new user')}</DialogTitle>
           <DialogContent>
-            <TagForm
+            <PlayerForm
+              organizations={organizations}
+              initialValues={{ user_tags: [] }}
               onSubmit={this.onSubmit.bind(this)}
-              handleClose={this.handleCloseTagCreation.bind(this)}
+              handleClose={this.handleCloseUserCreation.bind(this)}
             />
           </DialogContent>
-        </Dialog>}
+        </Dialog>
       </div>
     );
   }
@@ -131,13 +135,13 @@ class TagField extends Component {
 const select = (state) => {
   const helper = storeHelper(state);
   return {
-    tags: helper.getTags(),
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    users: helper.getUsers(),
+    organizations: helper.getOrganizations(),
   };
 };
 
 export default R.compose(
-  connect(select, { fetchTags, addTag }),
+  connect(select, { fetchPlayers, fetchOrganizations, addPlayer }),
   inject18n,
   withStyles(styles),
-)(TagField);
+)(PlayerField);

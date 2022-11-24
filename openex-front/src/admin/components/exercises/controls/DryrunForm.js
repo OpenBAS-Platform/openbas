@@ -3,8 +3,8 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import inject18n from '../../../../components/i18n';
-import UserField from '../../../../components/UserField';
 import { TextField } from '../../../../components/TextField';
+import PlayerField from '../../../../components/PlayerField';
 
 class DryrunForm extends Component {
   validate(values) {
@@ -41,7 +41,7 @@ class DryrunForm extends Component {
               fullWidth={true}
               label={t('Name')}
             />
-            <UserField
+            <PlayerField
               label={t('Dryrun recipients')}
               name="dryrun_users"
               values={values}
