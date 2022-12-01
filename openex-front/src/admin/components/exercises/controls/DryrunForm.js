@@ -10,7 +10,7 @@ class DryrunForm extends Component {
   validate(values) {
     const { t } = this.props;
     const errors = {};
-    const requiredFields = ['dryrun_users'];
+    const requiredFields = ['dryrun_name', 'dryrun_users'];
     requiredFields.forEach((field) => {
       if (!values[field]) {
         errors[field] = t('This field is required.');
