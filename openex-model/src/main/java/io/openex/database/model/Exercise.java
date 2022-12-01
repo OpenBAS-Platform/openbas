@@ -107,7 +107,7 @@ public class Exercise implements Base {
     @JsonIgnore
     private List<Audience> audiences = new ArrayList<>();
 
-    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Grant> grants = new ArrayList<>();
 

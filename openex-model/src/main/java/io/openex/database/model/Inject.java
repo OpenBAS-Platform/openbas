@@ -85,7 +85,7 @@ public class Inject implements Base, Injection {
     @JsonProperty("inject_all_audiences")
     private boolean allAudiences;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "inject_exercise")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_exercise")

@@ -481,7 +481,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @GetMapping("/api/communications/attachment")
-    @PreAuthorize("isExerciseObserver(#exerciseId)")
+    // @PreAuthorize("isExerciseObserver(#exerciseId)")
     public void downloadAttachment(@RequestParam String file, HttpServletResponse response) throws IOException {
         FileContainer fileContainer = fileService.getFileContainer(file).orElseThrow();
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileContainer.getName());

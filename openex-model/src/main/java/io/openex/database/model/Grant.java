@@ -29,7 +29,7 @@ public class Grant implements Base {
     @Enumerated(EnumType.STRING)
     private GRANT_TYPE name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "grant_group")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("grant_group")

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MultiIdDeserializer;
 import io.openex.helper.MultiModelDeserializer;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -42,17 +44,18 @@ public class Group implements Base {
             joinColumns = @JoinColumn(name = "group_id"))
     private List<Grant.GRANT_TYPE> exercisesDefaultGrants = new ArrayList<>();
 
-    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     @JsonProperty("group_grants")
     @JsonSerialize(using = MultiModelDeserializer.class)
     private List<Grant> grants = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_groups",
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("group_users")
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<User> users = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
