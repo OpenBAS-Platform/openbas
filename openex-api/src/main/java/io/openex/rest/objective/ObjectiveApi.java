@@ -82,13 +82,13 @@ public class ObjectiveApi extends RestBehavior {
     // region evaluations
     @GetMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public Evaluation getEvaluation(@PathVariable String evaluationId) {
+    public Evaluation getEvaluation(@PathVariable String exerciseId, @PathVariable String evaluationId) {
         return evaluationRepository.findById(evaluationId).orElseThrow();
     }
 
     @GetMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public Iterable<Evaluation> getEvaluations(@PathVariable String objectiveId) {
+    public Iterable<Evaluation> getEvaluations(@PathVariable String exerciseId, @PathVariable String objectiveId) {
         return evaluationRepository.findAll(EvaluationSpecification.fromObjective(objectiveId));
     }
 

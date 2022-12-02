@@ -179,19 +179,19 @@ public class InjectApi extends RestBehavior {
 
     @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public Inject exerciseInject(@PathVariable String injectId) {
+    public Inject exerciseInject(@PathVariable String exerciseId, @PathVariable String injectId) {
         return injectRepository.findById(injectId).orElseThrow();
     }
 
     @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}/audiences")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public Iterable<Audience> exerciseInjectAudiences(@PathVariable String injectId) {
+    public Iterable<Audience> exerciseInjectAudiences(@PathVariable String exerciseId, @PathVariable String injectId) {
         return injectRepository.findById(injectId).orElseThrow().getAudiences();
     }
 
     @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}/communications")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public Iterable<Communication> exerciseInjectCommunications(@PathVariable String injectId) {
+    public Iterable<Communication> exerciseInjectCommunications(@PathVariable String exerciseId, @PathVariable String injectId) {
         List<Communication> coms = communicationRepository.findAll(fromInject(injectId), Sort.by(Sort.Direction.DESC, "receivedAt"));
         List<Communication> ackComs = coms.stream().peek(com -> com.setAck(true)).toList();
         return communicationRepository.saveAll(ackComs);

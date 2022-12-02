@@ -136,7 +136,7 @@ public class LessonsApi extends RestBehavior {
 
     @PutMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public LessonsCategory updateExerciseLessonsCategory(@PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsCategoryUpdateInput input) {
+    public LessonsCategory updateExerciseLessonsCategory(@PathVariable String exerciseId, @PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsCategoryUpdateInput input) {
         LessonsCategory lessonsTemplateCategory = lessonsCategoryRepository.findById(lessonsCategoryId).orElseThrow();
         lessonsTemplateCategory.setUpdateAttributes(input);
         lessonsTemplateCategory.setUpdated(now());
@@ -145,7 +145,7 @@ public class LessonsApi extends RestBehavior {
 
     @DeleteMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public void deleteExerciseLessonsCategory(@PathVariable String lessonsCategoryId) {
+    public void deleteExerciseLessonsCategory(@PathVariable String exerciseId, @PathVariable String lessonsCategoryId) {
         lessonsCategoryRepository.deleteById(lessonsCategoryId);
     }
 
@@ -167,13 +167,13 @@ public class LessonsApi extends RestBehavior {
 
     @GetMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public Iterable<LessonsQuestion> exerciseLessonsCategoryQuestions(@PathVariable String lessonsCategoryId) {
+    public Iterable<LessonsQuestion> exerciseLessonsCategoryQuestions(@PathVariable String exerciseId, @PathVariable String lessonsCategoryId) {
         return lessonsQuestionRepository.findAll(LessonsQuestionSpecification.fromCategory(lessonsCategoryId));
     }
 
     @PostMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public LessonsQuestion createExerciseLessonsQuestion(@PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsQuestionCreateInput input) {
+    public LessonsQuestion createExerciseLessonsQuestion(@PathVariable String exerciseId, @PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsQuestionCreateInput input) {
         LessonsCategory lessonsCategory = lessonsCategoryRepository.findById(lessonsCategoryId).orElseThrow();
         LessonsQuestion lessonsQuestion = new LessonsQuestion();
         lessonsQuestion.setUpdateAttributes(input);
@@ -183,7 +183,7 @@ public class LessonsApi extends RestBehavior {
 
     @PutMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public LessonsQuestion updateExerciseLessonsQuestion(@PathVariable String lessonsQuestionId, @Valid @RequestBody LessonsQuestionUpdateInput input) {
+    public LessonsQuestion updateExerciseLessonsQuestion(@PathVariable String exerciseId, @PathVariable String lessonsQuestionId, @Valid @RequestBody LessonsQuestionUpdateInput input) {
         LessonsQuestion lessonsQuestion = lessonsQuestionRepository.findById(lessonsQuestionId).orElseThrow();
         lessonsQuestion.setUpdateAttributes(input);
         lessonsQuestion.setUpdated(now());
@@ -192,7 +192,7 @@ public class LessonsApi extends RestBehavior {
 
     @DeleteMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public void deleteExerciseLessonsQuestion(@PathVariable String lessonsQuestionId) {
+    public void deleteExerciseLessonsQuestion(@PathVariable String exerciseId, @PathVariable String lessonsQuestionId) {
         lessonsQuestionRepository.deleteById(lessonsQuestionId);
     }
 
@@ -247,7 +247,7 @@ public class LessonsApi extends RestBehavior {
     }
 
     @PostMapping("/api/player/lessons/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}/lessons_answers")
-    public LessonsAnswer createExerciseLessonsQuestion(@PathVariable String lessonsQuestionId, @Valid @RequestBody LessonsAnswerCreateInput input, @RequestParam Optional<String> userId) {
+    public LessonsAnswer createExerciseLessonsQuestion(@PathVariable String exerciseId, @PathVariable String lessonsQuestionId, @Valid @RequestBody LessonsAnswerCreateInput input, @RequestParam Optional<String> userId) {
         final User user = userId.map(id -> impersonateUser(userRepository, id)).orElse(currentUser());
         if (user.getId().equals(ANONYMOUS)) {
             throw new UnsupportedOperationException("User must be logged or dynamic player is required");

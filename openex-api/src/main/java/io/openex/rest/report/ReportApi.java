@@ -48,7 +48,7 @@ public class ReportApi extends RestBehavior {
 
     @PutMapping("/api/exercises/{exerciseId}/reports/{reportId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public Report updateExerciseReport(@PathVariable String reportId, @Valid @RequestBody ReportUpdateInput input) {
+    public Report updateExerciseReport(@PathVariable String exerciseId,@PathVariable String reportId, @Valid @RequestBody ReportUpdateInput input) {
         Report report = reportRepository.findById(reportId).orElseThrow();
         report.setUpdateAttributes(input);
         report.setUpdated(now());
@@ -57,7 +57,7 @@ public class ReportApi extends RestBehavior {
 
     @DeleteMapping("/api/exercises/{exerciseId}/reports/{reportId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public void deleteExerciseReport(@PathVariable String reportId) {
+    public void deleteExerciseReport(@PathVariable String exerciseId, @PathVariable String reportId) {
         reportRepository.deleteById(reportId);
     }
 }

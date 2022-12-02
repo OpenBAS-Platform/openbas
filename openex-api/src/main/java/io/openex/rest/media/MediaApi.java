@@ -219,7 +219,7 @@ public class MediaApi extends RestBehavior {
     @Transactional(rollbackOn = Exception.class)
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @DeleteMapping("/api/exercises/{exerciseId}/articles/{articleId}")
-    public void deleteArticle(@PathVariable String articleId) {
+    public void deleteArticle(@PathVariable String exerciseId, @PathVariable String articleId) {
         articleRepository.deleteById(articleId);
     }
     // endregion
