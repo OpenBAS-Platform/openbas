@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.openex</groupId>
         <artifactId>openex-platform</artifactId>
-        <version>3.2.1-SNAPSHOT</version>
+        <version>3.2.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>openex-api</artifactId>
@@ -20,22 +20,22 @@
                 <dependency>
                     <groupId>io.openex</groupId>
                     <artifactId>openex-injector-ovh</artifactId>
-                    <version>3.2.1-SNAPSHOT</version>
+                    <version>3.2.2-SNAPSHOT</version>
                 </dependency>
                 <dependency>
                     <groupId>io.openex</groupId>
                     <artifactId>openex-injector-lade</artifactId>
-                    <version>3.2.1-SNAPSHOT</version>
+                    <version>3.2.2-SNAPSHOT</version>
                 </dependency>
                 <dependency>
                     <groupId>io.openex</groupId>
                     <artifactId>openex-injector-mastodon</artifactId>
-                    <version>3.2.1-SNAPSHOT</version>
+                    <version>3.2.2-SNAPSHOT</version>
                 </dependency>
                 <dependency>
                     <groupId>io.openex</groupId>
                     <artifactId>openex-injector-http</artifactId>
-                    <version>3.2.1-SNAPSHOT</version>
+                    <version>3.2.2-SNAPSHOT</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>io.openex</groupId>
             <artifactId>openex-framework</artifactId>
-            <version>3.2.1-SNAPSHOT</version>
+            <version>3.2.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.openex</groupId>
         <artifactId>openex-platform</artifactId>
-        <version>3.2.1-SNAPSHOT</version>
+        <version>3.2.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>openex-model</artifactId>
