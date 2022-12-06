@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,8 +103,8 @@ public class InjectApi extends RestBehavior {
     }
 
     @GetMapping("/api/inject_types")
-    public List<Contract> injectTypes() {
-        return contractService.getContracts().values().stream().toList();
+    public Collection<Contract> injectTypes() {
+        return contractService.getContracts().values();
     }
 
     @GetMapping("/api/injects/try/{injectId}")
