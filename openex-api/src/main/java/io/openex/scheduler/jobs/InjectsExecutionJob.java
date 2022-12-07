@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -62,61 +61,75 @@ public class InjectsExecutionJob implements Job {
         this.injectHelper = injectHelper;
     }
 
+    public void handleAutoStartExercises() {
+        List<Exercise> exercises = exerciseRepository.findAllShouldBeInRunningState(now());
+        exerciseRepository.saveAll(exercises.stream()
+                .peek(exercise -> {
+                    exercise.setStatus(Exercise.STATUS.RUNNING);
+                    exercise.setUpdatedAt(now());
+                }).toList());
+    }
+
+    public void handleAutoClosingExercises() {
+        // Change status of finished exercises.
+        List<Exercise> mustBeFinishedExercises = exerciseRepository.thatMustBeFinished();
+        exerciseRepository.saveAll(mustBeFinishedExercises.stream()
+                .peek(exercise -> {
+                    exercise.setStatus(Exercise.STATUS.FINISHED);
+                    exercise.setEnd(now());
+                    exercise.setUpdatedAt(now());
+                }).toList());
+    }
+
+    public void executeInject(ExecutableInject executableInject) {
+        Injection source = executableInject.getSource();
+        Contract contract = executableInject.getContract();
+        Execution execution;
+        if (contract == null) {
+            execution = executionError(executableInject.isRuntime(), "injector", "Inject is not available for execution");
+        } else {
+            Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
+            execution = executor.executeInjection(executableInject);
+        }
+        // Report inject execution
+        if (source instanceof Inject) {
+            Inject executedInject = injectRepository.findById(source.getId()).orElseThrow();
+            executedInject.setStatus(InjectStatus.fromExecution(execution, executedInject));
+            injectRepository.save(executedInject);
+        }
+        // Report dry inject execution
+        if (source instanceof DryInject) {
+            DryInject executedDry = dryInjectRepository.findById(source.getId()).orElseThrow();
+            executedDry.setStatus(DryInjectStatus.fromExecution(execution, executedDry));
+            dryInjectRepository.save(executedDry);
+        }
+    }
+
+    public void updateExercise(String exerciseId) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        exercise.setUpdatedAt(now());
+        exerciseRepository.save(exercise);
+    }
+
     @Override
-    @Transactional
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         try {
             // Handle starting exercises if needed.
-            List<Exercise> exercises = exerciseRepository.findAllShouldBeInRunningState(now());
-            exercises.stream().parallel().forEach(exercise -> {
-                exercise.setStatus(Exercise.STATUS.RUNNING);
-                exercise.setUpdatedAt(now());
-                exerciseRepository.save(exercise);
-            });
-            List<ExecutableInject> injects = injectHelper.getInjectsToRun();
+            handleAutoStartExercises();
             // Get all injects to execute grouped by exercise.
-            Map<Exercise, List<ExecutableInject>> byExercises = injects.stream()
-                    .collect(groupingBy(ex -> ex.getInject().getExercise()));
+            List<ExecutableInject> injects = injectHelper.getInjectsToRun();
+            Map<Exercise, List<ExecutableInject>> byExercises = injects.stream().collect(groupingBy(ex -> ex.getInject().getExercise()));
             // Execute injects in parallel for each exercise.
             byExercises.entrySet().stream().parallel().forEach(entry -> {
                 Exercise exercise = entry.getKey();
                 List<ExecutableInject> executableInjects = entry.getValue();
                 // Execute each inject for the exercise in order.
-                executableInjects.forEach(executableInject -> {
-                    Injection source = executableInject.getSource();
-                    Contract contract = executableInject.getContract();
-                    Execution execution;
-                    if (contract == null) {
-                        execution = executionError(executableInject.isRuntime(), "injector", "Inject is not available for execution");
-                    } else {
-                        Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
-                        execution = executor.executeInjection(executableInject);
-                    }
-                    // Report inject execution
-                    if (source instanceof Inject) {
-                        Inject executedInject = injectRepository.findById(source.getId()).orElseThrow();
-                        executedInject.setStatus(InjectStatus.fromExecution(execution, executedInject));
-                        injectRepository.save(executedInject);
-                    }
-                    // Report dry inject execution
-                    if (source instanceof DryInject) {
-                        DryInject executedDry = dryInjectRepository.findById(source.getId()).orElseThrow();
-                        executedDry.setStatus(DryInjectStatus.fromExecution(execution, executedDry));
-                        dryInjectRepository.save(executedDry);
-                    }
-                });
+                executableInjects.forEach(this::executeInject);
                 // Update the exercise
-                exercise.setUpdatedAt(now());
-                exerciseRepository.save(exercise);
+                updateExercise(exercise.getId());
             });
             // Change status of finished exercises.
-            List<Exercise> mustBeFinishedExercises = exerciseRepository.thatMustBeFinished();
-            exerciseRepository.saveAll(mustBeFinishedExercises.stream()
-                    .peek(exercise -> {
-                        exercise.setStatus(Exercise.STATUS.FINISHED);
-                        exercise.setEnd(now());
-                        exercise.setUpdatedAt(now());
-                    }).toList());
+            handleAutoClosingExercises();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new JobExecutionException(e);

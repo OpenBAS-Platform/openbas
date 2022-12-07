@@ -2,6 +2,9 @@ package io.openex.database.repository;
 
 import io.openex.database.model.Inject;
 import javax.validation.constraints.NotNull;
+
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +21,10 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
 
     @NotNull
     Optional<Inject> findById(@NotNull String id);
+
+    @Override
+    @EntityGraph(attributePaths = {"documents"})
+    List<Inject> findAll(Specification<Inject> spec);
 
     @Query(value = "select i from Inject i where i.exercise.id = :exerciseId")
     List<Inject> findAllForExercise(@Param("exerciseId") String exerciseId);

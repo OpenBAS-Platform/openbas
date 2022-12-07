@@ -108,7 +108,7 @@ public class Inject implements Base, Injection {
     private User user;
 
     // CascadeType.ALL is required here because inject status are embedded
-    @OneToOne(mappedBy = "inject", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty("inject_status")
     private InjectStatus status;
 

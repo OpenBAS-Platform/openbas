@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -88,6 +89,7 @@ public class InjectHelper {
         return injectWhen.equals(now) || injectWhen.isBefore(now);
     }
 
+    @Transactional
     public List<ExecutableInject> getInjectsToRun() {
         // Get injects
         List<Inject> executableInjects = injectRepository.findAll(InjectSpecification.executable());
@@ -97,7 +99,7 @@ public class InjectHelper {
                 .map(inject -> {
                     Contract contract = contractService.resolveContract(inject);
                     List<Audience> audiences = getInjectAudiences(inject);
-                    return new ExecutableInject(true,false, inject, contract, audiences, usersFromInjection(inject));
+                    return new ExecutableInject(true, false, inject, contract, audiences, usersFromInjection(inject));
                 });
         // Get dry injects
         List<DryInject> executableDryInjects = dryInjectRepository.findAll(DryInjectSpecification.executable());
