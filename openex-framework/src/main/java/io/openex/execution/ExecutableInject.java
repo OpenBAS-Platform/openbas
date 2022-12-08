@@ -17,6 +17,8 @@ public class ExecutableInject {
     private final List<Audience> audiences;
     private final boolean runtime;
     private final boolean direct;
+    private final int audienceSize;
+    private final int documentSize;
     private List<MultipartFile> directAttachments = new ArrayList<>();
 
     public ExecutableInject(boolean runtime, boolean direct, Injection source, Inject inject, Contract contract, List<Audience> audiences, List<ExecutionContext> users) {
@@ -27,6 +29,8 @@ public class ExecutableInject {
         this.contract = contract;
         this.users = users;
         this.audiences = audiences;
+        this.audienceSize = audiences.size();
+        this.documentSize = inject.getDocuments().size();
     }
 
     public ExecutableInject(boolean runtime, boolean direct, Inject inject, Contract contract, List<Audience> audiences, List<ExecutionContext> users) {
@@ -71,5 +75,13 @@ public class ExecutableInject {
 
     public boolean isRuntime() {
         return runtime;
+    }
+
+    public int getDocumentSize() {
+        return documentSize;
+    }
+
+    public int getAudienceSize() {
+        return audienceSize;
     }
 }

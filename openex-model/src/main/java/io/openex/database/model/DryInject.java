@@ -44,7 +44,7 @@ public class DryInject implements Base, Injection {
     private Inject inject;
 
     // CascadeType.ALL is required here because dry inject status are embedded
-    @OneToOne(mappedBy = "dryInject", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "dryInject", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty("dryinject_status")
     private DryInjectStatus status;
 

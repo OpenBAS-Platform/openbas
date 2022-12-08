@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -109,7 +110,7 @@ public class InjectHelper {
                 .map(dry -> {
                     Inject inject = dry.getInject();
                     Contract contract = contractService.resolveContract(inject);
-                    List<Audience> audiences = getInjectAudiences(inject);
+                    List<Audience> audiences = new ArrayList<>(); // No audiences in dry run, only direct users
                     return new ExecutableInject(false, false, dry, inject, contract, audiences, usersFromInjection(dry));
                 });
         // Combine injects and dry
