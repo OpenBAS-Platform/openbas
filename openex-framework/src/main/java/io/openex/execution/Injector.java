@@ -89,7 +89,7 @@ public abstract class Injector {
             // Process the execution
             List<Expectation> expectations = process(execution, executableInject, contract);
             // Create the expectations
-            List<Audience> audiences = executableInject.getInject().getAudiences();
+            List<Audience> audiences = executableInject.getAudiences();
             if (isScheduledInject && audiences.size() > 0 && expectations.size() > 0) {
                 List<InjectExpectation> executions = audiences.stream()
                         .flatMap(audience -> expectations.stream()
