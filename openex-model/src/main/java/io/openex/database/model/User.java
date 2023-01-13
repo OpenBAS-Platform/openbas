@@ -10,6 +10,9 @@ import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import javax.persistence.*;
@@ -23,7 +26,7 @@ import static java.util.stream.StreamSupport.stream;
 @Entity
 @Table(name = "users")
 @EntityListeners(ModelBaseListener.class)
-public class User implements Base, OAuth2User {
+public class User implements Base, OidcUser, OAuth2User {
 
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String ROLE_USER = "ROLE_USER";
@@ -216,6 +219,12 @@ public class User implements Base, OAuth2User {
         this.email = email.toLowerCase();
     }
 
+    @Override
+    @JsonIgnore
+    public String getName() {
+        return getFirstname() + " " + getLastname();
+    }
+
     public String getLang() {
         return lang;
     }
@@ -394,6 +403,7 @@ public class User implements Base, OAuth2User {
         return user.isAdmin() || user.getId().equals(getId());
     }
 
+    // region oauth
     @Override
     @JsonIgnore
     public Map<String, Object> getAttributes() {
@@ -414,12 +424,27 @@ public class User implements Base, OAuth2User {
         }
         return roles;
     }
+    // endregion
+
+    // region oidc
+    @Override
+    @JsonIgnore
+    public Map<String, Object> getClaims() {
+        return getAttributes();
+    }
 
     @Override
     @JsonIgnore
-    public String getName() {
-        return getFirstname() + " " + getLastname();
+    public OidcUserInfo getUserInfo() {
+        return OidcUserInfo.builder().name(getName()).email(getEmail()).build();
     }
+
+    @Override
+    @JsonIgnore
+    public OidcIdToken getIdToken() {
+        return null;
+    }
+    // endregion
 
     @Override
     public boolean equals(Object o) {

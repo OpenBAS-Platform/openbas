@@ -88,6 +88,10 @@ public class UserService {
         tokenRepository.save(token);
     }
 
+    public User updateUser(User user) {
+        return userRepository.save(user);
+    }
+
     public User createUser(CreateUserInput input, int status) {
         User user = new User();
         user.setUpdateAttributes(input);
