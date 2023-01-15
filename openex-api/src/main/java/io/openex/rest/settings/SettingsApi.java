@@ -12,6 +12,7 @@ import io.openex.rest.settings.response.PlatformSetting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,9 +39,15 @@ public class SettingsApi extends RestBehavior {
 
     private SettingRepository settingRepository;
     private ApplicationContext context;
+    private Environment env;
 
     @Resource
     private OpenExConfig openExConfig;
+
+    @Autowired
+    public void setEnv(Environment env) {
+        this.env = env;
+    }
 
     @Autowired
     public void setContext(ApplicationContext context) {
@@ -59,7 +66,7 @@ public class SettingsApi extends RestBehavior {
             return providers.entrySet().stream()
                     .map(entry -> {
                         String uri = "/oauth2/authorization/" + entry.getKey();
-                        String clientName = entry.getValue().getClientName();
+                        String clientName = env.getProperty("openex.provider." + entry.getKey() + ".login");
                         // In case of missing name configuration, generate a generic name
                         if (clientName == null) {
                             clientName = "Login with " + entry.getKey();
