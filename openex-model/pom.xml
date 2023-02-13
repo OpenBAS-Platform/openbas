@@ -69,7 +69,7 @@
         <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
-            <version>8.4.6</version>
+            <version>8.5.1</version>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
