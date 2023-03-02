@@ -5,7 +5,7 @@
   <a href="https://www.openex.io" alt="Website"><img src="https://img.shields.io/badge/website-openex.io-blue.svg" /></a>
   <a href="https://filigran.notion.site/OpenEx-Public-Knowledge-Base-bbc835446e9140999d6f2e10d96c2ee0" alt="Documentation"><img src="https://img.shields.io/badge/Documentation-Notion-orange.svg" /></a>
   <a href="https://community.filigran.io" alt="Slack"><img src="https://slack.filigran.io/badge.svg" /></a>
-  <a href="https://cloud.drone.io/OpenEx-Platform/openex"><img src="https://cloud.drone.io/api/badges/OpenEx-Platform/openex/status.svg" /></a>
+  <a href="https://drone.opencti.io/OpenEx-Platform/openex"><img src="https://drone.opencti.io/api/badges/OpenEx-Platform/openex/status.svg" /></a>
   <a href="https://codecov.io/gh/OpenEx-Platform/openex"><img src="https://codecov.io/gh/OpenEx-Platform/openex/graph/badge.svg" /></a>
   <a href="https://deepscan.io/dashboard#view=project&tid=11710&pid=14631&bid=276803"><img src="https://deepscan.io/api/teams/11710/projects/14631/branches/276803/badge/grade.svg" alt="DeepScan grade"></a>
   <a href="https://hub.docker.com/u/openexhq" alt="Docker pulls"><img src="https://img.shields.io/docker/pulls/openexhq/platform" /></a>
