@@ -96,7 +96,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webflux-ui</artifactId>
-            <version>1.6.14</version>
+            <version>1.6.15</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
