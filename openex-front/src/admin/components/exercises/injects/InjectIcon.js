@@ -1,19 +1,16 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import {
-  EmailOutlined,
-  SmsOutlined,
-  NotificationsActiveOutlined,
-  HelpOutlined,
-  SpeakerNotesOutlined,
   ApiOutlined,
+  EmailOutlined,
   EmojiEventsOutlined,
+  HelpOutlined,
+  LastPage,
+  NotificationsActiveOutlined,
+  SmsOutlined,
+  SpeakerNotesOutlined,
 } from '@mui/icons-material';
-import {
-  Mastodon,
-  NewspaperVariantMultipleOutline,
-  Twitter,
-} from 'mdi-material-ui';
+import { Mastodon, NewspaperVariantMultipleOutline, Twitter, } from 'mdi-material-ui';
 import Airbus from '../../../../resources/images/contracts/airbus.png';
 import CustomTooltip from '../../../../components/CustomTooltip';
 
@@ -121,6 +118,14 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
           style={style}
           fontSize={fontSize}
           sx={{ color: done ? '#4caf50' : '#e91e63' }}
+        />
+      );
+    case 'openex_ssh':
+      return (
+        <LastPage
+          style={style}
+          fontSize={fontSize}
+          sx={{ color: color || '#6300d4' }}
         />
       );
     default:
