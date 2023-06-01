@@ -45,6 +45,7 @@ public class ModelBaseListener {
     @PreRemove
     void preRemove(Object base) {
         Base instance = (Base) base;
-        appPublisher.publishEvent(new BaseEvent(DATA_DELETE, instance, mapper));
+        BaseEvent event = new BaseEvent(DATA_DELETE, instance, mapper);
+        appPublisher.publishEvent(event);
     }
 }

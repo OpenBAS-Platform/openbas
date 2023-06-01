@@ -218,7 +218,8 @@ public class User implements Base {
   @JsonProperty("user_is_observer")
   public boolean isObserver() {
     return isAdmin() || getGroups().stream()
-        .mapToLong(group -> group.getGrants().size()).sum() > 0;
+                .flatMap(group -> group.getGrants().stream())
+                .anyMatch(grant -> Grant.GRANT_TYPE.OBSERVER.equals(grant.getName()));
   }
 
   @JsonProperty("user_is_manager")
