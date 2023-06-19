@@ -110,7 +110,9 @@ const Inject = () => {
       },
       inject_users: topic.communication_users,
     };
-    return dispatch(executeInject(exerciseId, inputValues, data.communication_file)).then(() => handleCloseReply());
+    return dispatch(
+      executeInject(exerciseId, inputValues, data.communication_file),
+    ).then(() => handleCloseReply());
   };
   if (inject && communications) {
     // Group communication by subject
@@ -131,9 +133,7 @@ const Inject = () => {
         'communication_communications',
         sortCommunications(
           R.filter(
-            (o) => o.communication_subject
-              .toLowerCase()
-              .includes(`re: ${n.communication_subject.toLowerCase()}`)
+            (o) => o.communication_subject.toLowerCase().includes('re: ')
                 && ((o.communication_animation
                   && R.any(
                     (p) => o.communication_to
