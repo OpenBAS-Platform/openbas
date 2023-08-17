@@ -7,11 +7,9 @@ assignees: ''
 
 ---
 
-Please replace every line in curly brackets { like this } with an appropriate answer, and remove this line.
-
 ## Description
 
-{ Please provide a clear and concise description of the bug. }
+<!-- Please provide a clear and concise description of the bug. -->
 
 ## Environment
 
@@ -29,12 +27,14 @@ Steps to create the smallest reproducible scenario:
 
 ## Expected Output
 
-{ Please describe what you expected to happen. }
+<!-- Please describe what you expected to happen. -->
 
 ## Actual Output
 
-{ Please describe what actually happened. }
+<!-- Please describe what actually happened. -->
  
 ## Additional information
 
-{ Any additional information, including logs or screenshots if you have any. }
+<!-- Any additional information, including logs or screenshots if you have any. -->
+
+## Screenshots (optional)
