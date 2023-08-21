@@ -1552,7 +1552,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-dev-utils@npm:^31.1.0, @ckeditor/ckeditor5-dev-utils@npm:^31.1.13, @ckeditor/ckeditor5-dev-utils@npm:^31.1.9":
+"@ckeditor/ckeditor5-dev-utils@npm:^31.1.0, @ckeditor/ckeditor5-dev-utils@npm:^31.1.13":
   version: 31.1.13
   resolution: "@ckeditor/ckeditor5-dev-utils@npm:31.1.13"
   dependencies:
@@ -1586,22 +1586,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-dev-webpack-plugin@npm:^31.1.0":
-  version: 31.1.9
-  resolution: "@ckeditor/ckeditor5-dev-webpack-plugin@npm:31.1.9"
-  dependencies:
-    "@ckeditor/ckeditor5-dev-utils": ^31.1.9
-    chalk: ^4.0.0
-    rimraf: ^3.0.2
-    semver: ^7.3.4
-    webpack-sources: ^2.0.1
-  peerDependencies:
-    webpack: ^4.43.0 || ^5.24.0
-  checksum: 1da26b6b5803816738660a4cffe9b8074dbe7cb9e669733381aa81241da37e47d8d8a4207c0799079c6cfd9aba45736d24f65b4128bd6b5e2a001e2d787c8ff3
-  languageName: node
-  linkType: hard
-
-"@ckeditor/ckeditor5-dev-webpack-plugin@npm:^31.1.13":
+"@ckeditor/ckeditor5-dev-webpack-plugin@npm:^31.1.0, @ckeditor/ckeditor5-dev-webpack-plugin@npm:^31.1.13":
   version: 31.1.13
   resolution: "@ckeditor/ckeditor5-dev-webpack-plugin@npm:31.1.13"
   dependencies:
