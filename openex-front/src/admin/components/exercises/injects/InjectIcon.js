@@ -10,7 +10,7 @@ import {
   SmsOutlined,
   SpeakerNotesOutlined,
 } from '@mui/icons-material';
-import { Mastodon, NewspaperVariantMultipleOutline, Twitter, } from 'mdi-material-ui';
+import { Mastodon, NewspaperVariantMultipleOutline, Twitter } from 'mdi-material-ui';
 import Airbus from '../../../../resources/images/contracts/airbus.png';
 import CustomTooltip from '../../../../components/CustomTooltip';
 
