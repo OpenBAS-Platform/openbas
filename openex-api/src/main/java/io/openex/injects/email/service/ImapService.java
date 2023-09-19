@@ -11,11 +11,23 @@ import io.openex.database.repository.SettingRepository;
 import io.openex.database.repository.UserRepository;
 import io.openex.service.FileService;
 import org.apache.commons.mail.util.MimeMessageParser;
+import org.apache.hc.client5.http.ClientProtocolException;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mchange.rmi.NotAuthorizedException;
 
 import javax.activation.DataSource;
 import javax.mail.*;
@@ -23,6 +35,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,6 +69,18 @@ public class ImapService {
 
     @Value("${openex.mail.imap.password}")
     private String password;
+
+    @Value("${openex.mail.imap.tenantId}")
+    private String tenantId;
+
+    @Value("${openex.mail.imap.clientId}")
+    private String clientId;
+
+    @Value("${openex.mail.imap.clientSecret}")
+    private String clientSecret;
+
+    @Value("${openex.mail.imap.o365AuthModeEnabled}")
+    private boolean o365AuthModeEnabled;
 
     @Value("${openex.mail.imap.inbox}")
     private List<String> inboxFolders;
@@ -100,15 +125,39 @@ public class ImapService {
 
     private void initStore(Environment env) throws Exception {
         Session session = Session.getDefaultInstance(buildProperties(env), null);
+        if (env.getProperty("openex.mail.imap.debug", Boolean.class, false)){
+            session.setDebug(true);
+        }
         imapStore = session.getStore(PROVIDER);
         String host = env.getProperty("openex.mail.imap.host");
         int port = env.getProperty("openex.mail.imap.port", Integer.class, 995);
         String username = env.getProperty("openex.mail.imap.username");
         String password = env.getProperty("openex.mail.imap.password");
+        boolean o365AuthModeEnabled = env.getProperty("openex.mail.imap.o365AuthModeEnabled", Boolean.class, false);
+        String clientId = env.getProperty("openex.mail.imap.clientId");
+        String clientSecret = env.getProperty("openex.mail.imap.clientSecret");
+        String tenantId = env.getProperty("openex.mail.imap.tenantId");
+
         boolean isEnabled = env.getProperty("openex.mail.imap.enabled", Boolean.class, false);
         if (isEnabled) {
             LOGGER.log(Level.INFO, "IMAP sync started");
-            imapStore.connect(host, port, username, password);
+            if (o365AuthModeEnabled) {
+                LOGGER.log(Level.INFO, "IMAP sync O365 mode");
+                String token = getAuthToken(tenantId, clientId, clientSecret);
+                LOGGER.log(Level.INFO, "token retrieved");
+                imapStore.connect(host, username, token);
+                // test immediatly the folder, because MS accept AUTHENTICATE but refuse just after with "BAD User is authenticated but not connected"
+                // test now to avoid an error message in planned task
+                LOGGER.log(Level.INFO, "O365 connection successfull. Opening inbox to ensure user has IMAP access right, no MFA enforced.");
+                String indoxFolder = env.getProperty("openex.mail.imap.inbox");
+                Folder folder = imapStore.getFolder(indoxFolder);
+                folder.open(Folder.READ_ONLY);
+                folder.close();
+            }
+            else
+            {
+                imapStore.connect(host, port, username, password);
+            }
         } else {
             LOGGER.log(Level.INFO, "IMAP sync disabled");
         }
@@ -176,6 +225,22 @@ public class ImapService {
         props.setProperty("mail.imap.ssl.trust", sslTrust);
         props.setProperty("mail.imap.auth", sslAuth);
         props.setProperty("mail.imap.starttls.enable", sslStartTLS);
+
+        boolean o365AuthModeEnabled = env.getProperty("openex.mail.imap.o365AuthModeEnabled", Boolean.class, false);
+        if (o365AuthModeEnabled)
+        {
+            props.put("mail.imap.ssl.enable", "true");
+            props.put("mail.imap.starttls.enable", "true");
+            props.put("mail.imap.auth", "true");
+            props.put("mail.imap.auth.mechanisms", "XOAUTH2");
+
+            String mailAddress = env.getProperty("openex.mail.imap.username");
+            props.put("mail.imap.user", mailAddress);
+        }
+        if (env.getProperty("openex.mail.imap.debug", Boolean.class, false)){
+            props.put("mail.debug", "true");
+            props.put("mail.debug.auth", "true");
+        }
         return props;
     }
 
@@ -279,11 +344,13 @@ public class ImapService {
         Folder sentBox = imapStore.getFolder(sentFolder);
         sentBox.open(Folder.READ_ONLY);
         synchronizeBox(sentBox, true);
+        sentBox.close();
         // Sync received
         for (String listeningFolder : inboxFolders) {
             Folder inbox = imapStore.getFolder(listeningFolder);
             inbox.open(Folder.READ_ONLY);
             synchronizeBox(inbox, false);
+            inbox.close();
         }
     }
 
@@ -292,7 +359,13 @@ public class ImapService {
     public void connectionListener() throws Exception {
         if (enabled) {
             if (!imapStore.isConnected()) {
-                imapStore.connect(host, port, username, password);
+                
+                if (o365AuthModeEnabled) {
+                    String token = getAuthToken(tenantId, clientId, clientSecret);
+                    imapStore.connect(host, username, token);
+                } else {
+                    imapStore.connect(host, port, username, password);
+                }
             }
             syncFolders();
         }
@@ -306,5 +379,34 @@ public class ImapService {
             folder.appendMessages(new Message[]{message});
             folder.close();
         }
+    }
+
+    public String getAuthToken(String tenantId,String clientId,String client_secret) throws ClientProtocolException, IOException, NotAuthorizedException {
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost loginPost = new HttpPost("https://login.microsoftonline.com/" + tenantId + "/oauth2/v2.0/token");
+        String scopes = "https://outlook.office365.com/.default";
+        String encodedBody = "client_id=" + clientId + "&scope=" + scopes + "&client_secret=" + client_secret
+                + "&grant_type=client_credentials";
+        loginPost.setEntity(new StringEntity(encodedBody, ContentType.APPLICATION_FORM_URLENCODED));
+        loginPost.addHeader(new BasicHeader("cache-control", "no-cache"));
+        CloseableHttpResponse loginResponse = client.execute(loginPost);
+        InputStream inputStream = loginResponse.getEntity().getContent();
+        byte[] response = inputStream.readAllBytes();
+        
+        ObjectMapper objectMapper = new ObjectMapper();
+        JavaType type = objectMapper.constructType(
+                objectMapper.getTypeFactory().constructParametricType(Map.class, String.class, String.class));
+        Map<String, String> parsed = new ObjectMapper().readValue(response, type);
+        if (parsed.containsKey("error"))
+        {
+            String fullResponse = new String(response);
+            throw new NotAuthorizedException("Unable to authenticate to O365. Message: " + fullResponse);
+        }
+        if (!parsed.containsKey("access_token"))
+        {
+            String fullResponse = new String(response);
+            throw new NotAuthorizedException("Unable to authenticate to O365. No access token found in response: " + fullResponse);
+        }
+        return parsed.get("access_token");
     }
 }
