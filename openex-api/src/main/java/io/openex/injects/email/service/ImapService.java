@@ -245,8 +245,18 @@ public class ImapService {
     }
 
     private List<String> computeParticipants(Message message) throws Exception {
-        List<String> from = Arrays.stream(message.getFrom()).map(addr -> (((InternetAddress) addr).getAddress())).toList();
-        List<String> recipients = Arrays.stream(message.getAllRecipients()).map(addr -> (((InternetAddress) addr).getAddress())).toList();
+        List<String> from = new ArrayList<String>();
+        List<String> recipients = new ArrayList<String>();
+        Address[] fromMessage = message.getFrom();
+        if(fromMessage != null)
+        {
+            from = Arrays.stream(fromMessage).map(addr -> (((InternetAddress) addr).getAddress())).toList();
+        }
+        Address[] recipientsMessage = message.getAllRecipients();
+        if (recipientsMessage != null)
+        {
+            recipients = Arrays.stream(recipientsMessage).map(addr -> (((InternetAddress) addr).getAddress())).toList();
+        }
         return Stream.concat(from.stream(), recipients.stream()).map(String::toLowerCase).filter(recipient -> !recipient.equals(username)).distinct().toList();
     }
 
