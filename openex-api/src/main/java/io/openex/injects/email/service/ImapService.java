@@ -105,10 +105,21 @@ public class ImapService {
         int port = env.getProperty("openex.mail.imap.port", Integer.class, 995);
         String username = env.getProperty("openex.mail.imap.username");
         String password = env.getProperty("openex.mail.imap.password");
+        String sentFolder = env.getProperty("openex.mail.imap.sent");
         boolean isEnabled = env.getProperty("openex.mail.imap.enabled", Boolean.class, false);
         if (isEnabled) {
             LOGGER.log(Level.INFO, "IMAP sync started");
             imapStore.connect(host, port, username, password);
+            try {
+                Folder defaultFolder = imapStore.getDefaultFolder();
+                Folder sentBox = defaultFolder.getFolder(sentFolder);
+                if (!sentBox.exists()) {
+                    sentBox.create(Folder.READ_WRITE);
+                    sentBox.setSubscribed(true);
+                }
+            }  catch (Exception e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            }
         } else {
             LOGGER.log(Level.INFO, "IMAP sync disabled");
         }
