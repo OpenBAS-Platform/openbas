@@ -3387,10 +3387,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/seamless-immutable@npm:7.1.16":
-  version: 7.1.16
-  resolution: "@types/seamless-immutable@npm:7.1.16"
-  checksum: 611c468114a0a2d80052d80bd33fa29a78ce8334a534407cfd971c65c46a900fac1d322e5e39f6cc08e204f4ec578d2333db0fddfca4c07ba681a2e82cccf73c
+"@types/seamless-immutable@npm:7.1.17":
+  version: 7.1.17
+  resolution: "@types/seamless-immutable@npm:7.1.17"
+  checksum: e33d5558c00d794e93477693458cde2bf3855722a6773a01f813aa10d1608f78ef78dc642ca0476fe7aef6407311b0568a08fbbda1adb05c7c16277691efe0bc
   languageName: node
   linkType: hard
 
@@ -10830,7 +10830,7 @@ __metadata:
     "@types/node": 18.11.9
     "@types/react": 17.0.52
     "@types/react-dom": 17.0.18
-    "@types/seamless-immutable": 7.1.16
+    "@types/seamless-immutable": 7.1.17
     apexcharts: 3.36.3
     axios: 0.27.2
     chokidar: 3.5.3
