@@ -115,6 +115,7 @@ public class ImapService {
                 Folder sentBox = defaultFolder.getFolder(sentFolder);
                 if (!sentBox.exists()) {
                     sentBox.create(Folder.READ_WRITE);
+                    sentBox.setSubscribed(true);
                 }
             }  catch (Exception e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
