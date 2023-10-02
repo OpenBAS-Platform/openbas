@@ -101,7 +101,7 @@
   },
   "resolutions": {
     "mini-css-extract-plugin": "2.4.7",
-    "react-transition-group": "4.4.2"
+    "react-transition-group": "4.4.5"
   },
   "workspaces": [
     "packages/*"
