@@ -5883,10 +5883,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:2.4.1":
-  version: 2.4.1
-  resolution: "dompurify@npm:2.4.1"
-  checksum: 1169177465b3cbb25a44322937fba549f6c4e1a91b83245d144471be26619c835cccf0f8e20aa78c25ac11a06efd17cc1b9db9cacadceb78a4c08a1029eafee5
+"dompurify@npm:2.4.7":
+  version: 2.4.7
+  resolution: "dompurify@npm:2.4.7"
+  checksum: 13c047e772a1998348191554dda403950d45ef2ec75fa0b9915cc179ccea0a39ef780d283109bd72cf83a2a085af6c77664281d4d0106a737bc5f39906364efe
   languageName: node
   linkType: hard
 
@@ -10850,7 +10850,7 @@ __metadata:
     connected-react-router: 6.9.3
     cross-env: 7.0.3
     date-fns: 2.29.3
-    dompurify: 2.4.1
+    dompurify: 2.4.7
     esbuild: 0.15.14
     esbuild-jest: 0.5.0
     eslint: 8.27.0
