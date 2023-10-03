@@ -2916,9 +2916,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/x-date-pickers@npm:5.0.8":
-  version: 5.0.8
-  resolution: "@mui/x-date-pickers@npm:5.0.8"
+"@mui/x-date-pickers@npm:5.0.20":
+  version: 5.0.20
+  resolution: "@mui/x-date-pickers@npm:5.0.20"
   dependencies:
     "@babel/runtime": ^7.18.9
     "@date-io/core": ^2.15.0
@@ -2956,7 +2956,7 @@ __metadata:
       optional: true
     moment:
       optional: true
-  checksum: a7a9c1ebbe7cb4d18e6271b1082b941690402c1258aee445ad7390aba582e1b51a2af9f42f489dc3ab8060d130aefb491c510659f381d86f94d4eb652163cf30
+  checksum: c8537e6c0cee2659494c9f7250eb0ad35fb84bcd09f9cc0ae5c0ba2d4faaa3a87c598c97f0aa065aadb540384e4d7ac0cf1107f8ca94d7bf7a2d7f393adfd011
   languageName: node
   linkType: hard
 
@@ -10825,7 +10825,7 @@ __metadata:
     "@mui/lab": 5.0.0-alpha.108
     "@mui/material": 5.10.14
     "@mui/styles": 5.10.14
-    "@mui/x-date-pickers": 5.0.8
+    "@mui/x-date-pickers": 5.0.20
     "@types/jest": 27.5.2
     "@types/node": 18.11.9
     "@types/react": 17.0.52
