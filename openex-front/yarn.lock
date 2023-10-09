@@ -9479,10 +9479,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"leaflet@npm:1.9.2":
-  version: 1.9.2
-  resolution: "leaflet@npm:1.9.2"
-  checksum: ab6edb278c6bbd05db9a9395694fc517557433bedbcb233941ea42327ee90650f2d61dd3f9caf861040c8b25abfd8e1f79018f6ae899181e280287c7481ba4bf
+"leaflet@npm:1.9.4":
+  version: 1.9.4
+  resolution: "leaflet@npm:1.9.4"
+  checksum: bfc79f17a247b37b92d84b3c78702501603392d6589fde606de4a825d11f1609d90225388834f2e0709dac327e52dcd4b4b9cc9fd3d590060c5b1e53b84fa6c6
   languageName: node
   linkType: hard
 
@@ -10880,7 +10880,7 @@ __metadata:
     http-proxy-middleware: 2.0.6
     jest: 27.5.1
     js-file-download: 0.4.12
-    leaflet: 1.9.2
+    leaflet: 1.9.4
     mdi-material-ui: 7.6.0
     moment: 2.29.4
     moment-timezone: 0.5.39
