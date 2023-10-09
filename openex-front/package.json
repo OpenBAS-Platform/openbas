@@ -25,7 +25,7 @@
     "history": "4.10.1",
     "html-react-parser": "3.0.16",
     "html-to-image": "1.10.8",
-    "html-to-pdfmake": "2.4.9",
+    "html-to-pdfmake": "2.4.25",
     "http-proxy-middleware": "2.0.6",
     "js-file-download": "0.4.12",
     "leaflet": "1.9.2",
