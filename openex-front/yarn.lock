@@ -7842,10 +7842,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-to-pdfmake@npm:2.4.9":
-  version: 2.4.9
-  resolution: "html-to-pdfmake@npm:2.4.9"
-  checksum: d4ef0fcb601b548027089a0c84c809d2232427683b01891fbfe978c382a6185c930651e5cc08c347e5fce211870f3d72580b2c7151ccccde8cd7cb37df086287
+"html-to-pdfmake@npm:2.4.25":
+  version: 2.4.25
+  resolution: "html-to-pdfmake@npm:2.4.25"
+  checksum: 2bb7c8b1c02ac29914219a7a090ca88ff01ecc6fb3dcedbeaed6fe2ef56d7ac832f52e5bfa139395fbbbe776a546742ead5b304cdc171871507f74812f1f6244
   languageName: node
   linkType: hard
 
@@ -10876,7 +10876,7 @@ __metadata:
     history: 4.10.1
     html-react-parser: 3.0.16
     html-to-image: 1.10.8
-    html-to-pdfmake: 2.4.9
+    html-to-pdfmake: 2.4.25
     http-proxy-middleware: 2.0.6
     jest: 27.5.1
     js-file-download: 0.4.12
