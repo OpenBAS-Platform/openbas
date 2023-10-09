@@ -20,7 +20,7 @@
     "connected-react-router": "6.9.3",
     "date-fns": "2.29.3",
     "dompurify": "2.4.7",
-    "final-form": "4.20.7",
+    "final-form": "4.20.10",
     "final-form-arrays": "3.0.2",
     "history": "4.10.1",
     "html-react-parser": "3.0.16",
