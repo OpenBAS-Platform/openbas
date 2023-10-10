@@ -28,7 +28,7 @@
     "html-to-pdfmake": "2.4.25",
     "http-proxy-middleware": "2.0.6",
     "js-file-download": "0.4.12",
-    "leaflet": "1.9.2",
+    "leaflet": "1.9.4",
     "mdi-material-ui": "7.6.0",
     "moment": "2.29.4",
     "moment-timezone": "0.5.39",
