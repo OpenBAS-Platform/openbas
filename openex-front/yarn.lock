@@ -10885,7 +10885,7 @@ __metadata:
     moment: 2.29.4
     moment-timezone: 0.5.39
     normalizr: 3.6.2
-    pdfmake: 0.2.6
+    pdfmake: 0.2.7
     prettier: 2.7.1
     prop-types: 15.8.1
     ramda: 0.28.0
@@ -11122,15 +11122,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pdfmake@npm:0.2.6":
-  version: 0.2.6
-  resolution: "pdfmake@npm:0.2.6"
+"pdfmake@npm:0.2.7":
+  version: 0.2.7
+  resolution: "pdfmake@npm:0.2.7"
   dependencies:
     "@foliojs-fork/linebreak": ^1.1.1
     "@foliojs-fork/pdfkit": ^0.13.0
     iconv-lite: ^0.6.3
     xmldoc: ^1.1.2
-  checksum: b7c06c9d847d3be04266a61f0f398987c19daa185ff5d0ab96521368ab3fe772c1b0655f273c82e8e48e9722c89f20b87646f91511efc17d9a253654c27745c7
+  checksum: cf85c53edb8b54a07839c5f09a2ff11d04bdbf0345d388f99cb2496b57921f22c48684050cd570c8b1cceff0ecfbf81a5b718034f94ef6a6e9a235cc3add6fe5
   languageName: node
   linkType: hard
 
