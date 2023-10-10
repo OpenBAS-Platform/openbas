@@ -31,7 +31,7 @@
     "leaflet": "1.9.4",
     "mdi-material-ui": "7.6.0",
     "moment": "2.29.4",
-    "moment-timezone": "0.5.39",
+    "moment-timezone": "0.5.43",
     "normalizr": "3.6.2",
     "pdfmake": "0.2.6",
     "prop-types": "15.8.1",
