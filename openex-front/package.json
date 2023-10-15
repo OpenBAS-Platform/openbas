@@ -19,7 +19,7 @@
     "ckeditor5-custom-build": "0.0.1",
     "connected-react-router": "6.9.3",
     "date-fns": "2.29.3",
-    "dompurify": "2.4.7",
+    "dompurify": "3.0.6",
     "final-form": "4.20.10",
     "final-form-arrays": "3.0.2",
     "history": "4.10.1",
