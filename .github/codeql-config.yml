@@ -1,0 +1,8 @@
+name: "CodeQL config"
+paths:
+  - openex-api/src
+  - openex-front/src
+  - openex-framework/src
+  - openex-model/src
+paths-ignore:
+  - openex-front/src/static
