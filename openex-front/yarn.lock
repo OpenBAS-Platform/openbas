@@ -10909,7 +10909,7 @@ __metadata:
     redux-logger: 3.0.6
     redux-thunk: 2.4.2
     remark-gfm: 3.0.1
-    remark-parse: 10.0.1
+    remark-parse: 10.0.2
     reselect: 4.1.7
     rxjs: 7.5.7
     seamless-immutable: 7.1.4
@@ -12340,7 +12340,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remark-parse@npm:10.0.1, remark-parse@npm:^10.0.0":
+"remark-parse@npm:10.0.2":
+  version: 10.0.2
+  resolution: "remark-parse@npm:10.0.2"
+  dependencies:
+    "@types/mdast": ^3.0.0
+    mdast-util-from-markdown: ^1.0.0
+    unified: ^10.0.0
+  checksum: 5041b4b44725f377e69986e02f8f072ae2222db5e7d3b6c80829756b842e811343ffc2069cae1f958a96bfa36104ab91a57d7d7e2f0cef521e210ab8c614d5c7
+  languageName: node
+  linkType: hard
+
+"remark-parse@npm:^10.0.0":
   version: 10.0.1
   resolution: "remark-parse@npm:10.0.1"
   dependencies:
