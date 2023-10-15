@@ -203,41 +203,6 @@ jobs:
           only_on_fail: true
           webhook_url: $MS_TEAMS_WEBHOOK_URL
 
-  deploy_production:
-    working_directory: ~/openex
-    docker:
-      - image: maven:3.8.5-openjdk-18-slim
-    steps:
-      - attach_workspace:
-          at: ~/
-      - add_ssh_keys
-      - run: DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y rsync openssh-client git
-      - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts
-      - run: mkdir deploy
-      - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
-      - run:
-          working_directory: ~/openex/deploy
-          command: git clone ssh://openex-SvHlUVEo@openex.io:/~/openex-SvHlUVEo.git .
-      - run:
-          working_directory: ~/openex/deploy
-          command: git submodule init && git submodule update --remote
-      - run:
-          working_directory: ~/openex/deploy
-          command: git remote add ci ~/openex && git pull --no-edit -s recursive -X theirs ci master
-      - run: mv ~/openex/openex-api/target/openex-api.jar ./deploy/openex-api.jar
-      - run:
-          working_directory: ~/openex/deploy
-          command: git add --force -A
-      - run:
-          working_directory: ~/openex/deploy
-          command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
-      - slack/notify:
-          event: fail
-          template: basic_fail_1
-      - ms-teams/report:
-          only_on_fail: true
-          webhook_url: $MS_TEAMS_WEBHOOK_URL
-
   docker_build_platform:
     working_directory: ~/openex_docker
     machine:
@@ -390,27 +355,6 @@ workflows:
             branches:
               only:
                 - master
-      - deploy_lab:
-          requires:
-            - build_platform
-          filters:
-            branches:
-              only:
-                - master
-      - deploy_testing:
-          requires:
-            - build_platform
-          filters:
-            branches:
-              only:
-                - master
-      - deploy_production:
-          requires:
-            - build_platform
-          filters:
-            branches:
-              only:
-                - master                
       - docker_build_platform_rolling:
           requires:
             - build_frontend
@@ -429,10 +373,7 @@ workflows:
       - notify_rolling:
           requires:
             - deploy_demo
-            - deploy_lab
             - deploy_reference
-            - deploy_testing
-            - deploy_production
             - package_rolling
             - package_rolling_musl
             - docker_build_platform_rolling
