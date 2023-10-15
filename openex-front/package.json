@@ -13,7 +13,7 @@
     "@mui/lab": "5.0.0-alpha.108",
     "@mui/material": "5.10.14",
     "@mui/styles": "5.10.14",
-    "@mui/x-date-pickers": "5.0.20",
+    "@mui/x-date-pickers": "6.16.2",
     "apexcharts": "3.36.3",
     "axios": "0.27.2",
     "ckeditor5-custom-build": "0.0.1",
