@@ -20,10 +20,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ["javascript", "python"]
+        language: ["javascript", "java"]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python' ]
 
     steps:
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 18
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
