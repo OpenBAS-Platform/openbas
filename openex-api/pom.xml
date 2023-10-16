@@ -13,6 +13,10 @@
     <name>OpenEx API</name>
     <description>OpenEx api</description>
 
+    <properties>
+        <springdoc.version>1.7.0</springdoc.version>
+    </properties>
+
     <profiles>
         <profile>
             <id>dev</id>
@@ -91,12 +95,12 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.6.15</version>
+            <version>${springdoc.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webflux-ui</artifactId>
-            <version>1.6.15</version>
+            <version>${springdoc.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
