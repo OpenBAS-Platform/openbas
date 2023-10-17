@@ -33,7 +33,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodule: "true"
+          submodules: "true"
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
