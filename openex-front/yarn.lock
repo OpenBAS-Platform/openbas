@@ -1483,11 +1483,11 @@ __metadata:
   linkType: hard
 
 "@ckeditor/ckeditor5-alignment@npm:^35.1.0":
-  version: 35.3.1
-  resolution: "@ckeditor/ckeditor5-alignment@npm:35.3.1"
+  version: 35.4.0
+  resolution: "@ckeditor/ckeditor5-alignment@npm:35.4.0"
   dependencies:
-    ckeditor5: ^35.3.1
-  checksum: 875da527d2c62a4175fff13f3a3e65de25b8e82ad32807280f5ebcafd2f7eba1cb8871890267f52aedd8b1779cd912d85cb400c6a35ee07c79daa255ea2291c8
+    ckeditor5: ^35.4.0
+  checksum: 212f3b493b3713ee2940d9750c416c61e405775903a43838eb786a040ad3f980cba445851f7c5949c278038de30bd8efee52b90c04959f57b4dc2c5236ef980e
   languageName: node
   linkType: hard
 
