@@ -4,10 +4,5 @@ paths:
   - openex-front/src
   - openex-framework/src
   - openex-model/src
-  - openex-injectors/openex-http/src
-  - openex-injectors/openex-lade/src
-  - openex-injectors/openex-mastodon/src
-  - openex-injectors/openex-ovh/src
-  - openex-injectors/openex-ssh/src
 paths-ignore:
   - openex-front/src/static

@@ -75,5 +75,6 @@
         <module>openex-model</module>
         <module>openex-framework</module>
         <module>openex-api</module>
+        <module>openex-injectors</module>
     </modules>
 </project>
