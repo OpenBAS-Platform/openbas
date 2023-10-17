@@ -24,35 +24,35 @@ import javax.annotation.Resource;
 @EnableTransactionManagement
 public class AppConfig {
 
-    // Validations
-    public final static String EMPTY_MESSAGE = "This list cannot be empty.";
-    public final static String MANDATORY_MESSAGE = "This value should not be blank.";
-    public final static String NOW_FUTURE_MESSAGE = "This date must be now or in the future.";
-    public final static String EMAIL_FORMAT = "This field must be a valid email.";
+  // Validations
+  public final static String EMPTY_MESSAGE = "This list cannot be empty.";
+  public final static String MANDATORY_MESSAGE = "This value should not be blank.";
+  public final static String NOW_FUTURE_MESSAGE = "This date must be now or in the future.";
+  public final static String EMAIL_FORMAT = "This field must be a valid email.";
 
-    @Resource
-    private OpenExConfig openExConfig;
+  @Resource
+  private OpenExConfig openExConfig;
 
-    @Bean
-    ObjectMapper openexJsonMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.setDateFormat(new StdDateFormat().withColonInTimeZone(true));
-        mapper.registerModule(new Hibernate5Module());
-        mapper.registerModule(new Jdk8Module());
-        mapper.registerModule(new JavaTimeModule());
-        return mapper;
-    }
+  @Bean
+  ObjectMapper openexJsonMapper() {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.setDateFormat(new StdDateFormat().withColonInTimeZone(true));
+    mapper.registerModule(new Hibernate5Module());
+    mapper.registerModule(new Jdk8Module());
+    mapper.registerModule(new JavaTimeModule());
+    return mapper;
+  }
 
-    @Bean
-    public OpenAPI springShopOpenAPI() {
-        return new OpenAPI()
-                .info(new Info().title("OpenEX API")
-                        .description("Software under open source licence designed to plan and conduct exercises")
-                        .version(openExConfig.getVersion())
-                        .license(new License().name("Apache 2.0").url("https://www.openex.io/")))
-                .externalDocs(new ExternalDocumentation()
-                        .description("OpenEx documentation")
-                        .url("https://filigran.notion.site/OpenEx-Public-Knowledge-Base-bbc835446e9140999d6f2e10d96c2ee0"));
-    }
+  @Bean
+  public OpenAPI openExOpenAPI() {
+    return new OpenAPI()
+        .info(new Info().title("OpenEX API")
+            .description("Software under open source licence designed to plan and conduct exercises")
+            .version(this.openExConfig.getVersion())
+            .license(new License().name("Apache 2.0").url("https://www.openex.io/")))
+        .externalDocs(new ExternalDocumentation()
+            .description("OpenEx documentation")
+            .url("https://docs.openex.io/"));
+  }
 }
