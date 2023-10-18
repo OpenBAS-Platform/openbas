@@ -14,6 +14,7 @@
     <description>OpenEx api</description>
 
     <properties>
+        <commons-validator.version>1.7</commons-validator.version>
         <springdoc.version>1.7.0</springdoc.version>
     </properties>
 
@@ -117,6 +118,11 @@
             <artifactId>commons-io</artifactId>
             <!--suppress MavenPackageUpdate -->
             <version>2.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>${commons-validator.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
