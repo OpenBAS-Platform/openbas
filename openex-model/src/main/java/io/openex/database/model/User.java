@@ -7,6 +7,8 @@ import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.CryptoHelper;
 import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,9 +30,15 @@ import static java.util.stream.StreamSupport.stream;
 @EntityListeners(ModelBaseListener.class)
 public class User implements Base, OidcUser, OAuth2User {
 
+    public static final String ADMIN_UUID = "89206193-dbfb-4513-a186-d72c037dda4c";
+    public static final String ADMIN_FIRSTNAME = "admin";
+    public static final String ADMIN_LASTNAME = "openex";
+
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String ROLE_USER = "ROLE_USER";
 
+    @Getter
+    @Setter
     @Id
     @Column(name = "user_id")
     @GeneratedValue(generator = "UUID")
@@ -38,72 +46,106 @@ public class User implements Base, OidcUser, OAuth2User {
     @JsonProperty("user_id")
     private String id;
 
+    @Getter
+    @Setter
     @Column(name = "user_firstname")
     @JsonProperty("user_firstname")
     private String firstname;
 
+    @Getter
+    @Setter
     @Column(name = "user_lastname")
     @JsonProperty("user_lastname")
     private String lastname;
 
+    @Getter
+    @Setter
     @Column(name = "user_lang")
     @JsonProperty("user_lang")
     private String lang = "auto";
 
+    @Getter
+    @Setter
     @Column(name = "user_theme")
     @JsonProperty("user_theme")
     private String theme = "default";
 
+    @Getter
+    @Setter
     @Column(name = "user_email")
     @JsonProperty("user_email")
     private String email;
 
+    @Getter
+    @Setter
     @Column(name = "user_phone")
     @JsonProperty("user_phone")
     private String phone;
 
+    @Getter
+    @Setter
     @Column(name = "user_phone2")
     @JsonProperty("user_phone2")
     private String phone2;
 
+    @Getter
+    @Setter
     @Column(name = "user_pgp_key")
     @JsonProperty("user_pgp_key")
     private String pgpKey;
 
+    @Getter
+    @Setter
     @Column(name = "user_status")
     @JsonProperty("user_status")
     private Short status = 0;
 
+    @Getter
+    @Setter
     @Column(name = "user_password")
     @JsonIgnore
     private String password;
 
+    @Getter
+    @Setter
     @Column(name = "user_created_at")
     @JsonProperty("user_created_at")
     private Instant createdAt = now();
 
+    @Getter
+    @Setter
     @Column(name = "user_updated_at")
     @JsonProperty("user_updated_at")
     private Instant updatedAt = now();
 
+    @Getter
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_organization")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("user_organization")
     private Organization organization;
 
+    @Getter
+    @Setter
     @Column(name = "user_admin")
     @JsonProperty("user_admin")
     private boolean admin = false;
 
+    @Getter
+    @Setter
     @Column(name = "user_country")
     @JsonProperty("user_country")
     private String country;
 
+    @Getter
+    @Setter
     @Column(name = "user_city")
     @JsonProperty("user_city")
     private String city;
 
+    @Getter
+    @Setter
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_groups",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -112,6 +154,8 @@ public class User implements Base, OidcUser, OAuth2User {
     @JsonProperty("user_groups")
     private List<Group> groups = new ArrayList<>();
 
+    @Getter
+    @Setter
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_audiences",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -120,6 +164,8 @@ public class User implements Base, OidcUser, OAuth2User {
     @JsonProperty("user_audiences")
     private List<Audience> audiences = new ArrayList<>();
 
+    @Getter
+    @Setter
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_tags",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -128,6 +174,8 @@ public class User implements Base, OidcUser, OAuth2User {
     @JsonProperty("user_tags")
     private List<Tag> tags = new ArrayList<>();
 
+    @Getter
+    @Setter
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "communications_users",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -136,10 +184,14 @@ public class User implements Base, OidcUser, OAuth2User {
     @JsonProperty("user_communications")
     private List<Communication> communications = new ArrayList<>();
 
+    @Getter
+    @Setter
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Token> tokens = new ArrayList<>();
 
+    @Getter
+    @Setter
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<ComcheckStatus> comcheckStatuses = new ArrayList<>();
@@ -191,7 +243,7 @@ public class User implements Base, OidcUser, OAuth2User {
 
     @JsonProperty("user_is_player")
     public boolean isPlayer() {
-        return isAdmin() || isPlanner() || isObserver() || getAudiences().size() > 0;
+        return isAdmin() || isPlanner() || isObserver() || !getAudiences().isEmpty();
     }
 
     @JsonProperty("user_last_comcheck")
@@ -201,196 +253,17 @@ public class User implements Base, OidcUser, OAuth2User {
                 .map(comcheckStatus -> comcheckStatus.getReceiveDate().get())
                 .min(Instant::compareTo);
     }
+
+    @JsonProperty("user_is_external")
+    public boolean isExternal() {
+        return this.getId().equals(ADMIN_UUID);
+    }
     // endregion
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email.toLowerCase();
-    }
 
     @Override
     @JsonIgnore
     public String getName() {
         return getFirstname() + " " + getLastname();
-    }
-
-    public String getLang() {
-        return lang;
-    }
-
-    public void setLang(String lang) {
-        this.lang = lang;
-    }
-
-    public String getTheme() {
-        return theme;
-    }
-
-    public void setTheme(String theme) {
-        this.theme = theme;
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
-
-    public String getPgpKey() {
-        return pgpKey;
-    }
-
-    public void setPgpKey(String pgpKey) {
-        this.pgpKey = pgpKey;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getPhone2() {
-        return phone2;
-    }
-
-    public void setPhone2(String phone2) {
-        this.phone2 = phone2;
-    }
-
-    public Organization getOrganization() {
-        return organization;
-    }
-
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
-    }
-
-    public boolean isAdmin() {
-        return admin;
-    }
-
-    public void setAdmin(boolean admin) {
-        this.admin = admin;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public List<Group> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(List<Group> groups) {
-        this.groups = groups;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public List<Token> getTokens() {
-        return tokens;
-    }
-
-    public void setTokens(List<Token> tokens) {
-        this.tokens = tokens;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public Short getStatus() {
-        return status;
-    }
-
-    public void setStatus(Short status) {
-        this.status = status;
-    }
-
-    public List<Audience> getAudiences() {
-        return audiences;
-    }
-
-    public void setAudiences(List<Audience> audiences) {
-        this.audiences = audiences;
-    }
-
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
-    public List<ComcheckStatus> getComcheckStatuses() {
-        return comcheckStatuses;
-    }
-
-    public void setComcheckStatuses(List<ComcheckStatus> comcheckStatuses) {
-        this.comcheckStatuses = comcheckStatuses;
-    }
-
-    public List<Communication> getCommunications() {
-        return communications;
-    }
-
-    public void setCommunications(List<Communication> communications) {
-        this.communications = communications;
     }
 
     @JsonProperty("user_is_only_player")

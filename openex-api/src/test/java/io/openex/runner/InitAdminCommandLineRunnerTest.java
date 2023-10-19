@@ -12,8 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 
-import static io.openex.runner.InitAdminCommandLineRunner.ADMIN_TOKEN_UUID;
-import static io.openex.runner.InitAdminCommandLineRunner.ADMIN_UUID;
+import static io.openex.database.model.Token.ADMIN_TOKEN_UUID;
+import static io.openex.database.model.User.ADMIN_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -29,7 +29,6 @@ public class InitAdminCommandLineRunnerTest {
   @DisplayName("Test if admin user is created")
   @Test
   void adminUserExistTest() {
-    Iterable<User> toto = this.userRepository.findAll();
     Optional<User> adminUser = this.userRepository.findById(ADMIN_UUID);
     assertThat(adminUser.isPresent()).isEqualTo(true);
   }

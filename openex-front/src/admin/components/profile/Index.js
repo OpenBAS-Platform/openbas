@@ -6,13 +6,7 @@ import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { fetchOrganizations } from '../../../actions/Organization';
-import {
-  updateMeProfile,
-  updateMeInformation,
-  updateMePassword,
-  meTokens,
-  renewToken,
-} from '../../../actions/User';
+import { meTokens, renewToken, updateMeInformation, updateMePassword, updateMeProfile, } from '../../../actions/User';
 import UserForm from './UserForm';
 import ProfileForm from './ProfileForm';
 import PasswordForm from './PasswordForm';
@@ -106,6 +100,7 @@ const Index = () => {
       'user_pgp_key',
       'user_lang',
       'user_theme',
+      'user_is_external',
     ]),
   )(user);
   const userToken = tokens.length > 0 ? R.head(tokens) : undefined;
@@ -131,12 +126,15 @@ const Index = () => {
             initialValues={initialValues}
           />
         </Paper>
-        <Paper variant="outlined" className={classes.paper}>
-          <Typography variant="h5" style={{ marginBottom: 20 }}>
-            {t('Password')}
-          </Typography>
-          <PasswordForm onSubmit={onUpdatePassword} />
-        </Paper>
+        {!initialValues.user_is_external
+          &&
+          <Paper variant="outlined" className={classes.paper}>
+            <Typography variant="h5" style={{ marginBottom: 20 }}>
+              {t('Password')}
+            </Typography>
+            <PasswordForm onSubmit={onUpdatePassword} />
+          </Paper>
+        }
         <Paper variant="outlined" className={classes.paper}>
           <Typography variant="h5" style={{ marginBottom: 20 }}>
             {t('API access')}

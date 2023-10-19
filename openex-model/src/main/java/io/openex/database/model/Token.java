@@ -12,6 +12,9 @@ import java.util.Objects;
 @Entity
 @Table(name = "tokens")
 public class Token implements Base {
+
+    public static final String ADMIN_TOKEN_UUID = "0d17ce9a-f3a8-4c6d-9721-c98dc3dc023f";
+
     @Id
     @Column(name = "token_id")
     @GeneratedValue(generator = "UUID")

@@ -16,16 +16,13 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
+import static io.openex.database.model.Token.ADMIN_TOKEN_UUID;
+import static io.openex.database.model.User.*;
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.apache.logging.log4j.util.Strings.isNotBlank;
 
 @Component
 public class InitAdminCommandLineRunner implements CommandLineRunner {
-
-  public static final String ADMIN_UUID = "89206193-dbfb-4513-a186-d72c037dda4c";
-  public static final String ADMIN_TOKEN_UUID = "0d17ce9a-f3a8-4c6d-9721-c98dc3dc023f";
-  private static final String ADMIN_FIRSTNAME = "admin";
-  private static final String ADMIN_LASTNAME = "openex";
 
   @Value("${openex.admin.email:#{null}}")
   private String adminEmail;

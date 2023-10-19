@@ -43,6 +43,7 @@ class UserForm extends Component {
               name="user_email"
               fullWidth={true}
               label={t('Email address')}
+              disabled={initialValues.user_is_external}
             />
             <TextField
               variant="standard"
