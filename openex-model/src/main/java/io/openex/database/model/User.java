@@ -36,6 +36,8 @@ public class User implements Base, OidcUser, OAuth2User {
 
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String ROLE_USER = "ROLE_USER";
+    public static final String THEME_DEFAULT = "default";
+    public static final String LANG_AUTO = "auto";
 
     @Getter
     @Setter
@@ -58,17 +60,15 @@ public class User implements Base, OidcUser, OAuth2User {
     @JsonProperty("user_lastname")
     private String lastname;
 
-    @Getter
     @Setter
     @Column(name = "user_lang")
     @JsonProperty("user_lang")
-    private String lang = "auto";
+    private String lang = LANG_AUTO;
 
-    @Getter
     @Setter
     @Column(name = "user_theme")
     @JsonProperty("user_theme")
-    private String theme = "default";
+    private String theme = THEME_DEFAULT;
 
     @Getter
     @Setter
@@ -195,6 +195,14 @@ public class User implements Base, OidcUser, OAuth2User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<ComcheckStatus> comcheckStatuses = new ArrayList<>();
+
+    public String getLang() {
+        return Optional.ofNullable(this.lang).orElse(LANG_AUTO);
+    }
+
+    public String getTheme() {
+        return Optional.ofNullable(this.theme).orElse(THEME_DEFAULT);
+    }
 
     // region transient
     private transient List<Inject> injects = new ArrayList<>();
