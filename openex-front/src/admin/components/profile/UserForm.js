@@ -7,33 +7,23 @@ import { TextField } from '../../../components/TextField';
 import { useFormatter } from '../../../components/i18n';
 import OrganizationField from '../../../components/OrganizationField';
 import CountryField from '../../../components/CountryField';
-
-// 1. Functional component
-// 2. TSX
-// 2.1 Check Spring to TS or Swagger to TS
-// 3. Try YUP
+import * as Yup from 'yup';
+import schemaValidator from "../../../utils/Yup";
 
 const UserForm = ({ onSubmit, initialValues }) => {
 
   const { t } = useFormatter();
 
-  const validate = (values) => {
-    const errors = {};
-    const requiredFields = ['user_email'];
-    requiredFields.forEach((field) => {
-      if (!values[field]) {
-        errors[field] = t('This field is required.');
-      }
-    });
-    return errors;
-  }
+  const userFormSchemaValidation = Yup.object().shape({
+    user_email: Yup.string().email(t('Should be a valid email address')).required(t('This field is required')),
+  });
 
   return (
     <Form
       keepDirtyOnReinitialize={true}
       onSubmit={onSubmit}
       initialValues={initialValues}
-      validate={validate}
+      validate={schemaValidator(userFormSchemaValidation)}
       mutators={{
         setValue: ([field, value], state, { changeValue }) => {
           changeValue(state, field, () => value);
