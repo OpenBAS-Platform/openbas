@@ -27,7 +27,7 @@ import TopMenuChallenges from './TopMenuChallenges';
 import TopMenuLessons from './TopMenuLessons';
 import ImportUploader from '../exercises/ImportUploader';
 import TopMenuMedia from './TopMenuMedia';
-import TopMenuProfile from "./TopMenuProfile";
+import TopMenuProfile from './TopMenuProfile';
 
 const styles = (theme) => ({
   appBar: {

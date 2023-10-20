@@ -46,7 +46,7 @@ public class InitAdminCommandLineRunner implements CommandLineRunner {
 
   @Override
   @Transactional
-  public void run(String... args) throws Exception {
+  public void run(String... args) {
     // Handle admin user
     Optional<User> adminUserOptional = this.userRepository.findById(ADMIN_UUID);
     User adminUser = adminUserOptional.map(this::updateUser).orElseGet(this::createUser);
@@ -55,6 +55,8 @@ public class InitAdminCommandLineRunner implements CommandLineRunner {
     Optional<Token> adminToken = this.tokenRepository.findById(ADMIN_TOKEN_UUID);
     adminToken.ifPresentOrElse(this::updateToken, () -> this.createToken(adminUser));
   }
+
+  // -- USER --
 
   private String encodedPassword() {
     Argon2PasswordEncoder passwordEncoder = new Argon2PasswordEncoder();
@@ -88,6 +90,8 @@ public class InitAdminCommandLineRunner implements CommandLineRunner {
 
     return this.userRepository.save(user);
   }
+
+  // -- TOKEN --
 
   private void createToken(@NotNull final User user) {
     if (isBlank(this.adminToken)) {

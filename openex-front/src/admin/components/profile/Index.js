@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { fetchOrganizations } from '../../../actions/Organization';
-import { meTokens, renewToken, updateMeInformation, updateMePassword, updateMeProfile, } from '../../../actions/User';
+import { meTokens, renewToken, updateMeInformation, updateMePassword, updateMeProfile } from '../../../actions/User';
 import UserForm from './UserForm';
 import ProfileForm from './ProfileForm';
 import PasswordForm from './PasswordForm';
@@ -12,7 +12,7 @@ import { useFormatter } from '../../../components/i18n';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
 import { countryOption } from '../../../utils/Countries';
-import Paper from 'src/components/common/Paper';
+import Paper from '../../../components/common/Paper';
 
 const Index = () => {
   const { t } = useFormatter();
@@ -95,8 +95,7 @@ const Index = () => {
         />
       </Paper>
       {!initialValues.user_is_external
-        &&
-        <Paper>
+        && <Paper>
           <Typography variant="h1" style={{ marginBottom: 20 }}>
             {t('Password')}
           </Typography>

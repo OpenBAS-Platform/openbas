@@ -2,16 +2,15 @@ import React from 'react';
 import { Form } from 'react-final-form';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
+import * as Yup from 'yup';
 import { Select } from '../../../components/Select';
 import { TextField } from '../../../components/TextField';
 import { useFormatter } from '../../../components/i18n';
 import OrganizationField from '../../../components/OrganizationField';
 import CountryField from '../../../components/CountryField';
-import * as Yup from 'yup';
-import schemaValidator from "../../../utils/Yup";
+import schemaValidator from '../../../utils/Yup';
 
 const UserForm = ({ onSubmit, initialValues }) => {
-
   const { t } = useFormatter();
 
   const userFormSchemaValidation = Yup.object().shape({
@@ -64,7 +63,6 @@ const UserForm = ({ onSubmit, initialValues }) => {
             setFieldValue={form.mutators.setValue}
           />
           <Select
-            // value={values.user_theme}
             variant="standard"
             label={t('Theme')}
             name="user_theme"
@@ -112,6 +110,6 @@ const UserForm = ({ onSubmit, initialValues }) => {
       )}
     </Form>
   );
-}
+};
 
 export default UserForm;

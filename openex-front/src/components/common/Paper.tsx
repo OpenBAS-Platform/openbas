@@ -6,7 +6,7 @@ interface PaperProps {
   children: React.ReactElement
 }
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   paper: {
     padding: 20,
     marginBottom: 30,
@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Paper: FunctionComponent<PaperProps> = ({
-  children
+  children,
 }) => {
   const classes = useStyles();
 
@@ -23,7 +23,7 @@ const Paper: FunctionComponent<PaperProps> = ({
     <PaperMui variant="outlined" className={classes.paper}>
       {children}
     </PaperMui>
-  )
-}
+  );
+};
 
 export default Paper;

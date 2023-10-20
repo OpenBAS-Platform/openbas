@@ -1,9 +1,6 @@
 import { setIn } from 'final-form';
 
-const schemaValidator = schema => async values => {
-  if (typeof schema === 'function')
-    schema = schema();
-
+const schemaValidator = (schema) => async (values) => {
   try {
     await schema.validate(values, { abortEarly: false });
   } catch (e) {
@@ -11,6 +8,7 @@ const schemaValidator = schema => async values => {
       return setIn(errors, error.path, error.message);
     }, {});
   }
+  return {};
 };
 
 export default schemaValidator;
