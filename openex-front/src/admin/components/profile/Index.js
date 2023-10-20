@@ -1,8 +1,6 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { fetchOrganizations } from '../../../actions/Organization';
@@ -14,19 +12,11 @@ import { useFormatter } from '../../../components/i18n';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
 import { countryOption } from '../../../utils/Countries';
-
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    padding: 20,
-    marginBottom: 30,
-    borderRadius: 6,
-  },
-}));
+import Paper from 'src/components/common/Paper';
 
 const Index = () => {
   const { t } = useFormatter();
   const dispatch = useDispatch();
-  const classes = useStyles();
   useDataLoader(() => {
     dispatch(fetchOrganizations());
     dispatch(meTokens());
@@ -85,7 +75,7 @@ const Index = () => {
   const userToken = tokens.length > 0 ? R.head(tokens) : undefined;
   return (
     <div style={{ width: 800, margin: '0 auto' }}>
-      <Paper variant="outlined" className={classes.paper}>
+      <Paper>
         <Typography variant="h1" style={{ marginBottom: 20 }}>
           {t('Profile')}
         </Typography>
@@ -95,7 +85,7 @@ const Index = () => {
           initialValues={initialValues}
         />
       </Paper>
-      <Paper variant="outlined" className={classes.paper}>
+      <Paper>
         <Typography variant="h1" style={{ marginBottom: 20 }}>
           {t('Information')}
         </Typography>
@@ -106,14 +96,14 @@ const Index = () => {
       </Paper>
       {!initialValues.user_is_external
         &&
-        <Paper variant="outlined" className={classes.paper}>
+        <Paper>
           <Typography variant="h1" style={{ marginBottom: 20 }}>
             {t('Password')}
           </Typography>
           <PasswordForm onSubmit={onUpdatePassword} />
         </Paper>
       }
-      <Paper variant="outlined" className={classes.paper}>
+      <Paper>
         <Typography variant="h1" style={{ marginBottom: 20 }}>
           {t('API access')}
         </Typography>
