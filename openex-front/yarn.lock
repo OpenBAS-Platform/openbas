@@ -3595,12 +3595,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:17.0.21":
-  version: 17.0.21
-  resolution: "@types/react-dom@npm:17.0.21"
+"@types/react-dom@npm:17.0.22":
+  version: 17.0.22
+  resolution: "@types/react-dom@npm:17.0.22"
   dependencies:
     "@types/react": ^17
-  checksum: a2e3f068c1374601856b63bc57f3f436cf6270c1ba5c5cef0776def6de296c8bdd31c39b5be9e9e77f4652e923bef1e71ae377a2b038f4a81bfd0fec8d10d0d0
+  checksum: 3c24331c0a2211370968befaad107598ee4f796c08e9b0de0b0126ee598a7c51f7bf4e0e7d9a76522a3b60d91f091d46131d136bcbe49aeb6ec3b8480dff03f9
   languageName: node
   linkType: hard
 
@@ -3633,14 +3633,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:17.0.67":
-  version: 17.0.67
-  resolution: "@types/react@npm:17.0.67"
+"@types/react@npm:17.0.69":
+  version: 17.0.69
+  resolution: "@types/react@npm:17.0.69"
   dependencies:
     "@types/prop-types": "*"
     "@types/scheduler": "*"
     csstype: ^3.0.2
-  checksum: eb4915fc7d24e19fe6e98dfe98ade377423b1263e7dc001beda41b0298152fb5a410a55dde5def5ec0838156239a48e778d522da03d319ae5ecea80d455da604
+  checksum: b83d4ec968b712b2b1a444c614b1ef3e59879c6911bc4001158de5de49b80b6a20fc4859353244f0171b94845d4c85a6379071445242ff23bbbc9b0ff24577d7
   languageName: node
   linkType: hard
 
@@ -11137,8 +11137,8 @@ __metadata:
     "@mui/x-date-pickers": 6.16.2
     "@types/jest": 27.5.2
     "@types/node": 18.11.9
-    "@types/react": 17.0.67
-    "@types/react-dom": 17.0.21
+    "@types/react": 17.0.69
+    "@types/react-dom": 17.0.22
     "@types/seamless-immutable": 7.1.17
     apexcharts: 3.36.3
     axios: 0.27.2
