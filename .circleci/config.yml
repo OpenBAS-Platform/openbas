@@ -90,10 +90,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - add_ssh_keys
-      - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts
-      - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
-      - run: git remote add openex ssh://git-9qdBths0@openex.io:/~/git-9qdBths0.git && git push --force openex master
       - run: mkdir -p release/openex
       - run: cp -a ./openex-api/target/openex-api.jar release/openex/ && cp -a ./openex-api/src/main/resources/application.properties release/openex/
       - run:
@@ -116,8 +112,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - add_ssh_keys
-      - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts
       - run: mkdir -p release/openex
       - run: cp -a ./openex-api/target/openex-api.jar release/openex/ && cp -a ./openex-api/src/main/resources/application.properties release/openex/
       - run:
@@ -296,8 +290,7 @@ workflows:
               ignore: /.*/
       - deploy_testing:
           requires:
-            - docker_build_platform_rolling
-            - docker_build_worker_rolling                
+            - docker_build_platform_rolling            
       - notify_rolling:
           requires:
             - deploy_testing
