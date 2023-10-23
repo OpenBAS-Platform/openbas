@@ -1435,7 +1435,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.22.6, @babel/runtime@npm:^7.23.1":
+"@babel/runtime@npm:^7.22.6, @babel/runtime@npm:^7.23.1, @babel/runtime@npm:^7.7.6":
   version: 7.23.2
   resolution: "@babel/runtime@npm:7.23.2"
   dependencies:
@@ -8063,7 +8063,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"history@npm:4.10.1, history@npm:^4.9.0":
+"history@npm:5.3.0":
+  version: 5.3.0
+  resolution: "history@npm:5.3.0"
+  dependencies:
+    "@babel/runtime": ^7.7.6
+  checksum: d73c35df49d19ac172f9547d30a21a26793e83f16a78386d99583b5bf1429cc980799fcf1827eb215d31816a6600684fba9686ce78104e23bd89ec239e7c726f
+  languageName: node
+  linkType: hard
+
+"history@npm:^4.9.0":
   version: 4.10.1
   resolution: "history@npm:4.10.1"
   dependencies:
@@ -11171,7 +11180,7 @@ __metadata:
     final-form: 4.20.10
     final-form-arrays: 3.0.2
     fs-extra: 10.1.0
-    history: 4.10.1
+    history: 5.3.0
     html-react-parser: 4.2.9
     html-to-image: 1.10.8
     html-to-pdfmake: 2.4.26
