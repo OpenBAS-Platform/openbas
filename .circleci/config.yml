@@ -119,7 +119,7 @@ jobs:
           command: tar -zcvf "openex-$(date '+%Y%m%d')_musl.tar.gz" openex
       - run:
           working_directory: ~/openex_musl/release
-          command: curl -usamuel.hassine@filigran.io:$JFROG_TOKEN -T openex-$(date '+%Y%m%d')_musl.tar.gz "https://filigran.jfrog.io/artifactory/openex/openex-$(date '+%Y%m%d').tar.gz"
+          command: curl -usamuel.hassine@filigran.io:$JFROG_TOKEN -T openex-$(date '+%Y%m%d')_musl.tar.gz "https://filigran.jfrog.io/artifactory/openex/openex-$(date '+%Y%m%d')_musl.tar.gz"
       - slack/notify:
           event: fail
           template: basic_fail_1
