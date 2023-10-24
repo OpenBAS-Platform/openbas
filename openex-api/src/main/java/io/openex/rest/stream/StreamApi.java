@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openex.database.audit.BaseEvent;
 import io.openex.database.model.User;
+import io.openex.database.repository.UserRepository;
 import io.openex.rest.helper.RestBehavior;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -25,70 +27,76 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static io.openex.config.SessionHelper.currentUser;
 import static io.openex.database.audit.ModelBaseListener.DATA_DELETE;
-import static io.openex.helper.UserHelper.currentUser;
 import static java.time.Instant.now;
 
 @RestController
 public class StreamApi extends RestBehavior {
 
-    public static final String EVENT_TYPE_MESSAGE = "message";
-    public static final String EVENT_TYPE_PING = "ping";
-    public static final String X_ACCEL_BUFFERING = "X-Accel-Buffering";
-    private static final Logger LOGGER = Logger.getLogger(StreamApi.class.getName());
-    private final Map<String, Tuple2<User, FluxSink<Object>>> consumers = new HashMap<>();
+  public static final String EVENT_TYPE_MESSAGE = "message";
+  public static final String EVENT_TYPE_PING = "ping";
+  public static final String X_ACCEL_BUFFERING = "X-Accel-Buffering";
+  private static final Logger LOGGER = Logger.getLogger(StreamApi.class.getName());
+  private final Map<String, Tuple2<User, FluxSink<Object>>> consumers = new HashMap<>();
+  private UserRepository userRepository;
 
-    private void sendStreamEvent(FluxSink<Object> flux, BaseEvent event) {
-        // Serialize the instance now for lazy session decoupling
-        event.setInstanceData(mapper.valueToTree(event.getInstance()));
-        ServerSentEvent<BaseEvent> message = ServerSentEvent.builder(event)
-                .event(EVENT_TYPE_MESSAGE).build();
-        flux.next(message);
-    }
+  @Autowired
+  public void setUserRepository(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
 
-    @EventListener
-    public void listenDatabaseUpdate(BaseEvent event) {
-        consumers.entrySet().stream()
-                .parallel().forEach(entry -> {
-                    Tuple2<User, FluxSink<Object>> tupleFlux = entry.getValue();
-                    User listener = tupleFlux.getT1();
-                    FluxSink<Object> fluxSink = tupleFlux.getT2();
-                    boolean isCurrentObserver = event.isUserObserver(listener);
-                    if (!isCurrentObserver) {
-                        // If user as no visibility, we can send a "delete" userEvent with only the internal id
-                        try {
-                            String propertyId = event.getInstance().getClass().getDeclaredField("id")
-                                    .getAnnotation(JsonProperty.class).value();
-                            ObjectNode deleteNode = mapper.createObjectNode();
-                            deleteNode.set(propertyId, mapper.convertValue(event.getInstance().getId(), JsonNode.class));
-                            BaseEvent userEvent = event.clone();
-                            userEvent.setInstanceData(deleteNode);
-                            userEvent.setType(DATA_DELETE);
-                            sendStreamEvent(fluxSink, userEvent);
-                        } catch (Exception e) {
-                            String simpleName = event.getInstance().getClass().getSimpleName();
-                            LOGGER.log(Level.WARNING, "Class " + simpleName + " cant be streamed", e);
-                        }
-                    } else {
-                        sendStreamEvent(fluxSink, event);
-                    }
-                });
-    }
+  private void sendStreamEvent(FluxSink<Object> flux, BaseEvent event) {
+    // Serialize the instance now for lazy session decoupling
+    event.setInstanceData(mapper.valueToTree(event.getInstance()));
+    ServerSentEvent<BaseEvent> message = ServerSentEvent.builder(event)
+        .event(EVENT_TYPE_MESSAGE).build();
+    flux.next(message);
+  }
 
-    @GetMapping(path = "/api/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<Flux<Object>> streamFlux() {
-        User user = currentUser();
-        String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
-        // Build the database event flux.
-        Flux<Object> dataFlux = Flux.create(fluxSinkConsumer -> consumers.put(sessionId, Tuples.of(user, fluxSinkConsumer)))
-                .doAfterTerminate(() -> consumers.remove(sessionId));
-        // Build the health check flux.
-        Flux<Object> ping = Flux.interval(Duration.ofSeconds(1))
-                .map(l -> ServerSentEvent.builder(now().getEpochSecond()).event(EVENT_TYPE_PING).build());
-        // Merge the 2 flux to create the final one.
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CACHE_CONTROL, "no-cache")
-                .header(X_ACCEL_BUFFERING, "no")
-                .body(Flux.merge(dataFlux, ping));
-    }
+  @EventListener
+  public void listenDatabaseUpdate(BaseEvent event) {
+    consumers.entrySet().stream()
+        .parallel().forEach(entry -> {
+          Tuple2<User, FluxSink<Object>> tupleFlux = entry.getValue();
+          User listener = tupleFlux.getT1();
+          FluxSink<Object> fluxSink = tupleFlux.getT2();
+          boolean isCurrentObserver = event.isUserObserver(listener);
+          if (!isCurrentObserver) {
+            // If user as no visibility, we can send a "delete" userEvent with only the internal id
+            try {
+              String propertyId = event.getInstance().getClass().getDeclaredField("id")
+                  .getAnnotation(JsonProperty.class).value();
+              ObjectNode deleteNode = mapper.createObjectNode();
+              deleteNode.set(propertyId, mapper.convertValue(event.getInstance().getId(), JsonNode.class));
+              BaseEvent userEvent = event.clone();
+              userEvent.setInstanceData(deleteNode);
+              userEvent.setType(DATA_DELETE);
+              sendStreamEvent(fluxSink, userEvent);
+            } catch (Exception e) {
+              String simpleName = event.getInstance().getClass().getSimpleName();
+              LOGGER.log(Level.WARNING, "Class " + simpleName + " cant be streamed", e);
+            }
+          } else {
+            sendStreamEvent(fluxSink, event);
+          }
+        });
+  }
+
+  @GetMapping(path = "/api/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  public ResponseEntity<Flux<Object>> streamFlux() {
+    User user = userRepository.findById(currentUser().getId()).orElseThrow();
+    String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
+    // Build the database event flux.
+    Flux<Object> dataFlux = Flux.create(fluxSinkConsumer -> consumers.put(sessionId, Tuples.of(user, fluxSinkConsumer)))
+        .doAfterTerminate(() -> consumers.remove(sessionId));
+    // Build the health check flux.
+    Flux<Object> ping = Flux.interval(Duration.ofSeconds(1))
+        .map(l -> ServerSentEvent.builder(now().getEpochSecond()).event(EVENT_TYPE_PING).build());
+    // Merge the 2 flux to create the final one.
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CACHE_CONTROL, "no-cache")
+        .header(X_ACCEL_BUFFERING, "no")
+        .body(Flux.merge(dataFlux, ping));
+  }
 }

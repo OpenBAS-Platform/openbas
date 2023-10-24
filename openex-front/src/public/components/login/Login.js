@@ -35,8 +35,8 @@ const styles = () => ({
 
 const Login = (props) => {
   const { classes, parameters, t } = props;
-  const { auth_openid_enable: isOpenId, auth_local_enable: isLocal } = parameters;
-  const { platform_providers: providers } = parameters;
+  const { auth_openid_enable: isOpenId, auth_saml2_enable: isSaml2, auth_local_enable: isLocal } = parameters;
+  const { platform_openid_providers: openidProviders, platform_saml2_providers: saml2Providers } = parameters;
   const [reset, setReset] = useState(false);
   const [dimension, setDimension] = useState({ width: window.innerWidth, height: window.innerHeight });
   const updateWindowDimensions = () => setDimension({ width: window.innerWidth, height: window.innerHeight });
@@ -50,9 +50,9 @@ const Login = (props) => {
   }, []);
   const onSubmit = (data) => props.askToken(data.username, data.password);
   let loginHeight = 260;
-  if (isOpenId && isLocal) {
+  if ((isOpenId || isSaml2) && isLocal) {
     loginHeight = 350;
-  } else if (isOpenId) {
+  } else if ((isOpenId || isSaml2)) {
     loginHeight = 150;
   }
   const marginTop = dimension.height / 2 - loginHeight / 2 - 200;
@@ -67,9 +67,9 @@ const Login = (props) => {
           </div>
         </Paper>
       )}
-      {isLocal && reset && <Reset onCancel={() => setReset(false)}/>}
-      {isOpenId
-        && (providers ?? []).map((provider) => (
+      {isLocal && reset && <Reset onCancel={() => setReset(false)} />}
+      {(isOpenId)
+        && (openidProviders ?? []).map((provider) => (
           <div key={provider.provider_name}>
             <Button
               component="a"
@@ -84,6 +84,22 @@ const Login = (props) => {
             </Button>
           </div>
         ))}
+      {(isSaml2)
+          && (saml2Providers ?? []).map((provider) => (
+              <div key={provider.provider_name}>
+                <Button
+                    component="a"
+                    href={provider.provider_uri}
+                    variant="outlined"
+                    color="secondary"
+                    size="small"
+                    style={{ marginTop: 20 }}
+                    startIcon={<VpnKeyOutlined />}
+                >
+                  <span>{t(provider.provider_login)}</span>
+                </Button>
+              </div>
+          ))}
     </div>
   );
 };
