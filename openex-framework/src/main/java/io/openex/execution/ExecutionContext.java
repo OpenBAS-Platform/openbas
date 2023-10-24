@@ -20,12 +20,13 @@ public class ExecutionContext extends HashMap<String, Object> {
   public static final String LESSONS_URI = "lessons_uri";
 
   private ExecutionContext(User user, Exercise exercise, List<String> audiences) {
-    User protectUser = new User();
+    ProtectUser protectUser = new ProtectUser();
     protectUser.setId(user.getId());
     protectUser.setEmail(user.getEmail());
     protectUser.setFirstname(user.getFirstname());
     protectUser.setLastname(user.getLastname());
     protectUser.setLang(user.getLang());
+    protectUser.setPgpKey(user.getPgpKey());
     protectUser.setPhone(user.getPhone());
     this.put(USER, protectUser);
     this.put(EXERCISE, exercise);
@@ -52,8 +53,8 @@ public class ExecutionContext extends HashMap<String, Object> {
     this(baseUri, user, injection, List.of(audience));
   }
 
-  public User getUser() {
-    return (User) this.get(USER);
+  public ProtectUser getUser() {
+    return (ProtectUser) this.get(USER);
   }
 
   public List<String> getAudiences() {
