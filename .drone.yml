@@ -6,13 +6,10 @@ steps:
   image: alpine/git
   commands:
   - git submodule update --init --recursive
-    
+
 - name: api-tests
   image: maven:3.8.5-openjdk-18
   environment:
-    SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql:5432/openex
-    SPRING_DATASOURCE_USERNAME: openex
-    SPRING_DATASOURCE_PASSWORD: openex
     MINIO_ENDPOINT: minio
     MINIO_PORT: 9000
     MINIO_ACCESS-KEY: minioadmin
@@ -23,7 +20,7 @@ steps:
 - name: frontend-tests
   image: nikolaik/python-nodejs:python3.10-nodejs16-alpine
 
-  commands: 
+  commands:
   - cd openex-front
   - yarn install
   - yarn lint
@@ -64,15 +61,9 @@ steps:
     username: drone
     channel: notifications
   when:
-    status: [success, failure]  
+    status: [success, failure]
 
 services:
-- name: pgsql
-  image: postgres:13-alpine
-  environment:
-    POSTGRES_USER: openex
-    POSTGRES_PASSWORD: openex
-    POSTGRES_DB: openex
 - name: minio
   image: minio/minio:RELEASE.2021-11-09T03-21-45Z
   environment:

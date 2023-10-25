@@ -27,6 +27,7 @@ import TopMenuChallenges from './TopMenuChallenges';
 import TopMenuLessons from './TopMenuLessons';
 import ImportUploader from '../exercises/ImportUploader';
 import TopMenuMedia from './TopMenuMedia';
+import TopMenuProfile from './TopMenuProfile';
 
 const styles = (theme) => ({
   appBar: {
@@ -133,10 +134,15 @@ class TopBar extends Component {
             {location.pathname.includes('/admin/settings') && (
               <TopMenuSettings />
             )}
+            {location.pathname.includes('/admin/profile') && (
+              <TopMenuProfile />
+            )}
           </div>
           <div className={classes.barRight}>
             <Button component={ImportUploader}>{t('Import exercise')}</Button>
-            <IconButton onClick={this.handleOpen.bind(this)} size="small">
+            <IconButton onClick={this.handleOpen.bind(this)}
+                        size="small"
+                        color={location.pathname === '/admin/profile' ? 'secondary' : 'default'}>
               <AccountCircleOutlined />
             </IconButton>
             <Menu
