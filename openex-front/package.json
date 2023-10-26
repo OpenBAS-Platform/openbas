@@ -15,7 +15,7 @@
     "@mui/styles": "5.14.14",
     "@mui/x-date-pickers": "6.16.2",
     "apexcharts": "3.36.3",
-    "axios": "0.27.2",
+    "axios": "1.6.0",
     "ckeditor5-custom-build": "0.0.1",
     "connected-react-router": "6.9.3",
     "date-fns": "2.29.3",
