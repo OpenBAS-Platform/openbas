@@ -176,6 +176,25 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     return new ArrayList<>();
   }
 
+  private List<String> extractRolesFromUser(Saml2AuthenticatedPrincipal user, String registrationId) {
+    String rolesPathConfig = "openex.provider." + registrationId + ".roles_path";
+    List<String> rolesPath = env.getProperty(rolesPathConfig, List.class, new ArrayList<String>());
+    try {
+      return rolesPath.stream().map(path -> "/" + path.replaceAll("\\.", "/"))
+          .flatMap(path -> {
+            try {
+              List<String> roles = user.getAttribute(path);
+              return roles.stream();
+            } catch (NullPointerException e) {
+              return Stream.empty();
+            }
+          }).toList();
+    } catch (Exception e) {
+      LOGGER.log(Level.SEVERE, e.getMessage(), e);
+    }
+    return new ArrayList<>();
+  }
+
   public User userManagement(String emailAttribute, String registrationId, List<String> rolesFromToken,
       String firstName, String lastName) {
     String email = ofNullable(emailAttribute).orElseThrow();
@@ -190,14 +209,18 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
         createUserInput.setEmail(email);
         createUserInput.setFirstname(firstName);
         createUserInput.setLastname(lastName);
-        createUserInput.setAdmin(isAdmin);
+        if (!rolesAdmin.isEmpty()) {
+          createUserInput.setAdmin(isAdmin);
+        }
         return userService.createUser(createUserInput, 0);
       } else {
         // If user exists, update it
         User currentUser = optionalUser.get();
         currentUser.setFirstname(firstName);
         currentUser.setLastname(lastName);
-        currentUser.setAdmin(isAdmin);
+        if (!rolesAdmin.isEmpty()) {
+          currentUser.setAdmin(isAdmin);
+        }
         return userService.updateUser(currentUser);
       }
     }
@@ -224,9 +247,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     String emailAttribute = user.getFirstAttribute(
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress");
     String registrationId = user.getRelyingPartyRegistrationId();
-    List<String> rolesFromToken = List.of(); // TODO extract roles
-//    List<String> rolesFromToken = extractRolesFromToken(accessToken, registrationId);
-    User userLogin = userManagement(emailAttribute, registrationId, rolesFromToken,
+    List<String> rolesFromUser = extractRolesFromUser(user, registrationId);
+    User userLogin = userManagement(emailAttribute, registrationId, rolesFromUser,
         user.getFirstAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"),
         user.getFirstAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname")
     );

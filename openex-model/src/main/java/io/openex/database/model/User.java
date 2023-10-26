@@ -25,14 +25,16 @@ import static java.util.stream.StreamSupport.stream;
 public class User implements Base {
 
   public static final String ADMIN_UUID = "89206193-dbfb-4513-a186-d72c037dda4c";
-    public static final String ADMIN_FIRSTNAME = "admin";
-    public static final String ADMIN_LASTNAME = "openex";public static final String ROLE_ADMIN = "ROLE_ADMIN";
-  public static final String ROLE_USER = "ROLE_USER";public static final String THEME_DEFAULT = "default";
-    public static final String LANG_AUTO = "auto";
+  public static final String ADMIN_FIRSTNAME = "admin";
+  public static final String ADMIN_LASTNAME = "openex";
+  public static final String ROLE_ADMIN = "ROLE_ADMIN";
+  public static final String ROLE_USER = "ROLE_USER";
+  public static final String THEME_DEFAULT = "default";
+  public static final String LANG_AUTO = "auto";
 
   @Getter
-    @Setter
-    @Id
+  @Setter
+  @Id
   @Column(name = "user_id")
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
@@ -40,104 +42,104 @@ public class User implements Base {
   private String id;
 
   @Getter
-    @Setter
-    @Column(name = "user_firstname")
+  @Setter
+  @Column(name = "user_firstname")
   @JsonProperty("user_firstname")
   private String firstname;
 
   @Getter
-    @Setter
-    @Column(name = "user_lastname")
+  @Setter
+  @Column(name = "user_lastname")
   @JsonProperty("user_lastname")
   private String lastname;
 
   @Setter
-    @Column(name = "user_lang")
+  @Column(name = "user_lang")
   @JsonProperty("user_lang")
   private String lang = LANG_AUTO;
 
   @Setter
-    @Column(name = "user_theme")
+  @Column(name = "user_theme")
   @JsonProperty("user_theme")
   private String theme = THEME_DEFAULT;
 
   @Getter
-    @Setter
-    @Column(name = "user_email")
+  @Setter
+  @Column(name = "user_email")
   @JsonProperty("user_email")
   private String email;
 
   @Getter
-    @Setter
-    @Column(name = "user_phone")
+  @Setter
+  @Column(name = "user_phone")
   @JsonProperty("user_phone")
   private String phone;
 
   @Getter
-    @Setter
-    @Column(name = "user_phone2")
+  @Setter
+  @Column(name = "user_phone2")
   @JsonProperty("user_phone2")
   private String phone2;
 
   @Getter
-    @Setter
-    @Column(name = "user_pgp_key")
+  @Setter
+  @Column(name = "user_pgp_key")
   @JsonProperty("user_pgp_key")
   private String pgpKey;
 
   @Getter
-    @Setter
-    @Column(name = "user_status")
+  @Setter
+  @Column(name = "user_status")
   @JsonProperty("user_status")
   private Short status = 0;
 
   @Getter
-    @Setter
-    @Column(name = "user_password")
+  @Setter
+  @Column(name = "user_password")
   @JsonIgnore
   private String password;
 
   @Getter
-    @Setter
-    @Column(name = "user_created_at")
+  @Setter
+  @Column(name = "user_created_at")
   @JsonProperty("user_created_at")
   private Instant createdAt = now();
 
   @Getter
-    @Setter
-    @Column(name = "user_updated_at")
+  @Setter
+  @Column(name = "user_updated_at")
   @JsonProperty("user_updated_at")
   private Instant updatedAt = now();
 
   @Getter
-    @Setter
-    @ManyToOne(fetch = FetchType.LAZY)
+  @Setter
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_organization")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("user_organization")
   private Organization organization;
 
   @Getter
-    @Setter
-    @Column(name = "user_admin")
+  @Setter
+  @Column(name = "user_admin")
   @JsonProperty("user_admin")
   private boolean admin = false;
 
   @Getter
-    @Setter
-    @Column(name = "user_country")
+  @Setter
+  @Column(name = "user_country")
   @JsonProperty("user_country")
   private String country;
 
   @Getter
-    @Setter
-    @Column(name = "user_city")
+  @Setter
+  @Column(name = "user_city")
   @JsonProperty("user_city")
   private String city;
 
   @Getter
-    @Setter
-    @ManyToMany(fetch = FetchType.EAGER)
+  @Setter
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "users_groups",
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "group_id"))
@@ -146,8 +148,8 @@ public class User implements Base {
   private List<Group> groups = new ArrayList<>();
 
   @Getter
-    @Setter
-    @ManyToMany(fetch = FetchType.LAZY)
+  @Setter
+  @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "users_audiences",
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "audience_id"))
@@ -156,8 +158,8 @@ public class User implements Base {
   private List<Audience> audiences = new ArrayList<>();
 
   @Getter
-    @Setter
-    @ManyToMany(fetch = FetchType.LAZY)
+  @Setter
+  @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "users_tags",
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
@@ -166,8 +168,8 @@ public class User implements Base {
   private List<Tag> tags = new ArrayList<>();
 
   @Getter
-    @Setter
-    @ManyToMany(fetch = FetchType.LAZY)
+  @Setter
+  @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "communications_users",
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "communication_id"))
@@ -176,24 +178,25 @@ public class User implements Base {
   private List<Communication> communications = new ArrayList<>();
 
   @Getter
-    @Setter
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+  @Setter
+  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   @JsonIgnore
   private List<Token> tokens = new ArrayList<>();
 
   @Getter
-    @Setter
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+  @Setter
+  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   @JsonIgnore
   private List<ComcheckStatus> comcheckStatuses = new ArrayList<>();
 
   public String getLang() {
-        return Optional.ofNullable(this.lang).orElse(LANG_AUTO);
-    }
+    return Optional.ofNullable(this.lang).orElse(LANG_AUTO);
+  }
 
-    public String getTheme() {
-        return Optional.ofNullable(this.theme).orElse(THEME_DEFAULT);
-    }// region transient
+  public String getTheme() {
+    return Optional.ofNullable(this.theme).orElse(THEME_DEFAULT);
+  }// region transient
+
   private transient List<Inject> injects = new ArrayList<>();
 
   public void resolveInjects(Iterable<Inject> injects) {
@@ -250,19 +253,18 @@ public class User implements Base {
         .map(comcheckStatus -> comcheckStatus.getReceiveDate().get())
         .min(Instant::compareTo);
   }
-@JsonProperty("user_is_external")
-    public boolean isExternal() {
-        return this.getId().equals(ADMIN_UUID);
-    }
-    // endregion
 
+  @JsonProperty("user_is_external")
+  public boolean isExternal() {
+    return this.getId().equals(ADMIN_UUID);
+  }
+  // endregion
 
 
   @JsonIgnore
   public String getName() {
     return getFirstname() + " " + getLastname();
   }
-
 
 
   @JsonProperty("user_is_only_player")
