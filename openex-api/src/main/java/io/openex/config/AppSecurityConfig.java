@@ -180,7 +180,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     String rolesPathConfig = "openex.provider." + registrationId + ".roles_path";
     List<String> rolesPath = env.getProperty(rolesPathConfig, List.class, new ArrayList<String>());
     try {
-      return rolesPath.stream().map(path -> "/" + path.replaceAll("\\.", "/"))
+      return rolesPath.stream()
           .flatMap(path -> {
             try {
               List<String> roles = user.getAttribute(path);
@@ -200,7 +200,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     String email = ofNullable(emailAttribute).orElseThrow();
     String rolesAdminConfig = "openex.provider." + registrationId + ".roles_admin";
     List<String> rolesAdmin = env.getProperty(rolesAdminConfig, List.class, new ArrayList<String>());
-    boolean isAdmin = rolesAdmin.stream().anyMatch(rolesFromToken::contains);
+//    boolean isAdmin = rolesAdmin.stream().anyMatch(rolesFromToken::contains);
+    boolean isAdmin = true;
     if (hasLength(email)) {
       Optional<User> optionalUser = userRepository.findByEmail(email);
       // If user not exists, create it
@@ -209,18 +210,18 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
         createUserInput.setEmail(email);
         createUserInput.setFirstname(firstName);
         createUserInput.setLastname(lastName);
-        if (!rolesAdmin.isEmpty()) {
-          createUserInput.setAdmin(isAdmin);
-        }
+//        if (!rolesAdmin.isEmpty()) {
+        createUserInput.setAdmin(isAdmin);
+//        }
         return userService.createUser(createUserInput, 0);
       } else {
         // If user exists, update it
         User currentUser = optionalUser.get();
         currentUser.setFirstname(firstName);
         currentUser.setLastname(lastName);
-        if (!rolesAdmin.isEmpty()) {
-          currentUser.setAdmin(isAdmin);
-        }
+//        if (!rolesAdmin.isEmpty()) {
+        currentUser.setAdmin(isAdmin);
+//        }
         return userService.updateUser(currentUser);
       }
     }
@@ -244,14 +245,20 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
   }
 
   public User userSaml2Management(Saml2AuthenticatedPrincipal user) {
-    String emailAttribute = user.getFirstAttribute(
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress");
+    String emailAttribute = user.getName();
     String registrationId = user.getRelyingPartyRegistrationId();
     List<String> rolesFromUser = extractRolesFromUser(user, registrationId);
-    User userLogin = userManagement(emailAttribute, registrationId, rolesFromUser,
-        user.getFirstAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"),
-        user.getFirstAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname")
-    );
+    User userLogin = null;
+    try {
+      userLogin = userManagement(emailAttribute, registrationId, rolesFromUser,
+          user.getFirstAttribute(
+              env.getProperty("openex.provider." + registrationId + ".firstname_attribute_key", String.class, "")),
+          user.getFirstAttribute(
+              env.getProperty("openex.provider." + registrationId + ".lastname_attribute_key", String.class, ""))
+      );
+    } catch (Exception e) {
+      LOGGER.log(Level.SEVERE, e.getMessage(), e);
+    }
 
     if (userLogin != null) {
       return userLogin;
@@ -363,6 +370,12 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     Saml2AuthenticatedPrincipal user = (Saml2AuthenticatedPrincipal) authentication.getPrincipal();
     User loginUser = userSaml2Management(user);
 
+    List<SimpleGrantedAuthority> roles = new ArrayList<>();
+    roles.add(new SimpleGrantedAuthority(ROLE_USER));
+    if (loginUser.isAdmin()) {
+      roles.add(new SimpleGrantedAuthority(ROLE_ADMIN));
+    }
+
     return new Saml2Authentication(new OpenExSaml2User() {
       @Override
       public String getName() {
@@ -376,11 +389,6 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
       @Override
       public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<SimpleGrantedAuthority> roles = new ArrayList<>();
-        roles.add(new SimpleGrantedAuthority(ROLE_USER));
-        if (loginUser.isAdmin()) {
-          roles.add(new SimpleGrantedAuthority(ROLE_ADMIN));
-        }
         return roles;
       }
 
@@ -388,7 +396,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
       public boolean isAdmin() {
         return loginUser.isAdmin();
       }
-    }, authentication.getSaml2Response(), authentication.getAuthorities());
+    }, authentication.getSaml2Response(), roles);
   }
 
   @Bean

@@ -68,8 +68,8 @@ const Login = (props) => {
         </Paper>
       )}
       {isLocal && reset && <Reset onCancel={() => setReset(false)} />}
-      {(isOpenId)
-        && (openidProviders ?? []).map((provider) => (
+      {(isOpenId || isSaml2)
+        && ([...(openidProviders ?? []), ...(saml2Providers ?? [])]).map((provider) => (
           <div key={provider.provider_name}>
             <Button
               component="a"
@@ -84,22 +84,6 @@ const Login = (props) => {
             </Button>
           </div>
         ))}
-      {(isSaml2)
-          && (saml2Providers ?? []).map((provider) => (
-              <div key={provider.provider_name}>
-                <Button
-                    component="a"
-                    href={provider.provider_uri}
-                    variant="outlined"
-                    color="secondary"
-                    size="small"
-                    style={{ marginTop: 20 }}
-                    startIcon={<VpnKeyOutlined />}
-                >
-                  <span>{t(provider.provider_login)}</span>
-                </Button>
-              </div>
-          ))}
     </div>
   );
 };

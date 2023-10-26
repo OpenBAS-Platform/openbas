@@ -69,8 +69,12 @@ public class SessionManager {
 
   private Stream<HttpSession> getUserSessions(String userId) {
     return sessions.values().stream().filter(httpSession -> {
-      Optional<OpenexPrincipal> extractPrincipal = extractPrincipal(httpSession);
-      return extractPrincipal.map(user -> user.getId().equals(userId)).orElse(false);
+      try {
+        Optional<OpenexPrincipal> extractPrincipal = extractPrincipal(httpSession);
+        return extractPrincipal.map(user -> user.getId().equals(userId)).orElse(false);
+      } catch (IllegalStateException e) {
+        return false;
+      }
     });
   }
 
