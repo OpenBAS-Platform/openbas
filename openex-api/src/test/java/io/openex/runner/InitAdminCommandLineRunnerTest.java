@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
 
 import java.util.Optional;
 
@@ -19,6 +21,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class InitAdminCommandLineRunnerTest {
+
+  @MockBean
+  private RelyingPartyRegistrationRepository relyingPartyRegistrationRepository;
 
   @Autowired
   private UserRepository userRepository;
