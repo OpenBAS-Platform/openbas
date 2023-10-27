@@ -277,49 +277,6 @@ public class User implements Base {
     return user.isAdmin() || user.getId().equals(getId());
   }
 
-  // region oauth
-//  @Override
-//  @JsonIgnore
-//  public Map<String, Object> getAttributes() {
-//    HashMap<String, Object> attributes = new HashMap<>();
-//    attributes.put("id", getId());
-//    attributes.put("name", getName());
-//    attributes.put("email", getEmail());
-//    return attributes;
-//  }
-//
-//  @Override
-//  @JsonIgnore
-//  public Collection<? extends GrantedAuthority> getAuthorities() {
-//    List<SimpleGrantedAuthority> roles = new ArrayList<>();
-//    roles.add(new SimpleGrantedAuthority(ROLE_USER));
-//    if (isAdmin()) {
-//      roles.add(new SimpleGrantedAuthority(ROLE_ADMIN));
-//    }
-//    return roles;
-//  }
-//  // endregion
-//
-//  // region oidc
-//  @Override
-//  @JsonIgnore
-//  public Map<String, Object> getClaims() {
-//    return getAttributes();
-//  }
-//
-//  @Override
-//  @JsonIgnore
-//  public OidcUserInfo getUserInfo() {
-//    return OidcUserInfo.builder().name(getName()).email(getEmail()).build();
-//  }
-//
-//  @Override
-//  @JsonIgnore
-//  public OidcIdToken getIdToken() {
-//    return null;
-//  }
-//  // endregion
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
