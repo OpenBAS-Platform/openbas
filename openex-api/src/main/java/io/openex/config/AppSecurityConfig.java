@@ -200,8 +200,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     String email = ofNullable(emailAttribute).orElseThrow();
     String rolesAdminConfig = "openex.provider." + registrationId + ".roles_admin";
     List<String> rolesAdmin = env.getProperty(rolesAdminConfig, List.class, new ArrayList<String>());
-//    boolean isAdmin = rolesAdmin.stream().anyMatch(rolesFromToken::contains);
-    boolean isAdmin = true;
+    boolean isAdmin = rolesAdmin.stream().anyMatch(rolesFromToken::contains);
     if (hasLength(email)) {
       Optional<User> optionalUser = userRepository.findByEmail(email);
       // If user not exists, create it
@@ -210,18 +209,18 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
         createUserInput.setEmail(email);
         createUserInput.setFirstname(firstName);
         createUserInput.setLastname(lastName);
-//        if (!rolesAdmin.isEmpty()) {
-        createUserInput.setAdmin(isAdmin);
-//        }
+        if (!rolesAdmin.isEmpty()) {
+          createUserInput.setAdmin(isAdmin);
+        }
         return userService.createUser(createUserInput, 0);
       } else {
         // If user exists, update it
         User currentUser = optionalUser.get();
         currentUser.setFirstname(firstName);
         currentUser.setLastname(lastName);
-//        if (!rolesAdmin.isEmpty()) {
-        currentUser.setAdmin(isAdmin);
-//        }
+        if (!rolesAdmin.isEmpty()) {
+          currentUser.setAdmin(isAdmin);
+        }
         return userService.updateUser(currentUser);
       }
     }
