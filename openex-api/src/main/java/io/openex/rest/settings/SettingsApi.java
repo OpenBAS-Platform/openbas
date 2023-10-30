@@ -84,7 +84,6 @@ public class SettingsApi extends RestBehavior {
   private List<OAuthProvider> buildSaml2Providers() {
     try {
       Saml2RelyingPartyProperties properties = context.getBean(Saml2RelyingPartyProperties.class);
-      System.out.println(properties);
       Map<String, Saml2RelyingPartyProperties.Registration> providers = properties.getRegistration();
       return providers.entrySet().stream()
           .map(entry -> {

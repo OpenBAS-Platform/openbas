@@ -4,7 +4,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
-public abstract class OpenexPrincipal {
+public interface OpenexPrincipal {
 
   public abstract String getId();
 
