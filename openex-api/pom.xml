@@ -16,6 +16,7 @@
     <properties>
         <commons-validator.version>1.7</commons-validator.version>
         <springdoc.version>1.7.0</springdoc.version>
+        <opensaml.version>4.1.1</opensaml.version>
     </properties>
 
     <profiles>
@@ -179,6 +180,25 @@
             <artifactId>commons-codec</artifactId>
             <!--suppress MavenPackageUpdate -->
             <version>1.15</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-saml2-service-provider</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-core</artifactId>
+            <version>${opensaml.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-saml-api</artifactId>
+            <version>${opensaml.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-saml-impl</artifactId>
+            <version>${opensaml.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

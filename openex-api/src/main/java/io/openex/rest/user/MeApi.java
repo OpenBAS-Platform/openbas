@@ -25,7 +25,7 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
-import static io.openex.helper.UserHelper.currentUser;
+import static io.openex.config.SessionHelper.currentUser;
 import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.database.specification.TokenSpecification.fromUser;
 import static io.openex.helper.DatabaseHelper.updateRelation;
@@ -33,98 +33,95 @@ import static io.openex.helper.DatabaseHelper.updateRelation;
 @RestController
 public class MeApi extends RestBehavior {
 
-    @Resource
-    private SessionManager sessionManager;
+  @Resource
+  private SessionManager sessionManager;
 
-    private OrganizationRepository organizationRepository;
-    private TokenRepository tokenRepository;
-    private UserRepository userRepository;
-    private UserService userService;
+  private OrganizationRepository organizationRepository;
+  private TokenRepository tokenRepository;
+  private UserRepository userRepository;
+  private UserService userService;
 
-    @Autowired
-    public void setOrganizationRepository(OrganizationRepository organizationRepository) {
-        this.organizationRepository = organizationRepository;
+  @Autowired
+  public void setOrganizationRepository(OrganizationRepository organizationRepository) {
+    this.organizationRepository = organizationRepository;
+  }
+
+  @Autowired
+  public void setUserService(UserService userService) {
+    this.userService = userService;
+  }
+
+  @Autowired
+  public void setUserRepository(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
+
+  @Autowired
+  public void setTokenRepository(TokenRepository tokenRepository) {
+    this.tokenRepository = tokenRepository;
+  }
+
+  @RolesAllowed(ROLE_USER)
+  @GetMapping("/api/logout")
+  public ResponseEntity<Object> logout() {
+    return ResponseEntity.ok().build();
+  }
+
+  @RolesAllowed(ROLE_USER)
+  @GetMapping("/api/me")
+  public User me() {
+    return userRepository.findById(currentUser().getId()).orElseThrow();
+  }
+
+  @RolesAllowed(ROLE_USER)
+  @PutMapping("/api/me/profile")
+  public User updateProfile(@Valid @RequestBody UpdateProfileInput input) {
+    User user = userRepository.findById(currentUser().getId()).orElseThrow();
+    user.setUpdateAttributes(input);
+    user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
+    User savedUser = userRepository.save(user);
+    sessionManager.refreshUserSessions(savedUser);
+    return savedUser;
+  }
+
+  @RolesAllowed(ROLE_USER)
+  @PutMapping("/api/me/information")
+  public User updateInformation(@Valid @RequestBody UpdateUserInfoInput input) {
+    User user = userRepository.findById(currentUser().getId()).orElseThrow();
+    user.setUpdateAttributes(input);
+    User savedUser = userRepository.save(user);
+    sessionManager.refreshUserSessions(savedUser);
+    return savedUser;
+  }
+
+  @RolesAllowed(ROLE_USER)
+  @PutMapping("/api/me/password")
+  public User updatePassword(@Valid @RequestBody UpdateMePasswordInput input) throws InputValidationException {
+    User user = userRepository.findById(currentUser().getId()).orElseThrow();
+    if (userService.isUserPasswordValid(user, input.getCurrentPassword())) {
+      user.setPassword(userService.encodeUserPassword(input.getPassword()));
+      return userRepository.save(user);
+    } else {
+      throw new InputValidationException("user_current_password", "Bad current password");
     }
+  }
 
-    @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
+  @RolesAllowed(ROLE_USER)
+  @PostMapping("/api/me/token/refresh")
+  @Transactional(rollbackOn = Exception.class)
+  public Token renewToken(@Valid @RequestBody RenewTokenInput input) throws InputValidationException {
+    User user = userRepository.findById(currentUser().getId()).orElseThrow();
+    Token token = tokenRepository.findById(input.getTokenId()).orElseThrow();
+    if (!user.equals(token.getUser())) {
+      throw new AccessDeniedException("You are not allowed to renew this token");
     }
+    token.setValue(UUID.randomUUID().toString());
+    return tokenRepository.save(token);
+  }
 
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setTokenRepository(TokenRepository tokenRepository) {
-        this.tokenRepository = tokenRepository;
-    }
-
-    @RolesAllowed(ROLE_USER)
-    @GetMapping("/api/logout")
-    public ResponseEntity<Object> logout() {
-        return ResponseEntity.ok().build();
-    }
-
-    @RolesAllowed(ROLE_USER)
-    @GetMapping("/api/me")
-    public User me() {
-        return userRepository.findById(currentUser().getId()).orElseThrow();
-    }
-
-    @RolesAllowed(ROLE_USER)
-    @PutMapping("/api/me/profile")
-    public User updateProfile(@Valid @RequestBody UpdateProfileInput input) {
-        User currentUser = currentUser();
-        User user = userRepository.findById(currentUser.getId()).orElseThrow();
-        user.setUpdateAttributes(input);
-        user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
-        User savedUser = userRepository.save(user);
-        sessionManager.refreshUserSessions(savedUser);
-        return savedUser;
-    }
-
-    @RolesAllowed(ROLE_USER)
-    @PutMapping("/api/me/information")
-    public User updateInformation(@Valid @RequestBody UpdateUserInfoInput input) {
-        User currentUser = currentUser();
-        User user = userRepository.findById(currentUser.getId()).orElseThrow();
-        user.setUpdateAttributes(input);
-        User savedUser = userRepository.save(user);
-        sessionManager.refreshUserSessions(savedUser);
-        return savedUser;
-    }
-
-    @RolesAllowed(ROLE_USER)
-    @PutMapping("/api/me/password")
-    public User updatePassword(@Valid @RequestBody UpdateMePasswordInput input) throws InputValidationException {
-        User currentUser = currentUser();
-        User user = userRepository.findById(currentUser.getId()).orElseThrow();
-        if (userService.isUserPasswordValid(user, input.getCurrentPassword())) {
-            user.setPassword(userService.encodeUserPassword(input.getPassword()));
-            return userRepository.save(user);
-        } else {
-            throw new InputValidationException("user_current_password", "Bad current password");
-        }
-    }
-
-    @RolesAllowed(ROLE_USER)
-    @PostMapping("/api/me/token/refresh")
-    @Transactional(rollbackOn = Exception.class)
-    public Token renewToken(@Valid @RequestBody RenewTokenInput input) throws InputValidationException {
-        User currentUser = currentUser();
-        Token token = tokenRepository.findById(input.getTokenId()).orElseThrow();
-        if(!currentUser.equals(token.getUser())) {
-            throw new AccessDeniedException("You are not allowed to renew this token");
-        }
-        token.setValue(UUID.randomUUID().toString());
-        return tokenRepository.save(token);
-    }
-
-    @RolesAllowed(ROLE_USER)
-    @GetMapping("/api/me/tokens")
-    public List<Token> tokens() {
-        return tokenRepository.findAll(fromUser(currentUser().getId()));
-    }
+  @RolesAllowed(ROLE_USER)
+  @GetMapping("/api/me/tokens")
+  public List<Token> tokens() {
+    return tokenRepository.findAll(fromUser(currentUser().getId()));
+  }
 }
