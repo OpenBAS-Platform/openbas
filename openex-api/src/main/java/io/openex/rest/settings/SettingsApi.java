@@ -60,9 +60,9 @@ public class SettingsApi extends RestBehavior {
     this.settingRepository = settingRepository;
   }
 
-  private List<OAuthProvider> buildProviders() {
+  private List<OAuthProvider> buildOpenIdProviders() {
     try {
-      OAuth2ClientProperties properties = context.getBean(OAuth2ClientProperties.class);
+      OAuth2ClientProperties properties = this.context.getBean(OAuth2ClientProperties.class);
       Map<String, OAuth2ClientProperties.Registration> providers = properties.getRegistration();
       return providers.entrySet().stream()
           .map(entry -> {
@@ -83,7 +83,7 @@ public class SettingsApi extends RestBehavior {
 
   private List<OAuthProvider> buildSaml2Providers() {
     try {
-      Saml2RelyingPartyProperties properties = context.getBean(Saml2RelyingPartyProperties.class);
+      Saml2RelyingPartyProperties properties = this.context.getBean(Saml2RelyingPartyProperties.class);
       Map<String, Saml2RelyingPartyProperties.Registration> providers = properties.getRegistration();
       return providers.entrySet().stream()
           .map(entry -> {
@@ -109,7 +109,7 @@ public class SettingsApi extends RestBehavior {
   }
 
   private Map<String, Setting> mapOfSettings() {
-    return fromIterable(settingRepository.findAll()).stream().collect(
+    return fromIterable(this.settingRepository.findAll()).stream().collect(
         Collectors.toMap(Setting::getKey, Function.identity()));
   }
 
@@ -129,7 +129,7 @@ public class SettingsApi extends RestBehavior {
     // Get setting from database
     Map<String, Setting> dbSettings = mapOfSettings();
     // Build anonymous settings
-    settings.add(new PlatformSetting("platform_openid_providers", buildProviders()));
+    settings.add(new PlatformSetting("platform_openid_providers", buildOpenIdProviders()));
     settings.add(new PlatformSetting("platform_saml2_providers", buildSaml2Providers()));
     settings.add(new PlatformSetting("auth_openid_enable", openExConfig.isAuthOpenidEnable()));
     settings.add(new PlatformSetting("auth_saml2_enable", openExConfig.isAuthSaml2Enable()));

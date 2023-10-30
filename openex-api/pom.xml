@@ -16,6 +16,7 @@
     <properties>
         <commons-validator.version>1.7</commons-validator.version>
         <springdoc.version>1.7.0</springdoc.version>
+        <opensaml.version>4.1.1</opensaml.version>
     </properties>
 
     <profiles>
@@ -187,17 +188,17 @@
         <dependency>
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml-core</artifactId>
-            <version>4.1.1</version>
+            <version>${opensaml.version}</version>
         </dependency>
         <dependency>
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml-saml-api</artifactId>
-            <version>4.1.1</version>
+            <version>${opensaml.version}</version>
         </dependency>
         <dependency>
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml-saml-impl</artifactId>
-            <version>4.1.1</version>
+            <version>${opensaml.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

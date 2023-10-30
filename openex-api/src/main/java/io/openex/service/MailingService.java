@@ -58,19 +58,19 @@ public class MailingService {
     emailContent.setSubject(subject);
     emailContent.setBody(body);
     Inject inject = new Inject();
-    inject.setContent(mapper.valueToTree(emailContent));
+    inject.setContent(this.mapper.valueToTree(emailContent));
     inject.setContract(EmailContract.EMAIL_DEFAULT);
-    inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
-    Contract contract = contractService.resolveContract(inject);
+    inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
+    Contract contract = this.contractService.resolveContract(inject);
     if (contract == null) {
       throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
     }
     inject.setType(contract.getConfig().getType());
     exercise.ifPresent(inject::setExercise);
     List<ExecutionContext> userInjectContexts = users.stream().distinct()
-        .map(user -> new ExecutionContext(openExConfig, user, inject, "Direct execution")).toList();
+        .map(user -> new ExecutionContext(this.openExConfig, user, inject, "Direct execution")).toList();
     ExecutableInject injection = new ExecutableInject(false, true, inject, contract, List.of(), userInjectContexts);
-    Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
+    Injector executor = this.context.getBean(contract.getConfig().getType(), Injector.class);
     executor.executeInjection(injection);
   }
 

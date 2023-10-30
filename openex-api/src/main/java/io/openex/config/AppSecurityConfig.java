@@ -92,7 +92,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     this.userRepository = userRepository;
   }
 
-  @Autowired
+  @Autowired(required = false)
   private RelyingPartyRegistrationRepository relyingPartyRegistrationRepository;
 
   @Override
@@ -270,98 +270,13 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
   public OidcUser oidcUserManagement(OAuth2AccessToken accessToken, ClientRegistration clientRegistration,
       OAuth2User user) {
     User loginUser = userOauth2Management(accessToken, clientRegistration, user);
-    return new OpenExOidcUser() {
-      @Override
-      public String getId() {
-        return loginUser.getId();
-      }
-
-      @Override
-      public boolean isAdmin() {
-        return loginUser.isAdmin();
-      }
-
-      @Override
-      public Map<String, Object> getClaims() {
-        return getAttributes();
-      }
-
-      @Override
-      public OidcUserInfo getUserInfo() {
-        return OidcUserInfo.builder().name(getName()).email(getEmail()).build();
-      }
-
-      @Override
-      public OidcIdToken getIdToken() {
-        return null;
-      }
-
-      @Override
-      public Map<String, Object> getAttributes() {
-        HashMap<String, Object> attributes = new HashMap<>();
-        attributes.put("id", loginUser.getId());
-        attributes.put("name", loginUser.getFirstname() + " " + loginUser.getLastname());
-        attributes.put("email", loginUser.getEmail());
-        return attributes;
-      }
-
-      @Override
-      public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<SimpleGrantedAuthority> roles = new ArrayList<>();
-        roles.add(new SimpleGrantedAuthority(ROLE_USER));
-        if (loginUser.isAdmin()) {
-          roles.add(new SimpleGrantedAuthority(ROLE_ADMIN));
-        }
-        return roles;
-      }
-
-      @Override
-      public String getName() {
-        return loginUser.getFirstname() + " " + loginUser.getLastname();
-      }
-
-    };
+    return new OpenExOidcUser(loginUser);
   }
 
   public OAuth2User oAuth2UserManagement(OAuth2AccessToken accessToken, ClientRegistration clientRegistration,
       OAuth2User user) {
     User loginUser = userOauth2Management(accessToken, clientRegistration, user);
-    return new OpenExOAuth2User() {
-      @Override
-      public Map<String, Object> getAttributes() {
-        HashMap<String, Object> attributes = new HashMap<>();
-        attributes.put("id", loginUser.getId());
-        attributes.put("name", loginUser.getFirstname() + " " + loginUser.getLastname());
-        attributes.put("email", loginUser.getEmail());
-        return attributes;
-      }
-
-      @Override
-      public String getId() {
-        return loginUser.getId();
-      }
-
-      @Override
-      public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<SimpleGrantedAuthority> roles = new ArrayList<>();
-        roles.add(new SimpleGrantedAuthority(ROLE_USER));
-        if (loginUser.isAdmin()) {
-          roles.add(new SimpleGrantedAuthority(ROLE_ADMIN));
-        }
-        return roles;
-      }
-
-      @Override
-      public boolean isAdmin() {
-        return false;
-      }
-
-      @Override
-      public String getName() {
-        return loginUser.getFirstname() + " " + loginUser.getLastname();
-      }
-
-    };
+    return new OpenExOAuth2User(loginUser);
   }
 
   public Saml2Authentication saml2UserManagement(
@@ -375,27 +290,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
       roles.add(new SimpleGrantedAuthority(ROLE_ADMIN));
     }
 
-    return new Saml2Authentication(new OpenExSaml2User() {
-      @Override
-      public String getName() {
-        return loginUser.getName();
-      }
-
-      @Override
-      public String getId() {
-        return loginUser.getId();
-      }
-
-      @Override
-      public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
-      }
-
-      @Override
-      public boolean isAdmin() {
-        return loginUser.isAdmin();
-      }
-    }, authentication.getSaml2Response(), roles);
+    return new Saml2Authentication(new OpenExSaml2User(loginUser, roles), authentication.getSaml2Response(), roles);
   }
 
   @Bean

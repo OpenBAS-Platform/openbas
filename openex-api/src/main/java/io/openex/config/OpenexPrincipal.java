@@ -6,9 +6,9 @@ import java.util.Collection;
 
 public interface OpenexPrincipal {
 
-  public abstract String getId();
+  String getId();
 
-  public abstract Collection<? extends GrantedAuthority> getAuthorities();
+  Collection<? extends GrantedAuthority> getAuthorities();
 
-  public abstract boolean isAdmin();
+  boolean isAdmin();
 }
