@@ -17,14 +17,14 @@ jobs:
           command: |
             git submodule sync
             git submodule update --init --recursive --jobs 8
-      - run: 
+      - run:
           working_directory: ~/openex/openex-front
           command: yarn install
       - run:
           working_directory: ~/openex/openex-front
           command: NODE_OPTIONS=--max-old-space-size=8096 yarn build
           no_output_timeout: 30m
-      - run: 
+      - run:
           working_directory: ~/
           command: cp -a openex openex_docker && cp -a openex openex_musl
       - slack/notify:
@@ -39,7 +39,7 @@ jobs:
             - openex
             - openex_docker
             - openex_musl
-          
+
   build_platform:
     working_directory: ~/openex
     docker:
@@ -47,7 +47,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - run: 
+      - run:
           working_directory: ~/openex
           command: mvn install -DskipTests -Pdev
       - slack/notify:
@@ -69,7 +69,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - run: 
+      - run:
           working_directory: ~/openex_musl
           command: mvn install -DskipTests -Pdev
       - slack/notify:
@@ -214,12 +214,12 @@ jobs:
       - ms-teams/report:
           only_on_fail: true
           webhook_url: $MS_TEAMS_WEBHOOK_URL
-                 
+
   notify_rolling:
     docker:
       - image: "cimg/base:stable"
     steps:
-      - run: sudo apt-get update -qq && sudo apt install curl      
+      - run: sudo apt-get update -qq && sudo apt install curl
       - slack/notify:
           event: pass
           template: basic_success_1
@@ -230,13 +230,13 @@ jobs:
     docker:
       - image: "cimg/base:stable"
     steps:
-      - run: sudo apt-get update -qq && sudo apt install curl   
+      - run: sudo apt-get update -qq && sudo apt install curl
       - slack/notify:
           event: pass
           template: basic_success_1
       - ms-teams/report:
           only_on_fail: false
-          webhook_url: $MS_TEAMS_WEBHOOK_URL       
+          webhook_url: $MS_TEAMS_WEBHOOK_URL
 
 workflows:
   openex:
@@ -285,12 +285,12 @@ workflows:
             - build_frontend
           filters:
             tags:
-              only: /v[0-9]+(\.[0-9]+)+(\.[0-9]+)*/
+              only: /[0-9]+(\.[0-9]+)+(\.[0-9]+)*/
             branches:
               ignore: /.*/
       - deploy_testing:
           requires:
-            - docker_build_platform_rolling            
+            - docker_build_platform_rolling
       - notify_rolling:
           requires:
             - deploy_testing
@@ -301,6 +301,6 @@ workflows:
             - docker_build_platform
           filters:
             tags:
-              only: /v[0-9]+(\.[0-9]+)+(\.[0-9]+)*/
+              only: /[0-9]+(\.[0-9]+)+(\.[0-9]+)*/
             branches:
-              ignore: /.*/            
+              ignore: /.*/
