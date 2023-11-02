@@ -4,8 +4,6 @@ import { connect } from 'react-redux';
 import withStyles from '@mui/styles/withStyles';
 import Paper from '@mui/material/Paper';
 import * as R from 'ramda';
-import Button from '@mui/material/Button';
-import { VpnKeyOutlined } from '@mui/icons-material';
 import logo from '../../../resources/images/logo.png';
 import {
   askToken,
@@ -16,6 +14,9 @@ import LoginForm from './LoginForm';
 import inject18n from '../../../components/i18n';
 import { storeHelper } from '../../../actions/Schema';
 import Reset from './Reset';
+import LoginError from "./LoginError";
+import LoginSSOButton from "./LoginSSOButton";
+import Box from "@mui/material/Box";
 
 const styles = () => ({
   container: {
@@ -68,22 +69,16 @@ const Login = (props) => {
         </Paper>
       )}
       {isLocal && reset && <Reset onCancel={() => setReset(false)} />}
-      {(isOpenId || isSaml2)
-        && ([...(openidProviders ?? []), ...(saml2Providers ?? [])]).map((provider) => (
-          <div key={provider.provider_name}>
-            <Button
-              component="a"
-              href={provider.provider_uri}
-              variant="outlined"
-              color="secondary"
-              size="small"
-              style={{ marginTop: 20 }}
-              startIcon={<VpnKeyOutlined />}
-            >
-              <span>{t(provider.provider_login)}</span>
-            </Button>
-          </div>
-        ))}
+      <Box sx={{ marginTop: 2.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2.5 }}>
+        {(isOpenId || isSaml2)
+          && ([...(openidProviders ?? []), ...(saml2Providers ?? [])]).map((provider) => (
+            <LoginSSOButton
+              providerName={provider.provider_login}
+              providerUri={provider.provider_uri}
+            />
+          ))}
+        <LoginError/>
+      </Box>
     </div>
   );
 };

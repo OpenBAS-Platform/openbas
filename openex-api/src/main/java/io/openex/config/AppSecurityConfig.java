@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import io.openex.database.model.User;
 import io.openex.database.repository.UserRepository;
 import io.openex.rest.user.form.user.CreateUserInput;
+import io.openex.security.SsoRefererAuthenticationFailureHandler;
 import io.openex.security.SsoRefererAuthenticationSuccessHandler;
 import io.openex.security.TokenAuthenticationFilter;
 import io.openex.service.UserService;
@@ -18,7 +19,6 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -29,8 +29,6 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
-import org.springframework.security.oauth2.core.oidc.OidcIdToken;
-import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.saml2.core.Saml2Error;
@@ -49,7 +47,10 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -57,6 +58,7 @@ import java.util.stream.Stream;
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.database.model.User.ROLE_USER;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.util.StringUtils.hasLength;
 
 @EnableWebSecurity
@@ -119,7 +121,9 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
         /**/.logoutSuccessUrl("/");
 
     if (openExConfig.isAuthOpenidEnable()) {
-      http.oauth2Login().successHandler(new SsoRefererAuthenticationSuccessHandler());
+      http.oauth2Login()
+          .successHandler(new SsoRefererAuthenticationSuccessHandler())
+          .failureHandler(new SsoRefererAuthenticationFailureHandler());
     }
 
     if (openExConfig.isAuthSaml2Enable()) {
@@ -195,11 +199,15 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     return new ArrayList<>();
   }
 
-  public User userManagement(String emailAttribute, String registrationId, List<String> rolesFromToken,
-      String firstName, String lastName) {
+  public User userManagement(
+      String emailAttribute,
+      String registrationId,
+      List<String> rolesFromToken,
+      String firstName,
+      String lastName) {
     String email = ofNullable(emailAttribute).orElseThrow();
     String rolesAdminConfig = "openex.provider." + registrationId + ".roles_admin";
-    List<String> rolesAdmin = env.getProperty(rolesAdminConfig, List.class, new ArrayList<String>());
+    List<String> rolesAdmin = this.env.getProperty(rolesAdminConfig, List.class, new ArrayList<String>());
     boolean isAdmin = rolesAdmin.stream().anyMatch(rolesFromToken::contains);
     if (hasLength(email)) {
       Optional<User> optionalUser = userRepository.findByEmail(email);
@@ -212,7 +220,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
         if (!rolesAdmin.isEmpty()) {
           createUserInput.setAdmin(isAdmin);
         }
-        return userService.createUser(createUserInput, 0);
+        return this.userService.createUser(createUserInput, 0);
       } else {
         // If user exists, update it
         User currentUser = optionalUser.get();
@@ -221,17 +229,23 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
         if (!rolesAdmin.isEmpty()) {
           currentUser.setAdmin(isAdmin);
         }
-        return userService.updateUser(currentUser);
+        return this.userService.updateUser(currentUser);
       }
     }
     return null;
   }
 
-  public User userOauth2Management(OAuth2AccessToken accessToken, ClientRegistration clientRegistration,
+  public User userOauth2Management(
+      OAuth2AccessToken accessToken,
+      ClientRegistration clientRegistration,
       OAuth2User user) {
     String emailAttribute = user.getAttribute("email");
     String registrationId = clientRegistration.getRegistrationId();
     List<String> rolesFromToken = extractRolesFromToken(accessToken, registrationId);
+    if (isBlank(emailAttribute)) {
+      OAuth2Error authError = new OAuth2Error("invalid_configuration", "You need a public email in your github account", "");
+      throw new OAuth2AuthenticationException(authError);
+    }
     User userLogin = userManagement(emailAttribute, registrationId, rolesFromToken, user.getAttribute("given_name"),
         user.getAttribute("family_name"));
 
