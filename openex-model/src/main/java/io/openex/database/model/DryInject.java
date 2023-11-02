@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -19,98 +21,74 @@ import static java.util.Optional.of;
 @EntityListeners(ModelBaseListener.class)
 public class DryInject implements Base, Injection {
 
-    public static Comparator<DryInject> executionComparator = Comparator.comparing(o -> o.getDate().orElseThrow());
+  public static Comparator<DryInject> executionComparator = Comparator.comparing(o -> o.getDate().orElseThrow());
 
-    @Id
-    @Column(name = "dryinject_id")
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonProperty("dryinject_id")
-    private String id;
+  @Getter
+  @Setter
+  @Id
+  @Column(name = "dryinject_id")
+  @GeneratedValue(generator = "UUID")
+  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+  @JsonProperty("dryinject_id")
+  private String id;
 
-    @Column(name = "dryinject_date")
-    @JsonProperty("dryinject_date")
-    private Instant date;
+  @Setter
+  @Column(name = "dryinject_date")
+  @JsonProperty("dryinject_date")
+  private Instant date;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dryinject_dryrun")
-    @JsonSerialize(using = MonoIdDeserializer.class)
-    @JsonProperty("dryinject_dryrun")
-    private Dryrun run;
+  @Getter
+  @Setter
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "dryinject_dryrun")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("dryinject_dryrun")
+  private Dryrun run;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "dryinject_inject")
-    @JsonProperty("dryinject_inject")
-    private Inject inject;
+  @Getter
+  @Setter
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "dryinject_inject")
+  @JsonProperty("dryinject_inject")
+  private Inject inject;
 
-    // CascadeType.ALL is required here because dry inject status are embedded
-    @OneToOne(mappedBy = "dryInject", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonProperty("dryinject_status")
-    private DryInjectStatus status;
+  // CascadeType.ALL is required here because dry inject status are embedded
+  @Getter
+  @Setter
+  @OneToOne(mappedBy = "dryInject", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonProperty("dryinject_status")
+  private DryInjectStatus status;
 
-    @Override
-    @JsonSerialize(using = MonoIdDeserializer.class)
-    @JsonProperty("dryinject_exercise")
-    public Exercise getExercise() {
-        return getInject().getExercise();
-    }
+  @Override
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("dryinject_exercise")
+  public Exercise getExercise() {
+    return getInject().getExercise();
+  }
 
-    @Override
-    public Optional<Instant> getDate() {
-        return of(date);
-    }
+  @Override
+  public Optional<Instant> getDate() {
+    return of(date);
+  }
 
-    public void setDate(Instant date) {
-        this.date = date;
-    }
+  public boolean isUserHasAccess(User user) {
+    return getExercise().isUserHasAccess(user);
+  }
 
-    public String getId() {
-        return id;
-    }
+  @Override
+  public boolean equals(Object o) {
+      if (this == o) {
+          return true;
+      }
+      if (o == null || !Base.class.isAssignableFrom(o.getClass())) {
+          return false;
+      }
+    Base base = (Base) o;
+    return id.equals(base.getId());
+  }
 
-    @Override
-    public boolean isUserHasAccess(User user) {
-        return getExercise().isUserHasAccess(user);
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Dryrun getRun() {
-        return run;
-    }
-
-    public void setRun(Dryrun run) {
-        this.run = run;
-    }
-
-    public Inject getInject() {
-        return inject;
-    }
-
-    public void setInject(Inject inject) {
-        this.inject = inject;
-    }
-
-    public DryInjectStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(DryInjectStatus status) {
-        this.status = status;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
-        Base base = (Base) o;
-        return id.equals(base.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 }

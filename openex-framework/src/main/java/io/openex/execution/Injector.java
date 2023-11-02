@@ -90,12 +90,12 @@ public abstract class Injector {
             List<Expectation> expectations = process(execution, executableInject, contract);
             // Create the expectations
             List<Audience> audiences = executableInject.getAudiences();
-            if (isScheduledInject && audiences.size() > 0 && expectations.size() > 0) {
+            if (isScheduledInject && !audiences.isEmpty() && !expectations.isEmpty()) {
                 List<InjectExpectation> executions = audiences.stream()
                         .flatMap(audience -> expectations.stream()
                                 .map(expectation -> expectationConverter(audience, executableInject, expectation)))
                         .toList();
-                injectExpectationRepository.saveAll(executions);
+                this.injectExpectationRepository.saveAll(executions);
             }
         } catch (Exception e) {
             execution.addTrace(traceError(getClass().getSimpleName(), e.getMessage(), e));
