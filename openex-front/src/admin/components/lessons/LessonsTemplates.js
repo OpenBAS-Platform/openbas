@@ -98,6 +98,11 @@ const LessonsTemplates = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
+  const { userAdmin } = useHelper((helper) => {
+    return {
+      userAdmin: helper.getMe()?.user_admin ?? false,
+    };
+  });
   // Filter and sort hook
   const searchColumns = ['name', 'description'];
   const filtering = useSearchAnFilter(
@@ -196,7 +201,9 @@ const LessonsTemplates = () => {
           );
         })}
       </List>
-      <CreateLessonsTemplate />
+      {
+        userAdmin && <CreateLessonsTemplate />
+      }
     </div>
   );
 };
