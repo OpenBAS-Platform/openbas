@@ -107,6 +107,9 @@ const styles = (theme) => ({
   container: {
     padding: 20,
   },
+  errorColor: {
+    color: '#f44336',
+  },
 });
 
 const inlineStylesHeaders = {
@@ -733,7 +736,7 @@ class InjectDefinition extends Component {
               return (
                 <div key={field.key}>
                   <FieldArray name={field.key}>
-                    {({ fields }) => (
+                    {({ fields, meta }) => (
                       <div>
                         <div style={{ marginTop: 20 }}>
                           <InputLabel
@@ -759,6 +762,7 @@ class InjectDefinition extends Component {
                                 <ControlPointOutlined />
                               </IconButton>
                             )}
+                            {meta.error && meta.touched && <div className={classes.errorColor}>{meta.error}</div>}
                           </InputLabel>
                         </div>
                         <List style={{ marginTop: -20 }}>
