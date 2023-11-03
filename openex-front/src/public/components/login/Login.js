@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import withStyles from '@mui/styles/withStyles';
 import Paper from '@mui/material/Paper';
 import * as R from 'ramda';
+import Box from '@mui/material/Box';
 import logo from '../../../resources/images/logo.png';
 import {
   askToken,
@@ -14,9 +15,8 @@ import LoginForm from './LoginForm';
 import inject18n from '../../../components/i18n';
 import { storeHelper } from '../../../actions/Schema';
 import Reset from './Reset';
-import LoginError from "./LoginError";
-import LoginSSOButton from "./LoginSSOButton";
-import Box from "@mui/material/Box";
+import LoginError from './LoginError';
+import LoginSSOButton from './LoginSSOButton';
 
 const styles = () => ({
   container: {

@@ -26,6 +26,6 @@ const LoginSSOButton: FunctionComponent<LoginSSOButtonProperties> = ({
       <span>{t(providerName)}</span>
     </Button>
   );
-}
+};
 
 export default LoginSSOButton;

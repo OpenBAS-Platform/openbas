@@ -5,9 +5,9 @@ import { Theme as MuiTheme } from '@mui/material/styles/createTheme';
 
 const useStyles = makeStyles<MuiTheme>((theme) => ({
   errorColor: {
-    color: theme.palette.error.main
+    color: theme.palette.error.main,
   },
-}))
+}));
 
 const LoginError: FunctionComponent = () => {
   const classes = useStyles();
