@@ -73,6 +73,7 @@ const Login = (props) => {
         {(isOpenId || isSaml2)
           && ([...(openidProviders ?? []), ...(saml2Providers ?? [])]).map((provider) => (
             <LoginSSOButton
+              key={provider.provider_name}
               providerName={provider.provider_login}
               providerUri={provider.provider_uri}
             />
