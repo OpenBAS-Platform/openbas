@@ -6,7 +6,7 @@ const buildPath = "build";
 esbuild
   .build({
     logLevel: "info",
-    entryPoints: ["src/index.js"],
+    entryPoints: ["src/index.tsx"],
     bundle: true,
     loader: {
       ".js": "jsx",

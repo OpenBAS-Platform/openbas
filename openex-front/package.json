@@ -2,7 +2,7 @@
   "name": "openex-frontend",
   "version": "3.3.0",
   "private": true,
-  "main": "src/index.js",
+  "main": "src/index.tsx",
   "license": "Apache-2.0",
   "dependencies": {
     "@ckeditor/ckeditor5-react": "5.0.2",
