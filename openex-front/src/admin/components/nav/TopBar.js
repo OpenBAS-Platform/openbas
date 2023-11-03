@@ -89,6 +89,10 @@ class TopBar extends Component {
   handleLogout() {
     this.handleClose();
     this.props.logout();
+    if (process.env.NODE_ENV === 'development') {
+      // api logout success handler redirect to / or in dev it is localhost:8080 and not localhost:3000
+      window.location = '/';
+    }
   }
 
   render() {
