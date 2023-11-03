@@ -84,11 +84,7 @@ class ComcheckForm extends Component {
               label={t('End date')}
               autoOk={true}
               minDateTime={new Date()}
-              textFieldProps={{
-                variant: 'standard',
-                fullWidth: true,
-                style: { marginTop: 20 },
-              }}
+              slotProps={{ textField: { variant: 'standard', fullWidth: true, style: { marginTop: 20 } } }}
             />
             <TextField
               variant="standard"
