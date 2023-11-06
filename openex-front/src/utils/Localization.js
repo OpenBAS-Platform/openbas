@@ -14,7 +14,7 @@ const i18n = {
       'Back to login': "Retour à l'identification",
       'Sign in': "S'identifier",
       'Login with github': "S'identifier avec github",
-      "You probably need a public email in your github account": "Vous avez probablement besoin d'une adresse e-mail publique dans votre compte github",
+      'You probably need a public email in your github account': "Vous avez probablement besoin d'une adresse e-mail publique dans votre compte github",
       'Login with microsoft': "S'identifier avec microsoft",
       Continue: 'Continuer',
       Dashboard: 'Tableau de bord',
