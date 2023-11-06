@@ -243,7 +243,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     String registrationId = clientRegistration.getRegistrationId();
     List<String> rolesFromToken = extractRolesFromToken(accessToken, registrationId);
     if (isBlank(emailAttribute)) {
-      OAuth2Error authError = new OAuth2Error("invalid_configuration", "You need a public email in your github account", "");
+      OAuth2Error authError = new OAuth2Error("invalid_configuration", "You probably need a public email in your " + 
+registrationId + " account", "");
       throw new OAuth2AuthenticationException(authError);
     }
     User userLogin = userManagement(emailAttribute, registrationId, rolesFromToken, user.getAttribute("given_name"),
