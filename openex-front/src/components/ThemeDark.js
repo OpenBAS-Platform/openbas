@@ -12,6 +12,7 @@ export default (
     mode: 'dark',
     primary: { main: primary || '#00b1ff' },
     secondary: { main: secondary || '#ec407a' },
+    error: { main: '#f44336' },
     background: {
       default: background || '#0a1929',
       paper: paper || '#001e3c',

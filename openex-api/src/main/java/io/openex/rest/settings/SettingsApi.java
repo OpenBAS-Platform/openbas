@@ -61,6 +61,9 @@ public class SettingsApi extends RestBehavior {
   }
 
   private List<OAuthProvider> buildOpenIdProviders() {
+    if (!this.openExConfig.isAuthOpenidEnable()) {
+      return new ArrayList<>();
+    }
     try {
       OAuth2ClientProperties properties = this.context.getBean(OAuth2ClientProperties.class);
       Map<String, OAuth2ClientProperties.Registration> providers = properties.getRegistration();
@@ -82,6 +85,9 @@ public class SettingsApi extends RestBehavior {
   }
 
   private List<OAuthProvider> buildSaml2Providers() {
+    if (!this.openExConfig.isAuthSaml2Enable()) {
+      return new ArrayList<>();
+    }
     try {
       Saml2RelyingPartyProperties properties = this.context.getBean(Saml2RelyingPartyProperties.class);
       Map<String, Saml2RelyingPartyProperties.Registration> providers = properties.getRegistration();

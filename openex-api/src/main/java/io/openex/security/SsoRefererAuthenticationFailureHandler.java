@@ -1,7 +1,7 @@
 package io.openex.security;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
@@ -14,28 +14,25 @@ import java.util.List;
 
 import static org.springframework.http.HttpHeaders.REFERER;
 
-public class SsoRefererAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class SsoRefererAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
   private RequestCache requestCache = new HttpSessionRequestCache();
 
-  public SsoRefererAuthenticationSuccessHandler() {
-    // Default constructor
-  }
-
   @Override
-  public void onAuthenticationSuccess(
+  public void onAuthenticationFailure(
       HttpServletRequest request,
       HttpServletResponse response,
-      Authentication authentication) throws ServletException, IOException {
+      AuthenticationException exception) throws ServletException, IOException {
+    this.saveException(request, exception);
     SavedRequest savedRequest = this.requestCache.getRequest(request, response);
     if (savedRequest != null) {
       List<String> refererValues = savedRequest.getHeaderValues(REFERER);
       if (refererValues.size() == 1) {
-        this.getRedirectStrategy().sendRedirect(request, response, refererValues.get(0));
+        this.getRedirectStrategy().sendRedirect(request, response, refererValues.get(0)+"?error="+exception.getMessage());
         return;
       }
     }
-    super.onAuthenticationSuccess(request, response, authentication);
+    super.onAuthenticationFailure(request, response, exception);
   }
 
   public void setRequestCache(RequestCache requestCache) {
