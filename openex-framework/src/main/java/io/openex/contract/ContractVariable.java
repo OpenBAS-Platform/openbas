@@ -3,6 +3,7 @@ package io.openex.contract;
 import lombok.Getter;
 
 import java.util.List;
+import io.openex.database.model.Variable.VariableType;
 
 @Getter
 public class ContractVariable {
