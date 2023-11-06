@@ -108,7 +108,7 @@ const styles = (theme) => ({
     padding: 20,
   },
   errorColor: {
-    color: '#f44336',
+    color: theme.palette.error.main,
   },
 });
 
