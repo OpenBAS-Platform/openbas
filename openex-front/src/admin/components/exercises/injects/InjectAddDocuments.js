@@ -118,16 +118,16 @@ class InjectAddDocuments extends Component {
   }
 
   render() {
-    const { classes, t, documents, injectDocumentsIds, exerciseId, exercise } = this.props;
+    const { classes, t, documents, injectDocumentsIds, exerciseId, exercise, userAdmin } = this.props;
     const { keyword, documentsIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.document_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
       || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1;
+      !== -1;
     const filteredDocuments = R.pipe(
       R.filter(
         (n) => tags.length === 0
@@ -221,11 +221,13 @@ class InjectAddDocuments extends Component {
                       </ListItem>
                     );
                   })}
-                  <CreateDocument
-                    exerciseId={exerciseId}
-                    inline={true}
-                    onCreate={this.onCreate.bind(this)}
-                  />
+                  {
+                    userAdmin && <CreateDocument
+                      exerciseId={exerciseId}
+                      inline={true}
+                      onCreate={this.onCreate.bind(this)}
+                    />
+                  }
                 </List>
               </Grid>
               <Grid item={true} xs={4}>
@@ -268,6 +270,7 @@ InjectAddDocuments.propTypes = {
   injectDocumentsIds: PropTypes.array,
   handleAddDocuments: PropTypes.func,
   hasAttachments: PropTypes.bool,
+  userAdmin: PropTypes.bool,
 };
 
 const select = (state, ownProps) => {
@@ -275,7 +278,8 @@ const select = (state, ownProps) => {
   const { exerciseId } = ownProps;
   const exercise = helper.getExercise(exerciseId);
   const documents = helper.getDocumentsMap();
-  return { exercise, documents };
+  const userAdmin = helper.getMe()?.user_admin;
+  return { exercise, documents, userAdmin };
 };
 
 export default R.compose(
