@@ -18,6 +18,8 @@ class DocumentForm extends Component {
       requiredFields = ['document_exercises'];
     } else if (!hideExercises && !editing) {
       requiredFields = ['document_file', 'document_exercises'];
+    } else if (hideExercises && !editing) {
+      requiredFields = ['document_file'];
     }
     requiredFields.forEach((field) => {
       const data = values[field];
