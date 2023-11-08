@@ -21,13 +21,15 @@ const initialState = {
 export const history = createBrowserHistory();
 
 const initStore = () => {
-  if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
+  // eslint-disable-next-line no-underscore-dangle
+  if (process.env.NODE_ENV === 'development' && window.__REDUX_DEVTOOLS_EXTENSION__) {
     return createStore(
       createRootReducer(history),
       initialState,
       compose(
         applyMiddleware(routerMiddleware(history), thunk),
-        window.devToolsExtension && window.devToolsExtension(),
+        // eslint-disable-next-line no-underscore-dangle
+        window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
       ),
     );
   }
