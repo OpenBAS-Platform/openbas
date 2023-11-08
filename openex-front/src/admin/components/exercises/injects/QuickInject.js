@@ -627,13 +627,13 @@ class QuickInject extends Component {
         }
       });
     const { allAudiences, audiencesIds, documents } = this.state;
-    const inject_depends_duration = secondsFromToNow(
+    const injectDependsDuration = secondsFromToNow(
       this.props.exercise.exercise_start_date,
     );
     const values = {
       inject_title: finalData.subject,
       inject_contract: EMAIL_CONTRACT,
-      inject_depends_duration: inject_depends_duration > 0 ? inject_depends_duration : 0,
+      inject_depends_duration: injectDependsDuration > 0 ? injectDependsDuration : 0,
       inject_content: finalData,
       inject_all_audiences: allAudiences,
       inject_audiences: audiencesIds,

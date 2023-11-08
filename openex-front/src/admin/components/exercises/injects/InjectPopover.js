@@ -225,14 +225,14 @@ class InjectPopover extends Component {
   }
 
   submitTrigger() {
-    const inject_depends_duration = secondsFromToNow(
+    const injectDependsDuration = secondsFromToNow(
       this.props.exercise.exercise_start_date,
     );
     this.props.updateInjectTrigger(
       this.props.exerciseId,
       this.props.inject.inject_id,
       {
-        inject_depends_duration: inject_depends_duration > 0 ? inject_depends_duration : 0,
+        inject_depends_duration: injectDependsDuration > 0 ? injectDependsDuration : 0,
       },
     );
     this.handleCloseTrigger();
