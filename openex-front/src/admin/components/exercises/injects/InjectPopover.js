@@ -19,21 +19,11 @@ import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import withStyles from '@mui/styles/withStyles';
-import {
-  updateInject,
-  deleteInject,
-  tryInject,
-  updateInjectActivation,
-  injectDone,
-  updateInjectTrigger,
-} from '../../../../actions/Inject';
+import { deleteInject, injectDone, tryInject, updateInject, updateInjectActivation, updateInjectTrigger } from '../../../../actions/Inject';
 import InjectForm from './InjectForm';
 import inject18n from '../../../../components/i18n';
 import { splitDuration } from '../../../../utils/Time';
-import {
-  isExerciseReadOnly,
-  secondsFromToNow,
-} from '../../../../utils/Exercise';
+import { isExerciseReadOnly, secondsFromToNow } from '../../../../utils/Exercise';
 import { tagsConverter } from '../../../../actions/Schema';
 
 const Transition = React.forwardRef((props, ref) => (
@@ -235,13 +225,14 @@ class InjectPopover extends Component {
   }
 
   submitTrigger() {
+    const injectDependsDuration = secondsFromToNow(
+      this.props.exercise.exercise_start_date,
+    );
     this.props.updateInjectTrigger(
       this.props.exerciseId,
       this.props.inject.inject_id,
       {
-        inject_depends_duration: secondsFromToNow(
-          this.props.exercise.exercise_start_date,
-        ),
+        inject_depends_duration: injectDependsDuration > 0 ? injectDependsDuration : 0,
       },
     );
     this.handleCloseTrigger();

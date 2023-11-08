@@ -10,17 +10,7 @@ import ListItemText from '@mui/material/ListItemText';
 import { Form } from 'react-final-form';
 import InputLabel from '@mui/material/InputLabel';
 import { connect } from 'react-redux';
-import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-  AttachmentOutlined,
-  CastForEducationOutlined,
-  CloseRounded,
-  ControlPointOutlined,
-  DeleteOutlined,
-  EmojiEventsOutlined,
-  HelpOutlineOutlined,
-} from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, CastForEducationOutlined, CloseRounded, ControlPointOutlined, DeleteOutlined, EmojiEventsOutlined, HelpOutlineOutlined } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
@@ -38,17 +28,14 @@ import { DialogActions } from '@mui/material';
 import inject18n from '../../../../components/i18n';
 import { addInject } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
-import { fetchMedias, fetchExerciseArticles } from '../../../../actions/Media';
+import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
 import AudiencePopover from '../audiences/AudiencePopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddAudiences from './InjectAddAudiences';
-import {
-  isExerciseReadOnly,
-  secondsFromToNow,
-} from '../../../../utils/Exercise';
+import { isExerciseReadOnly, secondsFromToNow } from '../../../../utils/Exercise';
 import { TextField } from '../../../../components/TextField';
 import { SwitchField } from '../../../../components/SwitchField';
 import { EnrichedTextField } from '../../../../components/EnrichedTextField';
@@ -572,7 +559,7 @@ class QuickInject extends Component {
   }
 
   onSubmit(data) {
-    const { injectTypes, exercise } = this.props;
+    const { injectTypes } = this.props;
     const injectType = R.head(
       injectTypes.filter((i) => i.contract_id === EMAIL_CONTRACT),
     );
@@ -640,10 +627,13 @@ class QuickInject extends Component {
         }
       });
     const { allAudiences, audiencesIds, documents } = this.state;
+    const injectDependsDuration = secondsFromToNow(
+      this.props.exercise.exercise_start_date,
+    );
     const values = {
       inject_title: finalData.subject,
       inject_contract: EMAIL_CONTRACT,
-      inject_depends_duration: secondsFromToNow(exercise.exercise_start_date),
+      inject_depends_duration: injectDependsDuration > 0 ? injectDependsDuration : 0,
       inject_content: finalData,
       inject_all_audiences: allAudiences,
       inject_audiences: audiencesIds,

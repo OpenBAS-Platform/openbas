@@ -3,6 +3,8 @@ package io.openex.rest.inject.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openex.database.model.Inject;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,8 @@ public class InjectInput {
     @JsonProperty("inject_depends_from_another")
     private String dependsOn;
 
+    @Getter
+    @Setter
     @JsonProperty("inject_depends_duration")
     private Long dependsDuration;
 
@@ -111,14 +115,6 @@ public class InjectInput {
 
     public void setDependsOn(String dependsOn) {
         this.dependsOn = dependsOn;
-    }
-
-    public Long getDependsDuration() {
-        return dependsDuration;
-    }
-
-    public void setDependsDuration(Long dependsDuration) {
-        this.dependsDuration = dependsDuration;
     }
 
     public String getCountry() {

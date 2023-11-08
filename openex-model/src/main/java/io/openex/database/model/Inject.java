@@ -9,9 +9,13 @@ import io.openex.database.converter.ContentConverter;
 import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
 import io.openex.helper.MultiModelDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
 
@@ -97,8 +101,12 @@ public class Inject implements Base, Injection {
     @JsonProperty("inject_depends_on")
     private Inject dependsOn;
 
+    @Getter
+    @Setter
     @Column(name = "inject_depends_duration")
     @JsonProperty("inject_depends_duration")
+    @NotNull
+    @Min(value = 0L, message = "The value must be positive")
     private Long dependsDuration;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -364,14 +372,6 @@ public class Inject implements Base, Injection {
 
     public void setDependsOn(Inject dependsOn) {
         this.dependsOn = dependsOn;
-    }
-
-    public Long getDependsDuration() {
-        return dependsDuration;
-    }
-
-    public void setDependsDuration(Long dependsDuration) {
-        this.dependsDuration = dependsDuration;
     }
 
     public List<Tag> getTags() {
