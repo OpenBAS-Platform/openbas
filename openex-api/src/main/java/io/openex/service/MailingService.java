@@ -1,7 +1,6 @@
 package io.openex.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openex.config.OpenExConfig;
 import io.openex.contract.Contract;
 import io.openex.database.model.Exercise;
 import io.openex.database.model.Inject;
@@ -17,6 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,14 +29,13 @@ public class MailingService {
   @Resource
   protected ObjectMapper mapper;
 
-  @Resource
-  private OpenExConfig openExConfig;
-
   private ContractService contractService;
 
   private ApplicationContext context;
 
   private UserRepository userRepository;
+
+  private ExecutionContextService executionContextService;
 
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
@@ -51,6 +50,11 @@ public class MailingService {
   @Autowired
   public void setContractService(ContractService contractService) {
     this.contractService = contractService;
+  }
+
+  @Autowired
+  public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
+    this.executionContextService = executionContextService;
   }
 
   public void sendEmail(String subject, String body, List<User> users, Optional<Exercise> exercise) {
@@ -68,7 +72,7 @@ public class MailingService {
     inject.setType(contract.getConfig().getType());
     exercise.ifPresent(inject::setExercise);
     List<ExecutionContext> userInjectContexts = users.stream().distinct()
-        .map(user -> new ExecutionContext(this.openExConfig, user, inject, "Direct execution")).toList();
+        .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
     ExecutableInject injection = new ExecutableInject(false, true, inject, contract, List.of(), userInjectContexts);
     Injector executor = this.context.getBean(contract.getConfig().getType(), Injector.class);
     executor.executeInjection(injection);

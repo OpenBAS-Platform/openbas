@@ -1,6 +1,5 @@
 package io.openex.helper;
 
-import io.openex.config.OpenExConfig;
 import io.openex.contract.Contract;
 import io.openex.database.model.*;
 import io.openex.database.repository.AudienceRepository;
@@ -11,13 +10,14 @@ import io.openex.database.specification.InjectSpecification;
 import io.openex.execution.ExecutableInject;
 import io.openex.execution.ExecutionContext;
 import io.openex.service.ContractService;
+import io.openex.service.ExecutionContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
-import javax.annotation.Resource;
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,12 +32,11 @@ import static java.util.stream.Stream.concat;
 @Component
 public class InjectHelper {
 
-  @Resource
-  private OpenExConfig openExConfig;
   private InjectRepository injectRepository;
   private DryInjectRepository dryInjectRepository;
   private AudienceRepository audienceRepository;
   private ContractService contractService;
+  private ExecutionContextService executionContextService;
 
   @Autowired
   public void setContractService(ContractService contractService) {
@@ -57,6 +56,11 @@ public class InjectHelper {
   @Autowired
   public void setDryInjectRepository(DryInjectRepository dryInjectRepository) {
     this.dryInjectRepository = dryInjectRepository;
+  }
+
+  @Autowired
+  public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
+    this.executionContextService = executionContextService;
   }
 
   private List<Audience> getInjectAudiences(Inject inject) {
@@ -81,7 +85,7 @@ public class InjectHelper {
   private List<ExecutionContext> usersFromInjection(Injection injection) {
     return getUsersFromInjection(injection)
         .collect(groupingBy(Tuple2::getT1)).entrySet().stream()
-        .map(entry -> new ExecutionContext(openExConfig, entry.getKey(), injection,
+        .map(entry -> this.executionContextService.executionContext(entry.getKey(), injection,
             entry.getValue().stream().flatMap(ua -> Stream.of(ua.getT2())).toList()))
         .toList();
   }

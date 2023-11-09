@@ -36,7 +36,7 @@ public class VariableServiceTest {
     Exercise exerciseCreated = this.exerciseRepository.save(exercise);
     EXERCISE_ID = exerciseCreated.getId();
     Variable variable = new Variable();
-    String variableKey = "Key";
+    String variableKey = "key";
     variable.setKey(variableKey);
     variable.setValue(" a value ");
     variable.setType(VariableType.String);
@@ -70,7 +70,7 @@ public class VariableServiceTest {
   void updateVariableTest() {
     // -- PREPARE --
     Variable variable = this.variableService.variable(VARIABLE_ID);
-    String variableName = "keyUpdated";
+    String variableName = "key_updated";
     variable.setKey(variableName);
 
     // -- EXECUTE --

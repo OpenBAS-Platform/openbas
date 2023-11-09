@@ -40,7 +40,7 @@ public class Variable implements Base {
   @Column(name = "variable_key")
   @JsonProperty("variable_key")
   @NotBlank
-  @Pattern(regexp="^[a-zA-Z]+$")
+  @Pattern(regexp="^[a-z_]+$")
   private String key;
 
   @Column(name = "variable_value")

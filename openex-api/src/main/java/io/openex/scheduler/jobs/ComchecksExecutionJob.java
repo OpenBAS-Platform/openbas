@@ -13,6 +13,7 @@ import io.openex.execution.ExecutionContext;
 import io.openex.injects.email.EmailContract;
 import io.openex.injects.email.EmailExecutor;
 import io.openex.service.ContractService;
+import io.openex.service.ExecutionContextService;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +48,7 @@ public class ComchecksExecutionJob implements Job {
     private ComcheckRepository comcheckRepository;
     private ComcheckStatusRepository comcheckStatusRepository;
     private ContractService contractService;
+    private ExecutionContextService executionContextService;
 
     @Resource
     private ObjectMapper mapper;
@@ -73,6 +76,11 @@ public class ComchecksExecutionJob implements Job {
     @Autowired
     public void setComcheckStatusRepository(ComcheckStatusRepository comcheckStatusRepository) {
         this.comcheckStatusRepository = comcheckStatusRepository;
+    }
+
+    @Autowired
+    public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
+        this.executionContextService = executionContextService;
     }
 
     private Inject buildComcheckEmail(Comcheck comCheck) {
@@ -112,7 +120,7 @@ public class ComchecksExecutionJob implements Job {
                 Exercise exercise = comCheck.getExercise();
                 List<ComcheckStatus> comcheckStatuses = entry.getValue();
                 List<ExecutionContext> userInjectContexts = comcheckStatuses.stream().map(comcheckStatus -> {
-                    ExecutionContext injectContext = new ExecutionContext(comcheckStatus.getUser(), exercise, "Comcheck");
+                    ExecutionContext injectContext = this.executionContextService.executionContext(comcheckStatus.getUser(), exercise, "Comcheck");
                     injectContext.put(COMCHECK, buildComcheckLink(comcheckStatus)); // Add specific inject variable for comcheck link
                     return injectContext;
                 }).toList();
