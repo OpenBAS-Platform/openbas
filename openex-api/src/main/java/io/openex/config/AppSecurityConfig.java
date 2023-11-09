@@ -118,7 +118,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
         .logout()
         /**/.invalidateHttpSession(true)
         /**/.deleteCookies("JSESSIONID", openExConfig.getCookieName())
-        /**/.logoutSuccessUrl("/");
+        /**/.logoutSuccessUrl(env.getProperty("openex.logout-success-url", String.class, "/"));
 
     if (openExConfig.isAuthOpenidEnable()) {
       http.oauth2Login()
