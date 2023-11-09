@@ -8,9 +8,17 @@ import java.util.List;
 import static io.openex.contract.ContractCardinality.Multiple;
 import static io.openex.contract.ContractCardinality.One;
 import static io.openex.contract.ContractVariable.variable;
-import static io.openex.execution.ExecutionContext.*;
 
 public class VariableHelper {
+
+  public static final String USER = "user";
+  public static final String EXERCISE = "exercise";
+  public static final String AUDIENCES = "audiences";
+  public static final String COMCHECK = "comcheck";
+  public static final String PLAYER_URI = "player_uri";
+  public static final String CHALLENGES_URI = "challenges_uri";
+  public static final String SCOREBOARD_URI = "scoreboard_uri";
+  public static final String LESSONS_URI = "lessons_uri";
 
   public static final ContractVariable userVariable = variable(USER, "User that will receive the injection",
       VariableType.String, One, List.of(

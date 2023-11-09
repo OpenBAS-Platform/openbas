@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static io.openex.contract.variables.VariableHelper.COMCHECK;
 import static io.openex.database.model.Comcheck.COMCHECK_STATUS.EXPIRED;
 import static io.openex.database.specification.ComcheckStatusSpecification.thatNeedExecution;
-import static io.openex.execution.ExecutionContext.COMCHECK;
 import static java.time.Instant.now;
 import static java.util.stream.Collectors.groupingBy;
 

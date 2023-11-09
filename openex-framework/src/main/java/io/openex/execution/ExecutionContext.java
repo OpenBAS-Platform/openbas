@@ -8,16 +8,9 @@ import io.openex.database.model.User;
 import java.util.HashMap;
 import java.util.List;
 
-public class ExecutionContext extends HashMap<String, Object> {
+import static io.openex.contract.variables.VariableHelper.*;
 
-  public static final String USER = "user";
-  public static final String EXERCISE = "exercise";
-  public static final String AUDIENCES = "audiences";
-  public static final String COMCHECK = "comcheck";
-  public static final String PLAYER_URI = "player_uri";
-  public static final String CHALLENGES_URI = "challenges_uri";
-  public static final String SCOREBOARD_URI = "scoreboard_uri";
-  public static final String LESSONS_URI = "lessons_uri";
+public class ExecutionContext extends HashMap<String, Object> {
 
   private ExecutionContext(User user, Exercise exercise, List<String> audiences) {
     ProtectUser protectUser = new ProtectUser(user);
