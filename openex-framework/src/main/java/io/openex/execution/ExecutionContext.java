@@ -20,14 +20,7 @@ public class ExecutionContext extends HashMap<String, Object> {
   public static final String LESSONS_URI = "lessons_uri";
 
   private ExecutionContext(User user, Exercise exercise, List<String> audiences) {
-    ProtectUser protectUser = new ProtectUser();
-    protectUser.setId(user.getId());
-    protectUser.setEmail(user.getEmail());
-    protectUser.setFirstname(user.getFirstname());
-    protectUser.setLastname(user.getLastname());
-    protectUser.setLang(user.getLang());
-    protectUser.setPgpKey(user.getPgpKey());
-    protectUser.setPhone(user.getPhone());
+    ProtectUser protectUser = new ProtectUser(user);
     this.put(USER, protectUser);
     this.put(EXERCISE, exercise);
     this.put(AUDIENCES, audiences);
