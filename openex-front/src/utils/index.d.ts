@@ -83,15 +83,15 @@ export interface Audience {
   audience_injects?: Inject[];
   audience_communications?: Communication[];
   /** @format int64 */
+  audience_injects_expectations_total_expected_score?: number;
+  /** @format int64 */
   audience_injects_expectations_number?: number;
   /** @format int64 */
   audience_injects_expectations_total_score?: number;
   /** @format int64 */
-  audience_users_number?: number;
-  /** @format int64 */
   audience_injects_number?: number;
   /** @format int64 */
-  audience_injects_expectations_total_expected_score?: number;
+  audience_users_number?: number;
 }
 
 export interface Challenge {
@@ -211,21 +211,21 @@ export interface Exercise {
   exercise_lessons_categories?: LessonsCategory[];
   exercise_players?: User[];
   exercise_next_possible_status?: ("SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED")[];
-  exercise_injects_statistics?: Record<string, number>;
   /** @format date-time */
   exercise_next_inject_date?: string;
   /** @format int64 */
   exercise_lessons_answers_number?: number;
-  /** @format double */
-  exercise_score?: number;
   /** @format int64 */
   exercise_communications_number?: number;
+  /** @format double */
+  exercise_score?: number;
+  exercise_injects_statistics?: Record<string, number>;
   exercise_observers?: User[];
+  exercise_planners?: User[];
   /** @format int64 */
   exercise_users_number?: number;
   /** @format int64 */
   exercise_logs_number?: number;
-  exercise_planners?: User[];
 }
 
 export interface Grant {
@@ -285,11 +285,11 @@ export interface Inject {
   /** @format date-time */
   inject_date?: string;
   /** @format int64 */
-  inject_communications_number?: number;
-  /** @format int64 */
   inject_communications_not_ack_number?: number;
   /** @format int64 */
   inject_users_number?: number;
+  /** @format int64 */
+  inject_communications_number?: number;
   /** @format date-time */
   inject_sent_at?: string;
 }
@@ -462,15 +462,15 @@ export interface User {
   user_communications?: Communication[];
   user_is_external?: boolean;
   user_is_manager?: boolean;
-  user_is_planner?: boolean;
-  user_is_observer?: boolean;
   /** @format int64 */
   user_injects_number?: number;
+  user_is_planner?: boolean;
+  user_is_observer?: boolean;
   user_injects?: Inject[];
-  user_is_only_player?: boolean;
   user_gravatar?: string;
   /** @format date-time */
   user_last_comcheck?: string;
+  user_is_only_player?: boolean;
   user_is_player?: boolean;
 }
 
@@ -1072,9 +1072,9 @@ export interface Dryrun {
   /** @format int64 */
   dryrun_users_number?: number;
   /** @format date-time */
-  dryrun_end_date?: string;
-  /** @format date-time */
   dryrun_start_date?: string;
+  /** @format date-time */
+  dryrun_end_date?: string;
 }
 
 export interface ComcheckInput {

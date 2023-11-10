@@ -268,7 +268,7 @@
                 <configuration>
                     <apiDocsUrl>http://localhost:8080/api-docs</apiDocsUrl>
                     <outputFileName>swagger.json</outputFileName>
-                    <outputDir>../openex-front/swagger</outputDir>
+                    <outputDir>.</outputDir>
                 </configuration>
             </plugin>
         </plugins>
