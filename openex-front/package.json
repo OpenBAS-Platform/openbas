@@ -101,7 +101,7 @@
     "lint": "cross-env DEBUG=eslint:cli-engine TIMING=1 eslint --max-warnings 0 --cache -c .eslintrc.json src",
     "control": "yarn audit --groups dependencies --summary",
     "test": "jest --coverage",
-    "generate-types-from-api": "swagger-typescript-api -p /swagger.json -o src/utils -n index.d.ts"
+    "generate-types-from-api": "swagger-typescript-api --no-client -p ./swagger/swagger.json -o src/utils -n index.d.ts"
   },
   "resolutions": {
     "mini-css-extract-plugin": "2.4.7",
