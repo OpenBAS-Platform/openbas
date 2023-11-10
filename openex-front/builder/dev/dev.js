@@ -22,7 +22,7 @@ const debounce = (func, timeout = 500) => {
 esbuild
   .build({
     logLevel: "info",
-    entryPoints: ["src/index.js"],
+    entryPoints: ["src/index.tsx"],
     bundle: true,
     banner: {
       js: ' (() => new EventSource("http://localhost:3000/dev").onmessage = () => location.reload())();',
