@@ -17,6 +17,7 @@
         <commons-validator.version>1.7</commons-validator.version>
         <springdoc.version>1.7.0</springdoc.version>
         <opensaml.version>4.1.1</opensaml.version>
+        <flyway.version>9.0.3</flyway.version>
     </properties>
 
     <profiles>
@@ -173,7 +174,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>8.5.13</version>
+            <version>${flyway.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
