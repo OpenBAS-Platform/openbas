@@ -4,3 +4,4 @@ logs
 src/main/resources/application-*.properties
 src/main/resources/localhost.p12
 src/main/resources/build/*
+swagger.json
