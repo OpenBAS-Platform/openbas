@@ -17,6 +17,7 @@
         <commons-validator.version>1.7</commons-validator.version>
         <springdoc.version>1.7.0</springdoc.version>
         <opensaml.version>4.1.1</opensaml.version>
+        <springdoc-plugin.version>1.4</springdoc-plugin.version>
         <flyway.version>9.0.3</flyway.version>
     </properties>
 
@@ -251,6 +252,24 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-maven-plugin</artifactId>
+                <version>${springdoc-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <apiDocsUrl>http://localhost:8080/api-docs</apiDocsUrl>
+                    <outputFileName>swagger.json</outputFileName>
+                    <outputDir>.</outputDir>
+                </configuration>
             </plugin>
         </plugins>
     </build>

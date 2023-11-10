@@ -89,17 +89,19 @@
     "jest": "27.5.1",
     "prettier": "2.7.1",
     "redux-logger": "3.0.6",
+    "swagger-typescript-api": "13.0.3",
     "typescript": "4.9.5"
   },
   "engines": {
     "node": ">= 16.*"
   },
   "scripts": {
-    "start": "node builder/dev/dev.js",
+    "start": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n index.d.ts && node builder/dev/dev.js",
     "build": "node builder/prod/prod.js",
     "lint": "cross-env DEBUG=eslint:cli-engine TIMING=1 eslint --max-warnings 0 --cache -c .eslintrc.json src",
     "control": "yarn audit --groups dependencies --summary",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "generate-types-from-api": "swagger-typescript-api --no-client -p ../openex-api/swagger.json -o src/utils -n index.d.ts"
   },
   "resolutions": {
     "mini-css-extract-plugin": "2.4.7",
