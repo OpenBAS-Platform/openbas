@@ -39,7 +39,6 @@ public class VariableServiceTest {
     String variableKey = "key";
     variable.setKey(variableKey);
     variable.setValue(" a value ");
-    variable.setType(VariableType.String);
 
     // -- EXECUTE --
     Variable variableCreated = this.variableService.createVariable(exerciseCreated.getId(), variable);

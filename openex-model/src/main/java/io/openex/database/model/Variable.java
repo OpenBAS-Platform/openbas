@@ -55,7 +55,7 @@ public class Variable implements Base {
   @Column(name = "variable_type")
   @JsonProperty("variable_type")
   @NotNull
-  private VariableType type;
+  private VariableType type = VariableType.String;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "variable_exercise")
