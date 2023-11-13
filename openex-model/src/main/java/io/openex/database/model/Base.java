@@ -9,8 +9,12 @@ public interface Base {
 
     void setId(String id);
 
+    default boolean isUserHasAccess(final boolean isAdmin) {
+        return isAdmin;
+    }
+
     default boolean isUserHasAccess(User user) {
-        return user.isAdmin();
+        return this.isUserHasAccess(user.isAdmin());
     }
 
     @Transient
