@@ -45,7 +45,6 @@ public class Variable implements Base {
 
   @Column(name = "variable_value")
   @JsonProperty("variable_value")
-  @NotBlank
   private String value;
 
   @Column(name = "variable_description")

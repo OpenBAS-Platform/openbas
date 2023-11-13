@@ -1,5 +1,6 @@
 package io.openex.rest.exercise.exports;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.*;
 import lombok.Getter;
@@ -54,8 +55,9 @@ public class ExerciseFileExport {
   @JsonProperty("exercise_lessons_questions")
   private List<LessonsQuestion> lessonsQuestions = new ArrayList<>();
 
-
-  @JsonProperty("exercise_variables")
+  @JsonIgnore
+  public static final String EXERCISE_VARIABLES = "exercise_variables";
+  @JsonProperty(EXERCISE_VARIABLES)
   private List<Variable> variables;
 
 }

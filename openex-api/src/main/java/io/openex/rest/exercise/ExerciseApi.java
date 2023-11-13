@@ -613,7 +613,7 @@ public class ExerciseApi extends RestBehavior {
     // Tags
     importExport.setTags(exerciseTags.stream().distinct().toList());
     objectMapper.addMixIn(Tag.class, ExerciseExportMixins.Tag.class);
-    // Variables
+    // -- Variables --
     if (isWithVariables) {
       List<Variable> variables = this.variableService.variables(exerciseId);
       importExport.setVariables(variables);

@@ -15,7 +15,6 @@ public class VariableInput {
   private String key;
 
   @JsonProperty("variable_value")
-  @NotBlank(message = MANDATORY_MESSAGE)
   private String value;
 
   @JsonProperty("variable_description")

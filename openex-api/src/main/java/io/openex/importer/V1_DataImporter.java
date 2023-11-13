@@ -8,13 +8,17 @@ import io.openex.injects.challenge.model.ChallengeContent;
 import io.openex.injects.email.EmailContract;
 import io.openex.injects.manual.ManualContract;
 import io.openex.injects.media.model.MediaContent;
+import io.openex.rest.exercise.exports.ExerciseFileExport;
+import io.openex.rest.exercise.exports.VariableMixin;
 import io.openex.service.FileService;
 import io.openex.service.ImportEntry;
+import io.openex.service.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -45,6 +49,7 @@ public class V1_DataImporter implements Importer {
     private ArticleRepository articleRepository;
     private LessonsCategoryRepository lessonsCategoryRepository;
     private LessonsQuestionRepository lessonsQuestionRepository;
+    private VariableService variableService;
     // endregion
 
     // region setter
@@ -121,6 +126,11 @@ public class V1_DataImporter implements Importer {
     @Autowired
     public void setTagRepository(TagRepository tagRepository) {
         this.tagRepository = tagRepository;
+    }
+
+    @Autowired
+    public void setVariableService(@NotNull final VariableService variableService) {
+        this.variableService = variableService;
     }
     // endregion
 
@@ -565,6 +575,15 @@ public class V1_DataImporter implements Importer {
         Stream<JsonNode> injectsStream = resolveJsonElements(importNode, "exercise_injects");
         Stream<JsonNode> injectsNoParent = injectsStream.filter(jsonNode -> jsonNode.get("inject_depends_on").isNull());
         importInjects(baseIds, exercise, injectsNoParent.toList());
+
+        // ------------ Handling variables
+        Iterator<JsonNode> variableNodes = importNode.get(ExerciseFileExport.EXERCISE_VARIABLES).elements();
+        variableNodes.forEachRemaining(variableNode -> {
+            String id = VariableMixin.getId(variableNode);
+            Variable variable = VariableMixin.build(variableNode);
+            Variable variableSaved = this.variableService.createVariable(savedExercise.getId(), variable);
+            baseIds.put(id, variableSaved);
+        });
     }
 
     private static class BaseHolder implements Base {

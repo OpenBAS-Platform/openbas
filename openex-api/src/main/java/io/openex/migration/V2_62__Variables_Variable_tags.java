@@ -19,7 +19,7 @@ public class V2_62__Variables_Variable_tags extends BaseJavaMigration {
         CREATE TABLE IF NOT EXISTS variables (
             variable_id varchar(255) not null constraint variables_pkey primary key,
             variable_key varchar(255) not null,
-            variable_value varchar(255) not null,
+            variable_value varchar(255),
             variable_description text,
             variable_type INT not null,
             variable_exercise varchar(255) default NULL::character varying constraint fk_exercice_id references exercises on delete cascade,

@@ -38,7 +38,6 @@ public class VariableServiceTest {
     Variable variable = new Variable();
     String variableKey = "key";
     variable.setKey(variableKey);
-    variable.setValue(" a value ");
 
     // -- EXECUTE --
     Variable variableCreated = this.variableService.createVariable(exerciseCreated.getId(), variable);
@@ -69,13 +68,13 @@ public class VariableServiceTest {
   void updateVariableTest() {
     // -- PREPARE --
     Variable variable = this.variableService.variable(VARIABLE_ID);
-    String variableName = "key_updated";
-    variable.setKey(variableName);
+    String value = "A value";
+    variable.setValue(value);
 
     // -- EXECUTE --
     Variable variableUpdated = this.variableService.updateVariable(variable);
     assertNotNull(variable);
-    assertEquals(variableName, variableUpdated.getKey());
+    assertEquals(value, variableUpdated.getValue());
   }
 
   @DisplayName("Delete variable")
