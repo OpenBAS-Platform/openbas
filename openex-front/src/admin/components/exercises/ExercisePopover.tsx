@@ -32,6 +32,13 @@ const useStyles = makeStyles(() => ({
     float: 'left',
     margin: '-10px 0 0 5px',
   },
+  tableHeader: {
+    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
+  },
+  tableCell: {
+    borderTop: '1px solid rgba(255, 255, 255, 0.15)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
+  },
 }));
 
 interface ExercisePopoverProps {
@@ -125,7 +132,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         classes={{ root: classes.button }}
         onClick={handlePopoverOpen}
         aria-haspopup="true"
-        aria-label="More actions"
         size="large"
       >
         <MoreVert />
@@ -152,10 +158,10 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         </MenuItem>
       </Menu>
       <Dialog
-        onClose={handleCloseDelete}
         open={openDelete}
-        PaperProps={{ elevation: 1 }}
         TransitionComponent={Transition}
+        onClose={handleCloseDelete}
+        PaperProps={{ elevation: 1 }}
       >
         <DialogContent>
           <DialogContentText>
@@ -172,12 +178,12 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         </DialogActions>
       </Dialog>
       <Dialog
-        onClose={handleCloseEdit}
+        TransitionComponent={Transition}
         open={openEdit}
+        onClose={handleCloseEdit}
         fullWidth={true}
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
-        TransitionComponent={Transition}
       >
         <DialogTitle>{t('Update the exercise')}</DialogTitle>
         <DialogContent>
