@@ -56,13 +56,6 @@ const styles = () => ({
   chip: {
     margin: '0 10px 10px 0',
   },
-  tableHeader: {
-    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
-  },
-  tableCell: {
-    borderTop: '1px solid rgba(255, 255, 255, 0.15)',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
-  },
 });
 
 const TabPanel = (props) => {
@@ -442,19 +435,13 @@ class GroupPopover extends Component {
               <Table selectable={false} size="small">
                 <TableHead adjustForCheckbox={false} displaySelectAll={false}>
                   <TableRow>
-                    <TableCell classes={{ root: classes.tableHeader }}>
+                    <TableCell>
                       {t('Exercise')}
                     </TableCell>
-                    <TableCell
-                        classes={{ root: classes.tableHeader }}
-                        style={{ textAlign: 'center' }}
-                    >
+                    <TableCell style={{ textAlign: 'center' }}>
                       {t('Read/Write')}
                     </TableCell>
-                    <TableCell
-                        classes={{ root: classes.tableHeader }}
-                        style={{ textAlign: 'center' }}
-                    >
+                    <TableCell style={{ textAlign: 'center' }}>
                       {t('Read Only')}
                     </TableCell>
                   </TableRow>
@@ -481,10 +468,10 @@ class GroupPopover extends Component {
                     );
                     return (
                         <TableRow key={exercise.exercise_id}>
-                          <TableCell classes={{ root: classes.tableCell }}>
+                          <TableCell>
                             {exercise.exercise_name}
                           </TableCell>
-                          <TableCell classes={{ root: classes.tableCell }} style={{ textAlign: 'center' }}>
+                          <TableCell style={{ textAlign: 'center' }}>
                             <Checkbox
                                 checked={grantPlannerId !== null}
                                 onChange={this.handleGrantCheck.bind(
@@ -495,10 +482,7 @@ class GroupPopover extends Component {
                                 )}
                             />
                           </TableCell>
-                          <TableCell
-                              classes={{ root: classes.tableCell }}
-                              style={{ textAlign: 'center' }}
-                          >
+                          <TableCell style={{ textAlign: 'center' }}>
                             <Checkbox
                                 checked={
                                     grantObserverId !== null || grantPlannerId !== null
@@ -522,10 +506,10 @@ class GroupPopover extends Component {
               <Table selectable={false} size="small">
                 <TableHead adjustForCheckbox={false} displaySelectAll={false}>
                   <TableRow>
-                    <TableCell classes={{ root: classes.tableHeader }}>
+                    <TableCell>
                       {t('Organization')}
                     </TableCell>
-                    <TableCell classes={{ root: classes.tableHeader }} style={{ textAlign: 'center' }}>
+                    <TableCell style={{ textAlign: 'center' }}>
                       {t('Granted')}
                     </TableCell>
                   </TableRow>
@@ -535,10 +519,10 @@ class GroupPopover extends Component {
                     const isOrgaChecked = (this.props.group.group_organizations ?? []).includes(organization.organization_id);
                     return (
                         <TableRow key={organization.organization_id}>
-                          <TableCell classes={{ root: classes.tableCell }}>
+                          <TableCell>
                             {organization.organization_name}
                           </TableCell>
-                          <TableCell classes={{ root: classes.tableCell }} style={{ textAlign: 'center' }}>
+                          <TableCell style={{ textAlign: 'center' }}>
                             <Checkbox checked={isOrgaChecked} onChange={this.handleGrantOrganization.bind(this, organization.organization_id)}/>
                           </TableCell>
                         </TableRow>

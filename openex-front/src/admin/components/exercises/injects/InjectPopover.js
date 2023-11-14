@@ -18,7 +18,6 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
-import withStyles from '@mui/styles/withStyles';
 import { deleteInject, injectDone, tryInject, updateInject, updateInjectActivation, updateInjectTrigger } from '../../../../actions/Inject';
 import InjectForm from './InjectForm';
 import inject18n from '../../../../components/i18n';
@@ -30,16 +29,6 @@ const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';
-
-const styles = () => ({
-  tableHeader: {
-    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
-  },
-  tableCell: {
-    borderTop: '1px solid rgba(255, 255, 255, 0.15)',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
-  },
-});
 
 class InjectPopover extends Component {
   constructor(props) {
@@ -247,7 +236,6 @@ class InjectPopover extends Component {
       setSelectedInject,
       tagsMap,
       isDisabled,
-      classes,
     } = this.props;
     const injectTags = tagsConverter(inject.inject_tags, tagsMap);
     const duration = splitDuration(inject.inject_depends_duration || 0);
@@ -499,27 +487,21 @@ class InjectPopover extends Component {
                       if (key === 'execution_traces') {
                         return (
                           <TableRow key={key}>
-                            <TableCell classes={{ root: classes.tableCell }}>
+                            <TableCell>
                               {key}
                             </TableCell>
-                            <TableCell classes={{ root: classes.tableCell }}>
+                            <TableCell>
                               <Table selectable={false} size="small" key={key}>
                                 <TableBody displayRowCheckbox={false}>
                                   {value.map((trace) => (
                                     <TableRow key={trace.trace_identifier}>
-                                      <TableCell
-                                        classes={{ root: classes.tableCell }}
-                                      >
+                                      <TableCell>
                                         {trace.trace_message}
                                       </TableCell>
-                                      <TableCell
-                                        classes={{ root: classes.tableCell }}
-                                      >
+                                      <TableCell>
                                         {trace.trace_status}
                                       </TableCell>
-                                      <TableCell
-                                        classes={{ root: classes.tableCell }}
-                                      >
+                                      <TableCell>
                                         {trace.trace_time}
                                       </TableCell>
                                     </TableRow>
@@ -532,10 +514,10 @@ class InjectPopover extends Component {
                       }
                       return (
                         <TableRow key={key}>
-                          <TableCell classes={{ root: classes.tableCell }}>
+                          <TableCell>
                             {key}
                           </TableCell>
-                          <TableCell classes={{ root: classes.tableCell }}>
+                          <TableCell>
                             {value}
                           </TableCell>
                         </TableRow>
@@ -582,5 +564,4 @@ export default R.compose(
     injectDone,
   }),
   inject18n,
-  withStyles(styles),
 )(InjectPopover);

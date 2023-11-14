@@ -31,13 +31,6 @@ const useStyles = makeStyles(() => ({
     float: 'left',
     margin: '-10px 0 0 5px',
   },
-  tableHeader: {
-    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
-  },
-  tableCell: {
-    borderTop: '1px solid rgba(255, 255, 255, 0.15)',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
-  },
 }));
 
 interface ExercisePopoverProps {
@@ -205,48 +198,36 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell classes={{ root: classes.tableHeader }}>
+                <TableCell>
                   {t('Elements')}
                 </TableCell>
-                <TableCell
-                  classes={{ root: classes.tableHeader }}
-                  style={{ textAlign: 'center' }}
-                >
+                <TableCell style={{ textAlign: 'center' }}>
                   {t('Export')}
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               <TableRow>
-                <TableCell classes={{ root: classes.tableCell }}>
+                <TableCell>
                   {t('Scenario (including attached files)')}
                 </TableCell>
-                <TableCell
-                  classes={{ root: classes.tableCell }}
-                  style={{ textAlign: 'center' }}
-                >
+                <TableCell style={{ textAlign: 'center' }}>
                   <Checkbox checked={true} disabled={true} />
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell classes={{ root: classes.tableCell }}>
+                <TableCell>
                   {t('Audiences')}
                 </TableCell>
-                <TableCell
-                  classes={{ root: classes.tableCell }}
-                  style={{ textAlign: 'center' }}
-                >
+                <TableCell style={{ textAlign: 'center' }}>
                   <Checkbox checked={true} disabled={true} />
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell classes={{ root: classes.tableCell }}>
+                <TableCell>
                   {t('Players')}
                 </TableCell>
-                <TableCell
-                  classes={{ root: classes.tableCell }}
-                  style={{ textAlign: 'center' }}
-                >
+                <TableCell style={{ textAlign: 'center' }}>
                   <Checkbox
                     checked={exportPlayers}
                     onChange={handleToggleExportPlayers}
@@ -254,13 +235,10 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell classes={{ root: classes.tableCell }}>
+                <TableCell>
                   {t('Variables')}
                 </TableCell>
-                <TableCell
-                  classes={{ root: classes.tableCell }}
-                  style={{ textAlign: 'center' }}
-                >
+                <TableCell style={{ textAlign: 'center' }}>
                   <Checkbox
                     checked={exportVariables}
                     onChange={handleToggleExportVariables}
