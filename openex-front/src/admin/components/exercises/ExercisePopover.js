@@ -50,11 +50,16 @@ class ExercisePopover extends Component {
       openExport: false,
       openPopover: false,
       exportPlayers: false,
+      exportVariables: false,
     };
   }
 
   handleToggleExportPlayers() {
     this.setState({ exportPlayers: !this.state.exportPlayers });
+  }
+
+  handleToggleExportVariables() {
+    this.setState({ exportVariables: !this.state.exportVariables });
   }
 
   handlePopoverOpen(event) {
@@ -109,9 +114,9 @@ class ExercisePopover extends Component {
   }
 
   submitExport() {
-    const { exportPlayers } = this.state;
+    const { exportPlayers, exportVariables } = this.state;
     const link = document.createElement('a');
-    link.href = `/api/exercises/${this.props.exercise.exercise_id}/export?isWithPlayers=${exportPlayers}`;
+    link.href = `/api/exercises/${this.props.exercise.exercise_id}/export?isWithPlayers=${exportPlayers}&isWithVariables=${exportVariables}`;
     link.click();
     this.handleCloseExport();
   }
@@ -256,6 +261,20 @@ class ExercisePopover extends Component {
                     <Checkbox
                       checked={this.state.exportPlayers}
                       onChange={this.handleToggleExportPlayers.bind(this)}
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell classes={{ root: classes.tableCell }}>
+                    {t('Variables')}
+                  </TableCell>
+                  <TableCell
+                    classes={{ root: classes.tableCell }}
+                    style={{ textAlign: 'center' }}
+                  >
+                    <Checkbox
+                      checked={this.state.exportVariables}
+                      onChange={this.handleToggleExportVariables.bind(this)}
                     />
                   </TableCell>
                 </TableRow>

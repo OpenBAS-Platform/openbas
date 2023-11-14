@@ -620,9 +620,13 @@ public class ExerciseApi extends RestBehavior {
       objectMapper.addMixIn(Variable.class, VariableMixin.class);
     }
     // Build the response
+    String infos = "("
+        + (isWithPlayers ? "with_players" : "no_players")
+        + " & "
+        + (isWithVariables ? "with_variables" : "no_variables")
+        + ")";
     String zipName =
-        (exercise.getName() + "_" + now().toString()) + "_" + (isWithPlayers ? "(with_players)" : "(no_players)")
-            + ".zip";
+        (exercise.getName() + "_" + now().toString()) + "_" + infos + ".zip";
     response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
     response.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip");
     response.setStatus(HttpServletResponse.SC_OK);

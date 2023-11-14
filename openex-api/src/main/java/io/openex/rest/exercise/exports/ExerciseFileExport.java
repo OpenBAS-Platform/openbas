@@ -1,6 +1,7 @@
 package io.openex.rest.exercise.exports;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.*;
 import lombok.Getter;
@@ -9,8 +10,11 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 @Getter
 @Setter
+@JsonInclude(NON_NULL)
 public class ExerciseFileExport {
 
   @JsonProperty("export_version")
