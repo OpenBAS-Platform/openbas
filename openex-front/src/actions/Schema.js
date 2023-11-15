@@ -214,6 +214,13 @@ export const report = new schema.Entity(
 );
 export const arrayOfReports = new schema.Array(report);
 
+export const variable = new schema.Entity(
+  'variables',
+  {},
+  { idAttribute: 'variable_id' },
+);
+export const arrayOfVariables = new schema.Array(variable);
+
 token.define({ token_user: user });
 user.define({ user_organization: organization });
 
@@ -236,6 +243,7 @@ export const storeHelper = (state) => ({
   getExerciseDryruns: (id) => entities('dryruns', state).filter((i) => i.dryrun_exercise === id),
   getExerciseComchecks: (id) => entities('comchecks', state).filter((i) => i.comcheck_exercise === id),
   getExerciseAudiences: (id) => entities('audiences', state).filter((i) => i.audience_exercise === id),
+  getExerciseVariables: (id) => entities('variables', state).filter((i) => i.variable_exercise === id),
   getExerciseArticles: (id) => entities('articles', state).filter((i) => i.article_exercise === id),
   getExerciseInjects: (id) => entities('injects', state).filter((i) => i.inject_exercise === id),
   getExerciseCommunications: (id) => entities('communications', state).filter(
@@ -273,7 +281,7 @@ export const storeHelper = (state) => ({
   ),
   getExerciseUserLessonsAnswers: (exerciseId, userId) => entities('lessonsanswers', state).filter(
     (l) => l.lessons_answer_exercise === exerciseId
-        && l.lessons_answer_user === userId,
+      && l.lessons_answer_user === userId,
   ),
   getExerciseReports: (exerciseId) => entities('reports', state).filter((l) => l.report_exercise === exerciseId),
   // report
@@ -313,7 +321,7 @@ export const storeHelper = (state) => ({
     entities('inject_types', state)
       .map((t) => ({
         hasAudiences:
-            t.fields.filter((f) => f.key === 'audiences').length > 0,
+          t.fields.filter((f) => f.key === 'audiences').length > 0,
         ...t,
       }))
       .filter((t) => !t.hasAudiences)

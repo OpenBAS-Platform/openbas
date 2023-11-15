@@ -9,6 +9,7 @@ import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import {
+  AttachMoneyOutlined,
   CastForEducationOutlined,
   EmojiEventsOutlined,
 } from '@mui/icons-material';
@@ -83,6 +84,20 @@ class DefinitionMenu extends Component {
               <EmojiEventsOutlined />
             </ListItemIcon>
             <ListItemText primary={t('Challenges')} />
+          </MenuItem>
+          <MenuItem
+              component={Link}
+              to={`/admin/exercises/${exerciseId}/definition/variables`}
+              selected={
+                  location.pathname
+                  === `/admin/exercises/${exerciseId}/definition/variables`
+              }
+              classes={{ root: classes.item }}
+          >
+            <ListItemIcon>
+              <AttachMoneyOutlined />
+            </ListItemIcon>
+            <ListItemText primary={t('Variables')} />
           </MenuItem>
         </MenuList>
       </Drawer>

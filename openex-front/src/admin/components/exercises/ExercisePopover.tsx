@@ -18,14 +18,14 @@ import TableBody from '@mui/material/TableBody';
 import Checkbox from '@mui/material/Checkbox';
 import { makeStyles } from '@mui/styles';
 import { PopoverProps } from '@mui/material/Popover';
+import TableContainer from '@mui/material/TableContainer';
 import { useFormatter } from '../../../components/i18n';
 import ExerciseForm from './ExerciseForm';
 import { deleteExercise, updateExercise } from '../../../actions/Exercise';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
 import Transition from '../../../components/common/Transition';
-import { Exercise, ExerciseUpdateInput } from '../../../utils';
+import { Exercise, ExerciseUpdateInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
-import TableContainer from '@mui/material/TableContainer';
 
 const useStyles = makeStyles(() => ({
   button: {

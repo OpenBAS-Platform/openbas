@@ -69,6 +69,7 @@
     "@types/node": "18.11.9",
     "@types/react": "18.2.34",
     "@types/react-dom": "18.2.14",
+    "@types/react-router-dom": "^5.3.3",
     "@types/seamless-immutable": "7.1.18",
     "chokidar": "3.5.3",
     "compression": "1.7.4",
@@ -96,12 +97,12 @@
     "node": ">= 16.*"
   },
   "scripts": {
-    "start": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n index.d.ts && node builder/dev/dev.js",
+    "start": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n api-types.d.ts && node builder/dev/dev.js",
     "build": "node builder/prod/prod.js",
     "lint": "cross-env DEBUG=eslint:cli-engine TIMING=1 eslint --max-warnings 0 --cache -c .eslintrc.json src",
     "control": "yarn audit --groups dependencies --summary",
     "test": "jest --coverage",
-    "generate-types-from-api": "swagger-typescript-api --no-client -p ../openex-api/swagger.json -o src/utils -n index.d.ts"
+    "generate-types-from-api": "swagger-typescript-api --no-client -p ../openex-api/swagger.json -o src/utils -n api-types.d.ts"
   },
   "resolutions": {
     "mini-css-extract-plugin": "2.4.7",

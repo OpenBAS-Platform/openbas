@@ -585,6 +585,9 @@ const i18n = {
       'Pending validation': 'Validation en attente',
       Validate: 'Valider',
       Validated: 'Validé',
+      'Create a new variable': 'Créer une nouvelle variable',
+      'Do you want to delete the variable ?': 'Voulez vous supprimer cette variable ?',
+      'Update the variable': 'Mettre à jour la variable',
     },
     en: {
       openex_email: 'Email',
