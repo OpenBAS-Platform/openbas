@@ -33,6 +33,7 @@ public class VariableServiceTest {
   void createVariableTest() {
     // -- PREPARE --
     Exercise exercise = new Exercise();
+    exercise.setName("Exercice name");
     Exercise exerciseCreated = this.exerciseRepository.save(exercise);
     EXERCISE_ID = exerciseCreated.getId();
     Variable variable = new Variable();

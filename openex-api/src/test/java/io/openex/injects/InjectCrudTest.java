@@ -30,6 +30,7 @@ public class InjectCrudTest {
   void createInjectFailed() {
     // -- PREPARE --
     Exercise exercise = new Exercise();
+    exercise.setName("Exercice name");
     Exercise exerciseCreated = this.exerciseRepository.save(exercise);
     Inject inject = new Inject();
     inject.setExercise(exerciseCreated);
@@ -53,6 +54,7 @@ public class InjectCrudTest {
   void createInjectSuccess() {
     // -- PREPARE --
     Exercise exercise = new Exercise();
+    exercise.setName("Exercice name");
     Exercise exerciseCreated = this.exerciseRepository.save(exercise);
     Inject inject = new Inject();
     inject.setExercise(exerciseCreated);
