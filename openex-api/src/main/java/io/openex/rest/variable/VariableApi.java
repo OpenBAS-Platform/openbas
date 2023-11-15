@@ -48,7 +48,7 @@ public class VariableApi extends RestBehavior {
     return this.variableService.updateVariable(variable);
   }
 
-  @DeleteMapping("/api/exercises/{exerciseId}/variable/{variableId}")
+  @DeleteMapping("/api/exercises/{exerciseId}/variables/{variableId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public void deleteVariable(
       @PathVariable @NotBlank final String exerciseId,
