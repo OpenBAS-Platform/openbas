@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
@@ -12,6 +13,7 @@ public class VariableInput {
 
   @JsonProperty("variable_key")
   @NotBlank(message = MANDATORY_MESSAGE)
+  @Pattern(regexp="^[a-z_]+$")
   private String key;
 
   @JsonProperty("variable_value")
