@@ -13,11 +13,6 @@
     <name>OpenEx model</name>
     <description>OpenEx model</description>
 
-    <properties>
-        <minio.version>8.5.7</minio.version>
-        <validation-api.version>2.0.1.Final</validation-api.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
