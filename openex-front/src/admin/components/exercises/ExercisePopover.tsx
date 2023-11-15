@@ -25,6 +25,7 @@ import { isExerciseReadOnly } from '../../../utils/Exercise';
 import Transition from '../../../components/common/Transition';
 import { Exercise, ExerciseUpdateInput } from '../../../utils';
 import { useAppDispatch } from '../../../utils/hooks';
+import TableContainer from '@mui/material/TableContainer';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -124,6 +125,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         classes={{ root: classes.button }}
         onClick={handlePopoverOpen}
         aria-haspopup="true"
+        aria-label="More actions"
         size="large"
       >
         <MoreVert />
@@ -150,10 +152,10 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         </MenuItem>
       </Menu>
       <Dialog
-        open={openDelete}
-        TransitionComponent={Transition}
         onClose={handleCloseDelete}
+        open={openDelete}
         PaperProps={{ elevation: 1 }}
+        TransitionComponent={Transition}
       >
         <DialogContent>
           <DialogContentText>
@@ -170,12 +172,12 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         </DialogActions>
       </Dialog>
       <Dialog
-        TransitionComponent={Transition}
-        open={openEdit}
         onClose={handleCloseEdit}
+        open={openEdit}
         fullWidth={true}
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
+        TransitionComponent={Transition}
       >
         <DialogTitle>{t('Update the exercise')}</DialogTitle>
         <DialogContent>
@@ -188,65 +190,67 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         </DialogContent>
       </Dialog>
       <Dialog
-        open={openExport}
-        TransitionComponent={Transition}
         onClose={handleCloseExport}
+        open={openExport}
         PaperProps={{ elevation: 1 }}
+        TransitionComponent={Transition}
       >
         <DialogTitle>{t('Export the exercise')}</DialogTitle>
         <DialogContent>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  {t('Elements')}
-                </TableCell>
-                <TableCell style={{ textAlign: 'center' }}>
-                  {t('Export')}
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow>
-                <TableCell>
-                  {t('Scenario (including attached files)')}
-                </TableCell>
-                <TableCell style={{ textAlign: 'center' }}>
-                  <Checkbox checked={true} disabled={true} />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  {t('Audiences')}
-                </TableCell>
-                <TableCell style={{ textAlign: 'center' }}>
-                  <Checkbox checked={true} disabled={true} />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  {t('Players')}
-                </TableCell>
-                <TableCell style={{ textAlign: 'center' }}>
-                  <Checkbox
-                    checked={exportPlayers}
-                    onChange={handleToggleExportPlayers}
-                  />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  {t('Variables')}
-                </TableCell>
-                <TableCell style={{ textAlign: 'center' }}>
-                  <Checkbox
-                    checked={exportVariables}
-                    onChange={handleToggleExportVariables}
-                  />
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+          <TableContainer>
+            <Table aria-label="export table" size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>
+                    {t('Elements')}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {t('Export')}
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow>
+                  <TableCell>
+                    {t('Scenario (including attached files)')}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    <Checkbox checked={true} disabled={true} />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    {t('Audiences')}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    <Checkbox checked={true} disabled={true} />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    {t('Players')}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    <Checkbox
+                      checked={exportPlayers}
+                      onChange={handleToggleExportPlayers}
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    {t('Variables')}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    <Checkbox
+                      checked={exportVariables}
+                      onChange={handleToggleExportVariables}
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseExport}>
