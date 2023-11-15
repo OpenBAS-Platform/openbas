@@ -22,6 +22,8 @@
         <jackson.version>2.15.3</jackson.version>
         <spring.version>2.7.17</spring.version>
         <lombok.version>1.18.30</lombok.version>
+        <minio.version>8.5.7</minio.version>
+        <validation-api.version>2.0.1.Final</validation-api.version>
     </properties>
 
     <distributionManagement>
