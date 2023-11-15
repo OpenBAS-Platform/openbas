@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -127,5 +128,10 @@ public class UserService {
     createUserToken(savedUser);
     return savedUser;
   }
+
+  public User user(@NotBlank final String userId) {
+    return this.userRepository.findById(userId).orElseThrow();
+  }
+
   // endregion
 }

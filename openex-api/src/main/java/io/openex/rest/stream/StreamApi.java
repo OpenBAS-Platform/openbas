@@ -3,11 +3,9 @@ package io.openex.rest.stream;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openex.config.OpenexPrincipal;
 import io.openex.database.audit.BaseEvent;
-import io.openex.database.model.User;
-import io.openex.database.repository.UserRepository;
 import io.openex.rest.helper.RestBehavior;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -38,13 +36,7 @@ public class StreamApi extends RestBehavior {
   public static final String EVENT_TYPE_PING = "ping";
   public static final String X_ACCEL_BUFFERING = "X-Accel-Buffering";
   private static final Logger LOGGER = Logger.getLogger(StreamApi.class.getName());
-  private final Map<String, Tuple2<User, FluxSink<Object>>> consumers = new HashMap<>();
-  private UserRepository userRepository;
-
-  @Autowired
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
+  private final Map<String, Tuple2<OpenexPrincipal, FluxSink<Object>>> consumers = new HashMap<>();
 
   private void sendStreamEvent(FluxSink<Object> flux, BaseEvent event) {
     // Serialize the instance now for lazy session decoupling
@@ -58,10 +50,10 @@ public class StreamApi extends RestBehavior {
   public void listenDatabaseUpdate(BaseEvent event) {
     consumers.entrySet().stream()
         .parallel().forEach(entry -> {
-          Tuple2<User, FluxSink<Object>> tupleFlux = entry.getValue();
-          User listener = tupleFlux.getT1();
+          Tuple2<OpenexPrincipal, FluxSink<Object>> tupleFlux = entry.getValue();
+          OpenexPrincipal listener = tupleFlux.getT1();
           FluxSink<Object> fluxSink = tupleFlux.getT2();
-          boolean isCurrentObserver = event.isUserObserver(listener);
+          boolean isCurrentObserver = event.isUserObserver(listener.isAdmin());
           if (!isCurrentObserver) {
             // If user as no visibility, we can send a "delete" userEvent with only the internal id
             try {
@@ -83,12 +75,14 @@ public class StreamApi extends RestBehavior {
         });
   }
 
+  /**
+   * Create a flux for current user & session
+   */
   @GetMapping(path = "/api/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public ResponseEntity<Flux<Object>> streamFlux() {
-    User user = userRepository.findById(currentUser().getId()).orElseThrow();
     String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
     // Build the database event flux.
-    Flux<Object> dataFlux = Flux.create(fluxSinkConsumer -> consumers.put(sessionId, Tuples.of(user, fluxSinkConsumer)))
+    Flux<Object> dataFlux = Flux.create(fluxSinkConsumer -> consumers.put(sessionId, Tuples.of(currentUser(), fluxSinkConsumer)))
         .doAfterTerminate(() -> consumers.remove(sessionId));
     // Build the health check flux.
     Flux<Object> ping = Flux.interval(Duration.ofSeconds(1))

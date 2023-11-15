@@ -5,10 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.database.model.Base;
-import io.openex.database.model.User;
+import lombok.Getter;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
+@Getter
 public class BaseEvent implements Cloneable {
 
     @JsonIgnore
@@ -38,40 +39,16 @@ public class BaseEvent implements Cloneable {
         this.schema = className + (className.endsWith("s") ? "es" : "s");
     }
 
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    public String getType() {
-        return type;
-    }
-
     public void setType(String type) {
         this.type = type;
-    }
-
-    public String getAttributeId() {
-        return attributeId;
     }
 
     public void setAttributeId(String attributeId) {
         this.attributeId = attributeId;
     }
 
-    public String getSchema() {
-        return schema;
-    }
-
     public void setSchema(String schema) {
         this.schema = schema;
-    }
-
-    public Base getInstance() {
-        return instance;
-    }
-
-    public JsonNode getInstanceData() {
-        return instanceData;
     }
 
     public void setInstanceData(JsonNode instanceData) {
@@ -79,8 +56,8 @@ public class BaseEvent implements Cloneable {
     }
 
     @JsonIgnore
-    public boolean isUserObserver(User listener) {
-        return instance.isUserHasAccess(listener);
+    public boolean isUserObserver(final boolean isAdmin) {
+        return this.instance.isUserHasAccess(isAdmin);
     }
 
     @Override
