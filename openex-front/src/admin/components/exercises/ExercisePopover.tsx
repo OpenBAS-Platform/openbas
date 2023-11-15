@@ -125,6 +125,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         classes={{ root: classes.button }}
         onClick={handlePopoverOpen}
         aria-haspopup="true"
+        aria-label="More actions"
         size="large"
       >
         <MoreVert />
@@ -197,58 +198,59 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         <DialogTitle>{t('Export the exercise')}</DialogTitle>
         <DialogContent>
           <TableContainer>
-            <Table aria-label="export table"size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  {t('Elements')}
-                </TableCell>
-                <TableCell style={{ textAlign: 'center' }}>
-                  {t('Export')}
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow>
-                <TableCell>
-                  {t('Scenario (including attached files)')}
-                </TableCell>
-                <TableCell style={{ textAlign: 'center' }}>
-                  <Checkbox checked={true} disabled={true} />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  {t('Audiences')}
-                </TableCell>
-                <TableCell style={{ textAlign: 'center' }}>
+            <Table aria-label="export table" size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>
+                    {t('Elements')}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {t('Export')}
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow>
+                  <TableCell>
+                    {t('Scenario (including attached files)')}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
                     <Checkbox checked={true} disabled={true} />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  {t('Players')}
-                </TableCell>
-                <TableCell style={{ textAlign: 'center' }}>
-                  <Checkbox
-                    checked={exportPlayers}
-                    onChange={handleToggleExportPlayers}
-                  />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  {t('Variables')}
-                </TableCell>
-                <TableCell style={{ textAlign: 'center' }}>
-                  <Checkbox
-                    checked={exportVariables}
-                    onChange={handleToggleExportVariables}
-                  />
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table></TableContainer>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    {t('Audiences')}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    <Checkbox checked={true} disabled={true} />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    {t('Players')}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    <Checkbox
+                      checked={exportPlayers}
+                      onChange={handleToggleExportPlayers}
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    {t('Variables')}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    <Checkbox
+                      checked={exportVariables}
+                      onChange={handleToggleExportVariables}
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseExport}>
