@@ -1,6 +1,6 @@
 package io.openex.rest.mapping;
 
-import io.openex.model.PropertyJsonSchema;
+import io.openex.model.PropertySchema;
 import io.openex.rest.user.form.player.CreatePlayerInput;
 import io.openex.service.MappingService;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +16,8 @@ public class MappingApi {
   private final MappingService mappingService;
 
   @GetMapping("/api/mappings/player")
-  public List<PropertyJsonSchema> player() {
-    return this.mappingService.jsonSchema(CreatePlayerInput.class);
+  public List<PropertySchema> player() {
+    return this.mappingService.schema(CreatePlayerInput.class);
   }
 
 }

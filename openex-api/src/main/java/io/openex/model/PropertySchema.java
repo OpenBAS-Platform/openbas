@@ -9,10 +9,13 @@ import javax.validation.constraints.NotNull;
 
 @Builder
 @Getter
-public class PropertyJsonSchema {
+public class PropertySchema {
 
   @NotBlank
   private final String name;
+
+  @NotBlank
+  private final String jsonName;
 
   @NotNull
   private final Class<?> type;
@@ -23,15 +26,18 @@ public class PropertyJsonSchema {
 
   // -- VALIDATION --
 
-  public static PropertyJsonSchemaBuilder builder() {
+  public static PropertySchemaBuilder builder() {
     return new ValidationBuilder();
   }
 
-  private static class ValidationBuilder extends PropertyJsonSchemaBuilder {
+  private static class ValidationBuilder extends PropertySchemaBuilder {
 
-    public PropertyJsonSchema build() {
+    public PropertySchema build() {
       if (StringUtils.isBlank(super.name)) {
         throw new RuntimeException("Property name should not be empty");
+      }
+      if (StringUtils.isBlank(super.jsonName)) {
+        throw new RuntimeException("Property json name should not be empty");
       }
       if (super.type == null) {
         throw new RuntimeException("Property type should not be empty");
