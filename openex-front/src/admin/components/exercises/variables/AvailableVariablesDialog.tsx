@@ -132,7 +132,7 @@ const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps>
         </List>
         <List subheader={
           <ListSubheader component="div" classes={{ root: classes.containerFlex }}>
-            {t('User variables')}
+            {t('Custom variables')}
             {/* TODO: validate when migrate to new react router version */}
             {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
             {/* @ts-ignore */}
@@ -143,7 +143,7 @@ const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps>
                     color="primary"
                     classes={{ root: classes.button }}
             >
-              {me.user_is_observer ? t('View Variables') : t('Manage Variables')}
+              {me.user_is_planner ? t('Manage Variables') : t('View Variables')}
             </Button>
           </ListSubheader>
         }>

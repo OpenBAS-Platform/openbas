@@ -13,9 +13,9 @@ import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { useFormatter } from '../../../../components/i18n';
 import { Exercise, Variable, VariableInput } from '../../../../utils/api-types';
 import VariableForm from './VariableForm';
-import DialogTransitionSlideUp from '../../../../utils/DialogTransitionSlideUp';
 import { deleteVariable, updateVariable } from '../../../../actions/Variable';
 import { useAppDispatch } from '../../../../utils/hooks';
+import Transition from '../../../../components/common/Transition';
 
 interface Props {
   disabled?: boolean,
@@ -85,7 +85,7 @@ const VariablePopover: React.FC<Props> = ({ disabled, exercise, variable, onDele
       </Menu>
       <Dialog
         open={deleteVar}
-        TransitionComponent={DialogTransitionSlideUp}
+        TransitionComponent={Transition}
         onClose={() => setDeleteVar(false)}
         PaperProps={{ elevation: 1 }}
       >
@@ -104,7 +104,7 @@ const VariablePopover: React.FC<Props> = ({ disabled, exercise, variable, onDele
         </DialogActions>
       </Dialog>
       <Dialog
-        TransitionComponent={DialogTransitionSlideUp}
+        TransitionComponent={Transition}
         open={editVar}
         onClose={() => setEditVar(false)}
         fullWidth={true}

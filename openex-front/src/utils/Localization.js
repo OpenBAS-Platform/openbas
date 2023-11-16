@@ -585,10 +585,15 @@ const i18n = {
       'Pending validation': 'Validation en attente',
       Validate: 'Valider',
       Validated: 'Validé',
+      // Variables
       'Create a new variable': 'Créer une nouvelle variable',
       'Do you want to delete the variable ?': 'Voulez vous supprimer cette variable ?',
       'Update the variable': 'Mettre à jour la variable',
       'Invalid input. Please use only letters or underscores, and ensure the field is not empty.': 'Saisie invalide. Merci d\'utiliser uniquement des lettres ou des tirets bas, et de vous assurer que le champ n\'est pas vide.',
+      'Built in variables': 'Variables intégrées',
+      'Custom variables': 'Variables personnalisées',
+      'Manage Variables': 'Gérer les variables',
+      'View variables': 'Afficher les variables',
     },
     en: {
       openex_email: 'Email',

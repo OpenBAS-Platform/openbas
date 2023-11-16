@@ -68,6 +68,7 @@ const VariableForm: React.FC<Props> = ({
         variant="standard"
         fullWidth={true}
         label={t('Value')}
+        style={{ marginTop: 20 }}
         error={!!errors.variable_value}
         helperText={
           errors.variable_value && errors.variable_value?.message

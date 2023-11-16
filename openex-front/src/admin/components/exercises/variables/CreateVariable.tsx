@@ -10,10 +10,10 @@ import ListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
 import VariableForm from './VariableForm';
-import DialogTransitionSlideUp from '../../../../utils/DialogTransitionSlideUp';
 import { addVariable } from '../../../../actions/Variable';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { VariableInput } from '../../../../utils/api-types';
+import Transition from '../../../../components/common/Transition';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {
@@ -74,7 +74,7 @@ const CreateVariable: React.FC<Props> = ({ exerciseId, inline }) => {
       )}
       <Dialog
         open={open}
-        TransitionComponent={DialogTransitionSlideUp}
+        TransitionComponent={Transition}
         onClose={() => setOpen(false)}
         fullWidth={true}
         maxWidth="md"
