@@ -32,7 +32,7 @@ const VariablePopover: React.FC<Props> = ({ disabled, exercise, variable, onDele
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
 
-  const initialValues = { variable_key: variable.variable_key, variable_description: variable.variable_description, variable_value: variable.variable_value };
+  const initialValues = (({ variable_key, variable_description, variable_value }) => ({ variable_key, variable_description, variable_value }))(variable);
 
   const submitDelete = () => {
     dispatch(deleteVariable(exercise.exercise_id, variable.variable_id));
@@ -63,14 +63,20 @@ const VariablePopover: React.FC<Props> = ({ disabled, exercise, variable, onDele
         onClose={() => setAnchorEl(null)}
       >
         <MenuItem
-          onClick={() => setEditVar(true)}
+          onClick={() => {
+            setEditVar(true);
+            setAnchorEl(null);
+          }}
           disabled={isExerciseReadOnly(exercise)}
         >
           {t('Update')}
         </MenuItem>
         {!onDeleteVariable && (
           <MenuItem
-            onClick={() => setDeleteVar(true)}
+            onClick={() => {
+              setDeleteVar(true);
+              setAnchorEl(null);
+            }}
             disabled={isExerciseReadOnly(exercise)}
           >
             {t('Delete')}

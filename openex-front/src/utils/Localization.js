@@ -588,6 +588,7 @@ const i18n = {
       'Create a new variable': 'Créer une nouvelle variable',
       'Do you want to delete the variable ?': 'Voulez vous supprimer cette variable ?',
       'Update the variable': 'Mettre à jour la variable',
+      'Invalid input. Please use only letters or underscores, and ensure the field is not empty.': 'Saisie invalide. Merci d\'utiliser uniquement des lettres ou des tirets bas, et de vous assurer que le champ n\'est pas vide.',
     },
     en: {
       openex_email: 'Email',

@@ -9,10 +9,11 @@ import { ListItemIcon, Theme } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
-import VariableForm, { Values } from './VariableForm';
+import VariableForm from './VariableForm';
 import DialogTransitionSlideUp from '../../../../utils/DialogTransitionSlideUp';
 import { addVariable } from '../../../../actions/Variable';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { VariableInput } from '../../../../utils/api-types';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {
@@ -39,7 +40,7 @@ const CreateVariable: React.FC<Props> = ({ exerciseId, inline }) => {
   const { t } = useFormatter();
 
   const dispatch = useAppDispatch();
-  const onSubmit = (data: Values) => {
+  const onSubmit = (data: VariableInput) => {
     dispatch(addVariable(exerciseId, data));
     setOpen(false);
   };

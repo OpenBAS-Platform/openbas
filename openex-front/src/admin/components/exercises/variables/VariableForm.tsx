@@ -1,90 +1,96 @@
-import { Form } from 'react-final-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import Button from '@mui/material/Button';
 import React from 'react';
-import { Config } from 'final-form';
-import { TextField } from '../../../../components/TextField';
+import { zodResolver } from '@hookform/resolvers/zod';
+import MuiTextField from '@mui/material/TextField';
+import { z } from 'zod';
 import { useFormatter } from '../../../../components/i18n';
-import { Variable } from '../../../../utils/api-types';
-
-export type Values = Pick<Variable, 'variable_key' | 'variable_description' | 'variable_value'>;
+import { VariableInput } from '../../../../utils/api-types';
+import { zodImplement } from '../../../../utils/Zod';
 
 interface Props {
-  onSubmit: Config<Values>['onSubmit']
+  onSubmit: SubmitHandler<VariableInput>
   handleClose: () => void,
   editing?: boolean,
-  initialValues?: Values
+  initialValues?: VariableInput
 }
 
-const VariableForm: React.FC<Props> = ({ onSubmit, handleClose, editing, initialValues }) => {
+const VariableForm: React.FC<Props> = ({
+  onSubmit, handleClose, editing, initialValues = {
+    variable_key: '',
+    variable_description: '',
+    variable_value: '',
+  },
+}) => {
   // Standard hooks
   const { t } = useFormatter();
 
-  const validate: Config<Values>['validate'] = (values) => {
-    const errors: Partial<Values> = {};
-    const requiredFields = ['variable_key'];
-    requiredFields.forEach((field) => {
-      const value = values[field as keyof Values];
-      if (!value) {
-        errors[field as keyof Values] = t('This field is required.');
-      }
-    });
-    return errors;
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty, isSubmitting },
+  } = useForm<VariableInput>({
+    mode: 'onTouched',
+    resolver: zodResolver(zodImplement<VariableInput>().with({
+      variable_key: z.string().regex(/^[a-z_]+$/, t('Invalid input. Please use only letters or underscores, and ensure the field is not empty.')),
+      variable_description: z.string().optional(),
+      variable_value: z.string().optional(),
+    })),
+    defaultValues: initialValues,
+  });
 
   return (
-    <Form<Values>
-      initialValues={initialValues}
-      keepDirtyOnReinitialize={true}
-      onSubmit={onSubmit}
-      validate={validate}
-      mutators={{
-        setValue: ([field, value], state, { changeValue }) => {
-          changeValue(state, field, () => value);
-        },
-      }}
-    >
-      {({ handleSubmit, form, values, submitting, pristine }) => (
-        <form id="audienceForm" onSubmit={handleSubmit}>
-          <TextField
-            variant="standard"
-            name="variable_key"
-            fullWidth={true}
-            label={t('Key')}
-          />
-          <TextField
-            variant="standard"
-            name="variable_description"
-            fullWidth={true}
-            multiline={true}
-            rows={2}
-            label={t('Description')}
-            style={{ marginTop: 20 }}
-          />
-          <TextField
-            variant="standard"
-            name="variable_value"
-            fullWidth={true}
-            label={t('Value')}
-          />
-          <div style={{ float: 'right', marginTop: 20 }}>
-            <Button
-              onClick={handleClose.bind(this)}
-              style={{ marginRight: 10 }}
-              disabled={submitting}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              color="secondary"
-              type="submit"
-              disabled={pristine || submitting}
-            >
-              {editing ? t('Update') : t('Create')}
-            </Button>
-          </div>
-        </form>
-      )}
-    </Form>
+    <form id="variableForm" onSubmit={handleSubmit(onSubmit)}>
+      <MuiTextField
+        variant="standard"
+        fullWidth={true}
+        label={t('Key')}
+        error={!!errors.variable_key}
+        helperText={
+          errors.variable_key && errors.variable_key?.message
+        }
+        inputProps={register('variable_key')}
+      />
+      <MuiTextField
+        variant="standard"
+        fullWidth={true}
+        multiline={true}
+        rows={2}
+        label={t('Description')}
+        style={{ marginTop: 20 }}
+        error={!!errors.variable_description}
+        helperText={
+          errors.variable_description && errors.variable_description?.message
+        }
+        inputProps={register('variable_description')}
+      />
+      <MuiTextField
+        variant="standard"
+        fullWidth={true}
+        label={t('Value')}
+        error={!!errors.variable_value}
+        helperText={
+          errors.variable_value && errors.variable_value?.message
+        }
+        inputProps={register('variable_value')}
+      />
+      <div style={{ float: 'right', marginTop: 20 }}>
+        <Button
+          onClick={handleClose.bind(this)}
+          style={{ marginRight: 10 }}
+          disabled={isSubmitting}
+        >
+          {t('Cancel')}
+        </Button>
+        <Button
+          color="secondary"
+          type="submit"
+          disabled={!isDirty || isSubmitting}
+        >
+          {editing ? t('Update') : t('Create')}
+        </Button>
+      </div>
+    </form>
   );
 };
 
