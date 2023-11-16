@@ -100,7 +100,7 @@
     "node": ">= 16.*"
   },
   "scripts": {
-    "start": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n api-types.d.ts && node builder/dev/dev.js",
+    "start": "node builder/dev/dev.js",
     "build": "node builder/prod/prod.js",
     "lint": "cross-env DEBUG=eslint:cli-engine TIMING=1 eslint --max-warnings 0 --cache -c .eslintrc.json src",
     "control": "yarn audit --groups dependencies --summary",
