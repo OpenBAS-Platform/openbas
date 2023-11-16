@@ -59,6 +59,7 @@ import InjectAddArticles from './InjectAddArticles';
 import MediaIcon from '../../medias/MediaIcon';
 import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
+import AvailableVariablesDialog from "../variables/AvailableVariablesDialog";
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -1909,56 +1910,10 @@ class InjectDefinition extends Component {
             )}
           </Form>
         </div>
-        <Dialog
-          TransitionComponent={Transition}
+        <AvailableVariablesDialog
           open={openVariables}
-          onClose={this.handleCloseVariables.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
-        >
-          <DialogTitle>{t('Available variables')}</DialogTitle>
-          <DialogContent>
-            <List>
-              {injectType.variables.map((variable) => (
-                <div key={variable.key}>
-                  <ListItem divider={true} dense={true}>
-                    <ListItemText
-                      primary={
-                        variable.children && variable.children.length > 0
-                          ? variable.key
-                          : `\${${variable.key}}`
-                      }
-                      secondary={t(variable.label)}
-                    />
-                  </ListItem>
-                  {variable.children && variable.children.length > 0 && (
-                    <List component="div" disablePadding>
-                      {variable.children.map((variableChild) => (
-                        <ListItem
-                          key={variableChild.key}
-                          divider={true}
-                          dense={true}
-                          sx={{ pl: 4 }}
-                        >
-                          <ListItemText
-                            primary={`\${${variableChild.key}}`}
-                            secondary={t(variableChild.label)}
-                          />
-                        </ListItem>
-                      ))}
-                    </List>
-                  )}
-                </div>
-              ))}
-            </List>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleCloseVariables.bind(this)}>
-              {t('Close')}
-            </Button>
-          </DialogActions>
-        </Dialog>
+          handleClose={this.handleCloseVariables.bind(this)}
+          injectType={injectType}/>
       </div>
     );
   }
