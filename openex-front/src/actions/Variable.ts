@@ -27,3 +27,7 @@ export const fetchVariables = (exerciseId: Exercise['exercise_id']) => (dispatch
   const uri = `/api/exercises/${exerciseId}/variables`;
   return getReferential(schema.arrayOfVariables, uri)(dispatch);
 };
+
+export interface VariablesHelper {
+  getExerciseVariables: (exerciseId: Exercise['exercise_id']) => [Variable]
+}

@@ -1,4 +1,4 @@
-import React, { CSSProperties, useState } from 'react';
+import React, { CSSProperties } from 'react';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 import List from '@mui/material/List';
@@ -6,31 +6,23 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import { AttachMoneyOutlined, CastForEducationOutlined } from '@mui/icons-material';
-import { useDispatch } from 'react-redux';
+import { AttachMoneyOutlined } from '@mui/icons-material';
 import { Theme } from '@mui/material';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import SearchFilter from '../../../../components/SearchFilter';
 import DefinitionMenu from '../DefinitionMenu';
 import { useHelper } from '../../../../store';
 import { Exercise, Variable } from '../../../../utils/api-types';
-import { useFormatter } from '../../../../components/i18n';
 import { usePermissions } from '../../../../utils/Exercise';
 import CreateVariable from './CreateVariable';
 import VariablePopover from './VariablePopover';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchAudiences } from '../../../../actions/Audience';
-import { fetchVariables } from '../../../../actions/Variable';
+import { fetchVariables, VariablesHelper } from '../../../../actions/Variable';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { ExercicesHelper } from '../../../../actions/helper';
 
 interface Params {
   exerciseId: string
-}
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-interface TODELETE_Helper {
-  getExercise: (exerciseId: Exercise['exercise_id']) => Exercise
-  getExerciseVariables: (exerciseId: Exercise['exercise_id']) => [Variable]
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -147,7 +139,7 @@ const Variables = () => {
   ]);
   // Fetching data
   const { exerciseId } = useParams<Params>();
-  const { exercise, variables }: { exercise: Exercise, variables: [Variable] } = useHelper((helper: TODELETE_Helper) => {
+  const { exercise, variables }: { exercise: Exercise, variables: [Variable] } = useHelper((helper: VariablesHelper & ExercicesHelper) => {
     return ({
       exercise: helper.getExercise(exerciseId),
       variables: helper.getExerciseVariables(exerciseId),

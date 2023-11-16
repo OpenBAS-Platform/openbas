@@ -9,12 +9,6 @@
  * ---------------------------------------------------------------
  */
 
-export interface ViolationErrorBag {
-  type?: string;
-  message?: string;
-  error?: string;
-}
-
 export interface ValidationContent {
   errors?: string[];
 }
@@ -28,6 +22,12 @@ export interface ValidationErrorBag {
   code?: number;
   message?: string;
   errors?: ValidationError;
+}
+
+export interface ViolationErrorBag {
+  type?: string;
+  message?: string;
+  error?: string;
 }
 
 export interface UpdateUserInput {
@@ -83,15 +83,15 @@ export interface Audience {
   audience_injects?: Inject[];
   audience_communications?: Communication[];
   /** @format int64 */
-  audience_injects_expectations_total_expected_score?: number;
+  audience_injects_number?: number;
+  /** @format int64 */
+  audience_users_number?: number;
   /** @format int64 */
   audience_injects_expectations_number?: number;
   /** @format int64 */
   audience_injects_expectations_total_score?: number;
   /** @format int64 */
-  audience_users_number?: number;
-  /** @format int64 */
-  audience_injects_number?: number;
+  audience_injects_expectations_total_expected_score?: number;
 }
 
 export interface Challenge {
@@ -211,21 +211,21 @@ export interface Exercise {
   exercise_lessons_categories?: LessonsCategory[];
   exercise_players?: User[];
   exercise_next_possible_status?: ("SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED")[];
+  /** @format double */
+  exercise_score?: number;
+  /** @format int64 */
+  exercise_lessons_answers_number?: number;
   /** @format date-time */
   exercise_next_inject_date?: string;
   exercise_injects_statistics?: Record<string, number>;
-  /** @format int64 */
-  exercise_lessons_answers_number?: number;
-  /** @format double */
-  exercise_score?: number;
   /** @format int64 */
   exercise_communications_number?: number;
   exercise_observers?: User[];
   /** @format int64 */
   exercise_users_number?: number;
-  exercise_planners?: User[];
   /** @format int64 */
   exercise_logs_number?: number;
+  exercise_planners?: User[];
 }
 
 export interface Grant {
@@ -285,11 +285,11 @@ export interface Inject {
   /** @format date-time */
   inject_date?: string;
   /** @format int64 */
+  inject_communications_number?: number;
+  /** @format int64 */
   inject_communications_not_ack_number?: number;
   /** @format int64 */
   inject_users_number?: number;
-  /** @format int64 */
-  inject_communications_number?: number;
   /** @format date-time */
   inject_sent_at?: string;
 }
@@ -461,18 +461,18 @@ export interface User {
   user_audiences?: Audience[];
   user_tags?: Tag[];
   user_communications?: Communication[];
+  user_is_external?: boolean;
+  user_is_manager?: boolean;
   /** @format int64 */
   user_injects_number?: number;
-  user_is_manager?: boolean;
-  user_is_planner?: boolean;
   user_is_observer?: boolean;
-  user_gravatar?: string;
+  user_is_planner?: boolean;
   /** @format date-time */
   user_last_comcheck?: string;
-  user_is_player?: boolean;
   user_injects?: Inject[];
+  user_gravatar?: string;
+  user_is_player?: boolean;
   user_is_only_player?: boolean;
-  user_is_external?: boolean;
 }
 
 export interface ChangePasswordInput {
@@ -1206,13 +1206,13 @@ export interface MediaReader {
 }
 
 export interface Contract {
-  config?: ContractConfig;
-  label?: Record<string, string>;
-  manual?: boolean;
-  fields?: ContractElement[];
-  variables?: ContractVariable[];
-  context?: Record<string, string>;
-  contract_id?: string;
+  config: ContractConfig;
+  label: Record<string, string>;
+  manual: boolean;
+  fields: ContractElement[];
+  variables: ContractVariable[];
+  context: Record<string, string>;
+  contract_id: string;
 }
 
 export interface ContractConfig {
@@ -1245,10 +1245,11 @@ export interface ContractElement {
 }
 
 export interface ContractVariable {
-  key?: string;
-  label?: string;
-  type?: "String" | "Object";
-  cardinality?: "1" | "n";
+  key: string;
+  label: string;
+  type: "String" | "Object";
+  cardinality: "1" | "n";
+  children?: ContractVariable[];
 }
 
 export interface LinkedFieldModel {

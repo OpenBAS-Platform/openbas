@@ -10,17 +10,7 @@ import ListItemText from '@mui/material/ListItemText';
 import { Form } from 'react-final-form';
 import InputLabel from '@mui/material/InputLabel';
 import { connect } from 'react-redux';
-import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-  AttachmentOutlined,
-  CastForEducationOutlined,
-  CloseRounded,
-  ControlPointOutlined,
-  DeleteOutlined,
-  EmojiEventsOutlined,
-  HelpOutlineOutlined,
-} from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, CastForEducationOutlined, CloseRounded, ControlPointOutlined, DeleteOutlined, EmojiEventsOutlined, HelpOutlineOutlined } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
@@ -30,15 +20,11 @@ import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
 import Slide from '@mui/material/Slide';
-import { DialogActions } from '@mui/material';
 import inject18n from '../../../../components/i18n';
 import { fetchInjectAudiences, updateInject } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
-import { fetchMedias, fetchExerciseArticles } from '../../../../actions/Media';
+import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
@@ -59,7 +45,7 @@ import InjectAddArticles from './InjectAddArticles';
 import MediaIcon from '../../medias/MediaIcon';
 import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
-import AvailableVariablesDialog from "../variables/AvailableVariablesDialog";
+import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -1913,6 +1899,7 @@ class InjectDefinition extends Component {
         <AvailableVariablesDialog
           open={openVariables}
           handleClose={this.handleCloseVariables.bind(this)}
+          exerciseId={exerciseId}
           injectType={injectType}/>
       </div>
     );

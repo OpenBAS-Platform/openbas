@@ -20,11 +20,7 @@ import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
 import Slide from '@mui/material/Slide';
-import { DialogActions } from '@mui/material';
 import inject18n from '../../../../components/i18n';
 import { addInject } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
@@ -48,7 +44,7 @@ import InjectAddArticles from './InjectAddArticles';
 import MediaIcon from '../../medias/MediaIcon';
 import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
-import AvailableVariablesDialog from "../variables/AvailableVariablesDialog";
+import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
 
 const EMAIL_CONTRACT = '138ad8f8-32f8-4a22-8114-aaa12322bd09';
 
@@ -1898,6 +1894,7 @@ class QuickInject extends Component {
         <AvailableVariablesDialog
           open={openVariables}
           handleClose={this.handleCloseVariables.bind(this)}
+          exerciseId={exerciseId}
           injectType={injectType}/>
       </div>
     );
