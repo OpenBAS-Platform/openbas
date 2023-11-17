@@ -54,6 +54,17 @@ const VariableForm: React.FC<Props> = ({
       <MuiTextField
         variant="standard"
         fullWidth={true}
+        label={t('Value')}
+        style={{ marginTop: 20 }}
+        error={!!errors.variable_value}
+        helperText={
+          errors.variable_value && errors.variable_value?.message
+        }
+        inputProps={register('variable_value')}
+      />
+      <MuiTextField
+        variant="standard"
+        fullWidth={true}
         multiline={true}
         rows={2}
         label={t('Description')}
@@ -63,17 +74,6 @@ const VariableForm: React.FC<Props> = ({
           errors.variable_description && errors.variable_description?.message
         }
         inputProps={register('variable_description')}
-      />
-      <MuiTextField
-        variant="standard"
-        fullWidth={true}
-        label={t('Value')}
-        style={{ marginTop: 20 }}
-        error={!!errors.variable_value}
-        helperText={
-          errors.variable_value && errors.variable_value?.message
-        }
-        inputProps={register('variable_value')}
       />
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button
