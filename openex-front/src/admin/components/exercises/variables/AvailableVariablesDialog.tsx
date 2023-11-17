@@ -57,7 +57,7 @@ const VariableChildItem: FunctionComponent<VariableChildItemProps> = ({
         primary={formattedVariableKey}
         secondary={builtin ? t(variableValue) : variableValue}
       />
-      {!hasChildren && <CopyAllOutlined />}
+      <CopyAllOutlined />
     </ListItemButton>
   );
 };
