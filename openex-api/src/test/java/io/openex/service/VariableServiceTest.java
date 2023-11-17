@@ -11,8 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -83,11 +82,7 @@ public class VariableServiceTest {
   @Order(4)
   void deleteVariableTest() {
     this.variableService.deleteVariable(VARIABLE_ID);
-    try {
-      this.variableService.variable(VARIABLE_ID);
-    } catch (Exception e) {
-      assertEquals(NoSuchElementException.class, e.getClass());
-    }
+    assertThrows(NoSuchElementException.class, () -> this.variableService.variable(VARIABLE_ID));
   }
 
 }
