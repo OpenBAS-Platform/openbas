@@ -77,7 +77,7 @@ const VariableForm: React.FC<Props> = ({
       />
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button
-          onClick={handleClose.bind(this)}
+          onClick={handleClose}
           style={{ marginRight: 10 }}
           disabled={isSubmitting}
         >

@@ -184,7 +184,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
           <ExerciseForm
             initialValues={initialValues}
             editing={true}
-            onSubmit={onSubmitEdit.bind(this)}
+            onSubmit={onSubmitEdit}
             handleClose={handleCloseEdit}
           />
         </DialogContent>
