@@ -1,4 +1,6 @@
-import { z } from 'zod';
+import { z, ZodError, ZodType } from 'zod';
+import { setIn } from 'final-form';
+import { ZodTypeDef } from 'zod/lib/types';
 
 type ZodImplements<Model> = {
   [key in keyof Model]-?: undefined extends Model[key]
@@ -21,3 +23,18 @@ export function zodImplement<Model = never>() {
     ) => z.object(schema),
   };
 }
+
+export const schemaValidator = (schema: ZodType<unknown>) => (values: unknown) => {
+  try {
+    schema.parse(values);
+  } catch (e) {
+    return (e as ZodError).issues.reduce((errors, error) => {
+      let path = '';
+      if (error.path) {
+        path = error.path[0].toString();
+      }
+      return setIn(errors, path, error.message);
+    }, {});
+  }
+  return {};
+};

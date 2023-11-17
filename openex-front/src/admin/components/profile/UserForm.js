@@ -2,19 +2,21 @@ import React from 'react';
 import { Form } from 'react-final-form';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
-import * as Yup from 'yup';
+import { z } from 'zod';
 import { Select } from '../../../components/Select';
 import { TextField } from '../../../components/TextField';
 import { useFormatter } from '../../../components/i18n';
 import OrganizationField from '../../../components/OrganizationField';
 import CountryField from '../../../components/CountryField';
-import schemaValidator from '../../../utils/Yup';
+import { schemaValidator } from '../../../utils/Zod';
 
 const UserForm = ({ onSubmit, initialValues }) => {
   const { t } = useFormatter();
 
-  const userFormSchemaValidation = Yup.object().shape({
-    user_email: Yup.string().email(t('Should be a valid email address')).required(t('This field is required')),
+  const userFormSchemaValidation = z.object({
+    user_email: z.string().email(t('Should be a valid email address')),
+    user_firstname: z.string(),
+    user_lastname: z.string(),
   });
 
   return (
