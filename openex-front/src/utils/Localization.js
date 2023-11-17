@@ -592,8 +592,9 @@ const i18n = {
       'Invalid input. Please use only letters or underscores, and ensure the field is not empty.': 'Saisie invalide. Merci d\'utiliser uniquement des lettres ou des tirets bas, et de vous assurer que le champ n\'est pas vide.',
       'Built in variables': 'Variables intégrées',
       'Custom variables': 'Variables personnalisées',
-      'Manage Variables': 'Gérer les variables',
-      'View variables': 'Afficher les variables',
+      'Please follow this link to': 'Merci de suivre ce lien pour',
+      'manage custom variables': 'gérer les variables personnalisées',
+      'view custom variables': 'afficher les variables personnalisées',
     },
     en: {
       openex_email: 'Email',

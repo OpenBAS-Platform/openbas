@@ -1,14 +1,15 @@
-import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import { DialogActions, ListSubheader, Theme } from '@mui/material';
+import { Alert, DialogActions, ListItemButton, Tab } from '@mui/material';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { Link } from 'react-router-dom';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
+import { CopyAllOutlined } from '@mui/icons-material';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { Contract, User, Variable } from '../../../../utils/api-types';
@@ -17,15 +18,18 @@ import { fetchVariables, VariablesHelper } from '../../../../actions/Variable';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { UsersHelper } from '../../../../actions/helper';
+import { copyToClipboard } from '../../../../utils/CopyToClipboard';
 
 interface VariableChildItemProps {
   hasChildren?: boolean
+  builtin?: boolean,
   variableKey: string
   variableValue: string | undefined
 }
 
 const VariableChildItem: FunctionComponent<VariableChildItemProps> = ({
   hasChildren = false,
+  builtin = false,
   variableKey,
   variableValue,
 }) => {
@@ -35,28 +39,42 @@ const VariableChildItem: FunctionComponent<VariableChildItemProps> = ({
     return <></>;
   }
 
+  const formattedVariableKey = `\${${variableKey}}`;
+
+  if (hasChildren) {
+    return (
+      <ListItem divider={true} dense={true}>
+        <ListItemText
+          primary={variableKey}
+          secondary={builtin ? t(variableValue) : variableValue}
+        />
+      </ListItem>
+    );
+  }
   return (
-    <ListItem divider={true} dense={true}>
+    <ListItemButton divider={true} dense={true} disabled={hasChildren} onClick={() => copyToClipboard(formattedVariableKey)}>
       <ListItemText
-        primary={hasChildren ? variableKey : `\${${variableKey}}`}
-        secondary={t(variableValue)}
+        primary={formattedVariableKey}
+        secondary={builtin ? t(variableValue) : variableValue}
       />
-    </ListItem>
+      {!hasChildren && <CopyAllOutlined />}
+    </ListItemButton>
   );
 };
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   button: {
-    marginRight: theme.spacing(2),
-    padding: '0 5px 0 5px',
-    minHeight: 20,
-    minWidth: 20,
     textTransform: 'none',
+    height: 18,
   },
   containerFlex: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
+  },
+  dialogPaper: {
+    minHeight: '90vh',
+    maxHeight: '90vh',
   },
 }));
 
@@ -76,6 +94,11 @@ const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps>
   const classes = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const [tab, setTab] = useState('1');
+
+  const handleChange = (event: React.SyntheticEvent, newTab: string) => {
+    setTab(newTab);
+  };
 
   const { variables, me }: { variables: [Variable], me: User } = useHelper((helper: VariablesHelper & UsersHelper) => {
     return ({
@@ -88,6 +111,7 @@ const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps>
   });
 
   return (
+
     <Dialog
       onClose={handleClose}
       open={open}
@@ -95,74 +119,89 @@ const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps>
       maxWidth="md"
       PaperProps={{ elevation: 1 }}
       TransitionComponent={Transition}
+      classes={{ paper: classes.dialogPaper }}
     >
-      <DialogTitle>{t('Available variables')}</DialogTitle>
-      <DialogContent>
-        <List subheader={
-          <ListSubheader component="div">
-            {t('Built in variables')}
-          </ListSubheader>
-        }>
-          {injectType.variables.map((variable) => (
-            <div key={variable.key}>
-              <VariableChildItem
-                hasChildren={variable.children && variable.children.length > 0}
-                variableKey={variable.key}
-                variableValue={variable.label}
-              />
-              {variable.children && variable.children.length > 0 && (
-                <List component="div" disablePadding>
-                  {variable.children.map((variableChild) => (
-                    <ListItem
-                      key={variableChild.key}
-                      divider={true}
-                      dense={true}
-                      sx={{ pl: 4 }}
-                    >
-                      <ListItemText
-                        primary={`\${${variableChild.key}}`}
-                        secondary={t(variableChild.label)}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-            </div>
-          ))}
-        </List>
-        <List subheader={
-          <ListSubheader component="div" classes={{ root: classes.containerFlex }}>
-            {t('Custom variables')}
-            {/* TODO: validate when migrate to new react router version */}
-            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-            {/* @ts-ignore */}
-            <Button component={Link}
-                    to={`/admin/exercises/${exerciseId}/definition/variables`}
-                    variant="text"
-                    size="small"
-                    color="primary"
-                    classes={{ root: classes.button }}
-            >
-              {me.user_is_planner ? t('Manage Variables') : t('View Variables')}
-            </Button>
-          </ListSubheader>
-        }>
-          {variables.map((variable) => (
-            <div key={variable.variable_key}>
-              <VariableChildItem
-                variableKey={variable.variable_key}
-                variableValue={variable.variable_value}
-              />
-            </div>
-          ))}
-        </List>
-      </DialogContent>
+      <TabContext value={tab}>
+        <TabList onChange={handleChange} style={{ marginLeft: 24, marginTop: 24 }}>
+          <Tab sx={{ textTransform: 'none' }} label={t('Builtin variables')} value="1" />
+          <Tab sx={{ textTransform: 'none' }} label={t('Custom variables')} value="2" />
+        </TabList>
+        <DialogContent>
+          <TabPanel value="1" style={{ maxHeight: '100%', overflow: 'auto', padding: 0 }}>
+            <List>
+              {injectType.variables.map((variable) => {
+                return (
+                  <div key={variable.key}>
+                    <VariableChildItem
+                      builtin
+                      hasChildren={variable.children && variable.children.length > 0}
+                      variableKey={variable.key}
+                      variableValue={variable.label}
+                    />
+                    {variable.children && variable.children.length > 0 && (
+                      <List component="div" disablePadding>
+                        {variable.children.map((variableChild) => {
+                          const variableChildKey = `\${${variableChild.key}}`;
+                          return (
+                            <ListItemButton
+                              key={variableChild.key}
+                              divider={true}
+                              dense={true}
+                              sx={{ pl: 4 }}
+                              onClick={() => copyToClipboard(variableChildKey)}
+                            >
+                              <ListItemText
+                                primary={variableChildKey}
+                                secondary={t(variableChild.label)}
+                              />
+                              <CopyAllOutlined />
+                            </ListItemButton>
+                          );
+                        })}
+                      </List>
+                    )}
+                  </div>
+                );
+              })}
+            </List>
+          </TabPanel>
+          <TabPanel value="2" style={{ maxHeight: '100%', overflow: 'auto', padding: 0 }}>
+            <Alert severity="info">
+              {t('Please follow this link to')}
+              {/* TODO: validate when migrate to new react router version */}
+              {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+              {/* @ts-ignore */}
+              <Button component={Link}
+                      to={`/admin/exercises/${exerciseId}/definition/variables`}
+                      color="primary"
+                      variant="text"
+                      size="small"
+                      className={classes.button}
+              >
+                {me.user_is_planner ? t('manage custom variables') : t('view custom variables')}
+              </Button>
+            </Alert>
+            <List>
+              {variables.map((variable) => (
+                <div key={variable.variable_key}>
+                  <VariableChildItem
+                    variableKey={variable.variable_key}
+                    variableValue={variable.variable_value}
+                  />
+                </div>
+              ))}
+            </List>
+          </TabPanel>
+        </DialogContent>
+      </TabContext>
+
       <DialogActions>
         <Button onClick={handleClose}>
           {t('Close')}
         </Button>
       </DialogActions>
     </Dialog>
+
   );
 };
 
