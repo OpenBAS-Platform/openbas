@@ -5,14 +5,14 @@ import { ListItemButton, ListItemIcon } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
 import { addPlayer } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
-import Drawer from '../../../components/common/Drawer';
 import { useFormatter } from '../../../components/i18n';
 import Dialog from '../../../components/common/Dialog';
 import { makeStyles } from '@mui/styles';
 import { useAppDispatch } from '../../../utils/hooks';
 import { Theme } from '../../../components/Theme';
-import { CreatePlayerInput, CreateUserInput, User } from '../../../utils/api-types';
+import { CreatePlayerInput } from '../../../utils/api-types';
 import { Option } from '../../../utils/Option';
+import { PlayerInputForm } from './Player';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {
@@ -32,8 +32,6 @@ interface CreatePlayerProps {
   onCreate: (result: any) => void,
 }
 
-type CreatePlayerInputForm = CreatePlayerInput & { user_organization: Option, user_country: Option, user_tags: Option[] }
-
 const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
   inline,
   onCreate,
@@ -43,15 +41,11 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
   const dispatch = useAppDispatch();
 
   const [openDialog, setOpenDialog] = useState(false);
-  const [openDrawer, setOpenDrawer] = useState(false);
 
   const handleOpen = () => setOpenDialog(true);
   const handleClose = () => setOpenDialog(false);
 
-  const handleOpenDrawer = () => setOpenDrawer(true)
-  const handleCloseDrawer = () => setOpenDrawer(false);
-
-  const onSubmit = (data: CreatePlayerInputForm) => {
+  const onSubmit = (data: PlayerInputForm) => {
     const inputValues: CreatePlayerInput = {
       ...data,
       user_organization: data.user_organization?.id,
@@ -65,12 +59,7 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
         if (onCreate) {
           onCreate(result.result);
         }
-        if (openDialog) {
-          return handleClose();
-        }
-        if (openDrawer) {
-          return handleCloseDrawer();
-        }
+        return handleClose();
       }
       return result;
     });
@@ -94,7 +83,7 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
         </ListItemButton>
       ) : (
         <Fab
-          onClick={handleOpenDrawer}
+          onClick={handleOpen}
           color="primary"
           aria-label="Add"
           className={classes.createButton}
@@ -113,18 +102,6 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
           handleClose={handleClose}
         />
       </Dialog>
-      <Drawer
-        open={openDrawer}
-        handleClose={handleCloseDrawer}
-        title={t('Create a new player')}>
-        <PlayerForm
-          editing={false}
-          onSubmit={onSubmit}
-          initialValues={{ user_tags: [] }}
-          handleClose={handleCloseDrawer}
-          variant="contained"
-        />
-      </Drawer>
     </div>
   );
 }

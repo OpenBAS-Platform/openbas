@@ -403,8 +403,6 @@ class AudiencesPlayers extends Component {
                   exerciseId={exerciseId}
                   audienceId={audienceId}
                   audienceUsersIds={users.map((u) => u.user_id)}
-                  tagsMap={tagsMap}
-                  organizationsMap={organizationsMap}
                 />
               </ListItemSecondaryAction>
             </ListItem>

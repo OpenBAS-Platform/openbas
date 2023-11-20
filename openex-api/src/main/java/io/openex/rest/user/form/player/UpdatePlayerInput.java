@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import static io.openex.config.AppConfig.EMAIL_FORMAT;
 public class UpdatePlayerInput {
 
   @Email(message = EMAIL_FORMAT)
+  @NotBlank
   @JsonProperty("user_email")
   private String email;
 

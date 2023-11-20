@@ -32,7 +32,7 @@ class PlayerForm extends Component {
   }
 
   render() {
-    const { t, classes, onSubmit, initialValues, editing, handleClose, canUpdateEmail, variant } = this.props;
+    const { t, classes, onSubmit, initialValues, editing, handleClose, canUpdateEmail } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -116,14 +116,12 @@ class PlayerForm extends Component {
             />
             <div className={classes.container} style={{ marginTop: 20 }}>
               <Button
-                variant={variant ? variant : 'text'}
                 onClick={handleClose.bind(this)}
                 disabled={submitting}
               >
                 {t('Cancel')}
               </Button>
               <Button
-                variant={variant ? variant : 'text'}
                 color="secondary"
                 type="submit"
                 disabled={pristine || submitting}
@@ -145,7 +143,6 @@ PlayerForm.propTypes = {
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
   canUpdateEmail: PropTypes.bool,
-  variant: PropTypes.string,
 };
 
 export default R.compose(

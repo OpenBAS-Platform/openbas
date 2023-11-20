@@ -403,3 +403,13 @@ export const exercisesConverter = (exercise_ids, exercisesMap) => (exercise_ids 
     id: exerciseItem.exercise_id,
     label: exerciseItem.exercise_name,
   }));
+
+export const organizationConverter = (organizationId, organizationsMap) => {
+  const value = organizationsMap[organizationId]
+  return value
+    ? {
+      id: value.organization_id,
+      label: value.organization_name,
+    }
+    : null;
+}
