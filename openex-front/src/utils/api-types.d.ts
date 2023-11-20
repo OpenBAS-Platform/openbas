@@ -83,15 +83,15 @@ export interface Audience {
   audience_injects?: Inject[];
   audience_communications?: Communication[];
   /** @format int64 */
+  audience_injects_number?: number;
+  /** @format int64 */
+  audience_users_number?: number;
+  /** @format int64 */
   audience_injects_expectations_number?: number;
   /** @format int64 */
   audience_injects_expectations_total_score?: number;
   /** @format int64 */
   audience_injects_expectations_total_expected_score?: number;
-  /** @format int64 */
-  audience_injects_number?: number;
-  /** @format int64 */
-  audience_users_number?: number;
 }
 
 export interface Challenge {
@@ -185,7 +185,7 @@ export interface ExecutionTrace {
 export interface Exercise {
   updateAttributes?: object;
   exercise_id?: string;
-  exercise_name?: string;
+  exercise_name: string;
   exercise_description?: string;
   exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   exercise_subtitle?: string;
@@ -211,21 +211,21 @@ export interface Exercise {
   exercise_lessons_categories?: LessonsCategory[];
   exercise_players?: User[];
   exercise_next_possible_status?: ("SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED")[];
-  exercise_injects_statistics?: Record<string, number>;
+  /** @format double */
+  exercise_score?: number;
   /** @format int64 */
   exercise_lessons_answers_number?: number;
   /** @format date-time */
   exercise_next_inject_date?: string;
+  exercise_injects_statistics?: Record<string, number>;
   /** @format int64 */
   exercise_communications_number?: number;
-  /** @format double */
-  exercise_score?: number;
-  exercise_planners?: User[];
   exercise_observers?: User[];
   /** @format int64 */
   exercise_users_number?: number;
   /** @format int64 */
   exercise_logs_number?: number;
+  exercise_planners?: User[];
 }
 
 export interface Grant {
@@ -287,9 +287,9 @@ export interface Inject {
   /** @format int64 */
   inject_communications_number?: number;
   /** @format int64 */
-  inject_users_number?: number;
-  /** @format int64 */
   inject_communications_not_ack_number?: number;
+  /** @format int64 */
+  inject_users_number?: number;
   /** @format date-time */
   inject_sent_at?: string;
 }
@@ -412,9 +412,9 @@ export interface Organization {
   /** @format date-time */
   organization_updated_at?: string;
   organization_tags?: Tag[];
+  organization_injects?: Inject[];
   /** @format int64 */
   organization_injects_number?: number;
-  organization_injects?: Inject[];
 }
 
 export interface Pause {
@@ -436,6 +436,7 @@ export interface Tag {
 }
 
 export interface User {
+  injects?: Inject[];
   updateAttributes?: object;
   user_id?: string;
   user_firstname?: string;
@@ -460,18 +461,18 @@ export interface User {
   user_audiences?: Audience[];
   user_tags?: Tag[];
   user_communications?: Communication[];
+  user_is_external?: boolean;
   user_is_manager?: boolean;
   /** @format int64 */
   user_injects_number?: number;
-  user_is_planner?: boolean;
   user_is_observer?: boolean;
+  user_is_planner?: boolean;
   /** @format date-time */
   user_last_comcheck?: string;
-  user_is_player?: boolean;
-  user_gravatar?: string;
-  user_is_only_player?: boolean;
   user_injects?: Inject[];
-  user_is_external?: boolean;
+  user_gravatar?: string;
+  user_is_player?: boolean;
+  user_is_only_player?: boolean;
 }
 
 export interface ChangePasswordInput {
@@ -649,6 +650,28 @@ export interface ExerciseUpdateInput {
   exercise_mail_from?: string;
   exercise_message_header?: string;
   exercise_message_footer?: string;
+}
+
+export interface VariableInput {
+  /** @pattern ^[a-z_]+$ */
+  variable_key: string;
+  variable_value?: string;
+  variable_description?: string;
+}
+
+export interface Variable {
+  updateAttributes?: object;
+  variable_id: string;
+  /** @pattern ^[a-z_]+$ */
+  variable_key: string;
+  variable_value?: string;
+  variable_description?: string;
+  variable_type: "String" | "Object";
+  variable_exercise?: Exercise;
+  /** @format date-time */
+  variable_created_at?: string;
+  /** @format date-time */
+  variable_updated_at?: string;
 }
 
 export interface ExerciseUpdateTagsInput {
@@ -1068,9 +1091,9 @@ export interface Dryrun {
   dryrun_date?: string;
   dryrun_exercise?: Exercise;
   dryrun_users?: User[];
-  dryrun_finished?: boolean;
   /** @format int64 */
   dryrun_users_number?: number;
+  dryrun_finished?: boolean;
   /** @format date-time */
   dryrun_start_date?: string;
   /** @format date-time */
@@ -1183,13 +1206,13 @@ export interface MediaReader {
 }
 
 export interface Contract {
-  config?: ContractConfig;
-  label?: Record<string, string>;
-  manual?: boolean;
-  fields?: ContractElement[];
-  variables?: ContractVariable[];
-  context?: Record<string, string>;
-  contract_id?: string;
+  config: ContractConfig;
+  label: Record<string, string>;
+  manual: boolean;
+  fields: ContractElement[];
+  variables: ContractVariable[];
+  context: Record<string, string>;
+  contract_id: string;
 }
 
 export interface ContractConfig {
@@ -1222,10 +1245,11 @@ export interface ContractElement {
 }
 
 export interface ContractVariable {
-  key?: string;
-  label?: string;
-  type?: "String" | "Object";
-  cardinality?: "1" | "n";
+  key: string;
+  label: string;
+  type: "String" | "Object";
+  cardinality: "1" | "n";
+  children?: ContractVariable[];
 }
 
 export interface LinkedFieldModel {

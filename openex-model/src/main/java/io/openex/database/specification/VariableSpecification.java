@@ -1,0 +1,13 @@
+package io.openex.database.specification;
+
+import io.openex.database.model.Variable;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.jpa.domain.Specification;
+
+public class VariableSpecification {
+
+  public static Specification<Variable> fromExercise(@NotNull final String exerciseId) {
+    return (root, query, cb) -> cb.equal(root.get("exercise").get("id"), exerciseId);
+  }
+
+}

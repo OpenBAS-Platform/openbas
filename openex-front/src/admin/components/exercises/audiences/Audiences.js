@@ -194,7 +194,7 @@ const Audiences = () => {
             currentTags={filtering.tags}
           />
         </div>
-        <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
+        <div style={{ float: 'right', margin: '-5px 15px 0 0', maxHeight: '35px' }}>
           {sortedAudiences.length > 0 ? (
             <CSVLink
               data={exportData(

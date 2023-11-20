@@ -16,8 +16,7 @@ import static io.openex.contract.ContractCardinality.Multiple;
 import static io.openex.contract.ContractCardinality.One;
 import static io.openex.contract.ContractDef.contractBuilder;
 import static io.openex.contract.ContractVariable.variable;
-import static io.openex.contract.VariableType.Object;
-import static io.openex.contract.VariableType.String;
+import io.openex.database.model.Variable.VariableType;
 import static io.openex.contract.fields.ContractArticle.articleField;
 import static io.openex.contract.fields.ContractAttachment.attachmentField;
 import static io.openex.contract.fields.ContractAudience.audienceField;
@@ -92,10 +91,10 @@ public class MediaContract extends Contractor {
         Contract publishArticle = executableContract(contractConfig,
                 MEDIA_PUBLISH, Map.of(en, "Publish media pressure", fr, "Publier de la pression médiatique"), publishInstance);
         // Adding generated variables
-        publishArticle.addVariable(variable(VARIABLE_ARTICLES, "List of articles published by the injection", Object, Multiple, List.of(
-                variable(VARIABLE_ARTICLE + ".id", "Id of the article in the platform", String, One),
-                variable(VARIABLE_ARTICLE + ".name", "Name of the article", String, One),
-                variable(VARIABLE_ARTICLE + ".uri", "Http user link to access the article", String, One)
+        publishArticle.addVariable(variable(VARIABLE_ARTICLES, "List of articles published by the injection", VariableType.Object, Multiple, List.of(
+                variable(VARIABLE_ARTICLE + ".id", "Id of the article in the platform", VariableType.String, One),
+                variable(VARIABLE_ARTICLE + ".name", "Name of the article", VariableType.String, One),
+                variable(VARIABLE_ARTICLE + ".uri", "Http user link to access the article", VariableType.String, One)
         )));
         return List.of(publishArticle);
     }

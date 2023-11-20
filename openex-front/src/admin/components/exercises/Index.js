@@ -27,6 +27,7 @@ import { errorWrapper } from '../../../components/Error';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
 import Report from './reports/Report';
+import Variables from './variables/Variables';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -88,6 +89,11 @@ const Index = () => {
             exact
             path="/admin/exercises/:exerciseId/definition/challenges"
             render={errorWrapper(Challenges)}
+          />
+          <Route
+              exact
+              path="/admin/exercises/:exerciseId/definition/variables"
+              render={errorWrapper(Variables)}
           />
           <Route
             exact

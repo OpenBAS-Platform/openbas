@@ -9,6 +9,7 @@ import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
 
@@ -40,6 +41,7 @@ public class Exercise implements Base {
 
     @Column(name = "exercise_name")
     @JsonProperty("exercise_name")
+    @NotBlank
     private String name;
 
     @Column(name = "exercise_description")

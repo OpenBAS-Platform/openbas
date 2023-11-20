@@ -1,0 +1,27 @@
+### Need to disable security entirely to run this
+
+###
+# @name Create variable
+POST http://localhost:8080/api/exercises/50d0125b-f97a-43fa-bbcf-968cebc7d033/variables
+Content-Type: application/json
+
+{ "variable_key": "key", "variable_value": "A value" }
+
+###
+# @name Retrieve variables
+GET http://localhost:8080/api/exercises/50d0125b-f97a-43fa-bbcf-968cebc7d033/variables
+
+###
+# @name Update variable
+PUT http://localhost:8080/api/exercises/50d0125b-f97a-43fa-bbcf-968cebc7d033/variables/f43300b7-83a5-4cff-bd6e-8876c25129e0
+Content-Type: application/json
+
+{ "variable_key": "key_updated", "variable_value": "A value" }
+
+###
+# @name Delete variable
+DELETE http://localhost:8080/api/exercises/50d0125b-f97a-43fa-bbcf-968cebc7d033/variables/f43300b7-83a5-4cff-bd6e-8876c25129e0
+
+###
+# @name Delete cascading
+DELETE http://localhost:8080/api/exercises/50d0125b-f97a-43fa-bbcf-968cebc7d033

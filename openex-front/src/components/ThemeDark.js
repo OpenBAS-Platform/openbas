@@ -200,5 +200,16 @@ export default (
         },
       },
     },
+    MuiTableCell: {
+      styleOverrides: {
+        head: {
+          borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
+        },
+        body: {
+          borderTop: '1px solid rgba(255, 255, 255, 0.15)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
+        },
+      },
+    },
   },
 });

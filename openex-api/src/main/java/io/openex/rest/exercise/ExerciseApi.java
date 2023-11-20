@@ -9,6 +9,7 @@ import io.openex.database.specification.*;
 import io.openex.rest.exception.InputValidationException;
 import io.openex.rest.exercise.exports.ExerciseExportMixins;
 import io.openex.rest.exercise.exports.ExerciseFileExport;
+import io.openex.rest.exercise.exports.VariableMixin;
 import io.openex.rest.exercise.form.*;
 import io.openex.rest.exercise.response.PublicExercise;
 import io.openex.rest.helper.RestBehavior;
@@ -27,6 +28,8 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
@@ -93,6 +96,7 @@ public class ExerciseApi extends RestBehavior {
   private FileService fileService;
   private InjectService injectService;
   private ChallengeService challengeService;
+  private VariableService variableService;
   // endregion
 
   // region setters
@@ -204,6 +208,11 @@ public class ExerciseApi extends RestBehavior {
   @Autowired
   public void setLessonsAnswerRepository(LessonsAnswerRepository lessonsAnswerRepository) {
     this.lessonsAnswerRepository = lessonsAnswerRepository;
+  }
+
+  @Autowired
+  public void setVariableService(@NotNull final VariableService variableService) {
+    this.variableService = variableService;
   }
   // endregion
 
@@ -526,7 +535,10 @@ public class ExerciseApi extends RestBehavior {
   // region import/export
   @GetMapping("/api/exercises/{exerciseId}/export")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public void exerciseExport(@PathVariable String exerciseId, @RequestParam(required = false) boolean isWithPlayers,
+  public void exerciseExport(
+      @NotBlank @PathVariable final String exerciseId,
+      @RequestParam(required = false) final boolean isWithPlayers,
+      @RequestParam(required = false) final boolean isWithVariables,
       HttpServletResponse response) throws IOException {
     // Setup the mapper for export
     List<String> documentIds = new ArrayList<>();
@@ -601,10 +613,20 @@ public class ExerciseApi extends RestBehavior {
     // Tags
     importExport.setTags(exerciseTags.stream().distinct().toList());
     objectMapper.addMixIn(Tag.class, ExerciseExportMixins.Tag.class);
+    // -- Variables --
+    if (isWithVariables) {
+      List<Variable> variables = this.variableService.variables(exerciseId);
+      importExport.setVariables(variables);
+      objectMapper.addMixIn(Variable.class, VariableMixin.class);
+    }
     // Build the response
+    String infos = "("
+        + (isWithPlayers ? "with_players" : "no_players")
+        + " & "
+        + (isWithVariables ? "with_variables" : "no_variables")
+        + ")";
     String zipName =
-        (exercise.getName() + "_" + now().toString()) + "_" + (isWithPlayers ? "(with_players)" : "(no_players)")
-            + ".zip";
+        (exercise.getName() + "_" + now().toString()) + "_" + infos + ".zip";
     response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
     response.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip");
     response.setStatus(HttpServletResponse.SC_OK);

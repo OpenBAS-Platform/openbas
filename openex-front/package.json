@@ -9,6 +9,7 @@
     "@date-io/date-fns": "2.16.0",
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
+    "@hookform/resolvers": "3.3.2",
     "@mui/icons-material": "5.14.14",
     "@mui/lab": "5.0.0-alpha.149",
     "@mui/material": "5.14.14",
@@ -46,6 +47,7 @@
     "react-dropzone": "14.2.3",
     "react-final-form": "6.5.9",
     "react-final-form-arrays": "3.1.4",
+    "react-hook-form": "7.48.2",
     "react-intl": "6.2.1",
     "react-leaflet": "4.1.0",
     "react-markdown": "8.0.7",
@@ -62,13 +64,14 @@
     "seamless-immutable": "7.1.4",
     "typeface-ibm-plex-sans": "1.1.13",
     "typeface-roboto": "1.1.13",
-    "yup": "1.3.2"
+    "zod": "3.22.4"
   },
   "devDependencies": {
     "@types/jest": "27.5.2",
     "@types/node": "18.11.9",
     "@types/react": "18.2.34",
     "@types/react-dom": "18.2.14",
+    "@types/react-router-dom": "5.3.3",
     "@types/seamless-immutable": "7.1.18",
     "chokidar": "3.5.3",
     "compression": "1.7.4",
@@ -96,12 +99,12 @@
     "node": ">= 16.*"
   },
   "scripts": {
-    "start": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n index.d.ts && node builder/dev/dev.js",
+    "start": "node builder/dev/dev.js",
     "build": "node builder/prod/prod.js",
     "lint": "cross-env DEBUG=eslint:cli-engine TIMING=1 eslint --max-warnings 0 --cache -c .eslintrc.json src",
     "control": "yarn audit --groups dependencies --summary",
     "test": "jest --coverage",
-    "generate-types-from-api": "swagger-typescript-api --no-client -p ../openex-api/swagger.json -o src/utils -n index.d.ts"
+    "generate-types-from-api": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n api-types.d.ts"
   },
   "resolutions": {
     "mini-css-extract-plugin": "2.4.7",

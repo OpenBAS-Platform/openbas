@@ -1,6 +1,5 @@
 package io.openex.rest.inject;
 
-import io.openex.config.OpenExConfig;
 import io.openex.contract.Contract;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
@@ -11,6 +10,7 @@ import io.openex.execution.Injector;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.inject.form.*;
 import io.openex.service.ContractService;
+import io.openex.service.ExecutionContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
@@ -18,9 +18,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -38,9 +38,6 @@ public class InjectApi extends RestBehavior {
 
   private static final int MAX_NEXT_INJECTS = 6;
 
-  @Resource
-  private OpenExConfig openExConfig;
-
   private CommunicationRepository communicationRepository;
   private ExerciseRepository exerciseRepository;
   private UserRepository userRepository;
@@ -51,6 +48,7 @@ public class InjectApi extends RestBehavior {
   private DocumentRepository documentRepository;
   private ApplicationContext context;
   private ContractService contractService;
+  private ExecutionContextService executionContextService;
 
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
@@ -101,6 +99,10 @@ public class InjectApi extends RestBehavior {
   public void setContext(ApplicationContext context) {
     this.context = context;
   }
+  @Autowired
+  public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
+    this.executionContextService = executionContextService;
+  }
 
   @GetMapping("/api/inject_types")
   public Collection<Contract> injectTypes() {
@@ -110,9 +112,10 @@ public class InjectApi extends RestBehavior {
   @GetMapping("/api/injects/try/{injectId}")
   public InjectStatus tryInject(@PathVariable String injectId) {
     Inject inject = injectRepository.findById(injectId).orElseThrow();
+    User user = this.userRepository.findById(currentUser().getId()).orElseThrow();
     List<ExecutionContext> userInjectContexts = List.of(
-        new ExecutionContext(openExConfig, userRepository.findById(currentUser().getId()).orElseThrow(), inject,
-            "Direct test"));
+        this.executionContextService.executionContext(user, inject, "Direct test")
+    );
     Contract contract = contractService.resolveContract(inject);
     if (contract == null) {
       throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
@@ -245,7 +248,7 @@ public class InjectApi extends RestBehavior {
     inject.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
     Iterable<User> users = userRepository.findAllById(input.getUserIds());
     List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
-        .map(user -> new ExecutionContext(openExConfig, user, inject, "Direct execution")).toList();
+        .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
     ExecutableInject injection = new ExecutableInject(true, true, inject, contract, List.of(), userInjectContexts);
     file.ifPresent(injection::addDirectAttachment);
     Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);

@@ -11,13 +11,13 @@ import javax.persistence.*;
 import java.time.Instant;
 import java.util.Objects;
 
+@Getter
 @Entity
 @Table(name = "tokens")
 public class Token implements Base {
 
     public static final String ADMIN_TOKEN_UUID = "0d17ce9a-f3a8-4c6d-9721-c98dc3dc023f";
 
-    @Getter
     @Setter
     @Id
     @Column(name = "token_id")
@@ -26,7 +26,6 @@ public class Token implements Base {
     @JsonProperty("token_id")
     private String id;
 
-    @Getter
     @Setter
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "token_user")
@@ -34,13 +33,11 @@ public class Token implements Base {
     @JsonProperty("token_user")
     private User user;
 
-    @Getter
     @Setter
     @Column(name = "token_value")
     @JsonProperty("token_value")
     private String value;
 
-    @Getter
     @Setter
     @Column(name = "token_created_at")
     @JsonProperty("token_created_at")

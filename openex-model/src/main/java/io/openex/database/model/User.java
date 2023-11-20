@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import static java.time.Instant.now;
 import static java.util.stream.StreamSupport.stream;
 
+@Getter
 @Entity
 @Table(name = "users")
 @EntityListeners(ModelBaseListener.class)
@@ -32,7 +33,6 @@ public class User implements Base {
   public static final String THEME_DEFAULT = "default";
   public static final String LANG_AUTO = "auto";
 
-  @Getter
   @Setter
   @Id
   @Column(name = "user_id")
@@ -41,13 +41,11 @@ public class User implements Base {
   @JsonProperty("user_id")
   private String id;
 
-  @Getter
   @Setter
   @Column(name = "user_firstname")
   @JsonProperty("user_firstname")
   private String firstname;
 
-  @Getter
   @Setter
   @Column(name = "user_lastname")
   @JsonProperty("user_lastname")
@@ -63,55 +61,46 @@ public class User implements Base {
   @JsonProperty("user_theme")
   private String theme = THEME_DEFAULT;
 
-  @Getter
   @Setter
   @Column(name = "user_email")
   @JsonProperty("user_email")
   private String email;
 
-  @Getter
   @Setter
   @Column(name = "user_phone")
   @JsonProperty("user_phone")
   private String phone;
 
-  @Getter
   @Setter
   @Column(name = "user_phone2")
   @JsonProperty("user_phone2")
   private String phone2;
 
-  @Getter
   @Setter
   @Column(name = "user_pgp_key")
   @JsonProperty("user_pgp_key")
   private String pgpKey;
 
-  @Getter
   @Setter
   @Column(name = "user_status")
   @JsonProperty("user_status")
   private Short status = 0;
 
-  @Getter
   @Setter
   @Column(name = "user_password")
   @JsonIgnore
   private String password;
 
-  @Getter
   @Setter
   @Column(name = "user_created_at")
   @JsonProperty("user_created_at")
   private Instant createdAt = now();
 
-  @Getter
   @Setter
   @Column(name = "user_updated_at")
   @JsonProperty("user_updated_at")
   private Instant updatedAt = now();
 
-  @Getter
   @Setter
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_organization")
@@ -119,25 +108,21 @@ public class User implements Base {
   @JsonProperty("user_organization")
   private Organization organization;
 
-  @Getter
   @Setter
   @Column(name = "user_admin")
   @JsonProperty("user_admin")
   private boolean admin = false;
 
-  @Getter
   @Setter
   @Column(name = "user_country")
   @JsonProperty("user_country")
   private String country;
 
-  @Getter
   @Setter
   @Column(name = "user_city")
   @JsonProperty("user_city")
   private String city;
 
-  @Getter
   @Setter
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "users_groups",
@@ -147,7 +132,6 @@ public class User implements Base {
   @JsonProperty("user_groups")
   private List<Group> groups = new ArrayList<>();
 
-  @Getter
   @Setter
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "users_audiences",
@@ -157,7 +141,6 @@ public class User implements Base {
   @JsonProperty("user_audiences")
   private List<Audience> audiences = new ArrayList<>();
 
-  @Getter
   @Setter
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "users_tags",
@@ -167,7 +150,6 @@ public class User implements Base {
   @JsonProperty("user_tags")
   private List<Tag> tags = new ArrayList<>();
 
-  @Getter
   @Setter
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "communications_users",
@@ -177,13 +159,11 @@ public class User implements Base {
   @JsonProperty("user_communications")
   private List<Communication> communications = new ArrayList<>();
 
-  @Getter
   @Setter
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   @JsonIgnore
   private List<Token> tokens = new ArrayList<>();
 
-  @Getter
   @Setter
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   @JsonIgnore

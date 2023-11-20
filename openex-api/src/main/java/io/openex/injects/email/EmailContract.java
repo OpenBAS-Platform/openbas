@@ -7,6 +7,7 @@ import io.openex.contract.Contractor;
 import io.openex.contract.fields.ContractElement;
 import io.openex.contract.fields.ContractNumber;
 import io.openex.contract.fields.ContractSelect;
+import io.openex.database.model.Variable.VariableType;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -18,7 +19,6 @@ import static io.openex.contract.ContractCardinality.Multiple;
 import static io.openex.contract.ContractCardinality.One;
 import static io.openex.contract.ContractDef.contractBuilder;
 import static io.openex.contract.ContractVariable.variable;
-import static io.openex.contract.VariableType.String;
 import static io.openex.contract.fields.ContractAttachment.attachmentField;
 import static io.openex.contract.fields.ContractAudience.audienceField;
 import static io.openex.contract.fields.ContractCheckbox.checkboxField;
@@ -54,7 +54,7 @@ public class EmailContract extends Contractor {
     public List<Contract> contracts() {
         // variables
         ContractVariable documentUriVariable = variable("document_uri",
-                "Http user link to upload the document (only for document expectation)", String, One);
+                "Http user link to upload the document (only for document expectation)", VariableType.String, One);
         // Contracts
         ContractConfig contractConfig = getConfig();
         HashMap<String, String> choices = new HashMap<>();

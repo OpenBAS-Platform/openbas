@@ -7,23 +7,12 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import { PreviewOutlined } from '@mui/icons-material';
-import withStyles from '@mui/styles/withStyles';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import TableBody from '@mui/material/TableBody';
 import Table from '@mui/material/Table';
 import { Transition } from '../../../../utils/Environment';
 import inject18n from '../../../../components/i18n';
-
-const styles = () => ({
-  tableHeader: {
-    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
-  },
-  tableCell: {
-    borderTop: '1px solid rgba(255, 255, 255, 0.15)',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
-  },
-});
 
 class InjectStatusDetails extends Component {
   constructor(props) {
@@ -40,7 +29,7 @@ class InjectStatusDetails extends Component {
   }
 
   render() {
-    const { t, classes, status } = this.props;
+    const { t, status } = this.props;
     return (
       <div>
         <IconButton
@@ -67,26 +56,22 @@ class InjectStatusDetails extends Component {
                       if (key === 'execution_traces') {
                         return (
                           <TableRow key={key}>
-                            <TableCell classes={{ root: classes.tableCell }}>
+                            <TableCell>
                               {key}
                             </TableCell>
-                            <TableCell classes={{ root: classes.tableCell }}>
+                            <TableCell>
                               <Table selectable={false} size="small" key={key}>
                                 <TableBody displayRowCheckbox={false}>
                                   {value.map((trace) => (
                                     <TableRow key={trace.trace_identifier}>
-                                      <TableCell
-                                        classes={{ root: classes.tableCell }}
-                                      >
+                                      <TableCell>
                                         {trace.trace_message}
                                       </TableCell>
-                                      <TableCell
-                                        classes={{ root: classes.tableCell }}
-                                      >
+                                      <TableCell>
                                         {trace.trace_status}
                                       </TableCell>
                                       <TableCell
-                                        classes={{ root: classes.tableCell }}
+
                                       >
                                         {trace.trace_time}
                                       </TableCell>
@@ -100,10 +85,10 @@ class InjectStatusDetails extends Component {
                       }
                       return (
                         <TableRow key={key}>
-                          <TableCell classes={{ root: classes.tableCell }}>
+                          <TableCell>
                             {key}
                           </TableCell>
-                          <TableCell classes={{ root: classes.tableCell }}>
+                          <TableCell>
                             {value}
                           </TableCell>
                         </TableRow>
@@ -131,4 +116,4 @@ InjectStatusDetails.propTypes = {
   status: PropTypes.object,
 };
 
-export default R.compose(inject18n, withStyles(styles))(InjectStatusDetails);
+export default R.compose(inject18n)(InjectStatusDetails);

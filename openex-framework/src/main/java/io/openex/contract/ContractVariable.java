@@ -1,52 +1,57 @@
 package io.openex.contract;
 
+import io.openex.database.model.Variable.VariableType;
+import lombok.Getter;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
+@Getter
 public class ContractVariable {
 
-    private final String key;
+  @NotBlank
+  private final String key;
 
-    private final String label;
+  @NotBlank
+  private final String label;
 
-    private final VariableType type;
+  @NotNull
+  private final VariableType type;
 
-    private final ContractCardinality cardinality;
+  @NotNull
+  private final ContractCardinality cardinality;
 
-    private final List<ContractVariable> children;
+  private final List<ContractVariable> children;
 
-    private ContractVariable(String key, String label, VariableType type, ContractCardinality cardinality, List<ContractVariable> children) {
-        this.key = key;
-        this.label = label;
-        this.type = type;
-        this.cardinality = cardinality;
-        this.children = children;
-    }
+  private ContractVariable(
+      @NotBlank final String key,
+      @NotBlank final String label,
+      @NotNull final VariableType type,
+      @NotNull final ContractCardinality cardinality,
+      final List<ContractVariable> children) {
+    this.key = key;
+    this.label = label;
+    this.type = type;
+    this.cardinality = cardinality;
+    this.children = children;
+  }
 
-    public static ContractVariable variable(String key, String label, VariableType type, ContractCardinality cardinality) {
-        return new ContractVariable(key, label, type, cardinality, List.of());
-    }
+  public static ContractVariable variable(
+      @NotBlank final String key,
+      @NotBlank final String label,
+      @NotNull final VariableType type,
+      @NotNull final ContractCardinality cardinality) {
+    return new ContractVariable(key, label, type, cardinality, List.of());
+  }
 
-    public static ContractVariable variable(String key, String label, VariableType type, ContractCardinality cardinality, List<ContractVariable> children) {
-        return new ContractVariable(key, label, type, cardinality, children);
-    }
+  public static ContractVariable variable(
+      @NotBlank final String key,
+      @NotBlank final String label,
+      @NotNull final VariableType type,
+      @NotNull final ContractCardinality cardinality,
+      final List<ContractVariable> children) {
+    return new ContractVariable(key, label, type, cardinality, children);
+  }
 
-    public String getKey() {
-        return key;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public VariableType getType() {
-        return type;
-    }
-
-    public ContractCardinality getCardinality() {
-        return cardinality;
-    }
-
-    public List<ContractVariable> getChildren() {
-        return children;
-    }
 }
