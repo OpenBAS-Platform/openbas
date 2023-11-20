@@ -3,7 +3,6 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
@@ -14,12 +13,13 @@ import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { updateAudiencePlayers } from '../../../actions/Audience';
-import { updatePlayer, deletePlayer } from '../../../actions/User';
+import { deletePlayer, updatePlayer } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
 import inject18n from '../../../components/i18n';
 import { storeHelper, tagsConverter } from '../../../actions/Schema';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
 import { countryOption } from '../../../utils/Countries';
+import Drawer from "../../../components/common/Drawer";
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -200,26 +200,20 @@ class PlayerPopover extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-        <Dialog
-          TransitionComponent={Transition}
+        <Drawer
           open={this.state.openEdit}
-          onClose={this.handleCloseEdit.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
-        >
-          <DialogTitle>{t('Update the player')}</DialogTitle>
-          <DialogContent>
-            <PlayerForm
-              initialValues={initialValues}
-              editing={true}
-              organizations={R.values(organizationsMap)}
-              onSubmit={this.onSubmitEdit.bind(this)}
-              handleClose={this.handleCloseEdit.bind(this)}
-              canUpdateEmail={canUpdateEmail}
-            />
-          </DialogContent>
-        </Dialog>
+          handleClose={this.handleCloseEdit.bind(this)}
+          title={t('Update the player')}>
+          <PlayerForm
+            initialValues={initialValues}
+            editing={true}
+            organizations={R.values(organizationsMap)}
+            onSubmit={this.onSubmitEdit.bind(this)}
+            handleClose={this.handleCloseEdit.bind(this)}
+            canUpdateEmail={canUpdateEmail}
+            variant="contained"
+          />
+        </Drawer>
         <Dialog
           open={this.state.openRemove}
           TransitionComponent={Transition}

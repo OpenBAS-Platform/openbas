@@ -3,9 +3,6 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Fab from '@mui/material/Fab';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
 import withStyles from '@mui/styles/withStyles';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { ListItemIcon } from '@mui/material';
@@ -13,8 +10,9 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItem from '@mui/material/ListItem';
 import { addPlayer } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
+import Drawer from "../../../components/common/Drawer";
 import inject18n from '../../../components/i18n';
-import { Transition } from '../../../utils/Environment';
+import Dialog from "../../../components/common/Dialog";
 
 const styles = (theme) => ({
   createButton: {
@@ -32,15 +30,26 @@ const styles = (theme) => ({
 class CreatePlayer extends Component {
   constructor(props) {
     super(props);
-    this.state = { open: false };
+    this.state = {
+      open: false,
+      openDrawer: false,
+    };
   }
 
   handleOpen() {
     this.setState({ open: true });
   }
 
+  handleOpenDrawer() {
+    this.setState({ openDrawer: true });
+  }
+
   handleClose() {
     this.setState({ open: false });
+  }
+
+  handleCloseDrawer() {
+    this.setState({ openDrawer: false });
   }
 
   onSubmit(data) {
@@ -64,7 +73,12 @@ class CreatePlayer extends Component {
         if (this.props.onCreate) {
           this.props.onCreate(result.result);
         }
-        return this.handleClose();
+        if (this.state.open) {
+          return this.handleClose();
+        }
+        if (this.state.openDrawer) {
+          return this.handleCloseDrawer();
+        }
       }
       return result;
     });
@@ -91,7 +105,7 @@ class CreatePlayer extends Component {
           </ListItem>
         ) : (
           <Fab
-            onClick={this.handleOpen.bind(this)}
+            onClick={this.handleOpenDrawer.bind(this)}
             color="primary"
             aria-label="Add"
             className={classes.createButton}
@@ -101,23 +115,29 @@ class CreatePlayer extends Component {
         )}
         <Dialog
           open={this.state.open}
-          TransitionComponent={Transition}
-          onClose={this.handleClose.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
-        >
-          <DialogTitle>{t('Create a new player')}</DialogTitle>
-          <DialogContent>
-            <PlayerForm
-              editing={false}
-              onSubmit={this.onSubmit.bind(this)}
-              organizations={organizations}
-              initialValues={{ user_tags: [] }}
-              handleClose={this.handleClose.bind(this)}
-            />
-          </DialogContent>
+          handleClose={this.handleClose.bind(this)}
+          title={t('Create a new player')}>
+          <PlayerForm
+            editing={false}
+            onSubmit={this.onSubmit.bind(this)}
+            organizations={organizations}
+            initialValues={{ user_tags: [] }}
+            handleClose={this.handleClose.bind(this)}
+          />
         </Dialog>
+        <Drawer
+          open={this.state.openDrawer}
+          handleClose={this.handleCloseDrawer.bind(this)}
+          title={t('Create a new player')}>
+          <PlayerForm
+            editing={false}
+            onSubmit={this.onSubmit.bind(this)}
+            organizations={organizations}
+            initialValues={{ user_tags: [] }}
+            handleClose={this.handleCloseDrawer.bind(this)}
+            variant="contained"
+          />
+        </Drawer>
       </div>
     );
   }

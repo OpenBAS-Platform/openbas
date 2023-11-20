@@ -7,6 +7,16 @@ import inject18n from '../../../components/i18n';
 import TagField from '../../../components/TagField';
 import OrganizationField from '../../../components/OrganizationField';
 import CountryField from '../../../components/CountryField';
+import * as R from "ramda";
+import withStyles from "@mui/styles/withStyles";
+
+const styles = (theme) => ({
+  container: {
+    display: 'flex',
+    gap: theme.spacing(2),
+    placeContent: 'end'
+  },
+});
 
 class PlayerForm extends Component {
   validate(values) {
@@ -22,7 +32,7 @@ class PlayerForm extends Component {
   }
 
   render() {
-    const { t, onSubmit, initialValues, editing, handleClose, canUpdateEmail } = this.props;
+    const { t, classes, onSubmit, initialValues, editing, handleClose, canUpdateEmail, variant } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -104,15 +114,16 @@ class PlayerForm extends Component {
               setFieldValue={form.mutators.setValue}
               style={{ marginTop: 20 }}
             />
-            <div style={{ float: 'right', marginTop: 20 }}>
+            <div className={classes.container} style={{ marginTop: 20 }}>
               <Button
+                variant={variant ? variant : 'text'}
                 onClick={handleClose.bind(this)}
-                style={{ marginRight: 10 }}
                 disabled={submitting}
               >
                 {t('Cancel')}
               </Button>
               <Button
+                variant={variant ? variant : 'text'}
                 color="secondary"
                 type="submit"
                 disabled={pristine || submitting}
@@ -134,6 +145,10 @@ PlayerForm.propTypes = {
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
   canUpdateEmail: PropTypes.bool,
+  variant: PropTypes.string,
 };
 
-export default inject18n(PlayerForm);
+export default R.compose(
+  inject18n,
+  withStyles(styles),
+)(PlayerForm);
