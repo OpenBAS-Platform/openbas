@@ -8,7 +8,7 @@ export interface Option {
   color?: string
 }
 
-export const tagOptions = (tag_ids: string[], tagsMap: Record<string, Tag>) => (tag_ids ?? [])
+export const tagOptions = (tag_ids: string[] | undefined, tagsMap: Record<string, Tag>) => (tag_ids ?? [])
   .map((tagId) => tagsMap[tagId])
   .filter((tagItem) => tagItem !== undefined)
   .map((tagItem) => ({
@@ -25,7 +25,10 @@ export const exerciseOptions = (exercise_ids: string[], exercisesMap: Record<str
     label: exerciseItem.exercise_name,
   } as Option));
 
-export const organizationOption = (organizationId: string, organizationsMap: Record<string, Organization>) => {
+export const organizationOption = (organizationId: string | undefined, organizationsMap: Record<string, Organization>) => {
+  if (!organizationId) {
+    return undefined;
+  }
   const value = organizationsMap[organizationId];
   return value
     ? {
@@ -40,7 +43,7 @@ export const countryOptions = () => countries.features.map((n) => ({
   label: n.properties.NAME,
 } as Option));
 
-export const countryOption = (iso3: string) => {
+export const countryOption = (iso3: string | undefined) => {
   if (!iso3) {
     return undefined;
   }
