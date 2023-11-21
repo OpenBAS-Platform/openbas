@@ -42,6 +42,7 @@ public class InjectHelperTest {
   void injectsToRunTest() {
     // -- PREPARE --
     Exercise exercise = new Exercise();
+    exercise.setName("Exercice name");
     exercise.setStart(Instant.now());
     exercise.setStatus(RUNNING);
     Exercise exerciseSaved = this.exerciseRepository.save(exercise);
@@ -64,6 +65,7 @@ public class InjectHelperTest {
     inject.setStatus(status);
     inject.setExercise(exerciseSaved);
     inject.setAudiences(List.of(audience));
+    inject.setDependsDuration(0L);
     this.injectRepository.save(inject);
 
     // -- EXECUTE --

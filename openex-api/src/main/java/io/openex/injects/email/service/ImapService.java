@@ -217,7 +217,7 @@ public class ImapService {
                 Inject inject = injectResolver(content, contentHtml);
                 List<String> participants = computeParticipants(message);
                 List<User> users = userRepository.findAllByEmailIn(participants);
-                if (inject != null && users.size() > 0) {
+                if (inject != null && !users.isEmpty()) {
                     String subject = message.getSubject();
                     String from = String.valueOf(Arrays.stream(message.getFrom()).toList().get(0));
                     String to = String.valueOf(Arrays.stream(message.getAllRecipients()).toList());

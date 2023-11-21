@@ -75,7 +75,7 @@ public class EmailExecutor extends Injector {
         boolean mustBeEncrypted = content.isEncrypted();
         // Resolve the attachments only once
         List<ExecutionContext> users = injection.getUsers();
-        if (users.size() == 0) {
+        if (users.isEmpty()) {
             throw new UnsupportedOperationException("Email needs at least one user");
         }
         // If a doc upload is required, add the doc uri variable
