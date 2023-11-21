@@ -29,6 +29,7 @@ public class AppConfig {
   public final static String MANDATORY_MESSAGE = "This value should not be blank.";
   public final static String NOW_FUTURE_MESSAGE = "This date must be now or in the future.";
   public final static String EMAIL_FORMAT = "This field must be a valid email.";
+  public final static String PHONE_FORMAT = "This field must start with '+' character and country identifier.";
 
   @Resource
   private OpenExConfig openExConfig;

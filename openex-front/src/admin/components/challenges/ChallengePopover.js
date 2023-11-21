@@ -15,8 +15,8 @@ import { useDispatch } from 'react-redux';
 import ChallengeForm from './ChallengeForm';
 import { useFormatter } from '../../../components/i18n';
 import { deleteChallenge, updateChallenge } from '../../../actions/Challenge';
-import { tagsConverter } from '../../../actions/Schema';
 import { useHelper } from '../../../store';
+import { tagOptions } from '../../../utils/Option';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -76,7 +76,7 @@ const ChallengePopover = ({ challenge, documents, onRemoveChallenge }) => {
     handleCloseRemove();
   };
   // Rendering
-  const challengeTags = tagsConverter(challenge.challenge_tags, tagsMap);
+  const challengeTags = tagOptions(challenge.challenge_tags, tagsMap);
   const initialValues = R.pipe(
     R.assoc('challenge_tags', challengeTags),
     R.pick([

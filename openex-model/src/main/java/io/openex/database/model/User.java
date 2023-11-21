@@ -12,6 +12,8 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,6 +41,7 @@ public class User implements Base {
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
   @JsonProperty("user_id")
+  @NotBlank
   private String id;
 
   @Setter
@@ -64,6 +67,7 @@ public class User implements Base {
   @Setter
   @Column(name = "user_email")
   @JsonProperty("user_email")
+  @NotBlank
   private String email;
 
   @Setter
@@ -84,6 +88,7 @@ public class User implements Base {
   @Setter
   @Column(name = "user_status")
   @JsonProperty("user_status")
+  @NotNull
   private Short status = 0;
 
   @Setter
@@ -175,7 +180,7 @@ public class User implements Base {
 
   public String getTheme() {
     return Optional.ofNullable(this.theme).orElse(THEME_DEFAULT);
-  }// region transient
+  }
 
   private transient List<Inject> injects = new ArrayList<>();
 
@@ -189,12 +194,12 @@ public class User implements Base {
   @JsonProperty("user_injects")
   @JsonSerialize(using = MultiIdDeserializer.class)
   public List<Inject> getUserInject() {
-    return injects;
+    return this.injects;
   }
 
   @JsonProperty("user_injects_number")
   public long getUserInjectsNumber() {
-    return injects.size();
+    return this.injects.size();
   }
 
   @JsonProperty("user_gravatar")
@@ -238,14 +243,11 @@ public class User implements Base {
   public boolean isExternal() {
     return this.getId().equals(ADMIN_UUID);
   }
-  // endregion
-
 
   @JsonIgnore
   public String getName() {
     return getFirstname() + " " + getLastname();
   }
-
 
   @JsonProperty("user_is_only_player")
   public boolean isOnlyPlayer() {
@@ -266,16 +268,16 @@ public class User implements Base {
       return false;
     }
     Base base = (Base) o;
-    return id.equals(base.getId());
+    return this.id.equals(base.getId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);
+    return Objects.hash(this.id);
   }
 
   @Override
   public String toString() {
-    return email;
+    return this.email;
   }
 }

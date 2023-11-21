@@ -318,11 +318,7 @@ const Players = () => {
               }
             />
             <ListItemSecondaryAction>
-              <PlayerPopover
-                user={user}
-                tagsMap={tagsMap}
-                organizationsMap={organizationsMap}
-              />
+              <PlayerPopover user={user} />
             </ListItemSecondaryAction>
           </ListItem>
         ))}

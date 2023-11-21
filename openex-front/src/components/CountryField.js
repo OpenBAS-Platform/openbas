@@ -3,9 +3,9 @@ import * as R from 'ramda';
 import { FlagOutlined } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import withStyles from '@mui/styles/withStyles';
-import { countriesOptions } from '../utils/Countries';
 import { Autocomplete } from './Autocomplete';
 import inject18n from './i18n';
+import { countryOptions } from '../utils/Option';
 
 const styles = () => ({
   icon: {
@@ -34,7 +34,7 @@ class CountryField extends Component {
           fullWidth={true}
           multiple={false}
           label={t('Country')}
-          options={countriesOptions()}
+          options={countryOptions()}
           style={{ marginTop: 20 }}
           renderOption={(props, option) => (
             <Box component="li" {...props}>
