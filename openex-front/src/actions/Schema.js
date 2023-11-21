@@ -386,30 +386,3 @@ export const storeHelper = (state) => ({
     (c) => c.lessons_template_question_category === id,
   ),
 });
-
-export const tagsConverter = (tag_ids, tagsMap) => (tag_ids ?? [])
-  .map((tagId) => tagsMap[tagId])
-  .filter((tagItem) => tagItem !== undefined)
-  .map((tagItem) => ({
-    id: tagItem.tag_id,
-    label: tagItem.tag_name,
-    color: tagItem.tag_color,
-  }));
-
-export const exercisesConverter = (exercise_ids, exercisesMap) => (exercise_ids ?? [])
-  .map((exerciseId) => exercisesMap[exerciseId])
-  .filter((exerciseItem) => exerciseItem !== undefined)
-  .map((exerciseItem) => ({
-    id: exerciseItem.exercise_id,
-    label: exerciseItem.exercise_name,
-  }));
-
-export const organizationConverter = (organizationId, organizationsMap) => {
-  const value = organizationsMap[organizationId]
-  return value
-    ? {
-      id: value.organization_id,
-      label: value.organization_name,
-    }
-    : null;
-}

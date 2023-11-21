@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
 import MuiDialog from '@mui/material/Dialog';
-import Dialog from '../../../components/common/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
@@ -9,17 +8,16 @@ import IconButton from '@mui/material/IconButton';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Dialog from '../../../components/common/Dialog';
 import { updateAudiencePlayers } from '../../../actions/Audience';
 import { deletePlayer, updatePlayer } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
 import { useFormatter } from '../../../components/i18n';
-import { organizationConverter, tagsConverter } from '../../../actions/Schema';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
-import { countryOption } from '../../../utils/Countries';
 import { useAppDispatch } from '../../../utils/hooks';
 import Transition from '../../../components/common/Transition';
 import { UpdatePlayerInput } from '../../../utils/api-types';
-import { Option } from '../../../utils/Option';
+import { countryOption, Option, organizationOption, tagOptions } from '../../../utils/Option';
 import { useHelper } from '../../../store';
 import { ExercicesHelper, OrganizationsHelper, TagsHelper, UsersHelper } from '../../../actions/helper';
 import { PlayerInputForm, UserStore } from './Player';
@@ -74,12 +72,12 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
       ...data,
       user_organization: data.user_organization?.id,
       user_country: data.user_country?.id,
-      user_tags: data.user_tags?.map((t: Option) => t.id)
-    }
+      user_tags: data.user_tags?.map((tag: Option) => tag.id),
+    };
     return dispatch(
-      updatePlayer(user.user_id, inputValues)
+      updatePlayer(user.user_id, inputValues),
     ).then(() => handleCloseEdit());
-  }
+  };
 
   // Deletion
   const handleOpenDelete = () => {
@@ -109,18 +107,18 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
         exerciseId,
         audienceId,
         {
-          audience_users: audienceUsersIds?.filter((id) => id !== user.user_id)
-        }
-      )
+          audience_users: audienceUsersIds?.filter((id) => id !== user.user_id),
+        },
+      ),
     ).then(() => handleCloseRemove());
-  }
+  };
 
-  const initialValues = {
+  const initialValues: PlayerInputForm = {
     ...user,
-    user_organization: organizationConverter(user.user_organization, organizationsMap),
+    user_organization: organizationOption(user.user_organization, organizationsMap),
     user_country: countryOption(user.user_country),
-    user_tags: tagsConverter(user.user_tags, tagsMap),
-  }
+    user_tags: tagOptions(user.user_tags, tagsMap),
+  };
   const canDelete = user.user_email !== 'admin@openex.io' && (userAdmin || !user.user_admin);
   const canUpdateEmail = user.user_email !== 'admin@openex.io' && (userAdmin || !user.user_admin);
   return (
@@ -180,12 +178,10 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
         title={t('Update the player')}>
         <PlayerForm
           initialValues={initialValues}
-          editing={true}
-          organizations={Object.values(organizationsMap)}
-          onSubmit={onSubmitEdit}
           handleClose={handleCloseEdit.bind(this)}
+          onSubmit={onSubmitEdit}
+          editing={true}
           canUpdateEmail={canUpdateEmail}
-          variant="contained"
         />
       </Dialog>
       <MuiDialog
@@ -210,6 +206,6 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
       </MuiDialog>
     </div>
   );
-}
+};
 
 export default PlayerPopover;

@@ -78,7 +78,6 @@ class UserField extends Component {
       style,
       label,
       placeholder,
-      organizations,
       noMargin,
     } = this.props;
     const usersOptions = R.map(
@@ -120,10 +119,9 @@ class UserField extends Component {
           <DialogTitle>{t('Create a new user')}</DialogTitle>
           <DialogContent>
             <PlayerForm
-              organizations={organizations}
               initialValues={{ user_tags: [] }}
-              onSubmit={this.onSubmit.bind(this)}
               handleClose={this.handleCloseUserCreation.bind(this)}
+              onSubmit={this.onSubmit.bind(this)}
             />
           </DialogContent>
         </Dialog>

@@ -21,7 +21,8 @@ import inject18n from '../../../../components/i18n';
 import AudienceForm from './AudienceForm';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { Transition } from '../../../../utils/Environment';
-import { storeHelper, tagsConverter } from '../../../../actions/Schema';
+import { storeHelper } from '../../../../actions/Schema';
+import { tagOptions } from '../../../../utils/Option';
 
 class AudiencePopover extends Component {
   constructor(props) {
@@ -157,7 +158,7 @@ class AudiencePopover extends Component {
       tagsMap,
       disabled,
     } = this.props;
-    const audienceTags = tagsConverter(audience.audience_tags, tagsMap);
+    const audienceTags = tagOptions(audience.audience_tags, tagsMap);
     const initialValues = R.pipe(
       R.assoc('audience_tags', audienceTags),
       R.pick(['audience_name', 'audience_description', 'audience_tags']),

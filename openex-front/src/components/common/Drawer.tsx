@@ -27,9 +27,9 @@ interface DrawerProps {
   handleClose: () => void
   title: string
   children:
-    | (() => React.ReactElement)
-    | React.ReactElement
-    | null
+  | (() => React.ReactElement)
+  | React.ReactElement
+  | null
 }
 
 const Drawer: FunctionComponent<DrawerProps> = ({
@@ -72,6 +72,6 @@ const Drawer: FunctionComponent<DrawerProps> = ({
       <div className={classes.container}>{component}</div>
     </DrawerMUI>
   );
-}
+};
 
 export default Drawer;

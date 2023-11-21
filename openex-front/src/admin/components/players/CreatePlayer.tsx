@@ -3,11 +3,11 @@ import Fab from '@mui/material/Fab';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
+import { makeStyles } from '@mui/styles';
 import { addPlayer } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
 import { useFormatter } from '../../../components/i18n';
 import Dialog from '../../../components/common/Dialog';
-import { makeStyles } from '@mui/styles';
 import { useAppDispatch } from '../../../utils/hooks';
 import { Theme } from '../../../components/Theme';
 import { CreatePlayerInput } from '../../../utils/api-types';
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface CreatePlayerProps {
   inline: boolean
-  onCreate: (result: any) => void,
+  onCreate: (result: string) => void,
 }
 
 const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
@@ -50,10 +50,10 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
       ...data,
       user_organization: data.user_organization?.id,
       user_country: data.user_country?.id,
-      user_tags: data.user_tags?.map((t: Option) => t.id)
-    }
+      user_tags: data.user_tags?.map((tag: Option) => tag.id),
+    };
     return dispatch(
-      addPlayer(inputValues)
+      addPlayer(inputValues),
     ).then((result: { result: string }) => {
       if (result.result) {
         if (onCreate) {
@@ -63,7 +63,7 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
       }
       return result;
     });
-  }
+  };
 
   return (
     <div>
@@ -96,14 +96,13 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
         handleClose={handleClose}
         title={t('Create a new player')}>
         <PlayerForm
-          editing={false}
-          onSubmit={onSubmit}
           initialValues={{ user_tags: [] }}
           handleClose={handleClose}
+          onSubmit={onSubmit}
         />
       </Dialog>
     </div>
   );
-}
+};
 
 export default CreatePlayer;

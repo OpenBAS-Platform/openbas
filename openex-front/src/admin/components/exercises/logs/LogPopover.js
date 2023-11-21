@@ -16,8 +16,9 @@ import { updateLog, deleteLog } from '../../../../actions/Log';
 import LogForm from './LogForm';
 import inject18n from '../../../../components/i18n';
 import { Transition } from '../../../../utils/Environment';
-import { storeHelper, tagsConverter } from '../../../../actions/Schema';
+import { storeHelper } from '../../../../actions/Schema';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import { tagOptions } from '../../../../utils/Option';
 
 class LogPopover extends Component {
   constructor(props) {
@@ -72,7 +73,7 @@ class LogPopover extends Component {
 
   render() {
     const { t, log, exercise, tagsMap } = this.props;
-    const logTags = tagsConverter(log.log_tags, tagsMap);
+    const logTags = tagOptions(log.log_tags, tagsMap);
     const initialValues = R.pipe(
       R.assoc('log_tags', logTags),
       R.pick(['log_title', 'log_content', 'log_tags']),

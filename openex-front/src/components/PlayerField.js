@@ -9,7 +9,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import PlayerForm from '../admin/components/players/PlayerForm';
 import { addPlayer, fetchPlayers } from '../actions/User';
-import { fetchOrganizations } from '../actions/Organization';
 import { Autocomplete } from './Autocomplete';
 import inject18n from './i18n';
 import { storeHelper } from '../actions/Schema';
@@ -38,7 +37,6 @@ class PlayerField extends Component {
 
   componentDidMount() {
     this.props.fetchPlayers();
-    this.props.fetchOrganizations();
   }
 
   handleOpenUserCreation() {
@@ -78,7 +76,6 @@ class PlayerField extends Component {
       style,
       label,
       placeholder,
-      organizations,
       noMargin,
     } = this.props;
     const usersOptions = R.map(
@@ -120,10 +117,9 @@ class PlayerField extends Component {
           <DialogTitle>{t('Create a new user')}</DialogTitle>
           <DialogContent>
             <PlayerForm
-              organizations={organizations}
               initialValues={{ user_tags: [] }}
-              onSubmit={this.onSubmit.bind(this)}
               handleClose={this.handleCloseUserCreation.bind(this)}
+              onSubmit={this.onSubmit.bind(this)}
             />
           </DialogContent>
         </Dialog>
@@ -136,12 +132,11 @@ const select = (state) => {
   const helper = storeHelper(state);
   return {
     users: helper.getUsers(),
-    organizations: helper.getOrganizations(),
   };
 };
 
 export default R.compose(
-  connect(select, { fetchPlayers, fetchOrganizations, addPlayer }),
+  connect(select, { fetchPlayers, addPlayer }),
   inject18n,
   withStyles(styles),
 )(PlayerField);

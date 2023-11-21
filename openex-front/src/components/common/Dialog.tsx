@@ -2,26 +2,16 @@ import DialogMUI from '@mui/material/Dialog';
 import React, { FunctionComponent } from 'react';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import { makeStyles } from '@mui/styles';
-import { Theme } from '../Theme';
 import Transition from './Transition';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  text: {
-    fontSize: 15,
-    color: theme.palette.primary.main,
-    fontWeight: 500,
-  },
-}));
 
 interface DialogProps {
   open: boolean
   handleClose: () => void
   title: string
   children:
-    | (() => React.ReactElement)
-    | React.ReactElement
-    | null
+  | (() => React.ReactElement)
+  | React.ReactElement
+  | null
 }
 
 const Dialog: FunctionComponent<DialogProps> = ({
@@ -30,8 +20,6 @@ const Dialog: FunctionComponent<DialogProps> = ({
   title,
   children,
 }) => {
-  const classes = useStyles();
-
   let component;
   if (children) {
     if (typeof children === 'function') {
@@ -55,7 +43,7 @@ const Dialog: FunctionComponent<DialogProps> = ({
         {component}
       </DialogContent>
     </DialogMUI>
-  )
-}
+  );
+};
 
 export default Dialog;

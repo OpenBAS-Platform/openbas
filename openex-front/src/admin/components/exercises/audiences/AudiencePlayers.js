@@ -222,7 +222,6 @@ class AudiencesPlayers extends Component {
       organizationsMap,
       exerciseId,
       audienceId,
-      tagsMap,
     } = this.props;
     const { keyword, sortBy, orderAsc, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
@@ -429,7 +428,6 @@ AudiencesPlayers.propTypes = {
   fetchAudiencePlayers: PropTypes.func,
   fetchOrganizations: PropTypes.func,
   handleClose: PropTypes.func,
-  tagsMap: PropTypes.object,
 };
 
 const select = (state, ownProps) => {

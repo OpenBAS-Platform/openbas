@@ -16,11 +16,10 @@ import { updateDocument, deleteDocument } from '../../../actions/Document';
 import DocumentForm from './DocumentForm';
 import inject18n from '../../../components/i18n';
 import {
-  exercisesConverter,
   storeHelper,
-  tagsConverter,
 } from '../../../actions/Schema';
 import { Transition } from '../../../utils/Environment';
+import { exerciseOptions, tagOptions } from '../../../utils/Option';
 
 class DocumentPopover extends Component {
   constructor(props) {
@@ -105,8 +104,8 @@ class DocumentPopover extends Component {
       exercisesMap,
       disabled,
     } = this.props;
-    const documentTags = tagsConverter(document.document_tags, tagsMap);
-    const documentExercises = exercisesConverter(
+    const documentTags = tagOptions(document.document_tags, tagsMap);
+    const documentExercises = exerciseOptions(
       document.document_exercises,
       exercisesMap,
     );

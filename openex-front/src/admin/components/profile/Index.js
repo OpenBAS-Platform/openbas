@@ -11,8 +11,8 @@ import PasswordForm from './PasswordForm';
 import { useFormatter } from '../../../components/i18n';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
-import { countryOption } from '../../../utils/Countries';
 import Paper from '../../../components/common/Paper';
+import { countryOption } from '../../../utils/Option';
 
 const Index = () => {
   const { t } = useFormatter();
