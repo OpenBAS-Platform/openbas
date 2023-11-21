@@ -178,7 +178,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
         title={t('Update the player')}>
         <PlayerForm
           initialValues={initialValues}
-          handleClose={handleCloseEdit.bind(this)}
+          handleClose={handleCloseEdit}
           onSubmit={onSubmitEdit}
           editing={true}
           canUpdateEmail={canUpdateEmail}
