@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 import countries from '../resources/geo/countries.json';
+import { Exercise, Organization, Tag } from './api-types';
 
 export interface Option {
   id: string
@@ -7,7 +8,7 @@ export interface Option {
   color?: string
 }
 
-export const tagOptions = (tag_ids, tagsMap) => (tag_ids ?? [])
+export const tagOptions = (tag_ids: string[], tagsMap: Record<string, Tag>) => (tag_ids ?? [])
   .map((tagId) => tagsMap[tagId])
   .filter((tagItem) => tagItem !== undefined)
   .map((tagItem) => ({
@@ -16,7 +17,7 @@ export const tagOptions = (tag_ids, tagsMap) => (tag_ids ?? [])
     color: tagItem.tag_color,
   } as Option));
 
-export const exerciseOptions = (exercise_ids, exercisesMap) => (exercise_ids ?? [])
+export const exerciseOptions = (exercise_ids: string[], exercisesMap: Record<string, Exercise>) => (exercise_ids ?? [])
   .map((exerciseId) => exercisesMap[exerciseId])
   .filter((exerciseItem) => exerciseItem !== undefined)
   .map((exerciseItem) => ({
@@ -24,7 +25,7 @@ export const exerciseOptions = (exercise_ids, exercisesMap) => (exercise_ids ?? 
     label: exerciseItem.exercise_name,
   } as Option));
 
-export const organizationOption = (organizationId, organizationsMap) => {
+export const organizationOption = (organizationId: string, organizationsMap: Record<string, Organization>) => {
   const value = organizationsMap[organizationId];
   return value
     ? {
@@ -39,7 +40,7 @@ export const countryOptions = () => countries.features.map((n) => ({
   label: n.properties.NAME,
 } as Option));
 
-export const countryOption = (iso3) => {
+export const countryOption = (iso3: string) => {
   if (!iso3) {
     return undefined;
   }
