@@ -1,18 +1,16 @@
 package io.openex.service;
 
-import io.openex.model.CsvMapper;
-import io.openex.model.CsvMapperRepresentation;
-import io.openex.model.CsvMapperRepresentationProperty;
-import io.openex.model.PropertySchema;
+import io.openex.database.model.User;
+import io.openex.database.repository.UserRepository;
+import io.openex.model.*;
 import io.openex.rest.user.form.player.CreatePlayerInput;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.repository.CrudRepository;
-import reactor.util.function.Tuple2;
 
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import static io.openex.model.CsvMapper.SEPARATOR.COMMA;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,6 +21,9 @@ public class MappingServiceTest {
 
   @Autowired
   private MappingService mappingService;
+
+  @Autowired
+  private UserRepository userRepository;
 
   @DisplayName("Test get json schema for player")
   @Test
@@ -40,15 +41,16 @@ public class MappingServiceTest {
   void usePlayerJsonSchema() {
     CsvMapper csvMapper = buildCsvMapperForPlayer();
 
-    List<?> results = this.mappingService.mapCsvFile("mapper/Players.csv", csvMapper);
+    List<? extends RepositoryClass> results = this.mappingService.mapCsvFile("mapper/Players.csv", csvMapper);
+    this.mappingService.savingProcess(results);
 
     assertNotNull(results);
 
-    results.forEach((r) -> {
-//      Object object = r.getT1();
-//      CrudRepository<?, ?> repository = r.getT2();
-////      repository.save(object);
-    });
+    Iterable<User> userIterable = this.userRepository.findAll();
+    List<User> users = StreamSupport
+        .stream(userIterable.spliterator(), false)
+        .toList();
+    assertEquals(results.size() + 1, users.size());
 
   }
 

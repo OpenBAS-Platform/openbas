@@ -1,10 +1,8 @@
 package io.openex.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openex.model.CsvMapper;
-import io.openex.model.CsvMapperRepresentation;
-import io.openex.model.CsvMapperRepresentationProperty;
-import io.openex.model.PropertySchema;
+import io.openex.database.model.Base;
+import io.openex.model.*;
 import io.openex.model.PropertySchema.PropertySchemaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -71,12 +69,27 @@ public class MappingService {
 
   // -- REPOSITORIES --
 
-  public CrudRepository<?, ?> repository(@NotNull final Class<?> clazz) {
+  public <T extends RepositoryClass<U>, U extends Base> void savingProcess(@NotNull final List<T> inputs) {
+    inputs.forEach((input) -> {
+      try {
+        Class<U> clazz = input.repositoryClass();
+        Constructor<U> constructor = clazz.getConstructor();
+        U object = constructor.newInstance();
+        object.setUpdateAttributes(input);
+        CrudRepository<U, ?> repository = repository(clazz);
+        repository.save(object);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    });
+  }
+
+  public <U extends Base> CrudRepository<U, ?> repository(@NotNull final Class<U> clazz) {
     if (this.repositories == null) {
       this.repositories = new Repositories(this.appContext);
     }
 
-    return (CrudRepository<?, ?>) repositories.getRepositoryFor(clazz).orElseThrow();
+    return (CrudRepository<U, ?>) repositories.getRepositoryFor(clazz).orElseThrow();
   }
 
   // -- MAPPING --
@@ -84,8 +97,7 @@ public class MappingService {
   /**
    * Handle file with csv mapper
    */
-  public List<Object> mapCsvFile(@NotBlank final String path,
-      @NotNull final CsvMapper csvMapper) {
+  public <T extends RepositoryClass<U>, U extends Base> List<T> mapCsvFile(@NotBlank final String path, @NotNull final CsvMapper csvMapper) {
     List<List<String>> records = this.fileService.parseCsvFile(path, csvMapper.getSeparator().getValue());
 
     return mappingProcess(records, csvMapper);
@@ -94,19 +106,19 @@ public class MappingService {
   /**
    * Handle parse text with csv mapper
    */
-  private List<Object> mappingProcess(@NotNull final List<List<String>> records,
+  private <T extends RepositoryClass<U>, U extends Base> List<T> mappingProcess(@NotNull final List<List<String>> records,
       @NotNull final CsvMapper csvMapper) {
     if (csvMapper.isHasHeader()) {
       records.remove(0);
     }
 
-    List<Object> results = new ArrayList<>();
+    List<T> results = new ArrayList<>();
 
     // Parallelize ???
     for (List<String> record : records) {
       List<CsvMapperRepresentation> representations = csvMapper.getRepresentations();
       representations.forEach((representation) -> {
-        Object result;
+        T result;
         try {
           result = mapRecord(record, representation);
         } catch (Exception e) {
@@ -122,17 +134,17 @@ public class MappingService {
   /**
    * Map parse text to target class
    */
-  private Object mapRecord(@NotNull final List<String> record,
+  private <T extends RepositoryClass<U>, U extends Base> T mapRecord(@NotNull final List<String> record,
       @NotNull final CsvMapperRepresentation csvMapperRepresentation)
       throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-    Class<?> clazz = csvMapperRepresentation.getClazz();
+    Class<T> clazz = (Class<T>) csvMapperRepresentation.getClazz();
     // Retrieve schema
     List<PropertySchema> jsonSchema = this.schema(clazz);
     assert jsonSchema != null;
 
     // Prepare creation
-    Constructor<?> constructor = clazz.getConstructor();
-    Object object = constructor.newInstance();
+    Constructor<T> constructor = clazz.getConstructor();
+    T object = constructor.newInstance();
 
     // Compute properties
     List<CsvMapperRepresentationProperty> properties = csvMapperRepresentation.getProperties();

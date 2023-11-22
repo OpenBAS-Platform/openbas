@@ -1,6 +1,7 @@
 package io.openex.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openex.database.model.Base;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
@@ -19,7 +20,7 @@ public class CsvMapperRepresentation {
 
   @NotNull
   @JsonProperty("representation_clazz")
-  private Class<?> clazz;
+  private Class<? extends RepositoryClass<? extends Base>> clazz;
 
   @JsonProperty("representation_properties")
   @Singular
