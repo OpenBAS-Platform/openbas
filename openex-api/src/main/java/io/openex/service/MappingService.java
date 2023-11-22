@@ -12,8 +12,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.support.Repositories;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -31,7 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MappingService {
 
-  private final FileService fileService;
+  private final CsvFileService fileService;
 
   private final List<Class<?>> requiredAnnotations = List.of(
       NotNull.class,
@@ -45,6 +43,9 @@ public class MappingService {
 
   // -- SCHEMA --
 
+  /**
+   * Build mapper schema for a specific class
+   */
   public List<PropertySchema> schema(@NotNull final Class<?> clazz) {
     Field[] fields = clazz.getDeclaredFields();
     return Arrays.stream(fields).map(field -> {
@@ -80,39 +81,47 @@ public class MappingService {
 
   // -- MAPPING --
 
-  public List<Tuple2<?, CrudRepository<?, ?>>> mapCsvFile(@NotBlank final String path,
+  /**
+   * Handle file with csv mapper
+   */
+  public List<Object> mapCsvFile(@NotBlank final String path,
       @NotNull final CsvMapper csvMapper) {
     List<List<String>> records = this.fileService.parseCsvFile(path, csvMapper.getSeparator().getValue());
 
     return mappingProcess(records, csvMapper);
   }
 
-  private List<Tuple2<?, CrudRepository<?, ?>>> mappingProcess(@NotNull final List<List<String>> records,
+  /**
+   * Handle parse text with csv mapper
+   */
+  private List<Object> mappingProcess(@NotNull final List<List<String>> records,
       @NotNull final CsvMapper csvMapper) {
     if (csvMapper.isHasHeader()) {
       records.remove(0);
     }
 
-    List<Tuple2<?, CrudRepository<?, ?>>> results = new ArrayList<>();
+    List<Object> results = new ArrayList<>();
 
     // Parallelize ???
     for (List<String> record : records) {
       List<CsvMapperRepresentation> representations = csvMapper.getRepresentations();
       representations.forEach((representation) -> {
         Object result;
-        CrudRepository<?, ?> repository = this.repository(representation.getClazz());
         try {
           result = mapRecord(record, representation);
         } catch (Exception e) {
           throw new RuntimeException(e);
         }
-        results.add(Tuples.of(result, repository));
+        results.add(result);
       });
     }
 
     return results;
   }
 
+  /**
+   * Map parse text to target class
+   */
   private Object mapRecord(@NotNull final List<String> record,
       @NotNull final CsvMapperRepresentation csvMapperRepresentation)
       throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
@@ -152,10 +161,13 @@ public class MappingService {
     return object;
   }
 
+  /**
+   * Exctact value from parse text
+   */
   private String extractValue(
       @NotNull final List<String> record,
       @NotNull final CsvMapperRepresentationProperty property) {
-    int idx = FileService.columnNameToIdx(property.getColumnName());
+    int idx = CsvFileService.columnNameToIdx(property.getColumnName());
     assert idx != -1;
     return record.get(idx);
   }

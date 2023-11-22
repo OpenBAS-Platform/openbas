@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 @Service
-public class FileService {
+public class CsvFileService {
 
   /**
    * Read & parse a CSV file

@@ -40,14 +40,14 @@ public class MappingServiceTest {
   void usePlayerJsonSchema() {
     CsvMapper csvMapper = buildCsvMapperForPlayer();
 
-    List<Tuple2<?, CrudRepository<?, ?>>> results = this.mappingService.mapCsvFile("mapper/Players.csv", csvMapper);
+    List<?> results = this.mappingService.mapCsvFile("mapper/Players.csv", csvMapper);
 
     assertNotNull(results);
 
     results.forEach((r) -> {
-      Object object = r.getT1();
-      CrudRepository<?, ?> repository = r.getT2();
-//      repository.save(object);
+//      Object object = r.getT1();
+//      CrudRepository<?, ?> repository = r.getT2();
+////      repository.save(object);
     });
 
   }
