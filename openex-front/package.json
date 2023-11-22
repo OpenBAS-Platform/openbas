@@ -1,6 +1,6 @@
 {
   "name": "openex-frontend",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "private": true,
   "main": "src/index.tsx",
   "license": "Apache-2.0",
