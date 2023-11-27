@@ -1,8 +1,6 @@
 package io.openex.rest.user.form.player;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openex.database.model.User;
-import io.openex.model.RepositoryClass;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +13,7 @@ import static io.openex.config.AppConfig.EMAIL_FORMAT;
 
 @Getter
 @Setter
-public class CreatePlayerInput implements RepositoryClass<User> {
+public class CreatePlayerInput {
 
   @Email(message = EMAIL_FORMAT)
   @NotBlank
@@ -36,10 +34,5 @@ public class CreatePlayerInput implements RepositoryClass<User> {
 
   @JsonProperty("user_tags")
   private List<String> tagIds = new ArrayList<>();
-
-  @Override
-  public Class<User> repositoryClass() {
-    return User.class;
-  }
 
 }
