@@ -33,12 +33,10 @@ public class DataMapperRepresentationProperty implements Base {
   @JsonProperty("data_mapper_representation_property_name")
   private String propertyName;
 
-  @NotBlank
   @Column(name = "data_mapper_representation_property_column_name")
   @JsonProperty("data_mapper_representation_property_column_name")
   private String columnName;
 
-  @NotBlank
   @Column(name = "data_mapper_representation_property_based_on")
   @JsonProperty("data_mapper_representation_property_based_on")
   private String basedOn;
