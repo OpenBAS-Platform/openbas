@@ -8,9 +8,8 @@ import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.TagRepository;
 import io.openex.database.repository.UserRepository;
 import io.openex.database.specification.AudienceSpecification;
-import io.openex.rest.audience.form.AudienceCreateInput;
+import io.openex.rest.audience.form.AudienceInput;
 import io.openex.rest.audience.form.AudienceUpdateActivationInput;
-import io.openex.rest.audience.form.AudienceUpdateInput;
 import io.openex.rest.audience.form.UpdateUsersAudienceInput;
 import io.openex.rest.helper.RestBehavior;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +73,7 @@ public class AudienceApi extends RestBehavior {
     @PostMapping("/api/exercises/{exerciseId}/audiences")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Audience createAudience(@PathVariable String exerciseId,
-                                   @Valid @RequestBody AudienceCreateInput input) {
+                                   @Valid @RequestBody AudienceInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Audience audience = new Audience();
         audience.setUpdateAttributes(input);
@@ -93,7 +92,7 @@ public class AudienceApi extends RestBehavior {
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Audience updateAudience(@PathVariable String exerciseId,
                                    @PathVariable String audienceId,
-                                   @Valid @RequestBody AudienceUpdateInput input) {
+                                   @Valid @RequestBody AudienceInput input) {
         Audience audience = audienceRepository.findById(audienceId).orElseThrow();
         audience.setUpdateAttributes(input);
         audience.setUpdatedAt(now());
