@@ -14,11 +14,15 @@
     <description>OpenEx api</description>
 
     <properties>
+        <bcpg-jdk15on.version>1.70</bcpg-jdk15on.version>
+        <commons-codec.version>1.16.0</commons-codec.version>
+        <commons-collections4.version>4.4</commons-collections4.version>
+        <commons-email.version>1.5</commons-email.version>
         <commons-validator.version>1.7</commons-validator.version>
-        <springdoc.version>1.7.0</springdoc.version>
-        <opensaml.version>4.1.1</opensaml.version>
-        <springdoc-plugin.version>1.4</springdoc-plugin.version>
         <flyway.version>9.0.3</flyway.version>
+        <opensaml.version>4.1.1</opensaml.version>
+        <springdoc.version>1.7.0</springdoc.version>
+        <springdoc-plugin.version>1.4</springdoc-plugin.version>
     </properties>
 
     <profiles>
@@ -109,18 +113,13 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpg-jdk15on</artifactId>
-            <version>1.70</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.wnameless.json</groupId>
-            <artifactId>json-flattener</artifactId>
-            <version>0.16.6</version>
+            <version>${bcpg-jdk15on.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <!--suppress MavenPackageUpdate -->
-            <version>2.11.0</version>
+            <version>${commons-io.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-validator</groupId>
@@ -130,7 +129,7 @@
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
-            <version>2.0.1.Final</version>
+            <version>${validation-api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -153,19 +152,14 @@
             <version>${jackson.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>4.10.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-email</artifactId>
-            <version>1.5</version>
+            <version>${commons-email.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
-            <version>4.4</version>
+            <version>${commons-collections4.version}</version>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
@@ -176,7 +170,7 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <!--suppress MavenPackageUpdate -->
-            <version>1.15</version>
+            <version>${commons-codec.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>

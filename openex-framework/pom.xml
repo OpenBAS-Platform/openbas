@@ -13,10 +13,6 @@
     <name>OpenEx framework</name>
     <description>OpenEx framework</description>
 
-    <properties>
-        <commons-io.version>2.11.0</commons-io.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>io.openex</groupId>
@@ -26,12 +22,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-freemarker</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents.client5</groupId>
-            <artifactId>httpclient5</artifactId>
-            <version>5.2.1</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
