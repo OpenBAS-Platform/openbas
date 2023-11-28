@@ -40,7 +40,7 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
 
   const playerFormSchemaValidation = z.object({
     user_email: z.string().email(t('Should be a valid email address')),
-    user_phone: z.string().regex(/^\+/, t('Invalid input. Please use \'+\' character and country identifier.')).optional(),
+    user_phone: z.string().regex(/^\+/, t('Invalid input. Please use \'+\' character and country identifier.')).optional().nullable(),
   });
 
   return (

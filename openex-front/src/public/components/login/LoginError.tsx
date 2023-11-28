@@ -11,7 +11,7 @@ const LoginError: FunctionComponent = () => {
   }
 
   return (
-    <Message autoHide={false} />
+    <Message sticky={false} />
   );
 };
 

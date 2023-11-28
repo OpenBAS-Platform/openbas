@@ -1,7 +1,5 @@
 import React from 'react';
-import * as R from 'ramda';
 import * as PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 
@@ -26,7 +24,7 @@ ErrorBoundaryComponent.propTypes = {
   display: PropTypes.object,
   children: PropTypes.node,
 };
-export const ErrorBoundary = R.compose(withRouter)(ErrorBoundaryComponent);
+export const ErrorBoundary = ErrorBoundaryComponent;
 
 const SimpleError = () => (
   <Alert severity="error">

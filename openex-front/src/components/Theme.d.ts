@@ -7,6 +7,7 @@ interface ExtendedColor extends PaletteColorOptions {
 
 interface ExtendedBackground extends TypeBackground {
   nav: string;
+  navLight: string;
 }
 
 interface ExtendedPaletteOptions extends PaletteOptions {

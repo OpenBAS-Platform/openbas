@@ -29,12 +29,12 @@ const renderMarkDownField = ({
         selectedTab={selectedTab}
         onTabChange={setSelectedTab}
         generateMarkdownPreview={(markdown) => Promise.resolve(
-            <Markdown
-              remarkPlugins={[remarkGfm, remarkParse]}
-              parserOptions={{ commonmark: true }}
-            >
-              {markdown}
-            </Markdown>,
+          <Markdown
+            remarkPlugins={[remarkGfm, remarkParse]}
+            parserOptions={{ commonmark: true }}
+          >
+            {markdown}
+          </Markdown>,
         )
         }
         l18n={{

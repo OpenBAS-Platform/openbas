@@ -96,7 +96,7 @@ const LessonsPlayer = () => {
     });
     return errors;
   };
-  const submitForm = () => {};
+  const submitForm = () => { };
   const sortCategories = R.sortWith([
     R.ascend(R.prop('lessons_category_order')),
   ]);

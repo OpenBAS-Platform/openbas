@@ -22,7 +22,7 @@ const TopMenuLessons = () => {
     <div>
       <Button
         component={Link}
-        to="/admin"
+        to="/admin/lessons"
         variant={
           location.pathname.includes('/admin/lessons') ? 'contained' : 'text'
         }
