@@ -2,8 +2,6 @@ package io.openex.rest.lessons.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
 public class LessonsSendInput {
 
     @JsonProperty("subject")

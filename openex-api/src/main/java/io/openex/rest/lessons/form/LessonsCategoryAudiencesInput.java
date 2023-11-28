@@ -2,11 +2,7 @@ package io.openex.rest.lessons.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.validation.constraints.NotBlank;
-
 import java.util.List;
-
-import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
 public class LessonsCategoryAudiencesInput {
 

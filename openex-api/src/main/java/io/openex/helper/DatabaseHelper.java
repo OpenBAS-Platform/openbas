@@ -17,7 +17,7 @@ public class DatabaseHelper {
                 Optional<T> existingEntity = repository.findById(inputRelationId);
                 return existingEntity.orElse(null);
             }
-            //noinspection unchecked
+            // noinspection unchecked
             return (T) current;
         }
         return null;

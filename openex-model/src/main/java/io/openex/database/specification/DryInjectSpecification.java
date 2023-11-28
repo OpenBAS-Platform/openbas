@@ -1,7 +1,6 @@
 package io.openex.database.specification;
 
 import io.openex.database.model.DryInject;
-import io.openex.database.model.Dryrun;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.JoinType;
