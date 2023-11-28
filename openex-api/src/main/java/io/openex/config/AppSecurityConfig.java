@@ -127,8 +127,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     if (openExConfig.isAuthSaml2Enable()) {
-      DefaultRelyingPartyRegistrationResolver relyingPartyRegistrationResolver =
-          new DefaultRelyingPartyRegistrationResolver(this.relyingPartyRegistrationRepository);
+      DefaultRelyingPartyRegistrationResolver relyingPartyRegistrationResolver = new DefaultRelyingPartyRegistrationResolver(
+          this.relyingPartyRegistrationRepository);
       Saml2MetadataFilter filter = new Saml2MetadataFilter(
           (RelyingPartyRegistrationResolver) relyingPartyRegistrationResolver,
           new OpenSamlMetadataResolver());
@@ -143,8 +143,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     // Rewrite 403 code to 401
-    http.exceptionHandling().authenticationEntryPoint((request, response, authException)
-        -> response.setStatus(HttpStatus.UNAUTHORIZED.value()));
+    http.exceptionHandling().authenticationEntryPoint(
+        (request, response, authException) -> response.setStatus(HttpStatus.UNAUTHORIZED.value()));
   }
 
   @Bean
@@ -243,8 +243,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     String registrationId = clientRegistration.getRegistrationId();
     List<String> rolesFromToken = extractRolesFromToken(accessToken, registrationId);
     if (isBlank(emailAttribute)) {
-      OAuth2Error authError = new OAuth2Error("invalid_configuration", "You probably need a public email in your " + 
-registrationId + " account", "");
+      OAuth2Error authError = new OAuth2Error("invalid_configuration", "You probably need a public email in your " +
+          registrationId + " account", "");
       throw new OAuth2AuthenticationException(authError);
     }
     User userLogin = userManagement(emailAttribute, registrationId, rolesFromToken, user.getAttribute("given_name"),
@@ -268,8 +268,7 @@ registrationId + " account", "");
           user.getFirstAttribute(
               env.getProperty("openex.provider." + registrationId + ".firstname_attribute_key", String.class, "")),
           user.getFirstAttribute(
-              env.getProperty("openex.provider." + registrationId + ".lastname_attribute_key", String.class, ""))
-      );
+              env.getProperty("openex.provider." + registrationId + ".lastname_attribute_key", String.class, "")));
     } catch (Exception e) {
       LOGGER.log(Level.SEVERE, e.getMessage(), e);
     }

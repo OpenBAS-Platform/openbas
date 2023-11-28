@@ -37,12 +37,13 @@ public class InjectCrudTest {
 
     // -- EXECUTE --
     try {
-      Inject injectCreated = this.injectRepository.save(inject);
+      this.injectRepository.save(inject);
     } catch (Exception e) {
       assertEquals(TransactionSystemException.class, e.getClass());
       Throwable constraintViolationException = e.getCause().getCause();
       assertEquals(ConstraintViolationException.class, constraintViolationException.getClass());
-      Set<ConstraintViolation<?>> constraintViolations = ((ConstraintViolationException) constraintViolationException).getConstraintViolations();
+      Set<ConstraintViolation<?>> constraintViolations = ((ConstraintViolationException) constraintViolationException)
+          .getConstraintViolations();
       ConstraintViolation<?> constraintViolation = constraintViolations.iterator().next();
       assertTrue(constraintViolation.getPropertyPath().toString().contains("dependsDuration"));
       assertTrue(constraintViolation.getMessage().contains("must not be null"));

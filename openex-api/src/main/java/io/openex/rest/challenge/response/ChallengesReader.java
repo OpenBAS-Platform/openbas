@@ -1,7 +1,6 @@
 package io.openex.rest.challenge.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openex.database.model.Challenge;
 import io.openex.database.model.Exercise;
 import io.openex.rest.exercise.response.PublicExercise;
 

@@ -17,7 +17,6 @@ import javax.mail.util.ByteArrayDataSource;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static io.openex.database.model.ExecutionTrace.traceError;
 import static io.openex.database.model.ExecutionTrace.traceSuccess;
@@ -64,7 +63,8 @@ public class EmailService {
         }
     }
 
-    private MimeMessage buildMimeMessage(String from, String inReplyTo, String subject, String body, List<DataAttachment> attachments) throws Exception {
+    private MimeMessage buildMimeMessage(String from, String inReplyTo, String subject, String body,
+            List<DataAttachment> attachments) throws Exception {
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         mimeMessage.setFrom(from);
         if (inReplyTo != null) {
@@ -91,7 +91,7 @@ public class EmailService {
     }
 
     public void sendEmail(Execution execution, List<ExecutionContext> usersContext, String from, String inReplyTo,
-                          String subject, String message, List<DataAttachment> attachments) throws Exception {
+            String subject, String message, List<DataAttachment> attachments) throws Exception {
         MimeMessage mimeMessage = buildMimeMessage(from, inReplyTo, subject, message, attachments);
         List<InternetAddress> recipients = new ArrayList<>();
         for (ExecutionContext userContext : usersContext) {
@@ -107,7 +107,8 @@ public class EmailService {
     }
 
     public void sendEmail(Execution execution, ExecutionContext userContext, String from, String inReplyTo,
-                          boolean mustBeEncrypted, String subject, String message, List<DataAttachment> attachments) throws Exception {
+            boolean mustBeEncrypted, String subject, String message, List<DataAttachment> attachments)
+            throws Exception {
         String email = userContext.getUser().getEmail();
         String contextualSubject = buildContextualContent(subject, userContext);
         String contextualBody = buildContextualContent(message, userContext);

@@ -2,11 +2,8 @@ package io.openex.rest.document.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
-
-import static io.openex.config.AppConfig.EMPTY_MESSAGE;
 
 public class DocumentCreateInput {
 

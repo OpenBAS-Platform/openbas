@@ -2,10 +2,6 @@ package io.openex.rest.exercise.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.Exercise;
-import io.openex.rest.challenge.response.ChallengeInformation;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PublicExercise {
 

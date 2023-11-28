@@ -1,7 +1,6 @@
 package io.openex.rest.media.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openex.rest.inject.form.InjectDocumentInput;
 
 import javax.validation.constraints.NotBlank;
 
