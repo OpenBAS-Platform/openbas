@@ -65,7 +65,7 @@ public class User implements Base {
   private String theme = THEME_DEFAULT;
 
   @Setter
-  @Column(name = "user_email")
+  @Column(name = "user_email", unique = true)
   @JsonProperty("user_email")
   @NotBlank
   private String email;

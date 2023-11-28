@@ -30,7 +30,7 @@ public class DataMapperDefinitionHelper {
 
   public static DataMapper dataMapperAudienceDefinition() {
     // Player
-    DataMapperRepresentationProperty emailProperty = new DataMapperRepresentationProperty("user_email");
+    DataMapperRepresentationProperty emailProperty = new DataMapperRepresentationProperty("email");
 
     DataMapperRepresentation playerRepresentation = DataMapperRepresentation.builder()
         .name("Player representation")
@@ -39,10 +39,10 @@ public class DataMapperDefinitionHelper {
         .build();
 
     // Audience
-    DataMapperRepresentationProperty nameProperty = new DataMapperRepresentationProperty("audience_name");
-    DataMapperRepresentationProperty descriptionProperty = new DataMapperRepresentationProperty("audience_description");
+    DataMapperRepresentationProperty nameProperty = new DataMapperRepresentationProperty("name");
+    DataMapperRepresentationProperty descriptionProperty = new DataMapperRepresentationProperty("description");
     DataMapperRepresentationProperty userProperty = new DataMapperRepresentationProperty(
-        "audience_users",
+        "users",
         playerRepresentation.getName()
     );
 

@@ -82,4 +82,15 @@ public class DataMapperRepresentation implements Base {
     }
   }
 
+  // -- SORT --
+
+  public static int sort(
+      @NotNull final DataMapperRepresentation r1,
+      @NotNull final DataMapperRepresentation r2) {
+    return Math.toIntExact(
+        r1.getProperties().stream().filter((p) -> p.getBasedOn() != null).count()
+            - r2.getProperties().stream().filter((p) -> p.getBasedOn() != null).count()
+    );
+  }
+
 }
