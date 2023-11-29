@@ -4,9 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.Objects;
 
@@ -24,6 +27,8 @@ public class InjectExpectation implements Base {
         MANUAL,
     }
 
+    @Getter
+    @Setter
     @Column(name = "inject_expectation_type")
     @JsonProperty("inject_expectation_type")
     @Enumerated(EnumType.STRING)
@@ -31,52 +36,73 @@ public class InjectExpectation implements Base {
 
     // region basic
     @Id
-    @Column(name = "inject_expectation_id")
+    @NotBlank
+    @Getter
+    @Setter
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "inject_expectation_id")
     @JsonProperty("injectexpectation_id")
     private String id;
 
+    @Getter
+    @Setter
     @Column(name = "inject_expectation_created_at")
     @JsonProperty("inject_expectation_created_at")
     private Instant createdAt = now();
 
+    @Getter
+    @Setter
     @Column(name = "inject_expectation_updated_at")
     @JsonProperty("inject_expectation_updated_at")
     private Instant updatedAt = now();
 
+    @Getter
+    @Setter
     @Column(name = "inject_expectation_result")
     @JsonProperty("inject_expectation_result")
     private String result;
 
+    @Getter
+    @Setter
     @Column(name = "inject_expectation_score")
     @JsonProperty("inject_expectation_score")
     private Integer score;
 
+    @Getter
+    @Setter
     @Column(name = "inject_expectation_expected_score")
     @JsonProperty("inject_expectation_expected_score")
     private Integer expectedScore;
     // endregion
 
     // region contextual relations
+    @Getter
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_expectation_exercise")
     private Exercise exercise;
 
+    @Getter
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inject_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_expectation_inject")
     private Inject inject;
 
+    @Getter
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_expectation_user")
     private User user;
 
+    @Getter
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "audience_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
@@ -84,117 +110,23 @@ public class InjectExpectation implements Base {
     private Audience audience;
     // endregion
 
+    @Getter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_expectation_article")
     private Article article;
 
+    @Getter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_expectation_challenge")
     private Challenge challenge;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Exercise getExercise() {
-        return exercise;
-    }
-
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
-    }
-
-    public Inject getInject() {
-        return inject;
-    }
-
-    public void setInject(Inject inject) {
-        this.inject = inject;
-    }
-
-    public Audience getAudience() {
-        return audience;
-    }
-
-    public void setAudience(Audience audience) {
-        this.audience = audience;
-    }
-
-    public EXPECTATION_TYPE getType() {
-        return type;
-    }
-
-    public void setType(EXPECTATION_TYPE type) {
-        this.type = type;
-    }
-
-    public Integer getScore() {
-        return score;
-    }
-
-    public Integer getExpectedScore() {
-        return expectedScore;
-    }
-
-    public void setExpectedScore(Integer expectedScore) {
-        this.expectedScore = expectedScore;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
-    }
-
-    public Article getArticle() {
-        return article;
-    }
-
     public void setArticle(Article article) {
         this.type = EXPECTATION_TYPE.ARTICLE;
         this.article = article;
-    }
-
-    public Challenge getChallenge() {
-        return challenge;
     }
 
     public void setChallenge(Challenge challenge) {
