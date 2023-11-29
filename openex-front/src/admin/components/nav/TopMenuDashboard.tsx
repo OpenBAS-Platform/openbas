@@ -3,8 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../components/i18n';
+import { Theme } from '../../../components/Theme';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
   button: {
     marginRight: theme.spacing(2),
     padding: '0 5px 0 5px',
@@ -14,28 +15,25 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TopMenuChallenges = () => {
+const TopMenuDashboard: React.FC = () => {
+  const location = useLocation();
   const classes = useStyles();
   const { t } = useFormatter();
-  const location = useLocation();
+
   return (
     <div>
       <Button
         component={Link}
-        to="/admin/challenges"
-        variant={
-          location.pathname === '/admin/challenges' ? 'contained' : 'text'
-        }
+        to="/admin"
+        variant={location.pathname === '/admin' ? 'contained' : 'text'}
         size="small"
-        color={
-          location.pathname === '/admin/challenges' ? 'secondary' : 'primary'
-        }
+        color={location.pathname === '/admin' ? 'secondary' : 'primary'}
         classes={{ root: classes.button }}
       >
-        {t('Challenges')}
+        {t('Dashboard')}
       </Button>
     </div>
   );
 };
 
-export default TopMenuChallenges;
+export default TopMenuDashboard;

@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -43,7 +43,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const [anchorEl, setAnchorEl] = useState<PopoverProps['anchorEl']>(null);
@@ -87,7 +87,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     dispatch(
       deleteExercise(exercise.exercise_id),
     ).then(() => handleCloseDelete());
-    history.push('/admin/exercises');
+    navigate('/admin/exercises');
   };
 
   // Export

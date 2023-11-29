@@ -172,11 +172,11 @@ const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps>
               {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
               {/* @ts-ignore */}
               <Button component={Link}
-                      to={`/admin/exercises/${exerciseId}/definition/variables`}
-                      color="primary"
-                      variant="text"
-                      size="small"
-                      className={classes.button}
+                to={`/admin/exercises/${exerciseId}/definition/variables`}
+                color="primary"
+                variant="text"
+                size="small"
+                className={classes.button}
               >
                 {me.user_is_planner ? t('manage custom variables') : t('view custom variables')}
               </Button>

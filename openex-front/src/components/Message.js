@@ -38,13 +38,13 @@ class Message extends Component {
 
   render() {
     const { t } = this.props;
-    const { text, error, open, autoHide } = this.state;
+    const { text, error, open, sticky } = this.state;
     return (
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={open}
         onClose={this.handleCloseMessage.bind(this)}
-        autoHideDuration={autoHide ? 4000 : null}
+        autoHideDuration={sticky ? null : 4000}
       >
         {error ? (
           <Alert severity="error" onClose={this.handleCloseMessage.bind(this)}>
@@ -68,7 +68,7 @@ Message.propTypes = {
   t: PropTypes.func,
   handleClose: PropTypes.func,
   message: PropTypes.string,
-  autoHide: PropTypes.bool,
+  sticky: PropTypes.bool,
 };
 
 export default inject18n(Message);

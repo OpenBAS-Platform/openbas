@@ -504,27 +504,27 @@ const ChallengesPlayer = () => {
             </Typography>
             {(currentExpectation?.inject_expectation_result !== null
               || currentResult !== null) && (
-              <div>
-                {currentExpectation?.inject_expectation_result !== null && (
-                  <Alert severity="success">
-                    {t('Flag is correct! It has been successfully submitted.')}
-                  </Alert>
-                )}
-                {currentExpectation?.inject_expectation_result === null
-                  && currentResult !== null && (
-                    <Alert
-                      severity="error"
-                      onClose={() => setCurrentResult(null)}
-                    >
-                      {t('Flag is not correct! Try again...')}
+                <div>
+                  {currentExpectation?.inject_expectation_result !== null && (
+                    <Alert severity="success">
+                      {t('Flag is correct! It has been successfully submitted.')}
                     </Alert>
-                )}
-                <div style={{ float: 'right', marginTop: 20 }}>
-                  <Button onClick={handleClose} style={{ marginRight: 10 }}>
-                    {t('Close')}
-                  </Button>
+                  )}
+                  {currentExpectation?.inject_expectation_result === null
+                    && currentResult !== null && (
+                      <Alert
+                        severity="error"
+                        onClose={() => setCurrentResult(null)}
+                      >
+                        {t('Flag is not correct! Try again...')}
+                      </Alert>
+                  )}
+                  <div style={{ float: 'right', marginTop: 20 }}>
+                    <Button onClick={handleClose} style={{ marginRight: 10 }}>
+                      {t('Close')}
+                    </Button>
+                  </div>
                 </div>
-              </div>
             )}
             {currentExpectation?.inject_expectation_result === null
               && currentResult === null && (

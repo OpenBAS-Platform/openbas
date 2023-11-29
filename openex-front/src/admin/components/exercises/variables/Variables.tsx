@@ -21,10 +21,6 @@ import { fetchVariables, VariablesHelper } from '../../../../actions/Variable';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { ExercicesHelper } from '../../../../actions/helper';
 
-interface Params {
-  exerciseId: string
-}
-
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
     margin: '10px 0 50px 0',
@@ -138,7 +134,7 @@ const Variables = () => {
     'description',
   ]);
   // Fetching data
-  const { exerciseId } = useParams<Params>();
+  const { exerciseId } = useParams<'exerciseId'>();
   const { exercise, variables }: { exercise: Exercise, variables: [Variable] } = useHelper((helper: VariablesHelper & ExercicesHelper) => {
     return ({
       exercise: helper.getExercise(exerciseId),
@@ -247,7 +243,7 @@ const Variables = () => {
           </ListItem>
         ))}
       </List>
-      {permissions.canWrite && <CreateVariable exerciseId={exerciseId} />}
+      {permissions.canWrite && exerciseId && <CreateVariable exerciseId={exerciseId} />}
     </div>
   );
 };
