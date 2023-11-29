@@ -20,7 +20,7 @@ import static java.time.Instant.now;
 @Entity
 @Table(name = "audiences")
 @EntityListeners(ModelBaseListener.class)
-public class Audience implements Base {
+public class Audience implements ExerciseDependent {
     @Id
     @Column(name = "audience_id")
     @GeneratedValue(generator = "UUID")
@@ -28,7 +28,7 @@ public class Audience implements Base {
     @JsonProperty("audience_id")
     private String id;
 
-    @Column(name = "audience_name")
+    @Column(name = "audience_name", unique = true)
     @JsonProperty("audience_name")
     private String name;
 

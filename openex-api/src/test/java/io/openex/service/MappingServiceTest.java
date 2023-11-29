@@ -1,79 +1,110 @@
 package io.openex.service;
 
-import io.openex.database.model.User;
+import io.openex.database.model.*;
+import io.openex.database.repository.AudienceRepository;
+import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.UserRepository;
-import io.openex.model.*;
-import io.openex.rest.user.form.player.CreatePlayerInput;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import static io.openex.model.CsvMapper.SEPARATOR.COMMA;
+import static io.openex.helper.DataMapperDefinitionHelper.dataMapperAudienceDefinition;
+import static io.openex.helper.DataMapperDefinitionHelper.dataMapperPlayerDefinition;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-public class MappingServiceTest {
+public class MappingServiceTest<T extends Base> {
 
   @Autowired
   private MappingService mappingService;
 
   @Autowired
+  private AudienceRepository audienceRepository;
+  @Autowired
+  private ExerciseRepository exerciseRepository;
+  @Autowired
   private UserRepository userRepository;
 
-  @DisplayName("Test get json schema for player")
+  // -- PLAYER --
+
+  @DisplayName("Test use data mapper for player")
   @Test
-  void getPlayerJsonSchema() {
-    List<PropertySchema> jsonSchema = this.mappingService.schema(CreatePlayerInput.class);
-    assertNotNull(jsonSchema);
-    assertEquals(6, jsonSchema.size());
-    assertEquals(1, jsonSchema.stream().filter(PropertySchema::isMandatory).count()); // Required
-    assertEquals(5, jsonSchema.stream().filter((p) -> String.class.equals(p.getType())).count()); // Type
-    assertEquals(1, jsonSchema.stream().filter(PropertySchema::isMultiple).count()); // Cardinality
+  void playerDataMapper() {
+    // -- PREPARE --
+    DataMapper dataMapper = dataMapperPlayerDefinition();
+    List<DataMapperRepresentationProperty> properties = dataMapper.getRepresentations().get(0).getProperties();
+    for (DataMapperRepresentationProperty property : properties) {
+      switch (property.getPropertyName()) {
+        case "email" -> property.setColumnName("A");
+        case "firstname" -> property.setColumnName("B");
+        case "lastname" -> property.setColumnName("C");
+      }
+    }
+
+    // -- EXECUTE --
+    this.mappingService.mapCsvFile(null, "mapper/Players.csv", dataMapper);
+
+    // -- ASSERT --
+    Iterable<User> userIterable = this.userRepository.findAll();
+    List<User> users = StreamSupport
+        .stream(userIterable.spliterator(), false)
+        .filter((u) -> u.getEmail().contains("playertest"))
+        .toList();
+    assertEquals(8, users.size());
   }
 
-  @DisplayName("Test use json schema for player")
+  // -- AUDIENCE --
+
+  @DisplayName("Test use data mapper for audience")
   @Test
-  void usePlayerJsonSchema() {
-    CsvMapper csvMapper = buildCsvMapperForPlayer();
+  @Transactional
+  void audienceDataMapper() {
+    // -- PREPARE --
+    Exercise exercise = new Exercise();
+    exercise.setName("Exercice name");
+    Exercise exerciseCreated = this.exerciseRepository.save(exercise);
+    DataMapper dataMapper = dataMapperAudienceDefinition();
+    // Audience
+    List<DataMapperRepresentationProperty> audienceProperties = dataMapper.getRepresentations().get(0).getProperties();
+    for (DataMapperRepresentationProperty property : audienceProperties) {
+      switch (property.getPropertyName()) {
+        case "name" -> property.setColumnName("A");
+        case "description" -> property.setColumnName("B");
+      }
+    }
+    // PLayer
+    List<DataMapperRepresentationProperty> playerProperties = dataMapper.getRepresentations().get(1).getProperties();
+    for (DataMapperRepresentationProperty property : playerProperties) {
+      if (property.getPropertyName().equals("email")) {
+        property.setColumnName("C");
+      }
+    }
 
-    List<? extends RepositoryClass> results = this.mappingService.mapCsvFile("mapper/Players.csv", csvMapper);
-    this.mappingService.savingProcess(results);
+    // -- EXECUTE --
+    this.mappingService.mapCsvFile(exerciseCreated.getId(), "mapper/Audience.csv", dataMapper);
 
-    assertNotNull(results);
+    // -- ASSERT --
+    Iterable<Audience> audienceIterable = this.audienceRepository.findAll();
+    List<Audience> audiences = StreamSupport
+        .stream(audienceIterable.spliterator(), false)
+        .filter((a) -> a.getName().contains("Player"))
+        .toList();
+    assertEquals(3, audiences.size());
+    Audience playerTeamAudience = audiences.stream().filter((a) -> "Player team".equals(a.getName())).findFirst()
+        .orElseThrow();
+    assertEquals(6, playerTeamAudience.getUsers().size());
 
     Iterable<User> userIterable = this.userRepository.findAll();
     List<User> users = StreamSupport
         .stream(userIterable.spliterator(), false)
+        .filter((u) -> u.getEmail().contains("playertest"))
         .toList();
-    assertEquals(results.size() + 1, users.size());
-
-  }
-
-  private CsvMapper buildCsvMapperForPlayer() {
-    CsvMapperRepresentationProperty emailProperty = new CsvMapperRepresentationProperty("user_email", "A");
-    CsvMapperRepresentationProperty firstnameProperty = new CsvMapperRepresentationProperty("user_firstname", "B");
-    CsvMapperRepresentationProperty lastnameProperty = new CsvMapperRepresentationProperty("user_lastname", "C");
-
-    CsvMapperRepresentation csvMapperRepresentation = CsvMapperRepresentation.builder()
-        .id("players-representation")
-        .clazz(CreatePlayerInput.class)
-        .property(emailProperty)
-        .property(firstnameProperty)
-        .property(lastnameProperty)
-        .build();
-
-    CsvMapper.CsvMapperBuilder csvMapperBuilder = CsvMapper.builder()
-        .name("My player mapper")
-        .hasHeader(true)
-        .separator(COMMA)
-        .representation(csvMapperRepresentation);
-
-    return csvMapperBuilder.build();
+    assertEquals(8, users.size());
   }
 
 }

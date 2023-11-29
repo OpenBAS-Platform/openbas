@@ -1,95 +1,81 @@
 package io.openex.service;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openex.database.model.Base;
-import io.openex.model.*;
-import io.openex.model.PropertySchema.PropertySchemaBuilder;
+import io.openex.database.model.*;
+import io.openex.database.repository.ExerciseRepository;
+import io.openex.helper.SchemaHelper;
+import io.openex.model.PropertySchema;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.support.Repositories;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.Email;
+import javax.annotation.Nullable;
+import javax.transaction.Transactional;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
 @RequiredArgsConstructor
 public class MappingService {
 
   private final CsvFileService fileService;
-
-  private final List<Class<?>> requiredAnnotations = List.of(
-      NotNull.class,
-      NotBlank.class,
-      Email.class
-  );
+  private final ExerciseRepository exerciseRepository;
 
   private final WebApplicationContext appContext;
 
   private Repositories repositories;
 
-  // -- SCHEMA --
-
-  /**
-   * Build mapper schema for a specific class
-   */
-  public List<PropertySchema> schema(@NotNull final Class<?> clazz) {
-    Field[] fields = clazz.getDeclaredFields();
-    return Arrays.stream(fields).map(field -> {
-      PropertySchemaBuilder builder = PropertySchema.builder()
-          .name(field.getName()) // Name
-          .type(field.getType()) // Type
-          .multiple(field.getType().isArray() || Collection.class.isAssignableFrom(field.getType())); // Cardinality
-
-      Annotation[] annotations = field.getDeclaredAnnotations();
-      for (Annotation annotation : annotations) {
-        // Json Name
-        if (annotation.annotationType().equals(JsonProperty.class)) {
-          builder.jsonName(((JsonProperty) annotation).value());
-        }
-        // Required
-        if (this.requiredAnnotations.contains(annotation.annotationType())) {
-          builder.mandatory(true);
-        }
-      }
-      return builder.build();
-    }).toList();
-  }
-
   // -- REPOSITORIES --
 
-  public <T extends RepositoryClass<U>, U extends Base> void savingProcess(@NotNull final List<T> inputs) {
-    inputs.forEach((input) -> {
-      try {
-        Class<U> clazz = input.repositoryClass();
-        Constructor<U> constructor = clazz.getConstructor();
-        U object = constructor.newInstance();
-        object.setUpdateAttributes(input);
-        CrudRepository<U, ?> repository = repository(clazz);
-        repository.save(object);
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    });
+  @SuppressWarnings("unchecked")
+  public <T extends Base> T save(@NotNull final T input) {
+    try {
+      CrudRepository<T, ?> repository = (CrudRepository<T, ?>) repository(input.getClass());
+      return repository.save(input);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
-  public <U extends Base> CrudRepository<U, ?> repository(@NotNull final Class<U> clazz) {
+  // TODO: not performance at all
+  @SuppressWarnings("unchecked")
+  public <T extends Base> T find(@NotNull final T input) {
+    try {
+      CrudRepository<T, ?> repository = (CrudRepository<T, ?>) repository(input.getClass());
+      Iterable<T> iterable = repository.findAll();
+      List<T> list = StreamSupport.stream(iterable.spliterator(), false)
+          .collect(Collectors.toList());
+      PropertySchema uniqueProperty = SchemaHelper.getUniqueProperty(input);
+      List<T> matches = SchemaHelper.find(list, input, uniqueProperty);
+      if (matches.size() > 1) {
+        throw new IllegalArgumentException("Not supported for now");
+      } else if (matches.size() == 1) {
+        return matches.get(0);
+      } else {
+        return null;
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Base> CrudRepository<T, ?> repository(@NotNull final Class<T> clazz) {
     if (this.repositories == null) {
       this.repositories = new Repositories(this.appContext);
     }
 
-    return (CrudRepository<U, ?>) repositories.getRepositoryFor(clazz).orElseThrow();
+    return (CrudRepository<T, ?>) repositories.getRepositoryFor(clazz).orElseThrow();
   }
 
   // -- MAPPING --
@@ -97,49 +83,113 @@ public class MappingService {
   /**
    * Handle file with csv mapper
    */
-  public <T extends RepositoryClass<U>, U extends Base> List<T> mapCsvFile(@NotBlank final String path, @NotNull final CsvMapper csvMapper) {
-    List<List<String>> records = this.fileService.parseCsvFile(path, csvMapper.getSeparator().getValue());
-
-    return mappingProcess(records, csvMapper);
+  @Transactional(rollbackOn = Exception.class)
+  public <T extends Base> void mapCsvFile(
+      @Nullable final String exerciseId,
+      @NotNull final MultipartFile file,
+      @NotBlank final DataMapper dataMapper) {
+    List<List<String>> records = this.fileService.parseCsvFile(file, dataMapper.getSeparator().getValue());
+    this.mapCsvFile(exerciseId, records, dataMapper);
   }
 
   /**
-   * Handle parse text with csv mapper
+   * Handle file path with csv mapper
    */
-  private <T extends RepositoryClass<U>, U extends Base> List<T> mappingProcess(@NotNull final List<List<String>> records,
-      @NotNull final CsvMapper csvMapper) {
-    if (csvMapper.isHasHeader()) {
+  @Transactional(rollbackOn = Exception.class)
+  public <T extends Base> void mapCsvFile(
+      @Nullable final String exerciseId,
+      @NotBlank final String path,
+      @NotNull final DataMapper dataMapper) {
+    List<List<String>> records = this.fileService.parseCsvFilePath(path, dataMapper.getSeparator().getValue());
+    this.mapCsvFile(exerciseId, records, dataMapper);
+  }
+
+  private <T extends Base> void mapCsvFile(
+      @Nullable final String exerciseId,
+      @NotNull List<List<String>> records,
+      @NotNull final DataMapper dataMapper) {
+    Exercise exercise = null;
+    if (StringUtils.isNotBlank(exerciseId)) {
+      exercise = this.exerciseRepository.findById(exerciseId).orElseThrow();
+    }
+
+    mappingProcess(records, dataMapper, exercise);
+  }
+
+  /**
+   * Handle parse text with data mapper
+   */
+  private <T extends Base> void mappingProcess(
+      @NotNull final List<List<String>> records,
+      @NotNull final DataMapper dataMapper,
+      @Nullable final Exercise exercise) {
+    if (dataMapper.isHasHeader()) {
       records.remove(0);
     }
 
-    List<T> results = new ArrayList<>();
+    Map<Class<T>, List<T>> resultMap = new HashMap<>();
 
     // Parallelize ???
     for (List<String> record : records) {
-      List<CsvMapperRepresentation> representations = csvMapper.getRepresentations();
-      representations.forEach((representation) -> {
-        T result;
-        try {
-          result = mapRecord(record, representation);
-        } catch (Exception e) {
-          throw new RuntimeException(e);
-        }
-        results.add(result);
-      });
-    }
 
-    return results;
+      Map<String, T> lineMap = new HashMap<>();
+      List<DataMapperRepresentation> representations = dataMapper.getRepresentations();
+      representations.stream()
+          .sorted(DataMapperRepresentation::sort)
+          .forEach((representation) -> {
+            T result;
+            try {
+              result = mapRecord(record, representation, lineMap);
+            } catch (Exception e) {
+              throw new RuntimeException(e);
+            }
+
+            // TODO: Should retrieve first in DB
+            T dbResult = this.find(result);
+            if (dbResult != null) {
+              result = SchemaHelper.merge(List.of(dbResult), result);
+            }
+
+            // Merge
+            T mergeResult = SchemaHelper.merge(resultMap.get(representation.getClazz()), result);
+
+            // Handle exercise
+            if (exercise != null) {
+              handleExercise(mergeResult, exercise);
+            }
+
+            T resultSaved = save(mergeResult);
+            lineMap.put(representation.getName(), resultSaved);
+
+            // Add to global map
+            List<T> values = resultMap.get(representation.getClazz());
+            if (values == null) {
+              values = new ArrayList<>();
+            }
+            int idx = values.stream().map(Base::getId).toList().indexOf(resultSaved.getId());
+            if (idx > -1) {
+              values.set(idx, resultSaved);
+            } else {
+              values.add(resultSaved);
+            }
+            resultMap.put((Class<T>) representation.getClazz(), values);
+          });
+    }
+    System.out.println(resultMap);
   }
 
   /**
    * Map parse text to target class
    */
-  private <T extends RepositoryClass<U>, U extends Base> T mapRecord(@NotNull final List<String> record,
-      @NotNull final CsvMapperRepresentation csvMapperRepresentation)
+  @SuppressWarnings("unchecked")
+  private <T extends Base> T mapRecord(
+      @NotNull final List<String> record,
+      @NotNull final DataMapperRepresentation dataMapperRepresentation,
+      @NotNull final Map<String, T> mapLine)
       throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-    Class<T> clazz = (Class<T>) csvMapperRepresentation.getClazz();
+    Class<T> clazz = (Class<T>) dataMapperRepresentation.getClazz();
     // Retrieve schema
-    List<PropertySchema> jsonSchema = this.schema(clazz);
+    List<PropertySchema> jsonSchema = SchemaHelper.schema(clazz);
     assert jsonSchema != null;
 
     // Prepare creation
@@ -147,41 +197,55 @@ public class MappingService {
     T object = constructor.newInstance();
 
     // Compute properties
-    List<CsvMapperRepresentationProperty> properties = csvMapperRepresentation.getProperties();
+    List<DataMapperRepresentationProperty> properties = dataMapperRepresentation.getProperties();
     properties.forEach((property) -> {
-      // Extract value from CSV
-      String value = extractValue(record, property);
+      // Handle value
+      Object value = "";
+      if (StringUtils.isNotBlank(property.getColumnName())) {
+        value = extractValue(record, property);
+      } else if (property.getBasedOn() != null) {
+        value = mapLine.get(property.getBasedOn());
+      }
 
       // Sanity check
       PropertySchema jsonProperty = jsonSchema.stream()
-          .filter((p) -> property.getPropertyName().equals(p.getJsonName())).findFirst().orElseThrow();
+          .filter((p) -> property.getPropertyName().equals(p.getName()))
+          .findFirst()
+          .orElseThrow();
 
-      if (StringUtils.isBlank(value) && jsonProperty.isMandatory()) {
+      if ((value == null || (value instanceof String && isBlank(value.toString()))) && jsonProperty.isMandatory()) {
         throw new IllegalArgumentException("This property is mandatory"); // OR skip it ?
       }
 
-      // Set property value
-      Field field;
-      try {
-        field = clazz.getDeclaredField(jsonProperty.getName());
-        field.setAccessible(true);
-        field.set(object, jsonProperty.isMultiple() ? List.of(value) : value);
-      } catch (IllegalAccessException | NoSuchFieldException e) {
-        throw new RuntimeException(e);
+      // Set value
+      if (value != null) {
+        Object finalValue = jsonProperty.isMultiple() ? new ArrayList<>(List.of(value)) : value;
+        SchemaHelper.setPropertyValue(clazz, jsonProperty.getName(), object, finalValue);
       }
     });
     return object;
   }
 
   /**
-   * Exctact value from parse text
+   * Extract value from parse text
    */
   private String extractValue(
       @NotNull final List<String> record,
-      @NotNull final CsvMapperRepresentationProperty property) {
+      @NotNull final DataMapperRepresentationProperty property) {
     int idx = CsvFileService.columnNameToIdx(property.getColumnName());
     assert idx != -1;
     return record.get(idx);
+  }
+
+  // -- EXERCISE --
+
+  private <T extends Base> void handleExercise(
+      @NotNull T input,
+      @NotNull final Exercise exercise) {
+    List<Class<?>> classInterfaces = Arrays.stream(input.getClass().getInterfaces()).toList();
+    if (classInterfaces.contains(ExerciseDependent.class)) {
+      SchemaHelper.setPropertyValue(input.getClass(), "exercise", input, exercise);
+    }
   }
 
 }
