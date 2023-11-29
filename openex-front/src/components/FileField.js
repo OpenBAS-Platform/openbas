@@ -8,7 +8,6 @@ import { useFormatter } from './i18n';
 import { bytesFormat } from '../utils/Number';
 
 const FileFieldInput = ({
-  required,
   input,
   dropZoneProps,
   filters,
@@ -25,7 +24,7 @@ const FileFieldInput = ({
         input.onChange(files);
       }
     },
-    [input],
+    [filters, input],
   );
   const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
     onDrop,

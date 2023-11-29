@@ -185,6 +185,7 @@ const ChallengesPreview = () => {
     dispatch(fetchMe());
     dispatch(fetchObserverChallenges(exerciseId, userId));
     dispatch(fetchPlayerDocuments(exerciseId, userId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const documentsReverseBy = (field) => {
     setDocumentsSortBy(field);

@@ -7,7 +7,7 @@ import Popover from '@mui/material/Popover';
 import InputAdornment from '@mui/material/InputAdornment';
 import { ColorLensOutlined } from '@mui/icons-material';
 
-const renderColorPickerField = ({
+const ColorPickerFieldBase = ({
   label,
   input: { onChange, ...inputProps },
   meta: { touched, invalid, error, submitError },
@@ -63,5 +63,5 @@ const renderColorPickerField = ({
 };
 
 export const ColorPickerField = (props) => (
-  <Field name={props.name} component={renderColorPickerField} {...props} />
+  <Field name={props.name} component={ColorPickerFieldBase} {...props} />
 );

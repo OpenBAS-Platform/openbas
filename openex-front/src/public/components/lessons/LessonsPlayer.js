@@ -96,6 +96,7 @@ const LessonsPlayer = () => {
     dispatch(fetchPlayerLessonsCategories(exerciseId, finalUserId));
     dispatch(fetchPlayerLessonsQuestions(exerciseId, finalUserId));
     dispatch(fetchPlayerLessonsAnswers(exerciseId, finalUserId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const validate = (values) => {
     const errors = {};

@@ -49,6 +49,7 @@ const Comcheck = () => {
   const status = useHelper((helper) => helper.getComcheckStatus(statusId));
   useEffect(() => {
     dispatch(fetchComcheckStatus(statusId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const [dimension, setDimension] = useState({
     width: window.innerWidth,

@@ -45,6 +45,7 @@ const TagsFilter = (props) => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchTags());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const tags = useHelper((helper) => helper.getTags());
   const { onAddTag, onClearTag, onRemoveTag, currentTags, fullWidth } = props;

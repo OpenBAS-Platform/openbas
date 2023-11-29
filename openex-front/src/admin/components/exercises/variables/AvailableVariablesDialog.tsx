@@ -96,7 +96,7 @@ const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps>
   const dispatch = useAppDispatch();
   const [tab, setTab] = useState('1');
 
-  const handleChange = (event: React.SyntheticEvent, newTab: string) => {
+  const handleChange = (_event: React.SyntheticEvent, newTab: string) => {
     setTab(newTab);
   };
 

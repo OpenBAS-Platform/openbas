@@ -11,7 +11,7 @@ const dateFormatsMap = {
   'zg-cn': 'yyyy-MM-dd',
 };
 
-const renderDateTimePicker = ({
+const DateTimePickerBase = ({
   input: { onBlur, value, ...inputProps },
   meta: { submitting, error, touched },
   textFieldProps,
@@ -46,5 +46,5 @@ const renderDateTimePicker = ({
 };
 
 export const DateTimePicker = (props) => (
-  <Field name={props.name} component={renderDateTimePicker} {...props} />
+  <Field name={props.name} component={DateTimePickerBase} {...props} />
 );

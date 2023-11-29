@@ -129,6 +129,7 @@ const Dashboard = (props) => {
     props.fetchTags();
     props.fetchNextInjects();
     props.fetchPlayers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const {
     classes,

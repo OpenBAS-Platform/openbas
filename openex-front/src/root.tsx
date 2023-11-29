@@ -25,6 +25,7 @@ const Root = () => {
   useEffect(() => {
     dispatch(fetchMe());
     dispatch(fetchParameters());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   if (R.isEmpty(logged)) {
     return <div />;

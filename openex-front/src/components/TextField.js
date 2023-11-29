@@ -3,7 +3,7 @@ import { Field } from 'react-final-form';
 import MuiTextField from '@mui/material/TextField';
 import { useFormatter } from './i18n';
 
-const renderTextField = ({
+const TextFieldBase = ({
   label,
   input,
   meta: { touched, invalid, error, submitError },
@@ -24,5 +24,5 @@ const renderTextField = ({
 };
 
 export const TextField = (props) => (
-  <Field name={props.name} component={renderTextField} {...props} />
+  <Field name={props.name} component={TextFieldBase} {...props} />
 );

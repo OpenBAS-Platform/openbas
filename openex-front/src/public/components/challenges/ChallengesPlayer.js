@@ -191,6 +191,7 @@ const ChallengesPlayer = () => {
     dispatch(fetchMe());
     dispatch(fetchPlayerChallenges(exerciseId, userId));
     dispatch(fetchPlayerDocuments(exerciseId, userId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const documentsReverseBy = (field) => {
     setDocumentsSortBy(field);
@@ -518,14 +519,14 @@ const ChallengesPlayer = () => {
                       >
                         {t('Flag is not correct! Try again...')}
                       </Alert>
-                  )}
+                    )}
                   <div style={{ float: 'right', marginTop: 20 }}>
                     <Button onClick={handleClose} style={{ marginRight: 10 }}>
                       {t('Close')}
                     </Button>
                   </div>
                 </div>
-            )}
+              )}
             {currentExpectation?.inject_expectation_result === null
               && currentResult === null && (
                 <Form
@@ -568,7 +569,7 @@ const ChallengesPlayer = () => {
                     </form>
                   )}
                 </Form>
-            )}
+              )}
           </DialogContent>
         </Dialog>
       </div>
