@@ -83,5 +83,6 @@
         <module>openex-framework</module>
         <module>openex-api</module>
         <module>openex-injectors</module>
+        <module>openex-collectors</module>
     </modules>
 </project>

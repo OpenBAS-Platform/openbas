@@ -1,3 +1,6 @@
 [submodule "openex-injectors"]
 	path = openex-injectors
 	url = https://github.com/OpenEx-Platform/injectors.git
+[submodule "openex-collectors"]
+	path = openex-collectors
+	url = https://github.com/OpenEx-Platform/collectors.git

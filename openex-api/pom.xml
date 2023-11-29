@@ -49,6 +49,11 @@
                     <artifactId>openex-injector-http</artifactId>
                     <version>3.4.2-SNAPSHOT</version>
                 </dependency>
+                <dependency>
+                    <groupId>io.openex</groupId>
+                    <artifactId>openex-collector-users</artifactId>
+                    <version>3.4.2-SNAPSHOT</version>
+                </dependency>
             </dependencies>
         </profile>
     </profiles>
