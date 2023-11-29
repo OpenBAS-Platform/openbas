@@ -51,7 +51,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const [openEdit, setOpenEdit] = useState(false);
   const [openExport, setOpenExport] = useState(false);
   const [exportPlayers, setExportPlayers] = useState(false);
-  const [exportVariables, setExportVariables] = useState(false);
+  const [exportVariableValues, setExportVariableValues] = useState(false);
 
   // Popover
   const handlePopoverOpen = (event: React.MouseEvent) => {
@@ -100,13 +100,13 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
 
   const submitExport = () => {
     const link = document.createElement('a');
-    link.href = `/api/exercises/${exercise.exercise_id}/export?isWithPlayers=${exportPlayers}&isWithVariables=${exportVariables}`;
+    link.href = `/api/exercises/${exercise.exercise_id}/export?isWithPlayers=${exportPlayers}&isWithVariableValues=${exportVariableValues}`;
     link.click();
     handleCloseExport();
   };
 
   const handleToggleExportPlayers = () => setExportPlayers(!exportPlayers);
-  const handleToggleExportVariables = () => setExportVariables(!exportVariables);
+  const handleToggleExportVariableValues = () => setExportVariableValues(!exportVariableValues);
 
   // Form
 
@@ -239,12 +239,12 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
                 </TableRow>
                 <TableRow>
                   <TableCell>
-                    {t('Variables')}
+                    {t('Variables with values')}
                   </TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
                     <Checkbox
-                      checked={exportVariables}
-                      onChange={handleToggleExportVariables}
+                      checked={exportVariableValues}
+                      onChange={handleToggleExportVariableValues}
                     />
                   </TableCell>
                 </TableRow>

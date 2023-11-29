@@ -10,6 +10,7 @@ import io.openex.rest.exception.InputValidationException;
 import io.openex.rest.exercise.exports.ExerciseExportMixins;
 import io.openex.rest.exercise.exports.ExerciseFileExport;
 import io.openex.rest.exercise.exports.VariableMixin;
+import io.openex.rest.exercise.exports.VariableWithValueMixin;
 import io.openex.rest.exercise.form.*;
 import io.openex.rest.exercise.response.PublicExercise;
 import io.openex.rest.helper.RestBehavior;
@@ -538,7 +539,7 @@ public class ExerciseApi extends RestBehavior {
   public void exerciseExport(
       @NotBlank @PathVariable final String exerciseId,
       @RequestParam(required = false) final boolean isWithPlayers,
-      @RequestParam(required = false) final boolean isWithVariables,
+      @RequestParam(required = false) final boolean isWithVariableValues,
       HttpServletResponse response) throws IOException {
     // Setup the mapper for export
     List<String> documentIds = new ArrayList<>();
@@ -614,16 +615,18 @@ public class ExerciseApi extends RestBehavior {
     importExport.setTags(exerciseTags.stream().distinct().toList());
     objectMapper.addMixIn(Tag.class, ExerciseExportMixins.Tag.class);
     // -- Variables --
-    if (isWithVariables) {
-      List<Variable> variables = this.variableService.variables(exerciseId);
-      importExport.setVariables(variables);
+    List<Variable> variables = this.variableService.variables(exerciseId);
+    importExport.setVariables(variables);
+    if (isWithVariableValues) {
+      objectMapper.addMixIn(Variable.class, VariableWithValueMixin.class);
+    } else {
       objectMapper.addMixIn(Variable.class, VariableMixin.class);
     }
     // Build the response
     String infos = "("
         + (isWithPlayers ? "with_players" : "no_players")
         + " & "
-        + (isWithVariables ? "with_variables" : "no_variables")
+        + (isWithVariableValues ? "with_variable_values" : "no_variable_values")
         + ")";
     String zipName =
         (exercise.getName() + "_" + now().toString()) + "_" + infos + ".zip";

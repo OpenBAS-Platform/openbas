@@ -9,7 +9,7 @@ import io.openex.injects.email.EmailContract;
 import io.openex.injects.manual.ManualContract;
 import io.openex.injects.media.model.MediaContent;
 import io.openex.rest.exercise.exports.ExerciseFileExport;
-import io.openex.rest.exercise.exports.VariableMixin;
+import io.openex.rest.exercise.exports.VariableWithValueMixin;
 import io.openex.service.FileService;
 import io.openex.service.ImportEntry;
 import io.openex.service.VariableService;
@@ -580,8 +580,8 @@ public class V1_DataImporter implements Importer {
         // ------------ Handling variables
         Optional<Iterator<JsonNode>> variableNodesOpt = ofNullable(importNode.get(ExerciseFileExport.EXERCISE_VARIABLES)).map(JsonNode::elements);
         variableNodesOpt.ifPresent(variableNodes -> variableNodes.forEachRemaining(variableNode -> {
-                String id = VariableMixin.getId(variableNode);
-                Variable variable = VariableMixin.build(variableNode);
+                String id = VariableWithValueMixin.getId(variableNode);
+                Variable variable = VariableWithValueMixin.build(variableNode);
                 Variable variableSaved = this.variableService.createVariable(savedExercise.getId(), variable);
                 baseIds.put(id, variableSaved);
             }));
