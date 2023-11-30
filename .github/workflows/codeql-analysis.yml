@@ -6,16 +6,15 @@ name: "Analyse"
 
 on:
   push:
-    branches:
-      - issue/342
-#  pull_request:
-#    # The branches below must be a subset of the branches above
-#    branches: [ master ]
-#    paths-ignore:
-#      - '**/*.md'
-#      - '**/*.txt'
-#  schedule:
-#    - cron: "21 11 * * 0"
+    branches: [master]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [master]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+  schedule:
+    - cron: "21 11 * * 0"
 
 jobs:
   analyze:
@@ -25,8 +24,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ "javascript", "typeScript", "java" ]
-        # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'typeScript', 'python' ]
+        language: [ "javascript", "java" ]
+        # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python' ]
 
     steps:
       - name: Checkout repository
@@ -52,12 +51,12 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
-#      - name: Run tests and collect coverage
-#        run: mvn clean install
-#
-#      - name: Upload coverage reports to Codecov
-#        uses: codecov/codecov-action@v3
-#        env:
-#          CODECOV_TOKEN: be3e57cf-1a7e-4c41-960d-8b7381eff1d0
+      - name: Run tests and collect coverage
+        run: mvn clean install
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 #TODO: add caching
