@@ -1,9 +1,5 @@
 name: "Analyse"
 
-# Can be test locally with https://github.com/nektos/act
-# Use version 0.2.51
-# act -P ubuntu-latest=quay.io/jamezp/act-maven (to use docker image with maven)
-
 on:
   push:
     branches: [master]
@@ -50,13 +46,3 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
-
-      - name: Run tests and collect coverage
-        run: mvn clean install
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-#TODO: add caching
