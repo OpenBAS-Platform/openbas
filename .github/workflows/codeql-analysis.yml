@@ -1,11 +1,11 @@
-name: "CodeQL & Codecov"
+name: "Analyse"
 
 on:
   push:
-    branches: [master]
+    branches: [ master ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [master]
+    branches: [ master ]
     paths-ignore:
       - '**/*.md'
       - '**/*.txt'
@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ["javascript", "java"]
+        language: [ "javascript", "java" ]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python' ]
 
     steps:
@@ -47,11 +47,9 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
-  codecov:
-    name: Codecov
-    runs-on: ubuntu-latest
+      - name: Run tests and collect coverage
+        run: mvn clean install
 
-    steps:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
