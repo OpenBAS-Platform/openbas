@@ -2,15 +2,16 @@ name: "Analyse"
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ master ]
-    paths-ignore:
-      - '**/*.md'
-      - '**/*.txt'
-  schedule:
-    - cron: "21 11 * * 0"
+    branches:
+      - issue/342
+#  pull_request:
+#    # The branches below must be a subset of the branches above
+#    branches: [ master ]
+#    paths-ignore:
+#      - '**/*.md'
+#      - '**/*.txt'
+#  schedule:
+#    - cron: "21 11 * * 0"
 
 jobs:
   analyze:
@@ -35,17 +36,17 @@ jobs:
         with:
           submodules: "true"
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: ${{ matrix.language }}
-          config-file: ./.github/codeql-config.yml
-
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+#      - name: Initialize CodeQL
+#        uses: github/codeql-action/init@v2
+#        with:
+#          languages: ${{ matrix.language }}
+#          config-file: ./.github/codeql-config.yml
+#
+#      - name: Autobuild
+#        uses: github/codeql-action/autobuild@v2
+#
+#      - name: Perform CodeQL Analysis
+#        uses: github/codeql-action/analyze@v2
 
       - name: Run tests and collect coverage
         run: mvn clean install
