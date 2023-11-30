@@ -28,7 +28,6 @@ jobs:
         env:
           MINIO_ACCESS_KEY: minioadmin
           MINIO_SECRET_KEY: minioadmin
-        options: --name=minio --health-cmd "curl http://localhost:10000/minio/health/live"
 
     steps:
       - name: Checkout repository
