@@ -1,5 +1,9 @@
 name: "Analyse"
 
+# Can be test locally with https://github.com/nektos/act
+# Use version 0.2.51
+# act -P ubuntu-latest=quay.io/jamezp/act-maven (to use docker image with maven)
+
 on:
   push:
     branches:
@@ -21,37 +25,39 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ "javascript", "java" ]
+        language: [ "javascript", "typeScript", "java" ]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python' ]
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: "true"
+
       - name: Setup Java JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: 18
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
         with:
-          submodules: "true"
+          languages: ${{ matrix.language }}
+          config-file: ./.github/codeql-config.yml
 
-#      - name: Initialize CodeQL
-#        uses: github/codeql-action/init@v2
-#        with:
-#          languages: ${{ matrix.language }}
-#          config-file: ./.github/codeql-config.yml
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+#      - name: Run tests and collect coverage
+#        run: mvn clean install
 #
-#      - name: Autobuild
-#        uses: github/codeql-action/autobuild@v2
-#
-#      - name: Perform CodeQL Analysis
-#        uses: github/codeql-action/analyze@v2
+#      - name: Upload coverage reports to Codecov
+#        uses: codecov/codecov-action@v3
+#        env:
+#          CODECOV_TOKEN: be3e57cf-1a7e-4c41-960d-8b7381eff1d0
 
-      - name: Run tests and collect coverage
-        run: mvn clean install
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+#TODO: add caching
