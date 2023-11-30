@@ -20,14 +20,6 @@ jobs:
   codecov:
     name: CodeCov
     runs-on: ubuntu-latest
-    services:
-      minio:
-        image: minio/minio
-        ports:
-          - 10000:10000
-        env:
-          MINIO_ACCESS_KEY: minioadmin
-          MINIO_SECRET_KEY: minioadmin
 
     steps:
       - name: Checkout repository
@@ -42,12 +34,13 @@ jobs:
           java-version: 18
           cache: 'maven'
 
+      - name: Install dependencies
+        run: mvn install -DskipTests=true -B -V
+
       - name: Run tests and collect coverage
-        run: mvn clean install
+        run: mvn -B test
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-#TODO: add caching
