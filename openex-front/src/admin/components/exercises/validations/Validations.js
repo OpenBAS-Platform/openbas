@@ -279,35 +279,35 @@ const Validations = () => {
                 </ListItem>
                 {inject.inject_type === 'openex_media'
                 || inject.inject_type === 'openex_challenge' ? (
-                  <List component="div" disablePadding>
-                    {Object.keys(groupedExpectation[injectId]).map(
-                      (audienceId) => {
-                        const audience = audiencesMap[audienceId] || {};
-                        return (
-                          <div key={audience.audience_id}>
-                            <ListItem
-                              divider={true}
-                              sx={{ pl: 4 }}
-                              classes={{ root: classes.item }}
-                            >
-                              <ListItemIcon>
-                                <CastForEducationOutlined fontSize="small" />
-                              </ListItemIcon>
-                              <ListItemText
-                                primary={
-                                  <div>
-                                    <div
-                                      className={classes.bodyItem}
-                                      style={{ width: '20%' }}
-                                    >
-                                      {audience.audience_name}
+                    <List component="div" disablePadding>
+                      {Object.keys(groupedExpectation[injectId]).map(
+                        (audienceId) => {
+                          const audience = audiencesMap[audienceId] || {};
+                          return (
+                            <div key={audience.audience_id}>
+                              <ListItem
+                                divider={true}
+                                sx={{ pl: 4 }}
+                                classes={{ root: classes.item }}
+                              >
+                                <ListItemIcon>
+                                  <CastForEducationOutlined fontSize="small" />
+                                </ListItemIcon>
+                                <ListItemText
+                                  primary={
+                                    <div>
+                                      <div
+                                        className={classes.bodyItem}
+                                        style={{ width: '20%' }}
+                                      >
+                                        {audience.audience_name}
+                                      </div>
                                     </div>
-                                  </div>
-                                }
-                              />
-                            </ListItem>
-                            <List component="div" disablePadding>
-                              {inject.inject_type === 'openex_media'
+                                  }
+                                />
+                              </ListItem>
+                              <List component="div" disablePadding>
+                                {inject.inject_type === 'openex_media'
                                 && groupedExpectation[injectId][audienceId].map(
                                   (expectation) => {
                                     const article = articlesMap[
@@ -388,7 +388,7 @@ const Validations = () => {
                                     );
                                   },
                                 )}
-                              {inject.inject_type === 'openex_challenge'
+                                {inject.inject_type === 'openex_challenge'
                                 && groupedExpectation[injectId][audienceId].map(
                                   (expectation) => {
                                     const challenge = challengesMap[
@@ -465,75 +465,75 @@ const Validations = () => {
                                     );
                                   },
                                 )}
-                            </List>
-                          </div>
-                        );
-                      },
-                    )}
-                  </List>
+                              </List>
+                            </div>
+                          );
+                        },
+                      )}
+                    </List>
                   ) : (
-                  <List component="div" disablePadding>
-                    {groupedExpectation[injectId].map((expectation) => {
-                      const audience = audiencesMap[expectation.inject_expectation_audience]
+                    <List component="div" disablePadding>
+                      {groupedExpectation[injectId].map((expectation) => {
+                        const audience = audiencesMap[expectation.inject_expectation_audience]
                         || {};
-                      return (
-                        <ListItem
-                          key={audience.audience_id}
-                          divider={true}
-                          sx={{ pl: 4 }}
-                          classes={{ root: classes.item }}
-                          button={true}
-                          onClick={() => setCurrentExpectation(expectation)}
-                        >
-                          <ListItemIcon>
-                            <CastForEducationOutlined fontSize="small" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={{ width: '20%' }}
-                                >
-                                  {audience.audience_name}
+                        return (
+                          <ListItem
+                            key={audience.audience_id}
+                            divider={true}
+                            sx={{ pl: 4 }}
+                            classes={{ root: classes.item }}
+                            button={true}
+                            onClick={() => setCurrentExpectation(expectation)}
+                          >
+                            <ListItemIcon>
+                              <CastForEducationOutlined fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={
+                                <div>
+                                  <div
+                                    className={classes.bodyItem}
+                                    style={{ width: '20%' }}
+                                  >
+                                    {audience.audience_name}
+                                  </div>
+                                  <div className={classes.bodyItemRight}>
+                                    <Chip
+                                      classes={{ root: classes.chipInList }}
+                                      style={
+                                        expectation.inject_expectation_result
+                                          ? inlineStyles.green
+                                          : inlineStyles.orange
+                                      }
+                                      label={
+                                        expectation.inject_expectation_result
+                                          ? `${t('Validated')} (${
+                                            expectation.inject_expectation_score
+                                          })`
+                                          : t('Pending validation')
+                                      }
+                                    />
+                                  </div>
+                                  <div
+                                    className={classes.bodyItemRight}
+                                    style={{ marginRight: 20 }}
+                                  >
+                                    <Chip
+                                      classes={{
+                                        root: classes.points,
+                                      }}
+                                      label={
+                                        expectation.inject_expectation_expected_score
+                                      }
+                                    />
+                                  </div>
                                 </div>
-                                <div className={classes.bodyItemRight}>
-                                  <Chip
-                                    classes={{ root: classes.chipInList }}
-                                    style={
-                                      expectation.inject_expectation_result
-                                        ? inlineStyles.green
-                                        : inlineStyles.orange
-                                    }
-                                    label={
-                                      expectation.inject_expectation_result
-                                        ? `${t('Validated')} (${
-                                          expectation.inject_expectation_score
-                                        })`
-                                        : t('Pending validation')
-                                    }
-                                  />
-                                </div>
-                                <div
-                                  className={classes.bodyItemRight}
-                                  style={{ marginRight: 20 }}
-                                >
-                                  <Chip
-                                    classes={{
-                                      root: classes.points,
-                                    }}
-                                    label={
-                                      expectation.inject_expectation_expected_score
-                                    }
-                                  />
-                                </div>
-                              </div>
-                            }
-                          />
-                        </ListItem>
-                      );
-                    })}
-                  </List>
+                              }
+                            />
+                          </ListItem>
+                        );
+                      })}
+                    </List>
                   )}
               </div>
             );

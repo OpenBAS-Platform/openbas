@@ -583,7 +583,7 @@ const Lessons = () => {
                 </Grid>
                 <Grid item={true} xs={3} style={{ marginTop: -10 }}>
                   <Typography variant="h4">
-                    {t("What didn't work well")}
+                    {t('What didn\'t work well')}
                   </Typography>
                   {answer.lessons_answer_negative}
                 </Grid>

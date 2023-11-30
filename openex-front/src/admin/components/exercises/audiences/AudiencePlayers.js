@@ -337,45 +337,45 @@ class AudiencesPlayers extends Component {
                     >
                       {R.isNil(user.user_email)
                       || R.isEmpty(user.user_email) ? (
-                        <EmailOutlined
-                          color="warning"
-                          fontSize="small"
-                          className={classes.icon}
-                        />
+                          <EmailOutlined
+                            color="warning"
+                            fontSize="small"
+                            className={classes.icon}
+                          />
                         ) : (
-                        <EmailOutlined
-                          color="success"
-                          fontSize="small"
-                          className={classes.icon}
-                        />
+                          <EmailOutlined
+                            color="success"
+                            fontSize="small"
+                            className={classes.icon}
+                          />
                         )}
                       {R.isNil(user.user_pgp_key)
                       || R.isEmpty(user.user_pgp_key) ? (
-                        <KeyOutlined
-                          color="warning"
-                          fontSize="small"
-                          className={classes.icon}
-                        />
+                          <KeyOutlined
+                            color="warning"
+                            fontSize="small"
+                            className={classes.icon}
+                          />
                         ) : (
-                        <KeyOutlined
-                          color="success"
-                          fontSize="small"
-                          className={classes.icon}
-                        />
+                          <KeyOutlined
+                            color="success"
+                            fontSize="small"
+                            className={classes.icon}
+                          />
                         )}
                       {R.isNil(user.user_phone)
                       || R.isEmpty(user.user_phone) ? (
-                        <SmartphoneOutlined
-                          color="warning"
-                          fontSize="small"
-                          className={classes.icon}
-                        />
+                          <SmartphoneOutlined
+                            color="warning"
+                            fontSize="small"
+                            className={classes.icon}
+                          />
                         ) : (
-                        <SmartphoneOutlined
-                          color="success"
-                          fontSize="small"
-                          className={classes.icon}
-                        />
+                          <SmartphoneOutlined
+                            color="success"
+                            fontSize="small"
+                            className={classes.icon}
+                          />
                         )}
                     </div>
                     <div

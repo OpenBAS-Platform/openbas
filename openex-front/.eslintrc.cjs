@@ -9,11 +9,15 @@ module.exports = {
   ],
   ignorePatterns: ['dist', 'builder', '.eslintrc.cjs'],
   parser: '@typescript-eslint/parser',
-  plugins: ['react-refresh'],
+  plugins: ['react-refresh', '@stylistic'],
   rules: {
     'react-refresh/only-export-components': [
       'warn',
       { allowConstantExport: true },
     ],
+    '@stylistic/semi': 'error',
+    '@stylistic/quotes': ['error', 'single'],
+    '@stylistic/indent': ['error', 2],
+    '@stylistic/no-trailing-spaces': 'error',
   },
 }

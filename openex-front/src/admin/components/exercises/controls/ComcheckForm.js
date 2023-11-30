@@ -60,7 +60,7 @@ class ComcheckForm extends Component {
               displayEmpty={true}
               label={t('Audiences')}
               renderValue={(v) => (v.length === 0 ? (
-                  <em>{t('All audiences')}</em>
+                <em>{t('All audiences')}</em>
               ) : (
                 v.map((a) => audiencesbyId[a].audience_name).join(', ')
               ))
