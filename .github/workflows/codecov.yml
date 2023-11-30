@@ -20,6 +20,15 @@ jobs:
   codecov:
     name: CodeCov
     runs-on: ubuntu-latest
+    services:
+      minio:
+        image: minio/minio
+        ports:
+          - 10000:10000
+        env:
+          MINIO_ACCESS_KEY: minioadmin
+          MINIO_SECRET_KEY: minioadmin
+        options: --name=minio --health-cmd "curl http://localhost:10000/minio/health/live"
 
     steps:
       - name: Checkout repository
@@ -32,6 +41,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 18
+          cache: 'maven'
 
       - name: Run tests and collect coverage
         run: mvn clean install
