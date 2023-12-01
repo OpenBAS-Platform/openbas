@@ -53,7 +53,7 @@ public class Communication implements Base {
     @JsonProperty("communication_content_html")
     private String contentHtml;
 
-    @Type(type = "io.openex.database.converter.PostgreSqlStringArrayType")
+    @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
     @Column(name = "communication_attachments", columnDefinition = "text[]")
     @JsonProperty("communication_attachments")
     private String[] attachments;
