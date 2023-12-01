@@ -53,31 +53,33 @@ const CreateReport = (props) => {
   };
   return (
     <div>
-      {inline === true ? (
-        <ListItem
-          button={true}
-          divider={true}
-          onClick={handleOpen}
-          color="primary"
-        >
-          <ListItemIcon color="primary">
-            <ControlPointOutlined color="primary" />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('Create a new report')}
-            classes={{ primary: classes.text }}
-          />
-        </ListItem>
-      ) : (
-        <Fab
-          onClick={handleOpen}
-          color="primary"
-          aria-label="Add"
-          className={classes.createButton}
-        >
-          <Add />
-        </Fab>
-      )}
+      {inline === true
+        ? (
+          <ListItem
+            button={true}
+            divider={true}
+            onClick={handleOpen}
+            color="primary"
+          >
+            <ListItemIcon color="primary">
+              <ControlPointOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={t('Create a new report')}
+              classes={{ primary: classes.text }}
+            />
+          </ListItem>
+          )
+        : (
+          <Fab
+            onClick={handleOpen}
+            color="primary"
+            aria-label="Add"
+            className={classes.createButton}
+          >
+            <Add />
+          </Fab>
+          )}
       <Dialog
         open={open}
         TransitionComponent={Transition}

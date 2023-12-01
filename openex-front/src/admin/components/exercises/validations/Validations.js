@@ -178,8 +178,8 @@ const Validations = () => {
     )),
     R.filter((n) => (onlyManual
       ? !['openex_challenge', 'openex_media'].includes(
-        n.inject_expectation_inject?.inject_type,
-      )
+          n.inject_expectation_inject?.inject_type,
+        )
       : n.injectexpectation_id !== null)),
     R.filter(
       (n) => tags.length === 0
@@ -226,12 +226,12 @@ const Validations = () => {
         </div>
         <div style={{ float: 'right' }}>
           <FormControlLabel
-            control={
+            control={(
               <Switch
                 checked={onlyManual}
                 onChange={() => setOnlyManual(!onlyManual)}
               />
-            }
+            )}
             label={t('Only injects with manual validation')}
           />
         </div>
@@ -253,7 +253,7 @@ const Validations = () => {
                     />
                   </ListItemIcon>
                   <ListItemText
-                    primary={
+                    primary={(
                       <div>
                         <div
                           className={classes.bodyItem}
@@ -274,11 +274,12 @@ const Validations = () => {
                           <ItemTags variant="list" tags={inject.inject_tags} />
                         </div>
                       </div>
-                    }
+                    )}
                   />
                 </ListItem>
                 {inject.inject_type === 'openex_media'
-                || inject.inject_type === 'openex_challenge' ? (
+                || inject.inject_type === 'openex_challenge'
+                  ? (
                     <List component="div" disablePadding>
                       {Object.keys(groupedExpectation[injectId]).map(
                         (audienceId) => {
@@ -294,7 +295,7 @@ const Validations = () => {
                                   <CastForEducationOutlined fontSize="small" />
                                 </ListItemIcon>
                                 <ListItemText
-                                  primary={
+                                  primary={(
                                     <div>
                                       <div
                                         className={classes.bodyItem}
@@ -303,7 +304,7 @@ const Validations = () => {
                                         {audience.audience_name}
                                       </div>
                                     </div>
-                                  }
+                                  )}
                                 />
                               </ListItem>
                               <List component="div" disablePadding>
@@ -329,7 +330,7 @@ const Validations = () => {
                                           />
                                         </ListItemIcon>
                                         <ListItemText
-                                          primary={
+                                          primary={(
                                             <div>
                                               <div
                                                 className={classes.bodyItem}
@@ -382,7 +383,7 @@ const Validations = () => {
                                                 />
                                               </div>
                                             </div>
-                                          }
+                                          )}
                                         />
                                       </ListItem>
                                     );
@@ -405,7 +406,7 @@ const Validations = () => {
                                           <EmojiEventsOutlined fontSize="small" />
                                         </ListItemIcon>
                                         <ListItemText
-                                          primary={
+                                          primary={(
                                             <div>
                                               <div
                                                 className={classes.bodyItem}
@@ -459,7 +460,7 @@ const Validations = () => {
                                                 />
                                               </div>
                                             </div>
-                                          }
+                                          )}
                                         />
                                       </ListItem>
                                     );
@@ -471,7 +472,8 @@ const Validations = () => {
                         },
                       )}
                     </List>
-                  ) : (
+                    )
+                  : (
                     <List component="div" disablePadding>
                       {groupedExpectation[injectId].map((expectation) => {
                         const audience = audiencesMap[expectation.inject_expectation_audience]
@@ -489,7 +491,7 @@ const Validations = () => {
                               <CastForEducationOutlined fontSize="small" />
                             </ListItemIcon>
                             <ListItemText
-                              primary={
+                              primary={(
                                 <div>
                                   <div
                                     className={classes.bodyItem}
@@ -528,13 +530,13 @@ const Validations = () => {
                                     />
                                   </div>
                                 </div>
-                              }
+                              )}
                             />
                           </ListItem>
                         );
                       })}
                     </List>
-                  )}
+                    )}
               </div>
             );
           })}
@@ -588,8 +590,7 @@ const Validations = () => {
                 expectation_score:
                   currentExpectation?.inject_expectation_expected_score,
               }}
-              onSubmit={(data) => submit(currentExpectation?.injectexpectation_id, data)
-              }
+              onSubmit={(data) => submit(currentExpectation?.injectexpectation_id, data)}
               validate={validate}
               mutators={{
                 setValue: ([field, value], state, { changeValue }) => {

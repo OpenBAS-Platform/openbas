@@ -220,8 +220,7 @@ const LessonsCategories = ({
                           key={question.lessonsquestion_id}
                           divider={true}
                           button={true}
-                          onClick={() => setSelectedQuestion && setSelectedQuestion(question)
-                          }
+                          onClick={() => setSelectedQuestion && setSelectedQuestion(question)}
                         >
                           <ListItemText
                             style={{ width: '50%' }}
@@ -251,7 +250,8 @@ const LessonsCategories = ({
                                 variant="body2"
                                 color="text.secondary"
                               >
-                                {consolidatedAnswer.score}%
+                                {consolidatedAnswer.score}
+                                %
                               </Typography>
                             </Box>
                           </Box>
@@ -291,13 +291,13 @@ const LessonsCategories = ({
                           onDelete={
                             isReport
                               ? undefined
-                              : () => handleUpdateAudiences(
-                                category.lessonscategory_id,
-                                R.filter(
-                                  (n) => n !== audienceId,
-                                  category.lessons_category_audiences,
-                                ),
-                              )
+                              : () => (handleUpdateAudiences(
+                                  category.lessonscategory_id,
+                                  R.filter(
+                                    (n) => n !== audienceId,
+                                    category.lessons_category_audiences,
+                                  ),
+                                ))
                           }
                           label={truncate(audience?.audience_name || '', 30)}
                           icon={<CastForEducationOutlined />}

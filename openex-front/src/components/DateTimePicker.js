@@ -31,8 +31,7 @@ const DateTimePickerBase = ({
       error={error && touched}
       onChange={(date) => (Date.parse(date)
         ? inputProps.onChange(date.toISOString())
-        : inputProps.onChange(null))
-      }
+        : inputProps.onChange(null))}
       renderInput={(props) => (
         <TextField
           {...props}

@@ -60,22 +60,22 @@ const MediaOverviewTvChannel = ({ media }) => {
         <Grid item={true} xs={8}>
           <Card sx={{ width: '100%' }}>
             <CardHeader
-              avatar={
+              avatar={(
                 <Skeleton
                   animation={false}
                   variant="circular"
                   width={40}
                   height={40}
                 />
-              }
-              title={
+              )}
+              title={(
                 <Skeleton
                   animation={false}
                   height={10}
                   width="80%"
                   style={{ marginBottom: 6 }}
                 />
-              }
+              )}
               subheader={<Skeleton animation={false} height={10} width="40%" />}
             />
             <Skeleton
@@ -88,22 +88,22 @@ const MediaOverviewTvChannel = ({ media }) => {
         <Grid item={true} xs={4}>
           <Card sx={{ width: '100%' }}>
             <CardHeader
-              avatar={
+              avatar={(
                 <Skeleton
                   animation={false}
                   variant="circular"
                   width={40}
                   height={40}
                 />
-              }
-              title={
+              )}
+              title={(
                 <Skeleton
                   animation={false}
                   height={10}
                   width="80%"
                   style={{ marginBottom: 6 }}
                 />
-              }
+              )}
               subheader={<Skeleton animation={false} height={10} width="40%" />}
             />
             <Skeleton
@@ -114,22 +114,22 @@ const MediaOverviewTvChannel = ({ media }) => {
           </Card>
           <Card sx={{ width: '100%' }} style={{ marginTop: 20 }}>
             <CardHeader
-              avatar={
+              avatar={(
                 <Skeleton
                   animation={false}
                   variant="circular"
                   width={40}
                   height={40}
                 />
-              }
-              title={
+              )}
+              title={(
                 <Skeleton
                   animation={false}
                   height={10}
                   width="80%"
                   style={{ marginBottom: 6 }}
                 />
-              }
+              )}
               subheader={<Skeleton animation={false} height={10} width="40%" />}
             />
             <Skeleton
@@ -144,22 +144,22 @@ const MediaOverviewTvChannel = ({ media }) => {
         <Grid item={true} xs={4}>
           <Card sx={{ width: '100%' }}>
             <CardHeader
-              avatar={
+              avatar={(
                 <Skeleton
                   animation={false}
                   variant="circular"
                   width={40}
                   height={40}
                 />
-              }
-              title={
+              )}
+              title={(
                 <Skeleton
                   animation={false}
                   height={10}
                   width="80%"
                   style={{ marginBottom: 6 }}
                 />
-              }
+              )}
               subheader={<Skeleton animation={false} height={10} width="40%" />}
             />
             <Skeleton
@@ -172,22 +172,22 @@ const MediaOverviewTvChannel = ({ media }) => {
         <Grid item={true} xs={4}>
           <Card sx={{ width: '100%' }}>
             <CardHeader
-              avatar={
+              avatar={(
                 <Skeleton
                   animation={false}
                   variant="circular"
                   width={40}
                   height={40}
                 />
-              }
-              title={
+              )}
+              title={(
                 <Skeleton
                   animation={false}
                   height={10}
                   width="80%"
                   style={{ marginBottom: 6 }}
                 />
-              }
+              )}
               subheader={<Skeleton animation={false} height={10} width="40%" />}
             />
             <Skeleton
@@ -200,22 +200,22 @@ const MediaOverviewTvChannel = ({ media }) => {
         <Grid item={true} xs={4}>
           <Card sx={{ width: '100%' }}>
             <CardHeader
-              avatar={
+              avatar={(
                 <Skeleton
                   animation={false}
                   variant="circular"
                   width={40}
                   height={40}
                 />
-              }
-              title={
+              )}
+              title={(
                 <Skeleton
                   animation={false}
                   height={10}
                   width="80%"
                   style={{ marginBottom: 6 }}
                 />
-              }
+              )}
               subheader={<Skeleton animation={false} height={10} width="40%" />}
             />
             <Skeleton

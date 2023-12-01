@@ -35,8 +35,7 @@ const MarkDownFieldBase = ({
           >
             {markdown}
           </Markdown>,
-        )
-        }
+        )}
         l18n={{
           write: t('Write'),
           preview: t('Preview'),

@@ -198,11 +198,13 @@ const ChallengesPlayer = () => {
     setDocumentsOrderAsc(!documentsSortBy);
   };
   const documentsSortHeader = (field, label, isSortable) => {
-    const sortComponent = documentsOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = documentsOrderAsc
+      ? (
+        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -319,18 +321,17 @@ const ChallengesPlayer = () => {
                           sx={{ width: '100%', height: '100%' }}
                         >
                           <CardActionArea
-                            onClick={() => setCurrentChallengeEntry(challengeEntry)
-                            }
+                            onClick={() => setCurrentChallengeEntry(challengeEntry)}
                           >
                             <CardHeader
-                              avatar={
+                              avatar={(
                                 <Avatar sx={{ bgcolor: '#e91e63' }}>
                                   <EmojiEventsOutlined />
                                 </Avatar>
-                              }
+                              )}
                               title={challenge.challenge_name}
                               subheader={challenge.challenge_category}
-                              action={
+                              action={(
                                 <IconButton
                                   size="large"
                                   color={
@@ -341,7 +342,7 @@ const ChallengesPlayer = () => {
                                 >
                                   <PendingActionsOutlined fontSize="large" />
                                 </IconButton>
-                              }
+                              )}
                             />
                             <CardContent style={{ margin: '-20px 0 30px 0' }}>
                               <ExpandableMarkdown
@@ -439,13 +440,13 @@ const ChallengesPlayer = () => {
                       </span>
                     </ListItemIcon>
                     <ListItemText
-                      primary={
+                      primary={(
                         <div>
                           {documentsSortHeader('document_name', 'Name', true)}
                           {documentsSortHeader('document_type', 'Type', true)}
                           {documentsSortHeader('document_tags', 'Tags', true)}
                         </div>
-                      }
+                      )}
                     />
                   </ListItem>
                   {(currentChallenge?.challenge_documents || []).map(
@@ -464,7 +465,7 @@ const ChallengesPlayer = () => {
                             <AttachmentOutlined />
                           </ListItemIcon>
                           <ListItemText
-                            primary={
+                            primary={(
                               <div>
                                 <div
                                   className={classes.bodyItem}
@@ -491,7 +492,7 @@ const ChallengesPlayer = () => {
                                   />
                                 </div>
                               </div>
-                            }
+                            )}
                           />
                         </ListItem>
                       );
@@ -505,70 +506,69 @@ const ChallengesPlayer = () => {
             </Typography>
             {(currentExpectation?.inject_expectation_result !== null
               || currentResult !== null) && (
-              <div>
-                {currentExpectation?.inject_expectation_result !== null && (
-                  <Alert severity="success">
-                    {t('Flag is correct! It has been successfully submitted.')}
-                  </Alert>
-                )}
-                {currentExpectation?.inject_expectation_result === null
+                <div>
+                  {currentExpectation?.inject_expectation_result !== null && (
+                    <Alert severity="success">
+                      {t('Flag is correct! It has been successfully submitted.')}
+                    </Alert>
+                  )}
+                  {currentExpectation?.inject_expectation_result === null
                     && currentResult !== null && (
-                  <Alert
-                    severity="error"
-                    onClose={() => setCurrentResult(null)}
-                  >
-                    {t('Flag is not correct! Try again...')}
-                  </Alert>
-                )}
-                <div style={{ float: 'right', marginTop: 20 }}>
-                  <Button onClick={handleClose} style={{ marginRight: 10 }}>
-                    {t('Close')}
-                  </Button>
+                      <Alert
+                        severity="error"
+                        onClose={() => setCurrentResult(null)}
+                      >
+                        {t('Flag is not correct! Try again...')}
+                      </Alert>
+                  )}
+                  <div style={{ float: 'right', marginTop: 20 }}>
+                    <Button onClick={handleClose} style={{ marginRight: 10 }}>
+                      {t('Close')}
+                    </Button>
+                  </div>
                 </div>
-              </div>
             )}
             {currentExpectation?.inject_expectation_result === null
               && currentResult === null && (
-              <Form
-                keepDirtyOnReinitialize={true}
-                onSubmit={(data) => submit(currentChallenge?.challenge_id, data)
-                }
-                validate={validate}
-                mutators={{
-                  setValue: ([field, value], state, { changeValue }) => {
-                    changeValue(state, field, () => value);
-                  },
-                }}
-              >
-                {({ handleSubmit, submitting, errors }) => (
-                  <form id="challengeForm" onSubmit={handleSubmit}>
-                    <TextField
-                      variant="standard"
-                      name="challenge_value"
-                      fullWidth={true}
-                      label={t('Flag')}
-                    />
-                    <div style={{ float: 'right', marginTop: 20 }}>
-                      <Button
-                        onClick={handleClose}
-                        style={{ marginRight: 10 }}
-                        disabled={submitting}
-                      >
-                        {t('Cancel')}
-                      </Button>
-                      <Button
-                        color="secondary"
-                        type="submit"
-                        disabled={
+                <Form
+                  keepDirtyOnReinitialize={true}
+                  onSubmit={(data) => submit(currentChallenge?.challenge_id, data)}
+                  validate={validate}
+                  mutators={{
+                    setValue: ([field, value], state, { changeValue }) => {
+                      changeValue(state, field, () => value);
+                    },
+                  }}
+                >
+                  {({ handleSubmit, submitting, errors }) => (
+                    <form id="challengeForm" onSubmit={handleSubmit}>
+                      <TextField
+                        variant="standard"
+                        name="challenge_value"
+                        fullWidth={true}
+                        label={t('Flag')}
+                      />
+                      <div style={{ float: 'right', marginTop: 20 }}>
+                        <Button
+                          onClick={handleClose}
+                          style={{ marginRight: 10 }}
+                          disabled={submitting}
+                        >
+                          {t('Cancel')}
+                        </Button>
+                        <Button
+                          color="secondary"
+                          type="submit"
+                          disabled={
                           submitting || Object.keys(errors).length > 0
                         }
-                      >
-                        {t('Submit')}
-                      </Button>
-                    </div>
-                  </form>
-                )}
-              </Form>
+                        >
+                          {t('Submit')}
+                        </Button>
+                      </div>
+                    </form>
+                  )}
+                </Form>
             )}
           </DialogContent>
         </Dialog>

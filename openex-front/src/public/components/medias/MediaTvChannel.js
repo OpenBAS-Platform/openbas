@@ -120,11 +120,11 @@ const MediaTvChannel = ({ mediaReader }) => {
               sx={{ width: '100%', height: '100%' }}
             >
               <CardHeader
-                avatar={
+                avatar={(
                   <Avatar>
                     {(firstArticle.article_author || t('Unknown')).charAt(0)}
                   </Avatar>
-                }
+                )}
                 title={firstArticle.article_author || t('Unknown')}
                 subheader={fldt(firstArticle.article_virtual_publication)}
               />
@@ -202,11 +202,11 @@ const MediaTvChannel = ({ mediaReader }) => {
                   style={{ marginTop: index > 0 ? 20 : 0 }}
                 >
                   <CardHeader
-                    avatar={
+                    avatar={(
                       <Avatar>
                         {(article.article_author || t('Unknown')).charAt(0)}
                       </Avatar>
-                    }
+                    )}
                     title={article.article_author || t('Unknown')}
                     subheader={fldt(article.article_virtual_publication)}
                   />
@@ -284,11 +284,11 @@ const MediaTvChannel = ({ mediaReader }) => {
                 sx={{ width: '100%', height: '100%' }}
               >
                 <CardHeader
-                  avatar={
+                  avatar={(
                     <Avatar>
                       {(article.article_author || t('Unknown')).charAt(0)}
                     </Avatar>
-                  }
+                  )}
                   title={article.article_author || t('Unknown')}
                   subheader={fldt(article.article_virtual_publication)}
                 />

@@ -4,6 +4,7 @@
   "private": true,
   "main": "src/index.tsx",
   "license": "Apache-2.0",
+  "type": "module",
   "dependencies": {
     "@ckeditor/ckeditor5-react": "5.0.2",
     "@emotion/react": "11.11.1",
@@ -62,6 +63,7 @@
     "zod": "3.22.4"
   },
   "devDependencies": {
+    "@eslint/js": "^8.54.0",
     "@stylistic/eslint-plugin": "1.4.1",
     "@types/jest": "27.5.2",
     "@types/node": "18.11.9",
@@ -81,6 +83,7 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-react-refresh": "0.4.4",
     "fs-extra": "10.1.0",
+    "globals": "^13.23.0",
     "jest": "27.5.1",
     "swagger-typescript-api": "13.0.3",
     "typescript": "5.3.2",
@@ -93,7 +96,7 @@
     "start": "node builder/dev/dev.js",
     "dev": "vite",
     "build": "node builder/prod/prod.js",
-    "lint": "cross-env DEBUG=eslint:cli-engine TIMING=1 eslint --max-warnings 0 --cache -c .eslintrc.cjs src",
+    "lint": "cross-env DEBUG=eslint:cli-engine TIMING=1 eslint --max-warnings 0 --cache -c eslint.config.js src",
     "control": "yarn audit --groups dependencies --summary",
     "test": "jest --coverage",
     "generate-types-from-api": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n api-types.d.ts --sort-types"

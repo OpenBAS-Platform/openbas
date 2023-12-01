@@ -26,8 +26,8 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  exerciseId: Exercise['exercise_id'];
-  report: Report;
+  exerciseId: Exercise['exercise_id']
+  report: Report
 }
 
 const ReportPopover: React.FC<Props> = ({ exerciseId, report }) => {

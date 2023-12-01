@@ -151,7 +151,7 @@ const Medias = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div>
                 {filtering.buildHeader(
                   'media_type',
@@ -172,7 +172,7 @@ const Medias = () => {
                   headerStyles,
                 )}
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -192,7 +192,7 @@ const Medias = () => {
               />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   <div
                     className={classes.bodyItem}
@@ -213,7 +213,7 @@ const Medias = () => {
                     {media.media_description}
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <ChevronRightOutlined />

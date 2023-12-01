@@ -190,11 +190,13 @@ class AudiencesPlayers extends Component {
   sortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { orderAsc, sortBy } = this.state;
-    const sortComponent = orderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = orderAsc
+      ? (
+        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -302,14 +304,14 @@ class AudiencesPlayers extends Component {
               </span>
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   {this.sortHeader('user_email', 'Email address', true)}
                   {this.sortHeader('user_options', 'Options', false)}
                   {this.sortHeader('user_organization', 'Organization', true)}
                   {this.sortHeader('user_tags', 'Tags', true)}
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
@@ -323,7 +325,7 @@ class AudiencesPlayers extends Component {
                 <PersonOutlined />
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -336,47 +338,53 @@ class AudiencesPlayers extends Component {
                       style={inlineStyles.user_options}
                     >
                       {R.isNil(user.user_email)
-                      || R.isEmpty(user.user_email) ? (
+                      || R.isEmpty(user.user_email)
+                        ? (
                           <EmailOutlined
                             color="warning"
                             fontSize="small"
                             className={classes.icon}
                           />
-                        ) : (
+                          )
+                        : (
                           <EmailOutlined
                             color="success"
                             fontSize="small"
                             className={classes.icon}
                           />
-                        )}
+                          )}
                       {R.isNil(user.user_pgp_key)
-                      || R.isEmpty(user.user_pgp_key) ? (
+                      || R.isEmpty(user.user_pgp_key)
+                        ? (
                           <KeyOutlined
                             color="warning"
                             fontSize="small"
                             className={classes.icon}
                           />
-                        ) : (
+                          )
+                        : (
                           <KeyOutlined
                             color="success"
                             fontSize="small"
                             className={classes.icon}
                           />
-                        )}
+                          )}
                       {R.isNil(user.user_phone)
-                      || R.isEmpty(user.user_phone) ? (
+                      || R.isEmpty(user.user_phone)
+                        ? (
                           <SmartphoneOutlined
                             color="warning"
                             fontSize="small"
                             className={classes.icon}
                           />
-                        ) : (
+                          )
+                        : (
                           <SmartphoneOutlined
                             color="success"
                             fontSize="small"
                             className={classes.icon}
                           />
-                        )}
+                          )}
                     </div>
                     <div
                       className={classes.bodyItem}
@@ -394,7 +402,7 @@ class AudiencesPlayers extends Component {
                       <ItemTags variant="list" tags={user.user_tags} />
                     </div>
                   </div>
-                }
+                )}
               />
               <ListItemSecondaryAction>
                 <PlayerPopover

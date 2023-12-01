@@ -20,9 +20,6 @@
     "jsx": "react",
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true
   },
   "include": [

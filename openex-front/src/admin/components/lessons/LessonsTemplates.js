@@ -144,7 +144,7 @@ const LessonsTemplates = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div>
                 {filtering.buildHeader(
                   'lessons_template_name',
@@ -159,7 +159,7 @@ const LessonsTemplates = () => {
                   headerStyles,
                 )}
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -177,7 +177,7 @@ const LessonsTemplates = () => {
                 <SchoolOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -192,7 +192,7 @@ const LessonsTemplates = () => {
                       {lessonsTemplate.lessons_template_description}
                     </div>
                   </div>
-                }
+                )}
               />
               <ListItemSecondaryAction>
                 <ChevronRightOutlined />

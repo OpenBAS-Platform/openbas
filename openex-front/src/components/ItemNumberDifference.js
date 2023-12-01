@@ -59,7 +59,11 @@ class ItemNumberDifference extends Component {
           />
           <div className={classes.diffNumber}>{difference}</div>
           {description && (
-            <div className={classes.diffDescription}>({t(description)})</div>
+            <div className={classes.diffDescription}>
+              (
+              {t(description)}
+              )
+            </div>
           )}
         </div>
       );
@@ -73,7 +77,11 @@ class ItemNumberDifference extends Component {
           />
           <div className={classes.diffNumber}>{difference}</div>
           {description && (
-            <div className={classes.diffDescription}>({t(description)})</div>
+            <div className={classes.diffDescription}>
+              (
+              {t(description)}
+              )
+            </div>
           )}
         </div>
       );
@@ -86,7 +94,11 @@ class ItemNumberDifference extends Component {
         />
         <div className={classes.diffNumber}>{difference}</div>
         {description && (
-          <div className={classes.diffDescription}>({t(description)})</div>
+          <div className={classes.diffDescription}>
+            (
+            {t(description)}
+            )
+          </div>
         )}
       </div>
     );

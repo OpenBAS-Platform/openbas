@@ -83,9 +83,9 @@ class SearchFilter extends Component {
           // eslint-disable-next-line no-nested-ternary
           classes: !fullWidth
             ? {
-              root: searchInput,
-              focused: searchInputFocused,
-            }
+                root: searchInput,
+                focused: searchInputFocused,
+              }
             : thin
               ? { root: searchInput }
               : null,

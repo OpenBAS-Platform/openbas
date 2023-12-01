@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface CreatePlayerProps {
   inline: boolean
-  onCreate: (result: string) => void,
+  onCreate: (result: string) => void
 }
 
 const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
@@ -67,34 +67,37 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
 
   return (
     <div>
-      {inline ? (
-        <ListItemButton
-          divider={true}
-          onClick={handleOpen}
-          color="primary"
-        >
-          <ListItemIcon color="primary">
-            <ControlPointOutlined color="primary" />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('Create a new player')}
-            classes={{ primary: classes.text }}
-          />
-        </ListItemButton>
-      ) : (
-        <Fab
-          onClick={handleOpen}
-          color="primary"
-          aria-label="Add"
-          className={classes.createButton}
-        >
-          <Add />
-        </Fab>
-      )}
+      {inline
+        ? (
+          <ListItemButton
+            divider={true}
+            onClick={handleOpen}
+            color="primary"
+          >
+            <ListItemIcon color="primary">
+              <ControlPointOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={t('Create a new player')}
+              classes={{ primary: classes.text }}
+            />
+          </ListItemButton>
+          )
+        : (
+          <Fab
+            onClick={handleOpen}
+            color="primary"
+            aria-label="Add"
+            className={classes.createButton}
+          >
+            <Add />
+          </Fab>
+          )}
       <Dialog
         open={openDialog}
         handleClose={handleClose}
-        title={t('Create a new player')}>
+        title={t('Create a new player')}
+      >
         <PlayerForm
           initialValues={{ user_tags: [] }}
           handleClose={handleClose}

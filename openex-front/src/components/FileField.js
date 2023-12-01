@@ -40,10 +40,13 @@ const FileFieldInput = ({
       <FormHelperText key={1} error={true} focused={true}>
         {t('This file type is not accepted here.')}
       </FormHelperText>,
-    ]
+      ]
     : acceptedFiles.map((file) => (
       <FormHelperText key={file.path} focused={true}>
-        {file.path} - {bytesFormat(file.size).number}
+        {file.path}
+        {' '}
+        -
+        {bytesFormat(file.size).number}
         {bytesFormat(file.size).symbol}
       </FormHelperText>
     ));
@@ -65,10 +68,11 @@ const FileField = ({ name, ...props }) => (
     <Field
       name={name}
       subscribe={{ touched: true, error: true }}
-      render={({ meta: { touched, error } }) => (touched && error ? (
-        <FormHelperText error={true}>{error}</FormHelperText>
-      ) : null)
-      }
+      render={({ meta: { touched, error } }) => (touched && error
+        ? (
+          <FormHelperText error={true}>{error}</FormHelperText>
+          )
+        : null)}
     />
   </>
 );

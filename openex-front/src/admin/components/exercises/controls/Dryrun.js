@@ -262,14 +262,16 @@ const Dryrun = () => {
             style={{ display: 'flex' }}
           >
             <div className={classes.icon}>
-              {dryrun?.dryrun_finished ? (
-                <CheckCircleOutlineOutlined
-                  color="primary"
-                  sx={{ fontSize: 50 }}
-                />
-              ) : (
-                <CastOutlined color="primary" sx={{ fontSize: 50 }} />
-              )}
+              {dryrun?.dryrun_finished
+                ? (
+                  <CheckCircleOutlineOutlined
+                    color="primary"
+                    sx={{ fontSize: 50 }}
+                  />
+                  )
+                : (
+                  <CastOutlined color="primary" sx={{ fontSize: 50 }} />
+                  )}
             </div>
             <div>
               <div className={classes.title}>{t('Dryrun')}</div>
@@ -317,7 +319,7 @@ const Dryrun = () => {
               </span>
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   {filtering.buildHeader(
                     'dryinject_type',
@@ -350,7 +352,7 @@ const Dryrun = () => {
                     headerStyles,
                   )}
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
@@ -371,7 +373,7 @@ const Dryrun = () => {
                   />
                 </ListItemIcon>
                 <ListItemText
-                  primary={
+                  primary={(
                     <div>
                       <div
                         className={classes.bodyItem}
@@ -417,7 +419,9 @@ const Dryrun = () => {
                           float: 'left',
                         }}
                       >
-                        {fndt(dryinject.dryinject_status?.status_date)} (
+                        {fndt(dryinject.dryinject_status?.status_date)}
+                        {' '}
+                        (
                         {dryinject.dryinject_status
                           && (
                             dryinject.dryinject_status.status_execution / 1000
@@ -425,7 +429,7 @@ const Dryrun = () => {
                         s)
                       </div>
                     </div>
-                  }
+                  )}
                 />
                 <ListItemSecondaryAction>
                   <InjectStatusDetails status={dryinject.dryinject_status} />

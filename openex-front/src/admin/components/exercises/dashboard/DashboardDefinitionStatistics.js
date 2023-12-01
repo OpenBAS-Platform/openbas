@@ -119,21 +119,23 @@ const DashboardDefinitionStatistics = ({
           {t('Distribution of injects by type')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {injectsByType.length > 0 ? (
-            <Chart
-              options={horizontalBarsChartOptions(theme)}
-              series={injectsByInjectTypeData}
-              type="bar"
-              width="100%"
-              height={50 + injectsByType.length * 50}
-            />
-          ) : (
-            <Empty
-              message={t(
-                'No data to display or the exercise has not started yet',
+          {injectsByType.length > 0
+            ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={injectsByInjectTypeData}
+                type="bar"
+                width="100%"
+                height={50 + injectsByType.length * 50}
+              />
+              )
+            : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
               )}
-            />
-          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={6}>
@@ -141,21 +143,23 @@ const DashboardDefinitionStatistics = ({
           {t('Distribution of injects by audience')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedAudiencesByInjectsNumber.length > 0 ? (
-            <Chart
-              options={horizontalBarsChartOptions(theme)}
-              series={injectsByAudienceData}
-              type="bar"
-              width="100%"
-              height={50 + sortedAudiencesByInjectsNumber.length * 50}
-            />
-          ) : (
-            <Empty
-              message={t(
-                'No data to display or the exercise has not started yet',
+          {sortedAudiencesByInjectsNumber.length > 0
+            ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={injectsByAudienceData}
+                type="bar"
+                width="100%"
+                height={50 + sortedAudiencesByInjectsNumber.length * 50}
+              />
+              )
+            : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
               )}
-            />
-          )}
         </Paper>
       </Grid>
     </Grid>

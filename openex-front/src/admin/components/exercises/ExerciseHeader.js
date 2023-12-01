@@ -49,16 +49,18 @@ const useStyles = makeStyles(() => ({
 const TagChip = ({ tagId, isReadOnly, deleteTag }) => {
   const classes = useStyles();
   const tag = useHelper((helper) => helper.getTag(tagId));
-  return tag ? (
-    <Chip
-      key={tag.tag_id}
-      classes={{ root: classes.tag }}
-      label={tag.tag_name}
-      onDelete={isReadOnly ? null : () => deleteTag(tag.tag_id)}
-    />
-  ) : (
-    <div />
-  );
+  return tag
+    ? (
+      <Chip
+        key={tag.tag_id}
+        classes={{ root: classes.tag }}
+        label={tag.tag_name}
+        onDelete={isReadOnly ? null : () => deleteTag(tag.tag_id)}
+      />
+      )
+    : (
+      <div />
+      );
 };
 
 const ExerciseHeader = (props) => {
@@ -128,7 +130,7 @@ const ExerciseHeader = (props) => {
             onClick={handleToggleAddTag}
             isReadOnly={permissions.readOnlyBypassStatus}
           >
-            {<AddOutlined />}
+            <AddOutlined />
           </IconButton>
         </div>
         <Dialog

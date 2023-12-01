@@ -62,10 +62,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 const headerStyles: {
-  iconSort: CSSProperties,
-  variable_key: CSSProperties,
-  variable_description: CSSProperties,
-  variable_value: CSSProperties,
+  iconSort: CSSProperties
+  variable_key: CSSProperties
+  variable_description: CSSProperties
+  variable_value: CSSProperties
 } = {
   iconSort: {
     position: 'absolute',
@@ -94,9 +94,9 @@ const headerStyles: {
 };
 
 const inlineStyles: {
-  variable_key: CSSProperties,
-  variable_description: CSSProperties,
-  variable_value: CSSProperties,
+  variable_key: CSSProperties
+  variable_description: CSSProperties
+  variable_value: CSSProperties
 } = {
   variable_key: {
     float: 'left',
@@ -175,7 +175,7 @@ const Variables = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div>
                 {filtering.buildHeader(
                   'variable_key',
@@ -196,7 +196,7 @@ const Variables = () => {
                   headerStyles,
                 )}
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -210,7 +210,7 @@ const Variables = () => {
               <AttachMoneyOutlined />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   <div
                     className={classes.bodyItem}
@@ -231,7 +231,7 @@ const Variables = () => {
                     {variable.variable_value}
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <VariablePopover

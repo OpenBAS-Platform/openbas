@@ -110,19 +110,21 @@ class TagField extends Component {
           )}
           classes={{ clearIndicator: classes.autoCompleteIndicator }}
         />
-        {userAdmin && <Dialog
-          open={this.state.tagCreation}
-          onClose={this.handleCloseTagCreation.bind(this)}
-          PaperProps={{ elevation: 1 }}
-        >
-          <DialogTitle>{t('Create a new tag')}</DialogTitle>
-          <DialogContent>
-            <TagForm
-              onSubmit={this.onSubmit.bind(this)}
-              handleClose={this.handleCloseTagCreation.bind(this)}
-            />
-          </DialogContent>
-        </Dialog>}
+        {userAdmin && (
+          <Dialog
+            open={this.state.tagCreation}
+            onClose={this.handleCloseTagCreation.bind(this)}
+            PaperProps={{ elevation: 1 }}
+          >
+            <DialogTitle>{t('Create a new tag')}</DialogTitle>
+            <DialogContent>
+              <TagForm
+                onSubmit={this.onSubmit.bind(this)}
+                handleClose={this.handleCloseTagCreation.bind(this)}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     );
   }

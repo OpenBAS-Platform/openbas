@@ -175,7 +175,8 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
       <Dialog
         open={openEdit}
         handleClose={handleCloseEdit}
-        title={t('Update the player')}>
+        title={t('Update the player')}
+      >
         <PlayerForm
           initialValues={initialValues}
           handleClose={handleCloseEdit}

@@ -65,7 +65,7 @@ const ExerciseDatePopover: React.FC<Props> = ({ exercise }) => {
           />
         </DialogContent>
       </Dialog>
-    </div >
+    </div>
   );
 };
 

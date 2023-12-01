@@ -22,7 +22,7 @@ import { copyToClipboard } from '../../../../utils/CopyToClipboard';
 
 interface VariableChildItemProps {
   hasChildren?: boolean
-  builtin?: boolean,
+  builtin?: boolean
   variableKey: string
   variableValue: string | undefined
 }
@@ -171,7 +171,8 @@ const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps>
               {/* TODO: validate when migrate to new react router version */}
               {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
               {/* @ts-ignore */}
-              <Button component={Link}
+              <Button
+                component={Link}
                 to={`/admin/exercises/${exerciseId}/definition/variables`}
                 color="primary"
                 variant="text"

@@ -28,12 +28,12 @@ export default defineConfig({
         };
       },
     },
-    react()
+    react(),
   ],
 
   publicDir: 'builder/public',
   resolve: {
-    extensions: ['.js', '.tsx', '.mjs', '.js', '.mts', '.ts', '.jsx', '.json']
+    extensions: ['.js', '.tsx', '.mjs', '.mts', '.ts', '.jsx', '.json'],
   },
 
   optimizeDeps: {
@@ -58,8 +58,8 @@ export default defineConfig({
         './src/components/hooks.ts',
         './src/components/Zod.ts',
         './src/components/common/Transition.tsx',
-        './src/resources/geo/countries.json'
-      ]
+        './src/resources/geo/countries.json',
+      ],
     },
     proxy: {
       '/api': {
@@ -86,7 +86,7 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
         ws: true,
-      }
-    }
-  }
+      },
+    },
+  },
 });

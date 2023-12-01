@@ -61,8 +61,13 @@ const styles = () => ({
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
   return (
-    <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}{...other}>
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
       {value === index && (
         <Box style={{ padding: 0, marginTop: 20 }} sx={{ p: 3 }}>
           <Typography>{children}</Typography>
@@ -416,20 +421,25 @@ class GroupPopover extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-        <Dialog open={this.state.openGrants}
+        <Dialog
+          open={this.state.openGrants}
           TransitionComponent={Transition}
           onClose={this.handleCloseGrants.bind(this)}
-          fullWidth={true} maxWidth="md"
-          PaperProps={{ elevation: 1 }}>
+          fullWidth={true}
+          maxWidth="md"
+          PaperProps={{ elevation: 1 }}
+        >
           <DialogTitle>{t('Manage grants')}</DialogTitle>
           <DialogContent style={{ minHeight: 480, maxHeight: 480 }}>
-            <Tabs value={this.state.tabSelect}
+            <Tabs
+              value={this.state.tabSelect}
               onChange={this.handleTabChange.bind(this)}
               textColor="secondary"
               indicatorColor="secondary"
-              aria-label="secondary tabs example">
-              <Tab label="Exercises"/>
-              <Tab label="Organizations"/>
+              aria-label="secondary tabs example"
+            >
+              <Tab label="Exercises" />
+              <Tab label="Organizations" />
             </Tabs>
             <TabPanel value={this.state.tabSelect} index={0}>
               <Table selectable={false} size="small">
@@ -523,7 +533,7 @@ class GroupPopover extends Component {
                           {organization.organization_name}
                         </TableCell>
                         <TableCell style={{ textAlign: 'center' }}>
-                          <Checkbox checked={isOrgaChecked} onChange={this.handleGrantOrganization.bind(this, organization.organization_id)}/>
+                          <Checkbox checked={isOrgaChecked} onChange={this.handleGrantOrganization.bind(this, organization.organization_id)} />
                         </TableCell>
                       </TableRow>
                     );

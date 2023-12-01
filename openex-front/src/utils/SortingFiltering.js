@@ -26,11 +26,13 @@ const useSearchAnFilter = (schema, defaultSortKey, searchColumns, orderAsc = tru
     setOrder({ sortBy: field, orderAsc: !order.orderAsc });
   };
   const buildHeader = (field, label, isSortable, styles) => {
-    const sortComponent = order.orderAsc ? (
-      <ArrowDropDownOutlined style={styles.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={styles.iconSort} />
-    );
+    const sortComponent = order.orderAsc
+      ? (
+        <ArrowDropDownOutlined style={styles.iconSort} />
+        )
+      : (
+        <ArrowDropUpOutlined style={styles.iconSort} />
+        );
     if (isSortable) {
       return (
         <div style={styles[field]} onClick={() => reverseBy(field)}>

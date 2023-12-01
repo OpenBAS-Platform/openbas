@@ -18,9 +18,9 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import Transition from '../../../../components/common/Transition';
 
 interface Props {
-  disabled?: boolean,
-  exercise: Exercise,
-  variable: Variable,
+  disabled?: boolean
+  exercise: Exercise
+  variable: Variable
   onDeleteVariable?: () => void
 }
 

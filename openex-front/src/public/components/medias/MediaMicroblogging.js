@@ -120,11 +120,11 @@ const MediaMicroblogging = ({ mediaReader }) => {
             sx={{ width: '100%' }}
           >
             <CardHeader
-              avatar={
+              avatar={(
                 <Avatar>
                   {(article.article_author || t('Unknown')).charAt(0)}
                 </Avatar>
-              }
+              )}
               title={article.article_author || t('Unknown')}
               subheader={fldt(article.article_virtual_publication)}
             />

@@ -192,11 +192,13 @@ const ChallengesPreview = () => {
     setDocumentsOrderAsc(!documentsSortBy);
   };
   const documentsSortHeader = (field, label, isSortable) => {
-    const sortComponent = documentsOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = documentsOrderAsc
+      ? (
+        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -304,11 +306,11 @@ const ChallengesPreview = () => {
                             onClick={() => setCurrentChallenge(challenge)}
                           >
                             <CardHeader
-                              avatar={
+                              avatar={(
                                 <Avatar sx={{ bgcolor: '#e91e63' }}>
                                   <EmojiEventsOutlined />
                                 </Avatar>
-                              }
+                              )}
                               title={challenge.challenge_name}
                               subheader={challenge.challenge_category}
                             />
@@ -408,13 +410,13 @@ const ChallengesPreview = () => {
                       </span>
                     </ListItemIcon>
                     <ListItemText
-                      primary={
+                      primary={(
                         <div>
                           {documentsSortHeader('document_name', 'Name', true)}
                           {documentsSortHeader('document_type', 'Type', true)}
                           {documentsSortHeader('document_tags', 'Tags', true)}
                         </div>
-                      }
+                      )}
                     />
                   </ListItem>
                   {(currentChallenge?.challenge_documents || []).map(
@@ -433,7 +435,7 @@ const ChallengesPreview = () => {
                             <AttachmentOutlined />
                           </ListItemIcon>
                           <ListItemText
-                            primary={
+                            primary={(
                               <div>
                                 <div
                                   className={classes.bodyItem}
@@ -460,7 +462,7 @@ const ChallengesPreview = () => {
                                   />
                                 </div>
                               </div>
-                            }
+                            )}
                           />
                         </ListItem>
                       );
@@ -474,18 +476,20 @@ const ChallengesPreview = () => {
             </Typography>
             {currentResult !== null && (
               <div>
-                {currentResult === true ? (
-                  <Alert severity="success">
-                    {t('Flag is correct! It has been successfully submitted.')}
-                  </Alert>
-                ) : (
-                  <Alert
-                    severity="error"
-                    onClose={() => setCurrentResult(null)}
-                  >
-                    {t('Flag is not correct! Try again...')}
-                  </Alert>
-                )}
+                {currentResult === true
+                  ? (
+                    <Alert severity="success">
+                      {t('Flag is correct! It has been successfully submitted.')}
+                    </Alert>
+                    )
+                  : (
+                    <Alert
+                      severity="error"
+                      onClose={() => setCurrentResult(null)}
+                    >
+                      {t('Flag is not correct! Try again...')}
+                    </Alert>
+                    )}
                 <div style={{ float: 'right', marginTop: 20 }}>
                   <Button onClick={handleClose} style={{ marginRight: 10 }}>
                     {t('Close')}
@@ -496,8 +500,7 @@ const ChallengesPreview = () => {
             {currentResult === null && (
               <Form
                 keepDirtyOnReinitialize={true}
-                onSubmit={(data) => submit(currentChallenge?.challenge_id, data)
-                }
+                onSubmit={(data) => submit(currentChallenge?.challenge_id, data)}
                 validate={validate}
                 mutators={{
                   setValue: ([field, value], state, { changeValue }) => {

@@ -14,7 +14,7 @@ const renderCheckbox = ({
 }) => (
   <FormGroup row={true} style={{ ...style, marginLeft: 5 }}>
     <FormControlLabel
-      control={
+      control={(
         <MuiCheckbox
           checked={input.value}
           onChange={(event) => {
@@ -22,7 +22,7 @@ const renderCheckbox = ({
           }}
           {...others}
         />
-      }
+      )}
       disabled={disabled}
       label={label}
       error={touched && invalid}

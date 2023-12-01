@@ -235,95 +235,103 @@ const DashboardDataStatistics = ({
       <Grid item={true} xs={6}>
         <Typography variant="h4">{t('Sent injects over time')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {injectsOverTime.length > 0 ? (
-            <Chart
-              options={areaChartOptions(theme, true, nsdt, null, undefined)}
-              series={injectsData}
-              type="area"
-              width="100%"
-              height={350}
-            />
-          ) : (
-            <Empty
-              message={t(
-                'No data to display or the exercise has not started yet',
+          {injectsOverTime.length > 0
+            ? (
+              <Chart
+                options={areaChartOptions(theme, true, nsdt, null, undefined)}
+                series={injectsData}
+                type="area"
+                width="100%"
+                height={350}
+              />
+              )
+            : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
               )}
-            />
-          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={6}>
         <Typography variant="h4">{t('Sent injects over time')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {audiencesInjects.length > 0 ? (
-            <Chart
-              options={lineChartOptions(
-                theme,
-                true,
-                nsdt,
-                null,
-                undefined,
-                false,
+          {audiencesInjects.length > 0
+            ? (
+              <Chart
+                options={lineChartOptions(
+                  theme,
+                  true,
+                  nsdt,
+                  null,
+                  undefined,
+                  false,
+                )}
+                series={audiencesInjects}
+                type="line"
+                width="100%"
+                height={350}
+              />
+              )
+            : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
               )}
-              series={audiencesInjects}
-              type="line"
-              width="100%"
-              height={350}
-            />
-          ) : (
-            <Empty
-              message={t(
-                'No data to display or the exercise has not started yet',
-              )}
-            />
-          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={6} style={{ marginTop: 30 }}>
         <Typography variant="h4">{t('Sent mails over time')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {communicationsOverTime.length > 0 ? (
-            <Chart
-              options={areaChartOptions(theme, true, nsdt, null, undefined)}
-              series={communicationsData}
-              type="area"
-              width="100%"
-              height={350}
-            />
-          ) : (
-            <Empty
-              message={t(
-                'No data to display or the exercise has not started yet',
+          {communicationsOverTime.length > 0
+            ? (
+              <Chart
+                options={areaChartOptions(theme, true, nsdt, null, undefined)}
+                series={communicationsData}
+                type="area"
+                width="100%"
+                height={350}
+              />
+              )
+            : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
               )}
-            />
-          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={6} style={{ marginTop: 30 }}>
         <Typography variant="h4">{t('Sent mails over time')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {audiencesCommunications.length > 0 ? (
-            <Chart
-              options={lineChartOptions(
-                theme,
-                true,
-                nsdt,
-                null,
-                undefined,
-                false,
+          {audiencesCommunications.length > 0
+            ? (
+              <Chart
+                options={lineChartOptions(
+                  theme,
+                  true,
+                  nsdt,
+                  null,
+                  undefined,
+                  false,
+                )}
+                series={audiencesCommunications}
+                type="line"
+                width="100%"
+                height={350}
+              />
+              )
+            : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
               )}
-              series={audiencesCommunications}
-              type="line"
-              width="100%"
-              height={350}
-            />
-          ) : (
-            <Empty
-              message={t(
-                'No data to display or the exercise has not started yet',
-              )}
-            />
-          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={4} style={{ marginTop: 30 }}>
@@ -331,21 +339,23 @@ const DashboardDataStatistics = ({
           {t('Distribution of mails by audience')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedAudiencesByCommunicationNumber.length > 0 ? (
-            <Chart
-              options={horizontalBarsChartOptions(theme)}
-              series={totalMailsByAudienceData}
-              type="bar"
-              width="100%"
-              height={50 + sortedAudiencesByCommunicationNumber.length * 50}
-            />
-          ) : (
-            <Empty
-              message={t(
-                'No data to display or the exercise has not started yet',
+          {sortedAudiencesByCommunicationNumber.length > 0
+            ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={totalMailsByAudienceData}
+                type="bar"
+                width="100%"
+                height={50 + sortedAudiencesByCommunicationNumber.length * 50}
+              />
+              )
+            : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
               )}
-            />
-          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={4} style={{ marginTop: 30 }}>
@@ -353,21 +363,23 @@ const DashboardDataStatistics = ({
           {t('Distribution of mails by player')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {communicationsUsers.length > 0 ? (
-            <Chart
-              options={horizontalBarsChartOptions(theme)}
-              series={totalMailsByUserData}
-              type="bar"
-              width="100%"
-              height={50 + communicationsUsers.length * 50}
-            />
-          ) : (
-            <Empty
-              message={t(
-                'No data to display or the exercise has not started yet',
+          {communicationsUsers.length > 0
+            ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={totalMailsByUserData}
+                type="bar"
+                width="100%"
+                height={50 + communicationsUsers.length * 50}
+              />
+              )
+            : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
               )}
-            />
-          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={4} style={{ marginTop: 30 }}>
@@ -375,21 +387,23 @@ const DashboardDataStatistics = ({
           {t('Distribution of mails by inject')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedInjectsByCommunicationNumber.length > 0 ? (
-            <Chart
-              options={horizontalBarsChartOptions(theme)}
-              series={totalMailsByInjectData}
-              type="bar"
-              width="100%"
-              height={50 + sortedInjectsByCommunicationNumber.length * 50}
-            />
-          ) : (
-            <Empty
-              message={t(
-                'No data to display or the exercise has not started yet',
+          {sortedInjectsByCommunicationNumber.length > 0
+            ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={totalMailsByInjectData}
+                type="bar"
+                width="100%"
+                height={50 + sortedInjectsByCommunicationNumber.length * 50}
+              />
+              )
+            : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
               )}
-            />
-          )}
         </Paper>
       </Grid>
     </Grid>

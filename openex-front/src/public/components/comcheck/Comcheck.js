@@ -86,8 +86,10 @@ const Comcheck = () => {
           <CheckCircleOutlineOutlined color="success" sx={{ fontSize: 50 }} />
           <br />
           <pre>
-            {t('Verification done at')}{' '}
-            {fldt(status?.comcheckstatus_receive_date)}.
+            {t('Verification done at')}
+            {' '}
+            {fldt(status?.comcheckstatus_receive_date)}
+            .
           </pre>
         </div>
       </Paper>

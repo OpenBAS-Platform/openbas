@@ -189,21 +189,23 @@ class AudiencePopover extends Component {
               {t('Manage players')}
             </MenuItem>
           )}
-          {audience.audience_enabled ? (
-            <MenuItem
-              onClick={this.handleOpenDisable.bind(this)}
-              disabled={isExerciseReadOnly(exercise)}
-            >
-              {t('Disable')}
-            </MenuItem>
-          ) : (
-            <MenuItem
-              onClick={this.handleOpenEnable.bind(this)}
-              disabled={isExerciseReadOnly(exercise)}
-            >
-              {t('Enable')}
-            </MenuItem>
-          )}
+          {audience.audience_enabled
+            ? (
+              <MenuItem
+                onClick={this.handleOpenDisable.bind(this)}
+                disabled={isExerciseReadOnly(exercise)}
+              >
+                {t('Disable')}
+              </MenuItem>
+              )
+            : (
+              <MenuItem
+                onClick={this.handleOpenEnable.bind(this)}
+                disabled={isExerciseReadOnly(exercise)}
+              >
+                {t('Enable')}
+              </MenuItem>
+              )}
           {onRemoveAudience && (
             <MenuItem
               onClick={this.handleOpenRemove.bind(this)}
