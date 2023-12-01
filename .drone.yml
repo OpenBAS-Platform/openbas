@@ -2,71 +2,78 @@ kind: pipeline
 name: openex-tests
 
 steps:
-- name: submodules
-  image: alpine/git
-  commands:
-  - git submodule update --init --recursive
+  - name: submodules
+    image: alpine/git
+    commands:
+      - git submodule update --init --recursive
 
-- name: api-tests
+  - name: api-tests
   image: maven:3.8.7-openjdk-18
-  environment:
-    MINIO_ENDPOINT: minio
-    MINIO_PORT: 9000
-    MINIO_ACCESS-KEY: minioadmin
-    MINIO_ACCESS-SECRET: minioadmin
-  commands:
-  - mvn install
+    environment:
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS-KEY: minioadmin
+      MINIO_ACCESS-SECRET: minioadmin
+    commands:
+      - mvn install
 
-- name: frontend-tests
-  image: nikolaik/python-nodejs:python3.10-nodejs16-alpine
+  - name: frontend-tests
+    image: nikolaik/python-nodejs:python3.10-nodejs16-alpine
 
-  commands:
-  - cd openex-front
-  - yarn install
-  - yarn lint
-  - yarn build
-  - NODE_OPTIONS=--max_old_space_size=8192 yarn test
+    commands:
+      - cd openex-front
+      - yarn install
+      - yarn lint
+      - yarn build
+      - NODE_OPTIONS=--max_old_space_size=8192 yarn test
 
-- name: build-circleci
-  image: curlimages/curl
-  commands:
-  - curl -X POST --data "branch=master" https://circleci.com/api/v1.1/project/github/OpenEx-Platform/openex/build?circle-token=$CIRCLECI_TOKEN
-  environment:
-    CIRCLECI_TOKEN:
-      from_secret: circleci_token
-  when:
-    branch:
-    - master
-    event:
-      exclude:
-      - pull_request
-      - tag
+  - name: codecov
+    image: robertstettner/drone-codecov
+    settings:
+      token:
+        from_secret: CODECOV_TOKEN
+      files: openex-api/target/site/jacoco/jacoco.xml
 
-- name: build-circleci-release
-  image: curlimages/curl
-  commands:
-  - curl -X POST --data "tag=$DRONE_TAG" https://circleci.com/api/v1.1/project/github/OpenEx-Platform/openex/build?circle-token=$CIRCLECI_TOKEN
-  environment:
-    CIRCLECI_TOKEN:
-      from_secret: circleci_token
-  when:
-    event:
-      - tag
+  - name: build-circleci
+    image: curlimages/curl
+    commands:
+      - curl -X POST --data "branch=master" https://circleci.com/api/v1.1/project/github/OpenEx-Platform/openex/build?circle-token=$CIRCLECI_TOKEN
+    environment:
+      CIRCLECI_TOKEN:
+        from_secret: circleci_token
+    when:
+      branch:
+        - master
+      event:
+        exclude:
+          - pull_request
+          - tag
 
-- name: slack
-  image: plugins/slack
-  settings:
-    webhook:
-      from_secret: slack_webhook
-    username: drone
-    channel: notifications
-  when:
-    status: [success, failure]
+  - name: build-circleci-release
+    image: curlimages/curl
+    commands:
+      - curl -X POST --data "tag=$DRONE_TAG" https://circleci.com/api/v1.1/project/github/OpenEx-Platform/openex/build?circle-token=$CIRCLECI_TOKEN
+    environment:
+      CIRCLECI_TOKEN:
+        from_secret: circleci_token
+    when:
+      event:
+        - tag
+
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_webhook
+      username: drone
+      channel: notifications
+    when:
+      status: [ success, failure ]
 
 services:
-- name: minio
-  image: minio/minio:RELEASE.2021-11-09T03-21-45Z
-  environment:
-    MINIO_ROOT_USER: minioadmin
-    MINIO_ROOT_PASSWORD: minioadmin
-  command: [ server, /data ]
+  - name: minio
+    image: minio/minio:RELEASE.2021-11-09T03-21-45Z
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: [ server, /data ]
