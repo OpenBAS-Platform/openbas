@@ -7,7 +7,7 @@ import io.openex.helper.MultiIdDeserializer;
 import io.openex.helper.MultiModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

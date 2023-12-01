@@ -8,7 +8,7 @@ import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
