@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.activation.MimetypesFileTypeMap;
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.function.Function;
@@ -33,7 +33,7 @@ import static java.util.Optional.ofNullable;
 public class V1_DataImporter implements Importer {
 
     // region variables
-    @Resource
+    @Autowired
     protected ObjectMapper mapper;
     private FileService documentService;
     private DocumentRepository documentRepository;

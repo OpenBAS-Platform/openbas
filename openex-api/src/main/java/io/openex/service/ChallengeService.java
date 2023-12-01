@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -23,7 +23,7 @@ import static io.openex.injects.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 @Service
 public class ChallengeService {
 
-    @Resource
+    @Autowired
     protected ObjectMapper mapper;
 
     private ExerciseRepository exerciseRepository;

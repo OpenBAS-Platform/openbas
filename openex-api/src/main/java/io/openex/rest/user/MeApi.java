@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -33,7 +33,7 @@ import static io.openex.helper.DatabaseHelper.updateRelation;
 @RestController
 public class MeApi extends RestBehavior {
 
-  @Resource
+  @Autowired
   private SessionManager sessionManager;
 
   private OrganizationRepository organizationRepository;

@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
 import jakarta.persistence.PreRemove;
@@ -18,7 +18,7 @@ public class ModelBaseListener {
     public static final String DATA_UPDATE = "DATA_UPDATE_SUCCESS";
     public static final String DATA_DELETE = "DATA_DELETE_SUCCESS";
 
-    @Resource
+    @Autowired
     protected ObjectMapper mapper;
 
     private ApplicationEventPublisher appPublisher;

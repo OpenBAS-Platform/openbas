@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +26,7 @@ import static io.openex.config.SessionHelper.currentUser;
 @Service
 public class MailingService {
 
-  @Resource
+  @Autowired
   protected ObjectMapper mapper;
 
   private ContractService contractService;

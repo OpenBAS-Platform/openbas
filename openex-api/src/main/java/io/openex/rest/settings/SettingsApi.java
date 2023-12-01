@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class SettingsApi extends RestBehavior {
   private ApplicationContext context;
   private Environment env;
 
-  @Resource
+  @Autowired
   private OpenExConfig openExConfig;
 
   @Autowired

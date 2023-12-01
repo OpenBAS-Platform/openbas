@@ -16,7 +16,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Component
 @EnableAsync
@@ -31,7 +31,7 @@ public class AppConfig {
   public final static String EMAIL_FORMAT = "This field must be a valid email.";
   public final static String PHONE_FORMAT = "This field must start with '+' character and country identifier.";
 
-  @Resource
+  @Autowired
   private OpenExConfig openExConfig;
 
   @Bean

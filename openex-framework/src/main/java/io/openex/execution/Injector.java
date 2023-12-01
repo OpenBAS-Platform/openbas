@@ -14,7 +14,7 @@ import io.openex.service.FileService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.Instant;
@@ -27,7 +27,7 @@ import static io.openex.database.model.ExecutionTrace.traceError;
 
 public abstract class Injector {
 
-    @Resource
+    @Autowired
     protected ObjectMapper mapper;
     private FileService fileService;
     private DocumentRepository documentRepository;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.database.model.Execution;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.io.IOException;
 @Converter(autoApply = true)
 public class ExecutionConverter implements AttributeConverter<Execution, String> {
 
-    @Resource
+    @Autowired
     private ObjectMapper mapper;
 
     @Override

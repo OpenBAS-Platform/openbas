@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.InputStream;
@@ -29,7 +29,7 @@ public class ImportService {
 
     private final Map<Integer, Importer> dataImporters = new HashMap<>();
 
-    @Resource
+    @Autowired
     protected ObjectMapper mapper;
 
     @Autowired

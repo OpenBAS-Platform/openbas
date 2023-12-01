@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +29,7 @@ import static io.openex.injects.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 @Component(ChallengeContract.TYPE)
 public class ChallengeExecutor extends Injector {
 
-    @Resource
+    @Autowired
     private OpenExConfig openExConfig;
 
     private ChallengeRepository challengeRepository;

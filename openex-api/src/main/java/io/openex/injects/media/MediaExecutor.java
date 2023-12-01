@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +33,7 @@ public class MediaExecutor extends Injector {
 
     public static final String VARIABLE_ARTICLE = "article";
 
-    @Resource
+    @Autowired
     private OpenExConfig openExConfig;
 
     private ArticleRepository articleRepository;

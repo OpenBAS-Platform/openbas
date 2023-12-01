@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.util.function.Tuples;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -66,7 +66,7 @@ public class ExerciseApi extends RestBehavior {
   @Value("${openex.mail.imap.username}")
   private String imapUsername;
 
-  @Resource
+  @Autowired
   private OpenExConfig openExConfig;
   // endregion
 

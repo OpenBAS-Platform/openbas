@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
@@ -27,7 +27,7 @@ import static io.openex.helper.StreamHelper.fromIterable;
 @RestController
 public class PlayerApi extends RestBehavior {
 
-  @Resource
+  @Autowired
   private SessionManager sessionManager;
 
   private CommunicationRepository communicationRepository;

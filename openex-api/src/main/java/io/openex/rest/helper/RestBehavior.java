@@ -18,7 +18,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,7 +28,7 @@ import static io.openex.config.SessionHelper.currentUser;
 
 public class RestBehavior {
 
-  @Resource
+  @Autowired
   protected ObjectMapper mapper;
 
   // Build the mapping between json specific name and the actual database field name

@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -34,7 +34,7 @@ import static io.openex.helper.StreamHelper.fromIterable;
 @RestController
 public class UserApi extends RestBehavior {
     PassiveExpiringMap<String, String> resetTokenMap = new PassiveExpiringMap<>(1000 * 60 * 10);
-    @Resource
+    @Autowired
     private SessionManager sessionManager;
     private OrganizationRepository organizationRepository;
     private UserRepository userRepository;

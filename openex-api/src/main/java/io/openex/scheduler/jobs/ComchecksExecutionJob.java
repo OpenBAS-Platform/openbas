@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
@@ -42,7 +42,7 @@ import static java.util.stream.Collectors.groupingBy;
 public class ComchecksExecutionJob implements Job {
 
     private static final Logger LOGGER = Logger.getLogger(ComchecksExecutionJob.class.getName());
-    @Resource
+    @Autowired
     private OpenExConfig openExConfig;
     private ApplicationContext context;
     private ComcheckRepository comcheckRepository;
@@ -50,7 +50,7 @@ public class ComchecksExecutionJob implements Job {
     private ContractService contractService;
     private ExecutionContextService executionContextService;
 
-    @Resource
+    @Autowired
     private ObjectMapper mapper;
 
     @Autowired

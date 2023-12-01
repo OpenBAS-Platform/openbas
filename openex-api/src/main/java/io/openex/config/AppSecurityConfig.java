@@ -45,7 +45,7 @@ import org.springframework.security.saml2.provider.service.web.Saml2MetadataFilt
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -71,7 +71,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
   private OpenExConfig openExConfig;
   private Environment env;
 
-  @Resource
+  @Autowired
   protected ObjectMapper mapper;
 
   @Autowired

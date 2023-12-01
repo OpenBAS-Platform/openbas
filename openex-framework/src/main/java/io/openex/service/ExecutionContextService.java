@@ -11,7 +11,7 @@ import io.openex.execution.ExecutionContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -22,7 +22,7 @@ import static io.openex.contract.variables.VariableHelper.*;
 @Service
 public class ExecutionContextService {
 
-  @Resource
+  @Autowired
   private final OpenExConfig openExConfig;
 
   private final VariableRepository variableRepository;
