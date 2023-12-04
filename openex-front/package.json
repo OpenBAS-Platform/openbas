@@ -60,7 +60,7 @@
     "remark-gfm": "3.0.1",
     "remark-parse": "10.0.2",
     "reselect": "4.1.8",
-    "rxjs": "7.5.7",
+    "rxjs": "7.8.1",
     "seamless-immutable": "7.1.4",
     "typeface-ibm-plex-sans": "1.1.13",
     "typeface-roboto": "1.1.13",

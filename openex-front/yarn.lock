@@ -12044,7 +12044,7 @@ __metadata:
     remark-gfm: 3.0.1
     remark-parse: 10.0.2
     reselect: 4.1.8
-    rxjs: 7.5.7
+    rxjs: 7.8.1
     seamless-immutable: 7.1.4
     swagger-typescript-api: 13.0.3
     typeface-ibm-plex-sans: 1.1.13
@@ -13789,12 +13789,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rxjs@npm:7.5.7":
-  version: 7.5.7
-  resolution: "rxjs@npm:7.5.7"
+"rxjs@npm:7.8.1":
+  version: 7.8.1
+  resolution: "rxjs@npm:7.8.1"
   dependencies:
     tslib: ^2.1.0
-  checksum: edabcdb73b0f7e0f5f6e05c2077aff8c52222ac939069729704357d6406438acca831c24210db320aba269e86dbe1a400f3769c89101791885121a342fb15d9c
+  checksum: de4b53db1063e618ec2eca0f7965d9137cabe98cf6be9272efe6c86b47c17b987383df8574861bcced18ebd590764125a901d5506082be84a8b8e364bf05f119
   languageName: node
   linkType: hard
 
