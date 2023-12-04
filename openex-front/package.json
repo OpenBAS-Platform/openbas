@@ -14,7 +14,7 @@
     "@mui/lab": "5.0.0-alpha.149",
     "@mui/material": "5.14.14",
     "@mui/styles": "5.14.14",
-    "@mui/x-date-pickers": "6.16.2",
+    "@mui/x-date-pickers": "6.18.2",
     "@redux-devtools/extension": "3.2.6",
     "apexcharts": "3.44.1",
     "axios": "1.6.0",
