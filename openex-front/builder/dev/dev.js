@@ -20,7 +20,7 @@ const debounce = (func, timeout = 500) => {
 
 // Start with an initial build
 esbuild
-  .build({
+  .context({
     logLevel: "info",
     entryPoints: ["src/index.tsx"],
     bundle: true,
@@ -43,9 +43,9 @@ esbuild
     sourcemap: true,
     sourceRoot: "src",
     outdir: "builder/dev/build",
-    incremental: true,
   })
-  .then((builder) => {
+  .then(async (builder) => {
+    await builder.rebuild();
     // Listen change for hot recompile
     chokidar
       .watch("src/**/*.{js,jsx,ts,tsx}", {
