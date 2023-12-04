@@ -12090,7 +12090,7 @@ __metadata:
     react-final-form-arrays: 3.1.4
     react-hook-form: 7.48.2
     react-intl: 6.5.5
-    react-leaflet: 4.1.0
+    react-leaflet: 4.2.1
     react-markdown: 8.0.7
     react-mde: 11.5.0
     react-redux: 8.0.5
@@ -13197,16 +13197,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-leaflet@npm:4.1.0":
-  version: 4.1.0
-  resolution: "react-leaflet@npm:4.1.0"
+"react-leaflet@npm:4.2.1":
+  version: 4.2.1
+  resolution: "react-leaflet@npm:4.2.1"
   dependencies:
     "@react-leaflet/core": ^2.1.0
   peerDependencies:
     leaflet: ^1.9.0
     react: ^18.0.0
     react-dom: ^18.0.0
-  checksum: e49b00b5b0364fa6e187e5a47e4b334043fe5886a22ecb6f57458264775e61986ab9272771fc24011484d859628363f1f4e53cf994ab5ec1c98dcb7a957333cd
+  checksum: 79222c2ba0c62facaa3dfee18f7a692f917a4fb744ba8d22269a77f9779fc9634962230eb51265ff2563a1a5e3287d2ec16640ee7f5de459458027e05cd756ba
   languageName: node
   linkType: hard
 
