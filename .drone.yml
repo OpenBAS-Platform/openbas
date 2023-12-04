@@ -8,7 +8,7 @@ steps:
   - git submodule update --init --recursive
 
 - name: api-tests
-  image: maven:3.8.5-openjdk-18
+  image: maven:3.8.7-openjdk-18
   environment:
     MINIO_ENDPOINT: minio
     MINIO_PORT: 9000

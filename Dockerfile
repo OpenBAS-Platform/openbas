@@ -8,7 +8,7 @@ RUN yarn install
 COPY openex-front /opt/openex-build/openex-front
 RUN yarn build
 
-FROM maven:3.8.5-openjdk-18 AS api-builder
+FROM maven:3.8.7-openjdk-18 AS api-builder
 
 WORKDIR /opt/openex-build/openex
 COPY openex-model ./openex-model
