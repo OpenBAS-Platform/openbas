@@ -57,6 +57,7 @@ import MediaIcon from '../../medias/MediaIcon';
 import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
+import InjectExpectations from './expectations/InjectExpectations';
 
 const styles = (theme) => ({
   header: {
@@ -330,6 +331,7 @@ class InjectDefinition extends Component {
       allAudiences: props.inject.inject_all_audiences,
       audiencesIds: props.inject.inject_audiences,
       documents: props.inject.inject_documents,
+      expectationDatas: [],
       audiencesSortBy: 'audience_name',
       audiencesOrderAsc: true,
       documentsSortBy: 'document_name',
@@ -413,6 +415,10 @@ class InjectDefinition extends Component {
         (d) => d.document_id !== documentId,
       ),
     });
+  }
+
+  handleExpectations(expectations) {
+    this.setState({ expectations: expectations });
   }
 
   toggleAttachment(documentId) {
@@ -1044,6 +1050,7 @@ class InjectDefinition extends Component {
       allAudiences,
       audiencesIds,
       documents,
+      expectationDatas,
       audiencesSortBy,
       audiencesOrderAsc,
       documentsSortBy,
@@ -1751,6 +1758,11 @@ class InjectDefinition extends Component {
                     </div>
                   </div>
                 )}
+                <InjectExpectations
+                  exercise={exercise}
+                  expectationDatas={expectationDatas}
+                  handleExpectations={this.handleExpectations.bind(this)}
+                />
                 <div>
                   <Typography variant="h2" style={{ marginTop: 30 }}>
                     {t('Inject documents')}
