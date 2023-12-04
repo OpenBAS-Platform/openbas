@@ -2177,24 +2177,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@date-io/core@npm:^2.16.0":
-  version: 2.16.0
-  resolution: "@date-io/core@npm:2.16.0"
-  checksum: 336d0dd90fd0848116472cfb0e694e85860b2916952304201bb4d3a23d453d44589d346494584faba0fc05751cc38f1880889ce48cd982377aac2bfb20469b8a
+"@date-io/core@npm:^2.17.0":
+  version: 2.17.0
+  resolution: "@date-io/core@npm:2.17.0"
+  checksum: 008dfc79eb54256805113d76feca82fe0b08a245ecbfb2d53809e6a129dc201f9dbd053c8ad63512203ab1a13ff7f76de0edc31829588ef507d53307974c29a8
   languageName: node
   linkType: hard
 
-"@date-io/date-fns@npm:2.16.0":
-  version: 2.16.0
-  resolution: "@date-io/date-fns@npm:2.16.0"
+"@date-io/date-fns@npm:2.17.0":
+  version: 2.17.0
+  resolution: "@date-io/date-fns@npm:2.17.0"
   dependencies:
-    "@date-io/core": ^2.16.0
+    "@date-io/core": ^2.17.0
   peerDependencies:
     date-fns: ^2.0.0
   peerDependenciesMeta:
     date-fns:
       optional: true
-  checksum: aedb23c07da6f1e38a81ffe77ca1cb95167e1a175a3d65561cf244fbd1a5a0b961e84df88fe00b9cfa4bd32eda6d430e6d14567e2b040257198cd12748d5fcc5
+  checksum: bfab634c985a98dd44fdfc5f982b0348da2886c9ad79a8d71fd7bfa05b740af7f5cf340508cd7ce51d67c141fb8766998c8efdf50653252c68ec078471cd76e6
   languageName: node
   linkType: hard
 
@@ -11966,7 +11966,7 @@ __metadata:
   resolution: "openex-frontend@workspace:."
   dependencies:
     "@ckeditor/ckeditor5-react": 5.0.2
-    "@date-io/date-fns": 2.16.0
+    "@date-io/date-fns": 2.17.0
     "@emotion/react": 11.11.1
     "@emotion/styled": 11.11.0
     "@hookform/resolvers": 3.3.2
