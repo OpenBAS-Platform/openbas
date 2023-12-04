@@ -7983,12 +7983,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"final-form-arrays@npm:3.0.2":
-  version: 3.0.2
-  resolution: "final-form-arrays@npm:3.0.2"
+"final-form-arrays@npm:3.1.0":
+  version: 3.1.0
+  resolution: "final-form-arrays@npm:3.1.0"
   peerDependencies:
-    final-form: ^4.18.2
-  checksum: bed684815967fa3e5b2cc91eb69e5d88e1048a5dbe421e2eb61b90434c634a09fec877ce52c85add8d009c20c052b6f2a884277d7ca80e9a628944a012d20205
+    final-form: ^4.20.8
+  checksum: 01763ba1801b8973b805037e5809562f601e711a540db5fa3fef46bd0065a5de8351c4c8713fdd2fd2f0301e206ea604696c448ba0b3ab866c6f8a7b0a1c2fbf
   languageName: node
   linkType: hard
 
@@ -12003,7 +12003,7 @@ __metadata:
     eslint-plugin-react: 7.33.2
     express: 4.18.2
     final-form: 4.20.10
-    final-form-arrays: 3.0.2
+    final-form-arrays: 3.1.0
     fs-extra: 10.1.0
     history: 5.3.0
     html-react-parser: 4.2.9
