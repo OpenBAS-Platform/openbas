@@ -106,7 +106,7 @@
     "generate-types-from-api": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n api-types.d.ts --sort-types"
   },
   "resolutions": {
-    "mini-css-extract-plugin": "2.4.7",
+    "mini-css-extract-plugin": "2.7.6",
     "react-transition-group": "4.4.5"
   },
   "workspaces": [
