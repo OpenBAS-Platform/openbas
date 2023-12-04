@@ -4,6 +4,12 @@ import globals from 'globals';
 import js from '@eslint/js';
 import tsParser from '@typescript-eslint/parser';
 
+// import eslint-plugin-react-hooks & @typescript-eslint/eslint-plugin to not let tools report them as unused
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import eslintPluginReactHooks from 'eslint-plugin-react-hooks';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import tsEslintEslintPlugin from '@typescript-eslint/eslint-plugin';
+
 import { FlatCompat } from '@eslint/eslintrc';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -29,6 +35,7 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.jest,
+        ...globals.commonjs,
         ...globals.es2020,
         process: true,
       },

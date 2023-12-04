@@ -1,5 +1,5 @@
 import { build } from 'esbuild';
-import fsExtra from 'fs-extra';
+import { copySync } from 'fs-extra/esm';
 import { readdirSync, writeFileSync } from 'fs';
 
 const buildPath = 'build';
@@ -28,7 +28,7 @@ build({
 })
   .then(() => {
     // region Copy public files to build
-    fsExtra.copySync('./builder/public/', buildPath, {
+    copySync('./builder/public/', buildPath, {
       recursive: true,
       overwrite: true,
     });
