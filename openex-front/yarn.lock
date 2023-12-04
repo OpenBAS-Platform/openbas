@@ -4154,6 +4154,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@yr/monotone-cubic-spline@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@yr/monotone-cubic-spline@npm:1.0.3"
+  checksum: ebc75e4d84d5b97d1d715452088ffe3cf6b3d71943433118116a2e90f17aed654b6f726868e913a49aef28645bb8afcc28580349de1ac77ad0c7dab3d991843e
+  languageName: node
+  linkType: hard
+
 "abab@npm:^2.0.3, abab@npm:^2.0.5":
   version: 2.0.6
   resolution: "abab@npm:2.0.6"
@@ -4370,17 +4377,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"apexcharts@npm:3.36.3":
-  version: 3.36.3
-  resolution: "apexcharts@npm:3.36.3"
+"apexcharts@npm:3.44.1":
+  version: 3.44.1
+  resolution: "apexcharts@npm:3.44.1"
   dependencies:
+    "@yr/monotone-cubic-spline": ^1.0.3
     svg.draggable.js: ^2.2.2
     svg.easing.js: ^2.0.0
     svg.filter.js: ^2.0.2
     svg.pathmorphing.js: ^0.1.3
     svg.resize.js: ^1.4.3
     svg.select.js: ^3.0.1
-  checksum: 2b92f123cf3e52255d379d95411d12943c096a1575234ae90513d9dd9dd3f118fa1f08098b5acf142e1d119ac0c19a7ca2a62d3979cf7e333d361d582ec12daf
+  checksum: dec13906ebddf046c5228692bfbb7268b9ee112460ddc928de018da36aba97d33cea16f6c38c3e4f880535a9e57626c0ea24ec8b8a7f8288620e7320ecd58242
   languageName: node
   linkType: hard
 
@@ -11455,7 +11463,7 @@ __metadata:
     "@types/react": 18.2.34
     "@types/react-dom": 18.2.14
     "@types/seamless-immutable": 7.1.18
-    apexcharts: 3.36.3
+    apexcharts: 3.44.1
     axios: 1.6.0
     chokidar: 3.5.3
     ckeditor5-custom-build: 0.0.1
