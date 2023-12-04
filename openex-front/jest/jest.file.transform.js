@@ -1,13 +1,11 @@
 'use strict';
 
-const path = require('path');
+import { basename } from 'path';
 
 // This is a custom Jest transformer turning file imports into filenames.
 // http://facebook.github.io/jest/docs/en/webpack.html
 
-module.exports = {
-  process(src, filename) {
-    const assetFilename = JSON.stringify(path.basename(filename));
-    return `module.exports = ${assetFilename};`;
-  },
-};
+export function process(_src, filename) {
+  const assetFilename = JSON.stringify(basename(filename));
+  return `module.exports = ${assetFilename};`;
+}
