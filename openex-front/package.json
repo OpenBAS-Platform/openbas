@@ -37,7 +37,7 @@
     "normalizr": "3.6.2",
     "pdfmake": "0.2.7",
     "prop-types": "15.8.1",
-    "ramda": "0.28.0",
+    "ramda": "0.29.1",
     "raw-loader": "4.0.2",
     "react": "18.2.0",
     "react-apexcharts": "1.4.1",
