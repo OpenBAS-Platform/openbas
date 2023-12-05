@@ -48,7 +48,7 @@ const AnimationMenu: React.FC<Props> = ({ exerciseId }) => {
       classes={{ paper: classes.drawer }}
     >
       <div className={classes.toolbar} />
-      < MenuList component="nav" >
+      <MenuList component="nav">
         <MenuItem
           component={Link}
           to={`/admin/exercises/${exerciseId}/animation/timeline`}
@@ -61,24 +61,22 @@ const AnimationMenu: React.FC<Props> = ({ exerciseId }) => {
           <ListItemIcon>
             <TheatersOutlined />
           </ListItemIcon>
-          < ListItemText primary={t('Timeline')} />
+          <ListItemText primary={t('Timeline')} />
         </MenuItem>
-        < MenuItem
+        <MenuItem
           component={Link}
           to={`/admin/exercises/${exerciseId}/animation/mails`}
           selected={
-            location.pathname.includes(
-              `/admin/exercises/${exerciseId}/animation/mails`,
-            )
+            location.pathname.includes(`/admin/exercises/${exerciseId}/animation/mails`)
           }
           classes={{ root: classes.item }}
         >
           <ListItemIcon>
             <MailOutlined />
           </ListItemIcon>
-          < ListItemText primary={t('Mails')} />
+          <ListItemText primary={t('Mails')} />
         </MenuItem>
-        < MenuItem
+        <MenuItem
           component={Link}
           to={`/admin/exercises/${exerciseId}/animation/validations`}
           selected={
@@ -92,7 +90,7 @@ const AnimationMenu: React.FC<Props> = ({ exerciseId }) => {
           </ListItemIcon>
           <ListItemText primary={t('Validations')} />
         </MenuItem>
-        < MenuItem
+        <MenuItem
           component={Link}
           to={`/admin/exercises/${exerciseId}/animation/logs`}
           selected={

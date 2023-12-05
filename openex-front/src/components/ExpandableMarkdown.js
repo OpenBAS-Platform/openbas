@@ -10,6 +10,7 @@ import withTheme from '@mui/styles/withTheme';
 import { truncate } from '../utils/String';
 
 export const MarkDownComponents = (theme) => ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   table: ({ node, ...tableProps }) => (
     <table
       style={{
@@ -19,9 +20,11 @@ export const MarkDownComponents = (theme) => ({
       {...tableProps}
     />
   ),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   tr: ({ node, ...trProps }) => (
     <tr style={{ border: `1px solid ${theme.palette.divider}` }} {...trProps} />
   ),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   td: ({ node, ...tdProps }) => (
     <td
       style={{
@@ -31,6 +34,7 @@ export const MarkDownComponents = (theme) => ({
       {...tdProps}
     />
   ),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   th: ({ node, ...tdProps }) => (
     <th
       style={{

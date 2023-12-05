@@ -22,7 +22,7 @@ import { copyToClipboard } from '../../../../utils/CopyToClipboard';
 
 interface VariableChildItemProps {
   hasChildren?: boolean
-  builtin?: boolean,
+  builtin?: boolean
   variableKey: string
   variableValue: string | undefined
 }
@@ -96,7 +96,7 @@ const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps>
   const dispatch = useAppDispatch();
   const [tab, setTab] = useState('1');
 
-  const handleChange = (event: React.SyntheticEvent, newTab: string) => {
+  const handleChange = (_event: React.SyntheticEvent, newTab: string) => {
     setTab(newTab);
   };
 
@@ -171,7 +171,8 @@ const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps>
               {/* TODO: validate when migrate to new react router version */}
               {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
               {/* @ts-ignore */}
-              <Button component={Link}
+              <Button
+                component={Link}
                 to={`/admin/exercises/${exerciseId}/definition/variables`}
                 color="primary"
                 variant="text"

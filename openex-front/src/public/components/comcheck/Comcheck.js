@@ -49,6 +49,7 @@ const Comcheck = () => {
   const status = useHelper((helper) => helper.getComcheckStatus(statusId));
   useEffect(() => {
     dispatch(fetchComcheckStatus(statusId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const [dimension, setDimension] = useState({
     width: window.innerWidth,
@@ -85,8 +86,10 @@ const Comcheck = () => {
           <CheckCircleOutlineOutlined color="success" sx={{ fontSize: 50 }} />
           <br />
           <pre>
-            {t('Verification done at')}{' '}
-            {fldt(status?.comcheckstatus_receive_date)}.
+            {t('Verification done at')}
+            {' '}
+            {fldt(status?.comcheckstatus_receive_date)}
+            .
           </pre>
         </div>
       </Paper>

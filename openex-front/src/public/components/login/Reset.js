@@ -61,54 +61,98 @@ const Reset = ({ onCancel }) => {
     <div className={classes.container}>
       <Paper variant="outlined">
         <div style={{ padding: 15 }}>
-          {step === STEP_ASK_RESET && <Form onSubmit={onSubmitAskToken}
-                                   validate={(values) => validateFields(t, values, ['username'])}>
-            {({ handleSubmit, submitting, pristine }) => (
+          {step === STEP_ASK_RESET && (
+            <Form
+              onSubmit={onSubmitAskToken}
+              validate={(values) => validateFields(t, values, ['username'])}
+            >
+              {({ handleSubmit, submitting, pristine }) => (
                 <form onSubmit={handleSubmit}>
-                  <TextField name="username" type="text"
-                      variant="standard" label={t('Email address')}
-                      fullWidth={true} style={{ marginTop: 5 }}/>
-                  <Button type="submit" variant="contained"
-                      disabled={pristine || submitting} onClick={handleSubmit}
-                      style={{ marginTop: 30 }}>
+                  <TextField
+                    name="username"
+                    type="text"
+                    variant="standard"
+                    label={t('Email address')}
+                    fullWidth={true}
+                    style={{ marginTop: 5 }}
+                  />
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={pristine || submitting}
+                    onClick={handleSubmit}
+                    style={{ marginTop: 30 }}
+                  >
                     {t('Send reset code')}
                   </Button>
                 </form>
-            )}
-          </Form>}
-          {step === STEP_VALIDATE_TOKEN && <Form onSubmit={onSubmitValidateToken}
-                                        validate={(values) => validateFields(t, values, ['code'])}>
-            {({ handleSubmit, submitting, pristine }) => (
+              )}
+            </Form>
+          )}
+          {step === STEP_VALIDATE_TOKEN && (
+            <Form
+              onSubmit={onSubmitValidateToken}
+              validate={(values) => validateFields(t, values, ['code'])}
+            >
+              {({ handleSubmit, submitting, pristine }) => (
                 <form onSubmit={handleSubmit}>
-                  <TextField name="code" type="text"
-                             variant="standard" label={t('Enter code')}
-                             fullWidth={true} style={{ marginTop: 5 }}/>
-                  <Button type="submit" variant="contained"
-                          disabled={pristine || submitting} onClick={handleSubmit}
-                          style={{ marginTop: 30 }}>
+                  <TextField
+                    name="code"
+                    type="text"
+                    variant="standard"
+                    label={t('Enter code')}
+                    fullWidth={true}
+                    style={{ marginTop: 5 }}
+                  />
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={pristine || submitting}
+                    onClick={handleSubmit}
+                    style={{ marginTop: 30 }}
+                  >
                     {t('Continue')}
                   </Button>
                 </form>
-            )}
-          </Form>}
-          {step === STEP_RESET_PASSWORD && <Form onSubmit={onSubmitValidatePassword}
-                                                 validate={(values) => validateFields(t, values, ['password', 'password_validation'])}>
-            {({ handleSubmit, submitting, pristine }) => (
+              )}
+            </Form>
+          )}
+          {step === STEP_RESET_PASSWORD && (
+            <Form
+              onSubmit={onSubmitValidatePassword}
+              validate={(values) => validateFields(t, values, ['password', 'password_validation'])}
+            >
+              {({ handleSubmit, submitting, pristine }) => (
                 <form onSubmit={handleSubmit}>
-                  <TextField name="password" type="password"
-                             variant="standard" label={t('Password')}
-                             fullWidth={true} style={{ marginTop: 5 }}/>
-                  <TextField name="password_validation" type="password"
-                             variant="standard" label={t('Password validation')}
-                             fullWidth={true} style={{ marginTop: 5 }}/>
-                  <Button type="submit" variant="contained"
-                          disabled={pristine || submitting} onClick={handleSubmit}
-                          style={{ marginTop: 30 }}>
+                  <TextField
+                    name="password"
+                    type="password"
+                    variant="standard"
+                    label={t('Password')}
+                    fullWidth={true}
+                    style={{ marginTop: 5 }}
+                  />
+                  <TextField
+                    name="password_validation"
+                    type="password"
+                    variant="standard"
+                    label={t('Password validation')}
+                    fullWidth={true}
+                    style={{ marginTop: 5 }}
+                  />
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={pristine || submitting}
+                    onClick={handleSubmit}
+                    style={{ marginTop: 30 }}
+                  >
                     {t('Change your password')}
                   </Button>
                 </form>
-            )}
-          </Form>}
+              )}
+            </Form>
+          )}
           <div style={{ marginTop: 10 }}>
             <a onClick={() => onCancel()}>{t('Back to login')}</a>
           </div>

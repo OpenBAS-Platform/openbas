@@ -191,17 +191,20 @@ const ChallengesPlayer = () => {
     dispatch(fetchMe());
     dispatch(fetchPlayerChallenges(exerciseId, userId));
     dispatch(fetchPlayerDocuments(exerciseId, userId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const documentsReverseBy = (field) => {
     setDocumentsSortBy(field);
     setDocumentsOrderAsc(!documentsSortBy);
   };
   const documentsSortHeader = (field, label, isSortable) => {
-    const sortComponent = documentsOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = documentsOrderAsc
+      ? (
+        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -318,18 +321,17 @@ const ChallengesPlayer = () => {
                           sx={{ width: '100%', height: '100%' }}
                         >
                           <CardActionArea
-                            onClick={() => setCurrentChallengeEntry(challengeEntry)
-                            }
+                            onClick={() => setCurrentChallengeEntry(challengeEntry)}
                           >
                             <CardHeader
-                              avatar={
+                              avatar={(
                                 <Avatar sx={{ bgcolor: '#e91e63' }}>
                                   <EmojiEventsOutlined />
                                 </Avatar>
-                              }
+                              )}
                               title={challenge.challenge_name}
                               subheader={challenge.challenge_category}
-                              action={
+                              action={(
                                 <IconButton
                                   size="large"
                                   color={
@@ -340,7 +342,7 @@ const ChallengesPlayer = () => {
                                 >
                                   <PendingActionsOutlined fontSize="large" />
                                 </IconButton>
-                              }
+                              )}
                             />
                             <CardContent style={{ margin: '-20px 0 30px 0' }}>
                               <ExpandableMarkdown
@@ -438,13 +440,13 @@ const ChallengesPlayer = () => {
                       </span>
                     </ListItemIcon>
                     <ListItemText
-                      primary={
+                      primary={(
                         <div>
                           {documentsSortHeader('document_name', 'Name', true)}
                           {documentsSortHeader('document_type', 'Type', true)}
                           {documentsSortHeader('document_tags', 'Tags', true)}
                         </div>
-                      }
+                      )}
                     />
                   </ListItem>
                   {(currentChallenge?.challenge_documents || []).map(
@@ -463,7 +465,7 @@ const ChallengesPlayer = () => {
                             <AttachmentOutlined />
                           </ListItemIcon>
                           <ListItemText
-                            primary={
+                            primary={(
                               <div>
                                 <div
                                   className={classes.bodyItem}
@@ -490,7 +492,7 @@ const ChallengesPlayer = () => {
                                   />
                                 </div>
                               </div>
-                            }
+                            )}
                           />
                         </ListItem>
                       );
@@ -530,8 +532,7 @@ const ChallengesPlayer = () => {
               && currentResult === null && (
                 <Form
                   keepDirtyOnReinitialize={true}
-                  onSubmit={(data) => submit(currentChallenge?.challenge_id, data)
-                  }
+                  onSubmit={(data) => submit(currentChallenge?.challenge_id, data)}
                   validate={validate}
                   mutators={{
                     setValue: ([field, value], state, { changeValue }) => {
@@ -559,8 +560,8 @@ const ChallengesPlayer = () => {
                           color="secondary"
                           type="submit"
                           disabled={
-                            submitting || Object.keys(errors).length > 0
-                          }
+                          submitting || Object.keys(errors).length > 0
+                        }
                         >
                           {t('Submit')}
                         </Button>

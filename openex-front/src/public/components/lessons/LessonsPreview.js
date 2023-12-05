@@ -81,6 +81,7 @@ const LessonsPlayer = () => {
     dispatch(fetchExercise(exerciseId));
     dispatch(fetchLessonsCategories(exerciseId));
     dispatch(fetchLessonsQuestions(exerciseId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const validate = (values) => {
     const errors = {};
@@ -248,7 +249,7 @@ const LessonsPlayer = () => {
                             </Grid>
                             <Grid item={true} xs={3}>
                               <Typography variant="h4">
-                                {t("What didn't work well")}
+                                {t('What didn\'t work well')}
                               </Typography>
                               <TextField
                                 style={{ marginTop: 10 }}

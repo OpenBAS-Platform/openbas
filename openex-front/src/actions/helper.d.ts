@@ -5,7 +5,7 @@ export interface ExercicesHelper {
 }
 
 export interface UsersHelper {
-  getMe: () => User;
+  getMe: () => User
 }
 
 export interface OrganizationsHelper {

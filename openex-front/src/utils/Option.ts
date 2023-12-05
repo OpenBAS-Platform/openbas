@@ -32,9 +32,9 @@ export const organizationOption = (organizationId: string | undefined, organizat
   const value = organizationsMap[organizationId];
   return value
     ? {
-      id: value.organization_id,
-      label: value.organization_name,
-    } as Option
+        id: value.organization_id,
+        label: value.organization_name,
+      } as Option
     : undefined;
 };
 

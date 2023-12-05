@@ -14,7 +14,8 @@ const RedirectManager: React.FC<Props> = ({ children }) => {
       next: (url) => navigate(url),
     });
 
-    return subscription.unsubscribe;
+    return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return children;

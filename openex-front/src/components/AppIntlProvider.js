@@ -39,7 +39,7 @@ const AppIntlProvider = (props) => {
   }
   useEffect(() => {
     document.title = platformName;
-  }, []);
+  }, [platformName]);
   return (
     <IntlProvider
       locale={lang}

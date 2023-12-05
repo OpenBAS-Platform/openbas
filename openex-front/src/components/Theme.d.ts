@@ -2,19 +2,19 @@ import { PaletteColorOptions, PaletteOptions, TypeBackground } from '@mui/materi
 import { Theme as MuiTheme } from '@mui/material/styles/createTheme';
 
 interface ExtendedColor extends PaletteColorOptions {
-  main: string;
+  main: string
 }
 
 interface ExtendedBackground extends TypeBackground {
-  nav: string;
-  navLight: string;
+  nav: string
+  navLight: string
 }
 
 interface ExtendedPaletteOptions extends PaletteOptions {
-  background: Partial<ExtendedBackground>;
-  primary: Partial<ExtendedColor>;
+  background: Partial<ExtendedBackground>
+  primary: Partial<ExtendedColor>
 }
 
 export interface Theme extends MuiTheme {
-  palette: ExtendedPaletteOptions;
+  palette: ExtendedPaletteOptions
 }

@@ -149,7 +149,7 @@ const Logs = () => {
                 borderBottom: `1px solid ${theme.palette.divider}`,
               }}
               action={<LogPopover exerciseId={exerciseId} log={log} />}
-              title={
+              title={(
                 <div>
                   <div
                     style={{
@@ -165,7 +165,9 @@ const Logs = () => {
                     </strong>
                     &nbsp;
                     <span style={{ color: theme.palette.text.secondary }}>
-                      {t('added an entry on')} {nsdt(log.log_created_at)}
+                      {t('added an entry on')}
+                      {' '}
+                      {nsdt(log.log_created_at)}
                     </span>
                   </div>
                   <div
@@ -179,7 +181,7 @@ const Logs = () => {
                     <ItemTags tags={log.log_tags} />
                   </div>
                 </div>
-              }
+              )}
             />
             <CardContent>
               <strong>{log.log_title}</strong>

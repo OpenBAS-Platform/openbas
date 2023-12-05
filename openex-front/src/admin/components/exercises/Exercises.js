@@ -181,33 +181,35 @@ const Exercises = () => {
           />
         </div>
         <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
-          {sortedExercises.length > 0 ? (
-            <CSVLink
-              data={exportData(
-                'exercise',
-                [
-                  'exercise_name',
-                  'exercise_subtitle',
-                  'exercise_description',
-                  'exercise_status',
-                  'exercise_tags',
-                ],
-                sortedExercises,
-                tagsMap,
+          {sortedExercises.length > 0
+            ? (
+              <CSVLink
+                data={exportData(
+                  'exercise',
+                  [
+                    'exercise_name',
+                    'exercise_subtitle',
+                    'exercise_description',
+                    'exercise_status',
+                    'exercise_tags',
+                  ],
+                  sortedExercises,
+                  tagsMap,
+                )}
+                filename={`${t('Exercises')}.csv`}
+              >
+                <Tooltip title={t('Export this list')}>
+                  <IconButton size="large">
+                    <FileDownloadOutlined color="primary" />
+                  </IconButton>
+                </Tooltip>
+              </CSVLink>
+              )
+            : (
+              <IconButton size="large" disabled={true}>
+                <FileDownloadOutlined />
+              </IconButton>
               )}
-              filename={`${t('Exercises')}.csv`}
-            >
-              <Tooltip title={t('Export this list')}>
-                <IconButton size="large">
-                  <FileDownloadOutlined color="primary" />
-                </IconButton>
-              </Tooltip>
-            </CSVLink>
-          ) : (
-            <IconButton size="large" disabled={true}>
-              <FileDownloadOutlined />
-            </IconButton>
-          )}
         </div>
       </div>
       <div className="clearfix" />
@@ -229,7 +231,7 @@ const Exercises = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div>
                 {filtering.buildHeader(
                   'exercise_name',
@@ -262,7 +264,7 @@ const Exercises = () => {
                   headerStyles,
                 )}
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
@@ -279,7 +281,7 @@ const Exercises = () => {
               <Kayaking color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   <div
                     className={classes.bodyItem}
@@ -297,11 +299,13 @@ const Exercises = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.exercise_start_date}
                   >
-                    {exercise.exercise_start_date ? (
-                      nsdt(exercise.exercise_start_date)
-                    ) : (
-                      <i>{t('Manual')}</i>
-                    )}
+                    {exercise.exercise_start_date
+                      ? (
+                          nsdt(exercise.exercise_start_date)
+                        )
+                      : (
+                        <i>{t('Manual')}</i>
+                        )}
                   </div>
                   <div
                     className={classes.bodyItem}
@@ -319,7 +323,7 @@ const Exercises = () => {
                     <ItemTags variant="list" tags={exercise.exercise_tags} />
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <ChevronRightOutlined />

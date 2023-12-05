@@ -222,11 +222,13 @@ class InjectAddDocuments extends Component {
                     );
                   })}
                   {
-                    userAdmin && <CreateDocument
-                      exerciseId={exerciseId}
-                      inline={true}
-                      onCreate={this.onCreate.bind(this)}
-                    />
+                    userAdmin && (
+                      <CreateDocument
+                        exerciseId={exerciseId}
+                        inline={true}
+                        onCreate={this.onCreate.bind(this)}
+                      />
+                    )
                   }
                 </List>
               </Grid>

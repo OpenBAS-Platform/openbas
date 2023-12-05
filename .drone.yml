@@ -18,7 +18,7 @@ steps:
       - mvn install
 
   - name: frontend-tests
-    image: nikolaik/python-nodejs:python3.10-nodejs16-alpine
+    image: nikolaik/python-nodejs:python3.10-nodejs20-alpine
 
     commands:
       - cd openex-front

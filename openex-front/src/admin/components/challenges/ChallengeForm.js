@@ -161,11 +161,13 @@ const ChallengeForm = (props) => {
     setDocumentsOrderAsc(!documentsSortBy);
   };
   const documentsSortHeader = (field, label, isSortable) => {
-    const sortComponent = documentsOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = documentsOrderAsc
+      ? (
+        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -269,13 +271,13 @@ const ChallengeForm = (props) => {
                 </span>
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div>
                     {documentsSortHeader('document_name', 'Name', true)}
                     {documentsSortHeader('document_type', 'Type', true)}
                     {documentsSortHeader('document_tags', 'Tags', true)}
                   </div>
-                }
+                )}
               />
               <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
             </ListItem>
@@ -294,7 +296,7 @@ const ChallengeForm = (props) => {
                     <AttachmentOutlined />
                   </ListItemIcon>
                   <ListItemText
-                    primary={
+                    primary={(
                       <div>
                         <div
                           className={classes.bodyItem}
@@ -321,7 +323,7 @@ const ChallengeForm = (props) => {
                           />
                         </div>
                       </div>
-                    }
+                    )}
                   />
                   <ListItemSecondaryAction>
                     <DocumentPopover
@@ -346,8 +348,7 @@ const ChallengeForm = (props) => {
                   {t('Flags')}
                 </Typography>
                 <IconButton
-                  onClick={() => fields.push({ flag_type: 'VALUE', flag_value: '' })
-                  }
+                  onClick={() => fields.push({ flag_type: 'VALUE', flag_value: '' })}
                   size="small"
                   color="primary"
                   style={{ float: 'left', margin: '-8px 0 0 10px' }}

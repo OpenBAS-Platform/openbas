@@ -8,7 +8,7 @@ import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import { useFormatter } from './i18n';
 
-const renderMarkDownField = ({
+const MarkDownFieldBase = ({
   label,
   style,
   disabled,
@@ -35,8 +35,7 @@ const renderMarkDownField = ({
           >
             {markdown}
           </Markdown>,
-        )
-        }
+        )}
         l18n={{
           write: t('Write'),
           preview: t('Preview'),
@@ -54,5 +53,5 @@ const renderMarkDownField = ({
 };
 
 export const MarkDownField = (props) => (
-  <Field name={props.name} component={renderMarkDownField} {...props} />
+  <Field name={props.name} component={MarkDownFieldBase} {...props} />
 );

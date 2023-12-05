@@ -70,9 +70,7 @@ class InjectStatusDetails extends Component {
                                       <TableCell>
                                         {trace.trace_status}
                                       </TableCell>
-                                      <TableCell
-
-                                      >
+                                      <TableCell>
                                         {trace.trace_time}
                                       </TableCell>
                                     </TableRow>

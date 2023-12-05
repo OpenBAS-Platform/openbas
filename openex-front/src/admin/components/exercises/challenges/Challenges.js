@@ -126,11 +126,11 @@ const Challenges = () => {
                       sx={{ width: '100%', height: '100%' }}
                     >
                       <CardHeader
-                        avatar={
+                        avatar={(
                           <Avatar sx={{ bgcolor: '#e91e63' }}>
                             <EmojiEventsOutlined />
                           </Avatar>
-                        }
+                        )}
                         title={challenge.challenge_name}
                         subheader={challenge.challenge_category}
                       />

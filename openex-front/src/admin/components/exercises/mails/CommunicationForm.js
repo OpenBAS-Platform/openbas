@@ -48,10 +48,10 @@ const CommunicationForm = ({ onSubmit, handleClose, initialValues }) => {
             style={{ marginTop: 20, height: 250 }}
           />
           <FileField
-              variant="standard"
-              type="file"
-              name="communication_file"
-              label={t('File')}
+            variant="standard"
+            type="file"
+            name="communication_file"
+            label={t('File')}
           />
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button onClick={handleClose} style={{ marginRight: 10 }} disabled={submitting}>

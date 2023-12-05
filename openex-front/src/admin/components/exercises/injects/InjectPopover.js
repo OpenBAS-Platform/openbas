@@ -309,21 +309,23 @@ class InjectPopover extends Component {
               {t('Try the inject')}
             </MenuItem>
           )}
-          {inject.inject_enabled ? (
-            <MenuItem
-              onClick={this.handleOpenDisable.bind(this)}
-              disabled={isDisabled}
-            >
-              {t('Disable')}
-            </MenuItem>
-          ) : (
-            <MenuItem
-              onClick={this.handleOpenEnable.bind(this)}
-              disabled={isDisabled}
-            >
-              {t('Enable')}
-            </MenuItem>
-          )}
+          {inject.inject_enabled
+            ? (
+              <MenuItem
+                onClick={this.handleOpenDisable.bind(this)}
+                disabled={isDisabled}
+              >
+                {t('Disable')}
+              </MenuItem>
+              )
+            : (
+              <MenuItem
+                onClick={this.handleOpenEnable.bind(this)}
+                disabled={isDisabled}
+              >
+                {t('Enable')}
+              </MenuItem>
+              )}
           <MenuItem onClick={this.handleOpenDelete.bind(this)}>
             {t('Delete')}
           </MenuItem>

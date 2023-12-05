@@ -10,8 +10,8 @@ import { zodImplement } from '../../../../utils/Zod';
 
 interface Props {
   onSubmit: SubmitHandler<VariableInput>
-  handleClose: () => void,
-  editing?: boolean,
+  handleClose: () => void
+  editing?: boolean
   initialValues?: VariableInput
 }
 

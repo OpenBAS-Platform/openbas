@@ -76,9 +76,9 @@ class InjectStatus extends Component {
         );
       case 'PENDING':
         return (
-            <div>
-              <Chip classes={{ root: style }} style={inlineStyles.grey} label={t('Pending')}/>
-              <CircularProgress size={10} thickness={1}/>
+          <div>
+            <Chip classes={{ root: style }} style={inlineStyles.grey} label={t('Pending')} />
+            <CircularProgress size={10} thickness={1} />
           </div>
         );
       default:

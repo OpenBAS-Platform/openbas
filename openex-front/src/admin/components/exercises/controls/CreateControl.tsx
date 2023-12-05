@@ -43,8 +43,8 @@ const useStyles = makeStyles<Theme>((theme) => ({
 }));
 
 interface Props {
-  exerciseId: Exercise['exercise_id'],
-  variant?: string,
+  exerciseId: Exercise['exercise_id']
+  variant?: string
 }
 
 const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
@@ -82,52 +82,54 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
 
   return (
     <div>
-      {variant === 'buttons' ? (
-        <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
-          <Grid item={true} xs={6}>
-            <Typography variant="h3">{t('Dryrun')}</Typography>
-            <Button
-              variant="contained"
-              startIcon={<VideoSettingsOutlined />}
-              color="info"
+      {variant === 'buttons'
+        ? (
+          <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
+            <Grid item={true} xs={6}>
+              <Typography variant="h3">{t('Dryrun')}</Typography>
+              <Button
+                variant="contained"
+                startIcon={<VideoSettingsOutlined />}
+                color="info"
+                onClick={() => setOpenDryrun(true)}
+                disabled={isExerciseReadOnly(exercise)}
+              >
+                {t('Launch')}
+              </Button>
+            </Grid>
+            <Grid item={true} xs={4}>
+              <Typography variant="h3">{t('Comcheck')}</Typography>
+              <Button
+                variant="contained"
+                startIcon={<MarkEmailReadOutlined />}
+                color="secondary"
+                onClick={() => setOpenComcheck(true)}
+                disabled={isExerciseReadOnly(exercise)}
+              >
+                {t('Send')}
+              </Button>
+            </Grid>
+          </Grid>
+          )
+        : (
+          <SpeedDial
+            classes={{ root: classes.createButton }}
+            icon={<SpeedDialIcon />}
+            ariaLabel={t('New control')}
+            hidden={isExerciseReadOnly(exercise)}
+          >
+            <SpeedDialAction
+              icon={<VideoSettingsOutlined />}
+              tooltipTitle={t('Launch a new dryrun')}
               onClick={() => setOpenDryrun(true)}
-              disabled={isExerciseReadOnly(exercise)}
-            >
-              {t('Launch')}
-            </Button>
-          </Grid>
-          <Grid item={true} xs={4}>
-            <Typography variant="h3">{t('Comcheck')}</Typography>
-            <Button
-              variant="contained"
-              startIcon={<MarkEmailReadOutlined />}
-              color="secondary"
+            />
+            <SpeedDialAction
+              icon={<MarkEmailReadOutlined />}
+              tooltipTitle={t('Send a new comcheck')}
               onClick={() => setOpenComcheck(true)}
-              disabled={isExerciseReadOnly(exercise)}
-            >
-              {t('Send')}
-            </Button>
-          </Grid>
-        </Grid>
-      ) : (
-        <SpeedDial
-          classes={{ root: classes.createButton }}
-          icon={<SpeedDialIcon />}
-          ariaLabel={t('New control')}
-          hidden={isExerciseReadOnly(exercise)}
-        >
-          <SpeedDialAction
-            icon={<VideoSettingsOutlined />}
-            tooltipTitle={t('Launch a new dryrun')}
-            onClick={() => setOpenDryrun(true)}
-          />
-          <SpeedDialAction
-            icon={<MarkEmailReadOutlined />}
-            tooltipTitle={t('Send a new comcheck')}
-            onClick={() => setOpenComcheck(true)}
-          />
-        </SpeedDial>
-      )}
+            />
+          </SpeedDial>
+          )}
       <Dialog
         open={openComcheck}
         TransitionComponent={Transition}

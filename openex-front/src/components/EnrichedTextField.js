@@ -7,7 +7,7 @@ import 'ckeditor5-custom-build/build/translations/fr';
 import locale from '../utils/BrowserLanguage';
 import { useHelper } from '../store';
 
-const renderEnrichedTextField = ({
+const EnrichedTextFieldBase = ({
   label,
   input: { onChange, value },
   style,
@@ -43,7 +43,7 @@ const renderEnrichedTextField = ({
 };
 
 export const ConnectedEnrichedTextField = (props) => (
-  <Field name={props.name} component={renderEnrichedTextField} {...props} />
+  <Field name={props.name} component={EnrichedTextFieldBase} {...props} />
 );
 
 export const EnrichedTextField = ConnectedEnrichedTextField;

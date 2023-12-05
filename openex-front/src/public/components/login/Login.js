@@ -48,6 +48,7 @@ const Login = (props) => {
   useEffect(() => {
     props.fetchParameters();
     props.checkKerberos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const onSubmit = (data) => props.askToken(data.username, data.password);
   let loginHeight = 260;
@@ -78,7 +79,7 @@ const Login = (props) => {
               providerUri={provider.provider_uri}
             />
           ))}
-        <LoginError/>
+        <LoginError />
       </Box>
     </div>
   );

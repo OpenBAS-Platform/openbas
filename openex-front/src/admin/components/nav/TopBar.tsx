@@ -141,9 +141,11 @@ const TopBar: React.FC = () => {
         </div>
         <div className={classes.barRight}>
           <Button component={ImportUploader}>{t('Import exercise')}</Button>
-          <IconButton onClick={handleOpen}
+          <IconButton
+            onClick={handleOpen}
             size="small"
-            color={location.pathname === '/admin/profile' ? 'secondary' : 'default'}>
+            color={location.pathname === '/admin/profile' ? 'secondary' : 'default'}
+          >
             <AccountCircleOutlined />
           </IconButton>
           <Menu

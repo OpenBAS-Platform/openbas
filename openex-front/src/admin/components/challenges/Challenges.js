@@ -203,7 +203,7 @@ const Challenges = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div>
                 {filtering.buildHeader(
                   'challenge_name',
@@ -236,7 +236,7 @@ const Challenges = () => {
                   headerStyles,
                 )}
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -254,7 +254,7 @@ const Challenges = () => {
                 <EmojiEventsOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -308,7 +308,7 @@ const Challenges = () => {
                       />
                     </div>
                   </div>
-                }
+                )}
               />
               <ListItemSecondaryAction>
                 <ChallengePopover challenge={challenge} documents={docs} />
