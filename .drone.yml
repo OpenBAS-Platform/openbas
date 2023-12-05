@@ -45,6 +45,9 @@ name: openex-tests-master
 trigger:
   branch:
     - master
+  event:
+    exclude:
+      - pull_request
 
 steps:
   - name: submodules
