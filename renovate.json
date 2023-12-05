@@ -12,7 +12,10 @@
     {
       "matchUpdateTypes": ["minor"],
       "prPriority": 5
+    },
+    {
+      "matchPackagePatterns": ["react-apexcharts", "org.flywaydb:flyway-core"],
+      "commitMessage": "[DANGER] Do not merge, breaking changes incoming"
     }
-  ],
-  "ignoreDeps": ["apexcharts"]
+  ]
 }
