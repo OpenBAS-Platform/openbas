@@ -91,7 +91,6 @@ steps:
     when:
       event:
         exclude:
-          - pull_request
           - tag
 
   - name: build-circleci-release
