@@ -679,7 +679,7 @@ class InjectDefinition extends Component {
     const { exercise, classes, t } = this.props;
     return (
       <div>
-        {renderedFields.map((field, position) => {
+        {renderedFields.map((field) => {
           switch (field.type) {
             case 'textarea':
               return field.richText

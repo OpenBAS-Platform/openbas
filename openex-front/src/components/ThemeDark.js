@@ -80,7 +80,7 @@ export default (
         fontWeight: 400,
         fontSize: '0.75rem',
         margin: '8px 0',
-      }
+      },
     },
     components: {
       MuiTooltip: {
@@ -222,4 +222,4 @@ export default (
       },
     },
   });
-}
+};

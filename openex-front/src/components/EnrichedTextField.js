@@ -6,9 +6,9 @@ import Editor from 'ckeditor5-custom-build/build/ckeditor';
 import 'ckeditor5-custom-build/build/translations/fr';
 import locale from '../utils/BrowserLanguage';
 import { useHelper } from '../store';
-import { makeStyles } from "@mui/styles";
-import Typography from "@mui/material/Typography";
-import classNames from "classnames";
+import { makeStyles } from '@mui/styles';
+import Typography from '@mui/material/Typography';
+import classNames from 'classnames';
 
 const useStyles = makeStyles((theme) => ({
   errorColor: {
@@ -35,12 +35,14 @@ const EnrichedTextFieldBase = ({
   });
   return (
     <div style={style}>
-      <InputLabel variant="standard"
-                  shrink={true}
-                  disabled={disabled}
-                  className={classNames({
-                    [classes.errorColor]: error && touched
-                  })}>
+      <InputLabel
+        variant="standard"
+        shrink={true}
+        disabled={disabled}
+        className={classNames({
+          [classes.errorColor]: error && touched,
+        })}
+      >
         {label}
       </InputLabel>
       <CKEditor
