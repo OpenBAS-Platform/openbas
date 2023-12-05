@@ -226,7 +226,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>{t('Variables with values')}</TableCell>
+                  <TableCell>{t('Variable values')}</TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
                     <Checkbox
                       checked={exportVariableValues}
