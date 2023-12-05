@@ -13,5 +13,6 @@
       "matchUpdateTypes": ["minor"],
       "prPriority": 5
     }
-  ]
+  ],
+  "ignoreDeps": ["apexcharts"]
 }
