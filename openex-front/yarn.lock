@@ -3811,6 +3811,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@yr/monotone-cubic-spline@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@yr/monotone-cubic-spline@npm:1.0.3"
+  checksum: ebc75e4d84d5b97d1d715452088ffe3cf6b3d71943433118116a2e90f17aed654b6f726868e913a49aef28645bb8afcc28580349de1ac77ad0c7dab3d991843e
+  languageName: node
+  linkType: hard
+
 "abab@npm:^2.0.6":
   version: 2.0.6
   resolution: "abab@npm:2.0.6"
@@ -4043,17 +4050,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"apexcharts@npm:3.41.1":
-  version: 3.41.1
-  resolution: "apexcharts@npm:3.41.1"
+"apexcharts@npm:3.44.2":
+  version: 3.44.2
+  resolution: "apexcharts@npm:3.44.2"
   dependencies:
+    "@yr/monotone-cubic-spline": ^1.0.3
     svg.draggable.js: ^2.2.2
     svg.easing.js: ^2.0.0
     svg.filter.js: ^2.0.2
     svg.pathmorphing.js: ^0.1.3
     svg.resize.js: ^1.4.3
     svg.select.js: ^3.0.1
-  checksum: 096830c583f16093a16b940fc9268c5da620f084217df5695810a85b50aeb077f67b58aa3839c72e1c78a2ee4af6b4053286cf9f6599478789030ebbdff482fa
+  checksum: 19274467dbd339f366f6fcfa8ac06595336a80fba2659ea34ae7de793602c60537cc60af4b8553f7b84ae36475aa49ae2dc32a47713609840bcbce5776fe2812
   languageName: node
   linkType: hard
 
@@ -10329,7 +10337,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": 6.13.1
     "@typescript-eslint/parser": 6.13.1
     "@vitejs/plugin-react-swc": 3.5.0
-    apexcharts: 3.41.1
+    apexcharts: 3.44.2
     axios: 1.6.0
     chokidar: 3.5.3
     ckeditor5-custom-build: 0.0.1
@@ -11356,6 +11364,18 @@ __metadata:
     apexcharts: ^3.41.0
     react: ">=0.13"
   checksum: 32d1a946ad40493ecd82f7ba68c8657424a8cf0d08e0cd813752211175d6b23dd3ae9f0f7edbac9dd2bbc050a7f3531ca6e5d7ea0158f1c276c49c4f397f347f
+  languageName: node
+  linkType: hard
+
+"react-apexcharts@patch:react-apexcharts@npm%3A1.4.1#./.yarn/patches/react-apexcharts-npm-1.4.1-2dc909d883.patch::locator=openex-frontend%40workspace%3A.":
+  version: 1.4.1
+  resolution: "react-apexcharts@patch:react-apexcharts@npm%3A1.4.1#./.yarn/patches/react-apexcharts-npm-1.4.1-2dc909d883.patch::version=1.4.1&hash=5a1794&locator=openex-frontend%40workspace%3A."
+  dependencies:
+    prop-types: ^15.8.1
+  peerDependencies:
+    apexcharts: ^3.41.0
+    react: ">=0.13"
+  checksum: ef1068bde0c998cebeab56faa0ace4c7ff76fbb7042ef353fcce82b8844691984b1d1e9280a4c3e384ae0ec67f9c8d357c963a3b05698299b345885a83d1be2d
   languageName: node
   linkType: hard
 

@@ -16,7 +16,7 @@
     "@mui/styles": "5.14.14",
     "@mui/x-date-pickers": "6.18.2",
     "@redux-devtools/extension": "3.2.6",
-    "apexcharts": "3.41.1",
+    "apexcharts": "3.44.2",
     "axios": "1.6.0",
     "ckeditor5-custom-build": "0.0.1",
     "classnames": "2.3.2",
@@ -106,7 +106,8 @@
   },
   "resolutions": {
     "mini-css-extract-plugin": "2.7.6",
-    "react-transition-group": "4.4.5"
+    "react-transition-group": "4.4.5",
+    "react-apexcharts@1.4.1": "patch:react-apexcharts@npm%3A1.4.1#./.yarn/patches/react-apexcharts-npm-1.4.1-2dc909d883.patch"
   },
   "workspaces": [
     "packages/*"
