@@ -66,7 +66,7 @@ public class InjectHelper {
   private List<Audience> getInjectAudiences(Inject inject) {
     Exercise exercise = inject.getExercise();
     return inject.isAllAudiences() ?
-        fromIterable(audienceRepository.findAll(fromExercise(exercise.getId()))) : inject.getAudiences();
+        fromIterable(this.audienceRepository.findAll(fromExercise(exercise.getId()))) : inject.getAudiences();
   }
 
   private Stream<Tuple2<User, String>> getUsersFromInjection(Injection injection) {
@@ -99,30 +99,31 @@ public class InjectHelper {
   @Transactional
   public List<ExecutableInject> getInjectsToRun() {
     // Get injects
-    List<Inject> executableInjects = injectRepository.findAll(InjectSpecification.executable());
-    Stream<ExecutableInject> injects = executableInjects.stream()
+    List<Inject> injects = this.injectRepository.findAll(InjectSpecification.executable());
+    Stream<ExecutableInject> executableInjects = injects.stream()
         .filter(this::isBeforeOrEqualsNow)
         .sorted(Inject.executionComparator)
         .map(inject -> {
-          Contract contract = contractService.resolveContract(inject);
+          Contract contract = this.contractService.resolveContract(inject);
           List<Audience> audiences = getInjectAudiences(inject);
           return new ExecutableInject(true, false, inject, contract, audiences, usersFromInjection(inject));
         });
     // Get dry injects
-    List<DryInject> executableDryInjects = dryInjectRepository.findAll(DryInjectSpecification.executable());
-    Stream<ExecutableInject> dryInjects = executableDryInjects.stream()
+    List<DryInject> dryInjects = this.dryInjectRepository.findAll(DryInjectSpecification.executable());
+    Stream<ExecutableInject> executableDryInjects = dryInjects.stream()
         .filter(this::isBeforeOrEqualsNow)
         .sorted(DryInject.executionComparator)
         .map(dry -> {
           Inject inject = dry.getInject();
-          Contract contract = contractService.resolveContract(inject);
+          Contract contract = this.contractService.resolveContract(inject);
           List<Audience> audiences = new ArrayList<>(); // No audiences in dry run, only direct users
           return new ExecutableInject(false, false, dry, inject, contract, audiences, usersFromInjection(dry));
         });
     // Combine injects and dry
-    return concat(injects, dryInjects)
+    return concat(executableInjects, executableDryInjects)
         .filter(
-            executableInject -> executableInject.getContract() == null || !executableInject.getContract().isManual())
+            executableInject -> executableInject.getContract() == null || !executableInject.getContract().isManual()
+        )
         .collect(Collectors.toList());
   }
 }

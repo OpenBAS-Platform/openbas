@@ -19,6 +19,7 @@
     "apexcharts": "3.44.1",
     "axios": "1.6.0",
     "ckeditor5-custom-build": "0.0.1",
+    "classnames": "2.3.2",
     "date-fns": "2.30.0",
     "dompurify": "3.0.6",
     "final-form": "4.20.10",

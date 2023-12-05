@@ -667,7 +667,7 @@ class InjectDefinition extends Component {
         )
         .forEach((field) => {
           const value = values[field.key];
-          if (field.mandatory && R.isEmpty(value)) {
+          if (field.mandatory && (value === undefined || R.isEmpty(value))) {
             errors[field.key] = t('This field is required.');
           }
         });
@@ -679,7 +679,7 @@ class InjectDefinition extends Component {
     const { exercise, classes, t } = this.props;
     return (
       <div>
-        {renderedFields.map((field, position) => {
+        {renderedFields.map((field) => {
           switch (field.type) {
             case 'textarea':
               return field.richText
@@ -725,7 +725,7 @@ class InjectDefinition extends Component {
                   key={field.key}
                   name={field.key}
                   label={t(field.label)}
-                  style={{ marginTop: position > 0 ? 10 : 20 }}
+                  style={{ marginTop: 20 }}
                   disabled={isExerciseReadOnly(exercise)}
                 />
               );
