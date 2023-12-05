@@ -273,41 +273,6 @@ workflows:
             branches:
               only:
                 - master
-      - deploy_demo:
-          requires:
-            - build_platform
-          filters:
-            branches:
-              only:
-                - master
-      - deploy_reference:
-          requires:
-            - build_platform
-          filters:
-            branches:
-              only:
-                - master
-      - deploy_lab:
-          requires:
-            - build_platform
-          filters:
-            branches:
-              only:
-                - master
-      - deploy_testing:
-          requires:
-            - build_platform
-          filters:
-            branches:
-              only:
-                - master
-      - deploy_production:
-          requires:
-            - build_platform
-          filters:
-            branches:
-              only:
-                - master
       - docker_build_platform_rolling:
           requires:
             - build_frontend
@@ -339,4 +304,3 @@ workflows:
               only: /[0-9]+(\.[0-9]+)+(\.[0-9]+)*/
             branches:
               ignore: /.*/
-
