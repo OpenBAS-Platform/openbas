@@ -559,7 +559,7 @@ export interface ExerciseUpdateTagsInput {
 
 export interface ExpectationUpdateInput {
   /** @format int32 */
-  expectation_score?: number;
+  expectation_score: number;
 }
 
 export interface FlagInput {

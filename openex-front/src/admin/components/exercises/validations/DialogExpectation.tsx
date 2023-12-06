@@ -4,8 +4,6 @@ import DialogContent from '@mui/material/DialogContent';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import ItemTags from '../../../../components/ItemTags.js';
-import { Form } from 'react-final-form';
-import { TextField } from '../../../../components/TextField.js';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import Transition from '../../../../components/common/Transition.tsx';
@@ -13,6 +11,81 @@ import { InjectExpectationsStore } from '../injects/expectations/Expectation';
 import { useFormatter } from '../../../../components/i18n.js';
 import { updateInjectExpectation } from '../../../../actions/Exercise.js';
 import { useAppDispatch } from '../../../../utils/hooks.ts';
+import { useForm } from 'react-hook-form';
+import { ExpectationUpdateInput } from '../../../../utils/api-types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { zodImplement } from '../../../../utils/Zod.ts';
+import { z } from 'zod';
+import MuiTextField from '@mui/material/TextField';
+
+interface FormProps {
+  exerciseId: string;
+  expectation: InjectExpectationsStore;
+  onClose: () => void;
+}
+
+const DialogExpectationForm: FunctionComponent<FormProps> = ({
+  exerciseId,
+  expectation,
+  onClose,
+}) => {
+  const { t } = useFormatter();
+  const dispatch = useAppDispatch();
+
+  const submit = (data: ExpectationUpdateInput) => dispatch(
+    updateInjectExpectation(exerciseId, expectation.injectexpectation_id, data),
+  ).then(onClose);
+
+  const onSubmit = (data: ExpectationUpdateInput) => {
+    submit(data);
+  };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty, isSubmitting },
+  } = useForm<ExpectationUpdateInput>({
+    mode: 'onTouched',
+    resolver: zodResolver(zodImplement<ExpectationUpdateInput>().with({
+      expectation_score: z.coerce.number(),
+    })),
+    defaultValues: {
+      expectation_score: expectation.inject_expectation_expected_score,
+    },
+  });
+
+  return (
+    <form id="expectationForm" onSubmit={handleSubmit(onSubmit)}>
+      <MuiTextField
+        variant="standard"
+        fullWidth={true}
+        label={t('Score')}
+        type="number"
+        error={!!errors.expectation_score}
+        helperText={
+          errors.expectation_score && errors.expectation_score?.message
+        }
+        inputProps={register('expectation_score')}
+      />
+      <div style={{ float: 'right', marginTop: 20 }}>
+        <Button
+          onClick={onClose}
+          style={{ marginRight: 10 }}
+          disabled={isSubmitting}
+        >
+          {t('Cancel')}
+        </Button>
+        <Button
+          color="secondary"
+          type="submit"
+          disabled={!isDirty || isSubmitting}
+        >
+          {t('Validate')}
+        </Button>
+      </div>
+    </form>
+  );
+};
 
 interface Props {
   exerciseId: string;
@@ -28,25 +101,6 @@ const DialogExpectation: FunctionComponent<Props> = ({
   onClose,
 }) => {
   const { t, fndt } = useFormatter();
-  const dispatch = useAppDispatch();
-
-  const validate = (values) => {
-    const errors = {};
-    const requiredFields = ['expectation_score'];
-    requiredFields.forEach((field) => {
-      if (!values[field]) {
-        errors[field] = t('This field is required.');
-      }
-    });
-    return errors;
-  };
-  const onSubmit = (injectExpectationId: string, data: InjectExpectationsStore) => dispatch(
-    updateInjectExpectation(exerciseId, injectExpectationId, data),
-  ).then(onClose);
-
-  if (!expectation) {
-    return (<></>);
-  }
 
   return (
     <Dialog
@@ -58,7 +112,7 @@ const DialogExpectation: FunctionComponent<Props> = ({
       PaperProps={{ elevation: 1 }}
     >
       <DialogTitle>
-        {expectation.inject_expectation_inject?.inject_title}
+        {expectation?.inject_expectation_inject?.inject_title}
       </DialogTitle>
       <DialogContent>
         <Grid container={true} spacing={3}>
@@ -92,48 +146,9 @@ const DialogExpectation: FunctionComponent<Props> = ({
         <Typography variant="h2" style={{ marginTop: 30 }}>
           {t('Results')}
         </Typography>
-        <Form
-          keepDirtyOnReinitialize={true}
-          initialValues={{
-            expectation_score:
-            expectation?.inject_expectation_expected_score,
-          }}
-          onSubmit={(data) => onSubmit(expectation?.injectexpectation_id, data)}
-          validate={validate}
-          mutators={{
-            setValue: ([field, value], state, { changeValue }) => {
-              changeValue(state, field, () => value);
-            },
-          }}
-        >
-          {({ handleSubmit, submitting, errors }) => (
-            <form id="challengeForm" onSubmit={handleSubmit}>
-              <TextField
-                variant="standard"
-                type="number"
-                name="expectation_score"
-                fullWidth={true}
-                label={t('Score')}
-              />
-              <div style={{ float: 'right', marginTop: 20 }}>
-                <Button
-                  onClick={onClose}
-                  style={{ marginRight: 10 }}
-                  disabled={submitting}
-                >
-                  {t('Cancel')}
-                </Button>
-                <Button
-                  color="secondary"
-                  type="submit"
-                  disabled={submitting || Object.keys(errors).length > 0}
-                >
-                  {t('Validate')}
-                </Button>
-              </div>
-            </form>
-          )}
-        </Form>
+        {expectation &&
+          <DialogExpectationForm exerciseId={exerciseId} expectation={expectation} onClose={onClose} />
+        }
       </DialogContent>
     </Dialog>
   );
