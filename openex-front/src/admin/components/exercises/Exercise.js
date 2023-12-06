@@ -444,22 +444,20 @@ const Exercise = () => {
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Injects distribution')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            {topAudiences.length > 0
-              ? (
-                <Chart
-                  options={horizontalBarsChartOptions(
-                    theme,
-                    maxInjectsNumber < 2,
-                  )}
-                  series={distributionChartData}
-                  type="bar"
-                  width="100%"
-                  height={50 + topAudiences.length * 50}
-                />
-                )
-              : (
-                <Empty message={t('No audiences in this exercise.')} />
+            {topAudiences.length > 0 ? (
+              <Chart
+                options={horizontalBarsChartOptions(
+                  theme,
+                  maxInjectsNumber < 2,
                 )}
+                series={distributionChartData}
+                type="bar"
+                width="100%"
+                height={50 + topAudiences.length * 50}
+              />
+            ) : (
+              <Empty message={t('No audiences in this exercise.')} />
+            )}
           </Paper>
         </Grid>
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>
@@ -475,151 +473,143 @@ const Exercise = () => {
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Dryruns')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper2 }}>
-            {dryruns.length > 0
-              ? (
-                <List style={{ paddingTop: 0 }}>
-                  {dryruns.map((dryrun) => (
-                    <ListItem
-                      key={dryrun.dryrun_id}
-                      dense={true}
-                      button={true}
-                      classes={{ root: classes.item }}
-                      divider={true}
-                      component={Link}
-                      to={`/admin/exercises/${exercise.exercise_id}/controls/dryruns/${dryrun.dryrun_id}`}
-                    >
-                      <ListItemIcon>
-                        <VideoSettingsOutlined />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={(
-                          <div>
-                            <div
-                              className={classes.bodyItem}
-                              style={{ width: '30%' }}
-                            >
-                              {dryrun.dryrun_name}
-                            </div>
-                            <div
-                              className={classes.bodyItem}
-                              style={{ width: '15%' }}
-                            >
-                              {nsd(dryrun.dryrun_date)}
-                            </div>
-                            <div
-                              className={classes.bodyItem}
-                              style={{ width: '15%' }}
-                            >
-                              <code>
-                                {dryrun.dryrun_speed}
-                                x
-                              </code>
-                            </div>
-                            <div
-                              className={classes.bodyItem}
-                              style={{ width: '20%' }}
-                            >
-                              {t('injects')}
-                            </div>
-                            <div className={classes.bodyItem}>
-                              <DryrunStatus
-                                finished={dryrun.dryrun_finished}
-                                variant="list"
-                              />
-                            </div>
+            {dryruns.length > 0 ? (
+              <List style={{ paddingTop: 0 }}>
+                {dryruns.map((dryrun) => (
+                  <ListItem
+                    key={dryrun.dryrun_id}
+                    dense={true}
+                    button={true}
+                    classes={{ root: classes.item }}
+                    divider={true}
+                    component={Link}
+                    to={`/admin/exercises/${exercise.exercise_id}/controls/dryruns/${dryrun.dryrun_id}`}
+                  >
+                    <ListItemIcon>
+                      <VideoSettingsOutlined />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '30%' }}
+                          >
+                            {dryrun.dryrun_name}
                           </div>
-                        )}
-                      />
-                      <ListItemSecondaryAction>
-                        <IconButton
-                          onClick={() => setOpenDryrunDelete(dryrun.dryrun_id)}
-                          aria-haspopup="true"
-                          size="large"
-                          disabled={permissions.readOnlyBypassStatus}
-                        >
-                          <DeleteOutlined />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  ))}
-                </List>
-                )
-              : (
-                <Empty message={t('No dryrun in this exercise.')} />
-                )}
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '15%' }}
+                          >
+                            {nsd(dryrun.dryrun_date)}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '15%' }}
+                          >
+                            <code>{dryrun.dryrun_speed}x</code>
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '20%' }}
+                          >
+                            {t('injects')}
+                          </div>
+                          <div className={classes.bodyItem}>
+                            <DryrunStatus
+                              finished={dryrun.dryrun_finished}
+                              variant="list"
+                            />
+                          </div>
+                        </div>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <IconButton
+                        onClick={() => setOpenDryrunDelete(dryrun.dryrun_id)}
+                        aria-haspopup="true"
+                        size="large"
+                        disabled={permissions.readOnlyBypassStatus}
+                      >
+                        <DeleteOutlined />
+                      </IconButton>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                ))}
+              </List>
+            ) : (
+              <Empty message={t('No dryrun in this exercise.')} />
+            )}
           </Paper>
         </Grid>
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Comchecks')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper2 }}>
-            {comchecks.length > 0
-              ? (
-                <List style={{ paddingTop: 0 }}>
-                  {comchecks.map((comcheck) => (
-                    <ListItem
-                      key={comcheck.comcheck_id}
-                      dense={true}
-                      button={true}
-                      classes={{ root: classes.item }}
-                      divider={true}
-                      component={Link}
-                      to={`/admin/exercises/${exercise.exercise_id}/controls/comchecks/${comcheck.comcheck_id}`}
-                    >
-                      <ListItemIcon>
-                        <MarkEmailReadOutlined />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={(
-                          <div>
-                            <div
-                              className={classes.bodyItem}
-                              style={{ width: '30%' }}
-                            >
-                              {comcheck.comcheck_name}
-                            </div>
-                            <div
-                              className={classes.bodyItem}
-                              style={{ width: '15%' }}
-                            >
-                              {nsd(comcheck.comcheck_end_date)}
-                            </div>
-                            <div
-                              className={classes.bodyItem}
-                              style={{ width: '20%' }}
-                            >
-                              <span style={{ fontWeight: 600 }}>
-                                {comcheck.comcheck_users_number}
-                                {' '}
-&nbsp;
-                              </span>
-                              {t('players')}
-                            </div>
-                            <div className={classes.bodyItem}>
-                              <ComcheckState
-                                state={comcheck.comcheck_state}
-                                variant="list"
-                              />
-                            </div>
+            {comchecks.length > 0 ? (
+              <List style={{ paddingTop: 0 }}>
+                {comchecks.map((comcheck) => (
+                  <ListItem
+                    key={comcheck.comcheck_id}
+                    dense={true}
+                    button={true}
+                    classes={{ root: classes.item }}
+                    divider={true}
+                    component={Link}
+                    to={`/admin/exercises/${exercise.exercise_id}/controls/comchecks/${comcheck.comcheck_id}`}
+                  >
+                    <ListItemIcon>
+                      <MarkEmailReadOutlined />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '30%' }}
+                          >
+                            {comcheck.comcheck_name}
                           </div>
-                        )}
-                      />
-                      <ListItemSecondaryAction>
-                        <IconButton
-                          onClick={() => setOpenComcheckDelete(comcheck.comcheck_id)}
-                          aria-haspopup="true"
-                          size="large"
-                          disabled={permissions.readOnlyBypassStatus}
-                        >
-                          <DeleteOutlined />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  ))}
-                </List>
-                )
-              : (
-                <Empty message={t('No comcheck in this exercise.')} />
-                )}
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '15%' }}
+                          >
+                            {nsd(comcheck.comcheck_end_date)}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '20%' }}
+                          >
+                            <span style={{ fontWeight: 600 }}>
+                              {comcheck.comcheck_users_number} &nbsp;
+                            </span>
+                            {t('players')}
+                          </div>
+                          <div className={classes.bodyItem}>
+                            <ComcheckState
+                              state={comcheck.comcheck_state}
+                              variant="list"
+                            />
+                          </div>
+                        </div>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <IconButton
+                        onClick={() => setOpenComcheckDelete(comcheck.comcheck_id)
+                        }
+                        aria-haspopup="true"
+                        size="large"
+                        disabled={permissions.readOnlyBypassStatus}
+                      >
+                        <DeleteOutlined />
+                      </IconButton>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                ))}
+              </List>
+            ) : (
+              <Empty message={t('No comcheck in this exercise.')} />
+            )}
           </Paper>
         </Grid>
       </Grid>
@@ -640,7 +630,8 @@ const Exercise = () => {
           </Button>
           <Button
             color="secondary"
-            onClick={() => submitUpdateStatus({ exercise_status: openChangeStatus })}
+            onClick={() => submitUpdateStatus({ exercise_status: openChangeStatus })
+            }
           >
             {t('Confirm')}
           </Button>

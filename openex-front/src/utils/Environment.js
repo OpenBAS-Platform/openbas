@@ -11,6 +11,7 @@ export const MESSAGING$ = {
   messages: MESSENGER$,
   notifyError: (text) => MESSENGER$.next([{ type: 'error', text }]),
   notifySuccess: (text) => MESSENGER$.next([{ type: 'message', text }]),
+  toggleNav: new Subject(),
   redirect: new Subject(),
 };
 
@@ -38,6 +39,8 @@ export const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';
+
+export const fileUri = (fileImport) => `${APP_BASE_PATH}${fileImport}`; // No slash here, will be replace by the builder
 
 // Export
 const escape = (value) => value?.toString().replaceAll('"', '""');

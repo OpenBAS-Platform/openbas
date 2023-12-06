@@ -12,7 +12,11 @@ export const addGroupOrganization = (groupId, data) => (dispatch) => {
 };
 
 export const deleteGroupOrganization = (groupId, organizationId) => (dispatch) => {
-  return delReferential(`/api/groups/${groupId}/organizations/${organizationId}`, 'grants', organizationId)(dispatch);
+  return delReferential(
+    `/api/groups/${groupId}/organizations/${organizationId}`,
+    'grants',
+    organizationId,
+  )(dispatch);
 };
 
 export const deleteGrant = (groupId, grantId) => (dispatch) => {

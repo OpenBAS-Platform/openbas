@@ -39,28 +39,21 @@ const useStyles = makeStyles(() => ({
   tag: {
     marginLeft: 5,
   },
-  tagsInput: {
-    width: 300,
-    margin: '0 10px 0 10px',
-    float: 'right',
-  },
 }));
 
 const TagChip = ({ tagId, isReadOnly, deleteTag }) => {
   const classes = useStyles();
   const tag = useHelper((helper) => helper.getTag(tagId));
-  return tag
-    ? (
-      <Chip
-        key={tag.tag_id}
-        classes={{ root: classes.tag }}
-        label={tag.tag_name}
-        onDelete={isReadOnly ? null : () => deleteTag(tag.tag_id)}
-      />
-      )
-    : (
-      <div />
-      );
+  return tag ? (
+    <Chip
+      key={tag.tag_id}
+      classes={{ root: classes.tag }}
+      label={tag.tag_name}
+      onDelete={isReadOnly ? null : () => deleteTag(tag.tag_id)}
+    />
+  ) : (
+    <div />
+  );
 };
 
 const ExerciseHeader = (props) => {

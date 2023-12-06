@@ -36,12 +36,6 @@ const useStyles = makeStyles(() => ({
     overflow: 'hidden',
     height: '100%',
   },
-  card: {
-    margin: '0 0 20px 0',
-  },
-  cardNested: {
-    margin: '0 0 20px 20px',
-  },
 }));
 
 const Inject = () => {

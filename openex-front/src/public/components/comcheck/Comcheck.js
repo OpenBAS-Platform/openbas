@@ -7,7 +7,7 @@ import Paper from '@mui/material/Paper';
 import { useParams } from 'react-router-dom';
 import { CheckCircleOutlineOutlined } from '@mui/icons-material';
 import { fetchComcheckStatus } from '../../../actions/Comcheck';
-import logo from '../../../resources/images/logo.png';
+import logo from '../../../static/images/logo.png';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 
@@ -23,10 +23,6 @@ const useStyles = makeStyles(() => ({
   },
   appBar: {
     textAlign: 'center',
-  },
-  comcheck: {
-    borderRadius: '10px',
-    paddingBottom: '15px',
   },
   logo: {
     width: 200,
@@ -86,10 +82,8 @@ const Comcheck = () => {
           <CheckCircleOutlineOutlined color="success" sx={{ fontSize: 50 }} />
           <br />
           <pre>
-            {t('Verification done at')}
-            {' '}
-            {fldt(status?.comcheckstatus_receive_date)}
-            .
+            {t('Verification done at')}{' '}
+            {fldt(status?.comcheckstatus_receive_date)}.
           </pre>
         </div>
       </Paper>

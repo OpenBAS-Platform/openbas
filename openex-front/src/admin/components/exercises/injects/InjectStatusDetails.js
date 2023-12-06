@@ -56,9 +56,7 @@ class InjectStatusDetails extends Component {
                       if (key === 'execution_traces') {
                         return (
                           <TableRow key={key}>
-                            <TableCell>
-                              {key}
-                            </TableCell>
+                            <TableCell>{key}</TableCell>
                             <TableCell>
                               <Table selectable={false} size="small" key={key}>
                                 <TableBody displayRowCheckbox={false}>
@@ -70,9 +68,7 @@ class InjectStatusDetails extends Component {
                                       <TableCell>
                                         {trace.trace_status}
                                       </TableCell>
-                                      <TableCell>
-                                        {trace.trace_time}
-                                      </TableCell>
+                                      <TableCell>{trace.trace_time}</TableCell>
                                     </TableRow>
                                   ))}
                                 </TableBody>
@@ -83,12 +79,8 @@ class InjectStatusDetails extends Component {
                       }
                       return (
                         <TableRow key={key}>
-                          <TableCell>
-                            {key}
-                          </TableCell>
-                          <TableCell>
-                            {value}
-                          </TableCell>
+                          <TableCell>{key}</TableCell>
+                          <TableCell>{value}</TableCell>
                         </TableRow>
                       );
                     },

@@ -18,13 +18,18 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import Transition from '../../../../components/common/Transition';
 
 interface Props {
-  disabled?: boolean
-  exercise: Exercise
-  variable: Variable
-  onDeleteVariable?: () => void
+  disabled?: boolean;
+  exercise: Exercise;
+  variable: Variable;
+  onDeleteVariable?: () => void;
 }
 
-const VariablePopover: React.FC<Props> = ({ disabled, exercise, variable, onDeleteVariable }) => {
+const VariablePopover: React.FC<Props> = ({
+  disabled,
+  exercise,
+  variable,
+  onDeleteVariable,
+}) => {
   // Standard hooks
   const [editVar, setEditVar] = useState(false);
   const [deleteVar, setDeleteVar] = useState(false);
@@ -32,7 +37,11 @@ const VariablePopover: React.FC<Props> = ({ disabled, exercise, variable, onDele
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
 
-  const initialValues = (({ variable_key, variable_description, variable_value }) => ({ variable_key, variable_description, variable_value }))(variable);
+  const initialValues = (({
+    variable_key,
+    variable_description,
+    variable_value,
+  }) => ({ variable_key, variable_description, variable_value }))(variable);
 
   const submitDelete = () => {
     dispatch(deleteVariable(exercise.exercise_id, variable.variable_id));
@@ -95,9 +104,7 @@ const VariablePopover: React.FC<Props> = ({ disabled, exercise, variable, onDele
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteVar(false)}>
-            {t('Cancel')}
-          </Button>
+          <Button onClick={() => setDeleteVar(false)}>{t('Cancel')}</Button>
           <Button color="secondary" onClick={submitDelete}>
             {t('Delete')}
           </Button>

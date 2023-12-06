@@ -15,7 +15,11 @@ import { useFormatter } from '../../../../components/i18n';
 import { deleteReport, updateReport } from '../../../../actions/Report';
 import Transition from '../../../../components/common/Transition';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { Exercise, Report, ReportUpdateInput } from '../../../../utils/api-types';
+import {
+  Exercise,
+  Report,
+  ReportUpdateInput,
+} from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -26,8 +30,8 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  exerciseId: Exercise['exercise_id']
-  report: Report
+  exerciseId: Exercise['exercise_id'];
+  report: Report;
 }
 
 const ReportPopover: React.FC<Props> = ({ exerciseId, report }) => {

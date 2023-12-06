@@ -1,5 +1,5 @@
 {
-  "name": "openex-frontend",
+  "name": "openex-front",
   "version": "3.4.2",
   "private": true,
   "main": "src/index.tsx",
@@ -79,9 +79,16 @@
     "cross-env": "7.0.3",
     "esbuild": "0.19.8",
     "esbuild-jest": "0.5.0",
-    "eslint": "8.55.0",
-    "eslint-plugin-react-hooks": "4.6.0",
-    "eslint-plugin-react-refresh": "0.4.5",
+    "eslint": "8.54.0",
+    "eslint-config-airbnb": "19.0.4",
+    "eslint-config-airbnb-base": "15.0.0",
+    "eslint-config-airbnb-typescript": "17.1.0",
+    "eslint-config-prettier": "9.0.0",
+    "eslint-config-react-app": "7.0.1",
+    "eslint-plugin-custom-rules": "link:packages/eslint-plugin-custom-rules",
+    "eslint-plugin-import": "2.28.1",
+    "eslint-plugin-prettier": "5.0.1",
+    "eslint-plugin-react": "7.33.2",
     "express": "4.18.2",
     "fs-extra": "11.2.0",
     "globals": "13.23.0",
@@ -92,13 +99,13 @@
     "vite": "5.0.6"
   },
   "engines": {
-    "node": ">= 20.*"
+    "node": ">= 16.*"
   },
   "scripts": {
     "start": "node builder/dev/dev.js",
     "dev": "vite",
     "build": "node builder/prod/prod.js",
-    "lint": "cross-env DEBUG=eslint:cli-engine TIMING=1 eslint --max-warnings 0 --cache -c eslint.config.js src",
+    "lint": "cross-env DEBUG=eslint:cli-engine TIMING=1 eslint --max-warnings 0 --cache -c .eslintrc.cjs src",
     "control": "yarn audit --groups dependencies --summary",
     "test": "jest --coverage",
     "generate-types-from-api": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n api-types.d.ts --sort-types"

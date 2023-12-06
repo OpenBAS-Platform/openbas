@@ -1,2 +1,2 @@
-declare module '*.png'
-declare module 'ramda'
+declare module '*.png';
+declare module 'ramda';

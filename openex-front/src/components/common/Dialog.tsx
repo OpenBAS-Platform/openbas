@@ -5,13 +5,10 @@ import DialogContent from '@mui/material/DialogContent';
 import Transition from './Transition';
 
 interface DialogProps {
-  open: boolean
-  handleClose: () => void
-  title: string
-  children:
-  | (() => React.ReactElement)
-  | React.ReactElement
-  | null
+  open: boolean;
+  handleClose: () => void;
+  title: string;
+  children: (() => React.ReactElement) | React.ReactElement | null;
 }
 
 const Dialog: FunctionComponent<DialogProps> = ({
@@ -39,9 +36,7 @@ const Dialog: FunctionComponent<DialogProps> = ({
       TransitionComponent={Transition}
     >
       <DialogTitle>{title}</DialogTitle>
-      <DialogContent>
-        {component}
-      </DialogContent>
+      <DialogContent>{component}</DialogContent>
     </DialogMUI>
   );
 };

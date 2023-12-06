@@ -110,11 +110,7 @@ const Integrations = () => {
             style={{ marginBottom: 30 }}
           >
             <Typography variant="h4">
-              [
-              {type.ttype}
-              ]
-              {' '}
-              {type.tname}
+              [{type.ttype}] {type.tname}
             </Typography>
             <Paper variant="outlined" classes={{ root: classes.paper }}>
               <List style={{ paddingTop: 0 }}>

@@ -21,11 +21,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface PlayerFormProps {
-  initialValues: Partial<PlayerInputForm>
-  handleClose: () => void
-  onSubmit: (data: PlayerInputForm) => void
-  editing?: boolean
-  canUpdateEmail?: boolean
+  initialValues: Partial<PlayerInputForm>;
+  handleClose: () => void;
+  onSubmit: (data: PlayerInputForm) => void;
+  editing?: boolean;
+  canUpdateEmail?: boolean;
 }
 
 const PlayerForm: FunctionComponent<PlayerFormProps> = ({
@@ -40,7 +40,14 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
 
   const playerFormSchemaValidation = z.object({
     user_email: z.string().email(t('Should be a valid email address')),
-    user_phone: z.string().regex(/^\+/, t('Invalid input. Please use \'+\' character and country identifier.')).optional().nullable(),
+    user_phone: z
+      .string()
+      .regex(
+        /^\+/,
+        t("Invalid input. Please use '+' character and country identifier."),
+      )
+      .optional()
+      .nullable(),
   });
 
   return (
@@ -125,10 +132,7 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
             style={{ marginTop: 20 }}
           />
           <div className={classes.container} style={{ marginTop: 20 }}>
-            <Button
-              onClick={handleClose}
-              disabled={submitting}
-            >
+            <Button onClick={handleClose} disabled={submitting}>
               {t('Cancel')}
             </Button>
             <Button

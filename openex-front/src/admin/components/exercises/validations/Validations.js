@@ -178,8 +178,8 @@ const Validations = () => {
     )),
     R.filter((n) => (onlyManual
       ? !['openex_challenge', 'openex_media'].includes(
-          n.inject_expectation_inject?.inject_type,
-        )
+        n.inject_expectation_inject?.inject_type,
+      )
       : n.injectexpectation_id !== null)),
     R.filter(
       (n) => tags.length === 0
@@ -226,12 +226,12 @@ const Validations = () => {
         </div>
         <div style={{ float: 'right' }}>
           <FormControlLabel
-            control={(
+            control={
               <Switch
                 checked={onlyManual}
                 onChange={() => setOnlyManual(!onlyManual)}
               />
-            )}
+            }
             label={t('Only injects with manual validation')}
           />
         </div>
@@ -253,7 +253,7 @@ const Validations = () => {
                     />
                   </ListItemIcon>
                   <ListItemText
-                    primary={(
+                    primary={
                       <div>
                         <div
                           className={classes.bodyItem}
@@ -274,41 +274,40 @@ const Validations = () => {
                           <ItemTags variant="list" tags={inject.inject_tags} />
                         </div>
                       </div>
-                    )}
+                    }
                   />
                 </ListItem>
                 {inject.inject_type === 'openex_media'
-                || inject.inject_type === 'openex_challenge'
-                  ? (
-                    <List component="div" disablePadding>
-                      {Object.keys(groupedExpectation[injectId]).map(
-                        (audienceId) => {
-                          const audience = audiencesMap[audienceId] || {};
-                          return (
-                            <div key={audience.audience_id}>
-                              <ListItem
-                                divider={true}
-                                sx={{ pl: 4 }}
-                                classes={{ root: classes.item }}
-                              >
-                                <ListItemIcon>
-                                  <CastForEducationOutlined fontSize="small" />
-                                </ListItemIcon>
-                                <ListItemText
-                                  primary={(
-                                    <div>
-                                      <div
-                                        className={classes.bodyItem}
-                                        style={{ width: '20%' }}
-                                      >
-                                        {audience.audience_name}
-                                      </div>
+                || inject.inject_type === 'openex_challenge' ? (
+                  <List component="div" disablePadding>
+                    {Object.keys(groupedExpectation[injectId]).map(
+                      (audienceId) => {
+                        const audience = audiencesMap[audienceId] || {};
+                        return (
+                          <div key={audience.audience_id}>
+                            <ListItem
+                              divider={true}
+                              sx={{ pl: 4 }}
+                              classes={{ root: classes.item }}
+                            >
+                              <ListItemIcon>
+                                <CastForEducationOutlined fontSize="small" />
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={
+                                  <div>
+                                    <div
+                                      className={classes.bodyItem}
+                                      style={{ width: '20%' }}
+                                    >
+                                      {audience.audience_name}
                                     </div>
-                                  )}
-                                />
-                              </ListItem>
-                              <List component="div" disablePadding>
-                                {inject.inject_type === 'openex_media'
+                                  </div>
+                                }
+                              />
+                            </ListItem>
+                            <List component="div" disablePadding>
+                              {inject.inject_type === 'openex_media'
                                 && groupedExpectation[injectId][audienceId].map(
                                   (expectation) => {
                                     const article = articlesMap[
@@ -330,7 +329,7 @@ const Validations = () => {
                                           />
                                         </ListItemIcon>
                                         <ListItemText
-                                          primary={(
+                                          primary={
                                             <div>
                                               <div
                                                 className={classes.bodyItem}
@@ -383,13 +382,13 @@ const Validations = () => {
                                                 />
                                               </div>
                                             </div>
-                                          )}
+                                          }
                                         />
                                       </ListItem>
                                     );
                                   },
                                 )}
-                                {inject.inject_type === 'openex_challenge'
+                              {inject.inject_type === 'openex_challenge'
                                 && groupedExpectation[injectId][audienceId].map(
                                   (expectation) => {
                                     const challenge = challengesMap[
@@ -406,7 +405,7 @@ const Validations = () => {
                                           <EmojiEventsOutlined fontSize="small" />
                                         </ListItemIcon>
                                         <ListItemText
-                                          primary={(
+                                          primary={
                                             <div>
                                               <div
                                                 className={classes.bodyItem}
@@ -460,83 +459,82 @@ const Validations = () => {
                                                 />
                                               </div>
                                             </div>
-                                          )}
+                                          }
                                         />
                                       </ListItem>
                                     );
                                   },
                                 )}
-                              </List>
-                            </div>
-                          );
-                        },
-                      )}
-                    </List>
-                    )
-                  : (
-                    <List component="div" disablePadding>
-                      {groupedExpectation[injectId].map((expectation) => {
-                        const audience = audiencesMap[expectation.inject_expectation_audience]
-                          || {};
-                        return (
-                          <ListItem
-                            key={audience.audience_id}
-                            divider={true}
-                            sx={{ pl: 4 }}
-                            classes={{ root: classes.item }}
-                            button={true}
-                            onClick={() => setCurrentExpectation(expectation)}
-                          >
-                            <ListItemIcon>
-                              <CastForEducationOutlined fontSize="small" />
-                            </ListItemIcon>
-                            <ListItemText
-                              primary={(
-                                <div>
-                                  <div
-                                    className={classes.bodyItem}
-                                    style={{ width: '20%' }}
-                                  >
-                                    {audience.audience_name}
-                                  </div>
-                                  <div className={classes.bodyItemRight}>
-                                    <Chip
-                                      classes={{ root: classes.chipInList }}
-                                      style={
-                                        expectation.inject_expectation_result
-                                          ? inlineStyles.green
-                                          : inlineStyles.orange
-                                      }
-                                      label={
-                                        expectation.inject_expectation_result
-                                          ? `${t('Validated')} (${
-                                            expectation.inject_expectation_score
-                                          })`
-                                          : t('Pending validation')
-                                      }
-                                    />
-                                  </div>
-                                  <div
-                                    className={classes.bodyItemRight}
-                                    style={{ marginRight: 20 }}
-                                  >
-                                    <Chip
-                                      classes={{
-                                        root: classes.points,
-                                      }}
-                                      label={
-                                        expectation.inject_expectation_expected_score
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                              )}
-                            />
-                          </ListItem>
+                            </List>
+                          </div>
                         );
-                      })}
-                    </List>
+                      },
                     )}
+                  </List>
+                  ) : (
+                  <List component="div" disablePadding>
+                    {groupedExpectation[injectId].map((expectation) => {
+                      const audience = audiencesMap[expectation.inject_expectation_audience]
+                          || {};
+                      return (
+                        <ListItem
+                          key={audience.audience_id}
+                          divider={true}
+                          sx={{ pl: 4 }}
+                          classes={{ root: classes.item }}
+                          button={true}
+                          onClick={() => setCurrentExpectation(expectation)}
+                        >
+                          <ListItemIcon>
+                            <CastForEducationOutlined fontSize="small" />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={{ width: '20%' }}
+                                >
+                                  {audience.audience_name}
+                                </div>
+                                <div className={classes.bodyItemRight}>
+                                  <Chip
+                                    classes={{ root: classes.chipInList }}
+                                    style={
+                                      expectation.inject_expectation_result
+                                        ? inlineStyles.green
+                                        : inlineStyles.orange
+                                    }
+                                    label={
+                                      expectation.inject_expectation_result
+                                        ? `${t('Validated')} (${
+                                          expectation.inject_expectation_score
+                                        })`
+                                        : t('Pending validation')
+                                    }
+                                  />
+                                </div>
+                                <div
+                                  className={classes.bodyItemRight}
+                                  style={{ marginRight: 20 }}
+                                >
+                                  <Chip
+                                    classes={{
+                                      root: classes.points,
+                                    }}
+                                    label={
+                                      expectation.inject_expectation_expected_score
+                                    }
+                                  />
+                                </div>
+                              </div>
+                            }
+                          />
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                  )}
               </div>
             );
           })}
@@ -590,7 +588,8 @@ const Validations = () => {
                 expectation_score:
                   currentExpectation?.inject_expectation_expected_score,
               }}
-              onSubmit={(data) => submit(currentExpectation?.injectexpectation_id, data)}
+              onSubmit={(data) => submit(currentExpectation?.injectexpectation_id, data)
+              }
               validate={validate}
               mutators={{
                 setValue: ([field, value], state, { changeValue }) => {

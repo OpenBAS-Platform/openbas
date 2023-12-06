@@ -27,7 +27,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  media: Media
+  media: Media;
 }
 
 const MediaPopover: React.FC<Props> = ({ media }) => {
@@ -88,12 +88,8 @@ const MediaPopover: React.FC<Props> = ({ media }) => {
         open={Boolean(anchorEl)}
         onClose={handlePopoverClose}
       >
-        <MenuItem onClick={handleOpenEdit}>
-          {t('Update')}
-        </MenuItem>
-        <MenuItem onClick={handleOpenDelete}>
-          {t('Delete')}
-        </MenuItem>
+        <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
+        <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
       </Menu>
       <Dialog
         open={openDelete}
@@ -107,9 +103,7 @@ const MediaPopover: React.FC<Props> = ({ media }) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDelete(false)}>
-            {t('Cancel')}
-          </Button>
+          <Button onClick={() => setOpenDelete(false)}>{t('Cancel')}</Button>
           <Button color="secondary" onClick={submitDelete}>
             {t('Delete')}
           </Button>

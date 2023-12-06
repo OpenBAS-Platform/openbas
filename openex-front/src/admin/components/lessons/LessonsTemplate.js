@@ -96,7 +96,11 @@ const LessonsTemplate = () => {
                 <List style={{ padding: 0 }}>
                   {sortedLessonsTemplateQuestions.map((question) => {
                     return (
-                      <ListItem key={question.lessonsquestion_id} divider={true} button={false}>
+                      <ListItem
+                        key={question.lessonsquestion_id}
+                        divider={true}
+                        button={false}
+                      >
                         <ListItemIcon>
                           <HelpOutlined />
                         </ListItemIcon>

@@ -18,18 +18,17 @@ const useStyles = makeStyles((theme: Theme) => ({
     alignItems: 'center',
   },
   container: {
-    padding: `${theme.spacing(2)} ${theme.spacing(3)} ${theme.spacing(3)} ${theme.spacing(3)}`,
+    padding: `${theme.spacing(2)} ${theme.spacing(3)} ${theme.spacing(
+      3,
+    )} ${theme.spacing(3)}`,
   },
 }));
 
 interface DrawerProps {
-  open: boolean
-  handleClose: () => void
-  title: string
-  children:
-  | (() => React.ReactElement)
-  | React.ReactElement
-  | null
+  open: boolean;
+  handleClose: () => void;
+  title: string;
+  children: (() => React.ReactElement) | React.ReactElement | null;
 }
 
 const Drawer: FunctionComponent<DrawerProps> = ({

@@ -44,23 +44,6 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     fontSize: 13,
   },
-  itemIcon: {
-    color: theme.palette.primary.main,
-  },
-  goIcon: {
-    position: 'absolute',
-    right: -10,
-  },
-  inputLabel: {
-    float: 'left',
-  },
-  sortIcon: {
-    float: 'left',
-    margin: '-5px 0 0 15px',
-  },
-  icon: {
-    color: theme.palette.primary.main,
-  },
 }));
 
 const headerStyles = {
@@ -189,37 +172,35 @@ const Players = () => {
           />
         </div>
         <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
-          {sortedUsers.length > 0
-            ? (
-              <CSVLink
-                data={exportData(
-                  'user',
-                  [
-                    'user_email',
-                    'user_firstname',
-                    'user_lastname',
-                    'user_phone',
-                    'user_organization',
-                    'user_tags',
-                  ],
-                  sortedUsers,
-                  tagsMap,
-                  organizationsMap,
-                )}
-                filename={`${t('Players')}.csv`}
-              >
-                <Tooltip title={t('Export this list')}>
-                  <IconButton size="large">
-                    <FileDownloadOutlined color="primary" />
-                  </IconButton>
-                </Tooltip>
-              </CSVLink>
-              )
-            : (
-              <IconButton size="large" disabled={true}>
-                <FileDownloadOutlined />
-              </IconButton>
+          {sortedUsers.length > 0 ? (
+            <CSVLink
+              data={exportData(
+                'user',
+                [
+                  'user_email',
+                  'user_firstname',
+                  'user_lastname',
+                  'user_phone',
+                  'user_organization',
+                  'user_tags',
+                ],
+                sortedUsers,
+                tagsMap,
+                organizationsMap,
               )}
+              filename={`${t('Players')}.csv`}
+            >
+              <Tooltip title={t('Export this list')}>
+                <IconButton size="large">
+                  <FileDownloadOutlined color="primary" />
+                </IconButton>
+              </Tooltip>
+            </CSVLink>
+          ) : (
+            <IconButton size="large" disabled={true}>
+              <FileDownloadOutlined />
+            </IconButton>
+          )}
         </div>
       </div>
       <div className="clearfix" />
@@ -241,7 +222,7 @@ const Players = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={(
+            primary={
               <div>
                 {filtering.buildHeader(
                   'user_email',
@@ -269,7 +250,7 @@ const Players = () => {
                 )}
                 {filtering.buildHeader('user_tags', 'Tags', true, headerStyles)}
               </div>
-            )}
+            }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
@@ -283,7 +264,7 @@ const Players = () => {
               <PersonOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={(
+              primary={
                 <div>
                   <div
                     className={classes.bodyItem}
@@ -317,7 +298,7 @@ const Players = () => {
                     <ItemTags variant="list" tags={user.user_tags} />
                   </div>
                 </div>
-              )}
+              }
             />
             <ListItemSecondaryAction>
               <PlayerPopover user={user} />

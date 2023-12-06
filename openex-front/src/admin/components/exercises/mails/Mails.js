@@ -46,21 +46,8 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     fontSize: 13,
   },
-  itemIcon: {
-    color: theme.palette.primary.main,
-  },
   goIcon: {
     paddingTop: 3,
-  },
-  inputLabel: {
-    float: 'left',
-  },
-  sortIcon: {
-    float: 'left',
-    margin: '-5px 0 0 15px',
-  },
-  icon: {
-    color: theme.palette.primary.main,
   },
   coms: {
     fontSize: 12,
@@ -75,11 +62,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: 'rgba(236, 64, 122, 0.08)',
     color: '#ec407a',
     border: '1px solid #ec407a',
-  },
-  drawerPaper: {
-    minHeight: '100vh',
-    width: '50%',
-    padding: 0,
   },
 }));
 
@@ -236,38 +218,36 @@ const Mails = () => {
           />
         </div>
         <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
-          {sortedInjects.length > 0
-            ? (
-              <CSVLink
-                data={exportData(
-                  'inject',
-                  [
-                    'inject_type',
-                    'inject_title',
-                    'inject_description',
-                    'inject_depends_duration',
-                    'inject_users_number',
-                    'inject_enabled',
-                    'inject_tags',
-                    'inject_content',
-                  ],
-                  sortedInjects,
-                  tagsMap,
-                )}
-                filename={`[${exercise.exercise_name}] ${t('Injects')}.csv`}
-              >
-                <Tooltip title={t('Export this list')}>
-                  <IconButton size="large">
-                    <FileDownloadOutlined color="primary" />
-                  </IconButton>
-                </Tooltip>
-              </CSVLink>
-              )
-            : (
-              <IconButton size="large" disabled={true}>
-                <FileDownloadOutlined />
-              </IconButton>
+          {sortedInjects.length > 0 ? (
+            <CSVLink
+              data={exportData(
+                'inject',
+                [
+                  'inject_type',
+                  'inject_title',
+                  'inject_description',
+                  'inject_depends_duration',
+                  'inject_users_number',
+                  'inject_enabled',
+                  'inject_tags',
+                  'inject_content',
+                ],
+                sortedInjects,
+                tagsMap,
               )}
+              filename={`[${exercise.exercise_name}] ${t('Injects')}.csv`}
+            >
+              <Tooltip title={t('Export this list')}>
+                <IconButton size="large">
+                  <FileDownloadOutlined color="primary" />
+                </IconButton>
+              </Tooltip>
+            </CSVLink>
+          ) : (
+            <IconButton size="large" disabled={true}>
+              <FileDownloadOutlined />
+            </IconButton>
+          )}
         </div>
       </div>
       <div className="clearfix" />
@@ -289,7 +269,7 @@ const Mails = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={(
+            primary={
               <div>
                 {filtering.buildHeader(
                   'inject_title',
@@ -328,7 +308,7 @@ const Mails = () => {
                   headerStyles,
                 )}
               </div>
-            )}
+            }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
@@ -352,7 +332,7 @@ const Mails = () => {
                 />
               </ListItemIcon>
               <ListItemText
-                primary={(
+                primary={
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -397,7 +377,7 @@ const Mails = () => {
                       <ItemTags variant="list" tags={inject.inject_tags} />
                     </div>
                   </div>
-                )}
+                }
               />
               <ListItemSecondaryAction classes={{ root: classes.goIcon }}>
                 <KeyboardArrowRight />

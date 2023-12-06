@@ -36,7 +36,12 @@ import {
   updateGroupUsers,
   updateGroupInformation,
 } from '../../../../actions/Group';
-import { addGrant, deleteGrant, addGroupOrganization, deleteGroupOrganization } from '../../../../actions/Grant';
+import {
+  addGrant,
+  deleteGrant,
+  addGroupOrganization,
+  deleteGroupOrganization,
+} from '../../../../actions/Grant';
 import GroupForm from './GroupForm';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
@@ -194,17 +199,21 @@ class GroupPopover extends Component {
   handleGrantOrganization(organizationId, event) {
     const isChecked = event.target.checked;
     if (isChecked) {
-      this.props.addGroupOrganization(this.props.group.group_id, {
-        organization_id: organizationId,
-      }).then(() => {
-        this.props.fetchGroup(this.props.group.group_id);
-      });
+      this.props
+        .addGroupOrganization(this.props.group.group_id, {
+          organization_id: organizationId,
+        })
+        .then(() => {
+          this.props.fetchGroup(this.props.group.group_id);
+        });
     }
     // the grand does not exist
     if (!isChecked && organizationId !== null) {
-      this.props.deleteGroupOrganization(this.props.group.group_id, organizationId).then(() => {
-        this.props.fetchGroup(this.props.group.group_id);
-      });
+      this.props
+        .deleteGroupOrganization(this.props.group.group_id, organizationId)
+        .then(() => {
+          this.props.fetchGroup(this.props.group.group_id);
+        });
     }
   }
 
@@ -445,9 +454,7 @@ class GroupPopover extends Component {
               <Table selectable={false} size="small">
                 <TableHead adjustForCheckbox={false} displaySelectAll={false}>
                   <TableRow>
-                    <TableCell>
-                      {t('Exercise')}
-                    </TableCell>
+                    <TableCell>{t('Exercise')}</TableCell>
                     <TableCell style={{ textAlign: 'center' }}>
                       {t('Read/Write')}
                     </TableCell>
@@ -460,11 +467,11 @@ class GroupPopover extends Component {
                   {this.props.exercises.map((exercise) => {
                     const grantPlanner = R.find(
                       (g) => g.grant_exercise === exercise.exercise_id
-                      && g.grant_name === 'PLANNER',
+                        && g.grant_name === 'PLANNER',
                     )(group.group_grants);
                     const grantObserver = R.find(
                       (g) => g.grant_exercise === exercise.exercise_id
-                      && g.grant_name === 'OBSERVER',
+                        && g.grant_name === 'OBSERVER',
                     )(group.group_grants);
                     const grantPlannerId = R.propOr(
                       null,
@@ -478,9 +485,7 @@ class GroupPopover extends Component {
                     );
                     return (
                       <TableRow key={exercise.exercise_id}>
-                        <TableCell>
-                          {exercise.exercise_name}
-                        </TableCell>
+                        <TableCell>{exercise.exercise_name}</TableCell>
                         <TableCell style={{ textAlign: 'center' }}>
                           <Checkbox
                             checked={grantPlannerId !== null}
@@ -495,7 +500,8 @@ class GroupPopover extends Component {
                         <TableCell style={{ textAlign: 'center' }}>
                           <Checkbox
                             checked={
-                              grantObserverId !== null || grantPlannerId !== null
+                              grantObserverId !== null
+                              || grantPlannerId !== null
                             }
                             disabled={grantPlannerId !== null}
                             onChange={this.handleGrantCheck.bind(
@@ -516,9 +522,7 @@ class GroupPopover extends Component {
               <Table selectable={false} size="small">
                 <TableHead adjustForCheckbox={false} displaySelectAll={false}>
                   <TableRow>
-                    <TableCell>
-                      {t('Organization')}
-                    </TableCell>
+                    <TableCell>{t('Organization')}</TableCell>
                     <TableCell style={{ textAlign: 'center' }}>
                       {t('Granted')}
                     </TableCell>
@@ -526,14 +530,20 @@ class GroupPopover extends Component {
                 </TableHead>
                 <TableBody displayRowCheckbox={false}>
                   {this.props.organizations.map((organization) => {
-                    const isOrgaChecked = (this.props.group.group_organizations ?? []).includes(organization.organization_id);
+                    const isOrgaChecked = (
+                      this.props.group.group_organizations ?? []
+                    ).includes(organization.organization_id);
                     return (
                       <TableRow key={organization.organization_id}>
-                        <TableCell>
-                          {organization.organization_name}
-                        </TableCell>
+                        <TableCell>{organization.organization_name}</TableCell>
                         <TableCell style={{ textAlign: 'center' }}>
-                          <Checkbox checked={isOrgaChecked} onChange={this.handleGrantOrganization.bind(this, organization.organization_id)} />
+                          <Checkbox
+                            checked={isOrgaChecked}
+                            onChange={this.handleGrantOrganization.bind(
+                              this,
+                              organization.organization_id,
+                            )}
+                          />
                         </TableCell>
                       </TableRow>
                     );

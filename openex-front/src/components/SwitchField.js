@@ -13,7 +13,7 @@ const renderSwitch = ({
 }) => (
   <FormGroup row={true} style={{ ...style, marginLeft: 5 }}>
     <FormControlLabel
-      control={(
+      control={
         <MuiSwitch
           checked={input.value}
           onChange={(event) => {
@@ -21,7 +21,7 @@ const renderSwitch = ({
           }}
           {...others}
         />
-      )}
+      }
       label={label}
       error={touched && invalid}
       helperText={touched && (error || submitError)}

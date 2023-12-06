@@ -39,21 +39,19 @@ class DryrunStatus extends Component {
   render() {
     const { t, finished, classes, variant } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
-    return finished
-      ? (
-        <Chip
-          classes={{ root: style }}
-          style={inlineStyles.green}
-          label={t('Finished')}
-        />
-        )
-      : (
-        <Chip
-          classes={{ root: style }}
-          style={inlineStyles.blue}
-          label={t('Running')}
-        />
-        );
+    return finished ? (
+      <Chip
+        classes={{ root: style }}
+        style={inlineStyles.green}
+        label={t('Finished')}
+      />
+    ) : (
+      <Chip
+        classes={{ root: style }}
+        style={inlineStyles.blue}
+        label={t('Running')}
+      />
+    );
   }
 }
 

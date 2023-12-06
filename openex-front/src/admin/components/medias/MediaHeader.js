@@ -9,25 +9,9 @@ const useStyles = makeStyles(() => ({
   container: {
     width: '100%',
   },
-  containerWithPadding: {
-    width: '100%',
-    paddingRight: 200,
-  },
   title: {
     float: 'left',
     textTransform: 'uppercase',
-  },
-  tags: {
-    marginTop: -4,
-    float: 'right',
-  },
-  tag: {
-    marginLeft: 5,
-  },
-  tagsInput: {
-    width: 300,
-    margin: '0 10px 0 10px',
-    float: 'right',
   },
 }));
 

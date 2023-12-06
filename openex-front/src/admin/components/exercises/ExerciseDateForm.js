@@ -26,7 +26,9 @@ class ExerciseDateForm extends Component {
               label={t('Start date (optional)')}
               autoOk={true}
               minDateTime={new Date()}
-              slotProps={{ textField: { variant: 'standard', fullWidth: true } }}
+              slotProps={{
+                textField: { variant: 'standard', fullWidth: true },
+              }}
             />
             <div style={{ float: 'right', marginTop: 20 }}>
               {handleClose && (

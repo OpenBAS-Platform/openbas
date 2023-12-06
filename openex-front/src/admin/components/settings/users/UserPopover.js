@@ -70,9 +70,7 @@ const UserPopover = ({ user, organizationsMap, tagsMap }) => {
   const handleCloseEditPassword = () => setOpenEditPassword(false);
 
   const onSubmitEditPassword = (data) => {
-    dispatch(updateUserPassword(user.user_id, data)).then(
-      () => handleCloseEditPassword(),
-    );
+    dispatch(updateUserPassword(user.user_id, data)).then(() => handleCloseEditPassword());
   };
 
   const handleOpenDelete = () => {

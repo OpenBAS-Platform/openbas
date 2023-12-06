@@ -20,7 +20,10 @@ import {
   updateLessonsTemplate,
 } from '../../../actions/Lessons';
 import Transition from '../../../components/common/Transition';
-import { LessonsTemplate, LessonsTemplateUpdateInput } from '../../../utils/api-types';
+import {
+  LessonsTemplate,
+  LessonsTemplateUpdateInput,
+} from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({
@@ -31,7 +34,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  lessonsTemplate: LessonsTemplate
+  lessonsTemplate: LessonsTemplate;
 }
 
 const LessonsTemplatePopover: React.FC<Props> = ({ lessonsTemplate }) => {

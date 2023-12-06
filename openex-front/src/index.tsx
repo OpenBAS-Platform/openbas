@@ -1,10 +1,10 @@
 import 'typeface-ibm-plex-sans';
 import 'typeface-roboto';
 import React from 'react';
-import './resources/css/main.css';
-import './resources/css/leaflet.css';
-import './resources/css/CKEditorDark.css';
-import './resources/css/CKEditorLight.css';
+import './static/css/main.css';
+import './static/css/leaflet.css';
+import './static/css/CKEditorDark.css';
+import './static/css/CKEditorLight.css';
 import { createRoot } from 'react-dom/client';
 import App from './app';
 

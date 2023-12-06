@@ -13,9 +13,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     minWidth: 20,
     textTransform: 'none',
   },
-  icon: {
-    marginRight: theme.spacing(1),
-  },
 }));
 
 const TopMenuSettings: React.FC = () => {
@@ -30,7 +27,9 @@ const TopMenuSettings: React.FC = () => {
         to="/admin/settings"
         variant={location.pathname === '/admin/settings' ? 'contained' : 'text'}
         size="small"
-        color={location.pathname === '/admin/settings' ? 'secondary' : 'primary'}
+        color={
+          location.pathname === '/admin/settings' ? 'secondary' : 'primary'
+        }
         classes={{ root: classes.button }}
       >
         {t('Parameters')}

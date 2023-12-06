@@ -21,7 +21,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  exercise: Exercise
+  exercise: Exercise;
 }
 
 const ExerciseDatePopover: React.FC<Props> = ({ exercise }) => {

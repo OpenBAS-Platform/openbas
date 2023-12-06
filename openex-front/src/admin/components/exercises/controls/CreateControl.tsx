@@ -27,7 +27,11 @@ import { addDryrun } from '../../../../actions/Dryrun';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import { useHelper } from '../../../../store';
-import { AudiencesHelper, ExercicesHelper, UsersHelper } from '../../../../actions/helper';
+import {
+  AudiencesHelper,
+  ExercicesHelper,
+  UsersHelper,
+} from '../../../../actions/helper';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   createButton: {
@@ -35,16 +39,11 @@ const useStyles = makeStyles<Theme>((theme) => ({
     bottom: 30,
     right: 30,
   },
-  text: {
-    fontSize: 15,
-    color: theme.palette.primary.main,
-    fontWeight: 500,
-  },
 }));
 
 interface Props {
-  exerciseId: Exercise['exercise_id']
-  variant?: string
+  exerciseId: Exercise['exercise_id'];
+  variant?: string;
 }
 
 const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
@@ -56,13 +55,15 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const { me, exercise, audiences } = useHelper((helper: UsersHelper & ExercicesHelper & AudiencesHelper) => {
-    return ({
-      me: helper.getMe(),
-      exercise: helper.getExercise(exerciseId),
-      audiences: helper.getExerciseAudiences(exerciseId),
-    });
-  });
+  const { me, exercise, audiences } = useHelper(
+    (helper: UsersHelper & ExercicesHelper & AudiencesHelper) => {
+      return {
+        me: helper.getMe(),
+        exercise: helper.getExercise(exerciseId),
+        audiences: helper.getExerciseAudiences(exerciseId),
+      };
+    },
+  );
 
   const initialValues = {
     dryrun_users: [{ id: me.user_id, label: resolveUserName(me) }],
@@ -70,66 +71,71 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
 
   const onSubmitComcheck = async (data: ComcheckInput) => {
     const result = await dispatch(addComcheck(exerciseId, data));
-    navigate(`/admin/exercises/${exerciseId}/controls/comchecks/${result.result}`);
+    navigate(
+      `/admin/exercises/${exerciseId}/controls/comchecks/${result.result}`,
+    );
   };
 
   const onSubmitDryrun = async (data: typeof initialValues) => {
-    const inputValues = { ...data, dryrun_users: data.dryrun_users.map(({ id }) => id) };
+    const inputValues = {
+      ...data,
+      dryrun_users: data.dryrun_users.map(({ id }) => id),
+    };
 
     const result = await dispatch(addDryrun(exerciseId, inputValues));
-    navigate(`/admin/exercises/${exerciseId}/controls/dryruns/${result.result}`);
+    navigate(
+      `/admin/exercises/${exerciseId}/controls/dryruns/${result.result}`,
+    );
   };
 
   return (
     <div>
-      {variant === 'buttons'
-        ? (
-          <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
-            <Grid item={true} xs={6}>
-              <Typography variant="h3">{t('Dryrun')}</Typography>
-              <Button
-                variant="contained"
-                startIcon={<VideoSettingsOutlined />}
-                color="info"
-                onClick={() => setOpenDryrun(true)}
-                disabled={isExerciseReadOnly(exercise)}
-              >
-                {t('Launch')}
-              </Button>
-            </Grid>
-            <Grid item={true} xs={4}>
-              <Typography variant="h3">{t('Comcheck')}</Typography>
-              <Button
-                variant="contained"
-                startIcon={<MarkEmailReadOutlined />}
-                color="secondary"
-                onClick={() => setOpenComcheck(true)}
-                disabled={isExerciseReadOnly(exercise)}
-              >
-                {t('Send')}
-              </Button>
-            </Grid>
-          </Grid>
-          )
-        : (
-          <SpeedDial
-            classes={{ root: classes.createButton }}
-            icon={<SpeedDialIcon />}
-            ariaLabel={t('New control')}
-            hidden={isExerciseReadOnly(exercise)}
-          >
-            <SpeedDialAction
-              icon={<VideoSettingsOutlined />}
-              tooltipTitle={t('Launch a new dryrun')}
+      {variant === 'buttons' ? (
+        <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
+          <Grid item={true} xs={6}>
+            <Typography variant="h3">{t('Dryrun')}</Typography>
+            <Button
+              variant="contained"
+              startIcon={<VideoSettingsOutlined />}
+              color="info"
               onClick={() => setOpenDryrun(true)}
-            />
-            <SpeedDialAction
-              icon={<MarkEmailReadOutlined />}
-              tooltipTitle={t('Send a new comcheck')}
+              disabled={isExerciseReadOnly(exercise)}
+            >
+              {t('Launch')}
+            </Button>
+          </Grid>
+          <Grid item={true} xs={4}>
+            <Typography variant="h3">{t('Comcheck')}</Typography>
+            <Button
+              variant="contained"
+              startIcon={<MarkEmailReadOutlined />}
+              color="secondary"
               onClick={() => setOpenComcheck(true)}
-            />
-          </SpeedDial>
-          )}
+              disabled={isExerciseReadOnly(exercise)}
+            >
+              {t('Send')}
+            </Button>
+          </Grid>
+        </Grid>
+      ) : (
+        <SpeedDial
+          classes={{ root: classes.createButton }}
+          icon={<SpeedDialIcon />}
+          ariaLabel={t('New control')}
+          hidden={isExerciseReadOnly(exercise)}
+        >
+          <SpeedDialAction
+            icon={<VideoSettingsOutlined />}
+            tooltipTitle={t('Launch a new dryrun')}
+            onClick={() => setOpenDryrun(true)}
+          />
+          <SpeedDialAction
+            icon={<MarkEmailReadOutlined />}
+            tooltipTitle={t('Send a new comcheck')}
+            onClick={() => setOpenComcheck(true)}
+          />
+        </SpeedDial>
+      )}
       <Dialog
         open={openComcheck}
         TransitionComponent={Transition}
@@ -147,7 +153,7 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
               comcheck_subject: t('[${exercise.name}] Communication check'),
               comcheck_message: `${t('Hello')},<br /><br />${t(
                 'This is a communication check before the beginning of the exercise. Please click on the following link'
-                + ' in order to confirm you successfully received this message: <a href="${comcheck.url}">${comcheck.url}</a>.',
+                  + ' in order to confirm you successfully received this message: <a href="${comcheck.url}">${comcheck.url}</a>.',
               )}<br /><br />${t('Best regards')},<br />${t(
                 'The exercise control team',
               )}`,

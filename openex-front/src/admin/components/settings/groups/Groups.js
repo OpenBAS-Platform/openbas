@@ -212,13 +212,11 @@ class Groups extends Component {
   sortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { orderAsc, sortBy } = this.state;
-    const sortComponent = orderAsc
-      ? (
-        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-        )
-      : (
-        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-        );
+    const sortComponent = orderAsc ? (
+      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+    ) : (
+      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+    );
     if (isSortable) {
       return (
         <div
@@ -284,7 +282,7 @@ class Groups extends Component {
               </span>
             </ListItemIcon>
             <ListItemText
-              primary={(
+              primary={
                 <div>
                   {this.sortHeader('group_name', 'Name', true)}
                   {this.sortHeader('group_description', 'Description', true)}
@@ -305,7 +303,7 @@ class Groups extends Component {
                   )}
                   {this.sortHeader('group_users_number', 'Users', true)}
                 </div>
-              )}
+              }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
@@ -319,7 +317,7 @@ class Groups extends Component {
                 <GroupOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={(
+                primary={
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -337,58 +335,58 @@ class Groups extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.group_default_user_assign}
                     >
-                      {group.group_default_user_assign
-                        ? (
-                          <Tooltip
-                            title={t(
-                              'The new users will automatically be assigned to this group.',
-                            )}
-                          >
-                            <CheckCircleOutlined fontSize="small" />
-                          </Tooltip>
-                          )
-                        : (
-                            '-'
+                      {group.group_default_user_assign ? (
+                        <Tooltip
+                          title={t(
+                            'The new users will automatically be assigned to this group.',
                           )}
+                        >
+                          <CheckCircleOutlined fontSize="small" />
+                        </Tooltip>
+                      ) : (
+                        '-'
+                      )}
                     </div>
                     <div
                       className={classes.bodyItem}
                       style={inlineStyles.group_default_exercise_observer}
                     >
-                      {group.group_default_exercise_observer
-                        ? (
-                          <Tooltip
-                            title={t(
-                              'This group will have observer permission on new exercises.',
-                            )}
-                          >
-                            <CheckCircleOutlined fontSize="small" />
-                          </Tooltip>
-                          )
-                        : (
-                            '-'
+                      {group.group_default_exercise_observer ? (
+                        <Tooltip
+                          title={t(
+                            'This group will have observer permission on new exercises.',
                           )}
+                        >
+                          <CheckCircleOutlined fontSize="small" />
+                        </Tooltip>
+                      ) : (
+                        '-'
+                      )}
                     </div>
-                    <div className={classes.bodyItem} style={inlineStyles.group_default_exercise_planner}>
-                      {group.group_default_exercise_planner
-                        ? (
-                          <Tooltip
-                            title={t(
-                              'This group will have planner permission on new exercises.',
-                            )}
-                          >
-                            <CheckCircleOutlined fontSize="small" />
-                          </Tooltip>
-                          )
-                        : (
-                            '-'
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.group_default_exercise_planner}
+                    >
+                      {group.group_default_exercise_planner ? (
+                        <Tooltip
+                          title={t(
+                            'This group will have planner permission on new exercises.',
                           )}
+                        >
+                          <CheckCircleOutlined fontSize="small" />
+                        </Tooltip>
+                      ) : (
+                        '-'
+                      )}
                     </div>
-                    <div className={classes.bodyItem} style={inlineStyles.group_users_number}>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.group_users_number}
+                    >
                       {group.group_users_number}
                     </div>
                   </div>
-                )}
+                }
               />
               <ListItemSecondaryAction>
                 <GroupPopover group={group} groupUsersIds={group.group_users} />

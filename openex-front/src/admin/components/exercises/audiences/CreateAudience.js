@@ -69,33 +69,31 @@ class CreateAudience extends Component {
     const { classes, t, inline } = this.props;
     return (
       <div>
-        {inline === true
-          ? (
-            <ListItem
-              button={true}
-              divider={true}
-              onClick={this.handleOpen.bind(this)}
-              color="primary"
-            >
-              <ListItemIcon color="primary">
-                <ControlPointOutlined color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary={t('Create a new audience')}
-                classes={{ primary: classes.text }}
-              />
-            </ListItem>
-            )
-          : (
-            <Fab
-              onClick={this.handleOpen.bind(this)}
-              color="primary"
-              aria-label="Add"
-              className={classes.createButton}
-            >
-              <Add />
-            </Fab>
-            )}
+        {inline === true ? (
+          <ListItem
+            button={true}
+            divider={true}
+            onClick={this.handleOpen.bind(this)}
+            color="primary"
+          >
+            <ListItemIcon color="primary">
+              <ControlPointOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={t('Create a new audience')}
+              classes={{ primary: classes.text }}
+            />
+          </ListItem>
+        ) : (
+          <Fab
+            onClick={this.handleOpen.bind(this)}
+            color="primary"
+            aria-label="Add"
+            className={classes.createButton}
+          >
+            <Add />
+          </Fab>
+        )}
         <Dialog
           open={this.state.open}
           TransitionComponent={Transition}

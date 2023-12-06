@@ -1,5 +1,10 @@
+import LogoText from '../static/images/logo_text.png';
+import LogoCollapsed from '../static/images/logo.png';
+import { fileUri } from '../utils/Environment.js';
+
 export default (
   logo = null,
+  logo_collapsed = null,
   background = null,
   paper = null,
   nav = null,
@@ -8,9 +13,9 @@ export default (
   accent = null,
 ) => {
   const errorColor = '#f44336';
-
-  return ({
-    logo: logo || `${window.BASE_PATH}/static/logo_text.png`,
+  return {
+    logo: logo || fileUri(LogoText),
+    logo_collapsed: logo_collapsed || fileUri(LogoCollapsed),
     palette: {
       mode: 'dark',
       primary: { main: primary || '#00b1ff' },
@@ -87,6 +92,9 @@ export default (
         styleOverrides: {
           tooltip: {
             backgroundColor: 'rgba(0,0,0,0.7)',
+          },
+          arrow: {
+            color: 'rgba(0,0,0,0.7)',
           },
         },
       },
@@ -228,5 +236,5 @@ export default (
         },
       },
     },
-  });
+  };
 };

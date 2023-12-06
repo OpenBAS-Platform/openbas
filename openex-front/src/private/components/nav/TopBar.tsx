@@ -8,7 +8,7 @@ import Menu, { MenuProps } from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { makeStyles } from '@mui/styles';
 import { logout } from '../../../actions/Application';
-import logo from '../../../resources/images/logo_openex_horizontal_small.png';
+import logo from '../../../static/images/logo_text.png';
 import { useFormatter } from '../../../components/i18n';
 import { useAppDispatch } from '../../../utils/hooks';
 import { Theme } from '../../../components/Theme';
@@ -21,9 +21,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     backgroundColor: theme.palette.background.nav,
     paddingTop: theme.spacing(0.2),
   },
-  flex: {
-    flexGrow: 1,
-  },
   logoContainer: {
     marginLeft: -10,
   },
@@ -31,28 +28,12 @@ const useStyles = makeStyles<Theme>((theme) => ({
     cursor: 'pointer',
     height: 35,
   },
-  menuContainer: {
-    float: 'left',
-    marginLeft: 30,
-  },
   barRight: {
     position: 'absolute',
     top: 15,
     right: 15,
     verticalAlign: 'middle',
     height: '100%',
-  },
-  divider: {
-    display: 'table-cell',
-    float: 'left',
-    height: '100%',
-    margin: '0 5px 0 5px',
-  },
-  searchContainer: {
-    display: 'table-cell',
-    float: 'left',
-    marginRight: 5,
-    paddingTop: 9,
   },
 }));
 
@@ -95,11 +76,7 @@ const TopBar: React.FC = () => {
           <IconButton onClick={handleOpen} size="small">
             <AccountCircleOutlined />
           </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-          >
+          <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
             <MenuItem
               onClick={handleClose}
               component={Link}
@@ -107,9 +84,7 @@ const TopBar: React.FC = () => {
             >
               {t('Profile')}
             </MenuItem>
-            <MenuItem onClick={handleLogout}>
-              {t('Logout')}
-            </MenuItem>
+            <MenuItem onClick={handleLogout}>{t('Logout')}</MenuItem>
           </Menu>
         </div>
       </Toolbar>

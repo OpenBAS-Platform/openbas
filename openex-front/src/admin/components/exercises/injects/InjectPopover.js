@@ -18,11 +18,21 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
-import { deleteInject, injectDone, tryInject, updateInject, updateInjectActivation, updateInjectTrigger } from '../../../../actions/Inject';
+import {
+  deleteInject,
+  injectDone,
+  tryInject,
+  updateInject,
+  updateInjectActivation,
+  updateInjectTrigger,
+} from '../../../../actions/Inject';
 import InjectForm from './InjectForm';
 import inject18n from '../../../../components/i18n';
 import { splitDuration } from '../../../../utils/Time';
-import { isExerciseReadOnly, secondsFromToNow } from '../../../../utils/Exercise';
+import {
+  isExerciseReadOnly,
+  secondsFromToNow,
+} from '../../../../utils/Exercise';
 import { tagOptions } from '../../../../utils/Option';
 
 const Transition = React.forwardRef((props, ref) => (
@@ -221,7 +231,8 @@ class InjectPopover extends Component {
       this.props.exerciseId,
       this.props.inject.inject_id,
       {
-        inject_depends_duration: injectDependsDuration > 0 ? injectDependsDuration : 0,
+        inject_depends_duration:
+          injectDependsDuration > 0 ? injectDependsDuration : 0,
       },
     );
     this.handleCloseTrigger();
@@ -309,23 +320,21 @@ class InjectPopover extends Component {
               {t('Try the inject')}
             </MenuItem>
           )}
-          {inject.inject_enabled
-            ? (
-              <MenuItem
-                onClick={this.handleOpenDisable.bind(this)}
-                disabled={isDisabled}
-              >
-                {t('Disable')}
-              </MenuItem>
-              )
-            : (
-              <MenuItem
-                onClick={this.handleOpenEnable.bind(this)}
-                disabled={isDisabled}
-              >
-                {t('Enable')}
-              </MenuItem>
-              )}
+          {inject.inject_enabled ? (
+            <MenuItem
+              onClick={this.handleOpenDisable.bind(this)}
+              disabled={isDisabled}
+            >
+              {t('Disable')}
+            </MenuItem>
+          ) : (
+            <MenuItem
+              onClick={this.handleOpenEnable.bind(this)}
+              disabled={isDisabled}
+            >
+              {t('Enable')}
+            </MenuItem>
+          )}
           <MenuItem onClick={this.handleOpenDelete.bind(this)}>
             {t('Delete')}
           </MenuItem>
@@ -484,48 +493,40 @@ class InjectPopover extends Component {
             <Table selectable={false} size="small">
               <TableBody displayRowCheckbox={false}>
                 {this.state.injectResult
-                && Object.entries(this.state.injectResult.status_reporting).map(
-                  ([key, value]) => {
-                    if (key === 'execution_traces') {
+                  && Object.entries(this.state.injectResult.status_reporting).map(
+                    ([key, value]) => {
+                      if (key === 'execution_traces') {
+                        return (
+                          <TableRow key={key}>
+                            <TableCell>{key}</TableCell>
+                            <TableCell>
+                              <Table selectable={false} size="small" key={key}>
+                                <TableBody displayRowCheckbox={false}>
+                                  {value.map((trace) => (
+                                    <TableRow key={trace.trace_identifier}>
+                                      <TableCell>
+                                        {trace.trace_message}
+                                      </TableCell>
+                                      <TableCell>
+                                        {trace.trace_status}
+                                      </TableCell>
+                                      <TableCell>{trace.trace_time}</TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      }
                       return (
                         <TableRow key={key}>
-                          <TableCell>
-                            {key}
-                          </TableCell>
-                          <TableCell>
-                            <Table selectable={false} size="small" key={key}>
-                              <TableBody displayRowCheckbox={false}>
-                                {value.map((trace) => (
-                                  <TableRow key={trace.trace_identifier}>
-                                    <TableCell>
-                                      {trace.trace_message}
-                                    </TableCell>
-                                    <TableCell>
-                                      {trace.trace_status}
-                                    </TableCell>
-                                    <TableCell>
-                                      {trace.trace_time}
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </TableCell>
+                          <TableCell>{key}</TableCell>
+                          <TableCell>{value}</TableCell>
                         </TableRow>
                       );
-                    }
-                    return (
-                      <TableRow key={key}>
-                        <TableCell>
-                          {key}
-                        </TableCell>
-                        <TableCell>
-                          {value}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  },
-                )}
+                    },
+                  )}
               </TableBody>
             </Table>
           </DialogContent>

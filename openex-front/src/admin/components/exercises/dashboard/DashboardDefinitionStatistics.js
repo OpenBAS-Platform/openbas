@@ -10,54 +10,11 @@ import { colors, horizontalBarsChartOptions } from '../../../../utils/Charts';
 import Empty from '../../../../components/Empty';
 
 const useStyles = makeStyles((theme) => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
-  metric: {
-    position: 'relative',
-    padding: 20,
-    height: 100,
-    overflow: 'hidden',
-  },
-  title: {
-    textTransform: 'uppercase',
-    fontSize: 12,
-    fontWeight: 500,
-    color: theme.palette.text.secondary,
-  },
-  number: {
-    fontSize: 30,
-    fontWeight: 800,
-    float: 'left',
-  },
-  icon: {
-    position: 'absolute',
-    top: 25,
-    right: 15,
-  },
-  paper2: {
-    position: 'relative',
-    padding: 0,
-    overflow: 'hidden',
-    height: '100%',
-  },
   paperChart: {
     position: 'relative',
     padding: '0 20px 0 0',
     overflow: 'hidden',
     height: '100%',
-  },
-  card: {
-    width: '100%',
-    height: '100%',
-    marginBottom: 30,
-    borderRadius: 6,
-    padding: 0,
-    position: 'relative',
-  },
-  heading: {
-    display: 'flex',
   },
 }));
 
@@ -119,23 +76,21 @@ const DashboardDefinitionStatistics = ({
           {t('Distribution of injects by type')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {injectsByType.length > 0
-            ? (
-              <Chart
-                options={horizontalBarsChartOptions(theme)}
-                series={injectsByInjectTypeData}
-                type="bar"
-                width="100%"
-                height={50 + injectsByType.length * 50}
-              />
-              )
-            : (
-              <Empty
-                message={t(
-                  'No data to display or the exercise has not started yet',
-                )}
-              />
+          {injectsByType.length > 0 ? (
+            <Chart
+              options={horizontalBarsChartOptions(theme)}
+              series={injectsByInjectTypeData}
+              type="bar"
+              width="100%"
+              height={50 + injectsByType.length * 50}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
               )}
+            />
+          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={6}>
@@ -143,23 +98,21 @@ const DashboardDefinitionStatistics = ({
           {t('Distribution of injects by audience')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedAudiencesByInjectsNumber.length > 0
-            ? (
-              <Chart
-                options={horizontalBarsChartOptions(theme)}
-                series={injectsByAudienceData}
-                type="bar"
-                width="100%"
-                height={50 + sortedAudiencesByInjectsNumber.length * 50}
-              />
-              )
-            : (
-              <Empty
-                message={t(
-                  'No data to display or the exercise has not started yet',
-                )}
-              />
+          {sortedAudiencesByInjectsNumber.length > 0 ? (
+            <Chart
+              options={horizontalBarsChartOptions(theme)}
+              series={injectsByAudienceData}
+              type="bar"
+              width="100%"
+              height={50 + sortedAudiencesByInjectsNumber.length * 50}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
               )}
+            />
+          )}
         </Paper>
       </Grid>
     </Grid>

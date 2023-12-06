@@ -26,8 +26,15 @@ export const askReset = (username, locale) => (dispatch) => {
 };
 
 export const resetPassword = (token, values) => (dispatch) => {
-  const data = { password: values.password, password_validation: values.password_validation };
-  const ref = postReferential(schema.user, `/api/reset/${token}`, data)(dispatch);
+  const data = {
+    password: values.password,
+    password_validation: values.password_validation,
+  };
+  const ref = postReferential(
+    schema.user,
+    `/api/reset/${token}`,
+    data,
+  )(dispatch);
   return ref.then((finalData) => {
     if (finalData[FORM_ERROR]) {
       return finalData;

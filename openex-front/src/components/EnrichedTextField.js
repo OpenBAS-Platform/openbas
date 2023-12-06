@@ -4,11 +4,11 @@ import InputLabel from '@mui/material/InputLabel';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import Editor from 'ckeditor5-custom-build/build/ckeditor';
 import 'ckeditor5-custom-build/build/translations/fr';
-import locale from '../utils/BrowserLanguage';
-import { useHelper } from '../store';
 import { makeStyles } from '@mui/styles';
 import Typography from '@mui/material/Typography';
 import classNames from 'classnames';
+import { useHelper } from '../store';
+import locale from '../utils/BrowserLanguage';
 
 const useStyles = makeStyles((theme) => ({
   errorColor: {
@@ -57,7 +57,11 @@ const EnrichedTextFieldBase = ({
         }}
         disabled={disabled}
       />
-      {error && touched && <Typography variant="error" component="div">{error}</Typography>}
+      {error && touched && (
+        <Typography variant="error" component="div">
+          {error}
+        </Typography>
+      )}
     </div>
   );
 };

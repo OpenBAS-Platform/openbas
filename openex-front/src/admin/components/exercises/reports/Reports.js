@@ -41,23 +41,6 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     fontSize: 13,
   },
-  itemIcon: {
-    color: theme.palette.primary.main,
-  },
-  goIcon: {
-    position: 'absolute',
-    right: -10,
-  },
-  inputLabel: {
-    float: 'left',
-  },
-  sortIcon: {
-    float: 'left',
-    margin: '-5px 0 0 15px',
-  },
-  icon: {
-    color: theme.palette.primary.main,
-  },
 }));
 
 const headerStyles = {
@@ -144,7 +127,7 @@ const Reports = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={(
+            primary={
               <div>
                 {filtering.buildHeader(
                   'report_name',
@@ -159,7 +142,7 @@ const Reports = () => {
                   headerStyles,
                 )}
               </div>
-            )}
+            }
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -177,7 +160,7 @@ const Reports = () => {
                 <ContentPasteOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={(
+                primary={
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -192,7 +175,7 @@ const Reports = () => {
                       {report.report_description || t('No description')}
                     </div>
                   </div>
-                )}
+                }
               />
               <ListItemSecondaryAction>
                 <ChevronRightOutlined />

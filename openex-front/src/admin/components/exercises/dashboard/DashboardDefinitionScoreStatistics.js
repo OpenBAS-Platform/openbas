@@ -10,54 +10,11 @@ import { colors, horizontalBarsChartOptions } from '../../../../utils/Charts';
 import Empty from '../../../../components/Empty';
 
 const useStyles = makeStyles((theme) => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
-  metric: {
-    position: 'relative',
-    padding: 20,
-    height: 100,
-    overflow: 'hidden',
-  },
-  title: {
-    textTransform: 'uppercase',
-    fontSize: 12,
-    fontWeight: 500,
-    color: theme.palette.text.secondary,
-  },
-  number: {
-    fontSize: 30,
-    fontWeight: 800,
-    float: 'left',
-  },
-  icon: {
-    position: 'absolute',
-    top: 25,
-    right: 15,
-  },
-  paper2: {
-    position: 'relative',
-    padding: 0,
-    overflow: 'hidden',
-    height: '100%',
-  },
   paperChart: {
     position: 'relative',
     padding: '0 20px 0 0',
     overflow: 'hidden',
     height: '100%',
-  },
-  card: {
-    width: '100%',
-    height: '100%',
-    marginBottom: 30,
-    borderRadius: 6,
-    padding: 0,
-    position: 'relative',
-  },
-  heading: {
-    display: 'flex',
   },
 }));
 
@@ -172,23 +129,21 @@ const DashboardDefinitionScoreStatistics = ({
           {t('Distribution of expectations by inject type')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {injectTypesWithScore.length > 0
-            ? (
-              <Chart
-                options={horizontalBarsChartOptions(theme)}
-                series={expectationsByInjectTypeData}
-                type="bar"
-                width="100%"
-                height={50 + injectTypesWithScore.length * 50}
-              />
-              )
-            : (
-              <Empty
-                message={t(
-                  'No data to display or the exercise has not started yet',
-                )}
-              />
+          {injectTypesWithScore.length > 0 ? (
+            <Chart
+              options={horizontalBarsChartOptions(theme)}
+              series={expectationsByInjectTypeData}
+              type="bar"
+              width="100%"
+              height={50 + injectTypesWithScore.length * 50}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
               )}
+            />
+          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={3}>
@@ -196,23 +151,21 @@ const DashboardDefinitionScoreStatistics = ({
           {t('Distribution of expected total score by inject type')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {injectTypesWithScore.length > 0
-            ? (
-              <Chart
-                options={horizontalBarsChartOptions(theme)}
-                series={expectedScoreByInjectTypeData}
-                type="bar"
-                width="100%"
-                height={50 + injectTypesWithScore.length * 50}
-              />
-              )
-            : (
-              <Empty
-                message={t(
-                  'No data to display or the exercise has not started yet',
-                )}
-              />
+          {injectTypesWithScore.length > 0 ? (
+            <Chart
+              options={horizontalBarsChartOptions(theme)}
+              series={expectedScoreByInjectTypeData}
+              type="bar"
+              width="100%"
+              height={50 + injectTypesWithScore.length * 50}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
               )}
+            />
+          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={3}>
@@ -220,19 +173,17 @@ const DashboardDefinitionScoreStatistics = ({
           {t('Distribution of expectations by audience')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedAudiencesByExpectation.length > 0
-            ? (
-              <Chart
-                options={horizontalBarsChartOptions(theme)}
-                series={expectationsByAudienceData}
-                type="bar"
-                width="100%"
-                height={50 + sortedAudiencesByExpectation.length * 50}
-              />
-              )
-            : (
-              <Empty message={t('No audiences in this exercise.')} />
-              )}
+          {sortedAudiencesByExpectation.length > 0 ? (
+            <Chart
+              options={horizontalBarsChartOptions(theme)}
+              series={expectationsByAudienceData}
+              type="bar"
+              width="100%"
+              height={50 + sortedAudiencesByExpectation.length * 50}
+            />
+          ) : (
+            <Empty message={t('No audiences in this exercise.')} />
+          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={3}>
@@ -240,19 +191,17 @@ const DashboardDefinitionScoreStatistics = ({
           {t('Distribution of expected total score by audience')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedAudiencesByExpectedScore.length > 0
-            ? (
-              <Chart
-                options={horizontalBarsChartOptions(theme)}
-                series={expectedScoreByAudienceData}
-                type="bar"
-                width="100%"
-                height={50 + sortedAudiencesByExpectedScore.length * 50}
-              />
-              )
-            : (
-              <Empty message={t('No audiences in this exercise.')} />
-              )}
+          {sortedAudiencesByExpectedScore.length > 0 ? (
+            <Chart
+              options={horizontalBarsChartOptions(theme)}
+              series={expectedScoreByAudienceData}
+              type="bar"
+              width="100%"
+              height={50 + sortedAudiencesByExpectedScore.length * 50}
+            />
+          ) : (
+            <Empty message={t('No audiences in this exercise.')} />
+          )}
         </Paper>
       </Grid>
     </Grid>

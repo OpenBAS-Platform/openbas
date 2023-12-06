@@ -23,14 +23,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     padding: 0,
     minWidth: 0,
   },
-  message: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  messageIcon: {
-    marginRight: theme.spacing(1),
-  },
-  toolbar: theme.mixins.toolbar,
 }));
 
 const Index = () => {
@@ -41,8 +33,14 @@ const Index = () => {
         <Routes>
           <Route path="comcheck/:statusId" element={errorWrapper(Comcheck)()} />
           <Route path="reset" element={errorWrapper(Reset)()} />
-          <Route path="medias/:exerciseId/:mediaId" element={errorWrapper(Media)()} />
-          <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
+          <Route
+            path="medias/:exerciseId/:mediaId"
+            element={errorWrapper(Media)()}
+          />
+          <Route
+            path="challenges/:exerciseId"
+            element={errorWrapper(Challenges)()}
+          />
           <Route path="lessons/:exerciseId" element={errorWrapper(Lessons)()} />
           <Route path="*" element={<Login />} />
         </Routes>

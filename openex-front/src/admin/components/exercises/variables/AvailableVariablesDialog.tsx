@@ -21,10 +21,10 @@ import { UsersHelper } from '../../../../actions/helper';
 import { copyToClipboard } from '../../../../utils/CopyToClipboard';
 
 interface VariableChildItemProps {
-  hasChildren?: boolean
-  builtin?: boolean
-  variableKey: string
-  variableValue: string | undefined
+  hasChildren?: boolean;
+  builtin?: boolean;
+  variableKey: string;
+  variableValue: string | undefined;
 }
 
 const VariableChildItem: FunctionComponent<VariableChildItemProps> = ({
@@ -52,7 +52,12 @@ const VariableChildItem: FunctionComponent<VariableChildItemProps> = ({
     );
   }
   return (
-    <ListItemButton divider={true} dense={true} disabled={hasChildren} onClick={() => copyToClipboard(formattedVariableKey)}>
+    <ListItemButton
+      divider={true}
+      dense={true}
+      disabled={hasChildren}
+      onClick={() => copyToClipboard(formattedVariableKey)}
+    >
       <ListItemText
         primary={formattedVariableKey}
         secondary={builtin ? t(variableValue) : variableValue}
@@ -67,11 +72,6 @@ const useStyles = makeStyles(() => ({
     textTransform: 'none',
     height: 18,
   },
-  containerFlex: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-  },
   dialogPaper: {
     minHeight: '90vh',
     maxHeight: '90vh',
@@ -79,18 +79,15 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface AvailableVariablesDialogProps {
-  open: boolean
-  handleClose: () => void
-  exerciseId: string
-  injectType: Contract
+  open: boolean;
+  handleClose: () => void;
+  exerciseId: string;
+  injectType: Contract;
 }
 
-const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps> = ({
-  open,
-  handleClose,
-  exerciseId,
-  injectType,
-}) => {
+const AvailableVariablesDialog: FunctionComponent<
+AvailableVariablesDialogProps
+> = ({ open, handleClose, exerciseId, injectType }) => {
   const classes = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -100,18 +97,19 @@ const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps>
     setTab(newTab);
   };
 
-  const { variables, me }: { variables: [Variable], me: User } = useHelper((helper: VariablesHelper & UsersHelper) => {
-    return ({
-      variables: helper.getExerciseVariables(exerciseId),
-      me: helper.getMe(),
-    });
-  });
+  const { variables, me }: { variables: [Variable]; me: User } = useHelper(
+    (helper: VariablesHelper & UsersHelper) => {
+      return {
+        variables: helper.getExerciseVariables(exerciseId),
+        me: helper.getMe(),
+      };
+    },
+  );
   useDataLoader(() => {
     dispatch(fetchVariables(exerciseId));
   });
 
   return (
-
     <Dialog
       onClose={handleClose}
       open={open}
@@ -122,19 +120,35 @@ const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps>
       classes={{ paper: classes.dialogPaper }}
     >
       <TabContext value={tab}>
-        <TabList onChange={handleChange} style={{ marginLeft: 24, marginTop: 24 }}>
-          <Tab sx={{ textTransform: 'none' }} label={t('Builtin variables')} value="1" />
-          <Tab sx={{ textTransform: 'none' }} label={t('Custom variables')} value="2" />
+        <TabList
+          onChange={handleChange}
+          style={{ marginLeft: 24, marginTop: 24 }}
+        >
+          <Tab
+            sx={{ textTransform: 'none' }}
+            label={t('Builtin variables')}
+            value="1"
+          />
+          <Tab
+            sx={{ textTransform: 'none' }}
+            label={t('Custom variables')}
+            value="2"
+          />
         </TabList>
         <DialogContent>
-          <TabPanel value="1" style={{ maxHeight: '100%', overflow: 'auto', padding: 0 }}>
+          <TabPanel
+            value="1"
+            style={{ maxHeight: '100%', overflow: 'auto', padding: 0 }}
+          >
             <List>
               {injectType.variables.map((variable) => {
                 return (
                   <div key={variable.key}>
                     <VariableChildItem
                       builtin
-                      hasChildren={variable.children && variable.children.length > 0}
+                      hasChildren={
+                        variable.children && variable.children.length > 0
+                      }
                       variableKey={variable.key}
                       variableValue={variable.label}
                     />
@@ -165,7 +179,10 @@ const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps>
               })}
             </List>
           </TabPanel>
-          <TabPanel value="2" style={{ maxHeight: '100%', overflow: 'auto', padding: 0 }}>
+          <TabPanel
+            value="2"
+            style={{ maxHeight: '100%', overflow: 'auto', padding: 0 }}
+          >
             <Alert severity="info">
               {t('Please follow this link to')}
               {/* TODO: validate when migrate to new react router version */}
@@ -179,7 +196,9 @@ const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps>
                 size="small"
                 className={classes.button}
               >
-                {me.user_is_planner ? t('manage custom variables') : t('view custom variables')}
+                {me.user_is_planner
+                  ? t('manage custom variables')
+                  : t('view custom variables')}
               </Button>
             </Alert>
             <List>
@@ -197,12 +216,9 @@ const AvailableVariablesDialog: FunctionComponent<AvailableVariablesDialogProps>
       </TabContext>
 
       <DialogActions>
-        <Button onClick={handleClose}>
-          {t('Close')}
-        </Button>
+        <Button onClick={handleClose}>{t('Close')}</Button>
       </DialogActions>
     </Dialog>
-
   );
 };
 

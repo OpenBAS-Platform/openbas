@@ -15,9 +15,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { updateDocument, deleteDocument } from '../../../actions/Document';
 import DocumentForm from './DocumentForm';
 import inject18n from '../../../components/i18n';
-import {
-  storeHelper,
-} from '../../../actions/Schema';
+import { storeHelper } from '../../../actions/Schema';
 import { Transition } from '../../../utils/Environment';
 import { exerciseOptions, tagOptions } from '../../../utils/Option';
 

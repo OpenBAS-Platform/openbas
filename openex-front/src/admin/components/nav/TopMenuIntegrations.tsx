@@ -30,9 +30,7 @@ const TopMenuIntegrations: React.FC = () => {
         }
         size="small"
         color={
-          location.pathname === '/admin/integrations'
-            ? 'secondary'
-            : 'primary'
+          location.pathname === '/admin/integrations' ? 'secondary' : 'primary'
         }
         classes={{ root: classes.button }}
       >

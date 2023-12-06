@@ -9,10 +9,6 @@ const useStyles = makeStyles(() => ({
   container: {
     width: '100%',
   },
-  containerWithPadding: {
-    width: '100%',
-    paddingRight: 200,
-  },
   title: {
     float: 'left',
     textTransform: 'uppercase',

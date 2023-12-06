@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { makeStyles } from '@mui/styles';
+import { useTheme, makeStyles } from '@mui/styles';
+import Box from '@mui/material/Box';
 import TopBar from './components/nav/TopBar';
 import LeftBar from './components/nav/LeftBar';
 import Message from '../components/Message';
@@ -25,60 +26,74 @@ import { Theme } from '../components/Theme';
 import { LoggedHelper } from '../actions/helper';
 
 const useStyles = makeStyles<Theme>((theme) => ({
-  root: {
-    minWidth: 1280,
-    height: '100%',
-  },
-  content: {
-    height: '100%',
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.default,
-    padding: '24px 24px 24px 214px',
-    minWidth: 0,
-  },
-  message: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  messageIcon: {
-    marginRight: theme.spacing(1),
-  },
   toolbar: theme.mixins.toolbar,
 }));
 
 const Index = () => {
+  const theme = useTheme<Theme>();
   const classes = useStyles();
   const navigate = useNavigate();
   const logged = useHelper((helper: LoggedHelper) => helper.logged());
   if (logged.isOnlyPlayer) {
     navigate('/private');
   }
+  const boxSx = {
+    flexGrow: 1,
+    padding: 3,
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.easeInOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    overflowX: 'hidden',
+  };
   useDataLoader();
   return (
-    <div className={classes.root}>
-      <TopBar />
-      <LeftBar />
-      <Message />
-      <main className={classes.content} style={{ paddingRight: 24 }}>
-        <div className={classes.toolbar} />
-        <Routes>
-          <Route path="" element={errorWrapper(Dashboard)()} />
-          <Route path="profile/*" element={errorWrapper(IndexProfile)()} />
-          <Route path="exercises" element={errorWrapper(Exercises)()} />
-          <Route path="exercises/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
-          <Route path="players" element={errorWrapper(Players)()} />
-          <Route path="organizations" element={errorWrapper(Organizations)()} />
-          <Route path="documents" element={errorWrapper(Documents)()} />
-          <Route path="medias" element={errorWrapper(Medias)()} />
-          <Route path="medias/:mediaId/*" element={errorWrapper(IndexMedia)()} />
-          <Route path="challenges" element={errorWrapper(Challenges)()} />
-          <Route path="lessons" element={errorWrapper(LessonsTemplates)()} />
-          <Route path="lessons/:lessonsTemplateId/*" element={errorWrapper(IndexLessonsTemplate)()} />
-          <Route path="integrations/*" element={errorWrapper(IndexIntegrations)()} />
-          <Route path="settings/*" element={errorWrapper(IndexSettings)()} />
-        </Routes>
-      </main>
-    </div>
+    <>
+      <Box
+        sx={{
+          display: 'flex',
+          minWidth: 1400,
+        }}
+      >
+        <TopBar />
+        <LeftBar />
+        <Message />
+        <Box component="main" sx={boxSx}>
+          <div className={classes.toolbar} />
+          <Routes>
+            <Route path="" element={errorWrapper(Dashboard)()} />
+            <Route path="profile/*" element={errorWrapper(IndexProfile)()} />
+            <Route path="exercises" element={errorWrapper(Exercises)()} />
+            <Route
+              path="exercises/:exerciseId/*"
+              element={errorWrapper(IndexExercise)()}
+            />
+            <Route path="players" element={errorWrapper(Players)()} />
+            <Route
+              path="organizations"
+              element={errorWrapper(Organizations)()}
+            />
+            <Route path="documents" element={errorWrapper(Documents)()} />
+            <Route path="medias" element={errorWrapper(Medias)()} />
+            <Route
+              path="medias/:mediaId/*"
+              element={errorWrapper(IndexMedia)()}
+            />
+            <Route path="challenges" element={errorWrapper(Challenges)()} />
+            <Route path="lessons" element={errorWrapper(LessonsTemplates)()} />
+            <Route
+              path="lessons/:lessonsTemplateId/*"
+              element={errorWrapper(IndexLessonsTemplate)()}
+            />
+            <Route
+              path="integrations/*"
+              element={errorWrapper(IndexIntegrations)()}
+            />
+            <Route path="settings/*" element={errorWrapper(IndexSettings)()} />
+          </Routes>
+        </Box>
+      </Box>
+    </>
   );
 };
 

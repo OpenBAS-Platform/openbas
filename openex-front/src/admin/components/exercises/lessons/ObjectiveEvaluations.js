@@ -82,54 +82,16 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
   }
   return (
     <div>
-      {evaluations.length > 0
-        ? (
-          <List style={{ padding: 0 }}>
-            {evaluations.map((evaluation) => (
-              <ListItem key={evaluation.evaluation_id} divider={true}>
-                <ListItemIcon>
-                  <HowToVoteOutlined />
-                </ListItemIcon>
-                <ListItemText
-                  style={{ width: '50%' }}
-                  primary={resolveUserName(usersMap[evaluation.evaluation_user])}
-                />
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    width: '30%',
-                    marginRight: 1,
-                  }}
-                >
-                  <Box sx={{ width: '100%', mr: 1 }}>
-                    <LinearProgress
-                      variant="determinate"
-                      value={evaluation.evaluation_score}
-                    />
-                  </Box>
-                  <Box sx={{ minWidth: 35 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      {evaluation.evaluation_score}
-                      %
-                    </Typography>
-                  </Box>
-                </Box>
-              </ListItem>
-            ))}
-          </List>
-          )
-        : (
-          <List style={{ padding: 0 }}>
-            <ListItem divider={true}>
+      {evaluations.length > 0 ? (
+        <List style={{ padding: 0 }}>
+          {evaluations.map((evaluation) => (
+            <ListItem key={evaluation.evaluation_id} divider={true}>
               <ListItemIcon>
                 <HowToVoteOutlined />
               </ListItemIcon>
               <ListItemText
                 style={{ width: '50%' }}
-                primary={
-                  <i>{t('There is no evaluation for this objective yet')}</i>
-              }
+                primary={resolveUserName(usersMap[evaluation.evaluation_user])}
               />
               <Box
                 sx={{
@@ -140,17 +102,52 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
                 }}
               >
                 <Box sx={{ width: '100%', mr: 1 }}>
-                  <LinearProgress variant="determinate" value={0} />
+                  <LinearProgress
+                    variant="determinate"
+                    value={evaluation.evaluation_score}
+                  />
                 </Box>
                 <Box sx={{ minWidth: 35 }}>
                   <Typography variant="body2" color="text.secondary">
-                    -
+                    {evaluation.evaluation_score}%
                   </Typography>
                 </Box>
               </Box>
             </ListItem>
-          </List>
-          )}
+          ))}
+        </List>
+      ) : (
+        <List style={{ padding: 0 }}>
+          <ListItem divider={true}>
+            <ListItemIcon>
+              <HowToVoteOutlined />
+            </ListItemIcon>
+            <ListItemText
+              style={{ width: '50%' }}
+              primary={
+                <i>{t('There is no evaluation for this objective yet')}</i>
+              }
+            />
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                width: '30%',
+                marginRight: 1,
+              }}
+            >
+              <Box sx={{ width: '100%', mr: 1 }}>
+                <LinearProgress variant="determinate" value={0} />
+              </Box>
+              <Box sx={{ minWidth: 35 }}>
+                <Typography variant="body2" color="text.secondary">
+                  -
+                </Typography>
+              </Box>
+            </Box>
+          </ListItem>
+        </List>
+      )}
       {isExerciseUpdatable(exercise, true) && (
         <Box
           sx={{

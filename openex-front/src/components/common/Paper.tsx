@@ -3,7 +3,7 @@ import PaperMui from '@mui/material/Paper';
 import React, { FunctionComponent } from 'react';
 
 interface PaperProps {
-  children: React.ReactElement
+  children: React.ReactElement;
 }
 
 const useStyles = makeStyles(() => ({
@@ -14,9 +14,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Paper: FunctionComponent<PaperProps> = ({
-  children,
-}) => {
+const Paper: FunctionComponent<PaperProps> = ({ children }) => {
   const classes = useStyles();
 
   return (

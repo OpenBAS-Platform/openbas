@@ -17,16 +17,26 @@ import { isExerciseReadOnly } from '../../../utils/Exercise';
 import { useAppDispatch } from '../../../utils/hooks';
 import Transition from '../../../components/common/Transition';
 import { UpdatePlayerInput } from '../../../utils/api-types';
-import { countryOption, Option, organizationOption, tagOptions } from '../../../utils/Option';
+import {
+  countryOption,
+  Option,
+  organizationOption,
+  tagOptions,
+} from '../../../utils/Option';
 import { useHelper } from '../../../store';
-import { ExercicesHelper, OrganizationsHelper, TagsHelper, UsersHelper } from '../../../actions/helper';
+import {
+  ExercicesHelper,
+  OrganizationsHelper,
+  TagsHelper,
+  UsersHelper,
+} from '../../../actions/helper';
 import { PlayerInputForm, UserStore } from './Player';
 
 interface PlayerPopoverProps {
-  user: UserStore
-  exerciseId?: string
-  audienceId?: string
-  audienceUsersIds?: string[]
+  user: UserStore;
+  exerciseId?: string;
+  audienceId?: string;
+  audienceUsersIds?: string[];
 }
 
 const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
@@ -37,14 +47,18 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-  const { userAdmin, exercise, organizationsMap, tagsMap } = useHelper((helper: ExercicesHelper & UsersHelper & OrganizationsHelper & TagsHelper) => {
-    return ({
-      userAdmin: helper.getMe()?.user_admin,
-      exercise: helper.getExercise(exerciseId),
-      organizationsMap: helper.getOrganizationsMap(),
-      tagsMap: helper.getTagsMap(),
-    });
-  });
+  const { userAdmin, exercise, organizationsMap, tagsMap } = useHelper(
+    (
+      helper: ExercicesHelper & UsersHelper & OrganizationsHelper & TagsHelper,
+    ) => {
+      return {
+        userAdmin: helper.getMe()?.user_admin,
+        exercise: helper.getExercise(exerciseId),
+        organizationsMap: helper.getOrganizationsMap(),
+        tagsMap: helper.getTagsMap(),
+      };
+    },
+  );
 
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -74,9 +88,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
       user_country: data.user_country?.id,
       user_tags: data.user_tags?.map((tag: Option) => tag.id),
     };
-    return dispatch(
-      updatePlayer(user.user_id, inputValues),
-    ).then(() => handleCloseEdit());
+    return dispatch(updatePlayer(user.user_id, inputValues)).then(() => handleCloseEdit());
   };
 
   // Deletion
@@ -88,9 +100,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   const handleCloseDelete = () => setOpenDelete(false);
 
   const submitDelete = () => {
-    dispatch(
-      deletePlayer(user.user_id),
-    ).then(() => handleCloseDelete());
+    dispatch(deletePlayer(user.user_id)).then(() => handleCloseDelete());
   };
 
   // Remove
@@ -103,19 +113,18 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
 
   const submitRemove = () => {
     return dispatch(
-      updateAudiencePlayers(
-        exerciseId,
-        audienceId,
-        {
-          audience_users: audienceUsersIds?.filter((id) => id !== user.user_id),
-        },
-      ),
+      updateAudiencePlayers(exerciseId, audienceId, {
+        audience_users: audienceUsersIds?.filter((id) => id !== user.user_id),
+      }),
     ).then(() => handleCloseRemove());
   };
 
   const initialValues: PlayerInputForm = {
     ...user,
-    user_organization: organizationOption(user.user_organization, organizationsMap),
+    user_organization: organizationOption(
+      user.user_organization,
+      organizationsMap,
+    ),
     user_country: countryOption(user.user_country),
     user_tags: tagOptions(user.user_tags, tagsMap),
   };
@@ -123,11 +132,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   const canUpdateEmail = user.user_email !== 'admin@openex.io' && (userAdmin || !user.user_admin);
   return (
     <div>
-      <IconButton
-        onClick={handlePopoverOpen}
-        aria-haspopup="true"
-        size="large"
-      >
+      <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large">
         <MoreVert />
       </IconButton>
       <Menu
@@ -135,9 +140,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
         open={Boolean(anchorEl)}
         onClose={handlePopoverClose}
       >
-        <MenuItem onClick={handleOpenEdit}>
-          {t('Update')}
-        </MenuItem>
+        <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
         {audienceId && (
           <MenuItem
             onClick={handleOpenRemove}
@@ -147,9 +150,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
           </MenuItem>
         )}
         {canDelete && (
-          <MenuItem onClick={handleOpenDelete}>
-            {t('Delete')}
-          </MenuItem>
+          <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
         )}
       </Menu>
       <MuiDialog
@@ -164,9 +165,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDelete}>
-            {t('Cancel')}
-          </Button>
+          <Button onClick={handleCloseDelete}>{t('Cancel')}</Button>
           <Button color="secondary" onClick={submitDelete}>
             {t('Delete')}
           </Button>
@@ -197,9 +196,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseRemove}>
-            {t('Cancel')}
-          </Button>
+          <Button onClick={handleCloseRemove}>{t('Cancel')}</Button>
           <Button color="secondary" onClick={submitRemove}>
             {t('Remove')}
           </Button>

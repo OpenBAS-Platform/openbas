@@ -9,10 +9,7 @@ class UserPasswordForm extends Component {
   validate(values) {
     const { t } = this.props;
     const errors = {};
-    if (
-      !values.password
-      || values.password !== values.password_validation
-    ) {
+    if (!values.password || values.password !== values.password_validation) {
       errors.password = t('Passwords do no match');
     }
     return errors;

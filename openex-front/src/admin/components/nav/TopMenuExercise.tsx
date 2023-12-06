@@ -57,18 +57,14 @@ const TopMenuExercise: React.FC = () => {
         to={`/admin/exercises/${exerciseId}`}
         variant={
           location.pathname === `/admin/exercises/${exerciseId}`
-          || location.pathname.includes(
-              `/admin/exercises/${exerciseId}/controls`,
-          )
+          || location.pathname.includes(`/admin/exercises/${exerciseId}/controls`)
             ? 'contained'
             : 'text'
         }
         size="small"
         color={
           location.pathname === `/admin/exercises/${exerciseId}`
-          || location.pathname.includes(
-              `/admin/exercises/${exerciseId}/controls`,
-          )
+          || location.pathname.includes(`/admin/exercises/${exerciseId}/controls`)
             ? 'secondary'
             : 'primary'
         }
@@ -102,17 +98,13 @@ const TopMenuExercise: React.FC = () => {
         component={Link}
         to={`/admin/exercises/${exerciseId}/scenario`}
         variant={
-          location.pathname.includes(
-            `/admin/exercises/${exerciseId}/scenario`,
-          )
+          location.pathname.includes(`/admin/exercises/${exerciseId}/scenario`)
             ? 'contained'
             : 'text'
         }
         size="small"
         color={
-          location.pathname.includes(
-            `/admin/exercises/${exerciseId}/scenario`,
-          )
+          location.pathname.includes(`/admin/exercises/${exerciseId}/scenario`)
             ? 'secondary'
             : 'primary'
         }
@@ -124,17 +116,13 @@ const TopMenuExercise: React.FC = () => {
         component={Link}
         to={`/admin/exercises/${exerciseId}/animation/timeline`}
         variant={
-          location.pathname.includes(
-            `/admin/exercises/${exerciseId}/animation`,
-          )
+          location.pathname.includes(`/admin/exercises/${exerciseId}/animation`)
             ? 'contained'
             : 'text'
         }
         size="small"
         color={
-          location.pathname.includes(
-            `/admin/exercises/${exerciseId}/animation`,
-          )
+          location.pathname.includes(`/admin/exercises/${exerciseId}/animation`)
             ? 'secondary'
             : 'primary'
         }

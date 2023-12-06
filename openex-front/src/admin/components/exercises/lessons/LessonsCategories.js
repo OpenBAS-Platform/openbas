@@ -24,32 +24,6 @@ import { truncate } from '../../../../utils/String';
 import { updateLessonsCategoryAudiences } from '../../../../actions/Lessons';
 
 const useStyles = makeStyles((theme) => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
-  metric: {
-    position: 'relative',
-    padding: 20,
-    height: 100,
-    overflow: 'hidden',
-  },
-  title: {
-    textTransform: 'uppercase',
-    fontSize: 12,
-    fontWeight: 500,
-    color: theme.palette.text.secondary,
-  },
-  number: {
-    fontSize: 30,
-    fontWeight: 800,
-    float: 'left',
-  },
-  icon: {
-    position: 'absolute',
-    top: 25,
-    right: 15,
-  },
   paper: {
     position: 'relative',
     padding: 0,
@@ -61,23 +35,6 @@ const useStyles = makeStyles((theme) => ({
     padding: '20px 20px 0 20px',
     overflow: 'hidden',
     height: '100%',
-  },
-  paperChart: {
-    position: 'relative',
-    padding: '0 20px 0 0',
-    overflow: 'hidden',
-    height: '100%',
-  },
-  card: {
-    width: '100%',
-    height: '100%',
-    marginBottom: 30,
-    borderRadius: 6,
-    padding: 0,
-    position: 'relative',
-  },
-  heading: {
-    display: 'flex',
   },
   chip: {
     margin: '0 10px 10px 0',
@@ -220,7 +177,8 @@ const LessonsCategories = ({
                           key={question.lessonsquestion_id}
                           divider={true}
                           button={true}
-                          onClick={() => setSelectedQuestion && setSelectedQuestion(question)}
+                          onClick={() => setSelectedQuestion && setSelectedQuestion(question)
+                          }
                         >
                           <ListItemText
                             style={{ width: '50%' }}
@@ -250,8 +208,7 @@ const LessonsCategories = ({
                                 variant="body2"
                                 color="text.secondary"
                               >
-                                {consolidatedAnswer.score}
-                                %
+                                {consolidatedAnswer.score}%
                               </Typography>
                             </Box>
                           </Box>
@@ -291,13 +248,13 @@ const LessonsCategories = ({
                           onDelete={
                             isReport
                               ? undefined
-                              : () => (handleUpdateAudiences(
-                                  category.lessonscategory_id,
-                                  R.filter(
-                                    (n) => n !== audienceId,
-                                    category.lessons_category_audiences,
-                                  ),
-                                ))
+                              : () => handleUpdateAudiences(
+                                category.lessonscategory_id,
+                                R.filter(
+                                  (n) => n !== audienceId,
+                                  category.lessons_category_audiences,
+                                ),
+                              )
                           }
                           label={truncate(audience?.audience_name || '', 30)}
                           icon={<CastForEducationOutlined />}

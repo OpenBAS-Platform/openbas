@@ -41,47 +41,43 @@ const CreateLessonsCategory = (props) => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const onSubmit = (data) => {
-    return dispatch(addLessonsCategory(exerciseId, data)).then(
-      (result) => {
-        if (result.result) {
-          if (onCreate) {
-            onCreate(result.result);
-          }
-          return handleClose();
+    return dispatch(addLessonsCategory(exerciseId, data)).then((result) => {
+      if (result.result) {
+        if (onCreate) {
+          onCreate(result.result);
         }
-        return result;
-      },
-    );
+        return handleClose();
+      }
+      return result;
+    });
   };
   return (
     <div>
-      {inline === true
-        ? (
-          <ListItem
-            button={true}
-            divider={true}
-            onClick={handleOpen}
-            color="primary"
-          >
-            <ListItemIcon color="primary">
-              <ControlPointOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={t('Create a new lessons learned category')}
-              classes={{ primary: classes.text }}
-            />
-          </ListItem>
-          )
-        : (
-          <Fab
-            onClick={handleOpen}
-            color="primary"
-            aria-label="Add"
-            className={classes.createButton}
-          >
-            <Add />
-          </Fab>
-          )}
+      {inline === true ? (
+        <ListItem
+          button={true}
+          divider={true}
+          onClick={handleOpen}
+          color="primary"
+        >
+          <ListItemIcon color="primary">
+            <ControlPointOutlined color="primary" />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('Create a new lessons learned category')}
+            classes={{ primary: classes.text }}
+          />
+        </ListItem>
+      ) : (
+        <Fab
+          onClick={handleOpen}
+          color="primary"
+          aria-label="Add"
+          className={classes.createButton}
+        >
+          <Add />
+        </Fab>
+      )}
       <Dialog
         open={open}
         TransitionComponent={Transition}

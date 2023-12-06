@@ -10,9 +10,7 @@ const LoginError: FunctionComponent = () => {
     MESSAGING$.notifyError(decodeURIComponent(error));
   }
 
-  return (
-    <Message sticky={false} />
-  );
+  return <Message sticky={false} />;
 };
 
 export default LoginError;

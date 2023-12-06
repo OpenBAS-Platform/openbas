@@ -47,23 +47,6 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     fontSize: 13,
   },
-  itemIcon: {
-    color: theme.palette.primary.main,
-  },
-  goIcon: {
-    position: 'absolute',
-    right: -10,
-  },
-  inputLabel: {
-    float: 'left',
-  },
-  sortIcon: {
-    float: 'left',
-    margin: '-5px 0 0 15px',
-  },
-  icon: {
-    color: theme.palette.primary.main,
-  },
   drawerPaper: {
     minHeight: '100vh',
     width: '50%',
@@ -194,36 +177,36 @@ const Audiences = () => {
             currentTags={filtering.tags}
           />
         </div>
-        <div style={{ float: 'right', margin: '-5px 15px 0 0', maxHeight: '35px' }}>
-          {sortedAudiences.length > 0
-            ? (
-              <CSVLink
-                data={exportData(
-                  'audience',
-                  [
-                    'audience_name',
-                    'audience_description',
-                    'audience_users_number',
-                    'audience_enabled',
-                    'audience_tags',
-                  ],
-                  sortedAudiences,
-                  tagsMap,
-                )}
-                filename={`[${exercise.exercise_name}] ${t('Audiences')}.csv`}
-              >
-                <Tooltip title={t('Export this list')}>
-                  <IconButton size="large">
-                    <FileDownloadOutlined color="primary" />
-                  </IconButton>
-                </Tooltip>
-              </CSVLink>
-              )
-            : (
-              <IconButton size="large" disabled={true}>
-                <FileDownloadOutlined />
-              </IconButton>
+        <div
+          style={{ float: 'right', margin: '-5px 15px 0 0', maxHeight: '35px' }}
+        >
+          {sortedAudiences.length > 0 ? (
+            <CSVLink
+              data={exportData(
+                'audience',
+                [
+                  'audience_name',
+                  'audience_description',
+                  'audience_users_number',
+                  'audience_enabled',
+                  'audience_tags',
+                ],
+                sortedAudiences,
+                tagsMap,
               )}
+              filename={`[${exercise.exercise_name}] ${t('Audiences')}.csv`}
+            >
+              <Tooltip title={t('Export this list')}>
+                <IconButton size="large">
+                  <FileDownloadOutlined color="primary" />
+                </IconButton>
+              </Tooltip>
+            </CSVLink>
+          ) : (
+            <IconButton size="large" disabled={true}>
+              <FileDownloadOutlined />
+            </IconButton>
+          )}
         </div>
       </div>
       <div className="clearfix" />
@@ -241,7 +224,7 @@ const Audiences = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={(
+            primary={
               <div>
                 {filtering.buildHeader(
                   'audience_name',
@@ -274,7 +257,7 @@ const Audiences = () => {
                   headerStyles,
                 )}
               </div>
-            )}
+            }
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -290,7 +273,7 @@ const Audiences = () => {
               <CastForEducationOutlined />
             </ListItemIcon>
             <ListItemText
-              primary={(
+              primary={
                 <div>
                   <div
                     className={classes.bodyItem}
@@ -329,7 +312,7 @@ const Audiences = () => {
                     <ItemTags variant="list" tags={audience.audience_tags} />
                   </div>
                 </div>
-              )}
+              }
             />
             <ListItemSecondaryAction>
               <AudiencePopover

@@ -35,23 +35,6 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     fontSize: 13,
   },
-  itemIcon: {
-    color: theme.palette.primary.main,
-  },
-  goIcon: {
-    position: 'absolute',
-    right: -10,
-  },
-  inputLabel: {
-    float: 'left',
-  },
-  sortIcon: {
-    float: 'left',
-    margin: '-5px 0 0 15px',
-  },
-  icon: {
-    color: theme.palette.primary.main,
-  },
 }));
 
 const headerStyles = {
@@ -144,7 +127,7 @@ const LessonsTemplates = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={(
+            primary={
               <div>
                 {filtering.buildHeader(
                   'lessons_template_name',
@@ -159,7 +142,7 @@ const LessonsTemplates = () => {
                   headerStyles,
                 )}
               </div>
-            )}
+            }
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -177,7 +160,7 @@ const LessonsTemplates = () => {
                 <SchoolOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={(
+                primary={
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -192,7 +175,7 @@ const LessonsTemplates = () => {
                       {lessonsTemplate.lessons_template_description}
                     </div>
                   </div>
-                )}
+                }
               />
               <ListItemSecondaryAction>
                 <ChevronRightOutlined />
@@ -201,9 +184,7 @@ const LessonsTemplates = () => {
           );
         })}
       </List>
-      {
-        userAdmin && <CreateLessonsTemplate />
-      }
+      {userAdmin && <CreateLessonsTemplate />}
     </div>
   );
 };

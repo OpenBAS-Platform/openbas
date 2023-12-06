@@ -16,13 +16,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
   bar: {
     width: '100%',
   },
-  right: {
-    marginRight: theme.spacing(1),
-    padding: '2px 5px 2px 5px',
-    minHeight: 20,
-    textTransform: 'none',
-    float: 'right',
-  },
 }));
 
 const TopMenuExercises: React.FC = () => {

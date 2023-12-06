@@ -58,9 +58,6 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     fontSize: 13,
   },
-  itemIcon: {
-    color: theme.palette.primary.main,
-  },
 }));
 
 const inlineStylesHeaders = {
@@ -173,13 +170,11 @@ const ArticleForm = ({
   };
 
   const documentsSortHeader = (field, label, isSortable) => {
-    const sortComponent = documentsOrderAsc
-      ? (
-        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-        )
-      : (
-        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-        );
+    const sortComponent = documentsOrderAsc ? (
+      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+    ) : (
+      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+    );
     if (isSortable) {
       return (
         <div
@@ -309,13 +304,13 @@ const ArticleForm = ({
                   </span>
                 </ListItemIcon>
                 <ListItemText
-                  primary={(
+                  primary={
                     <div>
                       {documentsSortHeader('document_name', 'Name', true)}
                       {documentsSortHeader('document_type', 'Type', true)}
                       {documentsSortHeader('document_tags', 'Tags', true)}
                     </div>
-                  )}
+                  }
                 />
                 <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
               </ListItem>
@@ -334,7 +329,7 @@ const ArticleForm = ({
                       <AttachmentOutlined />
                     </ListItemIcon>
                     <ListItemText
-                      primary={(
+                      primary={
                         <div>
                           <div
                             className={classes.bodyItem}
@@ -361,7 +356,7 @@ const ArticleForm = ({
                             />
                           </div>
                         </div>
-                      )}
+                      }
                     />
                     <ListItemSecondaryAction>
                       <DocumentPopover

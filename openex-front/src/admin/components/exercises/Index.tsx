@@ -61,10 +61,7 @@ const Index = () => {
         <ExerciseHeader withPadding={withPadding} />
         <div className="clearfix" />
         <Routes>
-          <Route
-            path=""
-            element={errorWrapper(Exercise)()}
-          />
+          <Route path="" element={errorWrapper(Exercise)()} />
           <Route
             path="controls/dryruns/:dryrunId"
             element={errorWrapper(Dryrun)()}
@@ -77,10 +74,7 @@ const Index = () => {
             path="definition/audiences"
             element={errorWrapper(Audiences)()}
           />
-          <Route
-            path="definition/media"
-            element={errorWrapper(Articles)()}
-          />
+          <Route path="definition/media" element={errorWrapper(Articles)()} />
           <Route
             path="definition/challenges"
             element={errorWrapper(Challenges)()}
@@ -89,46 +83,22 @@ const Index = () => {
             path="definition/variables"
             element={errorWrapper(Variables)()}
           />
-          <Route
-            path="scenario"
-            element={errorWrapper(Injects)()}
-          />
-          <Route
-            path="animation/timeline"
-            element={errorWrapper(Timeline)()}
-          />
-          <Route
-            path="animation/mails"
-            element={errorWrapper(Mails)()}
-          />
+          <Route path="scenario" element={errorWrapper(Injects)()} />
+          <Route path="animation/timeline" element={errorWrapper(Timeline)()} />
+          <Route path="animation/mails" element={errorWrapper(Mails)()} />
           <Route
             path="animation/mails/:injectId"
             element={errorWrapper(MailsInject)()}
           />
-          <Route
-            path="animation/logs"
-            element={errorWrapper(Logs)()}
-          />
-          <Route
-            path="animation/chat"
-            element={errorWrapper(Chat)()}
-          />
+          <Route path="animation/logs" element={errorWrapper(Logs)()} />
+          <Route path="animation/chat" element={errorWrapper(Chat)()} />
           <Route
             path="animation/validations"
             element={errorWrapper(Validations)()}
           />
-          <Route
-            path="results/dashboard"
-            element={errorWrapper(Dashboard)()}
-          />
-          <Route
-            path="results/lessons"
-            element={errorWrapper(Lessons)()}
-          />
-          <Route
-            path="results/reports"
-            element={errorWrapper(Reports)()}
-          />
+          <Route path="results/dashboard" element={errorWrapper(Dashboard)()} />
+          <Route path="results/lessons" element={errorWrapper(Lessons)()} />
+          <Route path="results/reports" element={errorWrapper(Reports)()} />
           <Route
             path="results/reports/:reportId"
             element={errorWrapper(Report)()}

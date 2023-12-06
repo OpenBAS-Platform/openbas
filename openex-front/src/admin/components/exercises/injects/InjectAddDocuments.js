@@ -118,11 +118,19 @@ class InjectAddDocuments extends Component {
   }
 
   render() {
-    const { classes, t, documents, injectDocumentsIds, exerciseId, exercise, userAdmin } = this.props;
+    const {
+      classes,
+      t,
+      documents,
+      injectDocumentsIds,
+      exerciseId,
+      exercise,
+      userAdmin,
+    } = this.props;
     const { keyword, documentsIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-      !== -1
+        !== -1
       || (n.document_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
@@ -221,15 +229,13 @@ class InjectAddDocuments extends Component {
                       </ListItem>
                     );
                   })}
-                  {
-                    userAdmin && (
-                      <CreateDocument
-                        exerciseId={exerciseId}
-                        inline={true}
-                        onCreate={this.onCreate.bind(this)}
-                      />
-                    )
-                  }
+                  {userAdmin && (
+                    <CreateDocument
+                      exerciseId={exerciseId}
+                      inline={true}
+                      onCreate={this.onCreate.bind(this)}
+                    />
+                  )}
                 </List>
               </Grid>
               <Grid item={true} xs={4}>

@@ -58,23 +58,23 @@ const MediaOverviewMicroblogging = ({ media }) => {
       </Typography>
       <Card sx={{ width: '100%' }} style={{ marginBottom: 20 }}>
         <CardHeader
-          avatar={(
+          avatar={
             <Skeleton
               animation={false}
               variant="circular"
               width={40}
               height={40}
             />
-          )}
-          title={(
+          }
+          title={
             <Skeleton
               animation={false}
               height={10}
               width="80%"
               style={{ marginBottom: 6 }}
             />
-          )}
-          subheader={(
+          }
+          subheader={
             <React.Fragment>
               <Skeleton
                 animation={false}
@@ -83,28 +83,28 @@ const MediaOverviewMicroblogging = ({ media }) => {
               />
               <Skeleton animation={false} height={10} width="80%" />
             </React.Fragment>
-          )}
+          }
         />
       </Card>
       <Card sx={{ width: '100%' }} style={{ marginBottom: 20 }}>
         <CardHeader
-          avatar={(
+          avatar={
             <Skeleton
               animation={false}
               variant="circular"
               width={40}
               height={40}
             />
-          )}
-          title={(
+          }
+          title={
             <Skeleton
               animation={false}
               height={10}
               width="80%"
               style={{ marginBottom: 6 }}
             />
-          )}
-          subheader={(
+          }
+          subheader={
             <React.Fragment>
               <Skeleton
                 animation={false}
@@ -113,28 +113,28 @@ const MediaOverviewMicroblogging = ({ media }) => {
               />
               <Skeleton animation={false} height={10} width="80%" />
             </React.Fragment>
-          )}
+          }
         />
       </Card>
       <Card sx={{ width: '100%' }} style={{ marginBottom: 20 }}>
         <CardHeader
-          avatar={(
+          avatar={
             <Skeleton
               animation={false}
               variant="circular"
               width={40}
               height={40}
             />
-          )}
-          title={(
+          }
+          title={
             <Skeleton
               animation={false}
               height={10}
               width="80%"
               style={{ marginBottom: 6 }}
             />
-          )}
-          subheader={(
+          }
+          subheader={
             <React.Fragment>
               <Skeleton
                 animation={false}
@@ -143,7 +143,7 @@ const MediaOverviewMicroblogging = ({ media }) => {
               />
               <Skeleton animation={false} height={10} width="80%" />
             </React.Fragment>
-          )}
+          }
         />
         <Grid container={true} spacing={3}>
           <Grid item={true} xs={4}>
@@ -171,23 +171,23 @@ const MediaOverviewMicroblogging = ({ media }) => {
       </Card>
       <Card sx={{ width: '100%' }} style={{ marginBottom: 20 }}>
         <CardHeader
-          avatar={(
+          avatar={
             <Skeleton
               animation={false}
               variant="circular"
               width={40}
               height={40}
             />
-          )}
-          title={(
+          }
+          title={
             <Skeleton
               animation={false}
               height={10}
               width="80%"
               style={{ marginBottom: 6 }}
             />
-          )}
-          subheader={(
+          }
+          subheader={
             <React.Fragment>
               <Skeleton
                 animation={false}
@@ -196,28 +196,28 @@ const MediaOverviewMicroblogging = ({ media }) => {
               />
               <Skeleton animation={false} height={10} width="80%" />
             </React.Fragment>
-          )}
+          }
         />
       </Card>
       <Card sx={{ width: '100%' }} style={{ marginBottom: 20 }}>
         <CardHeader
-          avatar={(
+          avatar={
             <Skeleton
               animation={false}
               variant="circular"
               width={40}
               height={40}
             />
-          )}
-          title={(
+          }
+          title={
             <Skeleton
               animation={false}
               height={10}
               width="80%"
               style={{ marginBottom: 6 }}
             />
-          )}
-          subheader={(
+          }
+          subheader={
             <React.Fragment>
               <Skeleton
                 animation={false}
@@ -226,7 +226,7 @@ const MediaOverviewMicroblogging = ({ media }) => {
               />
               <Skeleton animation={false} height={10} width="80%" />
             </React.Fragment>
-          )}
+          }
         />
       </Card>
     </div>

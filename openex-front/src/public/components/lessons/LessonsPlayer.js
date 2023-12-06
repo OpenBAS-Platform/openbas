@@ -20,7 +20,7 @@ import { usePermissions } from '../../../utils/Exercise';
 import { fetchMe } from '../../../actions/Application';
 import Loader from '../../../components/Loader';
 import Empty from '../../../components/Empty';
-import logo from '../../../resources/images/logo.png';
+import logo from '../../../static/images/logo.png';
 import {
   addLessonsAnswers,
   fetchPlayerLessonsAnswers,
@@ -49,16 +49,6 @@ const useStyles = makeStyles(() => ({
   container: {
     margin: '0 auto',
     width: '90%',
-  },
-  card: {
-    position: 'relative',
-  },
-  footer: {
-    width: '100%',
-    position: 'absolute',
-    padding: '0 15px 0 15px',
-    left: 0,
-    bottom: 10,
   },
   paper: {
     position: 'relative',
@@ -301,7 +291,7 @@ const LessonsPlayer = () => {
                             </Grid>
                             <Grid item={true} xs={3}>
                               <Typography variant="h4">
-                                {t('What didn\'t work well')}
+                                {t("What didn't work well")}
                               </Typography>
                               <TextField
                                 disabled={lessonsAnswers.length > 0}

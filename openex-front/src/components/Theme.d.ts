@@ -1,20 +1,73 @@
-import { PaletteColorOptions, PaletteOptions, TypeBackground } from '@mui/material';
+import {
+  PaletteColorOptions,
+  PaletteOptions,
+  TypeBackground,
+} from '@mui/material';
 import { Theme as MuiTheme } from '@mui/material/styles/createTheme';
 
+declare module '@mui/material/IconButton' {
+  interface IconButtonPropsColorOverrides {
+    ee: true;
+  }
+}
+
+declare module '@mui/material/Button' {
+  interface ButtonPropsColorOverrides {
+    ee: true;
+  }
+}
+
+declare module '@mui/material/Button' {
+  interface ChipPropsColorOverrides {
+    ee: true;
+  }
+}
+
+declare module '@mui/material/SvgIcon' {
+  interface SvgIconPropsColorOverrides {
+    ee: true;
+  }
+}
+
 interface ExtendedColor extends PaletteColorOptions {
-  main: string
+  main: string;
+  dark: string;
+  palette: ExtendedPaletteOptions;
+  text: Partial<TypeText>;
+  mode: PaletteMode;
+  background: string;
+  lightBackground: string;
+  contrastText: string;
 }
 
 interface ExtendedBackground extends TypeBackground {
-  nav: string
-  navLight: string
+  nav: string;
+  accent: string;
+  shadow: string;
 }
 
 interface ExtendedPaletteOptions extends PaletteOptions {
-  background: Partial<ExtendedBackground>
-  primary: Partial<ExtendedColor>
+  common: Partial<CommonColors>;
+  background: Partial<ExtendedBackground>;
+  primary: Partial<ExtendedColor>;
+  error: Partial<ExtendedColor>;
+  success: Partial<ExtendedColor>;
+  chip: Partial<ExtendedColor>;
+  ee: Partial<ExtendedColor>;
+  secondary: Partial<ExtendedColor>;
+  mode: PaletteMode;
+}
+
+interface ExtendedThemeOptions extends ThemeOptions {
+  logo: string | null;
+  logo_collapsed: string | null;
+  palette: ExtendedPaletteOptions;
+  borderRadius: number;
 }
 
 export interface Theme extends MuiTheme {
-  palette: ExtendedPaletteOptions
+  logo: string | undefined;
+  logo_collapsed: string | undefined;
+  borderRadius: number;
+  palette: ExtendedPaletteOptions;
 }

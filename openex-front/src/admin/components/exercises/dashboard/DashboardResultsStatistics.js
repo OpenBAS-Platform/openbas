@@ -15,54 +15,11 @@ import Empty from '../../../../components/Empty';
 import { resolveUserName } from '../../../../utils/String';
 
 const useStyles = makeStyles((theme) => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
-  metric: {
-    position: 'relative',
-    padding: 20,
-    height: 100,
-    overflow: 'hidden',
-  },
-  title: {
-    textTransform: 'uppercase',
-    fontSize: 12,
-    fontWeight: 500,
-    color: theme.palette.text.secondary,
-  },
-  number: {
-    fontSize: 30,
-    fontWeight: 800,
-    float: 'left',
-  },
-  icon: {
-    position: 'absolute',
-    top: 25,
-    right: 15,
-  },
-  paper2: {
-    position: 'relative',
-    padding: 0,
-    overflow: 'hidden',
-    height: '100%',
-  },
   paperChart: {
     position: 'relative',
     padding: '0 20px 0 0',
     overflow: 'hidden',
     height: '100%',
-  },
-  card: {
-    width: '100%',
-    height: '100%',
-    marginBottom: 30,
-    borderRadius: 6,
-    padding: 0,
-    position: 'relative',
-  },
-  heading: {
-    display: 'flex',
   },
 }));
 
@@ -352,23 +309,21 @@ const DashboardDefinitionStatistics = ({
           {t('Distribution of score by audience (in % of expectations)')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedAudiencesByPercentScore.length > 0
-            ? (
-              <Chart
-                options={horizontalBarsChartOptions(theme)}
-                series={percentScoreByAudienceData}
-                type="bar"
-                width="100%"
-                height={50 + sortedAudiencesByPercentScore.length * 50}
-              />
-              )
-            : (
-              <Empty
-                message={t(
-                  'No data to display or the exercise has not started yet',
-                )}
-              />
+          {sortedAudiencesByPercentScore.length > 0 ? (
+            <Chart
+              options={horizontalBarsChartOptions(theme)}
+              series={percentScoreByAudienceData}
+              type="bar"
+              width="100%"
+              height={50 + sortedAudiencesByPercentScore.length * 50}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
               )}
+            />
+          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={8}>
@@ -376,31 +331,29 @@ const DashboardDefinitionStatistics = ({
           {t('Audiences scores over time (in % of expectations)')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {audiencesPercentScoresData.length > 0
-            ? (
-              <Chart
-                options={lineChartOptions(
-                  theme,
-                  true,
-                  nsdt,
-                  null,
-                  undefined,
-                  false,
-                  true,
-                )}
-                series={audiencesPercentScoresData}
-                type="line"
-                width="100%"
-                height={350}
-              />
-              )
-            : (
-              <Empty
-                message={t(
-                  'No data to display or the exercise has not started yet',
-                )}
-              />
+          {audiencesPercentScoresData.length > 0 ? (
+            <Chart
+              options={lineChartOptions(
+                theme,
+                true,
+                nsdt,
+                null,
+                undefined,
+                false,
+                true,
               )}
+              series={audiencesPercentScoresData}
+              type="line"
+              width="100%"
+              height={350}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
+              )}
+            />
+          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={4} style={{ marginTop: 30 }}>
@@ -408,53 +361,49 @@ const DashboardDefinitionStatistics = ({
           {t('Distribution of total score by audience')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {audiencesTotalScores.length > 0
-            ? (
-              <Chart
-                options={horizontalBarsChartOptions(theme)}
-                series={totalScoreByAudienceData}
-                type="bar"
-                width="100%"
-                height={50 + audiencesTotalScores.length * 50}
-              />
-              )
-            : (
-              <Empty
-                message={t(
-                  'No data to display or the exercise has not started yet',
-                )}
-              />
+          {audiencesTotalScores.length > 0 ? (
+            <Chart
+              options={horizontalBarsChartOptions(theme)}
+              series={totalScoreByAudienceData}
+              type="bar"
+              width="100%"
+              height={50 + audiencesTotalScores.length * 50}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
               )}
+            />
+          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={8} style={{ marginTop: 30 }}>
         <Typography variant="h4">{t('Audiences scores over time')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {audiencesScores.length > 0
-            ? (
-              <Chart
-                options={lineChartOptions(
-                  theme,
-                  true,
-                  nsdt,
-                  null,
-                  undefined,
-                  false,
-                  true,
-                )}
-                series={audiencesScores}
-                type="line"
-                width="100%"
-                height={350}
-              />
-              )
-            : (
-              <Empty
-                message={t(
-                  'No data to display or the exercise has not started yet',
-                )}
-              />
+          {audiencesScores.length > 0 ? (
+            <Chart
+              options={lineChartOptions(
+                theme,
+                true,
+                nsdt,
+                null,
+                undefined,
+                false,
+                true,
               )}
+              series={audiencesScores}
+              type="line"
+              width="100%"
+              height={350}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
+              )}
+            />
+          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={4} style={{ marginTop: 30 }}>
@@ -462,29 +411,27 @@ const DashboardDefinitionStatistics = ({
           {t('Distribution of total score by inject type')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedInjectTypesByTotalScore.length > 0
-            ? (
-              <Chart
-                options={horizontalBarsChartOptions(
-                  theme,
-                  false,
-                  null,
-                  null,
-                  true,
-                )}
-                series={totalScoreByInjectTypeData}
-                type="bar"
-                width="100%"
-                height={50 + sortedInjectTypesByTotalScore.length * 50}
-              />
-              )
-            : (
-              <Empty
-                message={t(
-                  'No data to display or the exercise has not started yet',
-                )}
-              />
+          {sortedInjectTypesByTotalScore.length > 0 ? (
+            <Chart
+              options={horizontalBarsChartOptions(
+                theme,
+                false,
+                null,
+                null,
+                true,
               )}
+              series={totalScoreByInjectTypeData}
+              type="bar"
+              width="100%"
+              height={50 + sortedInjectTypesByTotalScore.length * 50}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
+              )}
+            />
+          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={8} style={{ marginTop: 30 }}>
@@ -492,31 +439,29 @@ const DashboardDefinitionStatistics = ({
           {t('Inject types scores over time')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {injectsTypesScores.length > 0
-            ? (
-              <Chart
-                options={lineChartOptions(
-                  theme,
-                  true,
-                  nsdt,
-                  null,
-                  undefined,
-                  false,
-                  true,
-                )}
-                series={injectsTypesScores}
-                type="line"
-                width="100%"
-                height={350}
-              />
-              )
-            : (
-              <Empty
-                message={t(
-                  'No data to display or the exercise has not started yet',
-                )}
-              />
+          {injectsTypesScores.length > 0 ? (
+            <Chart
+              options={lineChartOptions(
+                theme,
+                true,
+                nsdt,
+                null,
+                undefined,
+                false,
+                true,
               )}
+              series={injectsTypesScores}
+              type="line"
+              width="100%"
+              height={350}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
+              )}
+            />
+          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={4} style={{ marginTop: 30 }}>
@@ -524,23 +469,21 @@ const DashboardDefinitionStatistics = ({
           {t('Distribution of total score by organization')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {organizationsTotalScores.length > 0
-            ? (
-              <Chart
-                options={horizontalBarsChartOptions(theme)}
-                series={totalScoreByOrganizationData}
-                type="bar"
-                width="100%"
-                height={50 + organizationsTotalScores.length * 50}
-              />
-              )
-            : (
-              <Empty
-                message={t(
-                  'No data to display or the exercise has not started yet',
-                )}
-              />
+          {organizationsTotalScores.length > 0 ? (
+            <Chart
+              options={horizontalBarsChartOptions(theme)}
+              series={totalScoreByOrganizationData}
+              type="bar"
+              width="100%"
+              height={50 + organizationsTotalScores.length * 50}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
               )}
+            />
+          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={4} style={{ marginTop: 30 }}>
@@ -548,23 +491,21 @@ const DashboardDefinitionStatistics = ({
           {t('Distribution of total score by player')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {usersTotalScores.length > 0
-            ? (
-              <Chart
-                options={horizontalBarsChartOptions(theme)}
-                series={totalScoreByUserData}
-                type="bar"
-                width="100%"
-                height={50 + usersTotalScores.length * 50}
-              />
-              )
-            : (
-              <Empty
-                message={t(
-                  'No data to display or the exercise has not started yet',
-                )}
-              />
+          {usersTotalScores.length > 0 ? (
+            <Chart
+              options={horizontalBarsChartOptions(theme)}
+              series={totalScoreByUserData}
+              type="bar"
+              width="100%"
+              height={50 + usersTotalScores.length * 50}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
               )}
+            />
+          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={4} style={{ marginTop: 30 }}>
@@ -572,29 +513,27 @@ const DashboardDefinitionStatistics = ({
           {t('Distribution of total score by inject')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {injectsTotalScores.length > 0
-            ? (
-              <Chart
-                options={horizontalBarsChartOptions(
-                  theme,
-                  false,
-                  null,
-                  null,
-                  true,
-                )}
-                series={totalScoreByInjectData}
-                type="bar"
-                width="100%"
-                height={50 + injectsTotalScores.length * 50}
-              />
-              )
-            : (
-              <Empty
-                message={t(
-                  'No data to display or the exercise has not started yet',
-                )}
-              />
+          {injectsTotalScores.length > 0 ? (
+            <Chart
+              options={horizontalBarsChartOptions(
+                theme,
+                false,
+                null,
+                null,
+                true,
               )}
+              series={totalScoreByInjectData}
+              type="bar"
+              width="100%"
+              height={50 + injectsTotalScores.length * 50}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
+              )}
+            />
+          )}
         </Paper>
       </Grid>
     </Grid>

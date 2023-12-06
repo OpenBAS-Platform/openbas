@@ -9,14 +9,17 @@ import { VariableInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 
 interface Props {
-  onSubmit: SubmitHandler<VariableInput>
-  handleClose: () => void
-  editing?: boolean
-  initialValues?: VariableInput
+  onSubmit: SubmitHandler<VariableInput>;
+  handleClose: () => void;
+  editing?: boolean;
+  initialValues?: VariableInput;
 }
 
 const VariableForm: React.FC<Props> = ({
-  onSubmit, handleClose, editing, initialValues = {
+  onSubmit,
+  handleClose,
+  editing,
+  initialValues = {
     variable_key: '',
     variable_description: '',
     variable_value: '',
@@ -31,11 +34,20 @@ const VariableForm: React.FC<Props> = ({
     formState: { errors, isDirty, isSubmitting },
   } = useForm<VariableInput>({
     mode: 'onTouched',
-    resolver: zodResolver(zodImplement<VariableInput>().with({
-      variable_key: z.string().regex(/^[a-z_]+$/, t('Invalid input. Please use only letters or underscores, and ensure the field is not empty.')),
-      variable_description: z.string().optional(),
-      variable_value: z.string().optional(),
-    })),
+    resolver: zodResolver(
+      zodImplement<VariableInput>().with({
+        variable_key: z
+          .string()
+          .regex(
+            /^[a-z_]+$/,
+            t(
+              'Invalid input. Please use only letters or underscores, and ensure the field is not empty.',
+            ),
+          ),
+        variable_description: z.string().optional(),
+        variable_value: z.string().optional(),
+      }),
+    ),
     defaultValues: initialValues,
   });
 
@@ -46,9 +58,7 @@ const VariableForm: React.FC<Props> = ({
         fullWidth={true}
         label={t('Key')}
         error={!!errors.variable_key}
-        helperText={
-          errors.variable_key && errors.variable_key?.message
-        }
+        helperText={errors.variable_key && errors.variable_key?.message}
         inputProps={register('variable_key')}
       />
       <MuiTextField
@@ -57,9 +67,7 @@ const VariableForm: React.FC<Props> = ({
         label={t('Value')}
         style={{ marginTop: 20 }}
         error={!!errors.variable_value}
-        helperText={
-          errors.variable_value && errors.variable_value?.message
-        }
+        helperText={errors.variable_value && errors.variable_value?.message}
         inputProps={register('variable_value')}
       />
       <MuiTextField

@@ -54,10 +54,18 @@ const CommunicationForm = ({ onSubmit, handleClose, initialValues }) => {
             label={t('File')}
           />
           <div style={{ float: 'right', marginTop: 20 }}>
-            <Button onClick={handleClose} style={{ marginRight: 10 }} disabled={submitting}>
+            <Button
+              onClick={handleClose}
+              style={{ marginRight: 10 }}
+              disabled={submitting}
+            >
               {t('Cancel')}
             </Button>
-            <Button color="secondary" type="submit" disabled={pristine || submitting}>
+            <Button
+              color="secondary"
+              type="submit"
+              disabled={pristine || submitting}
+            >
               {t('Send')}
             </Button>
           </div>

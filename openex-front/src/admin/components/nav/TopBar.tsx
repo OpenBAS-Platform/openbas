@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { Link, useLocation } from 'react-router-dom';
@@ -7,9 +7,8 @@ import { AccountCircleOutlined } from '@mui/icons-material';
 import Menu, { MenuProps } from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import { logout } from '../../../actions/Application';
-import logo from '../../../resources/images/logo_openex_horizontal_small.png';
 import { useFormatter } from '../../../components/i18n';
 import TopMenuDashboard from './TopMenuDashboard';
 import TopMenuSettings from './TopMenuSettings';
@@ -27,6 +26,7 @@ import TopMenuMedia from './TopMenuMedia';
 import TopMenuProfile from './TopMenuProfile';
 import { Theme } from '../../../components/Theme';
 import { useAppDispatch } from '../../../utils/hooks';
+import { MESSAGING$ } from '../../../utils/Environment.js';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   appBar: {
@@ -36,15 +36,17 @@ const useStyles = makeStyles<Theme>((theme) => ({
     backgroundColor: theme.palette.background.nav,
     paddingTop: theme.spacing(0.2),
   },
-  flex: {
-    flexGrow: 1,
-  },
   logoContainer: {
     marginLeft: -10,
   },
   logo: {
     cursor: 'pointer',
     height: 35,
+  },
+  logoCollapsed: {
+    cursor: 'pointer',
+    height: 35,
+    marginRight: 10,
   },
   menuContainer: {
     float: 'left',
@@ -57,28 +59,28 @@ const useStyles = makeStyles<Theme>((theme) => ({
     verticalAlign: 'middle',
     height: '100%',
   },
-  divider: {
-    display: 'table-cell',
-    float: 'left',
-    height: '100%',
-    margin: '0 5px 0 5px',
-  },
-  searchContainer: {
-    display: 'table-cell',
-    float: 'left',
-    marginRight: 5,
-    paddingTop: 9,
-  },
 }));
 
 const TopBar: React.FC = () => {
-  const [open, setOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<MenuProps['anchorEl']>(null);
-  const dispatch = useAppDispatch();
+  const theme = useTheme<Theme>();
   const location = useLocation();
   const classes = useStyles();
   const { t } = useFormatter();
+  const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<MenuProps['anchorEl']>(null);
+  const dispatch = useAppDispatch();
 
+  const [navOpen, setNavOpen] = useState(
+    localStorage.getItem('navOpen') === 'true',
+  );
+  useEffect(() => {
+    const sub = MESSAGING$.toggleNav.subscribe({
+      next: () => setNavOpen(localStorage.getItem('navOpen') === 'true'),
+    });
+    return () => {
+      sub.unsubscribe();
+    };
+  });
   const handleOpen = (event: React.MouseEvent) => {
     setOpen(true);
     setAnchorEl(event.currentTarget);
@@ -104,7 +106,11 @@ const TopBar: React.FC = () => {
       <Toolbar>
         <div className={classes.logoContainer}>
           <Link to="/admin">
-            <img src={`/${logo}`} alt="logo" className={classes.logo} />
+            <img
+              src={navOpen ? theme.logo : theme.logo_collapsed}
+              alt="logo"
+              className={navOpen ? classes.logo : classes.logoCollapsed}
+            />
           </Link>
         </div>
         <div className={classes.menuContainer}>
@@ -132,27 +138,21 @@ const TopBar: React.FC = () => {
           {location.pathname.includes('/admin/integrations') && (
             <TopMenuIntegrations />
           )}
-          {location.pathname.includes('/admin/settings') && (
-            <TopMenuSettings />
-          )}
-          {location.pathname.includes('/admin/profile') && (
-            <TopMenuProfile />
-          )}
+          {location.pathname.includes('/admin/settings') && <TopMenuSettings />}
+          {location.pathname.includes('/admin/profile') && <TopMenuProfile />}
         </div>
         <div className={classes.barRight}>
           <Button component={ImportUploader}>{t('Import exercise')}</Button>
           <IconButton
             onClick={handleOpen}
             size="small"
-            color={location.pathname === '/admin/profile' ? 'secondary' : 'default'}
+            color={
+              location.pathname === '/admin/profile' ? 'secondary' : 'default'
+            }
           >
             <AccountCircleOutlined />
           </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-          >
+          <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
             <MenuItem
               onClick={handleClose}
               component={Link}
@@ -160,9 +160,7 @@ const TopBar: React.FC = () => {
             >
               {t('Profile')}
             </MenuItem>
-            <MenuItem onClick={handleLogout}>
-              {t('Logout')}
-            </MenuItem>
+            <MenuItem onClick={handleLogout}>{t('Logout')}</MenuItem>
           </Menu>
         </div>
       </Toolbar>

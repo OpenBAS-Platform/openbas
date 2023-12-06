@@ -9,7 +9,7 @@ const EVENT_PING_MAX_TIME = 5000;
 let sseClient;
 let lastPingDate = new Date().getTime();
 const listeners = new Map();
-const useDataLoader = (loader = () => { }) => {
+const useDataLoader = (loader = () => {}) => {
   const sseConnect = () => {
     sseClient = new EventSource('/api/stream', { withCredentials: true });
     const autoReConnect = setInterval(() => {

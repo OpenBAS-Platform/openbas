@@ -39,14 +39,35 @@ const Root = () => {
         <CssBaseline />
         <ConnectedIntlProvider>
           <Routes>
-            <Route path="" element={logged.isOnlyPlayer ? <Navigate to="private" /> : <Navigate to="admin" />} />
+            <Route
+              path=""
+              element={
+                logged.isOnlyPlayer ? (
+                  <Navigate to="private" />
+                ) : (
+                  <Navigate to="admin" />
+                )
+              }
+            />
             <Route path="private/*" element={errorWrapper(IndexPrivate)()} />
             <Route path="admin/*" element={errorWrapper(IndexAdmin)()} />
             {/* Routes from /public/Index that need to be accessible for logged user are duplicated here */}
-            <Route path="comcheck/:statusId" element={errorWrapper(Comcheck)()} />
-            <Route path="medias/:exerciseId/:mediaId" element={errorWrapper(Media)()} />
-            <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
-            <Route path="lessons/:exerciseId" element={errorWrapper(Lessons)()} />
+            <Route
+              path="comcheck/:statusId"
+              element={errorWrapper(Comcheck)()}
+            />
+            <Route
+              path="medias/:exerciseId/:mediaId"
+              element={errorWrapper(Media)()}
+            />
+            <Route
+              path="challenges/:exerciseId"
+              element={errorWrapper(Challenges)()}
+            />
+            <Route
+              path="lessons/:exerciseId"
+              element={errorWrapper(Lessons)()}
+            />
             {/* Not found */}
             <Route path="*" element={<NotFound />} />
           </Routes>

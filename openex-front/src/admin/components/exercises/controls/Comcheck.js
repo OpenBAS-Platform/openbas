@@ -57,20 +57,6 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     fontSize: 13,
   },
-  itemIcon: {
-    color: theme.palette.primary.main,
-  },
-  goIcon: {
-    position: 'absolute',
-    right: -10,
-  },
-  inputLabel: {
-    float: 'left',
-  },
-  sortIcon: {
-    float: 'left',
-    margin: '-5px 0 0 15px',
-  },
   icon: {
     position: 'absolute',
     top: 25,
@@ -302,7 +288,11 @@ const Comcheck = () => {
                 value={
                   comcheck?.comcheck_state === 'FINISHED'
                     ? 100
-                    : progression(currentDate, Date.parse(comcheck?.comcheck_start_date), Date.parse(comcheck?.comcheck_end_date))
+                    : progression(
+                      currentDate,
+                      Date.parse(comcheck?.comcheck_start_date),
+                      Date.parse(comcheck?.comcheck_end_date),
+                    )
                 }
                 variant="determinate"
               />
@@ -350,7 +340,7 @@ const Comcheck = () => {
               </span>
             </ListItemIcon>
             <ListItemText
-              primary={(
+              primary={
                 <div>
                   {filtering.buildHeader(
                     'user_email',
@@ -389,7 +379,7 @@ const Comcheck = () => {
                     headerStyles,
                   )}
                 </div>
-              )}
+              }
             />
           </ListItem>
           {filtering.filterAndSort(players).map((user) => (
@@ -402,7 +392,7 @@ const Comcheck = () => {
                 <PersonOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={(
+                primary={
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -444,7 +434,7 @@ const Comcheck = () => {
                       />
                     </div>
                   </div>
-                )}
+                }
               />
             </ListItem>
           ))}

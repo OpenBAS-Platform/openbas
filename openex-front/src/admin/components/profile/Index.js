@@ -4,7 +4,13 @@ import * as R from 'ramda';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { fetchOrganizations } from '../../../actions/Organization';
-import { meTokens, renewToken, updateMeInformation, updateMePassword, updateMeProfile } from '../../../actions/User';
+import {
+  meTokens,
+  renewToken,
+  updateMeInformation,
+  updateMePassword,
+  updateMeProfile,
+} from '../../../actions/User';
 import UserForm from './UserForm';
 import ProfileForm from './ProfileForm';
 import PasswordForm from './PasswordForm';
@@ -51,9 +57,9 @@ const Index = () => {
   const userOrganizationValue = organizationsMap[user.user_organization];
   const userOrganization = userOrganizationValue
     ? {
-        id: userOrganizationValue.organization_id,
-        label: userOrganizationValue.organization_name,
-      }
+      id: userOrganizationValue.organization_id,
+      label: userOrganizationValue.organization_name,
+    }
     : null;
   const initialValues = R.pipe(
     R.assoc('user_organization', userOrganization),
@@ -94,8 +100,7 @@ const Index = () => {
           initialValues={initialValues}
         />
       </Paper>
-      {!initialValues.user_is_external
-      && (
+      {!initialValues.user_is_external && (
         <Paper>
           <Typography variant="h1" style={{ marginBottom: 20 }}>
             {t('Password')}
@@ -110,10 +115,8 @@ const Index = () => {
         <Typography variant="body1">
           {t(
             'The OpenEx API relies on the REST standard. The token must be passed into the HTTP header',
-          )}
-          {' '}
-          <strong>Authorization</strong>
-          .
+          )}{' '}
+          <strong>Authorization</strong>.
           <Typography
             variant="h4"
             gutterBottom={true}
@@ -142,9 +145,7 @@ const Index = () => {
             <br />
             Content-Type: application/json
             <br />
-            Authorization: Bearer
-            {' '}
-            {userToken?.token_value}
+            Authorization: Bearer {userToken?.token_value}
           </pre>
         </Typography>
         <Button

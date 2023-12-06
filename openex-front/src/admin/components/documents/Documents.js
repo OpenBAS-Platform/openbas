@@ -199,13 +199,11 @@ class Documents extends Component {
   sortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { orderAsc, sortBy } = this.state;
-    const sortComponent = orderAsc
-      ? (
-        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-        )
-      : (
-        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-        );
+    const sortComponent = orderAsc ? (
+      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+    ) : (
+      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+    );
     if (isSortable) {
       return (
         <div
@@ -267,37 +265,35 @@ class Documents extends Component {
             />
           </div>
           <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
-            {sortedDocuments.length > 0
-              ? (
-                <CSVLink
-                  data={exportData(
-                    'document',
-                    [
-                      'document_name',
-                      'document_description',
-                      'document_exercises',
-                      'document_type',
-                      'document_tags',
-                    ],
-                    sortedDocuments,
-                    tagsMap,
-                    null,
-                    exercisesMap,
-                  )}
-                  filename={`${t('Documents')}.csv`}
-                >
-                  <Tooltip title={t('Export this list')}>
-                    <IconButton size="large">
-                      <FileDownloadOutlined color="primary" />
-                    </IconButton>
-                  </Tooltip>
-                </CSVLink>
-                )
-              : (
-                <IconButton size="large" disabled={true}>
-                  <FileDownloadOutlined />
-                </IconButton>
+            {sortedDocuments.length > 0 ? (
+              <CSVLink
+                data={exportData(
+                  'document',
+                  [
+                    'document_name',
+                    'document_description',
+                    'document_exercises',
+                    'document_type',
+                    'document_tags',
+                  ],
+                  sortedDocuments,
+                  tagsMap,
+                  null,
+                  exercisesMap,
                 )}
+                filename={`${t('Documents')}.csv`}
+              >
+                <Tooltip title={t('Export this list')}>
+                  <IconButton size="large">
+                    <FileDownloadOutlined color="primary" />
+                  </IconButton>
+                </Tooltip>
+              </CSVLink>
+            ) : (
+              <IconButton size="large" disabled={true}>
+                <FileDownloadOutlined />
+              </IconButton>
+            )}
           </div>
         </div>
         <div className="clearfix" />
@@ -320,7 +316,7 @@ class Documents extends Component {
               </span>
             </ListItemIcon>
             <ListItemText
-              primary={(
+              primary={
                 <div>
                   {this.sortHeader('document_name', 'Name', true)}
                   {this.sortHeader('document_description', 'Description', true)}
@@ -328,7 +324,7 @@ class Documents extends Component {
                   {this.sortHeader('document_type', 'Type', true)}
                   {this.sortHeader('document_tags', 'Tags', true)}
                 </div>
-              )}
+              }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
@@ -345,7 +341,7 @@ class Documents extends Component {
                 <DescriptionOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={(
+                primary={
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -359,12 +355,18 @@ class Documents extends Component {
                     >
                       {document.document_description}
                     </div>
-                    <div className={classes.bodyItem} style={inlineStyles.document_exercises}>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.document_exercises}
+                    >
                       {R.take(3, document.document_exercises).map((e) => {
                         const exercise = exercisesMap[e];
                         if (exercise === undefined) return <div />;
                         return (
-                          <Tooltip key={exercise.exercise_id} title={exercise.exercise_name}>
+                          <Tooltip
+                            key={exercise.exercise_id}
+                            title={exercise.exercise_name}
+                          >
                             <Chip
                               icon={<RowingOutlined style={{ fontSize: 12 }} />}
                               classes={{ root: classes.exercise }}
@@ -394,7 +396,7 @@ class Documents extends Component {
                       <ItemTags variant="list" tags={document.document_tags} />
                     </div>
                   </div>
-                )}
+                }
               />
               <ListItemSecondaryAction>
                 <DocumentPopover

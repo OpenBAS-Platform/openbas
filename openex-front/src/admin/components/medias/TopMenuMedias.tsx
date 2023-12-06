@@ -27,9 +27,7 @@ const TopMenuMedia: React.FC = () => {
         to="/admin/medias"
         variant={location.pathname === '/admin/medias' ? 'contained' : 'text'}
         size="small"
-        color={
-          location.pathname === '/admin/medias' ? 'secondary' : 'primary'
-        }
+        color={location.pathname === '/admin/medias' ? 'secondary' : 'primary'}
         classes={{ root: classes.button }}
       >
         {t('Medias')}

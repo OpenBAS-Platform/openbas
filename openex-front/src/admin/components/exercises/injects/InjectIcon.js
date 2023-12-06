@@ -14,7 +14,7 @@ import {
   NewspaperVariantMultipleOutline,
   Twitter,
 } from 'mdi-material-ui';
-import Airbus from '../../../../resources/images/contracts/airbus.png';
+import Airbus from '../../../../static/images/contracts/airbus.png';
 import CustomTooltip from '../../../../components/CustomTooltip';
 
 const iconSelector = (type, variant, fontSize, done, disabled) => {

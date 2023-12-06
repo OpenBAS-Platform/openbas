@@ -28,9 +28,7 @@ const initStore = () => {
     return createStore(
       createRootReducer(routerReducer),
       initialState,
-      composeWithDevTools(
-        applyMiddleware(routerMiddleware, thunk),
-      ),
+      composeWithDevTools(applyMiddleware(routerMiddleware, thunk)),
     );
   }
   return createStore(

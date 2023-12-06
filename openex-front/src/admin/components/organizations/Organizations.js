@@ -170,13 +170,11 @@ class Organizations extends Component {
   sortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { orderAsc, sortBy } = this.state;
-    const sortComponent = orderAsc
-      ? (
-        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-        )
-      : (
-        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-        );
+    const sortComponent = orderAsc ? (
+      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+    ) : (
+      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+    );
     if (isSortable) {
       return (
         <div
@@ -237,33 +235,31 @@ class Organizations extends Component {
             />
           </div>
           <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
-            {sortedOrganizations.length > 0
-              ? (
-                <CSVLink
-                  data={exportData(
-                    'organization',
-                    [
-                      'organization_name',
-                      'organization_description',
-                      'organization_tags',
-                    ],
-                    sortedOrganizations,
-                    tagsMap,
-                  )}
-                  filename={`${t('Organizations')}.csv`}
-                >
-                  <Tooltip title={t('Export this list')}>
-                    <IconButton size="large">
-                      <FileDownloadOutlined color="primary" />
-                    </IconButton>
-                  </Tooltip>
-                </CSVLink>
-                )
-              : (
-                <IconButton size="large" disabled={true}>
-                  <FileDownloadOutlined />
-                </IconButton>
+            {sortedOrganizations.length > 0 ? (
+              <CSVLink
+                data={exportData(
+                  'organization',
+                  [
+                    'organization_name',
+                    'organization_description',
+                    'organization_tags',
+                  ],
+                  sortedOrganizations,
+                  tagsMap,
                 )}
+                filename={`${t('Organizations')}.csv`}
+              >
+                <Tooltip title={t('Export this list')}>
+                  <IconButton size="large">
+                    <FileDownloadOutlined color="primary" />
+                  </IconButton>
+                </Tooltip>
+              </CSVLink>
+            ) : (
+              <IconButton size="large" disabled={true}>
+                <FileDownloadOutlined />
+              </IconButton>
+            )}
           </div>
         </div>
         <div className="clearfix" />
@@ -285,7 +281,7 @@ class Organizations extends Component {
               </div>
             </ListItemIcon>
             <ListItemText
-              primary={(
+              primary={
                 <div>
                   {this.sortHeader('organization_name', 'Name', true)}
                   {this.sortHeader(
@@ -295,7 +291,7 @@ class Organizations extends Component {
                   )}
                   {this.sortHeader('organization_tags', 'Tags', true)}
                 </div>
-              )}
+              }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
@@ -309,7 +305,7 @@ class Organizations extends Component {
                 <DomainOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={(
+                primary={
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -336,7 +332,7 @@ class Organizations extends Component {
                       />
                     </div>
                   </div>
-                )}
+                }
               />
               <ListItemSecondaryAction>
                 <OrganizationPopover
@@ -347,7 +343,7 @@ class Organizations extends Component {
             </ListItem>
           ))}
         </List>
-        { this.props.userAdmin && <CreateOrganization /> }
+        {this.props.userAdmin && <CreateOrganization />}
       </div>
     );
   }

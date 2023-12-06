@@ -66,29 +66,6 @@ const useStyles = makeStyles((theme) => ({
     top: 25,
     right: 15,
   },
-  paper2: {
-    position: 'relative',
-    padding: 0,
-    overflow: 'hidden',
-    height: '100%',
-  },
-  paperChart: {
-    position: 'relative',
-    padding: '0 20px 0 0',
-    overflow: 'hidden',
-    height: '100%',
-  },
-  card: {
-    width: '100%',
-    height: '100%',
-    marginBottom: 30,
-    borderRadius: 6,
-    padding: 0,
-    position: 'relative',
-  },
-  heading: {
-    display: 'flex',
-  },
   head: {
     margin: '20 auto',
     textAlign: 'center',

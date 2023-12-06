@@ -33,34 +33,6 @@ const useStyles = makeStyles((theme) => ({
     margin: '10px 0 50px 0',
     padding: '0 200px 0 0',
   },
-  metric: {
-    position: 'relative',
-    padding: 20,
-    height: 100,
-    overflow: 'hidden',
-  },
-  title: {
-    textTransform: 'uppercase',
-    fontSize: 12,
-    fontWeight: 500,
-    color: theme.palette.text.secondary,
-  },
-  number: {
-    fontSize: 30,
-    fontWeight: 800,
-    float: 'left',
-  },
-  icon: {
-    position: 'absolute',
-    top: 25,
-    right: 15,
-  },
-  paper: {
-    position: 'relative',
-    padding: 0,
-    overflow: 'hidden',
-    height: '100%',
-  },
   card: {
     width: '100%',
     height: '100%',
@@ -149,7 +121,7 @@ const Logs = () => {
                 borderBottom: `1px solid ${theme.palette.divider}`,
               }}
               action={<LogPopover exerciseId={exerciseId} log={log} />}
-              title={(
+              title={
                 <div>
                   <div
                     style={{
@@ -165,9 +137,7 @@ const Logs = () => {
                     </strong>
                     &nbsp;
                     <span style={{ color: theme.palette.text.secondary }}>
-                      {t('added an entry on')}
-                      {' '}
-                      {nsdt(log.log_created_at)}
+                      {t('added an entry on')} {nsdt(log.log_created_at)}
                     </span>
                   </div>
                   <div
@@ -181,7 +151,7 @@ const Logs = () => {
                     <ItemTags tags={log.log_tags} />
                   </div>
                 </div>
-              )}
+              }
             />
             <CardContent>
               <strong>{log.log_title}</strong>

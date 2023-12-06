@@ -10,7 +10,10 @@ const LessonsTemplateCategoryForm = (props) => {
   // Functions
   const validate = (values) => {
     const errors = {};
-    const requiredFields = ['lessons_template_category_name', 'lessons_template_category_order'];
+    const requiredFields = [
+      'lessons_template_category_name',
+      'lessons_template_category_order',
+    ];
     requiredFields.forEach((field) => {
       if (!values[field]) {
         errors[field] = t('This field is required.');

@@ -37,35 +37,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: '100%',
     fontSize: 13,
   },
-  itemIcon: {
-    color: theme.palette.primary.main,
-  },
-  goIcon: {
-    position: 'absolute',
-    right: -10,
-  },
-  inputLabel: {
-    float: 'left',
-  },
-  sortIcon: {
-    float: 'left',
-    margin: '-5px 0 0 15px',
-  },
-  icon: {
-    color: theme.palette.primary.main,
-  },
-  drawerPaper: {
-    minHeight: '100vh',
-    width: '50%',
-    padding: 0,
-  },
 }));
 
 const headerStyles: {
-  iconSort: CSSProperties
-  variable_key: CSSProperties
-  variable_description: CSSProperties
-  variable_value: CSSProperties
+  iconSort: CSSProperties;
+  variable_key: CSSProperties;
+  variable_description: CSSProperties;
+  variable_value: CSSProperties;
 } = {
   iconSort: {
     position: 'absolute',
@@ -94,9 +72,9 @@ const headerStyles: {
 };
 
 const inlineStyles: {
-  variable_key: CSSProperties
-  variable_description: CSSProperties
-  variable_value: CSSProperties
+  variable_key: CSSProperties;
+  variable_description: CSSProperties;
+  variable_value: CSSProperties;
 } = {
   variable_key: {
     float: 'left',
@@ -135,11 +113,11 @@ const Variables = () => {
   ]);
   // Fetching data
   const { exerciseId } = useParams<'exerciseId'>();
-  const { exercise, variables }: { exercise: Exercise, variables: [Variable] } = useHelper((helper: VariablesHelper & ExercicesHelper) => {
-    return ({
+  const { exercise, variables }: { exercise: Exercise; variables: [Variable] } = useHelper((helper: VariablesHelper & ExercicesHelper) => {
+    return {
       exercise: helper.getExercise(exerciseId),
       variables: helper.getExerciseVariables(exerciseId),
-    });
+    };
   });
   useDataLoader(() => {
     dispatch(fetchVariables(exerciseId));
@@ -175,7 +153,7 @@ const Variables = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={(
+            primary={
               <div>
                 {filtering.buildHeader(
                   'variable_key',
@@ -196,7 +174,7 @@ const Variables = () => {
                   headerStyles,
                 )}
               </div>
-            )}
+            }
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -210,7 +188,7 @@ const Variables = () => {
               <AttachMoneyOutlined />
             </ListItemIcon>
             <ListItemText
-              primary={(
+              primary={
                 <div>
                   <div
                     className={classes.bodyItem}
@@ -231,7 +209,7 @@ const Variables = () => {
                     {variable.variable_value}
                   </div>
                 </div>
-              )}
+              }
             />
             <ListItemSecondaryAction>
               <VariablePopover
@@ -243,7 +221,9 @@ const Variables = () => {
           </ListItem>
         ))}
       </List>
-      {permissions.canWrite && exerciseId && <CreateVariable exerciseId={exerciseId} />}
+      {permissions.canWrite && exerciseId && (
+        <CreateVariable exerciseId={exerciseId} />
+      )}
     </div>
   );
 };

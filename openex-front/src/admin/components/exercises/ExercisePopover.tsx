@@ -35,7 +35,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface ExercisePopoverProps {
-  exercise: Exercise
+  exercise: Exercise;
 }
 
 const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
@@ -70,9 +70,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleCloseEdit = () => setOpenEdit(false);
 
   const onSubmitEdit = (data: ExerciseUpdateInput) => {
-    return dispatch(
-      updateExercise(exercise.exercise_id, data),
-    ).then(() => handleCloseEdit());
+    return dispatch(updateExercise(exercise.exercise_id, data)).then(() => handleCloseEdit());
   };
 
   // Deletion
@@ -84,9 +82,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleCloseDelete = () => setOpenDelete(false);
 
   const submitDelete = () => {
-    dispatch(
-      deleteExercise(exercise.exercise_id),
-    ).then(() => handleCloseDelete());
+    dispatch(deleteExercise(exercise.exercise_id)).then(() => handleCloseDelete());
     navigate('/admin/exercises');
   };
 
@@ -141,9 +137,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         >
           {t('Update')}
         </MenuItem>
-        <MenuItem onClick={handleOpenExport}>
-          {t('Export')}
-        </MenuItem>
+        <MenuItem onClick={handleOpenExport}>{t('Export')}</MenuItem>
         <MenuItem
           onClick={handleOpenDelete}
           disabled={isExerciseReadOnly(exercise, true)}
@@ -163,9 +157,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDelete}>
-            {t('Cancel')}
-          </Button>
+          <Button onClick={handleCloseDelete}>{t('Cancel')}</Button>
           <Button color="secondary" onClick={submitDelete}>
             {t('Delete')}
           </Button>
@@ -201,9 +193,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
             <Table aria-label="export table" size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>
-                    {t('Elements')}
-                  </TableCell>
+                  <TableCell>{t('Elements')}</TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
                     {t('Export')}
                   </TableCell>
@@ -219,17 +209,13 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>
-                    {t('Audiences')}
-                  </TableCell>
+                  <TableCell>{t('Audiences')}</TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
                     <Checkbox checked={true} disabled={true} />
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>
-                    {t('Players')}
-                  </TableCell>
+                  <TableCell>{t('Players')}</TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
                     <Checkbox
                       checked={exportPlayers}
@@ -238,9 +224,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>
-                    {t('Variables with values')}
-                  </TableCell>
+                  <TableCell>{t('Variables with values')}</TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
                     <Checkbox
                       checked={exportVariableValues}
@@ -253,9 +237,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
           </TableContainer>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseExport}>
-            {t('Cancel')}
-          </Button>
+          <Button onClick={handleCloseExport}>{t('Cancel')}</Button>
           <Button color="secondary" onClick={submitExport}>
             {t('Export')}
           </Button>

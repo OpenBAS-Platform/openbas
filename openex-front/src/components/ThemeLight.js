@@ -1,5 +1,10 @@
+import LogoText from '../static/images/logo_text.png';
+import LogoCollapsed from '../static/images/logo.png';
+import { fileUri } from '../utils/Environment.js';
+
 export default (
   logo = null,
+  logo_collapsed = null,
   background = null,
   paper = null,
   nav = null,
@@ -7,7 +12,8 @@ export default (
   secondary = null,
   accent = null,
 ) => ({
-  logo: logo || `${window.BASE_PATH}/static/logo_text.png`,
+  logo: logo || fileUri(LogoText),
+  logo_collapsed: logo_collapsed || fileUri(LogoCollapsed),
   palette: {
     mode: 'light',
     primary: { main: primary || '#007fff' },
@@ -78,6 +84,9 @@ export default (
       styleOverrides: {
         tooltip: {
           backgroundColor: 'rgba(0,0,0,0.7)',
+        },
+        arrow: {
+          color: 'rgba(0,0,0,0.7)',
         },
       },
     },

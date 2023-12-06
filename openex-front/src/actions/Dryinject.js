@@ -7,7 +7,7 @@ export const fetchDryinjects = (exerciseId, dryrunId) => (dispatch) => {
 };
 
 export const dryinjectDone = (dryinjectId) => (dispatch) => {
-  const data = { status: 'SUCCESS', message: '[\'Manual validation\']' };
+  const data = { status: 'SUCCESS', message: "['Manual validation']" };
   const uri = `/api/dryinjects/${dryinjectId}/status`;
   return postReferential(null, uri, data)(dispatch);
 };

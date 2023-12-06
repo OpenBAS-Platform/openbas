@@ -19,13 +19,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     padding: '24px 24px 24px 204px',
     minWidth: 0,
   },
-  message: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  messageIcon: {
-    marginRight: theme.spacing(1),
-  },
   toolbar: theme.mixins.toolbar,
 }));
 

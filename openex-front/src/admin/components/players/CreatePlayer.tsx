@@ -28,8 +28,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface CreatePlayerProps {
-  inline: boolean
-  onCreate: (result: string) => void
+  inline: boolean;
+  onCreate: (result: string) => void;
 }
 
 const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
@@ -52,47 +52,41 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
       user_country: data.user_country?.id,
       user_tags: data.user_tags?.map((tag: Option) => tag.id),
     };
-    return dispatch(
-      addPlayer(inputValues),
-    ).then((result: { result: string }) => {
-      if (result.result) {
-        if (onCreate) {
-          onCreate(result.result);
+    return dispatch(addPlayer(inputValues)).then(
+      (result: { result: string }) => {
+        if (result.result) {
+          if (onCreate) {
+            onCreate(result.result);
+          }
+          return handleClose();
         }
-        return handleClose();
-      }
-      return result;
-    });
+        return result;
+      },
+    );
   };
 
   return (
     <div>
-      {inline
-        ? (
-          <ListItemButton
-            divider={true}
-            onClick={handleOpen}
-            color="primary"
-          >
-            <ListItemIcon color="primary">
-              <ControlPointOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={t('Create a new player')}
-              classes={{ primary: classes.text }}
-            />
-          </ListItemButton>
-          )
-        : (
-          <Fab
-            onClick={handleOpen}
-            color="primary"
-            aria-label="Add"
-            className={classes.createButton}
-          >
-            <Add />
-          </Fab>
-          )}
+      {inline ? (
+        <ListItemButton divider={true} onClick={handleOpen} color="primary">
+          <ListItemIcon color="primary">
+            <ControlPointOutlined color="primary" />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('Create a new player')}
+            classes={{ primary: classes.text }}
+          />
+        </ListItemButton>
+      ) : (
+        <Fab
+          onClick={handleOpen}
+          color="primary"
+          aria-label="Add"
+          className={classes.createButton}
+        >
+          <Add />
+        </Fab>
+      )}
       <Dialog
         open={openDialog}
         handleClose={handleClose}

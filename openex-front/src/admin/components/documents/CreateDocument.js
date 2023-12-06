@@ -39,7 +39,9 @@ const CreateDocument = (props) => {
     )(data);
     const formData = new FormData();
     formData.append('file', data.document_file[0]);
-    const blob = new Blob([JSON.stringify(inputValues)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(inputValues)], {
+      type: 'application/json',
+    });
     formData.append('input', blob);
     return props.addDocument(formData).then((result) => {
       if (result.result) {
@@ -53,33 +55,31 @@ const CreateDocument = (props) => {
   };
   return (
     <div>
-      {inline === true
-        ? (
-          <ListItem
-            button={true}
-            divider={true}
-            onClick={() => setOpen(true)}
-            color="primary"
-          >
-            <ListItemIcon color="primary">
-              <ControlPointOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={t('Create a new document')}
-              classes={{ primary: classes.text }}
-            />
-          </ListItem>
-          )
-        : (
-          <Fab
-            onClick={() => setOpen(true)}
-            color="primary"
-            aria-label="Add"
-            className={classes.createButton}
-          >
-            <Add />
-          </Fab>
-          )}
+      {inline === true ? (
+        <ListItem
+          button={true}
+          divider={true}
+          onClick={() => setOpen(true)}
+          color="primary"
+        >
+          <ListItemIcon color="primary">
+            <ControlPointOutlined color="primary" />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('Create a new document')}
+            classes={{ primary: classes.text }}
+          />
+        </ListItem>
+      ) : (
+        <Fab
+          onClick={() => setOpen(true)}
+          color="primary"
+          aria-label="Add"
+          className={classes.createButton}
+        >
+          <Add />
+        </Fab>
+      )}
       <Dialog
         open={open}
         TransitionComponent={Transition}

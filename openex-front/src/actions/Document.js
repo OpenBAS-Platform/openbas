@@ -28,7 +28,5 @@ export const deleteDocument = (documentId) => (dispatch) => {
 
 export const fetchPlayerDocuments = (exerciseId, userId = null) => (dispatch) => getReferential(
   schema.arrayOfDocuments,
-  `/api/player/${exerciseId}/documents${
-    userId ? `?userId=${userId}` : ''
-  }`,
+  `/api/player/${exerciseId}/documents${userId ? `?userId=${userId}` : ''}`,
 )(dispatch);

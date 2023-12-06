@@ -5,7 +5,7 @@ import withStyles from '@mui/styles/withStyles';
 import Paper from '@mui/material/Paper';
 import * as R from 'ramda';
 import Box from '@mui/material/Box';
-import logo from '../../../resources/images/logo.png';
+import logo from '../../../static/images/logo.png';
 import {
   askToken,
   checkKerberos,
@@ -36,10 +36,20 @@ const styles = () => ({
 
 const Login = (props) => {
   const { classes, parameters, t } = props;
-  const { auth_openid_enable: isOpenId, auth_saml2_enable: isSaml2, auth_local_enable: isLocal } = parameters;
-  const { platform_openid_providers: openidProviders, platform_saml2_providers: saml2Providers } = parameters;
+  const {
+    auth_openid_enable: isOpenId,
+    auth_saml2_enable: isSaml2,
+    auth_local_enable: isLocal,
+  } = parameters;
+  const {
+    platform_openid_providers: openidProviders,
+    platform_saml2_providers: saml2Providers,
+  } = parameters;
   const [reset, setReset] = useState(false);
-  const [dimension, setDimension] = useState({ width: window.innerWidth, height: window.innerHeight });
+  const [dimension, setDimension] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
   const updateWindowDimensions = () => setDimension({ width: window.innerWidth, height: window.innerHeight });
   useEffect(() => {
     window.addEventListener('resize', updateWindowDimensions);
@@ -54,7 +64,7 @@ const Login = (props) => {
   let loginHeight = 260;
   if ((isOpenId || isSaml2) && isLocal) {
     loginHeight = 350;
-  } else if ((isOpenId || isSaml2)) {
+  } else if (isOpenId || isSaml2) {
     loginHeight = 150;
   }
   const marginTop = dimension.height / 2 - loginHeight / 2 - 200;
@@ -70,15 +80,25 @@ const Login = (props) => {
         </Paper>
       )}
       {isLocal && reset && <Reset onCancel={() => setReset(false)} />}
-      <Box sx={{ marginTop: 2.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2.5 }}>
+      <Box
+        sx={{
+          marginTop: 2.5,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 2.5,
+        }}
+      >
         {(isOpenId || isSaml2)
-        && ([...(openidProviders ?? []), ...(saml2Providers ?? [])]).map((provider) => (
-          <LoginSSOButton
-            key={provider.provider_name}
-            providerName={provider.provider_login}
-            providerUri={provider.provider_uri}
-          />
-        ))}
+        && [...(openidProviders ?? []), ...(saml2Providers ?? [])].map(
+            (provider) => (
+              <LoginSSOButton
+                key={provider.provider_name}
+                providerName={provider.provider_login}
+                providerUri={provider.provider_uri}
+              />
+            ),
+          )}
         <LoginError />
       </Box>
     </div>

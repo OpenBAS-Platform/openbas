@@ -157,11 +157,7 @@ const ArticlePopover = ({ exercise, article, documents, onRemoveArticle }) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={handleCloseRemove}
-          >
-            {t('Cancel')}
-          </Button>
+          <Button onClick={handleCloseRemove}>{t('Cancel')}</Button>
           <Button color="secondary" onClick={submitRemove}>
             {t('Remove')}
           </Button>

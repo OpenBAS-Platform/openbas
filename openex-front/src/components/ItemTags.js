@@ -14,10 +14,6 @@ const Transition = React.forwardRef((props, ref) => (
 Transition.displayName = 'TransitionSlide';
 
 const useStyles = makeStyles(() => ({
-  tags: {
-    margin: 0,
-    padding: 0,
-  },
   tag: {
     height: 25,
     fontSize: 12,
@@ -33,10 +29,6 @@ const useStyles = makeStyles(() => ({
     height: 25,
     fontSize: 12,
     margin: '0 7px 0 0',
-  },
-  tagInput: {
-    margin: '4px 0 0 10px',
-    float: 'right',
   },
 }));
 
@@ -59,39 +51,37 @@ const ItemTags = (props) => {
   const orderedTags = R.sortWith([R.ascend(R.prop('tag_name'))], resolvedTags);
   return (
     <div>
-      {orderedTags.length > 0
-        ? (
-            R.map(
-              (tag) => (
-                <Chip
-                  key={tag.tag_id}
-                  variant="outlined"
-                  classes={{ root: style }}
-                  label={tag.tag_name}
-                  style={{
-                    color: tag.tag_color,
-                    borderColor: tag.tag_color,
-                    backgroundColor: hexToRGB(tag.tag_color),
-                  }}
-                />
-              ),
-              R.take(3, orderedTags),
-            )
-          )
-        : (
-          <Chip
-            classes={{ root: style }}
-            variant="outlined"
-            label={t('No tag')}
-            style={{
-              color: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
-              borderColor: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
-              backgroundColor: hexToRGB(
-                theme.palette.mode === 'dark' ? '#ffffff' : 'transparent',
-              ),
-            }}
-          />
-          )}
+      {orderedTags.length > 0 ? (
+        R.map(
+          (tag) => (
+            <Chip
+              key={tag.tag_id}
+              variant="outlined"
+              classes={{ root: style }}
+              label={tag.tag_name}
+              style={{
+                color: tag.tag_color,
+                borderColor: tag.tag_color,
+                backgroundColor: hexToRGB(tag.tag_color),
+              }}
+            />
+          ),
+          R.take(3, orderedTags),
+        )
+      ) : (
+        <Chip
+          classes={{ root: style }}
+          variant="outlined"
+          label={t('No tag')}
+          style={{
+            color: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
+            borderColor: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
+            backgroundColor: hexToRGB(
+              theme.palette.mode === 'dark' ? '#ffffff' : 'transparent',
+            ),
+          }}
+        />
+      )}
     </div>
   );
 };

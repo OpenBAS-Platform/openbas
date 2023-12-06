@@ -12,9 +12,6 @@ import { useFormatter } from './i18n';
 import { useHelper } from '../store';
 
 const useStyles = makeStyles(() => ({
-  input: {
-    height: 50,
-  },
   icon: {
     paddingTop: 4,
     display: 'inline-block',
@@ -24,18 +21,12 @@ const useStyles = makeStyles(() => ({
     flexGrow: 1,
     marginLeft: 10,
   },
-  autoCompleteIndicator: {
-    display: 'none',
-  },
   filters: {
     float: 'left',
     margin: '5px 0 0 15px',
   },
   filter: {
     marginRight: 10,
-  },
-  thin: {
-    height: 30,
   },
 }));
 

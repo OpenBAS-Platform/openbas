@@ -5,7 +5,7 @@ import withTheme from '@mui/styles/withTheme';
 import withStyles from '@mui/styles/withStyles';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import { connect } from 'react-redux';
-import countries from '../../resources/geo/countries.json';
+import countries from '../../static/geo/countries.json';
 import { storeHelper } from '../../actions/Schema';
 import Loader from '../../components/Loader';
 

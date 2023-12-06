@@ -33,7 +33,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
 }));
 
 interface Props {
-  exerciseId: Exercise['exercise_id']
+  exerciseId: Exercise['exercise_id'];
 }
 
 const AnimationMenu: React.FC<Props> = ({ exerciseId }) => {
@@ -66,9 +66,9 @@ const AnimationMenu: React.FC<Props> = ({ exerciseId }) => {
         <MenuItem
           component={Link}
           to={`/admin/exercises/${exerciseId}/animation/mails`}
-          selected={
-            location.pathname.includes(`/admin/exercises/${exerciseId}/animation/mails`)
-          }
+          selected={location.pathname.includes(
+            `/admin/exercises/${exerciseId}/animation/mails`,
+          )}
           classes={{ root: classes.item }}
         >
           <ListItemIcon>

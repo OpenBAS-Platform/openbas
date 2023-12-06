@@ -21,41 +21,9 @@ import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import { areaChartOptions } from '../../../../utils/Charts';
 
 const useStyles = makeStyles((theme) => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
-  metric: {
-    position: 'relative',
-    padding: 20,
-    height: 100,
-    overflow: 'hidden',
-  },
-  title: {
-    textTransform: 'uppercase',
-    fontSize: 12,
-    fontWeight: 500,
-    color: theme.palette.text.secondary,
-  },
-  number: {
-    fontSize: 30,
-    fontWeight: 800,
-    float: 'left',
-  },
-  icon: {
-    position: 'absolute',
-    top: 25,
-    right: 15,
-  },
   paper: {
     position: 'relative',
     padding: 0,
-    overflow: 'hidden',
-    height: '100%',
-  },
-  paperPadding: {
-    position: 'relative',
-    padding: '20px 20px 0 20px',
     overflow: 'hidden',
     height: '100%',
   },
@@ -64,20 +32,6 @@ const useStyles = makeStyles((theme) => ({
     padding: '0 20px 0 0',
     overflow: 'hidden',
     height: '100%',
-  },
-  card: {
-    width: '100%',
-    height: '100%',
-    marginBottom: 30,
-    borderRadius: 6,
-    padding: 0,
-    position: 'relative',
-  },
-  heading: {
-    display: 'flex',
-  },
-  chip: {
-    margin: '0 10px 10px 0',
   },
 }));
 
@@ -126,61 +80,59 @@ const LessonsObjectives = ({
         )}
         <div className="clearfix" />
         <Paper variant="outlined" classes={{ root: classes.paper }}>
-          {sortedObjectives.length > 0
-            ? (
-              <List style={{ padding: 0 }}>
-                {sortedObjectives.map((objective) => (
-                  <ListItem
-                    key={objective.objective_id}
-                    divider={true}
-                    button={true}
-                    onClick={() => setSelectedObjective
-                    && setSelectedObjective(objective.objective_id)}
+          {sortedObjectives.length > 0 ? (
+            <List style={{ padding: 0 }}>
+              {sortedObjectives.map((objective) => (
+                <ListItem
+                  key={objective.objective_id}
+                  divider={true}
+                  button={true}
+                  onClick={() => setSelectedObjective
+                    && setSelectedObjective(objective.objective_id)
+                  }
+                >
+                  <ListItemIcon>
+                    <FlagOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    style={{ width: '50%' }}
+                    primary={objective.objective_title}
+                    secondary={objective.objective_description}
+                  />
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      width: '30%',
+                      marginRight: 1,
+                    }}
                   >
-                    <ListItemIcon>
-                      <FlagOutlined />
-                    </ListItemIcon>
-                    <ListItemText
-                      style={{ width: '50%' }}
-                      primary={objective.objective_title}
-                      secondary={objective.objective_description}
-                    />
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        width: '30%',
-                        marginRight: 1,
-                      }}
-                    >
-                      <Box sx={{ width: '100%', mr: 1 }}>
-                        <LinearProgress
-                          variant="determinate"
-                          value={objective.objective_score}
-                        />
-                      </Box>
-                      <Box sx={{ minWidth: 35 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          {objective.objective_score}
-                          %
-                        </Typography>
-                      </Box>
+                    <Box sx={{ width: '100%', mr: 1 }}>
+                      <LinearProgress
+                        variant="determinate"
+                        value={objective.objective_score}
+                      />
                     </Box>
-                    {!isReport && (
-                      <ListItemSecondaryAction>
-                        <ObjectivePopover
-                          exercise={exercise}
-                          objective={objective}
-                        />
-                      </ListItemSecondaryAction>
-                    )}
-                  </ListItem>
-                ))}
-              </List>
-              )
-            : (
-              <Empty message={t('No objectives in this exercise.')} />
-              )}
+                    <Box sx={{ minWidth: 35 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        {objective.objective_score}%
+                      </Typography>
+                    </Box>
+                  </Box>
+                  {!isReport && (
+                    <ListItemSecondaryAction>
+                      <ObjectivePopover
+                        exercise={exercise}
+                        objective={objective}
+                      />
+                    </ListItemSecondaryAction>
+                  )}
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <Empty message={t('No objectives in this exercise.')} />
+          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={6}>
@@ -188,23 +140,21 @@ const LessonsObjectives = ({
           {t('Crisis intensity (injects by hour)')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {injectsData.length > 0
-            ? (
-              <Chart
-                options={areaChartOptions(theme, true, nsdt, null, undefined)}
-                series={chartData}
-                type="area"
-                width="100%"
-                height={350}
-              />
-              )
-            : (
-              <Empty
-                message={t(
-                  'No data to display or the exercise has not started yet',
-                )}
-              />
+          {injectsData.length > 0 ? (
+            <Chart
+              options={areaChartOptions(theme, true, nsdt, null, undefined)}
+              series={chartData}
+              type="area"
+              width="100%"
+              height={350}
+            />
+          ) : (
+            <Empty
+              message={t(
+                'No data to display or the exercise has not started yet',
               )}
+            />
+          )}
         </Paper>
       </Grid>
     </Grid>

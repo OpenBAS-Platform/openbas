@@ -13,7 +13,11 @@ export const addVariable = (exerciseId: Exercise['exercise_id'], data: VariableI
   return postReferential(schema.variable, uri, data)(dispatch);
 };
 
-export const updateVariable = (exerciseId: Exercise['exercise_id'], variableId: Variable['variable_id'], data: VariableInput) => (dispatch: Dispatch) => {
+export const updateVariable = (
+  exerciseId: Exercise['exercise_id'],
+  variableId: Variable['variable_id'],
+  data: VariableInput,
+) => (dispatch: Dispatch) => {
   const uri = `/api/exercises/${exerciseId}/variables/${variableId}`;
   return putReferential(schema.variable, uri, data)(dispatch);
 };
@@ -29,5 +33,5 @@ export const fetchVariables = (exerciseId: Exercise['exercise_id']) => (dispatch
 };
 
 export interface VariablesHelper {
-  getExerciseVariables: (exerciseId: Exercise['exercise_id']) => [Variable]
+  getExerciseVariables: (exerciseId: Exercise['exercise_id']) => [Variable];
 }

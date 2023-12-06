@@ -4,8 +4,8 @@ import Button from '@mui/material/Button';
 import { useFormatter } from '../../../components/i18n';
 
 interface LoginSSOButtonProperties {
-  providerUri: string
-  providerName: string
+  providerUri: string;
+  providerName: string;
 }
 
 const LoginSSOButton: FunctionComponent<LoginSSOButtonProperties> = ({

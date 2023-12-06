@@ -58,34 +58,32 @@ const CreateLessonsTemplateQuestion = (props) => {
   };
   return (
     <div>
-      {inline === true
-        ? (
-          <ListItem
-            button={true}
-            divider={true}
-            onClick={handleOpen}
-            color="primary"
-          >
-            <ListItemIcon color="primary">
-              <ControlPointOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={t('Create a new lessons learned question')}
-              classes={{ primary: classes.text }}
-            />
-          </ListItem>
-          )
-        : (
-          <IconButton
-            classes={{ root: classes.createButton }}
-            onClick={handleOpen}
-            aria-haspopup="true"
-            size="large"
-            color="secondary"
-          >
-            <Add fontSize="small" />
-          </IconButton>
-          )}
+      {inline === true ? (
+        <ListItem
+          button={true}
+          divider={true}
+          onClick={handleOpen}
+          color="primary"
+        >
+          <ListItemIcon color="primary">
+            <ControlPointOutlined color="primary" />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('Create a new lessons learned question')}
+            classes={{ primary: classes.text }}
+          />
+        </ListItem>
+      ) : (
+        <IconButton
+          classes={{ root: classes.createButton }}
+          onClick={handleOpen}
+          aria-haspopup="true"
+          size="large"
+          color="secondary"
+        >
+          <Add fontSize="small" />
+        </IconButton>
+      )}
       <Dialog
         open={open}
         TransitionComponent={Transition}

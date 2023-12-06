@@ -44,23 +44,6 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     fontSize: 13,
   },
-  itemIcon: {
-    color: theme.palette.primary.main,
-  },
-  goIcon: {
-    position: 'absolute',
-    right: -10,
-  },
-  inputLabel: {
-    float: 'left',
-  },
-  sortIcon: {
-    float: 'left',
-    margin: '-5px 0 0 15px',
-  },
-  icon: {
-    color: theme.palette.primary.main,
-  },
   exercise: {
     fontSize: 12,
     height: 20,
@@ -203,7 +186,7 @@ const Challenges = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={(
+            primary={
               <div>
                 {filtering.buildHeader(
                   'challenge_name',
@@ -236,7 +219,7 @@ const Challenges = () => {
                   headerStyles,
                 )}
               </div>
-            )}
+            }
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -254,7 +237,7 @@ const Challenges = () => {
                 <EmojiEventsOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={(
+                primary={
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -308,7 +291,7 @@ const Challenges = () => {
                       />
                     </div>
                   </div>
-                )}
+                }
               />
               <ListItemSecondaryAction>
                 <ChallengePopover challenge={challenge} documents={docs} />
