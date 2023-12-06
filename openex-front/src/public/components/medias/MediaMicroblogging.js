@@ -102,7 +102,7 @@ const MediaMicroblogging = ({ mediaReader }) => {
           .filter((d) => d !== undefined)
           .filter(
             (d) => d.document_type.includes('image/')
-              || d.document_type.includes('video/'),
+            || d.document_type.includes('video/'),
           );
         let columns = 12;
         if (docs.length === 2) {

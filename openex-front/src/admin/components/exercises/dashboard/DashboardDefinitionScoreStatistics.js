@@ -81,7 +81,7 @@ const DashboardDefinitionScoreStatistics = ({
   const injectTypesWithScore = R.pipe(
     R.filter(
       (n) => n.inject_type === 'openex_challenge'
-        || n.inject_content?.expectationScore,
+      || n.inject_content?.expectationScore,
     ),
     R.map((n) => {
       if (n.inject_type !== 'openex_challenge') {

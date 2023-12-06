@@ -229,11 +229,11 @@ class Documents extends Component {
     const { keyword, sortBy, orderAsc, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.document_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
-      || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
+        || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1;
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
@@ -241,10 +241,10 @@ class Documents extends Component {
     const sortedDocuments = R.pipe(
       R.filter(
         (n) => tags.length === 0
-          || R.any(
-            (filter) => R.includes(filter, n.document_tags),
-            R.pluck('id', tags),
-          ),
+        || R.any(
+          (filter) => R.includes(filter, n.document_tags),
+          R.pluck('id', tags),
+        ),
       ),
       R.filter(filterByKeyword),
       sort,

@@ -99,7 +99,7 @@ const Articles = () => {
   }));
   const sortedArticles = R.filter(
     (n) => medias.length === 0
-      || medias.map((o) => o.id).includes(n.article_fullmedia.media_id),
+    || medias.map((o) => o.id).includes(n.article_fullmedia.media_id),
     filtering.filterAndSort(fullArticles),
   );
   const mediaColor = (type) => {

@@ -423,9 +423,9 @@ const Dryrun = () => {
                         {' '}
                         (
                         {dryinject.dryinject_status
-                          && (
-                            dryinject.dryinject_status.status_execution / 1000
-                          ).toFixed(2)}
+                        && (
+                          dryinject.dryinject_status.status_execution / 1000
+                        ).toFixed(2)}
                         s)
                       </div>
                     </div>

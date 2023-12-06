@@ -72,13 +72,13 @@ const Login = (props) => {
       {isLocal && reset && <Reset onCancel={() => setReset(false)} />}
       <Box sx={{ marginTop: 2.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2.5 }}>
         {(isOpenId || isSaml2)
-          && ([...(openidProviders ?? []), ...(saml2Providers ?? [])]).map((provider) => (
-            <LoginSSOButton
-              key={provider.provider_name}
-              providerName={provider.provider_login}
-              providerUri={provider.provider_uri}
-            />
-          ))}
+        && ([...(openidProviders ?? []), ...(saml2Providers ?? [])]).map((provider) => (
+          <LoginSSOButton
+            key={provider.provider_name}
+            providerName={provider.provider_login}
+            providerUri={provider.provider_uri}
+          />
+        ))}
         <LoginError />
       </Box>
     </div>

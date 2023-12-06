@@ -239,10 +239,10 @@ const Dashboard = () => {
             </Grid>
           )}
           {(report.report_stats_definition
-            || report.report_stats_definition_score) && (
-              <Typography variant="h1" style={{ marginTop: 40 }}>
-                {t('Exercise definition and scenario')}
-              </Typography>
+          || report.report_stats_definition_score) && (
+            <Typography variant="h1" style={{ marginTop: 40 }}>
+              {t('Exercise definition and scenario')}
+            </Typography>
           )}
           {report.report_stats_definition && (
             <DashboardDefinitionStatistics
@@ -291,10 +291,10 @@ const Dashboard = () => {
             />
           )}
           {(report.report_lessons_objectives
-            || report.report_lessons_stats) && (
-              <Typography variant="h1" style={{ marginTop: 60 }}>
-                {t('Lessons learned')}
-              </Typography>
+          || report.report_lessons_stats) && (
+            <Typography variant="h1" style={{ marginTop: 60 }}>
+              {t('Lessons learned')}
+            </Typography>
           )}
           {report.report_lessons_objectives && (
             <LessonsObjectives

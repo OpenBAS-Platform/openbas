@@ -417,7 +417,7 @@ const Timeline = () => {
                 <List style={{ paddingTop: 0 }}>
                   {pendingInjects.map((inject) => {
                     const isDisabled = disabledTypes.includes(inject.inject_type)
-                    || !types.includes(inject.inject_type);
+                      || !types.includes(inject.inject_type);
                     return (
                       <ListItem
                         key={inject.inject_id}

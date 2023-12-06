@@ -165,9 +165,9 @@ const Validations = () => {
     || (n.inject_expectation_inject?.inject_title || '')
       .toLowerCase()
       .indexOf(keyword.toLowerCase()) !== -1
-    || (n.inject_expectation_inject?.inject_description || '')
-      .toLowerCase()
-      .indexOf(keyword.toLowerCase()) !== -1;
+      || (n.inject_expectation_inject?.inject_description || '')
+        .toLowerCase()
+        .indexOf(keyword.toLowerCase()) !== -1;
   const sort = R.sortWith([R.descend(R.prop('inject_expectation_created_at'))]);
   const sortedInjectExpectations = R.pipe(
     R.uniqBy(R.prop('injectexpectation_id')),
@@ -183,10 +183,10 @@ const Validations = () => {
       : n.injectexpectation_id !== null)),
     R.filter(
       (n) => tags.length === 0
-        || R.any(
-          (filter) => R.includes(filter, n.inject_expectation_inject?.inject_tags),
-          R.pluck('id', tags),
-        ),
+      || R.any(
+        (filter) => R.includes(filter, n.inject_expectation_inject?.inject_tags),
+        R.pluck('id', tags),
+      ),
     ),
     R.filter(filterByKeyword),
     sort,
@@ -477,7 +477,7 @@ const Validations = () => {
                     <List component="div" disablePadding>
                       {groupedExpectation[injectId].map((expectation) => {
                         const audience = audiencesMap[expectation.inject_expectation_audience]
-                        || {};
+                          || {};
                         return (
                           <ListItem
                             key={audience.audience_id}
