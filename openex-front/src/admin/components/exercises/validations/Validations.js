@@ -22,6 +22,7 @@ import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import MediaIcon from '../../medias/MediaIcon';
 import TextField from '../../../../components/TextField';
+import ManualExpectations from "./ManualExpectations.js";
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -448,70 +449,13 @@ const Validations = () => {
                         );
                       },
                     )}
-                  </List>
-                  ) : (
-                    <List component="div" disablePadding>
-                      {groupedExpectation[injectId].map((expectation) => {
-                        const audience = audiencesMap[expectation.inject_expectation_audience]
-                        || {};
-                        return (
-                          <ListItem
-                            key={audience.audience_id}
-                            divider={true}
-                            sx={{ pl: 4 }}
-                            classes={{ root: classes.item }}
-                            button={true}
-                            onClick={() => setCurrentExpectation(expectation)}
-                          >
-                            <ListItemIcon>
-                              <CastForEducationOutlined fontSize="small" />
-                            </ListItemIcon>
-                            <ListItemText
-                              primary={
-                                <div>
-                                  <div
-                                    className={classes.bodyItem}
-                                    style={{ width: '20%' }}
-                                  >
-                                    {audience.audience_name}
-                                  </div>
-                                  <div className={classes.bodyItemRight}>
-                                    <Chip
-                                      classes={{ root: classes.chipInList }}
-                                      style={
-                                      expectation.inject_expectation_result
-                                        ? inlineStyles.green
-                                        : inlineStyles.orange
-                                    }
-                                      label={
-                                      expectation.inject_expectation_result
-                                        ? `${t('Validated')} (${
-                                          expectation.inject_expectation_score
-                                        })`
-                                        : t('Pending validation')
-                                    }
-                                    />
-                                  </div>
-                                  <div
-                                    className={classes.bodyItemRight}
-                                    style={{ marginRight: 20 }}
-                                  >
-                                    <Chip
-                                      classes={{
-                                        root: classes.points,
-                                      }}
-                                      label={
-                                      expectation.inject_expectation_expected_score
-                                    }
-                                    />
-                                  </div>
-                                </div>
-                            }
-                            />
-                          </ListItem>
-                        );
-                      })}
                     </List>
+                    )
+                  : (
+                    <ManualExpectations
+                      injectExpectations={groupedExpectation[injectId]}
+                      setCurrentExpectation={setCurrentExpectation}
+                    />
                   )}
               </div>
             );
