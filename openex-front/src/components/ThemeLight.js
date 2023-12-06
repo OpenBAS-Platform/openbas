@@ -137,6 +137,55 @@ export default (
             fontSize: 12,
             fontWeight: 400,
           },
+          '.w-md-editor': {
+            boxShadow: 'none',
+            background: 'transparent',
+            borderBottom: '1px solid rgba(0, 0, 0, 0.87) !important',
+            transition: 'borderBottom .3s',
+            '&:hover': {
+              borderBottom: '2px solid #000000 !important',
+            },
+            '&:focus-within': {
+              borderBottom: `2px solid #${primary || '007fff'} !important`,
+            },
+          },
+          '.error .w-md-editor': {
+            border: '0 !important',
+            borderBottom: '2px solid #f44336 !important',
+            '&:hover': {
+              border: '0 !important',
+              borderBottom: '2px solid #f44336 !important',
+            },
+            '&:focus': {
+              border: '0 !important',
+              borderBottom: '2px solid #f44336 !important',
+            },
+          },
+          '.w-md-editor-toolbar': {
+            border: '0 !important',
+            backgroundColor: 'transparent !important',
+            color: '#000000 !important',
+          },
+          '.w-md-editor-toolbar li button': {
+            color: '#000000 !important',
+          },
+          '.w-md-editor-text textarea': {
+            fontFamily: '"IBM Plex Sans", sans-serif',
+            fontSize: 13,
+            color: '#000000',
+          },
+          '.w-md-editor-preview': {
+            boxShadow: 'inset 1px 0 0 0 rgba(0, 0, 0, 0.2)',
+          },
+          '.wmde-markdown': {
+            background: 'transparent',
+            fontFamily: '"IBM Plex Sans", sans-serif',
+            fontSize: 13,
+            color: '#000000',
+          },
+          '.wmde-markdown tr': {
+            background: 'transparent !important',
+          },
           '.react-mde': {
             border: '0 !important',
           },

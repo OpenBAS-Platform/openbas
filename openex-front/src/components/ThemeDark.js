@@ -146,10 +146,19 @@ export default (
               fontSize: 12,
               fontWeight: 400,
             },
-            '.react-mde': {
-              border: '0 !important',
+            '.w-md-editor': {
+              boxShadow: 'none',
+              background: 'transparent',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.7) !important',
+              transition: 'borderBottom .3s',
+              '&:hover': {
+                borderBottom: '2px solid #ffffff !important',
+              },
+              '&:focus-within': {
+                borderBottom: `2px solid #${primary || '00b1ff'} !important`,
+              },
             },
-            '.error .react-mde textarea': {
+            '.error .w-md-editor': {
               border: '0 !important',
               borderBottom: '2px solid #f44336 !important',
               '&:hover': {
@@ -161,32 +170,30 @@ export default (
                 borderBottom: '2px solid #f44336 !important',
               },
             },
-            '.mde-header': {
+            '.w-md-editor-toolbar': {
               border: '0 !important',
               backgroundColor: 'transparent !important',
               color: '#ffffff !important',
             },
-            '.mde-header-item button': {
-              fontFamily: '"IBM Plex Sans", sans-serif',
+            '.w-md-editor-toolbar li button': {
               color: '#ffffff !important',
             },
-            '.mde-tabs button': {
-              fontFamily: '"IBM Plex Sans", sans-serif',
-              color: '#ffffff !important',
-            },
-            '.mde-textarea-wrapper textarea': {
+            '.w-md-editor-text textarea': {
               fontFamily: '"IBM Plex Sans", sans-serif',
               fontSize: 13,
               color: '#ffffff',
+            },
+            '.w-md-editor-preview': {
+              boxShadow: 'inset 1px 0 0 0 rgba(255, 255, 255, 0.5)',
+            },
+            '.wmde-markdown': {
               background: 'transparent',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.7) !important',
-              transition: 'borderBottom .3s',
-              '&:hover': {
-                borderBottom: '2px solid #ffffff !important',
-              },
-              '&:focus': {
-                borderBottom: `2px solid #${primary || '00b1ff'} !important`,
-              },
+              fontFamily: '"IBM Plex Sans", sans-serif',
+              fontSize: 13,
+              color: '#ffffff',
+            },
+            '.wmde-markdown tr': {
+              background: 'transparent !important',
             },
             '.react-grid-placeholder': {
               backgroundColor: `${accent || '#01478d'} !important`,

@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
-import * as PropTypes from 'prop-types';
-import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
-import { compose } from 'ramda';
-import withTheme from '@mui/styles/withTheme';
 import { truncate } from '../utils/String';
+import MDEditor from '@uiw/react-md-editor/nohighlight';
+import { Theme } from './Theme';
+import { useTheme } from '@mui/material';
 
-export const MarkDownComponents = (theme) => ({
+interface MardDownComponentProps {
+  node?: unknown
+}
+
+export const MarkDownComponents = (theme: Theme) => ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  table: ({ node, ...tableProps }) => (
+  table: ({ node, ...tableProps }: MardDownComponentProps) => (
     <table
       style={{
         border: `1px solid ${theme.palette.divider}`,
@@ -21,11 +24,11 @@ export const MarkDownComponents = (theme) => ({
     />
   ),
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  tr: ({ node, ...trProps }) => (
+  tr: ({ node, ...trProps }: MardDownComponentProps) => (
     <tr style={{ border: `1px solid ${theme.palette.divider}` }} {...trProps} />
   ),
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  td: ({ node, ...tdProps }) => (
+  td: ({ node, ...tdProps }: MardDownComponentProps) => (
     <td
       style={{
         border: `1px solid ${theme.palette.divider}`,
@@ -35,7 +38,7 @@ export const MarkDownComponents = (theme) => ({
     />
   ),
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  th: ({ node, ...tdProps }) => (
+  th: ({ node, ...tdProps }: MardDownComponentProps) => (
     <th
       style={{
         border: `1px solid ${theme.palette.divider}`,
@@ -46,12 +49,17 @@ export const MarkDownComponents = (theme) => ({
   ),
 });
 
-const ExpandableMarkdown = (props) => {
+interface Props {
+  source: string
+  limit: number
+  controlled?: boolean
+  isExpanded?: boolean
+}
+
+const ExpandableMarkdow: React.FC<Props> = ({ source, limit, isExpanded, controlled }) => {
   const [expand, setExpand] = useState(false);
-
+  const theme = useTheme<Theme>();
   const onClick = () => setExpand(!expand);
-
-  const { source, limit, theme, isExpanded, controlled } = props;
   const shouldBeTruncated = (source || '').length > limit;
 
   return (
@@ -63,27 +71,17 @@ const ExpandableMarkdown = (props) => {
           </IconButton>
         </div>
       )}
-      <div style={{ marginTop: 10 }}>
-        <Markdown
+      <div style={{ marginTop: 10 }} data-color-mode={theme.palette.mode}>
+        <MDEditor.Markdown
+          source={expand || isExpanded ? source : truncate(source, limit)}
           remarkPlugins={[remarkGfm, remarkParse]}
-          parserOptions={{ commonmark: true }}
           components={MarkDownComponents(theme)}
           className="markdown"
-          {...props}
-        >
-          {expand || isExpanded ? source : truncate(source, limit)}
-        </Markdown>
+        />
       </div>
       <div className="clearfix" />
     </div>
   );
 };
 
-ExpandableMarkdown.propTypes = {
-  source: PropTypes.string.isRequired,
-  limit: PropTypes.number.isRequired,
-  controlled: PropTypes.bool,
-  isExpanded: PropTypes.bool,
-};
-
-export default compose(withTheme)(ExpandableMarkdown);
+export default ExpandableMarkdow;
