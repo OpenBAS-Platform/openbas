@@ -687,7 +687,7 @@ export interface InjectExpectation {
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: User;
-  injectexpectation_id?: string;
+  injectexpectation_id: string;
   updateAttributes?: object;
 }
 
@@ -1207,7 +1207,7 @@ export interface UpdatePlayerInput {
   user_lastname?: string;
   user_organization?: string;
   user_pgp_key?: string;
-  /** @pattern ^\+ */
+  /** @pattern ^\+[\d\s]* */
   user_phone?: string;
   user_tags?: string[];
 }

@@ -3,14 +3,21 @@ import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
-import { FormControlLabel, Switch, List, ListItem, ListItemIcon, ListItemText, Chip, Dialog, DialogContent, DialogTitle, Slide, Button, Grid, Typography } from '@mui/material';
-import { CastForEducationOutlined, EmojiEventsOutlined } from '@mui/icons-material';
-import { Form } from 'react-final-form';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import { CastForEducationOutlined, EmojiEventsOutlined, } from '@mui/icons-material';
+import Chip from '@mui/material/Chip';
+import Slide from '@mui/material/Slide';
+import { Chip, FormControlLabel, List, ListItem, ListItemIcon, ListItemText, Slide, Switch } from '@mui/material';
 import AnimationMenu from '../AnimationMenu';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchExerciseInjects, fetchInjectTypes } from '../../../../actions/Inject';
-import { fetchExerciseInjectExpectations, updateInjectExpectation } from '../../../../actions/Exercise';
+import { fetchExerciseInjects, fetchInjectTypes, } from '../../../../actions/Inject';
+import { fetchExerciseInjectExpectations, } from '../../../../actions/Exercise';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import InjectIcon from '../injects/InjectIcon';
@@ -21,8 +28,8 @@ import { fetchAudiences } from '../../../../actions/Audience';
 import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import MediaIcon from '../../medias/MediaIcon';
-import TextField from '../../../../components/TextField';
 import ManualExpectations from "./ManualExpectations.js";
+import DialogExpectation from "./DialogExpectation.js";
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -127,19 +134,6 @@ const Validations = () => {
     dispatch(fetchExerciseArticles(exerciseId));
     dispatch(fetchExerciseChallenges(exerciseId));
   });
-  const validate = (values) => {
-    const errors = {};
-    const requiredFields = ['expectation_score'];
-    requiredFields.forEach((field) => {
-      if (!values[field]) {
-        errors[field] = t('This field is required.');
-      }
-    });
-    return errors;
-  };
-  const submit = (injectExpectationId, data) => dispatch(
-    updateInjectExpectation(exerciseId, injectExpectationId, data),
-  ).then(() => setCurrentExpectation(null));
   const filterByKeyword = (n) => keyword === ''
     || (n.inject_expectation_inject?.inject_title || '')
       .toLowerCase()
@@ -258,199 +252,199 @@ const Validations = () => {
                 </ListItem>
                 {inject.inject_type === 'openex_media'
                 || inject.inject_type === 'openex_challenge' ? (
-                  <List component="div" disablePadding>
-                    {Object.keys(groupedExpectation[injectId]).map(
-                      (audienceId) => {
-                        const audience = audiencesMap[audienceId] || {};
-                        return (
-                          <div key={audience.audience_id}>
-                            <ListItem
-                              divider={true}
-                              sx={{ pl: 4 }}
-                              classes={{ root: classes.item }}
-                            >
-                              <ListItemIcon>
-                                <CastForEducationOutlined fontSize="small" />
-                              </ListItemIcon>
-                              <ListItemText
-                                primary={
-                                  <div>
-                                    <div
-                                      className={classes.bodyItem}
-                                      style={{ width: '20%' }}
-                                    >
-                                      {audience.audience_name}
+                    <List component="div" disablePadding>
+                      {Object.keys(groupedExpectation[injectId]).map(
+                        (audienceId) => {
+                          const audience = audiencesMap[audienceId] || {};
+                          return (
+                            <div key={audience.audience_id}>
+                              <ListItem
+                                divider={true}
+                                sx={{ pl: 4 }}
+                                classes={{ root: classes.item }}
+                              >
+                                <ListItemIcon>
+                                  <CastForEducationOutlined fontSize="small" />
+                                </ListItemIcon>
+                                <ListItemText
+                                  primary={
+                                    <div>
+                                      <div
+                                        className={classes.bodyItem}
+                                        style={{ width: '20%' }}
+                                      >
+                                        {audience.audience_name}
+                                      </div>
                                     </div>
-                                  </div>
-                                }
-                              />
-                            </ListItem>
-                            <List component="div" disablePadding>
-                              {inject.inject_type === 'openex_media'
-                                && groupedExpectation[injectId][audienceId].map(
-                                  (expectation) => {
-                                    const article = articlesMap[
-                                      expectation.inject_expectation_article
-                                    ] || {};
-                                    const media = mediasMap[article.article_media] || {};
-                                    return (
-                                      <ListItem
-                                        key={audience.audience_id}
-                                        divider={true}
-                                        sx={{ pl: 8 }}
-                                        classes={{ root: classes.item }}
-                                      >
-                                        <ListItemIcon>
-                                          <MediaIcon
-                                            type={media.media_type}
-                                            variant="inline"
-                                            size="small"
+                                  }
+                                />
+                              </ListItem>
+                              <List component="div" disablePadding>
+                                {inject.inject_type === 'openex_media'
+                                  && groupedExpectation[injectId][audienceId].map(
+                                    (expectation) => {
+                                      const article = articlesMap[
+                                        expectation.inject_expectation_article
+                                        ] || {};
+                                      const media = mediasMap[article.article_media] || {};
+                                      return (
+                                        <ListItem
+                                          key={audience.audience_id}
+                                          divider={true}
+                                          sx={{ pl: 8 }}
+                                          classes={{ root: classes.item }}
+                                        >
+                                          <ListItemIcon>
+                                            <MediaIcon
+                                              type={media.media_type}
+                                              variant="inline"
+                                              size="small"
+                                            />
+                                          </ListItemIcon>
+                                          <ListItemText
+                                            primary={
+                                              <div>
+                                                <div
+                                                  className={classes.bodyItem}
+                                                  style={{ width: '20%' }}
+                                                >
+                                                  {media.media_name}
+                                                </div>
+                                                <div
+                                                  className={classes.bodyItem}
+                                                  style={{ width: '30%' }}
+                                                >
+                                                  {article.article_name}
+                                                </div>
+                                                <div
+                                                  className={
+                                                    classes.bodyItemRight
+                                                  }
+                                                >
+                                                  <Chip
+                                                    classes={{
+                                                      root: classes.chipInList,
+                                                    }}
+                                                    style={
+                                                      expectation.inject_expectation_result
+                                                        ? inlineStyles.green
+                                                        : inlineStyles.grey
+                                                    }
+                                                    label={
+                                                      expectation.inject_expectation_result
+                                                        ? `${t('Validated')} (${
+                                                          expectation.inject_expectation_score
+                                                        })`
+                                                        : t('Pending reading')
+                                                    }
+                                                  />
+                                                </div>
+                                                <div
+                                                  className={
+                                                    classes.bodyItemRight
+                                                  }
+                                                  style={{ marginRight: 20 }}
+                                                >
+                                                  <Chip
+                                                    classes={{
+                                                      root: classes.points,
+                                                    }}
+                                                    label={
+                                                      expectation.inject_expectation_expected_score
+                                                    }
+                                                  />
+                                                </div>
+                                              </div>
+                                            }
                                           />
-                                        </ListItemIcon>
-                                        <ListItemText
-                                          primary={
-                                            <div>
-                                              <div
-                                                className={classes.bodyItem}
-                                                style={{ width: '20%' }}
-                                              >
-                                                {media.media_name}
-                                              </div>
-                                              <div
-                                                className={classes.bodyItem}
-                                                style={{ width: '30%' }}
-                                              >
-                                                {article.article_name}
-                                              </div>
-                                              <div
-                                                className={
-                                                  classes.bodyItemRight
-                                                }
-                                              >
-                                                <Chip
-                                                  classes={{
-                                                    root: classes.chipInList,
-                                                  }}
-                                                  style={
-                                                    expectation.inject_expectation_result
-                                                      ? inlineStyles.green
-                                                      : inlineStyles.grey
-                                                  }
-                                                  label={
-                                                    expectation.inject_expectation_result
-                                                      ? `${t('Validated')} (${
-                                                        expectation.inject_expectation_score
-                                                      })`
-                                                      : t('Pending reading')
-                                                  }
-                                                />
-                                              </div>
-                                              <div
-                                                className={
-                                                  classes.bodyItemRight
-                                                }
-                                                style={{ marginRight: 20 }}
-                                              >
-                                                <Chip
-                                                  classes={{
-                                                    root: classes.points,
-                                                  }}
-                                                  label={
-                                                    expectation.inject_expectation_expected_score
-                                                  }
-                                                />
-                                              </div>
-                                            </div>
-                                          }
-                                        />
-                                      </ListItem>
-                                    );
-                                  },
-                                )}
-                              {inject.inject_type === 'openex_challenge'
-                                && groupedExpectation[injectId][audienceId].map(
-                                  (expectation) => {
-                                    const challenge = challengesMap[
-                                      expectation.inject_expectation_challenge
-                                    ] || {};
-                                    return (
-                                      <ListItem
-                                        key={challenge.challenge_id}
-                                        divider={true}
-                                        sx={{ pl: 8 }}
-                                        classes={{ root: classes.item }}
-                                      >
-                                        <ListItemIcon>
-                                          <EmojiEventsOutlined fontSize="small" />
-                                        </ListItemIcon>
-                                        <ListItemText
-                                          primary={
-                                            <div>
-                                              <div
-                                                className={classes.bodyItem}
-                                                style={{ width: '20%' }}
-                                              >
-                                                {challenge.challenge_category}
-                                              </div>
-                                              <div
-                                                className={classes.bodyItem}
-                                                style={{ width: '30%' }}
-                                              >
-                                                {challenge.challenge_name}
-                                              </div>
+                                        </ListItem>
+                                      );
+                                    },
+                                  )}
+                                {inject.inject_type === 'openex_challenge'
+                                  && groupedExpectation[injectId][audienceId].map(
+                                    (expectation) => {
+                                      const challenge = challengesMap[
+                                        expectation.inject_expectation_challenge
+                                        ] || {};
+                                      return (
+                                        <ListItem
+                                          key={challenge.challenge_id}
+                                          divider={true}
+                                          sx={{ pl: 8 }}
+                                          classes={{ root: classes.item }}
+                                        >
+                                          <ListItemIcon>
+                                            <EmojiEventsOutlined fontSize="small" />
+                                          </ListItemIcon>
+                                          <ListItemText
+                                            primary={
+                                              <div>
+                                                <div
+                                                  className={classes.bodyItem}
+                                                  style={{ width: '20%' }}
+                                                >
+                                                  {challenge.challenge_category}
+                                                </div>
+                                                <div
+                                                  className={classes.bodyItem}
+                                                  style={{ width: '30%' }}
+                                                >
+                                                  {challenge.challenge_name}
+                                                </div>
 
-                                              <div
-                                                className={
-                                                  classes.bodyItemRight
-                                                }
-                                              >
-                                                <Chip
-                                                  classes={{
-                                                    root: classes.chipInList,
-                                                  }}
-                                                  style={
-                                                    expectation.inject_expectation_result
-                                                      ? inlineStyles.green
-                                                      : inlineStyles.grey
+                                                <div
+                                                  className={
+                                                    classes.bodyItemRight
                                                   }
-                                                  label={
-                                                    expectation.inject_expectation_result
-                                                      ? `${t('Validated')} (${
-                                                        expectation.inject_expectation_score
-                                                      })`
-                                                      : t('Pending submission')
+                                                >
+                                                  <Chip
+                                                    classes={{
+                                                      root: classes.chipInList,
+                                                    }}
+                                                    style={
+                                                      expectation.inject_expectation_result
+                                                        ? inlineStyles.green
+                                                        : inlineStyles.grey
+                                                    }
+                                                    label={
+                                                      expectation.inject_expectation_result
+                                                        ? `${t('Validated')} (${
+                                                          expectation.inject_expectation_score
+                                                        })`
+                                                        : t('Pending submission')
+                                                    }
+                                                  />
+                                                </div>
+                                                <div
+                                                  className={
+                                                    classes.bodyItemRight
                                                   }
-                                                />
+                                                  style={{ marginRight: 20 }}
+                                                >
+                                                  <Chip
+                                                    classes={{
+                                                      root: classes.points,
+                                                    }}
+                                                    label={
+                                                      expectation.inject_expectation_expected_score
+                                                    }
+                                                  />
+                                                </div>
                                               </div>
-                                              <div
-                                                className={
-                                                  classes.bodyItemRight
-                                                }
-                                                style={{ marginRight: 20 }}
-                                              >
-                                                <Chip
-                                                  classes={{
-                                                    root: classes.points,
-                                                  }}
-                                                  label={
-                                                    expectation.inject_expectation_expected_score
-                                                  }
-                                                />
-                                              </div>
-                                            </div>
-                                          }
-                                        />
-                                      </ListItem>
-                                    );
-                                  },
-                                )}
-                            </List>
-                          </div>
-                        );
-                      },
-                    )}
+                                            }
+                                          />
+                                        </ListItem>
+                                      );
+                                    },
+                                  )}
+                              </List>
+                            </div>
+                          );
+                        },
+                      )}
                     </List>
-                    )
+                  )
                   : (
                     <ManualExpectations
                       injectExpectations={groupedExpectation[injectId]}
@@ -461,94 +455,12 @@ const Validations = () => {
             );
           })}
         </List>
-        <Dialog
-          TransitionComponent={Transition}
+        <DialogExpectation
+          exerciseId={exerciseId}
+          expectation={currentExpectation}
           open={currentExpectation !== null}
           onClose={() => setCurrentExpectation(null)}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
-        >
-          <DialogTitle>
-            {currentExpectation?.inject_expectation_inject?.inject_title}
-          </DialogTitle>
-          <DialogContent>
-            <Grid container={true} spacing={3}>
-              <Grid item={true} xs={6}>
-                <Typography variant="h3">{t('Title')}</Typography>
-                {currentExpectation?.inject_expectation_inject?.inject_title}
-              </Grid>
-              <Grid item={true} xs={6}>
-                <Typography variant="h3">{t('Description')}</Typography>
-                {
-                  currentExpectation?.inject_expectation_inject
-                    ?.inject_description
-                }
-              </Grid>
-              <Grid item={true} xs={6}>
-                <Typography variant="h3">{t('Sent at')}</Typography>
-                {fndt(
-                  currentExpectation?.inject_expectation_inject?.inject_sent_at,
-                )}
-              </Grid>
-              <Grid item={true} xs={6}>
-                <Typography variant="h3">{t('Tags')}</Typography>
-                <ItemTags
-                  tags={
-                    currentExpectation?.inject_expectation_inject
-                      ?.inject_tags || []
-                  }
-                />
-              </Grid>
-            </Grid>
-            <Typography variant="h2" style={{ marginTop: 30 }}>
-              {t('Results')}
-            </Typography>
-            <Form
-              keepDirtyOnReinitialize={true}
-              initialValues={{
-                expectation_score:
-                  currentExpectation?.inject_expectation_expected_score,
-              }}
-              onSubmit={(data) => submit(currentExpectation?.injectexpectation_id, data)
-              }
-              validate={validate}
-              mutators={{
-                setValue: ([field, value], state, { changeValue }) => {
-                  changeValue(state, field, () => value);
-                },
-              }}
-            >
-              {({ handleSubmit, submitting, errors }) => (
-                <form id="challengeForm" onSubmit={handleSubmit}>
-                  <TextField
-                    variant="standard"
-                    type="number"
-                    name="expectation_score"
-                    fullWidth={true}
-                    label={t('Score')}
-                  />
-                  <div style={{ float: 'right', marginTop: 20 }}>
-                    <Button
-                      onClick={() => setCurrentExpectation(null)}
-                      style={{ marginRight: 10 }}
-                      disabled={submitting}
-                    >
-                      {t('Cancel')}
-                    </Button>
-                    <Button
-                      color="secondary"
-                      type="submit"
-                      disabled={submitting || Object.keys(errors).length > 0}
-                    >
-                      {t('Validate')}
-                    </Button>
-                  </div>
-                </form>
-              )}
-            </Form>
-          </DialogContent>
-        </Dialog>
+        />
       </div>
     );
   }
