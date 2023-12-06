@@ -53,6 +53,7 @@ const Index = () => {
         sx={{
           display: 'flex',
           minWidth: 1400,
+          height: '100%',
         }}
       >
         <TopBar />

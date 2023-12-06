@@ -1,9 +1,9 @@
 import express from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "url";
 import fsExtra from "fs-extra/esm";
 import path from "node:path";
-import { fileURLToPath } from "url";
 import esbuild from "esbuild";
 import chokidar from "chokidar";
 import compression from "compression";
@@ -36,6 +36,7 @@ esbuild
   .context({
     logLevel: "info",
     entryPoints: ["src/index.tsx"],
+    publicPath: "/",
     bundle: true,
     banner: {
       js: ' (() => new EventSource("http://localhost:3000/dev").onmessage = () => location.reload())();',

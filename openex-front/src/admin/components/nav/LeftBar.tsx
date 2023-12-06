@@ -166,7 +166,7 @@ const LeftBar = () => {
             dense={true}
             classes={{ root: classes.menuItem }}
           >
-            <ListItemIcon style={{ minWidth: 30 }}>
+            <ListItemIcon style={{ minWidth: 20 }}>
               <RowingOutlined />
             </ListItemIcon>
             {navOpen && (

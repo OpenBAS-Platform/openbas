@@ -30,7 +30,6 @@ import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
-import Slide from '@mui/material/Slide';
 import inject18n from '../../../../components/i18n';
 import { fetchInjectAudiences, updateInject } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
@@ -56,11 +55,6 @@ import MediaIcon from '../../medias/MediaIcon';
 import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
 
 const styles = (theme) => ({
   header: {
