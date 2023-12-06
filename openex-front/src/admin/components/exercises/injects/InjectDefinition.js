@@ -803,7 +803,7 @@ class InjectDefinition extends Component {
                                 && values[field.key]
                                 && values[field.key][index]
                                 && values[field.key][index].type
-                                  === 'attachment'
+                                === 'attachment'
                                   ? (
                                     <Select
                                       variant="standard"

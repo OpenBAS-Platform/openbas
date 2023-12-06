@@ -33,21 +33,13 @@ export default defineConfig({
 
   publicDir: 'builder/public',
   resolve: {
-    extensions: ['.js', '.tsx', '.mjs', '.mts', '.ts', '.jsx', '.json'],
+    extensions: ['.js', '.tsx', '.ts', '.jsx', '.json'],
   },
 
   optimizeDeps: {
     include: [
       'ckeditor5-custom-build/build/ckeditor',
     ],
-    esbuildOptions: {
-      loader: {
-        '.js': 'tsx',
-        '.woff2': 'dataurl',
-        '.ttf': 'dataurl',
-        '.eot': 'dataurl',
-      },
-    },
   },
 
   server: {

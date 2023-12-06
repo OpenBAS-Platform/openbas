@@ -228,13 +228,13 @@ class AudiencesPlayers extends Component {
     const { keyword, sortBy, orderAsc, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.user_organization || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
@@ -244,10 +244,10 @@ class AudiencesPlayers extends Component {
     const sortedUsers = R.pipe(
       R.filter(
         (n) => tags.length === 0
-          || R.any(
-            (filter) => R.includes(filter, n.user_tags),
-            R.pluck('id', tags),
-          ),
+        || R.any(
+          (filter) => R.includes(filter, n.user_tags),
+          R.pluck('id', tags),
+        ),
       ),
       R.filter(filterByKeyword),
       sort,

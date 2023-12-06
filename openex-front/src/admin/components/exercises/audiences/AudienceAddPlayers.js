@@ -129,19 +129,19 @@ class AudienceAddPlayers extends Component {
     const { keyword, usersIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.organization_name || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
-      || (n.organization_description || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1;
+        || (n.organization_description || '')
+          .toLowerCase()
+          .indexOf(keyword.toLowerCase()) !== -1;
     const filteredUsers = R.pipe(
       R.map((u) => ({
         organization_name:
@@ -153,10 +153,10 @@ class AudienceAddPlayers extends Component {
       })),
       R.filter(
         (n) => tags.length === 0
-          || R.any(
-            (filter) => R.includes(filter, n.user_tags),
-            R.pluck('id', tags),
-          ),
+        || R.any(
+          (filter) => R.includes(filter, n.user_tags),
+          R.pluck('id', tags),
+        ),
       ),
       R.filter(filterByKeyword),
       R.take(10),

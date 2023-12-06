@@ -57,18 +57,18 @@ const TopMenuExercise: React.FC = () => {
         to={`/admin/exercises/${exerciseId}`}
         variant={
           location.pathname === `/admin/exercises/${exerciseId}`
-            || location.pathname.includes(
+          || location.pathname.includes(
               `/admin/exercises/${exerciseId}/controls`,
-            )
+          )
             ? 'contained'
             : 'text'
         }
         size="small"
         color={
           location.pathname === `/admin/exercises/${exerciseId}`
-            || location.pathname.includes(
+          || location.pathname.includes(
               `/admin/exercises/${exerciseId}/controls`,
-            )
+          )
             ? 'secondary'
             : 'primary'
         }

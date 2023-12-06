@@ -242,7 +242,7 @@ class Groups extends Component {
     const { keyword, sortBy, orderAsc } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.group_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.group_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;

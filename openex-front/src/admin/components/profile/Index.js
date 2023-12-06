@@ -95,14 +95,14 @@ const Index = () => {
         />
       </Paper>
       {!initialValues.user_is_external
-        && (
-          <Paper>
-            <Typography variant="h1" style={{ marginBottom: 20 }}>
-              {t('Password')}
-            </Typography>
-            <PasswordForm onSubmit={onUpdatePassword} />
-          </Paper>
-        )}
+      && (
+        <Paper>
+          <Typography variant="h1" style={{ marginBottom: 20 }}>
+            {t('Password')}
+          </Typography>
+          <PasswordForm onSubmit={onUpdatePassword} />
+        </Paper>
+      )}
       <Paper>
         <Typography variant="h1" style={{ marginBottom: 20 }}>
           {t('API access')}

@@ -129,7 +129,7 @@ const LessonsCategories = ({
           number: n[1].length,
           comments: R.filter(
             (o) => o.lessons_answer_positive !== null
-              || o.lessons_answer_negative !== null,
+            || o.lessons_answer_negative !== null,
             n[1],
           ).length,
         },

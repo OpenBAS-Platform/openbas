@@ -125,20 +125,20 @@ class InjectAddChallenges extends Component {
     const { keyword, challengesIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.challenge_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.challenge_content || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
-      || (n.challenge_category || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1;
+        || (n.challenge_category || '')
+          .toLowerCase()
+          .indexOf(keyword.toLowerCase()) !== -1;
     const filteredChallenges = R.pipe(
       R.filter(
         (n) => tags.length === 0
-          || R.any(
-            (filter) => R.includes(filter, n.challenge_tags),
-            R.pluck('id', tags),
-          ),
+        || R.any(
+          (filter) => R.includes(filter, n.challenge_tags),
+          R.pluck('id', tags),
+        ),
       ),
       R.filter(filterByKeyword),
       R.take(10),

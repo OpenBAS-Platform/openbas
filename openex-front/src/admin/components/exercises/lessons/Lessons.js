@@ -451,7 +451,7 @@ const Lessons = () => {
                         </Typography>
                         <Typography variant="body2">
                           {template.lessons_template_description
-                            || t('No description')}
+                          || t('No description')}
                         </Typography>
                       </div>
                     )}

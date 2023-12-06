@@ -109,8 +109,8 @@ const TopBar: React.FC = () => {
         </div>
         <div className={classes.menuContainer}>
           {(location.pathname === '/admin'
-            || location.pathname.includes('/admin/import')) && (
-              <TopMenuDashboard />
+          || location.pathname.includes('/admin/import')) && (
+            <TopMenuDashboard />
           )}
           {location.pathname === '/admin/exercises' && <TopMenuExercises />}
           {location.pathname.includes('/admin/exercises/') && (
