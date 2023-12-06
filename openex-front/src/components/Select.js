@@ -66,6 +66,8 @@ const renderSelectField = ({
   </FormControl>
 );
 
-export const Select = (props) => (
+const Select = (props) => (
   <Field name={props.name} component={renderSelectField} {...props} />
 );
+
+export default Select;

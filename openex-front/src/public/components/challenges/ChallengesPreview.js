@@ -48,14 +48,14 @@ import logo from '../../../static/images/logo.png';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
 import DocumentType from '../../../admin/components/documents/DocumentType';
 import ItemTags from '../../../components/ItemTags';
-import { TextField } from '../../../components/TextField';
+import TextField from '../../../components/TextField';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     position: 'relative',
     flexGrow: 1,
@@ -182,7 +182,6 @@ const ChallengesPreview = () => {
     dispatch(fetchMe());
     dispatch(fetchObserverChallenges(exerciseId, userId));
     dispatch(fetchPlayerDocuments(exerciseId, userId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const documentsReverseBy = (field) => {
     setDocumentsSortBy(field);

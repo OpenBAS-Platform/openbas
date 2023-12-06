@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
-import { TextField } from '../../../../components/TextField';
-import { ColorPickerField } from '../../../../components/ColorPickerField';
+import TextField from '../../../../components/TextField';
+import ColorPickerField from '../../../../components/ColorPickerField';
 import inject18n from '../../../../components/i18n';
 
 class TagForm extends Component {

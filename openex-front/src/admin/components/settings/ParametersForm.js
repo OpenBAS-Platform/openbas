@@ -3,9 +3,9 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
-import { Select } from '../../../components/Select';
+import Select from '../../../components/Select';
 import inject18n from '../../../components/i18n';
-import { TextField } from '../../../components/TextField';
+import TextField from '../../../components/TextField';
 
 const ParametersForm = (props) => {
   const { t, onSubmit, initialValues } = props;

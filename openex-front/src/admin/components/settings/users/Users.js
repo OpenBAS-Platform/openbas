@@ -19,7 +19,7 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
 import UserPopover from './UserPopover';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   parameters: {
     float: 'left',
     marginTop: -10,

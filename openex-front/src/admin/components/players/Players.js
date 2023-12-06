@@ -24,7 +24,7 @@ import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { useFormatter } from '../../../components/i18n';
 import { exportData } from '../../../utils/Environment';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   parameters: {
     marginTop: -10,
   },

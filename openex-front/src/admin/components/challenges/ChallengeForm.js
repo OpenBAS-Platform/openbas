@@ -20,10 +20,10 @@ import {
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
 import IconButton from '@mui/material/IconButton';
-import { TextField } from '../../../components/TextField';
+import TextField from '../../../components/TextField';
 import { useFormatter } from '../../../components/i18n';
-import { Select } from '../../../components/Select';
-import { MarkDownField } from '../../../components/MarkDownField';
+import Select from '../../../components/Select';
+import MarkDownField from '../../../components/MarkDownField';
 import DocumentType from '../documents/DocumentType';
 import ItemTags from '../../../components/ItemTags';
 import DocumentPopover from '../documents/DocumentPopover';
@@ -34,7 +34,7 @@ import { fetchDocuments } from '../../../actions/Document';
 import ChallengeAddDocuments from './ChallengeAddDocuments';
 import TagField from '../../../components/TagField';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',

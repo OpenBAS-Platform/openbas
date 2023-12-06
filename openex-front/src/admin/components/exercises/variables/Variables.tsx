@@ -7,7 +7,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { AttachMoneyOutlined } from '@mui/icons-material';
-import { Theme } from '@mui/material';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import SearchFilter from '../../../../components/SearchFilter';
 import DefinitionMenu from '../DefinitionMenu';
@@ -21,7 +20,7 @@ import { fetchVariables, VariablesHelper } from '../../../../actions/Variable';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { ExercicesHelper } from '../../../../actions/helper';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   container: {
     margin: '10px 0 50px 0',
     padding: '0 200px 0 0',

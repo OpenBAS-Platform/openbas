@@ -127,17 +127,17 @@ class InjectAddAudiences extends Component {
     const { keyword, audiencesIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.audience_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-      !== -1
+        !== -1
       || (n.audience_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
     const filteredAudiences = R.pipe(
       R.filter(
         (n) => tags.length === 0
-        || R.any(
-          (filter) => R.includes(filter, n.audience_tags),
-          R.pluck('id', tags),
-        ),
+          || R.any(
+            (filter) => R.includes(filter, n.audience_tags),
+            R.pluck('id', tags),
+          ),
       ),
       R.filter(filterByKeyword),
       R.take(10),

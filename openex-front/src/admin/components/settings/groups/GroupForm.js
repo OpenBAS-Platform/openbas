@@ -5,9 +5,9 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 import { InfoOutlined } from '@mui/icons-material';
-import { TextField } from '../../../../components/TextField';
+import TextField from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';
-import { SwitchField } from '../../../../components/SwitchField';
+import SwitchField from '../../../../components/SwitchField';
 
 class GroupForm extends Component {
   validate(values) {

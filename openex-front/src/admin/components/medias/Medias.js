@@ -17,7 +17,7 @@ import CreateMedia from './CreateMedia';
 import { useFormatter } from '../../../components/i18n';
 import MediaIcon from './MediaIcon';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   parameters: {
     marginTop: -10,
   },

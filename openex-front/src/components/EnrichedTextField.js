@@ -24,7 +24,6 @@ const EnrichedTextFieldBase = ({
   disabled,
 }) => {
   const classes = useStyles();
-
   const lang = useHelper((helper) => {
     const me = helper.getMe();
     const settings = helper.getSettings();
@@ -66,8 +65,8 @@ const EnrichedTextFieldBase = ({
   );
 };
 
-export const ConnectedEnrichedTextField = (props) => (
+const EnrichedTextField = (props) => (
   <Field name={props.name} component={EnrichedTextFieldBase} {...props} />
 );
 
-export const EnrichedTextField = ConnectedEnrichedTextField;
+export default EnrichedTextField;

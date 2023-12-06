@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
-import { TextField } from '../../../components/TextField';
+import TextField from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
 import TagField from '../../../components/TagField';
 import FileField from '../../../components/FileField';

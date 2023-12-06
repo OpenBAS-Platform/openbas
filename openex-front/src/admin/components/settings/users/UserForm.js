@@ -2,9 +2,9 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
-import { TextField } from '../../../../components/TextField';
+import TextField from '../../../../components/TextField';
 import { useFormatter } from '../../../../components/i18n';
-import { SwitchField } from '../../../../components/SwitchField';
+import SwitchField from '../../../../components/SwitchField';
 import TagField from '../../../../components/TagField';
 import OrganizationField from '../../../../components/OrganizationField';
 

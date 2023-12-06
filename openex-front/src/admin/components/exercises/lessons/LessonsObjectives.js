@@ -20,7 +20,7 @@ import ObjectivePopover from './ObjectivePopover';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import { areaChartOptions } from '../../../../utils/Charts';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   paper: {
     position: 'relative',
     padding: 0,

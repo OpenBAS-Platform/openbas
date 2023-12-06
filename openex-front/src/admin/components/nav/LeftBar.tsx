@@ -27,8 +27,9 @@ import { MESSAGING$ } from '../../../utils/Environment';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import { UsersHelper } from '../../../actions/helper';
+import { Theme } from '../../../components/Theme';
 
-const useStyles = makeStyles((theme) => createStyles({
+const useStyles = makeStyles<Theme>((theme) => createStyles({
   drawerPaper: {
     width: 55,
     minHeight: '100vh',
@@ -96,7 +97,7 @@ const useStyles = makeStyles((theme) => createStyles({
 
 const StyledTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} arrow classes={{ popper: className }} />
-))(({ theme }) => ({
+))(({ theme }: { theme: Theme }) => ({
   [`& .${tooltipClasses.arrow}`]: {
     color: theme.palette.common.black,
   },
@@ -106,7 +107,7 @@ const StyledTooltip = styled(({ className, ...props }) => (
 }));
 
 const LeftBar = () => {
-  const theme = useTheme();
+  const theme = useTheme<Theme>();
   const location = useLocation();
   const { t } = useFormatter();
   const [navOpen, setNavOpen] = useState(

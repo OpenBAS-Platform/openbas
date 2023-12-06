@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { normalize } from 'normalizr';
 
+// eslint-disable-next-line import/prefer-default-export
 export const api = (schema) => {
   const instance = axios.create({
     headers: { responseType: 'json' },

@@ -3,7 +3,7 @@ import {
   PaletteOptions,
   TypeBackground,
 } from '@mui/material';
-import { Theme as MuiTheme } from '@mui/material/styles/createTheme';
+import { Theme as MuiTheme, ThemeOptions } from '@mui/material/styles/createTheme';
 
 declare module '@mui/material/IconButton' {
   interface IconButtonPropsColorOverrides {

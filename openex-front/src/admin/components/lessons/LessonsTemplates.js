@@ -15,7 +15,7 @@ import useSearchAnFilter from '../../../utils/SortingFiltering';
 import CreateLessonsTemplate from './CreateLessonsTemplate';
 import { fetchLessonsTemplates } from '../../../actions/Lessons';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   parameters: {
     marginTop: -10,
   },

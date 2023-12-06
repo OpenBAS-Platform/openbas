@@ -39,7 +39,6 @@ const MediaPlayer = () => {
     dispatch(fetchMe());
     dispatch(fetchPlayerMedia(exerciseId, mediaId, userId));
     dispatch(fetchPlayerDocuments(exerciseId, userId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   if (media) {
     return (

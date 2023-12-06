@@ -20,7 +20,7 @@ import ResultsMenu from '../ResultsMenu';
 import CreateReport from './CreateReport';
 import { fetchReports } from '../../../../actions/Report';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   container: {
     margin: '10px 0 50px 0',
     padding: '0 200px 0 0',

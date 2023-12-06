@@ -9,7 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import OrganizationForm from '../admin/components/organizations/OrganizationForm';
 import { fetchOrganizations, addOrganization } from '../actions/Organization';
-import { Autocomplete } from './Autocomplete';
+import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
 import { storeHelper } from '../actions/Schema';
 

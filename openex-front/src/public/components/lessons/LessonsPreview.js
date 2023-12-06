@@ -22,8 +22,8 @@ import {
   fetchLessonsQuestions,
 } from '../../../actions/Lessons';
 import { fetchExercise } from '../../../actions/Exercise';
-import { SliderField } from '../../../components/SliderField';
-import { TextField } from '../../../components/TextField';
+import SliderField from '../../../components/SliderField';
+import TextField from '../../../components/TextField';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -71,7 +71,6 @@ const LessonsPlayer = () => {
     dispatch(fetchExercise(exerciseId));
     dispatch(fetchLessonsCategories(exerciseId));
     dispatch(fetchLessonsQuestions(exerciseId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const validate = (values) => {
     const errors = {};
@@ -164,7 +163,7 @@ const LessonsPlayer = () => {
                 const questions = sortQuestions(
                   lessonsQuestions.filter(
                     (n) => n.lessons_question_category
-                    === category.lessonscategory_id,
+                      === category.lessonscategory_id,
                   ),
                 );
                 return (
@@ -202,7 +201,7 @@ const LessonsPlayer = () => {
                               </Typography>
                               <Typography variant="body2">
                                 {question.lessons_question_explanation
-                                || t('No explanation')}
+                                  || t('No explanation')}
                               </Typography>
                             </Grid>
                             <Grid item={true} xs={3}>

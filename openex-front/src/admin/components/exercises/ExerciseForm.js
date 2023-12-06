@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
-import { TextField } from '../../../components/TextField';
-import { DateTimePicker } from '../../../components/DateTimePicker';
+import TextField from '../../../components/TextField';
+import DateTimePicker from '../../../components/DateTimePicker';
 import inject18n from '../../../components/i18n';
 import TagField from '../../../components/TagField';
 

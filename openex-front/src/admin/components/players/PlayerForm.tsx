@@ -3,7 +3,7 @@ import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import { makeStyles } from '@mui/styles';
 import { z } from 'zod';
-import { TextField } from '../../../components/TextField';
+import TextField from '../../../components/TextField';
 import { useFormatter } from '../../../components/i18n';
 import TagField from '../../../components/TagField';
 import OrganizationField from '../../../components/OrganizationField';

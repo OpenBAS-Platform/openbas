@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
-import { TextField } from '../../../../components/TextField';
+import TextField from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';
-import { EnrichedTextField } from '../../../../components/EnrichedTextField';
+import EnrichedTextField from '../../../../components/EnrichedTextField';
 
 class SendLessonsForm extends Component {
   validate(values) {

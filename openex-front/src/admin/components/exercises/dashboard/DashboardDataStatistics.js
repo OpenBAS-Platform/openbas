@@ -15,7 +15,7 @@ import {
 import Empty from '../../../../components/Empty';
 import { resolveUserName } from '../../../../utils/String';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   paperChart: {
     position: 'relative',
     padding: '0 20px 0 0',

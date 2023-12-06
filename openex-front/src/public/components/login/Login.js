@@ -58,7 +58,6 @@ const Login = (props) => {
   useEffect(() => {
     props.fetchParameters();
     props.checkKerberos();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const onSubmit = (data) => props.askToken(data.username, data.password);
   let loginHeight = 260;
@@ -90,7 +89,7 @@ const Login = (props) => {
         }}
       >
         {(isOpenId || isSaml2)
-        && [...(openidProviders ?? []), ...(saml2Providers ?? [])].map(
+          && [...(openidProviders ?? []), ...(saml2Providers ?? [])].map(
             (provider) => (
               <LoginSSOButton
                 key={provider.provider_name}

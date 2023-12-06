@@ -2,8 +2,8 @@ import React from 'react';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import { useFormatter } from '../../../../components/i18n';
-import { TextField } from '../../../../components/TextField';
-import { EnrichedTextField } from '../../../../components/EnrichedTextField';
+import TextField from '../../../../components/TextField';
+import EnrichedTextField from '../../../../components/EnrichedTextField';
 import FileField from '../../../../components/FileField';
 
 const CommunicationForm = ({ onSubmit, handleClose, initialValues }) => {

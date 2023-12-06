@@ -26,7 +26,7 @@ import TopMenuMedia from './TopMenuMedia';
 import TopMenuProfile from './TopMenuProfile';
 import { Theme } from '../../../components/Theme';
 import { useAppDispatch } from '../../../utils/hooks';
-import { MESSAGING$ } from '../../../utils/Environment.js';
+import { MESSAGING$ } from '../../../utils/Environment';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   appBar: {
@@ -115,7 +115,7 @@ const TopBar: React.FC = () => {
         </div>
         <div className={classes.menuContainer}>
           {(location.pathname === '/admin'
-          || location.pathname.includes('/admin/import')) && (
+            || location.pathname.includes('/admin/import')) && (
             <TopMenuDashboard />
           )}
           {location.pathname === '/admin/exercises' && <TopMenuExercises />}

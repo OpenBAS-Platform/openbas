@@ -18,7 +18,7 @@ const ColorPickerFieldBase = ({
     onChange(color && color.hex ? color.hex : '');
   };
   return (
-    <div>
+    <>
       <MuiTextField
         label={label}
         error={touched && invalid}
@@ -58,10 +58,12 @@ const ColorPickerFieldBase = ({
           onChangeComplete={(color) => handleChange(color)}
         />
       </Popover>
-    </div>
+    </>
   );
 };
 
-export const ColorPickerField = (props) => (
+const ColorPickerField = (props) => (
   <Field name={props.name} component={ColorPickerFieldBase} {...props} />
 );
+
+export default ColorPickerField;

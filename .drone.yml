@@ -26,8 +26,9 @@ steps:
     commands:
       - cd openex-front
       - yarn install
-      - yarn lint
       - yarn build
+      - yarn check-ts
+      - yarn lint
       - NODE_OPTIONS=--max_old_space_size=8192 yarn test
 
 services:
@@ -70,8 +71,9 @@ steps:
     commands:
       - cd openex-front
       - yarn install
-      - yarn lint
       - yarn build
+      - yarn check-ts
+      - yarn lint
       - NODE_OPTIONS=--max_old_space_size=8192 yarn test
 
   - name: codecov

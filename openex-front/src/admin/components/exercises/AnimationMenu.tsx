@@ -23,7 +23,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     position: 'fixed',
     overflow: 'auto',
     padding: 0,
-    backgroundColor: theme.palette.background.navLight,
   },
   toolbar: theme.mixins.toolbar,
   item: {

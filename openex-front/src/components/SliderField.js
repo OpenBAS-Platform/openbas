@@ -42,6 +42,8 @@ renderSliderField.propTypes = {
   disabled: PropTypes.bool,
 };
 
-export const SliderField = (props) => (
+const SliderField = (props) => (
   <Field component={renderSliderField} {...props} />
 );
+
+export default SliderField;

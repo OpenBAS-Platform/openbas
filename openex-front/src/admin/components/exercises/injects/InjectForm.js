@@ -5,11 +5,11 @@ import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import withStyles from '@mui/styles/withStyles';
 import Box from '@mui/material/Box';
-import { TextField } from '../../../../components/TextField';
+import TextField from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 import InjectIcon from './InjectIcon';
-import { Autocomplete } from '../../../../components/Autocomplete';
+import Autocomplete from '../../../../components/Autocomplete';
 
 const styles = (theme) => ({
   duration: {

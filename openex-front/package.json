@@ -14,6 +14,7 @@
     "@mui/lab": "5.0.0-alpha.155",
     "@mui/material": "5.14.20",
     "@mui/styles": "5.14.20",
+    "@mui/utils": "5.14.20",
     "@mui/x-date-pickers": "6.18.3",
     "@redux-devtools/extension": "3.2.6",
     "@uiw/react-md-editor": "4.0.1",
@@ -67,12 +68,14 @@
     "@eslint/eslintrc": "2.1.4",
     "@eslint/js": "8.55.0",
     "@stylistic/eslint-plugin": "1.5.0",
+    "@testing-library/react": "14.0.0",
     "@types/node": "20.10.3",
     "@types/react": "18.2.42",
     "@types/react-dom": "18.2.17",
     "@types/seamless-immutable": "7.1.19",
     "@typescript-eslint/eslint-plugin": "6.13.2",
     "@typescript-eslint/parser": "6.13.2",
+    "@vitejs/plugin-react": "4.1.0",
     "@vitejs/plugin-react-swc": "3.5.0",
     "chokidar": "3.5.3",
     "compression": "1.7.4",
@@ -96,7 +99,8 @@
     "jest-environment-jsdom": "29.7.0",
     "swagger-typescript-api": "13.0.3",
     "typescript": "5.3.2",
-    "vite": "5.0.6"
+    "vite": "5.0.6",
+    "vitest": "0.34.6"
   },
   "engines": {
     "node": ">= 16.*"
@@ -107,7 +111,8 @@
     "build": "node builder/prod/prod.js",
     "lint": "cross-env DEBUG=eslint:cli-engine TIMING=1 eslint --max-warnings 0 --cache -c .eslintrc.cjs src",
     "control": "yarn audit --groups dependencies --summary",
-    "test": "jest --coverage",
+    "test": "vitest run",
+    "check-ts": "tsc --noEmit",
     "generate-types-from-api": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n api-types.d.ts --sort-types"
   },
   "resolutions": {

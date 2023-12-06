@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
-import { DateTimePicker } from '../../../components/DateTimePicker';
+import DateTimePicker from '../../../components/DateTimePicker';
 import inject18n from '../../../components/i18n';
 
 class ExerciseDateForm extends Component {

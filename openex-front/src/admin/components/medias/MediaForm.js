@@ -3,9 +3,9 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
-import { TextField } from '../../../components/TextField';
+import TextField from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
-import { Select } from '../../../components/Select';
+import Select from '../../../components/Select';
 
 class MediaForm extends Component {
   validate(values) {

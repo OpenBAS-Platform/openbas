@@ -10,7 +10,7 @@ import {
   validateResetToken,
 } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';
-import { TextField } from '../../../components/TextField';
+import TextField from '../../../components/TextField';
 
 const useStyles = makeStyles(() => ({
   container: {

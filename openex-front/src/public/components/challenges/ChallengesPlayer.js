@@ -50,14 +50,14 @@ import logo from '../../../static/images/logo.png';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
 import DocumentType from '../../../admin/components/documents/DocumentType';
 import ItemTags from '../../../components/ItemTags';
-import { TextField } from '../../../components/TextField';
+import TextField from '../../../components/TextField';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     position: 'relative',
     flexGrow: 1,
@@ -188,7 +188,6 @@ const ChallengesPlayer = () => {
     dispatch(fetchMe());
     dispatch(fetchPlayerChallenges(exerciseId, userId));
     dispatch(fetchPlayerDocuments(exerciseId, userId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const documentsReverseBy = (field) => {
     setDocumentsSortBy(field);
@@ -525,11 +524,11 @@ const ChallengesPlayer = () => {
               </div>
             )}
             {currentExpectation?.inject_expectation_result === null
-            && currentResult === null && (
-              <Form
-                keepDirtyOnReinitialize={true}
-                onSubmit={(data) => submit(currentChallenge?.challenge_id, data)
-                }
+              && currentResult === null && (
+                <Form
+                  keepDirtyOnReinitialize={true}
+                  onSubmit={(data) => submit(currentChallenge?.challenge_id, data)
+                  }
                   validate={validate}
                   mutators={{
                     setValue: ([field, value], state, { changeValue }) => {

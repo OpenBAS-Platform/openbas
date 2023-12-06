@@ -9,7 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import PlayerForm from '../admin/components/players/PlayerForm';
 import { addPlayer, fetchPlayers } from '../actions/User';
-import { Autocomplete } from './Autocomplete';
+import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
 import { storeHelper } from '../actions/Schema';
 import { resolveUserName } from '../utils/String';

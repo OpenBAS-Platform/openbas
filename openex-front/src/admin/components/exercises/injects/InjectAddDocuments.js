@@ -134,15 +134,15 @@ class InjectAddDocuments extends Component {
       || (n.document_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
-        || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
+      || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1;
     const filteredDocuments = R.pipe(
       R.filter(
         (n) => tags.length === 0
-        || R.any(
-          (filter) => R.includes(filter, n.document_tags),
-          R.pluck('id', tags),
-        ),
+          || R.any(
+            (filter) => R.includes(filter, n.document_tags),
+            R.pluck('id', tags),
+          ),
       ),
       R.filter(filterByKeyword),
       R.take(10),

@@ -68,7 +68,6 @@ const useDataLoader = (loader = () => {}) => {
         sseClient = undefined;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };
 

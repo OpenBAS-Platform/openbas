@@ -5,9 +5,9 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
 import inject18n from '../../../components/i18n';
-import { ColorPickerField } from '../../../components/ColorPickerField';
-import { Select } from '../../../components/Select';
-import { TextField } from '../../../components/TextField';
+import ColorPickerField from '../../../components/ColorPickerField';
+import Select from '../../../components/Select';
+import TextField from '../../../components/TextField';
 
 class MediaParametersForm extends Component {
   render() {

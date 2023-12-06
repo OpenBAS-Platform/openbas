@@ -136,7 +136,7 @@ const inject18n = (WrappedComponent) => {
           {...{ t: translate }}
           {...{
             tPick: (label) => label[this.props.intl.locale]
-            ?? label[this.props.intl.defaultLocale],
+              ?? label[this.props.intl.defaultLocale],
           }}
           {...{ n: formatNumber }}
           {...{ b: formatBytes }}

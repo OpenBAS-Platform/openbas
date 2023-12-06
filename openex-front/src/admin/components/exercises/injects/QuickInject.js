@@ -45,13 +45,13 @@ import {
   isExerciseReadOnly,
   secondsFromToNow,
 } from '../../../../utils/Exercise';
-import { TextField } from '../../../../components/TextField';
-import { SwitchField } from '../../../../components/SwitchField';
-import { EnrichedTextField } from '../../../../components/EnrichedTextField';
+import TextField from '../../../../components/TextField';
+import SwitchField from '../../../../components/SwitchField';
+import EnrichedTextField from '../../../../components/EnrichedTextField';
 import InjectAddDocuments from './InjectAddDocuments';
 import DocumentType from '../../documents/DocumentType';
 import DocumentPopover from '../../documents/DocumentPopover';
-import { Select } from '../../../../components/Select';
+import Select from '../../../../components/Select';
 import ArticlePopover from '../articles/ArticlePopover';
 import InjectAddArticles from './InjectAddArticles';
 import MediaIcon from '../../medias/MediaIcon';
@@ -804,7 +804,7 @@ class QuickInject extends Component {
                                 && values[field.key]
                                 && values[field.key][index]
                                 && values[field.key][index].type
-                                === 'attachment' ? (
+                                  === 'attachment' ? (
                                   <Select
                                     variant="standard"
                                     name={`${name}.value`}

@@ -1,28 +1,45 @@
 import LogoText from '../static/images/logo_text.png';
 import LogoCollapsed from '../static/images/logo.png';
-import { fileUri } from '../utils/Environment.js';
+import { fileUri } from '../utils/Environment';
+import { hexToRGB } from '../utils/Colors';
+import { ExtendedThemeOptions } from './Theme';
 
-export default (
-  logo = null,
-  logo_collapsed = null,
-  background = null,
-  paper = null,
-  nav = null,
-  primary = null,
-  secondary = null,
-  accent = null,
-) => ({
+const EE_COLOR = '#0066ff';
+
+const ThemeLight = (
+  logo: string | null,
+  logo_collapsed: string | null,
+  background: string | null,
+  paper: string | null,
+  nav: string | null,
+  primary: string | null,
+  secondary: string | null,
+  accent: string | null,
+): ExtendedThemeOptions => ({
   logo: logo || fileUri(LogoText),
   logo_collapsed: logo_collapsed || fileUri(LogoCollapsed),
+  borderRadius: 2,
   palette: {
     mode: 'light',
-    primary: { main: primary || '#007fff' },
+    common: { white: '#ffffff' },
+    error: {
+      main: '#f44336',
+      dark: '#c62828',
+    },
+    success: { main: '#03A847' },
+    primary: { main: primary || '#0066ff' },
     secondary: { main: secondary || '#d81b60' },
-    error: { main: '#f44336' },
+    chip: { main: '#000000' },
+    ee: {
+      main: EE_COLOR,
+      background: hexToRGB(EE_COLOR, 0.2),
+      lightBackground: hexToRGB(EE_COLOR, 0.08),
+      contrastText: '#ffffff',
+    },
     background: {
-      default: background || '#ffffff',
-      paper: paper || '#f3f6f9',
-      nav: nav || '#f9feff',
+      default: background || '#f3f6f9',
+      paper: paper || '#ffffff',
+      nav: nav || '#ffffff',
       accent: accent || '#d3eaff',
       shadow: 'rgba(0, 0, 0, .05)',
     },
@@ -269,3 +286,5 @@ export default (
     },
   },
 });
+
+export default ThemeLight;

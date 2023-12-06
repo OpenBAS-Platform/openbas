@@ -4,11 +4,11 @@ import * as R from 'ramda';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
-import { TextField } from '../../../../components/TextField';
-import { Select } from '../../../../components/Select';
+import TextField from '../../../../components/TextField';
+import Select from '../../../../components/Select';
 import inject18n from '../../../../components/i18n';
-import { DateTimePicker } from '../../../../components/DateTimePicker';
-import { EnrichedTextField } from '../../../../components/EnrichedTextField';
+import DateTimePicker from '../../../../components/DateTimePicker';
+import EnrichedTextField from '../../../../components/EnrichedTextField';
 
 class ComcheckForm extends Component {
   validate(values) {

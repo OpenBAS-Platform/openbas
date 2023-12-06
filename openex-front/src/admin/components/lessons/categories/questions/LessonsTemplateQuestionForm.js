@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
-import { TextField } from '../../../../../components/TextField';
+import TextField from '../../../../../components/TextField';
 import { useFormatter } from '../../../../../components/i18n';
 
 const LessonsTemplateQuestionForm = (props) => {

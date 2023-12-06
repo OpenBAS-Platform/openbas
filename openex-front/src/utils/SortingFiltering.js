@@ -70,10 +70,10 @@ const useSearchAnFilter = (
       ? R.pipe(
         R.filter(
           (n) => tags.length === 0
-          || R.any(
-            (filter) => R.includes(filter, n[`${schema}${tagSuffix}_tags`] || []),
-            R.pluck('id', tags),
-          ),
+              || R.any(
+                (filter) => R.includes(filter, n[`${schema}${tagSuffix}_tags`] || []),
+                R.pluck('id', tags),
+              ),
         ),
         R.filter(filterByKeyword),
         sort,

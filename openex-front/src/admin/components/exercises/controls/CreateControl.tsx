@@ -33,7 +33,7 @@ import {
   UsersHelper,
 } from '../../../../actions/helper';
 
-const useStyles = makeStyles<Theme>((theme) => ({
+const useStyles = makeStyles<Theme>(() => ({
   createButton: {
     position: 'fixed',
     bottom: 30,

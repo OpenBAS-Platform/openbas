@@ -31,6 +31,8 @@ const renderCheckbox = ({
   </FormGroup>
 );
 
-export const CheckboxField = (props) => (
+const CheckboxField = (props) => (
   <Field name={props.name} component={renderCheckbox} {...props} />
 );
+
+export default CheckboxField;

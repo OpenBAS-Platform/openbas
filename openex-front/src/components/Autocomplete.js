@@ -67,6 +67,8 @@ const renderAutocomplete = ({
   );
 };
 
-export const Autocomplete = (props) => (
+const Autocomplete = (props) => (
   <Field name={props.name} component={renderAutocomplete} {...props} />
 );
+
+export default Autocomplete;

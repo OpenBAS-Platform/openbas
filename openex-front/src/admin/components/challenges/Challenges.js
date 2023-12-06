@@ -24,7 +24,7 @@ import ItemTags from '../../../components/ItemTags';
 import { fetchDocuments } from '../../../actions/Document';
 import { fetchExercises } from '../../../actions/Exercise';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   parameters: {
     marginTop: -10,
   },

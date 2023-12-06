@@ -15,7 +15,6 @@ const RedirectManager: React.FC<Props> = ({ children }) => {
     });
 
     return () => subscription.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return children;

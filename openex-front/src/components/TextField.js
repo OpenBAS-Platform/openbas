@@ -23,6 +23,8 @@ const TextFieldBase = ({
   );
 };
 
-export const TextField = (props) => (
+const TextField = (props) => (
   <Field name={props.name} component={TextFieldBase} {...props} />
 );
+
+export default TextField;

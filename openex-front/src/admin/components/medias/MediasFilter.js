@@ -36,7 +36,6 @@ const MediasFilter = (props) => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchMedias());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const medias = useHelper((helper) => helper.getMedias());
   const { onAddMedia, onClearMedia, onRemoveMedia, currentMedias, fullWidth } = props;

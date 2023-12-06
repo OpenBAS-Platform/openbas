@@ -9,8 +9,8 @@ import IndexPrivate from './private/Index';
 import { useHelper } from './store';
 import { fetchMe, fetchParameters } from './actions/Application';
 import NotFound from './components/NotFound';
-import { ConnectedThemeProvider } from './components/AppThemeProvider';
-import { ConnectedIntlProvider } from './components/AppIntlProvider';
+import ConnectedThemeProvider from './components/AppThemeProvider';
+import ConnectedIntlProvider from './components/AppIntlProvider';
 import { errorWrapper } from './components/Error';
 import { useAppDispatch } from './utils/hooks';
 import Comcheck from './public/components/comcheck/Comcheck';
@@ -25,7 +25,6 @@ const Root = () => {
   useEffect(() => {
     dispatch(fetchMe());
     dispatch(fetchParameters());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   if (R.isEmpty(logged)) {
     return <div />;

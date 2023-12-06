@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { Kayaking } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import { makeStyles } from '@mui/styles';
-import { Autocomplete } from './Autocomplete';
+import Autocomplete from './Autocomplete';
 import useDataLoader from '../utils/ServerSideEvent';
 import { useHelper } from '../store';
 import { fetchExercises } from '../actions/Exercise';

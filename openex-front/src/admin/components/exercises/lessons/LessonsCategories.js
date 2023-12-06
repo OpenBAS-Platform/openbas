@@ -23,7 +23,7 @@ import LessonsCategoryAddAudiences from './categories/LessonsCategoryAddAudience
 import { truncate } from '../../../../utils/String';
 import { updateLessonsCategoryAudiences } from '../../../../actions/Lessons';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   paper: {
     position: 'relative',
     padding: 0,
@@ -86,7 +86,7 @@ const LessonsCategories = ({
           number: n[1].length,
           comments: R.filter(
             (o) => o.lessons_answer_positive !== null
-            || o.lessons_answer_negative !== null,
+              || o.lessons_answer_negative !== null,
             n[1],
           ).length,
         },

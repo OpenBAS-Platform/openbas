@@ -114,13 +114,13 @@ class InjectAddArticles extends Component {
     const { keyword, articlesIds } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.article_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-      !== -1
+        !== -1
       || (n.article_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
-        || (n.article_fullmedia?.media_name || '')
-          .toLowerCase()
-          .indexOf(keyword.toLowerCase()) !== -1;
+      || (n.article_fullmedia?.media_name || '')
+        .toLowerCase()
+        .indexOf(keyword.toLowerCase()) !== -1;
     const fullArticles = articles.map((item) => ({
       ...item,
       article_fullmedia: mediasMap[item.article_media] || {},

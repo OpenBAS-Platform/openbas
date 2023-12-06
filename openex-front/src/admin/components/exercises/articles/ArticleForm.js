@@ -18,21 +18,21 @@ import {
   ArrowDropUpOutlined,
 } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
-import { TextField } from '../../../../components/TextField';
-import { Autocomplete } from '../../../../components/Autocomplete';
+import TextField from '../../../../components/TextField';
+import Autocomplete from '../../../../components/Autocomplete';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchMedias } from '../../../../actions/Media';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
 import MediaIcon from '../../medias/MediaIcon';
-import { MarkDownField } from '../../../../components/MarkDownField';
+import MarkDownField from '../../../../components/MarkDownField';
 import DocumentType from '../../documents/DocumentType';
 import ItemTags from '../../../../components/ItemTags';
 import DocumentPopover from '../../documents/DocumentPopover';
 import ArticleAddDocuments from './ArticleAddDocuments';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   icon: {
     paddingTop: 4,
     display: 'inline-block',

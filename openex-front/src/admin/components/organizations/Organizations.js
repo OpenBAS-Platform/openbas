@@ -200,19 +200,19 @@ class Organizations extends Component {
       || (n.organization_name || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
-        || (n.organization_description || '')
-          .toLowerCase()
-          .indexOf(keyword.toLowerCase()) !== -1;
+      || (n.organization_description || '')
+        .toLowerCase()
+        .indexOf(keyword.toLowerCase()) !== -1;
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
     const sortedOrganizations = R.pipe(
       R.filter(
         (n) => tags.length === 0
-        || R.any(
-          (filter) => R.includes(filter, n.organization_tags),
-          R.pluck('id', tags),
-        ),
+          || R.any(
+            (filter) => R.includes(filter, n.organization_tags),
+            R.pluck('id', tags),
+          ),
       ),
       R.filter(filterByKeyword),
       sort,

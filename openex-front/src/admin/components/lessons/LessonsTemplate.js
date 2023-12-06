@@ -70,7 +70,7 @@ const LessonsTemplate = () => {
           const sortedLessonsTemplateQuestions = sortQuestions(
             lessonsTemplateQuestions.filter(
               (n) => n.lessons_template_question_category
-              === category.lessonstemplatecategory_id,
+                === category.lessonstemplatecategory_id,
             ),
           );
           return (
@@ -89,7 +89,7 @@ const LessonsTemplate = () => {
               />
               <Typography variant="h3" style={{ float: 'right' }}>
                 {category.lessons_template_category_description
-                || t('No description')}
+                  || t('No description')}
               </Typography>
               <div className="clearfix" />
               <Paper variant="outlined" classes={{ root: classes.paper }}>

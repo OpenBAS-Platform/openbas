@@ -29,6 +29,8 @@ const renderSwitch = ({
   </FormGroup>
 );
 
-export const SwitchField = (props) => (
+const SwitchField = (props) => (
   <Field name={props.name} component={renderSwitch} {...props} />
 );
+
+export default SwitchField;

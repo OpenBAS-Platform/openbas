@@ -28,4 +28,6 @@ AppThemeProvider.propTypes = {
   children: PropTypes.node,
 };
 
-export const ConnectedThemeProvider = AppThemeProvider;
+const ConnectedThemeProvider = AppThemeProvider;
+
+export default ConnectedThemeProvider;

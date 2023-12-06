@@ -14,7 +14,7 @@ import {
 import Empty from '../../../../components/Empty';
 import { resolveUserName } from '../../../../utils/String';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   paperChart: {
     position: 'relative',
     padding: '0 20px 0 0',
@@ -94,10 +94,10 @@ const DashboardDefinitionStatistics = ({
               'inject_expectation_percent_score',
               Math.round(
                 (cumulation * 100)
-                / (audiencesMap[n[0]]
-                  ? audiencesMap[n[0]]
-                    .audience_injects_expectations_total_expected_score
-                  : 1),
+                  / (audiencesMap[n[0]]
+                    ? audiencesMap[n[0]]
+                      .audience_injects_expectations_total_expected_score
+                    : 1),
               ),
               i,
             );
@@ -222,7 +222,7 @@ const DashboardDefinitionStatistics = ({
   const organizationsTotalScores = R.pipe(
     R.filter(
       (n) => n.inject_expectation_result !== null
-      && n.inject_expectation_user !== null,
+        && n.inject_expectation_user !== null,
     ),
     R.map((n) => R.assoc(
       'inject_expectation_user',
@@ -255,7 +255,7 @@ const DashboardDefinitionStatistics = ({
   const usersTotalScores = R.pipe(
     R.filter(
       (n) => n.inject_expectation_result !== null
-      && n.inject_expectation_user !== null,
+        && n.inject_expectation_user !== null,
     ),
     R.groupBy(R.prop('inject_expectation_user')),
     R.toPairs,
@@ -282,7 +282,7 @@ const DashboardDefinitionStatistics = ({
       'audience_total_percent_score',
       Math.round(
         (n.audience_injects_expectations_total_score * 100)
-        / n.audience_injects_expectations_total_expected_score,
+            / n.audience_injects_expectations_total_expected_score,
       ),
       n,
     ),

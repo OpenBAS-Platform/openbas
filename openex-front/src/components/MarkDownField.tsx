@@ -3,16 +3,16 @@ import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
 import { Field, FieldInputProps, FieldMetaState } from 'react-final-form';
 import InputLabel from '@mui/material/InputLabel';
 import FormHelperText from '@mui/material/FormHelperText';
-import { useFormatter } from './i18n';
 import { useTheme } from '@mui/material';
+import { useFormatter } from './i18n';
 import { Theme } from './Theme';
 
 interface Props {
-  label: string
-  style: React.CSSProperties
-  disabled?: boolean
-  input: FieldInputProps<string, HTMLElement>
-  meta: FieldMetaState<string>
+  label: string;
+  style: React.CSSProperties;
+  disabled?: boolean;
+  input: FieldInputProps<string, HTMLElement>;
+  meta: FieldMetaState<string>;
 }
 
 const MarkDownFieldBase: React.FC<Props> = ({
@@ -25,16 +25,21 @@ const MarkDownFieldBase: React.FC<Props> = ({
   const { t } = useFormatter();
   const theme = useTheme<Theme>();
   const [fullscreen, setFullscreen] = useState(false);
-
   return (
-    <div style={style} className={touched && invalid ? 'error' : 'main'} data-color-mode={theme.palette.mode}>
+    <div
+      style={style}
+      className={touched && invalid ? 'error' : 'main'}
+      data-color-mode={theme.palette.mode}
+    >
       <InputLabel shrink={true} variant="standard">
         {label}
       </InputLabel>
       <MDEditor
         value={value}
         style={{
-          background: fullscreen ? theme.palette.background.paper : 'transparent',
+          background: fullscreen
+            ? theme.palette.background.paper
+            : 'transparent',
         }}
         textareaProps={{
           disabled,
@@ -58,9 +63,21 @@ const MarkDownFieldBase: React.FC<Props> = ({
           { ...commands.checkedListCommand, buttonProps: { disabled } },
         ]}
         extraCommands={[
-          { ...commands.codeEdit, buttonProps: { 'aria-label': 'code edit', title: 'code edit' } },
-          { ...commands.codeLive, buttonProps: { 'aria-label': 'code live', title: 'code live' } },
-          { ...commands.codePreview, buttonProps: { 'aria-label': 'code preview', title: 'code preview' } },
+          {
+            ...commands.codeEdit,
+            buttonProps: { 'aria-label': 'code edit', title: 'code edit' },
+          },
+          {
+            ...commands.codeLive,
+            buttonProps: { 'aria-label': 'code live', title: 'code live' },
+          },
+          {
+            ...commands.codePreview,
+            buttonProps: {
+              'aria-label': 'code preview',
+              title: 'code preview',
+            },
+          },
           { ...commands.divider },
           { ...commands.fullscreen, execute: () => setFullscreen(!fullscreen) },
         ]}
@@ -74,6 +91,8 @@ const MarkDownFieldBase: React.FC<Props> = ({
   );
 };
 
-export const MarkDownField = (props: Props & { name: string }) => (
+const MarkDownField = (props: Props & { name: string }) => (
   <Field component={MarkDownFieldBase} {...props} />
 );
+
+export default MarkDownField;

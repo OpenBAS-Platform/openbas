@@ -86,7 +86,7 @@ const Inject = () => {
 <div class=3D"x_elementToProof" style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12pt;">
  ${
   lastCommunication.communication_content
-  && lastCommunication.communication_content.length > 10
+   && lastCommunication.communication_content.length > 10
     ? lastCommunication.communication_content.replaceAll('\n', '<br />')
     : lastCommunication.communication_content_html
 }
@@ -128,19 +128,19 @@ const Inject = () => {
         sortCommunications(
           R.filter(
             (o) => o.communication_subject.toLowerCase().includes('re: ')
-            && ((o.communication_animation
-            && R.any(
-              (p) => o.communication_to
-                .toLowerCase()
-                .includes(p.toLowerCase()),
-              n.communication_mails,
-            ))
-            || R.any(
-              (p) => o.communication_from
-                .toLowerCase()
-                .includes(p.toLowerCase()),
-              n.communication_mails,
-            )),
+                && ((o.communication_animation
+                  && R.any(
+                    (p) => o.communication_to
+                      .toLowerCase()
+                      .includes(p.toLowerCase()),
+                    n.communication_mails,
+                  ))
+                  || R.any(
+                    (p) => o.communication_from
+                      .toLowerCase()
+                      .includes(p.toLowerCase()),
+                    n.communication_mails,
+                  )),
             communicationsWithMails,
           ),
         ),

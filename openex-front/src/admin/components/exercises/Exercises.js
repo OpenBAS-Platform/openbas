@@ -27,7 +27,7 @@ import useDataLoader from '../../../utils/ServerSideEvent';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { exportData } from '../../../utils/Environment';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   parameters: {
     marginTop: -10,
   },

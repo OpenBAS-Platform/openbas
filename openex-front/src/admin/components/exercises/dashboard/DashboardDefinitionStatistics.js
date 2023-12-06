@@ -9,7 +9,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { colors, horizontalBarsChartOptions } from '../../../../utils/Charts';
 import Empty from '../../../../components/Empty';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   paperChart: {
     position: 'relative',
     padding: '0 20px 0 0',

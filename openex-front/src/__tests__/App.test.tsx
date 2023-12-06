@@ -1,12 +1,19 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
-import App from '../app';
+import { act, cleanup, render } from '@testing-library/react';
+import { describe, afterEach, it, expect } from 'vitest';
+import { StyledEngineProvider } from '@mui/material/styles';
 
-it('renders without crashing', () => {
-  const div = document.createElement('div');
-  if (div) {
-    const root = createRoot(div);
-    root.render(<App />);
-    root.unmount();
-  }
+describe('App', () => {
+  afterEach(cleanup);
+  it('renders without crashing', async () => {
+    const { getByDisplayValue } = render(
+      <StyledEngineProvider injectFirst={true}>
+        <input readOnly type="text" id="lastName" value="Admin" />
+      </StyledEngineProvider>,
+    );
+    act(() => {
+      const firstname = getByDisplayValue('Admin');
+      expect(firstname).toBeDefined();
+    });
+  });
 });

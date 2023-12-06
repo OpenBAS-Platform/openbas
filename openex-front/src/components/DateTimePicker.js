@@ -45,6 +45,8 @@ const DateTimePickerBase = ({
   );
 };
 
-export const DateTimePicker = (props) => (
+const DateTimePicker = (props) => (
   <Field name={props.name} component={DateTimePickerBase} {...props} />
 );
+
+export default DateTimePicker;

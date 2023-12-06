@@ -2,9 +2,9 @@ import React from 'react';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import { TextField } from '../../../../components/TextField';
+import TextField from '../../../../components/TextField';
 import { useFormatter } from '../../../../components/i18n';
-import { CheckboxField } from '../../../../components/CheckboxField';
+import CheckboxField from '../../../../components/CheckboxField';
 
 const ReportForm = (props) => {
   const { t } = useFormatter();

@@ -66,4 +66,6 @@ AppIntlProvider.propTypes = {
   children: PropTypes.node,
 };
 
-export const ConnectedIntlProvider = AppIntlProvider;
+const ConnectedIntlProvider = AppIntlProvider;
+
+export default ConnectedIntlProvider;

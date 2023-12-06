@@ -9,7 +9,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { colors, horizontalBarsChartOptions } from '../../../../utils/Charts';
 import Empty from '../../../../components/Empty';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   paperChart: {
     position: 'relative',
     padding: '0 20px 0 0',
@@ -38,7 +38,7 @@ const DashboardDefinitionScoreStatistics = ({
   const injectTypesWithScore = R.pipe(
     R.filter(
       (n) => n.inject_type === 'openex_challenge'
-      || n.inject_content?.expectationScore,
+        || n.inject_content?.expectationScore,
     ),
     R.map((n) => {
       if (n.inject_type !== 'openex_challenge') {

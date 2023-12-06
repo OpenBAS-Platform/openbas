@@ -3,13 +3,13 @@ import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
-import { truncate } from '../utils/String';
 import MDEditor from '@uiw/react-md-editor/nohighlight';
-import { Theme } from './Theme';
 import { useTheme } from '@mui/material';
+import { truncate } from '../utils/String';
+import { Theme } from './Theme';
 
 interface MardDownComponentProps {
-  node?: unknown
+  node?: unknown;
 }
 
 export const MarkDownComponents = (theme: Theme) => ({
@@ -50,13 +50,18 @@ export const MarkDownComponents = (theme: Theme) => ({
 });
 
 interface Props {
-  source: string
-  limit: number
-  controlled?: boolean
-  isExpanded?: boolean
+  source: string;
+  limit: number;
+  controlled?: boolean;
+  isExpanded?: boolean;
 }
 
-const ExpandableMarkdow: React.FC<Props> = ({ source, limit, isExpanded, controlled }) => {
+const ExpandableMarkdow: React.FC<Props> = ({
+  source,
+  limit,
+  isExpanded,
+  controlled,
+}) => {
   const [expand, setExpand] = useState(false);
   const theme = useTheme<Theme>();
   const onClick = () => setExpand(!expand);
