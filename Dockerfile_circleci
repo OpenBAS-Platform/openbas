@@ -6,7 +6,7 @@ COPY openex-framework ./openex-framework
 COPY openex-api ./openex-api
 COPY openex-injectors ./openex-injectors
 COPY openex-collectors ./openex-collectors
-COPY openex-front/builder/prod/build ./openex-front/build
+COPY openex-front/builder/prod/build ./openex-front/builder/prod/build
 COPY pom.xml ./pom.xml
 RUN mvn install -DskipTests -Pdev
 

@@ -240,7 +240,7 @@
                             <outputDirectory>${project.build.outputDirectory}/build</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>../openex-front/build</directory>
+                                    <directory>../openex-front/builder/prod/build</directory>
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>

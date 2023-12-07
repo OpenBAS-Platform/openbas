@@ -22,6 +22,7 @@ import useDataLoader from '../../../utils/ServerSideEvent';
 const styles = () => ({
   root: {
     flexGrow: 1,
+    paddingBottom: 50,
   },
   paper: {
     position: 'relative',
@@ -43,7 +44,6 @@ const Parameters = (props) => {
     dispatch(fetchParameters());
   });
   const onUpdate = (data) => connectedUpdateParameters(data);
-
   return (
     <div className={classes.root}>
       <Grid container={true} spacing={3}>
