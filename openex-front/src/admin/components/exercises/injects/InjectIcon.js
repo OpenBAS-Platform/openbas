@@ -16,6 +16,7 @@ import {
 } from 'mdi-material-ui';
 import Airbus from '../../../../static/images/contracts/airbus.png';
 import CustomTooltip from '../../../../components/CustomTooltip';
+import { fileUri } from '../../../../utils/Environment';
 
 const iconSelector = (type, variant, fontSize, done, disabled) => {
   let style;
@@ -75,7 +76,7 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
     case 'openex_lade':
       return (
         <img
-          src={`/${window.BASE_PATH ? `${window.BASE_PATH}/` : ''}${Airbus}`}
+          src={fileUri(Airbus)}
           alt="Airbus Lade"
           style={{
             width: fontSize === 'small' || variant === 'inline' ? 20 : 24,

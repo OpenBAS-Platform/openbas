@@ -323,7 +323,7 @@ const i18n = {
       Trigger: 'Déclencheur',
       'Manage content': 'Gérer le contenu',
       Controls: 'Contrôles',
-      'Lessons learned': "Retour d'expérience",
+      'Lessons learned': 'Expérience',
       Planning: 'Planification',
       'Media pressure': 'Pression médiatique',
       Comchecks: 'Vérifications',

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch } from 'react-redux';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import { Link, useParams } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -29,7 +29,6 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import Alert from '@mui/material/Alert';
-import Slide from '@mui/material/Slide';
 import List from '@mui/material/List';
 import IconButton from '@mui/material/IconButton';
 import { ListItem, ListItemIcon } from '@mui/material';
@@ -46,16 +45,11 @@ import { fetchMe } from '../../../actions/Application';
 import { fetchPlayerDocuments } from '../../../actions/Document';
 import Loader from '../../../components/Loader';
 import Empty from '../../../components/Empty';
-import logo from '../../../static/images/logo.png';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
 import DocumentType from '../../../admin/components/documents/DocumentType';
 import ItemTags from '../../../components/ItemTags';
 import TextField from '../../../components/TextField';
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
+import Transition from '../../../components/common/Transition';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -160,6 +154,7 @@ const inlineStyles = {
 };
 
 const ChallengesPlayer = () => {
+  const theme = useTheme();
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
@@ -273,7 +268,7 @@ const ChallengesPlayer = () => {
         )}
         <div className={classes.container}>
           <div style={{ margin: '0 auto', textAlign: 'center' }}>
-            <img src={`/${logo}`} alt="logo" className={classes.logo} />
+            <img src={theme.logo} alt="logo" className={classes.logo} />
           </div>
           <Typography
             variant="h1"

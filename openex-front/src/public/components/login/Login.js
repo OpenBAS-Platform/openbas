@@ -17,6 +17,7 @@ import { storeHelper } from '../../../actions/Schema';
 import Reset from './Reset';
 import LoginError from './LoginError';
 import LoginSSOButton from './LoginSSOButton';
+import { fileUri } from '../../../utils/Environment';
 
 const styles = () => ({
   container: {
@@ -69,7 +70,7 @@ const Login = (props) => {
   const marginTop = dimension.height / 2 - loginHeight / 2 - 200;
   return (
     <div className={classes.container} style={{ marginTop }}>
-      <img src={`/${logo}`} alt="logo" className={classes.logo} />
+      <img src={fileUri(logo)} alt="logo" className={classes.logo} />
       {isLocal && !reset && (
         <Paper variant="outlined">
           <LoginForm onSubmit={onSubmit} />

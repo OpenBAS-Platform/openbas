@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Paper from '@mui/material/Paper';
 import { useParams } from 'react-router-dom';
 import { CheckCircleOutlineOutlined } from '@mui/icons-material';
 import { fetchComcheckStatus } from '../../../actions/Comcheck';
-import logo from '../../../static/images/logo.png';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 
@@ -38,6 +37,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Comcheck = () => {
+  const theme = useTheme();
   const classes = useStyles();
   const dispatch = useDispatch();
   const { fldt, t } = useFormatter();
@@ -61,7 +61,7 @@ const Comcheck = () => {
   const marginTop = dimension.height / 2 - comcheckHeight / 2 - 200;
   return (
     <div className={classes.container} style={{ marginTop }}>
-      <img src={`/${logo}`} alt="logo" className={classes.logo} />
+      <img src={theme.logo} alt="logo" className={classes.logo} />
       <Paper variant="outlined">
         <AppBar color="primary" position="relative" className={classes.appBar}>
           <Toolbar>

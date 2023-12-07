@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
 import { Link, useParams } from 'react-router-dom';
 import { Form } from 'react-final-form';
@@ -8,7 +8,6 @@ import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import Slide from '@mui/material/Slide';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
 import { useFormatter } from '../../../components/i18n';
@@ -16,7 +15,6 @@ import { usePermissions } from '../../../utils/Exercise';
 import { fetchMe } from '../../../actions/Application';
 import Loader from '../../../components/Loader';
 import Empty from '../../../components/Empty';
-import logo from '../../../static/images/logo.png';
 import {
   fetchLessonsCategories,
   fetchLessonsQuestions,
@@ -24,11 +22,6 @@ import {
 import { fetchExercise } from '../../../actions/Exercise';
 import SliderField from '../../../components/SliderField';
 import TextField from '../../../components/TextField';
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -52,6 +45,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const LessonsPlayer = () => {
+  const theme = useTheme();
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
@@ -122,7 +116,7 @@ const LessonsPlayer = () => {
         )}
         <div className={classes.container}>
           <div style={{ margin: '0 auto', textAlign: 'center' }}>
-            <img src={`/${logo}`} alt="logo" className={classes.logo} />
+            <img src={theme.logo} alt="logo" className={classes.logo} />
           </div>
           <Typography
             variant="h1"
