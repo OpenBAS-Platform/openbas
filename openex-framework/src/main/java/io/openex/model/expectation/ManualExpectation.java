@@ -2,31 +2,24 @@ package io.openex.model.expectation;
 
 import io.openex.database.model.InjectExpectation;
 import io.openex.model.Expectation;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 
+@Getter
+@Setter
 public class ManualExpectation implements Expectation {
-    private Integer score;
 
-    public ManualExpectation(Integer score) {
-        setScore(Objects.requireNonNullElse(score, 100));
-    }
+  private Integer score;
 
-    @Override
-    public InjectExpectation.EXPECTATION_TYPE type() {
-        return InjectExpectation.EXPECTATION_TYPE.MANUAL;
-    }
+  public ManualExpectation(Integer score) {
+    setScore(Objects.requireNonNullElse(score, 100));
+  }
 
-    @Override
-    public Integer score() {
-        return score;
-    }
+  @Override
+  public InjectExpectation.EXPECTATION_TYPE type() {
+    return InjectExpectation.EXPECTATION_TYPE.MANUAL;
+  }
 
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
-    }
 }

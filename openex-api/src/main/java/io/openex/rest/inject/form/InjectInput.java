@@ -9,6 +9,8 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
+@Getter
 public class InjectInput {
 
     @JsonProperty("inject_title")
@@ -26,8 +28,6 @@ public class InjectInput {
     @JsonProperty("inject_depends_from_another")
     private String dependsOn;
 
-    @Getter
-    @Setter
     @JsonProperty("inject_depends_duration")
     private Long dependsDuration;
 
@@ -47,98 +47,10 @@ public class InjectInput {
     private String city;
 
     @JsonProperty("inject_tags")
-    private List<String> tagIds = new ArrayList<>();;
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public ObjectNode getContent() {
-        return content;
-    }
-
-    public void setContent(ObjectNode content) {
-        this.content = content;
-    }
-
-    public String getContract() {
-        return contract;
-    }
-
-    public void setContract(String contract) {
-        this.contract = contract;
-    }
-
-    public List<String> getAudiences() {
-        return audiences;
-    }
-
-    public void setAudiences(List<String> audiences) {
-        this.audiences = audiences;
-    }
+    private List<String> tagIds = new ArrayList<>();
 
     public boolean getAllAudiences() {
         return allAudiences;
-    }
-
-    public void setAllAudiences(boolean allAudiences) {
-        this.allAudiences = allAudiences;
-    }
-
-    public boolean isAllAudiences() {
-        return allAudiences;
-    }
-
-    public List<InjectDocumentInput> getDocuments() {
-        return documents;
-    }
-
-    public void setDocuments(List<InjectDocumentInput> documents) {
-        this.documents = documents;
-    }
-
-    public String getDependsOn() {
-        return dependsOn;
-    }
-
-    public void setDependsOn(String dependsOn) {
-        this.dependsOn = dependsOn;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public List<String> getTagIds() {
-        return tagIds;
-    }
-
-    public void setTagIds(List<String> tagIds) {
-        this.tagIds = tagIds;
     }
 
     public Inject toInject() {

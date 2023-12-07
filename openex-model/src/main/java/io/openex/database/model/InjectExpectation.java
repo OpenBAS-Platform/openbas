@@ -15,6 +15,7 @@ import java.util.Objects;
 
 import static java.time.Instant.now;
 
+@Getter
 @Entity
 @Table(name = "injects_expectations")
 @EntityListeners(ModelBaseListener.class)
@@ -27,7 +28,6 @@ public class InjectExpectation implements Base {
         MANUAL,
     }
 
-    @Getter
     @Setter
     @Column(name = "inject_expectation_type")
     @JsonProperty("inject_expectation_type")
@@ -37,7 +37,6 @@ public class InjectExpectation implements Base {
     // region basic
     @Id
     @NotBlank
-    @Getter
     @Setter
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
@@ -45,31 +44,26 @@ public class InjectExpectation implements Base {
     @JsonProperty("injectexpectation_id")
     private String id;
 
-    @Getter
     @Setter
     @Column(name = "inject_expectation_created_at")
     @JsonProperty("inject_expectation_created_at")
     private Instant createdAt = now();
 
-    @Getter
     @Setter
     @Column(name = "inject_expectation_updated_at")
     @JsonProperty("inject_expectation_updated_at")
     private Instant updatedAt = now();
 
-    @Getter
     @Setter
     @Column(name = "inject_expectation_result")
     @JsonProperty("inject_expectation_result")
     private String result;
 
-    @Getter
     @Setter
     @Column(name = "inject_expectation_score")
     @JsonProperty("inject_expectation_score")
     private Integer score;
 
-    @Getter
     @Setter
     @Column(name = "inject_expectation_expected_score")
     @JsonProperty("inject_expectation_expected_score")
@@ -77,7 +71,6 @@ public class InjectExpectation implements Base {
     // endregion
 
     // region contextual relations
-    @Getter
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_id")
@@ -85,7 +78,6 @@ public class InjectExpectation implements Base {
     @JsonProperty("inject_expectation_exercise")
     private Exercise exercise;
 
-    @Getter
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inject_id")
@@ -93,7 +85,6 @@ public class InjectExpectation implements Base {
     @JsonProperty("inject_expectation_inject")
     private Inject inject;
 
-    @Getter
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -101,7 +92,6 @@ public class InjectExpectation implements Base {
     @JsonProperty("inject_expectation_user")
     private User user;
 
-    @Getter
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "audience_id")
@@ -110,14 +100,12 @@ public class InjectExpectation implements Base {
     private Audience audience;
     // endregion
 
-    @Getter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_expectation_article")
     private Article article;
 
-    @Getter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
