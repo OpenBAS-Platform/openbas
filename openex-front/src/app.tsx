@@ -5,10 +5,11 @@ import { HistoryRouter as Router } from 'redux-first-history/rr6';
 import { history, store } from './store';
 import RedirectManager from './components/RedirectManager';
 import Root from './root';
+import { APP_BASE_PATH } from './utils/Action';
 
 const App = () => (
   <Provider store={store}>
-    <Router history={history}>
+    <Router basename={APP_BASE_PATH} history={history}>
       <RedirectManager>
         <Routes>
           <Route path="/*" element={<Root />} />

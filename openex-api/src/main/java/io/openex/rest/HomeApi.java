@@ -1,5 +1,6 @@
 package io.openex.rest;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -9,6 +10,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -27,11 +29,14 @@ public class HomeApi {
         }
     }
 
-    @GetMapping(path = "/**", produces = MediaType.TEXT_HTML_VALUE)
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
+
+    @GetMapping(path = {"/", "/admin/**", "/players/**"}, produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> home() {
         ClassPathResource classPathResource = new ClassPathResource("/build/index.html");
         String index = readResourceAsString(classPathResource);
-        String basePath = ""; // TODO Add this in configuration
+        String basePath = contextPath.endsWith("/") ? contextPath.substring(0, contextPath.length() - 1) : contextPath;
         String newIndex = index.
                 replaceAll("%APP_TITLE%", "OpenEx - Crisis Exercises and Adversary Simulation Platform").
                 replaceAll("%APP_DESCRIPTION%", "OpenEx is an open source platform allowing organizations to plan, schedule and conduct crisis exercises as well as adversary simulation campaign.").

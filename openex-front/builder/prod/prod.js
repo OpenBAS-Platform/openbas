@@ -36,12 +36,12 @@ build({
   // region Generate index.html
   const cssStaticFiles = fs.readdirSync(buildPath + 'static/css');
   const cssLinks = cssStaticFiles.map(
-    (f) => `<link href="/static/css/${f}" rel="stylesheet">`,
+    (f) => `<link href="%BASE_PATH%/static/css/${f}" rel="stylesheet">`,
   );
   const cssImport = cssLinks.join('\n');
   const jsStaticFiles = fs.readdirSync(buildPath + 'static/js');
   const jsLinks = jsStaticFiles.map(
-    (f) => `<script defer="defer" src="/static/js/${f}"></script>`,
+    (f) => `<script defer="defer" src="%BASE_PATH%/static/js/${f}"></script>`,
   );
   const jsImport = jsLinks.join('\n');
   const indexHtml = `

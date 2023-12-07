@@ -5,6 +5,12 @@ import * as Constants from '../constants/ActionTypes';
 import { api } from '../network';
 import { MESSAGING$ } from './Environment';
 
+const isEmptyPath = R.isNil(window.BASE_PATH) || R.isEmpty(window.BASE_PATH);
+const contextPath = isEmptyPath || window.BASE_PATH === '/' ? '' : window.BASE_PATH;
+export const APP_BASE_PATH = isEmptyPath || contextPath.startsWith('/') ? contextPath : `/${contextPath}`;
+
+export const buildUri = (uri) => `${APP_BASE_PATH}${uri}`;
+
 const buildError = (data) => {
   const errorsExtractor = R.pipe(
     R.pathOr({}, ['errors', 'children']),
@@ -24,14 +30,14 @@ const buildError = (data) => {
   return errorsExtractor(data);
 };
 
-export const simpleCall = (uri) => api().get(uri);
+export const simpleCall = (uri) => api().get(buildUri(uri));
 
 export const getReferential = (schema, uri, noloading) => (dispatch) => {
   if (noloading !== true) {
     dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
   }
   return api(schema)
-    .get(uri)
+    .get(buildUri(uri))
     .then((response) => {
       dispatch({ type: Constants.DATA_FETCH_SUCCESS, payload: response.data });
       return response.data;
@@ -45,7 +51,7 @@ export const getReferential = (schema, uri, noloading) => (dispatch) => {
 export const putReferential = (schema, uri, data) => (dispatch) => {
   dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
   return api(schema)
-    .put(uri, data)
+    .put(buildUri(uri), data)
     .then((response) => {
       dispatch({ type: Constants.DATA_FETCH_SUCCESS, payload: response.data });
       dispatch({ type: Constants.DATA_UPDATE_SUCCESS, payload: response.data });
@@ -61,7 +67,7 @@ export const putReferential = (schema, uri, data) => (dispatch) => {
 export const postReferential = (schema, uri, data) => (dispatch) => {
   dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
   return api(schema)
-    .post(uri, data)
+    .post(buildUri(uri), data)
     .then((response) => {
       dispatch({ type: Constants.DATA_FETCH_SUCCESS, payload: response.data });
       return response.data;
@@ -78,7 +84,7 @@ export const postReferential = (schema, uri, data) => (dispatch) => {
 export const delReferential = (uri, type, id) => (dispatch) => {
   dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
   return api()
-    .delete(uri)
+    .delete(buildUri(uri))
     .then(() => {
       dispatch({
         type: Constants.DATA_DELETE_SUCCESS,

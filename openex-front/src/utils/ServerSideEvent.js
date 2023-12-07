@@ -2,6 +2,7 @@ import { normalize, schema } from 'normalizr';
 import { useEffect } from 'react';
 import { DATA_DELETE_SUCCESS } from '../constants/ActionTypes';
 import { store } from '../store';
+import { buildUri } from './Action';
 
 const EVENT_TRY_DELAY = 1500;
 const EVENT_PING_MAX_TIME = 5000;
@@ -11,7 +12,7 @@ let lastPingDate = new Date().getTime();
 const listeners = new Map();
 const useDataLoader = (loader = () => {}) => {
   const sseConnect = () => {
-    sseClient = new EventSource('/api/stream', { withCredentials: true });
+    sseClient = new EventSource(buildUri('/api/stream'), { withCredentials: true });
     const autoReConnect = setInterval(() => {
       const current = new Date().getTime();
       if (current - lastPingDate > EVENT_PING_MAX_TIME) {
