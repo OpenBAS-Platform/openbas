@@ -1,10 +1,9 @@
 package io.openex.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -12,32 +11,9 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.resource.AbstractResourceResolver;
 import org.springframework.web.servlet.resource.EncodedResourceResolver;
 import org.springframework.web.servlet.resource.PathResourceResolver;
-import org.springframework.web.servlet.resource.ResourceResolverChain;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotNull;
 import java.util.List;
-
-
-class ReactIndexResourceResolver extends AbstractResourceResolver {
-
-  @Override
-  protected Resource resolveResourceInternal(HttpServletRequest request, @NotNull String requestPath,
-      @NotNull List<? extends Resource> locations,
-      @NotNull ResourceResolverChain chain) {
-    return new ClassPathResource("/build/index.html");
-  }
-
-  @Override
-  protected String resolveUrlPathInternal(@NotNull String resourceUrlPath,
-      @NotNull List<? extends Resource> locations,
-      @NotNull ResourceResolverChain chain) {
-    return chain.resolveUrlPath(resourceUrlPath, locations);
-  }
-}
 
 @Configuration
 @EnableWebMvc
@@ -59,7 +35,6 @@ public class MvcConfig implements WebMvcConfigurer {
   public void configureMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
     //https://springdoc.org/#why-am-i-getting-an-error-swagger-ui-unable-to-render-definition-when-overriding-the-default-spring-registered-httpmessageconverter
     messageConverters.add(new ByteArrayHttpMessageConverter());
-
     messageConverters.add(new StringHttpMessageConverter());
     messageConverters.add(customJackson2HttpMessageConverter());
   }
@@ -69,20 +44,13 @@ public class MvcConfig implements WebMvcConfigurer {
         .addResourceHandler(pattern)
         .addResourceLocations(location)
         .setCachePeriod(CACHE_PERIOD)
-        .resourceChain(true)
+        .resourceChain(false)
         .addResolver(new EncodedResourceResolver())
         .addResolver(new PathResourceResolver());
   }
 
   @Override
-  public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    // Specific case of react index
-    registry.addResourceHandler("*")
-        .addResourceLocations("classpath:/build/")
-        .setCachePeriod(CACHE_PERIOD)
-        .resourceChain(true)
-        .addResolver(new EncodedResourceResolver())
-        .addResolver(new ReactIndexResourceResolver());
+  public void addResourceHandlers(@NotNull ResourceHandlerRegistry registry) {
     // React statics
     addPathStaticResolver(registry, "/static/**", "classpath:/build/static/");
     // Specific application images
