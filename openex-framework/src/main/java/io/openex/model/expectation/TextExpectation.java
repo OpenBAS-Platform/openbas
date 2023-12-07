@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @Getter
 @Setter
-public class TextExpectation implements Expectation {
+public class TextExpectation implements Expectation { // TODO: unused
 
   private Integer score;
 

@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @Getter
 @Setter
-public class DocumentExpectation implements Expectation {
+public class DocumentExpectation implements Expectation { // TODO: unused
 
   private Integer score;
 

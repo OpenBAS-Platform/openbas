@@ -45,14 +45,14 @@ public class InjectExpectation implements Base {
     private String id;
 
     @Setter
-    @Column(name = "inject_expectation_created_at")
-    @JsonProperty("inject_expectation_created_at")
-    private Instant createdAt = now();
+    @Column(name = "inject_expectation_name")
+    @JsonProperty("inject_expectation_name")
+    private String name;
 
     @Setter
-    @Column(name = "inject_expectation_updated_at")
-    @JsonProperty("inject_expectation_updated_at")
-    private Instant updatedAt = now();
+    @Column(name = "inject_expectation_description")
+    @JsonProperty("inject_expectation_description")
+    private String description;
 
     @Setter
     @Column(name = "inject_expectation_result")
@@ -68,6 +68,16 @@ public class InjectExpectation implements Base {
     @Column(name = "inject_expectation_expected_score")
     @JsonProperty("inject_expectation_expected_score")
     private Integer expectedScore;
+
+    @Setter
+    @Column(name = "inject_expectation_created_at")
+    @JsonProperty("inject_expectation_created_at")
+    private Instant createdAt = now();
+
+    @Setter
+    @Column(name = "inject_expectation_updated_at")
+    @JsonProperty("inject_expectation_updated_at")
+    private Instant updatedAt = now();
     // endregion
 
     // region contextual relations
