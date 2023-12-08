@@ -7,6 +7,10 @@
     "dependencies",
     "filigran team"
   ],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "openex-front/packages/ckeditor5-custom-build/package.json"
+  ],
   "prConcurrentLimit": 2,
   "packageRules": [
     {

@@ -1,5 +1,8 @@
 html[data-theme="light"],
 body[data-theme="light"] {
+  --ck-z-default: 10555 !important;
+  --ck-z-modal: calc(var(--ck-z-default) + 999) !important;
+
   /* Overrides the border radius setting in the theme. */
   --ck-border-radius: 4px !important;
 
@@ -118,6 +121,10 @@ body[data-theme="light"] {
   /* -- Overrides the default colors used by the ckeditor5-link package. ---------------------- */
 
   --ck-color-link-default: #00b1ff !important;
+
+  /* -- Overrides the default colors used by the ckeditor5 powered by. ---------------------- */
+
+  --ck-powered-by-background: transparent;
 }
 
 .ck-editor,

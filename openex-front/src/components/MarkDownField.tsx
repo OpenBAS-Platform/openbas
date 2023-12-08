@@ -65,17 +65,17 @@ const MarkDownFieldBase: React.FC<Props> = ({
         extraCommands={[
           {
             ...commands.codeEdit,
-            buttonProps: { 'aria-label': 'code edit', title: 'code edit' },
+            buttonProps: { 'aria-label': t('Edit code'), title: t('Edit code') },
           },
           {
             ...commands.codeLive,
-            buttonProps: { 'aria-label': 'code live', title: 'code live' },
+            buttonProps: { 'aria-label': t('Live code'), title: t('Live code') },
           },
           {
             ...commands.codePreview,
             buttonProps: {
-              'aria-label': 'code preview',
-              title: 'code preview',
+              'aria-label': t('Preview code'),
+              title: t('Preview code'),
             },
           },
           { ...commands.divider },
