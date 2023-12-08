@@ -29,10 +29,6 @@ module.exports = {
     '**/src/generated/**',
     '**/__generated__/**',
     '**/src/static/ext/**',
-    'jest.config.js',
-    'jest.setup.js',
-    'jest.file.transform.js',
-    'jest.relay.transform.js'
   ],
   plugins: ["custom-rules"],
   rules: {
