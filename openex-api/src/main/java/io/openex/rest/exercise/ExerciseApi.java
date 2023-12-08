@@ -34,10 +34,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -86,7 +83,6 @@ public class ExerciseApi extends RestBehavior {
   private ComcheckRepository comcheckRepository;
   private ImportService importService;
   private InjectRepository injectRepository;
-  private InjectExpectationRepository injectExpectationRepository;
   private LessonsCategoryRepository lessonsCategoryRepository;
   private LessonsQuestionRepository lessonsQuestionRepository;
   private LessonsAnswerRepository lessonsAnswerRepository;
@@ -189,11 +185,6 @@ public class ExerciseApi extends RestBehavior {
   @Autowired
   public void setExerciseRepository(ExerciseRepository exerciseRepository) {
     this.exerciseRepository = exerciseRepository;
-  }
-
-  @Autowired
-  public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
-    this.injectExpectationRepository = injectExpectationRepository;
   }
 
   @Autowired
@@ -510,26 +501,6 @@ public class ExerciseApi extends RestBehavior {
     response.addHeader(HttpHeaders.CONTENT_TYPE, fileContainer.getContentType());
     response.setStatus(HttpServletResponse.SC_OK);
     fileContainer.getInputStream().transferTo(response.getOutputStream());
-  }
-  // endregion
-
-  // region expectation
-  @GetMapping("/api/exercises/{exerciseId}/expectations")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Iterable<InjectExpectation> exerciseInjectExpectations(@PathVariable String exerciseId) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-    return injectExpectationRepository.findAllForExercise(exercise.getId()).stream().toList();
-  }
-
-  @PutMapping("/api/exercises/{exerciseId}/expectations/{expectationId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public InjectExpectation updateInjectExpectation(@PathVariable String exerciseId, @PathVariable String expectationId,
-      @Valid @RequestBody ExpectationUpdateInput input) {
-    InjectExpectation injectExpectation = injectExpectationRepository.findById(expectationId).orElseThrow();
-    injectExpectation.setResult("VALIDATED");
-    injectExpectation.setScore(input.getScore());
-    injectExpectation.setUpdatedAt(now());
-    return injectExpectationRepository.save(injectExpectation);
   }
   // endregion
 

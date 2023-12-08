@@ -48,6 +48,12 @@ export const updateInjectExpectation = (exerciseId, injectExpectationId, data) =
   data,
 )(dispatch);
 
+export const updateInjectExpectations = (exerciseId, data) => (dispatch) => putReferential(
+  schema.injectexpectation,
+  `/api/exercises/${exerciseId}/expectations`,
+  data,
+)(dispatch);
+
 export const deleteExercise = (exerciseId) => (dispatch) => delReferential(
   `/api/exercises/${exerciseId}`,
   'exercises',

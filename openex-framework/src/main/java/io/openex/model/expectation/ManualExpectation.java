@@ -5,6 +5,7 @@ import io.openex.model.Expectation;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
 import java.util.Objects;
 
 @Getter
@@ -12,9 +13,17 @@ import java.util.Objects;
 public class ManualExpectation implements Expectation {
 
   private Integer score;
+  private String name;
+  private String description;
 
-  public ManualExpectation(Integer score) {
-    setScore(Objects.requireNonNullElse(score, 100));
+  public ManualExpectation(final Integer score) {
+    this.score = Objects.requireNonNullElse(score, 100);
+  }
+
+  public ManualExpectation(final Integer score, @NotBlank final String name, final String description) {
+    this(score);
+    this.name = name;
+    this.description = description;
   }
 
   @Override

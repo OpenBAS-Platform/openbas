@@ -56,19 +56,19 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
   const handleAddExpectation = (expectation: ExpectationInput) => {
     const values = [...expectations, expectation];
     setExpectations(values);
-    handleExpectations(values)
+    handleExpectations(values);
   };
 
   const handleUpdateExpectation = (expectation: ExpectationInput, idx: number) => {
     const values = expectations.map((item, i) => i !== idx ? item : expectation);
     setExpectations(values);
-    handleExpectations(values)
+    handleExpectations(values);
   };
 
   const handleRemoveExpectation = (idx: number) => {
     const values = expectations.filter((_, i) => i !== idx);
     setExpectations(values);
-    handleExpectations(values)
+    handleExpectations(values);
   };
 
   const headers = [

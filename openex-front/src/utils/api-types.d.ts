@@ -288,7 +288,8 @@ export interface ContractElement {
     | "challenge"
     | "dependency-select"
     | "attachment"
-    | "audience";
+    | "audience"
+    | "expectation";
 }
 
 export interface ContractVariable {
@@ -467,13 +468,7 @@ export interface Exercise {
   exercise_name: string;
   /** @format date-time */
   exercise_next_inject_date?: string;
-  exercise_next_possible_status?: (
-    | "SCHEDULED"
-    | "CANCELED"
-    | "RUNNING"
-    | "PAUSED"
-    | "FINISHED"
-  )[];
+  exercise_next_possible_status?: ("SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED")[];
   exercise_observers?: User[];
   exercise_pauses?: Pause[];
   exercise_planners?: User[];
@@ -482,12 +477,7 @@ export interface Exercise {
   exercise_score?: number;
   /** @format date-time */
   exercise_start_date?: string;
-  exercise_status?:
-    | "SCHEDULED"
-    | "CANCELED"
-    | "RUNNING"
-    | "PAUSED"
-    | "FINISHED";
+  exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   exercise_subtitle?: string;
   exercise_tags?: Tag[];
   /** @format date-time */
@@ -515,12 +505,7 @@ export interface ExerciseSimple {
   exercise_name?: string;
   /** @format date-time */
   exercise_start_date?: string;
-  exercise_status?:
-    | "SCHEDULED"
-    | "CANCELED"
-    | "RUNNING"
-    | "PAUSED"
-    | "FINISHED";
+  exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   exercise_subtitle?: string;
   exercise_tags?: Tag[];
 }
@@ -545,12 +530,7 @@ export interface ExerciseUpdateStartDateInput {
 }
 
 export interface ExerciseUpdateStatusInput {
-  exercise_status?:
-    | "SCHEDULED"
-    | "CANCELED"
-    | "RUNNING"
-    | "PAUSED"
-    | "FINISHED";
+  exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
 }
 
 export interface ExerciseUpdateTagsInput {
@@ -558,6 +538,7 @@ export interface ExerciseUpdateTagsInput {
 }
 
 export interface ExpectationUpdateInput {
+  expectation_id?: string;
   /** @format int32 */
   expectation_score: number;
 }
@@ -671,19 +652,16 @@ export interface InjectExpectation {
   inject_expectation_challenge?: Challenge;
   /** @format date-time */
   inject_expectation_created_at?: string;
+  inject_expectation_description?: string;
   inject_expectation_exercise?: Exercise;
   /** @format int32 */
   inject_expectation_expected_score?: number;
   inject_expectation_inject?: Inject;
+  inject_expectation_name?: string;
   inject_expectation_result?: string;
   /** @format int32 */
   inject_expectation_score?: number;
-  inject_expectation_type?:
-    | "TEXT"
-    | "DOCUMENT"
-    | "ARTICLE"
-    | "CHALLENGE"
-    | "MANUAL";
+  inject_expectation_type?: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL";
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: User;
@@ -917,7 +895,8 @@ export interface LinkedFieldModel {
     | "challenge"
     | "dependency-select"
     | "attachment"
-    | "audience";
+    | "audience"
+    | "expectation";
 }
 
 export interface Log {

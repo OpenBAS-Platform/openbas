@@ -28,8 +28,8 @@ import { fetchAudiences } from '../../../../actions/Audience';
 import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import MediaIcon from '../../medias/MediaIcon';
-import ManualExpectations from "./ManualExpectations.js";
-import DialogExpectation from "./DialogExpectation.js";
+import ManualExpectations from "./ManualExpectations";
+import DialogExpectation from "./DialogExpectation";
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -447,8 +447,9 @@ const Validations = () => {
                   )
                   : (
                     <ManualExpectations
+                      exerciseId={exerciseId}
+                      inject={inject}
                       injectExpectations={groupedExpectation[injectId]}
-                      setCurrentExpectation={setCurrentExpectation}
                     />
                   )}
               </div>

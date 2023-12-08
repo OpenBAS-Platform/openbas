@@ -1,18 +1,19 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import { CastForEducationOutlined } from '@mui/icons-material';
 import ListItemText from '@mui/material/ListItemText';
 import Chip from '@mui/material/Chip';
 import List from '@mui/material/List';
-import { Audience } from '../../../../utils/api-types';
-import { useHelper } from '../../../../store.ts';
+import { Audience, Inject } from '../../../../utils/api-types';
+import { useHelper } from '../../../../store';
 import { AudiencesHelper } from '../../../../actions/helper';
 import { InjectExpectationsStore } from '../injects/expectations/Expectation';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n.js';
 import { ListItemButton } from '@mui/material';
 import { Theme } from '../../../../components/Theme';
-import { colorStyles } from '../../../../components/Color.ts';
+import { colorStyles } from '../../../../components/Color';
+import DialogExpectations from './DialogExpectations';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -42,13 +43,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
+  exerciseId: string;
+  inject: Inject;
   injectExpectations: InjectExpectationsStore[];
-  setCurrentExpectation: (expectation: InjectExpectationsStore) => void;
 }
 
 const ManualExpectations: FunctionComponent<Props> = ({
+  exerciseId,
+  inject,
   injectExpectations,
-  setCurrentExpectation,
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
@@ -59,56 +62,81 @@ const ManualExpectations: FunctionComponent<Props> = ({
     });
   });
 
+  const groupedByAudience = injectExpectations.reduce((group: Record<string, InjectExpectationsStore[]>, expectation) => {
+    const { inject_expectation_audience } = expectation;
+    if (inject_expectation_audience) {
+      group[inject_expectation_audience] = group[inject_expectation_audience] ?? [];
+      group[inject_expectation_audience].push(expectation);
+    }
+    return group;
+  }, {});
+
+  const [currentExpectations, setCurrentExpectations] = useState<InjectExpectationsStore[] | null>(null);
+
   return (
-    <List component="div" disablePadding>
-      {injectExpectations.map((expectation) => {
-        if (!expectation.inject_expectation_audience) {
-          return (<></>);
-        }
-        const audience = audiencesMap[expectation.inject_expectation_audience] || {};
-        return (
-          <ListItemButton
-            key={audience.audience_id}
-            divider={true}
-            sx={{ pl: 4 }}
-            classes={{ root: classes.item }}
-            onClick={() => setCurrentExpectation(expectation)}
-          >
-            <ListItemIcon>
-              <CastForEducationOutlined fontSize="small" />
-            </ListItemIcon>
-            <ListItemText
-              primary={(
-                <div className={classes.container}>
-                  {audience.audience_name}
-                  <div>
-                    <Chip
-                      classes={{ root: classes.points }}
-                      label={expectation.inject_expectation_expected_score}
-                    />
-                    <Chip
-                      classes={{ root: classes.chipInList }}
-                      style={
-                        expectation.inject_expectation_result
-                          ? colorStyles.green
-                          : colorStyles.orange
-                      }
-                      label={
-                        expectation.inject_expectation_result
-                          ? `${t('Validated')} (${
-                            expectation.inject_expectation_score
-                          })`
-                          : t('Pending validation')
-                      }
-                    />
-                  </div>
-                </div>
-              )}
-            />
-          </ListItemButton>
-        );
-      })}
-    </List>
+    <>
+      <List component="div" disablePadding>
+        {Object.entries(groupedByAudience)
+          .map(([entry, values]) => {
+              const audience = audiencesMap[entry] || {};
+              const expectationValues = values
+                .reduce((acc, el) => ({
+                  ...acc,
+                  expected_score: acc.expected_score + (el.inject_expectation_expected_score ?? 0),
+                  score: acc.score + (el.inject_expectation_score ?? 0),
+                  result: acc.result + (el.inject_expectation_result ?? ''),
+                }), { expected_score: 0, score: 0, result: '' });
+              const validated = values.filter((v) => v.inject_expectation_result !== null).length;
+              let label = t('Pending validation');
+              if (validated === values.length) {
+                label = `${t('Validated')} (${expectationValues.score})`
+              }
+              return (
+                <ListItemButton
+                  key={audience.audience_id}
+                  divider={true}
+                  sx={{ pl: 4 }}
+                  classes={{ root: classes.item }}
+                  onClick={() => setCurrentExpectations(values)}
+                >
+                  <ListItemIcon>
+                    <CastForEducationOutlined fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={(
+                      <div className={classes.container}>
+                        {audience.audience_name}
+                        <div>
+                          <Chip
+                            classes={{ root: classes.points }}
+                            label={expectationValues.expected_score}
+                          />
+                          <Chip
+                            classes={{ root: classes.chipInList }}
+                            style={
+                              validated === values.length
+                                ? colorStyles.green
+                                : colorStyles.orange
+                            }
+                            label={label}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  />
+                </ListItemButton>
+              );
+            }
+          )}
+      </List>
+      <DialogExpectations
+        exerciseId={exerciseId}
+        inject={inject}
+        expectations={currentExpectations}
+        open={currentExpectations !== null}
+        onClose={() => setCurrentExpectations(null)}
+      />
+    </>
   );
 };
 

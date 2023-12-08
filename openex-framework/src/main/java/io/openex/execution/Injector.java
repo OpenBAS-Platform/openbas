@@ -9,6 +9,7 @@ import io.openex.database.repository.DocumentRepository;
 import io.openex.database.repository.InjectExpectationRepository;
 import io.openex.model.Expectation;
 import io.openex.model.expectation.ChallengeExpectation;
+import io.openex.model.expectation.ManualExpectation;
 import io.openex.model.expectation.MediaExpectation;
 import io.openex.service.FileService;
 import org.apache.commons.io.IOUtils;
@@ -55,14 +56,18 @@ public abstract class Injector {
         expectationExecution.setExercise(executableInject.getInject().getExercise());
         expectationExecution.setInject(executableInject.getInject());
         expectationExecution.setAudience(audience);
-        expectationExecution.setExpectedScore(expectation.score());
+        expectationExecution.setExpectedScore(expectation.getScore());
         expectationExecution.setScore(0);
         switch (expectation.type()) {
             case ARTICLE -> expectationExecution.setArticle(((MediaExpectation) expectation).getArticle());
             case CHALLENGE -> expectationExecution.setChallenge(((ChallengeExpectation) expectation).getChallenge());
             case DOCUMENT -> expectationExecution.setType(EXPECTATION_TYPE.DOCUMENT);
             case TEXT -> expectationExecution.setType(EXPECTATION_TYPE.TEXT);
-            case MANUAL -> expectationExecution.setType(EXPECTATION_TYPE.MANUAL);
+            case MANUAL -> {
+                expectationExecution.setType(EXPECTATION_TYPE.MANUAL);
+                expectationExecution.setName(((ManualExpectation) expectation).getName());
+                expectationExecution.setDescription(((ManualExpectation) expectation).getDescription());
+            }
             default -> throw new IllegalStateException("Unexpected value: " + expectation);
         }
         return expectationExecution;

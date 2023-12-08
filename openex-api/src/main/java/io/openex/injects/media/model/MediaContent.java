@@ -18,6 +18,9 @@ public class MediaContent extends EmailContent {
   @JsonProperty("expectation")
   private boolean expectation;
 
+  @JsonProperty("expectationScore")
+  private Integer expectationScore;
+
   @JsonProperty("emailing")
   private boolean emailing;
 

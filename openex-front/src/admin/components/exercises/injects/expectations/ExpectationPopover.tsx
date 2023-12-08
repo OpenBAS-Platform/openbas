@@ -75,6 +75,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
         onClick={(event) => handlePopoverOpen(event)}
         aria-haspopup="true"
         size="large"
+        disabled={isExerciseReadOnly(exercise)}
       >
         <MoreVert />
       </IconButton>
@@ -85,13 +86,11 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
       >
         <MenuItem
           onClick={handleOpenEdit}
-          disabled={isExerciseReadOnly(exercise)}
         >
           {t('Update')}
         </MenuItem>
         <MenuItem
           onClick={handleOpenDelete}
-          disabled={isExerciseReadOnly(exercise, true)}
         >
           {t('Remove')}
         </MenuItem>

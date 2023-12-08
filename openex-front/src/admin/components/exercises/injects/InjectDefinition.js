@@ -19,17 +19,7 @@ import {
 } from '@mui/material';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
-import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-  AttachmentOutlined,
-  CastForEducationOutlined,
-  CloseRounded,
-  ControlPointOutlined,
-  DeleteOutlined,
-  EmojiEventsOutlined,
-  HelpOutlineOutlined,
-} from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, CastForEducationOutlined, CloseRounded, ControlPointOutlined, DeleteOutlined, EmojiEventsOutlined, HelpOutlineOutlined, } from '@mui/icons-material';
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
@@ -331,7 +321,7 @@ class InjectDefinition extends Component {
       allAudiences: props.inject.inject_all_audiences,
       audiencesIds: props.inject.inject_audiences,
       documents: props.inject.inject_documents,
-      expectationDatas: [],
+      expectations: props.inject.inject_content?.expectations || [],
       audiencesSortBy: 'audience_name',
       audiencesOrderAsc: true,
       documentsSortBy: 'document_name',
@@ -575,22 +565,28 @@ class InjectDefinition extends Component {
     const injectType = R.head(
       injectTypes.filter((i) => i.contract_id === inject.inject_contract),
     );
+    const finalData = {};
     const hasArticles = injectType.fields
       .map((f) => f.key)
       .includes('articles');
-    const hasChallenges = injectType.fields
-      .map((f) => f.key)
-      .includes('challenges');
-    const finalData = {};
     if (hasArticles) {
       finalData.articles = this.state.articlesIds;
     }
+    const hasChallenges = injectType.fields
+      .map((f) => f.key)
+      .includes('challenges');
     if (hasChallenges) {
       finalData.challenges = this.state.challengesIds;
     }
+    const hasExpectations = injectType.fields
+      .map((f) => f.key)
+      .includes('expectations');
+    if (hasExpectations) {
+      finalData.expectations = this.state.expectations;
+    }
     injectType.fields
       .filter(
-        (f) => !['audiences', 'articles', 'challenges', 'attachments'].includes(
+        (f) => !['audiences', 'articles', 'challenges', 'attachments', 'expectations'].includes(
           f.key,
         ),
       )
@@ -665,7 +661,7 @@ class InjectDefinition extends Component {
     if (injectType && Array.isArray(injectType.fields)) {
       injectType.fields
         .filter(
-          (f) => !['audiences', 'articles', 'challenges', 'attachments'].includes(
+          (f) => !['audiences', 'articles', 'challenges', 'attachments', 'expectations'].includes(
             f.key,
           ),
         )
@@ -810,36 +806,36 @@ class InjectDefinition extends Component {
                                 && values[field.key]
                                 && values[field.key][index]
                                 && values[field.key][index].type
-                                  === 'attachment' ? (
-                                    <Select
-                                      variant="standard"
-                                      name={`${name}.value`}
-                                      fullWidth={true}
-                                      label={t('Value')}
-                                      style={{ marginRight: 20 }}
-                                      disabled={isExerciseReadOnly(exercise)}
-                                    >
-                                      {attachedDocs.map((doc) => (
-                                        <MenuItem
-                                          key={doc.document_id}
-                                          value={doc.document_id}
-                                        >
-                                          <ListItemText>
-                                            {doc.document_name}
-                                          </ListItemText>
-                                        </MenuItem>
-                                      ))}
-                                    </Select>
-                                  ) : (
-                                    <TextField
-                                      variant="standard"
-                                      name={`${name}.value`}
-                                      fullWidth={true}
-                                      label={t('Value')}
-                                      style={{ marginRight: 20 }}
-                                      disabled={isExerciseReadOnly(exercise)}
-                                    />
-                                  )}
+                                === 'attachment' ? (
+                                  <Select
+                                    variant="standard"
+                                    name={`${name}.value`}
+                                    fullWidth={true}
+                                    label={t('Value')}
+                                    style={{ marginRight: 20 }}
+                                    disabled={isExerciseReadOnly(exercise)}
+                                  >
+                                    {attachedDocs.map((doc) => (
+                                      <MenuItem
+                                        key={doc.document_id}
+                                        value={doc.document_id}
+                                      >
+                                        <ListItemText>
+                                          {doc.document_name}
+                                        </ListItemText>
+                                      </MenuItem>
+                                    ))}
+                                  </Select>
+                                ) : (
+                                  <TextField
+                                    variant="standard"
+                                    name={`${name}.value`}
+                                    fullWidth={true}
+                                    label={t('Value')}
+                                    style={{ marginRight: 20 }}
+                                    disabled={isExerciseReadOnly(exercise)}
+                                  />
+                                )}
                                 {field.cardinality === 'n' && (
                                   <IconButton
                                     onClick={() => fields.remove(index)}
@@ -1050,7 +1046,7 @@ class InjectDefinition extends Component {
       allAudiences,
       audiencesIds,
       documents,
-      expectationDatas,
+      expectations,
       audiencesSortBy,
       audiencesOrderAsc,
       documentsSortBy,
@@ -1066,6 +1062,7 @@ class InjectDefinition extends Component {
     const injectType = R.head(
       injectTypes.filter((i) => i.contract_id === inject.inject_contract),
     );
+    // -- AUDIENCES --
     const audiences = audiencesIds
       .map((a) => audiencesMap[a])
       .filter((a) => a !== undefined);
@@ -1075,6 +1072,10 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(audiencesSortBy))],
     );
     const sortedAudiences = sortAudiences(audiences);
+    const hasAudiences = injectType.fields
+      .map((f) => f.key)
+      .includes('audiences');
+    // -- ARTICLES --
     const articles = articlesIds
       .map((a) => articlesMap[a])
       .filter((a) => a !== undefined)
@@ -1089,6 +1090,10 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(articlesSortBy))],
     );
     const sortedArticles = sortArticles(articles);
+    const hasArticles = injectType.fields
+      .map((f) => f.key)
+      .includes('articles');
+    // -- CHALLENGES --
     const challenges = challengesIds
       .map((a) => challengesMap[a])
       .filter((a) => a !== undefined);
@@ -1098,6 +1103,10 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(challengesSortBy))],
     );
     const sortedChallenges = sortChallenges(challenges);
+    const hasChallenges = injectType.fields
+      .map((f) => f.key)
+      .includes('challenges');
+    // -- DOCUMENTS --
     const docs = documents
       .map((d) => (documentsMap[d.document_id]
         ? {
@@ -1113,21 +1122,17 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(documentsSortBy))],
     );
     const sortedDocuments = sortDocuments(docs);
-    const hasAudiences = injectType.fields
-      .map((f) => f.key)
-      .includes('audiences');
-    const hasArticles = injectType.fields
-      .map((f) => f.key)
-      .includes('articles');
-    const hasChallenges = injectType.fields
-      .map((f) => f.key)
-      .includes('challenges');
     const hasAttachments = injectType.fields
       .map((f) => f.key)
       .includes('attachments');
-    const expectations = injectType.fields.filter(
+    // -- EXPECTATIONS --
+    const hasExpectations = injectType.fields
+      .map((f) => f.key)
+      .includes('expectations');
+    const expectationsNotManual = injectType.fields.filter(
       (f) => f.expectation === true,
     );
+
     const initialValues = { ...inject.inject_content };
     // Enrich initialValues with default contract value
     const builtInFields = [
@@ -1135,6 +1140,7 @@ class InjectDefinition extends Component {
       'articles',
       'challenges',
       'attachments',
+      'expectations',
     ];
     if (inject.inject_content === null) {
       injectType.fields
@@ -1722,47 +1728,54 @@ class InjectDefinition extends Component {
                     {t('Reset to default values')}
                   </Button>
                 </div>
-                {expectations.length > 0 && (
-                  <div>
+                {(hasExpectations || expectationsNotManual.length > 0) &&
+                  <>
                     <Typography variant="h2" style={{ marginTop: 30 }}>
                       {t('Inject expectations')}
                     </Typography>
-                    <div style={{ marginTop: -15 }}>
-                      {this.renderFields(
-                        expectations.filter((f) => {
-                          // Filter display if linked fields
-                          for (
-                            let index = 0;
-                            index < f.linkedFields.length;
-                            index += 1
-                          ) {
-                            const linkedField = f.linkedFields[index];
-                            if (
-                              linkedField.type === 'checkbox'
-                              && values[linkedField.key] === false
-                            ) {
-                              return false;
-                            }
-                            if (
-                              linkedField.type === 'select'
-                              && !f.linkedValues.includes(values[linkedField.key])
-                            ) {
-                              return false;
-                            }
-                          }
-                          return true;
-                        }),
-                        values,
-                        attachedDocs,
-                      )}
-                    </div>
-                  </div>
-                )}
-                <InjectExpectations
-                  exercise={exercise}
-                  expectationDatas={expectationDatas}
-                  handleExpectations={this.handleExpectations.bind(this)}
-                />
+                    {expectationsNotManual.length > 0 && (
+                      <div>
+
+                        <div style={{ marginTop: -15 }}>
+                          {this.renderFields(
+                            expectationsNotManual.filter((f) => {
+                              // Filter display if linked fields
+                              for (
+                                let index = 0;
+                                index < f.linkedFields.length;
+                                index += 1
+                              ) {
+                                const linkedField = f.linkedFields[index];
+                                if (
+                                  linkedField.type === 'checkbox'
+                                  && values[linkedField.key] === false
+                                ) {
+                                  return false;
+                                }
+                                if (
+                                  linkedField.type === 'select'
+                                  && !f.linkedValues.includes(values[linkedField.key])
+                                ) {
+                                  return false;
+                                }
+                              }
+                              return true;
+                            }),
+                            values,
+                            attachedDocs,
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {hasExpectations &&
+                      <InjectExpectations
+                        exercise={exercise}
+                        expectationDatas={expectations}
+                        handleExpectations={this.handleExpectations.bind(this)}
+                      />
+                    }
+                  </>
+                }
                 <div>
                   <Typography variant="h2" style={{ marginTop: 30 }}>
                     {t('Inject documents')}

@@ -9,64 +9,97 @@ import Dialog from '@mui/material/Dialog';
 import Transition from '../../../../components/common/Transition';
 import { InjectExpectationsStore } from '../injects/expectations/Expectation';
 import { useFormatter } from '../../../../components/i18n.js';
-import { updateInjectExpectation } from '../../../../actions/Exercise.js';
+import { updateInjectExpectations } from '../../../../actions/Exercise.js';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { useForm } from 'react-hook-form';
-import { ExpectationUpdateInput } from '../../../../utils/api-types';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { ExpectationUpdateInput, Inject } from '../../../../utils/api-types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { zodImplement } from '../../../../utils/Zod';
 import { z } from 'zod';
 import MuiTextField from '@mui/material/TextField';
+import { makeStyles } from '@mui/styles';
+import classNames from 'classnames';
+
+const useStyles = makeStyles(() => ({
+  mt_20: {
+    marginTop: 20
+  }
+}));
 
 interface FormProps {
   exerciseId: string;
-  expectation: InjectExpectationsStore;
+  expectations: InjectExpectationsStore[];
   onClose: () => void;
 }
 
-const DialogExpectationForm: FunctionComponent<FormProps> = ({
+const DialogExpectationsForm: FunctionComponent<FormProps> = ({
   exerciseId,
-  expectation,
+  expectations,
   onClose,
 }) => {
+  const classes = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  // TODO: improv UI
 
-  const submit = (data: ExpectationUpdateInput) => dispatch(
-    updateInjectExpectation(exerciseId, expectation.injectexpectation_id, data),
+  const submit = (data: ExpectationUpdateInput[]) => dispatch(
+    updateInjectExpectations(exerciseId, data),
   ).then(onClose);
 
-  const onSubmit = (data: ExpectationUpdateInput) => {
-    submit(data);
+  const onSubmit = (data: { expectations: ExpectationUpdateInput[] }) => {
+    const datas = data.expectations.map((e, idx) => ({
+      expectation_id: expectations[idx].injectexpectation_id,
+      expectation_score: e.expectation_score,
+    }));
+    submit(datas);
   };
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<Omit<ExpectationUpdateInput, 'expectation_id'>>({
+    control,
+    formState: { errors, isDirty, isSubmitting },
+  } = useForm<{ expectations: ExpectationUpdateInput[] }>({
     mode: 'onTouched',
-    resolver: zodResolver(zodImplement<Omit<ExpectationUpdateInput, 'expectation_id'>>().with({
-      expectation_score: z.coerce.number(),
+    resolver: zodResolver(z.object({
+      expectations: z.array(z.object({
+        expectation_score: z.coerce.number()
+      }))
     })),
     defaultValues: {
-      expectation_score: expectation.inject_expectation_expected_score,
+      expectations: expectations
+        .sort((e1, e2) => (e1.inject_expectation_name ?? '').localeCompare(e2.inject_expectation_name ?? ''))
+        .map((expectation) => ({
+          expectation_score: expectation.inject_expectation_score ?? expectation.inject_expectation_expected_score,
+        }))
     },
+  });
+
+  const { fields } = useFieldArray({
+    control,
+    name: 'expectations',
   });
 
   return (
     <form id="expectationForm" onSubmit={handleSubmit(onSubmit)}>
-      <MuiTextField
-        variant="standard"
-        fullWidth={true}
-        label={t('Score')}
-        type="number"
-        error={!!errors.expectation_score}
-        helperText={
-          errors.expectation_score && errors.expectation_score?.message
-        }
-        inputProps={register('expectation_score')}
-      />
+      {fields.map((field, index) => {
+        const expectation = expectations[index];
+        return (
+          <MuiTextField
+            variant="standard"
+            fullWidth={true}
+            label={expectation.inject_expectation_name}
+            type="number"
+            error={!!errors.expectations?.[index]?.expectation_score}
+            helperText={
+              errors.expectations?.[index]?.expectation_score && errors.expectations?.[index]?.expectation_score?.message
+            }
+            inputProps={register(`expectations.${index}.expectation_score`)}
+            className={classNames({
+              [classes.mt_20]: index !== 0,
+            })}
+          />
+        )
+      })}
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button
           onClick={onClose}
@@ -78,7 +111,7 @@ const DialogExpectationForm: FunctionComponent<FormProps> = ({
         <Button
           color="secondary"
           type="submit"
-          disabled={isSubmitting}
+          disabled={!isDirty || isSubmitting}
         >
           {t('Validate')}
         </Button>
@@ -89,14 +122,16 @@ const DialogExpectationForm: FunctionComponent<FormProps> = ({
 
 interface Props {
   exerciseId: string;
-  expectation: InjectExpectationsStore | undefined;
+  inject: Inject;
+  expectations: InjectExpectationsStore[] | null;
   open: boolean;
   onClose: () => void;
 }
 
 const DialogExpectation: FunctionComponent<Props> = ({
   exerciseId,
-  expectation,
+  inject,
+  expectations,
   open,
   onClose,
 }) => {
@@ -112,42 +147,32 @@ const DialogExpectation: FunctionComponent<Props> = ({
       PaperProps={{ elevation: 1 }}
     >
       <DialogTitle>
-        {expectation?.inject_expectation_inject?.inject_title}
+        {inject.inject_title}
       </DialogTitle>
       <DialogContent>
         <Grid container={true} spacing={3}>
           <Grid item={true} xs={6}>
             <Typography variant="h3">{t('Title')}</Typography>
-            {expectation?.inject_expectation_inject?.inject_title}
+            {inject.inject_title}
           </Grid>
           <Grid item={true} xs={6}>
             <Typography variant="h3">{t('Description')}</Typography>
-            {
-              expectation?.inject_expectation_inject
-                ?.inject_description
-            }
+            {inject.inject_description}
           </Grid>
           <Grid item={true} xs={6}>
             <Typography variant="h3">{t('Sent at')}</Typography>
-            {fndt(
-              expectation?.inject_expectation_inject?.inject_sent_at,
-            )}
+            {fndt(inject.inject_sent_at)}
           </Grid>
           <Grid item={true} xs={6}>
             <Typography variant="h3">{t('Tags')}</Typography>
-            <ItemTags
-              tags={
-                expectation?.inject_expectation_inject
-                  ?.inject_tags || []
-              }
-            />
+            <ItemTags tags={inject.inject_tags || []} />
           </Grid>
         </Grid>
         <Typography variant="h2" style={{ marginTop: 30 }}>
           {t('Results')}
         </Typography>
-        {expectation &&
-          <DialogExpectationForm exerciseId={exerciseId} expectation={expectation} onClose={onClose} />
+        {expectations &&
+          <DialogExpectationsForm exerciseId={exerciseId} expectations={expectations} onClose={onClose} />
         }
       </DialogContent>
     </Dialog>

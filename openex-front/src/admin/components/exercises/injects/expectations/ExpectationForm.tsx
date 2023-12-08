@@ -20,6 +20,7 @@ const ExpectationForm: FunctionComponent<ExpectationFormProps> = ({
   handleClose,
   editing = false,
   initialValues = {
+    expectation_type: 'MANUAL',
     expectation_name: '',
     expectation_description: '',
     expectation_score: 0
@@ -34,6 +35,7 @@ const ExpectationForm: FunctionComponent<ExpectationFormProps> = ({
   } = useForm<ExpectationInput>({
     mode: 'onTouched',
     resolver: zodResolver(zodImplement<ExpectationInput>().with({
+      expectation_type: z.string(),
       expectation_name: z.string(),
       expectation_description: z.string().optional(),
       expectation_score: z.coerce.number(),
@@ -50,6 +52,7 @@ const ExpectationForm: FunctionComponent<ExpectationFormProps> = ({
   return (
     <form id="expectationForm" onSubmit={handleSubmitWithoutPropagation}>
       <MuiTextField
+        placeholder='The animation team can validate the audience reaction'
         variant="standard"
         fullWidth={true}
         label={t('Name')}

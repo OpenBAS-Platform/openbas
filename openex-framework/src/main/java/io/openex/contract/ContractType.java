@@ -24,5 +24,7 @@ public enum ContractType {
     @JsonProperty("attachment")
     Attachment,
     @JsonProperty("audience")
-    Audience
+    Audience,
+    @JsonProperty("expectation")
+    Expectation
 }
