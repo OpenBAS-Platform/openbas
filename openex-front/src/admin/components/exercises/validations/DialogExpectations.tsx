@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import MuiTextField from '@mui/material/TextField';
 import { makeStyles } from '@mui/styles';
+import Divider from '@mui/material/Divider';
 import Transition from '../../../../components/common/Transition';
 import { InjectExpectationsStore } from '../injects/expectations/Expectation';
 import { useFormatter } from '../../../../components/i18n';
@@ -17,7 +18,6 @@ import { updateInjectExpectations } from '../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { ExpectationUpdateInput, Inject } from '../../../../utils/api-types';
 import ItemTags from '../../../../components/ItemTags';
-import Divider from '@mui/material/Divider';
 import ExpandableText from '../../../../components/common/ExpendableText';
 
 const useStyles = makeStyles(() => ({

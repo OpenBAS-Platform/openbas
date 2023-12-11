@@ -554,8 +554,14 @@ const i18n = {
         'Chaque audience doit uploader un document',
       'Each audience should submit a text response':
         'Chaque audience doit soumettre une réponse texte',
+      // -- Expectation start --
       Expectation: 'Attendu',
       'Expectation score': "Score de l'attendu",
+      'Add expectations': 'Ajouter des attendus',
+      'Add expectation in this inject': 'Ajouter des attendus dans ce stimuli',
+      'Update the expectation': 'Modifier l\'attendu',
+      'Do you want to delete this expectation ?': 'Voulez vous supprimer cet attendu ?',
+      // -- Expectation end --
       'Distribution of expected total score by audience':
         'Distribution du score total attendu par audience',
       'Exercise definition and scenario':

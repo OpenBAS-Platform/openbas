@@ -52,7 +52,7 @@ const ExpectationManualForm: FunctionComponent<ExpectationFormProps> = ({
   return (
     <form id="expectationForm" onSubmit={handleSubmitWithoutPropagation}>
       <MuiTextField
-        placeholder='The animation team can validate the audience reaction'
+        placeholder={t('The animation team can validate the audience reaction')}
         variant="standard"
         fullWidth={true}
         label={t('Name')}
