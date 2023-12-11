@@ -3,6 +3,7 @@ package io.openex.service;
 import io.openex.contract.Contract;
 import io.openex.contract.Contractor;
 import io.openex.database.model.Inject;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class ContractService {
 
     private static final Logger LOGGER = Logger.getLogger(ContractService.class.getName());
+    @Getter
     private final Map<String, Contract> contracts = new HashMap<>();
     private List<Contractor> baseContracts;
 
@@ -39,10 +41,6 @@ public class ContractService {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
         });
-    }
-
-    public Map<String, Contract> getContracts() {
-        return contracts;
     }
 
     public String getContractType(String contractId) {

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -57,15 +58,11 @@ public class EmailExecutor extends Injector {
     });
   }
 
-  private String buildDocumentUri(ExecutionContext context, Inject inject) {
-    String userId = context.getUser().getId();
-    String exerciseId = context.getExercise().getId();
-    String injectId = inject.getId();
-    return openExConfig.getBaseUrl() + "/expectation/document/" + exerciseId + "/" + injectId + "?user=" + userId;
-  }
-
   @Override
-  public List<Expectation> process(Execution execution, ExecutableInject injection, Contract contract)
+  public List<Expectation> process(
+      @NotNull final Execution execution,
+      @NotNull final ExecutableInject injection,
+      @NotNull final Contract contract)
       throws Exception {
     Inject inject = injection.getInject();
     EmailContent content = contentConvert(injection, EmailContent.class);
@@ -74,7 +71,7 @@ public class EmailExecutor extends Injector {
     List<DataAttachment> attachments = resolveAttachments(execution, injection, documents);
     String inReplyTo = content.getInReplyTo();
     String subject = content.getSubject();
-    String message = content.buildMessage(injection, imapEnabled);
+    String message = content.buildMessage(injection, this.imapEnabled);
     boolean mustBeEncrypted = content.isEncrypted();
     // Resolve the attachments only once
     List<ExecutionContext> users = injection.getUsers();
@@ -82,7 +79,7 @@ public class EmailExecutor extends Injector {
       throw new UnsupportedOperationException("Email needs at least one user");
     }
     Exercise exercise = injection.getSource().getExercise();
-    String replyTo = exercise != null ? exercise.getReplyTo() : openExConfig.getDefaultMailer();
+    String replyTo = exercise != null ? exercise.getReplyTo() : this.openExConfig.getDefaultMailer();
     //noinspection SwitchStatementWithTooFewBranches
     switch (contract.getId()) {
       case EMAIL_GLOBAL -> sendMulti(execution, users, replyTo, inReplyTo, subject, message, attachments);
