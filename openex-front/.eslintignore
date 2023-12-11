@@ -5,3 +5,4 @@
 /builder/prod/build
 /src/static/ext/*
 __generated__
+/packages
