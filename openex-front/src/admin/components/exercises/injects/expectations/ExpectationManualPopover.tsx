@@ -3,14 +3,14 @@ import IconButton from '@mui/material/IconButton';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { isExerciseReadOnly } from '../../../../../utils/Exercise';
 import Dialog from '@mui/material/Dialog';
-import Transition from '../../../../../components/common/Transition';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import DialogTitle from '@mui/material/DialogTitle';
+import Transition from '../../../../../components/common/Transition';
+import { isExerciseReadOnly } from '../../../../../utils/Exercise';
 import { Exercise } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
 import ExpectationManualForm from './ExpectationManualForm';
@@ -67,7 +67,6 @@ const ExpectationManualPopover: FunctionComponent<ExpectationPopoverProps> = ({
     handleDelete(index);
     handleCloseDelete();
   };
-
 
   return (
     <div>

@@ -57,7 +57,7 @@ import MediaIcon from '../../medias/MediaIcon';
 import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
-import InjectExpectationsManual from "./expectations/InjectExpectationsManual.js";
+import InjectExpectationsManual from './expectations/InjectExpectationsManual';
 
 const EMAIL_CONTRACT = '138ad8f8-32f8-4a22-8114-aaa12322bd09';
 
@@ -421,7 +421,7 @@ class QuickInject extends Component {
   }
 
   handleExpectations(expectations) {
-    this.setState({ expectations: expectations });
+    this.setState({ expectations });
   }
 
   toggleAttachment(documentId) {
@@ -1729,8 +1729,8 @@ class QuickInject extends Component {
                     {t('Reset to default values')}
                   </Button>
                 </div>
-                {(hasExpectations || expectationsNotManual.length > 0) &&
-                  <>
+                {(hasExpectations || expectationsNotManual.length > 0)
+                  && <>
                     <Typography variant="h2" style={{ marginTop: 30 }}>
                       {t('Inject expectations')}
                     </Typography>
@@ -1767,8 +1767,8 @@ class QuickInject extends Component {
                         </div>
                       </div>
                     )}
-                    {hasExpectations &&
-                      <InjectExpectationsManual
+                    {hasExpectations
+                      && <InjectExpectationsManual
                         exercise={exercise}
                         expectationDatas={expectations}
                         handleExpectations={this.handleExpectations.bind(this)}

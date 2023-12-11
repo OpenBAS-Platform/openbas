@@ -3,26 +3,26 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import ItemTags from '../../../../components/ItemTags.js';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
-import Transition from '../../../../components/common/Transition';
-import { InjectExpectationsStore } from '../injects/expectations/Expectation';
-import { useFormatter } from '../../../../components/i18n.js';
-import { updateInjectExpectations } from '../../../../actions/Exercise.js';
-import { useAppDispatch } from '../../../../utils/hooks';
 import { useFieldArray, useForm } from 'react-hook-form';
-import { ExpectationUpdateInput, Inject } from '../../../../utils/api-types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import MuiTextField from '@mui/material/TextField';
 import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
+import Transition from '../../../../components/common/Transition';
+import { InjectExpectationsStore } from '../injects/expectations/Expectation';
+import { useFormatter } from '../../../../components/i18n';
+import { updateInjectExpectations } from '../../../../actions/Exercise';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { ExpectationUpdateInput, Inject } from '../../../../utils/api-types';
+import ItemTags from '../../../../components/ItemTags';
 
 const useStyles = makeStyles(() => ({
   mt_20: {
-    marginTop: 20
-  }
+    marginTop: 20,
+  },
 }));
 
 interface FormProps {
@@ -62,15 +62,15 @@ const DialogExpectationsForm: FunctionComponent<FormProps> = ({
     mode: 'onTouched',
     resolver: zodResolver(z.object({
       expectations: z.array(z.object({
-        expectation_score: z.coerce.number()
-      }))
+        expectation_score: z.coerce.number(),
+      })),
     })),
     defaultValues: {
       expectations: expectations
         .sort((e1, e2) => (e1.inject_expectation_name ?? '').localeCompare(e2.inject_expectation_name ?? ''))
         .map((expectation) => ({
           expectation_score: expectation.inject_expectation_score ?? expectation.inject_expectation_expected_score,
-        }))
+        })),
     },
   });
 
@@ -99,7 +99,7 @@ const DialogExpectationsForm: FunctionComponent<FormProps> = ({
               [classes.mt_20]: index !== 0,
             })}
           />
-        )
+        );
       })}
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button
@@ -172,8 +172,8 @@ const DialogExpectation: FunctionComponent<Props> = ({
         <Typography variant="h2" style={{ marginTop: 30 }}>
           {t('Results')}
         </Typography>
-        {expectations &&
-          <DialogExpectationsForm exerciseId={exerciseId} expectations={expectations} onClose={onClose} />
+        {expectations
+          && <DialogExpectationsForm exerciseId={exerciseId} expectations={expectations} onClose={onClose} />
         }
       </DialogContent>
     </Dialog>

@@ -4,15 +4,15 @@ import { CastForEducationOutlined } from '@mui/icons-material';
 import ListItemText from '@mui/material/ListItemText';
 import Chip from '@mui/material/Chip';
 import List from '@mui/material/List';
+import { makeStyles } from '@mui/styles';
+import { ListItemButton } from '@mui/material';
 import { Audience, Inject } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import { AudiencesHelper } from '../../../../actions/helper';
 import { InjectExpectationsStore } from '../injects/expectations/Expectation';
-import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../../../components/i18n.js';
-import { ListItemButton } from '@mui/material';
+import { useFormatter } from '../../../../components/i18n';
 import { Theme } from '../../../../components/Theme';
-import { colorStyles } from '../../../../components/Color';
+import colorStyles from '../../../../components/Color';
 import DialogExpectations from './DialogExpectations';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -25,8 +25,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     fontSize: theme.typography.h3.fontSize,
     '& div': {
       display: 'flex',
-      gap: 20
-    }
+      gap: 20,
+    },
   },
   chipInList: {
     height: 20,
@@ -62,36 +62,37 @@ const ManualExpectations: FunctionComponent<Props> = ({
     });
   });
 
-  const groupedByAudience = injectExpectations.reduce((group: Record<string, InjectExpectationsStore[]>, expectation) => {
+  const groupedByAudience = injectExpectations.reduce((group: Map<string, InjectExpectationsStore[]>, expectation) => {
     const { inject_expectation_audience } = expectation;
     if (inject_expectation_audience) {
-      group[inject_expectation_audience] = group[inject_expectation_audience] ?? [];
-      group[inject_expectation_audience].push(expectation);
+      const values = group.get(inject_expectation_audience) ?? [];
+      values.push(expectation);
+      group.set(inject_expectation_audience, values);
     }
     return group;
-  }, {});
+  }, new Map());
 
   const [currentExpectations, setCurrentExpectations] = useState<InjectExpectationsStore[] | null>(null);
 
   return (
     <>
       <List component="div" disablePadding>
-        {Object.entries(groupedByAudience)
+        {Array.from(groupedByAudience)
           .map(([entry, values]) => {
-              const audience = audiencesMap[entry] || {};
-              const expectationValues = values
-                .reduce((acc, el) => ({
-                  ...acc,
-                  expected_score: acc.expected_score + (el.inject_expectation_expected_score ?? 0),
-                  score: acc.score + (el.inject_expectation_score ?? 0),
-                  result: acc.result + (el.inject_expectation_result ?? ''),
-                }), { expected_score: 0, score: 0, result: '' });
-              const validated = values.filter((v) => v.inject_expectation_result !== null).length;
-              let label = t('Pending validation');
-              if (validated === values.length) {
-                label = `${t('Validated')} (${expectationValues.score})`
-              }
-              return (
+            const audience = audiencesMap[entry] || {};
+            const expectationValues = values
+              .reduce((acc, el) => ({
+                ...acc,
+                expected_score: acc.expected_score + (el.inject_expectation_expected_score ?? 0),
+                score: acc.score + (el.inject_expectation_score ?? 0),
+                result: acc.result + (el.inject_expectation_result ?? ''),
+              }), { expected_score: 0, score: 0, result: '' });
+            const validated = values.filter((v) => v.inject_expectation_result !== null).length;
+            let label = t('Pending validation');
+            if (validated === values.length) {
+              label = `${t('Validated')} (${expectationValues.score})`;
+            }
+            return (
                 <ListItemButton
                   key={audience.audience_id}
                   divider={true}
@@ -125,9 +126,8 @@ const ManualExpectations: FunctionComponent<Props> = ({
                     )}
                   />
                 </ListItemButton>
-              );
-            }
-          )}
+            );
+          })}
       </List>
       <DialogExpectations
         exerciseId={exerciseId}

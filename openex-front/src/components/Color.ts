@@ -1,4 +1,4 @@
-export const colorStyles = {
+const colorStyles = {
   green: {
     backgroundColor: 'rgba(76, 175, 80, 0.08)',
     color: '#4caf50',
@@ -12,3 +12,5 @@ export const colorStyles = {
     color: '#607d8b',
   },
 };
+
+export default colorStyles;

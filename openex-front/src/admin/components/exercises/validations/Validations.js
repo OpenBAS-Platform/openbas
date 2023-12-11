@@ -9,15 +9,15 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { CastForEducationOutlined, EmojiEventsOutlined, } from '@mui/icons-material';
+import { CastForEducationOutlined, EmojiEventsOutlined } from '@mui/icons-material';
 import Chip from '@mui/material/Chip';
 import Slide from '@mui/material/Slide';
 import { Chip, FormControlLabel, List, ListItem, ListItemIcon, ListItemText, Slide, Switch } from '@mui/material';
 import AnimationMenu from '../AnimationMenu';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchExerciseInjects, fetchInjectTypes, } from '../../../../actions/Inject';
-import { fetchExerciseInjectExpectations, } from '../../../../actions/Exercise';
+import { fetchExerciseInjects, fetchInjectTypes } from '../../../../actions/Inject';
+import { fetchExerciseInjectExpectations } from '../../../../actions/Exercise';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import InjectIcon from '../injects/InjectIcon';
@@ -28,7 +28,7 @@ import { fetchAudiences } from '../../../../actions/Audience';
 import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import MediaIcon from '../../medias/MediaIcon';
-import ManualExpectations from "./ManualExpectations";
+import ManualExpectations from './ManualExpectations';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -391,57 +391,57 @@ const Validations = () => {
                                                   {challenge.challenge_name}
                                                 </div>
 
-                                                <div
-                                                  className={
-                                                    classes.bodyItemRight
+                                              <div
+                                                className={
+                                                  classes.bodyItemRight
+                                                }
+                                              >
+                                                <Chip
+                                                  classes={{
+                                                    root: classes.chipInList,
+                                                  }}
+                                                  style={
+                                                    expectation.inject_expectation_result
+                                                      ? inlineStyles.green
+                                                      : inlineStyles.grey
                                                   }
-                                                >
-                                                  <Chip
-                                                    classes={{
-                                                      root: classes.chipInList,
-                                                    }}
-                                                    style={
-                                                      expectation.inject_expectation_result
-                                                        ? inlineStyles.green
-                                                        : inlineStyles.grey
-                                                    }
-                                                    label={
-                                                      expectation.inject_expectation_result
-                                                        ? `${t('Validated')} (${
-                                                          expectation.inject_expectation_score
-                                                        })`
-                                                        : t('Pending submission')
-                                                    }
-                                                  />
-                                                </div>
-                                                <div
-                                                  className={
-                                                    classes.bodyItemRight
+                                                  label={
+                                                    expectation.inject_expectation_result
+                                                      ? `${t('Validated')} (${
+                                                        expectation.inject_expectation_score
+                                                      })`
+                                                      : t('Pending submission')
                                                   }
-                                                  style={{ marginRight: 20 }}
-                                                >
-                                                  <Chip
-                                                    classes={{
-                                                      root: classes.points,
-                                                    }}
-                                                    label={
-                                                      expectation.inject_expectation_expected_score
-                                                    }
-                                                  />
-                                                </div>
+                                                />
                                               </div>
-                                            }
-                                          />
-                                        </ListItem>
-                                      );
-                                    },
-                                  )}
-                              </List>
-                            </div>
-                          );
-                        },
-                      )}
-                    </List>
+                                              <div
+                                                className={
+                                                  classes.bodyItemRight
+                                                }
+                                                style={{ marginRight: 20 }}
+                                              >
+                                                <Chip
+                                                  classes={{
+                                                    root: classes.points,
+                                                  }}
+                                                  label={
+                                                    expectation.inject_expectation_expected_score
+                                                  }
+                                                />
+                                              </div>
+                                            </div>
+                                          }
+                                        />
+                                      </ListItem>
+                                    );
+                                  },
+                                )}
+                            </List>
+                          </div>
+                        );
+                      },
+                    )}
+                  </List>
                   )
                   : (
                     <ManualExpectations

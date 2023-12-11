@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, CastForEducationOutlined, CloseRounded, ControlPointOutlined, DeleteOutlined, EmojiEventsOutlined, HelpOutlineOutlined, } from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, CastForEducationOutlined, CloseRounded, ControlPointOutlined, DeleteOutlined, EmojiEventsOutlined, HelpOutlineOutlined } from '@mui/icons-material';
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
@@ -47,7 +47,7 @@ import MediaIcon from '../../medias/MediaIcon';
 import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
-import InjectExpectationsManual from './expectations/InjectExpectationsManual.js';
+import InjectExpectationsManual from './expectations/InjectExpectationsManual';
 
 const styles = (theme) => ({
   header: {
@@ -408,7 +408,7 @@ class InjectDefinition extends Component {
   }
 
   handleExpectations(expectations) {
-    this.setState({ expectations: expectations });
+    this.setState({ expectations });
   }
 
   toggleAttachment(documentId) {
@@ -826,7 +826,7 @@ class InjectDefinition extends Component {
                                       </MenuItem>
                                     ))}
                                   </Select>
-                                ) : (
+                                  ) : (
                                   <TextField
                                     variant="standard"
                                     name={`${name}.value`}
@@ -835,7 +835,7 @@ class InjectDefinition extends Component {
                                     style={{ marginRight: 20 }}
                                     disabled={isExerciseReadOnly(exercise)}
                                   />
-                                )}
+                                  )}
                                 {field.cardinality === 'n' && (
                                   <IconButton
                                     onClick={() => fields.remove(index)}
@@ -1728,8 +1728,8 @@ class InjectDefinition extends Component {
                     {t('Reset to default values')}
                   </Button>
                 </div>
-                {(hasExpectations || expectationsNotManual.length > 0) &&
-                  <>
+                {(hasExpectations || expectationsNotManual.length > 0)
+                  && <>
                     <Typography variant="h2" style={{ marginTop: 30 }}>
                       {t('Inject expectations')}
                     </Typography>
@@ -1766,8 +1766,8 @@ class InjectDefinition extends Component {
                         </div>
                       </div>
                     )}
-                    {hasExpectations &&
-                      <InjectExpectationsManual
+                    {hasExpectations
+                      && <InjectExpectationsManual
                         exercise={exercise}
                         expectationDatas={expectations}
                         handleExpectations={this.handleExpectations.bind(this)}

@@ -1,11 +1,11 @@
-import React, { FunctionComponent } from 'react';
-import { useFormatter } from '../../../../../components/i18n';
+import React, { FunctionComponent, SyntheticEvent } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { zodImplement } from '../../../../../utils/Zod';
 import { z } from 'zod';
 import MuiTextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { zodImplement } from '../../../../../utils/Zod';
+import { useFormatter } from '../../../../../components/i18n';
 import { ExpectationInput } from '../../../../../actions/Expectation';
 
 interface ExpectationFormProps {
@@ -23,8 +23,8 @@ const ExpectationManualForm: FunctionComponent<ExpectationFormProps> = ({
     expectation_type: 'MANUAL',
     expectation_name: '',
     expectation_description: '',
-    expectation_score: 0
-  }
+    expectation_score: 0,
+  },
 }) => {
   const { t } = useFormatter();
 
@@ -43,7 +43,7 @@ const ExpectationManualForm: FunctionComponent<ExpectationFormProps> = ({
     defaultValues: initialValues,
   });
 
-  const handleSubmitWithoutPropagation = (e: any) => {
+  const handleSubmitWithoutPropagation = (e: SyntheticEvent) => {
     e.preventDefault();
     e.stopPropagation();
     handleSubmit(onSubmit)(e);

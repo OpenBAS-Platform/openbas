@@ -1,6 +1,4 @@
 import React, { FunctionComponent, useState } from 'react';
-import { Exercise } from '../../../../../utils/api-types';
-import InjectAddExpectationManual from './InjectAddExpectationManual';
 import List from '@mui/material/List';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -8,8 +6,10 @@ import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import ListItem from '@mui/material/ListItem';
 import { makeStyles } from '@mui/styles';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import { Theme } from '../../../../../components/Theme';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
+import { Theme } from '../../../../../components/Theme';
+import InjectAddExpectationManual from './InjectAddExpectationManual';
+import { Exercise } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
 import ExpectationManualPopover from './ExpectationManualPopover';
 import { ExpectationInput } from '../../../../../actions/Expectation';
@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   bodyItem: {
     fontSize: theme.typography.h3.fontSize,
-  }
+  },
 }));
 
 interface InjectExpectationsProps {
@@ -60,7 +60,7 @@ const InjectExpectationsManual: FunctionComponent<InjectExpectationsProps> = ({
   };
 
   const handleUpdateExpectation = (expectation: ExpectationInput, idx: number) => {
-    const values = expectations.map((item, i) => i !== idx ? item : expectation);
+    const values = expectations.map((item, i) => (i !== idx ? item : expectation));
     setExpectations(values);
     handleExpectations(values);
   };
@@ -75,18 +75,18 @@ const InjectExpectationsManual: FunctionComponent<InjectExpectationsProps> = ({
     {
       field: 'expectation_name',
       label: 'Name',
-      isSortable: true
+      isSortable: true,
     },
     {
       field: 'expectation_description',
       label: 'Description',
-      isSortable: true
+      isSortable: true,
     },
     {
       field: 'expectation_score',
       label: 'Score',
-      isSortable: false
-    }
+      isSortable: false,
+    },
   ];
 
   // -- SORT HEADERS --
