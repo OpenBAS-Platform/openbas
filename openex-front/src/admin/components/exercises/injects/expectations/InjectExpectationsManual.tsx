@@ -13,6 +13,7 @@ import { Exercise } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
 import ExpectationManualPopover from './ExpectationManualPopover';
 import { ExpectationInput } from '../../../../../actions/Expectation';
+import { truncate } from '../../../../../utils/String';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -154,10 +155,10 @@ const InjectExpectationsManual: FunctionComponent<InjectExpectationsProps> = ({
               primary={
                 <div className={classes.column}>
                   <div className={classes.bodyItem}>
-                    {expectation.expectation_name}
+                    {truncate(expectation.expectation_name || '', 22)}
                   </div>
                   <div className={classes.bodyItem}>
-                    {expectation.expectation_description}
+                    {truncate(expectation.expectation_description || '', 22)}
                   </div>
                   <div className={classes.bodyItem}>
                     {expectation.expectation_score}

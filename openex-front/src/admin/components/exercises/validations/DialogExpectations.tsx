@@ -10,7 +10,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import MuiTextField from '@mui/material/TextField';
 import { makeStyles } from '@mui/styles';
-import classNames from 'classnames';
 import Transition from '../../../../components/common/Transition';
 import { InjectExpectationsStore } from '../injects/expectations/Expectation';
 import { useFormatter } from '../../../../components/i18n';
@@ -18,9 +17,12 @@ import { updateInjectExpectations } from '../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { ExpectationUpdateInput, Inject } from '../../../../utils/api-types';
 import ItemTags from '../../../../components/ItemTags';
+import Divider from '@mui/material/Divider';
+import ExpandableText from '../../../../components/common/ExpendableText';
 
 const useStyles = makeStyles(() => ({
-  mt_20: {
+  m_bt_20: {
+    marginBottom: 20,
     marginTop: 20,
   },
 }));
@@ -39,7 +41,6 @@ const DialogExpectationsForm: FunctionComponent<FormProps> = ({
   const classes = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-  // TODO: improv UI
 
   const submit = (data: ExpectationUpdateInput[]) => dispatch(
     updateInjectExpectations(exerciseId, data),
@@ -57,7 +58,7 @@ const DialogExpectationsForm: FunctionComponent<FormProps> = ({
     register,
     handleSubmit,
     control,
-    formState: { errors, isDirty, isSubmitting },
+    formState: { errors, isSubmitting },
   } = useForm<{ expectations: ExpectationUpdateInput[] }>({
     mode: 'onTouched',
     resolver: zodResolver(z.object({
@@ -69,7 +70,7 @@ const DialogExpectationsForm: FunctionComponent<FormProps> = ({
       expectations: expectations
         .sort((e1, e2) => (e1.inject_expectation_name ?? '').localeCompare(e2.inject_expectation_name ?? ''))
         .map((expectation) => ({
-          expectation_score: expectation.inject_expectation_score ?? expectation.inject_expectation_expected_score,
+          expectation_score: expectation.inject_expectation_score || expectation.inject_expectation_expected_score,
         })),
     },
   });
@@ -84,21 +85,33 @@ const DialogExpectationsForm: FunctionComponent<FormProps> = ({
       {fields.map((field, index) => {
         const expectation = expectations[index];
         return (
-          <MuiTextField
-            key={field.id}
-            variant="standard"
-            fullWidth={true}
-            label={expectation.inject_expectation_name}
-            type="number"
-            error={!!errors.expectations?.[index]?.expectation_score}
-            helperText={
-              errors.expectations?.[index]?.expectation_score && errors.expectations?.[index]?.expectation_score?.message
-            }
-            inputProps={register(`expectations.${index}.expectation_score`)}
-            className={classNames({
-              [classes.mt_20]: index !== 0,
-            })}
-          />
+          <>
+            { index !== 0 && <Divider className={classes.m_bt_20}/> }
+            <Grid container={true} spacing={3}>
+              <Grid item={true} xs={8}>
+                <Typography variant="h3">{t('Name')}</Typography>
+                {expectation.inject_expectation_name}
+              </Grid>
+              <Grid item={true} xs={4}>
+                <MuiTextField
+                  key={field.id}
+                  variant="standard"
+                  fullWidth={true}
+                  label={t('Score')}
+                  type="number"
+                  error={!!errors.expectations?.[index]?.expectation_score}
+                  helperText={
+                    errors.expectations?.[index]?.expectation_score && errors.expectations?.[index]?.expectation_score?.message
+                  }
+                  inputProps={register(`expectations.${index}.expectation_score`)}
+                />
+              </Grid>
+              <Grid item={true} xs={12}>
+                <Typography variant="h3">{t('Description')}</Typography>
+                <ExpandableText source={expectation.inject_expectation_description} limit={120}/>
+              </Grid>
+            </Grid>
+          </>
         );
       })}
       <div style={{ float: 'right', marginTop: 20 }}>
@@ -112,7 +125,7 @@ const DialogExpectationsForm: FunctionComponent<FormProps> = ({
         <Button
           color="secondary"
           type="submit"
-          disabled={!isDirty || isSubmitting}
+          disabled={isSubmitting}
         >
           {t('Validate')}
         </Button>
