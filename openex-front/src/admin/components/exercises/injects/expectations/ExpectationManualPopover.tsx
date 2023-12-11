@@ -13,7 +13,7 @@ import Button from '@mui/material/Button';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Exercise } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
-import ExpectationForm from './ExpectationForm';
+import ExpectationManualForm from './ExpectationManualForm';
 import { ExpectationInput } from '../../../../../actions/Expectation';
 
 interface ExpectationPopoverProps {
@@ -24,7 +24,7 @@ interface ExpectationPopoverProps {
   handleDelete: (idx: number) => void;
 }
 
-const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
+const ExpectationManualPopover: FunctionComponent<ExpectationPopoverProps> = ({
   index,
   exercise,
   expectation,
@@ -125,7 +125,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
       >
         <DialogTitle>{t('Update the expectation')}</DialogTitle>
         <DialogContent>
-          <ExpectationForm
+          <ExpectationManualForm
             initialValues={expectation}
             editing={true}
             onSubmit={onSubmitEdit}
@@ -137,4 +137,4 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   );
 };
 
-export default ExpectationPopover;
+export default ExpectationManualPopover;

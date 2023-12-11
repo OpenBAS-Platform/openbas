@@ -47,7 +47,7 @@ import MediaIcon from '../../medias/MediaIcon';
 import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
-import InjectExpectations from './expectations/InjectExpectations';
+import InjectExpectationsManual from './expectations/InjectExpectationsManual.js';
 
 const styles = (theme) => ({
   header: {
@@ -1735,7 +1735,6 @@ class InjectDefinition extends Component {
                     </Typography>
                     {expectationsNotManual.length > 0 && (
                       <div>
-
                         <div style={{ marginTop: -15 }}>
                           {this.renderFields(
                             expectationsNotManual.filter((f) => {
@@ -1768,7 +1767,7 @@ class InjectDefinition extends Component {
                       </div>
                     )}
                     {hasExpectations &&
-                      <InjectExpectations
+                      <InjectExpectationsManual
                         exercise={exercise}
                         expectationDatas={expectations}
                         handleExpectations={this.handleExpectations.bind(this)}

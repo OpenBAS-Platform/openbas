@@ -15,7 +15,7 @@ interface ExpectationFormProps {
   initialValues?: ExpectationInput;
 }
 
-const ExpectationForm: FunctionComponent<ExpectationFormProps> = ({
+const ExpectationManualForm: FunctionComponent<ExpectationFormProps> = ({
   onSubmit,
   handleClose,
   editing = false,
@@ -105,4 +105,4 @@ const ExpectationForm: FunctionComponent<ExpectationFormProps> = ({
   );
 };
 
-export default ExpectationForm;
+export default ExpectationManualForm;

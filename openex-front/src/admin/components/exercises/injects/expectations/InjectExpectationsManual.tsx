@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
 import { Exercise } from '../../../../../utils/api-types';
-import InjectAddExpectation from './InjectAddExpectation';
+import InjectAddExpectationManual from './InjectAddExpectationManual';
 import List from '@mui/material/List';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -11,7 +11,7 @@ import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import { Theme } from '../../../../../components/Theme';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../../../components/i18n';
-import ExpectationPopover from './ExpectationPopover';
+import ExpectationManualPopover from './ExpectationManualPopover';
 import { ExpectationInput } from '../../../../../actions/Expectation';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -43,7 +43,7 @@ interface InjectExpectationsProps {
   handleExpectations: (expectations: ExpectationInput[]) => void;
 }
 
-const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
+const InjectExpectationsManual: FunctionComponent<InjectExpectationsProps> = ({
   exercise,
   expectationDatas,
   handleExpectations,
@@ -165,7 +165,7 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
                 </div>
               } />
             <ListItemSecondaryAction>
-              <ExpectationPopover
+              <ExpectationManualPopover
                 index={idx}
                 exercise={exercise}
                 expectation={expectation}
@@ -176,9 +176,9 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
           </ListItem>
         ))}
       </List>
-      <InjectAddExpectation exercise={exercise} handleAddExpectation={handleAddExpectation} />
+      <InjectAddExpectationManual exercise={exercise} handleAddExpectation={handleAddExpectation} />
     </>
   );
 };
 
-export default InjectExpectations;
+export default InjectExpectationsManual;

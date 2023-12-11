@@ -57,6 +57,7 @@ import MediaIcon from '../../medias/MediaIcon';
 import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
+import InjectExpectationsManual from "./expectations/InjectExpectationsManual.js";
 
 const EMAIL_CONTRACT = '138ad8f8-32f8-4a22-8114-aaa12322bd09';
 
@@ -334,6 +335,7 @@ class QuickInject extends Component {
       allAudiences: false,
       audiencesIds: [],
       documents: [],
+      expectations: [],
       audiencesSortBy: 'audience_name',
       audiencesOrderAsc: true,
       documentsSortBy: 'document_name',
@@ -416,6 +418,10 @@ class QuickInject extends Component {
         (d) => d.document_id !== documentId,
       ),
     });
+  }
+
+  handleExpectations(expectations) {
+    this.setState({ expectations: expectations });
   }
 
   toggleAttachment(documentId) {
@@ -572,22 +578,28 @@ class QuickInject extends Component {
     const injectType = R.head(
       injectTypes.filter((i) => i.contract_id === EMAIL_CONTRACT),
     );
+    const finalData = {};
     const hasArticles = injectType.fields
       .map((f) => f.key)
       .includes('articles');
-    const hasChallenges = injectType.fields
-      .map((f) => f.key)
-      .includes('challenges');
-    const finalData = {};
     if (hasArticles) {
       finalData.articles = this.state.articlesIds;
     }
+    const hasChallenges = injectType.fields
+      .map((f) => f.key)
+      .includes('challenges');
     if (hasChallenges) {
       finalData.challenges = this.state.challengesIds;
     }
+    const hasExpectations = injectType.fields
+      .map((f) => f.key)
+      .includes('expectations');
+    if (hasExpectations) {
+      finalData.expectations = this.state.expectations;
+    }
     injectType.fields
       .filter(
-        (f) => !['audiences', 'articles', 'challenges', 'attachments'].includes(
+        (f) => !['audiences', 'articles', 'challenges', 'attachments', 'expectations'].includes(
           f.key,
         ),
       )
@@ -663,7 +675,7 @@ class QuickInject extends Component {
     if (injectType && Array.isArray(injectType.fields)) {
       injectType.fields
         .filter(
-          (f) => !['audiences', 'articles', 'challenges', 'attachments'].includes(
+          (f) => !['audiences', 'articles', 'challenges', 'attachments', 'expectations'].includes(
             f.key,
           ),
         )
@@ -1038,6 +1050,7 @@ class QuickInject extends Component {
       allAudiences,
       audiencesIds,
       documents,
+      expectations,
       audiencesSortBy,
       audiencesOrderAsc,
       documentsSortBy,
@@ -1053,6 +1066,7 @@ class QuickInject extends Component {
     const injectType = R.head(
       injectTypes.filter((i) => i.contract_id === EMAIL_CONTRACT),
     );
+    // -- AUDIENCES --
     const audiences = audiencesIds
       .map((a) => audiencesMap[a])
       .filter((a) => a !== undefined);
@@ -1062,6 +1076,10 @@ class QuickInject extends Component {
         : [R.descend(R.prop(audiencesSortBy))],
     );
     const sortedAudiences = sortAudiences(audiences);
+    const hasAudiences = injectType.fields
+      .map((f) => f.key)
+      .includes('audiences');
+    // -- ARTICLES --
     const articles = articlesIds
       .map((a) => articlesMap[a])
       .filter((a) => a !== undefined)
@@ -1076,6 +1094,10 @@ class QuickInject extends Component {
         : [R.descend(R.prop(articlesSortBy))],
     );
     const sortedArticles = sortArticles(articles);
+    const hasArticles = injectType.fields
+      .map((f) => f.key)
+      .includes('articles');
+    // -- CHALLENGES --
     const challenges = challengesIds
       .map((a) => challengesMap[a])
       .filter((a) => a !== undefined);
@@ -1085,6 +1107,10 @@ class QuickInject extends Component {
         : [R.descend(R.prop(challengesSortBy))],
     );
     const sortedChallenges = sortChallenges(challenges);
+    const hasChallenges = injectType.fields
+      .map((f) => f.key)
+      .includes('challenges');
+    // -- DOCUMENTS --
     const docs = documents
       .map((d) => (documentsMap[d.document_id]
         ? {
@@ -1100,19 +1126,14 @@ class QuickInject extends Component {
         : [R.descend(R.prop(documentsSortBy))],
     );
     const sortedDocuments = sortDocuments(docs);
-    const hasAudiences = injectType.fields
-      .map((f) => f.key)
-      .includes('audiences');
-    const hasArticles = injectType.fields
-      .map((f) => f.key)
-      .includes('articles');
-    const hasChallenges = injectType.fields
-      .map((f) => f.key)
-      .includes('challenges');
     const hasAttachments = injectType.fields
       .map((f) => f.key)
       .includes('attachments');
-    const expectations = injectType.fields.filter(
+    // -- EXPECTATIONS --
+    const hasExpectations = injectType.fields
+      .map((f) => f.key)
+      .includes('expectations');
+    const expectationsNotManual = injectType.fields.filter(
       (f) => f.expectation === true,
     );
     const initialValues = {};
@@ -1122,6 +1143,7 @@ class QuickInject extends Component {
       'articles',
       'challenges',
       'attachments',
+      'expectations',
     ];
     injectType.fields
       .filter((f) => !builtInFields.includes(f.key))
@@ -1707,42 +1729,53 @@ class QuickInject extends Component {
                     {t('Reset to default values')}
                   </Button>
                 </div>
-                {expectations.length > 0 && (
-                  <div>
+                {(hasExpectations || expectationsNotManual.length > 0) &&
+                  <>
                     <Typography variant="h2" style={{ marginTop: 30 }}>
                       {t('Inject expectations')}
                     </Typography>
-                    <div style={{ marginTop: -15 }}>
-                      {this.renderFields(
-                        expectations.filter((f) => {
-                          // Filter display if linked fields
-                          for (
-                            let index = 0;
-                            index < f.linkedFields.length;
-                            index += 1
-                          ) {
-                            const linkedField = f.linkedFields[index];
-                            if (
-                              linkedField.type === 'checkbox'
-                              && values[linkedField.key] === false
-                            ) {
-                              return false;
-                            }
-                            if (
-                              linkedField.type === 'select'
-                              && !f.linkedValues.includes(values[linkedField.key])
-                            ) {
-                              return false;
-                            }
-                          }
-                          return true;
-                        }),
-                        values,
-                        attachedDocs,
-                      )}
-                    </div>
-                  </div>
-                )}
+                    {expectationsNotManual.length > 0 && (
+                      <div>
+                        <div style={{ marginTop: -15 }}>
+                          {this.renderFields(
+                            expectationsNotManual.filter((f) => {
+                              // Filter display if linked fields
+                              for (
+                                let index = 0;
+                                index < f.linkedFields.length;
+                                index += 1
+                              ) {
+                                const linkedField = f.linkedFields[index];
+                                if (
+                                  linkedField.type === 'checkbox'
+                                  && values[linkedField.key] === false
+                                ) {
+                                  return false;
+                                }
+                                if (
+                                  linkedField.type === 'select'
+                                  && !f.linkedValues.includes(values[linkedField.key])
+                                ) {
+                                  return false;
+                                }
+                              }
+                              return true;
+                            }),
+                            values,
+                            attachedDocs,
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {hasExpectations &&
+                      <InjectExpectationsManual
+                        exercise={exercise}
+                        expectationDatas={expectations}
+                        handleExpectations={this.handleExpectations.bind(this)}
+                      />
+                    }
+                  </>
+                }
                 <div>
                   <Typography variant="h2" style={{ marginTop: 30 }}>
                     {t('Inject documents')}

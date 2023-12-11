@@ -8,7 +8,7 @@ import { Exercise } from '../../../../../utils/api-types';
 import { Theme } from '../../../../../components/Theme';
 import { useFormatter } from '../../../../../components/i18n';
 import Dialog from '../../../../../components/common/Dialog';
-import ExpectationForm from './ExpectationForm';
+import ExpectationManualForm from './ExpectationManualForm';
 import { ExpectationInput } from '../../../../../actions/Expectation';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -28,7 +28,7 @@ interface InjectAddExpectationProps {
   handleAddExpectation: (data: ExpectationInput) => void;
 }
 
-const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
+const InjectAddExpectationManual: FunctionComponent<InjectAddExpectationProps> = ({
   exercise,
   handleAddExpectation,
 }) => {
@@ -67,10 +67,10 @@ const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
         open={openDialog}
         handleClose={handleClose}
         title={t('Add expectation in this inject')}>
-        <ExpectationForm onSubmit={onSubmit} handleClose={handleClose} />
+        <ExpectationManualForm onSubmit={onSubmit} handleClose={handleClose} />
       </Dialog>
     </>
   );
 };
 
-export default InjectAddExpectation;
+export default InjectAddExpectationManual;

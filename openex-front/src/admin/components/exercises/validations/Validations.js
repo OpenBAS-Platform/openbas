@@ -95,7 +95,6 @@ const Validations = () => {
   const { t, fndt } = useFormatter();
   const [keyword, setKeyword] = useState('');
   const [onlyManual, setOnlyManual] = useState(true);
-  const [currentExpectation, setCurrentExpectation] = useState(null);
   const handleSearch = (value) => setKeyword(value);
   const handleAddTag = (value) => {
     if (value) {
@@ -456,12 +455,6 @@ const Validations = () => {
             );
           })}
         </List>
-        <DialogExpectation
-          exerciseId={exerciseId}
-          expectation={currentExpectation}
-          open={currentExpectation !== null}
-          onClose={() => setCurrentExpectation(null)}
-        />
       </div>
     );
   }
