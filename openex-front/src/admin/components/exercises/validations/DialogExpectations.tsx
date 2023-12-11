@@ -85,6 +85,7 @@ const DialogExpectationsForm: FunctionComponent<FormProps> = ({
         const expectation = expectations[index];
         return (
           <MuiTextField
+            key={field.id}
             variant="standard"
             fullWidth={true}
             label={expectation.inject_expectation_name}

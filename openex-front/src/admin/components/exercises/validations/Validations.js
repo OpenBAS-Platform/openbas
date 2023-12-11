@@ -29,7 +29,6 @@ import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import MediaIcon from '../../medias/MediaIcon';
 import ManualExpectations from "./ManualExpectations";
-import DialogExpectation from "./DialogExpectation";
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
