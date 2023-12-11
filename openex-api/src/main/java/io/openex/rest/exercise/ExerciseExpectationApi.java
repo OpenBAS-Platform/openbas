@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -19,7 +20,7 @@ public class ExerciseExpectationApi extends RestBehavior {
 
   @GetMapping(value = "/api/exercises/{exerciseId}/expectations")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Iterable<InjectExpectation> exerciseInjectExpectations(@PathVariable @NotBlank final String exerciseId) {
+  public List<InjectExpectation> exerciseInjectExpectations(@PathVariable @NotBlank final String exerciseId) {
     return this.exerciseExpectationService.injectExpectations(exerciseId);
   }
 
@@ -27,7 +28,7 @@ public class ExerciseExpectationApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Iterable<InjectExpectation> updateInjectExpectations(
       @PathVariable @NotBlank final String exerciseId,
-      @Valid @RequestBody final ExpectationUpdateInput[] inputs) {
+      @Valid @RequestBody final List<ExpectationUpdateInput> inputs) {
     return this.exerciseExpectationService.updateInjectExpectations(inputs);
   }
 

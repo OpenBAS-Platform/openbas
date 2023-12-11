@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Arrays;
+import java.util.List;
 
 import static java.time.Instant.now;
 
@@ -21,16 +21,16 @@ public class ExerciseExpectationService {
   private final InjectExpectationRepository injectExpectationRepository;
   private final ExerciseRepository exerciseRepository;
 
-  public Iterable<InjectExpectation> injectExpectations(@NotBlank final String exerciseId) {
+  public List<InjectExpectation> injectExpectations(@NotBlank final String exerciseId) {
     Exercise exercise = this.exerciseRepository.findById(exerciseId).orElseThrow();
-    return this.injectExpectationRepository.findAllForExercise(exercise.getId()).stream().toList();
+    return this.injectExpectationRepository.findAllForExercise(exercise.getId());
   }
 
-  public Iterable<InjectExpectation> updateInjectExpectations(@NotNull final ExpectationUpdateInput[] inputs) {
+  public Iterable<InjectExpectation> updateInjectExpectations(@NotNull final List<ExpectationUpdateInput> inputs) {
     Iterable<InjectExpectation> injectExpectations = this.injectExpectationRepository
-        .findAllById(Arrays.stream(inputs).map(ExpectationUpdateInput::getId).toList());
+        .findAllById(inputs.stream().map(ExpectationUpdateInput::getId).toList());
     injectExpectations.forEach((e) -> {
-      Integer score = Arrays.stream(inputs)
+      Integer score = inputs.stream()
           .filter((i) -> i.getId().equals(e.getId()))
           .findFirst()
           .orElseThrow()
