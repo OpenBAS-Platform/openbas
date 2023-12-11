@@ -3,7 +3,11 @@ package io.openex.contract.fields;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.contract.ContractCardinality;
 import io.openex.contract.ContractType;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 public class ContractTuple extends ContractCardinalityElement {
 
     public static final String FILE_PREFIX = "file :: ";
@@ -27,14 +31,6 @@ public class ContractTuple extends ContractCardinalityElement {
     @Override
     public ContractType getType() {
         return ContractType.Tuple;
-    }
-
-    public String getAttachmentKey() {
-        return attachmentKey;
-    }
-
-    public void setAttachmentKey(String attachmentKey) {
-        this.attachmentKey = attachmentKey;
     }
 
     public Boolean isContractAttachment() {

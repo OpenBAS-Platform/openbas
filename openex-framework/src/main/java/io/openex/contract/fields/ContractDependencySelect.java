@@ -2,13 +2,17 @@ package io.openex.contract.fields;
 
 import io.openex.contract.ContractCardinality;
 import io.openex.contract.ContractType;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class ContractDependencySelect extends ContractCardinalityElement {
 
     private final String dependencyField;
+    @Setter
     private Map<String, Map<String, String>> choices = new HashMap<>();
 
     public ContractDependencySelect(String key, String label, String dependencyField, ContractCardinality cardinality) {
@@ -33,15 +37,4 @@ public class ContractDependencySelect extends ContractCardinalityElement {
         return ContractType.DependencySelect;
     }
 
-    public Map<String, Map<String, String>> getChoices() {
-        return choices;
-    }
-
-    public void setChoices(Map<String, Map<String, String>> choices) {
-        this.choices = choices;
-    }
-
-    public String getDependencyField() {
-        return dependencyField;
-    }
 }

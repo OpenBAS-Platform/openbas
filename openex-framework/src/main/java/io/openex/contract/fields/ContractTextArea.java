@@ -1,11 +1,15 @@
 package io.openex.contract.fields;
 
 import io.openex.contract.ContractType;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Getter
 public class ContractTextArea extends ContractElement {
 
+    @Setter
     private String defaultValue = "";
     private final boolean richText;
 
@@ -40,15 +44,4 @@ public class ContractTextArea extends ContractElement {
         return ContractType.Textarea;
     }
 
-    public boolean isRichText() {
-        return richText;
-    }
-
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
-    }
 }

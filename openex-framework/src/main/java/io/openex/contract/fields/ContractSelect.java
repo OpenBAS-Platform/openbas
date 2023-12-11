@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Setter
+@Getter
 public class ContractSelect extends ContractCardinalityElement {
 
-  @Getter
-  @Setter
   private Map<String, String> choices = new HashMap<>();
 
   public ContractSelect(String key, String label, ContractCardinality cardinality) {

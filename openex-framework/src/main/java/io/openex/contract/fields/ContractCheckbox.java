@@ -1,9 +1,13 @@
 package io.openex.contract.fields;
 
 import io.openex.contract.ContractType;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Setter
+@Getter
 public class ContractCheckbox extends ContractElement {
 
     private boolean defaultValue = false;
@@ -30,11 +34,4 @@ public class ContractCheckbox extends ContractElement {
         return ContractType.Checkbox;
     }
 
-    public boolean isDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(boolean defaultValue) {
-        this.defaultValue = defaultValue;
-    }
 }
