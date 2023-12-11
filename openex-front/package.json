@@ -20,7 +20,7 @@
     "@uiw/react-md-editor": "4.0.1",
     "apexcharts": "3.44.2",
     "axios": "1.6.2",
-    "ckeditor5-custom-build": "0.0.1",
+    "ckeditor5-custom-build": "link:packages/ckeditor5-custom-build",
     "classnames": "2.3.2",
     "date-fns": "2.30.0",
     "dompurify": "3.0.6",

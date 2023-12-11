@@ -5304,7 +5304,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ckeditor5-custom-build@0.0.1, ckeditor5-custom-build@workspace:packages/ckeditor5-custom-build":
+"ckeditor5-custom-build@link:packages/ckeditor5-custom-build::locator=openex-front%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "ckeditor5-custom-build@link:packages/ckeditor5-custom-build::locator=openex-front%40workspace%3A."
+  languageName: node
+  linkType: soft
+
+"ckeditor5-custom-build@workspace:packages/ckeditor5-custom-build":
   version: 0.0.0-use.local
   resolution: "ckeditor5-custom-build@workspace:packages/ckeditor5-custom-build"
   dependencies:
@@ -10872,7 +10878,7 @@ __metadata:
     apexcharts: 3.44.2
     axios: 1.6.2
     chokidar: 3.5.3
-    ckeditor5-custom-build: 0.0.1
+    ckeditor5-custom-build: "link:packages/ckeditor5-custom-build"
     classnames: 2.3.2
     compression: 1.7.4
     cross-env: 7.0.3
