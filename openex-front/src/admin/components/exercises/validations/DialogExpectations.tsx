@@ -85,7 +85,7 @@ const DialogExpectationsForm: FunctionComponent<FormProps> = ({
       {fields.map((field, index) => {
         const expectation = expectations[index];
         return (
-          <>
+          <div key={field.id}>
             { index !== 0 && <Divider className={classes.m_bt_20}/> }
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={8}>
@@ -94,7 +94,6 @@ const DialogExpectationsForm: FunctionComponent<FormProps> = ({
               </Grid>
               <Grid item={true} xs={4}>
                 <MuiTextField
-                  key={field.id}
                   variant="standard"
                   fullWidth={true}
                   label={t('Score')}
@@ -111,7 +110,7 @@ const DialogExpectationsForm: FunctionComponent<FormProps> = ({
                 <ExpandableText source={expectation.inject_expectation_description} limit={120}/>
               </Grid>
             </Grid>
-          </>
+          </div>
         );
       })}
       <div style={{ float: 'right', marginTop: 20 }}>
