@@ -212,46 +212,6 @@ const ThemeLight = (
           '.wmde-markdown tr': {
             background: 'transparent !important',
           },
-          '.react-mde': {
-            border: '0 !important',
-          },
-          '.error .react-mde textarea': {
-            border: '0 !important',
-            borderBottom: '2px solid #f44336 !important',
-            '&:hover': {
-              border: '0 !important',
-              borderBottom: '2px solid #f44336 !important',
-            },
-            '&:focus': {
-              border: '0 !important',
-              borderBottom: '2px solid #f44336 !important',
-            },
-          },
-          '.mde-header': {
-            border: '0 !important',
-            backgroundColor: 'transparent !important',
-            color: '#000000 !important',
-          },
-          '.mde-header-item button': {
-            color: '#000000 !important',
-          },
-          '.mde-tabs button': {
-            color: '#000000 !important',
-          },
-          '.mde-textarea-wrapper textarea': {
-            fontFamily: '"IBM Plex Sans", sans-serif',
-            fontSize: 13,
-            color: 'rgba(0, 0, 0, 0.87)',
-            background: 'transparent',
-            borderBottom: '1px solid rgba(0, 0, 0, 0.87) !important',
-            transition: 'borderBottom .3s',
-            '&:hover': {
-              borderBottom: '2px solid #000000 !important',
-            },
-            '&:focus': {
-              borderBottom: `2px solid #${primary || '#007fff'} !important`,
-            },
-          },
           '.react-grid-placeholder': {
             backgroundColor: `${accent || '#c0dfff'} !important`,
           },

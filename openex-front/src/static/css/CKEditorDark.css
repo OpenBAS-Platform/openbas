@@ -121,6 +121,10 @@ body[data-theme="dark"] {
   /* -- Overrides the default colors used by the ckeditor5-link package. ---------------------- */
 
   --ck-color-link-default: #00b1ff !important;
+
+  /* -- Overrides the default colors used by the ckeditor5 powered by. ---------------------- */
+
+  --ck-powered-by-background: #00b1ff;
 }
 
 .ck-editor,

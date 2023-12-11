@@ -598,6 +598,9 @@ const i18n = {
       'Please follow this link to': 'Merci de suivre ce lien pour',
       'manage custom variables': 'gérer les variables personnalisées',
       'view custom variables': 'afficher les variables personnalisées',
+      'Edit code': 'Edition',
+      'Live code': 'Code en temps réel',
+      'Preview code': 'Prévisualisation',
     },
     en: {
       openex_email: 'Email',
