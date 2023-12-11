@@ -13,12 +13,12 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useDispatch } from 'react-redux';
 import { makeStyles } from '@mui/styles';
-import LessonsTemplateCategoryForm from './LessonsTemplateCategoryForm';
 import { useFormatter } from '../../../../components/i18n';
 import {
   deleteLessonsTemplateCategory,
   updateLessonsTemplateCategory,
 } from '../../../../actions/Lessons';
+import LessonsTemplateCategoryForm from './LessonsTemplateCategoryForm';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

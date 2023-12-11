@@ -40,13 +40,15 @@ const Root = () => {
           <Routes>
             <Route
               path=""
-              element={
-                logged.isOnlyPlayer ? (
-                  <Navigate to="private" />
-                ) : (
-                  <Navigate to="admin" />
-                )
-              }
+              element={(
+                logged.isOnlyPlayer
+                  ? (
+                    <Navigate to="private" />
+                    )
+                  : (
+                    <Navigate to="admin" />
+                    )
+              )}
             />
             <Route path="private/*" element={errorWrapper(IndexPrivate)()} />
             <Route path="admin/*" element={errorWrapper(IndexAdmin)()} />

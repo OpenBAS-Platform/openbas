@@ -10,7 +10,6 @@ import { EditOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import Fab from '@mui/material/Fab';
 import { useNavigate } from 'react-router-dom';
-import ReportForm from './ReportForm';
 import { useFormatter } from '../../../../components/i18n';
 import { deleteReport, updateReport } from '../../../../actions/Report';
 import Transition from '../../../../components/common/Transition';
@@ -20,6 +19,7 @@ import {
   Report,
   ReportUpdateInput,
 } from '../../../../utils/api-types';
+import ReportForm from './ReportForm';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -30,8 +30,8 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  exerciseId: Exercise['exercise_id'];
-  report: Report;
+  exerciseId: Exercise['exercise_id']
+  report: Report
 }
 
 const ReportPopover: React.FC<Props> = ({ exerciseId, report }) => {

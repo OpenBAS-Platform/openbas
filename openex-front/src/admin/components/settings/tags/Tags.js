@@ -18,9 +18,9 @@ import inject18n from '../../../../components/i18n';
 import { fetchTags } from '../../../../actions/Tag';
 import { FIVE_SECONDS } from '../../../../utils/Time';
 import SearchFilter from '../../../../components/SearchFilter';
+import { storeHelper } from '../../../../actions/Schema';
 import CreateTag from './CreateTag';
 import TagPopover from './TagPopover';
-import { storeHelper } from '../../../../actions/Schema';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -143,11 +143,13 @@ class Tags extends Component {
   sortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { orderAsc, sortBy } = this.state;
-    const sortComponent = orderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = orderAsc
+      ? (
+        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -206,12 +208,12 @@ class Tags extends Component {
               </span>
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   {this.sortHeader('tag_name', 'Name', true)}
                   {this.sortHeader('tag_color', 'Color', true)}
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
@@ -227,7 +229,7 @@ class Tags extends Component {
                 </ListItemIcon>
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -242,7 +244,7 @@ class Tags extends Component {
                       {tag.tag_color}
                     </div>
                   </div>
-                }
+                )}
               />
               <ListItemSecondaryAction>
                 <TagPopover tag={tag} />

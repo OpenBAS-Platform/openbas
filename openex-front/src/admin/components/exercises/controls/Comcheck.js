@@ -32,9 +32,9 @@ import {
   fetchComcheckStatuses,
 } from '../../../../actions/Comcheck';
 import { useFormatter } from '../../../../components/i18n';
+import { progression } from '../../../../utils/Time';
 import ComcheckStatusState from './ComcheckStatusState';
 import ComcheckState from './ComcheckState';
-import { progression } from '../../../../utils/Time';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -285,7 +285,7 @@ const Comcheck = () => {
             </div>
             <div className={classes.progress}>
               <BorderLinearProgress
-                value={
+                value={(
                   comcheck?.comcheck_state === 'FINISHED'
                     ? 100
                     : progression(
@@ -293,7 +293,7 @@ const Comcheck = () => {
                       Date.parse(comcheck?.comcheck_start_date),
                       Date.parse(comcheck?.comcheck_end_date),
                     )
-                }
+                )}
                 variant="determinate"
               />
             </div>
@@ -340,7 +340,7 @@ const Comcheck = () => {
               </span>
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   {filtering.buildHeader(
                     'user_email',
@@ -379,7 +379,7 @@ const Comcheck = () => {
                     headerStyles,
                   )}
                 </div>
-              }
+              )}
             />
           </ListItem>
           {filtering.filterAndSort(players).map((user) => (
@@ -392,7 +392,7 @@ const Comcheck = () => {
                 <PersonOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -434,7 +434,7 @@ const Comcheck = () => {
                       />
                     </div>
                   </div>
-                }
+                )}
               />
             </ListItem>
           ))}

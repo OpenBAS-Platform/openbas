@@ -1,10 +1,10 @@
-import * as schema from './Schema';
 import {
   getReferential,
   putReferential,
   postReferential,
   delReferential,
 } from '../utils/Action';
+import * as schema from './Schema';
 
 export const fetchLogs = (exerciseId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/logs`;

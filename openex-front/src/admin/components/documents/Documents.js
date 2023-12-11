@@ -28,10 +28,10 @@ import ItemTags from '../../../components/ItemTags';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
 import { storeHelper } from '../../../actions/Schema';
+import { exportData } from '../../../utils/Environment';
 import CreateDocument from './CreateDocument';
 import DocumentPopover from './DocumentPopover';
 import DocumentType from './DocumentType';
-import { exportData } from '../../../utils/Environment';
 
 const styles = (theme) => ({
   parameters: {
@@ -199,11 +199,13 @@ class Documents extends Component {
   sortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { orderAsc, sortBy } = this.state;
-    const sortComponent = orderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = orderAsc
+      ? (
+        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -227,11 +229,11 @@ class Documents extends Component {
     const { keyword, sortBy, orderAsc, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.document_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
-      || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
+        || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1;
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
@@ -239,10 +241,10 @@ class Documents extends Component {
     const sortedDocuments = R.pipe(
       R.filter(
         (n) => tags.length === 0
-          || R.any(
-            (filter) => R.includes(filter, n.document_tags),
-            R.pluck('id', tags),
-          ),
+        || R.any(
+          (filter) => R.includes(filter, n.document_tags),
+          R.pluck('id', tags),
+        ),
       ),
       R.filter(filterByKeyword),
       sort,
@@ -265,35 +267,37 @@ class Documents extends Component {
             />
           </div>
           <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
-            {sortedDocuments.length > 0 ? (
-              <CSVLink
-                data={exportData(
-                  'document',
-                  [
-                    'document_name',
-                    'document_description',
-                    'document_exercises',
-                    'document_type',
-                    'document_tags',
-                  ],
-                  sortedDocuments,
-                  tagsMap,
-                  null,
-                  exercisesMap,
+            {sortedDocuments.length > 0
+              ? (
+                <CSVLink
+                  data={exportData(
+                    'document',
+                    [
+                      'document_name',
+                      'document_description',
+                      'document_exercises',
+                      'document_type',
+                      'document_tags',
+                    ],
+                    sortedDocuments,
+                    tagsMap,
+                    null,
+                    exercisesMap,
+                  )}
+                  filename={`${t('Documents')}.csv`}
+                >
+                  <Tooltip title={t('Export this list')}>
+                    <IconButton size="large">
+                      <FileDownloadOutlined color="primary" />
+                    </IconButton>
+                  </Tooltip>
+                </CSVLink>
+                )
+              : (
+                <IconButton size="large" disabled={true}>
+                  <FileDownloadOutlined />
+                </IconButton>
                 )}
-                filename={`${t('Documents')}.csv`}
-              >
-                <Tooltip title={t('Export this list')}>
-                  <IconButton size="large">
-                    <FileDownloadOutlined color="primary" />
-                  </IconButton>
-                </Tooltip>
-              </CSVLink>
-            ) : (
-              <IconButton size="large" disabled={true}>
-                <FileDownloadOutlined />
-              </IconButton>
-            )}
           </div>
         </div>
         <div className="clearfix" />
@@ -316,7 +320,7 @@ class Documents extends Component {
               </span>
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   {this.sortHeader('document_name', 'Name', true)}
                   {this.sortHeader('document_description', 'Description', true)}
@@ -324,7 +328,7 @@ class Documents extends Component {
                   {this.sortHeader('document_type', 'Type', true)}
                   {this.sortHeader('document_tags', 'Tags', true)}
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
@@ -341,7 +345,7 @@ class Documents extends Component {
                 <DescriptionOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -396,7 +400,7 @@ class Documents extends Component {
                       <ItemTags variant="list" tags={document.document_tags} />
                     </div>
                   </div>
-                }
+                )}
               />
               <ListItemSecondaryAction>
                 <DocumentPopover

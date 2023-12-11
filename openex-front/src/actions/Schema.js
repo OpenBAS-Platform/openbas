@@ -281,7 +281,7 @@ export const storeHelper = (state) => ({
   ),
   getExerciseUserLessonsAnswers: (exerciseId, userId) => entities('lessonsanswers', state).filter(
     (l) => l.lessons_answer_exercise === exerciseId
-        && l.lessons_answer_user === userId,
+    && l.lessons_answer_user === userId,
   ),
   getExerciseReports: (exerciseId) => entities('reports', state).filter((l) => l.report_exercise === exerciseId),
   // report

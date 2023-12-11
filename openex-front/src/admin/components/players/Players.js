@@ -13,8 +13,6 @@ import IconButton from '@mui/material/IconButton';
 import { fetchPlayers } from '../../../actions/User';
 import { fetchOrganizations } from '../../../actions/Organization';
 import ItemTags from '../../../components/ItemTags';
-import CreatePlayer from './CreatePlayer';
-import PlayerPopover from './PlayerPopover';
 import TagsFilter from '../../../components/TagsFilter';
 import SearchFilter from '../../../components/SearchFilter';
 import { fetchTags } from '../../../actions/Tag';
@@ -23,6 +21,8 @@ import { useHelper } from '../../../store';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { useFormatter } from '../../../components/i18n';
 import { exportData } from '../../../utils/Environment';
+import PlayerPopover from './PlayerPopover';
+import CreatePlayer from './CreatePlayer';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -172,35 +172,37 @@ const Players = () => {
           />
         </div>
         <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
-          {sortedUsers.length > 0 ? (
-            <CSVLink
-              data={exportData(
-                'user',
-                [
-                  'user_email',
-                  'user_firstname',
-                  'user_lastname',
-                  'user_phone',
-                  'user_organization',
-                  'user_tags',
-                ],
-                sortedUsers,
-                tagsMap,
-                organizationsMap,
+          {sortedUsers.length > 0
+            ? (
+              <CSVLink
+                data={exportData(
+                  'user',
+                  [
+                    'user_email',
+                    'user_firstname',
+                    'user_lastname',
+                    'user_phone',
+                    'user_organization',
+                    'user_tags',
+                  ],
+                  sortedUsers,
+                  tagsMap,
+                  organizationsMap,
+                )}
+                filename={`${t('Players')}.csv`}
+              >
+                <Tooltip title={t('Export this list')}>
+                  <IconButton size="large">
+                    <FileDownloadOutlined color="primary" />
+                  </IconButton>
+                </Tooltip>
+              </CSVLink>
+              )
+            : (
+              <IconButton size="large" disabled={true}>
+                <FileDownloadOutlined />
+              </IconButton>
               )}
-              filename={`${t('Players')}.csv`}
-            >
-              <Tooltip title={t('Export this list')}>
-                <IconButton size="large">
-                  <FileDownloadOutlined color="primary" />
-                </IconButton>
-              </Tooltip>
-            </CSVLink>
-          ) : (
-            <IconButton size="large" disabled={true}>
-              <FileDownloadOutlined />
-            </IconButton>
-          )}
         </div>
       </div>
       <div className="clearfix" />
@@ -222,7 +224,7 @@ const Players = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div>
                 {filtering.buildHeader(
                   'user_email',
@@ -250,7 +252,7 @@ const Players = () => {
                 )}
                 {filtering.buildHeader('user_tags', 'Tags', true, headerStyles)}
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
@@ -264,7 +266,7 @@ const Players = () => {
               <PersonOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   <div
                     className={classes.bodyItem}
@@ -298,7 +300,7 @@ const Players = () => {
                     <ItemTags variant="list" tags={user.user_tags} />
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <PlayerPopover user={user} />

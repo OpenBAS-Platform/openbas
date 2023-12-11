@@ -29,19 +29,21 @@ const renderSelectField = ({
   ...others
 }) => (
   <FormControl error={touched && error} fullWidth={fullWidth} style={style}>
-    {others.displayEmpty ? (
-      <InputLabel
-        shrink={true}
-        htmlFor={name}
-        variant={others.variant || 'standard'}
-      >
-        {label}
-      </InputLabel>
-    ) : (
-      <InputLabel htmlFor={name} variant={others.variant || 'standard'}>
-        {label}
-      </InputLabel>
-    )}
+    {others.displayEmpty
+      ? (
+        <InputLabel
+          shrink={true}
+          htmlFor={name}
+          variant={others.variant || 'standard'}
+        >
+          {label}
+        </InputLabel>
+        )
+      : (
+        <InputLabel htmlFor={name} variant={others.variant || 'standard'}>
+          {label}
+        </InputLabel>
+        )}
     <MUISelect
       onChange={(event) => {
         onChange(event.target.value);

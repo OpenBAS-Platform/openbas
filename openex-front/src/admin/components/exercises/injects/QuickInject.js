@@ -40,7 +40,6 @@ import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
 import AudiencePopover from '../audiences/AudiencePopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
-import InjectAddAudiences from './InjectAddAudiences';
 import {
   isExerciseReadOnly,
   secondsFromToNow,
@@ -48,16 +47,17 @@ import {
 import TextField from '../../../../components/TextField';
 import SwitchField from '../../../../components/SwitchField';
 import EnrichedTextField from '../../../../components/EnrichedTextField';
-import InjectAddDocuments from './InjectAddDocuments';
 import DocumentType from '../../documents/DocumentType';
 import DocumentPopover from '../../documents/DocumentPopover';
 import Select from '../../../../components/Select';
 import ArticlePopover from '../articles/ArticlePopover';
-import InjectAddArticles from './InjectAddArticles';
 import MediaIcon from '../../medias/MediaIcon';
 import ChallengePopover from '../../challenges/ChallengePopover';
-import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
+import InjectAddChallenges from './InjectAddChallenges';
+import InjectAddArticles from './InjectAddArticles';
+import InjectAddDocuments from './InjectAddDocuments';
+import InjectAddAudiences from './InjectAddAudiences';
 
 const EMAIL_CONTRACT = '138ad8f8-32f8-4a22-8114-aaa12322bd09';
 
@@ -423,9 +423,9 @@ class QuickInject extends Component {
     this.setState({
       documents: this.state.documents.map((d) => (d.document_id === documentId
         ? {
-          document_id: d.document_id,
-          document_attached: !d.document_attached,
-        }
+            document_id: d.document_id,
+            document_attached: !d.document_attached,
+          }
         : d)),
     });
   }
@@ -446,11 +446,13 @@ class QuickInject extends Component {
   audiencesSortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { audiencesSortBy, audiencesOrderAsc } = this.state;
-    const sortComponent = audiencesOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = audiencesOrderAsc
+      ? (
+        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -479,11 +481,13 @@ class QuickInject extends Component {
   articlesSortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { articlesSortBy, articlesOrderAsc } = this.state;
-    const sortComponent = articlesOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = articlesOrderAsc
+      ? (
+        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -512,11 +516,13 @@ class QuickInject extends Component {
   challengesSortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { challengesSortBy, challengesOrderAsc } = this.state;
-    const sortComponent = challengesOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = challengesOrderAsc
+      ? (
+        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -545,11 +551,13 @@ class QuickInject extends Component {
   documentsSortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { documentsSortBy, documentsOrderAsc } = this.state;
-    const sortComponent = documentsOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = documentsOrderAsc
+      ? (
+        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -685,28 +693,30 @@ class QuickInject extends Component {
         {renderedFields.map((field, position) => {
           switch (field.type) {
             case 'textarea':
-              return field.richText ? (
-                <EnrichedTextField
-                  key={field.key}
-                  name={field.key}
-                  label={t(field.label)}
-                  fullWidth={true}
-                  style={{ marginTop: 20, height: 250 }}
-                  disabled={isExerciseReadOnly(exercise)}
-                />
-              ) : (
-                <TextField
-                  variant="standard"
-                  key={field.key}
-                  name={field.key}
-                  fullWidth={true}
-                  multiline={true}
-                  rows={10}
-                  label={t(field.label)}
-                  style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
-                />
-              );
+              return field.richText
+                ? (
+                  <EnrichedTextField
+                    key={field.key}
+                    name={field.key}
+                    label={t(field.label)}
+                    fullWidth={true}
+                    style={{ marginTop: 20, height: 250 }}
+                    disabled={isExerciseReadOnly(exercise)}
+                  />
+                  )
+                : (
+                  <TextField
+                    variant="standard"
+                    key={field.key}
+                    name={field.key}
+                    fullWidth={true}
+                    multiline={true}
+                    rows={10}
+                    label={t(field.label)}
+                    style={{ marginTop: 20 }}
+                    disabled={isExerciseReadOnly(exercise)}
+                  />
+                  );
             case 'number':
               return (
                 <TextField
@@ -749,8 +759,7 @@ class QuickInject extends Component {
                                   type: 'text',
                                   key: '',
                                   value: '',
-                                })
-                                }
+                                })}
                                 aria-haspopup="true"
                                 size="medium"
                                 style={{ marginTop: -2 }}
@@ -804,36 +813,38 @@ class QuickInject extends Component {
                                 && values[field.key]
                                 && values[field.key][index]
                                 && values[field.key][index].type
-                                  === 'attachment' ? (
-                                  <Select
-                                    variant="standard"
-                                    name={`${name}.value`}
-                                    fullWidth={true}
-                                    label={t('Value')}
-                                    style={{ marginRight: 20 }}
-                                    disabled={isExerciseReadOnly(exercise)}
-                                  >
-                                    {attachedDocs.map((doc) => (
-                                      <MenuItem
-                                        key={doc.document_id}
-                                        value={doc.document_id}
-                                      >
-                                        <ListItemText>
-                                          {doc.document_name}
-                                        </ListItemText>
-                                      </MenuItem>
-                                    ))}
-                                  </Select>
-                                  ) : (
-                                  <TextField
-                                    variant="standard"
-                                    name={`${name}.value`}
-                                    fullWidth={true}
-                                    label={t('Value')}
-                                    style={{ marginRight: 20 }}
-                                    disabled={isExerciseReadOnly(exercise)}
-                                  />
-                                  )}
+                                === 'attachment'
+                                  ? (
+                                    <Select
+                                      variant="standard"
+                                      name={`${name}.value`}
+                                      fullWidth={true}
+                                      label={t('Value')}
+                                      style={{ marginRight: 20 }}
+                                      disabled={isExerciseReadOnly(exercise)}
+                                    >
+                                      {attachedDocs.map((doc) => (
+                                        <MenuItem
+                                          key={doc.document_id}
+                                          value={doc.document_id}
+                                        >
+                                          <ListItemText>
+                                            {doc.document_name}
+                                          </ListItemText>
+                                        </MenuItem>
+                                      ))}
+                                    </Select>
+                                    )
+                                  : (
+                                    <TextField
+                                      variant="standard"
+                                      name={`${name}.value`}
+                                      fullWidth={true}
+                                      label={t('Value')}
+                                      style={{ marginRight: 20 }}
+                                      disabled={isExerciseReadOnly(exercise)}
+                                    />
+                                    )}
                                 {field.cardinality === 'n' && (
                                   <IconButton
                                     onClick={() => fields.remove(index)}
@@ -855,100 +866,102 @@ class QuickInject extends Component {
                 </div>
               );
             case 'select':
-              return field.cardinality === 'n' ? (
-                <Select
-                  variant="standard"
-                  label={t(field.label)}
-                  key={field.key}
-                  multiple
-                  renderValue={(v) => v.map((a) => field.choices[a]).join(', ')}
-                  name={field.key}
-                  fullWidth={true}
-                  style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
-                >
-                  {Object.entries(field.choices)
-                    .sort((a, b) => a[1].localeCompare(b[1]))
-                    .map(([k, v]) => (
-                      <MenuItem key={k} value={k}>
-                        <ListItemText>
-                          {field.expectation ? t(v || 'Unknown') : v}
-                        </ListItemText>
-                      </MenuItem>
-                    ))}
-                </Select>
-              ) : (
-                <Select
-                  variant="standard"
-                  label={t(field.label)}
-                  key={field.key}
-                  renderValue={(v) => (field.expectation
-                    ? t(field.choices[v] || 'Unknown')
-                    : field.choices[v])
-                  }
-                  name={field.key}
-                  fullWidth={true}
-                  style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
-                >
-                  {Object.entries(field.choices)
-                    .sort((a, b) => a[1].localeCompare(b[1]))
-                    .map(([k, v]) => (
-                      <MenuItem key={k} value={k}>
-                        <ListItemText>
-                          {field.expectation ? t(v || 'Unknown') : v}
-                        </ListItemText>
-                      </MenuItem>
-                    ))}
-                </Select>
-              );
+              return field.cardinality === 'n'
+                ? (
+                  <Select
+                    variant="standard"
+                    label={t(field.label)}
+                    key={field.key}
+                    multiple
+                    renderValue={(v) => v.map((a) => field.choices[a]).join(', ')}
+                    name={field.key}
+                    fullWidth={true}
+                    style={{ marginTop: 20 }}
+                    disabled={isExerciseReadOnly(exercise)}
+                  >
+                    {Object.entries(field.choices)
+                      .sort((a, b) => a[1].localeCompare(b[1]))
+                      .map(([k, v]) => (
+                        <MenuItem key={k} value={k}>
+                          <ListItemText>
+                            {field.expectation ? t(v || 'Unknown') : v}
+                          </ListItemText>
+                        </MenuItem>
+                      ))}
+                  </Select>
+                  )
+                : (
+                  <Select
+                    variant="standard"
+                    label={t(field.label)}
+                    key={field.key}
+                    renderValue={(v) => (field.expectation
+                      ? t(field.choices[v] || 'Unknown')
+                      : field.choices[v])}
+                    name={field.key}
+                    fullWidth={true}
+                    style={{ marginTop: 20 }}
+                    disabled={isExerciseReadOnly(exercise)}
+                  >
+                    {Object.entries(field.choices)
+                      .sort((a, b) => a[1].localeCompare(b[1]))
+                      .map(([k, v]) => (
+                        <MenuItem key={k} value={k}>
+                          <ListItemText>
+                            {field.expectation ? t(v || 'Unknown') : v}
+                          </ListItemText>
+                        </MenuItem>
+                      ))}
+                  </Select>
+                  );
             case 'dependency-select':
               // eslint-disable-next-line no-case-declarations
               const depValue = values[field.dependencyField];
               // eslint-disable-next-line no-case-declarations
               const choices = field.choices[depValue] ?? {};
-              return field.cardinality === 'n' ? (
-                <Select
-                  variant="standard"
-                  label={t(field.label)}
-                  key={field.key}
-                  multiple
-                  renderValue={(v) => v.map((a) => choices[a]).join(', ')}
-                  name={field.key}
-                  fullWidth={true}
-                  style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
-                >
-                  {Object.entries(choices)
-                    .sort((a, b) => a[1].localeCompare(b[1]))
-                    .map(([k, v]) => (
-                      <MenuItem key={k} value={k}>
-                        <ListItemText>{v}</ListItemText>
-                      </MenuItem>
-                    ))}
-                </Select>
-              ) : (
-                <Select
-                  variant="standard"
-                  label={t(field.label)}
-                  key={field.key}
-                  renderValue={(v) => (field.expectation ? t(choices[v] || 'Unknown') : choices[v])
-                  }
-                  name={field.key}
-                  fullWidth={true}
-                  style={{ marginTop: 20 }}
-                >
-                  {Object.entries(choices)
-                    .sort((a, b) => a[1].localeCompare(b[1]))
-                    .map(([k, v]) => (
-                      <MenuItem key={k} value={k}>
-                        <ListItemText>
-                          {field.expectation ? t(v || 'Unknown') : v}
-                        </ListItemText>
-                      </MenuItem>
-                    ))}
-                </Select>
-              );
+              return field.cardinality === 'n'
+                ? (
+                  <Select
+                    variant="standard"
+                    label={t(field.label)}
+                    key={field.key}
+                    multiple
+                    renderValue={(v) => v.map((a) => choices[a]).join(', ')}
+                    name={field.key}
+                    fullWidth={true}
+                    style={{ marginTop: 20 }}
+                    disabled={isExerciseReadOnly(exercise)}
+                  >
+                    {Object.entries(choices)
+                      .sort((a, b) => a[1].localeCompare(b[1]))
+                      .map(([k, v]) => (
+                        <MenuItem key={k} value={k}>
+                          <ListItemText>{v}</ListItemText>
+                        </MenuItem>
+                      ))}
+                  </Select>
+                  )
+                : (
+                  <Select
+                    variant="standard"
+                    label={t(field.label)}
+                    key={field.key}
+                    renderValue={(v) => (field.expectation ? t(choices[v] || 'Unknown') : choices[v])}
+                    name={field.key}
+                    fullWidth={true}
+                    style={{ marginTop: 20 }}
+                  >
+                    {Object.entries(choices)
+                      .sort((a, b) => a[1].localeCompare(b[1]))
+                      .map(([k, v]) => (
+                        <MenuItem key={k} value={k}>
+                          <ListItemText>
+                            {field.expectation ? t(v || 'Unknown') : v}
+                          </ListItemText>
+                        </MenuItem>
+                      ))}
+                  </Select>
+                  );
             default:
               return (
                 <TextField
@@ -1089,9 +1102,9 @@ class QuickInject extends Component {
     const docs = documents
       .map((d) => (documentsMap[d.document_id]
         ? {
-          ...documentsMap[d.document_id],
-          document_attached: d.document_attached,
-        }
+            ...documentsMap[d.document_id],
+            document_attached: d.document_attached,
+          }
         : undefined))
       .filter((d) => d !== undefined);
     const attachedDocs = docs.filter((n) => n.document_attached);
@@ -1237,14 +1250,14 @@ class QuickInject extends Component {
                       classes={{ root: classes.allAudiences }}
                     >
                       <FormControlLabel
-                        control={
+                        control={(
                           <Switch
                             checked={allAudiences}
                             onChange={this.toggleAll.bind(this)}
                             color="primary"
                             disabled={isExerciseReadOnly(exercise)}
                           />
-                        }
+                        )}
                         label={<strong>{t('All audiences')}</strong>}
                       />
                     </FormGroup>
@@ -1267,7 +1280,7 @@ class QuickInject extends Component {
                           </span>
                         </ListItemIcon>
                         <ListItemText
-                          primary={
+                          primary={(
                             <div>
                               {this.audiencesSortHeader(
                                 'audience_name',
@@ -1290,134 +1303,136 @@ class QuickInject extends Component {
                                 true,
                               )}
                             </div>
-                          }
+                          )}
                         />
                         <ListItemSecondaryAction>
                           &nbsp;
                         </ListItemSecondaryAction>
                       </ListItem>
-                      {allAudiences ? (
-                        <ListItem
-                          classes={{ root: classes.item }}
-                          divider={true}
-                        >
-                          <ListItemIcon>
-                            <CastForEducationOutlined />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.audience_name}
-                                >
-                                  <i>{t('All audiences')}</i>
+                      {allAudiences
+                        ? (
+                          <ListItem
+                            classes={{ root: classes.item }}
+                            divider={true}
+                          >
+                            <ListItemIcon>
+                              <CastForEducationOutlined />
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={(
+                                <div>
+                                  <div
+                                    className={classes.bodyItem}
+                                    style={inlineStyles.audience_name}
+                                  >
+                                    <i>{t('All audiences')}</i>
+                                  </div>
+                                  <div
+                                    className={classes.bodyItem}
+                                    style={inlineStyles.audience_users_number}
+                                  >
+                                    <strong>
+                                      {exercise.exercise_users_number}
+                                    </strong>
+                                  </div>
+                                  <div
+                                    className={classes.bodyItem}
+                                    style={inlineStyles.audience_enabled}
+                                  >
+                                    <ItemBoolean
+                                      status={true}
+                                      label={t('Enabled')}
+                                      variant="list"
+                                    />
+                                  </div>
+                                  <div
+                                    className={classes.bodyItem}
+                                    style={inlineStyles.audience_tags}
+                                  >
+                                    <ItemTags variant="list" tags={[]} />
+                                  </div>
                                 </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.audience_users_number}
-                                >
-                                  <strong>
-                                    {exercise.exercise_users_number}
-                                  </strong>
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.audience_enabled}
-                                >
-                                  <ItemBoolean
-                                    status={true}
-                                    label={t('Enabled')}
-                                    variant="list"
-                                  />
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.audience_tags}
-                                >
-                                  <ItemTags variant="list" tags={[]} />
-                                </div>
-                              </div>
-                            }
-                          />
-                          <ListItemSecondaryAction>
+                              )}
+                            />
+                            <ListItemSecondaryAction>
                             &nbsp;
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                      ) : (
-                        <div>
-                          {sortedAudiences.map((audience) => (
-                            <ListItem
-                              key={audience.audience_id}
-                              classes={{ root: classes.item }}
-                              divider={true}
-                            >
-                              <ListItemIcon>
-                                <CastForEducationOutlined />
-                              </ListItemIcon>
-                              <ListItemText
-                                primary={
-                                  <div>
-                                    <div
-                                      className={classes.bodyItem}
-                                      style={inlineStyles.audience_name}
-                                    >
-                                      {audience.audience_name}
-                                    </div>
-                                    <div
-                                      className={classes.bodyItem}
-                                      style={inlineStyles.audience_users_number}
-                                    >
-                                      {audience.audience_users_number}
-                                    </div>
-                                    <div
-                                      className={classes.bodyItem}
-                                      style={inlineStyles.audience_enabled}
-                                    >
-                                      <ItemBoolean
-                                        status={audience.audience_enabled}
-                                        label={
+                            </ListItemSecondaryAction>
+                          </ListItem>
+                          )
+                        : (
+                          <div>
+                            {sortedAudiences.map((audience) => (
+                              <ListItem
+                                key={audience.audience_id}
+                                classes={{ root: classes.item }}
+                                divider={true}
+                              >
+                                <ListItemIcon>
+                                  <CastForEducationOutlined />
+                                </ListItemIcon>
+                                <ListItemText
+                                  primary={(
+                                    <div>
+                                      <div
+                                        className={classes.bodyItem}
+                                        style={inlineStyles.audience_name}
+                                      >
+                                        {audience.audience_name}
+                                      </div>
+                                      <div
+                                        className={classes.bodyItem}
+                                        style={inlineStyles.audience_users_number}
+                                      >
+                                        {audience.audience_users_number}
+                                      </div>
+                                      <div
+                                        className={classes.bodyItem}
+                                        style={inlineStyles.audience_enabled}
+                                      >
+                                        <ItemBoolean
+                                          status={audience.audience_enabled}
+                                          label={
                                           audience.audience_enabled
                                             ? t('Enabled')
                                             : t('Disabled')
                                         }
-                                        variant="list"
-                                      />
+                                          variant="list"
+                                        />
+                                      </div>
+                                      <div
+                                        className={classes.bodyItem}
+                                        style={inlineStyles.audience_tags}
+                                      >
+                                        <ItemTags
+                                          variant="list"
+                                          tags={audience.audience_tags}
+                                        />
+                                      </div>
                                     </div>
-                                    <div
-                                      className={classes.bodyItem}
-                                      style={inlineStyles.audience_tags}
-                                    >
-                                      <ItemTags
-                                        variant="list"
-                                        tags={audience.audience_tags}
-                                      />
-                                    </div>
-                                  </div>
-                                }
-                              />
-                              <ListItemSecondaryAction>
-                                <AudiencePopover
-                                  exerciseId={exerciseId}
-                                  exercise={exercise}
-                                  audience={audience}
-                                  onRemoveAudience={this.handleRemoveAudience.bind(
-                                    this,
                                   )}
-                                  disabled={isExerciseReadOnly(exercise)}
                                 />
-                              </ListItemSecondaryAction>
-                            </ListItem>
-                          ))}
-                          <InjectAddAudiences
-                            exerciseId={exerciseId}
-                            injectAudiencesIds={audiencesIds}
-                            handleAddAudiences={this.handleAddAudiences.bind(
-                              this,
-                            )}
-                          />
-                        </div>
-                      )}
+                                <ListItemSecondaryAction>
+                                  <AudiencePopover
+                                    exerciseId={exerciseId}
+                                    exercise={exercise}
+                                    audience={audience}
+                                    onRemoveAudience={this.handleRemoveAudience.bind(
+                                      this,
+                                    )}
+                                    disabled={isExerciseReadOnly(exercise)}
+                                  />
+                                </ListItemSecondaryAction>
+                              </ListItem>
+                            ))}
+                            <InjectAddAudiences
+                              exerciseId={exerciseId}
+                              injectAudiencesIds={audiencesIds}
+                              handleAddAudiences={this.handleAddAudiences.bind(
+                                this,
+                              )}
+                            />
+                          </div>
+                          )}
                     </List>
                   </div>
                 )}
@@ -1447,7 +1462,7 @@ class QuickInject extends Component {
                           </span>
                         </ListItemIcon>
                         <ListItemText
-                          primary={
+                          primary={(
                             <div>
                               {this.articlesSortHeader(
                                 'article_media_type',
@@ -1470,7 +1485,7 @@ class QuickInject extends Component {
                                 true,
                               )}
                             </div>
-                          }
+                          )}
                         />
                         <ListItemSecondaryAction>
                           &nbsp;
@@ -1489,7 +1504,7 @@ class QuickInject extends Component {
                             />
                           </ListItemIcon>
                           <ListItemText
-                            primary={
+                            primary={(
                               <div>
                                 <div
                                   className={classes.bodyItem}
@@ -1516,7 +1531,7 @@ class QuickInject extends Component {
                                   {article.article_author}
                                 </div>
                               </div>
-                            }
+                            )}
                           />
                           <ListItemSecondaryAction>
                             <ArticlePopover
@@ -1565,7 +1580,7 @@ class QuickInject extends Component {
                           </span>
                         </ListItemIcon>
                         <ListItemText
-                          primary={
+                          primary={(
                             <div>
                               {this.challengesSortHeader(
                                 'challenge_category',
@@ -1583,7 +1598,7 @@ class QuickInject extends Component {
                                 true,
                               )}
                             </div>
-                          }
+                          )}
                         />
                         <ListItemSecondaryAction>
                           &nbsp;
@@ -1599,7 +1614,7 @@ class QuickInject extends Component {
                             <EmojiEventsOutlined />
                           </ListItemIcon>
                           <ListItemText
-                            primary={
+                            primary={(
                               <div>
                                 <div
                                   className={classes.bodyItem}
@@ -1623,7 +1638,7 @@ class QuickInject extends Component {
                                   />
                                 </div>
                               </div>
-                            }
+                            )}
                           />
                           <ListItemSecondaryAction>
                             <ChallengePopover
@@ -1766,7 +1781,7 @@ class QuickInject extends Component {
                         </span>
                       </ListItemIcon>
                       <ListItemText
-                        primary={
+                        primary={(
                           <div>
                             {this.documentsSortHeader(
                               'document_name',
@@ -1789,7 +1804,7 @@ class QuickInject extends Component {
                               true,
                             )}
                           </div>
-                        }
+                        )}
                       />
                       <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
                     </ListItem>
@@ -1806,7 +1821,7 @@ class QuickInject extends Component {
                           <AttachmentOutlined />
                         </ListItemIcon>
                         <ListItemText
-                          primary={
+                          primary={(
                             <div>
                               <div
                                 className={classes.bodyItem}
@@ -1859,7 +1874,7 @@ class QuickInject extends Component {
                                 />
                               </div>
                             </div>
-                          }
+                          )}
                         />
                         <ListItemSecondaryAction>
                           <DocumentPopover

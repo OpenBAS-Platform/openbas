@@ -38,7 +38,7 @@ const DashboardDefinitionScoreStatistics = ({
   const injectTypesWithScore = R.pipe(
     R.filter(
       (n) => n.inject_type === 'openex_challenge'
-        || n.inject_content?.expectationScore,
+      || n.inject_content?.expectationScore,
     ),
     R.map((n) => {
       if (n.inject_type !== 'openex_challenge') {
@@ -129,21 +129,23 @@ const DashboardDefinitionScoreStatistics = ({
           {t('Distribution of expectations by inject type')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {injectTypesWithScore.length > 0 ? (
-            <Chart
-              options={horizontalBarsChartOptions(theme)}
-              series={expectationsByInjectTypeData}
-              type="bar"
-              width="100%"
-              height={50 + injectTypesWithScore.length * 50}
-            />
-          ) : (
-            <Empty
-              message={t(
-                'No data to display or the exercise has not started yet',
+          {injectTypesWithScore.length > 0
+            ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={expectationsByInjectTypeData}
+                type="bar"
+                width="100%"
+                height={50 + injectTypesWithScore.length * 50}
+              />
+              )
+            : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
               )}
-            />
-          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={3}>
@@ -151,21 +153,23 @@ const DashboardDefinitionScoreStatistics = ({
           {t('Distribution of expected total score by inject type')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {injectTypesWithScore.length > 0 ? (
-            <Chart
-              options={horizontalBarsChartOptions(theme)}
-              series={expectedScoreByInjectTypeData}
-              type="bar"
-              width="100%"
-              height={50 + injectTypesWithScore.length * 50}
-            />
-          ) : (
-            <Empty
-              message={t(
-                'No data to display or the exercise has not started yet',
+          {injectTypesWithScore.length > 0
+            ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={expectedScoreByInjectTypeData}
+                type="bar"
+                width="100%"
+                height={50 + injectTypesWithScore.length * 50}
+              />
+              )
+            : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
               )}
-            />
-          )}
         </Paper>
       </Grid>
       <Grid item={true} xs={3}>
@@ -173,17 +177,19 @@ const DashboardDefinitionScoreStatistics = ({
           {t('Distribution of expectations by audience')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedAudiencesByExpectation.length > 0 ? (
-            <Chart
-              options={horizontalBarsChartOptions(theme)}
-              series={expectationsByAudienceData}
-              type="bar"
-              width="100%"
-              height={50 + sortedAudiencesByExpectation.length * 50}
-            />
-          ) : (
-            <Empty message={t('No audiences in this exercise.')} />
-          )}
+          {sortedAudiencesByExpectation.length > 0
+            ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={expectationsByAudienceData}
+                type="bar"
+                width="100%"
+                height={50 + sortedAudiencesByExpectation.length * 50}
+              />
+              )
+            : (
+              <Empty message={t('No audiences in this exercise.')} />
+              )}
         </Paper>
       </Grid>
       <Grid item={true} xs={3}>
@@ -191,17 +197,19 @@ const DashboardDefinitionScoreStatistics = ({
           {t('Distribution of expected total score by audience')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedAudiencesByExpectedScore.length > 0 ? (
-            <Chart
-              options={horizontalBarsChartOptions(theme)}
-              series={expectedScoreByAudienceData}
-              type="bar"
-              width="100%"
-              height={50 + sortedAudiencesByExpectedScore.length * 50}
-            />
-          ) : (
-            <Empty message={t('No audiences in this exercise.')} />
-          )}
+          {sortedAudiencesByExpectedScore.length > 0
+            ? (
+              <Chart
+                options={horizontalBarsChartOptions(theme)}
+                series={expectedScoreByAudienceData}
+                type="bar"
+                width="100%"
+                height={50 + sortedAudiencesByExpectedScore.length * 50}
+              />
+              )
+            : (
+              <Empty message={t('No audiences in this exercise.')} />
+              )}
         </Paper>
       </Grid>
     </Grid>

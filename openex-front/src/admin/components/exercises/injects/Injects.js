@@ -22,11 +22,6 @@ import {
   fetchExerciseInjects,
   fetchInjectTypes,
 } from '../../../../actions/Inject';
-import InjectIcon from './InjectIcon';
-import CreateInject from './CreateInject';
-import InjectPopover from './InjectPopover';
-import InjectType from './InjectType';
-import InjectDefinition from './InjectDefinition';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { useFormatter } from '../../../../components/i18n';
 import useDataLoader from '../../../../utils/ServerSideEvent';
@@ -35,6 +30,11 @@ import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import { exportData } from '../../../../utils/Environment';
 import Loader from '../../../../components/Loader';
+import InjectDefinition from './InjectDefinition';
+import InjectType from './InjectType';
+import InjectPopover from './InjectPopover';
+import CreateInject from './CreateInject';
+import InjectIcon from './InjectIcon';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -228,36 +228,38 @@ const Injects = () => {
             />
           </div>
           <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
-            {sortedInjects.length > 0 ? (
-              <CSVLink
-                data={exportData(
-                  'inject',
-                  [
-                    'inject_type',
-                    'inject_title',
-                    'inject_description',
-                    'inject_depends_duration',
-                    'inject_users_number',
-                    'inject_enabled',
-                    'inject_tags',
-                    'inject_content',
-                  ],
-                  sortedInjects,
-                  tagsMap,
+            {sortedInjects.length > 0
+              ? (
+                <CSVLink
+                  data={exportData(
+                    'inject',
+                    [
+                      'inject_type',
+                      'inject_title',
+                      'inject_description',
+                      'inject_depends_duration',
+                      'inject_users_number',
+                      'inject_enabled',
+                      'inject_tags',
+                      'inject_content',
+                    ],
+                    sortedInjects,
+                    tagsMap,
+                  )}
+                  filename={`[${exercise.exercise_name}] ${t('Injects')}.csv`}
+                >
+                  <Tooltip title={t('Export this list')}>
+                    <IconButton size="large">
+                      <FileDownloadOutlined color="primary" />
+                    </IconButton>
+                  </Tooltip>
+                </CSVLink>
+                )
+              : (
+                <IconButton size="large" disabled={true}>
+                  <FileDownloadOutlined />
+                </IconButton>
                 )}
-                filename={`[${exercise.exercise_name}] ${t('Injects')}.csv`}
-              >
-                <Tooltip title={t('Export this list')}>
-                  <IconButton size="large">
-                    <FileDownloadOutlined color="primary" />
-                  </IconButton>
-                </Tooltip>
-              </CSVLink>
-            ) : (
-              <IconButton size="large" disabled={true}>
-                <FileDownloadOutlined />
-              </IconButton>
-            )}
           </div>
         </div>
         <div className="clearfix" />
@@ -279,7 +281,7 @@ const Injects = () => {
               </span>
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   {filtering.buildHeader(
                     'inject_type',
@@ -318,7 +320,7 @@ const Injects = () => {
                     headerStyles,
                   )}
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
@@ -359,7 +361,7 @@ const Injects = () => {
                   />
                 </ListItemIcon>
                 <ListItemText
-                  primary={
+                  primary={(
                     <div>
                       <div
                         className={classes.bodyItem}
@@ -416,7 +418,7 @@ const Injects = () => {
                         <ItemTags variant="list" tags={inject.inject_tags} />
                       </div>
                     </div>
-                  }
+                  )}
                 />
                 <ListItemSecondaryAction>
                   <InjectPopover

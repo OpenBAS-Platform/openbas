@@ -23,13 +23,13 @@ import { fetchOrganizations } from '../../../actions/Organization';
 import { FIVE_SECONDS } from '../../../utils/Time';
 import ItemTags from '../../../components/ItemTags';
 import { truncate } from '../../../utils/String';
-import CreateOrganization from './CreateOrganization';
-import OrganizationPopover from './OrganizationPopover';
 import { storeHelper } from '../../../actions/Schema';
 import { fetchTags } from '../../../actions/Tag';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
 import { exportData } from '../../../utils/Environment';
+import OrganizationPopover from './OrganizationPopover';
+import CreateOrganization from './CreateOrganization';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -170,11 +170,13 @@ class Organizations extends Component {
   sortHeader(field, label, isSortable) {
     const { t } = this.props;
     const { orderAsc, sortBy } = this.state;
-    const sortComponent = orderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
+    const sortComponent = orderAsc
+      ? (
+        <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+        )
+      : (
+        <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+        );
     if (isSortable) {
       return (
         <div
@@ -200,19 +202,19 @@ class Organizations extends Component {
       || (n.organization_name || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
-      || (n.organization_description || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1;
+        || (n.organization_description || '')
+          .toLowerCase()
+          .indexOf(keyword.toLowerCase()) !== -1;
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
     const sortedOrganizations = R.pipe(
       R.filter(
         (n) => tags.length === 0
-          || R.any(
-            (filter) => R.includes(filter, n.organization_tags),
-            R.pluck('id', tags),
-          ),
+        || R.any(
+          (filter) => R.includes(filter, n.organization_tags),
+          R.pluck('id', tags),
+        ),
       ),
       R.filter(filterByKeyword),
       sort,
@@ -235,31 +237,33 @@ class Organizations extends Component {
             />
           </div>
           <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
-            {sortedOrganizations.length > 0 ? (
-              <CSVLink
-                data={exportData(
-                  'organization',
-                  [
-                    'organization_name',
-                    'organization_description',
-                    'organization_tags',
-                  ],
-                  sortedOrganizations,
-                  tagsMap,
+            {sortedOrganizations.length > 0
+              ? (
+                <CSVLink
+                  data={exportData(
+                    'organization',
+                    [
+                      'organization_name',
+                      'organization_description',
+                      'organization_tags',
+                    ],
+                    sortedOrganizations,
+                    tagsMap,
+                  )}
+                  filename={`${t('Organizations')}.csv`}
+                >
+                  <Tooltip title={t('Export this list')}>
+                    <IconButton size="large">
+                      <FileDownloadOutlined color="primary" />
+                    </IconButton>
+                  </Tooltip>
+                </CSVLink>
+                )
+              : (
+                <IconButton size="large" disabled={true}>
+                  <FileDownloadOutlined />
+                </IconButton>
                 )}
-                filename={`${t('Organizations')}.csv`}
-              >
-                <Tooltip title={t('Export this list')}>
-                  <IconButton size="large">
-                    <FileDownloadOutlined color="primary" />
-                  </IconButton>
-                </Tooltip>
-              </CSVLink>
-            ) : (
-              <IconButton size="large" disabled={true}>
-                <FileDownloadOutlined />
-              </IconButton>
-            )}
           </div>
         </div>
         <div className="clearfix" />
@@ -281,7 +285,7 @@ class Organizations extends Component {
               </div>
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   {this.sortHeader('organization_name', 'Name', true)}
                   {this.sortHeader(
@@ -291,7 +295,7 @@ class Organizations extends Component {
                   )}
                   {this.sortHeader('organization_tags', 'Tags', true)}
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
@@ -305,7 +309,7 @@ class Organizations extends Component {
                 <DomainOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -332,7 +336,7 @@ class Organizations extends Component {
                       />
                     </div>
                   </div>
-                }
+                )}
               />
               <ListItemSecondaryAction>
                 <OrganizationPopover

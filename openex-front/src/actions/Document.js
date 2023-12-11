@@ -1,10 +1,10 @@
-import * as schema from './Schema';
 import {
   getReferential,
   postReferential,
   delReferential,
   putReferential,
 } from '../utils/Action';
+import * as schema from './Schema';
 
 export const fetchDocuments = () => (dispatch) => getReferential(schema.arrayOfDocuments, '/api/documents')(dispatch);
 

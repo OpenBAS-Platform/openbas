@@ -8,10 +8,10 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import { Add } from '@mui/icons-material';
-import ObjectiveForm from './ObjectiveForm';
 import { addObjective } from '../../../../actions/Objective';
 import inject18n from '../../../../components/i18n';
 import { Transition } from '../../../../utils/Environment';
+import ObjectiveForm from './ObjectiveForm';
 
 const styles = () => ({
   createButton: {

@@ -3,14 +3,14 @@ import { Route, Routes, useParams } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import Loader from '../../../components/Loader';
 import TopBar from '../nav/TopBar';
-import LessonsTemplate from './LessonsTemplate';
-import LessonsTemplateHeader from './LessonsTemplateHeader';
 import { errorWrapper } from '../../../components/Error';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
 import { fetchLessonsTemplates } from '../../../actions/Lessons';
 import { useAppDispatch } from '../../../utils/hooks';
 import { LessonsTemplatesHelper } from '../../../actions/helper';
+import LessonsTemplateHeader from './LessonsTemplateHeader';
+import LessonsTemplate from './LessonsTemplate';
 
 const useStyles = makeStyles(() => ({
   root: {

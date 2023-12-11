@@ -2,9 +2,14 @@ import React from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { useTheme, makeStyles } from '@mui/styles';
 import Box from '@mui/material/Box';
+import Message from '../components/Message';
+import { errorWrapper } from '../components/Error';
+import useDataLoader from '../utils/ServerSideEvent';
+import { useHelper } from '../store';
+import { Theme } from '../components/Theme';
+import { LoggedHelper } from '../actions/helper';
 import TopBar from './components/nav/TopBar';
 import LeftBar from './components/nav/LeftBar';
-import Message from '../components/Message';
 import IndexProfile from './components/profile/Index';
 import Dashboard from './components/Dashboard';
 import Exercises from './components/exercises/Exercises';
@@ -15,15 +20,10 @@ import Documents from './components/documents/Documents';
 import Medias from './components/medias/Medias';
 import IndexMedia from './components/medias/Index';
 import IndexIntegrations from './components/integrations/Index';
-import { errorWrapper } from '../components/Error';
 import IndexSettings from './components/settings/Index';
-import useDataLoader from '../utils/ServerSideEvent';
-import { useHelper } from '../store';
 import Challenges from './components/challenges/Challenges';
 import LessonsTemplates from './components/lessons/LessonsTemplates';
 import IndexLessonsTemplate from './components/lessons/Index';
-import { Theme } from '../components/Theme';
-import { LoggedHelper } from '../actions/helper';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   toolbar: theme.mixins.toolbar,

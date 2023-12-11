@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MESSAGING$ } from '../utils/Environment';
 
 interface Props {
-  children: React.ReactElement;
+  children: React.ReactElement
 }
 
 const RedirectManager: React.FC<Props> = ({ children }) => {

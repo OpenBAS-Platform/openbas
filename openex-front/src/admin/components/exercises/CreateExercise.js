@@ -9,9 +9,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import { Add } from '@mui/icons-material';
 import Slide from '@mui/material/Slide';
-import ExerciseForm from './ExerciseForm';
 import { addExercise, importingExercise } from '../../../actions/Exercise';
 import inject18n from '../../../components/i18n';
+import ExerciseForm from './ExerciseForm';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

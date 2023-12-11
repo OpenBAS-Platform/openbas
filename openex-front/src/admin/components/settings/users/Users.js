@@ -11,12 +11,12 @@ import { fetchUsers } from '../../../../actions/User';
 import { fetchOrganizations } from '../../../../actions/Organization';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
-import CreateUser from './CreateUser';
 import { fetchTags } from '../../../../actions/Tag';
 import TagsFilter from '../../../../components/TagsFilter';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
+import CreateUser from './CreateUser';
 import UserPopover from './UserPopover';
 
 const useStyles = makeStyles(() => ({
@@ -194,7 +194,7 @@ const Users = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div>
                 {filtering.buildHeader(
                   'user_email',
@@ -228,7 +228,7 @@ const Users = () => {
                 )}
                 {filtering.buildHeader('user_tags', 'Tags', true, headerStyles)}
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
@@ -242,7 +242,7 @@ const Users = () => {
               <PersonOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   <div
                     className={classes.bodyItem}
@@ -275,11 +275,13 @@ const Users = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.user_admin}
                   >
-                    {user.user_admin ? (
-                      <CheckCircleOutlined fontSize="small" />
-                    ) : (
-                      '-'
-                    )}
+                    {user.user_admin
+                      ? (
+                        <CheckCircleOutlined fontSize="small" />
+                        )
+                      : (
+                          '-'
+                        )}
                   </div>
                   <div
                     className={classes.bodyItem}
@@ -288,7 +290,7 @@ const Users = () => {
                     <ItemTags variant="list" tags={user.user_tags} />
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <UserPopover

@@ -9,9 +9,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import TagForm from '../admin/components/settings/tags/TagForm';
 import { fetchTags, addTag } from '../actions/Tag';
+import { storeHelper } from '../actions/Schema';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
-import { storeHelper } from '../actions/Schema';
 
 const styles = () => ({
   icon: {

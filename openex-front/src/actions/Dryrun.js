@@ -1,9 +1,9 @@
-import * as schema from './Schema';
 import {
   getReferential,
   postReferential,
   delReferential,
 } from '../utils/Action';
+import * as schema from './Schema';
 
 export const fetchDryruns = (exerciseId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/dryruns`;

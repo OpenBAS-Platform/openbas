@@ -1,5 +1,5 @@
-import * as schema from './Schema';
 import { postReferential, delReferential } from '../utils/Action';
+import * as schema from './Schema';
 
 export const addGrant = (groupId, data) => (dispatch) => {
   const uri = `/api/groups/${groupId}/grants`;

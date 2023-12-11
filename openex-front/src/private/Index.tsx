@@ -1,11 +1,11 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
-import TopBar from './components/nav/TopBar';
-import Dashboard from './components/Dashboard';
 import useDataLoader from '../utils/ServerSideEvent';
 import { errorWrapper } from '../components/Error';
 import { Theme } from '../components/Theme';
+import Dashboard from './components/Dashboard';
+import TopBar from './components/nav/TopBar';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {

@@ -13,8 +13,8 @@ import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { fetchMedias } from '../../../actions/Media';
-import CreateMedia from './CreateMedia';
 import { useFormatter } from '../../../components/i18n';
+import CreateMedia from './CreateMedia';
 import MediaIcon from './MediaIcon';
 
 const useStyles = makeStyles(() => ({
@@ -134,7 +134,7 @@ const Medias = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div>
                 {filtering.buildHeader(
                   'media_type',
@@ -155,7 +155,7 @@ const Medias = () => {
                   headerStyles,
                 )}
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -175,7 +175,7 @@ const Medias = () => {
               />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   <div
                     className={classes.bodyItem}
@@ -196,7 +196,7 @@ const Medias = () => {
                     {media.media_description}
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <ChevronRightOutlined />

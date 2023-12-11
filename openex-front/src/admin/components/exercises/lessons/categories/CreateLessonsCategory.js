@@ -11,8 +11,8 @@ import { ListItemIcon } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../../components/i18n';
-import LessonsCategoryForm from './LessonsCategoryForm';
 import { addLessonsCategory } from '../../../../../actions/Lessons';
+import LessonsCategoryForm from './LessonsCategoryForm';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -53,31 +53,33 @@ const CreateLessonsCategory = (props) => {
   };
   return (
     <div>
-      {inline === true ? (
-        <ListItem
-          button={true}
-          divider={true}
-          onClick={handleOpen}
-          color="primary"
-        >
-          <ListItemIcon color="primary">
-            <ControlPointOutlined color="primary" />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('Create a new lessons learned category')}
-            classes={{ primary: classes.text }}
-          />
-        </ListItem>
-      ) : (
-        <Fab
-          onClick={handleOpen}
-          color="primary"
-          aria-label="Add"
-          className={classes.createButton}
-        >
-          <Add />
-        </Fab>
-      )}
+      {inline === true
+        ? (
+          <ListItem
+            button={true}
+            divider={true}
+            onClick={handleOpen}
+            color="primary"
+          >
+            <ListItemIcon color="primary">
+              <ControlPointOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={t('Create a new lessons learned category')}
+              classes={{ primary: classes.text }}
+            />
+          </ListItem>
+          )
+        : (
+          <Fab
+            onClick={handleOpen}
+            color="primary"
+            aria-label="Add"
+            className={classes.createButton}
+          >
+            <Add />
+          </Fab>
+          )}
       <Dialog
         open={open}
         TransitionComponent={Transition}

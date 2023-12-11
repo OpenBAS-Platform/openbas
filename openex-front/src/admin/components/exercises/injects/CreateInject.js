@@ -10,8 +10,8 @@ import Slide from '@mui/material/Slide';
 import withStyles from '@mui/styles/withStyles';
 import { Add } from '@mui/icons-material';
 import { addInject } from '../../../../actions/Inject';
-import InjectForm from './InjectForm';
 import inject18n from '../../../../components/i18n';
+import InjectForm from './InjectForm';
 
 const styles = (theme) => ({
   createButton: {
@@ -50,9 +50,9 @@ class CreateInject extends Component {
       R.assoc(
         'inject_depends_duration',
         data.inject_depends_duration_days * 3600 * 24
-          + data.inject_depends_duration_hours * 3600
-          + data.inject_depends_duration_minutes * 60
-          + data.inject_depends_duration_seconds,
+        + data.inject_depends_duration_hours * 3600
+        + data.inject_depends_duration_minutes * 60
+        + data.inject_depends_duration_seconds,
       ),
       R.assoc('inject_contract', data.inject_contract.id),
       R.assoc('inject_tags', R.pluck('id', data.inject_tags)),

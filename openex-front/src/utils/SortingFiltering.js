@@ -32,11 +32,13 @@ const useSearchAnFilter = (
     setOrder({ sortBy: field, orderAsc: !order.orderAsc });
   };
   const buildHeader = (field, label, isSortable, styles) => {
-    const sortComponent = order.orderAsc ? (
-      <ArrowDropDownOutlined style={styles.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={styles.iconSort} />
-    );
+    const sortComponent = order.orderAsc
+      ? (
+        <ArrowDropDownOutlined style={styles.iconSort} />
+        )
+      : (
+        <ArrowDropUpOutlined style={styles.iconSort} />
+        );
     if (isSortable) {
       return (
         <div style={styles[field]} onClick={() => reverseBy(field)}>
@@ -70,10 +72,10 @@ const useSearchAnFilter = (
       ? R.pipe(
         R.filter(
           (n) => tags.length === 0
-              || R.any(
-                (filter) => R.includes(filter, n[`${schema}${tagSuffix}_tags`] || []),
-                R.pluck('id', tags),
-              ),
+          || R.any(
+            (filter) => R.includes(filter, n[`${schema}${tagSuffix}_tags`] || []),
+            R.pluck('id', tags),
+          ),
         ),
         R.filter(filterByKeyword),
         sort,

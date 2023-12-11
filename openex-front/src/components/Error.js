@@ -35,6 +35,7 @@ const SimpleError = () => (
 );
 
 export const errorWrapper = (Component) => {
+  // eslint-disable-next-line react/display-name
   return (routeProps) => (
     <ErrorBoundary display={<SimpleError />}>
       <Component {...routeProps} />

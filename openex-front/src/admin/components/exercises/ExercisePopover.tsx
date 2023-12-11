@@ -20,12 +20,12 @@ import { makeStyles } from '@mui/styles';
 import { PopoverProps } from '@mui/material/Popover';
 import TableContainer from '@mui/material/TableContainer';
 import { useFormatter } from '../../../components/i18n';
-import ExerciseForm from './ExerciseForm';
 import { deleteExercise, updateExercise } from '../../../actions/Exercise';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
 import Transition from '../../../components/common/Transition';
 import { Exercise, ExerciseUpdateInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
+import ExerciseForm from './ExerciseForm';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -35,7 +35,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface ExercisePopoverProps {
-  exercise: Exercise;
+  exercise: Exercise
 }
 
 const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({

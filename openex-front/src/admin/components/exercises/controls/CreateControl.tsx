@@ -15,8 +15,6 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from 'react-router-dom';
-import ComcheckForm from './ComcheckForm';
-import DryrunForm from './DryrunForm';
 import { resolveUserName } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { Theme } from '../../../../components/Theme';
@@ -32,6 +30,8 @@ import {
   ExercicesHelper,
   UsersHelper,
 } from '../../../../actions/helper';
+import DryrunForm from './DryrunForm';
+import ComcheckForm from './ComcheckForm';
 
 const useStyles = makeStyles<Theme>(() => ({
   createButton: {
@@ -42,8 +42,8 @@ const useStyles = makeStyles<Theme>(() => ({
 }));
 
 interface Props {
-  exerciseId: Exercise['exercise_id'];
-  variant?: string;
+  exerciseId: Exercise['exercise_id']
+  variant?: string
 }
 
 const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
@@ -90,52 +90,54 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
 
   return (
     <div>
-      {variant === 'buttons' ? (
-        <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
-          <Grid item={true} xs={6}>
-            <Typography variant="h3">{t('Dryrun')}</Typography>
-            <Button
-              variant="contained"
-              startIcon={<VideoSettingsOutlined />}
-              color="info"
+      {variant === 'buttons'
+        ? (
+          <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
+            <Grid item={true} xs={6}>
+              <Typography variant="h3">{t('Dryrun')}</Typography>
+              <Button
+                variant="contained"
+                startIcon={<VideoSettingsOutlined />}
+                color="info"
+                onClick={() => setOpenDryrun(true)}
+                disabled={isExerciseReadOnly(exercise)}
+              >
+                {t('Launch')}
+              </Button>
+            </Grid>
+            <Grid item={true} xs={4}>
+              <Typography variant="h3">{t('Comcheck')}</Typography>
+              <Button
+                variant="contained"
+                startIcon={<MarkEmailReadOutlined />}
+                color="secondary"
+                onClick={() => setOpenComcheck(true)}
+                disabled={isExerciseReadOnly(exercise)}
+              >
+                {t('Send')}
+              </Button>
+            </Grid>
+          </Grid>
+          )
+        : (
+          <SpeedDial
+            classes={{ root: classes.createButton }}
+            icon={<SpeedDialIcon />}
+            ariaLabel={t('New control')}
+            hidden={isExerciseReadOnly(exercise)}
+          >
+            <SpeedDialAction
+              icon={<VideoSettingsOutlined />}
+              tooltipTitle={t('Launch a new dryrun')}
               onClick={() => setOpenDryrun(true)}
-              disabled={isExerciseReadOnly(exercise)}
-            >
-              {t('Launch')}
-            </Button>
-          </Grid>
-          <Grid item={true} xs={4}>
-            <Typography variant="h3">{t('Comcheck')}</Typography>
-            <Button
-              variant="contained"
-              startIcon={<MarkEmailReadOutlined />}
-              color="secondary"
+            />
+            <SpeedDialAction
+              icon={<MarkEmailReadOutlined />}
+              tooltipTitle={t('Send a new comcheck')}
               onClick={() => setOpenComcheck(true)}
-              disabled={isExerciseReadOnly(exercise)}
-            >
-              {t('Send')}
-            </Button>
-          </Grid>
-        </Grid>
-      ) : (
-        <SpeedDial
-          classes={{ root: classes.createButton }}
-          icon={<SpeedDialIcon />}
-          ariaLabel={t('New control')}
-          hidden={isExerciseReadOnly(exercise)}
-        >
-          <SpeedDialAction
-            icon={<VideoSettingsOutlined />}
-            tooltipTitle={t('Launch a new dryrun')}
-            onClick={() => setOpenDryrun(true)}
-          />
-          <SpeedDialAction
-            icon={<MarkEmailReadOutlined />}
-            tooltipTitle={t('Send a new comcheck')}
-            onClick={() => setOpenComcheck(true)}
-          />
-        </SpeedDial>
-      )}
+            />
+          </SpeedDial>
+          )}
       <Dialog
         open={openComcheck}
         TransitionComponent={Transition}
@@ -153,7 +155,7 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
               comcheck_subject: t('[${exercise.name}] Communication check'),
               comcheck_message: `${t('Hello')},<br /><br />${t(
                 'This is a communication check before the beginning of the exercise. Please click on the following link'
-                  + ' in order to confirm you successfully received this message: <a href="${comcheck.url}">${comcheck.url}</a>.',
+                + ' in order to confirm you successfully received this message: <a href="${comcheck.url}">${comcheck.url}</a>.',
               )}<br /><br />${t('Best regards')},<br />${t(
                 'The exercise control team',
               )}`,

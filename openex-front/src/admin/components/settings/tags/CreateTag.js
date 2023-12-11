@@ -10,8 +10,8 @@ import withStyles from '@mui/styles/withStyles';
 import Slide from '@mui/material/Slide';
 import Fab from '@mui/material/Fab';
 import { addTag } from '../../../../actions/Tag';
-import TagForm from './TagForm';
 import inject18n from '../../../../components/i18n';
+import TagForm from './TagForm';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

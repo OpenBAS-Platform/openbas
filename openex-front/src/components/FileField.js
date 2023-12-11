@@ -4,8 +4,8 @@ import { Field } from 'react-final-form';
 import { useDropzone } from 'react-dropzone';
 import Button from '@mui/material/Button';
 import FormHelperText from '@mui/material/FormHelperText';
-import { useFormatter } from './i18n';
 import { bytesFormat } from '../utils/Number';
+import { useFormatter } from './i18n';
 
 const FileFieldInput = ({ input, dropZoneProps, filters, ...props }) => {
   const { t } = useFormatter();
@@ -32,15 +32,18 @@ const FileFieldInput = ({ input, dropZoneProps, filters, ...props }) => {
     ).length === 0;
   const files = isErroredFile
     ? [
-        <FormHelperText key={1} error={true} focused={true}>
-          {t('This file type is not accepted here.')}
-        </FormHelperText>,
-    ]
+      <FormHelperText key={1} error={true} focused={true}>
+        {t('This file type is not accepted here.')}
+      </FormHelperText>,
+      ]
     : acceptedFiles.map((file) => (
-        <FormHelperText key={file.path} focused={true}>
-          {file.path} -{bytesFormat(file.size).number}
-          {bytesFormat(file.size).symbol}
-        </FormHelperText>
+      <FormHelperText key={file.path} focused={true}>
+        {file.path}
+        {' '}
+        -
+        {bytesFormat(file.size).number}
+        {bytesFormat(file.size).symbol}
+      </FormHelperText>
     ));
   return (
     <div {...getRootProps()} style={{ marginTop: 20 }}>
@@ -60,10 +63,11 @@ const FileField = ({ name, ...props }) => (
     <Field
       name={name}
       subscribe={{ touched: true, error: true }}
-      render={({ meta: { touched, error } }) => (touched && error ? (
+      render={({ meta: { touched, error } }) => (touched && error
+        ? (
           <FormHelperText error={true}>{error}</FormHelperText>
-      ) : null)
-      }
+          )
+        : null)}
     />
   </>
 );

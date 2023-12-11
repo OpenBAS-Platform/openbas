@@ -124,19 +124,19 @@ class ArticleAddDocuments extends Component {
     const { keyword, documentsIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.document_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
-      || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
+        || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1;
     const filteredDocuments = R.pipe(
       R.filter(
         (n) => tags.length === 0
-          || R.any(
-            (filter) => R.includes(filter, n.document_tags),
-            R.pluck('id', tags),
-          ),
+        || R.any(
+          (filter) => R.includes(filter, n.document_tags),
+          R.pluck('id', tags),
+        ),
       ),
       R.filter(filterByKeyword),
     )(Object.values(documents));
@@ -153,7 +153,7 @@ class ArticleAddDocuments extends Component {
         10,
         filteredDocuments.filter(
           (d) => d.document_type.includes('image/')
-            || d.document_type.includes('video/'),
+          || d.document_type.includes('video/'),
         ),
       );
       filters = ['image/', 'video/'];

@@ -17,8 +17,8 @@ import { useHelper } from '../../../../store';
 import { useFormatter } from '../../../../components/i18n';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import ResultsMenu from '../ResultsMenu';
-import CreateReport from './CreateReport';
 import { fetchReports } from '../../../../actions/Report';
+import CreateReport from './CreateReport';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -127,7 +127,7 @@ const Reports = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div>
                 {filtering.buildHeader(
                   'report_name',
@@ -142,7 +142,7 @@ const Reports = () => {
                   headerStyles,
                 )}
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -160,7 +160,7 @@ const Reports = () => {
                 <ContentPasteOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -175,7 +175,7 @@ const Reports = () => {
                       {report.report_description || t('No description')}
                     </div>
                   </div>
-                }
+                )}
               />
               <ListItemSecondaryAction>
                 <ChevronRightOutlined />

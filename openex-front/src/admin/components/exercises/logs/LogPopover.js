@@ -13,12 +13,12 @@ import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { updateLog, deleteLog } from '../../../../actions/Log';
-import LogForm from './LogForm';
 import inject18n from '../../../../components/i18n';
 import { Transition } from '../../../../utils/Environment';
 import { storeHelper } from '../../../../actions/Schema';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { tagOptions } from '../../../../utils/Option';
+import LogForm from './LogForm';
 
 class LogPopover extends Component {
   constructor(props) {

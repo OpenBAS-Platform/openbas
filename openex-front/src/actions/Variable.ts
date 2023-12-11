@@ -1,5 +1,4 @@
 import { Dispatch } from 'redux';
-import * as schema from './Schema';
 import {
   getReferential,
   putReferential,
@@ -7,6 +6,7 @@ import {
   delReferential,
 } from '../utils/Action';
 import { Exercise, Variable, VariableInput } from '../utils/api-types';
+import * as schema from './Schema';
 
 export const addVariable = (exerciseId: Exercise['exercise_id'], data: VariableInput) => (dispatch: Dispatch) => {
   const uri = `/api/exercises/${exerciseId}/variables`;
@@ -33,5 +33,5 @@ export const fetchVariables = (exerciseId: Exercise['exercise_id']) => (dispatch
 };
 
 export interface VariablesHelper {
-  getExerciseVariables: (exerciseId: Exercise['exercise_id']) => [Variable];
+  getExerciseVariables: (exerciseId: Exercise['exercise_id']) => [Variable]
 }

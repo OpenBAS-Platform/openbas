@@ -24,7 +24,6 @@ import IconButton from '@mui/material/IconButton';
 import DefinitionMenu from '../DefinitionMenu';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import { useHelper } from '../../../../store';
-import CreateArticle from './CreateArticle';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
@@ -32,9 +31,10 @@ import SearchFilter from '../../../../components/SearchFilter';
 import { useFormatter } from '../../../../components/i18n';
 import MediasFilter from '../../medias/MediasFilter';
 import { fetchDocuments } from '../../../../actions/Document';
-import ArticlePopover from './ArticlePopover';
 import MediaIcon from '../../medias/MediaIcon';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
+import ArticlePopover from './ArticlePopover';
+import CreateArticle from './CreateArticle';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -99,7 +99,7 @@ const Articles = () => {
   }));
   const sortedArticles = R.filter(
     (n) => medias.length === 0
-      || medias.map((o) => o.id).includes(n.article_fullmedia.media_id),
+    || medias.map((o) => o.id).includes(n.article_fullmedia.media_id),
     filtering.filterAndSort(fullArticles),
   );
   const mediaColor = (type) => {
@@ -166,7 +166,7 @@ const Articles = () => {
                 sx={{ width: '100%', height: '100%' }}
               >
                 <CardHeader
-                  avatar={
+                  avatar={(
                     <Avatar
                       sx={{
                         bgcolor: mediaColor(
@@ -176,20 +176,22 @@ const Articles = () => {
                     >
                       {(article.article_author || t('Unknown')).charAt(0)}
                     </Avatar>
-                  }
+                  )}
                   title={article.article_author || t('Unknown')}
-                  subheader={
-                    article.article_is_scheduled ? (
-                      <span style={{ color: green[500] }}>
-                        {t('Scheduled')}
-                      </span>
-                    ) : (
-                      <span style={{ color: orange[500] }}>
-                        {t('Not used in the exercise')}
-                      </span>
-                    )
-                  }
-                  action={
+                  subheader={(
+                    article.article_is_scheduled
+                      ? (
+                        <span style={{ color: green[500] }}>
+                          {t('Scheduled')}
+                        </span>
+                        )
+                      : (
+                        <span style={{ color: orange[500] }}>
+                          {t('Not used in the exercise')}
+                        </span>
+                        )
+                  )}
+                  action={(
                     <React.Fragment>
                       <IconButton
                         aria-haspopup="true"
@@ -205,7 +207,7 @@ const Articles = () => {
                         documents={docs}
                       />
                     </React.Fragment>
-                  }
+                  )}
                 />
                 <Grid container={true} spacing={3}>
                   {headersDocs.map((doc) => (
@@ -246,12 +248,12 @@ const Articles = () => {
                     <div style={{ float: 'left' }}>
                       <Tooltip title={article.article_fullmedia.media_name}>
                         <Chip
-                          icon={
+                          icon={(
                             <MediaIcon
                               type={article.article_fullmedia.media_type}
                               variant="chip"
                             />
-                          }
+                          )}
                           classes={{ root: classes.media }}
                           style={{
                             color: mediaColor(

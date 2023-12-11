@@ -56,12 +56,12 @@ const Communication = (props) => {
       variant="outlined"
     >
       <CardHeader
-        avatar={
+        avatar={(
           <Avatar sx={{ bgcolor: lightBlue[500] }}>
             {Array.from(communication.communication_from)[0].toUpperCase()}
           </Avatar>
-        }
-        action={
+        )}
+        action={(
           <div style={{ display: 'flex' }}>
             {isTopic && (
               <IconButton
@@ -75,88 +75,94 @@ const Communication = (props) => {
               {expand ? <ExpandLess /> : <ExpandMore />}
             </IconButton>
           </div>
-        }
-        title={
+        )}
+        title={(
           <TruncatedText
             content={communication.communication_subject}
             limit={50}
           />
-        }
-        subheader={
-          communication.communication_animation ? (
-            <span>
-              <span
-                style={{
-                  color: theme.palette.text.secondary,
-                }}
-              >
-                {t('To')}
-              </span>
+        )}
+        subheader={(
+          communication.communication_animation
+            ? (
+              <span>
+                <span
+                  style={{
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  {t('To')}
+                </span>
               &nbsp;
-              <span
-                style={{
-                  color: theme.palette.secondary.main,
-                }}
-              >
-                <TruncatedText
-                  content={resolveUserNames(communicationUsers, true)}
-                  limit={60}
-                />
+                <span
+                  style={{
+                    color: theme.palette.secondary.main,
+                  }}
+                >
+                  <TruncatedText
+                    content={resolveUserNames(communicationUsers, true)}
+                    limit={60}
+                  />
+                </span>
+                ,&nbsp;
+                <span
+                  style={{
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  {t('on')}
+                  {' '}
+                  {nsdt(communication.communication_sent_at)}
+                </span>
               </span>
-              ,&nbsp;
-              <span
-                style={{
-                  color: theme.palette.text.secondary,
-                }}
-              >
-                {t('on')} {nsdt(communication.communication_sent_at)}
-              </span>
-            </span>
-          ) : (
-            <span>
-              {' '}
-              <span
-                style={{
-                  color: theme.palette.text.secondary,
-                }}
-              >
-                {t('From')}
-              </span>
+              )
+            : (
+              <span>
+                {' '}
+                <span
+                  style={{
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  {t('From')}
+                </span>
               &nbsp;
-              <span
-                style={{
-                  color: theme.palette.secondary.main,
-                }}
-              >
-                <TruncatedText
-                  content={communication.communication_from}
-                  limit={60}
-                />
+                <span
+                  style={{
+                    color: theme.palette.secondary.main,
+                  }}
+                >
+                  <TruncatedText
+                    content={communication.communication_from}
+                    limit={60}
+                  />
+                </span>
+                ,&nbsp;
+                <span
+                  style={{
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  {nsdt(communication.communication_sent_at)}
+                </span>
               </span>
-              ,&nbsp;
-              <span
-                style={{
-                  color: theme.palette.text.secondary,
-                }}
-              >
-                {nsdt(communication.communication_sent_at)}
-              </span>
-            </span>
-          )
-        }
+              )
+        )}
       />
       <CardContent>
-        {isHtml ? (
-          <div style={{ marginTop: -5 }}>
-            {expand
-              ? parse(DOMPurify.sanitize(content))
-              : parse(DOMPurify.sanitize(truncate(content, limit)))}
-          </div>
-        ) : (
-          <div style={{ marginTop: -5, whiteSpace: 'pre-line' }}>
-            {expand ? content : truncate(content, limit)}
-          </div>
-        )}
+        {isHtml
+          ? (
+            <div style={{ marginTop: -5 }}>
+              {expand
+                ? parse(DOMPurify.sanitize(content))
+                : parse(DOMPurify.sanitize(truncate(content, limit)))}
+            </div>
+            )
+          : (
+            <div style={{ marginTop: -5, whiteSpace: 'pre-line' }}>
+              {expand ? content : truncate(content, limit)}
+            </div>
+            )}
         {hasAttachment && (
           <div style={{ marginTop: 10 }}>
             {communication.communication_attachments.map((a) => {

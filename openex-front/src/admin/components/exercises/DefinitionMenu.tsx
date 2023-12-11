@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  exerciseId: Exercise['exercise_id'];
+  exerciseId: Exercise['exercise_id']
 }
 
 const DefinitionMenu: React.FC<Props> = ({ exerciseId }) => {

@@ -33,10 +33,8 @@ import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchObjectives } from '../../../../actions/Objective';
 import { Transition } from '../../../../utils/Environment';
-import ObjectiveEvaluations from './ObjectiveEvaluations';
 import ResultsMenu from '../ResultsMenu';
 import { fetchInjects } from '../../../../actions/Inject';
-import CreateLessonsCategory from './categories/CreateLessonsCategory';
 import {
   applyLessonsTemplate,
   emptyLessonsCategories,
@@ -50,8 +48,10 @@ import {
 import { fetchAudiences } from '../../../../actions/Audience';
 import { resolveUserName } from '../../../../utils/String';
 import { updateExerciseLessons } from '../../../../actions/Exercise';
-import SendLessonsForm from './SendLessonsForm';
 import { fetchPlayers } from '../../../../actions/User';
+import SendLessonsForm from './SendLessonsForm';
+import CreateLessonsCategory from './categories/CreateLessonsCategory';
+import ObjectiveEvaluations from './ObjectiveEvaluations';
 import LessonsObjectives from './LessonsObjectives';
 import LessonsCategories from './LessonsCategories';
 
@@ -185,7 +185,10 @@ const Lessons = () => {
               <SportsScoreOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
             <div className={classes.title}>{t('Overall objectives score')}</div>
-            <div className={classes.number}>{exercise.exercise_score}%</div>
+            <div className={classes.number}>
+              {exercise.exercise_score}
+              %
+            </div>
           </Paper>
         </Grid>
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>
@@ -245,12 +248,15 @@ const Lessons = () => {
                   exercise.exercise_end_date
                     ? new Date(exercise.exercise_end_date)
                     : new Date(),
-                )}{' '}
+                )}
+                {' '}
                 {t('hours')}
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Audience')}</Typography>
-                {exercise.exercise_users_number} {t('players')}
+                {exercise.exercise_users_number}
+                {' '}
+                {t('players')}
               </Grid>
             </Grid>
           </Paper>
@@ -262,14 +268,14 @@ const Lessons = () => {
               <Grid item={true} xs={6}>
                 <Typography variant="h3">{t('Questionnaire mode')}</Typography>
                 <FormControlLabel
-                  control={
+                  control={(
                     <Switch
                       disabled={exercise.exercise_lessons_anonymized}
                       checked={exercise.exercise_lessons_anonymized}
                       onChange={() => setOpenAnonymize(true)}
                       name="anonymized"
                     />
-                  }
+                  )}
                   label={t('Anonymize answers')}
                 />
               </Grid>
@@ -414,7 +420,7 @@ const Lessons = () => {
                     }}
                     value={template.lessonstemplate_id}
                     control={<Radio />}
-                    label={
+                    label={(
                       <div
                         style={{
                           margin: '15px 0 15px 10px',
@@ -425,10 +431,10 @@ const Lessons = () => {
                         </Typography>
                         <Typography variant="body2">
                           {template.lessons_template_description
-                            || t('No description')}
+                          || t('No description')}
                         </Typography>
                       </div>
-                    }
+                    )}
                   />
                 );
               })}
@@ -563,7 +569,7 @@ const Lessons = () => {
                 </Grid>
                 <Grid item={true} xs={3} style={{ marginTop: -10 }}>
                   <Typography variant="h4">
-                    {t("What didn't work well")}
+                    {t('What didn\'t work well')}
                   </Typography>
                   {answer.lessons_answer_negative}
                 </Grid>

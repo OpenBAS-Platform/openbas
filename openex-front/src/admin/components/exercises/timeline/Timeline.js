@@ -260,191 +260,265 @@ const Timeline = () => {
         </div>
       </div>
       <div className="clearfix" />
-      {sortedAudiences.length > 0 ? (
-        <div className={classes.container}>
-          <div className={classes.names}>
-            {sortedAudiences.map((audience) => (
-              <div key={audience.audience_id} className={classes.lineName}>
-                <div className={classes.name}>
-                  {audience.audience_name.startsWith('openex_') ? (
-                    <CastOutlined fontSize="small" />
-                  ) : (
-                    <CastForEducationOutlined fontSize="small" />
-                  )}
+      {sortedAudiences.length > 0
+        ? (
+          <div className={classes.container}>
+            <div className={classes.names}>
+              {sortedAudiences.map((audience) => (
+                <div key={audience.audience_id} className={classes.lineName}>
+                  <div className={classes.name}>
+                    {audience.audience_name.startsWith('openex_')
+                      ? (
+                        <CastOutlined fontSize="small" />
+                        )
+                      : (
+                        <CastForEducationOutlined fontSize="small" />
+                        )}
                   &nbsp;&nbsp;
-                  {audience.audience_name.startsWith('openex_')
-                    ? t(audience.audience_name)
-                    : truncate(audience.audience_name, 20)}
+                    {audience.audience_name.startsWith('openex_')
+                      ? t(audience.audience_name)
+                      : truncate(audience.audience_name, 20)}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          <div className={classes.timeline}>
-            {sortedAudiences.map((audience, index) => {
-              const injectsGroupedByTick = byTick(
-                filtering.filterAndSort(injectsMap[audience.audience_id]),
-              );
-              return (
-                <div
-                  key={audience.audience_id}
-                  className={classes.line}
-                  style={{ backgroundColor: index % 2 === 0 ? grid0 : grid5 }}
-                >
-                  {Object.keys(injectsGroupedByTick).map((key, i) => {
-                    const injectGroupPosition = (key * 100) / totalDuration;
-                    return (
-                      <div
-                        key={i}
-                        className={classes.injectGroup}
-                        style={{ left: `${injectGroupPosition}%` }}
-                      >
-                        {injectsGroupedByTick[key].map((inject) => (
-                          <InjectIcon
-                            key={inject.inject_id}
-                            type={inject.inject_type}
-                            tooltip={inject.inject_title}
-                            done={inject.inject_status !== null}
-                            disabled={!inject.inject_enabled}
-                            size="small"
-                          />
-                        ))}
+              ))}
+            </div>
+            <div className={classes.timeline}>
+              {sortedAudiences.map((audience, index) => {
+                const injectsGroupedByTick = byTick(
+                  filtering.filterAndSort(injectsMap[audience.audience_id]),
+                );
+                return (
+                  <div
+                    key={audience.audience_id}
+                    className={classes.line}
+                    style={{ backgroundColor: index % 2 === 0 ? grid0 : grid5 }}
+                  >
+                    {Object.keys(injectsGroupedByTick).map((key, i) => {
+                      const injectGroupPosition = (key * 100) / totalDuration;
+                      return (
+                        <div
+                          key={i}
+                          className={classes.injectGroup}
+                          style={{ left: `${injectGroupPosition}%` }}
+                        >
+                          {injectsGroupedByTick[key].map((inject) => (
+                            <InjectIcon
+                              key={inject.inject_id}
+                              type={inject.inject_type}
+                              tooltip={inject.inject_title}
+                              done={inject.inject_status !== null}
+                              disabled={!inject.inject_enabled}
+                              size="small"
+                            />
+                          ))}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+              <div className={classes.scale}>
+                {ticks.map((tick, index) => {
+                  const duration = splitDuration(tick);
+                  return (
+                    <div
+                      key={tick}
+                      className={classes.tick}
+                      style={{
+                        left: `${index * 5}%`,
+                        height: index % 5 === 0 ? 'calc(100% + 30px)' : '100%',
+                        top: index % 5 === 0 ? -15 : 0,
+                        borderRight: index % 5 === 0 ? grid25 : grid15,
+                      }}
+                    >
+                      <div className={classes.tickLabelTop}>
+                        {index % 5 === 0
+                          ? `${duration.days}
+                        ${t('d')}, ${duration.hours}
+                        ${t('h')}, ${duration.minutes}
+                        ${t('m')}`
+                          : ''}
                       </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
-            <div className={classes.scale}>
-              {ticks.map((tick, index) => {
-                const duration = splitDuration(tick);
-                return (
-                  <div
-                    key={tick}
-                    className={classes.tick}
-                    style={{
-                      left: `${index * 5}%`,
-                      height: index % 5 === 0 ? 'calc(100% + 30px)' : '100%',
-                      top: index % 5 === 0 ? -15 : 0,
-                      borderRight: index % 5 === 0 ? grid25 : grid15,
-                    }}
-                  >
-                    <div className={classes.tickLabelTop}>
-                      {index % 5 === 0
-                        ? `${duration.days}
+                      <div className={classes.tickLabelBottom}>
+                        {index % 5 === 0
+                          ? `${duration.days}
                         ${t('d')}, ${duration.hours}
                         ${t('h')}, ${duration.minutes}
                         ${t('m')}`
-                        : ''}
+                          : ''}
+                      </div>
                     </div>
-                    <div className={classes.tickLabelBottom}>
-                      {index % 5 === 0
-                        ? `${duration.days}
-                        ${t('d')}, ${duration.hours}
-                        ${t('h')}, ${duration.minutes}
-                        ${t('m')}`
-                        : ''}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className={classes.container}>
-          <div className={classes.names}>
-            <div className={classes.lineName}>
-              <div className={classes.name}>
-                <CastForEducationOutlined fontSize="small" />
-                &nbsp;&nbsp;
-                {t('No audience')}
+                  );
+                })}
               </div>
             </div>
           </div>
-          <div className={classes.timeline}>
-            <div className={classes.line}> &nbsp; </div>
-            <div className={classes.scale}>
-              {ticks.map((tick, index) => {
-                const duration = splitDuration(tick);
-                return (
-                  <div
-                    key={tick}
-                    className={classes.tick}
-                    style={{
-                      left: `${index * 5}%`,
-                      height: index % 5 === 0 ? '110%' : '100%',
-                      top: index % 5 === 0 ? '-5%' : 0,
-                      borderRight: index % 5 === 0 ? grid25 : grid15,
-                    }}
-                  >
-                    <div className={classes.tickLabelTop}>
-                      {index % 5 === 0
-                        ? `${duration.days}
+          )
+        : (
+          <div className={classes.container}>
+            <div className={classes.names}>
+              <div className={classes.lineName}>
+                <div className={classes.name}>
+                  <CastForEducationOutlined fontSize="small" />
+                &nbsp;&nbsp;
+                  {t('No audience')}
+                </div>
+              </div>
+            </div>
+            <div className={classes.timeline}>
+              <div className={classes.line}> &nbsp; </div>
+              <div className={classes.scale}>
+                {ticks.map((tick, index) => {
+                  const duration = splitDuration(tick);
+                  return (
+                    <div
+                      key={tick}
+                      className={classes.tick}
+                      style={{
+                        left: `${index * 5}%`,
+                        height: index % 5 === 0 ? '110%' : '100%',
+                        top: index % 5 === 0 ? '-5%' : 0,
+                        borderRight: index % 5 === 0 ? grid25 : grid15,
+                      }}
+                    >
+                      <div className={classes.tickLabelTop}>
+                        {index % 5 === 0
+                          ? `${duration.days}
                         ${t('d')}, ${duration.hours}
                         ${t('h')}, ${duration.minutes}
                         ${t('m')}`
-                        : ''}
-                    </div>
-                    <div className={classes.tickLabelBottom}>
-                      {index % 5 === 0
-                        ? `${duration.days}
+                          : ''}
+                      </div>
+                      <div className={classes.tickLabelBottom}>
+                        {index % 5 === 0
+                          ? `${duration.days}
                         ${t('d')}, ${duration.hours}
                         ${t('h')}, ${duration.minutes}
                         ${t('m')}`
-                        : ''}
+                          : ''}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+          )}
       <div className="clearfix" />
       <Grid container={true} spacing={3} style={{ marginTop: 50 }}>
         <Grid item={true} xs={6}>
           <Typography variant="h4">{t('Pending injects')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            {pendingInjects.length > 0 ? (
-              <List style={{ paddingTop: 0 }}>
-                {pendingInjects.map((inject) => {
-                  const isDisabled = disabledTypes.includes(inject.inject_type)
-                    || !types.includes(inject.inject_type);
-                  return (
+            {pendingInjects.length > 0
+              ? (
+                <List style={{ paddingTop: 0 }}>
+                  {pendingInjects.map((inject) => {
+                    const isDisabled = disabledTypes.includes(inject.inject_type)
+                      || !types.includes(inject.inject_type);
+                    return (
+                      <ListItem
+                        key={inject.inject_id}
+                        dense={true}
+                        classes={{ root: classes.item }}
+                        divider={true}
+                        button={true}
+                        disabled={isDisabled || !inject.inject_enabled}
+                        onClick={() => setSelectedInject(inject.inject_id)}
+                      >
+                        <ListItemIcon>
+                          <InjectIcon
+                            type={inject.inject_type}
+                            variant="inline"
+                          />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={(
+                            <div>
+                              <div
+                                className={classes.bodyItem}
+                                style={{ width: '50%' }}
+                              >
+                                {inject.inject_title}
+                              </div>
+                              <div
+                                className={classes.bodyItem}
+                                style={{ width: '20%', paddingTop: 8 }}
+                              >
+                                <ProgressBarCountdown
+                                  date={inject.inject_date}
+                                  paused={
+                                  exercise?.exercise_status === 'PAUSED'
+                                  || exercise?.exercise_status === 'CANCELED'
+                                }
+                                />
+                              </div>
+                              <div
+                                className={classes.bodyItem}
+                                style={{
+                                  fontFamily: 'Consolas, monaco, monospace',
+                                  fontSize: 12,
+                                  paddingTop: 3,
+                                  marginRight: 15,
+                                }}
+                              >
+                                {fndt(inject.inject_date)}
+                              </div>
+                            </div>
+                          )}
+                        />
+                        <ListItemSecondaryAction>
+                          <InjectPopover
+                            inject={inject}
+                            exerciseId={exerciseId}
+                            exercise={exercise}
+                            tagsMap={tagsMap}
+                            injectTypesMap={injectTypesMap}
+                            setSelectedInject={setSelectedInject}
+                            isDisabled={isDisabled}
+                          />
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    );
+                  })}
+                </List>
+                )
+              : (
+                <Empty message={t('No pending injects in this exercise.')} />
+                )}
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={6}>
+          <Typography variant="h4">{t('Processed injects')}</Typography>
+          <Paper variant="outlined" classes={{ root: classes.paper }}>
+            {processedInjects.length > 0
+              ? (
+                <List style={{ paddingTop: 0 }}>
+                  {processedInjects.map((inject) => (
                     <ListItem
                       key={inject.inject_id}
                       dense={true}
                       classes={{ root: classes.item }}
                       divider={true}
-                      button={true}
-                      disabled={isDisabled || !inject.inject_enabled}
-                      onClick={() => setSelectedInject(inject.inject_id)}
                     >
                       <ListItemIcon>
-                        <InjectIcon
-                          type={inject.inject_type}
-                          variant="inline"
-                        />
+                        <InjectIcon type={inject.inject_type} variant="inline" />
                       </ListItemIcon>
                       <ListItemText
-                        primary={
+                        primary={(
                           <div>
                             <div
                               className={classes.bodyItem}
-                              style={{ width: '50%' }}
+                              style={{ width: '40%' }}
                             >
                               {inject.inject_title}
                             </div>
                             <div
                               className={classes.bodyItem}
-                              style={{ width: '20%', paddingTop: 8 }}
+                              style={{ width: '20%' }}
                             >
-                              <ProgressBarCountdown
-                                date={inject.inject_date}
-                                paused={
-                                  exercise?.exercise_status === 'PAUSED'
-                                  || exercise?.exercise_status === 'CANCELED'
-                                }
+                              <InjectStatus
+                                variant="list"
+                                status={inject.inject_status?.status_name}
                               />
                             </div>
                             <div
@@ -456,92 +530,28 @@ const Timeline = () => {
                                 marginRight: 15,
                               }}
                             >
-                              {fndt(inject.inject_date)}
-                            </div>
-                          </div>
-                        }
-                      />
-                      <ListItemSecondaryAction>
-                        <InjectPopover
-                          inject={inject}
-                          exerciseId={exerciseId}
-                          exercise={exercise}
-                          tagsMap={tagsMap}
-                          injectTypesMap={injectTypesMap}
-                          setSelectedInject={setSelectedInject}
-                          isDisabled={isDisabled}
-                        />
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  );
-                })}
-              </List>
-            ) : (
-              <Empty message={t('No pending injects in this exercise.')} />
-            )}
-          </Paper>
-        </Grid>
-        <Grid item={true} xs={6}>
-          <Typography variant="h4">{t('Processed injects')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            {processedInjects.length > 0 ? (
-              <List style={{ paddingTop: 0 }}>
-                {processedInjects.map((inject) => (
-                  <ListItem
-                    key={inject.inject_id}
-                    dense={true}
-                    classes={{ root: classes.item }}
-                    divider={true}
-                  >
-                    <ListItemIcon>
-                      <InjectIcon type={inject.inject_type} variant="inline" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <div>
-                          <div
-                            className={classes.bodyItem}
-                            style={{ width: '40%' }}
-                          >
-                            {inject.inject_title}
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={{ width: '20%' }}
-                          >
-                            <InjectStatus
-                              variant="list"
-                              status={inject.inject_status?.status_name}
-                            />
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={{
-                              fontFamily: 'Consolas, monaco, monospace',
-                              fontSize: 12,
-                              paddingTop: 3,
-                              marginRight: 15,
-                            }}
-                          >
-                            {fndt(inject.inject_status?.status_date)} (
-                            {inject.inject_status
+                              {fndt(inject.inject_status?.status_date)}
+                              {' '}
+                              (
+                              {inject.inject_status
                               && (
                                 inject.inject_status.status_execution / 1000
                               ).toFixed(2)}
-                            s)
+                              s)
+                            </div>
                           </div>
-                        </div>
-                      }
-                    />
-                    <ListItemSecondaryAction>
-                      <InjectStatusDetails status={inject.inject_status} />
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-              </List>
-            ) : (
-              <Empty message={t('No processed injects in this exercise.')} />
-            )}
+                        )}
+                      />
+                      <ListItemSecondaryAction>
+                        <InjectStatusDetails status={inject.inject_status} />
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  ))}
+                </List>
+                )
+              : (
+                <Empty message={t('No processed injects in this exercise.')} />
+                )}
           </Paper>
         </Grid>
       </Grid>

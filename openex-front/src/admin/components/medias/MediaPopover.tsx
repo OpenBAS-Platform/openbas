@@ -14,10 +14,10 @@ import { makeStyles } from '@mui/styles';
 import { PopoverProps } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';
 import { updateMedia } from '../../../actions/Media';
-import MediaForm from './MediaForm';
 import { useAppDispatch } from '../../../utils/hooks';
 import Transition from '../../../components/common/Transition';
 import { Media, MediaUpdateInput } from '../../../utils/api-types';
+import MediaForm from './MediaForm';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -27,7 +27,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  media: Media;
+  media: Media
 }
 
 const MediaPopover: React.FC<Props> = ({ media }) => {

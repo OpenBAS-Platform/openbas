@@ -12,9 +12,9 @@ import Slide from '@mui/material/Slide';
 import ListItem from '@mui/material/ListItem';
 import { ListItemIcon } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
-import AudienceForm from './AudienceForm';
 import { addAudience } from '../../../../actions/Audience';
 import inject18n from '../../../../components/i18n';
+import AudienceForm from './AudienceForm';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -69,31 +69,33 @@ class CreateAudience extends Component {
     const { classes, t, inline } = this.props;
     return (
       <div>
-        {inline === true ? (
-          <ListItem
-            button={true}
-            divider={true}
-            onClick={this.handleOpen.bind(this)}
-            color="primary"
-          >
-            <ListItemIcon color="primary">
-              <ControlPointOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={t('Create a new audience')}
-              classes={{ primary: classes.text }}
-            />
-          </ListItem>
-        ) : (
-          <Fab
-            onClick={this.handleOpen.bind(this)}
-            color="primary"
-            aria-label="Add"
-            className={classes.createButton}
-          >
-            <Add />
-          </Fab>
-        )}
+        {inline === true
+          ? (
+            <ListItem
+              button={true}
+              divider={true}
+              onClick={this.handleOpen.bind(this)}
+              color="primary"
+            >
+              <ListItemIcon color="primary">
+                <ControlPointOutlined color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={t('Create a new audience')}
+                classes={{ primary: classes.text }}
+              />
+            </ListItem>
+            )
+          : (
+            <Fab
+              onClick={this.handleOpen.bind(this)}
+              color="primary"
+              aria-label="Add"
+              className={classes.createButton}
+            >
+              <Add />
+            </Fab>
+            )}
         <Dialog
           open={this.state.open}
           TransitionComponent={Transition}

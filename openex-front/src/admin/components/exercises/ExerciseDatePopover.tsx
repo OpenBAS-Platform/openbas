@@ -7,11 +7,11 @@ import { EditOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { updateExerciseStartDate } from '../../../actions/Exercise';
 import { useFormatter } from '../../../components/i18n';
-import ExerciseDateForm from './ExerciseDateForm';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
 import { Exercise } from '../../../utils/api-types';
 import Transition from '../../../components/common/Transition';
 import { useAppDispatch } from '../../../utils/hooks';
+import ExerciseDateForm from './ExerciseDateForm';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -21,7 +21,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  exercise: Exercise;
+  exercise: Exercise
 }
 
 const ExerciseDatePopover: React.FC<Props> = ({ exercise }) => {

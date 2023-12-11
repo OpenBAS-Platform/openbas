@@ -16,10 +16,10 @@ import {
   updateObjective,
   deleteObjective,
 } from '../../../../actions/Objective';
-import ObjectiveForm from './ObjectiveForm';
 import inject18n from '../../../../components/i18n';
 import { Transition } from '../../../../utils/Environment';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import ObjectiveForm from './ObjectiveForm';
 
 class ObjectivePopover extends Component {
   constructor(props) {

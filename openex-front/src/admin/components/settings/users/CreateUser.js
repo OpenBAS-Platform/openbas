@@ -10,8 +10,8 @@ import Slide from '@mui/material/Slide';
 import withStyles from '@mui/styles/withStyles';
 import { Add } from '@mui/icons-material';
 import { addUser } from '../../../../actions/User';
-import UserForm from './UserForm';
 import inject18n from '../../../../components/i18n';
+import UserForm from './UserForm';
 
 const styles = () => ({
   createButton: {

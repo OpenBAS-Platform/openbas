@@ -1,10 +1,10 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
+import { errorWrapper } from '../../../components/Error';
 import Parameters from './Parameters';
 import Users from './users/Users';
 import Groups from './groups/Groups';
 import Tags from './tags/Tags';
-import { errorWrapper } from '../../../components/Error';
 
 const Index = () => (
   <Routes>

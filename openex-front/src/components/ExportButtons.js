@@ -13,13 +13,13 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import ToggleButton from '@mui/material/ToggleButton';
 import { connect } from 'react-redux';
 import * as PropTypes from 'prop-types';
-import themeLight from './ThemeLight';
-import themeDark from './ThemeDark';
 import { storeHelper } from '../actions/Schema';
 import { exportImage, exportPdf } from '../utils/Image';
+import { localUpdateUser } from '../actions/User';
+import themeLight from './ThemeLight';
+import themeDark from './ThemeDark';
 import inject18n from './i18n';
 import Loader from './Loader';
-import { localUpdateUser } from '../actions/User';
 
 const styles = () => ({
   exportButtons: {

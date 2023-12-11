@@ -8,11 +8,11 @@ import { useFormatter } from './i18n';
 import { Theme } from './Theme';
 
 interface Props {
-  label: string;
-  style: React.CSSProperties;
-  disabled?: boolean;
-  input: FieldInputProps<string, HTMLElement>;
-  meta: FieldMetaState<string>;
+  label: string
+  style: React.CSSProperties
+  disabled?: boolean
+  input: FieldInputProps<string, HTMLElement>
+  meta: FieldMetaState<string>
 }
 
 const MarkDownFieldBase: React.FC<Props> = ({

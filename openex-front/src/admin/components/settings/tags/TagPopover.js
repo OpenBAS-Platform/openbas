@@ -14,8 +14,8 @@ import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { updateTag, deleteTag } from '../../../../actions/Tag';
-import TagForm from './TagForm';
 import inject18n from '../../../../components/i18n';
+import TagForm from './TagForm';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

@@ -21,15 +21,15 @@ import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import { fetchAudiences } from '../../../../actions/Audience';
-import CreateAudience from './CreateAudience';
-import AudiencePopover from './AudiencePopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
-import AudiencePlayers from './AudiencePlayers';
 import { useHelper } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { usePermissions } from '../../../../utils/Exercise';
 import { exportData } from '../../../../utils/Environment';
 import DefinitionMenu from '../DefinitionMenu';
+import AudiencePlayers from './AudiencePlayers';
+import AudiencePopover from './AudiencePopover';
+import CreateAudience from './CreateAudience';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -180,33 +180,35 @@ const Audiences = () => {
         <div
           style={{ float: 'right', margin: '-5px 15px 0 0', maxHeight: '35px' }}
         >
-          {sortedAudiences.length > 0 ? (
-            <CSVLink
-              data={exportData(
-                'audience',
-                [
-                  'audience_name',
-                  'audience_description',
-                  'audience_users_number',
-                  'audience_enabled',
-                  'audience_tags',
-                ],
-                sortedAudiences,
-                tagsMap,
+          {sortedAudiences.length > 0
+            ? (
+              <CSVLink
+                data={exportData(
+                  'audience',
+                  [
+                    'audience_name',
+                    'audience_description',
+                    'audience_users_number',
+                    'audience_enabled',
+                    'audience_tags',
+                  ],
+                  sortedAudiences,
+                  tagsMap,
+                )}
+                filename={`[${exercise.exercise_name}] ${t('Audiences')}.csv`}
+              >
+                <Tooltip title={t('Export this list')}>
+                  <IconButton size="large">
+                    <FileDownloadOutlined color="primary" />
+                  </IconButton>
+                </Tooltip>
+              </CSVLink>
+              )
+            : (
+              <IconButton size="large" disabled={true}>
+                <FileDownloadOutlined />
+              </IconButton>
               )}
-              filename={`[${exercise.exercise_name}] ${t('Audiences')}.csv`}
-            >
-              <Tooltip title={t('Export this list')}>
-                <IconButton size="large">
-                  <FileDownloadOutlined color="primary" />
-                </IconButton>
-              </Tooltip>
-            </CSVLink>
-          ) : (
-            <IconButton size="large" disabled={true}>
-              <FileDownloadOutlined />
-            </IconButton>
-          )}
         </div>
       </div>
       <div className="clearfix" />
@@ -224,7 +226,7 @@ const Audiences = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div>
                 {filtering.buildHeader(
                   'audience_name',
@@ -257,7 +259,7 @@ const Audiences = () => {
                   headerStyles,
                 )}
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -273,7 +275,7 @@ const Audiences = () => {
               <CastForEducationOutlined />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   <div
                     className={classes.bodyItem}
@@ -312,7 +314,7 @@ const Audiences = () => {
                     <ItemTags variant="list" tags={audience.audience_tags} />
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <AudiencePopover

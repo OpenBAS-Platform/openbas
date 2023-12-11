@@ -13,12 +13,12 @@ import DefinitionMenu from '../DefinitionMenu';
 import { useHelper } from '../../../../store';
 import { Exercise, Variable } from '../../../../utils/api-types';
 import { usePermissions } from '../../../../utils/Exercise';
-import CreateVariable from './CreateVariable';
-import VariablePopover from './VariablePopover';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchVariables, VariablesHelper } from '../../../../actions/Variable';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { ExercicesHelper } from '../../../../actions/helper';
+import VariablePopover from './VariablePopover';
+import CreateVariable from './CreateVariable';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -39,10 +39,10 @@ const useStyles = makeStyles(() => ({
 }));
 
 const headerStyles: {
-  iconSort: CSSProperties;
-  variable_key: CSSProperties;
-  variable_description: CSSProperties;
-  variable_value: CSSProperties;
+  iconSort: CSSProperties
+  variable_key: CSSProperties
+  variable_description: CSSProperties
+  variable_value: CSSProperties
 } = {
   iconSort: {
     position: 'absolute',
@@ -71,9 +71,9 @@ const headerStyles: {
 };
 
 const inlineStyles: {
-  variable_key: CSSProperties;
-  variable_description: CSSProperties;
-  variable_value: CSSProperties;
+  variable_key: CSSProperties
+  variable_description: CSSProperties
+  variable_value: CSSProperties
 } = {
   variable_key: {
     float: 'left',
@@ -112,7 +112,7 @@ const Variables = () => {
   ]);
   // Fetching data
   const { exerciseId } = useParams<'exerciseId'>();
-  const { exercise, variables }: { exercise: Exercise; variables: [Variable] } = useHelper((helper: VariablesHelper & ExercicesHelper) => {
+  const { exercise, variables }: { exercise: Exercise, variables: [Variable] } = useHelper((helper: VariablesHelper & ExercicesHelper) => {
     return {
       exercise: helper.getExercise(exerciseId),
       variables: helper.getExerciseVariables(exerciseId),
@@ -152,7 +152,7 @@ const Variables = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div>
                 {filtering.buildHeader(
                   'variable_key',
@@ -173,7 +173,7 @@ const Variables = () => {
                   headerStyles,
                 )}
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -187,7 +187,7 @@ const Variables = () => {
               <AttachMoneyOutlined />
             </ListItemIcon>
             <ListItemText
-              primary={
+              primary={(
                 <div>
                   <div
                     className={classes.bodyItem}
@@ -208,7 +208,7 @@ const Variables = () => {
                     {variable.variable_value}
                   </div>
                 </div>
-              }
+              )}
             />
             <ListItemSecondaryAction>
               <VariablePopover

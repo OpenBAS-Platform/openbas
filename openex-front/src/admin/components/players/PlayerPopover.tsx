@@ -11,7 +11,6 @@ import MenuItem from '@mui/material/MenuItem';
 import Dialog from '../../../components/common/Dialog';
 import { updateAudiencePlayers } from '../../../actions/Audience';
 import { deletePlayer, updatePlayer } from '../../../actions/User';
-import PlayerForm from './PlayerForm';
 import { useFormatter } from '../../../components/i18n';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
 import { useAppDispatch } from '../../../utils/hooks';
@@ -30,13 +29,14 @@ import {
   TagsHelper,
   UsersHelper,
 } from '../../../actions/helper';
+import PlayerForm from './PlayerForm';
 import { PlayerInputForm, UserStore } from './Player';
 
 interface PlayerPopoverProps {
-  user: UserStore;
-  exerciseId?: string;
-  audienceId?: string;
-  audienceUsersIds?: string[];
+  user: UserStore
+  exerciseId?: string
+  audienceId?: string
+  audienceUsersIds?: string[]
 }
 
 const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({

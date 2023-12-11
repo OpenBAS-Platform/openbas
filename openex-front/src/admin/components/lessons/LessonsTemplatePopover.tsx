@@ -13,7 +13,6 @@ import MenuItem from '@mui/material/MenuItem';
 import { useNavigate } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { PopoverProps } from '@mui/material';
-import LessonsTemplateForm from './LessonsTemplateForm';
 import { useFormatter } from '../../../components/i18n';
 import {
   deleteLessonsTemplate,
@@ -25,6 +24,7 @@ import {
   LessonsTemplateUpdateInput,
 } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
+import LessonsTemplateForm from './LessonsTemplateForm';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -34,7 +34,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  lessonsTemplate: LessonsTemplate;
+  lessonsTemplate: LessonsTemplate
 }
 
 const LessonsTemplatePopover: React.FC<Props> = ({ lessonsTemplate }) => {

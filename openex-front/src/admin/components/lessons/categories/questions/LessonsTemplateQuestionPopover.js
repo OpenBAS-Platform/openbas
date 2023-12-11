@@ -12,12 +12,12 @@ import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useDispatch } from 'react-redux';
-import LessonsTemplateQuestionForm from './LessonsTemplateQuestionForm';
 import { useFormatter } from '../../../../../components/i18n';
 import {
   deleteLessonsTemplateQuestion,
   updateLessonsTemplateQuestion,
 } from '../../../../../actions/Lessons';
+import LessonsTemplateQuestionForm from './LessonsTemplateQuestionForm';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

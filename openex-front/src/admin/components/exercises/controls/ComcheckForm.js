@@ -59,12 +59,13 @@ class ComcheckForm extends Component {
               multiple={true}
               displayEmpty={true}
               label={t('Audiences')}
-              renderValue={(v) => (v.length === 0 ? (
+              renderValue={(v) => (v.length === 0
+                ? (
                   <em>{t('All audiences')}</em>
-              ) : (
-                v.map((a) => audiencesbyId[a].audience_name).join(', ')
-              ))
-              }
+                  )
+                : (
+                    v.map((a) => audiencesbyId[a].audience_name).join(', ')
+                  ))}
               style={{ marginTop: 20 }}
             >
               <MenuItem disabled value="">

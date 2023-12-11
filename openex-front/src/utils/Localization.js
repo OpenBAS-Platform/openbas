@@ -8,15 +8,15 @@ const i18n = {
       Password: 'Mot de passe',
       'Password validation': 'Validation du mot de passe',
       'Change your password': 'Changer votre mot de passe',
-      'I forgot my password': "J'ai oublié mon mot de passe",
+      'I forgot my password': 'J\'ai oublié mon mot de passe',
       'Send reset code': 'Envoyer le code',
       'Enter code': 'Entrer le code',
-      'Back to login': "Retour à l'identification",
-      'Sign in': "S'identifier",
-      'Login with github': "S'identifier avec github",
+      'Back to login': 'Retour à l\'identification',
+      'Sign in': 'S\'identifier',
+      'Login with github': 'S\'identifier avec github',
       'You probably need a public email in your github account':
-        "Vous avez probablement besoin d'une adresse e-mail publique dans votre compte github",
-      'Login with microsoft': "S'identifier avec microsoft",
+        'Vous avez probablement besoin d\'une adresse e-mail publique dans votre compte github',
+      'Login with microsoft': 'S\'identifier avec microsoft',
       Continue: 'Continuer',
       Dashboard: 'Tableau de bord',
       Exercises: 'Exercices',
@@ -61,12 +61,12 @@ const i18n = {
       'Inject context': 'Contexte du stimuli',
       'added an entry on': 'a ajouté une entrée le',
       'This file type is not accepted here.':
-        "Ce type de fichier n'est pas accepté ici",
+        'Ce type de fichier n\'est pas accepté ici',
       'Distribution of score by audience (in % of expectations)':
         'Distribution du score par audience (en % des attendus)',
       'Select all': 'Sélectionner tout',
       'Do you want to anonymize lessons learned questionnaire?':
-        "Souhaitez-vous anonymiser le questionnaire de retour d'expérience ?",
+        'Souhaitez-vous anonymiser le questionnaire de retour d\'expérience ?',
       'You will not be able to change this setting later.':
         'Vous ne serez plus en mesure de modifier ce paramètre après.',
       Stop: 'Arrêter',
@@ -104,7 +104,7 @@ const i18n = {
       'Phone number (fix)': 'Numéro de téléphone (fixe)',
       'PGP public key': 'Clé publique PGP',
       'Create a new organization': 'Créer une nouvelle organisation',
-      'Update the organization': "Modifier l'organisation",
+      'Update the organization': 'Modifier l\'organisation',
       'Do you want to delete this organization?':
         'Souhaitez-vous supprimer cette organisation ?',
       'Mail sent to': 'Mail envoyé à',
@@ -125,7 +125,7 @@ const i18n = {
       'Trigger now': 'Déclencher maintenant',
       Automatic: 'Automatique',
       'Passwords do no match': 'Les mots de passe ne correspondent pas',
-      'Update the user password': "Modifier le mot de passe de l'utilisateur",
+      'Update the user password': 'Modifier le mot de passe de l\'utilisateur',
       'Update password': 'Modifier le mot de passe',
       'Current password': 'Mot de passe actuel',
       'New password': 'Nouveau mot de passe',
@@ -143,7 +143,7 @@ const i18n = {
       'Do you want to delete this group?':
         'Souhaitez-vous supprimer ce groupe ?',
       'No tag': 'Aucun tag',
-      'Update the user': "Modifier l'utilisateur",
+      'Update the user': 'Modifier l\'utilisateur',
       Exercise: 'Exercice',
       'Read/Write': 'Lecture/Ecriture',
       'Read Only': 'Lecture Seule',
@@ -168,8 +168,8 @@ const i18n = {
       Dark: 'Sombre',
       Light: 'Clair',
       'This field is required.': 'Ce champ est requis.',
-      'The element has been updated': "L'élément a été modifié.",
-      'The element already exists': "L'élément existe déjà.",
+      'The element has been updated': 'L\'élément a été modifié.',
+      'The element already exists': 'L\'élément existe déjà.',
       'Manage the users of this group': 'Gérer les utilisateurs de ce groupe',
       'Create a new document': 'Créer un nouveau document',
       Close: 'Fermer',
@@ -209,18 +209,18 @@ const i18n = {
       'Add target audiences': 'Ajouter des audiences cibles',
       'Trigger after': 'Se déclenche après',
       'Create a new inject': 'Créer un nouveau stimuli',
-      'Remove from the audience': "Retirer de l'audience",
-      'Update the audience': "Modifier l'audience",
-      'Update the exercise': "Modifier l'exercice",
+      'Remove from the audience': 'Retirer de l\'audience',
+      'Update the audience': 'Modifier l\'audience',
+      'Update the exercise': 'Modifier l\'exercice',
       'Update the inject': 'Modifier le stimuli',
       'Do you want to remove the player from the audience?':
         'Souhaitez-vous retirer le joueur de cette audience ?',
       'Add players in this audience': 'Ajouter des joueurs dans cette audience',
       'Create a new audience': 'Créer une nouvelle audience',
       'Remove from the inject': 'Retirer du stimuli',
-      'Remove from the element': "Retirer de l'élément",
+      'Remove from the element': 'Retirer de l\'élément',
       'Do you want to remove the audience from the inject?':
-        "Souhaitez-vous retirer l'audience du stimuli ?",
+        'Souhaitez-vous retirer l\'audience du stimuli ?',
       'Do you want to delete this exercise?':
         'Souhaitez-vous supprimer cet exercice ?',
       'Number of injects': 'Nombre de stimulis',
@@ -229,7 +229,7 @@ const i18n = {
       'No injects to send in this platform.':
         'Aucun stimuli à envoyer dans cette plateforme.',
       'Before starting the exercise, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.':
-        "Avant de démarrer l'exercice, vous pouvez lancer une vérification pour valider les adresses emails et une simulation pour envoyer les stimulis à l'équipe d'animation.",
+        'Avant de démarrer l\'exercice, vous pouvez lancer une vérification pour valider les adresses emails et une simulation pour envoyer les stimulis à l\'équipe d\'animation.',
       'Applying a template will add all categories and questions of the selected template to this exercise.':
         'Appliquer un template va ajouter toutes les catégories et questions du template sélectionné à cet exercice.',
       'Apply a template': 'Appliquer un template',
@@ -239,7 +239,7 @@ const i18n = {
       'The new users will automatically be assigned to this group.':
         'Les nouveaux utilisateurs seront automatiquement assignés à ce groupe.',
       'This group will have observer permission on new exercises.':
-        "Ce groupe aura la permission d'observateur sur les nouveaux exercices.",
+        'Ce groupe aura la permission d\'observateur sur les nouveaux exercices.',
       'This group will have planner permission on new exercises.':
         'Ce groupe aura la permission de planificateur sur les nouveaux exercices.',
       'Processed injects': 'Stimulis traités',
@@ -290,11 +290,11 @@ const i18n = {
         'Souhaitez-vous changer le statut de cet exercice ?',
       Confirm: 'Confirmer',
       Text: 'Texte',
-      'Sender email address': "Adresse email de l'expéditeur",
+      'Sender email address': 'Adresse email de l\'expéditeur',
       'Creation date': 'Date de création',
       'Next inject': 'Prochain stimuli',
       'Dangerous zone': 'Zone sensible',
-      'Invalid user or password': "Nom d'utilisateur ou mot de passe incorrect",
+      'Invalid user or password': 'Nom d\'utilisateur ou mot de passe incorrect',
       Default: 'Défaut',
       Mandatory: 'Requis',
       Optional: 'Optionnel',
@@ -340,20 +340,20 @@ const i18n = {
       'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message: <a href="${comcheck.url}">${comcheck.url}</a>.':
         'Ceci est une vérification des moyens de communication avant le début de l\'exercice. Merci de bien vouloir cliquer sur le lien ci-dessous afin de confirmer que vous avez reçu ce message avec succès : <a href="${comcheck.url}">${comcheck.url}</a>.',
       'We would like thank your for your participation in this exercise. You are kindly requested to fill this lessons learned questionnaire: <a href="${lessons_uri}">${lessons_uri}</a>.':
-        "Nous souhaitons vous remercier pour votre participation à l'exercice. Vous êtes cordialement invités à remplir le formulaire de retour d'expérience : <a href=\"${lessons_uri}\">${lessons_uri}</a>.",
+        'Nous souhaitons vous remercier pour votre participation à l\'exercice. Vous êtes cordialement invités à remplir le formulaire de retour d\'expérience : <a href="${lessons_uri}">${lessons_uri}</a>.',
       '[${exercise.name}] Lessons learned questionnaire':
-        "[${exercise.name}] Questionnaire de retour d'expérience",
+        '[${exercise.name}] Questionnaire de retour d\'expérience',
       'Best regards': 'Bien cordialement',
-      'The exercise control team': "L'équipe d'animation de l'exercice",
+      'The exercise control team': 'L\'équipe d\'animation de l\'exercice',
       'Do you want to launch a new dryrun?':
         'Souhaitez-vous lancer une nouvelle simulation ?',
       'Add tags to this exercise': 'Ajouter des tags à cet exercice',
       'No comcheck in this exercise.': 'Aucune vérification dans cet exercice',
-      'There is nothing to see here...': "Il n'y a rien à voir ici...",
+      'There is nothing to see here...': 'Il n\'y a rien à voir ici...',
       'Send the lessons learned questionnaire':
-        "Envoyer le questionnaire de retour d'expérience",
+        'Envoyer le questionnaire de retour d\'expérience',
       'Comment (optional)': 'Commentaire (optionnel)',
-      "What didn't work well": "Ce qui n'a pas bien fonctionné",
+      'What didn\'t work well': 'Ce qui n\'a pas bien fonctionné',
       'What worked well': 'Ce qui a bien fonctionné',
       'Global evaluation': 'Evaluation globale',
       'Your overall evaluation about this question.':
@@ -366,7 +366,7 @@ const i18n = {
       message: 'Message',
       Pending: 'En attente',
       State: 'Etat',
-      'Sent date': "Date d'envoi",
+      'Sent date': 'Date d\'envoi',
       'Received date': 'Date de réception',
       'Communication check': 'Vérification des moyens de communication',
       Running: 'En cours',
@@ -390,25 +390,25 @@ const i18n = {
       'Do you want to delete this poll?':
         'Souhaitez-vous supprimer ce sondage ?',
       'Update the poll': 'Modifier le sondage',
-      'Exercise logs': "Journal d'exercice",
+      'Exercise logs': 'Journal d\'exercice',
       'Poll replies': 'Réponses au sondage',
       Overview: 'Aperçu',
       Objectives: 'Objectifs',
       'Create a new objective': 'Créer un nouvel objectif',
-      'Update the objective': "Modifier l'objectif",
+      'Update the objective': 'Modifier l\'objectif',
       'Do you want to delete this objective?':
         'Souhaitez-vous supprimer cet objectif ?',
       'Write an entry': 'Ecrire une entrée',
       'Do you want to delete this log?':
         'Souhaitez-vous supprimer cette entrée ?',
       'Objective achievement evalution':
-        "Evaluation de l'atteinte de l'objectif",
+        'Evaluation de l\'atteinte de l\'objectif',
       Evaluate: 'Evaluer',
       'My evaluation': 'Mon évaluation',
       Priority: 'Priorité',
       Polls: 'Sondages',
       'Create a new poll': 'Créer un nouveau sondage',
-      'Update the log': "Modifier l'entrée",
+      'Update the log': 'Modifier l\'entrée',
       'Create a new user': 'Créer un nouvel utilisateur',
       'Dryrun recipients': 'Destinataires de la simulation',
       'Create a new report': 'Créer un nouveau rapport',
@@ -437,7 +437,7 @@ const i18n = {
       'Send an email': 'Envoyer un email',
       'Send a SMS': 'Envoyer un SMS',
       'To fill': 'A remplir',
-      Username: "Nom d'utilisateur",
+      Username: 'Nom d\'utilisateur',
       Unknown: 'Inconnu',
       'Primary color (dark)': 'Couleur primaire (sombre)',
       'Secondary color (dark)': 'Couleur secondaire (sombre)',
@@ -453,46 +453,46 @@ const i18n = {
       'Create an image': 'Créer une image',
       'Change logo': 'Changer le logo',
       'Scheduled / in use': 'Planifié / utilisé',
-      'Not used in the exercise': "Pas utilisé dans l'exercice",
+      'Not used in the exercise': 'Pas utilisé dans l\'exercice',
       'Update the media pressure': 'Modifier la pression médiatique',
       'Do you want to delete this media pressure?':
         'Souhaitez-vous supprimer cette pression médiatique ?',
       'Do you want to delete this challenge?':
         'Souhaitez-vous supprimer ce challenge ?',
       'Do you want to delete this lessons learned category?':
-        "Souhaitez-vous supprimer cette catégorie de retour d'expérience ?",
+        'Souhaitez-vous supprimer cette catégorie de retour d\'expérience ?',
       'Update the lessons learned category':
-        "Modifier une catégorie de retour d'expérience",
+        'Modifier une catégorie de retour d\'expérience',
       'Create a new media pressure': 'Créer une nouvelle pression médiatique',
       'Create a new lessons learned question':
-        "Créer une nouvelle question de retour d'expérience",
-      'Collaborative lessons learned': "Retour d'expérience collaboratif",
+        'Créer une nouvelle question de retour d\'expérience',
+      'Collaborative lessons learned': 'Retour d\'expérience collaboratif',
       'Create a new lessons learned category':
-        "Créer une catégorie de retour d'expérience",
+        'Créer une catégorie de retour d\'expérience',
       'Do you want to delete this lessons learned question?':
-        "Souhaitez-vous supprimer cette question de retour d'expérience ?",
+        'Souhaitez-vous supprimer cette question de retour d\'expérience ?',
       'Update the lessons learned question':
-        "Modifier la question de retour d'expérience",
+        'Modifier la question de retour d\'expérience',
       Answers: 'Réponses',
       'Categories and questions': 'Catégories et questions',
       Empty: 'Vider',
       'Objective achievement evaluation':
-        "Evaluation de l'atteinte de l'objectif",
+        'Evaluation de l\'atteinte de l\'objectif',
       'Crisis intensity (injects by hour)':
         'Intensité de la crise (stimulis par heure)',
       'Apply a lessons learned template':
-        "Appliquer un template de retour d'expérience",
+        'Appliquer un template de retour d\'expérience',
       'Questionnaire mode': 'Mode du questionnaire',
       'Anonymize answers': 'Anonymiser les réponses',
       'No explanation': 'Aucune explication',
       'Add target audiences in this lessons learned category':
-        "Ajouter des audiences cibles à cette catégorie de retour d'expérience",
+        'Ajouter des audiences cibles à cette catégorie de retour d\'expérience',
       'Sending the questionnaire will emit an email to each player with a unique link to access and fill it.':
         'Envoyer le questionnaire va émettre un email à chaque joueur avec un lien unique pour y accéder et le remplir.',
       'Do you want to empty lessons learned categories and questions?':
-        "Souhaitez-vous vider les catégories et les questions de retour d'expérience ?",
+        'Souhaitez-vous vider les catégories et les questions de retour d\'expérience ?',
       'Do you want to reset lessons learned answers?':
-        "Souhaitez-vous réinitialiser les réponses du retour d'expérience ?",
+        'Souhaitez-vous réinitialiser les réponses du retour d\'expérience ?',
       Reset: 'Réinitialiser',
       Campaign: 'Campagne',
       Duration: 'Durée',
@@ -505,14 +505,14 @@ const i18n = {
       Category: 'Catégorie',
       'Create a new challenge': 'Créer un nouveau challenge',
       'Create a new lessons learned template':
-        "Créer un nouveau template de retour d'expérience",
+        'Créer un nouveau template de retour d\'expérience',
       'Update the lessons learned template':
-        "Modifier le template de retour d'expérience",
+        'Modifier le template de retour d\'expérience',
       'Do you want to delete this lessons learned template?':
-        "Souhaitez-vous supprimer ce template de retour d'expérience ?",
+        'Souhaitez-vous supprimer ce template de retour d\'expérience ?',
       Media: 'Média',
       Author: 'Auteur',
-      'Max number of attempts': "Nombre maximum d'essais",
+      'Max number of attempts': 'Nombre maximum d\'essais',
       'Add documents in this challenge': 'Ajouter un document à ce challenge',
       'At least one flag is required for a challenge.':
         'Au moins un flag est requis pour un challenge.',
@@ -544,18 +544,18 @@ const i18n = {
       'Each audience should submit a text response':
         'Chaque audience doit soumettre une réponse texte',
       Expectation: 'Attendu',
-      'Expectation score': "Score de l'attendu",
+      'Expectation score': 'Score de l\'attendu',
       'Distribution of expected total score by audience':
         'Distribution du score total attendu par audience',
       'Exercise definition and scenario':
-        "Définition de l'exercice et scénario",
-      'Exercise results': "Résultats de l'exercice",
-      'Exercise data': "Données de l'exercice",
+        'Définition de l\'exercice et scénario',
+      'Exercise results': 'Résultats de l\'exercice',
+      'Exercise data': 'Données de l\'exercice',
       'Distribution of total score by audience':
         'Distribution du score total par audience',
       'Distribution of total score by organization':
         'Distribution du score total par organisation',
-      'Number of expectations': "Nombre d'attendus",
+      'Number of expectations': 'Nombre d\'attendus',
       'Total expected score': 'Score total attendu',
       'Distribution of total score by player':
         'Distribution du score total par joueur',
@@ -571,13 +571,13 @@ const i18n = {
       'Sent injects over time': 'Stimulis envoyés dans le temps',
       'Sent mails over time': 'Emails envoyés dans le temps',
       'No data to display or the exercise has not started yet':
-        "Aucune donnée disponible ou l'exercice n'a pas encore commencé",
-      'Back to administration': "Retour à l'administration",
+        'Aucune donnée disponible ou l\'exercice n\'a pas encore commencé',
+      'Back to administration': 'Retour à l\'administration',
       'Audiences scores over time': 'Score des audiences dans le temps',
       'Inject types scores over time':
         'Score des types de stimuli dans le temps',
       'The animation team can validate the audience reaction':
-        "L'équipe d'animation peut valider la réaction de l'audience",
+        'L\'équipe d\'animation peut valider la réaction de l\'audience',
       'No description': 'Aucune description',
       'Only injects with manual validation':
         'Seulement les stimulis avec validation manuelle',
@@ -592,7 +592,7 @@ const i18n = {
         'Voulez vous supprimer cette variable ?',
       'Update the variable': 'Mettre à jour la variable',
       'Invalid input. Please use only letters or underscores, and ensure the field is not empty.':
-        "Saisie invalide. Merci d'utiliser uniquement des lettres ou des tirets bas, et de vous assurer que le champ n'est pas vide.",
+        'Saisie invalide. Merci d\'utiliser uniquement des lettres ou des tirets bas, et de vous assurer que le champ n\'est pas vide.',
       'Built in variables': 'Variables intégrées',
       'Custom variables': 'Variables personnalisées',
       'Please follow this link to': 'Merci de suivre ce lien pour',

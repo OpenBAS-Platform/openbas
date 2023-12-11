@@ -9,8 +9,8 @@ import TagField from '../../../components/TagField';
 import OrganizationField from '../../../components/OrganizationField';
 import CountryField from '../../../components/CountryField';
 import { Theme } from '../../../components/Theme';
-import { PlayerInputForm } from './Player';
 import { schemaValidator } from '../../../utils/Zod';
+import { PlayerInputForm } from './Player';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -21,11 +21,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface PlayerFormProps {
-  initialValues: Partial<PlayerInputForm>;
-  handleClose: () => void;
-  onSubmit: (data: PlayerInputForm) => void;
-  editing?: boolean;
-  canUpdateEmail?: boolean;
+  initialValues: Partial<PlayerInputForm>
+  handleClose: () => void
+  onSubmit: (data: PlayerInputForm) => void
+  editing?: boolean
+  canUpdateEmail?: boolean
 }
 
 const PlayerForm: FunctionComponent<PlayerFormProps> = ({
@@ -44,7 +44,7 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
       .string()
       .regex(
         /^\+/,
-        t("Invalid input. Please use '+' character and country identifier."),
+        t('Invalid input. Please use \'+\' character and country identifier.'),
       )
       .optional()
       .nullable(),

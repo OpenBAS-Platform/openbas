@@ -3,9 +3,9 @@ import * as R from 'ramda';
 import { FlagOutlined } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import withStyles from '@mui/styles/withStyles';
+import { countryOptions } from '../utils/Option';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
-import { countryOptions } from '../utils/Option';
 
 const styles = () => ({
   icon: {

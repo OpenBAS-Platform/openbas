@@ -9,10 +9,10 @@ import Drawer from '@mui/material/Drawer';
 import { withTheme } from '@mui/styles';
 import { fetchInjectTypes } from '../../../../actions/Inject';
 import inject18n from '../../../../components/i18n';
-import QuickInject from './QuickInject';
 import { storeHelper } from '../../../../actions/Schema';
 import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchTags } from '../../../../actions/Tag';
+import QuickInject from './QuickInject';
 
 const styles = (theme) => ({
   createButton: {

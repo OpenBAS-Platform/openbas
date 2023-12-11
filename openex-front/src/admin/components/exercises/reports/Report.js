@@ -28,7 +28,6 @@ import DashboardDataStatistics from '../dashboard/DashboardDataStatistics';
 import DashboardResultsStatistics from '../dashboard/DashboardResultsStatistics';
 import { fetchReports } from '../../../../actions/Report';
 import Loader from '../../../../components/Loader';
-import ReportPopover from './ReportPopover';
 import {
   fetchLessonsAnswers,
   fetchLessonsCategories,
@@ -38,6 +37,7 @@ import { fetchObjectives } from '../../../../actions/Objective';
 import LessonsObjectives from '../lessons/LessonsObjectives';
 import LessonsCategories from '../lessons/LessonsCategories';
 import ExportButtons from '../../../../components/ExportButtons';
+import ReportPopover from './ReportPopover';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -216,7 +216,7 @@ const Dashboard = () => {
             </Grid>
           )}
           {(report.report_stats_definition
-            || report.report_stats_definition_score) && (
+          || report.report_stats_definition_score) && (
             <Typography variant="h1" style={{ marginTop: 40 }}>
               {t('Exercise definition and scenario')}
             </Typography>
@@ -268,7 +268,7 @@ const Dashboard = () => {
             />
           )}
           {(report.report_lessons_objectives
-            || report.report_lessons_stats) && (
+          || report.report_lessons_stats) && (
             <Typography variant="h1" style={{ marginTop: 60 }}>
               {t('Lessons learned')}
             </Typography>

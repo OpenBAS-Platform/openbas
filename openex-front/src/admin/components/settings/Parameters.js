@@ -10,7 +10,6 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Chip from '@mui/material/Chip';
-import ParametersForm from './ParametersForm';
 import inject18n from '../../../components/i18n';
 import { storeHelper } from '../../../actions/Schema';
 import {
@@ -18,6 +17,7 @@ import {
   fetchParameters,
 } from '../../../actions/Application';
 import useDataLoader from '../../../utils/ServerSideEvent';
+import ParametersForm from './ParametersForm';
 
 const styles = () => ({
   root: {

@@ -18,11 +18,11 @@ import {
   updateAudienceActivation,
 } from '../../../../actions/Audience';
 import inject18n from '../../../../components/i18n';
-import AudienceForm from './AudienceForm';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { Transition } from '../../../../utils/Environment';
 import { storeHelper } from '../../../../actions/Schema';
 import { tagOptions } from '../../../../utils/Option';
+import AudienceForm from './AudienceForm';
 
 class AudiencePopover extends Component {
   constructor(props) {
@@ -189,21 +189,23 @@ class AudiencePopover extends Component {
               {t('Manage players')}
             </MenuItem>
           )}
-          {audience.audience_enabled ? (
-            <MenuItem
-              onClick={this.handleOpenDisable.bind(this)}
-              disabled={isExerciseReadOnly(exercise)}
-            >
-              {t('Disable')}
-            </MenuItem>
-          ) : (
-            <MenuItem
-              onClick={this.handleOpenEnable.bind(this)}
-              disabled={isExerciseReadOnly(exercise)}
-            >
-              {t('Enable')}
-            </MenuItem>
-          )}
+          {audience.audience_enabled
+            ? (
+              <MenuItem
+                onClick={this.handleOpenDisable.bind(this)}
+                disabled={isExerciseReadOnly(exercise)}
+              >
+                {t('Disable')}
+              </MenuItem>
+              )
+            : (
+              <MenuItem
+                onClick={this.handleOpenEnable.bind(this)}
+                disabled={isExerciseReadOnly(exercise)}
+              >
+                {t('Enable')}
+              </MenuItem>
+              )}
           {onRemoveAudience && (
             <MenuItem
               onClick={this.handleOpenRemove.bind(this)}

@@ -11,8 +11,8 @@ import { ListItemIcon } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../../../components/i18n';
-import LessonsQuestionForm from './LessonsQuestionForm';
 import { addLessonsQuestion } from '../../../../../../actions/Lessons';
+import LessonsQuestionForm from './LessonsQuestionForm';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -54,32 +54,34 @@ const CreateLessonsQuestion = (props) => {
   };
   return (
     <div>
-      {inline === true ? (
-        <ListItem
-          button={true}
-          divider={true}
-          onClick={handleOpen}
-          color="primary"
-        >
-          <ListItemIcon color="primary">
-            <ControlPointOutlined color="primary" />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('Create a new lessons learned question')}
-            classes={{ primary: classes.text }}
-          />
-        </ListItem>
-      ) : (
-        <IconButton
-          classes={{ root: classes.createButton }}
-          onClick={handleOpen}
-          aria-haspopup="true"
-          size="large"
-          color="secondary"
-        >
-          <Add fontSize="small" />
-        </IconButton>
-      )}
+      {inline === true
+        ? (
+          <ListItem
+            button={true}
+            divider={true}
+            onClick={handleOpen}
+            color="primary"
+          >
+            <ListItemIcon color="primary">
+              <ControlPointOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={t('Create a new lessons learned question')}
+              classes={{ primary: classes.text }}
+            />
+          </ListItem>
+          )
+        : (
+          <IconButton
+            classes={{ root: classes.createButton }}
+            onClick={handleOpen}
+            aria-haspopup="true"
+            size="large"
+            color="secondary"
+          >
+            <Add fontSize="small" />
+          </IconButton>
+          )}
       <Dialog
         open={open}
         TransitionComponent={Transition}

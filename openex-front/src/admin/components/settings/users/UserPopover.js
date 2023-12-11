@@ -17,10 +17,10 @@ import {
   deleteUser,
   updateUserPassword,
 } from '../../../../actions/User';
-import UserForm from './UserForm';
 import { useFormatter } from '../../../../components/i18n';
-import UserPasswordForm from './UserPasswordForm';
 import { tagOptions } from '../../../../utils/Option';
+import UserForm from './UserForm';
+import UserPasswordForm from './UserPasswordForm';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

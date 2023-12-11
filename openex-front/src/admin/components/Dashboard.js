@@ -22,7 +22,6 @@ import {
 } from '@mui/icons-material';
 import Chart from 'react-apexcharts';
 import ItemTags from '../../components/ItemTags';
-import MiniMap from './MiniMap';
 import inject18n from '../../components/i18n';
 import Countdown from '../../components/Countdown';
 import { fetchStatistics } from '../../actions/Application';
@@ -35,9 +34,10 @@ import { storeHelper } from '../../actions/Schema';
 import ItemNumberDifference from '../../components/ItemNumberDifference';
 import Empty from '../../components/Empty';
 import { colors, horizontalBarsChartOptions } from '../../utils/Charts';
-import InjectIcon from './exercises/injects/InjectIcon';
 import ProgressBarCountdown from '../../components/ProgressBarCountdown';
 import { computeLevel } from '../../utils/Countries';
+import InjectIcon from './exercises/injects/InjectIcon';
+import MiniMap from './MiniMap';
 
 const styles = (theme) => ({
   root: {
@@ -129,6 +129,7 @@ const Dashboard = (props) => {
     props.fetchTags();
     props.fetchNextInjects();
     props.fetchPlayers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const {
     classes,
@@ -270,130 +271,136 @@ const Dashboard = (props) => {
         <Grid item={true} xs={6}>
           <Typography variant="h4">{t('Recent exercises')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.list }}>
-            {exercises.length > 0 ? (
-              <List style={{ paddingTop: 0 }}>
-                {R.take(6, exercises).map((exercise) => (
-                  <ListItem
-                    key={exercise.exercise_id}
-                    button={true}
-                    classes={{ root: classes.item }}
-                    divider={true}
-                    component={Link}
-                    to={`/admin/exercises/${exercise.exercise_id}`}
-                  >
-                    <ListItemIcon>
-                      <Kayaking />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <div>
-                          <div
-                            className={classes.bodyItem}
-                            style={{ width: '40%' }}
-                          >
-                            {exercise.exercise_name}
+            {exercises.length > 0
+              ? (
+                <List style={{ paddingTop: 0 }}>
+                  {R.take(6, exercises).map((exercise) => (
+                    <ListItem
+                      key={exercise.exercise_id}
+                      button={true}
+                      classes={{ root: classes.item }}
+                      divider={true}
+                      component={Link}
+                      to={`/admin/exercises/${exercise.exercise_id}`}
+                    >
+                      <ListItemIcon>
+                        <Kayaking />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={(
+                          <div>
+                            <div
+                              className={classes.bodyItem}
+                              style={{ width: '40%' }}
+                            >
+                              {exercise.exercise_name}
+                            </div>
+                            <div
+                              className={classes.bodyItem}
+                              style={{ width: '20%' }}
+                            >
+                              {exercise.exercise_start_date
+                                ? (
+                                    nsd(exercise.exercise_start_date)
+                                  )
+                                : (
+                                  <i>{t('Manual')}</i>
+                                  )}
+                            </div>
+                            <div
+                              className={classes.bodyItem}
+                              style={{ width: '40%' }}
+                            >
+                              <ItemTags
+                                variant="list"
+                                tags={exercise.exercise_tags}
+                              />
+                            </div>
                           </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={{ width: '20%' }}
-                          >
-                            {exercise.exercise_start_date ? (
-                              nsd(exercise.exercise_start_date)
-                            ) : (
-                              <i>{t('Manual')}</i>
-                            )}
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={{ width: '40%' }}
-                          >
-                            <ItemTags
-                              variant="list"
-                              tags={exercise.exercise_tags}
-                            />
-                          </div>
-                        </div>
-                      }
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            ) : (
-              <Empty message={t('No exercises in this platform.')} />
-            )}
+                        )}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+                )
+              : (
+                <Empty message={t('No exercises in this platform.')} />
+                )}
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
           <Typography variant="h4">{t('Next injects to send')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.list }}>
-            {injects?.length > 0 ? (
-              <List style={{ paddingTop: 0 }}>
-                {injects.map((inject) => {
-                  const exercise = exercisesMap[inject.inject_exercise];
-                  return (
-                    <ListItem
-                      key={inject.inject_id}
-                      dense={true}
-                      classes={{ root: classes.item }}
-                      divider={true}
-                      button={true}
-                      component={Link}
-                      to={`/admin/exercises/${inject.inject_exercise}/animation/timeline`}
-                    >
-                      <ListItemIcon style={{ paddingTop: 5 }}>
-                        <InjectIcon
-                          type={inject.inject_type}
-                          variant="inline"
-                          disabled={!inject.inject_enabled}
-                        />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <div>
-                            <div
-                              className={classes.bodyItem}
-                              style={{ width: '50%' }}
-                            >
-                              {inject.inject_title}
-                            </div>
-                            <div
-                              className={classes.bodyItem}
-                              style={{ width: '25%', paddingTop: 8 }}
-                            >
-                              <ProgressBarCountdown
-                                date={inject.inject_date}
-                                paused={
+            {injects?.length > 0
+              ? (
+                <List style={{ paddingTop: 0 }}>
+                  {injects.map((inject) => {
+                    const exercise = exercisesMap[inject.inject_exercise];
+                    return (
+                      <ListItem
+                        key={inject.inject_id}
+                        dense={true}
+                        classes={{ root: classes.item }}
+                        divider={true}
+                        button={true}
+                        component={Link}
+                        to={`/admin/exercises/${inject.inject_exercise}/animation/timeline`}
+                      >
+                        <ListItemIcon style={{ paddingTop: 5 }}>
+                          <InjectIcon
+                            type={inject.inject_type}
+                            variant="inline"
+                            disabled={!inject.inject_enabled}
+                          />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={(
+                            <div>
+                              <div
+                                className={classes.bodyItem}
+                                style={{ width: '50%' }}
+                              >
+                                {inject.inject_title}
+                              </div>
+                              <div
+                                className={classes.bodyItem}
+                                style={{ width: '25%', paddingTop: 8 }}
+                              >
+                                <ProgressBarCountdown
+                                  date={inject.inject_date}
+                                  paused={
                                   exercise?.exercise_status === 'PAUSED'
                                   || exercise?.exercise_status === 'CANCELED'
                                 }
-                              />
+                                />
+                              </div>
+                              <div
+                                className={classes.bodyItem}
+                                style={{
+                                  paddingTop: 3,
+                                  marginRight: 15,
+                                  float: 'right',
+                                  paddingRight: 20,
+                                  fontFamily: 'Consolas, monaco, monospace',
+                                  fontSize: 12,
+                                }}
+                              >
+                                <Countdown
+                                  date={inject.inject_date}
+                                  paused={exercise?.exercise_status === 'PAUSED'}
+                                />
+                              </div>
                             </div>
-                            <div
-                              className={classes.bodyItem}
-                              style={{
-                                paddingTop: 3,
-                                marginRight: 15,
-                                float: 'right',
-                                paddingRight: 20,
-                                fontFamily: 'Consolas, monaco, monospace',
-                                fontSize: 12,
-                              }}
-                            >
-                              <Countdown
-                                date={inject.inject_date}
-                                paused={exercise?.exercise_status === 'PAUSED'}
-                              />
-                            </div>
-                          </div>
-                        }
-                      />
-                    </ListItem>
-                  );
-                })}
-              </List>
-            ) : (
-              <Empty message={t('No injects to send in this platform.')} />
-            )}
+                          )}
+                        />
+                      </ListItem>
+                    );
+                  })}
+                </List>
+                )
+              : (
+                <Empty message={t('No injects to send in this platform.')} />
+                )}
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
@@ -401,20 +408,22 @@ const Dashboard = (props) => {
             {t('Organizations distribution across exercises')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            {topOrganizations.length > 0 ? (
-              <Chart
-                options={horizontalBarsChartOptions(
-                  theme,
-                  maxInjectsNumber < 2,
+            {topOrganizations.length > 0
+              ? (
+                <Chart
+                  options={horizontalBarsChartOptions(
+                    theme,
+                    maxInjectsNumber < 2,
+                  )}
+                  series={distributionChartData}
+                  type="bar"
+                  width="100%"
+                  height={50 + topOrganizations.length * 50}
+                />
+                )
+              : (
+                <Empty message={t('No organizations in this platform.')} />
                 )}
-                series={distributionChartData}
-                type="bar"
-                width="100%"
-                height={50 + topOrganizations.length * 50}
-              />
-            ) : (
-              <Empty message={t('No organizations in this platform.')} />
-            )}
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>

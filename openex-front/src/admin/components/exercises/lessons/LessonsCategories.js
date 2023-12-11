@@ -16,12 +16,12 @@ import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
 import { useDispatch } from 'react-redux';
 import { useFormatter } from '../../../../components/i18n';
+import { truncate } from '../../../../utils/String';
+import { updateLessonsCategoryAudiences } from '../../../../actions/Lessons';
 import LessonsCategoryPopover from './categories/LessonsCategoryPopover';
 import LessonsQuestionPopover from './categories/questions/LessonsQuestionPopover';
 import CreateLessonsQuestion from './categories/questions/CreateLessonsQuestion';
 import LessonsCategoryAddAudiences from './categories/LessonsCategoryAddAudiences';
-import { truncate } from '../../../../utils/String';
-import { updateLessonsCategoryAudiences } from '../../../../actions/Lessons';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -86,7 +86,7 @@ const LessonsCategories = ({
           number: n[1].length,
           comments: R.filter(
             (o) => o.lessons_answer_positive !== null
-              || o.lessons_answer_negative !== null,
+            || o.lessons_answer_negative !== null,
             n[1],
           ).length,
         },
@@ -177,8 +177,7 @@ const LessonsCategories = ({
                           key={question.lessonsquestion_id}
                           divider={true}
                           button={true}
-                          onClick={() => setSelectedQuestion && setSelectedQuestion(question)
-                          }
+                          onClick={() => setSelectedQuestion && setSelectedQuestion(question)}
                         >
                           <ListItemText
                             style={{ width: '50%' }}
@@ -208,7 +207,8 @@ const LessonsCategories = ({
                                 variant="body2"
                                 color="text.secondary"
                               >
-                                {consolidatedAnswer.score}%
+                                {consolidatedAnswer.score}
+                                %
                               </Typography>
                             </Box>
                           </Box>
@@ -245,17 +245,17 @@ const LessonsCategories = ({
                         title={audience?.audience_name || ''}
                       >
                         <Chip
-                          onDelete={
+                          onDelete={(
                             isReport
                               ? undefined
                               : () => handleUpdateAudiences(
-                                category.lessonscategory_id,
-                                R.filter(
-                                  (n) => n !== audienceId,
-                                  category.lessons_category_audiences,
-                                ),
-                              )
-                          }
+                                  category.lessonscategory_id,
+                                  R.filter(
+                                    (n) => n !== audienceId,
+                                    category.lessons_category_audiences,
+                                  ),
+                                )
+                          )}
                           label={truncate(audience?.audience_name || '', 30)}
                           icon={<CastForEducationOutlined />}
                           classes={{ root: classes.chip }}

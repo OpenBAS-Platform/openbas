@@ -1,12 +1,12 @@
 import { FORM_ERROR } from 'final-form';
 import * as Constants from '../constants/ActionTypes';
-import * as schema from './Schema';
 import {
   getReferential,
   postReferential,
   putReferential,
   simpleCall,
 } from '../utils/Action';
+import * as schema from './Schema';
 
 export const fetchParameters = () => (dispatch) => {
   return getReferential(schema.arrayOfParameters, '/api/settings')(dispatch);

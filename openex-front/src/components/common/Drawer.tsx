@@ -25,10 +25,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface DrawerProps {
-  open: boolean;
-  handleClose: () => void;
-  title: string;
-  children: (() => React.ReactElement) | React.ReactElement | null;
+  open: boolean
+  handleClose: () => void
+  title: string
+  children: (() => React.ReactElement) | React.ReactElement | null
 }
 
 const Drawer: FunctionComponent<DrawerProps> = ({

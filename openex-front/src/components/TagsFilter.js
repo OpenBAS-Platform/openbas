@@ -8,8 +8,8 @@ import Chip from '@mui/material/Chip';
 import { LabelOutlined } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { fetchTags } from '../actions/Tag';
-import { useFormatter } from './i18n';
 import { useHelper } from '../store';
+import { useFormatter } from './i18n';
 
 const useStyles = makeStyles(() => ({
   icon: {

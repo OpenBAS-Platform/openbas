@@ -1,12 +1,17 @@
 import React from 'react';
 import { Route, Routes, useParams, useLocation } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
-import Exercise from './Exercise';
 import { fetchExercise } from '../../../actions/Exercise';
 import { fetchTags } from '../../../actions/Tag';
 import Loader from '../../../components/Loader';
-import ExerciseHeader from './ExerciseHeader';
 import TopBar from '../nav/TopBar';
+import { errorWrapper } from '../../../components/Error';
+import useDataLoader from '../../../utils/ServerSideEvent';
+import { useHelper } from '../../../store';
+import { ExercicesHelper } from '../../../actions/helper';
+import { useAppDispatch } from '../../../utils/hooks';
+import Exercise from './Exercise';
+import ExerciseHeader from './ExerciseHeader';
 import Audiences from './audiences/Audiences';
 import Injects from './injects/Injects';
 import Articles from './articles/Articles';
@@ -22,13 +27,8 @@ import Comcheck from './controls/Comcheck';
 import Dashboard from './dashboard/Dashboard';
 import Lessons from './lessons/Lessons';
 import Reports from './reports/Reports';
-import { errorWrapper } from '../../../components/Error';
-import useDataLoader from '../../../utils/ServerSideEvent';
-import { useHelper } from '../../../store';
 import Report from './reports/Report';
 import Variables from './variables/Variables';
-import { ExercicesHelper } from '../../../actions/helper';
-import { useAppDispatch } from '../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({
   root: {

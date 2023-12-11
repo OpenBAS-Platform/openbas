@@ -131,11 +131,11 @@ const MediaNewspaper = ({ mediaReader }) => {
               sx={{ width: '100%', height: '100%' }}
             >
               <CardHeader
-                avatar={
+                avatar={(
                   <Avatar>
                     {(firstArticle.article_author || t('Unknown')).charAt(0)}
                   </Avatar>
-                }
+                )}
                 title={firstArticle.article_author || t('Unknown')}
                 subheader={fldt(firstArticle.article_virtual_publication)}
               />
@@ -230,11 +230,11 @@ const MediaNewspaper = ({ mediaReader }) => {
                   style={{ marginTop: index > 0 ? 20 : 0 }}
                 >
                   <CardHeader
-                    avatar={
+                    avatar={(
                       <Avatar>
                         {(article.article_author || t('Unknown')).charAt(0)}
                       </Avatar>
-                    }
+                    )}
                     title={article.article_author || t('Unknown')}
                     subheader={fldt(article.article_virtual_publication)}
                   />
@@ -322,11 +322,11 @@ const MediaNewspaper = ({ mediaReader }) => {
                 sx={{ width: '100%', height: '100%' }}
               >
                 <CardHeader
-                  avatar={
+                  avatar={(
                     <Avatar>
                       {(article.article_author || t('Unknown')).charAt(0)}
                     </Avatar>
-                  }
+                  )}
                   title={article.article_author || t('Unknown')}
                   subheader={fldt(article.article_virtual_publication)}
                 />
@@ -402,7 +402,11 @@ const MediaNewspaper = ({ mediaReader }) => {
         <DialogTitle>{currentArticle?.article_name}</DialogTitle>
         <DialogContent>
           <Typography variant="body2">
-            {t('By')} {currentArticle?.article_author || t('Unknown')},{' '}
+            {t('By')}
+            {' '}
+            {currentArticle?.article_author || t('Unknown')}
+            ,
+            {' '}
             {fldt(currentArticle?.article_virtual_publication)}
           </Typography>
           <ExpandableMarkdown

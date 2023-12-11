@@ -21,10 +21,10 @@ import { UsersHelper } from '../../../../actions/helper';
 import { copyToClipboard } from '../../../../utils/CopyToClipboard';
 
 interface VariableChildItemProps {
-  hasChildren?: boolean;
-  builtin?: boolean;
-  variableKey: string;
-  variableValue: string | undefined;
+  hasChildren?: boolean
+  builtin?: boolean
+  variableKey: string
+  variableValue: string | undefined
 }
 
 const VariableChildItem: FunctionComponent<VariableChildItemProps> = ({
@@ -79,10 +79,10 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface AvailableVariablesDialogProps {
-  open: boolean;
-  handleClose: () => void;
-  exerciseId: string;
-  injectType: Contract;
+  open: boolean
+  handleClose: () => void
+  exerciseId: string
+  injectType: Contract
 }
 
 const AvailableVariablesDialog: FunctionComponent<
@@ -97,7 +97,7 @@ AvailableVariablesDialogProps
     setTab(newTab);
   };
 
-  const { variables, me }: { variables: [Variable]; me: User } = useHelper(
+  const { variables, me }: { variables: [Variable], me: User } = useHelper(
     (helper: VariablesHelper & UsersHelper) => {
       return {
         variables: helper.getExerciseVariables(exerciseId),

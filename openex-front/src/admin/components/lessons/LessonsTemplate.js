@@ -14,12 +14,12 @@ import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { HelpOutlined } from '@mui/icons-material';
 import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
-import CreateLessonsTemplateCategory from './categories/CreateLessonsTemplateCategory';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import {
   fetchLessonsTemplateCategories,
   fetchLessonsTemplateQuestions,
 } from '../../../actions/Lessons';
+import CreateLessonsTemplateCategory from './categories/CreateLessonsTemplateCategory';
 import LessonsTemplateCategoryPopover from './categories/LessonsTemplateCategoryPopover';
 import CreateLessonsTemplateQuestion from './categories/questions/CreateLessonsTemplateQuestion';
 import LessonsTemplateQuestionPopover from './categories/questions/LessonsTemplateQuestionPopover';
@@ -70,7 +70,7 @@ const LessonsTemplate = () => {
           const sortedLessonsTemplateQuestions = sortQuestions(
             lessonsTemplateQuestions.filter(
               (n) => n.lessons_template_question_category
-                === category.lessonstemplatecategory_id,
+              === category.lessonstemplatecategory_id,
             ),
           );
           return (
@@ -89,7 +89,7 @@ const LessonsTemplate = () => {
               />
               <Typography variant="h3" style={{ float: 'right' }}>
                 {category.lessons_template_category_description
-                  || t('No description')}
+                || t('No description')}
               </Typography>
               <div className="clearfix" />
               <Paper variant="outlined" classes={{ root: classes.paper }}>

@@ -116,8 +116,7 @@ const Reset = ({ onCancel }) => {
           {step === STEP_RESET_PASSWORD && (
             <Form
               onSubmit={onSubmitValidatePassword}
-              validate={(values) => validateFields(t, values, ['password', 'password_validation'])
-              }
+              validate={(values) => validateFields(t, values, ['password', 'password_validation'])}
             >
               {({ handleSubmit, submitting, pristine }) => (
                 <form onSubmit={handleSubmit}>

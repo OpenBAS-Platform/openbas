@@ -102,7 +102,7 @@ const MediaMicroblogging = ({ mediaReader }) => {
           .filter((d) => d !== undefined)
           .filter(
             (d) => d.document_type.includes('image/')
-              || d.document_type.includes('video/'),
+            || d.document_type.includes('video/'),
           );
         let columns = 12;
         if (docs.length === 2) {
@@ -120,11 +120,11 @@ const MediaMicroblogging = ({ mediaReader }) => {
             sx={{ width: '100%' }}
           >
             <CardHeader
-              avatar={
+              avatar={(
                 <Avatar>
                   {(article.article_author || t('Unknown')).charAt(0)}
                 </Avatar>
-              }
+              )}
               title={article.article_author || t('Unknown')}
               subheader={fldt(article.article_virtual_publication)}
             />

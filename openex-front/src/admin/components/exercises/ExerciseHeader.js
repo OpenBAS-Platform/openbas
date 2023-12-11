@@ -14,11 +14,11 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import { updateExerciseTags } from '../../../actions/Exercise';
 import TagField from '../../../components/TagField';
-import ExercisePopover from './ExercisePopover';
 import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import { Transition } from '../../../utils/Environment';
 import { usePermissions } from '../../../utils/Exercise';
+import ExercisePopover from './ExercisePopover';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -44,16 +44,18 @@ const useStyles = makeStyles(() => ({
 const TagChip = ({ tagId, isReadOnly, deleteTag }) => {
   const classes = useStyles();
   const tag = useHelper((helper) => helper.getTag(tagId));
-  return tag ? (
-    <Chip
-      key={tag.tag_id}
-      classes={{ root: classes.tag }}
-      label={tag.tag_name}
-      onDelete={isReadOnly ? null : () => deleteTag(tag.tag_id)}
-    />
-  ) : (
-    <div />
-  );
+  return tag
+    ? (
+      <Chip
+        key={tag.tag_id}
+        classes={{ root: classes.tag }}
+        label={tag.tag_name}
+        onDelete={isReadOnly ? null : () => deleteTag(tag.tag_id)}
+      />
+      )
+    : (
+      <div />
+      );
 };
 
 const ExerciseHeader = (props) => {

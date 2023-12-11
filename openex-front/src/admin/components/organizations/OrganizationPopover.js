@@ -17,9 +17,9 @@ import {
   updateOrganization,
   deleteOrganization,
 } from '../../../actions/Organization';
-import OrganizationForm from './OrganizationForm';
 import inject18n from '../../../components/i18n';
 import { tagOptions } from '../../../utils/Option';
+import OrganizationForm from './OrganizationForm';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

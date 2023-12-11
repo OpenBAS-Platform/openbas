@@ -3,9 +3,9 @@ import countries from '../static/geo/countries.json';
 import { Exercise, Organization, Tag } from './api-types';
 
 export interface Option {
-  id: string;
-  label: string;
-  color?: string;
+  id: string
+  label: string
+  color?: string
 }
 
 export const tagOptions = (
@@ -45,9 +45,9 @@ export const organizationOption = (
   const value = organizationsMap[organizationId];
   return value
     ? ({
-      id: value.organization_id,
-      label: value.organization_name,
-    } as Option)
+        id: value.organization_id,
+        label: value.organization_name,
+      } as Option)
     : undefined;
 };
 

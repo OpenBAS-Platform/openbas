@@ -6,14 +6,14 @@ import Button from '@mui/material/Button';
 import { fetchPlayerMedia } from '../../../actions/Media';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
-import MediaNewspaper from './MediaNewspaper';
-import MediaMicroblogging from './MediaMicroblogging';
-import MediaTvChannel from './MediaTvChannel';
 import { useFormatter } from '../../../components/i18n';
 import { usePermissions } from '../../../utils/Exercise';
 import { fetchMe } from '../../../actions/Application';
 import { fetchPlayerDocuments } from '../../../actions/Document';
 import Loader from '../../../components/Loader';
+import MediaTvChannel from './MediaTvChannel';
+import MediaMicroblogging from './MediaMicroblogging';
+import MediaNewspaper from './MediaNewspaper';
 
 const useStyles = makeStyles(() => ({
   root: {

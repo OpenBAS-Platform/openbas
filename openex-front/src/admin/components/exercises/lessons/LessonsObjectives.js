@@ -13,12 +13,12 @@ import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import LinearProgress from '@mui/material/LinearProgress';
 import * as R from 'ramda';
 import Chart from 'react-apexcharts';
-import CreateObjective from './CreateObjective';
 import { useFormatter } from '../../../../components/i18n';
 import Empty from '../../../../components/Empty';
-import ObjectivePopover from './ObjectivePopover';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import { areaChartOptions } from '../../../../utils/Charts';
+import ObjectivePopover from './ObjectivePopover';
+import CreateObjective from './CreateObjective';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -80,59 +80,61 @@ const LessonsObjectives = ({
         )}
         <div className="clearfix" />
         <Paper variant="outlined" classes={{ root: classes.paper }}>
-          {sortedObjectives.length > 0 ? (
-            <List style={{ padding: 0 }}>
-              {sortedObjectives.map((objective) => (
-                <ListItem
-                  key={objective.objective_id}
-                  divider={true}
-                  button={true}
-                  onClick={() => setSelectedObjective
-                    && setSelectedObjective(objective.objective_id)
-                  }
-                >
-                  <ListItemIcon>
-                    <FlagOutlined />
-                  </ListItemIcon>
-                  <ListItemText
-                    style={{ width: '50%' }}
-                    primary={objective.objective_title}
-                    secondary={objective.objective_description}
-                  />
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      width: '30%',
-                      marginRight: 1,
-                    }}
+          {sortedObjectives.length > 0
+            ? (
+              <List style={{ padding: 0 }}>
+                {sortedObjectives.map((objective) => (
+                  <ListItem
+                    key={objective.objective_id}
+                    divider={true}
+                    button={true}
+                    onClick={() => setSelectedObjective
+                    && setSelectedObjective(objective.objective_id)}
                   >
-                    <Box sx={{ width: '100%', mr: 1 }}>
-                      <LinearProgress
-                        variant="determinate"
-                        value={objective.objective_score}
-                      />
+                    <ListItemIcon>
+                      <FlagOutlined />
+                    </ListItemIcon>
+                    <ListItemText
+                      style={{ width: '50%' }}
+                      primary={objective.objective_title}
+                      secondary={objective.objective_description}
+                    />
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        width: '30%',
+                        marginRight: 1,
+                      }}
+                    >
+                      <Box sx={{ width: '100%', mr: 1 }}>
+                        <LinearProgress
+                          variant="determinate"
+                          value={objective.objective_score}
+                        />
+                      </Box>
+                      <Box sx={{ minWidth: 35 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          {objective.objective_score}
+                          %
+                        </Typography>
+                      </Box>
                     </Box>
-                    <Box sx={{ minWidth: 35 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        {objective.objective_score}%
-                      </Typography>
-                    </Box>
-                  </Box>
-                  {!isReport && (
-                    <ListItemSecondaryAction>
-                      <ObjectivePopover
-                        exercise={exercise}
-                        objective={objective}
-                      />
-                    </ListItemSecondaryAction>
-                  )}
-                </ListItem>
-              ))}
-            </List>
-          ) : (
-            <Empty message={t('No objectives in this exercise.')} />
-          )}
+                    {!isReport && (
+                      <ListItemSecondaryAction>
+                        <ObjectivePopover
+                          exercise={exercise}
+                          objective={objective}
+                        />
+                      </ListItemSecondaryAction>
+                    )}
+                  </ListItem>
+                ))}
+              </List>
+              )
+            : (
+              <Empty message={t('No objectives in this exercise.')} />
+              )}
         </Paper>
       </Grid>
       <Grid item={true} xs={6}>
@@ -140,21 +142,23 @@ const LessonsObjectives = ({
           {t('Crisis intensity (injects by hour)')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {injectsData.length > 0 ? (
-            <Chart
-              options={areaChartOptions(theme, true, nsdt, null, undefined)}
-              series={chartData}
-              type="area"
-              width="100%"
-              height={350}
-            />
-          ) : (
-            <Empty
-              message={t(
-                'No data to display or the exercise has not started yet',
+          {injectsData.length > 0
+            ? (
+              <Chart
+                options={areaChartOptions(theme, true, nsdt, null, undefined)}
+                series={chartData}
+                type="area"
+                width="100%"
+                height={350}
+              />
+              )
+            : (
+              <Empty
+                message={t(
+                  'No data to display or the exercise has not started yet',
+                )}
+              />
               )}
-            />
-          )}
         </Paper>
       </Grid>
     </Grid>

@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import * as PropTypes from 'prop-types';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useHelper } from '../store';
 import themeDark from './ThemeDark';
 import themeLight from './ThemeLight';
-import { useHelper } from '../store';
 
 const AppThemeProvider = (props) => {
   const { children } = props;

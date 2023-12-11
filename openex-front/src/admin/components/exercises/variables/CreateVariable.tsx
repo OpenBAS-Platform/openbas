@@ -9,11 +9,11 @@ import { ListItemIcon, Theme } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
-import VariableForm from './VariableForm';
 import { addVariable } from '../../../../actions/Variable';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { VariableInput } from '../../../../utils/api-types';
 import Transition from '../../../../components/common/Transition';
+import VariableForm from './VariableForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {
@@ -29,8 +29,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  exerciseId: string;
-  inline?: boolean;
+  exerciseId: string
+  inline?: boolean
 }
 
 const CreateVariable: React.FC<Props> = ({ exerciseId, inline }) => {
@@ -47,31 +47,33 @@ const CreateVariable: React.FC<Props> = ({ exerciseId, inline }) => {
 
   return (
     <div>
-      {inline ? (
-        <ListItem
-          button={true}
-          divider={true}
-          onClick={() => setOpen(true)}
-          color="primary"
-        >
-          <ListItemIcon color="primary">
-            <ControlPointOutlined color="primary" />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('Create a new variable')}
-            classes={{ primary: classes.text }}
-          />
-        </ListItem>
-      ) : (
-        <Fab
-          onClick={() => setOpen(true)}
-          color="primary"
-          aria-label="Add"
-          className={classes.createButton}
-        >
-          <Add />
-        </Fab>
-      )}
+      {inline
+        ? (
+          <ListItem
+            button={true}
+            divider={true}
+            onClick={() => setOpen(true)}
+            color="primary"
+          >
+            <ListItemIcon color="primary">
+              <ControlPointOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={t('Create a new variable')}
+              classes={{ primary: classes.text }}
+            />
+          </ListItem>
+          )
+        : (
+          <Fab
+            onClick={() => setOpen(true)}
+            color="primary"
+            aria-label="Add"
+            className={classes.createButton}
+          >
+            <Add />
+          </Fab>
+          )}
       <Dialog
         open={open}
         TransitionComponent={Transition}

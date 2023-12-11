@@ -1,4 +1,3 @@
-import * as schema from './Schema';
 import {
   delReferential,
   getReferential,
@@ -6,6 +5,7 @@ import {
   putReferential,
 } from '../utils/Action';
 import * as Constants from '../constants/ActionTypes';
+import * as schema from './Schema';
 
 // region players
 export const fetchPlayers = () => (dispatch) => getReferential(schema.arrayOfUsers, '/api/players')(dispatch);

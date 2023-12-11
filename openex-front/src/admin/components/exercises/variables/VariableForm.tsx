@@ -9,10 +9,10 @@ import { VariableInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 
 interface Props {
-  onSubmit: SubmitHandler<VariableInput>;
-  handleClose: () => void;
-  editing?: boolean;
-  initialValues?: VariableInput;
+  onSubmit: SubmitHandler<VariableInput>
+  handleClose: () => void
+  editing?: boolean
+  initialValues?: VariableInput
 }
 
 const VariableForm: React.FC<Props> = ({

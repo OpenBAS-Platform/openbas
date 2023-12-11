@@ -10,6 +10,11 @@ import Button from '@mui/material/Button';
 import { makeStyles, useTheme } from '@mui/styles';
 import { logout } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';
+import TopMenuMedias from '../medias/TopMenuMedias';
+import ImportUploader from '../exercises/ImportUploader';
+import { Theme } from '../../../components/Theme';
+import { useAppDispatch } from '../../../utils/hooks';
+import { MESSAGING$ } from '../../../utils/Environment';
 import TopMenuDashboard from './TopMenuDashboard';
 import TopMenuSettings from './TopMenuSettings';
 import TopMenuExercises from './TopMenuExercises';
@@ -17,16 +22,11 @@ import TopMenuExercise from './TopMenuExercise';
 import TopMenuPlayers from './TopMenuPlayers';
 import TopMenuOrganizations from './TopMenuOrganizations';
 import TopMenuDocuments from './TopMenuDocuments';
-import TopMenuMedias from '../medias/TopMenuMedias';
 import TopMenuIntegrations from './TopMenuIntegrations';
 import TopMenuChallenges from './TopMenuChallenges';
 import TopMenuLessons from './TopMenuLessons';
-import ImportUploader from '../exercises/ImportUploader';
 import TopMenuMedia from './TopMenuMedia';
 import TopMenuProfile from './TopMenuProfile';
-import { Theme } from '../../../components/Theme';
-import { useAppDispatch } from '../../../utils/hooks';
-import { MESSAGING$ } from '../../../utils/Environment';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   appBar: {
@@ -115,7 +115,7 @@ const TopBar: React.FC = () => {
         </div>
         <div className={classes.menuContainer}>
           {(location.pathname === '/admin'
-            || location.pathname.includes('/admin/import')) && (
+          || location.pathname.includes('/admin/import')) && (
             <TopMenuDashboard />
           )}
           {location.pathname === '/admin/exercises' && <TopMenuExercises />}

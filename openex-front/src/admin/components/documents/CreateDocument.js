@@ -11,10 +11,10 @@ import { Add, ControlPointOutlined } from '@mui/icons-material';
 import ListItem from '@mui/material/ListItem';
 import { ListItemIcon } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
-import DocumentForm from './DocumentForm';
 import { addDocument, fetchDocument } from '../../../actions/Document';
 import inject18n from '../../../components/i18n';
 import { Transition } from '../../../utils/Environment';
+import DocumentForm from './DocumentForm';
 
 const styles = (theme) => ({
   createButton: {
@@ -55,31 +55,33 @@ const CreateDocument = (props) => {
   };
   return (
     <div>
-      {inline === true ? (
-        <ListItem
-          button={true}
-          divider={true}
-          onClick={() => setOpen(true)}
-          color="primary"
-        >
-          <ListItemIcon color="primary">
-            <ControlPointOutlined color="primary" />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('Create a new document')}
-            classes={{ primary: classes.text }}
-          />
-        </ListItem>
-      ) : (
-        <Fab
-          onClick={() => setOpen(true)}
-          color="primary"
-          aria-label="Add"
-          className={classes.createButton}
-        >
-          <Add />
-        </Fab>
-      )}
+      {inline === true
+        ? (
+          <ListItem
+            button={true}
+            divider={true}
+            onClick={() => setOpen(true)}
+            color="primary"
+          >
+            <ListItemIcon color="primary">
+              <ControlPointOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={t('Create a new document')}
+              classes={{ primary: classes.text }}
+            />
+          </ListItem>
+          )
+        : (
+          <Fab
+            onClick={() => setOpen(true)}
+            color="primary"
+            aria-label="Add"
+            className={classes.createButton}
+          >
+            <Add />
+          </Fab>
+          )}
       <Dialog
         open={open}
         TransitionComponent={Transition}

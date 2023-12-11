@@ -10,10 +10,10 @@ import DialogContent from '@mui/material/DialogContent';
 import PlayerForm from '../admin/components/players/PlayerForm';
 import { fetchUsers, addUser } from '../actions/User';
 import { fetchOrganizations } from '../actions/Organization';
-import Autocomplete from './Autocomplete';
-import inject18n from './i18n';
 import { storeHelper } from '../actions/Schema';
 import { resolveUserName } from '../utils/String';
+import Autocomplete from './Autocomplete';
+import inject18n from './i18n';
 
 const styles = () => ({
   icon: {

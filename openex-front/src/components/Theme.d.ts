@@ -7,67 +7,67 @@ import { Theme as MuiTheme, ThemeOptions } from '@mui/material/styles/createThem
 
 declare module '@mui/material/IconButton' {
   interface IconButtonPropsColorOverrides {
-    ee: true;
+    ee: true
   }
 }
 
 declare module '@mui/material/Button' {
   interface ButtonPropsColorOverrides {
-    ee: true;
+    ee: true
   }
 }
 
 declare module '@mui/material/Button' {
   interface ChipPropsColorOverrides {
-    ee: true;
+    ee: true
   }
 }
 
 declare module '@mui/material/SvgIcon' {
   interface SvgIconPropsColorOverrides {
-    ee: true;
+    ee: true
   }
 }
 
 interface ExtendedColor extends PaletteColorOptions {
-  main: string;
-  dark: string;
-  palette: ExtendedPaletteOptions;
-  text: Partial<TypeText>;
-  mode: PaletteMode;
-  background: string;
-  lightBackground: string;
-  contrastText: string;
+  main: string
+  dark: string
+  palette: ExtendedPaletteOptions
+  text: Partial<TypeText>
+  mode: PaletteMode
+  background: string
+  lightBackground: string
+  contrastText: string
 }
 
 interface ExtendedBackground extends TypeBackground {
-  nav: string;
-  accent: string;
-  shadow: string;
+  nav: string
+  accent: string
+  shadow: string
 }
 
 interface ExtendedPaletteOptions extends PaletteOptions {
-  common: Partial<CommonColors>;
-  background: Partial<ExtendedBackground>;
-  primary: Partial<ExtendedColor>;
-  error: Partial<ExtendedColor>;
-  success: Partial<ExtendedColor>;
-  chip: Partial<ExtendedColor>;
-  ee: Partial<ExtendedColor>;
-  secondary: Partial<ExtendedColor>;
-  mode: PaletteMode;
+  common: Partial<CommonColors>
+  background: Partial<ExtendedBackground>
+  primary: Partial<ExtendedColor>
+  error: Partial<ExtendedColor>
+  success: Partial<ExtendedColor>
+  chip: Partial<ExtendedColor>
+  ee: Partial<ExtendedColor>
+  secondary: Partial<ExtendedColor>
+  mode: PaletteMode
 }
 
 interface ExtendedThemeOptions extends ThemeOptions {
-  logo: string | null;
-  logo_collapsed: string | null;
-  palette: ExtendedPaletteOptions;
-  borderRadius: number;
+  logo: string | null
+  logo_collapsed: string | null
+  palette: ExtendedPaletteOptions
+  borderRadius: number
 }
 
 export interface Theme extends MuiTheme {
-  logo: string | undefined;
-  logo_collapsed: string | undefined;
-  borderRadius: number;
-  palette: ExtendedPaletteOptions;
+  logo: string | undefined
+  logo_collapsed: string | undefined
+  borderRadius: number
+  palette: ExtendedPaletteOptions
 }

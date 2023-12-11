@@ -9,7 +9,7 @@ import { truncate } from '../utils/String';
 import { Theme } from './Theme';
 
 interface MardDownComponentProps {
-  node?: unknown;
+  node?: unknown
 }
 
 export const MarkDownComponents = (theme: Theme) => ({
@@ -50,10 +50,10 @@ export const MarkDownComponents = (theme: Theme) => ({
 });
 
 interface Props {
-  source: string;
-  limit: number;
-  controlled?: boolean;
-  isExpanded?: boolean;
+  source: string
+  limit: number
+  controlled?: boolean
+  isExpanded?: boolean
 }
 
 const ExpandableMarkdow: React.FC<Props> = ({

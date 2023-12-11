@@ -8,8 +8,8 @@ import Box from '@mui/material/Box';
 import TextField from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
-import InjectIcon from './InjectIcon';
 import Autocomplete from '../../../../components/Autocomplete';
+import InjectIcon from './InjectIcon';
 
 const styles = (theme) => ({
   duration: {

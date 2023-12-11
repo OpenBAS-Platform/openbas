@@ -10,13 +10,13 @@ import Skeleton from '@mui/material/Skeleton';
 import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import { updateMedia, updateMediaLogos } from '../../../actions/Media';
+import useDataLoader from '../../../utils/ServerSideEvent';
+import { fetchDocuments } from '../../../actions/Document';
 import MediaParametersForm from './MediaParametersForm';
 import MediaOverviewNewspaper from './MediaOverviewNewspaper';
 import MediaOverviewMicroblogging from './MediaOverviewMicroblogging';
 import MediaOverviewTvChannel from './MediaOverviewTvChannel';
 import MediaAddLogo from './MediaAddLogo';
-import useDataLoader from '../../../utils/ServerSideEvent';
-import { fetchDocuments } from '../../../actions/Document';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -97,22 +97,23 @@ const Media = () => {
                 <Typography variant="h5" style={{ marginBottom: 20 }}>
                   {t('Dark theme')}
                 </Typography>
-                {logoDark ? (
-                  <img
-                    src={`/api/documents/${logoDark.document_id}/file`}
-                    style={{ maxHeight: 200, maxWidth: 200 }}
-                  />
-                ) : (
-                  <Skeleton
-                    sx={{ width: 200, height: 200 }}
-                    animation={false}
-                    variant="rectangular"
-                  />
-                )}
+                {logoDark
+                  ? (
+                    <img
+                      src={`/api/documents/${logoDark.document_id}/file`}
+                      style={{ maxHeight: 200, maxWidth: 200 }}
+                    />
+                    )
+                  : (
+                    <Skeleton
+                      sx={{ width: 200, height: 200 }}
+                      animation={false}
+                      variant="rectangular"
+                    />
+                    )}
                 {userAdmin && (
                   <MediaAddLogo
-                    handleAddLogo={(documentId) => submitLogo(documentId, 'dark')
-                    }
+                    handleAddLogo={(documentId) => submitLogo(documentId, 'dark')}
                   />
                 )}
               </Grid>
@@ -120,22 +121,23 @@ const Media = () => {
                 <Typography variant="h5" style={{ marginBottom: 20 }}>
                   {t('Light theme')}
                 </Typography>
-                {logoLight ? (
-                  <img
-                    src={`/api/documents/${logoLight.document_id}/file`}
-                    style={{ maxHeight: 200, maxWidth: 200 }}
-                  />
-                ) : (
-                  <Skeleton
-                    sx={{ width: 200, height: 200 }}
-                    animation={false}
-                    variant="rectangular"
-                  />
-                )}
+                {logoLight
+                  ? (
+                    <img
+                      src={`/api/documents/${logoLight.document_id}/file`}
+                      style={{ maxHeight: 200, maxWidth: 200 }}
+                    />
+                    )
+                  : (
+                    <Skeleton
+                      sx={{ width: 200, height: 200 }}
+                      animation={false}
+                      variant="rectangular"
+                    />
+                    )}
                 {userAdmin && (
                   <MediaAddLogo
-                    handleAddLogo={(documentId) => submitLogo(documentId, 'light')
-                    }
+                    handleAddLogo={(documentId) => submitLogo(documentId, 'light')}
                   />
                 )}
               </Grid>

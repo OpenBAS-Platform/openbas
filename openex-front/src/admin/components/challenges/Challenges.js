@@ -16,13 +16,13 @@ import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { fetchChallenges } from '../../../actions/Challenge';
-import ChallengePopover from './ChallengePopover';
-import CreateChallenge from './CreateChallenge';
 import { fetchTags } from '../../../actions/Tag';
 import TagsFilter from '../../../components/TagsFilter';
 import ItemTags from '../../../components/ItemTags';
 import { fetchDocuments } from '../../../actions/Document';
 import { fetchExercises } from '../../../actions/Exercise';
+import CreateChallenge from './CreateChallenge';
+import ChallengePopover from './ChallengePopover';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -186,7 +186,7 @@ const Challenges = () => {
             </span>
           </ListItemIcon>
           <ListItemText
-            primary={
+            primary={(
               <div>
                 {filtering.buildHeader(
                   'challenge_name',
@@ -219,7 +219,7 @@ const Challenges = () => {
                   headerStyles,
                 )}
               </div>
-            }
+            )}
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
@@ -237,7 +237,7 @@ const Challenges = () => {
                 <EmojiEventsOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={
+                primary={(
                   <div>
                     <div
                       className={classes.bodyItem}
@@ -291,7 +291,7 @@ const Challenges = () => {
                       />
                     </div>
                   </div>
-                }
+                )}
               />
               <ListItemSecondaryAction>
                 <ChallengePopover challenge={challenge} documents={docs} />

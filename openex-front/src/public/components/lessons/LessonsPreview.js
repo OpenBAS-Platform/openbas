@@ -157,7 +157,7 @@ const LessonsPlayer = () => {
                 const questions = sortQuestions(
                   lessonsQuestions.filter(
                     (n) => n.lessons_question_category
-                      === category.lessonscategory_id,
+                    === category.lessonscategory_id,
                   ),
                 );
                 return (
@@ -195,7 +195,7 @@ const LessonsPlayer = () => {
                               </Typography>
                               <Typography variant="body2">
                                 {question.lessons_question_explanation
-                                  || t('No explanation')}
+                                || t('No explanation')}
                               </Typography>
                             </Grid>
                             <Grid item={true} xs={3}>
@@ -232,7 +232,7 @@ const LessonsPlayer = () => {
                             </Grid>
                             <Grid item={true} xs={3}>
                               <Typography variant="h4">
-                                {t("What didn't work well")}
+                                {t('What didn\'t work well')}
                               </Typography>
                               <TextField
                                 style={{ marginTop: 10 }}
