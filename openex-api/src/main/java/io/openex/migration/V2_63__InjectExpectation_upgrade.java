@@ -38,6 +38,7 @@ public class V2_63__InjectExpectation_upgrade extends BaseJavaMigration {
         SELECT * FROM injects
         WHERE inject_type = 'openex_email' OR inject_type = 'openex_ovh_sms'
         """);
+    Statement statement = connection.createStatement();
     while (results.next()) {
       String id = results.getString("inject_id");
       String content = results.getString("inject_content");
@@ -49,12 +50,11 @@ public class V2_63__InjectExpectation_upgrade extends BaseJavaMigration {
         EmailContentOld email = mapper.readValue(content, EmailContentOld.class);
         content = mapper.writeValueAsString(email.toNewContent());
       }
-      PreparedStatement statement = connection.prepareStatement(
-          "UPDATE injects SET inject_content = ? WHERE inject_id = '" + id + "'"
+      statement.addBatch(
+          "UPDATE injects SET inject_content = "+ content +" WHERE inject_id = '" + id + "'"
       );
-      statement.setString(1, content);
-      statement.execute();
     }
+    statement.executeBatch();
   }
 
   @Data
