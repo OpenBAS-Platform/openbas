@@ -1,4 +1,4 @@
-package io.openex.injects.email.model;
+package io.openex.model.inject.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.InjectExpectation;

@@ -10,7 +10,7 @@ import io.openex.database.repository.UserRepository;
 import io.openex.execution.ExecutableInject;
 import io.openex.execution.ExecutionContext;
 import io.openex.injects.email.model.EmailContent;
-import io.openex.injects.email.model.Expectation;
+import io.openex.model.inject.form.Expectation;
 import io.openex.service.ContractService;
 import io.openex.service.ExecutionContextService;
 import org.junit.jupiter.api.Test;
