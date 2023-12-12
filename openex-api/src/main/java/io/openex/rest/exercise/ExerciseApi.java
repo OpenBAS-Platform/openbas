@@ -396,7 +396,7 @@ public class ExerciseApi extends RestBehavior {
     exercise.setUpdatedAt(now());
     Document doc = documentRepository.findById(documentId).orElseThrow();
     List<Exercise> docExercises = doc.getExercises().stream().filter(ex -> !ex.getId().equals(exerciseId)).toList();
-    if (docExercises.size() == 0) {
+    if (docExercises.isEmpty()) {
       // Document is no longer associate to any exercise, delete it
       documentRepository.delete(doc);
       // All associations with this document will be automatically cleanup.
