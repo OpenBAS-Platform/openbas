@@ -3,17 +3,17 @@ import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import ListItem from '@mui/material/ListItem';
 import { makeStyles } from '@mui/styles';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, AssignmentTurnedIn } from '@mui/icons-material';
+import List from '@mui/material/List';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import * as R from 'ramda';
 import { Theme } from '../../../../../components/Theme';
 import InjectAddExpectationManual from './InjectAddExpectationManual';
 import { Exercise } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
 import { ExpectationInput } from '../../../../../actions/Expectation';
-import List from '@mui/material/List';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import { truncate } from '../../../../../utils/String';
 import ExpectationManualPopover from './ExpectationManualPopover';
-import * as R from 'ramda';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
