@@ -2,7 +2,6 @@ HELP.md
 *.bat
 **/application-dev.properties
 target/
-!.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 logs/**
