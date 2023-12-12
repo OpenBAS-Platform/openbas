@@ -1,6 +1,9 @@
 kind: pipeline
+type: docker
 name: openex-tests-pull-request
-concurrency: 2
+concurrency: {
+  limit: 2
+}
 
 trigger:
   event:
