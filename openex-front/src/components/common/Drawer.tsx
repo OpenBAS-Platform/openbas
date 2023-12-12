@@ -4,7 +4,7 @@ import React, { FunctionComponent } from 'react';
 import { Close } from '@mui/icons-material';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
-import { Theme } from '../Theme';
+import type { Theme } from '../Theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   drawerPaper: {

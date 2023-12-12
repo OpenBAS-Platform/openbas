@@ -15,7 +15,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { deleteReport, updateReport } from '../../../../actions/Report';
 import Transition from '../../../../components/common/Transition';
 import { useAppDispatch } from '../../../../utils/hooks';
-import {
+import type {
   Exercise,
   Report,
   ReportUpdateInput,

@@ -24,7 +24,7 @@ import ExerciseForm from './ExerciseForm';
 import { deleteExercise, updateExercise } from '../../../actions/Exercise';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
 import Transition from '../../../components/common/Transition';
-import { Exercise, ExerciseUpdateInput } from '../../../utils/api-types';
+import type { Exercise, ExerciseUpdateInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({

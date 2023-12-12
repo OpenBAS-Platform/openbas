@@ -19,15 +19,15 @@ import ComcheckForm from './ComcheckForm';
 import DryrunForm from './DryrunForm';
 import { resolveUserName } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
-import { Theme } from '../../../../components/Theme';
+import type { Theme } from '../../../../components/Theme';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { ComcheckInput, Exercise } from '../../../../utils/api-types';
+import type { ComcheckInput, Exercise } from '../../../../utils/api-types';
 import { addComcheck } from '../../../../actions/Comcheck';
 import { addDryrun } from '../../../../actions/Dryrun';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import { useHelper } from '../../../../store';
-import {
+import type {
   AudiencesHelper,
   ExercicesHelper,
   UsersHelper,

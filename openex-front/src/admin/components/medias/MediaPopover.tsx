@@ -17,7 +17,7 @@ import { updateMedia } from '../../../actions/Media';
 import MediaForm from './MediaForm';
 import { useAppDispatch } from '../../../utils/hooks';
 import Transition from '../../../components/common/Transition';
-import { Media, MediaUpdateInput } from '../../../utils/api-types';
+import type { Media, MediaUpdateInput } from '../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   button: {

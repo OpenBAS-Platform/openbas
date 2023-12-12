@@ -22,8 +22,8 @@ import { useHelper } from '../store';
 import Challenges from './components/challenges/Challenges';
 import LessonsTemplates from './components/lessons/LessonsTemplates';
 import IndexLessonsTemplate from './components/lessons/Index';
-import { Theme } from '../components/Theme';
-import { LoggedHelper } from '../actions/helper';
+import type { Theme } from '../components/Theme';
+import type { LoggedHelper } from '../actions/helper';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   toolbar: theme.mixins.toolbar,

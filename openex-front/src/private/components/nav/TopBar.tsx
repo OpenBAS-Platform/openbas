@@ -10,7 +10,7 @@ import { makeStyles, useTheme } from '@mui/styles';
 import { logout } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';
 import { useAppDispatch } from '../../../utils/hooks';
-import { Theme } from '../../../components/Theme';
+import type { Theme } from '../../../components/Theme';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   appBar: {

@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import MuiTextField from '@mui/material/TextField';
 import { z } from 'zod';
 import { useFormatter } from '../../../../components/i18n';
-import { VariableInput } from '../../../../utils/api-types';
+import type { VariableInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 
 interface Props {

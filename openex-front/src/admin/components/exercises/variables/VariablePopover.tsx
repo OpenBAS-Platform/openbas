@@ -11,7 +11,7 @@ import Button from '@mui/material/Button';
 import DialogTitle from '@mui/material/DialogTitle';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { useFormatter } from '../../../../components/i18n';
-import { Exercise, Variable, VariableInput } from '../../../../utils/api-types';
+import type { Exercise, Variable, VariableInput } from '../../../../utils/api-types';
 import VariableForm from './VariableForm';
 import { deleteVariable, updateVariable } from '../../../../actions/Variable';
 import { useAppDispatch } from '../../../../utils/hooks';

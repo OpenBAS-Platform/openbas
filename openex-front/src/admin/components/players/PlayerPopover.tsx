@@ -16,7 +16,7 @@ import { useFormatter } from '../../../components/i18n';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
 import { useAppDispatch } from '../../../utils/hooks';
 import Transition from '../../../components/common/Transition';
-import { UpdatePlayerInput } from '../../../utils/api-types';
+import type { UpdatePlayerInput } from '../../../utils/api-types';
 import {
   countryOption,
   Option,
@@ -24,13 +24,13 @@ import {
   tagOptions,
 } from '../../../utils/Option';
 import { useHelper } from '../../../store';
-import {
+import type {
   ExercicesHelper,
   OrganizationsHelper,
   TagsHelper,
   UsersHelper,
 } from '../../../actions/helper';
-import { PlayerInputForm, UserStore } from './Player';
+import type { PlayerInputForm, UserStore } from './Player';
 
 interface PlayerPopoverProps {
   user: UserStore;

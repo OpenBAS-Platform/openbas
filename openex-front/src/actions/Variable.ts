@@ -6,7 +6,7 @@ import {
   postReferential,
   delReferential,
 } from '../utils/Action';
-import { Exercise, Variable, VariableInput } from '../utils/api-types';
+import type { Exercise, Variable, VariableInput } from '../utils/api-types';
 
 export const addVariable = (exerciseId: Exercise['exercise_id'], data: VariableInput) => (dispatch: Dispatch) => {
   const uri = `/api/exercises/${exerciseId}/variables`;

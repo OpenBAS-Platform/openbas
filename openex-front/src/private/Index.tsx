@@ -5,7 +5,7 @@ import TopBar from './components/nav/TopBar';
 import Dashboard from './components/Dashboard';
 import useDataLoader from '../utils/ServerSideEvent';
 import { errorWrapper } from '../components/Error';
-import { Theme } from '../components/Theme';
+import type { Theme } from '../components/Theme';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {

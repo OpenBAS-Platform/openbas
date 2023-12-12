@@ -26,8 +26,8 @@ import { createStyles, makeStyles, styled, useTheme } from '@mui/styles';
 import { MESSAGING$ } from '../../../utils/Environment';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import { UsersHelper } from '../../../actions/helper';
-import { Theme } from '../../../components/Theme';
+import type { UsersHelper } from '../../../actions/helper';
+import type { Theme } from '../../../components/Theme';
 
 const useStyles = makeStyles<Theme>((theme) => createStyles({
   drawerPaper: {

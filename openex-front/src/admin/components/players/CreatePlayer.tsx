@@ -9,10 +9,10 @@ import PlayerForm from './PlayerForm';
 import { useFormatter } from '../../../components/i18n';
 import Dialog from '../../../components/common/Dialog';
 import { useAppDispatch } from '../../../utils/hooks';
-import { Theme } from '../../../components/Theme';
-import { CreatePlayerInput } from '../../../utils/api-types';
+import type { Theme } from '../../../components/Theme';
+import type { CreatePlayerInput } from '../../../utils/api-types';
 import { Option } from '../../../utils/Option';
-import { PlayerInputForm } from './Player';
+import type { PlayerInputForm } from './Player';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {

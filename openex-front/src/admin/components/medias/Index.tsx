@@ -10,7 +10,7 @@ import { errorWrapper } from '../../../components/Error';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
 import { useAppDispatch } from '../../../utils/hooks';
-import { MediasHelper } from '../../../actions/helper';
+import type { MediasHelper } from '../../../actions/helper';
 
 const useStyles = makeStyles(() => ({
   root: {

@@ -12,7 +12,7 @@ import { useFormatter } from '../../../../components/i18n';
 import VariableForm from './VariableForm';
 import { addVariable } from '../../../../actions/Variable';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { VariableInput } from '../../../../utils/api-types';
+import type { VariableInput } from '../../../../utils/api-types';
 import Transition from '../../../../components/common/Transition';
 
 const useStyles = makeStyles((theme: Theme) => ({

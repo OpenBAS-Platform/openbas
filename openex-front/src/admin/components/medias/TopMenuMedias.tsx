@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../components/i18n';
-import { Theme } from '../../../components/Theme';
+import type { Theme } from '../../../components/Theme';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   button: {

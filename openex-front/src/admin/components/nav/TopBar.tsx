@@ -24,7 +24,7 @@ import TopMenuLessons from './TopMenuLessons';
 import ImportUploader from '../exercises/ImportUploader';
 import TopMenuMedia from './TopMenuMedia';
 import TopMenuProfile from './TopMenuProfile';
-import { Theme } from '../../../components/Theme';
+import type { Theme } from '../../../components/Theme';
 import { useAppDispatch } from '../../../utils/hooks';
 import { MESSAGING$ } from '../../../utils/Environment';
 

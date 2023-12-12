@@ -17,7 +17,7 @@ import Comcheck from './public/components/comcheck/Comcheck';
 import Media from './public/components/medias/Media';
 import Challenges from './public/components/challenges/Challenges';
 import Lessons from './public/components/lessons/Lessons';
-import { LoggedHelper } from './actions/helper';
+import type { LoggedHelper } from './actions/helper';
 
 const Root = () => {
   const logged = useHelper((helper: LoggedHelper) => helper.logged());

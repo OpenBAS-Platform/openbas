@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import countries from '../static/geo/countries.json';
-import { Exercise, Organization, Tag } from './api-types';
+import type { Exercise, Organization, Tag } from './api-types';
 
 export interface Option {
   id: string;
