@@ -1,19 +1,19 @@
 import React, { FunctionComponent, useState } from 'react';
-import List from '@mui/material/List';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import ListItem from '@mui/material/ListItem';
 import { makeStyles } from '@mui/styles';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, AssignmentTurnedIn } from '@mui/icons-material';
 import { Theme } from '../../../../../components/Theme';
 import InjectAddExpectationManual from './InjectAddExpectationManual';
 import { Exercise } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
-import ExpectationManualPopover from './ExpectationManualPopover';
 import { ExpectationInput } from '../../../../../actions/Expectation';
+import List from '@mui/material/List';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import { truncate } from '../../../../../utils/String';
+import ExpectationManualPopover from './ExpectationManualPopover';
+import * as R from 'ramda';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -124,6 +124,13 @@ const InjectExpectationsManual: FunctionComponent<InjectExpectationsProps> = ({
     );
   };
 
+  const sortExpectations = R.sortWith(
+    sortAsc
+      ? [R.ascend(R.prop(sortBy))]
+      : [R.descend(R.prop(sortBy))],
+  );
+  const sortedExpectations: ExpectationInput[] = sortExpectations(expectations);
+
   return (
     <>
       <List>
@@ -142,14 +149,14 @@ const InjectExpectationsManual: FunctionComponent<InjectExpectationsProps> = ({
           <ListItemSecondaryAction>
           </ListItemSecondaryAction>
         </ListItem>
-        {expectations?.map((expectation, idx) => (
+        {sortedExpectations?.map((expectation, idx) => (
           <ListItem
             key={idx}
             classes={{ root: classes.item }}
             divider={true}
           >
             <ListItemIcon>
-              <AssignmentTurnedInIcon />
+              <AssignmentTurnedIn />
             </ListItemIcon>
             <ListItemText
               primary={

@@ -236,7 +236,7 @@ const i18n = {
       'No injects to send in this platform.':
         'Aucun stimuli à envoyer dans cette plateforme.',
       'Before starting the exercise, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.':
-        "Avant de démarrer l'exercice, vous pouvez lancer une vérification pour valider les adresses emails et une simulation pour envoyer les stimulis à l'équipe d'animation.",
+        "Avant de démarrer l’exercice, vous pouvez lancer une vérification pour valider les adresses emails et une simulation pour envoyer les stimulis à l'équipe d’animation.",
       'Applying a template will add all categories and questions of the selected template to this exercise.':
         'Appliquer un template va ajouter toutes les catégories et questions du template sélectionné à cet exercice.',
       'Apply a template': 'Appliquer un template',

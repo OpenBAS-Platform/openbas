@@ -54,7 +54,7 @@ const ExpectationManualForm: FunctionComponent<ExpectationFormProps> = ({
       <MuiTextField
         placeholder={t('The animation team can validate the audience reaction')}
         variant="standard"
-        fullWidth={true}
+        fullWidth
         label={t('Name')}
         error={!!errors.expectation_name}
         helperText={
@@ -64,9 +64,10 @@ const ExpectationManualForm: FunctionComponent<ExpectationFormProps> = ({
       />
       <MuiTextField
         variant="standard"
-        fullWidth={true}
+        fullWidth
         label={t('Description')}
         style={{ marginTop: 20 }}
+        multiline
         error={!!errors.expectation_description}
         helperText={
           errors.expectation_description && errors.expectation_description?.message
@@ -75,7 +76,7 @@ const ExpectationManualForm: FunctionComponent<ExpectationFormProps> = ({
       />
       <MuiTextField
         variant="standard"
-        fullWidth={true}
+        fullWidth
         label={t('Score')}
         type="number"
         style={{ marginTop: 20 }}
