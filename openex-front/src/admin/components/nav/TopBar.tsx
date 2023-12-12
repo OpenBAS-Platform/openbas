@@ -142,7 +142,7 @@ const TopBar: React.FC = () => {
           {location.pathname.includes('/admin/profile') && <TopMenuProfile />}
         </div>
         <div className={classes.barRight}>
-          <Button component={ImportUploader}>{t('Import exercise')}</Button>
+          <Button component={ImportUploader}>{t('Import an exercise')}</Button>
           <IconButton
             onClick={handleOpen}
             size="small"
