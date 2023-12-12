@@ -12,11 +12,11 @@ import MuiTextField from '@mui/material/TextField';
 import { makeStyles } from '@mui/styles';
 import Divider from '@mui/material/Divider';
 import Transition from '../../../../components/common/Transition';
-import { InjectExpectationsStore } from '../injects/expectations/Expectation';
+import type { InjectExpectationsStore } from '../injects/expectations/Expectation';
 import { useFormatter } from '../../../../components/i18n';
 import { updateInjectExpectations } from '../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { ExpectationUpdateInput, Inject } from '../../../../utils/api-types';
+import type { ExpectationUpdateInput, Inject } from '../../../../utils/api-types';
 import ItemTags from '../../../../components/ItemTags';
 import ExpandableText from '../../../../components/common/ExpendableText';
 
@@ -86,7 +86,7 @@ const DialogExpectationsForm: FunctionComponent<FormProps> = ({
         const expectation = expectations[index];
         return (
           <div key={field.id}>
-            { index !== 0 && <Divider className={classes.m_bt_20}/> }
+            {index !== 0 && <Divider className={classes.m_bt_20} />}
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={8}>
                 <Typography variant="h3">{t('Name')}</Typography>
@@ -105,10 +105,13 @@ const DialogExpectationsForm: FunctionComponent<FormProps> = ({
                   inputProps={register(`expectations.${index}.expectation_score`)}
                 />
               </Grid>
-              <Grid item={true} xs={12}>
-                <Typography variant="h3">{t('Description')}</Typography>
-                <ExpandableText source={expectation.inject_expectation_description} limit={120}/>
-              </Grid>
+              {
+                expectation.inject_expectation_description
+                && <Grid item={true} xs={12}>
+                  <Typography variant="h3">{t('Description')}</Typography>
+                  <ExpandableText source={expectation.inject_expectation_description} limit={120} />
+                </Grid>
+              }
             </Grid>
           </div>
         );

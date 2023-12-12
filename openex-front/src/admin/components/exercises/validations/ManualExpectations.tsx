@@ -6,12 +6,12 @@ import Chip from '@mui/material/Chip';
 import List from '@mui/material/List';
 import { makeStyles } from '@mui/styles';
 import { ListItemButton } from '@mui/material';
-import { Audience, Inject } from '../../../../utils/api-types';
+import type { Audience, Inject } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
-import { AudiencesHelper } from '../../../../actions/helper';
-import { InjectExpectationsStore } from '../injects/expectations/Expectation';
+import type { AudiencesHelper } from '../../../../actions/helper';
+import type { InjectExpectationsStore } from '../injects/expectations/Expectation';
 import { useFormatter } from '../../../../components/i18n';
-import { Theme } from '../../../../components/Theme';
+import type { Theme } from '../../../../components/Theme';
 import colorStyles from '../../../../components/Color';
 import DialogExpectations from './DialogExpectations';
 
