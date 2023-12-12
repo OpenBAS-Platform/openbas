@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import MDEditor from '@uiw/react-md-editor/nohighlight';
 import { useTheme } from '@mui/material';
 import { truncate } from '../utils/String';
-import { Theme } from './Theme';
+import type { Theme } from './Theme';
 
 interface MardDownComponentProps {
   node?: unknown;

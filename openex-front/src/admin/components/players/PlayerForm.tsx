@@ -8,8 +8,8 @@ import { useFormatter } from '../../../components/i18n';
 import TagField from '../../../components/TagField';
 import OrganizationField from '../../../components/OrganizationField';
 import CountryField from '../../../components/CountryField';
-import { Theme } from '../../../components/Theme';
-import { PlayerInputForm } from './Player';
+import type { Theme } from '../../../components/Theme';
+import type { PlayerInputForm } from './Player';
 import { schemaValidator } from '../../../utils/Zod';
 
 const useStyles = makeStyles((theme: Theme) => ({

@@ -12,12 +12,12 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { CopyAllOutlined } from '@mui/icons-material';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import { Contract, User, Variable } from '../../../../utils/api-types';
+import type { Contract, User, Variable } from '../../../../utils/api-types';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchVariables, VariablesHelper } from '../../../../actions/Variable';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { UsersHelper } from '../../../../actions/helper';
+import type { UsersHelper } from '../../../../actions/helper';
 import { copyToClipboard } from '../../../../utils/CopyToClipboard';
 
 interface VariableChildItemProps {

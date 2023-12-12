@@ -3,7 +3,7 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { RowingOutlined, ArrowForwardIosOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { Theme } from '../../../components/Theme';
+import type { Theme } from '../../../components/Theme';
 import { useFormatter } from '../../../components/i18n';
 
 const useStyles = makeStyles<Theme>((theme) => ({

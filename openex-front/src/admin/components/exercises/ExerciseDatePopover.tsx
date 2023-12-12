@@ -9,7 +9,7 @@ import { updateExerciseStartDate } from '../../../actions/Exercise';
 import { useFormatter } from '../../../components/i18n';
 import ExerciseDateForm from './ExerciseDateForm';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
-import { Exercise } from '../../../utils/api-types';
+import type { Exercise } from '../../../utils/api-types';
 import Transition from '../../../components/common/Transition';
 import { useAppDispatch } from '../../../utils/hooks';
 

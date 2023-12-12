@@ -20,7 +20,7 @@ import {
   updateLessonsTemplate,
 } from '../../../actions/Lessons';
 import Transition from '../../../components/common/Transition';
-import {
+import type {
   LessonsTemplate,
   LessonsTemplateUpdateInput,
 } from '../../../utils/api-types';

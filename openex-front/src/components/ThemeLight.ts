@@ -2,7 +2,7 @@ import LogoText from '../static/images/logo_text.png';
 import LogoCollapsed from '../static/images/logo.png';
 import { fileUri } from '../utils/Environment';
 import { hexToRGB } from '../utils/Colors';
-import { ExtendedThemeOptions } from './Theme';
+import type { ExtendedThemeOptions } from './Theme';
 
 const EE_COLOR = '#0066ff';
 

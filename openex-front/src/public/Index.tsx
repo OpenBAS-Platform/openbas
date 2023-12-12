@@ -9,7 +9,7 @@ import Media from './components/medias/Media';
 import Challenges from './components/challenges/Challenges';
 import Lessons from './components/lessons/Lessons';
 import Reset from './components/login/Reset';
-import { Theme } from '../components/Theme';
+import type { Theme } from '../components/Theme';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {

@@ -27,7 +27,7 @@ import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
 import Report from './reports/Report';
 import Variables from './variables/Variables';
-import { ExercicesHelper } from '../../../actions/helper';
+import type { ExercicesHelper } from '../../../actions/helper';
 import { useAppDispatch } from '../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({

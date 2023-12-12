@@ -13,8 +13,8 @@ import {
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../components/i18n';
-import { Exercise } from '../../../utils/api-types';
-import { Theme } from '../../../components/Theme';
+import type { Exercise } from '../../../utils/api-types';
+import type { Theme } from '../../../components/Theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   drawer: {

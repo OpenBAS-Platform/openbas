@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFormatter } from '../../../components/i18n';
 import { importingExercise } from '../../../actions/Exercise';
 import { useHelper } from '../../../store';
-import { UsersHelper } from '../../../actions/helper';
+import type { UsersHelper } from '../../../actions/helper';
 import { useAppDispatch } from '../../../utils/hooks';
 
 interface Props {

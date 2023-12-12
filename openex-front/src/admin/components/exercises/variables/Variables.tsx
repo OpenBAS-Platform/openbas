@@ -11,14 +11,14 @@ import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import SearchFilter from '../../../../components/SearchFilter';
 import DefinitionMenu from '../DefinitionMenu';
 import { useHelper } from '../../../../store';
-import { Exercise, Variable } from '../../../../utils/api-types';
+import type { Exercise, Variable } from '../../../../utils/api-types';
 import { usePermissions } from '../../../../utils/Exercise';
 import CreateVariable from './CreateVariable';
 import VariablePopover from './VariablePopover';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchVariables, VariablesHelper } from '../../../../actions/Variable';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { ExercicesHelper } from '../../../../actions/helper';
+import type { ExercicesHelper } from '../../../../actions/helper';
 
 const useStyles = makeStyles(() => ({
   container: {

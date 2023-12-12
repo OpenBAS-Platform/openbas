@@ -5,7 +5,7 @@ import InputLabel from '@mui/material/InputLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import { useTheme } from '@mui/material';
 import { useFormatter } from './i18n';
-import { Theme } from './Theme';
+import type { Theme } from './Theme';
 
 interface Props {
   label: string;
