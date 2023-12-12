@@ -1,5 +1,6 @@
 kind: pipeline
 name: openex-tests-pull-request
+concurrency: 2
 
 trigger:
   event:
@@ -20,6 +21,8 @@ steps:
       MINIO_ACCESS-SECRET: minioadmin
     commands:
       - mvn install
+    depends_on:
+      - submodules
 
   - name: frontend-tests
     image: node:20.10.0-alpine3.18
