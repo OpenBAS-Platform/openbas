@@ -557,8 +557,8 @@ const i18n = {
       // -- Expectation start --
       Expectation: 'Attendu',
       'Expectation score': "Score de l'attendu",
-      'Add expectations': 'Ajouter des attendus',
-      'Add expectation in this inject': 'Ajouter des attendus dans ce stimuli',
+      'Add manual expectations': 'Ajouter des attendus manuelles',
+      'Add manual expectation in this inject': 'Ajouter des attendus manuelles dans ce stimuli',
       'Update the expectation': 'Modifier l\'attendu',
       'Do you want to delete this expectation ?': 'Voulez vous supprimer cet attendu ?',
       // -- Expectation end --

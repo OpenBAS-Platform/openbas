@@ -134,10 +134,7 @@ const InjectExpectationsManual: FunctionComponent<InjectExpectationsProps> = ({
   return (
     <>
       <List>
-        <ListItem
-          classes={{ root: classes.item }}
-          divider={true}
-        >
+        <ListItem classes={{ root: classes.item }}>
           <ListItemIcon>
           </ListItemIcon>
           <ListItemText

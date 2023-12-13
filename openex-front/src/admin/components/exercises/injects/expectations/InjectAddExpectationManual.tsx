@@ -59,14 +59,14 @@ const InjectAddExpectationManual: FunctionComponent<InjectAddExpectationProps> =
           <ControlPointOutlined color="primary" />
         </ListItemIcon>
         <ListItemText
-          primary={t('Add expectations')}
+          primary={t('Add manual expectations')}
           classes={{ primary: classes.text }}
         />
       </ListItemButton>
       <Dialog
         open={openDialog}
         handleClose={handleClose}
-        title={t('Add expectation in this inject')}>
+        title={t('Add manual expectation in this inject')}>
         <ExpectationManualForm onSubmit={onSubmit} handleClose={handleClose} />
       </Dialog>
     </>
