@@ -16,7 +16,7 @@ import io.openex.service.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.activation.MimetypesFileTypeMap;
+import jakarta.activation.MimetypesFileTypeMap;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
