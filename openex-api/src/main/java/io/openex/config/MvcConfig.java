@@ -1,6 +1,7 @@
 package io.openex.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Resource;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +22,7 @@ public class MvcConfig implements WebMvcConfigurer {
 
   private final static int CACHE_PERIOD = 3600;
 
-  @javax.annotation.Resource
+  @Resource
   private ObjectMapper objectMapper;
 
   @Bean

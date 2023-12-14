@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
+import jakarta.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Spliterator;
 
 import static io.openex.database.audit.ModelBaseListener.DATA_UPDATE;

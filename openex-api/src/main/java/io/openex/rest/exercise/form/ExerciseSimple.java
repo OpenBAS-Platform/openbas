@@ -7,8 +7,8 @@ import io.openex.database.model.Tag;
 import io.openex.helper.MultiIdDeserializer;
 import org.springframework.beans.BeanUtils;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

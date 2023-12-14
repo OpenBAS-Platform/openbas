@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.openex.database.model.Variable;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import static io.openex.rest.exercise.exports.VariableMixin.*;
 import static io.openex.rest.exercise.exports.VariableWithValueMixin.VARIABLE_VALUE;

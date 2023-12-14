@@ -23,8 +23,6 @@
         <springdoc.version>1.7.0</springdoc.version>
         <springdoc-plugin.version>1.4</springdoc-plugin.version>
         <jacoco-plugin.version>0.8.11</jacoco-plugin.version>
-
-        <spring-security.version>5.8.8</spring-security.version>
     </properties>
 
     <profiles>
@@ -133,8 +131,8 @@
             <version>${commons-validator.version}</version>
         </dependency>
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>

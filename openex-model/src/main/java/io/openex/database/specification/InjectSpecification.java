@@ -2,11 +2,10 @@ package io.openex.database.specification;
 
 import io.openex.database.model.Exercise;
 import io.openex.database.model.Inject;
-// import io.openex.injects.manual.ManualContract;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Path;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Path;
 
 public class InjectSpecification {
 

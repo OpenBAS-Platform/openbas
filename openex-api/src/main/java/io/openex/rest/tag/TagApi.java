@@ -8,8 +8,8 @@ import io.openex.rest.tag.form.TagUpdateInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
-import javax.validation.Valid;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.Valid;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
 

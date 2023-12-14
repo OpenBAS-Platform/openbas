@@ -3,7 +3,7 @@ package io.openex.database.specification;
 import io.openex.database.model.DryInject;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.JoinType;
 
 public class DryInjectSpecification {
 

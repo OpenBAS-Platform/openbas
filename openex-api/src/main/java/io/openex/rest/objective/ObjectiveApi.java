@@ -17,7 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import static io.openex.config.SessionHelper.currentUser;
 import static io.openex.helper.DatabaseHelper.resolveRelation;

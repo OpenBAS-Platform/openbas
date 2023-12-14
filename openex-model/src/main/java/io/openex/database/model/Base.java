@@ -2,7 +2,7 @@ package io.openex.database.model;
 
 import org.springframework.beans.BeanUtils;
 
-import javax.persistence.Transient;
+import jakarta.persistence.Transient;
 
 public interface Base {
     String getId();
