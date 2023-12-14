@@ -1,4 +1,4 @@
-FROM maven:3.8.7-openjdk-18 AS api-builder
+FROM maven:3.9.6-eclipse-temurin-21 AS api-builder
 
 WORKDIR /opt/openex-build/openex
 COPY openex-model ./openex-model
@@ -10,7 +10,7 @@ COPY openex-front/builder/prod/build ./openex-front/builder/prod/build
 COPY pom.xml ./pom.xml
 RUN mvn install -DskipTests -Pdev
 
-FROM openjdk:18-slim AS app
+FROM eclipse-temurin:21-jre AS app
 
 RUN ln -s /usr/bin/dpkg-split /usr/sbin/dpkg-split
 RUN ln -s /usr/bin/dpkg-deb /usr/sbin/dpkg-deb
