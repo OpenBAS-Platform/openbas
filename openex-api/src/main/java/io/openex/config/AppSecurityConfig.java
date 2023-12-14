@@ -11,13 +11,16 @@ import io.openex.security.SsoRefererAuthenticationFailureHandler;
 import io.openex.security.SsoRefererAuthenticationSuccessHandler;
 import io.openex.security.TokenAuthenticationFilter;
 import io.openex.service.UserService;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -37,15 +40,13 @@ import org.springframework.security.saml2.provider.service.authentication.Saml2A
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticationException;
 import org.springframework.security.saml2.provider.service.metadata.OpenSamlMetadataResolver;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
-import org.springframework.security.saml2.provider.service.web.authentication.Saml2WebSsoAuthenticationFilter;
 import org.springframework.security.saml2.provider.service.web.DefaultRelyingPartyRegistrationResolver;
-import org.springframework.security.saml2.provider.service.web.RelyingPartyRegistrationResolver;
 import org.springframework.security.saml2.provider.service.web.Saml2MetadataFilter;
+import org.springframework.security.saml2.provider.service.web.authentication.Saml2WebSsoAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
-import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -100,51 +101,53 @@ public class AppSecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-        .requestCache()
-        /**/.requestCache(new HttpSessionRequestCache())
-        .and()
-        .csrf()
-        /**/.disable()
-        .formLogin()
-        /**/.disable()
-        .authorizeHttpRequests()
-        /**/.requestMatchers("/api/comcheck/**").permitAll()
-        /**/.requestMatchers("/api/player/**").permitAll()
-        /**/.requestMatchers("/api/settings").permitAll()
-        /**/.requestMatchers("/api/login").permitAll()
-        /**/.requestMatchers("/api/reset/**").permitAll()
-        /**/.requestMatchers("/api/**").authenticated()
-        .and()
-        .logout()
-        /**/.invalidateHttpSession(true)
-        /**/.deleteCookies("JSESSIONID", openExConfig.getCookieName())
-        /**/.logoutSuccessUrl(env.getProperty("openex.logout-success-url", String.class, "/"));
+        .requestCache(Customizer.withDefaults())
+        /**/.requestCache((cache) -> cache.requestCache(new HttpSessionRequestCache()))
+        .csrf(AbstractHttpConfigurer::disable)
+        .formLogin(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(
+            rq -> rq.requestMatchers("/api/comcheck/**").permitAll()
+                .requestMatchers("/api/player/**").permitAll()
+                .requestMatchers("/api/settings").permitAll()
+                .requestMatchers("/api/login").permitAll()
+                .requestMatchers("/api/reset/**").permitAll()
+                .requestMatchers("/api/**").authenticated()
+        )
+        .logout(
+            logout -> logout.invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID", openExConfig.getCookieName())
+                .logoutSuccessUrl(env.getProperty("openex.logout-success-url", String.class, "/"))
+        );
 
     if (openExConfig.isAuthOpenidEnable()) {
-      http.oauth2Login()
-          .successHandler(new SsoRefererAuthenticationSuccessHandler())
-          .failureHandler(new SsoRefererAuthenticationFailureHandler());
+      http.oauth2Login(
+          login -> login.successHandler(new SsoRefererAuthenticationSuccessHandler())
+              .failureHandler(new SsoRefererAuthenticationFailureHandler())
+      );
     }
 
     if (openExConfig.isAuthSaml2Enable()) {
       DefaultRelyingPartyRegistrationResolver relyingPartyRegistrationResolver = new DefaultRelyingPartyRegistrationResolver(
           this.relyingPartyRegistrationRepository);
       Saml2MetadataFilter filter = new Saml2MetadataFilter(
-          (RelyingPartyRegistrationResolver) relyingPartyRegistrationResolver,
+          relyingPartyRegistrationResolver,
           new OpenSamlMetadataResolver());
 
       OpenSaml4AuthenticationProvider authenticationProvider = getOpenSaml4AuthenticationProvider();
 
-      http
-          .addFilterBefore(filter, Saml2WebSsoAuthenticationFilter.class)
-          .saml2Login()
-          .authenticationManager(new ProviderManager(authenticationProvider))
-          .successHandler(new SsoRefererAuthenticationSuccessHandler());
+      http.addFilterBefore(filter, Saml2WebSsoAuthenticationFilter.class)
+          .saml2Login(
+              saml2Login -> saml2Login
+                  .authenticationManager(new ProviderManager(authenticationProvider))
+                  .successHandler(new SsoRefererAuthenticationSuccessHandler())
+          );
     }
 
     // Rewrite 403 code to 401
-    http.exceptionHandling().authenticationEntryPoint(
-        (request, response, authException) -> response.setStatus(HttpStatus.UNAUTHORIZED.value()));
+    http.exceptionHandling(
+        exceptionHandling -> exceptionHandling.authenticationEntryPoint(
+            (request, response, authException) -> response.setStatus(HttpStatus.UNAUTHORIZED.value()))
+    );
 
     return http.build();
   }
