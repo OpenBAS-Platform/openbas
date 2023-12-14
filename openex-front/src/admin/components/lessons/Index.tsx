@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
+import { LessonsTemplatesHelper } from 'src/actions/lessons/lesson';
 import Loader from '../../../components/Loader';
 import TopBar from '../nav/TopBar';
 import LessonsTemplate from './LessonsTemplate';
@@ -10,7 +11,6 @@ import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
 import { fetchLessonsTemplates } from '../../../actions/Lessons';
 import { useAppDispatch } from '../../../utils/hooks';
-import type { LessonsTemplatesHelper } from '../../../actions/helper';
 
 const useStyles = makeStyles(() => ({
   root: {
