@@ -32,7 +32,7 @@ import static java.time.Instant.now;
 @Service
 public class UserService {
 
-  private final Argon2PasswordEncoder passwordEncoder = new Argon2PasswordEncoder();
+  private final Argon2PasswordEncoder passwordEncoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_2();
   private UserRepository userRepository;
   private TokenRepository tokenRepository;
   private TagRepository tagRepository;

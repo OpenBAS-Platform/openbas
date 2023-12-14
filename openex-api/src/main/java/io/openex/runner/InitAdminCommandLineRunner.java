@@ -59,7 +59,7 @@ public class InitAdminCommandLineRunner implements CommandLineRunner {
   // -- USER --
 
   private String encodedPassword() {
-    Argon2PasswordEncoder passwordEncoder = new Argon2PasswordEncoder();
+    Argon2PasswordEncoder passwordEncoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_2();
     return passwordEncoder.encode(this.adminPassword);
   }
 
