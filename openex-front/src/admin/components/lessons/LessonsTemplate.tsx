@@ -9,24 +9,24 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { HelpOutlined } from '@mui/icons-material';
+import { ListItemButton } from '@mui/material';
 import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import CreateLessonsTemplateCategory from './categories/CreateLessonsTemplateCategory';
 import useDataLoader from '../../../utils/ServerSideEvent';
-import { fetchLessonsTemplateCategories, fetchLessonsTemplateQuestions, } from '../../../actions/Lessons';
+import { fetchLessonsTemplateCategories, fetchLessonsTemplateQuestions } from '../../../actions/Lessons';
 import LessonsTemplateCategoryPopover from './categories/LessonsTemplateCategoryPopover';
 import CreateLessonsTemplateQuestion from './categories/questions/CreateLessonsTemplateQuestion';
 import LessonsTemplateQuestionPopover from './categories/questions/LessonsTemplateQuestionPopover';
 import { useAppDispatch } from '../../../utils/hooks';
-import { ListItemButton } from '@mui/material';
-import { LessonsTemplatesHelper } from '../../../actions/lessons/lesson';
-import { UsersHelper } from '../../../actions/helper';
-import { LessonsTemplateCategory, LessonsTemplateQuestion } from '../../../utils/api-types';
+import type { LessonsTemplatesHelper } from '../../../actions/lessons/lesson';
+import type { UsersHelper } from '../../../actions/helper';
+import type { LessonsTemplateCategory, LessonsTemplateQuestion } from '../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   container: {
-    display: 'flex'
-  }
+    display: 'flex',
+  },
 }));
 
 const LessonsTemplate = () => {
@@ -40,7 +40,7 @@ const LessonsTemplate = () => {
   const {
     userAdmin,
     categories,
-    questions
+    questions,
   }: {
     userAdmin: boolean,
     categories: LessonsTemplateCategory[],
@@ -59,10 +59,10 @@ const LessonsTemplate = () => {
 
   // Utils
   const categoriesSorted = categories
-    .sort((c1, c2) => (c1.lessons_template_category_order ?? 0) > (c2.lessons_template_category_order ?? 0) ? 1 : -1);
-  const sortQuestions = (questions: LessonsTemplateQuestion[]) => {
-    return questions
-      .sort((q1, q2) => (q1.lessons_template_question_order ?? 0) > (q2.lessons_template_question_order ?? 0) ? 1 : -1);
+    .sort((c1, c2) => ((c1.lessons_template_category_order ?? 0) > (c2.lessons_template_category_order ?? 0) ? 1 : -1));
+  const sortQuestions = (qs: LessonsTemplateQuestion[]) => {
+    return qs
+      .sort((q1, q2) => ((q1.lessons_template_question_order ?? 0) > (q2.lessons_template_question_order ?? 0) ? 1 : -1));
   };
 
   return (
@@ -74,7 +74,7 @@ const LessonsTemplate = () => {
       >
         {categoriesSorted.map((category) => {
           const questionsSorted = sortQuestions(
-            questions.filter((q) => q.lessons_template_question_category === category.lessonstemplatecategory_id)
+            questions.filter((q) => q.lessons_template_question_category === category.lessonstemplatecategory_id),
           );
           return (
             <Grid
