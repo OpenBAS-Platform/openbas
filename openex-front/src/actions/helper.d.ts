@@ -1,7 +1,6 @@
 import type {
   Audience,
   Exercise,
-  LessonsTemplate,
   Media,
   Organization,
   Tag,
@@ -30,12 +29,6 @@ export interface AudiencesHelper {
 
 export interface MediasHelper {
   getMedia: (mediaId: Media['media_id']) => Media;
-}
-
-export interface LessonsTemplatesHelper {
-  getLessonsTemplate: (
-    lessonsTemplateId: LessonsTemplate['lessonstemplate_id'],
-  ) => LessonsTemplate;
 }
 
 export interface LoggedHelper {
