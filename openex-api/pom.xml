@@ -124,7 +124,6 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <!--suppress MavenPackageUpdate -->
             <version>${commons-io.version}</version>
         </dependency>
         <dependency>

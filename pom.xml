@@ -18,12 +18,12 @@
     <description>OpenEx platform</description>
 
     <properties>
-        <log4j2.version>2.17.2</log4j2.version>
-        <jackson.version>2.15.3</jackson.version>
+        <jackson.version>2.16.0</jackson.version>
         <lombok.version>1.18.30</lombok.version>
         <minio.version>8.5.7</minio.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
-        <commons-io.version>2.15.0</commons-io.version>
+        <commons-io.version>2.15.1</commons-io.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
     </properties>
 
     <distributionManagement>
@@ -69,7 +69,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>18</source>
                     <target>18</target>
