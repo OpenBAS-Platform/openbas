@@ -14,6 +14,7 @@ import io.openex.service.UserService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ProviderManager;
@@ -62,6 +63,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.util.StringUtils.hasLength;
 
+@Configuration
 @EnableWebSecurity
 public class AppSecurityConfig {
 
