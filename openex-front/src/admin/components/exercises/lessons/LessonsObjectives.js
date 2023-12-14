@@ -65,7 +65,7 @@ const LessonsObjectives = ({
   )(injects);
   const chartData = [
     {
-      name: t('Number of inject'),
+      name: t('Number of injects'),
       data: injectsData,
     },
   ];
