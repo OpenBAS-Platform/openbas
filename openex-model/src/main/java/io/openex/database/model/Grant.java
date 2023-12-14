@@ -20,7 +20,7 @@ public class Grant implements Base {
     @Id
     @Column(name = "grant_id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
     @JsonProperty("grant_id")
     private String id;
 

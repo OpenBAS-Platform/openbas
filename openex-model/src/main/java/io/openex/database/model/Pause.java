@@ -16,7 +16,7 @@ public class Pause implements Base {
     @Id
     @Column(name = "pause_id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
     @JsonProperty("log_id")
     private String id;
 

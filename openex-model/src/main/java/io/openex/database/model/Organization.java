@@ -24,7 +24,7 @@ public class Organization implements Base {
     @Id
     @Column(name = "organization_id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
     @JsonProperty("organization_id")
     private String id;
 

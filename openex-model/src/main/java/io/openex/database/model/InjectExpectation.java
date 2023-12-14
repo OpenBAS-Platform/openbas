@@ -39,7 +39,7 @@ public class InjectExpectation implements Base {
     @NotBlank
     @Setter
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
     @Column(name = "inject_expectation_id")
     @JsonProperty("injectexpectation_id")
     private String id;

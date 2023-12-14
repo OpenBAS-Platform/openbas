@@ -28,7 +28,7 @@ public class DryInject implements Base, Injection {
   @Id
   @Column(name = "dryinject_id")
   @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+  @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
   @JsonProperty("dryinject_id")
   private String id;
 

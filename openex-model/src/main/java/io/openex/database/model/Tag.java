@@ -19,7 +19,7 @@ public class Tag implements Base {
     @Id
     @Column(name = "tag_id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
     @JsonProperty("tag_id")
     private String id;
 

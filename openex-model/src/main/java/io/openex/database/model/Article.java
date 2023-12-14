@@ -23,7 +23,7 @@ public class Article implements Base {
     @Id
     @Column(name = "article_id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
     @JsonProperty("article_id")
     private String id;
 

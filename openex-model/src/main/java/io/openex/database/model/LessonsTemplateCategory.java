@@ -22,7 +22,7 @@ public class LessonsTemplateCategory implements Base {
     @Id
     @Column(name = "lessons_template_category_id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
     @JsonProperty("lessonstemplatecategory_id")
     private String id;
 

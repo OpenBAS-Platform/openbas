@@ -19,7 +19,7 @@ public class LessonsTemplateQuestion implements Base {
     @Id
     @Column(name = "lessons_template_question_id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
     @JsonProperty("lessonstemplatequestion_id")
     private String id;
 

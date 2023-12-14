@@ -22,7 +22,7 @@ public class Log implements Base {
     @Id
     @Column(name = "log_id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
     @JsonProperty("log_id")
     private String id;
 

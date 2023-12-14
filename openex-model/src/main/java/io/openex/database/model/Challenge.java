@@ -22,7 +22,7 @@ public class Challenge implements Base {
     @Id
     @Column(name = "challenge_id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
     @JsonProperty("challenge_id")
     private String id;
 

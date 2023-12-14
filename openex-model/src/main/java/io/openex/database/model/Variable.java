@@ -32,7 +32,7 @@ public class Variable implements Base {
   @Id
   @Column(name = "variable_id")
   @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+  @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
   @JsonProperty("variable_id")
   @NotBlank
   private String id;

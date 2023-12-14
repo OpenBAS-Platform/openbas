@@ -28,7 +28,7 @@ public class Team implements Base {
     @Id
     @Column(name = "team_id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
     @JsonProperty("team_id")
     private String id;
 

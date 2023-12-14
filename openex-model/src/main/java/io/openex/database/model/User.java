@@ -39,7 +39,7 @@ public class User implements Base {
   @Id
   @Column(name = "user_id")
   @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+  @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
   @JsonProperty("user_id")
   @NotBlank
   private String id;
