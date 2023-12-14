@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoIdDeserializer;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
 import java.time.Instant;
@@ -22,7 +22,7 @@ public class Token implements Base {
     @Id
     @Column(name = "token_id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
+    @UuidGenerator
     @JsonProperty("token_id")
     private String id;
 

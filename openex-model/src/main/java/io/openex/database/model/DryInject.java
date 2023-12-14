@@ -6,7 +6,7 @@ import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
 import java.time.Instant;
@@ -28,7 +28,7 @@ public class DryInject implements Base, Injection {
   @Id
   @Column(name = "dryinject_id")
   @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
+  @UuidGenerator
   @JsonProperty("dryinject_id")
   private String id;
 

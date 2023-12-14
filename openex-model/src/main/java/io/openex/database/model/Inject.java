@@ -11,7 +11,7 @@ import io.openex.helper.MultiIdDeserializer;
 import io.openex.helper.MultiModelDeserializer;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -42,7 +42,7 @@ public class Inject implements Base, Injection {
     @Id
     @Column(name = "inject_id")
     @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
+  @UuidGenerator
     @JsonProperty("inject_id")
     private String id;
 

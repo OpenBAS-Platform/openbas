@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.converter.ExecutionConverter;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
 import java.time.Instant;
@@ -22,7 +22,7 @@ public class InjectStatus implements Base {
   @Id
   @Column(name = "status_id")
   @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
+  @UuidGenerator
   @JsonProperty("status_id")
   private String id;
 

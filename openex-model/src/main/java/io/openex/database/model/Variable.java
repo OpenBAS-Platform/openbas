@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -32,7 +32,7 @@ public class Variable implements Base {
   @Id
   @Column(name = "variable_id")
   @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
+  @UuidGenerator
   @JsonProperty("variable_id")
   @NotBlank
   private String id;

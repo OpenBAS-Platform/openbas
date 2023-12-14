@@ -9,7 +9,7 @@ import io.openex.helper.MultiIdDeserializer;
 import io.openex.helper.MultiModelDeserializer;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -38,7 +38,7 @@ public class Exercise implements Base {
     @Id
     @Column(name = "exercise_id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", type = org.hibernate.id.uuid.UuidGenerator.class)
+    @UuidGenerator
     @JsonProperty("exercise_id")
     private String id;
 
