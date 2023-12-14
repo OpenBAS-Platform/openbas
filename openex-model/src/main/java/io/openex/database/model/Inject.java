@@ -30,7 +30,7 @@ public class Inject implements Base, Injection {
 
     public static final int SPEED_STANDARD = 1; // Standard speed define by the user.
 
-    public static Comparator<Inject> executionComparator = (o1, o2) -> {
+  public static final Comparator<Inject> executionComparator = (o1, o2) -> {
         if (o1.getDate().isPresent() && o2.getDate().isPresent()) {
             return o1.getDate().get().compareTo(o2.getDate().get());
         }

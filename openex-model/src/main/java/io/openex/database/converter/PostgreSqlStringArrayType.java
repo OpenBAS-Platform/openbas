@@ -16,7 +16,7 @@ public class PostgreSqlStringArrayType implements UserType {
     }
 
     @Override
-    public Class returnedClass() {
+    public Class<String[]> returnedClass() {
         return String[].class;
     }
 

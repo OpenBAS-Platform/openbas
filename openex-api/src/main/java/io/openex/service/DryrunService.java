@@ -59,7 +59,7 @@ public class DryrunService {
     public Dryrun provisionDryrun(Exercise exercise, List<User> users, String name) {
         Specification<Inject> injectFilters = InjectSpecification.forDryrun(exercise.getId());
         List<Inject> injects = injectRepository.findAll(injectFilters);
-        Assert.isTrue(injects.size() > 0, "Cant create dryrun without injects");
+        Assert.isTrue(!injects.isEmpty(), "Cant create dryrun without injects");
         Dryrun dryrun = createDryRun(exercise, users, name);
         List<? extends DryInject> dryInjects = toDryInjects(injects, dryrun);
         dryInjectRepository.saveAll(dryInjects);

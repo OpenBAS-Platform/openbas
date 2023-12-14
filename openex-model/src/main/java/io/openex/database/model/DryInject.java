@@ -21,7 +21,7 @@ import static java.util.Optional.of;
 @EntityListeners(ModelBaseListener.class)
 public class DryInject implements Base, Injection {
 
-  public static Comparator<DryInject> executionComparator = Comparator.comparing(o -> o.getDate().orElseThrow());
+  public static final Comparator<DryInject> executionComparator = Comparator.comparing(o -> o.getDate().orElseThrow());
 
   @Getter
   @Setter

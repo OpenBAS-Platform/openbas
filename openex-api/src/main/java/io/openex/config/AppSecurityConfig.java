@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -38,10 +37,11 @@ import org.springframework.security.saml2.provider.service.authentication.Saml2A
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticationException;
 import org.springframework.security.saml2.provider.service.metadata.OpenSamlMetadataResolver;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
-import org.springframework.security.saml2.provider.service.servlet.filter.Saml2WebSsoAuthenticationFilter;
+import org.springframework.security.saml2.provider.service.web.authentication.Saml2WebSsoAuthenticationFilter;
 import org.springframework.security.saml2.provider.service.web.DefaultRelyingPartyRegistrationResolver;
 import org.springframework.security.saml2.provider.service.web.RelyingPartyRegistrationResolver;
 import org.springframework.security.saml2.provider.service.web.Saml2MetadataFilter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
@@ -62,7 +62,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.util.StringUtils.hasLength;
 
 @EnableWebSecurity
-public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
+public class AppSecurityConfig {
 
   private static final Logger LOGGER = Logger.getLogger(AppSecurityConfig.class.getName());
 
@@ -97,8 +97,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
   @Autowired(required = false)
   private RelyingPartyRegistrationRepository relyingPartyRegistrationRepository;
 
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
         .requestCache()
         /**/.requestCache(new HttpSessionRequestCache())
@@ -107,13 +107,13 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
         /**/.disable()
         .formLogin()
         /**/.disable()
-        .authorizeRequests()
-        /**/.antMatchers("/api/comcheck/**").permitAll()
-        /**/.antMatchers("/api/player/**").permitAll()
-        /**/.antMatchers("/api/settings").permitAll()
-        /**/.antMatchers("/api/login").permitAll()
-        /**/.antMatchers("/api/reset/**").permitAll()
-        /**/.antMatchers("/api/**").authenticated()
+        .authorizeHttpRequests()
+        /**/.requestMatchers("/api/comcheck/**").permitAll()
+        /**/.requestMatchers("/api/player/**").permitAll()
+        /**/.requestMatchers("/api/settings").permitAll()
+        /**/.requestMatchers("/api/login").permitAll()
+        /**/.requestMatchers("/api/reset/**").permitAll()
+        /**/.requestMatchers("/api/**").authenticated()
         .and()
         .logout()
         /**/.invalidateHttpSession(true)
@@ -145,6 +145,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     // Rewrite 403 code to 401
     http.exceptionHandling().authenticationEntryPoint(
         (request, response, authException) -> response.setStatus(HttpStatus.UNAUTHORIZED.value()));
+
+    return http.build();
   }
 
   @Bean
@@ -157,6 +159,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     });
     if (accessToken != null) {
       String rolesPathConfig = "openex.provider." + registrationId + ".roles_path";
+      //noinspection unchecked
       List<String> rolesPath = env.getProperty(rolesPathConfig, List.class, new ArrayList<String>());
       try {
         String[] chunks = accessToken.getTokenValue().split("\\.");
@@ -182,12 +185,14 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
   private List<String> extractRolesFromUser(Saml2AuthenticatedPrincipal user, String registrationId) {
     String rolesPathConfig = "openex.provider." + registrationId + ".roles_path";
+    //noinspection unchecked
     List<String> rolesPath = env.getProperty(rolesPathConfig, List.class, new ArrayList<String>());
     try {
       return rolesPath.stream()
           .flatMap(path -> {
             try {
               List<String> roles = user.getAttribute(path);
+              assert roles != null;
               return roles.stream();
             } catch (NullPointerException e) {
               return Stream.empty();
@@ -207,6 +212,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
       String lastName) {
     String email = ofNullable(emailAttribute).orElseThrow();
     String rolesAdminConfig = "openex.provider." + registrationId + ".roles_admin";
+    //noinspection unchecked
     List<String> rolesAdmin = this.env.getProperty(rolesAdminConfig, List.class, new ArrayList<String>());
     boolean isAdmin = rolesAdmin.stream().anyMatch(rolesFromToken::contains);
     if (hasLength(email)) {

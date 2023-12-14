@@ -267,7 +267,7 @@ public class ChannelApi extends RestBehavior {
         .filter(Objects::nonNull)
         .distinct()
         .collect(Collectors.toMap(VirtualArticle::id, VirtualArticle::date));
-    if (toPublishArticleIdsMap.size() > 0) {
+    if (!toPublishArticleIdsMap.isEmpty()) {
       List<Article> publishedArticles = fromIterable(articleRepository.findAllById(toPublishArticleIdsMap.keySet()))
           .stream().filter(article -> article.getChannel().equals(channel))
           .peek(article -> article.setVirtualPublication(toPublishArticleIdsMap.get(article.getId())))

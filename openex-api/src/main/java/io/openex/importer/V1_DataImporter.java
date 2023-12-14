@@ -238,7 +238,7 @@ public class V1_DataImporter implements Importer {
             String injectDependsOn = jsonNode.get("inject_depends_on").asText();
             return injected.contains(injectDependsOn);
         }).toList();
-        if (childInjects.size() > 0) {
+        if (!childInjects.isEmpty()) {
             importInjects(baseIds, exercise, childInjects);
         }
     }

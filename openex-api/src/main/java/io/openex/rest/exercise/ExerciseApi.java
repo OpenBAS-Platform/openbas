@@ -264,7 +264,7 @@ public class ExerciseApi extends RestBehavior {
     public Dryrun createDryrun(@PathVariable String exerciseId, @Valid @RequestBody DryrunCreateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         List<String> userIds = input.getUserIds();
-        List<User> users = userIds.size() == 0 ? List.of(userRepository.findById(currentUser().getId()).orElseThrow()) : fromIterable(userRepository.findAllById(userIds));
+        List<User> users = userIds.isEmpty() ? List.of(userRepository.findById(currentUser().getId()).orElseThrow()) : fromIterable(userRepository.findAllById(userIds));
         return dryrunService.provisionDryrun(exercise, users, input.getName());
     }
 
@@ -387,14 +387,14 @@ public class ExerciseApi extends RestBehavior {
         }
         // Find automatic groups to grants
         List<Group> groups = fromIterable(groupRepository.findAll());
-        List<Grant> grants = groups.stream().filter(group -> group.getExercisesDefaultGrants().size() > 0).flatMap(group -> group.getExercisesDefaultGrants().stream().map(s -> Tuples.of(group, s))).map(tuple -> {
+        List<Grant> grants = groups.stream().filter(group -> !group.getExercisesDefaultGrants().isEmpty()).flatMap(group -> group.getExercisesDefaultGrants().stream().map(s -> Tuples.of(group, s))).map(tuple -> {
             Grant grant = new Grant();
             grant.setGroup(tuple.getT1());
             grant.setName(tuple.getT2());
             grant.setExercise(exercise);
             return grant;
         }).toList();
-        if (grants.size() > 0) {
+    if (!grants.isEmpty()) {
             Iterable<Grant> exerciseGrants = grantRepository.saveAll(grants);
             exercise.setGrants(fromIterable(exerciseGrants));
         }

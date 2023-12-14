@@ -7,7 +7,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=admin
     ports:
-      - 5432:5432
+      - "5432:5432"
   openex-dev-minio:
     container_name: openex-dev-minio
     image: minio/minio:latest

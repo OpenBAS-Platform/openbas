@@ -136,7 +136,7 @@ public class ComchecksExecutionJob implements Job {
                 List<ComcheckStatus> statusToUpdate = comcheckStatuses.stream()
                         .filter(comcheckStatus -> usersSuccessfullyNotified.contains(comcheckStatus.getUser().getId()))
                         .toList();
-                if (statusToUpdate.size() > 0) {
+                if (!statusToUpdate.isEmpty()) {
                     comcheckStatusRepository.saveAll(statusToUpdate.stream()
                             .peek(comcheckStatus -> comcheckStatus.setLastSent(now))
                             .toList());
