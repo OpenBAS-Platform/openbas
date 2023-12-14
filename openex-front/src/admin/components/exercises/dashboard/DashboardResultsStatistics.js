@@ -6,11 +6,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Chart from 'react-apexcharts';
 import { useFormatter } from '../../../../components/i18n';
-import {
-  colors,
-  horizontalBarsChartOptions,
-  lineChartOptions,
-} from '../../../../utils/Charts';
+import { colors, horizontalBarsChartOptions, lineChartOptions } from '../../../../utils/Charts';
 import Empty from '../../../../components/Empty';
 import { resolveUserName } from '../../../../utils/String';
 

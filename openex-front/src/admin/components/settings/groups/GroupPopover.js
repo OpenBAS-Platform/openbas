@@ -30,18 +30,8 @@ import withStyles from '@mui/styles/withStyles';
 import { ListItemIcon } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import {
-  fetchGroup,
-  deleteGroup,
-  updateGroupUsers,
-  updateGroupInformation,
-} from '../../../../actions/Group';
-import {
-  addGrant,
-  deleteGrant,
-  addGroupOrganization,
-  deleteGroupOrganization,
-} from '../../../../actions/Grant';
+import { fetchGroup, deleteGroup, updateGroupUsers, updateGroupInformation } from '../../../../actions/Group';
+import { addGrant, deleteGrant, addGroupOrganization, deleteGroupOrganization } from '../../../../actions/Grant';
 import GroupForm from './GroupForm';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';

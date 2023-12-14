@@ -13,13 +13,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import {
-  RowingOutlined,
-  NotificationsOutlined,
-  GroupsOutlined,
-  ContactMailOutlined,
-  Kayaking,
-} from '@mui/icons-material';
+import { RowingOutlined, NotificationsOutlined, GroupsOutlined, ContactMailOutlined, Kayaking } from '@mui/icons-material';
 import Chart from 'react-apexcharts';
 import ItemTags from '../../components/ItemTags';
 import MiniMap from './MiniMap';

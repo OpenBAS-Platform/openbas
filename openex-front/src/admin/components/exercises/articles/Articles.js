@@ -14,12 +14,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
 import Button from '@mui/material/Button';
 import { green, orange } from '@mui/material/colors';
-import {
-  ChatBubbleOutlineOutlined,
-  ShareOutlined,
-  FavoriteBorderOutlined,
-  VisibilityOutlined,
-} from '@mui/icons-material';
+import { ChatBubbleOutlineOutlined, ShareOutlined, FavoriteBorderOutlined, VisibilityOutlined } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import DefinitionMenu from '../DefinitionMenu';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';

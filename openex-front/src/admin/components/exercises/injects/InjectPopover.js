@@ -18,21 +18,11 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
-import {
-  deleteInject,
-  injectDone,
-  tryInject,
-  updateInject,
-  updateInjectActivation,
-  updateInjectTrigger,
-} from '../../../../actions/Inject';
+import { deleteInject, injectDone, tryInject, updateInject, updateInjectActivation, updateInjectTrigger } from '../../../../actions/Inject';
 import InjectForm from './InjectForm';
 import inject18n from '../../../../components/i18n';
 import { splitDuration } from '../../../../utils/Time';
-import {
-  isExerciseReadOnly,
-  secondsFromToNow,
-} from '../../../../utils/Exercise';
+import { isExerciseReadOnly, secondsFromToNow } from '../../../../utils/Exercise';
 import { tagOptions } from '../../../../utils/Option';
 
 const Transition = React.forwardRef((props, ref) => (

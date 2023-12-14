@@ -1,10 +1,5 @@
 import * as schema from './Schema';
-import {
-  getReferential,
-  putReferential,
-  postReferential,
-  delReferential,
-} from '../utils/Action';
+import { getReferential, putReferential, postReferential, delReferential } from '../utils/Action';
 
 export const fetchExercises = () => (dispatch) => getReferential(schema.arrayOfExercises, '/api/exercises')(dispatch);
 

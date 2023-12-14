@@ -5,11 +5,7 @@ import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import {
-  AttachMoneyOutlined,
-  CastForEducationOutlined,
-  EmojiEventsOutlined,
-} from '@mui/icons-material';
+import { AttachMoneyOutlined, CastForEducationOutlined, EmojiEventsOutlined } from '@mui/icons-material';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../components/i18n';

@@ -1,10 +1,5 @@
 import * as schema from './Schema';
-import {
-  delReferential,
-  getReferential,
-  postReferential,
-  putReferential,
-} from '../utils/Action';
+import { delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
 import * as Constants from '../constants/ActionTypes';
 
 // region players

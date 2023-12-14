@@ -6,11 +6,7 @@ import Paper from '@mui/material/Paper';
 import * as R from 'ramda';
 import Box from '@mui/material/Box';
 import logo from '../../../static/images/logo.png';
-import {
-  askToken,
-  checkKerberos,
-  fetchParameters,
-} from '../../../actions/Application';
+import { askToken, checkKerberos, fetchParameters } from '../../../actions/Application';
 import LoginForm from './LoginForm';
 import inject18n from '../../../components/i18n';
 import { storeHelper } from '../../../actions/Schema';

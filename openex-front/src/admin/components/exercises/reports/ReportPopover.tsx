@@ -15,11 +15,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { deleteReport, updateReport } from '../../../../actions/Report';
 import Transition from '../../../../components/common/Transition';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type {
-  Exercise,
-  Report,
-  ReportUpdateInput,
-} from '../../../../utils/api-types';
+import type { Exercise, Report, ReportUpdateInput } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   button: {

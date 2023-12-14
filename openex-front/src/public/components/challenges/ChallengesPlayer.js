@@ -33,10 +33,7 @@ import List from '@mui/material/List';
 import IconButton from '@mui/material/IconButton';
 import { ListItem, ListItemIcon } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
-import {
-  validateChallenge,
-  fetchPlayerChallenges,
-} from '../../../actions/Challenge';
+import { validateChallenge, fetchPlayerChallenges } from '../../../actions/Challenge';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
 import { useFormatter } from '../../../components/i18n';

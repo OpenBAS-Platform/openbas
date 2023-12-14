@@ -5,11 +5,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { useDispatch } from 'react-redux';
-import {
-  PersonOutlined,
-  CastOutlined,
-  CheckCircleOutlineOutlined,
-} from '@mui/icons-material';
+import { PersonOutlined, CastOutlined, CheckCircleOutlineOutlined } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';

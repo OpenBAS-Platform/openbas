@@ -17,19 +17,9 @@ import { isExerciseReadOnly } from '../../../utils/Exercise';
 import { useAppDispatch } from '../../../utils/hooks';
 import Transition from '../../../components/common/Transition';
 import type { UpdatePlayerInput } from '../../../utils/api-types';
-import {
-  countryOption,
-  Option,
-  organizationOption,
-  tagOptions,
-} from '../../../utils/Option';
+import { countryOption, Option, organizationOption, tagOptions } from '../../../utils/Option';
 import { useHelper } from '../../../store';
-import type {
-  ExercicesHelper,
-  OrganizationsHelper,
-  TagsHelper,
-  UsersHelper,
-} from '../../../actions/helper';
+import type { ExercicesHelper, OrganizationsHelper, TagsHelper, UsersHelper } from '../../../actions/helper';
 import type { PlayerInputForm, UserStore } from './Player';
 
 interface PlayerPopoverProps {

@@ -7,10 +7,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import {
-  ChevronRightOutlined,
-  ContentPasteOutlined,
-} from '@mui/icons-material';
+import { ChevronRightOutlined, ContentPasteOutlined } from '@mui/icons-material';
 import SearchFilter from '../../../../components/SearchFilter';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';

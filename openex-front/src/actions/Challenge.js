@@ -1,10 +1,5 @@
 import { schema } from 'normalizr';
-import {
-  delReferential,
-  getReferential,
-  postReferential,
-  putReferential,
-} from '../utils/Action';
+import { delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
 import { challengesReader } from './Schema';
 
 const challenge = new schema.Entity(

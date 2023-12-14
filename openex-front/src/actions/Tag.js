@@ -1,10 +1,5 @@
 import * as schema from './Schema';
-import {
-  getReferential,
-  postReferential,
-  delReferential,
-  putReferential,
-} from '../utils/Action';
+import { getReferential, postReferential, delReferential, putReferential } from '../utils/Action';
 
 export const fetchTags = () => (dispatch) => getReferential(schema.arrayOfTags, '/api/tags')(dispatch);
 

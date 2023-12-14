@@ -13,10 +13,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useDispatch } from 'react-redux';
 import { useFormatter } from '../../../../components/i18n';
-import {
-  deleteExerciseArticle,
-  updateExerciseArticle,
-} from '../../../../actions/Media';
+import { deleteExerciseArticle, updateExerciseArticle } from '../../../../actions/Media';
 import ArticleForm from './ArticleForm';
 
 const Transition = React.forwardRef((props, ref) => (

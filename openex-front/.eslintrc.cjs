@@ -4,7 +4,8 @@ module.exports = {
     'airbnb-typescript/base',
     'plugin:import/typescript',
     'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended'
+    'plugin:@typescript-eslint/recommended',
+    'plugin:react/recommended'
   ],
   parserOptions: {
     ecmaVersion: 2020,
@@ -30,7 +31,7 @@ module.exports = {
     '**/__generated__/**',
     '**/src/static/ext/**',
   ],
-  plugins: ["custom-rules"],
+  plugins: ["import-newlines", "custom-rules"],
   rules: {
     'custom-rules/classes-rule': 1,
     'no-restricted-syntax': 0,
@@ -66,6 +67,10 @@ module.exports = {
         'varsIgnorePattern': '^_',
         'caughtErrorsIgnorePattern': '^_'
       }
-    ]
+    ],
+    'import-newlines/enforce': ['error', { items: 20, 'max-len': 180 }],
+    'react/jsx-indent': [2, 2],
+    'react/jsx-indent-props': [2, 2],
+    'react/jsx-closing-bracket-location': 'error',
   }
 }

@@ -6,10 +6,7 @@ import Drawer from '@mui/material/Drawer';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { useDispatch } from 'react-redux';
-import {
-  CastForEducationOutlined,
-  FileDownloadOutlined,
-} from '@mui/icons-material';
+import { CastForEducationOutlined, FileDownloadOutlined } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { useParams } from 'react-router-dom';
 import { CSVLink } from 'react-csv';

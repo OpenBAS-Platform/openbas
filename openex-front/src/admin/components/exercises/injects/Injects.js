@@ -18,10 +18,7 @@ import { splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
-import {
-  fetchExerciseInjects,
-  fetchInjectTypes,
-} from '../../../../actions/Inject';
+import { fetchExerciseInjects, fetchInjectTypes } from '../../../../actions/Inject';
 import InjectIcon from './InjectIcon';
 import CreateInject from './CreateInject';
 import InjectPopover from './InjectPopover';

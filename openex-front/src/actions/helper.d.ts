@@ -1,11 +1,4 @@
-import type {
-  Audience,
-  Exercise,
-  Media,
-  Organization,
-  Tag,
-  User,
-} from '../utils/api-types';
+import type { Audience, Exercise, Media, Organization, Tag, User } from '../utils/api-types';
 
 export interface ExercicesHelper {
   getExercise: (exerciseId: Exercise['exercise_id']) => Exercise;

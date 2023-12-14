@@ -9,10 +9,7 @@ import Paper from '@mui/material/Paper';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import {
-  executeInject,
-  fetchExerciseInjects,
-} from '../../../../actions/Inject';
+import { executeInject, fetchExerciseInjects } from '../../../../actions/Inject';
 import { useFormatter } from '../../../../components/i18n';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';

@@ -7,15 +7,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { connect } from 'react-redux';
-import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-  CloseRounded,
-  EmailOutlined,
-  KeyOutlined,
-  PersonOutlined,
-  SmartphoneOutlined,
-} from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, CloseRounded, EmailOutlined, KeyOutlined, PersonOutlined, SmartphoneOutlined } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
@@ -343,11 +335,11 @@ class AudiencesPlayers extends Component {
                           className={classes.icon}
                         />
                         ) : (
-                        <EmailOutlined
-                          color="success"
-                          fontSize="small"
-                          className={classes.icon}
-                        />
+                          <EmailOutlined
+                            color="success"
+                            fontSize="small"
+                            className={classes.icon}
+                          />
                         )}
                       {R.isNil(user.user_pgp_key)
                       || R.isEmpty(user.user_pgp_key) ? (
@@ -357,11 +349,11 @@ class AudiencesPlayers extends Component {
                           className={classes.icon}
                         />
                         ) : (
-                        <KeyOutlined
-                          color="success"
-                          fontSize="small"
-                          className={classes.icon}
-                        />
+                          <KeyOutlined
+                            color="success"
+                            fontSize="small"
+                            className={classes.icon}
+                          />
                         )}
                       {R.isNil(user.user_phone)
                       || R.isEmpty(user.user_phone) ? (
@@ -371,11 +363,11 @@ class AudiencesPlayers extends Component {
                           className={classes.icon}
                         />
                         ) : (
-                        <SmartphoneOutlined
-                          color="success"
-                          fontSize="small"
-                          className={classes.icon}
-                        />
+                          <SmartphoneOutlined
+                            color="success"
+                            fontSize="small"
+                            className={classes.icon}
+                          />
                         )}
                     </div>
                     <div

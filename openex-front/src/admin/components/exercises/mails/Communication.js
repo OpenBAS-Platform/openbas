@@ -6,12 +6,7 @@ import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import { lightBlue } from '@mui/material/colors';
 import IconButton from '@mui/material/IconButton';
-import {
-  ExpandLess,
-  ExpandMore,
-  AttachFileRounded,
-  ReplyOutlined,
-} from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AttachFileRounded, ReplyOutlined } from '@mui/icons-material';
 import parse from 'html-react-parser';
 import DOMPurify from 'dompurify';
 import Button from '@mui/material/Button';

@@ -5,11 +5,7 @@ import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import {
-  InsertChartOutlinedOutlined,
-  SchoolOutlined,
-  ContentPasteOutlined,
-} from '@mui/icons-material';
+import { InsertChartOutlinedOutlined, SchoolOutlined, ContentPasteOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../components/i18n';
 import type { Exercise } from '../../../utils/api-types';

@@ -15,10 +15,7 @@ import { usePermissions } from '../../../utils/Exercise';
 import { fetchMe } from '../../../actions/Application';
 import Loader from '../../../components/Loader';
 import Empty from '../../../components/Empty';
-import {
-  fetchLessonsCategories,
-  fetchLessonsQuestions,
-} from '../../../actions/Lessons';
+import { fetchLessonsCategories, fetchLessonsQuestions } from '../../../actions/Lessons';
 import { fetchExercise } from '../../../actions/Exercise';
 import SliderField from '../../../components/SliderField';
 import TextField from '../../../components/TextField';

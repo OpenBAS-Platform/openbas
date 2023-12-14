@@ -31,10 +31,7 @@ import Alert from '@mui/material/Alert';
 import List from '@mui/material/List';
 import { ListItem, ListItemIcon } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
-import {
-  tryChallenge,
-  fetchObserverChallenges,
-} from '../../../actions/Challenge';
+import { tryChallenge, fetchObserverChallenges } from '../../../actions/Challenge';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
 import { useFormatter } from '../../../components/i18n';

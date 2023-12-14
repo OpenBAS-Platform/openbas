@@ -2,9 +2,7 @@ import React, { ChangeEvent, useRef, useState } from 'react';
 import { CloudUploadOutlined } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import CircularProgress, {
-  CircularProgressProps,
-} from '@mui/material/CircularProgress';
+import CircularProgress, { CircularProgressProps } from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
 import { useFormatter } from '../../../components/i18n';
 import { importingExercise } from '../../../actions/Exercise';

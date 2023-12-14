@@ -5,18 +5,11 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { useDispatch } from 'react-redux';
-import {
-  CastOutlined,
-  CheckCircleOutlineOutlined,
-  PersonOutlined,
-  HistoryToggleOffOutlined,
-} from '@mui/icons-material';
+import { CastOutlined, CheckCircleOutlineOutlined, PersonOutlined, HistoryToggleOffOutlined } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import LinearProgress, {
-  linearProgressClasses,
-} from '@mui/material/LinearProgress';
+import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
 import { fetchPlayers } from '../../../../actions/User';
 import { fetchOrganizations } from '../../../../actions/Organization';
@@ -27,10 +20,7 @@ import { fetchTags } from '../../../../actions/Tag';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import {
-  fetchComcheck,
-  fetchComcheckStatuses,
-} from '../../../../actions/Comcheck';
+import { fetchComcheck, fetchComcheckStatuses } from '../../../../actions/Comcheck';
 import { useFormatter } from '../../../../components/i18n';
 import ComcheckStatusState from './ComcheckStatusState';
 import ComcheckState from './ComcheckState';

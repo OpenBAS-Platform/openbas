@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import * as R from 'ramda';
-import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-} from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import { useFormatter } from '../components/i18n';
 
 const useSearchAnFilter = (

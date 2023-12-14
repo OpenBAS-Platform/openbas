@@ -1,10 +1,5 @@
 import * as schema from './Schema';
-import {
-  getReferential,
-  postReferential,
-  putReferential,
-  delReferential,
-} from '../utils/Action';
+import { getReferential, postReferential, putReferential, delReferential } from '../utils/Action';
 
 export const fetchGroups = () => (dispatch) => getReferential(schema.arrayOfGroups, '/api/groups')(dispatch);
 
