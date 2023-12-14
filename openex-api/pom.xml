@@ -15,7 +15,6 @@
 
     <properties>
         <bcpg-jdk15on.version>1.70</bcpg-jdk15on.version>
-        <commons-codec.version>1.16.0</commons-codec.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <commons-email.version>1.5</commons-email.version>
         <commons-validator.version>1.7</commons-validator.version>
@@ -134,7 +133,6 @@
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
-            <version>${validation-api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -144,17 +142,14 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-hibernate5</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jdk8</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -169,13 +164,10 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>${flyway.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <!--suppress MavenPackageUpdate -->
-            <version>${commons-codec.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
