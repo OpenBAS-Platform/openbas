@@ -1,11 +1,5 @@
 import { createLogger, defineConfig, transformWithEsbuild } from 'vite';
 import react from '@vitejs/plugin-react';
-import { fileURLToPath } from 'url';
-import path from 'path';
-
-// mimic CommonJS variables -- not needed if using CommonJS
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const logger = createLogger()
 const loggerError = logger.error
@@ -92,15 +86,6 @@ export default defineConfig({
 
   server: {
     port: 3000,
-    warmup: {
-      clientFiles: [
-        // './src/components/i18n.js',
-        // './src/components/hooks.ts',
-        // './src/components/Zod.ts',
-        // './src/components/common/Transition.tsx',
-        // './src/resources/geo/countries.json',
-      ],
-    },
     proxy: {
       '/api': backProxy,
       '/login':  backProxy,
@@ -110,25 +95,3 @@ export default defineConfig({
     },
   },
 });
-
-
- //  './src/public/Root',
-      //  './src/private/Index',
-      //  './src/admin/Index',
-      //  './public/components/login/Login',
-      //  './public/components/comcheck/Comcheck',
-      //  './public/components/medias/Media',
-      //  './public/components/challenges/Challenges',
-      //  './public/components/lessons/Lessons',
-      //  './admin/components/profile/Index',
-      //  './admin/components/exercises/Exercises',
-      //  './admin/components/players/Players',
-      //  './admin/components/organizations/Organizations',
-      //  './admin/components/documents/Documents',
-      //  './admin/components/medias/Medias',
-      //  './admin/components/medias/Index',
-      //  './admin/components/integrations/Index',
-      //  './admin/components/challenges/Challenges',
-      //  './admin/components/lessons/LessonsTemplates',
-      //  './admin/components/lessons/Index',
-      //  './admin/components/settings/Index.tsx',
