@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
 import { Form } from 'react-final-form';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
+import { Button, Box, Grid, Typography, List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
-import Typography from '@mui/material/Typography';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import { ListItemIcon } from '@mui/material';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { AttachmentOutlined, ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import TextField from '../../../../components/TextField';

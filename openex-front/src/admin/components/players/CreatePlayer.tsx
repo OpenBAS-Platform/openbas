@@ -1,8 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
-import Fab from '@mui/material/Fab';
+import { Fab, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
-import { ListItemButton, ListItemIcon } from '@mui/material';
-import ListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
 import { addPlayer } from '../../../actions/User';
 import PlayerForm from './PlayerForm';

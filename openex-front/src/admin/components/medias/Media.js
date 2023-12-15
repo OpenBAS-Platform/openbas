@@ -1,12 +1,9 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
+import { Grid, Typography, Paper, Skeleton } from '@mui/material';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
-import Skeleton from '@mui/material/Skeleton';
 import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import { updateMedia, updateMediaLogos } from '../../../actions/Media';

@@ -1,15 +1,7 @@
 /* eslint-disable no-template-curly-in-string */
 import React, { useState } from 'react';
-import SpeedDial from '@mui/material/SpeedDial';
-import SpeedDialIcon from '@mui/material/SpeedDialIcon';
-import SpeedDialAction from '@mui/material/SpeedDialAction';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
+import { SpeedDial, SpeedDialIcon, SpeedDialAction, Dialog, DialogTitle, DialogContent, Grid, Typography, Button } from '@mui/material';
 import { VideoSettingsOutlined, MarkEmailReadOutlined } from '@mui/icons-material';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from 'react-router-dom';
 import ComcheckForm from './ComcheckForm';

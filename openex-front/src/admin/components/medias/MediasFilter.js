@@ -1,10 +1,7 @@
 import React, { useEffect } from 'react';
 import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
-import Box from '@mui/material/Box';
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
-import Chip from '@mui/material/Chip';
+import { Box, Autocomplete, TextField, Chip } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { fetchMedias } from '../../../actions/Media';
 import { useFormatter } from '../../../components/i18n';

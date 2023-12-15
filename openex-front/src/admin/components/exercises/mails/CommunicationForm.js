@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form } from 'react-final-form';
-import Button from '@mui/material/Button';
+import { Button } from '@mui/material';
 import { useFormatter } from '../../../../components/i18n';
 import TextField from '../../../../components/TextField';
 import EnrichedTextField from '../../../../components/EnrichedTextField';

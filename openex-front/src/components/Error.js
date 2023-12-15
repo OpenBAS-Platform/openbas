@@ -1,7 +1,6 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
+import { Alert, AlertTitle } from '@mui/material';
 
 class ErrorBoundaryComponent extends React.Component {
   constructor(props) {

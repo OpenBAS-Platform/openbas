@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import Typography from '@mui/material/Typography';
+import { Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import MediaPopover from './MediaPopover';
 import { useHelper } from '../../../store';

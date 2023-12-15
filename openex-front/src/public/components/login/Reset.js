@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import Paper from '@mui/material/Paper';
-import Button from '@mui/material/Button';
+import { Paper, Button } from '@mui/material';
 import { Form } from 'react-final-form';
 import { makeStyles } from '@mui/styles';
 import { askReset, resetPassword, validateResetToken } from '../../../actions/Application';

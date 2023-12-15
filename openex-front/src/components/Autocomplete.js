@@ -1,9 +1,7 @@
 import React from 'react';
 import { Field } from 'react-final-form';
-import TextField from '@mui/material/TextField';
-import IconButton from '@mui/material/IconButton';
+import { TextField, IconButton, Autocomplete as MuiAutocomplete } from '@mui/material';
 import { AddOutlined } from '@mui/icons-material';
-import MuiAutocomplete from '@mui/material/Autocomplete';
 
 const renderAutocomplete = ({
   label,

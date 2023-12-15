@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { makeStyles, useTheme } from '@mui/styles';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Paper from '@mui/material/Paper';
+import { AppBar, Toolbar, Paper } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { CheckCircleOutlineOutlined } from '@mui/icons-material';
 import { fetchComcheckStatus } from '../../../actions/Comcheck';

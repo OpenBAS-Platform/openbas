@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Tooltip from '@mui/material/Tooltip';
+import { Tooltip } from '@mui/material';
 
 export default function CustomTooltip({ children, ...rest }) {
   const [renderTooltip, setRenderTooltip] = useState(false);

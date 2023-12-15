@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import Button from '@mui/material/Button';
+import { Button } from '@mui/material';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import { ArrowForwardIosOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';

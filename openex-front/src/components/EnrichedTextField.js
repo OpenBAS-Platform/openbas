@@ -1,14 +1,15 @@
 import React from 'react';
 import { Field } from 'react-final-form';
-import InputLabel from '@mui/material/InputLabel';
+import { InputLabel, Typography } from '@mui/material';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import Editor from 'ckeditor5-custom-build/build/ckeditor';
 import 'ckeditor5-custom-build/build/translations/fr';
 import { makeStyles } from '@mui/styles';
-import Typography from '@mui/material/Typography';
 import classNames from 'classnames';
 import { useHelper } from '../store';
 import locale from '../utils/BrowserLanguage';
+import '../static/css/CKEditorDark.css';
+import '../static/css/CKEditorLight.css';
 
 const useStyles = makeStyles((theme) => ({
   errorColor: {

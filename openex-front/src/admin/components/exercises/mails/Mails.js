@@ -1,16 +1,9 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import Chip from '@mui/material/Chip';
+import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Chip, Tooltip, IconButton } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { CSVLink } from 'react-csv';
-import Tooltip from '@mui/material/Tooltip';
-import IconButton from '@mui/material/IconButton';
 import { FileDownloadOutlined, KeyboardArrowRight } from '@mui/icons-material';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';

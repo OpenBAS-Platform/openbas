@@ -1,11 +1,7 @@
 import React, { CSSProperties } from 'react';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
 import { AttachMoneyOutlined } from '@mui/icons-material';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import SearchFilter from '../../../../components/SearchFilter';

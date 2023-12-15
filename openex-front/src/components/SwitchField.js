@@ -1,8 +1,6 @@
 import React from 'react';
 import { Field } from 'react-final-form';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import MuiSwitch from '@mui/material/Switch';
+import { FormGroup, FormControlLabel, Switch as MuiSwitch } from '@mui/material';
 
 const renderSwitch = ({
   label,

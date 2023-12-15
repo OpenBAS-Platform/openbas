@@ -1,13 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import Drawer from '@mui/material/Drawer';
-import ListItemText from '@mui/material/ListItemText';
-import Toolbar from '@mui/material/Toolbar';
-import MenuList from '@mui/material/MenuList';
-import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import Divider from '@mui/material/Divider';
-import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+import { Drawer, ListItemText, Toolbar, MenuList, MenuItem, ListItemIcon, Divider, Tooltip, tooltipClasses } from '@mui/material';
 import {
   DashboardOutlined,
   RowingOutlined,

@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
-import IconButton from '@mui/material/IconButton';
+import { IconButton, useTheme } from '@mui/material';
 import MDEditor from '@uiw/react-md-editor/nohighlight';
-import { useTheme } from '@mui/material';
 import { truncate } from '../utils/String';
 import type { Theme } from './Theme';
 

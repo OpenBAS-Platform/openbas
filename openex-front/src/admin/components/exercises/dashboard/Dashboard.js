@@ -1,9 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
+import { Grid, Paper, Typography } from '@mui/material';
 import { GroupsOutlined, NotificationsOutlined, ContactMailOutlined, CastForEducationOutlined } from '@mui/icons-material';
-import Typography from '@mui/material/Typography';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useFormatter } from '../../../../components/i18n';

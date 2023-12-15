@@ -3,13 +3,27 @@ import { Form } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Link, useParams } from 'react-router-dom';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import {
+  Button,
+  Typography,
+  Grid,
+  Card,
+  CardHeader,
+  Avatar,
+  CardContent,
+  CardActionArea,
+  Tooltip,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Alert,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material';
 import * as R from 'ramda';
-import Grid from '@mui/material/Grid';
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import Avatar from '@mui/material/Avatar';
 import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
@@ -20,17 +34,6 @@ import {
   OutlinedFlagOutlined,
   SportsScoreOutlined,
 } from '@mui/icons-material';
-import CardContent from '@mui/material/CardContent';
-import CardActionArea from '@mui/material/CardActionArea';
-import Tooltip from '@mui/material/Tooltip';
-import Chip from '@mui/material/Chip';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import Alert from '@mui/material/Alert';
-import List from '@mui/material/List';
-import { ListItem, ListItemIcon } from '@mui/material';
-import ListItemText from '@mui/material/ListItemText';
 import { tryChallenge, fetchObserverChallenges } from '../../../actions/Challenge';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';

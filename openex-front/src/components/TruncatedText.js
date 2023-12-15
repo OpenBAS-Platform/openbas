@@ -1,6 +1,6 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import Tooltip from '@mui/material/Tooltip';
+import { Tooltip } from '@mui/material';
 import { truncate } from '../utils/String';
 
 const TruncatedText = (props) => {

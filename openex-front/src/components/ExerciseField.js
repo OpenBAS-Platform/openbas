@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Kayaking } from '@mui/icons-material';
-import Box from '@mui/material/Box';
+import { Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Autocomplete from './Autocomplete';
 import useDataLoader from '../utils/ServerSideEvent';

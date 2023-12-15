@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles, styled } from '@mui/styles';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import { List, ListItem, ListItemIcon, ListItemText, Grid, Paper, LinearProgress, linearProgressClasses, Typography } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { CastOutlined, CheckCircleOutlineOutlined, PersonOutlined, HistoryToggleOffOutlined } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
-import Typography from '@mui/material/Typography';
 import { fetchPlayers } from '../../../../actions/User';
 import { fetchOrganizations } from '../../../../actions/Organization';
 import ItemTags from '../../../../components/ItemTags';

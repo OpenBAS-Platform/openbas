@@ -1,11 +1,25 @@
 import React, { useState } from 'react';
 import Chart from 'react-apexcharts';
 import { makeStyles, styled, useTheme } from '@mui/styles';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import Button from '@mui/material/Button';
-import Alert from '@mui/material/Alert';
+import {
+  Typography,
+  Grid,
+  Paper,
+  Button,
+  Alert,
+  LinearProgress,
+  linearProgressClasses,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListItemSecondaryAction,
+  IconButton,
+} from '@mui/material';
 import { Link, useParams } from 'react-router-dom';
 import {
   GroupsOutlined,
@@ -22,19 +36,8 @@ import {
   DeleteOutlined,
   MarkEmailReadOutlined,
 } from '@mui/icons-material';
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogActions from '@mui/material/DialogActions';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import IconButton from '@mui/material/IconButton';
 import { updateExercise, updateExerciseStatus } from '../../../actions/Exercise';
 import { useFormatter } from '../../../components/i18n';
 import ExerciseStatus from './ExerciseStatus';

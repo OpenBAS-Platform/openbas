@@ -1,15 +1,9 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Tooltip, IconButton } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { FileDownloadOutlined, PersonOutlined } from '@mui/icons-material';
 import { CSVLink } from 'react-csv';
-import Tooltip from '@mui/material/Tooltip';
-import IconButton from '@mui/material/IconButton';
 import { fetchPlayers } from '../../../actions/User';
 import { fetchOrganizations } from '../../../actions/Organization';
 import ItemTags from '../../../components/ItemTags';

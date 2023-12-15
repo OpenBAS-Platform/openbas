@@ -1,15 +1,8 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import List from '@mui/material/List';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import { Typography, Grid, Paper, List, ListItemIcon, ListItemText, ListItemSecondaryAction, ListItemButton } from '@mui/material';
 import { HelpOutlined } from '@mui/icons-material';
-import { ListItemButton } from '@mui/material';
 import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import CreateLessonsTemplateCategory from './categories/CreateLessonsTemplateCategory';

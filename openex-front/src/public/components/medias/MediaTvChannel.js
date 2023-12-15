@@ -1,14 +1,7 @@
 import React from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardContent from '@mui/material/CardContent';
-import Avatar from '@mui/material/Avatar';
-import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
+import { Typography, Grid, Card, CardHeader, CardContent, Avatar, CardMedia, Button } from '@mui/material';
 import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, ShareOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
 import Empty from '../../../components/Empty';

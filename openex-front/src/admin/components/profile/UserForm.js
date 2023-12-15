@@ -1,7 +1,6 @@
 import React from 'react';
 import { Form } from 'react-final-form';
-import MenuItem from '@mui/material/MenuItem';
-import Button from '@mui/material/Button';
+import { MenuItem, Button } from '@mui/material';
 import { z } from 'zod';
 import Select from '../../../components/Select';
 import TextField from '../../../components/TextField';

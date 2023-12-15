@@ -1,17 +1,11 @@
 import React, { useState, useRef } from 'react';
 import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
-import Typography from '@mui/material/Typography';
-import Chip from '@mui/material/Chip';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
+import { Typography, Chip, Button, IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import { AddOutlined } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { Form } from 'react-final-form';
 import { useParams } from 'react-router-dom';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
 import { updateExerciseTags } from '../../../actions/Exercise';
 import TagField from '../../../components/TagField';
 import ExercisePopover from './ExercisePopover';

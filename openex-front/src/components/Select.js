@@ -1,8 +1,5 @@
 import React from 'react';
-import MUISelect from '@mui/material/Select';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import FormHelperText from '@mui/material/FormHelperText';
+import { Select as MUISelect, FormControl, InputLabel, FormHelperText } from '@mui/material';
 import { Field } from 'react-final-form';
 
 const renderHelper = ({ touched, error, submitError, helperText, variant }) => {

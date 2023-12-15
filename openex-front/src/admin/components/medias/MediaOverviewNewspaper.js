@@ -1,11 +1,6 @@
 import React from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardContent from '@mui/material/CardContent';
-import Skeleton from '@mui/material/Skeleton';
+import { Typography, Grid, Card, CardHeader, CardContent, Skeleton } from '@mui/material';
 
 const useStyles = makeStyles(() => ({
   root: {

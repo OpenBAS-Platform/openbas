@@ -1,17 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { RateReviewOutlined, ExpandMoreOutlined, EditOutlined } from '@mui/icons-material';
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-import Accordion from '@mui/material/Accordion';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import AccordionSummary from '@mui/material/AccordionSummary';
+import { Card, CardHeader, CardContent, Typography, Accordion, AccordionDetails, AccordionSummary, IconButton } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
-import IconButton from '@mui/material/IconButton';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';

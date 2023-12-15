@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
+import { Alert, AlertTitle } from '@mui/material';
 import inject18n from './i18n';
 
 class NotFound extends Component {

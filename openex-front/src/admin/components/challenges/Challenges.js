@@ -1,15 +1,9 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Tooltip, Chip } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { EmojiEventsOutlined, RowingOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
-import Tooltip from '@mui/material/Tooltip';
-import Chip from '@mui/material/Chip';
 import { Link } from 'react-router-dom';
 import SearchFilter from '../../../components/SearchFilter';
 import useDataLoader from '../../../utils/ServerSideEvent';

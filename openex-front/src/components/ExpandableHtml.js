@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import * as PropTypes from 'prop-types';
 import parse from 'html-react-parser';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
-import IconButton from '@mui/material/IconButton';
+import { IconButton } from '@mui/material';
 import { truncate } from '../utils/String';
 
 const ExpandableHtml = (props) => {

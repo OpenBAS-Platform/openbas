@@ -2,13 +2,23 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import withStyles from '@mui/styles/withStyles';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import {
+  List,
+  ListItem,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  InputLabel,
+  ListItemSecondaryAction,
+  IconButton,
+  Typography,
+  FormGroup,
+  FormControlLabel,
+  Switch,
+  Button,
+  Slide,
+} from '@mui/material';
 import { Form } from 'react-final-form';
-import InputLabel from '@mui/material/InputLabel';
 import { connect } from 'react-redux';
 import {
   ArrowDropDownOutlined,
@@ -21,16 +31,8 @@ import {
   EmojiEventsOutlined,
   HelpOutlineOutlined,
 } from '@mui/icons-material';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
-import Button from '@mui/material/Button';
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
-import Slide from '@mui/material/Slide';
 import inject18n from '../../../../components/i18n';
 import { addInject } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';

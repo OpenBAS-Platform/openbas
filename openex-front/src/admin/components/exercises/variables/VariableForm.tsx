@@ -1,8 +1,7 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
-import Button from '@mui/material/Button';
+import { Button, TextField as MuiTextField } from '@mui/material';
 import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import MuiTextField from '@mui/material/TextField';
 import { z } from 'zod';
 import { useFormatter } from '../../../../components/i18n';
 import type { VariableInput } from '../../../../utils/api-types';

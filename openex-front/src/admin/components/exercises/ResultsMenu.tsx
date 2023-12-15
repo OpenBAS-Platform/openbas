@@ -1,10 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import Drawer from '@mui/material/Drawer';
-import MenuList from '@mui/material/MenuList';
-import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import { Drawer, MenuList, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import { InsertChartOutlinedOutlined, SchoolOutlined, ContentPasteOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../components/i18n';

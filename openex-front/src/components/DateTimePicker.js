@@ -1,7 +1,7 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
-import TextField from '@mui/material/TextField';
-import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { TextField } from '@mui/material';
+import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
 import { Field } from 'react-final-form';
 
 const dateFormatsMap = {

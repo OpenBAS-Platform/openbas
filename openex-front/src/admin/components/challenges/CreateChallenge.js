@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import Fab from '@mui/material/Fab';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
+import { Fab, Dialog, DialogTitle, DialogContent, Slide, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
-import Slide from '@mui/material/Slide';
-import ListItem from '@mui/material/ListItem';
-import { ListItemIcon } from '@mui/material';
-import ListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useFormatter } from '../../../components/i18n';

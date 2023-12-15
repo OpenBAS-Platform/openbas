@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
 import * as R from 'ramda';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Fab } from '@mui/material';
 import { EditOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import Fab from '@mui/material/Fab';
 import { useNavigate } from 'react-router-dom';
 import ReportForm from './ReportForm';
 import { useFormatter } from '../../../../components/i18n';

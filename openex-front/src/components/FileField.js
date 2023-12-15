@@ -2,8 +2,7 @@ import React, { useCallback } from 'react';
 import * as R from 'ramda';
 import { Field } from 'react-final-form';
 import { useDropzone } from 'react-dropzone';
-import Button from '@mui/material/Button';
-import FormHelperText from '@mui/material/FormHelperText';
+import { Button, FormHelperText } from '@mui/material';
 import { useFormatter } from './i18n';
 import { bytesFormat } from '../utils/Number';
 

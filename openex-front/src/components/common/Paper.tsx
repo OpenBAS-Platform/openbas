@@ -1,5 +1,5 @@
 import { makeStyles } from '@mui/styles';
-import PaperMui from '@mui/material/Paper';
+import { Paper as PaperMui } from '@mui/material';
 import React, { FunctionComponent } from 'react';
 
 interface PaperProps {
