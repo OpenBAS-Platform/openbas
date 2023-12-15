@@ -6,10 +6,7 @@ import SpeedDialAction from '@mui/material/SpeedDialAction';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import {
-  VideoSettingsOutlined,
-  MarkEmailReadOutlined,
-} from '@mui/icons-material';
+import { VideoSettingsOutlined, MarkEmailReadOutlined } from '@mui/icons-material';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -27,11 +24,7 @@ import { addDryrun } from '../../../../actions/Dryrun';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import { useHelper } from '../../../../store';
-import type {
-  AudiencesHelper,
-  ExercicesHelper,
-  UsersHelper,
-} from '../../../../actions/helper';
+import type { AudiencesHelper, ExercicesHelper, UsersHelper } from '../../../../actions/helper';
 
 const useStyles = makeStyles<Theme>(() => ({
   createButton: {

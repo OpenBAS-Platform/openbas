@@ -4,11 +4,7 @@ import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import { Form } from 'react-final-form';
 import { makeStyles } from '@mui/styles';
-import {
-  askReset,
-  resetPassword,
-  validateResetToken,
-} from '../../../actions/Application';
+import { askReset, resetPassword, validateResetToken } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';
 import TextField from '../../../components/TextField';
 

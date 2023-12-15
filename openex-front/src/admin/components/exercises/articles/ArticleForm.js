@@ -12,11 +12,7 @@ import ListItem from '@mui/material/ListItem';
 import { ListItemIcon } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import {
-  AttachmentOutlined,
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-} from '@mui/icons-material';
+import { AttachmentOutlined, ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import TextField from '../../../../components/TextField';
 import Autocomplete from '../../../../components/Autocomplete';

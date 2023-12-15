@@ -9,10 +9,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import {
-  CastForEducationOutlined,
-  EmojiEventsOutlined,
-} from '@mui/icons-material';
+import { CastForEducationOutlined, EmojiEventsOutlined } from '@mui/icons-material';
 import Chip from '@mui/material/Chip';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -25,14 +22,8 @@ import Typography from '@mui/material/Typography';
 import AnimationMenu from '../AnimationMenu';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import {
-  fetchExerciseInjects,
-  fetchInjectTypes,
-} from '../../../../actions/Inject';
-import {
-  fetchExerciseInjectExpectations,
-  updateInjectExpectation,
-} from '../../../../actions/Exercise';
+import { fetchExerciseInjects, fetchInjectTypes } from '../../../../actions/Inject';
+import { fetchExerciseInjectExpectations, updateInjectExpectation } from '../../../../actions/Exercise';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import InjectIcon from '../injects/InjectIcon';
@@ -472,68 +463,68 @@ const Validations = () => {
                     )}
                   </List>
                   ) : (
-                  <List component="div" disablePadding>
-                    {groupedExpectation[injectId].map((expectation) => {
-                      const audience = audiencesMap[expectation.inject_expectation_audience]
+                    <List component="div" disablePadding>
+                      {groupedExpectation[injectId].map((expectation) => {
+                        const audience = audiencesMap[expectation.inject_expectation_audience]
                         || {};
-                      return (
-                        <ListItem
-                          key={audience.audience_id}
-                          divider={true}
-                          sx={{ pl: 4 }}
-                          classes={{ root: classes.item }}
-                          button={true}
-                          onClick={() => setCurrentExpectation(expectation)}
-                        >
-                          <ListItemIcon>
-                            <CastForEducationOutlined fontSize="small" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={{ width: '20%' }}
-                                >
-                                  {audience.audience_name}
-                                </div>
-                                <div className={classes.bodyItemRight}>
-                                  <Chip
-                                    classes={{ root: classes.chipInList }}
-                                    style={
+                        return (
+                          <ListItem
+                            key={audience.audience_id}
+                            divider={true}
+                            sx={{ pl: 4 }}
+                            classes={{ root: classes.item }}
+                            button={true}
+                            onClick={() => setCurrentExpectation(expectation)}
+                          >
+                            <ListItemIcon>
+                              <CastForEducationOutlined fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={
+                                <div>
+                                  <div
+                                    className={classes.bodyItem}
+                                    style={{ width: '20%' }}
+                                  >
+                                    {audience.audience_name}
+                                  </div>
+                                  <div className={classes.bodyItemRight}>
+                                    <Chip
+                                      classes={{ root: classes.chipInList }}
+                                      style={
                                       expectation.inject_expectation_result
                                         ? inlineStyles.green
                                         : inlineStyles.orange
                                     }
-                                    label={
+                                      label={
                                       expectation.inject_expectation_result
                                         ? `${t('Validated')} (${
                                           expectation.inject_expectation_score
                                         })`
                                         : t('Pending validation')
                                     }
-                                  />
-                                </div>
-                                <div
-                                  className={classes.bodyItemRight}
-                                  style={{ marginRight: 20 }}
-                                >
-                                  <Chip
-                                    classes={{
-                                      root: classes.points,
-                                    }}
-                                    label={
+                                    />
+                                  </div>
+                                  <div
+                                    className={classes.bodyItemRight}
+                                    style={{ marginRight: 20 }}
+                                  >
+                                    <Chip
+                                      classes={{
+                                        root: classes.points,
+                                      }}
+                                      label={
                                       expectation.inject_expectation_expected_score
                                     }
-                                  />
+                                    />
+                                  </div>
                                 </div>
-                              </div>
                             }
-                          />
-                        </ListItem>
-                      );
-                    })}
-                  </List>
+                            />
+                          </ListItem>
+                        );
+                      })}
+                    </List>
                   )}
               </div>
             );

@@ -10,12 +10,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { CSVLink } from 'react-csv';
 import { connect } from 'react-redux';
 import { interval } from 'rxjs';
-import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-  DomainOutlined,
-  FileDownloadOutlined,
-} from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, DomainOutlined, FileDownloadOutlined } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import IconButton from '@mui/material/IconButton';
 import inject18n from '../../../components/i18n';

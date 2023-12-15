@@ -12,11 +12,7 @@ import Slide from '@mui/material/Slide';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import {
-  updateUser,
-  deleteUser,
-  updateUserPassword,
-} from '../../../../actions/User';
+import { updateUser, deleteUser, updateUserPassword } from '../../../../actions/User';
 import UserForm from './UserForm';
 import { useFormatter } from '../../../../components/i18n';
 import UserPasswordForm from './UserPasswordForm';

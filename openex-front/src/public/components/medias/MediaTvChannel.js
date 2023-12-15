@@ -9,11 +9,7 @@ import CardContent from '@mui/material/CardContent';
 import Avatar from '@mui/material/Avatar';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
-import {
-  ChatBubbleOutlineOutlined,
-  FavoriteBorderOutlined,
-  ShareOutlined,
-} from '@mui/icons-material';
+import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, ShareOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
 import Empty from '../../../components/Empty';
 import { useHelper } from '../../../store';

@@ -22,9 +22,7 @@ import {
   DeleteOutlined,
   MarkEmailReadOutlined,
 } from '@mui/icons-material';
-import LinearProgress, {
-  linearProgressClasses,
-} from '@mui/material/LinearProgress';
+import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
 import Dialog from '@mui/material/Dialog';
@@ -37,10 +35,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import IconButton from '@mui/material/IconButton';
-import {
-  updateExercise,
-  updateExerciseStatus,
-} from '../../../actions/Exercise';
+import { updateExercise, updateExerciseStatus } from '../../../actions/Exercise';
 import { useFormatter } from '../../../components/i18n';
 import ExerciseStatus from './ExerciseStatus';
 import { useHelper } from '../../../store';

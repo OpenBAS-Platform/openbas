@@ -14,10 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { useDispatch } from 'react-redux';
 import LessonsTemplateQuestionForm from './LessonsTemplateQuestionForm';
 import { useFormatter } from '../../../../../components/i18n';
-import {
-  deleteLessonsTemplateQuestion,
-  updateLessonsTemplateQuestion,
-} from '../../../../../actions/Lessons';
+import { deleteLessonsTemplateQuestion, updateLessonsTemplateQuestion } from '../../../../../actions/Lessons';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

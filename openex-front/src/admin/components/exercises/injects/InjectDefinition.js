@@ -803,34 +803,34 @@ class InjectDefinition extends Component {
                                 && values[field.key][index]
                                 && values[field.key][index].type
                                   === 'attachment' ? (
-                                  <Select
-                                    variant="standard"
-                                    name={`${name}.value`}
-                                    fullWidth={true}
-                                    label={t('Value')}
-                                    style={{ marginRight: 20 }}
-                                    disabled={isExerciseReadOnly(exercise)}
-                                  >
-                                    {attachedDocs.map((doc) => (
-                                      <MenuItem
-                                        key={doc.document_id}
-                                        value={doc.document_id}
-                                      >
-                                        <ListItemText>
-                                          {doc.document_name}
-                                        </ListItemText>
-                                      </MenuItem>
-                                    ))}
-                                  </Select>
+                                    <Select
+                                      variant="standard"
+                                      name={`${name}.value`}
+                                      fullWidth={true}
+                                      label={t('Value')}
+                                      style={{ marginRight: 20 }}
+                                      disabled={isExerciseReadOnly(exercise)}
+                                    >
+                                      {attachedDocs.map((doc) => (
+                                        <MenuItem
+                                          key={doc.document_id}
+                                          value={doc.document_id}
+                                        >
+                                          <ListItemText>
+                                            {doc.document_name}
+                                          </ListItemText>
+                                        </MenuItem>
+                                      ))}
+                                    </Select>
                                   ) : (
-                                  <TextField
-                                    variant="standard"
-                                    name={`${name}.value`}
-                                    fullWidth={true}
-                                    label={t('Value')}
-                                    style={{ marginRight: 20 }}
-                                    disabled={isExerciseReadOnly(exercise)}
-                                  />
+                                    <TextField
+                                      variant="standard"
+                                      name={`${name}.value`}
+                                      fullWidth={true}
+                                      label={t('Value')}
+                                      style={{ marginRight: 20 }}
+                                      disabled={isExerciseReadOnly(exercise)}
+                                    />
                                   )}
                                 {field.cardinality === 'n' && (
                                   <IconButton

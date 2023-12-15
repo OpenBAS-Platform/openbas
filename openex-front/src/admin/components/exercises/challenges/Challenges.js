@@ -9,14 +9,7 @@ import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import * as R from 'ramda';
-import {
-  SportsScoreOutlined,
-  CrisisAlertOutlined,
-  DescriptionOutlined,
-  OutlinedFlagOutlined,
-  EmojiEventsOutlined,
-  VisibilityOutlined,
-} from '@mui/icons-material';
+import { SportsScoreOutlined, CrisisAlertOutlined, DescriptionOutlined, OutlinedFlagOutlined, EmojiEventsOutlined, VisibilityOutlined } from '@mui/icons-material';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
 import Button from '@mui/material/Button';

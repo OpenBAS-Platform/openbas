@@ -4,13 +4,7 @@ import * as R from 'ramda';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { fetchOrganizations } from '../../../actions/Organization';
-import {
-  meTokens,
-  renewToken,
-  updateMeInformation,
-  updateMePassword,
-  updateMeProfile,
-} from '../../../actions/User';
+import { meTokens, renewToken, updateMeInformation, updateMePassword, updateMeProfile } from '../../../actions/User';
 import UserForm from './UserForm';
 import ProfileForm from './ProfileForm';
 import PasswordForm from './PasswordForm';

@@ -15,10 +15,7 @@ import { useDispatch } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import LessonsCategoryForm from './LessonsCategoryForm';
 import { useFormatter } from '../../../../../components/i18n';
-import {
-  deleteLessonsCategory,
-  updateLessonsCategory,
-} from '../../../../../actions/Lessons';
+import { deleteLessonsCategory, updateLessonsCategory } from '../../../../../actions/Lessons';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

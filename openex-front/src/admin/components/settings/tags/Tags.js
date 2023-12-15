@@ -9,11 +9,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { connect } from 'react-redux';
 import { interval } from 'rxjs';
-import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-  LabelOutlined,
-} from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, LabelOutlined } from '@mui/icons-material';
 import inject18n from '../../../../components/i18n';
 import { fetchTags } from '../../../../actions/Tag';
 import { FIVE_SECONDS } from '../../../../utils/Time';

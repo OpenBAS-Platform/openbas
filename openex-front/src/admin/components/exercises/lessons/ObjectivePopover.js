@@ -12,10 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import {
-  updateObjective,
-  deleteObjective,
-} from '../../../../actions/Objective';
+import { updateObjective, deleteObjective } from '../../../../actions/Objective';
 import ObjectiveForm from './ObjectiveForm';
 import inject18n from '../../../../components/i18n';
 import { Transition } from '../../../../utils/Environment';

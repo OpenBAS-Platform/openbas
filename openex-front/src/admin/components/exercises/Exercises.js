@@ -6,11 +6,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { Link } from 'react-router-dom';
-import {
-  ChevronRightOutlined,
-  FileDownloadOutlined,
-  Kayaking,
-} from '@mui/icons-material';
+import { ChevronRightOutlined, FileDownloadOutlined, Kayaking } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { CSVLink } from 'react-csv';
 import Tooltip from '@mui/material/Tooltip';

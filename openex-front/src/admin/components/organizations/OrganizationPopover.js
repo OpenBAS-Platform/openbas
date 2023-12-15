@@ -13,10 +13,7 @@ import Slide from '@mui/material/Slide';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import {
-  updateOrganization,
-  deleteOrganization,
-} from '../../../actions/Organization';
+import { updateOrganization, deleteOrganization } from '../../../actions/Organization';
 import OrganizationForm from './OrganizationForm';
 import inject18n from '../../../components/i18n';
 import { tagOptions } from '../../../utils/Option';

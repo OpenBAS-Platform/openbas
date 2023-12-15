@@ -12,11 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import {
-  updateAudience,
-  deleteAudience,
-  updateAudienceActivation,
-} from '../../../../actions/Audience';
+import { updateAudience, deleteAudience, updateAudienceActivation } from '../../../../actions/Audience';
 import inject18n from '../../../../components/i18n';
 import AudienceForm from './AudienceForm';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';

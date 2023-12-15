@@ -9,12 +9,7 @@ import CardContent from '@mui/material/CardContent';
 import Avatar from '@mui/material/Avatar';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
-import {
-  ChatBubbleOutlineOutlined,
-  FavoriteBorderOutlined,
-  ShareOutlined,
-  MoreHorizOutlined,
-} from '@mui/icons-material';
+import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, ShareOutlined, MoreHorizOutlined } from '@mui/icons-material';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';

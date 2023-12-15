@@ -10,12 +10,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { connect } from 'react-redux';
 import { interval } from 'rxjs';
-import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-  CheckCircleOutlined,
-  GroupOutlined,
-} from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, CheckCircleOutlined, GroupOutlined } from '@mui/icons-material';
 import inject18n from '../../../../components/i18n';
 import { fetchUsers } from '../../../../actions/User';
 import { fetchOrganizations } from '../../../../actions/Organization';

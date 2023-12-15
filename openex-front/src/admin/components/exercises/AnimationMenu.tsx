@@ -5,12 +5,7 @@ import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import {
-  TheatersOutlined,
-  FactCheckOutlined,
-  MailOutlined,
-  NoteAltOutlined,
-} from '@mui/icons-material';
+import { TheatersOutlined, FactCheckOutlined, MailOutlined, NoteAltOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../components/i18n';
 import type { Exercise } from '../../../utils/api-types';

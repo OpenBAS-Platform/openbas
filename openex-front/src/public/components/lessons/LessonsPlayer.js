@@ -19,12 +19,7 @@ import { usePermissions } from '../../../utils/Exercise';
 import { fetchMe } from '../../../actions/Application';
 import Loader from '../../../components/Loader';
 import Empty from '../../../components/Empty';
-import {
-  addLessonsAnswers,
-  fetchPlayerLessonsAnswers,
-  fetchPlayerLessonsCategories,
-  fetchPlayerLessonsQuestions,
-} from '../../../actions/Lessons';
+import { addLessonsAnswers, fetchPlayerLessonsAnswers, fetchPlayerLessonsCategories, fetchPlayerLessonsQuestions } from '../../../actions/Lessons';
 import { fetchPlayerExercise } from '../../../actions/Exercise';
 import SliderField from '../../../components/SliderField';
 import TextField from '../../../components/TextField';

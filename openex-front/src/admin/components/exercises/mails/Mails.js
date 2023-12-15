@@ -15,10 +15,7 @@ import { FileDownloadOutlined, KeyboardArrowRight } from '@mui/icons-material';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
-import {
-  fetchExerciseInjects,
-  fetchInjectTypes,
-} from '../../../../actions/Inject';
+import { fetchExerciseInjects, fetchInjectTypes } from '../../../../actions/Inject';
 import InjectIcon from '../injects/InjectIcon';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { useFormatter } from '../../../../components/i18n';

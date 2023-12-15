@@ -1,11 +1,6 @@
 import { Dispatch } from 'redux';
 import * as schema from './Schema';
-import {
-  getReferential,
-  putReferential,
-  postReferential,
-  delReferential,
-} from '../utils/Action';
+import { getReferential, putReferential, postReferential, delReferential } from '../utils/Action';
 import type { Exercise, Variable, VariableInput } from '../utils/api-types';
 
 export const addVariable = (exerciseId: Exercise['exercise_id'], data: VariableInput) => (dispatch: Dispatch) => {

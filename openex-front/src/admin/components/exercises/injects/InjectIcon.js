@@ -1,19 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
-import {
-  EmailOutlined,
-  SmsOutlined,
-  NotificationsActiveOutlined,
-  HelpOutlined,
-  SpeakerNotesOutlined,
-  ApiOutlined,
-  EmojiEventsOutlined,
-} from '@mui/icons-material';
-import {
-  Mastodon,
-  NewspaperVariantMultipleOutline,
-  Twitter,
-} from 'mdi-material-ui';
+import { EmailOutlined, SmsOutlined, NotificationsActiveOutlined, HelpOutlined, SpeakerNotesOutlined, ApiOutlined, EmojiEventsOutlined } from '@mui/icons-material';
+import { Mastodon, NewspaperVariantMultipleOutline, Twitter } from 'mdi-material-ui';
 import Airbus from '../../../../static/images/contracts/airbus.png';
 import CustomTooltip from '../../../../components/CustomTooltip';
 import { fileUri } from '../../../../utils/Environment';

@@ -15,15 +15,9 @@ import { makeStyles } from '@mui/styles';
 import { PopoverProps } from '@mui/material';
 import LessonsTemplateForm from './LessonsTemplateForm';
 import { useFormatter } from '../../../components/i18n';
-import {
-  deleteLessonsTemplate,
-  updateLessonsTemplate,
-} from '../../../actions/Lessons';
+import { deleteLessonsTemplate, updateLessonsTemplate } from '../../../actions/Lessons';
 import Transition from '../../../components/common/Transition';
-import type {
-  LessonsTemplate,
-  LessonsTemplateUpdateInput,
-} from '../../../utils/api-types';
+import type { LessonsTemplate, LessonsTemplateUpdateInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({

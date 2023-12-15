@@ -1,10 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import {
-  RateReviewOutlined,
-  ExpandMoreOutlined,
-  EditOutlined,
-} from '@mui/icons-material';
+import { RateReviewOutlined, ExpandMoreOutlined, EditOutlined } from '@mui/icons-material';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';

@@ -15,11 +15,7 @@ import * as R from 'ramda';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import {
-  addEvaluation,
-  fetchEvaluations,
-  updateEvaluation,
-} from '../../../../actions/Evaluation';
+import { addEvaluation, fetchEvaluations, updateEvaluation } from '../../../../actions/Evaluation';
 import { resolveUserName } from '../../../../utils/String';
 import Loader from '../../../../components/Loader';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
