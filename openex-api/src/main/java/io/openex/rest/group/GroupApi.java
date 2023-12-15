@@ -13,7 +13,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.security.RolesAllowed;
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.util.Spliterator;
 
