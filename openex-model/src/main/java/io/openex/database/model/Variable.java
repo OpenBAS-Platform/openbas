@@ -52,6 +52,7 @@ public class Variable implements Base {
   private String description;
 
   @Column(name = "variable_type")
+  @Enumerated(EnumType.STRING)
   @JsonProperty("variable_type")
   @NotNull
   private VariableType type = VariableType.String;
