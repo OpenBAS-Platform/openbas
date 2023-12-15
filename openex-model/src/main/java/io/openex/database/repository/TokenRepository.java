@@ -29,7 +29,7 @@ public interface TokenRepository extends CrudRepository<Token, String>, JpaSpeci
       + "values (:id, :user, :value, :createdAt)", nativeQuery = true)
   void createToken(
       @Param("id") String tokenId,
-      @Param("user") User adminUser,
+      @Param("user") String adminUser,
       @Param("value") String tokenValue,
       @Param("createdAt") Instant createdAt
   );

@@ -103,7 +103,7 @@ public class InitAdminCommandLineRunner implements CommandLineRunner {
       throw new IllegalArgumentException("Config properties 'openex.admin.token' should be a valid UUID");
     }
 
-    this.tokenRepository.createToken(ADMIN_TOKEN_UUID, user, this.adminToken, Instant.now());
+    this.tokenRepository.createToken(ADMIN_TOKEN_UUID, user.getId(), this.adminToken, Instant.now());
   }
 
   private void updateToken(@NotNull final Token token) {
