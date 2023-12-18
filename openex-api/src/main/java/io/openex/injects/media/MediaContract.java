@@ -81,7 +81,7 @@ public class MediaContract extends Contractor {
                 .optional(expectationScore)
                 // Emailing zone
                 .optional(emailingField)
-                .mandatory(textField("subject", "Subject", "New media pressure entries published for you ${user.name}",
+                .mandatory(textField("subject", "Subject", "New media pressure entries published for ${user.email}",
                         List.of(emailingField)))
                 .mandatory(richTextareaField("body", "Body", messageBody,
                         List.of(emailingField)))
