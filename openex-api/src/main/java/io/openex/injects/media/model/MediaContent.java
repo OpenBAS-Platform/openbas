@@ -2,6 +2,7 @@ package io.openex.injects.media.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.injects.email.model.EmailContent;
+import io.openex.model.inject.form.Expectation;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,11 +16,8 @@ public class MediaContent extends EmailContent {
   @JsonProperty("articles")
   private List<String> articles = new ArrayList<>();
 
-  @JsonProperty("expectation")
-  private boolean expectation;
-
-  @JsonProperty("expectationScore")
-  private Integer expectationScore;
+  @JsonProperty("expectations")
+  private List<Expectation> expectations = new ArrayList<>();
 
   @JsonProperty("emailing")
   private boolean emailing;

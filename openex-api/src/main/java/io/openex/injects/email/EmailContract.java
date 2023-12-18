@@ -5,7 +5,7 @@ import io.openex.contract.ContractConfig;
 import io.openex.contract.ContractVariable;
 import io.openex.contract.Contractor;
 import io.openex.contract.fields.ContractElement;
-import io.openex.contract.fields.ContractManualExpectation;
+import io.openex.contract.fields.ContractExpectations;
 import io.openex.database.model.Variable.VariableType;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +20,7 @@ import static io.openex.contract.ContractVariable.variable;
 import static io.openex.contract.fields.ContractAttachment.attachmentField;
 import static io.openex.contract.fields.ContractAudience.audienceField;
 import static io.openex.contract.fields.ContractCheckbox.checkboxField;
-import static io.openex.contract.fields.ContractManualExpectation.manualExpectationField;
+import static io.openex.contract.fields.ContractExpectations.expectationsField;
 import static io.openex.contract.fields.ContractText.textField;
 import static io.openex.contract.fields.ContractTextArea.richTextareaField;
 import static io.openex.helper.SupportedLanguage.en;
@@ -54,7 +54,7 @@ public class EmailContract extends Contractor {
     ContractVariable documentUriVariable = variable("document_uri",
         "Http user link to upload the document (only for document expectation)", VariableType.String, One);
     // Contracts
-    ContractManualExpectation manualExpectationField = manualExpectationField(
+    ContractExpectations expectationsField = expectationsField(
         "expectations", "Expectations"
     );
     ContractConfig contractConfig = getConfig();
@@ -66,7 +66,7 @@ public class EmailContract extends Contractor {
         // .optional(textField("inReplyTo", "InReplyTo", "HIDDEN")) - Use for direct injection
         .optional(checkboxField("encrypted", "Encrypted", false))
         .optional(attachmentField("attachments", "Attachments", Multiple))
-        .optional(manualExpectationField)
+        .optional(expectationsField)
         .build();
     Contract standardEmail = executableContract(contractConfig, EMAIL_DEFAULT,
         Map.of(en, "Send individual mails", fr, "Envoyer des mails individuels"), standardInstance);
@@ -78,7 +78,7 @@ public class EmailContract extends Contractor {
         .mandatory(richTextareaField("body", "Body"))
         // .mandatory(textField("inReplyTo", "InReplyTo", "HIDDEN"))  - Use for direct injection
         .optional(attachmentField("attachments", "Attachments", Multiple))
-        .optional(manualExpectationField)
+        .optional(expectationsField)
         .build();
     Contract globalEmail = executableContract(contractConfig, EMAIL_GLOBAL,
         Map.of(en, "Send multi-recipients mail", fr, "Envoyer un mail multi-destinataires"), globalInstance);

@@ -18,8 +18,6 @@ public abstract class ContractElement {
 
     private boolean mandatory = true;
 
-    private boolean expectation = false;
-
     private List<LinkedFieldModel> linkedFields = new ArrayList<>();
 
     private List<String> linkedValues = new ArrayList<>();
