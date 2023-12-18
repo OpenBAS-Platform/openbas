@@ -44,7 +44,7 @@ const Root = () => {
       <ConnectedThemeProvider>
         <CssBaseline />
         <ConnectedIntlProvider>
-          <Suspense fallback={<div>rooot loader</div>}>
+          <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="" element={logged.isOnlyPlayer ? <Navigate to="private" /> : <Navigate to="admin" />} />
               <Route path="private/*" element={errorWrapper(IndexPrivate)()} />
