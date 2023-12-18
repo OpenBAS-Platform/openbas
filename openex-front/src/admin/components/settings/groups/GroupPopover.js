@@ -2,34 +2,36 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TableCell from '@mui/material/TableCell';
-import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
-import Avatar from '@mui/material/Avatar';
-import Checkbox from '@mui/material/Checkbox';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogActions from '@mui/material/DialogActions';
-import IconButton from '@mui/material/IconButton';
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+  Button,
+  Chip,
+  Avatar,
+  Checkbox,
+  Tabs,
+  Tab,
+  List,
+  ListItem,
+  ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  IconButton,
+  Box,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  Grid,
+  Typography,
+} from '@mui/material';
 import { MoreVert, PersonOutlined } from '@mui/icons-material';
-import Box from '@mui/material/Box';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import withStyles from '@mui/styles/withStyles';
-import { ListItemIcon } from '@mui/material';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
 import { fetchGroup, deleteGroup, updateGroupUsers, updateGroupInformation } from '../../../../actions/Group';
 import { addGrant, deleteGrant, addGroupOrganization, deleteGroupOrganization } from '../../../../actions/Grant';
 import GroupForm from './GroupForm';

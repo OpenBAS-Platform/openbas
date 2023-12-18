@@ -1,10 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { SchoolOutlined, ChevronRightOutlined } from '@mui/icons-material';
 import { Link } from 'react-router-dom';

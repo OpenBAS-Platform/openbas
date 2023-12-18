@@ -1,6 +1,6 @@
 import React from 'react';
 import { Field } from 'react-final-form';
-import MuiTextField from '@mui/material/TextField';
+import { TextField as MuiTextField } from '@mui/material';
 import { useFormatter } from './i18n';
 
 const TextFieldBase = ({

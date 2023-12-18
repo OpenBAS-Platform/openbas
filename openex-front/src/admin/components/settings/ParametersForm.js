@@ -1,8 +1,7 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import MenuItem from '@mui/material/MenuItem';
-import Button from '@mui/material/Button';
+import { MenuItem, Button } from '@mui/material';
 import Select from '../../../components/Select';
 import inject18n from '../../../components/i18n';
 import TextField from '../../../components/TextField';

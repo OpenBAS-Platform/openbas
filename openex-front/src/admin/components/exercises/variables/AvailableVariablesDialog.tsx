@@ -1,10 +1,4 @@
-import DialogContent from '@mui/material/DialogContent';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import { Alert, DialogActions, ListItemButton, Tab } from '@mui/material';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
+import { DialogContent, List, ListItem, ListItemText, Alert, DialogActions, ListItemButton, Tab, Button, Dialog } from '@mui/material';
 import React, { FunctionComponent, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { Link } from 'react-router-dom';

@@ -1,16 +1,7 @@
 import React from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
+import { Box, Grid, Paper, Typography, List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, LinearProgress } from '@mui/material';
 import { FlagOutlined } from '@mui/icons-material';
-import Typography from '@mui/material/Typography';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import LinearProgress from '@mui/material/LinearProgress';
 import * as R from 'ramda';
 import Chart from 'react-apexcharts';
 import CreateObjective from './CreateObjective';

@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import * as R from 'ramda';
 import { DomainOutlined } from '@mui/icons-material';
-import Box from '@mui/material/Box';
+import { Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import { connect } from 'react-redux';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
 import OrganizationForm from '../admin/components/organizations/OrganizationForm';
 import { fetchOrganizations, addOrganization } from '../actions/Organization';
 import Autocomplete from './Autocomplete';

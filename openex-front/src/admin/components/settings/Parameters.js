@@ -1,15 +1,9 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import { connect, useDispatch } from 'react-redux';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import Chip from '@mui/material/Chip';
+import { Typography, Grid, Paper, List, ListItem, ListItemText, Chip } from '@mui/material';
 import ParametersForm from './ParametersForm';
 import inject18n from '../../../components/i18n';
 import { storeHelper } from '../../../actions/Schema';

@@ -1,8 +1,6 @@
 import React from 'react';
 import { Field } from 'react-final-form';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import MuiCheckbox from '@mui/material/Checkbox';
+import { FormGroup, FormControlLabel, Checkbox as MuiCheckbox } from '@mui/material';
 
 const renderCheckbox = ({
   label,

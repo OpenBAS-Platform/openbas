@@ -1,13 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
-import MuiDialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
+import { Dialog as MuiDialog, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import Dialog from '../../../components/common/Dialog';
 import { updateAudiencePlayers } from '../../../actions/Audience';
 import { deletePlayer, updatePlayer } from '../../../actions/User';

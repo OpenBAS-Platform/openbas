@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form } from 'react-final-form';
-import Button from '@mui/material/Button';
+import { Button } from '@mui/material';
 import TextField from '../../../../components/TextField';
 import { useFormatter } from '../../../../components/i18n';
 

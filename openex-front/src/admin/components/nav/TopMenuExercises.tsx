@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import Button from '@mui/material/Button';
+import { Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../../../components/Theme';
 import { useFormatter } from '../../../components/i18n';

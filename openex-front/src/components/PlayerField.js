@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import * as R from 'ramda';
 import { PersonOutlined } from '@mui/icons-material';
-import Box from '@mui/material/Box';
+import { Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import { connect } from 'react-redux';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
 import PlayerForm from '../admin/components/players/PlayerForm';
 import { addPlayer, fetchPlayers } from '../actions/User';
 import Autocomplete from './Autocomplete';

@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
+import { AppBar, Toolbar, IconButton, Menu, MenuProps, MenuItem, Button } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
-import IconButton from '@mui/material/IconButton';
 import { AccountCircleOutlined } from '@mui/icons-material';
-import Menu, { MenuProps } from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Button from '@mui/material/Button';
 import { makeStyles, useTheme } from '@mui/styles';
 import { logout } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';

@@ -1,17 +1,9 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import { List, ListItem, ListItemIcon, ListItemText, Grid, Paper, Typography, Chip, ListItemSecondaryAction } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { PersonOutlined, CastOutlined, CheckCircleOutlineOutlined } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
-import Chip from '@mui/material/Chip';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import SearchFilter from '../../../../components/SearchFilter';
 import { fetchTags } from '../../../../actions/Tag';
 import { fetchPlayers } from '../../../../actions/User';

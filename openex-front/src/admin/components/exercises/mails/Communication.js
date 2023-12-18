@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import Avatar from '@mui/material/Avatar';
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardContent from '@mui/material/CardContent';
+import { Avatar, Card, CardHeader, CardContent, IconButton, Button } from '@mui/material';
 import { lightBlue } from '@mui/material/colors';
-import IconButton from '@mui/material/IconButton';
 import { ExpandLess, ExpandMore, AttachFileRounded, ReplyOutlined } from '@mui/icons-material';
 import parse from 'html-react-parser';
 import DOMPurify from 'dompurify';
-import Button from '@mui/material/Button';
 import { useFormatter } from '../../../../components/i18n';
 import { resolveUserNames, truncate } from '../../../../utils/String';
 import TruncatedText from '../../../../components/TruncatedText';

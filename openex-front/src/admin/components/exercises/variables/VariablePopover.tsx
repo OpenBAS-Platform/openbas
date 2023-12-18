@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
-import IconButton from '@mui/material/IconButton';
+import { IconButton, Menu, MenuItem, Dialog, DialogContent, DialogContentText, DialogActions, Button, DialogTitle } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import DialogTitle from '@mui/material/DialogTitle';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { useFormatter } from '../../../../components/i18n';
 import type { Exercise, Variable, VariableInput } from '../../../../utils/api-types';

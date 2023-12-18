@@ -1,16 +1,7 @@
 import React, { useState } from 'react';
 import * as R from 'ramda';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import Slide from '@mui/material/Slide';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Slide, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import { useDispatch } from 'react-redux';
 import LessonsTemplateQuestionForm from './LessonsTemplateQuestionForm';
 import { useFormatter } from '../../../../../components/i18n';

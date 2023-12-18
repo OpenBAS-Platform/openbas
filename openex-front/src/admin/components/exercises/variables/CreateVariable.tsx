@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
-import Fab from '@mui/material/Fab';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
+import { Fab, Dialog, DialogTitle, DialogContent, ListItem, ListItemIcon, Theme, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
-import ListItem from '@mui/material/ListItem';
-import { ListItemIcon, Theme } from '@mui/material';
-import ListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
 import VariableForm from './VariableForm';

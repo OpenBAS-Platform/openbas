@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import MenuItem from '@mui/material/MenuItem';
+import { Button, Grid, MenuItem } from '@mui/material';
 import inject18n from '../../../components/i18n';
 import ColorPickerField from '../../../components/ColorPickerField';
 import Select from '../../../components/Select';

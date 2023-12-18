@@ -1,16 +1,8 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
+import { Dialog, DialogContent, DialogActions, Button, IconButton, TableRow, TableCell, TableBody, Table } from '@mui/material';
 import { PreviewOutlined } from '@mui/icons-material';
-import TableRow from '@mui/material/TableRow';
-import TableCell from '@mui/material/TableCell';
-import TableBody from '@mui/material/TableBody';
-import Table from '@mui/material/Table';
 import { Transition } from '../../../../utils/Environment';
 import inject18n from '../../../../components/i18n';
 

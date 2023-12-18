@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import * as PropTypes from 'prop-types';
 import { Route, Routes } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
-import Comcheck from './components/comcheck/Comcheck';
-import Login from './components/login/Login';
 import { errorWrapper } from '../components/Error';
-import Media from './components/medias/Media';
-import Challenges from './components/challenges/Challenges';
-import Lessons from './components/lessons/Lessons';
 import Reset from './components/login/Reset';
 import type { Theme } from '../components/Theme';
+import Loader from '../components/Loader';
+
+const Login = lazy(() => import('./components/login/Login'));
+const Comcheck = lazy(() => import('./components/comcheck/Comcheck'));
+const Media = lazy(() => import('./components/medias/Media'));
+const Challenges = lazy(() => import('./components/challenges/Challenges'));
+const Lessons = lazy(() => import('./components/lessons/Lessons'));
 
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
@@ -27,23 +29,20 @@ const useStyles = makeStyles<Theme>((theme) => ({
 
 const Index = () => {
   const classes = useStyles();
+
   return (
     <div className={classes.root}>
       <main className={classes.content}>
-        <Routes>
-          <Route path="comcheck/:statusId" element={errorWrapper(Comcheck)()} />
-          <Route path="reset" element={errorWrapper(Reset)()} />
-          <Route
-            path="medias/:exerciseId/:mediaId"
-            element={errorWrapper(Media)()}
-          />
-          <Route
-            path="challenges/:exerciseId"
-            element={errorWrapper(Challenges)()}
-          />
-          <Route path="lessons/:exerciseId" element={errorWrapper(Lessons)()} />
-          <Route path="*" element={<Login />} />
-        </Routes>
+        <Suspense fallback={<Loader />}>
+          <Routes>
+            <Route path="comcheck/:statusId" element={errorWrapper(Comcheck)()} />
+            <Route path="reset" element={errorWrapper(Reset)()} />
+            <Route path="medias/:exerciseId/:mediaId" element={errorWrapper(Media)()} />
+            <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
+            <Route path="lessons/:exerciseId" element={errorWrapper(Lessons)()} />
+            <Route path="*" element={<Login />} />
+          </Routes>
+        </Suspense>
       </main>
     </div>
   );

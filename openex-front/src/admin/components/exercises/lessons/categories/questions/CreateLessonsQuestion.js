@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import IconButton from '@mui/material/IconButton';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
+import { IconButton, Dialog, DialogTitle, DialogContent, Slide, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
-import Slide from '@mui/material/Slide';
-import ListItem from '@mui/material/ListItem';
-import { ListItemIcon } from '@mui/material';
-import ListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../../../components/i18n';
 import LessonsQuestionForm from './LessonsQuestionForm';

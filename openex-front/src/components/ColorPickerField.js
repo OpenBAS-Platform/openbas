@@ -1,10 +1,7 @@
 import React from 'react';
 import { Field } from 'react-final-form';
-import MuiTextField from '@mui/material/TextField';
+import { TextField as MuiTextField, IconButton, Popover, InputAdornment } from '@mui/material';
 import { SketchPicker } from 'react-color';
-import IconButton from '@mui/material/IconButton';
-import Popover from '@mui/material/Popover';
-import InputAdornment from '@mui/material/InputAdornment';
 import { ColorLensOutlined } from '@mui/icons-material';
 
 const ColorPickerFieldBase = ({

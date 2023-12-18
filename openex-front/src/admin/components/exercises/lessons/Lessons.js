@@ -1,7 +1,23 @@
 import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
+import {
+  Grid,
+  Paper,
+  Typography,
+  Switch,
+  LinearProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
+  Button,
+  Alert,
+  DialogContentText,
+  DialogActions,
+} from '@mui/material';
 import {
   SportsScoreOutlined,
   SpeakerNotesOutlined,
@@ -11,23 +27,9 @@ import {
   DeleteSweepOutlined,
   VisibilityOutlined,
 } from '@mui/icons-material';
-import Typography from '@mui/material/Typography';
-import Switch from '@mui/material/Switch';
 import { Link, useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import LinearProgress from '@mui/material/LinearProgress';
 import * as R from 'ramda';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import Button from '@mui/material/Button';
-import Alert from '@mui/material/Alert';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogActions from '@mui/material/DialogActions';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';

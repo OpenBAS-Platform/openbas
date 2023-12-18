@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
 import { Field, FieldInputProps, FieldMetaState } from 'react-final-form';
-import InputLabel from '@mui/material/InputLabel';
-import FormHelperText from '@mui/material/FormHelperText';
-import { useTheme } from '@mui/material';
+import { InputLabel, FormHelperText, useTheme } from '@mui/material';
 import { useFormatter } from './i18n';
 import type { Theme } from './Theme';
 

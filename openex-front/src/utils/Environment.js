@@ -2,7 +2,7 @@ import { Subject, timer } from 'rxjs';
 import { debounce } from 'rxjs/operators';
 import * as R from 'ramda';
 import React from 'react';
-import Slide from '@mui/material/Slide';
+import { Slide } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 
 // Service bus

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
+import { Snackbar, Alert } from '@mui/material';
 import { head } from 'ramda';
 import { MESSAGING$ } from '../utils/Environment';
 import inject18n from './i18n';

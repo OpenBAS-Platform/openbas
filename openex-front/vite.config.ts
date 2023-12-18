@@ -1,5 +1,5 @@
 import { createLogger, defineConfig, transformWithEsbuild } from 'vite';
-import react from '@vitejs/plugin-react-swc';
+import react from '@vitejs/plugin-react';
 
 const logger = createLogger()
 const loggerError = logger.error
@@ -29,7 +29,27 @@ export default defineConfig({
   },
 
   optimizeDeps: {
+    entries: [
+      './src/**/*.{js,tsx,ts,jsx}'
+    ],
     include: [
+      'react-apexcharts',
+      'react-leaflet',
+      'react-final-form',
+      'react-color',
+      'react-csv',
+      'final-form-arrays',
+      'react-final-form-arrays',
+      '@mui/lab',
+      'react-dropzone',
+      '@uiw/react-md-editor/nohighlight',
+      'classnames',
+      'mdi-material-ui',
+      '@mui/styles',
+      '@mui/icons-material',
+      '@mui/material/colors',
+      '@ckeditor/ckeditor5-react',
+      'zod',
       'ckeditor5-custom-build/build/ckeditor',
     ],
   },
@@ -45,8 +65,8 @@ export default defineConfig({
       return html.replace(/%BASE_PATH%/g, basePath)
       .replace(/%APP_TITLE%/g, "OpenEx Dev")
       .replace(/%APP_DESCRIPTION%/g, "OpenEx Development platform")
-      .replace(/%APP_FAVICON%/g, `${basePath}/static/ext/favicon.png`)
-      .replace(/%APP_MANIFEST%/g, `${basePath}/static/ext/manifest.json`)
+      .replace(/%APP_FAVICON%/g, `${basePath}/src/static/ext/favicon.png`)
+      .replace(/%APP_MANIFEST%/g, `${basePath}/src/static/ext/manifest.json`)
     }
     },
     {
@@ -66,15 +86,6 @@ export default defineConfig({
 
   server: {
     port: 3000,
-    warmup: {
-      clientFiles: [
-        './src/components/i18n.js',
-        './src/components/hooks.ts',
-        './src/components/Zod.ts',
-        './src/components/common/Transition.tsx',
-        './src/resources/geo/countries.json',
-      ],
-    },
     proxy: {
       '/api': backProxy,
       '/login':  backProxy,

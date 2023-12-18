@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import { Link, useParams } from 'react-router-dom';
-import Button from '@mui/material/Button';
+import { Button } from '@mui/material';
 import { fetchObserverMedia } from '../../../actions/Media';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';

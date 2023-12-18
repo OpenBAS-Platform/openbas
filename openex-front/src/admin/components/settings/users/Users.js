@@ -1,10 +1,6 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CheckCircleOutlined, PersonOutlined } from '@mui/icons-material';
 import { fetchUsers } from '../../../../actions/User';

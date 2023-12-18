@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import withStyles from '@mui/styles/withStyles';
-import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
+import { TextField, InputAdornment } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import { compose } from 'ramda';
 import inject18n from './i18n';

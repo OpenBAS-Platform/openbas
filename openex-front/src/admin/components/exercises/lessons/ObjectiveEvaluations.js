@@ -1,16 +1,8 @@
 import React, { useState } from 'react';
-import Box from '@mui/material/Box';
+import { Box, Typography, Slider, List, ListItem, ListItemIcon, ListItemText, LinearProgress, Button } from '@mui/material';
 import { HowToVoteOutlined } from '@mui/icons-material';
-import Typography from '@mui/material/Typography';
-import Slider from '@mui/material/Slider';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import LinearProgress from '@mui/material/LinearProgress';
-import Button from '@mui/material/Button';
 import * as R from 'ramda';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';

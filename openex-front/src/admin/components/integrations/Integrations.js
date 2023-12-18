@@ -2,14 +2,7 @@ import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Chip from '@mui/material/Chip';
+import { Typography, Grid, Paper, List, ListItem, ListItemIcon, ListItemText, Chip } from '@mui/material';
 import {
   HelpOutlined,
   TitleOutlined,

@@ -1,34 +1,35 @@
-import React from 'react';
-import { Route, Routes, useParams, useLocation } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
-import Exercise from './Exercise';
+import React, { Suspense, lazy } from 'react';
+import { Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { fetchExercise } from '../../../actions/Exercise';
 import { fetchTags } from '../../../actions/Tag';
-import Loader from '../../../components/Loader';
-import ExerciseHeader from './ExerciseHeader';
-import TopBar from '../nav/TopBar';
-import Audiences from './audiences/Audiences';
-import Injects from './injects/Injects';
-import Articles from './articles/Articles';
-import Challenges from './challenges/Challenges';
-import Timeline from './timeline/Timeline';
-import Mails from './mails/Mails';
-import MailsInject from './mails/Inject';
-import Logs from './logs/Logs';
-import Chat from './chat/Chat';
-import Validations from './validations/Validations';
-import Dryrun from './controls/Dryrun';
-import Comcheck from './controls/Comcheck';
-import Dashboard from './dashboard/Dashboard';
-import Lessons from './lessons/Lessons';
-import Reports from './reports/Reports';
-import { errorWrapper } from '../../../components/Error';
-import useDataLoader from '../../../utils/ServerSideEvent';
-import { useHelper } from '../../../store';
-import Report from './reports/Report';
-import Variables from './variables/Variables';
 import type { ExercicesHelper } from '../../../actions/helper';
+import { errorWrapper } from '../../../components/Error';
+import Loader from '../../../components/Loader';
+import { useHelper } from '../../../store';
+import useDataLoader from '../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../utils/hooks';
+import TopBar from '../nav/TopBar';
+import ExerciseHeader from './ExerciseHeader';
+
+const Exercise = lazy(() => import('./Exercise'));
+const Dryrun = lazy(() => import('./controls/Dryrun'));
+const Comcheck = lazy(() => import('./controls/Comcheck'));
+const Dashboard = lazy(() => import('./dashboard/Dashboard'));
+const Lessons = lazy(() => import('./lessons/Lessons'));
+const Reports = lazy(() => import('./reports/Reports'));
+const Report = lazy(() => import('./reports/Report'));
+const Audiences = lazy(() => import('./audiences/Audiences'));
+const Injects = lazy(() => import('./injects/Injects'));
+const Articles = lazy(() => import('./articles/Articles'));
+const Challenges = lazy(() => import('./challenges/Challenges'));
+const Timeline = lazy(() => import('./timeline/Timeline'));
+const Mails = lazy(() => import('./mails/Mails'));
+const MailsInject = lazy(() => import('./mails/Inject'));
+const Logs = lazy(() => import('./logs/Logs'));
+const Chat = lazy(() => import('./chat/Chat'));
+const Validations = lazy(() => import('./validations/Validations'));
+const Variables = lazy(() => import('./variables/Variables'));
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -42,17 +43,14 @@ const Index = () => {
   const { exerciseId } = useParams();
   const location = useLocation();
   const exercise = useHelper((helper: ExercicesHelper) => helper.getExercise(exerciseId));
+
   useDataLoader(() => {
     dispatch(fetchTags());
     dispatch(fetchExercise(exerciseId));
   });
   if (exercise) {
     let withPadding = false;
-    if (
-      location.pathname.includes('/definition')
-      || location.pathname.includes('/animation')
-      || location.pathname.includes('/results')
-    ) {
+    if (location.pathname.includes('/definition') || location.pathname.includes('/animation') || location.pathname.includes('/results')) {
       withPadding = true;
     }
     return (
@@ -60,50 +58,28 @@ const Index = () => {
         <TopBar />
         <ExerciseHeader withPadding={withPadding} />
         <div className="clearfix" />
-        <Routes>
-          <Route path="" element={errorWrapper(Exercise)()} />
-          <Route
-            path="controls/dryruns/:dryrunId"
-            element={errorWrapper(Dryrun)()}
-          />
-          <Route
-            path="controls/comchecks/:comcheckId"
-            element={errorWrapper(Comcheck)()}
-          />
-          <Route
-            path="definition/audiences"
-            element={errorWrapper(Audiences)()}
-          />
-          <Route path="definition/media" element={errorWrapper(Articles)()} />
-          <Route
-            path="definition/challenges"
-            element={errorWrapper(Challenges)()}
-          />
-          <Route
-            path="definition/variables"
-            element={errorWrapper(Variables)()}
-          />
-          <Route path="scenario" element={errorWrapper(Injects)()} />
-          <Route path="animation/timeline" element={errorWrapper(Timeline)()} />
-          <Route path="animation/mails" element={errorWrapper(Mails)()} />
-          <Route
-            path="animation/mails/:injectId"
-            element={errorWrapper(MailsInject)()}
-          />
-          <Route path="animation/logs" element={errorWrapper(Logs)()} />
-          <Route path="animation/chat" element={errorWrapper(Chat)()} />
-          <Route
-            path="animation/validations"
-            element={errorWrapper(Validations)()}
-          />
-          <Route path="results/dashboard" element={errorWrapper(Dashboard)()} />
-          <Route path="results/lessons" element={errorWrapper(Lessons)()} />
-          <Route path="results/reports" element={errorWrapper(Reports)()} />
-          <Route
-            path="results/reports/:reportId"
-            element={errorWrapper(Report)()}
-          />
-        </Routes>
+        <Suspense fallback={<Loader />}>
+          <Routes>
+            <Route path="" element={errorWrapper(Exercise)()} />
+            <Route path="controls/dryruns/:dryrunId" element={errorWrapper(Dryrun)()} />
+            <Route path="controls/comchecks/:comcheckId" element={errorWrapper(Comcheck)()} />
+            <Route path="definition/audiences" element={errorWrapper(Audiences)()} />
+            <Route path="definition/media" element={errorWrapper(Articles)()} />
+            <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
+            <Route path="definition/variables" element={errorWrapper(Variables)()} />
+            <Route path="scenario" element={errorWrapper(Injects)()} />
+            <Route path="animation/timeline" element={errorWrapper(Timeline)()} />
+            <Route path="animation/mails" element={errorWrapper(Mails)()} />
+            <Route path="animation/mails/:injectId" element={errorWrapper(MailsInject)()} />
+            <Route path="animation/logs" element={errorWrapper(Logs)()} />
+            <Route path="animation/chat" element={errorWrapper(Chat)()} />
+            <Route path="animation/validations" element={errorWrapper(Validations)()} />
+            <Route path="results/dashboard" element={errorWrapper(Dashboard)()} />
+            <Route path="results/lessons" element={errorWrapper(Lessons)()} />
+            <Route path="results/reports" element={errorWrapper(Reports)()} />
+            <Route path="results/reports/:reportId" element={errorWrapper(Report)()} />
+          </Routes>
+        </Suspense>
       </div>
     );
   }

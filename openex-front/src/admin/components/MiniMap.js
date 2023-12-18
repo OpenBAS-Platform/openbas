@@ -1,13 +1,13 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import withTheme from '@mui/styles/withTheme';
-import withStyles from '@mui/styles/withStyles';
+import { withTheme, withStyles } from '@mui/styles';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import { connect } from 'react-redux';
 import countries from '../../static/geo/countries.json';
 import { storeHelper } from '../../actions/Schema';
 import Loader from '../../components/Loader';
+import '../../static/css/leaflet.css';
 
 const styles = () => ({
   paper: {

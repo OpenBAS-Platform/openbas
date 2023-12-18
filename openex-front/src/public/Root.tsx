@@ -1,5 +1,5 @@
 import React from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
+import { CssBaseline } from '@mui/material';
 import { StyledEngineProvider } from '@mui/material/styles';
 import ConnectedThemeProvider from '../components/AppThemeProvider';
 import ConnectedIntlProvider from '../components/AppIntlProvider';

@@ -1,24 +1,26 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Checkbox,
+  TableContainer,
+} from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Table from '@mui/material/Table';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TableCell from '@mui/material/TableCell';
-import TableBody from '@mui/material/TableBody';
-import Checkbox from '@mui/material/Checkbox';
 import { makeStyles } from '@mui/styles';
 import { PopoverProps } from '@mui/material/Popover';
-import TableContainer from '@mui/material/TableContainer';
 import { useFormatter } from '../../../components/i18n';
 import ExerciseForm from './ExerciseForm';
 import { deleteExercise, updateExercise } from '../../../actions/Exercise';

@@ -1,16 +1,10 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Tooltip, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { ChevronRightOutlined, FileDownloadOutlined, Kayaking } from '@mui/icons-material';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { CSVLink } from 'react-csv';
-import Tooltip from '@mui/material/Tooltip';
-import IconButton from '@mui/material/IconButton';
 import { useFormatter } from '../../../components/i18n';
 import { fetchExercises } from '../../../actions/Exercise';
 import ItemTags from '../../../components/ItemTags';

@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { Form } from 'react-final-form';
-import Button from '@mui/material/Button';
+import { Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { z } from 'zod';
 import TextField from '../../../components/TextField';

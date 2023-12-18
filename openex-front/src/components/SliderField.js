@@ -1,6 +1,6 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import MUISlider from '@mui/material/Slider';
+import { Slider as MUISlider } from '@mui/material';
 import { Field } from 'react-final-form';
 
 const renderSliderField = ({

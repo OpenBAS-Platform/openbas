@@ -1,8 +1,6 @@
-import DrawerMUI from '@mui/material/Drawer';
-import IconButton from '@mui/material/IconButton';
+import { Drawer as DrawerMUI, IconButton, Typography } from '@mui/material';
 import React, { FunctionComponent } from 'react';
 import { Close } from '@mui/icons-material';
-import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../Theme';
 

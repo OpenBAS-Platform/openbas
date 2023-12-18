@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/styles';
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
+import { LinearProgress, linearProgressClasses } from '@mui/material';
 import { progression } from '../../../../utils/Time';
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({

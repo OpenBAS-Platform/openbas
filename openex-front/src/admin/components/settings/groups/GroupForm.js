@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import Tooltip from '@mui/material/Tooltip';
+import { Button, Grid, Tooltip } from '@mui/material';
 import { InfoOutlined } from '@mui/icons-material';
 import TextField from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';

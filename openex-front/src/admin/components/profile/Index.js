@@ -1,8 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import { Button, Typography } from '@mui/material';
 import { fetchOrganizations } from '../../../actions/Organization';
 import { meTokens, renewToken, updateMeInformation, updateMePassword, updateMeProfile } from '../../../actions/User';
 import UserForm from './UserForm';
