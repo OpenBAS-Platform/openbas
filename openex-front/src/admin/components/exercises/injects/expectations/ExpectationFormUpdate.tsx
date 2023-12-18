@@ -1,47 +1,33 @@
 import React, { FunctionComponent, SyntheticEvent } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import MuiTextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import { zodImplement } from '../../../../../utils/Zod';
 import { useFormatter } from '../../../../../components/i18n';
 import { ExpectationInput } from '../../../../../actions/Expectation';
+import { Alert, MenuItem } from '@mui/material';
+import MUISelect from '@mui/material/Select';
+import { formProps, infoMessage } from './ExpectationFormUtils';
+import InputLabel from '@mui/material/InputLabel';
 
 interface ExpectationFormProps {
   onSubmit: SubmitHandler<ExpectationInput>;
   handleClose: () => void;
-  editing?: boolean;
-  initialValues?: ExpectationInput;
+  initialValues: ExpectationInput;
 }
 
-const ExpectationManualForm: FunctionComponent<ExpectationFormProps> = ({
+const ExpectationFormUpdate: FunctionComponent<ExpectationFormProps> = ({
   onSubmit,
   handleClose,
-  editing = false,
-  initialValues = {
-    expectation_type: 'MANUAL',
-    expectation_name: '',
-    expectation_description: '',
-    expectation_score: 0,
-  },
+  initialValues,
 }) => {
   const { t } = useFormatter();
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isDirty, isSubmitting },
-  } = useForm<ExpectationInput>({
-    mode: 'onTouched',
-    resolver: zodResolver(zodImplement<ExpectationInput>().with({
-      expectation_type: z.string(),
-      expectation_name: z.string(),
-      expectation_description: z.string().optional(),
-      expectation_score: z.coerce.number(),
-    })),
-    defaultValues: initialValues,
-  });
+    formState: { errors, isSubmitting, isValid },
+    getValues,
+  } = useForm<ExpectationInput>(formProps(initialValues));
 
   const handleSubmitWithoutPropagation = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -51,11 +37,32 @@ const ExpectationManualForm: FunctionComponent<ExpectationFormProps> = ({
 
   return (
     <form id="expectationForm" onSubmit={handleSubmitWithoutPropagation}>
+      <div>
+        <InputLabel id="input-type">{t('Type')}</InputLabel>
+        <MUISelect
+          disabled={true}
+          labelId="input-type"
+          value={getValues().expectation_type}
+          variant="standard"
+          fullWidth
+          error={!!errors.expectation_type}
+          inputProps={register('expectation_type')}
+        >
+          <MenuItem value={getValues().expectation_type}>{t(getValues().expectation_type)}</MenuItem>
+        </MUISelect>
+      </div>
+      {getValues().expectation_type === 'ARTICLE'
+        && <Alert
+          severity="info"
+          style={{ marginTop: 20 }}>
+          {infoMessage(getValues().expectation_type, t)}
+        </Alert>
+      }
       <MuiTextField
-        placeholder={t('The animation team can validate the audience reaction')}
         variant="standard"
         fullWidth
         label={t('Name')}
+        style={{ marginTop: 20 }}
         error={!!errors.expectation_name}
         helperText={
           errors.expectation_name && errors.expectation_name?.message
@@ -97,13 +104,13 @@ const ExpectationManualForm: FunctionComponent<ExpectationFormProps> = ({
         <Button
           color="secondary"
           type="submit"
-          disabled={!isDirty || isSubmitting}
+          disabled={!isValid || isSubmitting}
         >
-          {editing ? t('Update') : t('Create')}
+          {t('Update')}
         </Button>
       </div>
     </form>
   );
 };
 
-export default ExpectationManualForm;
+export default ExpectationFormUpdate;

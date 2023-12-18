@@ -13,8 +13,8 @@ import Transition from '../../../../../components/common/Transition';
 import { isExerciseReadOnly } from '../../../../../utils/Exercise';
 import { Exercise } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
-import ExpectationManualForm from './ExpectationManualForm';
 import { ExpectationInput } from '../../../../../actions/Expectation';
+import ExpectationFormUpdate from './ExpectationFormUpdate';
 
 interface ExpectationPopoverProps {
   index: number;
@@ -24,7 +24,7 @@ interface ExpectationPopoverProps {
   handleDelete: (idx: number) => void;
 }
 
-const ExpectationManualPopover: FunctionComponent<ExpectationPopoverProps> = ({
+const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   index,
   exercise,
   expectation,
@@ -124,9 +124,8 @@ const ExpectationManualPopover: FunctionComponent<ExpectationPopoverProps> = ({
       >
         <DialogTitle>{t('Update the expectation')}</DialogTitle>
         <DialogContent>
-          <ExpectationManualForm
+          <ExpectationFormUpdate
             initialValues={expectation}
-            editing={true}
             onSubmit={onSubmitEdit}
             handleClose={handleCloseEdit}
           />
@@ -136,4 +135,4 @@ const ExpectationManualPopover: FunctionComponent<ExpectationPopoverProps> = ({
   );
 };
 
-export default ExpectationManualPopover;
+export default ExpectationPopover;

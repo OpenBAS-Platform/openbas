@@ -57,7 +57,7 @@ import MediaIcon from '../../medias/MediaIcon';
 import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
-import InjectExpectationsManual from './expectations/InjectExpectationsManual';
+import InjectExpectations from './expectations/InjectExpectations';
 
 const EMAIL_CONTRACT = '138ad8f8-32f8-4a22-8114-aaa12322bd09';
 
@@ -1133,6 +1133,9 @@ class QuickInject extends Component {
     const hasExpectations = injectType.fields
       .map((f) => f.key)
       .includes('expectations');
+    const predefinedExpectations = injectType.fields.filter(
+      (f) => f.key === 'expectations'
+    ).flatMap((f) => f.predefinedExpectations);
     const expectationsNotManual = injectType.fields.filter(
       (f) => f.expectation === true,
     );
@@ -1768,8 +1771,9 @@ class QuickInject extends Component {
                       </div>
                     )}
                     {hasExpectations
-                      && <InjectExpectationsManual
+                      && <InjectExpectations
                         exercise={exercise}
+                        predefinedExpectationDatas={predefinedExpectations}
                         expectationDatas={expectations}
                         handleExpectations={this.handleExpectations.bind(this)}
                       />

@@ -8,21 +8,25 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import * as R from 'ramda';
 import { Theme } from '../../../../../components/Theme';
-import InjectAddExpectationManual from './InjectAddExpectationManual';
+import InjectAddExpectation from './InjectAddExpectation';
 import { Exercise } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
 import { ExpectationInput } from '../../../../../actions/Expectation';
 import { truncate } from '../../../../../utils/String';
-import ExpectationManualPopover from './ExpectationManualPopover';
+import ExpectationPopover from './ExpectationPopover';
+import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
     paddingLeft: 10,
     height: 50,
   },
+  itemDisabled: {
+    opacity: '0.38'
+  },
   column: {
     display: 'grid',
-    gridTemplateColumns: '1fr 1fr 1fr',
+    gridTemplateColumns: '2fr 1fr 1fr 1fr',
   },
   header: {
     display: 'inline-flex',
@@ -40,12 +44,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface InjectExpectationsProps {
   exercise: Exercise;
+  predefinedExpectationDatas: ExpectationInput[];
   expectationDatas: ExpectationInput[];
   handleExpectations: (expectations: ExpectationInput[]) => void;
 }
 
-const InjectExpectationsManual: FunctionComponent<InjectExpectationsProps> = ({
+const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
   exercise,
+  predefinedExpectationDatas,
   expectationDatas,
   handleExpectations,
 }) => {
@@ -54,23 +60,8 @@ const InjectExpectationsManual: FunctionComponent<InjectExpectationsProps> = ({
 
   const [expectations, setExpectations] = useState(expectationDatas ?? []);
 
-  const handleAddExpectation = (expectation: ExpectationInput) => {
-    const values = [...expectations, expectation];
-    setExpectations(values);
-    handleExpectations(values);
-  };
-
-  const handleUpdateExpectation = (expectation: ExpectationInput, idx: number) => {
-    const values = expectations.map((item, i) => (i !== idx ? item : expectation));
-    setExpectations(values);
-    handleExpectations(values);
-  };
-
-  const handleRemoveExpectation = (idx: number) => {
-    const values = expectations.filter((_, i) => i !== idx);
-    setExpectations(values);
-    handleExpectations(values);
-  };
+  const predefinedExpectations = predefinedExpectationDatas
+    .filter((pe) => !expectations.map((e) => e.expectation_type).includes(pe.expectation_type));
 
   const headers = [
     {
@@ -86,7 +77,12 @@ const InjectExpectationsManual: FunctionComponent<InjectExpectationsProps> = ({
     {
       field: 'expectation_score',
       label: 'Score',
-      isSortable: false,
+      isSortable: true,
+    },
+    {
+      field: 'expectation_type',
+      label: 'Type',
+      isSortable: true,
     },
   ];
 
@@ -118,7 +114,7 @@ const InjectExpectationsManual: FunctionComponent<InjectExpectationsProps> = ({
       );
     }
     return (
-      <div>
+      <div className={classes.header}>
         <span>{t(header.label)}</span>
       </div>
     );
@@ -130,6 +126,42 @@ const InjectExpectationsManual: FunctionComponent<InjectExpectationsProps> = ({
       : [R.descend(R.prop(sortBy))],
   );
   const sortedExpectations: ExpectationInput[] = sortExpectations(expectations);
+
+  // -- ACTIONS --
+
+  const handleAddExpectation = (expectation: ExpectationInput) => {
+    const values = [...sortedExpectations, expectation];
+    setExpectations(values);
+    handleExpectations(values);
+  };
+
+  const handleUpdateExpectation = (expectation: ExpectationInput, idx: number) => {
+    const values = sortedExpectations.map((item, i) => (i !== idx ? item : expectation));
+    setExpectations(values);
+    handleExpectations(values);
+  };
+
+  const handleRemoveExpectation = (idx: number) => {
+    const values = sortedExpectations.filter((_, i) => i !== idx);
+    setExpectations(values);
+    handleExpectations(values);
+  };
+
+  // -- UTILS --
+
+  const typeLabel = (type: string) => {
+    if (type === 'ARTICLE') {
+      return t('Automatic');
+    }
+    return t('Manual');
+  };
+
+  const typeIcon = (type: string) => {
+    if (type === 'ARTICLE') {
+      return <NewspaperVariantMultipleOutline />;
+    }
+    return <AssignmentTurnedIn />;
+  }
 
   return (
     <>
@@ -146,31 +178,34 @@ const InjectExpectationsManual: FunctionComponent<InjectExpectationsProps> = ({
           <ListItemSecondaryAction>
           </ListItemSecondaryAction>
         </ListItem>
-        {sortedExpectations?.map((expectation, idx) => (
+        {sortedExpectations.map((expectation, idx) => (
           <ListItem
             key={idx}
             classes={{ root: classes.item }}
             divider={true}
           >
             <ListItemIcon>
-              <AssignmentTurnedIn />
+              {typeIcon(expectation.expectation_type)}
             </ListItemIcon>
             <ListItemText
               primary={
                 <div className={classes.column}>
                   <div className={classes.bodyItem}>
-                    {truncate(expectation.expectation_name || '', 22)}
+                    {truncate(expectation.expectation_name || '', 40)}
                   </div>
                   <div className={classes.bodyItem}>
-                    {truncate(expectation.expectation_description || '', 22)}
+                    {truncate(expectation.expectation_description || '', 15)}
                   </div>
                   <div className={classes.bodyItem}>
                     {expectation.expectation_score}
                   </div>
+                  <div className={classes.bodyItem}>
+                    {typeLabel(expectation.expectation_type)}
+                  </div>
                 </div>
               } />
             <ListItemSecondaryAction>
-              <ExpectationManualPopover
+              <ExpectationPopover
                 index={idx}
                 exercise={exercise}
                 expectation={expectation}
@@ -181,9 +216,13 @@ const InjectExpectationsManual: FunctionComponent<InjectExpectationsProps> = ({
           </ListItem>
         ))}
       </List>
-      <InjectAddExpectationManual exercise={exercise} handleAddExpectation={handleAddExpectation} />
+      <InjectAddExpectation
+        exercise={exercise}
+        handleAddExpectation={handleAddExpectation}
+        predefinedExpectations={predefinedExpectations}
+      />
     </>
   );
 };
 
-export default InjectExpectationsManual;
+export default InjectExpectations;

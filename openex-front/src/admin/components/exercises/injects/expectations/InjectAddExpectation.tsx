@@ -8,7 +8,7 @@ import { Exercise } from '../../../../../utils/api-types';
 import { Theme } from '../../../../../components/Theme';
 import { useFormatter } from '../../../../../components/i18n';
 import Dialog from '../../../../../components/common/Dialog';
-import ExpectationManualForm from './ExpectationManualForm';
+import ExpectationFormCreate from './ExpectationFormCreate';
 import { ExpectationInput } from '../../../../../actions/Expectation';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -25,11 +25,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface InjectAddExpectationProps {
   exercise: Exercise;
+  predefinedExpectations: ExpectationInput[];
   handleAddExpectation: (data: ExpectationInput) => void;
 }
 
-const InjectAddExpectationManual: FunctionComponent<InjectAddExpectationProps> = ({
+const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
   exercise,
+  predefinedExpectations,
   handleAddExpectation,
 }) => {
   const classes = useStyles();
@@ -59,18 +61,22 @@ const InjectAddExpectationManual: FunctionComponent<InjectAddExpectationProps> =
           <ControlPointOutlined color="primary" />
         </ListItemIcon>
         <ListItemText
-          primary={t('Add manual expectations')}
+          primary={t('Add expectations')}
           classes={{ primary: classes.text }}
         />
       </ListItemButton>
       <Dialog
         open={openDialog}
         handleClose={handleClose}
-        title={t('Add manual expectation in this inject')}>
-        <ExpectationManualForm onSubmit={onSubmit} handleClose={handleClose} />
+        title={t('Add expectation in this inject')}>
+        <ExpectationFormCreate
+          predefinedExpectations={predefinedExpectations}
+          onSubmit={onSubmit}
+          handleClose={handleClose}
+        />
       </Dialog>
     </>
   );
 };
 
-export default InjectAddExpectationManual;
+export default InjectAddExpectation;
