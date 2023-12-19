@@ -271,7 +271,6 @@ export interface ContractConfig {
 }
 
 export interface ContractElement {
-  expectation?: boolean;
   key?: string;
   label?: string;
   linkedFields?: LinkedFieldModel[];

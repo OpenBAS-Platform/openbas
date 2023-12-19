@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import { CastForEducationOutlined } from '@mui/icons-material';
+import { AssignmentTurnedIn } from '@mui/icons-material';
 import ListItemText from '@mui/material/ListItemText';
 import Chip from '@mui/material/Chip';
 import List from '@mui/material/List';
@@ -13,7 +13,7 @@ import type { InjectExpectationsStore } from '../injects/expectations/Expectatio
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import colorStyles from '../../../../components/Color';
-import DialogExpectations from './DialogExpectations';
+import ManualExpectationsValidation from './ManualExpectationsValidation';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -23,10 +23,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     placeContent: 'space-between',
     fontSize: theme.typography.h3.fontSize,
-    '& div': {
-      display: 'flex',
-      gap: 20,
-    },
+  },
+  chip: {
+    display: 'flex',
+    gap: theme.spacing(3),
   },
   chipInList: {
     height: 20,
@@ -45,13 +45,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   exerciseId: string;
   inject: Inject;
-  injectExpectations: InjectExpectationsStore[];
+  expectations: InjectExpectationsStore[];
 }
 
 const ManualExpectations: FunctionComponent<Props> = ({
   exerciseId,
   inject,
-  injectExpectations,
+  expectations,
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
@@ -62,7 +62,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
     });
   });
 
-  const groupedByAudience = injectExpectations.reduce((group: Map<string, InjectExpectationsStore[]>, expectation) => {
+  const groupedByAudience = expectations.reduce((group: Map<string, InjectExpectationsStore[]>, expectation) => {
     const { inject_expectation_audience } = expectation;
     if (inject_expectation_audience) {
       const values = group.get(inject_expectation_audience) ?? [];
@@ -93,43 +93,43 @@ const ManualExpectations: FunctionComponent<Props> = ({
               label = `${t('Validated')} (${expectationValues.score})`;
             }
             return (
-                <ListItemButton
-                  key={audience.audience_id}
-                  divider={true}
-                  sx={{ pl: 4 }}
-                  classes={{ root: classes.item }}
-                  onClick={() => setCurrentExpectations(values)}
-                >
-                  <ListItemIcon>
-                    <CastForEducationOutlined fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={(
-                      <div className={classes.container}>
-                        {audience.audience_name}
-                        <div>
-                          <Chip
-                            classes={{ root: classes.points }}
-                            label={expectationValues.expected_score}
-                          />
-                          <Chip
-                            classes={{ root: classes.chipInList }}
-                            style={
-                              validated === values.length
-                                ? colorStyles.green
-                                : colorStyles.orange
-                            }
-                            label={label}
-                          />
-                        </div>
+              <ListItemButton
+                key={audience.audience_id}
+                divider
+                sx={{ pl: 8 }}
+                classes={{ root: classes.item }}
+                onClick={() => setCurrentExpectations(values)}
+              >
+                <ListItemIcon>
+                  <AssignmentTurnedIn fontSize="small" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={(
+                    <div className={classes.container}>
+                      {t('Manual expectations')}
+                      <div className={classes.chip}>
+                        <Chip
+                          classes={{ root: classes.points }}
+                          label={expectationValues.expected_score}
+                        />
+                        <Chip
+                          classes={{ root: classes.chipInList }}
+                          style={
+                            validated === values.length
+                              ? colorStyles.green
+                              : colorStyles.orange
+                          }
+                          label={label}
+                        />
                       </div>
-                    )}
-                  />
-                </ListItemButton>
+                    </div>
+                  )}
+                />
+              </ListItemButton>
             );
           })}
       </List>
-      <DialogExpectations
+      <ManualExpectationsValidation
         exerciseId={exerciseId}
         inject={inject}
         expectations={currentExpectations}

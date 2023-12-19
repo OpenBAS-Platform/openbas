@@ -4,12 +4,12 @@ import { ControlPointOutlined } from '@mui/icons-material';
 import ListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
 import { isExerciseReadOnly } from '../../../../../utils/Exercise';
-import { Exercise } from '../../../../../utils/api-types';
-import { Theme } from '../../../../../components/Theme';
+import type { Exercise } from '../../../../../utils/api-types';
+import type { Theme } from '../../../../../components/Theme';
 import { useFormatter } from '../../../../../components/i18n';
 import Dialog from '../../../../../components/common/Dialog';
 import ExpectationFormCreate from './ExpectationFormCreate';
-import { ExpectationInput } from '../../../../../actions/Expectation';
+import type { ExpectationInput } from './Expectation';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -68,7 +68,8 @@ const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
       <Dialog
         open={openDialog}
         handleClose={handleClose}
-        title={t('Add expectation in this inject')}>
+        title={t('Add expectation in this inject')}
+      >
         <ExpectationFormCreate
           predefinedExpectations={predefinedExpectations}
           onSubmit={onSubmit}

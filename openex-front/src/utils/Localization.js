@@ -274,7 +274,6 @@ const i18n = {
       Content: 'Contenu',
       Audiences: 'Audiences',
       'Send email': 'Envoyer le mail',
-      'Inject expectations': 'Attendus du stimuli',
       'Add documents in this media pressure':
         'Ajouter des documents à cette pression médiatique',
       'Expect audiences to read the article(s)':
@@ -555,12 +554,17 @@ const i18n = {
       'Each audience should submit a text response':
         'Chaque audience doit soumettre une réponse texte',
       // -- Expectation start --
-      Expectation: 'Attendu',
-      'Expectation score': "Score de l'attendu",
-      'Add manual expectations': 'Ajouter des attendus manuelles',
-      'Add manual expectation in this inject': 'Ajouter des attendus manuelles dans ce stimuli',
+      'This expectation is handled automatically by the platform and triggered when audience reads articles': 'Cet attendu est gérée automatiquement par la plateforme et déclenchée lorsque une audience lit les articles',
+      'Add expectations': 'Ajouter des attendus',
+      'Add expectation in this inject': 'Ajouter des attendus dans ce stimuli',
       'Update the expectation': 'Modifier l\'attendu',
       'Do you want to delete this expectation ?': 'Voulez vous supprimer cet attendu ?',
+      'Number of expectations': "Nombre d'attendus",
+      'Inject expectations': 'Attendus du stimuli',
+      'Manual expectations': 'Attendus manuels',
+      'Expectations of ': 'Attendus de',
+      MANUAL: 'Manuel',
+      ARTICLE: 'Attendu lié à aux articles',
       // -- Expectation end --
       'Distribution of expected total score by audience':
         'Distribution du score total attendu par audience',
@@ -572,7 +576,6 @@ const i18n = {
         'Distribution du score total par audience',
       'Distribution of total score by organization':
         'Distribution du score total par organisation',
-      'Number of expectations': "Nombre d'attendus",
       'Total expected score': 'Score total attendu',
       'Distribution of total score by player':
         'Distribution du score total par joueur',
@@ -622,7 +625,7 @@ const i18n = {
       'Please follow this link to': 'Merci de suivre ce lien pour',
       'manage custom variables': 'gérer les variables personnalisées',
       'view custom variables': 'afficher les variables personnalisées',
-      'Variables with values': 'Variables avec valeurs',
+      'Variable values': 'Valeurs des Variables',
       // MDEditor
       'Edit code': 'Edition',
       'Live code': 'Code en temps réel',
@@ -674,6 +677,7 @@ const i18n = {
       failed: 'Échoué',
       Question: 'Question',
       By: 'Par',
+      'Should not be empty': 'Ne doit pas être vide',
     },
     en: {
       openex_email: 'Email',
@@ -709,6 +713,8 @@ const i18n = {
       VALUE_CASE: 'Text (case-sensitive)',
       REGEXP: 'Regular expression',
       '-': 'None',
+      MANUAL: 'Manual',
+      ARTICLE: 'Automatic - Triggered when audience reads articles',
     },
   },
 };

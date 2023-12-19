@@ -11,9 +11,6 @@ import javax.validation.constraints.NotNull;
 @Setter
 public class ExpectationUpdateInput {
 
-  @JsonProperty("expectation_id")
-  private String id;
-
   @JsonProperty("expectation_score")
   @NotNull
   private Integer score;

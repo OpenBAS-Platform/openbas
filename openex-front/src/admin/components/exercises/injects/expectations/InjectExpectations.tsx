@@ -7,22 +7,19 @@ import List from '@mui/material/List';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import * as R from 'ramda';
-import { Theme } from '../../../../../components/Theme';
+import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
+import type { Theme } from '../../../../../components/Theme';
 import InjectAddExpectation from './InjectAddExpectation';
-import { Exercise } from '../../../../../utils/api-types';
+import type { Exercise } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
-import { ExpectationInput } from '../../../../../actions/Expectation';
 import { truncate } from '../../../../../utils/String';
 import ExpectationPopover from './ExpectationPopover';
-import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
+import type { ExpectationInput } from './Expectation';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
     paddingLeft: 10,
     height: 50,
-  },
-  itemDisabled: {
-    opacity: '0.38'
   },
   column: {
     display: 'grid',
@@ -161,7 +158,7 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
       return <NewspaperVariantMultipleOutline />;
     }
     return <AssignmentTurnedIn />;
-  }
+  };
 
   return (
     <>
@@ -174,7 +171,8 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
               <div className={classes.column}>
                 {headers.map((header) => (sortHeader(header)))}
               </div>
-            } />
+            }
+          />
           <ListItemSecondaryAction>
           </ListItemSecondaryAction>
         </ListItem>
@@ -203,7 +201,8 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
                     {typeLabel(expectation.expectation_type)}
                   </div>
                 </div>
-              } />
+              }
+            />
             <ListItemSecondaryAction>
               <ExpectationPopover
                 index={idx}

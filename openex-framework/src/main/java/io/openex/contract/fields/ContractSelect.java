@@ -25,7 +25,10 @@ public class ContractSelect extends ContractCardinalityElement {
     return contractSelect;
   }
 
-  public static ContractSelect selectFieldWithDefault(String key, String label, Map<String, String> choices,
+  public static ContractSelect selectFieldWithDefault(
+      String key,
+      String label,
+      Map<String, String> choices,
       String def) {
     ContractSelect contractSelect = new ContractSelect(key, label, ContractCardinality.One);
     contractSelect.setChoices(choices);

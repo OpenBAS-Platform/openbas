@@ -26,24 +26,6 @@ public class ExerciseExpectationService {
     return this.injectExpectationRepository.findAllForExercise(exercise.getId());
   }
 
-  public Iterable<InjectExpectation> updateInjectExpectations(@NotNull final List<ExpectationUpdateInput> inputs) {
-    Iterable<InjectExpectation> injectExpectations = this.injectExpectationRepository
-        .findAllById(inputs.stream().map(ExpectationUpdateInput::getId).toList());
-    injectExpectations.forEach((e) -> {
-      Integer score = inputs.stream()
-          .filter((i) -> i.getId().equals(e.getId()))
-          .findFirst()
-          .orElseThrow()
-          .getScore();
-      e.setScore(score);
-      if (score != null) {
-        e.setResult("VALIDATED");
-      }
-      e.setUpdatedAt(now());
-    });
-    return this.injectExpectationRepository.saveAll(injectExpectations);
-  }
-
   public InjectExpectation updateInjectExpectation(
       @NotBlank final String expectationId,
       @NotNull final ExpectationUpdateInput input) {

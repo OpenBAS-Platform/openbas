@@ -3,7 +3,6 @@ package io.openex.migration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.injects.email.model.EmailContent;
 import io.openex.injects.media.model.MediaContent;
-import io.openex.injects.ovh_sms.model.OvhSmsContent;
 import io.openex.model.inject.form.Expectation;
 import lombok.Data;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
@@ -72,8 +71,8 @@ public class V2_63__InjectExpectation_upgrade extends BaseJavaMigration {
     private String expectationType;
     private Integer expectationScore;
 
-    OvhSmsContent toNewContent() {
-      OvhSmsContent content = new OvhSmsContent();
+    OvhSmsContentNew toNewContent() {
+      OvhSmsContentNew content = new OvhSmsContentNew();
       content.setMessage(this.message);
       Expectation expectation = new Expectation();
       expectation.setScore(this.expectationScore);
@@ -82,6 +81,11 @@ public class V2_63__InjectExpectation_upgrade extends BaseJavaMigration {
       content.setExpectations(List.of(expectation));
       return content;
     }
+  }
+  @Data
+  public static class OvhSmsContentNew {
+    private String message;
+    private List<Expectation> expectations;
   }
 
   @Data

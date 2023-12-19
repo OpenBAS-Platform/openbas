@@ -19,7 +19,17 @@ import {
 } from '@mui/material';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, CastForEducationOutlined, CloseRounded, ControlPointOutlined, DeleteOutlined, EmojiEventsOutlined, HelpOutlineOutlined } from '@mui/icons-material';
+import {
+  ArrowDropDownOutlined,
+  ArrowDropUpOutlined,
+  AttachmentOutlined,
+  CastForEducationOutlined,
+  CloseRounded,
+  ControlPointOutlined,
+  DeleteOutlined,
+  EmojiEventsOutlined,
+  HelpOutlineOutlined,
+} from '@mui/icons-material';
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
@@ -827,14 +837,14 @@ class InjectDefinition extends Component {
                                     ))}
                                   </Select>
                                   ) : (
-                                  <TextField
-                                    variant="standard"
-                                    name={`${name}.value`}
-                                    fullWidth={true}
-                                    label={t('Value')}
-                                    style={{ marginRight: 20 }}
-                                    disabled={isExerciseReadOnly(exercise)}
-                                  />
+                                    <TextField
+                                      variant="standard"
+                                      name={`${name}.value`}
+                                      fullWidth={true}
+                                      label={t('Value')}
+                                      style={{ marginRight: 20 }}
+                                      disabled={isExerciseReadOnly(exercise)}
+                                    />
                                   )}
                                 {field.cardinality === 'n' && (
                                   <IconButton
@@ -1130,7 +1140,7 @@ class InjectDefinition extends Component {
       .map((f) => f.key)
       .includes('expectations');
     const predefinedExpectations = injectType.fields.filter(
-      (f) => f.key === 'expectations'
+      (f) => f.key === 'expectations',
     ).flatMap((f) => f.predefinedExpectations);
     const expectationsNotManual = injectType.fields.filter(
       (f) => f.expectation === true,
@@ -1775,7 +1785,7 @@ class InjectDefinition extends Component {
                         predefinedExpectationDatas={predefinedExpectations}
                         expectationDatas={expectations}
                         handleExpectations={this.handleExpectations.bind(this)}
-                      />
+                         />
                     }
                   </>
                 }

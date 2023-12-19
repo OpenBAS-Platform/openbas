@@ -3,18 +3,18 @@ import IconButton from '@mui/material/IconButton';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Dialog from '@mui/material/Dialog';
+import { Dialog as DialogMUI } from '@mui/material';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import DialogTitle from '@mui/material/DialogTitle';
 import Transition from '../../../../../components/common/Transition';
 import { isExerciseReadOnly } from '../../../../../utils/Exercise';
-import { Exercise } from '../../../../../utils/api-types';
+import type { Exercise } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
-import { ExpectationInput } from '../../../../../actions/Expectation';
 import ExpectationFormUpdate from './ExpectationFormUpdate';
+import type { ExpectationInput } from './Expectation';
+import Dialog from '../../../../../components/common/Dialog';
 
 interface ExpectationPopoverProps {
   index: number;
@@ -94,7 +94,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
           {t('Remove')}
         </MenuItem>
       </Menu>
-      <Dialog
+      <DialogMUI
         open={openDelete}
         TransitionComponent={Transition}
         onClose={handleCloseDelete}
@@ -113,23 +113,17 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
             {t('Delete')}
           </Button>
         </DialogActions>
-      </Dialog>
+      </DialogMUI>
       <Dialog
-        TransitionComponent={Transition}
         open={openEdit}
-        onClose={handleCloseEdit}
-        fullWidth={true}
-        maxWidth="md"
-        PaperProps={{ elevation: 1 }}
+        handleClose={handleCloseEdit}
+        title={t('Update the expectation')}
       >
-        <DialogTitle>{t('Update the expectation')}</DialogTitle>
-        <DialogContent>
-          <ExpectationFormUpdate
-            initialValues={expectation}
-            onSubmit={onSubmitEdit}
-            handleClose={handleCloseEdit}
-          />
-        </DialogContent>
+        <ExpectationFormUpdate
+          initialValues={expectation}
+          onSubmit={onSubmitEdit}
+          handleClose={handleCloseEdit}
+        />
       </Dialog>
     </div>
   );

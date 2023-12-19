@@ -60,27 +60,6 @@ public class ExerciseExpectationServiceTest {
     assertEquals(EXPECTATION_NAME, expectations.get(0).getName());
   }
 
-  @DisplayName("Update inject expectations")
-  @Test
-  void updateInjectExpectations() {
-    // -- PREPARE --
-    List<InjectExpectation> expectations = this.exerciseExpectationService.injectExpectations(EXERCISE_ID);
-    assertNotNull(expectations);
-    String id = expectations.get(0).getId();
-
-    // -- EXECUTE --
-    ExpectationUpdateInput input = new ExpectationUpdateInput();
-    input.setId(id);
-    input.setScore(7);
-    InjectExpectation expectation = this.exerciseExpectationService.updateInjectExpectations(List.of(input))
-        .iterator()
-        .next();
-
-    // -- ASSERT --
-    assertNotNull(expectation);
-    assertEquals(7, expectation.getScore());
-  }
-
   @DisplayName("Update inject expectation")
   @Test
   void updateInjectExpectation() {
