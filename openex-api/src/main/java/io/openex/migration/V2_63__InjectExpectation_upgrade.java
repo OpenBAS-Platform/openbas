@@ -44,22 +44,24 @@ public class V2_63__InjectExpectation_upgrade extends BaseJavaMigration {
         "UPDATE injects SET inject_content = ? WHERE inject_id = ?"
     );
     while (results.next()) {
-      String id = results.getString("inject_id");
       String content = results.getString("inject_content");
-      String type = results.getString("inject_type");
-      if (Objects.equals(type, "openex_ovh_sms")) {
-        OvhSmsContentOld ovhSms = mapper.readValue(content, OvhSmsContentOld.class);
-        content = mapper.writeValueAsString(ovhSms.toNewContent());
-      } else if (Objects.equals(type, "openex_email")) {
-        EmailContentOld email = mapper.readValue(content, EmailContentOld.class);
-        content = mapper.writeValueAsString(email.toNewContent());
-      } else if (Objects.equals(type, "openex_media")) {
-        MediaContentOld media = mapper.readValue(content, MediaContentOld.class);
-        content = mapper.writeValueAsString(media.toNewContent());
+      if (!content.equals("null")) {
+        String id = results.getString("inject_id");
+        String type = results.getString("inject_type");
+        if (Objects.equals(type, "openex_ovh_sms")) {
+          OvhSmsContentOld ovhSms = mapper.readValue(content, OvhSmsContentOld.class);
+          content = mapper.writeValueAsString(ovhSms.toNewContent());
+        } else if (Objects.equals(type, "openex_email")) {
+          EmailContentOld email = mapper.readValue(content, EmailContentOld.class);
+          content = mapper.writeValueAsString(email.toNewContent());
+        } else if (Objects.equals(type, "openex_media")) {
+          MediaContentOld media = mapper.readValue(content, MediaContentOld.class);
+          content = mapper.writeValueAsString(media.toNewContent());
+        }
+        statement.setString(1, content);
+        statement.setString(2, id);
+        statement.addBatch();
       }
-      statement.setString(1, content);
-      statement.setString(2, id);
-      statement.addBatch();
     }
     statement.executeBatch();
   }
