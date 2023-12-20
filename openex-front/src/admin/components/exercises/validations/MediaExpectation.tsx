@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import Chip from '@mui/material/Chip';
+import { ListItem, ListItemIcon, ListItemText, Chip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import type { Article, Media } from '../../../../utils/api-types';
 import type { InjectExpectationsStore } from '../injects/expectations/Expectation';

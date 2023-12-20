@@ -57,7 +57,7 @@ module.exports = {
     'no-restricted-imports': [
       'error', { 
         patterns: [{ 
-          group: ['@mui/material/*'],
+          group: ['@mui/material/*', '!@mui/material/styles', '!@mui/material/colors', '!@mui/material/transitions'],
           message: "Please use named import from @mui/material instead." 
         }] 
       }

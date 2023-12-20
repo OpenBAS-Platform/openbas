@@ -554,7 +554,7 @@ const i18n = {
       'Each audience should submit a text response':
         'Chaque audience doit soumettre une réponse texte',
       // -- Expectation start --
-      'This expectation is handled automatically by the platform and triggered when audience reads articles': 'Cet attendu est gérée automatiquement par la plateforme et déclenchée lorsque une audience lit les articles',
+      'This expectation is handled automatically by the platform and triggered when audience reads articles': 'Cet attendu est géré automatiquement par la plateforme et déclenché lorsque une audience lit les articles',
       'Add expectations': 'Ajouter des attendus',
       'Add expectation in this inject': 'Ajouter des attendus dans ce stimuli',
       'Update the expectation': 'Modifier l\'attendu',

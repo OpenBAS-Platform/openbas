@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
-import { List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { List, ListItemButton, ListItemIcon, ListItemText, Chip } from '@mui/material';
 import { AssignmentTurnedIn } from '@mui/icons-material';
-import Chip from '@mui/material/Chip';
 import { makeStyles } from '@mui/styles';
 import type { Audience, Inject } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';

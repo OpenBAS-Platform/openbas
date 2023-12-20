@@ -17,10 +17,10 @@ import {
   TableBody,
   Checkbox,
   TableContainer,
+  PopoverProps,
 } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { PopoverProps } from '@mui/material/Popover';
 import { useFormatter } from '../../../components/i18n';
 import ExerciseForm from './ExerciseForm';
 import { deleteExercise, updateExercise } from '../../../actions/Exercise';
