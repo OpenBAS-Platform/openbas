@@ -5,5 +5,5 @@ import io.openex.database.model.InjectExpectation.EXPECTATION_TYPE;
 public interface Expectation {
 
     EXPECTATION_TYPE type();
-    Integer score();
+    Integer getScore();
 }

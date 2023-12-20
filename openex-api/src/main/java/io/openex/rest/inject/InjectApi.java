@@ -129,7 +129,9 @@ public class InjectApi extends RestBehavior {
   @Transactional(rollbackOn = Exception.class)
   @PutMapping("/api/injects/{exerciseId}/{injectId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject updateInject(@PathVariable String exerciseId, @PathVariable String injectId,
+  public Inject updateInject(
+      @PathVariable String exerciseId,
+      @PathVariable String injectId,
       @Valid @RequestBody InjectInput input) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
     Inject inject = injectRepository.findById(injectId).orElseThrow();

@@ -2,10 +2,14 @@ package io.openex.contract.fields;
 
 import io.openex.contract.ContractType;
 import io.openex.model.LinkedFieldModel;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 public abstract class ContractElement {
 
     private String key;
@@ -13,8 +17,6 @@ public abstract class ContractElement {
     private String label;
 
     private boolean mandatory = true;
-
-    private boolean expectation = false;
 
     private List<LinkedFieldModel> linkedFields = new ArrayList<>();
 
@@ -25,52 +27,8 @@ public abstract class ContractElement {
         this.label = label;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public boolean isMandatory() {
-        return mandatory;
-    }
-
-    public void setMandatory(boolean mandatory) {
-        this.mandatory = mandatory;
-    }
-
-    public List<LinkedFieldModel> getLinkedFields() {
-        return linkedFields;
-    }
-
     public void setLinkedFields(List<ContractElement> linkedFields) {
         this.linkedFields = linkedFields.stream().map(LinkedFieldModel::fromField).toList();
-    }
-
-    public List<String> getLinkedValues() {
-        return linkedValues;
-    }
-
-    public void setLinkedValues(List<String> linkedValues) {
-        this.linkedValues = linkedValues;
-    }
-
-    public boolean isExpectation() {
-        return expectation;
-    }
-
-    public void setExpectation(boolean expectation) {
-        this.expectation = expectation;
     }
 
     public abstract ContractType getType();

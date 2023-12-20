@@ -1,9 +1,13 @@
 package io.openex.contract.fields;
 
 import io.openex.contract.ContractType;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Setter
+@Getter
 public class ContractNumber extends ContractElement {
 
     private String defaultValue = "";
@@ -42,11 +46,4 @@ public class ContractNumber extends ContractElement {
         return ContractType.Number;
     }
 
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
-    }
 }

@@ -2,42 +2,24 @@ package io.openex.injects.media.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.injects.email.model.EmailContent;
+import io.openex.model.inject.form.Expectation;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
+@Getter
 public class MediaContent extends EmailContent {
 
-    @JsonProperty("articles")
-    private List<String> articles = new ArrayList<>();
+  @JsonProperty("articles")
+  private List<String> articles = new ArrayList<>();
 
-    @JsonProperty("expectation")
-    private boolean expectation;
+  @JsonProperty("expectations")
+  private List<Expectation> expectations = new ArrayList<>();
 
-    @JsonProperty("emailing")
-    private boolean emailing;
+  @JsonProperty("emailing")
+  private boolean emailing;
 
-    public List<String> getArticles() {
-        return articles;
-    }
-
-    public void setArticles(List<String> articles) {
-        this.articles = articles;
-    }
-
-    public boolean isExpectation() {
-        return expectation;
-    }
-
-    public void setExpectation(boolean expectation) {
-        this.expectation = expectation;
-    }
-
-    public boolean isEmailing() {
-        return emailing;
-    }
-
-    public void setEmailing(boolean emailing) {
-        this.emailing = emailing;
-    }
 }

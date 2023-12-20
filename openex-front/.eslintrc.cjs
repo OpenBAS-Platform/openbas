@@ -24,7 +24,7 @@ module.exports = {
   },
   overrides: [
     {
-      "files": ["*.jsx", "*.js","*.ts", "*.tsx"]
+      "files": ["*.jsx", "*.js", "*.ts", "*.tsx"]
     }
   ],
   ignorePatterns: [
@@ -52,6 +52,14 @@ module.exports = {
         'ignoreRegExpLiterals': true,
         'ignoreStrings': true,
         'ignoreTemplateLiterals': true
+      }
+    ],
+    'no-restricted-imports': [
+      'error', { 
+        patterns: [{ 
+          group: ['@mui/material/*', '!@mui/material/styles', '!@mui/material/colors', '!@mui/material/transitions'],
+          message: "Please use named import from @mui/material instead." 
+        }] 
       }
     ],
     '@typescript-eslint/naming-convention': ['error', {

@@ -2,6 +2,8 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -17,18 +19,24 @@ public class Execution {
 
     private static final Logger LOGGER = Logger.getLogger(Execution.class.getName());
 
+    @Getter
     @JsonProperty("execution_runtime")
     private boolean runtime;
 
+    @Getter
     @JsonProperty("execution_start")
     private Instant startTime;
 
     @JsonProperty("execution_stop")
     private Instant stopTime;
 
+    @Setter
+    @Getter
     @JsonProperty("execution_async_id")
     private String asyncId;
 
+    @Getter
+    @Setter
     @JsonProperty("execution_traces")
     private List<ExecutionTrace> traces = new ArrayList<>();
 
@@ -44,10 +52,6 @@ public class Execution {
     @SuppressWarnings("unused")
     public void setRuntime(boolean runtime) {
         this.runtime = runtime;
-    }
-
-    public boolean isRuntime() {
-        return runtime;
     }
 
     public void stop() {
@@ -76,10 +80,6 @@ public class Execution {
         this.traces.add(context);
     }
 
-    public void setTraces(List<ExecutionTrace> traces) {
-        this.traces = traces;
-    }
-
     @JsonProperty("execution_time")
     public int getExecutionTime() {
         return (int) (this.stopTime.toEpochMilli() - this.startTime.toEpochMilli());
@@ -93,22 +93,6 @@ public class Execution {
         } else {
             return hasSuccess ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR;
         }
-    }
-
-    public String getAsyncId() {
-        return asyncId;
-    }
-
-    public void setAsyncId(String asyncId) {
-        this.asyncId = asyncId;
-    }
-
-    public Instant getStartTime() {
-        return startTime;
-    }
-
-    public List<ExecutionTrace> getTraces() {
-        return traces;
     }
 
     @Override

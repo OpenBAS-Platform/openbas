@@ -2,17 +2,17 @@
 package io.openex.rest.exercise.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
+
+@Getter
+@Setter
 public class ExpectationUpdateInput {
 
-    @JsonProperty("expectation_score")
-    private Integer score;
+  @JsonProperty("expectation_score")
+  @NotNull
+  private Integer score;
 
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
-    }
 }

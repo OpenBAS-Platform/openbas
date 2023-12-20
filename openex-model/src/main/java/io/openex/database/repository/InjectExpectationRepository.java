@@ -8,6 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,12 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
 
     @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId")
     List<InjectExpectation> findAllForExercise(@Param("exerciseId") String exerciseId);
+
+    @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId and i.inject.id = :injectId")
+    List<InjectExpectation> findAllForExerciseAndInject(
+        @Param("exerciseId") @NotBlank final String exerciseId,
+        @Param("injectId") @NotBlank final String injectId
+    );
 
     @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId " +
             "and i.type = 'CHALLENGE' and i.audience.id IN (:audienceIds)")

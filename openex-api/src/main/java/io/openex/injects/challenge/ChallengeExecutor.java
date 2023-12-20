@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,12 +50,6 @@ public class ChallengeExecutor extends Injector {
         this.emailService = emailService;
     }
 
-    private String buildChallengesUri(ExecutionContext context) {
-        String userId = context.getUser().getId();
-        String exerciseId = context.getExercise().getId();
-        return openExConfig.getBaseUrl() + "/challenges/" + exerciseId + "?user=" + userId;
-    }
-
     private String buildChallengeUri(ExecutionContext context, Challenge challenge) {
         String userId = context.getUser().getId();
         String challengeId = challenge.getId();
@@ -63,7 +58,10 @@ public class ChallengeExecutor extends Injector {
     }
 
     @Override
-    public List<Expectation> process(Execution execution, ExecutableInject injection, Contract contract) {
+    public List<Expectation> process(
+        @NotNull final Execution execution,
+        @NotNull final ExecutableInject injection,
+        @NotNull final Contract contract) {
         try {
             ChallengeContent content = contentConvert(injection, ChallengeContent.class);
             List<Challenge> challenges = fromIterable(challengeRepository.findAllById(content.getChallenges()));
