@@ -95,7 +95,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         && <Alert
           severity="info"
           className={classes.marginTop_2}
-        >
+           >
           {infoMessage(getValues().expectation_type, t)}
         </Alert>
       }
