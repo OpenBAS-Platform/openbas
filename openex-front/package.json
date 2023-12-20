@@ -102,8 +102,8 @@
     "node": ">= 16.*"
   },
   "scripts": {
-    "start": "node builder/dev/dev.js",
-    "dev": "vite",
+    "start": "vite",
+    "deprecated-start": "node builder/dev/dev.js",
     "build": "node builder/prod/prod.js",
     "lint": "cross-env DEBUG=eslint:cli-engine TIMING=1 eslint --max-warnings 0 --cache -c .eslintrc.cjs src",
     "control": "yarn audit --groups dependencies --summary",
