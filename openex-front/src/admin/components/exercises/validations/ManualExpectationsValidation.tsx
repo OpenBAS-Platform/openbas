@@ -1,12 +1,10 @@
 import React, { FunctionComponent, useState } from 'react';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+import { Alert, Button, TextField as MuiTextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import MuiTextField from '@mui/material/TextField';
 import { makeStyles } from '@mui/styles';
-import { Alert } from '@mui/material';
 import Chip from '@mui/material/Chip';
 import type { InjectExpectationsStore } from '../injects/expectations/Expectation';
 import { useFormatter } from '../../../../components/i18n';

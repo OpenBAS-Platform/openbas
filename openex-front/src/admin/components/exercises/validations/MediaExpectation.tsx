@@ -1,9 +1,7 @@
 import React, { FunctionComponent } from 'react';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import { ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import Chip from '@mui/material/Chip';
 import { makeStyles } from '@mui/styles';
-import ListItem from '@mui/material/ListItem';
 import type { Article, Media } from '../../../../utils/api-types';
 import type { InjectExpectationsStore } from '../injects/expectations/Expectation';
 import { useFormatter } from '../../../../components/i18n';
@@ -46,7 +44,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   media: Media;
-  article: Article
+  article: Article;
   expectation: InjectExpectationsStore;
 }
 

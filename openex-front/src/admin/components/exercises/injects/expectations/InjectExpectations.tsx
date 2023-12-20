@@ -1,11 +1,7 @@
 import React, { FunctionComponent, useState } from 'react';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import ListItem from '@mui/material/ListItem';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, AssignmentTurnedIn } from '@mui/icons-material';
-import List from '@mui/material/List';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import * as R from 'ramda';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import type { Theme } from '../../../../../components/Theme';

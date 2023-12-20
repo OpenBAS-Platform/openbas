@@ -1,11 +1,8 @@
 import React, { FunctionComponent, useState } from 'react';
-import ListItemIcon from '@mui/material/ListItemIcon';
+import { List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { AssignmentTurnedIn } from '@mui/icons-material';
-import ListItemText from '@mui/material/ListItemText';
 import Chip from '@mui/material/Chip';
-import List from '@mui/material/List';
 import { makeStyles } from '@mui/styles';
-import { ListItemButton } from '@mui/material';
 import type { Audience, Inject } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { AudiencesHelper } from '../../../../actions/helper';

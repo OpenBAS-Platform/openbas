@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
-import { ListItemButton, ListItemIcon } from '@mui/material';
+import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
-import ListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
 import { isExerciseReadOnly } from '../../../../../utils/Exercise';
 import type { Exercise } from '../../../../../utils/api-types';

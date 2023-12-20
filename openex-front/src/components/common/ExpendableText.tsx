@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import IconButton from '@mui/material/IconButton';
+import { IconButton } from '@mui/material';
 import { truncate } from '../../utils/String';
 
 interface Props {

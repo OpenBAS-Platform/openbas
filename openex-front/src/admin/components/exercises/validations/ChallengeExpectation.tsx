@@ -1,10 +1,8 @@
 import React, { FunctionComponent } from 'react';
-import ListItemIcon from '@mui/material/ListItemIcon';
+import { ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { EmojiEventsOutlined } from '@mui/icons-material';
-import ListItemText from '@mui/material/ListItemText';
 import Chip from '@mui/material/Chip';
 import { makeStyles } from '@mui/styles';
-import ListItem from '@mui/material/ListItem';
 import type { Challenge } from '../../../../utils/api-types';
 import type { InjectExpectationsStore } from '../injects/expectations/Expectation';
 import { useFormatter } from '../../../../components/i18n';

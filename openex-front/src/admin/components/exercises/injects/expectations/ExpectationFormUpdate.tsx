@@ -1,10 +1,6 @@
 import React, { FunctionComponent, SyntheticEvent } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import MuiTextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import { Alert, MenuItem } from '@mui/material';
-import MUISelect from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
+import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { formProps, infoMessage } from './ExpectationFormUtils';
 import type { ExpectationInput } from './Expectation';
@@ -70,7 +66,7 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
         && <Alert
           severity="info"
           className={classes.marginTop_2}
-           >
+        >
           {infoMessage(getValues().expectation_type, t)}
         </Alert>
       }
