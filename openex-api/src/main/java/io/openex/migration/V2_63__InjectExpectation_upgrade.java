@@ -5,6 +5,7 @@ import io.openex.injects.email.model.EmailContent;
 import io.openex.injects.media.model.MediaContent;
 import io.openex.model.inject.form.Expectation;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
@@ -38,7 +39,7 @@ public class V2_63__InjectExpectation_upgrade extends BaseJavaMigration {
     ObjectMapper mapper = new ObjectMapper();
     ResultSet results = select.executeQuery("""
         SELECT * FROM injects
-        WHERE inject_type = 'openex_email' OR inject_type = 'openex_ovh_sms' OR inject_type = '"openex_media"'
+        WHERE inject_type = 'openex_email' OR inject_type = 'openex_ovh_sms' OR inject_type = 'openex_media'
         """);
     PreparedStatement statement = connection.prepareStatement(
         "UPDATE injects SET inject_content = ? WHERE inject_id = ?"
@@ -115,16 +116,21 @@ public class V2_63__InjectExpectation_upgrade extends BaseJavaMigration {
     }
   }
 
+  @EqualsAndHashCode(callSuper = true)
   @Data
-  public static class MediaContentOld {
+  public static class MediaContentOld extends EmailContentOld {
 
     private List<String> articles;
     private boolean expectation;
     private Integer expectationScore;
     private boolean emailing;
 
-    EmailContent toNewContent() {
+    MediaContent toNewContent() {
       MediaContent content = new MediaContent();
+      content.setBody(this.getBody());
+      content.setSubject(this.getSubject());
+      content.setInReplyTo(this.getInReplyTo());
+      content.setEncrypted(this.isEncrypted());
       content.setArticles(this.articles);
       content.setEmailing(this.emailing);
       Expectation expectation = new Expectation();
