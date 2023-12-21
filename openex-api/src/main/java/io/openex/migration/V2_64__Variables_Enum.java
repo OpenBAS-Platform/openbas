@@ -11,7 +11,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 @Component
-public class V2_63__Variables_Enum extends BaseJavaMigration {
+public class V2_64__Variables_Enum extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
