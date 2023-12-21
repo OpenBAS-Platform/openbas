@@ -7,7 +7,7 @@ import io.openex.execution.Injector;
 import io.openex.model.Expectation;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @Component(ManualContract.TYPE)
