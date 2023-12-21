@@ -107,6 +107,7 @@ public class AppSecurityConfig {
         /**/.requestCache((cache) -> cache.requestCache(new HttpSessionRequestCache()))
         .csrf(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
+        .securityContext((securityContext) -> securityContext.requireExplicitSave(false))
         .authorizeHttpRequests(
             rq -> rq.requestMatchers("/api/comcheck/**").permitAll()
                 .requestMatchers("/api/player/**").permitAll()
