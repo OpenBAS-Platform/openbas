@@ -8,13 +8,13 @@ import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.channel.form.*;
 import io.openex.rest.channel.model.VirtualArticle;
 import io.openex.rest.channel.response.ChannelReader;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.security.RolesAllowed;
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -78,7 +78,7 @@ public class ChannelApi extends RestBehavior {
     return channelRepository.findById(channelId).orElseThrow();
   }
 
-  @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
   @PutMapping("/api/channels/{channelId}")
   public Channel updateChannel(@PathVariable String channelId, @Valid @RequestBody ChannelUpdateInput input) {
     Channel channel = channelRepository.findById(channelId).orElseThrow();
@@ -86,7 +86,7 @@ public class ChannelApi extends RestBehavior {
     return channelRepository.save(channel);
   }
 
-  @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
   @PutMapping("/api/channels/{channelId}/logos")
   public Channel updateChannelLogos(@PathVariable String channelId, @Valid @RequestBody ChannelUpdateLogoInput input) {
     Channel channel = channelRepository.findById(channelId).orElseThrow();
@@ -103,7 +103,7 @@ public class ChannelApi extends RestBehavior {
     return channelRepository.save(channel);
   }
 
-  @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
   @PostMapping("/api/channels")
   public Channel createChannel(@Valid @RequestBody ChannelCreateInput input) {
     Channel channel = new Channel();
@@ -111,7 +111,7 @@ public class ChannelApi extends RestBehavior {
     return channelRepository.save(channel);
   }
 
-  @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/channels/{channelId}")
   public void deleteChannel(@PathVariable String channelId) {
     channelRepository.deleteById(channelId);

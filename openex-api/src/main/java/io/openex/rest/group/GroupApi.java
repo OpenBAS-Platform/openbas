@@ -8,13 +8,13 @@ import io.openex.rest.group.form.GroupGrantInput;
 import io.openex.rest.group.form.GroupUpdateUsersInput;
 import io.openex.rest.group.form.OrganizationGrantInput;
 import io.openex.rest.helper.RestBehavior;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.web.bind.annotation.*;
-
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Spliterator;
 
 import static io.openex.database.audit.ModelBaseListener.DATA_UPDATE;
@@ -25,7 +25,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
 @RestController
-@RolesAllowed(ROLE_USER)
+@Secured(ROLE_USER)
 public class GroupApi extends RestBehavior {
 
     private ExerciseRepository exerciseRepository;
@@ -75,7 +75,7 @@ public class GroupApi extends RestBehavior {
         return groupRepository.findById(groupId).orElseThrow();
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PostMapping("/api/groups")
     public Group createGroup(@Valid @RequestBody GroupCreateInput input) {
         Group group = new Group();
@@ -84,7 +84,7 @@ public class GroupApi extends RestBehavior {
         return groupRepository.save(group);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PutMapping("/api/groups/{groupId}/users")
     public Group updateGroupUsers(@PathVariable String groupId,
                                   @Valid @RequestBody GroupUpdateUsersInput input) {
@@ -99,7 +99,7 @@ public class GroupApi extends RestBehavior {
         return savedGroup;
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PutMapping("/api/groups/{groupId}/information")
     public Group updateGroupInformation(@PathVariable String groupId,
                                         @Valid @RequestBody GroupCreateInput input) {
@@ -110,7 +110,7 @@ public class GroupApi extends RestBehavior {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PostMapping("/api/groups/{groupId}/grants")
     public Grant groupGrant(@PathVariable String groupId, @Valid @RequestBody GroupGrantInput input) {
         // Resolve dependencies
@@ -129,7 +129,7 @@ public class GroupApi extends RestBehavior {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PostMapping("/api/groups/{groupId}/organizations")
     public Group groupOrganization(@PathVariable String groupId, @Valid @RequestBody OrganizationGrantInput input) {
         // Resolve dependencies
@@ -139,7 +139,7 @@ public class GroupApi extends RestBehavior {
         return groupRepository.save(group);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @DeleteMapping("/api/groups/{groupId}/organizations/{organizationId}")
     public Group deleteGroupOrganization(@PathVariable String groupId, @PathVariable String organizationId) {
         Group group = groupRepository.findById(groupId).orElseThrow();
@@ -148,13 +148,13 @@ public class GroupApi extends RestBehavior {
         return groupRepository.save(group);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @DeleteMapping("/api/grants/{grantId}")
     public void deleteGrant(@PathVariable String grantId) {
         grantRepository.deleteById(grantId);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @DeleteMapping("/api/groups/{groupId}")
     public void deleteGroup(@PathVariable String groupId) {
         groupRepository.deleteById(groupId);

@@ -11,12 +11,12 @@ import io.openex.database.repository.UserRepository;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.organization.form.OrganizationCreateInput;
 import io.openex.rest.organization.form.OrganizationUpdateInput;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.security.RolesAllowed;
-import jakarta.validation.Valid;
 import java.util.List;
 
 import static io.openex.config.SessionHelper.currentUser;
@@ -68,7 +68,7 @@ public class OrganizationApi extends RestBehavior {
     return organizations.stream().peek(org -> org.resolveInjects(injects)).toList();
   }
 
-  @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
   @PostMapping("/api/organizations")
   public Organization createOrganization(@Valid @RequestBody OrganizationCreateInput input) {
     Organization organization = new Organization();
@@ -77,7 +77,7 @@ public class OrganizationApi extends RestBehavior {
     return organizationRepository.save(organization);
   }
 
-  @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
   @PutMapping("/api/organizations/{organizationId}")
   public Organization updateOrganization(@PathVariable String organizationId,
       @Valid @RequestBody OrganizationUpdateInput input) {
@@ -90,7 +90,7 @@ public class OrganizationApi extends RestBehavior {
   }
 
 
-  @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/organizations/{organizationId}")
   public void deleteOrganization(@PathVariable String organizationId) {
     checkOrganizationAccess(userRepository, organizationId);

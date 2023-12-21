@@ -9,7 +9,7 @@ import org.springframework.security.access.expression.method.MethodSecurityExpre
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 @Configuration
-@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
+@EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class MethodSecurityConfig {
 

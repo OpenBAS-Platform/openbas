@@ -15,26 +15,29 @@ import io.openex.rest.exercise.form.*;
 import io.openex.rest.exercise.response.PublicExercise;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.service.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import reactor.util.function.Tuples;
-
 import jakarta.annotation.Resource;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import reactor.util.function.Tuples;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -52,7 +55,7 @@ import static java.time.Instant.now;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 @RestController
-@RolesAllowed(ROLE_USER)
+@Secured(ROLE_USER)
 public class ExerciseApi extends RestBehavior {
 
     private static final Logger LOGGER = Logger.getLogger(ExerciseApi.class.getName());
@@ -537,7 +540,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @GetMapping("/api/exercises")
-    @RolesAllowed(ROLE_USER)
+  @Secured(ROLE_USER)
     public List<ExerciseSimple> exercises() {
         Iterable<Exercise> exercises = currentUser().isAdmin() ? exerciseRepository.findAll() : exerciseRepository.findAllGranted(currentUser().getId());
         return fromIterable(exercises).stream().map(ExerciseSimple::fromExercise).toList();
@@ -681,7 +684,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/import")
-    @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
     public void exerciseImport(@RequestPart("file") MultipartFile file) throws Exception {
         importService.handleFileImport(file);
     }

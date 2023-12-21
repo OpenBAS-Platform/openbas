@@ -4,19 +4,18 @@ import io.openex.database.model.Variable;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.variable.form.VariableInput;
 import io.openex.service.VariableService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import static io.openex.database.model.User.ROLE_USER;
 
 @RequiredArgsConstructor
 @RestController
-@RolesAllowed(ROLE_USER)
+@Secured(ROLE_USER)
 public class VariableApi extends RestBehavior {
 
   private final VariableService variableService;

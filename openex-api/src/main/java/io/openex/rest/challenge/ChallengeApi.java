@@ -11,13 +11,13 @@ import io.openex.rest.challenge.response.ChallengeResult;
 import io.openex.rest.challenge.response.ChallengesReader;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.service.ChallengeService;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.security.RolesAllowed;
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
@@ -170,7 +170,7 @@ public class ChallengeApi extends RestBehavior {
     return challengesReader;
   }
 
-  @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/challenges/{challengeId}")
   public void deleteChallenge(@PathVariable String challengeId) {
     challengeRepository.deleteById(challengeId);
