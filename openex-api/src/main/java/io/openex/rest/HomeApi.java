@@ -31,11 +31,11 @@ public class HomeApi {
     @Value("${server.servlet.context-path}")
     private String contextPath;
 
-    @GetMapping(path = {"/", "/{path:^(?!api$|login$|logout$|oauth2$|saml2$).*$}"}, produces = MediaType.TEXT_HTML_VALUE)
+    @GetMapping(path = {"/", "/{path:^(?!api$|login$|logout$|oauth2$|saml2$).*$}/**"}, produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> home() {
         ClassPathResource classPathResource = new ClassPathResource("/build/index.html");
         String index = readResourceAsString(classPathResource);
-        String basePath = contextPath.endsWith("/") ? contextPath.substring(0, contextPath.length() - 1) : contextPath;
+        String basePath = this.contextPath.endsWith("/") ? this.contextPath.substring(0, this.contextPath.length() - 1) : this.contextPath;
         String newIndex = index.
             replaceAll("%APP_TITLE%", "OpenEx - Crisis Exercises and Adversary Simulation Platform").
             replaceAll("%APP_DESCRIPTION%", "OpenEx is an open source platform allowing organizations to plan, schedule and conduct crisis exercises as well as adversary simulation campaign.").
