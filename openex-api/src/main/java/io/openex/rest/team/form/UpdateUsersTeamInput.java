@@ -1,12 +1,12 @@
-package io.openex.rest.audience.form;
+package io.openex.rest.team.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public class UpdateUsersAudienceInput {
+public class UpdateUsersTeamInput {
 
-    @JsonProperty("audience_users")
+    @JsonProperty("team_users")
     private List<String> userIds;
 
     public List<String> getUserIds() {

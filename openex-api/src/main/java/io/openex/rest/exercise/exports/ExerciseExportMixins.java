@@ -50,7 +50,7 @@ public class ExerciseExportMixins {
             "audience_tags",
             "audience_users",
     })
-    public static class Audience {
+    public static class Team {
     }
 
     @JsonIncludeProperties(value = {
@@ -59,7 +59,7 @@ public class ExerciseExportMixins {
             "audience_description",
             "audience_tags",
     })
-    public static class EmptyAudience {
+    public static class EmptyTeam {
     }
 
     @JsonIncludeProperties(value = {

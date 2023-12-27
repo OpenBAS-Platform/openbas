@@ -39,7 +39,7 @@ public class V1_DataImporter implements Importer {
     private DocumentRepository documentRepository;
     private TagRepository tagRepository;
     private ExerciseRepository exerciseRepository;
-    private AudienceRepository audienceRepository;
+    private TeamRepository teamRepository;
     private ObjectiveRepository objectiveRepository;
     private InjectRepository injectRepository;
     private OrganizationRepository organizationRepository;
@@ -120,8 +120,8 @@ public class V1_DataImporter implements Importer {
     }
 
     @Autowired
-    public void setAudienceRepository(AudienceRepository audienceRepository) {
-        this.audienceRepository = audienceRepository;
+    public void setTeamRepository(TeamRepository teamRepository) {
+        this.teamRepository = teamRepository;
     }
 
     @Autowired
@@ -207,8 +207,8 @@ public class V1_DataImporter implements Importer {
                 JsonNode dependsOnNode = injectNode.get("inject_depends_on");
                 String dependsOn = !dependsOnNode.isNull() ? baseIds.get(dependsOnNode.asText()).getId() : null;
                 Long dependsDuration = injectNode.get("inject_depends_duration").asLong();
-                boolean allAudiences = injectNode.get("inject_all_audiences").booleanValue();
-                injectRepository.importSave(injectId, title, description, country, city, type, contract, allAudiences,
+                boolean allTeams = injectNode.get("inject_all_teams").booleanValue();
+                injectRepository.importSave(injectId, title, description, country, city, type, contract, allTeams,
                         true, exercise.getId(), dependsOn, dependsDuration, content);
                 baseIds.put(id, new BaseHolder(injectId));
                 // Tags
@@ -217,11 +217,11 @@ public class V1_DataImporter implements Importer {
                     String remappedId = baseIds.get(tagId).getId();
                     injectRepository.addTag(injectId, remappedId);
                 });
-                // Audiences
-                List<String> injectAudienceIds = resolveJsonIds(injectNode, "inject_audiences");
-                injectAudienceIds.forEach(audienceId -> {
-                    String remappedId = baseIds.get(audienceId).getId();
-                    injectRepository.addAudience(injectId, remappedId);
+                // Teams
+                List<String> injectTeamIds = resolveJsonIds(injectNode, "inject_teams");
+                injectTeamIds.forEach(teamId -> {
+                    String remappedId = baseIds.get(teamId).getId();
+                    injectRepository.addTeam(injectId, remappedId);
                 });
                 // Documents
                 List<JsonNode> injectDocuments = resolveJsonElements(injectNode, "inject_documents").toList();
@@ -408,25 +408,33 @@ public class V1_DataImporter implements Importer {
             });
         }
 
-        // ------------ Handling audiences
-        Iterator<JsonNode> exerciseAudiences = importNode.get("exercise_audiences").elements();
-        exerciseAudiences.forEachRemaining(nodeAudience -> {
-            String id = nodeAudience.get("audience_id").textValue();
-            Audience audience = new Audience();
-            audience.setName(nodeAudience.get("audience_name").textValue());
-            audience.setDescription(nodeAudience.get("audience_description").textValue());
-            // Tags
-            List<String> audienceTagIds = resolveJsonIds(nodeAudience, "audience_tags");
-            List<Tag> tagsForAudience = audienceTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
-            audience.setTags(tagsForAudience);
-            // Users
-            List<String> audienceUserIds = resolveJsonIds(nodeAudience, "audience_users");
-            List<User> usersForAudience = audienceUserIds.stream().map(baseIds::get).map(base -> (User) base).toList();
-            audience.setUsers(usersForAudience);
-            // Finalize
-            audience.setExercise(savedExercise);
-            Audience savedAudience = audienceRepository.save(audience);
-            baseIds.put(id, savedAudience);
+        // ------------ Handling teams
+        Iterator<JsonNode> exerciseTeams = importNode.get("exercise_teams").elements();
+        exerciseTeams.forEachRemaining(nodeTeam -> {
+            String id = nodeTeam.get("team_id").textValue();
+            String teamName = nodeTeam.get("team_name").textValue();
+            // Prevent duplication of team, based on the team name
+            List<Team> existingTeams = teamRepository.findByNameIgnoreCase(teamName);
+            if (existingTeams.size() == 1) {
+                baseIds.put(id, existingTeams.get(0));
+            } else {
+                Team team = new Team();
+                team.setName(nodeTeam.get("team_name").textValue());
+                team.setDescription(nodeTeam.get("team_description").textValue());
+                // Tags
+                List<String> teamTagIds = resolveJsonIds(nodeTeam, "team_tags");
+                List<Tag> tagsForTeam = teamTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
+                team.setTags(tagsForTeam);
+                // Users
+                List<String> teamUserIds = resolveJsonIds(nodeTeam, "team_users");
+                List<User> usersForTeam = teamUserIds.stream().map(baseIds::get).map(base -> (User) base).toList();
+                team.setUsers(usersForTeam);
+                List<Exercise> savedExercises = new ArrayList<>();
+                savedExercises.add(savedExercise);
+                team.setExercises(savedExercises);
+                Team savedTeam = teamRepository.save(team);
+                baseIds.put(id, savedTeam);
+            }
         });
 
         // ------------ Handling challenges
@@ -550,11 +558,11 @@ public class V1_DataImporter implements Importer {
             lessonsCategory.setDescription(nodeLessonCategory.get("lessons_category_description").textValue());
             lessonsCategory.setOrder(nodeLessonCategory.get("lessons_category_order").intValue());
             lessonsCategory.setExercise(exercise);
-            List<Audience> lessonsCategoryAudiences = resolveJsonIds(nodeLessonCategory, "lessons_category_audiences")
-                    .stream().map(audienceId -> (Audience) baseIds.get(audienceId))
+            List<Team> lessonsCategoryTeams = resolveJsonIds(nodeLessonCategory, "lessons_category_teams")
+                    .stream().map(teamId -> (Team) baseIds.get(teamId))
                     .filter(Objects::nonNull)
                     .toList();
-            lessonsCategory.setAudiences(lessonsCategoryAudiences);
+            lessonsCategory.setTeams(lessonsCategoryTeams);
             LessonsCategory savedLessonsCategory = lessonsCategoryRepository.save(lessonsCategory);
             baseIds.put(id, savedLessonsCategory);
         });

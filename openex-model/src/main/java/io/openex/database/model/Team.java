@@ -18,100 +18,92 @@ import java.util.function.Predicate;
 import static java.time.Instant.now;
 
 @Entity
-@Table(name = "audiences")
+@Table(name = "teams")
 @EntityListeners(ModelBaseListener.class)
-public class Audience implements Base {
+public class Team implements Base {
     @Id
-    @Column(name = "audience_id")
+    @Column(name = "team_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonProperty("audience_id")
+    @JsonProperty("team_id")
     private String id;
 
-    @Column(name = "audience_name")
-    @JsonProperty("audience_name")
+    @Column(name = "team_name")
+    @JsonProperty("team_name")
     private String name;
 
-    @Column(name = "audience_description")
-    @JsonProperty("audience_description")
+    @Column(name = "team_description")
+    @JsonProperty("team_description")
     private String description;
 
-    @Column(name = "audience_enabled")
-    @JsonProperty("audience_enabled")
-    private boolean enabled = true;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "audience_exercise")
-    @JsonSerialize(using = MonoIdDeserializer.class)
-    @JsonProperty("audience_exercise")
-    private Exercise exercise;
-
-    @Column(name = "audience_created_at")
-    @JsonProperty("audience_created_at")
+    @Column(name = "team_created_at")
+    @JsonProperty("team_created_at")
     private Instant createdAt = now();
 
-    @Column(name = "audience_updated_at")
-    @JsonProperty("audience_updated_at")
+    @Column(name = "team_updated_at")
+    @JsonProperty("team_updated_at")
     private Instant updatedAt = now();
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "audiences_tags",
-            joinColumns = @JoinColumn(name = "audience_id"),
+    @JoinTable(name = "teams_tags",
+            joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @JsonSerialize(using = MultiIdDeserializer.class)
-    @JsonProperty("audience_tags")
+    @JsonProperty("team_tags")
     private List<Tag> tags = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "users_audiences",
-            joinColumns = @JoinColumn(name = "audience_id"),
+    @JoinTable(name = "exercises_teams",
+            joinColumns = @JoinColumn(name = "team_id"),
+            inverseJoinColumns = @JoinColumn(name = "exercise_id"))
+    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonProperty("team_exercises")
+    private List<Exercise> exercises = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "users_teams",
+            joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     @JsonSerialize(using = MultiIdDeserializer.class)
-    @JsonProperty("audience_users")
+    @JsonProperty("team_users")
     private List<User> users = new ArrayList<>();
 
-    @JsonProperty("audience_users_number")
+    @JsonProperty("team_users_number")
     public long getUsersNumber() {
         return getUsers().size();
     }
 
     // region transient
-    @JsonProperty("audience_injects")
+    @JsonProperty("team_injects")
     @JsonSerialize(using = MultiIdDeserializer.class)
     public List<Inject> getInjects() {
-        Predicate<Inject> selectedInject = inject -> inject.isAllAudiences() || inject.getAudiences().contains(this);
-        return getExercise().getInjects().stream().filter(selectedInject).distinct().toList();
+        Predicate<Inject> selectedInject = inject -> inject.isAllTeams() || inject.getTeams().contains(this);
+        return getExercises().stream().map(exercise -> exercise.getInjects().stream().filter(selectedInject).distinct().toList()).flatMap(List::stream).toList();
     }
 
-    @JsonProperty("audience_injects_number")
+    @JsonProperty("team_injects_number")
     public long getInjectsNumber() {
         return getInjects().size();
     }
 
-    @OneToMany(mappedBy = "audience", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
     @JsonSerialize(using = MultiIdDeserializer.class)
-    @JsonProperty("audience_inject_expectations")
+    @JsonProperty("team_inject_expectations")
     private List<InjectExpectation> injectExpectations = new ArrayList<>();
 
-    @JsonProperty("audience_injects_expectations_number")
+    @JsonProperty("team_injects_expectations_number")
     public long getInjectExceptationsNumber() {
         return getInjectExpectations().size();
     }
 
-    @JsonProperty("audience_injects_expectations_total_score")
+    @JsonProperty("team_injects_expectations_total_score")
     public long getInjectExceptationsTotalScore() {
         return getInjectExpectations().stream().mapToLong(InjectExpectation::getScore).sum();
     }
 
-    @JsonProperty("audience_injects_expectations_total_expected_score")
+    @JsonProperty("team_injects_expectations_total_expected_score")
     public long getInjectExceptationsTotalExpectedScore() {
         return getInjectExpectations().stream().mapToLong(InjectExpectation::getExpectedScore).sum();
-    }
-
-    @JsonIgnore
-    @Override
-    public boolean isUserHasAccess(User user) {
-        return exercise.isUserHasAccess(user);
     }
     // endregion
 
@@ -137,14 +129,6 @@ public class Audience implements Base {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 
     public Instant getCreatedAt() {
@@ -179,12 +163,12 @@ public class Audience implements Base {
         this.users = users;
     }
 
-    public Exercise getExercise() {
-        return exercise;
+    public List<Exercise> getExercises() {
+        return exercises;
     }
 
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
+    public void setExercises(List<Exercise> exercises) {
+        this.exercises = exercises;
     }
 
     public List<InjectExpectation> getInjectExpectations() {
@@ -195,7 +179,7 @@ public class Audience implements Base {
         this.injectExpectations = injectExpectations;
     }
 
-    @JsonProperty("audience_communications")
+    @JsonProperty("team_communications")
     public List<Communication> getCommunications() {
         return getInjects().stream().flatMap(inject -> inject.getCommunications().stream())
                 .distinct()

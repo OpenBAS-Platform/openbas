@@ -29,14 +29,14 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
     );
 
     @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId " +
-            "and i.type = 'CHALLENGE' and i.audience.id IN (:audienceIds)")
+            "and i.type = 'CHALLENGE' and i.team.id IN (:teamIds)")
     List<InjectExpectation> findChallengeExpectations(@Param("exerciseId") String exerciseId,
-                                                     @Param("audienceIds") List<String> audienceIds);
+                                                     @Param("teamIds") List<String> teamIds);
 
     @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId " +
-            "and i.challenge.id = :challengeId and i.audience.id IN (:audienceIds)")
+            "and i.challenge.id = :challengeId and i.team.id IN (:teamIds)")
     List<InjectExpectation> findChallengeExpectations(@Param("exerciseId") String exerciseId,
-                                               @Param("audienceIds") List<String> audienceIds,
+                                               @Param("teamIds") List<String> teamIds,
                                                @Param("challengeId") String challengeId);
 
     @Modifying

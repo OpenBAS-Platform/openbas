@@ -1,23 +1,24 @@
-package io.openex.rest.audience.form;
+package io.openex.rest.team.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotBlank;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
-public class AudienceUpdateInput {
+public class TeamCreateInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("audience_name")
+    @JsonProperty("team_name")
     private String name;
 
-    @JsonProperty("audience_description")
+    @JsonProperty("team_description")
     private String description;
 
-    @JsonProperty("audience_tags")
+    @JsonProperty("team_tags")
     private List<String> tagIds = new ArrayList<>();
 
     public String getName() {

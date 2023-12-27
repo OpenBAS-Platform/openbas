@@ -43,7 +43,7 @@ public class InjectApi extends RestBehavior {
   private UserRepository userRepository;
   private InjectRepository injectRepository;
   private InjectDocumentRepository injectDocumentRepository;
-  private AudienceRepository audienceRepository;
+  private TeamRepository teamRepository;
   private TagRepository tagRepository;
   private DocumentRepository documentRepository;
   private ApplicationContext context;
@@ -81,8 +81,8 @@ public class InjectApi extends RestBehavior {
   }
 
   @Autowired
-  public void setAudienceRepository(AudienceRepository audienceRepository) {
-    this.audienceRepository = audienceRepository;
+  public void setTeamRepository(TeamRepository teamRepository) {
+    this.teamRepository = teamRepository;
   }
 
   @Autowired
@@ -138,7 +138,7 @@ public class InjectApi extends RestBehavior {
     inject.setUpdateAttributes(input);
     // Set dependencies
     inject.setDependsOn(updateRelation(input.getDependsOn(), inject.getDependsOn(), injectRepository));
-    inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
+    inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
     List<InjectDocumentInput> documents = input.getDocuments();
     List<String> askedDocumentIds = documents.stream().map(InjectDocumentInput::getDocumentId).toList();
@@ -196,8 +196,8 @@ public class InjectApi extends RestBehavior {
 
   @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}/audiences")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Iterable<Audience> exerciseInjectAudiences(@PathVariable String exerciseId, @PathVariable String injectId) {
-    return injectRepository.findById(injectId).orElseThrow().getAudiences();
+  public Iterable<Team> exerciseInjectTeams(@PathVariable String exerciseId, @PathVariable String injectId) {
+    return injectRepository.findById(injectId).orElseThrow().getTeams();
   }
 
   @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}/communications")
@@ -221,7 +221,7 @@ public class InjectApi extends RestBehavior {
     inject.setExercise(exercise);
     // Set dependencies
     inject.setDependsOn(resolveOptionalRelation(input.getDependsOn(), injectRepository));
-    inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
+    inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
     List<InjectDocument> injectDocuments = input.getDocuments().stream()
         .map(i -> {
@@ -309,11 +309,11 @@ public class InjectApi extends RestBehavior {
 
   @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/audiences")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject updateInjectAudiences(@PathVariable String exerciseId, @PathVariable String injectId,
-      @Valid @RequestBody InjectAudiencesInput input) {
+  public Inject updateInjectTeams(@PathVariable String exerciseId, @PathVariable String injectId,
+      @Valid @RequestBody InjectTeamsInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow();
-    Iterable<Audience> injectAudiences = audienceRepository.findAllById(input.getAudienceIds());
-    inject.setAudiences(fromIterable(injectAudiences));
+    Iterable<Team> injectTeams = teamRepository.findAllById(input.getTeamIds());
+    inject.setTeams(fromIterable(injectTeams));
     return injectRepository.save(inject);
   }
 

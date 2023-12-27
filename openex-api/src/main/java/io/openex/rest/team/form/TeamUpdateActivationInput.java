@@ -1,10 +1,10 @@
-package io.openex.rest.audience.form;
+package io.openex.rest.team.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class AudienceUpdateActivationInput {
+public class TeamUpdateActivationInput {
 
-    @JsonProperty("audience_enabled")
+    @JsonProperty("team_enabled")
     private boolean enabled;
 
     public boolean isEnabled() {

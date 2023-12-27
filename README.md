@@ -21,7 +21,7 @@ OpenEx is an open source platform allowing organizations to plan, schedule and c
 
 The goal is to create a powerful, reliable and open source tool to effectively plan and play all types of training, exercises and simulation from the technical level to the strategic one. The need for rationalization and capitalization from one year to the next, as well as the publication of ISO 22398: 2013 standard necessarily lead to the need to acquire specific software. 
 
-OpenEx aims to respond to these issues, which not only concern state services but also many private organizations. With different modules (scenarios, audiences, simulations, verification of means of communication, encryption, etc.), the platform offers advantages such as collaborative work, real-time monitoring, statistics or the management of feedback.
+OpenEx aims to respond to these issues, which not only concern state services but also many private organizations. With different modules (scenarios, teams, simulations, verification of means of communication, encryption, etc.), the platform offers advantages such as collaborative work, real-time monitoring, statistics or the management of feedback.
 
 Finally, OpenEx supports different types of inject, allowing the tool to be integrated with emails, SMS platforms, social medias, alarm systems, etc. All currently supported integration can be found in the [OpenEx ecosystem](https://filigran.notion.site/OpenEx-Ecosystem-30d8eb73d7d04611843e758ddef8941b).
 

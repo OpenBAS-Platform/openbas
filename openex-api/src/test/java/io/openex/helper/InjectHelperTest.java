@@ -1,7 +1,7 @@
 package io.openex.helper;
 
 import io.openex.database.model.*;
-import io.openex.database.repository.AudienceRepository;
+import io.openex.database.repository.TeamRepository;
 import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.InjectRepository;
 import io.openex.database.repository.UserRepository;
@@ -26,7 +26,7 @@ public class InjectHelperTest {
   private InjectHelper injectHelper;
 
   @Autowired
-  private AudienceRepository audienceRepository;
+  private TeamRepository teamRepository;
 
   @Autowired
   private ExerciseRepository exerciseRepository;
@@ -51,12 +51,12 @@ public class InjectHelperTest {
     user.setEmail(USER_EMAIL);
     this.userRepository.save(user);
 
-    Audience audience = new Audience();
-    audience.setName("My audience");
-    audience.setEnabled(true);
-    audience.setUsers(List.of(user));
-    audience.setExercise(exerciseSaved);
-    this.audienceRepository.save(audience);
+    Team team = new Team();
+    team.setName("My audience");
+    team.setEnabled(true);
+    team.setUsers(List.of(user));
+    team.setExercise(exerciseSaved);
+    this.teamRepository.save(team);
 
     // Executable Inject
     Inject inject = new Inject();
@@ -64,7 +64,7 @@ public class InjectHelperTest {
     InjectStatus status = new InjectStatus();
     inject.setStatus(status);
     inject.setExercise(exerciseSaved);
-    inject.setAudiences(List.of(audience));
+    inject.setTeams(List.of(team));
     inject.setDependsDuration(0L);
     this.injectRepository.save(inject);
 
@@ -74,7 +74,7 @@ public class InjectHelperTest {
     // -- ASSERT --
     assertFalse(executableInjects.isEmpty());
     ExecutableInject executableInject = executableInjects.get(0);
-    assertEquals(1, executableInject.getAudienceSize());
+    assertEquals(1, executableInject.getTeamSize());
     assertEquals(1, executableInject.getUsers().size());
     assertEquals(USER_EMAIL, executableInject.getUsers().get(0).getUser().getEmail());
   }

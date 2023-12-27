@@ -109,9 +109,9 @@ public class Inject implements Base, Injection {
 
   @Getter
   @Setter
-  @Column(name = "inject_all_audiences")
-  @JsonProperty("inject_all_audiences")
-  private boolean allAudiences;
+  @Column(name = "inject_all_teams")
+  @JsonProperty("inject_all_teams")
+  private boolean allTeams;
 
   @Getter
   @Setter
@@ -164,12 +164,12 @@ public class Inject implements Base, Injection {
   @Getter
   @Setter
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "injects_audiences",
+  @JoinTable(name = "injects_teams",
       joinColumns = @JoinColumn(name = "inject_id"),
-      inverseJoinColumns = @JoinColumn(name = "audience_id"))
+      inverseJoinColumns = @JoinColumn(name = "team_id"))
   @JsonSerialize(using = MultiIdDeserializer.class)
-  @JsonProperty("inject_audiences")
-  private List<Audience> audiences = new ArrayList<>();
+  @JsonProperty("inject_teams")
+  private List<Team> teams = new ArrayList<>();
 
   // CascadeType.ALL is required here because of complex relationships
   @Getter
@@ -221,11 +221,11 @@ public class Inject implements Base, Injection {
 
   @JsonProperty("inject_users_number")
   public long getNumberOfTargetUsers() {
-    if (this.allAudiences) {
+    if (this.allTeams) {
       return getExercise().usersNumber();
     }
-    return getAudiences().stream()
-        .map(Audience::getUsersNumber)
+    return getTeams().stream()
+        .map(Team::getUsersNumber)
         .reduce(Long::sum).orElse(0L);
   }
 
@@ -286,7 +286,7 @@ public class Inject implements Base, Injection {
     return this.expectations.stream()
         .filter(execution -> execution.getType().equals(InjectExpectation.EXPECTATION_TYPE.ARTICLE))
         .filter(execution -> execution.getArticle().equals(article))
-        .filter(execution -> execution.getAudience().getUsers().contains(user))
+        .filter(execution -> execution.getTeam().getUsers().contains(user))
         .toList();
   }
 

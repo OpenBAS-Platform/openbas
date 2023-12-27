@@ -24,7 +24,7 @@ public class ExerciseFileExport {
   private Exercise exercise;
 
   @JsonProperty("exercise_audiences")
-  private List<Audience> audiences = new ArrayList<>();
+  private List<Team> teams = new ArrayList<>();
 
   @JsonProperty("exercise_objectives")
   private List<Objective> objectives = new ArrayList<>();

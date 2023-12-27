@@ -14,7 +14,7 @@ import static io.openex.contract.ContractCardinality.Multiple;
 import static io.openex.contract.ContractDef.contractBuilder;
 import static io.openex.contract.fields.ContractChallenge.challengeField;
 import static io.openex.contract.fields.ContractAttachment.attachmentField;
-import static io.openex.contract.fields.ContractAudience.audienceField;
+import static io.openex.contract.fields.ContractTeam.teamField;
 import static io.openex.contract.fields.ContractCheckbox.checkboxField;
 import static io.openex.contract.fields.ContractText.textField;
 import static io.openex.contract.fields.ContractTextArea.richTextareaField;
@@ -63,7 +63,7 @@ public class ChallengeContract extends Contractor {
                 .mandatory(textField("subject", "Subject", "New challenges published for ${user.email}"))
                 .mandatory(richTextareaField("body", "Body", messageBody))
                 .optional(checkboxField("encrypted", "Encrypted", false))
-                .mandatory(audienceField("audiences", "Audiences", Multiple))
+                .mandatory(teamField("audiences", "Audiences", Multiple))
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .build();
         Contract publishChallenge = executableContract(contractConfig,

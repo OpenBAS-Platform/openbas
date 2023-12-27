@@ -18,7 +18,7 @@ import static io.openex.contract.ContractCardinality.One;
 import static io.openex.contract.ContractDef.contractBuilder;
 import static io.openex.contract.ContractVariable.variable;
 import static io.openex.contract.fields.ContractAttachment.attachmentField;
-import static io.openex.contract.fields.ContractAudience.audienceField;
+import static io.openex.contract.fields.ContractTeam.teamField;
 import static io.openex.contract.fields.ContractCheckbox.checkboxField;
 import static io.openex.contract.fields.ContractExpectations.expectationsField;
 import static io.openex.contract.fields.ContractText.textField;
@@ -47,7 +47,7 @@ public class EmailContract extends Contractor {
   public ContractConfig getConfig() {
     return new ContractConfig(TYPE, Map.of(en, "Email", fr, "Email"), "#cddc39", "/img/email.png", isExpose());
   }
-
+  
   @Override
   public List<Contract> contracts() {
     // variables
@@ -60,7 +60,7 @@ public class EmailContract extends Contractor {
     ContractConfig contractConfig = getConfig();
     // Standard contract
     List<ContractElement> standardInstance = contractBuilder()
-        .mandatory(audienceField("audiences", "Audiences", Multiple))
+        .mandatory(teamField("teams", "Teams", Multiple))
         .mandatory(textField("subject", "Subject"))
         .mandatory(richTextareaField("body", "Body"))
         // .optional(textField("inReplyTo", "InReplyTo", "HIDDEN")) - Use for direct injection
@@ -73,7 +73,7 @@ public class EmailContract extends Contractor {
     standardEmail.addVariable(documentUriVariable);
     // Global contract
     List<ContractElement> globalInstance = contractBuilder()
-        .mandatory(audienceField("audiences", "Audiences", Multiple))
+        .mandatory(teamField("teams", "Teams", Multiple))
         .mandatory(textField("subject", "Subject"))
         .mandatory(richTextareaField("body", "Body"))
         // .mandatory(textField("inReplyTo", "InReplyTo", "HIDDEN"))  - Use for direct injection

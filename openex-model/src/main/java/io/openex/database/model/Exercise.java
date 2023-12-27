@@ -107,7 +107,7 @@ public class Exercise implements Base {
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Audience> audiences = new ArrayList<>();
+    private List<Team> teams = new ArrayList<>();
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
     @JsonIgnore
@@ -217,13 +217,13 @@ public class Exercise implements Base {
 
     @JsonProperty("exercise_users_number")
     public long usersNumber() {
-        return getAudiences().stream().flatMap(audience -> audience.getUsers().stream()).distinct().count();
+        return getTeams().stream().flatMap(team -> team.getUsers().stream()).distinct().count();
     }
 
     @JsonProperty("exercise_players")
     @JsonSerialize(using = MultiIdDeserializer.class)
     public List<User> getPlayers() {
-        return getAudiences().stream().flatMap(audience -> audience.getUsers().stream())
+        return getTeams().stream().flatMap(team -> team.getUsers().stream())
                 .distinct()
                 .toList();
     }
@@ -409,12 +409,12 @@ public class Exercise implements Base {
         this.pauses = pauses;
     }
 
-    public List<Audience> getAudiences() {
-        return audiences;
+    public List<Team> getTeams() {
+        return teams;
     }
 
-    public void setAudiences(List<Audience> audiences) {
-        this.audiences = audiences;
+    public void setTeams(List<Team> teams) {
+        this.teams = teams;
     }
 
     public List<Grant> getGrants() {

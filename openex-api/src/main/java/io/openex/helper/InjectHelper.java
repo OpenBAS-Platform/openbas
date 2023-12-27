@@ -2,7 +2,7 @@ package io.openex.helper;
 
 import io.openex.contract.Contract;
 import io.openex.database.model.*;
-import io.openex.database.repository.AudienceRepository;
+import io.openex.database.repository.TeamRepository;
 import io.openex.database.repository.DryInjectRepository;
 import io.openex.database.repository.InjectRepository;
 import io.openex.database.specification.DryInjectSpecification;
@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.openex.database.specification.AudienceSpecification.fromExercise;
 import static io.openex.helper.StreamHelper.fromIterable;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Stream.concat;
@@ -34,7 +33,7 @@ public class InjectHelper {
 
   private InjectRepository injectRepository;
   private DryInjectRepository dryInjectRepository;
-  private AudienceRepository audienceRepository;
+  private TeamRepository teamRepository;
   private ContractService contractService;
   private ExecutionContextService executionContextService;
 
@@ -44,8 +43,8 @@ public class InjectHelper {
   }
 
   @Autowired
-  public void setAudienceRepository(AudienceRepository audienceRepository) {
-    this.audienceRepository = audienceRepository;
+  public void setTeamRepository(TeamRepository teamRepository) {
+    this.teamRepository = teamRepository;
   }
 
   @Autowired
@@ -63,10 +62,9 @@ public class InjectHelper {
     this.executionContextService = executionContextService;
   }
 
-  private List<Audience> getInjectAudiences(Inject inject) {
+  private List<Team> getInjectTeams(Inject inject) {
     Exercise exercise = inject.getExercise();
-    return inject.isAllAudiences() ?
-        fromIterable(this.audienceRepository.findAll(fromExercise(exercise.getId()))) : inject.getAudiences();
+    return inject.isAllTeams() ? exercise.getTeams() : inject.getTeams();
   }
 
   private Stream<Tuple2<User, String>> getUsersFromInjection(Injection injection) {
@@ -74,10 +72,10 @@ public class InjectHelper {
       return dryInject.getRun().getUsers().stream()
           .map(user -> Tuples.of(user, "Dryrun"));
     } else if (injection instanceof Inject inject) {
-      List<Audience> audiences = getInjectAudiences(inject);
-      return audiences.stream().filter(Audience::isEnabled)
-          .flatMap(audience -> audience.getUsers().stream()
-              .map(user -> Tuples.of(user, audience.getName())));
+      List<Team> teams = getInjectTeams(inject);
+      return teams.stream().filter(Team::isEnabled)
+          .flatMap(team -> team.getUsers().stream()
+              .map(user -> Tuples.of(user, team.getName())));
     }
     throw new UnsupportedOperationException("Unsupported type of Injection");
   }
@@ -105,8 +103,8 @@ public class InjectHelper {
         .sorted(Inject.executionComparator)
         .map(inject -> {
           Contract contract = this.contractService.resolveContract(inject);
-          List<Audience> audiences = getInjectAudiences(inject);
-          return new ExecutableInject(true, false, inject, contract, audiences, usersFromInjection(inject));
+          List<Team> teams = getInjectTeams(inject);
+          return new ExecutableInject(true, false, inject, contract, teams, usersFromInjection(inject));
         });
     // Get dry injects
     List<DryInject> dryInjects = this.dryInjectRepository.findAll(DryInjectSpecification.executable());
@@ -116,8 +114,8 @@ public class InjectHelper {
         .map(dry -> {
           Inject inject = dry.getInject();
           Contract contract = this.contractService.resolveContract(inject);
-          List<Audience> audiences = new ArrayList<>(); // No audiences in dry run, only direct users
-          return new ExecutableInject(false, false, dry, inject, contract, audiences, usersFromInjection(dry));
+          List<Team> teams = new ArrayList<>(); // No teams in dry run, only direct users
+          return new ExecutableInject(false, false, dry, inject, contract, teams, usersFromInjection(dry));
         });
     // Combine injects and dry
     return concat(executableInjects, executableDryInjects)

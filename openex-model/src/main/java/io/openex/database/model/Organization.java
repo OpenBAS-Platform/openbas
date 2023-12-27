@@ -60,10 +60,10 @@ public class Organization implements Base {
     private transient List<Inject> injects = new ArrayList<>();
     public void resolveInjects(Iterable<Inject> injects) {
         this.injects = stream(injects.spliterator(), false)
-                .filter(inject -> inject.isAllAudiences() || inject.getAudiences().stream()
-                        .anyMatch(audience -> getUsers().stream()
-                                .flatMap(user -> user.getAudiences().stream()).toList()
-                                .contains(audience)))
+                .filter(inject -> inject.isAllTeams() || inject.getTeams().stream()
+                        .anyMatch(team -> getUsers().stream()
+                                .flatMap(user -> user.getTeams().stream()).toList()
+                                .contains(team)))
                 .collect(Collectors.toList());
     }
 

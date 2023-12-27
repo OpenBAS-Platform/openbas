@@ -20,7 +20,7 @@ import static io.openex.contract.ContractDef.contractBuilder;
 import static io.openex.contract.ContractVariable.variable;
 import static io.openex.contract.fields.ContractArticle.articleField;
 import static io.openex.contract.fields.ContractAttachment.attachmentField;
-import static io.openex.contract.fields.ContractAudience.audienceField;
+import static io.openex.contract.fields.ContractTeam.teamField;
 import static io.openex.contract.fields.ContractCheckbox.checkboxField;
 import static io.openex.contract.fields.ContractExpectations.expectationsField;
 import static io.openex.contract.fields.ContractText.textField;
@@ -78,7 +78,7 @@ public class MediaContract extends Contractor {
         );
         List<ContractElement> publishInstance = contractBuilder()
                 // built in
-                .optional(audienceField("audiences", "Audiences", Multiple))
+                .optional(teamField("audiences", "Audiences", Multiple))
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .mandatory(articleField("articles", "Articles", Multiple))
                 // Contract specific
