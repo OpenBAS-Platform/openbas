@@ -27,7 +27,7 @@ public interface ExerciseTeamUserRepository extends CrudRepository<ExerciseTeamU
     @Modifying
     @Query(value = "insert into exercises_teams_users (exercise_id, team_id, user_id) " +
             "values (:exerciseId, :teamId, :userId)", nativeQuery = true)
-    void addExerciseTeamUser(@Param("injectId") String exerciseId,
+    void addExerciseTeamUser(@Param("exerciseId") String exerciseId,
                       @Param("teamId") String teamId,
                       @Param("userId") String userId);
 }

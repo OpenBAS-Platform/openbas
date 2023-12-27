@@ -27,6 +27,10 @@ public class V2_64__Audiences_detach_exercises extends BaseJavaMigration {
         ALTER TABLE audiences RENAME COLUMN audience_updated_at TO team_updated_at;
         ALTER TABLE audiences RENAME TO teams;
      """);
+    select.execute("""
+        ALTER TABLE teams ADD COLUMN team_organization varchar(255);
+        ALTER TABLE teams ADD CONSTRAINT fk_teams_organizations FOREIGN KEY (team_organization) REFERENCES organizations(organization_id) ON DELETE SET NULL;
+    """);
     select.execute("""  
         CREATE TABLE exercises_teams (
             exercise_id varchar(255) not null
@@ -69,8 +73,25 @@ public class V2_64__Audiences_detach_exercises extends BaseJavaMigration {
     """);
     select.execute("""
       ALTER TABLE audiences_tags RENAME CONSTRAINT audiences_tags_pkey TO teams_tags_pkey;
+      ALTER TABLE audiences_tags RENAME CONSTRAINT audience_id_fk TO team_id_fk;
       ALTER TABLE audiences_tags RENAME COLUMN audience_id TO team_id;
       ALTER TABLE audiences_tags RENAME to teams_tags;
+    """);
+    select.execute("""
+      ALTER TABLE injects_audiences RENAME CONSTRAINT injects_subaudiences_pkey TO injects_teams_pkey;
+      ALTER TABLE injects_audiences RENAME COLUMN audience_id TO team_id;
+      ALTER TABLE injects_audiences RENAME to injects_teams;
+    """);
+    select.execute("""
+      ALTER TABLE lessons_categories_audiences RENAME CONSTRAINT lessons_categories_audiences_pkey TO lessons_categories_teams_pkey;
+      ALTER TABLE lessons_categories_audiences RENAME CONSTRAINT audience_id_fk TO team_id_fk;
+      ALTER TABLE lessons_categories_audiences RENAME COLUMN audience_id TO team_id;
+      ALTER TABLE lessons_categories_audiences RENAME to lessons_categories_teams;
+    """);
+    select.execute("""
+      ALTER TABLE injects RENAME COLUMN inject_all_audiences TO inject_all_teams;
+      ALTER TABLE injects_expectations RENAME COLUMN audience_id TO team_id;
+      ALTER TABLE injects_expectations RENAME CONSTRAINT fk_expectations_audience TO fk_expectations_team;
     """);
   }
 }
