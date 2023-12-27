@@ -31,7 +31,7 @@ public class HomeApi {
     @Value("${server.servlet.context-path}")
     private String contextPath;
 
-    @GetMapping(path = "/{path:^(?!api$login$|logout$|oauth2$|saml2$).*$}", produces = MediaType.TEXT_HTML_VALUE)
+    @GetMapping(path = {"/", "/{path:^(?!api$|login$|logout$|oauth2$|saml2$).*$}"}, produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> home() {
         ClassPathResource classPathResource = new ClassPathResource("/build/index.html");
         String index = readResourceAsString(classPathResource);
