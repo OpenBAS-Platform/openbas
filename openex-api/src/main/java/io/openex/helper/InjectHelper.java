@@ -73,9 +73,7 @@ public class InjectHelper {
           .map(user -> Tuples.of(user, "Dryrun"));
     } else if (injection instanceof Inject inject) {
       List<Team> teams = getInjectTeams(inject);
-      return teams.stream().filter(Team::isEnabled)
-          .flatMap(team -> team.getUsers().stream()
-              .map(user -> Tuples.of(user, team.getName())));
+      return teams.stream().flatMap(team -> team.getUsers().stream().map(user -> Tuples.of(user, team.getName())));
     }
     throw new UnsupportedOperationException("Unsupported type of Injection");
   }

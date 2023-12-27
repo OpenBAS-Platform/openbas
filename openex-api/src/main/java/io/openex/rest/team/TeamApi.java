@@ -1,8 +1,7 @@
 package io.openex.rest.team;
 
-import io.openex.database.model.Team;
-import io.openex.database.model.Exercise;
-import io.openex.database.model.User;
+import io.openex.config.OpenexPrincipal;
+import io.openex.database.model.*;
 import io.openex.database.repository.TeamRepository;
 import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.TagRepository;
@@ -19,6 +18,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static io.openex.config.SessionHelper.currentUser;
 import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
@@ -26,8 +29,6 @@ import static java.time.Instant.now;
 @RestController
 @RolesAllowed(ROLE_USER)
 public class TeamApi extends RestBehavior {
-
-    private ExerciseRepository exerciseRepository;
     private TeamRepository teamRepository;
     private UserRepository userRepository;
     private TagRepository tagRepository;
@@ -35,11 +36,6 @@ public class TeamApi extends RestBehavior {
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setExerciseRepository(ExerciseRepository exerciseRepository) {
-        this.exerciseRepository = exerciseRepository;
     }
 
     @Autowired
@@ -53,25 +49,37 @@ public class TeamApi extends RestBehavior {
     }
 
     @GetMapping("/api/teams")
-    @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public Iterable<Team> getTeams(@PathVariable String exerciseId) {
-        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        return exercise.getTeams();
+    @PreAuthorize("isObserver()")
+    public Iterable<Team> getTeams() {
+        List<Team> teams;
+        OpenexPrincipal currentUser = currentUser();
+        if (currentUser.isAdmin()) {
+            teams = fromIterable(teamRepository.findAll());
+        } else {
+            User local = userRepository.findById(currentUser.getId()).orElseThrow();
+            List<String> organizationIds = local.getGroups().stream()
+                    .flatMap(group -> group.getOrganizations().stream())
+                    .map(Organization::getId)
+                    .toList();
+            teams = teamRepository.teamsAccessibleFromOrganizations(organizationIds);
+        }
+        return teams;
     }
 
     @GetMapping("/api/teams/{teamId}")
-    @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public Team getTeam(@PathVariable String exerciseId, @PathVariable String teamId) {
+    @PreAuthorize("isObserver()")
+    public Team getTeam(@PathVariable String teamId) {
         return teamRepository.findById(teamId).orElseThrow();
     }
 
     @GetMapping("/api/teams/{teamId}/players")
-    @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public Iterable<User> getTeamPlayers(@PathVariable String exerciseId, @PathVariable String teamId) {
+    @PreAuthorize("isObserver()")
+    public Iterable<User> getTeamPlayers(@PathVariable String teamId) {
         return teamRepository.findById(teamId).orElseThrow().getUsers();
     }
 
     @PostMapping("/api/teams")
+    @PreAuthorize("isPlanner()")
     public Team createTeam(@Valid @RequestBody TeamCreateInput input) {
         Team team = new Team();
         team.setUpdateAttributes(input);
@@ -80,15 +88,14 @@ public class TeamApi extends RestBehavior {
     }
 
     @DeleteMapping("/api/teams/{teamId}")
-    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    @PreAuthorize("isPlanner()")
     public void deleteTeam(@PathVariable String teamId) {
         teamRepository.deleteById(teamId);
     }
 
     @PutMapping("/api/teams/{teamId}")
-    @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public Team updateTeam(@PathVariable String teamId,
-                           @Valid @RequestBody TeamUpdateInput input) {
+    @PreAuthorize("isPlanner()")
+    public Team updateTeam(@PathVariable String teamId, @Valid @RequestBody TeamUpdateInput input) {
         Team team = teamRepository.findById(teamId).orElseThrow();
         team.setUpdateAttributes(input);
         team.setUpdatedAt(now());
@@ -97,25 +104,11 @@ public class TeamApi extends RestBehavior {
     }
 
     @PutMapping("/api/teams/{teamId}/players")
-    @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public Team updateTeamUsers(
-            @PathVariable String exerciseId,
-            @PathVariable String teamId,
-            @Valid @RequestBody UpdateUsersTeamInput input) {
+    @PreAuthorize("isPlanner()")
+    public Team updateTeamUsers(@PathVariable String teamId, @Valid @RequestBody UpdateUsersTeamInput input) {
         Team team = teamRepository.findById(teamId).orElseThrow();
         Iterable<User> teamUsers = userRepository.findAllById(input.getUserIds());
         team.setUsers(fromIterable(teamUsers));
-        return teamRepository.save(team);
-    }
-
-    @PutMapping("/api/teams/{teamId}/activation")
-    @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public Team updateTeamActivation(
-            @PathVariable String exerciseId,
-            @PathVariable String teamId,
-            @Valid @RequestBody TeamUpdateActivationInput input) {
-        Team team = teamRepository.findById(teamId).orElseThrow();
-        team.setEnabled(input.isEnabled());
         return teamRepository.save(team);
     }
 }

@@ -1,10 +1,7 @@
 package io.openex.helper;
 
 import io.openex.database.model.*;
-import io.openex.database.repository.TeamRepository;
-import io.openex.database.repository.ExerciseRepository;
-import io.openex.database.repository.InjectRepository;
-import io.openex.database.repository.UserRepository;
+import io.openex.database.repository.*;
 import io.openex.execution.ExecutableInject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static io.openex.database.model.Exercise.STATUS.RUNNING;
@@ -32,6 +31,9 @@ public class InjectHelperTest {
   private ExerciseRepository exerciseRepository;
 
   @Autowired
+  private ExerciseTeamUserRepository exerciseTeamUserRepository;
+
+  @Autowired
   private InjectRepository injectRepository;
 
   @Autowired
@@ -46,17 +48,23 @@ public class InjectHelperTest {
     exercise.setStart(Instant.now());
     exercise.setStatus(RUNNING);
     Exercise exerciseSaved = this.exerciseRepository.save(exercise);
-
+    List<Exercise> exercises = new ArrayList<>();
+    exercises.add(exerciseSaved);
     User user = new User();
     user.setEmail(USER_EMAIL);
     this.userRepository.save(user);
 
     Team team = new Team();
-    team.setName("My audience");
-    team.setEnabled(true);
+    team.setName("My team");
+    team.setExercises(exercises);
     team.setUsers(List.of(user));
-    team.setExercise(exerciseSaved);
     this.teamRepository.save(team);
+
+    ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
+    exerciseTeamUser.setExercise(exercise);
+    exerciseTeamUser.setTeam(team);
+    exerciseTeamUser.setUser(user);
+    this.exerciseTeamUserRepository.save(exerciseTeamUser);
 
     // Executable Inject
     Inject inject = new Inject();

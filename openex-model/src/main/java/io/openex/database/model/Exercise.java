@@ -105,10 +105,6 @@ public class Exercise implements Base {
     @JsonProperty("exercise_updated_at")
     private Instant updatedAt = now();
 
-    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Team> teams = new ArrayList<>();
-
     @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Grant> grants = new ArrayList<>();
@@ -117,6 +113,14 @@ public class Exercise implements Base {
     @JsonProperty("exercise_injects")
     @JsonSerialize(using = MultiIdDeserializer.class)
     private List<Inject> injects = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "exercises_teams",
+            joinColumns = @JoinColumn(name = "exercise_id"),
+            inverseJoinColumns = @JoinColumn(name = "team_id"))
+    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonProperty("exercise_teams")
+    private List<Team> teams = new ArrayList<>();
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -401,20 +405,20 @@ public class Exercise implements Base {
         this.injects = injects;
     }
 
-    public List<Pause> getPauses() {
-        return pauses;
-    }
-
-    public void setPauses(List<Pause> pauses) {
-        this.pauses = pauses;
-    }
-
     public List<Team> getTeams() {
         return teams;
     }
 
     public void setTeams(List<Team> teams) {
         this.teams = teams;
+    }
+
+    public List<Pause> getPauses() {
+        return pauses;
+    }
+
+    public void setPauses(List<Pause> pauses) {
+        this.pauses = pauses;
     }
 
     public List<Grant> getGrants() {

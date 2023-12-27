@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -52,13 +53,12 @@ public class Team implements Base {
     @JsonProperty("team_tags")
     private List<Tag> tags = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "exercises_teams",
-            joinColumns = @JoinColumn(name = "team_id"),
-            inverseJoinColumns = @JoinColumn(name = "exercise_id"))
-    @JsonSerialize(using = MultiIdDeserializer.class)
-    @JsonProperty("team_exercises")
-    private List<Exercise> exercises = new ArrayList<>();
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_organization")
+    @JsonSerialize(using = MonoIdDeserializer.class)
+    @JsonProperty("team_organization")
+    private Organization organization;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_teams",
@@ -67,6 +67,14 @@ public class Team implements Base {
     @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("team_users")
     private List<User> users = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "exercises_teams",
+            joinColumns = @JoinColumn(name = "exercise_id"),
+            inverseJoinColumns = @JoinColumn(name = "team_id"))
+    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonProperty("team_exercises")
+    private List<Exercise> exercises = new ArrayList<>();
 
     @JsonProperty("team_users_number")
     public long getUsersNumber() {
@@ -153,6 +161,14 @@ public class Team implements Base {
 
     public void setTags(List<Tag> tags) {
         this.tags = tags;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     public List<User> getUsers() {
