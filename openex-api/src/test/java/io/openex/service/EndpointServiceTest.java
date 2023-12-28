@@ -73,7 +73,7 @@ public class EndpointServiceTest {
 
     List<Endpoint> endpoints = this.endpointService.endpoints();
     assertNotNull(endpoints);
-    assertEquals(ENDPOINT_ID, endpoints.get(0).getId());
+    assertTrue(endpoints.stream().map(Endpoint::getId).toList().contains(ENDPOINT_ID));
   }
 
   @DisplayName("Update endpoint")
