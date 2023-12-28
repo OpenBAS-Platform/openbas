@@ -1,7 +1,7 @@
 package io.openex.rest.settings;
 
 import io.openex.config.OpenExConfig;
-import io.openex.config.OpenexPrincipal;
+import io.openex.config.OpenExPrincipal;
 import io.openex.database.model.Setting;
 import io.openex.database.model.Setting.SETTING_KEYS;
 import io.openex.database.repository.SettingRepository;
@@ -143,7 +143,7 @@ public class SettingsApi extends RestBehavior {
     settings.add(buildPlatformSetting(dbSettings, DEFAULT_THEME));
     settings.add(buildPlatformSetting(dbSettings, DEFAULT_LANG));
     // Build authenticated user settings
-    OpenexPrincipal user = currentUser();
+    OpenExPrincipal user = currentUser();
     if (user != null) {
       settings.add(new PlatformSetting("map_tile_server_light", openExConfig.getMapTileServerLight()));
       settings.add(new PlatformSetting("map_tile_server_dark", openExConfig.getMapTileServerDark()));

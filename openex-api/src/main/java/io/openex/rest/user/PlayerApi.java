@@ -1,6 +1,6 @@
 package io.openex.rest.user;
 
-import io.openex.config.OpenexPrincipal;
+import io.openex.config.OpenExPrincipal;
 import io.openex.config.SessionManager;
 import io.openex.database.model.Communication;
 import io.openex.database.model.Inject;
@@ -73,7 +73,7 @@ public class PlayerApi extends RestBehavior {
   @PreAuthorize("isObserver()")
   public Iterable<User> players() {
     List<User> players;
-    OpenexPrincipal currentUser = currentUser();
+    OpenExPrincipal currentUser = currentUser();
     if (currentUser.isAdmin()) {
       players = fromIterable(userRepository.findAll());
     } else {

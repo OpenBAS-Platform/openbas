@@ -1,6 +1,6 @@
 package io.openex.service;
 
-import io.openex.config.OpenexPrincipal;
+import io.openex.config.OpenExPrincipal;
 import io.openex.database.model.Group;
 import io.openex.database.model.Token;
 import io.openex.database.model.User;
@@ -8,6 +8,7 @@ import io.openex.database.repository.*;
 import io.openex.database.specification.GroupSpecification;
 import io.openex.rest.user.form.user.CreateUserInput;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -70,28 +72,9 @@ public class UserService {
   }
 
   public void createUserSession(User user) {
-    List<SimpleGrantedAuthority> roles = new ArrayList<>();
-    roles.add(new SimpleGrantedAuthority(ROLE_USER));
-    if (user.isAdmin()) {
-      roles.add(new SimpleGrantedAuthority(ROLE_ADMIN));
-    }
+    Authentication authentication = buildAuthenticationToken(user);
     SecurityContext context = SecurityContextHolder.createEmptyContext();
-    context.setAuthentication(new PreAuthenticatedAuthenticationToken(new OpenexPrincipal() {
-      @Override
-      public String getId() {
-        return user.getId();
-      }
-
-      @Override
-      public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
-      }
-
-      @Override
-      public boolean isAdmin() {
-        return user.isAdmin();
-      }
-    }, "", roles));
+    context.setAuthentication(authentication);
     SecurityContextHolder.setContext(context);
   }
 
@@ -134,4 +117,28 @@ public class UserService {
   }
 
   // endregion
+
+  public static PreAuthenticatedAuthenticationToken buildAuthenticationToken(@NotNull final User user) {
+    List<SimpleGrantedAuthority> roles = new ArrayList<>();
+    roles.add(new SimpleGrantedAuthority(ROLE_USER));
+    if (user.isAdmin()) {
+      roles.add(new SimpleGrantedAuthority(ROLE_ADMIN));
+    }
+    return new PreAuthenticatedAuthenticationToken(new OpenExPrincipal() {
+      @Override
+      public String getId() {
+        return user.getId();
+      }
+
+      @Override
+      public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles;
+      }
+
+      @Override
+      public boolean isAdmin() {
+        return user.isAdmin();
+      }
+    }, "", roles);
+  }
 }

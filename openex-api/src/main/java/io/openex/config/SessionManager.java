@@ -56,11 +56,11 @@ public class SessionManager {
     return Optional.empty();
   }
 
-  private Optional<OpenexPrincipal> extractPrincipal(HttpSession httpSession) {
+  private Optional<OpenExPrincipal> extractPrincipal(HttpSession httpSession) {
     Optional<Authentication> authentication = extractAuthentication(httpSession);
     if (authentication.isPresent()) {
       Object principal = authentication.get().getPrincipal();
-      if (principal instanceof OpenexPrincipal user) {
+      if (principal instanceof OpenExPrincipal user) {
         return Optional.of(user);
       }
     }
@@ -70,7 +70,7 @@ public class SessionManager {
   private Stream<HttpSession> getUserSessions(String userId) {
     return sessions.values().stream().filter(httpSession -> {
       try {
-        Optional<OpenexPrincipal> extractPrincipal = extractPrincipal(httpSession);
+        Optional<OpenExPrincipal> extractPrincipal = extractPrincipal(httpSession);
         return extractPrincipal.map(user -> user.getId().equals(userId)).orElse(false);
       } catch (IllegalStateException e) {
         return false;
@@ -82,7 +82,7 @@ public class SessionManager {
     getUserSessions(databaseUser.getId()).forEach(httpSession -> {
       Optional<SecurityContext> context = extractSecurityContext(httpSession);
       Optional<Authentication> auth = extractAuthentication(httpSession);
-      OpenexPrincipal user = extractPrincipal(httpSession).orElseThrow();
+      OpenExPrincipal user = extractPrincipal(httpSession).orElseThrow();
       if (context.isPresent() && auth.isPresent()) {
         Authentication authentication = auth.get();
         SecurityContext securityContext = context.get();

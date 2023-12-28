@@ -11,7 +11,7 @@ import java.util.*;
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.database.model.User.ROLE_USER;
 
-public class OpenExOAuth2User implements OpenexPrincipal, OAuth2User {
+public class OpenExOAuth2User implements OpenExPrincipal, OAuth2User {
 
   private final User user;
 

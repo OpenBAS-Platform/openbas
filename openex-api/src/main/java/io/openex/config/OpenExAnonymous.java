@@ -5,7 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 
 
-public class OpenExAnonymous implements OpenexPrincipal {
+public class OpenExAnonymous implements OpenExPrincipal {
 
   public final static String ANONYMOUS = "anonymous";
 

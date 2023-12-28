@@ -27,6 +27,7 @@ public class EndpointApi {
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(input);
+    endpoint.setOs(Endpoint.OS_TYPE.valueOf(input.getOs()));
     return this.endpointService.createEndpoint(endpoint);
   }
 
@@ -43,6 +44,7 @@ public class EndpointApi {
       @Valid @RequestBody final EndpointInput input) {
     Endpoint endpoint = this.endpointService.endpoint(endpointId);
     endpoint.setUpdateAttributes(input);
+    endpoint.setOs(Endpoint.OS_TYPE.valueOf(input.getOs()));
     return this.endpointService.updateEndpoint(endpoint);
   }
 

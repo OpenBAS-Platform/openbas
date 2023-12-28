@@ -1,7 +1,7 @@
 package io.openex.rest.document;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.openex.config.OpenexPrincipal;
+import io.openex.config.OpenExPrincipal;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
 import io.openex.injects.challenge.model.ChallengeContent;
@@ -88,7 +88,7 @@ public class DocumentApi extends RestBehavior {
   }
 
   private Optional<Document> resolveDocument(String documentId) {
-    OpenexPrincipal user = currentUser();
+    OpenExPrincipal user = currentUser();
     if (user.isAdmin()) {
       return documentRepository.findById(documentId);
     } else {
@@ -143,7 +143,7 @@ public class DocumentApi extends RestBehavior {
   @GetMapping("/api/documents")
   public List<Document> documents() {
     Sort sorting = Sort.by(Sort.Direction.DESC, "id");
-    OpenexPrincipal user = currentUser();
+    OpenExPrincipal user = currentUser();
     if (user.isAdmin()) {
       return documentRepository.findAll(null, sorting);
     } else {

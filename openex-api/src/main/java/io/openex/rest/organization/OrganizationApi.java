@@ -1,6 +1,6 @@
 package io.openex.rest.organization;
 
-import io.openex.config.OpenexPrincipal;
+import io.openex.config.OpenExPrincipal;
 import io.openex.database.model.Inject;
 import io.openex.database.model.Organization;
 import io.openex.database.model.User;
@@ -55,7 +55,7 @@ public class OrganizationApi extends RestBehavior {
   @GetMapping("/api/organizations")
   @PreAuthorize("isObserver()")
   public Iterable<Organization> organizations() {
-    OpenexPrincipal currentUser = currentUser();
+    OpenExPrincipal currentUser = currentUser();
     List<Organization> organizations;
     if (currentUser.isAdmin()) {
       organizations = fromIterable(organizationRepository.findAll());

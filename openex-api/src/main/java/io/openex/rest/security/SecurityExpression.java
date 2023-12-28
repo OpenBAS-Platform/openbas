@@ -1,6 +1,6 @@
 package io.openex.rest.security;
 
-import io.openex.config.OpenexPrincipal;
+import io.openex.config.OpenExPrincipal;
 import io.openex.database.model.Exercise;
 import io.openex.database.model.User;
 import io.openex.database.repository.ExerciseRepository;
@@ -30,12 +30,12 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
     this.userRepository = userRepository;
   }
 
-  private OpenexPrincipal getUser() {
-    return (OpenexPrincipal) this.getPrincipal();
+  private OpenExPrincipal getUser() {
+    return (OpenExPrincipal) this.getPrincipal();
   }
 
   private boolean isUserHasBypass() {
-    OpenexPrincipal principal = getUser();
+    OpenExPrincipal principal = getUser();
     return principal.getAuthorities().stream().map(GrantedAuthority::getAuthority)
         .anyMatch(s -> s.equals(ROLE_ADMIN));
   }

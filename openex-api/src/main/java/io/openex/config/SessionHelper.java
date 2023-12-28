@@ -6,11 +6,11 @@ public class SessionHelper {
 
   public final static String ANONYMOUS_USER = "anonymousUser";
 
-  public static OpenexPrincipal currentUser() {
+  public static OpenExPrincipal currentUser() {
     Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     if (ANONYMOUS_USER.equals(principal)) {
       return new OpenExAnonymous();
     }
-    return (OpenexPrincipal) principal;
+    return (OpenExPrincipal) principal;
   }
 }

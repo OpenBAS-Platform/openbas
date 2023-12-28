@@ -13,7 +13,7 @@ import java.util.*;
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.database.model.User.ROLE_USER;
 
-public class OpenExOidcUser implements OpenexPrincipal, OidcUser {
+public class OpenExOidcUser implements OpenExPrincipal, OidcUser {
 
   private final User user;
 

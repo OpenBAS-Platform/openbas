@@ -9,7 +9,7 @@ import org.springframework.security.saml2.provider.service.authentication.Saml2A
 import java.util.Collection;
 import java.util.List;
 
-public class OpenExSaml2User implements OpenexPrincipal, Saml2AuthenticatedPrincipal {
+public class OpenExSaml2User implements OpenExPrincipal, Saml2AuthenticatedPrincipal {
 
   private final User user;
   private final List<SimpleGrantedAuthority> roles;

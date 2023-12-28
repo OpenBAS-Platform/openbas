@@ -3,7 +3,7 @@ package io.openex.rest.stream;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openex.config.OpenexPrincipal;
+import io.openex.config.OpenExPrincipal;
 import io.openex.database.audit.BaseEvent;
 import io.openex.rest.helper.RestBehavior;
 import org.springframework.context.event.EventListener;
@@ -36,7 +36,7 @@ public class StreamApi extends RestBehavior {
   public static final String EVENT_TYPE_PING = "ping";
   public static final String X_ACCEL_BUFFERING = "X-Accel-Buffering";
   private static final Logger LOGGER = Logger.getLogger(StreamApi.class.getName());
-  private final Map<String, Tuple2<OpenexPrincipal, FluxSink<Object>>> consumers = new HashMap<>();
+  private final Map<String, Tuple2<OpenExPrincipal, FluxSink<Object>>> consumers = new HashMap<>();
 
   private void sendStreamEvent(FluxSink<Object> flux, BaseEvent event) {
     // Serialize the instance now for lazy session decoupling
@@ -50,8 +50,8 @@ public class StreamApi extends RestBehavior {
   public void listenDatabaseUpdate(BaseEvent event) {
     consumers.entrySet().stream()
         .parallel().forEach(entry -> {
-          Tuple2<OpenexPrincipal, FluxSink<Object>> tupleFlux = entry.getValue();
-          OpenexPrincipal listener = tupleFlux.getT1();
+          Tuple2<OpenExPrincipal, FluxSink<Object>> tupleFlux = entry.getValue();
+          OpenExPrincipal listener = tupleFlux.getT1();
           FluxSink<Object> fluxSink = tupleFlux.getT2();
           boolean isCurrentObserver = event.isUserObserver(listener.isAdmin());
           if (!isCurrentObserver) {

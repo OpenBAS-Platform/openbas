@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
-import io.openex.config.OpenexPrincipal;
+import io.openex.config.OpenExPrincipal;
 import io.openex.database.model.Organization;
 import io.openex.database.model.User;
 import io.openex.database.repository.UserRepository;
@@ -111,7 +111,7 @@ public class RestBehavior {
   public void checkUserAccess(UserRepository userRepository, String userId) {
     User askedUser = userRepository.findById(userId).orElseThrow();
     if (askedUser.getOrganization() != null) {
-      OpenexPrincipal currentUser = currentUser();
+      OpenExPrincipal currentUser = currentUser();
       if (!currentUser.isAdmin()) {
         User local = userRepository.findById(currentUser.getId()).orElseThrow();
         List<String> localOrganizationIds = local.getGroups().stream()
@@ -127,7 +127,7 @@ public class RestBehavior {
 
   public void checkOrganizationAccess(UserRepository userRepository, String organizationId) {
     if (organizationId != null) {
-      OpenexPrincipal currentUser = currentUser();
+      OpenExPrincipal currentUser = currentUser();
       if (!currentUser.isAdmin()) {
         User local = userRepository.findById(currentUser.getId()).orElseThrow();
         List<String> localOrganizationIds = local.getGroups().stream()

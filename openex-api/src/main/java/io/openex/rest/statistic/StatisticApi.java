@@ -1,6 +1,6 @@
 package io.openex.rest.statistic;
 
-import io.openex.config.OpenexPrincipal;
+import io.openex.config.OpenExPrincipal;
 import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.InjectRepository;
 import io.openex.database.repository.StatisticRepository;
@@ -47,7 +47,7 @@ public class StatisticApi extends RestBehavior {
   }
 
   private StatisticElement computeUserStat(Instant from, StatisticRepository repository) {
-    OpenexPrincipal user = currentUser();
+    OpenExPrincipal user = currentUser();
     long global = repository.userCount(user.getId(), from);
     Instant minusMonth = from.minus(30, ChronoUnit.DAYS);
     long progression = global - repository.userCount(user.getId(), minusMonth);
