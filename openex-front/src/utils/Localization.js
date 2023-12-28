@@ -288,6 +288,7 @@ const i18n = {
       openex_twitter: 'Twitter',
       openex_http: 'Requête HTTP',
       openex_manual: 'Manuel (rappel)',
+      openex_caldera: 'Caldera',
       Subject: 'Sujet du mail',
       Body: 'Corps du mail',
       Encrypted: 'Chiffrer ce mail',
@@ -594,7 +595,8 @@ const i18n = {
       'Manual expectations': 'Attendus manuels',
       'Expectations of ': 'Attendus de',
       MANUAL: 'Manuel',
-      ARTICLE: 'Attendu lié à aux articles',
+      ARTICLE: 'Automatique - Déclenché lorsque l\'équipe a lu l\'article',
+      TECHNICAL: 'Automatique - Déclenché lorsque l\'injection est traitée',
       // -- Expectation end --
       'Distribution of expected total score by team':
         'Distribution du score total attendu par équipe',
@@ -738,6 +740,7 @@ const i18n = {
       openex_ovh_sms: 'SMS (OVH)',
       openex_mastodon: 'Mastodon',
       openex_manual: 'Manual (reminder)',
+      openex_caldera: 'Caldera',
       openex_lade: 'Airbus LADE',
       openex_gnu_social: 'GNU Social',
       openex_twitter: 'Twitter',
@@ -768,6 +771,7 @@ const i18n = {
       '-': 'None',
       MANUAL: 'Manual',
       ARTICLE: 'Automatic - Triggered when team reads articles',
+      TECHNICAL: 'Automatic - Triggered when inject is processed',
       'Ip Address': 'Ip Address',
       'Ip Address {index}': 'Ip Address {index}',
     },

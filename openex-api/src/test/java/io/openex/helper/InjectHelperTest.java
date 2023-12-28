@@ -88,8 +88,8 @@ public class InjectHelperTest {
         assertFalse(executableInjects.isEmpty());
         ExecutableInject executableInject = executableInjects.get(0);
         assertEquals(1, executableInject.getTeamSize());
-        assertEquals(1, executableInject.getUsers().size());
-        assertEquals(USER_EMAIL, executableInject.getUsers().get(0).getUser().getEmail());
+        assertEquals(1, executableInject.getContextUser().size());
+        assertEquals(USER_EMAIL, executableInject.getContextUser().get(0).getUser().getEmail());
 
         // -- CLEAN -
         this.exerciseRepository.delete(exercise);

@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useState } from 'react';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined, AssignmentTurnedIn } from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, AssignmentTurnedIn, PlumbingOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import type { Theme } from '../../../../../components/Theme';
@@ -150,6 +150,9 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
   };
 
   const typeIcon = (type: string) => {
+    if (type === 'TECHNICAL') {
+      return <PlumbingOutlined />;
+    }
     if (type === 'ARTICLE') {
       return <NewspaperVariantMultipleOutline />;
     }

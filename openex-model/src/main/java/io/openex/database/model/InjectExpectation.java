@@ -6,6 +6,7 @@ import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -26,6 +27,7 @@ public class InjectExpectation implements Base {
         ARTICLE,
         CHALLENGE,
         MANUAL,
+        TECHNICAL,
     }
 
     @Setter
@@ -108,6 +110,18 @@ public class InjectExpectation implements Base {
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_expectation_team")
     private Team team;
+
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "asset_id")
+    @JsonSerialize(using = MonoIdDeserializer.class)
+    @JsonProperty("inject_expectation_asset")
+    private Asset asset;
+
+    @Setter
+    @Column(name = "inject_expectation_expectation_group")
+    @JsonProperty("inject_expectation_expectation_group")
+    private boolean expectationGroup = false;
     // endregion
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -130,6 +144,11 @@ public class InjectExpectation implements Base {
     public void setChallenge(Challenge challenge) {
         this.type = EXPECTATION_TYPE.CHALLENGE;
         this.challenge = challenge;
+    }
+
+    public void setTechnical(@NotNull final Asset asset) {
+        this.type = EXPECTATION_TYPE.TECHNICAL;
+        this.asset = asset;
     }
 
     public boolean isUserHasAccess(User user) {

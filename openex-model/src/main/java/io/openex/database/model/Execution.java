@@ -2,6 +2,7 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -34,7 +35,7 @@ public class Execution {
     @Setter
     @Getter
     @JsonProperty("execution_async_ids")
-    @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
+    @Type(StringArrayType.class)
     private String[] asyncIds;
 
     @Getter
@@ -90,7 +91,9 @@ public class Execution {
     public ExecutionStatus getStatus() {
         boolean hasSuccess = traces.stream().anyMatch(context -> context.getStatus().equals(ExecutionStatus.SUCCESS));
         boolean hasError = traces.stream().anyMatch(context -> context.getStatus().equals(ExecutionStatus.ERROR));
-        if (hasSuccess && hasError) {
+        if (!hasSuccess && !hasError) {
+            return ExecutionStatus.PENDING;
+        } else if (hasSuccess && hasError) {
             return ExecutionStatus.PARTIAL;
         } else {
             return hasSuccess ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR;

@@ -74,7 +74,7 @@ public class EmailExecutor extends Injector {
     String message = content.buildMessage(injection, this.imapEnabled);
     boolean mustBeEncrypted = content.isEncrypted();
     // Resolve the attachments only once
-    List<ExecutionContext> users = injection.getUsers();
+    List<ExecutionContext> users = injection.getContextUser();
     if (users.isEmpty()) {
       throw new UnsupportedOperationException("Email needs at least one user");
     }

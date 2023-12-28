@@ -1,9 +1,9 @@
 import React, { FunctionComponent, SyntheticEvent, useEffect } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField } from '@mui/material';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { Alert, Button, FormControlLabel, InputLabel, MenuItem, Select as MUISelect, Switch, Switch as MuiSwitch, TextField as MuiTextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import type { ExpectationInput } from './Expectation';
-import { formProps, infoMessage } from './ExpectationFormUtils';
+import { formProps, infoMessage, isTechnicalExpectation } from './ExpectationFormUtils';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 
@@ -41,6 +41,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         expectation_name: predefinedExpectation.expectation_name ?? '',
         expectation_description: predefinedExpectation.expectation_description ?? '',
         expectation_score: predefinedExpectation.expectation_score ?? 0,
+        expectation_expectation_group: predefinedExpectation.expectation_expectation_group ?? false,
       };
     }
     return {
@@ -48,6 +49,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
       expectation_name: '',
       expectation_description: '',
       expectation_score: 0,
+      expectation_expectation_group: false,
     };
   };
 
@@ -62,6 +64,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
     watch,
     reset,
     getValues,
+    control,
   } = useForm<ExpectationInput>(formProps(initialValues, t));
   const watchType = watch('expectation_type');
 
@@ -134,6 +137,25 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         }
         inputProps={register('expectation_score')}
       />
+
+      {isTechnicalExpectation(initialValues)
+        && <Controller
+          control={control}
+          name="expectation_expectation_group"
+          render={({ field: { onChange, value } }) => (
+            <FormControlLabel
+              value={value}
+              label={t('Can be done in group')}
+              style={{ marginTop: 20 }}
+              control={<Switch
+                checked={value}
+                onChange={(v) => {onChange(v)}}
+              />}
+            />
+          )}
+        />
+      }
+
       <div className={classes.buttons}>
         <Button
           onClick={handleClose}

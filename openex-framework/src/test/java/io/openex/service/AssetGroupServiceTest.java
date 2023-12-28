@@ -1,13 +1,16 @@
 package io.openex.service;
 
+import io.openex.database.model.Asset;
 import io.openex.database.model.AssetGroup;
 import io.openex.database.model.Endpoint;
 import io.openex.database.model.Tag;
 import io.openex.database.repository.TagRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -61,6 +64,7 @@ public class AssetGroupServiceTest {
   @DisplayName("Update asset group")
   @Test
   @Order(3)
+  @Transactional
   void updateAssetGroupTest() {
     // -- PREPARE --
     Endpoint endpoint = new Endpoint();
@@ -74,17 +78,48 @@ public class AssetGroupServiceTest {
     AssetGroup assetGroup = this.assetGroupService.assetGroup(ASSET_GROUP_ID);
     String value = "Professional network";
     assetGroup.setName(value);
-    assetGroup.setAssets(List.of(endpointCreated));
+    assetGroup.setAssets(new ArrayList<>() {{add(endpointCreated);}});
 
     // -- EXECUTE --
     AssetGroup assetGroupUpdated = this.assetGroupService.updateAssetGroup(assetGroup);
     assertNotNull(assetGroupUpdated);
     assertEquals(value, assetGroupUpdated.getName());
+    assertEquals(1, assetGroupUpdated.getAssets().size());
+
+    // -- CLEAN --
+    assetGroupUpdated.setAssets(new ArrayList<>());
+    this.assetGroupService.updateAssetGroup(assetGroup);
+    this.assetEndpointService.deleteEndpoint(endpointCreated.getId());
+  }
+
+  @Test
+  @Order(4)
+  void updateAssetsOnAssetGroupTest() {
+    // -- PREPARE --
+    Endpoint endpoint = new Endpoint();
+    String name = "Personal PC";
+    endpoint.setName(name);
+    endpoint.setIps(new String[]{"127.0.0.1"});
+    endpoint.setHostname("hostname");
+    endpoint.setPlatform(Linux);
+    Endpoint endpointCreated = this.assetEndpointService.createEndpoint(endpoint);
+    AssetGroup assetGroup = this.assetGroupService.assetGroup(ASSET_GROUP_ID);
+
+    // -- EXECUTE --
+    AssetGroup assetGroupUpdated = this.assetGroupService.updateAssetsOnAssetGroup(assetGroup, List.of(endpointCreated.getId()));
+    assertNotNull(assetGroupUpdated);
+    assertEquals(1, assetGroupUpdated.getAssets().size());
+
+    List<Asset> assets = this.assetGroupService.assetsFromAssetGroup(ASSET_GROUP_ID);
+    assertEquals(1, assets.size());
+
+    // -- CLEAN --
+    this.assetEndpointService.deleteEndpoint(endpointCreated.getId());
   }
 
   @DisplayName("Update asset group with tag")
   @Test
-  @Order(4)
+  @Order(5)
   void updateAssetGroupWithTagTest() {
     // -- PREPARE --
     Tag tag = new Tag();
@@ -99,11 +134,14 @@ public class AssetGroupServiceTest {
     AssetGroup assetGroupUpdated = this.assetGroupService.updateAssetGroup(assetGroup);
     assertNotNull(assetGroupUpdated);
     assertEquals(tagName, assetGroupUpdated.getTags().get(0).getName());
+
+    // -- CLEAN --
+    this.tagRepository.delete(tag);
   }
 
   @DisplayName("Delete asset group")
   @Test
-  @Order(5)
+  @Order(6)
   void deleteAssetGroupTest() {
     this.assetGroupService.deleteAssetGroup(ASSET_GROUP_ID);
     assertThrows(NoSuchElementException.class, () -> this.assetGroupService.assetGroup(ASSET_GROUP_ID));

@@ -9,13 +9,15 @@ import io.openex.database.repository.DocumentRepository;
 import io.openex.database.repository.InjectExpectationRepository;
 import io.openex.model.Expectation;
 import io.openex.model.expectation.ChallengeExpectation;
-import io.openex.model.expectation.ManualExpectation;
 import io.openex.model.expectation.ChannelExpectation;
+import io.openex.model.expectation.ManualExpectation;
+import io.openex.model.expectation.TechnicalExpectation;
 import io.openex.service.FileService;
+import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.annotation.Resource;
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.Instant;
@@ -51,18 +53,32 @@ public abstract class Injector {
 
     public abstract List<Expectation> process(Execution execution, ExecutableInject injection, Contract contract) throws Exception;
 
+    private InjectExpectation expectationConverter(
+        @NotNull final ExecutableInject executableInject,
+        Expectation expectation) {
+        InjectExpectation expectationExecution = new InjectExpectation();
+        return this.expectationConverter(expectationExecution, executableInject, expectation);
+    }
     private InjectExpectation expectationConverter(Team team, ExecutableInject executableInject, Expectation expectation) {
         InjectExpectation expectationExecution = new InjectExpectation();
+        expectationExecution.setTeam(team);
+        return this.expectationConverter(expectationExecution, executableInject, expectation);
+    }
+    private InjectExpectation expectationConverter(
+        @NotNull InjectExpectation expectationExecution,
+        @NotNull final ExecutableInject executableInject,
+        @NotNull final Expectation expectation) {
         expectationExecution.setExercise(executableInject.getInject().getExercise());
         expectationExecution.setInject(executableInject.getInject());
-        expectationExecution.setTeam(team);
         expectationExecution.setExpectedScore(expectation.getScore());
         expectationExecution.setScore(0);
+        expectationExecution.setExpectationGroup(expectation.isExpectationGroup());
         switch (expectation.type()) {
             case ARTICLE -> expectationExecution.setArticle(((ChannelExpectation) expectation).getArticle());
             case CHALLENGE -> expectationExecution.setChallenge(((ChallengeExpectation) expectation).getChallenge());
             case DOCUMENT -> expectationExecution.setType(EXPECTATION_TYPE.DOCUMENT);
             case TEXT -> expectationExecution.setType(EXPECTATION_TYPE.TEXT);
+            case TECHNICAL -> expectationExecution.setTechnical(((TechnicalExpectation) expectation).getAsset());
             case MANUAL -> {
                 expectationExecution.setType(EXPECTATION_TYPE.MANUAL);
                 expectationExecution.setName(((ManualExpectation) expectation).getName());
@@ -95,12 +111,20 @@ public abstract class Injector {
             List<Expectation> expectations = process(execution, executableInject, contract);
             // Create the expectations
             List<Team> teams = executableInject.getTeams();
-            if (isScheduledInject && !teams.isEmpty() && !expectations.isEmpty()) {
-                List<InjectExpectation> executions = teams.stream()
+            List<Asset> assets = executableInject.getAssets();
+            if (isScheduledInject && !expectations.isEmpty()) {
+                if (!teams.isEmpty()) {
+                    List<InjectExpectation> injectExpectations = teams.stream()
                         .flatMap(team -> expectations.stream()
-                                .map(expectation -> expectationConverter(team, executableInject, expectation)))
+                            .map(expectation -> expectationConverter(team, executableInject, expectation)))
                         .toList();
-                this.injectExpectationRepository.saveAll(executions);
+                    this.injectExpectationRepository.saveAll(injectExpectations);
+                } else if (!assets.isEmpty()) {
+                    List<InjectExpectation> injectExpectations = expectations.stream()
+                        .map(expectation -> expectationConverter(executableInject, expectation))
+                        .toList();
+                    this.injectExpectationRepository.saveAll(injectExpectations);
+                }
             }
         } catch (Exception e) {
             execution.addTrace(traceError(getClass().getSimpleName(), e.getMessage(), e));
@@ -122,10 +146,15 @@ public abstract class Injector {
         return injectWhen.isAfter(start) && injectWhen.isBefore(now);
     }
 
-    public <T> T contentConvert(ExecutableInject injection, Class<T> converter) throws Exception {
+    public <T> T contentConvert(@NotNull final ExecutableInject injection, @NotNull final Class<T> converter) throws Exception {
         Inject inject = injection.getInject();
         ObjectNode content = inject.getContent();
-        return mapper.treeToValue(content, converter);
+        return this.mapper.treeToValue(content, converter);
+    }
+
+    public <T> T contentConvert(@NotNull final Inject inject, @NotNull final Class<T> converter) throws Exception {
+        ObjectNode content = inject.getContent();
+        return this.mapper.treeToValue(content, converter);
     }
 
     public List<DataAttachment> resolveAttachments(Execution execution, ExecutableInject injection, List<Document> documents) {
@@ -159,4 +188,10 @@ public abstract class Injector {
         return resolved;
     }
     // endregion
+
+    // -- ASSETS --
+
+    public List<Asset> assets(@NotNull final Inject inject) {
+        return new ArrayList<>();
+    }
 }

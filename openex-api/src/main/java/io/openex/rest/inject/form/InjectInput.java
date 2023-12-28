@@ -49,98 +49,6 @@ public class InjectInput {
     @JsonProperty("inject_tags")
     private List<String> tagIds = new ArrayList<>();
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public ObjectNode getContent() {
-        return content;
-    }
-
-    public void setContent(ObjectNode content) {
-        this.content = content;
-    }
-
-    public String getContract() {
-        return contract;
-    }
-
-    public void setContract(String contract) {
-        this.contract = contract;
-    }
-
-    public List<String> getTeams() {
-        return teams;
-    }
-
-    public void setTeams(List<String> teams) {
-        this.teams = teams;
-    }
-
-    public boolean getAllTeams() {
-        return allTeams;
-    }
-
-    public void setAllTeams(boolean allTeams) {
-        this.allTeams = allTeams;
-    }
-
-    public boolean isAllTeams() {
-        return allTeams;
-    }
-
-    public List<InjectDocumentInput> getDocuments() {
-        return documents;
-    }
-
-    public void setDocuments(List<InjectDocumentInput> documents) {
-        this.documents = documents;
-    }
-
-    public String getDependsOn() {
-        return dependsOn;
-    }
-
-    public void setDependsOn(String dependsOn) {
-        this.dependsOn = dependsOn;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public List<String> getTagIds() {
-        return tagIds;
-    }
-
-    public void setTagIds(List<String> tagIds) {
-        this.tagIds = tagIds;
-    }
-
     public Inject toInject() {
         Inject inject = new Inject();
         inject.setTitle(getTitle());
@@ -148,7 +56,7 @@ public class InjectInput {
         inject.setContent(getContent());
         inject.setContract(getContract());
         inject.setDependsDuration(getDependsDuration());
-        inject.setAllTeams(getAllTeams());
+        inject.setAllTeams(isAllTeams());
         inject.setCountry(getCountry());
         inject.setCity(getCity());
         return inject;

@@ -3,11 +3,12 @@ package io.openex.service;
 import io.openex.database.model.Asset;
 import io.openex.database.model.AssetGroup;
 import io.openex.database.repository.AssetGroupRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 import static io.openex.helper.StreamHelper.fromIterable;
@@ -54,6 +55,7 @@ public class AssetGroupService {
 
   // -- ASSET --
 
+  @Transactional(readOnly=true)
   public List<Asset> assetsFromAssetGroup(@NotBlank final String assetGroupId) {
     return this.assetGroupRepository.assetsFromAssetGroup(assetGroupId);
   }

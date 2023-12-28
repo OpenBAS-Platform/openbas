@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
 import { FormControlLabel, List, ListItem, ListItemIcon, ListItemText, Slide, Switch } from '@mui/material';
-import { CastForEducationOutlined } from '@mui/icons-material';
+import { CastForEducationOutlined, DnsOutlined } from '@mui/icons-material';
 import AnimationMenu from '../AnimationMenu';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
@@ -21,6 +21,8 @@ import ItemTags from '../../../../components/ItemTags';
 import ManualExpectations from './ManualExpectations';
 import ChallengeExpectation from './ChallengeExpectation';
 import ChannelExpectation from './ChannelExpectation';
+import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
+import TechnicalExpectation from './TechnicalExpectation';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -64,6 +66,7 @@ const Validations = () => {
     injectExpectations,
     injectsMap,
     teamsMap,
+    assetsMap,
     challengesMap,
     articlesMap,
     channelsMap,
@@ -74,6 +77,7 @@ const Validations = () => {
       injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
       injectTypesMap: helper.getInjectTypesMap(),
       teamsMap: helper.getTeamsMap(),
+      assetsMap: helper.getEndpointsMap(), // TODO: Should be asset
       challengesMap: helper.getChallengesMap(),
       articlesMap: helper.getArticlesMap(),
       channelsMap: helper.getChannelsMap(),
@@ -87,6 +91,7 @@ const Validations = () => {
     dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchExerciseArticles(exerciseId));
     dispatch(fetchExerciseChallenges(exerciseId));
+    dispatch(fetchEndpoints());
   });
   const filterByKeyword = (n) => keyword === ''
     || (n.inject_expectation_inject?.inject_title || '')
@@ -129,13 +134,19 @@ const Validations = () => {
     return group;
   }, {});
 
-  const groupedByTeam = (injects) => {
-    return injects.reduce((group, expectation) => {
+  const groupedByTeamOrAsset = (expectations) => {
+    return expectations.reduce((group, expectation) => {
       const { inject_expectation_team } = expectation;
+      const { inject_expectation_asset } = expectation;
       if (inject_expectation_team) {
         const values = group[inject_expectation_team] ?? [];
         values.push(expectation);
         group[inject_expectation_team] = values;
+      }
+      if (inject_expectation_asset) {
+        const values = group[inject_expectation_asset] ?? [];
+        values.push(expectation);
+        group[inject_expectation_asset] = values;
       }
       return group;
     }, {});
@@ -185,7 +196,7 @@ const Validations = () => {
         </div>
         <div className="clearfix" />
         <List>
-          {Object.entries(groupedByInject).map(([injectId, teams]) => {
+          {Object.entries(groupedByInject).map(([injectId, expectationsByInject]) => {
             const inject = injectsMap[injectId] || {};
             const injectContract = injectTypesMap[inject.inject_contract] || {};
             return (
@@ -217,22 +228,24 @@ const Validations = () => {
                   />
                 </ListItem>
                 <List component="div" disablePadding>
-                  {Object.entries(groupedByTeam(teams)).map(([teamId, expectations]) => {
-                    const team = teamsMap[teamId] || {};
+                  {Object.entries(groupedByTeamOrAsset(expectationsByInject)).map(([teamOrAssetId, expectations]) => {
+                    const team = teamsMap[teamOrAssetId];
+                    const asset = assetsMap[teamOrAssetId];
                     return (
-                      <div key={team.team_id}>
+                      <div key={teamOrAssetId}>
                         <ListItem
-                          divider={true}
+                          divider
                           sx={{ pl: 4 }}
                           classes={{ root: classes.item }}
                         >
                           <ListItemIcon>
-                            <CastForEducationOutlined fontSize="small" />
+                            {!!team && <CastForEducationOutlined fontSize="small" />}
+                            {!!asset && <DnsOutlined fontSize="small" />}
                           </ListItemIcon>
                           <ListItemText
                             primary={
                               <div className={classes.bodyItem} style={{ width: '20%' }}>
-                                {team.team_name}
+                                {team?.team_name || asset?.asset_name}
                               </div>
                             }
                           />
@@ -251,6 +264,11 @@ const Validations = () => {
                               const challenge = challengesMap[expectation.inject_expectation_challenge] || {};
                               return (
                                 <ChallengeExpectation key={expectationType} challenge={challenge} expectation={expectation} />
+                              );
+                            } if (expectationType === 'TECHNICAL') {
+                              const expectation = es[0];
+                              return (
+                                <TechnicalExpectation key={expectationType} expectation={expectation} injectContract={injectContract}/>
                               );
                             }
                             return (

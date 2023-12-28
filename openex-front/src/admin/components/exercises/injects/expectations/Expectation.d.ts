@@ -11,4 +11,5 @@ export interface ExpectationInput {
   expectation_name: string;
   expectation_description?: string;
   expectation_score: number;
+  expectation_expectation_group: boolean;
 }

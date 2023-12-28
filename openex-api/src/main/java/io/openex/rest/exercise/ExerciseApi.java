@@ -91,6 +91,7 @@ public class ExerciseApi extends RestBehavior {
   private LessonsCategoryRepository lessonsCategoryRepository;
   private LessonsQuestionRepository lessonsQuestionRepository;
   private LessonsAnswerRepository lessonsAnswerRepository;
+  private InjectStatusRepository injectStatusRepository;
   // endregion
 
   // region services
@@ -102,6 +103,12 @@ public class ExerciseApi extends RestBehavior {
   // endregion
 
   // region setters
+
+  @Autowired
+  public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
+    this.injectStatusRepository = injectStatusRepository;
+  }
+
   @Autowired
   public void setChallengeService(ChallengeService challengeService) {
     this.challengeService = challengeService;
@@ -499,10 +506,11 @@ public class ExerciseApi extends RestBehavior {
   @Transactional(rollbackOn = Exception.class)
   @PutMapping("/api/exercises/{exerciseId}/status")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Exercise changeExerciseStatus(@PathVariable String exerciseId,
+  public Exercise changeExerciseStatus(
+      @PathVariable String exerciseId,
       @Valid @RequestBody ExerciseUpdateStatusInput input) {
     STATUS status = input.getStatus();
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Exercise exercise = this.exerciseRepository.findById(exerciseId).orElseThrow();
     // Check if next status is possible
     List<STATUS> nextPossibleStatus = exercise.nextPossibleStatus();
     if (!nextPossibleStatus.contains(status)) {
@@ -517,7 +525,8 @@ public class ExerciseApi extends RestBehavior {
       exercise.setCurrentPause(null);
       pauseRepository.deleteAll(pauseRepository.findAllForExercise(exerciseId));
       // Reset injects outcome, communications and expectations
-      injectRepository.saveAll(injectRepository.findAllForExercise(exerciseId).stream().peek(Inject::clean).toList());
+      this.injectStatusRepository.deleteAllById(exercise.getInjects().stream().map(Inject::getStatus).map(i -> i.map(InjectStatus::getId).orElse("")).toList());
+      exercise.getInjects().forEach(Inject::clean);
       // Reset lessons learned answers
       List<LessonsAnswer> lessonsAnswers = lessonsCategoryRepository.findAll(
           LessonsCategorySpecification.fromExercise(exerciseId)).stream().flatMap(

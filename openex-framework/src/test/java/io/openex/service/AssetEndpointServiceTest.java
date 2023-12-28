@@ -79,7 +79,7 @@ public class AssetEndpointServiceTest {
   @Test
   @Order(3)
   void retrieveEndpointTest() {
-    List<Asset> assets = this.assetService.assets(List.of("Endpoint"));
+    List<Asset> assets = this.assetService.assetsFromTypes(List.of("Endpoint"));
     assertTrue(assets.stream().map(Asset::getId).toList().contains(ENDPOINT_ID));
 
     Endpoint endpoint = this.assetEndpointService.endpoint(ENDPOINT_ID);
@@ -122,6 +122,9 @@ public class AssetEndpointServiceTest {
     Endpoint endpointUpdated = this.assetEndpointService.updateEndpoint(endpoint);
     assertNotNull(endpointUpdated);
     assertEquals(tagName, endpointUpdated.getTags().get(0).getName());
+
+    // -- CLEAN --
+    this.tagRepository.delete(tag);
   }
 
   @DisplayName("Delete endpoint")

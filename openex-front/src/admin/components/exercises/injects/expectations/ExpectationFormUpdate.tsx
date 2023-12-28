@@ -1,8 +1,8 @@
 import React, { FunctionComponent, SyntheticEvent } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField } from '@mui/material';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { Alert, Button, FormControlLabel, InputLabel, MenuItem, Select as MUISelect, Switch, TextField as MuiTextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { formProps, infoMessage } from './ExpectationFormUtils';
+import { formProps, infoMessage, isTechnicalExpectation } from './ExpectationFormUtils';
 import type { ExpectationInput } from './Expectation';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
@@ -38,6 +38,7 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
     getValues,
+    control,
   } = useForm<ExpectationInput>(formProps(initialValues, t));
 
   const handleSubmitWithoutPropagation = (e: SyntheticEvent) => {
@@ -105,6 +106,25 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
         }
         inputProps={register('expectation_score')}
       />
+
+      {isTechnicalExpectation(initialValues)
+        && <Controller
+          control={control}
+          name="expectation_expectation_group"
+          render={({ field: { onChange, value } }) => (
+            <FormControlLabel
+              value={value}
+              label={t('Can be done in group')}
+              style={{ marginTop: 20 }}
+              control={<Switch
+                checked={value}
+                onChange={(v) => {onChange(v)}}
+              />}
+            />
+          )}
+        />
+      }
+
       <div className={classes.buttons}>
         <Button
           onClick={handleClose}

@@ -3,6 +3,7 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
@@ -53,7 +54,7 @@ public class Communication implements Base {
     @JsonProperty("communication_content_html")
     private String contentHtml;
 
-    @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
+    @Type(StringArrayType.class)
     @Column(name = "communication_attachments", columnDefinition = "text[]")
     @JsonProperty("communication_attachments")
     private String[] attachments;
