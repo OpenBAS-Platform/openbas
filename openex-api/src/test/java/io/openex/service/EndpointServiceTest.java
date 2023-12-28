@@ -22,10 +22,10 @@ public class EndpointServiceTest {
 
   static String ENDPOINT_ID;
 
-  @DisplayName("Create endpoint")
+  @DisplayName("Create endpoint failed")
   @Test
   @Order(1)
-  void createEndpointTest() {
+  void createEndpointFailedTest() {
     // -- PREPARE --
     Endpoint endpoint = new Endpoint();
     String name = "Personal PC";
@@ -38,9 +38,21 @@ public class EndpointServiceTest {
 
     // -- EXECUTE --
     assertThrows(TransactionSystemException.class, () -> this.endpointService.createEndpoint(endpoint));
+  }
 
+  @DisplayName("Create endpoint succeed")
+  @Test
+  @Order(2)
+  void createEndpointSucceedTest() {
     // -- PREPARE --
+    Endpoint endpoint = new Endpoint();
+    String name = "Personal PC";
+    endpoint.setName(name);
     endpoint.setIp("127.0.0.1");
+    endpoint.setHostname("hostname");
+    endpoint.setOs(LINUX);
+    endpoint.setHostname("hostname");
+    endpoint.setOs(LINUX);
 
     // -- EXECUTE --
     Endpoint endpointCreated = this.endpointService.createEndpoint(endpoint);
@@ -54,7 +66,7 @@ public class EndpointServiceTest {
 
   @DisplayName("Retrieve endpoint")
   @Test
-  @Order(2)
+  @Order(3)
   void retrieveEndpointTest() {
     Endpoint endpoint = this.endpointService.endpoint(ENDPOINT_ID);
     assertNotNull(endpoint);
@@ -66,7 +78,7 @@ public class EndpointServiceTest {
 
   @DisplayName("Update endpoint")
   @Test
-  @Order(3)
+  @Order(4)
   void updateEndpointTest() {
     // -- PREPARE --
     Endpoint endpoint = this.endpointService.endpoint(ENDPOINT_ID);
@@ -81,7 +93,7 @@ public class EndpointServiceTest {
 
   @DisplayName("Delete endpoint")
   @Test
-  @Order(4)
+  @Order(5)
   void deleteEndpointTest() {
     this.endpointService.deleteEndpoint(ENDPOINT_ID);
     assertThrows(NoSuchElementException.class, () -> this.endpointService.endpoint(ENDPOINT_ID));

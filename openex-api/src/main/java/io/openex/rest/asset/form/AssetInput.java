@@ -17,4 +17,7 @@ public abstract class AssetInput {
   @JsonProperty("asset_name")
   private String name;
 
+  @JsonProperty("asset_description")
+  private String description;
+
 }

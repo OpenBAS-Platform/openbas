@@ -29,7 +29,8 @@ public class V2_64__Assets_Asset_Groups extends BaseJavaMigration {
     // Create table endpoint
     select.execute("""
         CREATE TABLE IF NOT EXISTS endpoints (
-            endpoint_ip varchar(255) not null constraint endpoint_pkey primary key,
+            endpoint_id varchar(255) not null constraint endpoints_pkey primary key,
+            endpoint_ip varchar(255) not null,
             endpoint_hostname varchar(255),
             endpoint_os varchar(255)
         ) INHERITS (assets);
