@@ -129,9 +129,8 @@ public class User implements Base {
   private String city;
 
   @Setter
-  @ManyToMany(fetch = FetchType.LAZY)
-  // @ManyToMany(fetch = FetchType.EAGER)
-  // TODO ask Ju
+  // @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "users_groups",
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "group_id"))
