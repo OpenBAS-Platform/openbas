@@ -19,7 +19,9 @@
 
     <properties>
         <minio.version>8.5.7</minio.version>
-        <commons-io.version>2.15.1</commons-io.version>
+        <validation-api.version>2.0.1.Final</validation-api.version>
+        <commons-io.version>2.15.0</commons-io.version>
+        <commons-validator.version>1.8.0</commons-validator.version>
         <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
     </properties>
 
