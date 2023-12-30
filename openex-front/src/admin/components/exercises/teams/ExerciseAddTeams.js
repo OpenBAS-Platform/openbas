@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Button, Slide, Chip, Avatar, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, Box, ListItemIcon, Grid, Fab } from '@mui/material';
-import { Add, PersonOutlined } from '@mui/icons-material';
+import { Add, GroupsOutlined } from '@mui/icons-material';
 import withStyles from '@mui/styles/withStyles';
 import { updateExerciseTeams } from '../../../../actions/Exercise';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -199,7 +199,7 @@ class TeamAddTeams extends Component {
                         onClick={this.addTeam.bind(this, team.team_id)}
                       >
                         <ListItemIcon>
-                          <PersonOutlined />
+                          <GroupsOutlined />
                         </ListItemIcon>
                         <ListItemText
                           primary={team.team_name}

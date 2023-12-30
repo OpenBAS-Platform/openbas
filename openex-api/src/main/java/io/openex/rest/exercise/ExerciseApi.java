@@ -78,6 +78,7 @@ public class ExerciseApi extends RestBehavior {
     private DocumentRepository documentRepository;
     private ExerciseRepository exerciseRepository;
     private TeamRepository teamRepository;
+    private ExerciseTeamUserRepository exerciseTeamUserRepository;
     private LogRepository exerciseLogRepository;
     private DryRunRepository dryRunRepository;
     private DryInjectRepository dryInjectRepository;
@@ -191,6 +192,11 @@ public class ExerciseApi extends RestBehavior {
     @Autowired
     public void setTeamRepository(TeamRepository teamRepository) {
         this.teamRepository = teamRepository;
+    }
+
+    @Autowired
+    public void setExerciseTeamUserRepository(ExerciseTeamUserRepository exerciseTeamUserRepository) {
+        this.exerciseTeamUserRepository = exerciseTeamUserRepository;
     }
 
     @Autowired
@@ -314,6 +320,21 @@ public class ExerciseApi extends RestBehavior {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setTeams(fromIterable(teamRepository.findAllById(input.getTeamIds())));
         return exerciseRepository.save(exercise);
+    }
+
+    @PutMapping("/api/exercises/{exerciseId}/teams/{teamId}/players")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Exercise updateExerciseTeamPlayers(@PathVariable String exerciseId, @PathVariable String teamId, @Valid @RequestBody ExerciseTeamPlayersEnableInput input) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        Team team = teamRepository.findById(teamId).orElseThrow();
+        input.getPlayersIds().forEach(playerId -> {
+            ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
+            exerciseTeamUser.setExercise(exercise);
+            exerciseTeamUser.setTeam(team);
+            exerciseTeamUser.setUser(userRepository.findById(playerId).orElseThrow());
+            exerciseTeamUserRepository.save(exerciseTeamUser);
+        });
+        return exerciseRepository.findById(exerciseId).orElseThrow();
     }
     // endregion
 

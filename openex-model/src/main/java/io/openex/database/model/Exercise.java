@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
+import io.openex.helper.MultiModelDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -121,6 +124,13 @@ public class Exercise implements Base {
     @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("exercise_teams")
     private List<Team> teams = new ArrayList<>();
+
+    @Getter
+    @Setter
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonProperty("exercise_teams_users")
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    private List<ExerciseTeamUser> exerciseTeamUsers = new ArrayList<>();
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -411,6 +421,14 @@ public class Exercise implements Base {
 
     public void setTeams(List<Team> teams) {
         this.teams = teams;
+    }
+
+    public List<ExerciseTeamUser> getExerciseTeamUsers() {
+        return exerciseTeamUsers;
+    }
+
+    public void setExerciseTeamUsers(List<ExerciseTeamUser> exerciseTeamUsers) {
+        this.exerciseTeamUsers = exerciseTeamUsers;
     }
 
     public List<Pause> getPauses() {

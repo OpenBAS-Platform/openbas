@@ -8,12 +8,14 @@ import { ArrowDropDownOutlined, ArrowDropUpOutlined, CloseRounded, EmailOutlined
 import inject18n from '../../../../components/i18n';
 import { fetchTeamPlayers } from '../../../../actions/Team';
 import { fetchOrganizations } from '../../../../actions/Organization';
+import { updateExerciseTeamPlayers } from '../../../../actions/Exercise';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
 import PlayerPopover from '../players/PlayerPopover';
 import { storeHelper } from '../../../../actions/Schema';
 import TeamAddPlayers from './TeamAddPlayers';
+import ItemBoolean from '../../../../components/ItemBoolean';
 
 const styles = (theme) => ({
   header: {
@@ -91,13 +93,19 @@ const inlineStylesHeaders = {
   },
   user_organization: {
     float: 'left',
-    width: '25%',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
   user_tags: {
     float: 'left',
-    width: '30%',
+    width: '25%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  user_enabled: {
+    float: 'left',
+    width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -122,7 +130,7 @@ const inlineStyles = {
   },
   user_organization: {
     float: 'left',
-    width: '25%',
+    width: '20%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -130,7 +138,15 @@ const inlineStyles = {
   },
   user_tags: {
     float: 'left',
-    width: '30%',
+    width: '25%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  user_enabled: {
+    float: 'left',
+    width: '10%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -150,9 +166,9 @@ class TeamsPlayers extends Component {
   }
 
   componentDidMount() {
-    const { exerciseId, teamId } = this.props;
+    const { teamId } = this.props;
     this.props.fetchOrganizations();
-    this.props.fetchTeamPlayers(exerciseId, teamId);
+    this.props.fetchTeamPlayers(teamId);
   }
 
   handleSearch(value) {
@@ -199,6 +215,16 @@ class TeamsPlayers extends Component {
     );
   }
 
+  handleToggleUser(userId) {
+    this.props.updateExerciseTeamPlayers(
+      this.props.exerciseId,
+      this.props.teamId,
+      {
+        exercise_team_players: [userId],
+      },
+    );
+  }
+
   render() {
     const {
       classes,
@@ -206,6 +232,7 @@ class TeamsPlayers extends Component {
       handleClose,
       team,
       organizationsMap,
+      exerciseId,
       teamId,
     } = this.props;
     const { keyword, sortBy, orderAsc, tags } = this.state;
@@ -293,6 +320,7 @@ class TeamsPlayers extends Component {
                   {this.sortHeader('user_options', 'Options', false)}
                   {this.sortHeader('user_organization', 'Organization', true)}
                   {this.sortHeader('user_tags', 'Tags', true)}
+                  {exerciseId && this.sortHeader('user_enabled', 'Enabled', false)}
                 </div>
               }
             />
@@ -378,6 +406,11 @@ class TeamsPlayers extends Component {
                     >
                       <ItemTags variant="list" tags={user.user_tags} />
                     </div>
+                    {exerciseId && (
+                    <div className={classes.bodyItem} style={inlineStyles.user_enabled}>
+                      <ItemBoolean status={user.user_enabled} onClick={this.handleToggleUser.bind(this, user.user_id)} />
+                    </div>
+                    )}
                   </div>
                 }
               />
@@ -405,25 +438,29 @@ TeamsPlayers.propTypes = {
   nsdt: PropTypes.func,
   teamId: PropTypes.string,
   team: PropTypes.object,
+  exerciseId: PropTypes.string,
+  exercise: PropTypes.object,
   organizations: PropTypes.array,
   users: PropTypes.array,
   fetchTeamPlayers: PropTypes.func,
   fetchOrganizations: PropTypes.func,
+  updateExerciseTeamPlayers: PropTypes.func,
   handleClose: PropTypes.func,
 };
 
 const select = (state, ownProps) => {
   const helper = storeHelper(state);
-  const { teamId } = ownProps;
+  const { teamId, exerciseId } = ownProps;
   return {
     organizationsMap: helper.getOrganizationsMap(),
+    exercise: exerciseId && helper.getExercise(exerciseId),
     team: helper.getTeam(teamId),
     users: helper.getTeamUsers(teamId),
   };
 };
 
 export default R.compose(
-  connect(select, { fetchTeamPlayers, fetchOrganizations }),
+  connect(select, { fetchTeamPlayers, fetchOrganizations, updateExerciseTeamPlayers }),
   inject18n,
   withStyles(styles),
 )(TeamsPlayers);

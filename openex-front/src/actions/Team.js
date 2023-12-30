@@ -6,13 +6,8 @@ export const fetchTeams = () => (dispatch) => {
   return getReferential(schema.arrayOfTeams, uri)(dispatch);
 };
 
-export const fetchExerciseTeams = (exerciseId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/teams`;
-  return getReferential(schema.arrayOfTeams, uri)(dispatch);
-};
-
-export const fetchTeamPlayers = (exerciseId, teamId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/teams/${teamId}/players`;
+export const fetchTeamPlayers = (teamId) => (dispatch) => {
+  const uri = `/api/teams/${teamId}/players`;
   return getReferential(schema.arrayOfUsers, uri)(dispatch);
 };
 
