@@ -23,7 +23,7 @@ public class ComcheckInput {
     @JsonProperty("comcheck_message")
     private String message;
 
-    @JsonProperty("comcheck_audiences")
+    @JsonProperty("comcheck_teams")
     private List<String> teamIds = new ArrayList<>();
 
     public String getName() {

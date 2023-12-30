@@ -30,6 +30,12 @@ export const updateExerciseLessons = (exerciseId, data) => (dispatch) => putRefe
   data,
 )(dispatch);
 
+export const updateExerciseTeams = (exerciseId, data) => (dispatch) => putReferential(
+  schema.exercise,
+  `/api/exercises/${exerciseId}/teams`,
+  data,
+)(dispatch);
+
 export const updateExerciseTags = (exerciseId, data) => (dispatch) => putReferential(
   schema.exercise,
   `/api/exercises/${exerciseId}/tags`,

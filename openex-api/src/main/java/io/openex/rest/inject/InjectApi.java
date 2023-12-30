@@ -194,7 +194,7 @@ public class InjectApi extends RestBehavior {
     return injectRepository.findById(injectId).orElseThrow();
   }
 
-  @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}/audiences")
+  @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}/teams")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Team> exerciseInjectTeams(@PathVariable String exerciseId, @PathVariable String injectId) {
     return injectRepository.findById(injectId).orElseThrow().getTeams();
@@ -307,7 +307,7 @@ public class InjectApi extends RestBehavior {
     return injectRepository.save(inject);
   }
 
-  @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/audiences")
+  @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/teams")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject updateInjectTeams(@PathVariable String exerciseId, @PathVariable String injectId,
       @Valid @RequestBody InjectTeamsInput input) {

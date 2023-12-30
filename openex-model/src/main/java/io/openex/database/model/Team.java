@@ -70,8 +70,8 @@ public class Team implements Base {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "exercises_teams",
-            joinColumns = @JoinColumn(name = "exercise_id"),
-            inverseJoinColumns = @JoinColumn(name = "team_id"))
+            joinColumns = @JoinColumn(name = "team_id"),
+            inverseJoinColumns = @JoinColumn(name = "exercise_id"))
     @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("team_exercises")
     private List<Exercise> exercises = new ArrayList<>();

@@ -71,14 +71,14 @@ public class MediaContract extends Contractor {
         ContractCheckbox emailingField = checkboxField("emailing", "Send email", true);
         Expectation expectation = new Expectation();
         expectation.setType(ARTICLE);
-        expectation.setName("Expect audiences to read the article(s)");
+        expectation.setName("Expect teams to read the article(s)");
         expectation.setScore(0);
         ContractExpectations expectationsField = expectationsField(
             "expectations", "Expectations", List.of(expectation)
         );
         List<ContractElement> publishInstance = contractBuilder()
                 // built in
-                .optional(teamField("audiences", "Audiences", Multiple))
+                .optional(teamField("teams", "Teams", Multiple))
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .mandatory(articleField("articles", "Articles", Multiple))
                 // Contract specific

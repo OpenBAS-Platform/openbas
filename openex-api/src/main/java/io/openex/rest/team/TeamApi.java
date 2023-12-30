@@ -28,7 +28,6 @@ import static java.time.Instant.now;
 @RolesAllowed(ROLE_USER)
 public class TeamApi extends RestBehavior {
     private TeamRepository teamRepository;
-    private ExerciseRepository exerciseRepository;
     private UserRepository userRepository;
     private OrganizationRepository organizationRepository;
     private TagRepository tagRepository;
@@ -36,11 +35,6 @@ public class TeamApi extends RestBehavior {
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setExerciseRepository(ExerciseRepository exerciseRepository) {
-        this.exerciseRepository = exerciseRepository;
     }
 
     @Autowired
@@ -122,12 +116,5 @@ public class TeamApi extends RestBehavior {
         Iterable<User> teamUsers = userRepository.findAllById(input.getUserIds());
         team.setUsers(fromIterable(teamUsers));
         return teamRepository.save(team);
-    }
-
-    @GetMapping("/api/exercises/{exerciseId}/teams")
-    @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public Iterable<Team> getExerciseTeams(@PathVariable String exerciseId) {
-        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        return exercise.getTeams();
     }
 }

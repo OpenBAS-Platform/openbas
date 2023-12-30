@@ -20,6 +20,7 @@ import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { usePermissions } from '../../../../utils/Exercise';
 import { exportData } from '../../../../utils/Environment';
 import DefinitionMenu from '../DefinitionMenu';
+import ExerciseAddTeams from './ExerciseAddTeams';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -334,7 +335,7 @@ const Teams = () => {
           />
         )}
       </Drawer>
-      {permissions.canWrite && <CreateTeam exerciseId={exerciseId} />}
+      {permissions.canWrite && <ExerciseAddTeams exerciseId={exerciseId} exerciseTeamsIds={teams.map((team) => team.team_id)}/>}
     </div>
   );
 };

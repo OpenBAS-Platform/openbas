@@ -5,14 +5,13 @@ import * as R from 'ramda';
 import { Button, Slide, Chip, Avatar, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, Box, ListItemIcon, Grid, Fab } from '@mui/material';
 import { Add, PersonOutlined } from '@mui/icons-material';
 import withStyles from '@mui/styles/withStyles';
-import { updateTeamPlayers } from '../../../../actions/Team';
+import { updateExerciseTeams } from '../../../../actions/Exercise';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
-import { fetchPlayers } from '../../../../actions/User';
-import CreatePlayer from '../../persons/players/CreatePlayer';
-import { resolveUserName, truncate } from '../../../../utils/String';
-import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import { fetchTeams } from '../../../../actions/Team';
+import CreateTeam from '../../persons/teams/CreateTeam';
+import { truncate } from '../../../../utils/String';
 import ItemTags from '../../../../components/ItemTags';
 import TagsFilter from '../../../../components/TagsFilter';
 
@@ -20,7 +19,7 @@ const styles = () => ({
   createButton: {
     position: 'fixed',
     bottom: 30,
-    right: 30,
+    right: 230,
   },
   box: {
     width: '100%',
@@ -38,19 +37,19 @@ const Transition = React.forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-class TeamAddPlayers extends Component {
+class TeamAddTeams extends Component {
   constructor(props) {
     super(props);
     this.state = {
       open: false,
       keyword: '',
-      usersIds: [],
+      teamsIds: [],
       tags: [],
     };
   }
 
   componentDidMount() {
-    this.props.fetchPlayers();
+    this.props.fetchTeams();
   }
 
   handleOpen() {
@@ -58,10 +57,10 @@ class TeamAddPlayers extends Component {
   }
 
   handleClose() {
-    this.setState({ open: false, keyword: '', usersIds: [] });
+    this.setState({ open: false, keyword: '', teamsIds: [] });
   }
 
-  handleSearchUsers(value) {
+  handleSearchTeams(value) {
     this.setState({ keyword: value });
   }
 
@@ -75,24 +74,23 @@ class TeamAddPlayers extends Component {
     this.setState({ tags: [] });
   }
 
-  addUser(userId) {
-    this.setState({ usersIds: R.append(userId, this.state.usersIds) });
+  addTeam(teamId) {
+    this.setState({ teamsIds: R.append(teamId, this.state.teamsIds) });
   }
 
-  removeUser(userId) {
+  removeTeam(teamId) {
     this.setState({
-      usersIds: R.filter((u) => u !== userId, this.state.usersIds),
+      teamsIds: R.filter((u) => u !== teamId, this.state.teamsIds),
     });
   }
 
-  submitAddUsers() {
-    this.props.updateTeamPlayers(
+  submitAddTeams() {
+    this.props.updateExerciseTeams(
       this.props.exerciseId,
-      this.props.teamId,
       {
-        team_users: R.uniq([
-          ...this.props.teamUsersIds,
-          ...this.state.usersIds,
+        exercise_teams: R.uniq([
+          ...this.props.exerciseTeamsIds,
+          ...this.state.teamsIds,
         ]),
       },
     );
@@ -100,27 +98,23 @@ class TeamAddPlayers extends Component {
   }
 
   onCreate(result) {
-    this.addUser(result);
+    this.addTeam(result);
   }
 
   render() {
     const {
       classes,
       t,
-      usersMap,
-      teamUsersIds,
-      exercise,
+      teamsMap,
+      exerciseTeamsIds,
       organizationsMap,
     } = this.props;
-    const { keyword, usersIds, tags } = this.state;
+    const { keyword, teamsIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
+      || (n.team_name || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
-      || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase())
+      || (n.team_description || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
-      || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
       || (n.organization_name || '')
         .toLowerCase()
@@ -128,33 +122,32 @@ class TeamAddPlayers extends Component {
       || (n.organization_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
-    const filteredUsers = R.pipe(
+    const filteredTeams = R.pipe(
       R.map((u) => ({
         organization_name:
-          organizationsMap[u.user_organization]?.organization_name ?? '-',
+          organizationsMap[u.team_organization]?.organization_name ?? '-',
         organization_description:
-          organizationsMap[u.user_organization]?.organization_description
+          organizationsMap[u.team_organization]?.organization_description
           ?? '-',
         ...u,
       })),
       R.filter(
         (n) => tags.length === 0
           || R.any(
-            (filter) => R.includes(filter, n.user_tags),
+            (filter) => R.includes(filter, n.team_tags),
             R.pluck('id', tags),
           ),
       ),
       R.filter(filterByKeyword),
       R.take(10),
-    )(R.values(usersMap));
+    )(R.values(teamsMap));
     return (
-      <div>
+      <>
         <Fab
           onClick={this.handleOpen.bind(this)}
           color="primary"
           aria-label="Add"
           className={classes.createButton}
-          disabled={isExerciseReadOnly(exercise)}
         >
           <Add />
         </Fab>
@@ -172,14 +165,14 @@ class TeamAddPlayers extends Component {
             },
           }}
         >
-          <DialogTitle>{t('Add players in this team')}</DialogTitle>
+          <DialogTitle>{t('Add teams in this exercise')}</DialogTitle>
           <DialogContent>
             <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
               <Grid item={true} xs={8}>
                 <Grid container={true} spacing={3}>
                   <Grid item={true} xs={6}>
                     <SearchFilter
-                      onChange={this.handleSearchUsers.bind(this)}
+                      onChange={this.handleSearchTeams.bind(this)}
                       fullWidth={true}
                     />
                   </Grid>
@@ -193,30 +186,30 @@ class TeamAddPlayers extends Component {
                   </Grid>
                 </Grid>
                 <List>
-                  {filteredUsers.map((user) => {
-                    const disabled = usersIds.includes(user.user_id)
-                      || teamUsersIds.includes(user.user_id);
+                  {filteredTeams.map((team) => {
+                    const disabled = teamsIds.includes(team.team_id)
+                      || exerciseTeamsIds.includes(team.team_id);
                     return (
                       <ListItem
-                        key={user.user_id}
+                        key={team.team_id}
                         disabled={disabled}
                         button={true}
                         divider={true}
                         dense={true}
-                        onClick={this.addUser.bind(this, user.user_id)}
+                        onClick={this.addTeam.bind(this, team.team_id)}
                       >
                         <ListItemIcon>
                           <PersonOutlined />
                         </ListItemIcon>
                         <ListItemText
-                          primary={resolveUserName(user)}
-                          secondary={user.organization_name}
+                          primary={team.team_name}
+                          secondary={team.organization_name}
                         />
-                        <ItemTags variant="list" tags={user.user_tags} />
+                        <ItemTags variant="list" tags={team.team_tags} />
                       </ListItem>
                     );
                   })}
-                  <CreatePlayer
+                  <CreateTeam
                     inline={true}
                     onCreate={this.onCreate.bind(this)}
                   />
@@ -224,15 +217,15 @@ class TeamAddPlayers extends Component {
               </Grid>
               <Grid item={true} xs={4}>
                 <Box className={classes.box}>
-                  {this.state.usersIds.map((userId) => {
-                    const user = usersMap[userId];
-                    const userGravatar = R.propOr('-', 'user_gravatar', user);
+                  {this.state.teamsIds.map((teamId) => {
+                    const team = teamsMap[teamId];
+                    const teamGravatar = R.propOr('-', 'team_gravatar', team);
                     return (
                       <Chip
-                        key={userId}
-                        onDelete={this.removeUser.bind(this, userId)}
-                        label={truncate(resolveUserName(user), 22)}
-                        avatar={<Avatar src={userGravatar} size={32} />}
+                        key={teamId}
+                        onDelete={this.removeTeam.bind(this, teamId)}
+                        label={truncate(team.team_name, 22)}
+                        avatar={<Avatar src={teamGravatar} size={32} />}
                         classes={{ root: classes.chip }}
                       />
                     );
@@ -243,40 +236,36 @@ class TeamAddPlayers extends Component {
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleClose.bind(this)}>{t('Cancel')}</Button>
-            <Button color="secondary" onClick={this.submitAddUsers.bind(this)}>
+            <Button color="secondary" onClick={this.submitAddTeams.bind(this)}>
               {t('Add')}
             </Button>
           </DialogActions>
         </Dialog>
-      </div>
+      </>
     );
   }
 }
 
-TeamAddPlayers.propTypes = {
+TeamAddTeams.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
-  exercise: PropTypes.object,
-  teamId: PropTypes.string,
-  updateTeamPlayers: PropTypes.func,
-  fetchPlayers: PropTypes.func,
+  updateExerciseTeams: PropTypes.func,
+  fetchTeams: PropTypes.func,
   organizations: PropTypes.array,
-  usersMap: PropTypes.object,
-  teamUsersIds: PropTypes.array,
+  teamsMap: PropTypes.object,
+  exerciseTeamsIds: PropTypes.array,
 };
 
-const select = (state, ownProps) => {
+const select = (state) => {
   const helper = storeHelper(state);
-  const { exerciseId } = ownProps;
   return {
-    exercise: helper.getExercise(exerciseId),
-    usersMap: helper.getUsersMap(),
+    teamsMap: helper.getTeamsMap(),
     organizationsMap: helper.getOrganizationsMap(),
   };
 };
 
 export default R.compose(
-  connect(select, { updateTeamPlayers, fetchPlayers }),
+  connect(select, { updateExerciseTeams, fetchTeams }),
   inject18n,
   withStyles(styles),
-)(TeamAddPlayers);
+)(TeamAddTeams);

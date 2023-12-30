@@ -26,11 +26,6 @@ export const updateTeam = (teamId, data) => (dispatch) => {
   return putReferential(schema.team, uri, data)(dispatch);
 };
 
-export const updateTeamActivation = (exerciseId, teamId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/teams/${teamId}/activation`;
-  return putReferential(schema.team, uri, data)(dispatch);
-};
-
 export const updateTeamPlayers = (teamId, data) => (dispatch) => {
   const uri = `/api/teams/${teamId}/players`;
   return putReferential(schema.team, uri, data)(dispatch);

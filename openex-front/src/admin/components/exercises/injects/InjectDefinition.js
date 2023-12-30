@@ -39,7 +39,7 @@ import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
-import TeamPopover from '../teams/TeamPopover';
+import TeamPopover from '../../persons/teams/TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddTeams from './InjectAddTeams';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
