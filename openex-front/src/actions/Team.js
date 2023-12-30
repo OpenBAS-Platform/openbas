@@ -31,8 +31,8 @@ export const updateTeamActivation = (exerciseId, teamId, data) => (dispatch) => 
   return putReferential(schema.team, uri, data)(dispatch);
 };
 
-export const updateTeamPlayers = (exerciseId, teamId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/teams/${teamId}/players`;
+export const updateTeamPlayers = (teamId, data) => (dispatch) => {
+  const uri = `/api/teams/${teamId}/players`;
   return putReferential(schema.team, uri, data)(dispatch);
 };
 
@@ -44,9 +44,4 @@ export const addTeam = (data) => (dispatch) => {
 export const deleteTeam = (teamId) => (dispatch) => {
   const uri = `/api/teams/${teamId}`;
   return delReferential(uri, 'teams', teamId)(dispatch);
-};
-
-export const copyTeamToExercise = (exerciseId, teamId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/copy-team/${teamId}`;
-  return putReferential(schema.team, uri, data)(dispatch);
 };

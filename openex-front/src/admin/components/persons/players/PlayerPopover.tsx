@@ -6,7 +6,6 @@ import { updateTeamPlayers } from '../../../../actions/Team';
 import { deletePlayer, updatePlayer } from '../../../../actions/User';
 import PlayerForm from './PlayerForm';
 import { useFormatter } from '../../../../components/i18n';
-import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import Transition from '../../../../components/common/Transition';
 import type { UpdatePlayerInput } from '../../../../utils/api-types';
@@ -30,13 +29,12 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-  const { userAdmin, exercise, organizationsMap, tagsMap } = useHelper(
+  const { userAdmin, organizationsMap, tagsMap } = useHelper(
     (
       helper: ExercicesHelper & UsersHelper & OrganizationsHelper & TagsHelper,
     ) => {
       return {
         userAdmin: helper.getMe()?.user_admin,
-        exercise: helper.getExercise(exerciseId),
         organizationsMap: helper.getOrganizationsMap(),
         tagsMap: helper.getTagsMap(),
       };
@@ -96,7 +94,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
 
   const submitRemove = () => {
     return dispatch(
-      updateTeamPlayers(exerciseId, teamId, {
+      updateTeamPlayers(teamId, {
         team_users: teamUsersIds?.filter((id) => id !== user.user_id),
       }),
     ).then(() => handleCloseRemove());
@@ -125,10 +123,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
       >
         <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
         {teamId && (
-          <MenuItem
-            onClick={handleOpenRemove}
-            disabled={isExerciseReadOnly(exercise)}
-          >
+          <MenuItem onClick={handleOpenRemove}>
             {t('Remove from the team')}
           </MenuItem>
         )}

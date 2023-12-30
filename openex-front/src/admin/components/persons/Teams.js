@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Tooltip, IconButton } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Tooltip, IconButton, Drawer } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { FileDownloadOutlined, GroupsOutlined } from '@mui/icons-material';
 import { CSVLink } from 'react-csv';
@@ -17,6 +17,7 @@ import { useHelper } from '../../../store';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { useFormatter } from '../../../components/i18n';
 import { exportData } from '../../../utils/Environment';
+import TeamPlayers from './teams/TeamPlayers';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -38,6 +39,11 @@ const useStyles = makeStyles(() => ({
     height: '100%',
     fontSize: 13,
   },
+  drawerPaper: {
+    minHeight: '100vh',
+    width: '50%',
+    padding: 0,
+  },
 }));
 
 const headerStyles = {
@@ -55,7 +61,7 @@ const headerStyles = {
   },
   team_description: {
     float: 'left',
-    width: '30%',
+    width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -68,6 +74,12 @@ const headerStyles = {
   team_tags: {
     float: 'left',
     width: '25%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  team_users_number: {
+    float: 'left',
+    width: '8%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -84,7 +96,7 @@ const inlineStyles = {
   },
   team_description: {
     float: 'left',
-    width: '30%',
+    width: '25%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -106,6 +118,14 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
+  team_users_number: {
+    float: 'left',
+    width: '8%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
 };
 
 const Teams = () => {
@@ -113,6 +133,7 @@ const Teams = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
+  const [selectedTeam, setSelectedTeam] = useState(null);
   // Filter and sort hook
   const searchColumns = [
     'name',
@@ -159,6 +180,7 @@ const Teams = () => {
                   'team_description',
                   'team_organization',
                   'team_tags',
+                  'team_users_number',
                 ],
                 sortedTeams,
                 tagsMap,
@@ -219,6 +241,7 @@ const Teams = () => {
                   headerStyles,
                 )}
                 {filtering.buildHeader('team_tags', 'Tags', true, headerStyles)}
+                {filtering.buildHeader('team_users_number', 'Players', true, headerStyles)}
               </div>
             }
           />
@@ -229,6 +252,8 @@ const Teams = () => {
             key={team.team_id}
             classes={{ root: classes.item }}
             divider={true}
+            button={true}
+            onClick={() => setSelectedTeam(team.team_id)}
           >
             <ListItemIcon>
               <GroupsOutlined color="primary" />
@@ -261,6 +286,12 @@ const Teams = () => {
                   >
                     <ItemTags variant="list" tags={team.team_tags} />
                   </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.team_users_number}
+                  >
+                    {team.team_users_number}
+                  </div>
                 </div>
               }
             />
@@ -270,6 +301,23 @@ const Teams = () => {
           </ListItem>
         ))}
       </List>
+      <Drawer
+        open={selectedTeam !== null}
+        keepMounted={false}
+        anchor="right"
+        sx={{ zIndex: 1202 }}
+        classes={{ paper: classes.drawerPaper }}
+        onClose={() => setSelectedTeam(null)}
+        elevation={1}
+      >
+        {selectedTeam !== null && (
+        <TeamPlayers
+          teamId={selectedTeam}
+          handleClose={() => setSelectedTeam(null)}
+          tagsMap={tagsMap}
+        />
+        )}
+      </Drawer>
       <CreateTeam />
     </div>
   );

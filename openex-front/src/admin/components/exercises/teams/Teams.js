@@ -10,11 +10,11 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
-import { fetchTeams } from '../../../../actions/Team';
-import CreateTeam from './CreateTeam';
-import TeamPopover from './TeamPopover';
+import { fetchExerciseTeams } from '../../../../actions/Team';
+import CreateTeam from '../../persons/teams/CreateTeam';
+import TeamPopover from '../../persons/teams/TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
-import TeamPlayers from './TeamPlayers';
+import TeamPlayers from '../../persons/teams/TeamPlayers';
 import { useHelper } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { usePermissions } from '../../../../utils/Exercise';
@@ -146,7 +146,7 @@ const Teams = () => {
     tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
-    dispatch(fetchTeams(exerciseId));
+    dispatch(fetchExerciseTeams(exerciseId));
   });
   const sortedTeams = filtering.filterAndSort(teams);
   return (
