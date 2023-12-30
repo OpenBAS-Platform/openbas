@@ -2,10 +2,7 @@ package io.openex.rest.team;
 
 import io.openex.config.OpenexPrincipal;
 import io.openex.database.model.*;
-import io.openex.database.repository.TeamRepository;
-import io.openex.database.repository.ExerciseRepository;
-import io.openex.database.repository.TagRepository;
-import io.openex.database.repository.UserRepository;
+import io.openex.database.repository.*;
 import io.openex.rest.team.form.TeamCreateInput;
 import io.openex.rest.team.form.TeamUpdateActivationInput;
 import io.openex.rest.team.form.TeamUpdateInput;
@@ -23,6 +20,7 @@ import java.util.List;
 
 import static io.openex.config.SessionHelper.currentUser;
 import static io.openex.database.model.User.ROLE_USER;
+import static io.openex.helper.DatabaseHelper.updateRelation;
 import static io.openex.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
 
@@ -31,6 +29,7 @@ import static java.time.Instant.now;
 public class TeamApi extends RestBehavior {
     private TeamRepository teamRepository;
     private UserRepository userRepository;
+    private OrganizationRepository organizationRepository;
     private TagRepository tagRepository;
 
     @Autowired
@@ -41,6 +40,11 @@ public class TeamApi extends RestBehavior {
     @Autowired
     public void setTeamRepository(TeamRepository teamRepository) {
         this.teamRepository = teamRepository;
+    }
+
+    @Autowired
+    public void setOrganizationRepository(OrganizationRepository organizationRepository) {
+        this.organizationRepository = organizationRepository;
     }
 
     @Autowired
@@ -83,6 +87,7 @@ public class TeamApi extends RestBehavior {
     public Team createTeam(@Valid @RequestBody TeamCreateInput input) {
         Team team = new Team();
         team.setUpdateAttributes(input);
+        team.setOrganization(updateRelation(input.getOrganizationId(), team.getOrganization(), organizationRepository));
         team.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return teamRepository.save(team);
     }
@@ -100,6 +105,7 @@ public class TeamApi extends RestBehavior {
         team.setUpdateAttributes(input);
         team.setUpdatedAt(now());
         team.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        team.setOrganization(updateRelation(input.getOrganizationId(), team.getOrganization(), organizationRepository));
         return teamRepository.save(team);
     }
 

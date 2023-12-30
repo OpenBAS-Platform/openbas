@@ -1,5 +1,5 @@
-import type { UpdatePlayerInput, User } from '../../../utils/api-types';
-import { Option } from '../../../utils/Option';
+import type { UpdatePlayerInput, User } from '../../../../utils/api-types';
+import { Option } from '../../../../utils/Option';
 
 export type PlayerInputForm = Omit<
 UpdatePlayerInput,

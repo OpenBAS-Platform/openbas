@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
 
 const DashboardDataStatistics = ({
   injectsMap,
-  audiences,
+  teams,
   injects,
   communications,
   usersMap,
@@ -29,13 +29,13 @@ const DashboardDataStatistics = ({
   const theme = useTheme();
   let cumulation = 0;
   const mapIndexed = R.addIndex(R.map);
-  const audiencesColors = R.pipe(
+  const teamsColors = R.pipe(
     mapIndexed((a, index) => [
-      a.audience_id,
+      a.team_id,
       colors(theme.palette.mode === 'dark' ? 400 : 600)[index],
     ]),
     R.fromPairs,
-  )(audiences);
+  )(teams);
   const injectsOverTime = R.pipe(
     R.filter((i) => i && i.inject_sent_at !== null),
     R.sortWith([R.ascend(R.prop('inject_sent_at'))]),
@@ -53,11 +53,11 @@ const DashboardDataStatistics = ({
       })),
     },
   ];
-  const audiencesInjects = R.pipe(
+  const teamsInjects = R.pipe(
     R.map((n) => {
       cumulation = 0;
       return R.assoc(
-        'audience_injects',
+        'team_injects',
         R.pipe(
           R.map((i) => injectsMap[i]),
           R.filter((i) => i && i.inject_sent_at !== null),
@@ -66,19 +66,19 @@ const DashboardDataStatistics = ({
             cumulation += 1;
             return R.assoc('inject_cumulated_number', cumulation, i);
           }),
-        )(n.audience_injects),
+        )(n.team_injects),
         n,
       );
     }),
     R.map((a) => ({
-      name: a.audience_name,
-      color: audiencesColors[a.audience_id],
-      data: a.audience_injects.map((i) => ({
+      name: a.team_name,
+      color: teamsColors[a.team_id],
+      data: a.team_injects.map((i) => ({
         x: i.inject_sent_at,
         y: i.inject_cumulated_number,
       })),
     })),
-  )(audiences);
+  )(teams);
   const communicationsOverTime = R.pipe(
     R.sortWith([R.ascend(R.prop('communication_received_at'))]),
     R.map((i) => {
@@ -95,46 +95,46 @@ const DashboardDataStatistics = ({
       })),
     },
   ];
-  const audiencesCommunications = R.pipe(
+  const teamsCommunications = R.pipe(
     R.map((n) => {
       cumulation = 0;
       return R.assoc(
-        'audience_communications',
+        'team_communications',
         R.pipe(
           R.sortWith([R.ascend(R.prop('communication_received_at'))]),
           R.map((i) => {
             cumulation += 1;
             return R.assoc('communication_cumulated_number', cumulation, i);
           }),
-        )(n.audience_communications),
+        )(n.team_communications),
         n,
       );
     }),
     R.map((a) => ({
-      name: a.audience_name,
-      color: audiencesColors[a.audience_id],
-      data: a.audience_communications.map((c) => ({
+      name: a.team_name,
+      color: teamsColors[a.team_id],
+      data: a.team_communications.map((c) => ({
         x: c.communication_received_at,
         y: c.communication_cumulated_number,
       })),
     })),
-  )(audiences);
-  const sortedAudiencesByCommunicationNumber = R.pipe(
+  )(teams);
+  const sortedTeamsByCommunicationNumber = R.pipe(
     R.map((a) => R.assoc(
-      'audience_communications_number',
-      a.audience_communications.length,
+      'team_communications_number',
+      a.team_communications.length,
       a,
     )),
-    R.sortWith([R.descend(R.prop('audience_communications_number'))]),
+    R.sortWith([R.descend(R.prop('team_communications_number'))]),
     R.take(10),
-  )(audiences || []);
-  const totalMailsByAudienceData = [
+  )(teams || []);
+  const totalMailsByTeamData = [
     {
       name: t('Total mails'),
-      data: sortedAudiencesByCommunicationNumber.map((a) => ({
-        x: a.audience_name,
-        y: a.audience_communications_number,
-        fillColor: audiencesColors[a.audience_id],
+      data: sortedTeamsByCommunicationNumber.map((a) => ({
+        x: a.team_name,
+        y: a.team_communications_number,
+        fillColor: teamsColors[a.team_id],
       })),
     },
   ];
@@ -205,7 +205,7 @@ const DashboardDataStatistics = ({
       <Grid item={true} xs={6}>
         <Typography variant="h4">{t('Sent injects over time')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {audiencesInjects.length > 0 ? (
+          {teamsInjects.length > 0 ? (
             <Chart
               options={lineChartOptions(
                 theme,
@@ -215,7 +215,7 @@ const DashboardDataStatistics = ({
                 undefined,
                 false,
               )}
-              series={audiencesInjects}
+              series={teamsInjects}
               type="line"
               width="100%"
               height={350}
@@ -252,7 +252,7 @@ const DashboardDataStatistics = ({
       <Grid item={true} xs={6} style={{ marginTop: 30 }}>
         <Typography variant="h4">{t('Sent mails over time')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {audiencesCommunications.length > 0 ? (
+          {teamsCommunications.length > 0 ? (
             <Chart
               options={lineChartOptions(
                 theme,
@@ -262,7 +262,7 @@ const DashboardDataStatistics = ({
                 undefined,
                 false,
               )}
-              series={audiencesCommunications}
+              series={teamsCommunications}
               type="line"
               width="100%"
               height={350}
@@ -278,16 +278,16 @@ const DashboardDataStatistics = ({
       </Grid>
       <Grid item={true} xs={4} style={{ marginTop: 30 }}>
         <Typography variant="h4">
-          {t('Distribution of mails by audience')}
+          {t('Distribution of mails by team')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedAudiencesByCommunicationNumber.length > 0 ? (
+          {sortedTeamsByCommunicationNumber.length > 0 ? (
             <Chart
               options={horizontalBarsChartOptions(theme)}
-              series={totalMailsByAudienceData}
+              series={totalMailsByTeamData}
               type="bar"
               width="100%"
-              height={50 + sortedAudiencesByCommunicationNumber.length * 50}
+              height={50 + sortedTeamsByCommunicationNumber.length * 50}
             />
           ) : (
             <Empty

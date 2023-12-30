@@ -19,7 +19,7 @@ export const entitiesInitializer = Immutable({
     challengesreaders: Immutable({}),
     dryruns: Immutable({}),
     dryinjects: Immutable({}),
-    audiences: Immutable({}),
+    teams: Immutable({}),
     injects: Immutable({}),
     inject_types: Immutable({}),
     inject_statuses: Immutable({}),

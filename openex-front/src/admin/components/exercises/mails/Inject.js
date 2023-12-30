@@ -191,7 +191,7 @@ const Inject = () => {
                   <Typography variant="h3">{t('Documents')}</Typography>
                 </Grid>
                 <Grid item={true} xs={6}>
-                  <Typography variant="h3">{t('Audiences')}</Typography>
+                  <Typography variant="h3">{t('Teams')}</Typography>
                 </Grid>
               </Grid>
             </Paper>

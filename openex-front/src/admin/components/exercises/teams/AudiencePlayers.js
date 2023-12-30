@@ -6,14 +6,14 @@ import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Ic
 import { connect } from 'react-redux';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, CloseRounded, EmailOutlined, KeyOutlined, PersonOutlined, SmartphoneOutlined } from '@mui/icons-material';
 import inject18n from '../../../../components/i18n';
-import { fetchAudiencePlayers } from '../../../../actions/Audience';
+import { fetchTeamPlayers } from '../../../../actions/Team';
 import { fetchOrganizations } from '../../../../actions/Organization';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
-import PlayerPopover from '../../players/PlayerPopover';
+import PlayerPopover from '../../persons/players/PlayerPopover';
 import { storeHelper } from '../../../../actions/Schema';
-import AudienceAddPlayers from './AudienceAddPlayers';
+import TeamAddPlayers from './TeamAddPlayers';
 
 const styles = (theme) => ({
   header: {
@@ -138,7 +138,7 @@ const inlineStyles = {
   },
 };
 
-class AudiencesPlayers extends Component {
+class TeamsPlayers extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -150,9 +150,9 @@ class AudiencesPlayers extends Component {
   }
 
   componentDidMount() {
-    const { exerciseId, audienceId } = this.props;
+    const { exerciseId, teamId } = this.props;
     this.props.fetchOrganizations();
-    this.props.fetchAudiencePlayers(exerciseId, audienceId);
+    this.props.fetchTeamPlayers(exerciseId, teamId);
   }
 
   handleSearch(value) {
@@ -204,10 +204,10 @@ class AudiencesPlayers extends Component {
       classes,
       users,
       handleClose,
-      audience,
+      team,
       organizationsMap,
       exerciseId,
-      audienceId,
+      teamId,
     } = this.props;
     const { keyword, sortBy, orderAsc, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
@@ -249,7 +249,7 @@ class AudiencesPlayers extends Component {
             <CloseRounded fontSize="small" color="primary" />
           </IconButton>
           <Typography variant="h6" classes={{ root: classes.title }}>
-            {R.propOr('-', 'audience_name', audience)}
+            {R.propOr('-', 'team_name', team)}
           </Typography>
           <div className={classes.parameters}>
             <div className={classes.tags}>
@@ -386,48 +386,48 @@ class AudiencesPlayers extends Component {
                 <PlayerPopover
                   user={user}
                   exerciseId={exerciseId}
-                  audienceId={audienceId}
-                  audienceUsersIds={users.map((u) => u.user_id)}
+                  teamId={teamId}
+                  teamUsersIds={users.map((u) => u.user_id)}
                 />
               </ListItemSecondaryAction>
             </ListItem>
           ))}
         </List>
-        <AudienceAddPlayers
+        <TeamAddPlayers
           exerciseId={exerciseId}
-          audienceId={audienceId}
-          audienceUsersIds={users.map((u) => u.user_id)}
+          teamId={teamId}
+          teamUsersIds={users.map((u) => u.user_id)}
         />
       </div>
     );
   }
 }
 
-AudiencesPlayers.propTypes = {
+TeamsPlayers.propTypes = {
   t: PropTypes.func,
   nsdt: PropTypes.func,
   exerciseId: PropTypes.string,
-  audienceId: PropTypes.string,
-  audience: PropTypes.object,
+  teamId: PropTypes.string,
+  team: PropTypes.object,
   organizations: PropTypes.array,
   users: PropTypes.array,
-  fetchAudiencePlayers: PropTypes.func,
+  fetchTeamPlayers: PropTypes.func,
   fetchOrganizations: PropTypes.func,
   handleClose: PropTypes.func,
 };
 
 const select = (state, ownProps) => {
   const helper = storeHelper(state);
-  const { audienceId } = ownProps;
+  const { teamId } = ownProps;
   return {
     organizationsMap: helper.getOrganizationsMap(),
-    audience: helper.getAudience(audienceId),
-    users: helper.getAudienceUsers(audienceId),
+    team: helper.getTeam(teamId),
+    users: helper.getTeamUsers(teamId),
   };
 };
 
 export default R.compose(
-  connect(select, { fetchAudiencePlayers, fetchOrganizations }),
+  connect(select, { fetchTeamPlayers, fetchOrganizations }),
   inject18n,
   withStyles(styles),
-)(AudiencesPlayers);
+)(TeamsPlayers);

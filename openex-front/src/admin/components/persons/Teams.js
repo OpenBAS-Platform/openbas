@@ -2,13 +2,13 @@ import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Tooltip, IconButton } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { FileDownloadOutlined, PersonOutlined } from '@mui/icons-material';
+import { FileDownloadOutlined, GroupsOutlined } from '@mui/icons-material';
 import { CSVLink } from 'react-csv';
-import { fetchPlayers } from '../../../actions/User';
+import { fetchTeams } from '../../../actions/Team';
 import { fetchOrganizations } from '../../../actions/Organization';
 import ItemTags from '../../../components/ItemTags';
-import CreatePlayer from './CreatePlayer';
-import PlayerPopover from './PlayerPopover';
+import CreateTeam from './teams/CreateTeam';
+import TeamPopover from './teams/TeamPopover';
 import TagsFilter from '../../../components/TagsFilter';
 import SearchFilter from '../../../components/SearchFilter';
 import { fetchTags } from '../../../actions/Tag';
@@ -47,31 +47,25 @@ const headerStyles = {
     padding: 0,
     top: '0px',
   },
-  user_email: {
-    float: 'left',
-    width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_firstname: {
-    float: 'left',
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_lastname: {
-    float: 'left',
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_organization: {
+  team_name: {
     float: 'left',
     width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
-  user_tags: {
+  team_description: {
+    float: 'left',
+    width: '30%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  team_organization: {
+    float: 'left',
+    width: '20%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  team_tags: {
     float: 'left',
     width: '25%',
     fontSize: 12,
@@ -80,31 +74,7 @@ const headerStyles = {
 };
 
 const inlineStyles = {
-  user_email: {
-    float: 'left',
-    width: '25%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  user_firstname: {
-    float: 'left',
-    width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  user_lastname: {
-    float: 'left',
-    width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  user_organization: {
+  team_name: {
     float: 'left',
     width: '20%',
     height: 20,
@@ -112,7 +82,23 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  user_tags: {
+  team_description: {
+    float: 'left',
+    width: '30%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  team_organization: {
+    float: 'left',
+    width: '20%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  team_tags: {
     float: 'left',
     width: '25%',
     height: 20,
@@ -122,32 +108,30 @@ const inlineStyles = {
   },
 };
 
-const Players = () => {
+const Teams = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
   // Filter and sort hook
   const searchColumns = [
-    'email',
-    'firstname',
-    'lastname',
-    'phone',
+    'name',
+    'description',
     'organization',
   ];
-  const filtering = useSearchAnFilter('user', 'email', searchColumns);
+  const filtering = useSearchAnFilter('team', 'name', searchColumns);
   // Fetching data
-  const { users, organizationsMap, tagsMap } = useHelper((helper) => ({
-    users: helper.getUsers(),
+  const { teams, organizationsMap, tagsMap } = useHelper((helper) => ({
+    teams: helper.getTeams(),
     organizationsMap: helper.getOrganizationsMap(),
     tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchTags());
     dispatch(fetchOrganizations());
-    dispatch(fetchPlayers());
+    dispatch(fetchTeams());
   });
-  const sortedUsers = filtering.filterAndSort(users);
+  const sortedTeams = filtering.filterAndSort(teams);
   return (
     <div>
       <div className={classes.parameters}>
@@ -166,23 +150,21 @@ const Players = () => {
           />
         </div>
         <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
-          {sortedUsers.length > 0 ? (
+          {sortedTeams.length > 0 ? (
             <CSVLink
               data={exportData(
-                'user',
+                'team',
                 [
-                  'user_email',
-                  'user_firstname',
-                  'user_lastname',
-                  'user_phone',
-                  'user_organization',
-                  'user_tags',
+                  'team_name',
+                  'team_description',
+                  'team_organization',
+                  'team_tags',
                 ],
-                sortedUsers,
+                sortedTeams,
                 tagsMap,
                 organizationsMap,
               )}
-              filename={`${t('Players')}.csv`}
+              filename={`${t('Teams')}.csv`}
             >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
@@ -219,90 +201,78 @@ const Players = () => {
             primary={
               <div>
                 {filtering.buildHeader(
-                  'user_email',
-                  'Email address',
+                  'team_name',
+                  'Name',
                   true,
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'user_firstname',
-                  'Firstname',
+                  'team_description',
+                  'Description',
                   true,
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'user_lastname',
-                  'Lastname',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'user_organization',
+                  'team_organization',
                   'Organization',
                   true,
                   headerStyles,
                 )}
-                {filtering.buildHeader('user_tags', 'Tags', true, headerStyles)}
+                {filtering.buildHeader('team_tags', 'Tags', true, headerStyles)}
               </div>
             }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {sortedUsers.map((user) => (
+        {sortedTeams.map((team) => (
           <ListItem
-            key={user.user_id}
+            key={team.team_id}
             classes={{ root: classes.item }}
             divider={true}
           >
             <ListItemIcon>
-              <PersonOutlined color="primary" />
+              <GroupsOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={
                 <div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.user_email}
+                    style={inlineStyles.team_name}
                   >
-                    {user.user_email}
+                    {team.team_name}
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.user_firstname}
+                    style={inlineStyles.team_description}
                   >
-                    {user.user_firstname}
+                    {team.team_description}
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.user_lastname}
+                    style={inlineStyles.team_organization}
                   >
-                    {user.user_lastname}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.user_organization}
-                  >
-                    {organizationsMap[user.user_organization]
+                    {organizationsMap[team.team_organization]
                       ?.organization_name || '-'}
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.user_tags}
+                    style={inlineStyles.team_tags}
                   >
-                    <ItemTags variant="list" tags={user.user_tags} />
+                    <ItemTags variant="list" tags={team.team_tags} />
                   </div>
                 </div>
               }
             />
             <ListItemSecondaryAction>
-              <PlayerPopover user={user} />
+              <TeamPopover team={team} />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
-      <CreatePlayer />
+      <CreateTeam />
     </div>
   );
 };
 
-export default Players;
+export default Teams;

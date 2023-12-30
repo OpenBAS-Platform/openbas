@@ -16,7 +16,7 @@ import { addDryrun } from '../../../../actions/Dryrun';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import { useHelper } from '../../../../store';
-import type { AudiencesHelper, ExercicesHelper, UsersHelper } from '../../../../actions/helper';
+import type { TeamsHelper, ExercicesHelper, UsersHelper } from '../../../../actions/helper';
 
 const useStyles = makeStyles<Theme>(() => ({
   createButton: {
@@ -40,12 +40,12 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const { me, exercise, audiences } = useHelper(
-    (helper: UsersHelper & ExercicesHelper & AudiencesHelper) => {
+  const { me, exercise, teams } = useHelper(
+    (helper: UsersHelper & ExercicesHelper & TeamsHelper) => {
       return {
         me: helper.getMe(),
         exercise: helper.getExercise(exerciseId),
-        audiences: helper.getExerciseAudiences(exerciseId),
+        teams: helper.getExerciseTeams(exerciseId),
       };
     },
   );
@@ -134,7 +134,7 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
           <ComcheckForm
             onSubmit={onSubmitComcheck}
             initialValues={{
-              comcheck_audiences: [],
+              comcheck_teams: [],
               comcheck_subject: t('[${exercise.name}] Communication check'),
               comcheck_message: `${t('Hello')},<br /><br />${t(
                 'This is a communication check before the beginning of the exercise. Please click on the following link'
@@ -143,7 +143,7 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
                 'The exercise control team',
               )}`,
             }}
-            audiences={audiences}
+            teams={teams}
             handleClose={() => setOpenComcheck(false)}
           />
         </DialogContent>

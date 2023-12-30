@@ -5,12 +5,12 @@ import * as R from 'ramda';
 import { Button, Slide, Chip, Avatar, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, Box, ListItemIcon, Grid, Fab } from '@mui/material';
 import { Add, PersonOutlined } from '@mui/icons-material';
 import withStyles from '@mui/styles/withStyles';
-import { updateAudiencePlayers } from '../../../../actions/Audience';
+import { updateTeamPlayers } from '../../../../actions/Team';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
 import { fetchPlayers } from '../../../../actions/User';
-import CreatePlayer from '../../players/CreatePlayer';
+import CreatePlayer from '../../persons/players/CreatePlayer';
 import { resolveUserName, truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import ItemTags from '../../../../components/ItemTags';
@@ -38,7 +38,7 @@ const Transition = React.forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-class AudienceAddPlayers extends Component {
+class TeamAddPlayers extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -86,12 +86,12 @@ class AudienceAddPlayers extends Component {
   }
 
   submitAddUsers() {
-    this.props.updateAudiencePlayers(
+    this.props.updateTeamPlayers(
       this.props.exerciseId,
-      this.props.audienceId,
+      this.props.teamId,
       {
-        audience_users: R.uniq([
-          ...this.props.audienceUsersIds,
+        team_users: R.uniq([
+          ...this.props.teamUsersIds,
           ...this.state.usersIds,
         ]),
       },
@@ -108,7 +108,7 @@ class AudienceAddPlayers extends Component {
       classes,
       t,
       usersMap,
-      audienceUsersIds,
+      teamUsersIds,
       exercise,
       organizationsMap,
     } = this.props;
@@ -172,7 +172,7 @@ class AudienceAddPlayers extends Component {
             },
           }}
         >
-          <DialogTitle>{t('Add players in this audience')}</DialogTitle>
+          <DialogTitle>{t('Add players in this team')}</DialogTitle>
           <DialogContent>
             <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
               <Grid item={true} xs={8}>
@@ -195,7 +195,7 @@ class AudienceAddPlayers extends Component {
                 <List>
                   {filteredUsers.map((user) => {
                     const disabled = usersIds.includes(user.user_id)
-                      || audienceUsersIds.includes(user.user_id);
+                      || teamUsersIds.includes(user.user_id);
                     return (
                       <ListItem
                         key={user.user_id}
@@ -253,16 +253,16 @@ class AudienceAddPlayers extends Component {
   }
 }
 
-AudienceAddPlayers.propTypes = {
+TeamAddPlayers.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
   exercise: PropTypes.object,
-  audienceId: PropTypes.string,
-  updateAudiencePlayers: PropTypes.func,
+  teamId: PropTypes.string,
+  updateTeamPlayers: PropTypes.func,
   fetchPlayers: PropTypes.func,
   organizations: PropTypes.array,
   usersMap: PropTypes.object,
-  audienceUsersIds: PropTypes.array,
+  teamUsersIds: PropTypes.array,
 };
 
 const select = (state, ownProps) => {
@@ -276,7 +276,7 @@ const select = (state, ownProps) => {
 };
 
 export default R.compose(
-  connect(select, { updateAudiencePlayers, fetchPlayers }),
+  connect(select, { updateTeamPlayers, fetchPlayers }),
   inject18n,
   withStyles(styles),
-)(AudienceAddPlayers);
+)(TeamAddPlayers);

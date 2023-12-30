@@ -47,7 +47,7 @@ const iconField = (type) => {
       return <SplitscreenOutlined color="primary" />;
     case 'attachment':
       return <DescriptionOutlined color="primary" />;
-    case 'audience':
+    case 'team':
       return <CastForEducationOutlined color="primary" />;
     case 'select':
     case 'dependency-select':

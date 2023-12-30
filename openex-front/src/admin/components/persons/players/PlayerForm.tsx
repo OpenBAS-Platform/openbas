@@ -3,14 +3,14 @@ import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { z } from 'zod';
-import TextField from '../../../components/TextField';
-import { useFormatter } from '../../../components/i18n';
-import TagField from '../../../components/TagField';
-import OrganizationField from '../../../components/OrganizationField';
-import CountryField from '../../../components/CountryField';
-import type { Theme } from '../../../components/Theme';
+import TextField from '../../../../components/TextField';
+import { useFormatter } from '../../../../components/i18n';
+import TagField from '../../../../components/TagField';
+import OrganizationField from '../../../../components/OrganizationField';
+import CountryField from '../../../../components/CountryField';
+import type { Theme } from '../../../../components/Theme';
 import type { PlayerInputForm } from './Player';
-import { schemaValidator } from '../../../utils/Zod';
+import { schemaValidator } from '../../../../utils/Zod';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {

@@ -44,7 +44,7 @@ import ExerciseStatus from './ExerciseStatus';
 import { useHelper } from '../../../store';
 import ExerciseParametersForm from './ExerciseParametersForm';
 import useDataLoader from '../../../utils/ServerSideEvent';
-import { fetchAudiences } from '../../../actions/Audience';
+import { fetchTeams } from '../../../actions/Team';
 import Empty from '../../../components/Empty';
 import Countdown from '../../../components/Countdown';
 import { colors, horizontalBarsChartOptions } from '../../../utils/Charts';
@@ -162,15 +162,15 @@ const Exercise = () => {
   const [openComcheckDelete, setOpenComcheckDelete] = useState(null);
   const [openDryrunDelete, setOpenDryrunDelete] = useState(null);
   const { t, nsd, fldt } = useFormatter();
-  const { exercise, audiences, dryruns, comchecks } = useHelper((helper) => {
+  const { exercise, teams, dryruns, comchecks } = useHelper((helper) => {
     const ex = helper.getExercise(exerciseId);
-    const aud = helper.getExerciseAudiences(exerciseId);
+    const aud = helper.getExerciseTeams(exerciseId);
     const dry = helper.getExerciseDryruns(exerciseId);
     const com = helper.getExerciseComchecks(exerciseId);
-    return { exercise: ex, audiences: aud, dryruns: dry, comchecks: com };
+    return { exercise: ex, teams: aud, dryruns: dry, comchecks: com };
   });
   useDataLoader(() => {
-    dispatch(fetchAudiences(exerciseId));
+    dispatch(fetchTeams(exerciseId));
     dispatch(fetchComchecks(exerciseId));
     dispatch(fetchDryruns(exerciseId));
   });
@@ -197,29 +197,29 @@ const Exercise = () => {
     ]),
   )(exercise);
   const mapIndexed = R.addIndex(R.map);
-  const audiencesColors = R.pipe(
+  const teamsColors = R.pipe(
     mapIndexed((a, index) => [
-      a.audience_id,
+      a.team_id,
       colors(theme.palette.mode === 'dark' ? 400 : 600)[index],
     ]),
     R.fromPairs,
-  )(audiences);
-  const topAudiences = R.pipe(
-    R.sortWith([R.descend(R.prop('audience_injects_number'))]),
+  )(teams);
+  const topTeams = R.pipe(
+    R.sortWith([R.descend(R.prop('team_injects_number'))]),
     R.take(6),
-  )(audiences || []);
+  )(teams || []);
   const distributionChartData = [
     {
       name: t('Number of injects'),
-      data: topAudiences.map((a) => ({
-        x: a.audience_name,
-        y: a.audience_injects_number,
-        fillColor: audiencesColors[a.audience_id],
+      data: topTeams.map((a) => ({
+        x: a.team_name,
+        y: a.team_injects_number,
+        fillColor: teamsColors[a.team_id],
       })),
     },
   ];
   const maxInjectsNumber = Math.max(
-    ...topAudiences.map((a) => a.audience_injects_number),
+    ...topTeams.map((a) => a.team_injects_number),
   );
   const nextInjectDate = exercise.exercise_next_inject_date
     ? new Date(exercise.exercise_next_inject_date).getTime()
@@ -442,7 +442,7 @@ const Exercise = () => {
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Injects distribution')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            {topAudiences.length > 0 ? (
+            {topTeams.length > 0 ? (
               <Chart
                 options={horizontalBarsChartOptions(
                   theme,
@@ -451,10 +451,10 @@ const Exercise = () => {
                 series={distributionChartData}
                 type="bar"
                 width="100%"
-                height={50 + topAudiences.length * 50}
+                height={50 + topTeams.length * 50}
               />
             ) : (
-              <Empty message={t('No audiences in this exercise.')} />
+              <Empty message={t('No teams in this exercise.')} />
             )}
           </Paper>
         </Grid>

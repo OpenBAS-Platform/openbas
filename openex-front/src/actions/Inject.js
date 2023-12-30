@@ -21,9 +21,9 @@ export const fetchExerciseInjects = (exerciseId) => (dispatch) => {
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
 };
 
-export const fetchInjectAudiences = (exerciseId, injectId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/injects/${injectId}/audiences`;
-  return getReferential(schema.arrayOfAudiences, uri)(dispatch);
+export const fetchInjectTeams = (exerciseId, injectId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/injects/${injectId}/teams`;
+  return getReferential(schema.arrayOfTeams, uri)(dispatch);
 };
 
 export const updateInject = (exerciseId, injectId, data) => (dispatch) => {
@@ -41,8 +41,8 @@ export const updateInjectTrigger = (exerciseId, injectId, data) => (dispatch) =>
   return putReferential(schema.inject, uri, data)(dispatch);
 };
 
-export const updateInjectAudiences = (exerciseId, injectId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/injects/${injectId}/audiences`;
+export const updateInjectTeams = (exerciseId, injectId, data) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/injects/${injectId}/teams`;
   return putReferential(schema.inject, uri, data)(dispatch);
 };
 

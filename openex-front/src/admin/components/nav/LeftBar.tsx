@@ -4,7 +4,6 @@ import { Drawer, ListItemText, Toolbar, MenuList, MenuItem, ListItemIcon, Divide
 import {
   DashboardOutlined,
   PolicyOutlined,
-  GroupsOutlined,
   MovieFilterOutlined,
   HubOutlined,
   ExtensionOutlined,
@@ -12,10 +11,10 @@ import {
   DomainOutlined,
   Groups3Outlined,
   EmojiEventsOutlined,
-  SchoolOutlined,
   ChevronLeft,
   ChevronRight,
-  DnsOutlined, DescriptionOutlined,
+  DnsOutlined,
+  DescriptionOutlined,
 } from '@mui/icons-material';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import { createStyles, makeStyles, styled, useTheme } from '@mui/styles';
@@ -214,11 +213,11 @@ const LeftBar = () => {
             )}
           </MenuItem>
         </StyledTooltip>
-        <StyledTooltip title={!navOpen && t('Reports')} placement="right">
+        <StyledTooltip title={!navOpen && t('Reporting')} placement="right">
           <MenuItem
             component={Link}
             to="/admin/reports"
-            selected={location.pathname === '/admin/reports'}
+            selected={location.pathname === '/admin/reporting'}
             dense={true}
             classes={{ root: classes.menuItem }}
           >
@@ -228,7 +227,7 @@ const LeftBar = () => {
             {navOpen && (
             <ListItemText
               classes={{ primary: classes.menuItemText }}
-              primary={t('Reports')}
+              primary={t('Reporting')}
             />
             )}
           </MenuItem>
@@ -253,11 +252,11 @@ const LeftBar = () => {
             />
           </MenuItem>
         </StyledTooltip>
-        <StyledTooltip title={!navOpen && t('Players')} placement="right">
+        <StyledTooltip title={!navOpen && t('Persons')} placement="right">
           <MenuItem
             component={Link}
-            to="/admin/players"
-            selected={location.pathname === '/admin/players'}
+            to="/admin/persons"
+            selected={location.pathname.includes('/admin/persons')}
             dense={true}
             classes={{ root: classes.menuItem }}
           >
@@ -267,7 +266,7 @@ const LeftBar = () => {
             {navOpen && (
             <ListItemText
               classes={{ primary: classes.menuItemText }}
-              primary={t('Players')}
+              primary={t('Persons')}
             />
             )}
           </MenuItem>
@@ -307,22 +306,22 @@ const LeftBar = () => {
           </MenuItem>
         </StyledTooltip>
         <StyledTooltip
-          title={!navOpen && t('Retrospectives')}
+          title={!navOpen && t('Organizations')}
           placement="right"
         >
           <MenuItem
             component={Link}
-            to="/admin/lessons"
-            selected={location.pathname.includes('/admin/lessons')}
+            to="/admin/organizations"
+            selected={location.pathname.includes('/admin/organizations')}
             dense={true}
             classes={{ root: classes.menuItem }}
           >
             <ListItemIcon style={{ minWidth: 20 }}>
-              <SchoolOutlined />
+              <DomainOutlined />
             </ListItemIcon>
             <ListItemText
               classes={{ primary: classes.menuItemText }}
-              primary={t('Retrospectives')}
+              primary={t('Organizations')}
             />
           </MenuItem>
         </StyledTooltip>

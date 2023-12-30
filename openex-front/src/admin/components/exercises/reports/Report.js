@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchAudiences } from '../../../../actions/Audience';
+import { fetchTeams } from '../../../../actions/Team';
 import ResultsMenu from '../ResultsMenu';
 import { fetchInjects, fetchInjectTypes } from '../../../../actions/Inject';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
@@ -79,11 +79,11 @@ const Dashboard = () => {
   const {
     report,
     exercise,
-    audiences,
+    teams,
     injects,
     challengesMap,
     injectTypesMap,
-    audiencesMap,
+    teamsMap,
     injectExpectations,
     injectsMap,
     usersMap,
@@ -98,8 +98,8 @@ const Dashboard = () => {
     return {
       report: helper.getReport(reportId),
       exercise: helper.getExercise(exerciseId),
-      audiences: helper.getExerciseAudiences(exerciseId),
-      audiencesMap: helper.getAudiencesMap(),
+      teams: helper.getExerciseTeams(exerciseId),
+      teamsMap: helper.getTeamsMap(),
       injects: helper.getExerciseInjects(exerciseId),
       injectsMap: helper.getInjectsMap(),
       usersMap: helper.getUsersMap(),
@@ -117,7 +117,7 @@ const Dashboard = () => {
   });
   useDataLoader(() => {
     dispatch(fetchReports(exerciseId));
-    dispatch(fetchAudiences(exerciseId));
+    dispatch(fetchTeams(exerciseId));
     dispatch(fetchInjectTypes());
     dispatch(fetchInjects(exerciseId));
     dispatch(fetchExerciseChallenges(exerciseId));
@@ -182,9 +182,9 @@ const Dashboard = () => {
                       sx={{ fontSize: 50 }}
                     />
                   </div>
-                  <div className={classes.title}>{t('Audiences')}</div>
+                  <div className={classes.title}>{t('Teams')}</div>
                   <div className={classes.number}>
-                    {(audiences || []).length}
+                    {(teams || []).length}
                   </div>
                 </Paper>
               </Grid>
@@ -212,14 +212,14 @@ const Dashboard = () => {
           )}
           {report.report_stats_definition && (
             <DashboardDefinitionStatistics
-              audiences={audiences}
+              teams={teams}
               injects={injects}
               injectTypesMap={injectTypesMap}
             />
           )}
           {report.report_stats_definition_score && (
             <DashboardDefinitionScoreStatistics
-              audiences={audiences}
+              teams={teams}
               injects={injects}
               injectTypesMap={injectTypesMap}
               challengesMap={challengesMap}
@@ -232,7 +232,7 @@ const Dashboard = () => {
           )}
           {report.report_stats_data && (
             <DashboardDataStatistics
-              audiences={audiences}
+              teams={teams}
               injects={injects}
               injectsMap={injectsMap}
               usersMap={usersMap}
@@ -248,9 +248,9 @@ const Dashboard = () => {
             <DashboardResultsStatistics
               usersMap={usersMap}
               injectsMap={injectsMap}
-              audiences={audiences}
+              teams={teams}
               injectTypesMap={injectTypesMap}
-              audiencesMap={audiencesMap}
+              teamsMap={teamsMap}
               injectExpectations={injectExpectations}
               organizations={organizations}
               organizationsMap={organizationsMap}
@@ -277,7 +277,7 @@ const Dashboard = () => {
               lessonsAnswers={lessonsAnswers}
               isReport={true}
               lessonsQuestions={lessonsQuestions}
-              audiencesMap={audiencesMap}
+              teamsMap={teamsMap}
             />
           )}
         </div>

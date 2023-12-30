@@ -10,11 +10,11 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
-import { fetchAudiences } from '../../../../actions/Audience';
-import CreateAudience from './CreateAudience';
-import AudiencePopover from './AudiencePopover';
+import { fetchTeams } from '../../../../actions/Team';
+import CreateTeam from './CreateTeam';
+import TeamPopover from './TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
-import AudiencePlayers from './AudiencePlayers';
+import TeamPlayers from './TeamPlayers';
 import { useHelper } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { usePermissions } from '../../../../utils/Exercise';
@@ -51,31 +51,31 @@ const headerStyles = {
     padding: 0,
     top: '0px',
   },
-  audience_name: {
+  team_name: {
     float: 'left',
     width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
-  audience_description: {
+  team_description: {
     float: 'left',
     width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
-  audience_users_number: {
+  team_users_number: {
     float: 'left',
     width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
-  audience_enabled: {
+  team_enabled: {
     float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
-  audience_tags: {
+  team_tags: {
     float: 'left',
     width: '30%',
     fontSize: 12,
@@ -84,7 +84,7 @@ const headerStyles = {
 };
 
 const inlineStyles = {
-  audience_name: {
+  team_name: {
     float: 'left',
     width: '20%',
     height: 20,
@@ -92,7 +92,7 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  audience_description: {
+  team_description: {
     float: 'left',
     width: '25%',
     height: 20,
@@ -100,7 +100,7 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  audience_users_number: {
+  team_users_number: {
     float: 'left',
     width: '10%',
     height: 20,
@@ -108,7 +108,7 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  audience_enabled: {
+  team_enabled: {
     float: 'left',
     width: '15%',
     height: 20,
@@ -116,7 +116,7 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  audience_tags: {
+  team_tags: {
     float: 'left',
     width: '30%',
     height: 20,
@@ -126,29 +126,29 @@ const inlineStyles = {
   },
 };
 
-const Audiences = () => {
+const Teams = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
-  const [selectedAudience, setSelectedAudience] = useState(null);
+  const [selectedTeam, setSelectedTeam] = useState(null);
   // Filter and sort hook
-  const filtering = useSearchAnFilter('audience', 'name', [
+  const filtering = useSearchAnFilter('team', 'name', [
     'name',
     'description',
   ]);
   // Fetching data
   const { exerciseId } = useParams();
   const permissions = usePermissions(exerciseId);
-  const { exercise, audiences, tagsMap } = useHelper((helper) => ({
+  const { exercise, teams, tagsMap } = useHelper((helper) => ({
     exercise: helper.getExercise(exerciseId),
-    audiences: helper.getExerciseAudiences(exerciseId),
+    teams: helper.getExerciseTeams(exerciseId),
     tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
-    dispatch(fetchAudiences(exerciseId));
+    dispatch(fetchTeams(exerciseId));
   });
-  const sortedAudiences = filtering.filterAndSort(audiences);
+  const sortedTeams = filtering.filterAndSort(teams);
   return (
     <div className={classes.container}>
       <DefinitionMenu exerciseId={exerciseId} />
@@ -170,21 +170,21 @@ const Audiences = () => {
         <div
           style={{ float: 'right', margin: '-5px 15px 0 0', maxHeight: '35px' }}
         >
-          {sortedAudiences.length > 0 ? (
+          {sortedTeams.length > 0 ? (
             <CSVLink
               data={exportData(
-                'audience',
+                'team',
                 [
-                  'audience_name',
-                  'audience_description',
-                  'audience_users_number',
-                  'audience_enabled',
-                  'audience_tags',
+                  'team_name',
+                  'team_description',
+                  'team_users_number',
+                  'team_enabled',
+                  'team_tags',
                 ],
-                sortedAudiences,
+                sortedTeams,
                 tagsMap,
               )}
-              filename={`[${exercise.exercise_name}] ${t('Audiences')}.csv`}
+              filename={`[${exercise.exercise_name}] ${t('Teams')}.csv`}
             >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
@@ -217,31 +217,31 @@ const Audiences = () => {
             primary={
               <div>
                 {filtering.buildHeader(
-                  'audience_name',
+                  'team_name',
                   'Name',
                   true,
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'audience_description',
+                  'team_description',
                   'Description',
                   true,
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'audience_users_number',
+                  'team_users_number',
                   'Players',
                   true,
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'audience_enabled',
+                  'team_enabled',
                   'Status',
                   true,
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'audience_tags',
+                  'team_tags',
                   'Tags',
                   true,
                   headerStyles,
@@ -251,13 +251,13 @@ const Audiences = () => {
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
-        {sortedAudiences.map((audience) => (
+        {sortedTeams.map((team) => (
           <ListItem
-            key={audience.audience_id}
+            key={team.team_id}
             classes={{ root: classes.item }}
             divider={true}
             button={true}
-            onClick={() => setSelectedAudience(audience.audience_id)}
+            onClick={() => setSelectedTeam(team.team_id)}
           >
             <ListItemIcon>
               <CastForEducationOutlined />
@@ -267,49 +267,49 @@ const Audiences = () => {
                 <div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.audience_name}
+                    style={inlineStyles.team_name}
                   >
-                    {audience.audience_name}
+                    {team.team_name}
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.audience_description}
+                    style={inlineStyles.team_description}
                   >
-                    {audience.audience_description}
+                    {team.team_description}
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.audience_users_number}
+                    style={inlineStyles.team_users_number}
                   >
-                    {audience.audience_users_number}
+                    {team.team_users_number}
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.audience_enabled}
+                    style={inlineStyles.team_enabled}
                   >
                     <ItemBoolean
-                      status={audience.audience_enabled}
+                      status={team.team_enabled}
                       label={
-                        audience.audience_enabled ? t('Enabled') : t('Disabled')
+                        team.team_enabled ? t('Enabled') : t('Disabled')
                       }
                       variant="list"
                     />
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.audience_tags}
+                    style={inlineStyles.team_tags}
                   >
-                    <ItemTags variant="list" tags={audience.audience_tags} />
+                    <ItemTags variant="list" tags={team.team_tags} />
                   </div>
                 </div>
               }
             />
             <ListItemSecondaryAction>
-              <AudiencePopover
+              <TeamPopover
                 exerciseId={exerciseId}
                 exercise={exercise}
-                audience={audience}
-                setSelectedAudience={setSelectedAudience}
+                team={team}
+                setSelectedTeam={setSelectedTeam}
                 disabled={permissions.readOnly}
               />
             </ListItemSecondaryAction>
@@ -317,26 +317,26 @@ const Audiences = () => {
         ))}
       </List>
       <Drawer
-        open={selectedAudience !== null}
+        open={selectedTeam !== null}
         keepMounted={false}
         anchor="right"
         sx={{ zIndex: 1202 }}
         classes={{ paper: classes.drawerPaper }}
-        onClose={() => setSelectedAudience(null)}
+        onClose={() => setSelectedTeam(null)}
         elevation={1}
       >
-        {selectedAudience !== null && (
-          <AudiencePlayers
-            audienceId={selectedAudience}
+        {selectedTeam !== null && (
+          <TeamPlayers
+            teamId={selectedTeam}
             exerciseId={exerciseId}
-            handleClose={() => setSelectedAudience(null)}
+            handleClose={() => setSelectedTeam(null)}
             tagsMap={tagsMap}
           />
         )}
       </Drawer>
-      {permissions.canWrite && <CreateAudience exerciseId={exerciseId} />}
+      {permissions.canWrite && <CreateTeam exerciseId={exerciseId} />}
     </div>
   );
 };
 
-export default Audiences;
+export default Teams;

@@ -5,8 +5,8 @@ import * as R from 'ramda';
 import withStyles from '@mui/styles/withStyles';
 import { Fab, Dialog, DialogTitle, DialogContent, Slide, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
-import AudienceForm from './AudienceForm';
-import { addAudience } from '../../../../actions/Audience';
+import TeamForm from './TeamForm';
+import { addTeam } from '../../../../actions/Team';
 import inject18n from '../../../../components/i18n';
 
 const Transition = React.forwardRef((props, ref) => (
@@ -27,7 +27,7 @@ const styles = (theme) => ({
   },
 });
 
-class CreateAudience extends Component {
+class CreateTeam extends Component {
   constructor(props) {
     super(props);
     this.state = { open: false };
@@ -43,10 +43,10 @@ class CreateAudience extends Component {
 
   onSubmit(data) {
     const inputValues = R.pipe(
-      R.assoc('audience_tags', R.pluck('id', data.audience_tags)),
+      R.assoc('team_tags', R.pluck('id', data.team_tags)),
     )(data);
     return this.props
-      .addAudience(this.props.exerciseId, inputValues)
+      .addTeam(this.props.exerciseId, inputValues)
       .then((result) => {
         if (result.result) {
           if (this.props.onCreate) {
@@ -73,7 +73,7 @@ class CreateAudience extends Component {
               <ControlPointOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={t('Create a new audience')}
+              primary={t('Create a new team')}
               classes={{ primary: classes.text }}
             />
           </ListItem>
@@ -95,11 +95,11 @@ class CreateAudience extends Component {
           maxWidth="md"
           PaperProps={{ elevation: 1 }}
         >
-          <DialogTitle>{t('Create a new audience')}</DialogTitle>
+          <DialogTitle>{t('Create a new team')}</DialogTitle>
           <DialogContent>
-            <AudienceForm
+            <TeamForm
               onSubmit={this.onSubmit.bind(this)}
-              initialValues={{ audience_tags: [] }}
+              initialValues={{ team_tags: [] }}
               handleClose={this.handleClose.bind(this)}
             />
           </DialogContent>
@@ -109,17 +109,17 @@ class CreateAudience extends Component {
   }
 }
 
-CreateAudience.propTypes = {
+CreateTeam.propTypes = {
   exerciseId: PropTypes.string,
   classes: PropTypes.object,
   t: PropTypes.func,
-  addAudience: PropTypes.func,
+  addTeam: PropTypes.func,
   inline: PropTypes.bool,
   onCreate: PropTypes.func,
 };
 
 export default R.compose(
-  connect(null, { addAudience }),
+  connect(null, { addTeam }),
   inject18n,
   withStyles(styles),
-)(CreateAudience);
+)(CreateTeam);

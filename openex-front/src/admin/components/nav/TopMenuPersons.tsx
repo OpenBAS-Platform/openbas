@@ -15,25 +15,34 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }));
 
-const TopMenuPlayers: React.FC = () => {
+const TopMenuPersons: React.FC = () => {
   const location = useLocation();
   const classes = useStyles();
   const { t } = useFormatter();
-
   return (
-    <div>
+    <>
       <Button
         component={Link}
-        to="/admin/players"
-        variant={location.pathname === '/admin/players' ? 'contained' : 'text'}
+        to="/admin/persons/players"
+        variant={location.pathname === '/admin/persons/players' ? 'contained' : 'text'}
         size="small"
-        color={location.pathname === '/admin/players' ? 'secondary' : 'primary'}
+        color="primary"
         classes={{ root: classes.button }}
       >
         {t('Players')}
       </Button>
-    </div>
+      <Button
+        component={Link}
+        to="/admin/persons/teams"
+        variant={location.pathname === '/admin/persons/teams' ? 'contained' : 'text'}
+        size="small"
+        color="primary"
+        classes={{ root: classes.button }}
+      >
+        {t('Teams')}
+      </Button>
+    </>
   );
 };
 
-export default TopMenuPlayers;
+export default TopMenuPersons;

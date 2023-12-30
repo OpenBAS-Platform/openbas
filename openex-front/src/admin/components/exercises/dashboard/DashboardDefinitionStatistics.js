@@ -17,7 +17,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const DashboardDefinitionStatistics = ({
-  audiences,
+  teams,
   injects,
   injectTypesMap,
 }) => {
@@ -25,24 +25,24 @@ const DashboardDefinitionStatistics = ({
   const { t, tPick } = useFormatter();
   const theme = useTheme();
   const mapIndexed = R.addIndex(R.map);
-  const audiencesColors = R.pipe(
+  const teamsColors = R.pipe(
     mapIndexed((a, index) => [
-      a.audience_id,
+      a.team_id,
       colors(theme.palette.mode === 'dark' ? 400 : 600)[index],
     ]),
     R.fromPairs,
-  )(audiences);
-  const sortedAudiencesByInjectsNumber = R.pipe(
-    R.sortWith([R.descend(R.prop('audience_injects_number'))]),
+  )(teams);
+  const sortedTeamsByInjectsNumber = R.pipe(
+    R.sortWith([R.descend(R.prop('team_injects_number'))]),
     R.take(10),
-  )(audiences || []);
-  const injectsByAudienceData = [
+  )(teams || []);
+  const injectsByTeamData = [
     {
       name: t('Number of injects'),
-      data: sortedAudiencesByInjectsNumber.map((a) => ({
-        x: a.audience_name,
-        y: a.audience_injects_number,
-        fillColor: audiencesColors[a.audience_id],
+      data: sortedTeamsByInjectsNumber.map((a) => ({
+        x: a.team_name,
+        y: a.team_injects_number,
+        fillColor: teamsColors[a.team_id],
       })),
     },
   ];
@@ -93,16 +93,16 @@ const DashboardDefinitionStatistics = ({
       </Grid>
       <Grid item={true} xs={6}>
         <Typography variant="h4">
-          {t('Distribution of injects by audience')}
+          {t('Distribution of injects by team')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedAudiencesByInjectsNumber.length > 0 ? (
+          {sortedTeamsByInjectsNumber.length > 0 ? (
             <Chart
               options={horizontalBarsChartOptions(theme)}
-              series={injectsByAudienceData}
+              series={injectsByTeamData}
               type="bar"
               width="100%"
-              height={50 + sortedAudiencesByInjectsNumber.length * 50}
+              height={50 + sortedTeamsByInjectsNumber.length * 50}
             />
           ) : (
             <Empty

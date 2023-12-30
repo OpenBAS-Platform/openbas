@@ -211,7 +211,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>{t('Audiences')}</TableCell>
+                  <TableCell>{t('Teams')}</TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
                     <Checkbox checked={true} disabled={true} />
                   </TableCell>

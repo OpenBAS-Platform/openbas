@@ -42,17 +42,17 @@ const DefinitionMenu: React.FC<Props> = ({ exerciseId }) => {
       <MenuList component="nav">
         <MenuItem
           component={Link}
-          to={`/admin/exercises/${exerciseId}/definition/audiences`}
+          to={`/admin/exercises/${exerciseId}/definition/teams`}
           selected={
             location.pathname
-            === `/admin/exercises/${exerciseId}/definition/audiences`
+            === `/admin/exercises/${exerciseId}/definition/teams`
           }
           classes={{ root: classes.item }}
         >
           <ListItemIcon>
             <CastForEducationOutlined />
           </ListItemIcon>
-          <ListItemText primary={t('Audiences')} />
+          <ListItemText primary={t('Teams')} />
         </MenuItem>
         <MenuItem
           component={Link}

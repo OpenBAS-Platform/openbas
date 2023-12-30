@@ -17,6 +17,9 @@ public class TeamUpdateInput {
     @JsonProperty("team_description")
     private String description;
 
+    @JsonProperty("team_organization")
+    private String organizationId;
+
     @JsonProperty("team_tags")
     private List<String> tagIds = new ArrayList<>();
 
@@ -34,6 +37,14 @@ public class TeamUpdateInput {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
     }
 
     public List<String> getTagIds() {

@@ -4,7 +4,7 @@ import { PersonOutlined } from '@mui/icons-material';
 import { Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import { connect } from 'react-redux';
-import PlayerForm from '../admin/components/players/PlayerForm';
+import PlayerForm from '../admin/components/persons/players/PlayerForm';
 import { fetchUsers, addUser } from '../actions/User';
 import { fetchOrganizations } from '../actions/Organization';
 import Autocomplete from './Autocomplete';

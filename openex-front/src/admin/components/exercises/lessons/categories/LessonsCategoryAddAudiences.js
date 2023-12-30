@@ -8,8 +8,8 @@ import withStyles from '@mui/styles/withStyles';
 import SearchFilter from '../../../../../components/SearchFilter';
 import inject18n from '../../../../../components/i18n';
 import { storeHelper } from '../../../../../actions/Schema';
-import { fetchAudiences } from '../../../../../actions/Audience';
-import CreateAudience from '../../audiences/CreateAudience';
+import { fetchTeams } from '../../../../../actions/Team';
+import CreateTeam from '../../teams/CreateTeam';
 import { truncate } from '../../../../../utils/String';
 import { Transition } from '../../../../../utils/Environment';
 import TagsFilter from '../../../../../components/TagsFilter';
@@ -40,19 +40,19 @@ const styles = (theme) => ({
   },
 });
 
-class LessonsCategoryAddAudiences extends Component {
+class LessonsCategoryAddTeams extends Component {
   constructor(props) {
     super(props);
     this.state = {
       open: false,
       keyword: '',
-      audiencesIds: [],
+      teamsIds: [],
       tags: [],
     };
   }
 
   componentDidMount() {
-    this.props.fetchAudiences(this.props.exerciseId);
+    this.props.fetchTeams(this.props.exerciseId);
   }
 
   handleOpen() {
@@ -60,10 +60,10 @@ class LessonsCategoryAddAudiences extends Component {
   }
 
   handleClose() {
-    this.setState({ open: false, keyword: '', audiencesIds: [] });
+    this.setState({ open: false, keyword: '', teamsIds: [] });
   }
 
-  handleSearchAudiences(value) {
+  handleSearchTeams(value) {
     this.setState({ keyword: value });
   }
 
@@ -77,73 +77,73 @@ class LessonsCategoryAddAudiences extends Component {
     this.setState({ tags: [] });
   }
 
-  addAudience(audienceId) {
+  addTeam(teamId) {
     this.setState({
-      audiencesIds: R.append(audienceId, this.state.audiencesIds),
+      teamsIds: R.append(teamId, this.state.teamsIds),
     });
   }
 
-  addAllAudiences() {
-    const { lessonsCategoryAudiencesIds, audiences } = this.props;
-    const audiencesToAdd = R.pipe(
-      R.map((n) => n.audience_id),
-      R.filter((n) => !lessonsCategoryAudiencesIds.includes(n)),
-    )(audiences);
+  addAllTeams() {
+    const { lessonsCategoryTeamsIds, teams } = this.props;
+    const teamsToAdd = R.pipe(
+      R.map((n) => n.team_id),
+      R.filter((n) => !lessonsCategoryTeamsIds.includes(n)),
+    )(teams);
     this.setState({
-      audiencesIds: audiencesToAdd,
+      teamsIds: teamsToAdd,
     });
   }
 
-  removeAudience(audienceId) {
+  removeTeam(teamId) {
     this.setState({
-      audiencesIds: R.filter((u) => u !== audienceId, this.state.audiencesIds),
+      teamsIds: R.filter((u) => u !== teamId, this.state.teamsIds),
     });
   }
 
-  submitAddAudiences() {
+  submitAddTeams() {
     const {
-      lessonsCategoryAudiencesIds,
+      lessonsCategoryTeamsIds,
       lessonsCategoryId,
-      handleUpdateAudiences,
+      handleUpdateTeams,
     } = this.props;
-    handleUpdateAudiences(lessonsCategoryId, [
-      ...lessonsCategoryAudiencesIds,
-      ...this.state.audiencesIds,
+    handleUpdateTeams(lessonsCategoryId, [
+      ...lessonsCategoryTeamsIds,
+      ...this.state.teamsIds,
     ]);
     this.handleClose();
   }
 
   onCreate(result) {
-    this.addAudience(result);
+    this.addTeam(result);
   }
 
   render() {
     const {
       classes,
       t,
-      audiences,
-      lessonsCategoryAudiencesIds,
+      teams,
+      lessonsCategoryTeamsIds,
       exerciseId,
-      audiencesMap,
+      teamsMap,
     } = this.props;
-    const { keyword, audiencesIds, tags } = this.state;
+    const { keyword, teamsIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.audience_name || '').toLowerCase().indexOf(keyword.toLowerCase())
+      || (n.team_name || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
-      || (n.audience_description || '')
+      || (n.team_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
-    const filteredAudiences = R.pipe(
+    const filteredTeams = R.pipe(
       R.filter(
         (n) => tags.length === 0
           || R.any(
-            (filter) => R.includes(filter, n.audience_tags),
+            (filter) => R.includes(filter, n.team_tags),
             R.pluck('id', tags),
           ),
       ),
       R.filter(filterByKeyword),
       R.take(10),
-    )(audiences);
+    )(teams);
     return (
       <div>
         <IconButton
@@ -171,11 +171,11 @@ class LessonsCategoryAddAudiences extends Component {
         >
           <DialogTitle>
             <div style={{ float: 'left' }}>
-              {t('Add target audiences in this lessons learned category')}
+              {t('Add target teams in this lessons learned category')}
             </div>
             <div style={{ float: 'right', marginTop: -4 }}>
               <Button
-                onClick={this.addAllAudiences.bind(this)}
+                onClick={this.addAllTeams.bind(this)}
                 variant="outlined"
                 color="warning"
               >
@@ -189,7 +189,7 @@ class LessonsCategoryAddAudiences extends Component {
                 <Grid container={true} spacing={3}>
                   <Grid item={true} xs={6}>
                     <SearchFilter
-                      onChange={this.handleSearchAudiences.bind(this)}
+                      onChange={this.handleSearchTeams.bind(this)}
                       fullWidth={true}
                     />
                   </Grid>
@@ -203,38 +203,38 @@ class LessonsCategoryAddAudiences extends Component {
                   </Grid>
                 </Grid>
                 <List>
-                  {filteredAudiences.map((audience) => {
-                    const disabled = audiencesIds.includes(audience.audience_id)
-                      || lessonsCategoryAudiencesIds.includes(
-                        audience.audience_id,
+                  {filteredTeams.map((team) => {
+                    const disabled = teamsIds.includes(team.team_id)
+                      || lessonsCategoryTeamsIds.includes(
+                        team.team_id,
                       );
                     return (
                       <ListItem
-                        key={audience.audience_id}
+                        key={team.team_id}
                         disabled={disabled}
                         button={true}
                         divider={true}
                         dense={true}
-                        onClick={this.addAudience.bind(
+                        onClick={this.addTeam.bind(
                           this,
-                          audience.audience_id,
+                          team.team_id,
                         )}
                       >
                         <ListItemIcon>
                           <CastForEducationOutlined />
                         </ListItemIcon>
                         <ListItemText
-                          primary={audience.audience_name}
-                          secondary={audience.audience_description}
+                          primary={team.team_name}
+                          secondary={team.team_description}
                         />
                         <ItemTags
                           variant="list"
-                          tags={audience.audience_tags}
+                          tags={team.team_tags}
                         />
                       </ListItem>
                     );
                   })}
-                  <CreateAudience
+                  <CreateTeam
                     exerciseId={exerciseId}
                     inline={true}
                     onCreate={this.onCreate.bind(this)}
@@ -243,13 +243,13 @@ class LessonsCategoryAddAudiences extends Component {
               </Grid>
               <Grid item={true} xs={4}>
                 <Box className={classes.box}>
-                  {this.state.audiencesIds.map((audienceId) => {
-                    const audience = audiencesMap[audienceId];
+                  {this.state.teamsIds.map((teamId) => {
+                    const team = teamsMap[teamId];
                     return (
                       <Chip
-                        key={audienceId}
-                        onDelete={this.removeAudience.bind(this, audienceId)}
-                        label={truncate(audience?.audience_name || '', 22)}
+                        key={teamId}
+                        onDelete={this.removeTeam.bind(this, teamId)}
+                        label={truncate(team?.team_name || '', 22)}
                         icon={<CastForEducationOutlined />}
                         classes={{ root: classes.chip }}
                       />
@@ -263,7 +263,7 @@ class LessonsCategoryAddAudiences extends Component {
             <Button onClick={this.handleClose.bind(this)}>{t('Cancel')}</Button>
             <Button
               color="secondary"
-              onClick={this.submitAddAudiences.bind(this)}
+              onClick={this.submitAddTeams.bind(this)}
             >
               {t('Add')}
             </Button>
@@ -274,28 +274,28 @@ class LessonsCategoryAddAudiences extends Component {
   }
 }
 
-LessonsCategoryAddAudiences.propTypes = {
+LessonsCategoryAddTeams.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
-  fetchAudiences: PropTypes.func,
-  handleUpdateAudiences: PropTypes.func,
+  fetchTeams: PropTypes.func,
+  handleUpdateTeams: PropTypes.func,
   organizations: PropTypes.array,
-  audiences: PropTypes.array,
+  teams: PropTypes.array,
   lessonsCategoryId: PropTypes.string,
-  lessonsCategoryAudiencesIds: PropTypes.array,
+  lessonsCategoryTeamsIds: PropTypes.array,
   attachment: PropTypes.bool,
 };
 
 const select = (state, ownProps) => {
   const helper = storeHelper(state);
   const { exerciseId } = ownProps;
-  const audiences = helper.getExerciseAudiences(exerciseId);
-  const audiencesMap = helper.getAudiencesMap();
-  return { audiences, audiencesMap };
+  const teams = helper.getExerciseTeams(exerciseId);
+  const teamsMap = helper.getTeamsMap();
+  return { teams, teamsMap };
 };
 
 export default R.compose(
-  connect(select, { fetchAudiences }),
+  connect(select, { fetchTeams }),
   inject18n,
   withStyles(styles),
-)(LessonsCategoryAddAudiences);
+)(LessonsCategoryAddTeams);

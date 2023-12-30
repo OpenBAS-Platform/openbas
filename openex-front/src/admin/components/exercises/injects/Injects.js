@@ -176,7 +176,7 @@ const Injects = () => {
     injectTypesMap,
     tagsMap,
     exercisesMap,
-    injectTypesWithNoAudiences,
+    injectTypesWithNoTeams,
   } = useHelper((helper) => {
     return {
       exercise: helper.getExercise(exerciseId),
@@ -184,7 +184,7 @@ const Injects = () => {
       injectTypesMap: helper.getInjectTypesMap(),
       tagsMap: helper.getTagsMap(),
       exercisesMap: helper.getExercisesMap(),
-      injectTypesWithNoAudiences: helper.getInjectTypesWithNoAudiences(),
+      injectTypesWithNoTeams: helper.getInjectTypesWithNoTeams(),
     };
   });
   useDataLoader(() => {
@@ -317,7 +317,7 @@ const Injects = () => {
             const duration = splitDuration(inject.inject_depends_duration || 0);
             const isDisabled = disabledTypes.includes(inject.inject_type)
               || !types.includes(inject.inject_type);
-            const isNoAudience = injectTypesWithNoAudiences.includes(
+            const isNoTeam = injectTypesWithNoTeams.includes(
               inject.inject_type,
             );
             let injectStatus = inject.inject_enabled
@@ -382,7 +382,7 @@ const Injects = () => {
                         className={classes.bodyItem}
                         style={inlineStyles.inject_users_number}
                       >
-                        {isNoAudience ? t('N/A') : inject.inject_users_number}
+                        {isNoTeam ? t('N/A') : inject.inject_users_number}
                       </div>
                       <div
                         className={classes.bodyItem}

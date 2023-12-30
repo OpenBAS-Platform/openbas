@@ -2,15 +2,15 @@ import React, { FunctionComponent, useState } from 'react';
 import { Fab, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { addPlayer } from '../../../actions/User';
-import PlayerForm from './PlayerForm';
-import { useFormatter } from '../../../components/i18n';
-import Dialog from '../../../components/common/Dialog';
-import { useAppDispatch } from '../../../utils/hooks';
-import type { Theme } from '../../../components/Theme';
-import type { CreatePlayerInput } from '../../../utils/api-types';
-import { Option } from '../../../utils/Option';
-import type { PlayerInputForm } from './Player';
+import { addTeam } from '../../../../actions/Team';
+import TeamForm from './TeamForm';
+import { useFormatter } from '../../../../components/i18n';
+import Dialog from '../../../../components/common/Dialog';
+import { useAppDispatch } from '../../../../utils/hooks';
+import type { Theme } from '../../../../components/Theme';
+import type { TeamCreateInput } from '../../../../utils/api-types';
+import { Option } from '../../../../utils/Option';
+import type { TeamInputForm } from './Team';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {
@@ -25,12 +25,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface CreatePlayerProps {
+interface CreateTeamProps {
   inline: boolean;
   onCreate: (result: string) => void;
 }
 
-const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
+const CreateTeam: FunctionComponent<CreateTeamProps> = ({
   inline,
   onCreate,
 }) => {
@@ -43,14 +43,13 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
   const handleOpen = () => setOpenDialog(true);
   const handleClose = () => setOpenDialog(false);
 
-  const onSubmit = (data: PlayerInputForm) => {
-    const inputValues: CreatePlayerInput = {
+  const onSubmit = (data: TeamInputForm) => {
+    const inputValues: TeamCreateInput = {
       ...data,
-      user_organization: data.user_organization?.id,
-      user_country: data.user_country?.id,
-      user_tags: data.user_tags?.map((tag: Option) => tag.id),
+      team_organization: data.team_organization?.id,
+      team_tags: data.team_tags?.map((tag: Option) => tag.id),
     };
-    return dispatch(addPlayer(inputValues)).then(
+    return dispatch(addTeam(inputValues)).then(
       (result: { result: string }) => {
         if (result.result) {
           if (onCreate) {
@@ -71,7 +70,7 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
             <ControlPointOutlined color="primary" />
           </ListItemIcon>
           <ListItemText
-            primary={t('Create a new player')}
+            primary={t('Create a new team')}
             classes={{ primary: classes.text }}
           />
         </ListItemButton>
@@ -88,10 +87,10 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
       <Dialog
         open={openDialog}
         handleClose={handleClose}
-        title={t('Create a new player')}
+        title={t('Create a new team')}
       >
-        <PlayerForm
-          initialValues={{ user_tags: [] }}
+        <TeamForm
+          initialValues={{ team_tags: [] }}
           handleClose={handleClose}
           onSubmit={onSubmit}
         />
@@ -100,4 +99,4 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
   );
 };
 
-export default CreatePlayer;
+export default CreateTeam;

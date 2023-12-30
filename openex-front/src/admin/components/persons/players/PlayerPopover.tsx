@@ -1,32 +1,32 @@
 import React, { FunctionComponent, useState } from 'react';
 import { Dialog as MuiDialog, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import Dialog from '../../../components/common/Dialog';
-import { updateAudiencePlayers } from '../../../actions/Audience';
-import { deletePlayer, updatePlayer } from '../../../actions/User';
+import Dialog from '../../../../components/common/Dialog';
+import { updateTeamPlayers } from '../../../../actions/Team';
+import { deletePlayer, updatePlayer } from '../../../../actions/User';
 import PlayerForm from './PlayerForm';
-import { useFormatter } from '../../../components/i18n';
-import { isExerciseReadOnly } from '../../../utils/Exercise';
-import { useAppDispatch } from '../../../utils/hooks';
-import Transition from '../../../components/common/Transition';
-import type { UpdatePlayerInput } from '../../../utils/api-types';
-import { countryOption, Option, organizationOption, tagOptions } from '../../../utils/Option';
-import { useHelper } from '../../../store';
-import type { ExercicesHelper, OrganizationsHelper, TagsHelper, UsersHelper } from '../../../actions/helper';
+import { useFormatter } from '../../../../components/i18n';
+import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import { useAppDispatch } from '../../../../utils/hooks';
+import Transition from '../../../../components/common/Transition';
+import type { UpdatePlayerInput } from '../../../../utils/api-types';
+import { countryOption, Option, organizationOption, tagOptions } from '../../../../utils/Option';
+import { useHelper } from '../../../../store';
+import type { ExercicesHelper, OrganizationsHelper, TagsHelper, UsersHelper } from '../../../../actions/helper';
 import type { PlayerInputForm, UserStore } from './Player';
 
 interface PlayerPopoverProps {
   user: UserStore;
   exerciseId?: string;
-  audienceId?: string;
-  audienceUsersIds?: string[];
+  teamId?: string;
+  teamUsersIds?: string[];
 }
 
 const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   user,
   exerciseId,
-  audienceId,
-  audienceUsersIds,
+  teamId,
+  teamUsersIds,
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -96,8 +96,8 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
 
   const submitRemove = () => {
     return dispatch(
-      updateAudiencePlayers(exerciseId, audienceId, {
-        audience_users: audienceUsersIds?.filter((id) => id !== user.user_id),
+      updateTeamPlayers(exerciseId, teamId, {
+        team_users: teamUsersIds?.filter((id) => id !== user.user_id),
       }),
     ).then(() => handleCloseRemove());
   };
@@ -124,12 +124,12 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
         onClose={handlePopoverClose}
       >
         <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
-        {audienceId && (
+        {teamId && (
           <MenuItem
             onClick={handleOpenRemove}
             disabled={isExerciseReadOnly(exercise)}
           >
-            {t('Remove from the audience')}
+            {t('Remove from the team')}
           </MenuItem>
         )}
         {canDelete && (
@@ -175,7 +175,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to remove the player from the audience?')}
+            {t('Do you want to remove the player from the team?')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

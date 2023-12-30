@@ -6,11 +6,11 @@ import TextField from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 
-class AudienceForm extends Component {
+class TeamForm extends Component {
   validate(values) {
     const { t } = this.props;
     const errors = {};
-    const requiredFields = ['audience_name'];
+    const requiredFields = ['team_name'];
     requiredFields.forEach((field) => {
       if (!values[field]) {
         errors[field] = t('This field is required.');
@@ -34,16 +34,16 @@ class AudienceForm extends Component {
         }}
       >
         {({ handleSubmit, form, values, submitting, pristine }) => (
-          <form id="audienceForm" onSubmit={handleSubmit}>
+          <form id="teamForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"
-              name="audience_name"
+              name="team_name"
               fullWidth={true}
               label={t('Name')}
             />
             <TextField
               variant="standard"
-              name="audience_description"
+              name="team_description"
               fullWidth={true}
               multiline={true}
               rows={2}
@@ -51,7 +51,7 @@ class AudienceForm extends Component {
               style={{ marginTop: 20 }}
             />
             <TagField
-              name="audience_tags"
+              name="team_tags"
               label={t('Tags')}
               values={values}
               setFieldValue={form.mutators.setValue}
@@ -80,11 +80,11 @@ class AudienceForm extends Component {
   }
 }
 
-AudienceForm.propTypes = {
+TeamForm.propTypes = {
   t: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
 };
 
-export default inject18n(AudienceForm);
+export default inject18n(TeamForm);

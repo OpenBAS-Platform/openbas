@@ -4,15 +4,15 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { updateAudience, deleteAudience, updateAudienceActivation } from '../../../../actions/Audience';
+import { updateTeam, deleteTeam, updateTeamActivation } from '../../../../actions/Team';
 import inject18n from '../../../../components/i18n';
-import AudienceForm from './AudienceForm';
+import TeamForm from './TeamForm';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { Transition } from '../../../../utils/Environment';
 import { storeHelper } from '../../../../actions/Schema';
 import { tagOptions } from '../../../../utils/Option';
 
-class AudiencePopover extends Component {
+class TeamPopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -45,12 +45,12 @@ class AudiencePopover extends Component {
 
   onSubmitEdit(data) {
     const inputValues = R.pipe(
-      R.assoc('audience_tags', R.pluck('id', data.audience_tags)),
+      R.assoc('team_tags', R.pluck('id', data.team_tags)),
     )(data);
     return this.props
-      .updateAudience(
+      .updateTeam(
         this.props.exerciseId,
-        this.props.audience.audience_id,
+        this.props.team.team_id,
         inputValues,
       )
       .then(() => this.handleCloseEdit());
@@ -66,9 +66,9 @@ class AudiencePopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteAudience(
+    this.props.deleteTeam(
       this.props.exerciseId,
-      this.props.audience.audience_id,
+      this.props.team.team_id,
     );
     this.handleCloseDelete();
   }
@@ -83,7 +83,7 @@ class AudiencePopover extends Component {
   }
 
   submitRemove() {
-    this.props.onRemoveAudience(this.props.audience.audience_id);
+    this.props.onRemoveTeam(this.props.team.team_id);
     this.handleCloseRemove();
   }
 
@@ -101,10 +101,10 @@ class AudiencePopover extends Component {
   }
 
   submitEnable() {
-    this.props.updateAudienceActivation(
+    this.props.updateTeamActivation(
       this.props.exerciseId,
-      this.props.audience.audience_id,
-      { audience_enabled: true },
+      this.props.team.team_id,
+      { team_enabled: true },
     );
     this.handleCloseEnable();
   }
@@ -123,34 +123,34 @@ class AudiencePopover extends Component {
   }
 
   submitDisable() {
-    this.props.updateAudienceActivation(
+    this.props.updateTeamActivation(
       this.props.exerciseId,
-      this.props.audience.audience_id,
-      { audience_enabled: false },
+      this.props.team.team_id,
+      { team_enabled: false },
     );
     this.handleCloseDisable();
   }
 
   handleOpenEditPlayers() {
-    this.props.setSelectedAudience(this.props.audience.audience_id);
+    this.props.setSelectedTeam(this.props.team.team_id);
     this.handlePopoverClose();
   }
 
   render() {
     const {
       t,
-      audience,
-      setSelectedAudience,
+      team,
+      setSelectedTeam,
       exercise,
-      onRemoveAudience,
+      onRemoveTeam,
       tagsMap,
       disabled,
     } = this.props;
-    const audienceTags = tagOptions(audience.audience_tags, tagsMap);
+    const teamTags = tagOptions(team.team_tags, tagsMap);
     const initialValues = R.pipe(
-      R.assoc('audience_tags', audienceTags),
-      R.pick(['audience_name', 'audience_description', 'audience_tags']),
-    )(audience);
+      R.assoc('team_tags', teamTags),
+      R.pick(['team_name', 'team_description', 'team_tags']),
+    )(team);
     return (
       <div>
         <IconButton
@@ -172,12 +172,12 @@ class AudiencePopover extends Component {
           >
             {t('Update')}
           </MenuItem>
-          {setSelectedAudience && (
+          {setSelectedTeam && (
             <MenuItem onClick={this.handleOpenEditPlayers.bind(this)}>
               {t('Manage players')}
             </MenuItem>
           )}
-          {audience.audience_enabled ? (
+          {team.team_enabled ? (
             <MenuItem
               onClick={this.handleOpenDisable.bind(this)}
               disabled={isExerciseReadOnly(exercise)}
@@ -192,7 +192,7 @@ class AudiencePopover extends Component {
               {t('Enable')}
             </MenuItem>
           )}
-          {onRemoveAudience && (
+          {onRemoveTeam && (
             <MenuItem
               onClick={this.handleOpenRemove.bind(this)}
               disabled={isExerciseReadOnly(exercise)}
@@ -200,7 +200,7 @@ class AudiencePopover extends Component {
               {t('Remove from the inject')}
             </MenuItem>
           )}
-          {!onRemoveAudience && (
+          {!onRemoveTeam && (
             <MenuItem
               onClick={this.handleOpenDelete.bind(this)}
               disabled={isExerciseReadOnly(exercise)}
@@ -217,7 +217,7 @@ class AudiencePopover extends Component {
         >
           <DialogContent>
             <DialogContentText>
-              {t('Do you want to delete this audience?')}
+              {t('Do you want to delete this team?')}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -237,9 +237,9 @@ class AudiencePopover extends Component {
           maxWidth="md"
           PaperProps={{ elevation: 1 }}
         >
-          <DialogTitle>{t('Update the audience')}</DialogTitle>
+          <DialogTitle>{t('Update the team')}</DialogTitle>
           <DialogContent>
-            <AudienceForm
+            <TeamForm
               initialValues={initialValues}
               editing={true}
               onSubmit={this.onSubmitEdit.bind(this)}
@@ -255,7 +255,7 @@ class AudiencePopover extends Component {
         >
           <DialogContent>
             <DialogContentText>
-              {t('Do you want to remove the audience from the inject?')}
+              {t('Do you want to remove the team from the inject?')}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -275,7 +275,7 @@ class AudiencePopover extends Component {
         >
           <DialogContent>
             <DialogContentText>
-              {t('Do you want to enable this audience?')}
+              {t('Do you want to enable this team?')}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -295,7 +295,7 @@ class AudiencePopover extends Component {
         >
           <DialogContent>
             <DialogContentText>
-              {t('Do you want to disable this audience?')}
+              {t('Do you want to disable this team?')}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -312,16 +312,16 @@ class AudiencePopover extends Component {
   }
 }
 
-AudiencePopover.propTypes = {
+TeamPopover.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
   exercise: PropTypes.object,
-  audience: PropTypes.object,
-  updateAudience: PropTypes.func,
-  updateAudienceActivation: PropTypes.func,
-  deleteAudience: PropTypes.func,
-  setSelectedAudience: PropTypes.func,
-  onRemoveAudience: PropTypes.func,
+  team: PropTypes.object,
+  updateTeam: PropTypes.func,
+  updateTeamActivation: PropTypes.func,
+  deleteTeam: PropTypes.func,
+  setSelectedTeam: PropTypes.func,
+  onRemoveTeam: PropTypes.func,
   disabled: PropTypes.bool,
 };
 
@@ -333,9 +333,9 @@ const select = (state) => {
 
 export default R.compose(
   connect(select, {
-    updateAudience,
-    deleteAudience,
-    updateAudienceActivation,
+    updateTeam,
+    deleteTeam,
+    updateTeamActivation,
   }),
   inject18n,
-)(AudiencePopover);
+)(TeamPopover);
