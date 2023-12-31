@@ -213,7 +213,7 @@ const LeftBar = () => {
             )}
           </MenuItem>
         </StyledTooltip>
-        <StyledTooltip title={!navOpen && t('Reporting')} placement="right">
+        <StyledTooltip title={!navOpen && t('Reports')} placement="right">
           <MenuItem
             component={Link}
             to="/admin/reports"
@@ -227,7 +227,7 @@ const LeftBar = () => {
             {navOpen && (
             <ListItemText
               classes={{ primary: classes.menuItemText }}
-              primary={t('Reporting')}
+              primary={t('Reports')}
             />
             )}
           </MenuItem>
