@@ -142,7 +142,8 @@ const Teams = () => {
   ];
   const filtering = useSearchAnFilter('team', 'name', searchColumns);
   // Fetching data
-  const { teams, organizationsMap, tagsMap } = useHelper((helper) => ({
+  const { isPlanner, teams, organizationsMap, tagsMap } = useHelper((helper) => ({
+    isPlanner: helper.getMe().user_is_planner,
     teams: helper.getTeams(),
     organizationsMap: helper.getOrganizationsMap(),
     tagsMap: helper.getTagsMap(),
@@ -154,7 +155,7 @@ const Teams = () => {
   });
   const sortedTeams = filtering.filterAndSort(teams);
   return (
-    <div>
+    <>
       <div className={classes.parameters}>
         <div style={{ float: 'left', marginRight: 20 }}>
           <SearchFilter
@@ -318,8 +319,8 @@ const Teams = () => {
         />
         )}
       </Drawer>
-      <CreateTeam />
-    </div>
+      {isPlanner && <CreateTeam />}
+    </>
   );
 };
 

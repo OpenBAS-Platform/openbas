@@ -12,7 +12,6 @@ import { storeHelper } from '../../../../actions/Schema';
 import { fetchPlayers } from '../../../../actions/User';
 import CreatePlayer from '../players/CreatePlayer';
 import { resolveUserName, truncate } from '../../../../utils/String';
-import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import ItemTags from '../../../../components/ItemTags';
 import TagsFilter from '../../../../components/TagsFilter';
 
@@ -112,20 +111,12 @@ class TeamAddPlayers extends Component {
     } = this.props;
     const { keyword, usersIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.organization_name || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1
-      || (n.organization_description || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1;
+      || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || (n.organization_name || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || (n.organization_description || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
     const filteredUsers = R.pipe(
       R.map((u) => ({
         organization_name:

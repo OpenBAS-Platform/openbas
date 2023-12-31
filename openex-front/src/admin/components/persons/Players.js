@@ -137,7 +137,8 @@ const Players = () => {
   ];
   const filtering = useSearchAnFilter('user', 'email', searchColumns);
   // Fetching data
-  const { users, organizationsMap, tagsMap } = useHelper((helper) => ({
+  const { isPlanner, users, organizationsMap, tagsMap } = useHelper((helper) => ({
+    isPlanner: helper.getMe().user_is_planner,
     users: helper.getUsers(),
     organizationsMap: helper.getOrganizationsMap(),
     tagsMap: helper.getTagsMap(),
@@ -149,7 +150,7 @@ const Players = () => {
   });
   const sortedUsers = filtering.filterAndSort(users);
   return (
-    <div>
+    <>
       <div className={classes.parameters}>
         <div style={{ float: 'left', marginRight: 20 }}>
           <SearchFilter
@@ -300,8 +301,8 @@ const Players = () => {
           </ListItem>
         ))}
       </List>
-      <CreatePlayer />
-    </div>
+      {isPlanner && <CreatePlayer />}
+    </>
   );
 };
 

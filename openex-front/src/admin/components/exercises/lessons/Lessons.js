@@ -49,9 +49,8 @@ import {
   resetLessonsAnswers,
   sendLessons,
 } from '../../../../actions/Lessons';
-import { fetchTeams } from '../../../../actions/Team';
 import { resolveUserName } from '../../../../utils/String';
-import { updateExerciseLessons } from '../../../../actions/Exercise';
+import { fetchExerciseTeams, updateExerciseLessons } from '../../../../actions/Exercise';
 import SendLessonsForm from './SendLessonsForm';
 import { fetchPlayers } from '../../../../actions/User';
 import LessonsObjectives from './LessonsObjectives';
@@ -146,7 +145,7 @@ const Lessons = () => {
     dispatch(fetchLessonsAnswers(exerciseId));
     dispatch(fetchObjectives(exerciseId));
     dispatch(fetchInjects(exerciseId));
-    dispatch(fetchTeams(exerciseId));
+    dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchPlayers());
   });
   const applyTemplate = () => {

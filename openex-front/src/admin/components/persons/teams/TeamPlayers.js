@@ -16,6 +16,7 @@ import PlayerPopover from '../players/PlayerPopover';
 import { storeHelper } from '../../../../actions/Schema';
 import TeamAddPlayers from './TeamAddPlayers';
 import ItemBoolean from '../../../../components/ItemBoolean';
+import { isExerciseUpdatable } from '../../../../utils/Exercise';
 
 const styles = (theme) => ({
   header: {
@@ -246,20 +247,16 @@ class TeamsPlayers extends Component {
       exercise,
       teamId,
       t,
+      isPlanner,
     } = this.props;
+    const isWritePermission = exercise ? isExerciseUpdatable(exercise) : isPlanner;
     const { keyword, sortBy, orderAsc, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_organization || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1;
+      || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || (n.user_organization || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
@@ -436,19 +433,24 @@ class TeamsPlayers extends Component {
                 }
               />
               <ListItemSecondaryAction>
-                <PlayerPopover
-                  user={user}
-                  teamId={teamId}
-                  teamUsersIds={users.map((u) => u.user_id)}
-                />
+                {isWritePermission
+                  ? (<PlayerPopover
+                      user={user}
+                      teamId={teamId}
+                      teamUsersIds={users.map((u) => u.user_id)}
+                     />)
+                  : <span> &nbsp; </span>
+                }
               </ListItemSecondaryAction>
             </ListItem>
           ))}
         </List>
-        <TeamAddPlayers
-          teamId={teamId}
-          teamUsersIds={users.map((u) => u.user_id)}
-        />
+        {isWritePermission
+            && (<TeamAddPlayers
+              teamId={teamId}
+              teamUsersIds={users.map((u) => u.user_id)}
+                />)
+        }
       </>
     );
   }
@@ -459,6 +461,7 @@ TeamsPlayers.propTypes = {
   nsdt: PropTypes.func,
   teamId: PropTypes.string,
   team: PropTypes.object,
+  isPlanner: PropTypes.bool,
   exerciseId: PropTypes.string,
   exercise: PropTypes.object,
   organizations: PropTypes.array,
@@ -474,6 +477,7 @@ const select = (state, ownProps) => {
   const helper = storeHelper(state);
   const { teamId, exerciseId } = ownProps;
   return {
+    isPlanner: helper.getMe().user_is_planner,
     organizationsMap: helper.getOrganizationsMap(),
     exercise: exerciseId && helper.getExercise(exerciseId),
     team: helper.getTeam(teamId),

@@ -8,7 +8,7 @@ import * as R from 'ramda';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchTeams } from '../../../../actions/Team';
+import { fetchExerciseTeams } from '../../../../actions/Exercise';
 import { fetchInjects, fetchInjectTypes } from '../../../../actions/Inject';
 import Empty from '../../../../components/Empty';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -181,7 +181,7 @@ const Timeline = () => {
   const [selectedInject, setSelectedInject] = useState(null);
   useDataLoader(() => {
     dispatch(fetchInjectTypes());
-    dispatch(fetchTeams(exerciseId));
+    dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchInjects(exerciseId));
   });
   // Filter and sort hook

@@ -7,11 +7,10 @@ import { useDispatch } from 'react-redux';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchTeams } from '../../../../actions/Team';
 import ResultsMenu from '../ResultsMenu';
 import { fetchInjects, fetchInjectTypes } from '../../../../actions/Inject';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
-import { fetchExerciseInjectExpectations } from '../../../../actions/Exercise';
+import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../actions/Exercise';
 import { fetchPlayers } from '../../../../actions/User';
 import { fetchOrganizations } from '../../../../actions/Organization';
 import { fetchExerciseCommunications } from '../../../../actions/Communication';
@@ -117,7 +116,7 @@ const Dashboard = () => {
   });
   useDataLoader(() => {
     dispatch(fetchReports(exerciseId));
-    dispatch(fetchTeams(exerciseId));
+    dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchInjectTypes());
     dispatch(fetchInjects(exerciseId));
     dispatch(fetchExerciseChallenges(exerciseId));

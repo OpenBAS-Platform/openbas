@@ -110,17 +110,10 @@ class TeamAddTeams extends Component {
     } = this.props;
     const { keyword, teamsIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.team_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.team_description || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-        !== -1
-      || (n.organization_name || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1
-      || (n.organization_description || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1;
+      || (n.team_name || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || (n.team_description || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || (n.organization_name || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || (n.organization_description || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
     const filteredTeams = R.pipe(
       R.map((u) => ({
         organization_name:

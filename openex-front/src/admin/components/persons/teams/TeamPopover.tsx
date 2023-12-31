@@ -1,4 +1,4 @@
-import React, { FunctionComponent, MouseEventHandler, useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { Dialog as MuiDialog, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import Dialog from '../../../../components/common/Dialog';

@@ -117,9 +117,7 @@ const Variables = () => {
   useDataLoader(() => {
     dispatch(fetchVariables(exerciseId));
   });
-
   const permissions = usePermissions(exerciseId);
-
   const sortedVariables: [Variable] = filtering.filterAndSort(variables);
   return (
     <div className={classes.container}>
