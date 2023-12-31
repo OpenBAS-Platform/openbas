@@ -65,6 +65,12 @@ const headerStyles = {
     fontSize: 12,
     fontWeight: '700',
   },
+  team_users_number: {
+    float: 'left',
+    width: '8%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
   team_organization: {
     float: 'left',
     width: '20%',
@@ -74,12 +80,6 @@ const headerStyles = {
   team_tags: {
     float: 'left',
     width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  team_users_number: {
-    float: 'left',
-    width: '8%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -102,6 +102,14 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
+  team_users_number: {
+    float: 'left',
+    width: '8%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
   team_organization: {
     float: 'left',
     width: '20%',
@@ -113,14 +121,6 @@ const inlineStyles = {
   team_tags: {
     float: 'left',
     width: '25%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  team_users_number: {
-    float: 'left',
-    width: '8%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -234,6 +234,7 @@ const Teams = () => {
                   true,
                   headerStyles,
                 )}
+                {filtering.buildHeader('team_users_number', 'Players', true, headerStyles)}
                 {filtering.buildHeader(
                   'team_organization',
                   'Organization',
@@ -241,7 +242,6 @@ const Teams = () => {
                   headerStyles,
                 )}
                 {filtering.buildHeader('team_tags', 'Tags', true, headerStyles)}
-                {filtering.buildHeader('team_users_number', 'Players', true, headerStyles)}
               </div>
             }
           />
@@ -275,6 +275,12 @@ const Teams = () => {
                   </div>
                   <div
                     className={classes.bodyItem}
+                    style={inlineStyles.team_users_number}
+                  >
+                    <strong>{team.team_users_number}</strong>
+                  </div>
+                  <div
+                    className={classes.bodyItem}
                     style={inlineStyles.team_organization}
                   >
                     {organizationsMap[team.team_organization]
@@ -285,12 +291,6 @@ const Teams = () => {
                     style={inlineStyles.team_tags}
                   >
                     <ItemTags variant="list" tags={team.team_tags} />
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.team_users_number}
-                  >
-                    {team.team_users_number}
                   </div>
                 </div>
               }

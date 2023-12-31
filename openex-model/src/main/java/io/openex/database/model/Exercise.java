@@ -231,15 +231,13 @@ public class Exercise implements Base {
 
     @JsonProperty("exercise_users_number")
     public long usersNumber() {
-        return getTeams().stream().flatMap(team -> team.getUsers().stream()).distinct().count();
+        return getExerciseTeamUsers().stream().map(ExerciseTeamUser::getUser).distinct().count();
     }
 
     @JsonProperty("exercise_players")
     @JsonSerialize(using = MultiIdDeserializer.class)
     public List<User> getPlayers() {
-        return getTeams().stream().flatMap(team -> team.getUsers().stream())
-                .distinct()
-                .toList();
+        return getExerciseTeamUsers().stream().map(ExerciseTeamUser::getUser).distinct().toList();
     }
 
     @JsonProperty("exercise_score")

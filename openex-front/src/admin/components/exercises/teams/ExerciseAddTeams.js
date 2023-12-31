@@ -5,7 +5,7 @@ import * as R from 'ramda';
 import { Button, Slide, Chip, Avatar, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, Box, ListItemIcon, Grid, Fab } from '@mui/material';
 import { Add, GroupsOutlined } from '@mui/icons-material';
 import withStyles from '@mui/styles/withStyles';
-import { updateExerciseTeams } from '../../../../actions/Exercise';
+import { addExerciseTeams } from '../../../../actions/Exercise';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
@@ -85,11 +85,10 @@ class TeamAddTeams extends Component {
   }
 
   submitAddTeams() {
-    this.props.updateExerciseTeams(
+    this.props.addExerciseTeams(
       this.props.exerciseId,
       {
         exercise_teams: R.uniq([
-          ...this.props.exerciseTeamsIds,
           ...this.state.teamsIds,
         ]),
       },
@@ -249,7 +248,7 @@ class TeamAddTeams extends Component {
 TeamAddTeams.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
-  updateExerciseTeams: PropTypes.func,
+  addExerciseTeams: PropTypes.func,
   fetchTeams: PropTypes.func,
   organizations: PropTypes.array,
   teamsMap: PropTypes.object,
@@ -265,7 +264,7 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { updateExerciseTeams, fetchTeams }),
+  connect(select, { addExerciseTeams, fetchTeams }),
   inject18n,
   withStyles(styles),
 )(TeamAddTeams);

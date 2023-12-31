@@ -35,6 +35,14 @@ public class ExerciseTeamUserId implements Serializable {
         this.teamId = teamId;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

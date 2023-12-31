@@ -35,15 +35,27 @@ export const fetchExerciseTeams = (exerciseId) => (dispatch) => {
   return getReferential(schema.arrayOfTeams, uri)(dispatch);
 };
 
-export const updateExerciseTeams = (exerciseId, data) => (dispatch) => putReferential(
-  schema.exercise,
-  `/api/exercises/${exerciseId}/teams`,
+export const addExerciseTeams = (exerciseId, data) => (dispatch) => putReferential(
+  schema.arrayOfTeams,
+  `/api/exercises/${exerciseId}/teams/add`,
   data,
 )(dispatch);
 
-export const updateExerciseTeamPlayers = (exerciseId, teamId, data) => (dispatch) => putReferential(
+export const removeExerciseTeams = (exerciseId, data) => (dispatch) => putReferential(
+  schema.arrayOfTeams,
+  `/api/exercises/${exerciseId}/teams/remove`,
+  data,
+)(dispatch);
+
+export const addExerciseTeamPlayers = (exerciseId, teamId, data) => (dispatch) => putReferential(
   schema.exercise,
-  `/api/exercises/${exerciseId}/teams/${teamId}/players`,
+  `/api/exercises/${exerciseId}/teams/${teamId}/players/add`,
+  data,
+)(dispatch);
+
+export const removeExerciseTeamPlayers = (exerciseId, teamId, data) => (dispatch) => putReferential(
+  schema.exercise,
+  `/api/exercises/${exerciseId}/teams/${teamId}/players/remove`,
   data,
 )(dispatch);
 

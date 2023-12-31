@@ -12,7 +12,6 @@ import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import { fetchExerciseTeams } from '../../../../actions/Exercise';
 import TeamPopover from '../../persons/teams/TeamPopover';
-import ItemBoolean from '../../../../components/ItemBoolean';
 import TeamPlayers from '../../persons/teams/TeamPlayers';
 import { useHelper } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
@@ -65,7 +64,13 @@ const headerStyles = {
   },
   team_users_number: {
     float: 'left',
-    width: '10%',
+    width: '12%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  team_users_enabled_number: {
+    float: 'left',
+    width: '12%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -102,15 +107,15 @@ const inlineStyles = {
   },
   team_users_number: {
     float: 'left',
-    width: '10%',
+    width: '12%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  team_enabled: {
+  team_users_enabled_number: {
     float: 'left',
-    width: '15%',
+    width: '12%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -148,7 +153,10 @@ const Teams = () => {
   useDataLoader(() => {
     dispatch(fetchExerciseTeams(exerciseId));
   });
-  const sortedTeams = filtering.filterAndSort(teams);
+  const sortedTeams = filtering.filterAndSort(teams.map((n) => ({
+    team_users_enabled_number: exercise.exercise_teams_users.filter((o) => o.exercise_id === exerciseId && o.team_id === n.team_id).length,
+    ...n,
+  })));
   return (
     <div className={classes.container}>
       <DefinitionMenu exerciseId={exerciseId} />
@@ -178,6 +186,7 @@ const Teams = () => {
                   'team_name',
                   'team_description',
                   'team_users_number',
+                  'team_users_enabled_number',
                   'team_enabled',
                   'team_tags',
                 ],
@@ -235,8 +244,8 @@ const Teams = () => {
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'team_enabled',
-                  'Status',
+                  'team_users_enabled_number',
+                  'Enabled players',
                   true,
                   headerStyles,
                 )}
@@ -285,15 +294,9 @@ const Teams = () => {
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.team_enabled}
+                    style={inlineStyles.team_users_enabled_number}
                   >
-                    <ItemBoolean
-                      status={team.team_enabled}
-                      label={
-                        team.team_enabled ? t('Enabled') : t('Disabled')
-                      }
-                      variant="list"
-                    />
+                    {team.team_users_enabled_number}
                   </div>
                   <div
                     className={classes.bodyItem}
@@ -307,9 +310,7 @@ const Teams = () => {
             <ListItemSecondaryAction>
               <TeamPopover
                 exerciseId={exerciseId}
-                exercise={exercise}
                 team={team}
-                setSelectedTeam={setSelectedTeam}
                 disabled={permissions.readOnly}
               />
             </ListItemSecondaryAction>

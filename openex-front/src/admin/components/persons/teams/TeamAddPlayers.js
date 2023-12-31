@@ -108,7 +108,6 @@ class TeamAddPlayers extends Component {
       t,
       usersMap,
       teamUsersIds,
-      exercise,
       organizationsMap,
     } = this.props;
     const { keyword, usersIds, tags } = this.state;

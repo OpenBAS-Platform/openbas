@@ -1432,7 +1432,6 @@ class InjectDefinition extends Component {
                               <ListItemSecondaryAction>
                                 <TeamPopover
                                   exerciseId={exerciseId}
-                                  exercise={exercise}
                                   team={team}
                                   onRemoveTeam={this.handleRemoveTeam.bind(
                                     this,

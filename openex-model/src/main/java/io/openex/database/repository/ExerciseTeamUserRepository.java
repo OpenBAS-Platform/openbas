@@ -25,6 +25,10 @@ public interface ExerciseTeamUserRepository extends CrudRepository<ExerciseTeamU
     void deleteUserFromAllReferences(@Param("userId") String userId);
 
     @Modifying
+    @Query(value = "delete from exercises_teams_users i where i.team_id = :teamId", nativeQuery = true)
+    void deleteTeamFromAllReferences(@Param("teamId") String teamId);
+
+    @Modifying
     @Query(value = "insert into exercises_teams_users (exercise_id, team_id, user_id) " +
             "values (:exerciseId, :teamId, :userId)", nativeQuery = true)
     void addExerciseTeamUser(@Param("exerciseId") String exerciseId,

@@ -8,7 +8,7 @@ import { ArrowDropDownOutlined, ArrowDropUpOutlined, CloseRounded, EmailOutlined
 import inject18n from '../../../../components/i18n';
 import { fetchTeamPlayers } from '../../../../actions/Team';
 import { fetchOrganizations } from '../../../../actions/Organization';
-import { updateExerciseTeamPlayers } from '../../../../actions/Exercise';
+import { addExerciseTeamPlayers, removeExerciseTeamPlayers } from '../../../../actions/Exercise';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
@@ -79,6 +79,12 @@ const inlineStylesHeaders = {
     padding: 0,
     top: '0px',
   },
+  user_enabled: {
+    float: 'left',
+    width: '12%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
   user_email: {
     float: 'left',
     width: '30%',
@@ -99,19 +105,21 @@ const inlineStylesHeaders = {
   },
   user_tags: {
     float: 'left',
-    width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_enabled: {
-    float: 'left',
-    width: '10%',
+    width: '23%',
     fontSize: 12,
     fontWeight: '700',
   },
 };
 
 const inlineStyles = {
+  user_enabled: {
+    float: 'left',
+    width: '12%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
   user_email: {
     float: 'left',
     width: '30%',
@@ -138,15 +146,7 @@ const inlineStyles = {
   },
   user_tags: {
     float: 'left',
-    width: '25%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  user_enabled: {
-    float: 'left',
-    width: '10%',
+    width: '23%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -215,14 +215,24 @@ class TeamsPlayers extends Component {
     );
   }
 
-  handleToggleUser(userId) {
-    this.props.updateExerciseTeamPlayers(
-      this.props.exerciseId,
-      this.props.teamId,
-      {
-        exercise_team_players: [userId],
-      },
-    );
+  handleToggleUser(userId, enabled) {
+    if (!enabled) {
+      this.props.addExerciseTeamPlayers(
+        this.props.exerciseId,
+        this.props.teamId,
+        {
+          exercise_team_players: [userId],
+        },
+      );
+    } else {
+      this.props.removeExerciseTeamPlayers(
+        this.props.exerciseId,
+        this.props.teamId,
+        {
+          exercise_team_players: [userId],
+        },
+      );
+    }
   }
 
   render() {
@@ -233,7 +243,9 @@ class TeamsPlayers extends Component {
       team,
       organizationsMap,
       exerciseId,
+      exercise,
       teamId,
+      t,
     } = this.props;
     const { keyword, sortBy, orderAsc, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
@@ -260,10 +272,14 @@ class TeamsPlayers extends Component {
           ),
       ),
       R.filter(filterByKeyword),
+      R.map((n) => ({
+        user_enabled: exercise && exercise.exercise_teams_users.filter((o) => o.exercise_id === exerciseId && o.team_id === teamId && n.user_id === o.user_id).length > 0,
+        ...n,
+      })),
       sort,
     )(users);
     return (
-      <div>
+      <>
         <div className={classes.header}>
           <IconButton
             aria-label="Close"
@@ -315,13 +331,13 @@ class TeamsPlayers extends Component {
             </ListItemIcon>
             <ListItemText
               primary={
-                <div>
+                <>
+                  {exerciseId && this.sortHeader('user_enabled', 'Enabled', true)}
                   {this.sortHeader('user_email', 'Email address', true)}
                   {this.sortHeader('user_options', 'Options', false)}
                   {this.sortHeader('user_organization', 'Organization', true)}
                   {this.sortHeader('user_tags', 'Tags', true)}
-                  {exerciseId && this.sortHeader('user_enabled', 'Enabled', false)}
-                </div>
+                </>
               }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
@@ -337,7 +353,17 @@ class TeamsPlayers extends Component {
               </ListItemIcon>
               <ListItemText
                 primary={
-                  <div>
+                  <>
+                    {exerciseId && (
+                    <div className={classes.bodyItem} style={inlineStyles.user_enabled}>
+                      <ItemBoolean
+                        status={user.user_enabled}
+                        label={user.user_enabled ? t('Enabled') : t('Disabled')}
+                        onClick={this.handleToggleUser.bind(this, user.user_id, user.user_enabled)}
+                        variant="list"
+                      />
+                    </div>
+                    )}
                     <div
                       className={classes.bodyItem}
                       style={inlineStyles.user_email}
@@ -406,12 +432,7 @@ class TeamsPlayers extends Component {
                     >
                       <ItemTags variant="list" tags={user.user_tags} />
                     </div>
-                    {exerciseId && (
-                    <div className={classes.bodyItem} style={inlineStyles.user_enabled}>
-                      <ItemBoolean status={user.user_enabled} onClick={this.handleToggleUser.bind(this, user.user_id)} />
-                    </div>
-                    )}
-                  </div>
+                  </>
                 }
               />
               <ListItemSecondaryAction>
@@ -428,7 +449,7 @@ class TeamsPlayers extends Component {
           teamId={teamId}
           teamUsersIds={users.map((u) => u.user_id)}
         />
-      </div>
+      </>
     );
   }
 }
@@ -444,7 +465,8 @@ TeamsPlayers.propTypes = {
   users: PropTypes.array,
   fetchTeamPlayers: PropTypes.func,
   fetchOrganizations: PropTypes.func,
-  updateExerciseTeamPlayers: PropTypes.func,
+  addExerciseTeamPlayers: PropTypes.func,
+  removeExerciseTeamPlayers: PropTypes.func,
   handleClose: PropTypes.func,
 };
 
@@ -460,7 +482,7 @@ const select = (state, ownProps) => {
 };
 
 export default R.compose(
-  connect(select, { fetchTeamPlayers, fetchOrganizations, updateExerciseTeamPlayers }),
+  connect(select, { fetchTeamPlayers, fetchOrganizations, addExerciseTeamPlayers, removeExerciseTeamPlayers }),
   inject18n,
   withStyles(styles),
 )(TeamsPlayers);

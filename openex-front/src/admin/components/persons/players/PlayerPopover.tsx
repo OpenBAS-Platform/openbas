@@ -16,14 +16,12 @@ import type { PlayerInputForm, UserStore } from './Player';
 
 interface PlayerPopoverProps {
   user: UserStore;
-  exerciseId?: string;
   teamId?: string;
-  teamUsersIds?: string[];
+  anchorEl?: string[];
 }
 
 const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   user,
-  exerciseId,
   teamId,
   teamUsersIds,
 }) => {

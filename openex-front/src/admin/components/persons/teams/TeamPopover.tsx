@@ -3,12 +3,13 @@ import { Dialog as MuiDialog, DialogContent, DialogContentText, DialogActions, B
 import { MoreVert } from '@mui/icons-material';
 import Dialog from '../../../../components/common/Dialog';
 import { deleteTeam, updateTeam } from '../../../../actions/Team';
+import { removeExerciseTeams } from '../../../../actions/Exercise';
 import TeamForm from './TeamForm';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import Transition from '../../../../components/common/Transition';
 import type { TeamUpdateInput } from '../../../../utils/api-types';
-import { countryOption, Option, organizationOption, tagOptions } from '../../../../utils/Option';
+import { Option, organizationOption, tagOptions } from '../../../../utils/Option';
 import { useHelper } from '../../../../store';
 import type { ExercicesHelper, OrganizationsHelper, TagsHelper, TeamsHelper } from '../../../../actions/helper';
 import type { TeamInputForm, TeamStore } from './Team';
@@ -16,12 +17,13 @@ import type { TeamInputForm, TeamStore } from './Team';
 interface TeamPopoverProps {
   team: TeamStore;
   exerciseId?: string;
-  teamId?: string;
-  teamTeamsIds?: string[];
+  disabled: boolean,
 }
 
 const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   team,
+  exerciseId,
+  disabled,
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -38,6 +40,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
 
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
+  const [openRemove, setOpenRemove] = useState(false);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   // Popover
@@ -77,18 +80,33 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
     dispatch(deleteTeam(team.team_id)).then(() => handleCloseDelete());
   };
 
+  // Remove
+  const handleOpenRemove = () => {
+    setOpenRemove(true);
+    handlePopoverClose();
+  };
+
+  const handleCloseRemove = () => setOpenRemove(false);
+
+  const submitRemove = () => {
+    return dispatch(
+      removeExerciseTeams(exerciseId, {
+        exercise_teams: [team.team_id],
+      }),
+    ).then(() => handleCloseRemove());
+  };
+
   const initialValues: TeamInputForm = {
     ...team,
     team_organization: organizationOption(
       team.team_organization,
       organizationsMap,
     ),
-    team_country: countryOption(team.team_country),
     team_tags: tagOptions(team.team_tags, tagsMap),
   };
   return (
-    <div>
-      <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large">
+    <>
+      <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large" disabled={disabled}>
         <MoreVert />
       </IconButton>
       <Menu
@@ -97,6 +115,11 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
         onClose={handlePopoverClose}
       >
         <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
+        {exerciseId && (
+        <MenuItem onClick={handleOpenRemove}>
+          {t('Remove from the exercise')}
+        </MenuItem>
+        )}
         <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
       </Menu>
       <MuiDialog
@@ -129,7 +152,25 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
           editing={true}
         />
       </Dialog>
-    </div>
+      <MuiDialog
+        open={openRemove}
+        TransitionComponent={Transition}
+        onClose={handleCloseRemove}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t('Do you want to remove the team from the simulation?')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseRemove}>{t('Cancel')}</Button>
+          <Button color="secondary" onClick={submitRemove}>
+            {t('Remove')}
+          </Button>
+        </DialogActions>
+      </MuiDialog>
+    </>
   );
 };
 

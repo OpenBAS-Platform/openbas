@@ -9,6 +9,7 @@ TeamUpdateInput,
   team_tags: Option[];
 };
 export type TeamStore = Omit<User, 'team_organization' | 'team_tags'> & {
+  team_id: string | undefined,
   team_organization: string | undefined;
   team_tags: string[] | undefined;
 };

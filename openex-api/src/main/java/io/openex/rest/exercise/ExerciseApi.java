@@ -314,17 +314,38 @@ public class ExerciseApi extends RestBehavior {
         return exercise.getTeams();
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/teams")
+    @Transactional(rollbackOn = Exception.class)
+    @PutMapping("/api/exercises/{exerciseId}/teams/add")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public Exercise updateExerciseTeams(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateTeamsInput input) {
+    public Iterable<Team> addExerciseTeams(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateTeamsInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        exercise.setTeams(fromIterable(teamRepository.findAllById(input.getTeamIds())));
-        return exerciseRepository.save(exercise);
+        List<Team> teams = exercise.getTeams();
+        teams.addAll(fromIterable(teamRepository.findAllById(input.getTeamIds())));
+        exercise.setTeams(teams);
+        exerciseRepository.save(exercise);
+        return teamRepository.findAllById(input.getTeamIds());
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/teams/{teamId}/players")
+    @Transactional(rollbackOn = Exception.class)
+    @PutMapping("/api/exercises/{exerciseId}/teams/remove")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public Exercise updateExerciseTeamPlayers(@PathVariable String exerciseId, @PathVariable String teamId, @Valid @RequestBody ExerciseTeamPlayersEnableInput input) {
+    public Iterable<Team> removeExerciseTeams(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateTeamsInput input) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        // Remove teams from exercise
+        List<Team> teams = exercise.getTeams().stream().filter(team -> !input.getTeamIds().contains(team.getId())).toList();
+        exercise.setTeams(fromIterable(teams));
+        exerciseRepository.save(exercise);
+        // Remove all association between users / exercises / teams
+        input.getTeamIds().forEach(teamId -> {
+            exerciseTeamUserRepository.deleteTeamFromAllReferences(teamId);
+        });
+        return teamRepository.findAllById(input.getTeamIds());
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    @PutMapping("/api/exercises/{exerciseId}/teams/{teamId}/players/add")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Exercise addExerciseTeamPlayers(@PathVariable String exerciseId, @PathVariable String teamId, @Valid @RequestBody ExerciseTeamPlayersEnableInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Team team = teamRepository.findById(teamId).orElseThrow();
         input.getPlayersIds().forEach(playerId -> {
@@ -333,6 +354,20 @@ public class ExerciseApi extends RestBehavior {
             exerciseTeamUser.setTeam(team);
             exerciseTeamUser.setUser(userRepository.findById(playerId).orElseThrow());
             exerciseTeamUserRepository.save(exerciseTeamUser);
+        });
+        return exerciseRepository.findById(exerciseId).orElseThrow();
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    @PutMapping("/api/exercises/{exerciseId}/teams/{teamId}/players/remove")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Exercise removeExerciseTeamPlayers(@PathVariable String exerciseId, @PathVariable String teamId, @Valid @RequestBody ExerciseTeamPlayersEnableInput input) {
+        input.getPlayersIds().forEach(playerId -> {
+            ExerciseTeamUserId exerciseTeamUserId = new ExerciseTeamUserId();
+            exerciseTeamUserId.setExerciseId(exerciseId);
+            exerciseTeamUserId.setTeamId(teamId);
+            exerciseTeamUserId.setUserId(playerId);
+            exerciseTeamUserRepository.deleteById(exerciseTeamUserId);
         });
         return exerciseRepository.findById(exerciseId).orElseThrow();
     }
