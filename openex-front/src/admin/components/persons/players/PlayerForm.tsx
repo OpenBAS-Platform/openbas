@@ -37,7 +37,6 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
-
   const playerFormSchemaValidation = z.object({
     user_email: z.string().email(t('Should be a valid email address')),
     user_phone: z
@@ -49,7 +48,6 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
       .optional()
       .nullable(),
   });
-
   return (
     <Form
       keepDirtyOnReinitialize={true}

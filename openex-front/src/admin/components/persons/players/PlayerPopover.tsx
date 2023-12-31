@@ -17,6 +17,7 @@ import type { PlayerInputForm, UserStore } from './Player';
 interface PlayerPopoverProps {
   user: UserStore;
   teamId?: string;
+  teamUsersIds?: string[];
   anchorEl?: string[];
 }
 

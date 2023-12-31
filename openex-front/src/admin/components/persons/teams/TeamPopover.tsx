@@ -17,7 +17,7 @@ import type { TeamInputForm, TeamStore } from './Team';
 interface TeamPopoverProps {
   team: TeamStore;
   exerciseId?: string;
-  onRemoveTeam?: never,
+  onRemoveTeam?: (teamId: string | undefined) => void,
 }
 
 const TeamPopover: FunctionComponent<TeamPopoverProps> = ({

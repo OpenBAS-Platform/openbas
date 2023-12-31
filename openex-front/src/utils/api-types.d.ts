@@ -1154,7 +1154,7 @@ export interface Team {
   team_injects_expectations_total_score?: number;
   /** @format int64 */
   team_injects_number?: number;
-  team_name?: string;
+  team_name: string;
   team_organization?: Organization;
   team_tags?: Tag[];
   /** @format date-time */

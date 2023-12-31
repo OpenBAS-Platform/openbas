@@ -12,6 +12,7 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,18 +32,23 @@ public class Team implements Base {
     @JsonProperty("team_id")
     private String id;
 
+    @Setter
     @Column(name = "team_name")
+    @NotBlank
     @JsonProperty("team_name")
     private String name;
 
+    @Setter
     @Column(name = "team_description")
     @JsonProperty("team_description")
     private String description;
 
+    @Setter
     @Column(name = "team_created_at")
     @JsonProperty("team_created_at")
     private Instant createdAt = now();
 
+    @Setter
     @Column(name = "team_updated_at")
     @JsonProperty("team_updated_at")
     private Instant updatedAt = now();
@@ -217,6 +223,10 @@ public class Team implements Base {
         return getInjects().stream().flatMap(inject -> inject.getCommunications().stream())
                 .distinct()
                 .toList();
+    }
+
+    public long getUsersNumberInExercise(Exercise exercise) {
+        return getExerciseTeamUsers().stream().filter(exerciseTeamUser -> exerciseTeamUser.getExercise().getId().equals(exercise.getId())).toList().size();
     }
 
     @Override
