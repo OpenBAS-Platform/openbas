@@ -130,7 +130,7 @@ public class Exercise implements Base {
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty("exercise_teams_users")
     @JsonSerialize(using = MultiModelDeserializer.class)
-    private List<ExerciseTeamUser> exerciseTeamUsers = new ArrayList<>();
+    private List<ExerciseTeamUser> teamUsers = new ArrayList<>();
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -229,15 +229,20 @@ public class Exercise implements Base {
         return user.isAdmin() || getObservers().contains(user);
     }
 
-    @JsonProperty("exercise_users_number")
-    public long usersNumber() {
-        return getExerciseTeamUsers().stream().map(ExerciseTeamUser::getUser).distinct().count();
+    @JsonProperty("exercise_all_users_number")
+    public long usersAllNumber() {
+        return getTeams().stream().mapToLong(Team::getUsersNumber).sum();
     }
 
-    @JsonProperty("exercise_players")
+    @JsonProperty("exercise_users_number")
+    public long usersNumber() {
+        return getTeamUsers().stream().map(ExerciseTeamUser::getUser).distinct().count();
+    }
+
+    @JsonProperty("exercise_users")
     @JsonSerialize(using = MultiIdDeserializer.class)
-    public List<User> getPlayers() {
-        return getExerciseTeamUsers().stream().map(ExerciseTeamUser::getUser).distinct().toList();
+    public List<User> getUsers() {
+        return getTeamUsers().stream().map(ExerciseTeamUser::getUser).distinct().toList();
     }
 
     @JsonProperty("exercise_score")
@@ -421,12 +426,12 @@ public class Exercise implements Base {
         this.teams = teams;
     }
 
-    public List<ExerciseTeamUser> getExerciseTeamUsers() {
-        return exerciseTeamUsers;
+    public List<ExerciseTeamUser> getTeamUsers() {
+        return teamUsers;
     }
 
-    public void setExerciseTeamUsers(List<ExerciseTeamUser> exerciseTeamUsers) {
-        this.exerciseTeamUsers = exerciseTeamUsers;
+    public void setTeamUsers(List<ExerciseTeamUser> teamUsers) {
+        this.teamUsers = teamUsers;
     }
 
     public List<Pause> getPauses() {

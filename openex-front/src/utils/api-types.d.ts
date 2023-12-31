@@ -165,12 +165,12 @@ export interface Comcheck {
 }
 
 export interface ComcheckInput {
-  comcheck_audiences?: string[];
   /** @format date-time */
   comcheck_end_date?: string;
   comcheck_message?: string;
   comcheck_name: string;
   comcheck_subject?: string;
+  comcheck_teams?: string[];
 }
 
 export interface ComcheckStatus {
@@ -397,6 +397,8 @@ export interface ExecutionTrace {
 }
 
 export interface Exercise {
+  /** @format int64 */
+  exercise_all_users_number?: number;
   exercise_articles?: Article[];
   /** @format int64 */
   exercise_communications_number?: number;
@@ -427,7 +429,6 @@ export interface Exercise {
   exercise_observers?: User[];
   exercise_pauses?: Pause[];
   exercise_planners?: User[];
-  exercise_players?: User[];
   /** @format double */
   exercise_score?: number;
   /** @format date-time */
@@ -436,8 +437,10 @@ export interface Exercise {
   exercise_subtitle?: string;
   exercise_tags?: Tag[];
   exercise_teams?: Team[];
+  exercise_teams_users?: ExerciseTeamUser[];
   /** @format date-time */
   exercise_updated_at?: string;
+  exercise_users?: User[];
   /** @format int64 */
   exercise_users_number?: number;
   updateAttributes?: object;
@@ -466,6 +469,16 @@ export interface ExerciseSimple {
   exercise_tags?: Tag[];
 }
 
+export interface ExerciseTeamPlayersEnableInput {
+  exercise_team_players?: string[];
+}
+
+export interface ExerciseTeamUser {
+  exercise_id?: Exercise;
+  team_id?: Team;
+  user_id?: User;
+}
+
 export interface ExerciseUpdateInput {
   exercise_description?: string;
   exercise_mail_from?: string;
@@ -491,6 +504,10 @@ export interface ExerciseUpdateStatusInput {
 
 export interface ExerciseUpdateTagsInput {
   exercise_tags?: string[];
+}
+
+export interface ExerciseUpdateTeamsInput {
+  exercise_teams?: string[];
 }
 
 export interface ExpectationUpdateInput {
@@ -621,8 +638,7 @@ export interface InjectExpectation {
 }
 
 export interface InjectInput {
-  inject_all_audiences?: boolean;
-  inject_audiences?: string[];
+  inject_all_teams?: boolean;
   inject_city?: string;
   inject_content?: object;
   inject_contract?: string;
@@ -633,6 +649,7 @@ export interface InjectInput {
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
   inject_tags?: string[];
+  inject_teams?: string[];
   inject_title?: string;
 }
 
@@ -1125,6 +1142,7 @@ export interface Team {
   team_created_at?: string;
   team_description?: string;
   team_exercises?: Exercise[];
+  team_exercises_users?: ExerciseTeamUser[];
   team_id?: string;
   team_inject_expectations?: InjectExpectation[];
   team_injects?: Inject[];

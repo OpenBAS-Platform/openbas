@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, MouseEventHandler, useState } from 'react';
 import { Dialog as MuiDialog, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import Dialog from '../../../../components/common/Dialog';
@@ -17,12 +17,14 @@ import type { TeamInputForm, TeamStore } from './Team';
 interface TeamPopoverProps {
   team: TeamStore;
   exerciseId?: string;
+  onRemoveTeam?: never,
   disabled: boolean,
 }
 
 const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   team,
   exerciseId,
+  onRemoveTeam,
   disabled,
 }) => {
   const { t } = useFormatter();
@@ -115,9 +117,14 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
         onClose={handlePopoverClose}
       >
         <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
-        {exerciseId && (
-        <MenuItem onClick={handleOpenRemove}>
-          {t('Remove from the exercise')}
+        {exerciseId && !onRemoveTeam && (
+          <MenuItem onClick={handleOpenRemove}>
+            {t('Remove from the exercise')}
+          </MenuItem>
+        )}
+        {onRemoveTeam && (
+        <MenuItem onClick={() => onRemoveTeam(team.team_id)}>
+          {t('Remove from the inject')}
         </MenuItem>
         )}
         <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>

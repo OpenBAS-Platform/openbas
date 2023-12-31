@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, Drawer, ListItemIcon, ListItemText, ListItemSecondaryAction, Tooltip, IconButton } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { CastForEducationOutlined, FileDownloadOutlined } from '@mui/icons-material';
+import { GroupsOutlined, FileDownloadOutlined } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import { CSVLink } from 'react-csv';
 import { useFormatter } from '../../../../components/i18n';
@@ -269,7 +269,7 @@ const Teams = () => {
             onClick={() => setSelectedTeam(team.team_id)}
           >
             <ListItemIcon>
-              <CastForEducationOutlined />
+              <GroupsOutlined />
             </ListItemIcon>
             <ListItemText
               primary={

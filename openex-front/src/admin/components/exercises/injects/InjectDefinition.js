@@ -23,7 +23,7 @@ import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
   AttachmentOutlined,
-  CastForEducationOutlined,
+  GroupsOutlined,
   CloseRounded,
   ControlPointOutlined,
   DeleteOutlined,
@@ -125,7 +125,7 @@ const inlineStylesHeaders = {
     fontSize: 12,
     fontWeight: '700',
   },
-  team_enabled: {
+  team_users_enabled_number: {
     float: 'left',
     width: '15%',
     fontSize: 12,
@@ -220,7 +220,7 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  team_enabled: {
+  team_users_enabled_number: {
     float: 'left',
     width: '15%',
     height: 20,
@@ -1081,7 +1081,10 @@ class InjectDefinition extends Component {
         ? [R.ascend(R.prop(teamsSortBy))]
         : [R.descend(R.prop(teamsSortBy))],
     );
-    const sortedTeams = sortTeams(teams);
+    const sortedTeams = sortTeams(teams.map((n) => ({
+      team_users_enabled_number: exercise.exercise_teams_users.filter((o) => o.exercise_id === exerciseId && o.team_id === n.team_id).length,
+      ...n,
+    })));
     const hasTeams = injectType.fields
       .map((f) => f.key)
       .includes('teams');
@@ -1313,8 +1316,8 @@ class InjectDefinition extends Component {
                                 true,
                               )}
                               {this.teamsSortHeader(
-                                'team_enabled',
-                                'Status',
+                                'team_users_enabled_number',
+                                'Enabled players',
                                 true,
                               )}
                               {this.teamsSortHeader(
@@ -1335,7 +1338,7 @@ class InjectDefinition extends Component {
                           divider={true}
                         >
                           <ListItemIcon>
-                            <CastForEducationOutlined />
+                            <GroupsOutlined />
                           </ListItemIcon>
                           <ListItemText
                             primary={
@@ -1351,18 +1354,16 @@ class InjectDefinition extends Component {
                                   style={inlineStyles.team_users_number}
                                 >
                                   <strong>
-                                    {exercise.exercise_users_number}
+                                    {exercise.exercise_all_users_number}
                                   </strong>
                                 </div>
                                 <div
                                   className={classes.bodyItem}
-                                  style={inlineStyles.team_enabled}
+                                  style={inlineStyles.team_users_enabled_number}
                                 >
-                                  <ItemBoolean
-                                    status={true}
-                                    label={t('Enabled')}
-                                    variant="list"
-                                  />
+                                  <strong>
+                                    {exercise.exercise_users_number}
+                                  </strong>
                                 </div>
                                 <div
                                   className={classes.bodyItem}
@@ -1386,7 +1387,7 @@ class InjectDefinition extends Component {
                               divider={true}
                             >
                               <ListItemIcon>
-                                <CastForEducationOutlined />
+                                <GroupsOutlined />
                               </ListItemIcon>
                               <ListItemText
                                 primary={
@@ -1405,17 +1406,9 @@ class InjectDefinition extends Component {
                                     </div>
                                     <div
                                       className={classes.bodyItem}
-                                      style={inlineStyles.team_enabled}
+                                      style={inlineStyles.team_users_enabled_number}
                                     >
-                                      <ItemBoolean
-                                        status={team.team_enabled}
-                                        label={
-                                          team.team_enabled
-                                            ? t('Enabled')
-                                            : t('Disabled')
-                                        }
-                                        variant="list"
-                                      />
+                                      {team.team_users_enabled_number}
                                     </div>
                                     <div
                                       className={classes.bodyItem}
@@ -1432,6 +1425,7 @@ class InjectDefinition extends Component {
                               <ListItemSecondaryAction>
                                 <TeamPopover
                                   exerciseId={exerciseId}
+                                  injectId={inject.inject_id}
                                   team={team}
                                   onRemoveTeam={this.handleRemoveTeam.bind(
                                     this,

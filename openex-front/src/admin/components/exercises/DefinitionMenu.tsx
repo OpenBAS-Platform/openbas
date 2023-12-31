@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Drawer, MenuList, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
-import { AttachMoneyOutlined, CastForEducationOutlined, EmojiEventsOutlined } from '@mui/icons-material';
+import { AttachMoneyOutlined, GroupsOutlined, EmojiEventsOutlined } from '@mui/icons-material';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../components/i18n';
@@ -50,7 +50,7 @@ const DefinitionMenu: React.FC<Props> = ({ exerciseId }) => {
           classes={{ root: classes.item }}
         >
           <ListItemIcon>
-            <CastForEducationOutlined />
+            <GroupsOutlined />
           </ListItemIcon>
           <ListItemText primary={t('Teams')} />
         </MenuItem>

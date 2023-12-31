@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Button, Chip, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, Box, ListItemIcon, Grid } from '@mui/material';
-import { CastForEducationOutlined, ControlPointOutlined } from '@mui/icons-material';
+import { GroupsOutlined, ControlPointOutlined } from '@mui/icons-material';
 import withStyles from '@mui/styles/withStyles';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
@@ -197,7 +197,7 @@ class InjectAddTeams extends Component {
                         )}
                       >
                         <ListItemIcon>
-                          <CastForEducationOutlined />
+                          <GroupsOutlined />
                         </ListItemIcon>
                         <ListItemText
                           primary={team.team_name}
@@ -226,7 +226,7 @@ class InjectAddTeams extends Component {
                         key={teamId}
                         onDelete={this.removeTeam.bind(this, teamId)}
                         label={truncate(team?.team_name || '', 22)}
-                        icon={<CastForEducationOutlined />}
+                        icon={<GroupsOutlined />}
                         classes={{ root: classes.chip }}
                       />
                     );
