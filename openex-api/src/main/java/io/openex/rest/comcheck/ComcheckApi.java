@@ -1,7 +1,7 @@
 package io.openex.rest.comcheck;
 
 import io.openex.database.model.*;
-import io.openex.database.repository.AudienceRepository;
+import io.openex.database.repository.TeamRepository;
 import io.openex.database.repository.ComcheckRepository;
 import io.openex.database.repository.ComcheckStatusRepository;
 import io.openex.database.repository.ExerciseRepository;
@@ -22,7 +22,7 @@ import static java.time.Instant.now;
 public class ComcheckApi extends RestBehavior {
 
     private ComcheckRepository comcheckRepository;
-    private AudienceRepository audienceRepository;
+    private TeamRepository teamRepository;
     private ExerciseRepository exerciseRepository;
     private ComcheckStatusRepository comcheckStatusRepository;
 
@@ -37,8 +37,8 @@ public class ComcheckApi extends RestBehavior {
     }
 
     @Autowired
-    public void setAudienceRepository(AudienceRepository audienceRepository) {
-        this.audienceRepository = audienceRepository;
+    public void setTeamRepository(TeamRepository teamRepository) {
+        this.teamRepository = teamRepository;
     }
 
     @Autowired
@@ -83,10 +83,10 @@ public class ComcheckApi extends RestBehavior {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         check.setExercise(exercise);
         // 02. Get users
-        List<String> audienceIds = comCheck.getAudienceIds();
-        List<Audience> audiences = audienceIds.isEmpty() ? exercise.getAudiences() :
-                fromIterable(audienceRepository.findAllById(audienceIds));
-        List<User> users = audiences.stream().flatMap(audience -> audience.getUsers().stream()).distinct().toList();
+        List<String> teamIds = comCheck.getTeamIds();
+        List<Team> teams = teamIds.isEmpty() ? exercise.getTeams() :
+                fromIterable(teamRepository.findAllById(teamIds));
+        List<User> users = teams.stream().flatMap(team -> team.getUsers().stream()).distinct().toList();
         List<ComcheckStatus> comcheckStatuses = users.stream().map(user -> {
             ComcheckStatus comcheckStatus = new ComcheckStatus(user);
             comcheckStatus.setComcheck(check);

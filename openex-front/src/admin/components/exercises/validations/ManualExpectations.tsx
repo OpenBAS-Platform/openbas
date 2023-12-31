@@ -2,9 +2,9 @@ import React, { FunctionComponent, useState } from 'react';
 import { List, ListItemButton, ListItemIcon, ListItemText, Chip } from '@mui/material';
 import { AssignmentTurnedIn } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import type { Audience, Inject } from '../../../../utils/api-types';
+import type { Team, Inject } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
-import type { AudiencesHelper } from '../../../../actions/helper';
+import type { TeamsHelper } from '../../../../actions/helper';
 import type { InjectExpectationsStore } from '../injects/expectations/Expectation';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
@@ -52,18 +52,18 @@ const ManualExpectations: FunctionComponent<Props> = ({
   const classes = useStyles();
   const { t } = useFormatter();
 
-  const { audiencesMap }: { audiencesMap: Record<string, Audience> } = useHelper((helper: AudiencesHelper) => {
+  const { teamsMap }: { teamsMap: Record<string, Team> } = useHelper((helper: TeamsHelper) => {
     return ({
-      audiencesMap: helper.getAudiencesMap(),
+      teamsMap: helper.getTeamsMap(),
     });
   });
 
-  const groupedByAudience = expectations.reduce((group: Map<string, InjectExpectationsStore[]>, expectation) => {
-    const { inject_expectation_audience } = expectation;
-    if (inject_expectation_audience) {
-      const values = group.get(inject_expectation_audience) ?? [];
+  const groupedByTeam = expectations.reduce((group: Map<string, InjectExpectationsStore[]>, expectation) => {
+    const { inject_expectation_team } = expectation;
+    if (inject_expectation_team) {
+      const values = group.get(inject_expectation_team) ?? [];
       values.push(expectation);
-      group.set(inject_expectation_audience, values);
+      group.set(inject_expectation_team, values);
     }
     return group;
   }, new Map());
@@ -73,9 +73,9 @@ const ManualExpectations: FunctionComponent<Props> = ({
   return (
     <>
       <List component="div" disablePadding>
-        {Array.from(groupedByAudience)
+        {Array.from(groupedByTeam)
           .map(([entry, values]) => {
-            const audience = audiencesMap[entry] || {};
+            const team = teamsMap[entry] || {};
             const expectationValues = values
               .reduce((acc, el) => ({
                 ...acc,
@@ -90,7 +90,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
             }
             return (
               <ListItemButton
-                key={audience.audience_id}
+                key={team.team_id}
                 divider
                 sx={{ pl: 8 }}
                 classes={{ root: classes.item }}

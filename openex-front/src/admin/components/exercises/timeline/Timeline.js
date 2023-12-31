@@ -8,7 +8,7 @@ import * as R from 'ramda';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchAudiences } from '../../../../actions/Audience';
+import { fetchExerciseTeams } from '../../../../actions/Exercise';
 import { fetchInjects, fetchInjectTypes } from '../../../../actions/Inject';
 import Empty from '../../../../components/Empty';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -139,49 +139,49 @@ const Timeline = () => {
   const { t, fndt } = useFormatter();
   const {
     exercise,
-    audiences,
+    teams,
     injects,
     injectTypesMap,
-    injectTypesWithNoAudiences,
+    injectTypesWithNoTeams,
     exercisesMap,
     tagsMap,
-    audiencesInjectsMap,
+    teamsInjectsMap,
     technicalInjectsMap,
   } = useHelper((helper) => {
-    const exerciseAudiences = helper.getExerciseAudiences(exerciseId);
-    const injectsPerAudience = R.mergeAll(
-      exerciseAudiences.map((a) => ({
-        [a.audience_id]: helper.getAudienceInjects(a.audience_id),
+    const exerciseTeams = helper.getExerciseTeams(exerciseId);
+    const injectsPerTeam = R.mergeAll(
+      exerciseTeams.map((a) => ({
+        [a.team_id]: helper.getTeamInjects(a.team_id),
       })),
     );
     return {
       exercise: helper.getExercise(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
-      audiences: exerciseAudiences,
+      teams: exerciseTeams,
       exercisesMap: helper.getExercisesMap(),
       tagsMap: helper.getTagsMap(),
-      audiencesInjectsMap: injectsPerAudience,
+      teamsInjectsMap: injectsPerTeam,
       technicalInjectsMap:
         helper.getExerciseTechnicalInjectsPerType(exerciseId),
       injectTypesMap: helper.getInjectTypesMap(),
-      injectTypesWithNoAudiences: helper.getInjectTypesWithNoAudiences(),
+      injectTypesWithNoTeams: helper.getInjectTypesWithNoTeams(),
     };
   });
-  const technicalAudiences = injectTypesWithNoAudiences
+  const technicalTeams = injectTypesWithNoTeams
     .filter(
       (injectType) => injects.filter((i) => i.inject_type === injectType).length > 0,
     )
-    .map((type) => ({ audience_id: type, audience_name: type }));
-  const sortedNativeAudiences = R.sortWith(
-    [R.ascend(R.prop('audience_name'))],
-    audiences,
+    .map((type) => ({ team_id: type, team_name: type }));
+  const sortedNativeTeams = R.sortWith(
+    [R.ascend(R.prop('team_name'))],
+    teams,
   );
-  const sortedAudiences = [...technicalAudiences, ...sortedNativeAudiences];
-  const injectsMap = { ...audiencesInjectsMap, ...technicalInjectsMap };
+  const sortedTeams = [...technicalTeams, ...sortedNativeTeams];
+  const injectsMap = { ...teamsInjectsMap, ...technicalInjectsMap };
   const [selectedInject, setSelectedInject] = useState(null);
   useDataLoader(() => {
     dispatch(fetchInjectTypes());
-    dispatch(fetchAudiences(exerciseId));
+    dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchInjects(exerciseId));
   });
   // Filter and sort hook
@@ -252,33 +252,33 @@ const Timeline = () => {
         </div>
       </div>
       <div className="clearfix" />
-      {sortedAudiences.length > 0 ? (
+      {sortedTeams.length > 0 ? (
         <div className={classes.container}>
           <div className={classes.names}>
-            {sortedAudiences.map((audience) => (
-              <div key={audience.audience_id} className={classes.lineName}>
+            {sortedTeams.map((team) => (
+              <div key={team.team_id} className={classes.lineName}>
                 <div className={classes.name}>
-                  {audience.audience_name.startsWith('openex_') ? (
+                  {team.team_name.startsWith('openex_') ? (
                     <CastOutlined fontSize="small" />
                   ) : (
                     <CastForEducationOutlined fontSize="small" />
                   )}
                   &nbsp;&nbsp;
-                  {audience.audience_name.startsWith('openex_')
-                    ? t(audience.audience_name)
-                    : truncate(audience.audience_name, 20)}
+                  {team.team_name.startsWith('openex_')
+                    ? t(team.team_name)
+                    : truncate(team.team_name, 20)}
                 </div>
               </div>
             ))}
           </div>
           <div className={classes.timeline}>
-            {sortedAudiences.map((audience, index) => {
+            {sortedTeams.map((team, index) => {
               const injectsGroupedByTick = byTick(
-                filtering.filterAndSort(injectsMap[audience.audience_id]),
+                filtering.filterAndSort(injectsMap[team.team_id]),
               );
               return (
                 <div
-                  key={audience.audience_id}
+                  key={team.team_id}
                   className={classes.line}
                   style={{ backgroundColor: index % 2 === 0 ? grid0 : grid5 }}
                 >
@@ -349,7 +349,7 @@ const Timeline = () => {
               <div className={classes.name}>
                 <CastForEducationOutlined fontSize="small" />
                 &nbsp;&nbsp;
-                {t('No audience')}
+                {t('No team')}
               </div>
             </div>
           </div>

@@ -15,7 +15,7 @@ class ComcheckForm extends Component {
     const errors = {};
     const requiredFields = [
       'comcheck_name',
-      'comcheck_audiences',
+      'comcheck_teams',
       'comcheck_end_date',
       'comcheck_subject',
       'comcheck_message',
@@ -29,8 +29,8 @@ class ComcheckForm extends Component {
   }
 
   render() {
-    const { t, onSubmit, handleClose, initialValues, audiences } = this.props;
-    const audiencesbyId = R.indexBy(R.prop('audience_id'), audiences);
+    const { t, onSubmit, handleClose, initialValues, teams } = this.props;
+    const teamsbyId = R.indexBy(R.prop('team_id'), teams);
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -53,28 +53,28 @@ class ComcheckForm extends Component {
             />
             <Select
               variant="standard"
-              name="comcheck_audiences"
+              name="comcheck_teams"
               fullWidth={true}
               multiple={true}
               displayEmpty={true}
-              label={t('Audiences')}
+              label={t('Teams')}
               renderValue={(v) => (v.length === 0 ? (
-                <em>{t('All audiences')}</em>
+                <em>{t('All teams')}</em>
               ) : (
-                v.map((a) => audiencesbyId[a].audience_name).join(', ')
+                v.map((a) => teamsbyId[a].team_name).join(', ')
               ))
               }
               style={{ marginTop: 20 }}
             >
               <MenuItem disabled value="">
-                <em>{t('All audiences')}</em>
+                <em>{t('All teams')}</em>
               </MenuItem>
-              {audiences.map((audience) => (
+              {teams.map((team) => (
                 <MenuItem
-                  key={audience.audience_id}
-                  value={audience.audience_id}
+                  key={team.team_id}
+                  value={team.team_id}
                 >
-                  {audience.audience_name}
+                  {team.team_name}
                 </MenuItem>
               ))}
             </Select>
@@ -132,7 +132,7 @@ ComcheckForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
-  audiences: PropTypes.array,
+  teams: PropTypes.array,
 };
 
 export default inject18n(ComcheckForm);

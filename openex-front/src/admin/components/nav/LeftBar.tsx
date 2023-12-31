@@ -3,16 +3,18 @@ import { Link, useLocation } from 'react-router-dom';
 import { Drawer, ListItemText, Toolbar, MenuList, MenuItem, ListItemIcon, Divider, Tooltip, tooltipClasses } from '@mui/material';
 import {
   DashboardOutlined,
-  RowingOutlined,
-  GroupsOutlined,
-  DescriptionOutlined,
+  PolicyOutlined,
+  MovieFilterOutlined,
+  HubOutlined,
   ExtensionOutlined,
   SettingsOutlined,
   DomainOutlined,
+  Groups3Outlined,
   EmojiEventsOutlined,
-  SchoolOutlined,
   ChevronLeft,
   ChevronRight,
+  DnsOutlined,
+  DescriptionOutlined,
 } from '@mui/icons-material';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import { createStyles, makeStyles, styled, useTheme } from '@mui/styles';
@@ -151,7 +153,10 @@ const LeftBar = () => {
             )}
           </MenuItem>
         </StyledTooltip>
-        <StyledTooltip title={!navOpen && t('Exercises')} placement="right">
+      </MenuList>
+      <Divider />
+      <MenuList component="nav">
+        <StyledTooltip title={!navOpen && t('Simulations')} placement="right">
           <MenuItem
             component={Link}
             to="/admin/exercises"
@@ -160,67 +165,110 @@ const LeftBar = () => {
             classes={{ root: classes.menuItem }}
           >
             <ListItemIcon style={{ minWidth: 20 }}>
-              <RowingOutlined />
+              <HubOutlined />
             </ListItemIcon>
             {navOpen && (
               <ListItemText
                 classes={{ primary: classes.menuItemText }}
-                primary={t('Exercises')}
+                primary={t('Simulations')}
               />
             )}
           </MenuItem>
         </StyledTooltip>
-        <StyledTooltip title={!navOpen && t('Players')} placement="right">
+        <StyledTooltip title={!navOpen && t('Scenarios')} placement="right">
           <MenuItem
             component={Link}
-            to="/admin/players"
-            selected={location.pathname === '/admin/players'}
+            to="/admin/scenarios"
+            selected={location.pathname.includes('/admin/scenarios')}
             dense={true}
             classes={{ root: classes.menuItem }}
           >
             <ListItemIcon style={{ minWidth: 20 }}>
-              <GroupsOutlined />
+              <MovieFilterOutlined />
             </ListItemIcon>
             {navOpen && (
-              <ListItemText
-                classes={{ primary: classes.menuItemText }}
-                primary={t('Players')}
-              />
-            )}
-          </MenuItem>
-        </StyledTooltip>
-        <StyledTooltip title={!navOpen && t('Organizations')} placement="right">
-          <MenuItem
-            component={Link}
-            to="/admin/organizations"
-            selected={location.pathname === '/admin/organizations'}
-            dense={true}
-            classes={{ root: classes.menuItem }}
-          >
-            <ListItemIcon style={{ minWidth: 20 }}>
-              <DomainOutlined />
-            </ListItemIcon>
             <ListItemText
               classes={{ primary: classes.menuItemText }}
-              primary={t('Organizations')}
+              primary={t('Scenarios')}
             />
+            )}
           </MenuItem>
         </StyledTooltip>
-        <StyledTooltip title={!navOpen && t('Documents')} placement="right">
+        <StyledTooltip title={!navOpen && t('Detection')} placement="right">
           <MenuItem
             component={Link}
-            to="/admin/documents"
-            selected={location.pathname === '/admin/documents'}
+            to="/admin/detections"
+            selected={location.pathname === '/admin/detections'}
+            dense={true}
+            classes={{ root: classes.menuItem }}
+          >
+            <ListItemIcon style={{ minWidth: 20 }}>
+              <PolicyOutlined />
+            </ListItemIcon>
+            {navOpen && (
+            <ListItemText
+              classes={{ primary: classes.menuItemText }}
+              primary={t('Detections')}
+            />
+            )}
+          </MenuItem>
+        </StyledTooltip>
+        <StyledTooltip title={!navOpen && t('Reports')} placement="right">
+          <MenuItem
+            component={Link}
+            to="/admin/reports"
+            selected={location.pathname === '/admin/reporting'}
             dense={true}
             classes={{ root: classes.menuItem }}
           >
             <ListItemIcon style={{ minWidth: 20 }}>
               <DescriptionOutlined />
             </ListItemIcon>
+            {navOpen && (
             <ListItemText
               classes={{ primary: classes.menuItemText }}
-              primary={t('Documents')}
+              primary={t('Reports')}
             />
+            )}
+          </MenuItem>
+        </StyledTooltip>
+      </MenuList>
+      <Divider />
+      <MenuList component="nav">
+        <StyledTooltip title={!navOpen && t('Assets')} placement="right">
+          <MenuItem
+            component={Link}
+            to="/admin/assets"
+            selected={location.pathname === '/admin/assets'}
+            dense={true}
+            classes={{ root: classes.menuItem }}
+          >
+            <ListItemIcon style={{ minWidth: 20 }}>
+              <DnsOutlined />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.menuItemText }}
+              primary={t('Assets')}
+            />
+          </MenuItem>
+        </StyledTooltip>
+        <StyledTooltip title={!navOpen && t('Persons')} placement="right">
+          <MenuItem
+            component={Link}
+            to="/admin/persons"
+            selected={location.pathname.includes('/admin/persons')}
+            dense={true}
+            classes={{ root: classes.menuItem }}
+          >
+            <ListItemIcon style={{ minWidth: 20 }}>
+              <Groups3Outlined />
+            </ListItemIcon>
+            {navOpen && (
+            <ListItemText
+              classes={{ primary: classes.menuItemText }}
+              primary={t('Persons')}
+            />
+            )}
           </MenuItem>
         </StyledTooltip>
         <StyledTooltip title={!navOpen && t('Medias')} placement="right">
@@ -258,22 +306,22 @@ const LeftBar = () => {
           </MenuItem>
         </StyledTooltip>
         <StyledTooltip
-          title={!navOpen && t('Lessons learned')}
+          title={!navOpen && t('Organizations')}
           placement="right"
         >
           <MenuItem
             component={Link}
-            to="/admin/lessons"
-            selected={location.pathname.includes('/admin/lessons')}
+            to="/admin/organizations"
+            selected={location.pathname.includes('/admin/organizations')}
             dense={true}
             classes={{ root: classes.menuItem }}
           >
             <ListItemIcon style={{ minWidth: 20 }}>
-              <SchoolOutlined />
+              <DomainOutlined />
             </ListItemIcon>
             <ListItemText
               classes={{ primary: classes.menuItemText }}
-              primary={t('Lessons learned')}
+              primary={t('Organizations')}
             />
           </MenuItem>
         </StyledTooltip>

@@ -30,6 +30,35 @@ export const updateExerciseLessons = (exerciseId, data) => (dispatch) => putRefe
   data,
 )(dispatch);
 
+export const fetchExerciseTeams = (exerciseId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/teams`;
+  return getReferential(schema.arrayOfTeams, uri)(dispatch);
+};
+
+export const addExerciseTeams = (exerciseId, data) => (dispatch) => putReferential(
+  schema.arrayOfTeams,
+  `/api/exercises/${exerciseId}/teams/add`,
+  data,
+)(dispatch);
+
+export const removeExerciseTeams = (exerciseId, data) => (dispatch) => putReferential(
+  schema.arrayOfTeams,
+  `/api/exercises/${exerciseId}/teams/remove`,
+  data,
+)(dispatch);
+
+export const addExerciseTeamPlayers = (exerciseId, teamId, data) => (dispatch) => putReferential(
+  schema.exercise,
+  `/api/exercises/${exerciseId}/teams/${teamId}/players/add`,
+  data,
+)(dispatch);
+
+export const removeExerciseTeamPlayers = (exerciseId, teamId, data) => (dispatch) => putReferential(
+  schema.exercise,
+  `/api/exercises/${exerciseId}/teams/${teamId}/players/remove`,
+  data,
+)(dispatch);
+
 export const updateExerciseTags = (exerciseId, data) => (dispatch) => putReferential(
   schema.exercise,
   `/api/exercises/${exerciseId}/tags`,

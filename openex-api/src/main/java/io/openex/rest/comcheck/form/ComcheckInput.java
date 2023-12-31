@@ -23,8 +23,8 @@ public class ComcheckInput {
     @JsonProperty("comcheck_message")
     private String message;
 
-    @JsonProperty("comcheck_audiences")
-    private List<String> audienceIds = new ArrayList<>();
+    @JsonProperty("comcheck_teams")
+    private List<String> teamIds = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -34,12 +34,12 @@ public class ComcheckInput {
         this.name = name;
     }
 
-    public List<String> getAudienceIds() {
-        return audienceIds;
+    public List<String> getTeamIds() {
+        return teamIds;
     }
 
-    public void setAudienceIds(List<String> audienceIds) {
-        this.audienceIds = audienceIds;
+    public void setTeamIds(List<String> teamIds) {
+        this.teamIds = teamIds;
     }
 
     public Instant getEnd() {

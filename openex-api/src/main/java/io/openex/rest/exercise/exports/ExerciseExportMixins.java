@@ -44,22 +44,22 @@ public class ExerciseExportMixins {
     }
 
     @JsonIncludeProperties(value = {
-            "audience_id",
-            "audience_name",
-            "audience_description",
-            "audience_tags",
-            "audience_users",
+            "team_id",
+            "team_name",
+            "team_description",
+            "team_tags",
+            "team_users",
     })
-    public static class Audience {
+    public static class Team {
     }
 
     @JsonIncludeProperties(value = {
-            "audience_id",
-            "audience_name",
-            "audience_description",
-            "audience_tags",
+            "team_id",
+            "team_name",
+            "team_description",
+            "team_tags",
     })
-    public static class EmptyAudience {
+    public static class EmptyTeam {
     }
 
     @JsonIncludeProperties(value = {
@@ -70,12 +70,12 @@ public class ExerciseExportMixins {
             "inject_city",
             "inject_type",
             "inject_contract",
-            "inject_all_audiences",
+            "inject_all_teams",
             "inject_depends_on",
             "inject_depends_duration",
             "inject_tags",
             "inject_documents",
-            "inject_audiences",
+            "inject_teams",
             "inject_content",
     })
     public static class Inject {
@@ -171,7 +171,7 @@ public class ExerciseExportMixins {
             "lessons_category_description",
             "lessons_category_order",
             "lessons_category_questions",
-            "lessons_category_audiences",
+            "lessons_category_teams",
     })
     public static class LessonsCategory {
     }

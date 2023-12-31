@@ -129,6 +129,7 @@ public class User implements Base {
   private String city;
 
   @Setter
+  // @ManyToMany(fetch = FetchType.LAZY)
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "users_groups",
       joinColumns = @JoinColumn(name = "user_id"),
@@ -139,12 +140,12 @@ public class User implements Base {
 
   @Setter
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "users_audiences",
+  @JoinTable(name = "users_teams",
       joinColumns = @JoinColumn(name = "user_id"),
-      inverseJoinColumns = @JoinColumn(name = "audience_id"))
+      inverseJoinColumns = @JoinColumn(name = "team_id"))
   @JsonSerialize(using = MultiIdDeserializer.class)
-  @JsonProperty("user_audiences")
-  private List<Audience> audiences = new ArrayList<>();
+  @JsonProperty("user_teams")
+  private List<Team> teams = new ArrayList<>();
 
   @Setter
   @ManyToMany(fetch = FetchType.LAZY)
@@ -186,8 +187,8 @@ public class User implements Base {
 
   public void resolveInjects(Iterable<Inject> injects) {
     this.injects = stream(injects.spliterator(), false)
-        .filter(inject -> inject.isAllAudiences() || inject.getAudiences().stream()
-            .anyMatch(audience -> getAudiences().contains(audience)))
+        .filter(inject -> inject.isAllTeams() || inject.getTeams().stream()
+            .anyMatch(team -> getTeams().contains(team)))
         .collect(Collectors.toList());
   }
 
@@ -228,7 +229,7 @@ public class User implements Base {
 
   @JsonProperty("user_is_player")
   public boolean isPlayer() {
-    return isAdmin() || isPlanner() || isObserver() || !getAudiences().isEmpty();
+    return isAdmin() || isPlanner() || isObserver() || !getTeams().isEmpty();
   }
 
   @JsonProperty("user_last_comcheck")

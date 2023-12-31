@@ -31,14 +31,14 @@ public class InjectInput {
     @JsonProperty("inject_depends_duration")
     private Long dependsDuration;
 
-    @JsonProperty("inject_audiences")
-    private List<String> audiences = new ArrayList<>();
+    @JsonProperty("inject_teams")
+    private List<String> teams = new ArrayList<>();
 
     @JsonProperty("inject_documents")
     private List<InjectDocumentInput> documents = new ArrayList<>();
 
-    @JsonProperty("inject_all_audiences")
-    private boolean allAudiences = false;
+    @JsonProperty("inject_all_teams")
+    private boolean allTeams = false;
 
     @JsonProperty("inject_country")
     private String country;
@@ -49,8 +49,96 @@ public class InjectInput {
     @JsonProperty("inject_tags")
     private List<String> tagIds = new ArrayList<>();
 
-    public boolean getAllAudiences() {
-        return allAudiences;
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public ObjectNode getContent() {
+        return content;
+    }
+
+    public void setContent(ObjectNode content) {
+        this.content = content;
+    }
+
+    public String getContract() {
+        return contract;
+    }
+
+    public void setContract(String contract) {
+        this.contract = contract;
+    }
+
+    public List<String> getTeams() {
+        return teams;
+    }
+
+    public void setTeams(List<String> teams) {
+        this.teams = teams;
+    }
+
+    public boolean getAllTeams() {
+        return allTeams;
+    }
+
+    public void setAllTeams(boolean allTeams) {
+        this.allTeams = allTeams;
+    }
+
+    public boolean isAllTeams() {
+        return allTeams;
+    }
+
+    public List<InjectDocumentInput> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<InjectDocumentInput> documents) {
+        this.documents = documents;
+    }
+
+    public String getDependsOn() {
+        return dependsOn;
+    }
+
+    public void setDependsOn(String dependsOn) {
+        this.dependsOn = dependsOn;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public List<String> getTagIds() {
+        return tagIds;
+    }
+
+    public void setTagIds(List<String> tagIds) {
+        this.tagIds = tagIds;
     }
 
     public Inject toInject() {
@@ -60,7 +148,7 @@ public class InjectInput {
         inject.setContent(getContent());
         inject.setContract(getContract());
         inject.setDependsDuration(getDependsDuration());
-        inject.setAllAudiences(getAllAudiences());
+        inject.setAllTeams(getAllTeams());
         inject.setCountry(getCountry());
         inject.setCity(getCity());
         return inject;

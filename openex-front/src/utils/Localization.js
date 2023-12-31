@@ -25,7 +25,7 @@ const i18n = {
       Organizations: 'Organisations',
       Documents: 'Documents',
       Integrations: 'Intégrations',
-      Settings: 'Configuration',
+      Settings: 'Paramètres',
       Profile: 'Profil',
       Logout: 'Se déconnecter',
       Firstname: 'Prénom',
@@ -54,7 +54,7 @@ const i18n = {
       'Create a new media': 'Créer un nouveau média',
       'Update the media': 'Modifier le média',
       'Recent exercises': 'Exercices récents',
-      'No audiences in this exercise.': 'Aucune audience dans cet exercice.',
+      'No teams in this exercise.': 'Aucune team dans cet exercice.',
       'No exercises in this platform.': 'Aucun exercice dans cette plateforme.',
       'Injects distribution': 'Distribution des stimulis',
       'Next injects to send': 'Prochains stimlis à envoyer',
@@ -65,8 +65,8 @@ const i18n = {
       'added an entry on': 'a ajouté une entrée le',
       'This file type is not accepted here.':
         "Ce type de fichier n'est pas accepté ici",
-      'Distribution of score by audience (in % of expectations)':
-        'Distribution du score par audience (en % des attendus)',
+      'Distribution of score by team (in % of expectations)':
+        'Distribution du score par team (en % des attendus)',
       'Select all': 'Sélectionner tout',
       'Do you want to anonymize lessons learned questionnaire?':
         "Souhaitez-vous anonymiser le questionnaire de retour d'expérience ?",
@@ -89,8 +89,8 @@ const i18n = {
       'Inject details': 'Détails du stimuli',
       'Export this list': 'Exporter cette liste',
       'Create a new exercise': 'Créer un nouvel exercice',
-      'Do you want to delete this audience?':
-        'Souhaitez-vous supprimer cette audience ?',
+      'Do you want to delete this team?':
+        'Souhaitez-vous supprimer cette team ?',
       'Do you want to delete this comcheck?':
         'Souhaitez-vous supprimer cette vérification ?',
       'Do you want to delete this player?':
@@ -111,8 +111,8 @@ const i18n = {
       'Do you want to delete this organization?':
         'Souhaitez-vous supprimer cette organisation ?',
       'Mail sent to': 'Mail envoyé à',
-      'Audiences scores over time (in % of expectations)':
-        'Score des audience dans le temps (en % des attendus)',
+      'Teams scores over time (in % of expectations)':
+        'Score des team dans le temps (en % des attendus)',
       'Distribution of total score by inject type':
         'Distribution du score total par type de stimuli',
       on: 'le',
@@ -203,31 +203,41 @@ const i18n = {
       Seconds: 'Secondes',
       'Try the inject': 'Tester le stimuli',
       File: 'Fichier',
+      Simulations: 'Simulations',
+      Simulation: 'Simulation',
+      Scenarios: 'Scenarios',
+      Detection: 'Détection',
+      Detections: 'Détections',
+      Assets: 'Actifs',
+      Persons: 'Personnes',
+      'This field is mandatory': 'Ce champ est requis',
+      'Remove from the exercise': 'Retirer de cet exercice',
       'Select a file': 'Sélectionner un fichier',
       'Do you want to delete this document?':
         'Souhaitez-vous supprimer ce document ?',
       'Update the document': 'Modifier le document',
       'Inject data': 'Données du stimuli',
-      'Add target audiences in this inject':
-        'Ajouter des audiences cibles dans ce stimuli',
-      'Targeted audiences': 'Audiences ciblées',
+      'Add teams in this exercise': 'Ajouter une équipe dans cet exercice',
+      'Add target teams in this inject':
+        'Ajouter des teams cibles dans ce stimuli',
+      'Targeted teams': 'Teams ciblées',
       'Test the inject': 'Tester le stimuli',
-      'All audiences': 'Toutes les audiences',
-      'Add target audiences': 'Ajouter des audiences cibles',
+      'All teams': 'Toutes les teams',
+      'Add target teams': 'Ajouter des teams cibles',
       'Trigger after': 'Se déclenche après',
       'Create a new inject': 'Créer un nouveau stimuli',
-      'Remove from the audience': "Retirer de l'audience",
-      'Update the audience': "Modifier l'audience",
+      'Remove from the team': "Retirer de l'team",
+      'Update the team': "Modifier l'team",
       'Update the exercise': "Modifier l'exercice",
       'Update the inject': 'Modifier le stimuli',
-      'Do you want to remove the player from the audience?':
-        'Souhaitez-vous retirer le joueur de cette audience ?',
-      'Add players in this audience': 'Ajouter des joueurs dans cette audience',
-      'Create a new audience': 'Créer une nouvelle audience',
+      'Do you want to remove the player from the team?':
+        'Souhaitez-vous retirer le joueur de cette team ?',
+      'Add players in this team': 'Ajouter des joueurs dans cette team',
+      'Create a new team': 'Créer une nouvelle team',
       'Remove from the inject': 'Retirer du stimuli',
       'Remove from the element': "Retirer de l'élément",
-      'Do you want to remove the audience from the inject?':
-        "Souhaitez-vous retirer l'audience du stimuli ?",
+      'Do you want to remove the team from the inject?':
+        "Souhaitez-vous retirer l'team du stimuli ?",
       'Do you want to delete this exercise?':
         'Souhaitez-vous supprimer cet exercice ?',
       'Number of injects': 'Nombre de stimulis',
@@ -251,7 +261,7 @@ const i18n = {
         'Ce groupe aura la permission de planificateur sur les nouveaux exercices.',
       'Processed injects': 'Stimulis traités',
       'Pending injects': 'Stimulis en attente',
-      'No audience': 'Aucune audience',
+      'No team': 'Aucune team',
       'No processed injects in this exercise.':
         'Aucun stimuli traité dans cet exercice.',
       'No pending injects in this exercise.':
@@ -272,12 +282,12 @@ const i18n = {
       Attachments: 'Pièces jointes',
       Attachment: 'Pièce jointe',
       Content: 'Contenu',
-      Audiences: 'Audiences',
+      Teams: 'Teams',
       'Send email': 'Envoyer le mail',
       'Add documents in this media pressure':
         'Ajouter des documents à cette pression médiatique',
-      'Expect audiences to read the article(s)':
-        'Les audiences doivent lire le(s) article(s)',
+      'Expect teams to read the article(s)':
+        'Les teams doivent lire le(s) article(s)',
       'Add media pressure': 'Ajouter de la pression médiatique',
       'Remove from the medias pressure': 'Supprimer de la pression médiatique',
       'Raw request data': 'Données brutes de la requête',
@@ -285,7 +295,7 @@ const i18n = {
       'Form request data': 'Données de formulaire de la requête',
       Key: 'Clé',
       Headers: 'En-têtes',
-      audience: 'Audience',
+      team: 'Team',
       attachment: 'Document',
       'Executed in': 'Exécuté en',
       'Use basic authentication': 'Utiliser une authentification basique',
@@ -323,10 +333,10 @@ const i18n = {
         'Souhaitez-vous désactiver ce stimuli ?',
       'Do you want to enable this inject?':
         'Souhaitez-vous activer ce stimuli ?',
-      'Do you want to disable this audience?':
-        'Souhaitez-vous désactiver cette audience ?',
-      'Do you want to enable this audience?':
-        'Souhaitez-vous activer cette audience ?',
+      'Do you want to disable this team?':
+        'Souhaitez-vous désactiver cette team ?',
+      'Do you want to enable this team?':
+        'Souhaitez-vous activer cette team ?',
       Trigger: 'Déclencheur',
       'Manage content': 'Gérer le contenu',
       Controls: 'Contrôles',
@@ -495,8 +505,8 @@ const i18n = {
       'Questionnaire mode': 'Mode du questionnaire',
       'Anonymize answers': 'Anonymiser les réponses',
       'No explanation': 'Aucune explication',
-      'Add target audiences in this lessons learned category':
-        "Ajouter des audiences cibles à cette catégorie de retour d'expérience",
+      'Add target teams in this lessons learned category':
+        "Ajouter des teams cibles à cette catégorie de retour d'expérience",
       'Sending the questionnaire will emit an email to each player with a unique link to access and fill it.':
         'Envoyer le questionnaire va émettre un email à chaque joueur avec un lien unique pour y accéder et le remplir.',
       'Do you want to empty lessons learned categories and questions?':
@@ -542,19 +552,19 @@ const i18n = {
       'No category': 'Aucune catégorie',
       'No challenge in this exercise yet.':
         'Encore aucun challenge dans cet exercice.',
-      'Distribution of expectations by audience':
-        'Distribution des attendus par audience',
+      'Distribution of expectations by team':
+        'Distribution des attendus par team',
       'Distribution of expectations by inject type':
         'Distribution des attendus par type de stimuli',
       'Distribution of expected total score by inject type':
         'Distribution du score total attendu par type de stimuli',
       '-': 'Aucun',
-      'Each audience should upload a document':
-        'Chaque audience doit uploader un document',
-      'Each audience should submit a text response':
-        'Chaque audience doit soumettre une réponse texte',
+      'Each team should upload a document':
+        'Chaque team doit uploader un document',
+      'Each team should submit a text response':
+        'Chaque team doit soumettre une réponse texte',
       // -- Expectation start --
-      'This expectation is handled automatically by the platform and triggered when audience reads articles': 'Cet attendu est géré automatiquement par la plateforme et déclenché lorsque une audience lit les articles',
+      'This expectation is handled automatically by the platform and triggered when team reads articles': 'Cet attendu est géré automatiquement par la plateforme et déclenché lorsque une team lit les articles',
       'Add expectations': 'Ajouter des attendus',
       'Add expectation in this inject': 'Ajouter des attendus dans ce stimuli',
       'Update the expectation': 'Modifier l\'attendu',
@@ -566,14 +576,14 @@ const i18n = {
       MANUAL: 'Manuel',
       ARTICLE: 'Attendu lié à aux articles',
       // -- Expectation end --
-      'Distribution of expected total score by audience':
-        'Distribution du score total attendu par audience',
+      'Distribution of expected total score by team':
+        'Distribution du score total attendu par team',
       'Exercise definition and scenario':
         "Définition de l'exercice et scénario",
       'Exercise results': "Résultats de l'exercice",
       'Exercise data': "Données de l'exercice",
-      'Distribution of total score by audience':
-        'Distribution du score total par audience',
+      'Distribution of total score by team':
+        'Distribution du score total par team',
       'Distribution of total score by organization':
         'Distribution du score total par organisation',
       'Total expected score': 'Score total attendu',
@@ -582,10 +592,10 @@ const i18n = {
       'Distribution of total score by inject':
         'Distribution du score total par stimuli',
       'Distribution of injects by type': 'Distribution des stimulis par type',
-      'Distribution of injects by audience':
-        'Distribution des stimulis par audience',
-      'Distribution of mails by audience':
-        'Distribution des mails par audience',
+      'Distribution of injects by team':
+        'Distribution des stimulis par team',
+      'Distribution of mails by team':
+        'Distribution des mails par team',
       'Distribution of mails by player': 'Distribution des mails par joueur',
       'Distribution of mails by inject': 'Distribution des mails par stimuli',
       'Sent injects over time': 'Stimulis envoyés dans le temps',
@@ -593,11 +603,11 @@ const i18n = {
       'No data to display or the exercise has not started yet':
         "Aucune donnée disponible ou l'exercice n'a pas encore commencé",
       'Back to administration': "Retour à l'administration",
-      'Audiences scores over time': 'Score des audiences dans le temps',
+      'Teams scores over time': 'Score des teams dans le temps',
       'Inject types scores over time':
         'Score des types de stimuli dans le temps',
-      'The animation team can validate the audience reaction':
-        "L'équipe d'animation peut valider la réaction de l'audience",
+      'The animation team can validate the team reaction':
+        "L'équipe d'animation peut valider la réaction de l'team",
       Description: 'Description',
       'No description': 'Aucune description',
       'Only injects with manual validation':
@@ -654,7 +664,7 @@ const i18n = {
       'Quick inject definition': 'Définition rapide de l’injection',
       Order: 'Ordre',
       Details: 'Détails',
-      Audience: 'Public',
+      Team: 'Public',
       Template: 'Modèle',
       Questionnaire: 'Questionnaire',
       User: 'Utilisateur',
@@ -692,8 +702,8 @@ const i18n = {
       Body: 'Email body',
       Encrypted: 'Encrypt this email',
       Attachments: 'Attachments',
-      Audiences: 'Audiences',
-      audience: 'Audience',
+      Teams: 'Teams',
+      team: 'Team',
       text: 'Text field',
       textarea: 'Text area',
       tuple: 'Key value pair',
@@ -714,7 +724,7 @@ const i18n = {
       REGEXP: 'Regular expression',
       '-': 'None',
       MANUAL: 'Manual',
-      ARTICLE: 'Automatic - Triggered when audience reads articles',
+      ARTICLE: 'Automatic - Triggered when team reads articles',
     },
   },
 };

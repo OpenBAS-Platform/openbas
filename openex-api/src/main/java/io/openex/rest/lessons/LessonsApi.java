@@ -23,7 +23,7 @@ import static java.time.Instant.now;
 public class LessonsApi extends RestBehavior {
 
   private ExerciseRepository exerciseRepository;
-  private AudienceRepository audienceRepository;
+  private TeamRepository teamRepository;
   private LessonsTemplateRepository lessonsTemplateRepository;
   private LessonsCategoryRepository lessonsCategoryRepository;
   private LessonsQuestionRepository lessonsQuestionRepository;
@@ -47,8 +47,8 @@ public class LessonsApi extends RestBehavior {
   }
 
   @Autowired
-  public void setAudienceRepository(AudienceRepository audienceRepository) {
-    this.audienceRepository = audienceRepository;
+  public void setTeamRepository(TeamRepository teamRepository) {
+    this.teamRepository = teamRepository;
   }
 
   @Autowired
@@ -159,11 +159,11 @@ public class LessonsApi extends RestBehavior {
 
   @PutMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/audiences")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public LessonsCategory updateExerciseLessonsCategoryAudiences(@PathVariable String exerciseId,
-      @PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsCategoryAudiencesInput input) {
+  public LessonsCategory updateExerciseLessonsCategoryTeams(@PathVariable String exerciseId,
+      @PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsCategoryTeamsInput input) {
     LessonsCategory lessonsCategory = lessonsCategoryRepository.findById(lessonsCategoryId).orElseThrow();
-    Iterable<Audience> lessonsCategoryAudiences = audienceRepository.findAllById(input.getAudienceIds());
-    lessonsCategory.setAudiences(fromIterable(lessonsCategoryAudiences));
+    Iterable<Team> lessonsCategoryTeams = teamRepository.findAllById(input.getTeamIds());
+    lessonsCategory.setTeams(fromIterable(lessonsCategoryTeams));
     return lessonsCategoryRepository.save(lessonsCategory);
   }
 
@@ -215,8 +215,8 @@ public class LessonsApi extends RestBehavior {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
     List<LessonsCategory> lessonsCategories = lessonsCategoryRepository.findAll(
         LessonsCategorySpecification.fromExercise(exerciseId)).stream().toList();
-    List<User> users = lessonsCategories.stream().flatMap(lessonsCategory -> lessonsCategory.getAudiences().stream()
-        .flatMap(audience -> audience.getUsers().stream())).distinct().toList();
+    List<User> users = lessonsCategories.stream().flatMap(lessonsCategory -> lessonsCategory.getTeams().stream()
+        .flatMap(team -> team.getUsers().stream())).distinct().toList();
     mailingService.sendEmail(input.getSubject(), input.getBody(), users, Optional.of(exercise));
   }
 

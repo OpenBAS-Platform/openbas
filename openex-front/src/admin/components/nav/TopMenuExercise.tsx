@@ -74,7 +74,7 @@ const TopMenuExercise: React.FC = () => {
       </Button>
       <Button
         component={Link}
-        to={`/admin/exercises/${exerciseId}/definition/audiences`}
+        to={`/admin/exercises/${exerciseId}/definition/teams`}
         variant={
           location.pathname.includes(
             `/admin/exercises/${exerciseId}/definition`,

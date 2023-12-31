@@ -8,9 +8,9 @@ import { useFormatter } from '../../../../components/i18n';
 import LessonsCategoryPopover from './categories/LessonsCategoryPopover';
 import LessonsQuestionPopover from './categories/questions/LessonsQuestionPopover';
 import CreateLessonsQuestion from './categories/questions/CreateLessonsQuestion';
-import LessonsCategoryAddAudiences from './categories/LessonsCategoryAddAudiences';
+import LessonsCategoryAddTeams from './categories/LessonsCategoryAddTeams';
 import { truncate } from '../../../../utils/String';
-import { updateLessonsCategoryAudiences } from '../../../../actions/Lessons';
+import { updateLessonsCategoryTeams } from '../../../../actions/Lessons';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -36,7 +36,7 @@ const LessonsCategories = ({
   lessonsAnswers,
   lessonsQuestions,
   setSelectedQuestion,
-  audiencesMap,
+  teamsMap,
   isReport,
 }) => {
   const classes = useStyles();
@@ -49,10 +49,10 @@ const LessonsCategories = ({
     R.ascend(R.prop('lessons_question_order')),
   ]);
   const sortedCategories = sortCategories(lessonsCategories);
-  const handleUpdateAudiences = (lessonsCategoryId, audiencesIds) => {
-    const data = { lessons_category_audiences: audiencesIds };
+  const handleUpdateTeams = (lessonsCategoryId, teamsIds) => {
+    const data = { lessons_category_teams: teamsIds };
     return dispatch(
-      updateLessonsCategoryAudiences(exerciseId, lessonsCategoryId, data),
+      updateLessonsCategoryTeams(exerciseId, lessonsCategoryId, data),
     );
   };
   const consolidatedAnswers = R.pipe(
@@ -209,16 +209,16 @@ const LessonsCategories = ({
               </Grid>
               <Grid item={true} xs={3} style={{ marginTop: -10 }}>
                 <Typography variant="h4" style={{ float: 'left' }}>
-                  {t('Targeted audiences')}
+                  {t('Targeted teams')}
                 </Typography>
                 {!isReport && (
-                  <LessonsCategoryAddAudiences
+                  <LessonsCategoryAddTeams
                     exerciseId={exerciseId}
                     lessonsCategoryId={category.lessonscategory_id}
-                    lessonsCategoryAudiencesIds={
-                      category.lessons_category_audiences
+                    lessonsCategoryTeamsIds={
+                      category.lessons_category_teams
                     }
-                    handleUpdateAudiences={handleUpdateAudiences}
+                    handleUpdateTeams={handleUpdateTeams}
                   />
                 )}
                 <div className="clearfix" />
@@ -226,26 +226,26 @@ const LessonsCategories = ({
                   variant="outlined"
                   classes={{ root: classes.paperPadding }}
                 >
-                  {category.lessons_category_audiences.map((audienceId) => {
-                    const audience = audiencesMap[audienceId];
+                  {category.lessons_category_teams.map((teamId) => {
+                    const team = teamsMap[teamId];
                     return (
                       <Tooltip
-                        key={audienceId}
-                        title={audience?.audience_name || ''}
+                        key={teamId}
+                        title={team?.team_name || ''}
                       >
                         <Chip
                           onDelete={
                             isReport
                               ? undefined
-                              : () => handleUpdateAudiences(
+                              : () => handleUpdateTeams(
                                 category.lessonscategory_id,
                                 R.filter(
-                                  (n) => n !== audienceId,
-                                  category.lessons_category_audiences,
+                                  (n) => n !== teamId,
+                                  category.lessons_category_teams,
                                 ),
                               )
                           }
-                          label={truncate(audience?.audience_name || '', 30)}
+                          label={truncate(team?.team_name || '', 30)}
                           icon={<CastForEducationOutlined />}
                           classes={{ root: classes.chip }}
                         />

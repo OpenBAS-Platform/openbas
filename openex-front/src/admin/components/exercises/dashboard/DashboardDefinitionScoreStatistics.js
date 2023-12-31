@@ -17,7 +17,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const DashboardDefinitionScoreStatistics = ({
-  audiences,
+  teams,
   injects,
   injectTypesMap,
   challengesMap,
@@ -26,13 +26,13 @@ const DashboardDefinitionScoreStatistics = ({
   const { t, tPick } = useFormatter();
   const theme = useTheme();
   const mapIndexed = R.addIndex(R.map);
-  const audiencesColors = R.pipe(
+  const teamsColors = R.pipe(
     mapIndexed((a, index) => [
-      a.audience_id,
+      a.team_id,
       colors(theme.palette.mode === 'dark' ? 400 : 600)[index],
     ]),
     R.fromPairs,
-  )(audiences);
+  )(teams);
   const injectTypesWithScore = R.pipe(
     R.filter(
       (n) => n.inject_type === 'openex_challenge'
@@ -90,33 +90,33 @@ const DashboardDefinitionScoreStatistics = ({
       })),
     },
   ];
-  const sortedAudiencesByExpectation = R.pipe(
-    R.sortWith([R.descend(R.prop('audience_injects_expectations_number'))]),
+  const sortedTeamsByExpectation = R.pipe(
+    R.sortWith([R.descend(R.prop('team_injects_expectations_number'))]),
     R.take(10),
-  )(audiences || []);
-  const expectationsByAudienceData = [
+  )(teams || []);
+  const expectationsByTeamData = [
     {
       name: t('Number of expectations'),
-      data: sortedAudiencesByExpectation.map((a) => ({
-        x: a.audience_name,
-        y: a.audience_injects_expectations_number,
-        fillColor: audiencesColors[a.audience_id],
+      data: sortedTeamsByExpectation.map((a) => ({
+        x: a.team_name,
+        y: a.team_injects_expectations_number,
+        fillColor: teamsColors[a.team_id],
       })),
     },
   ];
-  const sortedAudiencesByExpectedScore = R.pipe(
+  const sortedTeamsByExpectedScore = R.pipe(
     R.sortWith([
-      R.descend(R.prop('audience_injects_expectations_total_expected_score')),
+      R.descend(R.prop('team_injects_expectations_total_expected_score')),
     ]),
     R.take(10),
-  )(audiences || []);
-  const expectedScoreByAudienceData = [
+  )(teams || []);
+  const expectedScoreByTeamData = [
     {
       name: t('Total expected score'),
-      data: sortedAudiencesByExpectedScore.map((a) => ({
-        x: a.audience_name,
-        y: a.audience_injects_expectations_total_expected_score,
-        fillColor: audiencesColors[a.audience_id],
+      data: sortedTeamsByExpectedScore.map((a) => ({
+        x: a.team_name,
+        y: a.team_injects_expectations_total_expected_score,
+        fillColor: teamsColors[a.team_id],
       })),
     },
   ];
@@ -168,37 +168,37 @@ const DashboardDefinitionScoreStatistics = ({
       </Grid>
       <Grid item={true} xs={3}>
         <Typography variant="h4">
-          {t('Distribution of expectations by audience')}
+          {t('Distribution of expectations by team')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedAudiencesByExpectation.length > 0 ? (
+          {sortedTeamsByExpectation.length > 0 ? (
             <Chart
               options={horizontalBarsChartOptions(theme)}
-              series={expectationsByAudienceData}
+              series={expectationsByTeamData}
               type="bar"
               width="100%"
-              height={50 + sortedAudiencesByExpectation.length * 50}
+              height={50 + sortedTeamsByExpectation.length * 50}
             />
           ) : (
-            <Empty message={t('No audiences in this exercise.')} />
+            <Empty message={t('No teams in this exercise.')} />
           )}
         </Paper>
       </Grid>
       <Grid item={true} xs={3}>
         <Typography variant="h4">
-          {t('Distribution of expected total score by audience')}
+          {t('Distribution of expected total score by team')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedAudiencesByExpectedScore.length > 0 ? (
+          {sortedTeamsByExpectedScore.length > 0 ? (
             <Chart
               options={horizontalBarsChartOptions(theme)}
-              series={expectedScoreByAudienceData}
+              series={expectedScoreByTeamData}
               type="bar"
               width="100%"
-              height={50 + sortedAudiencesByExpectedScore.length * 50}
+              height={50 + sortedTeamsByExpectedScore.length * 50}
             />
           ) : (
-            <Empty message={t('No audiences in this exercise.')} />
+            <Empty message={t('No teams in this exercise.')} />
           )}
         </Paper>
       </Grid>

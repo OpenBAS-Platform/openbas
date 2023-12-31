@@ -34,9 +34,9 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
 
     @Modifying
     @Query(value = "insert into injects (inject_id, inject_title, inject_description, inject_country, inject_city," +
-            "inject_type, inject_contract, inject_all_audiences, inject_enabled, inject_exercise, inject_depends_from_another, " +
+            "inject_type, inject_contract, inject_all_teams, inject_enabled, inject_exercise, inject_depends_from_another, " +
             "inject_depends_duration, inject_content) " +
-            "values (:id, :title, :description, :country, :city, :type, :contract, :allAudiences, :enabled, :exercise, :dependsOn, :dependsDuration, :content)", nativeQuery = true)
+            "values (:id, :title, :description, :country, :city, :type, :contract, :allTeams, :enabled, :exercise, :dependsOn, :dependsDuration, :content)", nativeQuery = true)
     void importSave(@Param("id") String id,
                     @Param("title") String title,
                     @Param("description") String description,
@@ -44,7 +44,7 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
                     @Param("city") String city,
                     @Param("type") String type,
                     @Param("contract") String contract,
-                    @Param("allAudiences") boolean allAudiences,
+                    @Param("allTeams") boolean allTeams,
                     @Param("enabled") boolean enabled,
                     @Param("exercise") String exerciseId,
                     @Param("dependsOn") String dependsOn,
@@ -56,8 +56,8 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
     void addTag(@Param("injectId") String injectId, @Param("tagId") String tagId);
 
     @Modifying
-    @Query(value = "insert into injects_audiences (inject_id, audience_id) values (:injectId, :audienceId)", nativeQuery = true)
-    void addAudience(@Param("injectId") String injectId, @Param("audienceId") String audienceId);
+    @Query(value = "insert into injects_teams (inject_id, team_id) values (:injectId, :teamId)", nativeQuery = true)
+    void addTeam(@Param("injectId") String injectId, @Param("teamId") String teamId);
 
     @Override
     @Query("select count(distinct i) from Inject i " +

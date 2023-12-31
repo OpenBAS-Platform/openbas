@@ -1,4 +1,4 @@
-import type { Audience, Exercise, InjectExpectation, Media, Organization, Tag, User } from '../utils/api-types';
+import type { Team, Exercise, InjectExpectation, Media, Organization, Tag, User } from '../utils/api-types';
 
 export interface ExercicesHelper {
   getExercise: (exerciseId: Exercise['exercise_id']) => Exercise;
@@ -17,9 +17,9 @@ export interface TagsHelper {
   getTagsMap: () => Record<string, Tag>;
 }
 
-export interface AudiencesHelper {
-  getExerciseAudiences: (exerciseId: Exercise['exercise_id']) => Audience[];
-  getAudiencesMap: () => Record<string, Audience>;
+export interface TeamsHelper {
+  getExerciseTeams: (exerciseId: Exercise['exercise_id']) => Team[];
+  getTeamsMap: () => Record<string, Team>;
 }
 
 export interface MediasHelper {

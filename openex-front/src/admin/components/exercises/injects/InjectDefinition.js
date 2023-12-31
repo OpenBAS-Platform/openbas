@@ -23,7 +23,7 @@ import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
   AttachmentOutlined,
-  CastForEducationOutlined,
+  GroupsOutlined,
   CloseRounded,
   ControlPointOutlined,
   DeleteOutlined,
@@ -33,15 +33,15 @@ import {
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
-import { fetchInjectAudiences, updateInject } from '../../../../actions/Inject';
+import { fetchInjectTeams, updateInject } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
-import AudiencePopover from '../audiences/AudiencePopover';
+import TeamPopover from '../../persons/teams/TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
-import InjectAddAudiences from './InjectAddAudiences';
+import InjectAddTeams from './InjectAddTeams';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import TextField from '../../../../components/TextField';
 import SwitchField from '../../../../components/SwitchField';
@@ -94,7 +94,7 @@ const styles = (theme) => ({
   title: {
     float: 'left',
   },
-  allAudiences: {
+  allTeams: {
     float: 'right',
     marginTop: -7,
   },
@@ -113,25 +113,25 @@ const inlineStylesHeaders = {
     padding: 0,
     top: '0px',
   },
-  audience_name: {
+  team_name: {
     float: 'left',
     width: '30%',
     fontSize: 12,
     fontWeight: '700',
   },
-  audience_users_number: {
+  team_users_number: {
     float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
-  audience_enabled: {
+  team_users_enabled_number: {
     float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
-  audience_tags: {
+  team_tags: {
     float: 'left',
     width: '30%',
     fontSize: 12,
@@ -204,7 +204,7 @@ const inlineStylesHeaders = {
 };
 
 const inlineStyles = {
-  audience_name: {
+  team_name: {
     float: 'left',
     width: '30%',
     height: 20,
@@ -212,7 +212,7 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  audience_users_number: {
+  team_users_number: {
     float: 'left',
     width: '15%',
     height: 20,
@@ -220,7 +220,7 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  audience_enabled: {
+  team_users_enabled_number: {
     float: 'left',
     width: '15%',
     height: 20,
@@ -228,7 +228,7 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  audience_tags: {
+  team_tags: {
     float: 'left',
     width: '30%',
     height: 20,
@@ -328,12 +328,12 @@ class InjectDefinition extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      allAudiences: props.inject.inject_all_audiences,
-      audiencesIds: props.inject.inject_audiences,
+      allTeams: props.inject.inject_all_teams,
+      teamsIds: props.inject.inject_teams,
       documents: props.inject.inject_documents,
       expectations: props.inject.inject_content?.expectations || [],
-      audiencesSortBy: 'audience_name',
-      audiencesOrderAsc: true,
+      teamsSortBy: 'team_name',
+      teamsOrderAsc: true,
       documentsSortBy: 'document_name',
       documentsOrderAsc: true,
       articlesIds: props.inject.inject_content?.articles || [],
@@ -349,14 +349,14 @@ class InjectDefinition extends Component {
   componentDidMount() {
     const { exerciseId, injectId } = this.props;
     this.props.fetchDocuments();
-    this.props.fetchInjectAudiences(exerciseId, injectId);
+    this.props.fetchInjectTeams(exerciseId, injectId);
     this.props.fetchExerciseArticles(exerciseId);
     this.props.fetchMedias();
     this.props.fetchChallenges();
   }
 
   toggleAll() {
-    this.setState({ allAudiences: !this.state.allAudiences });
+    this.setState({ allTeams: !this.state.allTeams });
   }
 
   handleOpenVariables() {
@@ -367,15 +367,15 @@ class InjectDefinition extends Component {
     this.setState({ openVariables: false });
   }
 
-  handleAddAudiences(audiencesIds) {
+  handleAddTeams(teamsIds) {
     this.setState({
-      audiencesIds: [...this.state.audiencesIds, ...audiencesIds],
+      teamsIds: [...this.state.teamsIds, ...teamsIds],
     });
   }
 
-  handleRemoveAudience(audienceId) {
+  handleRemoveTeam(teamId) {
     this.setState({
-      audiencesIds: this.state.audiencesIds.filter((a) => a !== audienceId),
+      teamsIds: this.state.teamsIds.filter((a) => a !== teamId),
     });
   }
 
@@ -438,17 +438,17 @@ class InjectDefinition extends Component {
     });
   }
 
-  audiencesReverseBy(field) {
+  teamsReverseBy(field) {
     this.setState({
-      audiencesSortBy: field,
-      audiencesOrderAsc: !this.state.audiencesOrderAsc,
+      teamsSortBy: field,
+      teamsOrderAsc: !this.state.teamsOrderAsc,
     });
   }
 
-  audiencesSortHeader(field, label, isSortable) {
+  teamsSortHeader(field, label, isSortable) {
     const { t } = this.props;
-    const { audiencesSortBy, audiencesOrderAsc } = this.state;
-    const sortComponent = audiencesOrderAsc ? (
+    const { teamsSortBy, teamsOrderAsc } = this.state;
+    const sortComponent = teamsOrderAsc ? (
       <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
     ) : (
       <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
@@ -457,10 +457,10 @@ class InjectDefinition extends Component {
       return (
         <div
           style={inlineStylesHeaders[field]}
-          onClick={this.audiencesReverseBy.bind(this, field)}
+          onClick={this.teamsReverseBy.bind(this, field)}
         >
           <span>{t(label)}</span>
-          {audiencesSortBy === field ? sortComponent : ''}
+          {teamsSortBy === field ? sortComponent : ''}
         </div>
       );
     }
@@ -596,7 +596,7 @@ class InjectDefinition extends Component {
     }
     injectType.fields
       .filter(
-        (f) => !['audiences', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+        (f) => !['teams', 'articles', 'challenges', 'attachments', 'expectations'].includes(
           f.key,
         ),
       )
@@ -644,7 +644,7 @@ class InjectDefinition extends Component {
           finalData[field.key] = data[field.key];
         }
       });
-    const { allAudiences, audiencesIds, documents } = this.state;
+    const { allTeams, teamsIds, documents } = this.state;
     const values = {
       inject_title: inject.inject_title,
       inject_contract: inject.inject_contract,
@@ -653,8 +653,8 @@ class InjectDefinition extends Component {
       inject_depends_duration: inject.inject_depends_duration,
       inject_depends_from_another: inject.inject_depends_from_another,
       inject_content: finalData,
-      inject_all_audiences: allAudiences,
-      inject_audiences: audiencesIds,
+      inject_all_teams: allTeams,
+      inject_teams: teamsIds,
       inject_documents: documents,
     };
     return this.props
@@ -671,7 +671,7 @@ class InjectDefinition extends Component {
     if (injectType && Array.isArray(injectType.fields)) {
       injectType.fields
         .filter(
-          (f) => !['audiences', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+          (f) => !['teams', 'articles', 'challenges', 'attachments', 'expectations'].includes(
             f.key,
           ),
         )
@@ -1041,7 +1041,7 @@ class InjectDefinition extends Component {
       exerciseId,
       exercise,
       injectTypes,
-      audiencesMap,
+      teamsMap,
       documentsMap,
       exercisesMap,
       tagsMap,
@@ -1053,12 +1053,12 @@ class InjectDefinition extends Component {
       return <Loader variant="inElement" />;
     }
     const {
-      allAudiences,
-      audiencesIds,
+      allTeams,
+      teamsIds,
       documents,
       expectations,
-      audiencesSortBy,
-      audiencesOrderAsc,
+      teamsSortBy,
+      teamsOrderAsc,
       documentsSortBy,
       documentsOrderAsc,
       articlesOrderAsc,
@@ -1072,19 +1072,22 @@ class InjectDefinition extends Component {
     const injectType = R.head(
       injectTypes.filter((i) => i.contract_id === inject.inject_contract),
     );
-    // -- AUDIENCES --
-    const audiences = audiencesIds
-      .map((a) => audiencesMap[a])
+    // -- TEAMS --
+    const teams = teamsIds
+      .map((a) => teamsMap[a])
       .filter((a) => a !== undefined);
-    const sortAudiences = R.sortWith(
-      audiencesOrderAsc
-        ? [R.ascend(R.prop(audiencesSortBy))]
-        : [R.descend(R.prop(audiencesSortBy))],
+    const sortTeams = R.sortWith(
+      teamsOrderAsc
+        ? [R.ascend(R.prop(teamsSortBy))]
+        : [R.descend(R.prop(teamsSortBy))],
     );
-    const sortedAudiences = sortAudiences(audiences);
-    const hasAudiences = injectType.fields
+    const sortedTeams = sortTeams(teams.map((n) => ({
+      team_users_enabled_number: exercise.exercise_teams_users.filter((o) => o.exercise_id === exerciseId && o.team_id === n.team_id).length,
+      ...n,
+    })));
+    const hasTeams = injectType.fields
       .map((f) => f.key)
-      .includes('audiences');
+      .includes('teams');
     // -- ARTICLES --
     const articles = articlesIds
       .map((a) => articlesMap[a])
@@ -1149,7 +1152,7 @@ class InjectDefinition extends Component {
     const initialValues = { ...inject.inject_content };
     // Enrich initialValues with default contract value
     const builtInFields = [
-      'audiences',
+      'teams',
       'articles',
       'challenges',
       'attachments',
@@ -1260,25 +1263,25 @@ class InjectDefinition extends Component {
           >
             {({ form, handleSubmit, submitting, values }) => (
               <form id="injectContentForm" onSubmit={handleSubmit}>
-                {hasAudiences && (
+                {hasTeams && (
                   <div>
                     <Typography variant="h2" style={{ float: 'left' }}>
-                      {t('Targeted audiences')}
+                      {t('Targeted teams')}
                     </Typography>
                     <FormGroup
                       row={true}
-                      classes={{ root: classes.allAudiences }}
+                      classes={{ root: classes.allTeams }}
                     >
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={allAudiences}
+                            checked={allTeams}
                             onChange={this.toggleAll.bind(this)}
                             color="primary"
                             disabled={isExerciseReadOnly(exercise)}
                           />
                         }
-                        label={<strong>{t('All audiences')}</strong>}
+                        label={<strong>{t('All teams')}</strong>}
                       />
                     </FormGroup>
                     <div className="clearfix" />
@@ -1302,23 +1305,23 @@ class InjectDefinition extends Component {
                         <ListItemText
                           primary={
                             <div>
-                              {this.audiencesSortHeader(
-                                'audience_name',
+                              {this.teamsSortHeader(
+                                'team_name',
                                 'Name',
                                 true,
                               )}
-                              {this.audiencesSortHeader(
-                                'audience_users_number',
+                              {this.teamsSortHeader(
+                                'team_users_number',
                                 'Players',
                                 true,
                               )}
-                              {this.audiencesSortHeader(
-                                'audience_enabled',
-                                'Status',
+                              {this.teamsSortHeader(
+                                'team_users_enabled_number',
+                                'Enabled players',
                                 true,
                               )}
-                              {this.audiencesSortHeader(
-                                'audience_tags',
+                              {this.teamsSortHeader(
+                                'team_tags',
                                 'Tags',
                                 true,
                               )}
@@ -1329,26 +1332,34 @@ class InjectDefinition extends Component {
                           &nbsp;
                         </ListItemSecondaryAction>
                       </ListItem>
-                      {allAudiences ? (
+                      {allTeams ? (
                         <ListItem
                           classes={{ root: classes.item }}
                           divider={true}
                         >
                           <ListItemIcon>
-                            <CastForEducationOutlined />
+                            <GroupsOutlined />
                           </ListItemIcon>
                           <ListItemText
                             primary={
                               <div>
                                 <div
                                   className={classes.bodyItem}
-                                  style={inlineStyles.audience_name}
+                                  style={inlineStyles.team_name}
                                 >
-                                  <i>{t('All audiences')}</i>
+                                  <i>{t('All teams')}</i>
                                 </div>
                                 <div
                                   className={classes.bodyItem}
-                                  style={inlineStyles.audience_users_number}
+                                  style={inlineStyles.team_users_number}
+                                >
+                                  <strong>
+                                    {exercise.exercise_all_users_number}
+                                  </strong>
+                                </div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={inlineStyles.team_users_enabled_number}
                                 >
                                   <strong>
                                     {exercise.exercise_users_number}
@@ -1356,17 +1367,7 @@ class InjectDefinition extends Component {
                                 </div>
                                 <div
                                   className={classes.bodyItem}
-                                  style={inlineStyles.audience_enabled}
-                                >
-                                  <ItemBoolean
-                                    status={true}
-                                    label={t('Enabled')}
-                                    variant="list"
-                                  />
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.audience_tags}
+                                  style={inlineStyles.team_tags}
                                 >
                                   <ItemTags variant="list" tags={[]} />
                                 </div>
@@ -1379,62 +1380,54 @@ class InjectDefinition extends Component {
                         </ListItem>
                       ) : (
                         <div>
-                          {sortedAudiences.map((audience) => (
+                          {sortedTeams.map((team) => (
                             <ListItem
-                              key={audience.audience_id}
+                              key={team.team_id}
                               classes={{ root: classes.item }}
                               divider={true}
                             >
                               <ListItemIcon>
-                                <CastForEducationOutlined />
+                                <GroupsOutlined />
                               </ListItemIcon>
                               <ListItemText
                                 primary={
                                   <div>
                                     <div
                                       className={classes.bodyItem}
-                                      style={inlineStyles.audience_name}
+                                      style={inlineStyles.team_name}
                                     >
-                                      {audience.audience_name}
+                                      {team.team_name}
                                     </div>
                                     <div
                                       className={classes.bodyItem}
-                                      style={inlineStyles.audience_users_number}
+                                      style={inlineStyles.team_users_number}
                                     >
-                                      {audience.audience_users_number}
+                                      {team.team_users_number}
                                     </div>
                                     <div
                                       className={classes.bodyItem}
-                                      style={inlineStyles.audience_enabled}
+                                      style={inlineStyles.team_users_enabled_number}
                                     >
-                                      <ItemBoolean
-                                        status={audience.audience_enabled}
-                                        label={
-                                          audience.audience_enabled
-                                            ? t('Enabled')
-                                            : t('Disabled')
-                                        }
-                                        variant="list"
-                                      />
+                                      {team.team_users_enabled_number}
                                     </div>
                                     <div
                                       className={classes.bodyItem}
-                                      style={inlineStyles.audience_tags}
+                                      style={inlineStyles.team_tags}
                                     >
                                       <ItemTags
                                         variant="list"
-                                        tags={audience.audience_tags}
+                                        tags={team.team_tags}
                                       />
                                     </div>
                                   </div>
                                 }
                               />
                               <ListItemSecondaryAction>
-                                <AudiencePopover
+                                <TeamPopover
                                   exerciseId={exerciseId}
-                                  exercise={exercise}
-                                  audience={audience}
-                                  onRemoveAudience={this.handleRemoveAudience.bind(
+                                  injectId={inject.inject_id}
+                                  team={team}
+                                  onRemoveTeam={this.handleRemoveTeam.bind(
                                     this,
                                   )}
                                   disabled={isExerciseReadOnly(exercise)}
@@ -1442,10 +1435,10 @@ class InjectDefinition extends Component {
                               </ListItemSecondaryAction>
                             </ListItem>
                           ))}
-                          <InjectAddAudiences
+                          <InjectAddTeams
                             exerciseId={exerciseId}
-                            injectAudiencesIds={audiencesIds}
-                            handleAddAudiences={this.handleAddAudiences.bind(
+                            injectTeamsIds={teamsIds}
+                            handleAddTeams={this.handleAddTeams.bind(
                               this,
                             )}
                           />
@@ -1458,7 +1451,7 @@ class InjectDefinition extends Component {
                   <div>
                     <Typography
                       variant="h2"
-                      style={{ marginTop: hasAudiences ? 30 : 0 }}
+                      style={{ marginTop: hasTeams ? 30 : 0 }}
                     >
                       {t('Media pressure to publish')}
                     </Typography>
@@ -1576,7 +1569,7 @@ class InjectDefinition extends Component {
                   <div>
                     <Typography
                       variant="h2"
-                      style={{ marginTop: hasAudiences ? 30 : 0 }}
+                      style={{ marginTop: hasTeams ? 30 : 0 }}
                     >
                       {t('Challenges to publish')}
                     </Typography>
@@ -1679,7 +1672,7 @@ class InjectDefinition extends Component {
                     </List>
                   </div>
                 )}
-                <div style={{ marginTop: hasAudiences ? 30 : 0 }}>
+                <div style={{ marginTop: hasTeams ? 30 : 0 }}>
                   <div style={{ float: 'left' }}>
                     <Typography variant="h2">{t('Inject data')}</Typography>
                   </div>
@@ -1968,7 +1961,7 @@ InjectDefinition.propTypes = {
   exercise: PropTypes.object,
   injectId: PropTypes.string,
   inject: PropTypes.object,
-  fetchInjectAudiences: PropTypes.func,
+  fetchInjectTeams: PropTypes.func,
   fetchExerciseArticles: PropTypes.func,
   fetchMedias: PropTypes.func,
   fetchChallenges: PropTypes.func,
@@ -1985,14 +1978,14 @@ const select = (state, ownProps) => {
   const { injectId } = ownProps;
   const inject = helper.getInject(injectId);
   const documentsMap = helper.getDocumentsMap();
-  const audiencesMap = helper.getAudiencesMap();
+  const teamsMap = helper.getTeamsMap();
   const mediasMap = helper.getMediasMap();
   const articlesMap = helper.getArticlesMap();
   const challengesMap = helper.getChallengesMap();
   return {
     inject,
     documentsMap,
-    audiencesMap,
+    teamsMap,
     articlesMap,
     mediasMap,
     challengesMap,
@@ -2001,7 +1994,7 @@ const select = (state, ownProps) => {
 
 export default R.compose(
   connect(select, {
-    fetchInjectAudiences,
+    fetchInjectTeams,
     updateInject,
     fetchDocuments,
     fetchExerciseArticles,

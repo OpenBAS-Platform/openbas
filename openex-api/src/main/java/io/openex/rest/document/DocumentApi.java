@@ -231,7 +231,7 @@ public class DocumentApi extends RestBehavior {
     if (user.getId().equals(ANONYMOUS)) {
       throw new UnsupportedOperationException("User must be logged or dynamic player is required");
     }
-    if (!exercise.isUserHasAccess(user) && !exercise.getPlayers().contains(user)) {
+    if (!exercise.isUserHasAccess(user) && !exercise.getUsers().contains(user)) {
       throw new UnsupportedOperationException("The given player is not in this exercise");
     }
     return getExercisePlayerDocuments(exercise);
@@ -245,7 +245,7 @@ public class DocumentApi extends RestBehavior {
     if (user.getId().equals(ANONYMOUS)) {
       throw new UnsupportedOperationException("User must be logged or dynamic player is required");
     }
-    if (!exercise.isUserHasAccess(user) && !exercise.getPlayers().contains(user)) {
+    if (!exercise.isUserHasAccess(user) && !exercise.getUsers().contains(user)) {
       throw new UnsupportedOperationException("The given player is not in this exercise");
     }
     Document document = getExercisePlayerDocuments(exercise).stream().filter(doc -> doc.getId().equals(documentId))

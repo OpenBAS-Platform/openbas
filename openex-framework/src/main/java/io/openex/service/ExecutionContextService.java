@@ -28,12 +28,12 @@ public class ExecutionContextService {
   private final VariableRepository variableRepository;
 
 
-  public ExecutionContext executionContext(@NotNull final User user, Injection injection, String audience) {
-    return this.executionContext(user, injection, List.of(audience));
+  public ExecutionContext executionContext(@NotNull final User user, Injection injection, String team) {
+    return this.executionContext(user, injection, List.of(team));
   }
 
-  public ExecutionContext executionContext(@NotNull final User user, Injection injection, List<String> audiences) {
-    ExecutionContext executionContext = new ExecutionContext(user, injection.getExercise(), audiences);
+  public ExecutionContext executionContext(@NotNull final User user, Injection injection, List<String> teams) {
+    ExecutionContext executionContext = new ExecutionContext(user, injection.getExercise(), teams);
     if (injection.getExercise() != null) {
       String exerciseId = injection.getExercise().getId();
       String queryParams = "?user=" + user.getId() + "&inject=" + injection.getId();
@@ -47,8 +47,8 @@ public class ExecutionContextService {
     return executionContext;
   }
 
-  public ExecutionContext executionContext(@NotNull final User user, Exercise exercise, String audience) {
-    ExecutionContext executionContext = new ExecutionContext(user, exercise, List.of(audience));
+  public ExecutionContext executionContext(@NotNull final User user, Exercise exercise, String team) {
+    ExecutionContext executionContext = new ExecutionContext(user, exercise, List.of(team));
     if (exercise != null) {
       fillDynamicVariable(executionContext, exercise.getId());
     }

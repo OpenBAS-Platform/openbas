@@ -53,12 +53,12 @@ public class LessonsCategory implements Base {
     private int order;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "lessons_categories_audiences",
+    @JoinTable(name = "lessons_categories_teams",
             joinColumns = @JoinColumn(name = "lessons_category_id"),
-            inverseJoinColumns = @JoinColumn(name = "audience_id"))
+            inverseJoinColumns = @JoinColumn(name = "team_id"))
     @JsonSerialize(using = MultiIdDeserializer.class)
-    @JsonProperty("lessons_category_audiences")
-    private List<Audience> audiences = new ArrayList<>();
+    @JsonProperty("lessons_category_teams")
+    private List<Team> teams = new ArrayList<>();
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     @JsonProperty("lessons_category_questions")
@@ -68,7 +68,7 @@ public class LessonsCategory implements Base {
     // region transient
     @JsonProperty("lessons_category_users")
     public List<String> getUsers() {
-        return getAudiences().stream().flatMap(audience -> audience.getUsers().stream().map(User::getId)).toList();
+        return getTeams().stream().flatMap(team -> team.getUsers().stream().map(User::getId)).toList();
     }
     // endregion
 
@@ -129,12 +129,12 @@ public class LessonsCategory implements Base {
         this.order = order;
     }
 
-    public List<Audience> getAudiences() {
-        return audiences;
+    public List<Team> getTeams() {
+        return teams;
     }
 
-    public void setAudiences(List<Audience> audiences) {
-        this.audiences = audiences;
+    public void setTeams(List<Team> teams) {
+        this.teams = teams;
     }
 
     public List<LessonsQuestion> getQuestions() {

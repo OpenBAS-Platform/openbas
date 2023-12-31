@@ -10,20 +10,20 @@ import static io.openex.contract.variables.VariableHelper.*;
 
 public class ExecutionContext extends HashMap<String, Object> {
 
-  public ExecutionContext(User user, Exercise exercise, List<String> audiences) {
+  public ExecutionContext(User user, Exercise exercise, List<String> teams) {
     ProtectUser protectUser = new ProtectUser(user);
     this.put(USER, protectUser);
     this.put(EXERCISE, exercise);
-    this.put(AUDIENCES, audiences);
+    this.put(TEAMS, teams);
   }
 
   public ProtectUser getUser() {
     return (ProtectUser) this.get(USER);
   }
 
-  public List<String> getAudiences() {
+  public List<String> getTeams() {
     //noinspection unchecked
-    return (List<String>) this.get(AUDIENCES);
+    return (List<String>) this.get(TEAMS);
   }
 
   public Exercise getExercise() {

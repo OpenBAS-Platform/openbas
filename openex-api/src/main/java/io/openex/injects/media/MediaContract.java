@@ -20,7 +20,7 @@ import static io.openex.contract.ContractDef.contractBuilder;
 import static io.openex.contract.ContractVariable.variable;
 import static io.openex.contract.fields.ContractArticle.articleField;
 import static io.openex.contract.fields.ContractAttachment.attachmentField;
-import static io.openex.contract.fields.ContractAudience.audienceField;
+import static io.openex.contract.fields.ContractTeam.teamField;
 import static io.openex.contract.fields.ContractCheckbox.checkboxField;
 import static io.openex.contract.fields.ContractExpectations.expectationsField;
 import static io.openex.contract.fields.ContractText.textField;
@@ -71,14 +71,14 @@ public class MediaContract extends Contractor {
         ContractCheckbox emailingField = checkboxField("emailing", "Send email", true);
         Expectation expectation = new Expectation();
         expectation.setType(ARTICLE);
-        expectation.setName("Expect audiences to read the article(s)");
+        expectation.setName("Expect teams to read the article(s)");
         expectation.setScore(0);
         ContractExpectations expectationsField = expectationsField(
             "expectations", "Expectations", List.of(expectation)
         );
         List<ContractElement> publishInstance = contractBuilder()
                 // built in
-                .optional(audienceField("audiences", "Audiences", Multiple))
+                .optional(teamField("teams", "Teams", Multiple))
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .mandatory(articleField("articles", "Articles", Multiple))
                 // Contract specific

@@ -63,50 +63,6 @@ export interface ArticleUpdateInput {
   article_shares?: number;
 }
 
-export interface Audience {
-  audience_communications?: Communication[];
-  /** @format date-time */
-  audience_created_at?: string;
-  audience_description?: string;
-  audience_enabled?: boolean;
-  audience_exercise?: Exercise;
-  audience_id?: string;
-  audience_inject_expectations?: InjectExpectation[];
-  audience_injects?: Inject[];
-  /** @format int64 */
-  audience_injects_expectations_number?: number;
-  /** @format int64 */
-  audience_injects_expectations_total_expected_score?: number;
-  /** @format int64 */
-  audience_injects_expectations_total_score?: number;
-  /** @format int64 */
-  audience_injects_number?: number;
-  audience_name?: string;
-  audience_tags?: Tag[];
-  /** @format date-time */
-  audience_updated_at?: string;
-  audience_users?: User[];
-  /** @format int64 */
-  audience_users_number?: number;
-  updateAttributes?: object;
-}
-
-export interface AudienceCreateInput {
-  audience_description?: string;
-  audience_name: string;
-  audience_tags?: string[];
-}
-
-export interface AudienceUpdateActivationInput {
-  audience_enabled?: boolean;
-}
-
-export interface AudienceUpdateInput {
-  audience_description?: string;
-  audience_name: string;
-  audience_tags?: string[];
-}
-
 export interface Challenge {
   challenge_category?: string;
   challenge_content?: string;
@@ -209,12 +165,12 @@ export interface Comcheck {
 }
 
 export interface ComcheckInput {
-  comcheck_audiences?: string[];
   /** @format date-time */
   comcheck_end_date?: string;
   comcheck_message?: string;
   comcheck_name: string;
   comcheck_subject?: string;
+  comcheck_teams?: string[];
 }
 
 export interface ComcheckStatus {
@@ -287,7 +243,7 @@ export interface ContractElement {
     | "challenge"
     | "dependency-select"
     | "attachment"
-    | "audience"
+    | "team"
     | "expectation";
 }
 
@@ -441,6 +397,8 @@ export interface ExecutionTrace {
 }
 
 export interface Exercise {
+  /** @format int64 */
+  exercise_all_users_number?: number;
   exercise_articles?: Article[];
   /** @format int64 */
   exercise_communications_number?: number;
@@ -471,7 +429,6 @@ export interface Exercise {
   exercise_observers?: User[];
   exercise_pauses?: Pause[];
   exercise_planners?: User[];
-  exercise_players?: User[];
   /** @format double */
   exercise_score?: number;
   /** @format date-time */
@@ -479,8 +436,11 @@ export interface Exercise {
   exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   exercise_subtitle?: string;
   exercise_tags?: Tag[];
+  exercise_teams?: Team[];
+  exercise_teams_users?: ExerciseTeamUser[];
   /** @format date-time */
   exercise_updated_at?: string;
+  exercise_users?: User[];
   /** @format int64 */
   exercise_users_number?: number;
   updateAttributes?: object;
@@ -507,6 +467,16 @@ export interface ExerciseSimple {
   exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   exercise_subtitle?: string;
   exercise_tags?: Tag[];
+}
+
+export interface ExerciseTeamPlayersEnableInput {
+  exercise_team_players?: string[];
+}
+
+export interface ExerciseTeamUser {
+  exercise_id?: Exercise;
+  team_id?: Team;
+  user_id?: User;
 }
 
 export interface ExerciseUpdateInput {
@@ -536,8 +506,11 @@ export interface ExerciseUpdateTagsInput {
   exercise_tags?: string[];
 }
 
+export interface ExerciseUpdateTeamsInput {
+  exercise_teams?: string[];
+}
+
 export interface ExpectationUpdateInput {
-  expectation_id?: string;
   /** @format int32 */
   expectation_score: number;
 }
@@ -589,8 +562,7 @@ export interface GroupUpdateUsersInput {
 export interface Inject {
   footer?: string;
   header?: string;
-  inject_all_audiences?: boolean;
-  inject_audiences?: Audience[];
+  inject_all_teams?: boolean;
   inject_city?: string;
   inject_communications?: Communication[];
   /** @format int64 */
@@ -620,6 +592,7 @@ export interface Inject {
   inject_sent_at?: string;
   inject_status?: InjectStatus;
   inject_tags?: Tag[];
+  inject_teams?: Team[];
   inject_title?: string;
   inject_type?: string;
   /** @format date-time */
@@ -628,10 +601,6 @@ export interface Inject {
   /** @format int64 */
   inject_users_number?: number;
   updateAttributes?: object;
-}
-
-export interface InjectAudiencesInput {
-  inject_audiences?: string[];
 }
 
 export interface InjectDocument {
@@ -647,7 +616,6 @@ export interface InjectDocumentInput {
 
 export interface InjectExpectation {
   inject_expectation_article?: Article;
-  inject_expectation_audience?: Audience;
   inject_expectation_challenge?: Challenge;
   /** @format date-time */
   inject_expectation_created_at?: string;
@@ -660,6 +628,7 @@ export interface InjectExpectation {
   inject_expectation_result?: string;
   /** @format int32 */
   inject_expectation_score?: number;
+  inject_expectation_team?: Team;
   inject_expectation_type?: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL";
   /** @format date-time */
   inject_expectation_updated_at?: string;
@@ -669,8 +638,7 @@ export interface InjectExpectation {
 }
 
 export interface InjectInput {
-  inject_all_audiences?: boolean;
-  inject_audiences?: string[];
+  inject_all_teams?: boolean;
   inject_city?: string;
   inject_content?: object;
   inject_contract?: string;
@@ -681,6 +649,7 @@ export interface InjectInput {
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
   inject_tags?: string[];
+  inject_teams?: string[];
   inject_title?: string;
 }
 
@@ -694,6 +663,10 @@ export interface InjectStatus {
   status_name?: string;
   status_reporting?: Execution;
   updateAttributes?: object;
+}
+
+export interface InjectTeamsInput {
+  inject_teams?: string[];
 }
 
 export interface InjectUpdateActivationInput {
@@ -734,7 +707,6 @@ export interface LessonsAnswerCreateInput {
 }
 
 export interface LessonsCategory {
-  lessons_category_audiences?: Audience[];
   /** @format date-time */
   lessons_category_created_at?: string;
   lessons_category_description?: string;
@@ -743,6 +715,7 @@ export interface LessonsCategory {
   /** @format int32 */
   lessons_category_order?: number;
   lessons_category_questions?: LessonsQuestion[];
+  lessons_category_teams?: Team[];
   /** @format date-time */
   lessons_category_updated_at?: string;
   lessons_category_users?: string[];
@@ -750,15 +723,15 @@ export interface LessonsCategory {
   updateAttributes?: object;
 }
 
-export interface LessonsCategoryAudiencesInput {
-  lessons_category_audiences?: string[];
-}
-
 export interface LessonsCategoryCreateInput {
   lessons_category_description?: string;
   lessons_category_name: string;
   /** @format int32 */
   lessons_category_order?: number;
+}
+
+export interface LessonsCategoryTeamsInput {
+  lessons_category_teams?: string[];
 }
 
 export interface LessonsCategoryUpdateInput {
@@ -894,7 +867,7 @@ export interface LinkedFieldModel {
     | "challenge"
     | "dependency-select"
     | "attachment"
-    | "audience"
+    | "team"
     | "expectation";
 }
 
@@ -1163,6 +1136,49 @@ export interface TagUpdateInput {
   tag_name: string;
 }
 
+export interface Team {
+  team_communications?: Communication[];
+  /** @format date-time */
+  team_created_at?: string;
+  team_description?: string;
+  team_exercises?: Exercise[];
+  team_exercises_users?: ExerciseTeamUser[];
+  team_id?: string;
+  team_inject_expectations?: InjectExpectation[];
+  team_injects?: Inject[];
+  /** @format int64 */
+  team_injects_expectations_number?: number;
+  /** @format int64 */
+  team_injects_expectations_total_expected_score?: number;
+  /** @format int64 */
+  team_injects_expectations_total_score?: number;
+  /** @format int64 */
+  team_injects_number?: number;
+  team_name: string;
+  team_organization?: Organization;
+  team_tags?: Tag[];
+  /** @format date-time */
+  team_updated_at?: string;
+  team_users?: User[];
+  /** @format int64 */
+  team_users_number?: number;
+  updateAttributes?: object;
+}
+
+export interface TeamCreateInput {
+  team_description?: string;
+  team_name: string;
+  team_organization?: string;
+  team_tags?: string[];
+}
+
+export interface TeamUpdateInput {
+  team_description?: string;
+  team_name: string;
+  team_organization?: string;
+  team_tags?: string[];
+}
+
 export interface Token {
   /** @format date-time */
   token_created_at?: string;
@@ -1218,8 +1234,8 @@ export interface UpdateUserInput {
   user_tags?: string[];
 }
 
-export interface UpdateUsersAudienceInput {
-  audience_users?: string[];
+export interface UpdateUsersTeamInput {
+  team_users?: string[];
 }
 
 export interface User {
@@ -1227,7 +1243,6 @@ export interface User {
   injects?: Inject[];
   updateAttributes?: object;
   user_admin?: boolean;
-  user_audiences?: Audience[];
   user_city?: string;
   user_communications?: Communication[];
   user_country?: string;
@@ -1257,6 +1272,7 @@ export interface User {
   /** @format int32 */
   user_status: number;
   user_tags?: Tag[];
+  user_teams?: Team[];
   user_theme?: string;
   /** @format date-time */
   user_updated_at?: string;

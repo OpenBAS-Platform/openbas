@@ -19,7 +19,7 @@ const Dashboard = lazy(() => import('./dashboard/Dashboard'));
 const Lessons = lazy(() => import('./lessons/Lessons'));
 const Reports = lazy(() => import('./reports/Reports'));
 const Report = lazy(() => import('./reports/Report'));
-const Audiences = lazy(() => import('./audiences/Audiences'));
+const Teams = lazy(() => import('./teams/Teams'));
 const Injects = lazy(() => import('./injects/Injects'));
 const Articles = lazy(() => import('./articles/Articles'));
 const Challenges = lazy(() => import('./challenges/Challenges'));
@@ -63,7 +63,7 @@ const Index = () => {
             <Route path="" element={errorWrapper(Exercise)()} />
             <Route path="controls/dryruns/:dryrunId" element={errorWrapper(Dryrun)()} />
             <Route path="controls/comchecks/:comcheckId" element={errorWrapper(Comcheck)()} />
-            <Route path="definition/audiences" element={errorWrapper(Audiences)()} />
+            <Route path="definition/teams" element={errorWrapper(Teams)()} />
             <Route path="definition/media" element={errorWrapper(Articles)()} />
             <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
             <Route path="definition/variables" element={errorWrapper(Variables)()} />

@@ -49,9 +49,8 @@ import {
   resetLessonsAnswers,
   sendLessons,
 } from '../../../../actions/Lessons';
-import { fetchAudiences } from '../../../../actions/Audience';
 import { resolveUserName } from '../../../../utils/String';
-import { updateExerciseLessons } from '../../../../actions/Exercise';
+import { fetchExerciseTeams, updateExerciseLessons } from '../../../../actions/Exercise';
 import SendLessonsForm from './SendLessonsForm';
 import { fetchPlayers } from '../../../../actions/User';
 import LessonsObjectives from './LessonsObjectives';
@@ -120,7 +119,7 @@ const Lessons = () => {
     exercise,
     objectives,
     injects,
-    audiencesMap,
+    teamsMap,
     lessonsCategories,
     lessonsQuestions,
     lessonsAnswers,
@@ -131,7 +130,7 @@ const Lessons = () => {
       exercise: helper.getExercise(exerciseId),
       objectives: helper.getExerciseObjectives(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
-      audiencesMap: helper.getAudiencesMap(),
+      teamsMap: helper.getTeamsMap(),
       lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
       lessonsQuestions: helper.getExerciseLessonsQuestions(exerciseId),
       lessonsAnswers: helper.getExerciseLessonsAnswers(exerciseId),
@@ -146,7 +145,7 @@ const Lessons = () => {
     dispatch(fetchLessonsAnswers(exerciseId));
     dispatch(fetchObjectives(exerciseId));
     dispatch(fetchInjects(exerciseId));
-    dispatch(fetchAudiences(exerciseId));
+    dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchPlayers());
   });
   const applyTemplate = () => {
@@ -251,7 +250,7 @@ const Lessons = () => {
                 {t('hours')}
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h3">{t('Audience')}</Typography>
+                <Typography variant="h3">{t('Team')}</Typography>
                 {exercise.exercise_users_number} {t('players')}
               </Grid>
             </Grid>
@@ -363,7 +362,7 @@ const Lessons = () => {
         lessonsAnswers={lessonsAnswers}
         setSelectedQuestion={setSelectedQuestion}
         lessonsQuestions={lessonsQuestions}
-        audiencesMap={audiencesMap}
+        teamsMap={teamsMap}
       />
       <Dialog
         TransitionComponent={Transition}

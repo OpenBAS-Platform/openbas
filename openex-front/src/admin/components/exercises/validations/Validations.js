@@ -9,11 +9,10 @@ import AnimationMenu from '../AnimationMenu';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchExerciseInjects, fetchInjectTypes } from '../../../../actions/Inject';
-import { fetchExerciseInjectExpectations } from '../../../../actions/Exercise';
+import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../actions/Exercise';
 import SearchFilter from '../../../../components/SearchFilter';
 import Loader from '../../../../components/Loader';
 import { useFormatter } from '../../../../components/i18n';
-import { fetchAudiences } from '../../../../actions/Audience';
 import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import TagsFilter from '../../../../components/TagsFilter';
@@ -64,7 +63,7 @@ const Validations = () => {
     injectTypesMap,
     injectExpectations,
     injectsMap,
-    audiencesMap,
+    teamsMap,
     challengesMap,
     articlesMap,
     mediasMap,
@@ -74,7 +73,7 @@ const Validations = () => {
       injectsMap: helper.getInjectsMap(),
       injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
       injectTypesMap: helper.getInjectTypesMap(),
-      audiencesMap: helper.getAudiencesMap(),
+      teamsMap: helper.getTeamsMap(),
       challengesMap: helper.getChallengesMap(),
       articlesMap: helper.getArticlesMap(),
       mediasMap: helper.getMediasMap(),
@@ -85,7 +84,7 @@ const Validations = () => {
     dispatch(fetchInjectTypes());
     dispatch(fetchExerciseInjectExpectations(exerciseId));
     dispatch(fetchExerciseInjects(exerciseId));
-    dispatch(fetchAudiences(exerciseId));
+    dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchExerciseArticles(exerciseId));
     dispatch(fetchExerciseChallenges(exerciseId));
   });
@@ -130,13 +129,13 @@ const Validations = () => {
     return group;
   }, {});
 
-  const groupedByAudience = (injects) => {
+  const groupedByTeam = (injects) => {
     return injects.reduce((group, expectation) => {
-      const { inject_expectation_audience } = expectation;
-      if (inject_expectation_audience) {
-        const values = group[inject_expectation_audience] ?? [];
+      const { inject_expectation_team } = expectation;
+      if (inject_expectation_team) {
+        const values = group[inject_expectation_team] ?? [];
         values.push(expectation);
-        group[inject_expectation_audience] = values;
+        group[inject_expectation_team] = values;
       }
       return group;
     }, {});
@@ -186,7 +185,7 @@ const Validations = () => {
         </div>
         <div className="clearfix" />
         <List>
-          {Object.entries(groupedByInject).map(([injectId, audiences]) => {
+          {Object.entries(groupedByInject).map(([injectId, teams]) => {
             const inject = injectsMap[injectId] || {};
             const injectContract = injectTypesMap[inject.inject_contract] || {};
             return (
@@ -218,10 +217,10 @@ const Validations = () => {
                   />
                 </ListItem>
                 <List component="div" disablePadding>
-                  {Object.entries(groupedByAudience(audiences)).map(([audienceId, expectations]) => {
-                    const audience = audiencesMap[audienceId] || {};
+                  {Object.entries(groupedByTeam(teams)).map(([teamId, expectations]) => {
+                    const team = teamsMap[teamId] || {};
                     return (
-                      <div key={audience.audience_id}>
+                      <div key={team.team_id}>
                         <ListItem
                           divider={true}
                           sx={{ pl: 4 }}
@@ -233,7 +232,7 @@ const Validations = () => {
                           <ListItemText
                             primary={
                               <div className={classes.bodyItem} style={{ width: '20%' }}>
-                                {audience.audience_name}
+                                {team.team_name}
                               </div>
                             }
                           />

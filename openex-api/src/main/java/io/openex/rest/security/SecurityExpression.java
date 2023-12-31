@@ -71,7 +71,7 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
       return true;
     }
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-    List<User> players = exercise.getPlayers();
+    List<User> players = exercise.getUsers();
     Optional<User> player = players.stream()
         .filter(user -> user.getId().equals(getUser().getId())).findAny();
     return player.isPresent();

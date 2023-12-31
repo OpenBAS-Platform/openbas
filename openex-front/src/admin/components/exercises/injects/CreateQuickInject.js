@@ -44,7 +44,7 @@ class CreateQuickInject extends Component {
     const { classes, exercise, injectTypes, exercisesMap, tagsMap } = this.props;
     const { open } = this.state;
     return (
-      <div>
+      <>
         <Fab
           onClick={this.handleOpen.bind(this)}
           color="primary"
@@ -73,7 +73,7 @@ class CreateQuickInject extends Component {
             tagsMap={tagsMap}
           />
         </Drawer>
-      </div>
+      </>
     );
   }
 }

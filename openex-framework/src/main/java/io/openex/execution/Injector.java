@@ -51,11 +51,11 @@ public abstract class Injector {
 
     public abstract List<Expectation> process(Execution execution, ExecutableInject injection, Contract contract) throws Exception;
 
-    private InjectExpectation expectationConverter(Audience audience, ExecutableInject executableInject, Expectation expectation) {
+    private InjectExpectation expectationConverter(Team team, ExecutableInject executableInject, Expectation expectation) {
         InjectExpectation expectationExecution = new InjectExpectation();
         expectationExecution.setExercise(executableInject.getInject().getExercise());
         expectationExecution.setInject(executableInject.getInject());
-        expectationExecution.setAudience(audience);
+        expectationExecution.setTeam(team);
         expectationExecution.setExpectedScore(expectation.getScore());
         expectationExecution.setScore(0);
         switch (expectation.type()) {
@@ -94,11 +94,11 @@ public abstract class Injector {
             // Process the execution
             List<Expectation> expectations = process(execution, executableInject, contract);
             // Create the expectations
-            List<Audience> audiences = executableInject.getAudiences();
-            if (isScheduledInject && !audiences.isEmpty() && !expectations.isEmpty()) {
-                List<InjectExpectation> executions = audiences.stream()
-                        .flatMap(audience -> expectations.stream()
-                                .map(expectation -> expectationConverter(audience, executableInject, expectation)))
+            List<Team> teams = executableInject.getTeams();
+            if (isScheduledInject && !teams.isEmpty() && !expectations.isEmpty()) {
+                List<InjectExpectation> executions = teams.stream()
+                        .flatMap(team -> expectations.stream()
+                                .map(expectation -> expectationConverter(team, executableInject, expectation)))
                         .toList();
                 this.injectExpectationRepository.saveAll(executions);
             }

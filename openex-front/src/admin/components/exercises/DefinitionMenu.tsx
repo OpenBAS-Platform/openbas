@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Drawer, MenuList, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
-import { AttachMoneyOutlined, CastForEducationOutlined, EmojiEventsOutlined } from '@mui/icons-material';
+import { AttachMoneyOutlined, GroupsOutlined, EmojiEventsOutlined } from '@mui/icons-material';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../components/i18n';
@@ -42,17 +42,17 @@ const DefinitionMenu: React.FC<Props> = ({ exerciseId }) => {
       <MenuList component="nav">
         <MenuItem
           component={Link}
-          to={`/admin/exercises/${exerciseId}/definition/audiences`}
+          to={`/admin/exercises/${exerciseId}/definition/teams`}
           selected={
             location.pathname
-            === `/admin/exercises/${exerciseId}/definition/audiences`
+            === `/admin/exercises/${exerciseId}/definition/teams`
           }
           classes={{ root: classes.item }}
         >
           <ListItemIcon>
-            <CastForEducationOutlined />
+            <GroupsOutlined />
           </ListItemIcon>
-          <ListItemText primary={t('Audiences')} />
+          <ListItemText primary={t('Teams')} />
         </MenuItem>
         <MenuItem
           component={Link}

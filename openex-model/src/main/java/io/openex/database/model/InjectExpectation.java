@@ -104,10 +104,10 @@ public class InjectExpectation implements Base {
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "audience_id")
+    @JoinColumn(name = "team_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
-    @JsonProperty("inject_expectation_audience")
-    private Audience audience;
+    @JsonProperty("inject_expectation_team")
+    private Team team;
     // endregion
 
     @ManyToOne(fetch = FetchType.LAZY)

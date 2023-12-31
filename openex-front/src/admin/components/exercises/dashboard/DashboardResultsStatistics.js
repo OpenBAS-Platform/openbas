@@ -18,9 +18,9 @@ const useStyles = makeStyles(() => ({
 }));
 
 const DashboardDefinitionStatistics = ({
-  audiences,
+  teams,
   organizations,
-  audiencesMap,
+  teamsMap,
   injectExpectations,
   injectsMap,
   injectTypesMap,
@@ -31,13 +31,13 @@ const DashboardDefinitionStatistics = ({
   const { t, nsdt, tPick } = useFormatter();
   const theme = useTheme();
   const mapIndexed = R.addIndex(R.map);
-  const audiencesColors = R.pipe(
+  const teamsColors = R.pipe(
     mapIndexed((a, index) => [
-      a.audience_id,
+      a.team_id,
       colors(theme.palette.mode === 'dark' ? 400 : 600)[index],
     ]),
     R.fromPairs,
-  )(audiences);
+  )(teams);
   const organizationsColors = R.pipe(
     mapIndexed((o, index) => [
       o.organization_id,
@@ -46,9 +46,9 @@ const DashboardDefinitionStatistics = ({
     R.fromPairs,
   )(organizations);
   let cumulation = 0;
-  const audiencesScores = R.pipe(
+  const teamsScores = R.pipe(
     R.filter((n) => n.inject_expectation_result !== null),
-    R.groupBy(R.prop('inject_expectation_audience')),
+    R.groupBy(R.prop('inject_expectation_team')),
     R.toPairs,
     R.map((n) => {
       cumulation = 0;
@@ -64,17 +64,17 @@ const DashboardDefinitionStatistics = ({
       ];
     }),
     R.map((n) => ({
-      name: audiencesMap[n[0]]?.audience_name,
-      color: audiencesColors[n[0]],
+      name: teamsMap[n[0]]?.team_name,
+      color: teamsColors[n[0]],
       data: n[1].map((i) => ({
         x: i.inject_expectation_updated_at,
         y: i.inject_expectation_cumulated_score,
       })),
     })),
   )(injectExpectations);
-  const audiencesPercentScoresData = R.pipe(
+  const teamsPercentScoresData = R.pipe(
     R.filter((n) => n.inject_expectation_result !== null),
-    R.groupBy(R.prop('inject_expectation_audience')),
+    R.groupBy(R.prop('inject_expectation_team')),
     R.toPairs,
     R.map((n) => {
       cumulation = 0;
@@ -88,9 +88,9 @@ const DashboardDefinitionStatistics = ({
               'inject_expectation_percent_score',
               Math.round(
                 (cumulation * 100)
-                  / (audiencesMap[n[0]]
-                    ? audiencesMap[n[0]]
-                      .audience_injects_expectations_total_expected_score
+                  / (teamsMap[n[0]]
+                    ? teamsMap[n[0]]
+                      .team_injects_expectations_total_expected_score
                     : 1),
               ),
               i,
@@ -100,8 +100,8 @@ const DashboardDefinitionStatistics = ({
       ];
     }),
     R.map((n) => ({
-      name: audiencesMap[n[0]]?.audience_name,
-      color: audiencesColors[n[0]],
+      name: teamsMap[n[0]]?.team_name,
+      color: teamsColors[n[0]],
       data: n[1].map((i) => ({
         x: i.inject_expectation_updated_at,
         y: i.inject_expectation_percent_score,
@@ -188,28 +188,28 @@ const DashboardDefinitionStatistics = ({
       })),
     },
   ];
-  const audiencesTotalScores = R.pipe(
+  const teamsTotalScores = R.pipe(
     R.filter((n) => n.inject_expectation_result !== null),
-    R.groupBy(R.prop('inject_expectation_audience')),
+    R.groupBy(R.prop('inject_expectation_team')),
     R.toPairs,
     R.map((n) => ({
-      ...audiencesMap[n[0]],
-      audience_total_score: R.sum(
+      ...teamsMap[n[0]],
+      team_total_score: R.sum(
         R.map((o) => o.inject_expectation_score, n[1]),
       ),
     })),
   )(injectExpectations);
-  const sortedAudiencesByTotalScore = R.pipe(
-    R.sortWith([R.descend(R.prop('audience_total_score'))]),
+  const sortedTeamsByTotalScore = R.pipe(
+    R.sortWith([R.descend(R.prop('team_total_score'))]),
     R.take(10),
-  )(audiencesTotalScores);
-  const totalScoreByAudienceData = [
+  )(teamsTotalScores);
+  const totalScoreByTeamData = [
     {
       name: t('Total score'),
-      data: sortedAudiencesByTotalScore.map((a) => ({
-        x: a.audience_name,
-        y: a.audience_total_score,
-        fillColor: audiencesColors[a.audience_id],
+      data: sortedTeamsByTotalScore.map((a) => ({
+        x: a.team_name,
+        y: a.team_total_score,
+        fillColor: teamsColors[a.team_id],
       })),
     },
   ];
@@ -271,28 +271,28 @@ const DashboardDefinitionStatistics = ({
       })),
     },
   ];
-  const audiencesByPercentScore = R.map(
+  const teamsByPercentScore = R.map(
     (n) => R.assoc(
-      'audience_total_percent_score',
+      'team_total_percent_score',
       Math.round(
-        (n.audience_injects_expectations_total_score * 100)
-            / n.audience_injects_expectations_total_expected_score,
+        (n.team_injects_expectations_total_score * 100)
+            / n.team_injects_expectations_total_expected_score,
       ),
       n,
     ),
-    audiencesTotalScores,
+    teamsTotalScores,
   );
-  const sortedAudiencesByPercentScore = R.pipe(
-    R.sortWith([R.descend(R.prop('audience_total_percent_score'))]),
+  const sortedTeamsByPercentScore = R.pipe(
+    R.sortWith([R.descend(R.prop('team_total_percent_score'))]),
     R.take(10),
-  )(audiencesByPercentScore || []);
-  const percentScoreByAudienceData = [
+  )(teamsByPercentScore || []);
+  const percentScoreByTeamData = [
     {
       name: t('Percent of reached score'),
-      data: sortedAudiencesByPercentScore.map((a) => ({
-        x: a.audience_name,
-        y: a.audience_total_percent_score,
-        fillColor: audiencesColors[a.audience_id],
+      data: sortedTeamsByPercentScore.map((a) => ({
+        x: a.team_name,
+        y: a.team_total_percent_score,
+        fillColor: teamsColors[a.team_id],
       })),
     },
   ];
@@ -300,16 +300,16 @@ const DashboardDefinitionStatistics = ({
     <Grid container={true} spacing={3} style={{ marginTop: -10 }}>
       <Grid item={true} xs={4}>
         <Typography variant="h4">
-          {t('Distribution of score by audience (in % of expectations)')}
+          {t('Distribution of score by team (in % of expectations)')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedAudiencesByPercentScore.length > 0 ? (
+          {sortedTeamsByPercentScore.length > 0 ? (
             <Chart
               options={horizontalBarsChartOptions(theme)}
-              series={percentScoreByAudienceData}
+              series={percentScoreByTeamData}
               type="bar"
               width="100%"
-              height={50 + sortedAudiencesByPercentScore.length * 50}
+              height={50 + sortedTeamsByPercentScore.length * 50}
             />
           ) : (
             <Empty
@@ -322,10 +322,10 @@ const DashboardDefinitionStatistics = ({
       </Grid>
       <Grid item={true} xs={8}>
         <Typography variant="h4">
-          {t('Audiences scores over time (in % of expectations)')}
+          {t('Teams scores over time (in % of expectations)')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {audiencesPercentScoresData.length > 0 ? (
+          {teamsPercentScoresData.length > 0 ? (
             <Chart
               options={lineChartOptions(
                 theme,
@@ -336,7 +336,7 @@ const DashboardDefinitionStatistics = ({
                 false,
                 true,
               )}
-              series={audiencesPercentScoresData}
+              series={teamsPercentScoresData}
               type="line"
               width="100%"
               height={350}
@@ -352,16 +352,16 @@ const DashboardDefinitionStatistics = ({
       </Grid>
       <Grid item={true} xs={4} style={{ marginTop: 30 }}>
         <Typography variant="h4">
-          {t('Distribution of total score by audience')}
+          {t('Distribution of total score by team')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {audiencesTotalScores.length > 0 ? (
+          {teamsTotalScores.length > 0 ? (
             <Chart
               options={horizontalBarsChartOptions(theme)}
-              series={totalScoreByAudienceData}
+              series={totalScoreByTeamData}
               type="bar"
               width="100%"
-              height={50 + audiencesTotalScores.length * 50}
+              height={50 + teamsTotalScores.length * 50}
             />
           ) : (
             <Empty
@@ -373,9 +373,9 @@ const DashboardDefinitionStatistics = ({
         </Paper>
       </Grid>
       <Grid item={true} xs={8} style={{ marginTop: 30 }}>
-        <Typography variant="h4">{t('Audiences scores over time')}</Typography>
+        <Typography variant="h4">{t('Teams scores over time')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {audiencesScores.length > 0 ? (
+          {teamsScores.length > 0 ? (
             <Chart
               options={lineChartOptions(
                 theme,
@@ -386,7 +386,7 @@ const DashboardDefinitionStatistics = ({
                 false,
                 true,
               )}
-              series={audiencesScores}
+              series={teamsScores}
               type="line"
               width="100%"
               height={350}

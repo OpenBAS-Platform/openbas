@@ -114,12 +114,12 @@ export const dryinject = new schema.Entity(
 );
 export const arrayOfDryinjects = new schema.Array(dryinject);
 
-export const audience = new schema.Entity(
-  'audiences',
+export const team = new schema.Entity(
+  'teams',
   {},
-  { idAttribute: 'audience_id' },
+  { idAttribute: 'team_id' },
 );
-export const arrayOfAudiences = new schema.Array(audience);
+export const arrayOfTeams = new schema.Array(team);
 
 export const inject = new schema.Entity(
   'injects',
@@ -242,7 +242,7 @@ export const storeHelper = (state) => ({
   getExercise: (id) => entity(id, 'exercises', state),
   getExerciseDryruns: (id) => entities('dryruns', state).filter((i) => i.dryrun_exercise === id),
   getExerciseComchecks: (id) => entities('comchecks', state).filter((i) => i.comcheck_exercise === id),
-  getExerciseAudiences: (id) => entities('audiences', state).filter((i) => i.audience_exercise === id),
+  getExerciseTeams: (id) => entities('teams', state).filter((i) => i.team_exercises.includes(id)),
   getExerciseVariables: (id) => entities('variables', state).filter((i) => i.variable_exercise === id),
   getExerciseArticles: (id) => entities('articles', state).filter((i) => i.article_exercise === id),
   getExerciseInjects: (id) => entities('injects', state).filter((i) => i.inject_exercise === id),
@@ -250,18 +250,18 @@ export const storeHelper = (state) => ({
     (i) => i.communication_exercise === id,
   ),
   getExerciseTechnicalInjectsPerType: (id) => {
-    const typesWithNoAudiences = R.uniq(
+    const typesWithNoTeams = R.uniq(
       entities('inject_types', state)
         .map((t) => ({
           type: t.config.type,
-          hasAudiences:
-            t.fields.filter((f) => f.name === 'audiences').length > 0,
+          hasTeams:
+            t.fields.filter((f) => f.name === 'teams').length > 0,
         }))
-        .filter((t) => !t.hasAudiences)
+        .filter((t) => !t.hasTeams)
         .map((t) => t.type),
     );
     return R.mergeAll(
-      typesWithNoAudiences.map((t) => ({
+      typesWithNoTeams.map((t) => ({
         [t]: entities('injects', state).filter(
           (i) => i.inject_type === t && i.inject_exercise === id,
         ),
@@ -317,14 +317,14 @@ export const storeHelper = (state) => ({
   getInjectTypes: () => entities('inject_types', state),
   getInjectTypesMap: () => maps('inject_types', state),
   getInjectTypesMapByType: () => R.indexBy(R.path(['config', 'type']), entities('inject_types', state)),
-  getInjectTypesWithNoAudiences: () => R.uniq(
+  getInjectTypesWithNoTeams: () => R.uniq(
     entities('inject_types', state)
       .map((t) => ({
-        hasAudiences:
-            t.fields.filter((f) => f.key === 'audiences').length > 0,
+        hasTeams:
+            t.fields.filter((f) => f.key === 'teams').length > 0,
         ...t,
       }))
-      .filter((t) => !t.hasAudiences)
+      .filter((t) => !t.hasTeams)
       .map((t) => t.config.type),
   ),
   getNextInjects: () => {
@@ -346,16 +346,16 @@ export const storeHelper = (state) => ({
   // documents
   getDocuments: () => entities('documents', state),
   getDocumentsMap: () => maps('documents', state),
-  // audiences
-  getAudience: (id) => entity(id, 'audiences', state),
-  getAudienceUsers: (id) => entities('users', state).filter((u) => (entity(id, 'audiences', state) || {}).audience_users?.includes(
+  // teams
+  getTeam: (id) => entity(id, 'teams', state),
+  getTeamUsers: (id) => entities('users', state).filter((u) => (entity(id, 'teams', state) || {}).team_users?.includes(
     u.user_id,
   )),
-  getAudienceInjects: (id) => entities('injects', state).filter((i) => (entity(id, 'audiences', state) || {}).audience_injects?.includes(
+  getTeamInjects: (id) => entities('injects', state).filter((i) => (entity(id, 'teams', state) || {}).team_injects?.includes(
     i.inject_id,
   )),
-  getAudiences: () => entities('audiences', state),
-  getAudiencesMap: () => maps('audiences', state),
+  getTeams: () => entities('teams', state),
+  getTeamsMap: () => maps('teams', state),
   getSettings: () => {
     return R.mergeAll(
       Object.entries(state.referential.entities.parameters ?? {}).map(

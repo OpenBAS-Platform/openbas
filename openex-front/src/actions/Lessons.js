@@ -90,8 +90,8 @@ export const updateLessonsCategory = (exerciseId, lessonsCategoryId, data) => (d
   return putReferential(schema.lessonsCategory, uri, data)(dispatch);
 };
 
-export const updateLessonsCategoryAudiences = (exerciseId, lessonsCategoryId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}/audiences`;
+export const updateLessonsCategoryTeams = (exerciseId, lessonsCategoryId, data) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/lessons_categories/${lessonsCategoryId}/teams`;
   return putReferential(schema.lessonsCategory, uri, data)(dispatch);
 };
 

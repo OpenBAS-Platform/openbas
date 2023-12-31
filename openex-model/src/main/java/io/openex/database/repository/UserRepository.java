@@ -29,8 +29,8 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
 
   @Override
   @Query("select count(distinct u) from User u " +
-      "join u.audiences as audience " +
-      "join audience.exercise as e " +
+      "join u.teams as team " +
+      "join team.exercises as e " +
       "join e.grants as grant " +
       "join grant.group.users as user " +
       "where user.id = :userId and u.createdAt < :creationDate")

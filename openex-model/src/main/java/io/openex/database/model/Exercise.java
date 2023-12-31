@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
+import io.openex.helper.MultiModelDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -105,10 +108,6 @@ public class Exercise implements Base {
     @JsonProperty("exercise_updated_at")
     private Instant updatedAt = now();
 
-    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Audience> audiences = new ArrayList<>();
-
     @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Grant> grants = new ArrayList<>();
@@ -117,6 +116,21 @@ public class Exercise implements Base {
     @JsonProperty("exercise_injects")
     @JsonSerialize(using = MultiIdDeserializer.class)
     private List<Inject> injects = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "exercises_teams",
+            joinColumns = @JoinColumn(name = "exercise_id"),
+            inverseJoinColumns = @JoinColumn(name = "team_id"))
+    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonProperty("exercise_teams")
+    private List<Team> teams = new ArrayList<>();
+
+    @Getter
+    @Setter
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonProperty("exercise_teams_users")
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    private List<ExerciseTeamUser> teamUsers = new ArrayList<>();
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -215,17 +229,20 @@ public class Exercise implements Base {
         return user.isAdmin() || getObservers().contains(user);
     }
 
-    @JsonProperty("exercise_users_number")
-    public long usersNumber() {
-        return getAudiences().stream().flatMap(audience -> audience.getUsers().stream()).distinct().count();
+    @JsonProperty("exercise_all_users_number")
+    public long usersAllNumber() {
+        return getTeams().stream().mapToLong(Team::getUsersNumber).sum();
     }
 
-    @JsonProperty("exercise_players")
+    @JsonProperty("exercise_users_number")
+    public long usersNumber() {
+        return getTeamUsers().stream().map(ExerciseTeamUser::getUser).distinct().count();
+    }
+
+    @JsonProperty("exercise_users")
     @JsonSerialize(using = MultiIdDeserializer.class)
-    public List<User> getPlayers() {
-        return getAudiences().stream().flatMap(audience -> audience.getUsers().stream())
-                .distinct()
-                .toList();
+    public List<User> getUsers() {
+        return getTeamUsers().stream().map(ExerciseTeamUser::getUser).distinct().toList();
     }
 
     @JsonProperty("exercise_score")
@@ -401,20 +418,28 @@ public class Exercise implements Base {
         this.injects = injects;
     }
 
+    public List<Team> getTeams() {
+        return teams;
+    }
+
+    public void setTeams(List<Team> teams) {
+        this.teams = teams;
+    }
+
+    public List<ExerciseTeamUser> getTeamUsers() {
+        return teamUsers;
+    }
+
+    public void setTeamUsers(List<ExerciseTeamUser> teamUsers) {
+        this.teamUsers = teamUsers;
+    }
+
     public List<Pause> getPauses() {
         return pauses;
     }
 
     public void setPauses(List<Pause> pauses) {
         this.pauses = pauses;
-    }
-
-    public List<Audience> getAudiences() {
-        return audiences;
-    }
-
-    public void setAudiences(List<Audience> audiences) {
-        this.audiences = audiences;
     }
 
     public List<Grant> getGrants() {

@@ -60,8 +60,8 @@ public class Contract {
         this.variables.add(VariableHelper.userVariable);
         // Exercise variables
         this.variables.add(VariableHelper.exerciceVariable);
-        // Audiences
-        this.variables.add(VariableHelper.audienceVariable);
+        // Teams
+        this.variables.add(VariableHelper.teamVariable);
         // Direct uris
         this.variables.addAll(VariableHelper.uriVariables);
     }

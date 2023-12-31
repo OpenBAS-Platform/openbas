@@ -51,11 +51,11 @@ export const usePermissions = (exerciseId, fullExercise = null) => {
     || (exercise || fullExercise).exercise_status === 'CANCELED'
     || (exercise || fullExercise).exercise_planners?.includes(me.user_id);
   const canPlayBypassStatus = logged.admin
-    || (exercise || fullExercise).exercise_players?.includes(me.user_id);
+    || (exercise || fullExercise).exercise_users?.includes(me.user_id);
   const canPlay = logged.admin
     || (exercise || fullExercise).exercise_status === 'FINISHED'
     || (exercise || fullExercise).exercise_status === 'CANCELED'
-    || (exercise || fullExercise).exercise_players?.includes(me.user_id);
+    || (exercise || fullExercise).exercise_users?.includes(me.user_id);
   return {
     canRead,
     canWrite,

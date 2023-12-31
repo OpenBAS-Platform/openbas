@@ -23,8 +23,8 @@ public enum ContractType {
     DependencySelect,
     @JsonProperty("attachment")
     Attachment,
-    @JsonProperty("audience")
-    Audience,
+    @JsonProperty("team")
+    Team,
     @JsonProperty("expectation")
     Expectation
 }
