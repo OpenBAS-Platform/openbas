@@ -38,13 +38,12 @@ import {
 } from '@mui/icons-material';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
-import { updateExercise, updateExerciseStatus } from '../../../actions/Exercise';
+import { fetchExerciseTeams, updateExercise, updateExerciseStatus } from '../../../actions/Exercise';
 import { useFormatter } from '../../../components/i18n';
 import ExerciseStatus from './ExerciseStatus';
 import { useHelper } from '../../../store';
 import ExerciseParametersForm from './ExerciseParametersForm';
 import useDataLoader from '../../../utils/ServerSideEvent';
-import { fetchTeams } from '../../../actions/Team';
 import Empty from '../../../components/Empty';
 import Countdown from '../../../components/Countdown';
 import { colors, horizontalBarsChartOptions } from '../../../utils/Charts';
@@ -170,7 +169,7 @@ const Exercise = () => {
     return { exercise: ex, teams: aud, dryruns: dry, comchecks: com };
   });
   useDataLoader(() => {
-    dispatch(fetchTeams(exerciseId));
+    dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchComchecks(exerciseId));
     dispatch(fetchDryruns(exerciseId));
   });

@@ -18,14 +18,12 @@ interface TeamPopoverProps {
   team: TeamStore;
   exerciseId?: string;
   onRemoveTeam?: never,
-  disabled: boolean,
 }
 
 const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   team,
   exerciseId,
   onRemoveTeam,
-  disabled,
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -108,7 +106,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   };
   return (
     <>
-      <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large" disabled={disabled}>
+      <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large">
         <MoreVert />
       </IconButton>
       <Menu

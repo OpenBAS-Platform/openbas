@@ -40,10 +40,10 @@ import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
-import TeamPopover from '../teams/TeamPopover';
+import TeamPopover from '../../persons/teams/TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddTeams from './InjectAddTeams';
-import { isExerciseReadOnly, secondsFromToNow } from '../../../../utils/Exercise';
+import { isExerciseUpdatable, isExerciseReadOnly, secondsFromToNow } from '../../../../utils/Exercise';
 import TextField from '../../../../components/TextField';
 import SwitchField from '../../../../components/SwitchField';
 import EnrichedTextField from '../../../../components/EnrichedTextField';
@@ -1421,15 +1421,14 @@ class QuickInject extends Component {
                                 }
                               />
                               <ListItemSecondaryAction>
-                                <TeamPopover
-                                  exerciseId={exerciseId}
-                                  exercise={exercise}
-                                  team={team}
-                                  onRemoveTeam={this.handleRemoveTeam.bind(
-                                    this,
-                                  )}
-                                  disabled={isExerciseReadOnly(exercise)}
-                                />
+                                {isExerciseUpdatable(exercise)
+                                  ? (<TeamPopover
+                                      exerciseId={exerciseId}
+                                      team={team}
+                                      onRemoveTeam={this.handleRemoveTeam.bind(
+                                        this,
+                                      )}
+                                     />) : <span> &nbsp; </span>}
                               </ListItemSecondaryAction>
                             </ListItem>
                           ))}

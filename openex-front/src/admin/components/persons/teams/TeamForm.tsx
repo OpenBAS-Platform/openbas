@@ -24,7 +24,6 @@ interface TeamFormProps {
   handleClose: () => void;
   onSubmit: (data: TeamInputForm) => void;
   editing?: boolean;
-  canUpdateEmail?: boolean;
 }
 
 const TeamForm: FunctionComponent<TeamFormProps> = ({
@@ -32,7 +31,6 @@ const TeamForm: FunctionComponent<TeamFormProps> = ({
   onSubmit,
   initialValues,
   handleClose,
-  canUpdateEmail,
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
