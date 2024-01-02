@@ -2,7 +2,6 @@ package io.openex.service;
 
 import io.openex.database.model.Endpoint;
 import io.openex.database.model.AssetGroup;
-import io.openex.service.asset.EndpointService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +19,7 @@ public class AssetGroupServiceTest {
   @Autowired
   private AssetGroupService assetGroupService;
   @Autowired
-  private EndpointService endpointService;
+  private AssetEndpointService assetEndpointService;
 
   static String ASSET_GROUP_ID;
 
@@ -63,12 +62,12 @@ public class AssetGroupServiceTest {
     Endpoint endpoint = new Endpoint();
     String name = "Personal PC";
     endpoint.setName(name);
-    endpoint.setIp("127.0.0.1");
+    endpoint.setIps(List.of("127.0.0.1"));
     endpoint.setHostname("hostname");
     endpoint.setOs(LINUX);
     endpoint.setHostname("hostname");
     endpoint.setOs(LINUX);
-    Endpoint endpointCreated = this.endpointService.createEndpoint(endpoint);
+    Endpoint endpointCreated = this.assetEndpointService.createEndpoint(endpoint);
 
     AssetGroup assetGroup = this.assetGroupService.assetGroup(ASSET_GROUP_ID);
     String value = "Professional network";

@@ -52,7 +52,7 @@ public class EndpointApiTest {
     EndpointInput endpointInput = new EndpointInput();
     String name = "Personal PC";
     endpointInput.setName(name);
-    endpointInput.setIp("127.0.0.1");
+    endpointInput.setIps(List.of("127.0.0.1"));
     endpointInput.setHostname("hostname");
     endpointInput.setOs(LINUX.name());
 
@@ -101,7 +101,7 @@ public class EndpointApiTest {
     EndpointInput endpointInput = new EndpointInput();
     String name = "Professional PC";
     endpointInput.setName(name);
-    endpointInput.setIp(endpointResponse.getIp());
+    endpointInput.setIps(endpointResponse.getIps());
     endpointInput.setHostname(endpointResponse.getHostname());
     endpointInput.setOs(endpointResponse.getOs().name());
 

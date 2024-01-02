@@ -29,11 +29,30 @@ public class V2_64__Assets_Asset_Groups extends BaseJavaMigration {
     // Create table endpoint
     select.execute("""
         CREATE TABLE IF NOT EXISTS endpoints (
-            endpoint_id varchar(255) not null constraint endpoints_pkey primary key,
-            endpoint_ip varchar(255) not null,
             endpoint_hostname varchar(255),
-            endpoint_os varchar(255)
+            endpoint_os varchar(255),
+            endpoint_last_seen timestamp
         ) INHERITS (assets);
+        ALTER TABLE endpoints
+            ADD CONSTRAINT endpoints_pkey PRIMARY KEY (asset_id) ;
+        """);
+    // Create table ips
+    select.execute("""
+        CREATE TABLE IF NOT EXISTS ips (
+            endpoint_id varchar(255) not null,
+            ip varchar(255) not null
+        );
+        ALTER TABLE ips
+            ADD CONSTRAINT fk_ips_on_assets FOREIGN KEY (endpoint_id) REFERENCES endpoints(asset_id) ;
+        """);
+    // Create table mac adresses
+    select.execute("""
+        CREATE TABLE IF NOT EXISTS macadresses (
+            endpoint_id varchar(255) not null,
+            mac_adress varchar(255) not null
+        );
+        ALTER TABLE macadresses
+            ADD CONSTRAINT fk_mac_adresses_on_assets FOREIGN KEY (endpoint_id) REFERENCES endpoints(asset_id) ;
         """);
     // Create table asset groups
     select.execute("""

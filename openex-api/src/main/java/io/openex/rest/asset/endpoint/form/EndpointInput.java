@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
+import java.time.Instant;
+import java.util.List;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
@@ -15,8 +17,8 @@ public class EndpointInput extends AssetInput {
 
 
   @NotBlank(message = MANDATORY_MESSAGE)
-  @JsonProperty("endpoint_ip")
-  private String ip;
+  @JsonProperty("endpoint_ips")
+  private List<String> ips;
 
   @JsonProperty("endpoint_hostname")
   private String hostname;
@@ -24,5 +26,11 @@ public class EndpointInput extends AssetInput {
   @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("endpoint_os")
   private String os;
+
+  @JsonProperty("endpoint_last_seen")
+  private Instant lastSeen;
+
+  @JsonProperty("endpoint_mac_adresses")
+  private List<String> macAdresses;
 
 }

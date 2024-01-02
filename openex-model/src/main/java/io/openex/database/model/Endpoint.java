@@ -7,7 +7,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+import java.time.Instant;
+import java.util.List;
+
+import static java.time.Instant.now;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -21,11 +24,12 @@ public class Endpoint extends Asset {
     WINDOWS,
   }
 
-  @NotBlank
   @Ipv4OrIpv6Constraint
-  @Column(name = "endpoint_ip")
-  @JsonProperty("endpoint_ip")
-  private String ip;
+  @ElementCollection(fetch = FetchType.EAGER)
+  @CollectionTable(name = "ips", joinColumns = @JoinColumn(name = "endpoint_id"))
+  @Column(name = "ip")
+  @JsonProperty("endpoint_ips")
+  private List<String> ips;
 
   @Column(name = "endpoint_hostname")
   @JsonProperty("endpoint_hostname")
@@ -35,5 +39,15 @@ public class Endpoint extends Asset {
   @JsonProperty("endpoint_os")
   @Enumerated(EnumType.STRING)
   private OS_TYPE os;
+
+  @Column(name = "endpoint_last_seen")
+  @JsonProperty("endpoint_last_seen")
+  private Instant lastSeen;
+
+  @ElementCollection(fetch = FetchType.EAGER)
+  @CollectionTable(name = "macadresses", joinColumns = @JoinColumn(name = "endpoint_id"))
+  @Column(name = "mac_adress")
+  @JsonProperty("endpoint_mac_adresses")
+  private List<String> macAdresses;
 
 }

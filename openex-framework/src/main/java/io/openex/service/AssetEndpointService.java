@@ -1,4 +1,4 @@
-package io.openex.service.asset;
+package io.openex.service;
 
 import io.openex.database.model.Endpoint;
 import io.openex.database.repository.EndpointRepository;
@@ -8,13 +8,14 @@ import org.springframework.stereotype.Service;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Optional;
 
 import static io.openex.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
 
 @RequiredArgsConstructor
 @Service
-public class EndpointService {
+public class AssetEndpointService {
 
   private final EndpointRepository endpointRepository;
 
@@ -24,6 +25,10 @@ public class EndpointService {
 
   public Endpoint endpoint(@NotBlank final String endpointId) {
     return this.endpointRepository.findById(endpointId).orElseThrow();
+  }
+
+  public Optional<Endpoint> endpointFromExternalId(@NotBlank final String externalId) {
+    return this.endpointRepository.findByExternalId(externalId);
   }
 
   public List<Endpoint> endpoints() {

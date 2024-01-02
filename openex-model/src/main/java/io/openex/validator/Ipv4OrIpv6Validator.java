@@ -5,13 +5,14 @@ import org.apache.commons.validator.routines.InetAddressValidator;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.List;
 
-public class Ipv4OrIpv6Validator implements ConstraintValidator<Ipv4OrIpv6Constraint, String> {
+public class Ipv4OrIpv6Validator implements ConstraintValidator<Ipv4OrIpv6Constraint, List<String>> {
 
   @Override
-  public boolean isValid(final String ip, final ConstraintValidatorContext cxt) {
+  public boolean isValid(final List<String> ips, final ConstraintValidatorContext cxt) {
     InetAddressValidator validator = InetAddressValidator.getInstance();
-    return validator.isValid(ip);
+    return ips.stream().allMatch(validator::isValid);
   }
 
 }

@@ -1,7 +1,6 @@
 package io.openex.service;
 
 import io.openex.database.model.Endpoint;
-import io.openex.service.asset.EndpointService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,10 +14,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class EndpointServiceTest {
+public class AssetEndpointServiceTest {
 
   @Autowired
-  private EndpointService endpointService;
+  private AssetEndpointService assetEndpointService;
 
   static String ENDPOINT_ID;
 
@@ -30,14 +29,14 @@ public class EndpointServiceTest {
     Endpoint endpoint = new Endpoint();
     String name = "Personal PC";
     endpoint.setName(name);
-    endpoint.setIp("wrong ip");
+    endpoint.setIps(List.of("wrong ip"));
     endpoint.setHostname("hostname");
     endpoint.setOs(LINUX);
     endpoint.setHostname("hostname");
     endpoint.setOs(LINUX);
 
     // -- EXECUTE --
-    assertThrows(TransactionSystemException.class, () -> this.endpointService.createEndpoint(endpoint));
+    assertThrows(TransactionSystemException.class, () -> this.assetEndpointService.createEndpoint(endpoint));
   }
 
   @DisplayName("Create endpoint succeed")
@@ -48,14 +47,14 @@ public class EndpointServiceTest {
     Endpoint endpoint = new Endpoint();
     String name = "Personal PC";
     endpoint.setName(name);
-    endpoint.setIp("127.0.0.1");
+    endpoint.setIps(List.of("127.0.0.1"));
     endpoint.setHostname("hostname");
     endpoint.setOs(LINUX);
     endpoint.setHostname("hostname");
     endpoint.setOs(LINUX);
 
     // -- EXECUTE --
-    Endpoint endpointCreated = this.endpointService.createEndpoint(endpoint);
+    Endpoint endpointCreated = this.assetEndpointService.createEndpoint(endpoint);
     ENDPOINT_ID = endpointCreated.getId();
     assertNotNull(endpointCreated);
     assertNotNull(endpointCreated.getId());
@@ -68,10 +67,10 @@ public class EndpointServiceTest {
   @Test
   @Order(3)
   void retrieveEndpointTest() {
-    Endpoint endpoint = this.endpointService.endpoint(ENDPOINT_ID);
+    Endpoint endpoint = this.assetEndpointService.endpoint(ENDPOINT_ID);
     assertNotNull(endpoint);
 
-    List<Endpoint> endpoints = this.endpointService.endpoints();
+    List<Endpoint> endpoints = this.assetEndpointService.endpoints();
     assertNotNull(endpoints);
     assertTrue(endpoints.stream().map(Endpoint::getId).toList().contains(ENDPOINT_ID));
   }
@@ -81,12 +80,12 @@ public class EndpointServiceTest {
   @Order(4)
   void updateEndpointTest() {
     // -- PREPARE --
-    Endpoint endpoint = this.endpointService.endpoint(ENDPOINT_ID);
+    Endpoint endpoint = this.assetEndpointService.endpoint(ENDPOINT_ID);
     String value = "Professional PC";
     endpoint.setName(value);
 
     // -- EXECUTE --
-    Endpoint endpointUpdated = this.endpointService.updateEndpoint(endpoint);
+    Endpoint endpointUpdated = this.assetEndpointService.updateEndpoint(endpoint);
     assertNotNull(endpoint);
     assertEquals(value, endpointUpdated.getName());
   }
@@ -95,8 +94,8 @@ public class EndpointServiceTest {
   @Test
   @Order(5)
   void deleteEndpointTest() {
-    this.endpointService.deleteEndpoint(ENDPOINT_ID);
-    assertThrows(NoSuchElementException.class, () -> this.endpointService.endpoint(ENDPOINT_ID));
+    this.assetEndpointService.deleteEndpoint(ENDPOINT_ID);
+    assertThrows(NoSuchElementException.class, () -> this.assetEndpointService.endpoint(ENDPOINT_ID));
   }
 
 }

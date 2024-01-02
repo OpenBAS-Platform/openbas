@@ -2,7 +2,7 @@ package io.openex.rest.asset.endpoint;
 
 import io.openex.database.model.Endpoint;
 import io.openex.rest.asset.endpoint.form.EndpointInput;
-import io.openex.service.asset.EndpointService;
+import io.openex.service.AssetEndpointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,7 @@ public class EndpointApi {
 
   public static final String ENDPOINT_URI = "/api/endpoints";
 
-  private final EndpointService endpointService;
+  private final AssetEndpointService assetEndpointService;
 
   @PostMapping(ENDPOINT_URI)
   @RolesAllowed(ROLE_ADMIN)
@@ -28,13 +28,13 @@ public class EndpointApi {
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(input);
     endpoint.setOs(Endpoint.OS_TYPE.valueOf(input.getOs()));
-    return this.endpointService.createEndpoint(endpoint);
+    return this.assetEndpointService.createEndpoint(endpoint);
   }
 
   @GetMapping(ENDPOINT_URI)
   @PreAuthorize("isObserver()")
   public List<Endpoint> endpoints() {
-    return this.endpointService.endpoints();
+    return this.assetEndpointService.endpoints();
   }
 
   @PutMapping(ENDPOINT_URI + "/{endpointId}")
@@ -42,15 +42,15 @@ public class EndpointApi {
   public Endpoint updateEndpoint(
       @PathVariable @NotBlank final String endpointId,
       @Valid @RequestBody final EndpointInput input) {
-    Endpoint endpoint = this.endpointService.endpoint(endpointId);
+    Endpoint endpoint = this.assetEndpointService.endpoint(endpointId);
     endpoint.setUpdateAttributes(input);
     endpoint.setOs(Endpoint.OS_TYPE.valueOf(input.getOs()));
-    return this.endpointService.updateEndpoint(endpoint);
+    return this.assetEndpointService.updateEndpoint(endpoint);
   }
 
   @DeleteMapping(ENDPOINT_URI + "/{endpointId}")
   @RolesAllowed(ROLE_ADMIN)
   public void deleteEndpoint(@PathVariable @NotBlank final String endpointId) {
-    this.endpointService.deleteEndpoint(endpointId);
+    this.assetEndpointService.deleteEndpoint(endpointId);
   }
 }
