@@ -10,7 +10,7 @@ COPY openex-front/builder/prod/build ./openex-front/builder/prod/build
 COPY pom.xml ./pom.xml
 RUN mvn install -DskipTests -Pdev
 
-FROM openjdk:18-slim AS app
+FROM openjdk:21-slim AS app
 
 RUN ln -s /usr/bin/dpkg-split /usr/sbin/dpkg-split
 RUN ln -s /usr/bin/dpkg-deb /usr/sbin/dpkg-deb

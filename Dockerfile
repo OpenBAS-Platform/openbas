@@ -20,7 +20,7 @@ COPY pom.xml ./pom.xml
 COPY --from=front-builder /opt/openex-build/openex-front/builder/prod/build ./openex-front/builder/prod/build
 RUN mvn install -DskipTests -Pdev
 
-FROM openjdk:18-slim AS app
+FROM openjdk:21-slim AS app
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y tini;
 COPY --from=api-builder /opt/openex-build/openex/openex-api/target/openex-api.jar ./
