@@ -23,6 +23,10 @@ public class AssetEndpointService {
     return this.endpointRepository.save(endpoint);
   }
 
+  public Iterable<Endpoint> createEndpoints(@NotNull final List<Endpoint> endpoints) {
+    return this.endpointRepository.saveAll(endpoints);
+  }
+
   public Endpoint endpoint(@NotBlank final String endpointId) {
     return this.endpointRepository.findById(endpointId).orElseThrow();
   }
@@ -38,6 +42,11 @@ public class AssetEndpointService {
   public Endpoint updateEndpoint(@NotNull final Endpoint endpoint) {
     endpoint.setUpdatedAt(now());
     return this.endpointRepository.save(endpoint);
+  }
+
+  public Iterable<Endpoint> updateEndpoints(@NotNull final List<Endpoint> endpoints) {
+    endpoints.forEach((e) -> e.setUpdatedAt(now()));
+    return this.endpointRepository.saveAll(endpoints);
   }
 
   public void deleteEndpoint(@NotBlank final String endpointId) {

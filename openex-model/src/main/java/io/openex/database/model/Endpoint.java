@@ -44,7 +44,7 @@ public class Endpoint extends Asset {
   @JsonProperty("endpoint_last_seen")
   private Instant lastSeen;
 
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(fetch = FetchType.LAZY)
   @CollectionTable(name = "macadresses", joinColumns = @JoinColumn(name = "endpoint_id"))
   @Column(name = "mac_adress")
   @JsonProperty("endpoint_mac_adresses")
