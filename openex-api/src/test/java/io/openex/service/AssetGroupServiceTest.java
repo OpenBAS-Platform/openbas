@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static io.openex.database.model.Endpoint.OS_TYPE.LINUX;
+import static io.openex.database.model.Endpoint.PLATFORM_TYPE.LINUX;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -64,9 +64,7 @@ public class AssetGroupServiceTest {
     endpoint.setName(name);
     endpoint.setIps(List.of("127.0.0.1"));
     endpoint.setHostname("hostname");
-    endpoint.setOs(LINUX);
-    endpoint.setHostname("hostname");
-    endpoint.setOs(LINUX);
+    endpoint.setPlatform(LINUX);
     Endpoint endpointCreated = this.assetEndpointService.createEndpoint(endpoint);
 
     AssetGroup assetGroup = this.assetGroupService.assetGroup(ASSET_GROUP_ID);

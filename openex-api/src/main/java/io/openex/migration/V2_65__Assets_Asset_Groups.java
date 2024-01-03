@@ -30,7 +30,7 @@ public class V2_65__Assets_Asset_Groups extends BaseJavaMigration {
     select.execute("""
         CREATE TABLE IF NOT EXISTS endpoints (
             endpoint_hostname varchar(255),
-            endpoint_os varchar(255),
+            endpoint_platform varchar(255),
             endpoint_last_seen timestamp
         ) INHERITS (assets);
         ALTER TABLE endpoints

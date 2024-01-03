@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static io.openex.database.model.Endpoint.OS_TYPE.LINUX;
+import static io.openex.database.model.Endpoint.PLATFORM_TYPE.LINUX;
 import static io.openex.rest.asset.endpoint.EndpointApi.ENDPOINT_URI;
 import static io.openex.rest.utils.JsonUtils.asJsonString;
 import static io.openex.rest.utils.JsonUtils.asStringJson;
@@ -54,7 +54,7 @@ public class EndpointApiTest {
     endpointInput.setName(name);
     endpointInput.setIps(List.of("127.0.0.1"));
     endpointInput.setHostname("hostname");
-    endpointInput.setOs(LINUX.name());
+    endpointInput.setPlatform(LINUX.name());
 
     // -- EXECUTE --
     String response = this.mvc
@@ -103,7 +103,7 @@ public class EndpointApiTest {
     endpointInput.setName(name);
     endpointInput.setIps(endpointResponse.getIps());
     endpointInput.setHostname(endpointResponse.getHostname());
-    endpointInput.setOs(endpointResponse.getOs().name());
+    endpointInput.setPlatform(endpointResponse.getPlatform().name());
 
     // -- EXECUTE --
     String response = this.mvc

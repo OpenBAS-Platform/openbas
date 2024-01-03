@@ -9,7 +9,7 @@ import org.springframework.transaction.TransactionSystemException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static io.openex.database.model.Endpoint.OS_TYPE.LINUX;
+import static io.openex.database.model.Endpoint.PLATFORM_TYPE.LINUX;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -31,9 +31,9 @@ public class AssetEndpointServiceTest {
     endpoint.setName(name);
     endpoint.setIps(List.of("wrong ip"));
     endpoint.setHostname("hostname");
-    endpoint.setOs(LINUX);
+    endpoint.setPlatform(LINUX);
     endpoint.setHostname("hostname");
-    endpoint.setOs(LINUX);
+    endpoint.setPlatform(LINUX);
 
     // -- EXECUTE --
     assertThrows(TransactionSystemException.class, () -> this.assetEndpointService.createEndpoint(endpoint));
@@ -49,9 +49,9 @@ public class AssetEndpointServiceTest {
     endpoint.setName(name);
     endpoint.setIps(List.of("127.0.0.1"));
     endpoint.setHostname("hostname");
-    endpoint.setOs(LINUX);
+    endpoint.setPlatform(LINUX);
     endpoint.setHostname("hostname");
-    endpoint.setOs(LINUX);
+    endpoint.setPlatform(LINUX);
 
     // -- EXECUTE --
     Endpoint endpointCreated = this.assetEndpointService.createEndpoint(endpoint);

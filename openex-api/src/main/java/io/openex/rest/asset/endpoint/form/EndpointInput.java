@@ -24,8 +24,8 @@ public class EndpointInput extends AssetInput {
   private String hostname;
 
   @NotBlank(message = MANDATORY_MESSAGE)
-  @JsonProperty("endpoint_os")
-  private String os;
+  @JsonProperty("endpoint_platform")
+  private String platform;
 
   @JsonProperty("endpoint_last_seen")
   private Instant lastSeen;

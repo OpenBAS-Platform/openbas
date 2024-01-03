@@ -19,7 +19,7 @@ import static java.time.Instant.now;
 @EntityListeners(ModelBaseListener.class)
 public class Endpoint extends Asset {
 
-  public enum OS_TYPE {
+  public enum PLATFORM_TYPE {
     LINUX,
     WINDOWS,
   }
@@ -35,10 +35,10 @@ public class Endpoint extends Asset {
   @JsonProperty("endpoint_hostname")
   private String hostname;
 
-  @Column(name = "endpoint_os")
-  @JsonProperty("endpoint_os")
+  @Column(name = "endpoint_platform")
+  @JsonProperty("endpoint_platform")
   @Enumerated(EnumType.STRING)
-  private OS_TYPE os;
+  private PLATFORM_TYPE platform;
 
   @Column(name = "endpoint_last_seen")
   @JsonProperty("endpoint_last_seen")
