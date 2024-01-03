@@ -23,6 +23,7 @@ public class Asset implements Base {
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
   @JsonProperty("asset_id")
+  @NotBlank
   private String id;
 
   @Column(name = "asset_external_id")

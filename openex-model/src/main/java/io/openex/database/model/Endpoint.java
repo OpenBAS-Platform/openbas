@@ -22,6 +22,7 @@ public class Endpoint extends Asset {
   public enum PLATFORM_TYPE {
     LINUX,
     WINDOWS,
+    DARWIN,
   }
 
   @Ipv4OrIpv6Constraint
