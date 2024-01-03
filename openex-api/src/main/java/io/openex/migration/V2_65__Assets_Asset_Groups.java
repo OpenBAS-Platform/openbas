@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V2_64__Assets_Asset_Groups extends BaseJavaMigration {
+public class V2_65__Assets_Asset_Groups extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
