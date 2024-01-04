@@ -15,7 +15,7 @@
     "@mui/material": "5.14.20",
     "@mui/styles": "5.14.20",
     "@mui/utils": "5.14.20",
-    "@mui/x-date-pickers": "6.18.3",
+    "@mui/x-date-pickers": "6.18.6",
     "@redux-devtools/extension": "3.2.6",
     "@uiw/react-md-editor": "4.0.1",
     "apexcharts": "3.44.2",
