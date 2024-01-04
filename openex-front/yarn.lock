@@ -2589,12 +2589,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hookform/resolvers@npm:3.3.2":
-  version: 3.3.2
-  resolution: "@hookform/resolvers@npm:3.3.2"
+"@hookform/resolvers@npm:3.3.4":
+  version: 3.3.4
+  resolution: "@hookform/resolvers@npm:3.3.4"
   peerDependencies:
     react-hook-form: ^7.0.0
-  checksum: bcaefe2a8a212b015b3ea99c93d7ecb5c8f475606d83be9d82dc6cc0cbb3cda03f7fd7a4426688c2de29b6800b93adbf9abb932a1dafee1d053dcaa69ec13f3f
+  checksum: 7761e3340d23acd092dec4023344678e62b0c0ea0ed5aa3687cd315fc339b3b965e11124d643811292e6962683357423e6fe646fffabf9b96f8322f41903924d
   languageName: node
   linkType: hard
 
@@ -10501,7 +10501,7 @@ __metadata:
     "@emotion/styled": 11.11.0
     "@eslint/eslintrc": 2.1.4
     "@eslint/js": 8.55.0
-    "@hookform/resolvers": 3.3.2
+    "@hookform/resolvers": 3.3.4
     "@mui/icons-material": 5.14.19
     "@mui/lab": 5.0.0-alpha.155
     "@mui/material": 5.14.20
