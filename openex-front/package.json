@@ -7,7 +7,7 @@
   "type": "module",
   "dependencies": {
     "@ckeditor/ckeditor5-react": "6.2.0",
-    "@emotion/react": "11.11.1",
+    "@emotion/react": "11.11.3",
     "@emotion/styled": "11.11.0",
     "@hookform/resolvers": "3.3.2",
     "@mui/icons-material": "5.14.19",
