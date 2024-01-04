@@ -36,7 +36,7 @@
     "moment": "2.29.4",
     "moment-timezone": "0.5.43",
     "normalizr": "3.6.2",
-    "pdfmake": "0.2.8",
+    "pdfmake": "0.2.9",
     "prop-types": "15.8.1",
     "ramda": "0.29.1",
     "react": "18.2.0",
