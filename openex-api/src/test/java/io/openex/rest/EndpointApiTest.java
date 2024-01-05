@@ -54,7 +54,7 @@ public class EndpointApiTest {
     endpointInput.setName(name);
     endpointInput.setIps(List.of("127.0.0.1"));
     endpointInput.setHostname("hostname");
-    endpointInput.setPlatform(LINUX.name());
+    endpointInput.setPlatform(LINUX);
 
     // -- EXECUTE --
     String response = this.mvc
@@ -103,7 +103,7 @@ public class EndpointApiTest {
     endpointInput.setName(name);
     endpointInput.setIps(endpointResponse.getIps());
     endpointInput.setHostname(endpointResponse.getHostname());
-    endpointInput.setPlatform(endpointResponse.getPlatform().name());
+    endpointInput.setPlatform(endpointResponse.getPlatform());
 
     // -- EXECUTE --
     String response = this.mvc

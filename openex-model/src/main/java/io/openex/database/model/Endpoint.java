@@ -7,10 +7,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.List;
-
-import static java.time.Instant.now;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -30,6 +29,7 @@ public class Endpoint extends Asset {
   @CollectionTable(name = "ips", joinColumns = @JoinColumn(name = "endpoint_id"))
   @Column(name = "ip")
   @JsonProperty("endpoint_ips")
+  @Size(min = 1)
   private List<String> ips;
 
   @Column(name = "endpoint_hostname")
