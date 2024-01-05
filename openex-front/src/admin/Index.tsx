@@ -1,6 +1,6 @@
-import React, { Suspense, lazy } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { useTheme, makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import { Box } from '@mui/material';
 import TopBar from './components/nav/TopBar';
 import LeftBar from './components/nav/LeftBar';
@@ -11,6 +11,8 @@ import { useHelper } from '../store';
 import type { Theme } from '../components/Theme';
 import type { LoggedHelper } from '../actions/helper';
 import Loader from '../components/Loader';
+import { contractImages } from '../actions/Contract';
+import { useAppDispatch } from '../utils/hooks';
 
 const IndexExercise = lazy(() => import('./components/exercises/Index'));
 const Dashboard = lazy(() => import('./components/Dashboard'));
@@ -48,6 +50,10 @@ const Index = () => {
     overflowX: 'hidden',
   };
   useDataLoader();
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    dispatch(contractImages());
+  }, []);
   return (
     <>
       <Box

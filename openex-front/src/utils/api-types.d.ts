@@ -63,6 +63,35 @@ export interface ArticleUpdateInput {
   article_shares?: number;
 }
 
+export interface Asset {
+  /** @format date-time */
+  asset_created_at?: string;
+  asset_description?: string;
+  asset_external_id?: string;
+  asset_id: string;
+  asset_name: string;
+  /** @format date-time */
+  asset_updated_at?: string;
+  updateAttributes?: object;
+}
+
+export interface AssetGroup {
+  asset_group_assets?: Asset[];
+  /** @format date-time */
+  asset_group_created_at?: string;
+  asset_group_description?: string;
+  asset_group_id?: string;
+  asset_group_name: string;
+  /** @format date-time */
+  asset_group_updated_at?: string;
+  updateAttributes?: object;
+}
+
+export interface AssetGroupInput {
+  asset_group_description?: string;
+  asset_group_name: string;
+}
+
 export interface Challenge {
   challenge_category?: string;
   challenge_content?: string;
@@ -403,6 +432,44 @@ export interface Dryrun {
 export interface DryrunCreateInput {
   dryrun_name: string;
   dryrun_users?: string[];
+}
+
+export interface Endpoint {
+  /** @format date-time */
+  asset_created_at?: string;
+  asset_description?: string;
+  asset_external_id?: string;
+  asset_id: string;
+  asset_name: string;
+  /** @format date-time */
+  asset_updated_at?: string;
+  endpoint_hostname?: string;
+  /**
+   * @maxItems 2147483647
+   * @minItems 1
+   */
+  endpoint_ips?: string[];
+  /** @format date-time */
+  endpoint_last_seen?: string;
+  endpoint_mac_adresses?: string[];
+  endpoint_platform?: "LINUX" | "WINDOWS" | "DARWIN";
+  updateAttributes?: object;
+}
+
+export interface EndpointInput {
+  asset_description?: string;
+  asset_external_id?: string;
+  asset_name: string;
+  endpoint_hostname?: string;
+  /**
+   * @maxItems 2147483647
+   * @minItems 1
+   */
+  endpoint_ips?: string[];
+  /** @format date-time */
+  endpoint_last_seen?: string;
+  endpoint_mac_adresses?: string[];
+  endpoint_platform?: "LINUX" | "WINDOWS" | "DARWIN";
 }
 
 export interface Evaluation {

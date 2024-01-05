@@ -1,12 +1,13 @@
-import React, { Component } from 'react';
+import React from 'react';
 import * as PropTypes from 'prop-types';
-import { EmailOutlined, SmsOutlined, NotificationsActiveOutlined, HelpOutlined, SpeakerNotesOutlined, ApiOutlined, EmojiEventsOutlined } from '@mui/icons-material';
+import { ApiOutlined, EmailOutlined, EmojiEventsOutlined, HelpOutlined, NotificationsActiveOutlined, SmsOutlined, SpeakerNotesOutlined } from '@mui/icons-material';
 import { Mastodon, NewspaperVariantMultipleOutline, Twitter } from 'mdi-material-ui';
 import Airbus from '../../../../static/images/contracts/airbus.png';
 import CustomTooltip from '../../../../components/CustomTooltip';
 import { fileUri } from '../../../../utils/Environment';
+import { useHelper } from "../../../../store.ts";
 
-const iconSelector = (type, variant, fontSize, done, disabled) => {
+const iconSelector = (type, variant, fontSize, done, disabled, contractImage) => {
   let style;
   switch (variant) {
     case 'inline':
@@ -112,24 +113,43 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
           sx={{ color: done ? '#4caf50' : '#e91e63' }}
         />
       );
+    case 'openex_caldera':
+      return (
+        <img
+          src={contractImage}
+          alt="Caldera"
+          style={{
+            width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
+            height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
+          }}
+        />
+      );
     default:
       return <HelpOutlined style={style} fontSize={fontSize} />;
   }
 };
 
-class InjectIcon extends Component {
-  render() {
-    const { type, size, variant, tooltip, done, disabled } = this.props;
-    const fontSize = size || 'medium';
-    if (tooltip) {
-      return (
-        <CustomTooltip title={tooltip}>
-          {iconSelector(type, variant, fontSize, done, disabled)}
-        </CustomTooltip>
-      );
-    }
-    return iconSelector(type, variant, fontSize, done, disabled);
+const InjectIcon = (props) => {
+  const { type, size, variant, tooltip, done, disabled} = props;
+
+  let contractImage;
+  const {
+    contractImages,
+  } = useHelper((helper) => {
+    return {
+      contractImages: helper.getContractImages(),
+    };
+  });
+  contractImage = "data:image/png;charset=utf-8;base64, "+contractImages[type];
+  const fontSize = size || 'medium';
+  if (tooltip) {
+    return (
+      <CustomTooltip title={tooltip}>
+        {iconSelector(type, variant, fontSize, done, disabled, contractImage)}
+      </CustomTooltip>
+    );
   }
+  return iconSelector(type, variant, fontSize, done, disabled, contractImage);
 }
 
 InjectIcon.propTypes = {
