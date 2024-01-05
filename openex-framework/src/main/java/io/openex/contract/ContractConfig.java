@@ -1,9 +1,11 @@
 package io.openex.contract;
 
 import io.openex.helper.SupportedLanguage;
+import lombok.Getter;
 
 import java.util.Map;
 
+@Getter
 public class ContractConfig {
     private final String type;
     private final boolean expose;
@@ -19,23 +21,4 @@ public class ContractConfig {
         this.label = label;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public boolean isExpose() {
-        return expose;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public Map<SupportedLanguage, String> getLabel() {
-        return label;
-    }
 }
