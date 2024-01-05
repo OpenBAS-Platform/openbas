@@ -2,8 +2,7 @@ package io.openex.database.repository;
 
 import io.openex.database.model.ExerciseTeamUser;
 import io.openex.database.model.ExerciseTeamUserId;
-import io.openex.database.model.InjectDocument;
-import io.openex.database.model.InjectDocumentId;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,7 +10,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
 @Repository
