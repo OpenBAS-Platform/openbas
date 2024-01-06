@@ -18,7 +18,7 @@ const IndexProfile = lazy(() => import('./components/profile/Index'));
 const Exercises = lazy(() => import('./components/exercises/Exercises'));
 const Persons = lazy(() => import('./components/persons/Index'));
 const Organizations = lazy(() => import('./components/organizations/Organizations'));
-const Medias = lazy(() => import('./components/medias'));
+const Medias = lazy(() => import('./components/medias/Index'));
 const IndexIntegrations = lazy(() => import('./components/integrations/Index'));
 const Challenges = lazy(() => import('./components/challenges/Challenges'));
 const LessonsTemplates = lazy(() => import('./components/lessons/LessonsTemplates'));
