@@ -24,7 +24,7 @@ const styles = (theme) => ({
 });
 
 const CreateDocument = (props) => {
-  const { classes, t, inline, exerciseId, hideExercises, filters } = props;
+  const { classes, t, inline, exercise, filters } = props;
   const [open, setOpen] = useState(false);
   const onSubmit = (data) => {
     const inputValues = R.pipe(
@@ -48,7 +48,7 @@ const CreateDocument = (props) => {
     });
   };
   return (
-    <div>
+    <>
       {inline === true ? (
         <ListItem
           button={true}
@@ -88,15 +88,14 @@ const CreateDocument = (props) => {
             onSubmit={onSubmit}
             initialValues={{
               document_tags: [],
-              document_exercises: exerciseId ? [exerciseId] : [],
+              document_exercises: exercise ? [{ id: exercise.exercise_id, label: exercise.exercise_name }] : [],
             }}
             handleClose={() => setOpen(false)}
-            hideExercises={hideExercises || !!exerciseId}
             filters={filters}
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 };
 
@@ -106,8 +105,7 @@ CreateDocument.propTypes = {
   addDocument: PropTypes.func,
   fetchDocument: PropTypes.func,
   inline: PropTypes.bool,
-  exerciseId: PropTypes.string,
-  hideExercises: PropTypes.bool,
+  exercise: PropTypes.object,
   filters: PropTypes.array,
 };
 

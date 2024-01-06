@@ -105,7 +105,7 @@ public class DocumentApi extends RestBehavior {
     if (targetDocument.isPresent()) {
       Document document = targetDocument.get();
       // Compute exercises
-      if (document.getExercises().size() > 0) {
+      if (!document.getExercises().isEmpty()) {
         List<Exercise> exercises = new ArrayList<>(document.getExercises());
         List<Exercise> inputExercises = fromIterable(exerciseRepository.findAllById(input.getExerciseIds()));
         inputExercises.forEach(inputExercise -> {
@@ -131,7 +131,7 @@ public class DocumentApi extends RestBehavior {
       document.setTarget(fileTarget);
       document.setName(file.getOriginalFilename());
       document.setDescription(input.getDescription());
-      if (input.getExerciseIds().size() > 0) {
+      if (!input.getExerciseIds().isEmpty()) {
         document.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
       }
       document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));

@@ -106,7 +106,6 @@ class ArticleAddDocuments extends Component {
       t,
       documents,
       articleDocumentsIds,
-      exerciseId,
       exercise,
       channelType,
     } = this.props;
@@ -236,10 +235,9 @@ class ArticleAddDocuments extends Component {
                     );
                   })}
                   <CreateDocument
-                    exerciseId={exerciseId}
+                    exercise={exercise}
                     inline={true}
                     onCreate={this.onCreate.bind(this)}
-                    hideExercises={true}
                     filters={filters}
                   />
                 </List>
@@ -279,6 +277,8 @@ class ArticleAddDocuments extends Component {
 
 ArticleAddDocuments.propTypes = {
   t: PropTypes.func,
+  exerciseId: PropTypes.string,
+  exercise: PropTypes.object,
   fetchDocuments: PropTypes.func,
   documents: PropTypes.object,
   articleDocumentsIds: PropTypes.array,

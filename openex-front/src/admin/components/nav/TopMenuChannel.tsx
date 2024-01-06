@@ -35,9 +35,8 @@ const TopMenuExercise: React.FC = () => {
   const { channelId } = useParams<'channelId'>();
   const classes = useStyles();
   const { t } = useFormatter();
-
   return (
-    <div>
+    <>
       <Button
         component={Link}
         to="/admin/medias/channels"
@@ -65,12 +64,16 @@ const TopMenuExercise: React.FC = () => {
             : 'text'
         }
         size="small"
-        color="primary"
+        color={
+          location.pathname === `/admin/medias/channels/${channelId}`
+            ? 'secondary'
+            : 'primary'
+        }
         classes={{ root: classes.button }}
       >
         {t('Overview')}
       </Button>
-    </div>
+    </>
   );
 };
 

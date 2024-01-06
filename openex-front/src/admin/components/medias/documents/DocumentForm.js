@@ -10,15 +10,17 @@ import ExerciseField from '../../../../components/ExerciseField';
 
 class DocumentForm extends Component {
   validate(values) {
-    const { t, editing, hideExercises } = this.props;
+    const { t, editing, requireExercises } = this.props;
     const errors = {};
     let requiredFields = [];
-    if (!hideExercises && editing) {
+    if (editing && requireExercises) {
       requiredFields = ['document_exercises'];
-    } else if (!hideExercises && !editing) {
-      requiredFields = ['document_file', 'document_exercises'];
-    } else if (hideExercises && !editing) {
-      requiredFields = ['document_file'];
+    } else if (!editing) {
+      if (requireExercises) {
+        requiredFields = ['document_file', 'document_exercises'];
+      } else {
+        requiredFields = ['document_file'];
+      }
     }
     requiredFields.forEach((field) => {
       const data = values[field];
@@ -38,7 +40,6 @@ class DocumentForm extends Component {
       onSubmit,
       initialValues,
       handleClose,
-      hideExercises,
       filters,
     } = this.props;
     return (
@@ -63,15 +64,13 @@ class DocumentForm extends Component {
               rows={2}
               label={t('Description')}
             />
-            {!hideExercises && (
-              <ExerciseField
-                name="document_exercises"
-                values={values}
-                label={t('Exercises')}
-                setFieldValue={form.mutators.setValue}
-                style={{ marginTop: 20 }}
-              />
-            )}
+            <ExerciseField
+              name="document_exercises"
+              values={values}
+              label={t('Exercises')}
+              setFieldValue={form.mutators.setValue}
+              style={{ marginTop: 20 }}
+            />
             <TagField
               name="document_tags"
               values={values}
@@ -118,7 +117,6 @@ DocumentForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
-  hideExercises: PropTypes.bool,
   filters: PropTypes.array,
 };
 

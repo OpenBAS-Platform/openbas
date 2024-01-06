@@ -112,7 +112,6 @@ class InjectAddDocuments extends Component {
       t,
       documents,
       injectDocumentsIds,
-      exerciseId,
       exercise,
       userAdmin,
     } = this.props;
@@ -220,7 +219,7 @@ class InjectAddDocuments extends Component {
                   })}
                   {userAdmin && (
                     <CreateDocument
-                      exerciseId={exerciseId}
+                      exercise={exercise}
                       inline={true}
                       onCreate={this.onCreate.bind(this)}
                     />

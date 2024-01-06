@@ -205,7 +205,6 @@ class ChallengeAddDocuments extends Component {
                   <CreateDocument
                     inline={true}
                     onCreate={this.onCreate.bind(this)}
-                    hideExercises={true}
                   />
                 </List>
               </Grid>

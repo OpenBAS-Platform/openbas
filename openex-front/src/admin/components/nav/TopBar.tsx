@@ -41,7 +41,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
   logoCollapsed: {
     cursor: 'pointer',
     height: 35,
-    marginRight: 10,
   },
   menuContainer: {
     float: 'left',
@@ -124,7 +123,7 @@ const TopBar: React.FC = () => {
           {location.pathname.includes('/admin/documents') && (
             <TopMenuDocuments />
           )}
-          {location.pathname.includes('/admin/medias') && <TopMenuMedias />}
+          {(location.pathname.endsWith('/admin/medias/channels') || location.pathname.endsWith('/admin/medias/documents')) && <TopMenuMedias />}
           {location.pathname.includes('/admin/medias/channels/') && <TopMenuChannel />}
           {location.pathname.includes('/admin/challenges') && (<TopMenuChallenges />)}
           {location.pathname.includes('/admin/lessons') && <TopMenuLessons />}

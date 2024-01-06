@@ -49,11 +49,15 @@ const inlineStyles = {
     backgroundColor: 'rgba(176, 176, 176, 0.08)',
     color: '#b0b0b0',
   },
+  blue: {
+    backgroundColor: 'rgba(92, 123, 245, 0.08)',
+    color: '#5c7bf5',
+  },
 };
 
 class ItemBoolean extends Component {
   render() {
-    const { classes, label, status, variant, t, reverse, onClick, disabled } = this.props;
+    const { classes, label, neutralLabel, status, variant, t, reverse, onClick, disabled } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     const inlineStyleRed = onClick
       ? inlineStyles.redClickable
@@ -75,8 +79,8 @@ class ItemBoolean extends Component {
       return (
         <Chip
           classes={{ root: style }}
-          style={inlineStyles.grey}
-          label={t('N/A')}
+          style={inlineStyles.blue}
+          label={neutralLabel || t('Not applicable')}
           onClick={!disabled && onClick ? onClick.bind(this) : null}
         />
       );
@@ -96,6 +100,7 @@ ItemBoolean.propTypes = {
   classes: PropTypes.object.isRequired,
   status: PropTypes.bool,
   label: PropTypes.string,
+  neutralLabel: PropTypes.string,
   variant: PropTypes.string,
   reverse: PropTypes.bool,
   onClick: PropTypes.func,

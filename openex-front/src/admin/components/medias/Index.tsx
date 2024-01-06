@@ -5,6 +5,7 @@ import { errorWrapper } from '../../../components/Error';
 import Loader from '../../../components/Loader';
 
 const Channels = lazy(() => import('./Channels'));
+const IndexChannel = lazy(() => import('./channels'));
 const Documents = lazy(() => import('./Documents'));
 
 const useStyles = makeStyles(() => ({
@@ -21,6 +22,7 @@ const Index = () => {
         <Routes>
           <Route path="" element={<Navigate to="channels" replace={true} />} />
           <Route path="channels" element={errorWrapper(Channels)()} />
+          <Route path="channels/:channelId/*" element={errorWrapper(IndexChannel)()} />
           <Route path="documents" element={errorWrapper(Documents)()} />
         </Routes>
       </Suspense>

@@ -18,11 +18,11 @@ import { fetchDocuments } from '../../../../actions/Document';
 const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
-    paddingBottom: 50,
+    paddingBottom: 40,
   },
   paper: {
     padding: 20,
-    marginBottom: 40,
+    marginBottom: 20,
   },
 }));
 
@@ -76,7 +76,7 @@ const Channel = () => {
   return (
     <div className={classes.root}>
       <Grid container={true} spacing={3}>
-        <Grid item={true} xs={6}>
+        <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
           <Typography variant="h4">{t('Parameters')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <ChannelParametersForm
@@ -85,7 +85,7 @@ const Channel = () => {
               disabled={!userAdmin}
             />
           </Paper>
-          <Typography variant="h4" style={{ marginTop: 20 }}>
+          <Typography variant="h4">
             {t('Logos')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
@@ -139,7 +139,7 @@ const Channel = () => {
             </Grid>
           </Paper>
         </Grid>
-        <Grid item={true} xs={6}>
+        <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
           <Typography variant="h4">{t('Overview')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             {channel.channel_type === 'newspaper' && (

@@ -57,6 +57,7 @@ const Parameters = (props) => {
             <List style={{ paddingTop: 0 }}>
               <ListItem divider={true}>
                 <ListItemText primary={t('OpenEx platform')} />
+
                 <Chip label={settings?.platform_version} color="primary" />
               </ListItem>
               <ListItem divider={true}>

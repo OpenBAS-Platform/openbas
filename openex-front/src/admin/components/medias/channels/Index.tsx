@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { fetchChannel } from '../../../../actions/Channel';
 import Loader from '../../../../components/Loader';
 import TopBar from '../../nav/TopBar';
-import Channel from './Channel';
 import ChannelHeader from './ChannelHeader';
 import { errorWrapper } from '../../../../components/Error';
 import useDataLoader from '../../../../utils/ServerSideEvent';
@@ -17,6 +16,8 @@ const useStyles = makeStyles(() => ({
     flexGrow: 1,
   },
 }));
+
+const Channel = lazy(() => import('./Channel'));
 
 const Index = () => {
   const classes = useStyles();

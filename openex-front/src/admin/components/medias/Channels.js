@@ -162,7 +162,7 @@ const Channels = () => {
             divider={true}
             component={Link}
             button={true}
-            to={`/admin/channels/${channel.channel_id}`}
+            to={`/admin/medias/channels/${channel.channel_id}`}
           >
             <ListItemIcon>
               <ChannelIcon

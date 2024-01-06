@@ -176,7 +176,6 @@ class DocumentPopover extends Component {
           <DialogContent>
             <DocumentForm
               initialValues={initialValues}
-              hideExercises={!!onRemoveDocument}
               editing={true}
               onSubmit={this.onSubmitEdit.bind(this)}
               handleClose={this.handleCloseEdit.bind(this)}

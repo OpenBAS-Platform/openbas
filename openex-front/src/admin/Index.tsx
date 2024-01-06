@@ -18,12 +18,12 @@ const IndexProfile = lazy(() => import('./components/profile/Index'));
 const Exercises = lazy(() => import('./components/exercises/Exercises'));
 const Persons = lazy(() => import('./components/persons/Index'));
 const Organizations = lazy(() => import('./components/organizations/Organizations'));
-const Medias = lazy(() => import('./components/medias/Index.js'));
+const Medias = lazy(() => import('./components/medias'));
 const IndexIntegrations = lazy(() => import('./components/integrations/Index'));
 const Challenges = lazy(() => import('./components/challenges/Challenges'));
 const LessonsTemplates = lazy(() => import('./components/lessons/LessonsTemplates'));
 const IndexLessonsTemplate = lazy(() => import('./components/lessons/Index'));
-const IndexSettings = lazy(() => import('./components/settings/Index.jsx'));
+const IndexSettings = lazy(() => import('./components/settings/Index'));
 
 const useStyles = makeStyles<Theme>((theme) => ({
   toolbar: theme.mixins.toolbar,
