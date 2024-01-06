@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, Drawer, ListItemIcon, ListItemText, ListItemSecondaryAction, Tooltip, IconButton } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { GroupsOutlined, FileDownloadOutlined } from '@mui/icons-material';
+import { GroupsOutlined, FileDownloadOutlined, CheckCircleOutlined } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import { CSVLink } from 'react-csv';
 import { useFormatter } from '../../../../components/i18n';
@@ -82,7 +82,13 @@ const headerStyles = {
   },
   team_tags: {
     float: 'left',
-    width: '30%',
+    width: '20%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  team_contextual: {
+    float: 'left',
+    width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -123,7 +129,15 @@ const inlineStyles = {
   },
   team_tags: {
     float: 'left',
-    width: '30%',
+    width: '20%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  team_contextual: {
+    float: 'left',
+    width: '10%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -255,6 +269,12 @@ const Teams = () => {
                   true,
                   headerStyles,
                 )}
+                {filtering.buildHeader(
+                  'team_contextual',
+                  'Contextual',
+                  true,
+                  headerStyles,
+                )}
               </div>
             }
           />
@@ -304,6 +324,16 @@ const Teams = () => {
                   >
                     <ItemTags variant="list" tags={team.team_tags} />
                   </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.team_contextual}
+                  >
+                    {team.team_contextual ? (
+                      <CheckCircleOutlined fontSize="small" />
+                    ) : (
+                      '-'
+                    )}
+                  </div>
                 </div>
               }
             />
@@ -311,6 +341,7 @@ const Teams = () => {
               <TeamPopover
                 exerciseId={exerciseId}
                 team={team}
+                managePlayers={() => setSelectedTeam(team.team_id)}
                 disabled={permissions.readOnly}
               />
             </ListItemSecondaryAction>

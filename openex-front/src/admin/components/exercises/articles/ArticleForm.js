@@ -10,14 +10,14 @@ import TextField from '../../../../components/TextField';
 import Autocomplete from '../../../../components/Autocomplete';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchMedias } from '../../../../actions/Media';
+import { fetchChannels } from '../../../../actions/Channel';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
-import MediaIcon from '../../medias/MediaIcon';
+import ChannelIcon from '../../medias/channels/ChannelIcon';
 import MarkDownField from '../../../../components/MarkDownField';
-import DocumentType from '../../documents/DocumentType';
+import DocumentType from '../../medias/documents/DocumentType';
 import ItemTags from '../../../../components/ItemTags';
-import DocumentPopover from '../../documents/DocumentPopover';
+import DocumentPopover from '../../medias/documents/DocumentPopover';
 import ArticleAddDocuments from './ArticleAddDocuments';
 
 const useStyles = makeStyles(() => ({
@@ -119,7 +119,7 @@ const ArticleForm = ({
   // Validation
   const validate = (values) => {
     const errors = {};
-    const requiredFields = ['article_name', 'article_media'];
+    const requiredFields = ['article_name', 'article_channel'];
     requiredFields.forEach((field) => {
       if (!values[field]) {
         errors[field] = t('This field is required.');
@@ -128,29 +128,29 @@ const ArticleForm = ({
     return errors;
   };
   // Fetching data
-  const { medias, exercisesMap, documentsMap, tagsMap } = useHelper(
+  const { channels, exercisesMap, documentsMap, tagsMap } = useHelper(
     (helper) => ({
-      medias: helper.getMedias(),
+      channels: helper.getChannels(),
       exercisesMap: helper.getExercisesMap(),
       documentsMap: helper.getDocumentsMap(),
       tagsMap: helper.getTagsMap(),
     }),
   );
   useDataLoader(() => {
-    dispatch(fetchMedias());
+    dispatch(fetchChannels());
     dispatch(fetchExercises());
     dispatch(fetchDocuments());
   });
   const handleAddDocuments = (docsIds) => setDocuments([...documents, ...docsIds]);
   const handleRemoveDocument = (docId) => setDocuments(documents.filter((n) => n !== docId));
   // Preparing data
-  const sortedMedias = R.sortWith([R.ascend(R.prop('media_name'))], medias).map(
-    (n) => ({ id: n.media_id, label: n.media_name, type: n.media_type }),
+  const sortedChannels = R.sortWith([R.ascend(R.prop('channel_name'))], channels).map(
+    (n) => ({ id: n.channel_id, label: n.channel_name, type: n.channel_type }),
   );
-  const currentMedia = sortedMedias.find(
-    (m) => m.id === initialValues.article_media,
+  const currentChannel = sortedChannels.find(
+    (m) => m.id === initialValues.article_channel,
   );
-  const formData = { ...initialValues, article_media: currentMedia };
+  const formData = { ...initialValues, article_channel: currentChannel };
 
   const documentsReverseBy = (field) => {
     setDocumentsSortBy(field);
@@ -207,15 +207,15 @@ const ArticleForm = ({
             <Autocomplete
               variant="standard"
               size="small"
-              name="article_media"
-              label={t('Media')}
+              name="article_channel"
+              label={t('Channel')}
               fullWidth={true}
               multiple={false}
-              options={sortedMedias}
+              options={sortedChannels}
               renderOption={(renderProps, option) => (
                 <Box component="li" {...renderProps}>
                   <div className={classes.icon}>
-                    <MediaIcon type={option.type} />
+                    <ChannelIcon type={option.type} />
                   </div>
                   <div className={classes.text}>{t(option.label)}</div>
                 </Box>
@@ -352,19 +352,19 @@ const ArticleForm = ({
                         document={document}
                         exercisesMap={exercisesMap}
                         tagsMap={tagsMap}
-                        removeChoice={t('Remove from the medias pressure')}
+                        removeChoice={t('Remove from the media pressure')}
                         onRemoveDocument={handleRemoveDocument}
                       />
                     </ListItemSecondaryAction>
                   </ListItem>
                 );
               })}
-              {values.article_media?.type && (
+              {values.article_channel?.type && (
                 <ArticleAddDocuments
                   exerciseId={exerciseId}
                   articleDocumentsIds={documents}
                   handleAddDocuments={handleAddDocuments}
-                  mediaType={values.article_media.type}
+                  channelType={values.article_channel.type}
                 />
               )}
             </List>

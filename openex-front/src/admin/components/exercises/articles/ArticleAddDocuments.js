@@ -9,7 +9,7 @@ import SearchFilter from '../../../../components/SearchFilter';
 import article18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
 import { fetchDocuments } from '../../../../actions/Document';
-import CreateDocument from '../../documents/CreateDocument';
+import CreateDocument from '../../medias/documents/CreateDocument';
 import { truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { Transition } from '../../../../utils/Environment';
@@ -108,7 +108,7 @@ class ArticleAddDocuments extends Component {
       articleDocumentsIds,
       exerciseId,
       exercise,
-      mediaType,
+      channelType,
     } = this.props;
     const { keyword, documentsIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
@@ -131,13 +131,13 @@ class ArticleAddDocuments extends Component {
     )(Object.values(documents));
     let finalDocuments = R.take(10, filteredDocuments);
     let filters = null;
-    if (mediaType === 'newspaper') {
+    if (channelType === 'newspaper') {
       finalDocuments = R.take(
         10,
         filteredDocuments.filter((d) => d.document_type.includes('image/')),
       );
       filters = ['image/'];
-    } else if (mediaType === 'microblogging') {
+    } else if (channelType === 'microblogging') {
       finalDocuments = R.take(
         10,
         filteredDocuments.filter(
@@ -146,7 +146,7 @@ class ArticleAddDocuments extends Component {
         ),
       );
       filters = ['image/', 'video/'];
-    } else if (mediaType === 'tv') {
+    } else if (channelType === 'tv') {
       finalDocuments = R.take(
         10,
         filteredDocuments.filter((d) => d.document_type.includes('video/')),
@@ -185,7 +185,7 @@ class ArticleAddDocuments extends Component {
             },
           }}
         >
-          <DialogTitle>{t('Add documents in this media pressure')}</DialogTitle>
+          <DialogTitle>{t('Add documents in this channel pressure')}</DialogTitle>
           <DialogContent>
             <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
               <Grid item={true} xs={8}>

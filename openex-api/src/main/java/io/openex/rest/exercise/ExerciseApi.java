@@ -622,14 +622,14 @@ public class ExerciseApi extends RestBehavior {
         objectMapper.addMixIn(Inject.class, ExerciseExportMixins.Inject.class);
         // Documents
         exerciseTags.addAll(exercise.getDocuments().stream().flatMap(doc -> doc.getTags().stream()).toList());
-        // Articles / Medias
+        // Articles / Channels
         List<Article> articles = exercise.getArticles();
         importExport.setArticles(articles);
         objectMapper.addMixIn(Article.class, ExerciseExportMixins.Article.class);
-        List<Media> medias = articles.stream().map(Article::getMedia).distinct().toList();
-        documentIds.addAll(medias.stream().flatMap(media -> media.getLogos().stream()).map(Document::getId).toList());
-        importExport.setMedias(medias);
-        objectMapper.addMixIn(Media.class, ExerciseExportMixins.Media.class);
+        List<Channel> channels = articles.stream().map(Article::getChannel).distinct().toList();
+        documentIds.addAll(channels.stream().flatMap(channel -> channel.getLogos().stream()).map(Document::getId).toList());
+        importExport.setChannels(channels);
+        objectMapper.addMixIn(Channel.class, ExerciseExportMixins.Channel.class);
         // Challenges
         List<Challenge> challenges = fromIterable(challengeService.getExerciseChallenges(exerciseId));
         importExport.setChallenges(challenges);

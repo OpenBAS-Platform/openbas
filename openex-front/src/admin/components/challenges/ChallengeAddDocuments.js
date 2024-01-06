@@ -9,7 +9,7 @@ import SearchFilter from '../../../components/SearchFilter';
 import inject18n from '../../../components/i18n';
 import { storeHelper } from '../../../actions/Schema';
 import { fetchDocuments } from '../../../actions/Document';
-import CreateDocument from '../documents/CreateDocument';
+import CreateDocument from '../medias/documents/CreateDocument';
 import { truncate } from '../../../utils/String';
 import { Transition } from '../../../utils/Environment';
 import TagsFilter from '../../../components/TagsFilter';

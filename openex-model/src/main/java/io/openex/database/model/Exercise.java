@@ -486,8 +486,8 @@ public class Exercise implements Base {
         return articles;
     }
 
-    public List<Article> getArticlesForMedia(Media media) {
-        return articles.stream().filter(article -> article.getMedia().equals(media)).toList();
+    public List<Article> getArticlesForChannel(Channel channel) {
+        return articles.stream().filter(article -> article.getChannel().equals(channel)).toList();
     }
 
     public void setArticles(List<Article> articles) {

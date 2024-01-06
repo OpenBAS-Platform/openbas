@@ -4,7 +4,7 @@ import { Fab, Dialog, DialogTitle, DialogContent, Slide, ListItem, ListItemIcon,
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
-import { addExerciseArticle } from '../../../../actions/Media';
+import { addExerciseArticle } from '../../../../actions/Channel';
 import ArticleForm from './ArticleForm';
 
 const Transition = React.forwardRef((props, ref) => (
@@ -34,7 +34,7 @@ const CreateArticle = (props) => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const onSubmit = (data) => {
-    const inputValues = { ...data, article_media: data.article_media.id };
+    const inputValues = { ...data, article_channel: data.article_channel.id };
     return dispatch(addExerciseArticle(exerciseId, inputValues)).then(
       (result) => {
         if (result.result) {
@@ -60,7 +60,7 @@ const CreateArticle = (props) => {
             <ControlPointOutlined color="primary" />
           </ListItemIcon>
           <ListItemText
-            primary={t('Create a new media pressure')}
+            primary={t('Create a new channel pressure')}
             classes={{ primary: classes.text }}
           />
         </ListItem>
@@ -82,14 +82,14 @@ const CreateArticle = (props) => {
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
-        <DialogTitle>{t('Create a new media pressure')}</DialogTitle>
+        <DialogTitle>{t('Create a new channel pressure')}</DialogTitle>
         <DialogContent style={{ overflowX: 'hidden' }}>
           <ArticleForm
             editing={false}
             onSubmit={onSubmit}
             handleClose={handleClose}
             exerciseId={exerciseId}
-            initialValues={{ article_name: '', article_media: '' }}
+            initialValues={{ article_name: '', article_channel: '' }}
           />
         </DialogContent>
       </Dialog>

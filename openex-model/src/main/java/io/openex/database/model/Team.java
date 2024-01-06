@@ -67,7 +67,6 @@ public class Team implements Base {
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("team_organization")
     private Organization organization;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_teams",
             joinColumns = @JoinColumn(name = "team_id"),
@@ -83,6 +82,11 @@ public class Team implements Base {
     @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("team_exercises")
     private List<Exercise> exercises = new ArrayList<>();
+
+    @Setter
+    @Column(name = "team_contextual")
+    @JsonProperty("team_contextual")
+    private Boolean contextual = false;
 
     @Getter
     @Setter
@@ -168,6 +172,14 @@ public class Team implements Base {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Boolean getContextual() {
+        return contextual;
+    }
+
+    public void setContextual(Boolean contextual) {
+        this.contextual = contextual;
     }
 
     public List<Tag> getTags() {

@@ -9,7 +9,7 @@ import Loader from '../components/Loader';
 
 const Login = lazy(() => import('./components/login/Login'));
 const Comcheck = lazy(() => import('./components/comcheck/Comcheck'));
-const Media = lazy(() => import('./components/medias/Media'));
+const Channel = lazy(() => import('./components/channels/Channel'));
 const Challenges = lazy(() => import('./components/challenges/Challenges'));
 const Lessons = lazy(() => import('./components/lessons/Lessons'));
 
@@ -37,7 +37,7 @@ const Index = () => {
           <Routes>
             <Route path="comcheck/:statusId" element={errorWrapper(Comcheck)()} />
             <Route path="reset" element={errorWrapper(Reset)()} />
-            <Route path="medias/:exerciseId/:mediaId" element={errorWrapper(Media)()} />
+            <Route path="channels/:exerciseId/:channelId" element={errorWrapper(Channel)()} />
             <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
             <Route path="lessons/:exerciseId" element={errorWrapper(Lessons)()} />
             <Route path="*" element={<Login />} />

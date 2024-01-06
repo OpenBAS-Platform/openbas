@@ -24,6 +24,12 @@ public class TeamCreateInput {
     @JsonProperty("team_tags")
     private List<String> tagIds = new ArrayList<>();
 
+    @JsonProperty("team_exercises")
+    private List<String> exerciseIds = new ArrayList<>();
+
+    @JsonProperty("team_contextual")
+    private Boolean contextual = false;
+
     public String getName() {
         return name;
     }
@@ -54,5 +60,21 @@ public class TeamCreateInput {
 
     public void setTagIds(List<String> tagIds) {
         this.tagIds = tagIds;
+    }
+
+    public List<String> getExerciseIds() {
+        return exerciseIds;
+    }
+
+    public void setExerciseIds(List<String> exerciseIds) {
+        this.exerciseIds = exerciseIds;
+    }
+
+    public Boolean getContextual() {
+        return contextual;
+    }
+
+    public void setContextual(Boolean contextual) {
+        this.contextual = contextual;
     }
 }

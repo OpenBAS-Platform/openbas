@@ -1,4 +1,4 @@
-import type { Team, Exercise, InjectExpectation, Media, Organization, Tag, User } from '../utils/api-types';
+import type { Team, Exercise, InjectExpectation, Channel, Organization, Tag, User } from '../utils/api-types';
 
 export interface ExercicesHelper {
   getExercise: (exerciseId: Exercise['exercise_id']) => Exercise;
@@ -22,8 +22,8 @@ export interface TeamsHelper {
   getTeamsMap: () => Record<string, Team>;
 }
 
-export interface MediasHelper {
-  getMedia: (mediaId: Media['media_id']) => Media;
+export interface ChannelsHelper {
+  getChannel: (channelId: Channel['channel_id']) => Channel;
 }
 
 export interface LoggedHelper {

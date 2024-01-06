@@ -18,9 +18,7 @@ const IndexProfile = lazy(() => import('./components/profile/Index'));
 const Exercises = lazy(() => import('./components/exercises/Exercises'));
 const Persons = lazy(() => import('./components/persons/Index'));
 const Organizations = lazy(() => import('./components/organizations/Organizations'));
-const Documents = lazy(() => import('./components/documents/Documents'));
-const Medias = lazy(() => import('./components/medias/Medias'));
-const IndexMedia = lazy(() => import('./components/medias/Index'));
+const Medias = lazy(() => import('./components/medias/Index.js'));
 const IndexIntegrations = lazy(() => import('./components/integrations/Index'));
 const Challenges = lazy(() => import('./components/challenges/Challenges'));
 const LessonsTemplates = lazy(() => import('./components/lessons/LessonsTemplates'));
@@ -71,9 +69,7 @@ const Index = () => {
               <Route path="exercises/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
               <Route path="persons/*" element={errorWrapper(Persons)()} />
               <Route path="organizations" element={errorWrapper(Organizations)()} />
-              <Route path="documents" element={errorWrapper(Documents)()} />
-              <Route path="medias" element={errorWrapper(Medias)()} />
-              <Route path="medias/:mediaId/*" element={errorWrapper(IndexMedia)()} />
+              <Route path="medias/*" element={errorWrapper(Medias)()} />
               <Route path="challenges" element={errorWrapper(Challenges)()} />
               <Route path="lessons" element={errorWrapper(LessonsTemplates)()} />
               <Route path="lessons/:lessonsTemplateId/*" element={errorWrapper(IndexLessonsTemplate)()} />

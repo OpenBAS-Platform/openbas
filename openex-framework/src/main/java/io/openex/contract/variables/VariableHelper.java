@@ -13,7 +13,7 @@ public class VariableHelper {
 
   public static final String USER = "user";
   public static final String EXERCISE = "exercise";
-  public static final String TEAMS = "audiences";
+  public static final String TEAMS = "teams";
   public static final String COMCHECK = "comcheck";
   public static final String PLAYER_URI = "player_uri";
   public static final String CHALLENGES_URI = "challenges_uri";
@@ -36,7 +36,7 @@ public class VariableHelper {
           variable(EXERCISE + ".description", "Description of the exercise", VariableType.String, One)
       ));
 
-  public static final ContractVariable teamVariable = variable(TEAMS, "List of audience name for the injection",
+  public static final ContractVariable teamVariable = variable(TEAMS, "List of team name for the injection",
       VariableType.String, Multiple);
 
   public static final List<ContractVariable> uriVariables = List.of(

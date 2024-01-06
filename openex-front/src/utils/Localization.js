@@ -38,7 +38,7 @@ const i18n = {
       Timeline: 'Chronologie',
       Definition: 'Définition',
       Results: 'Résultats',
-      Medias: 'Médias',
+      Channels: 'Canaux',
       Submit: 'Soumettre',
       Country: 'Pays',
       Flag: 'Flag',
@@ -51,8 +51,8 @@ const i18n = {
       'Preview challenges page': 'Aperçu des challenges',
       'Switch to preview mode': 'Basculer en mode aperçu',
       'Switch to player mode': 'Basculer en mode joueur',
-      'Create a new media': 'Créer un nouveau média',
-      'Update the media': 'Modifier le média',
+      'Create a new channel': 'Créer un nouveau canal',
+      'Update the channel': 'Modifier le canal',
       'Recent exercises': 'Exercices récents',
       'No teams in this exercise.': 'Aucune team dans cet exercice.',
       'No exercises in this platform.': 'Aucun exercice dans cette plateforme.',
@@ -97,8 +97,8 @@ const i18n = {
         'Souhaitez-vous supprimer ce joueur ?',
       'Do you want to delete this inject?':
         'Souhaitez-vous supprimer ce stimuli ?',
-      'Do you want to delete this media?':
-        'Souhaitez-vous supprimer ce média ?',
+      'Do you want to delete this channel?':
+        'Souhaitez-vous supprimer ce canal ?',
       'Start date (optional)': 'Date de début (optionnel)',
       'Create a new player': 'Créer un nouveau joueur',
       'Update the player': 'Modifier le joueur',
@@ -118,7 +118,6 @@ const i18n = {
       on: 'le',
       Manual: 'Manuel',
       'Total score': 'Score total',
-      'Media entries': 'Entrées de média',
       Parameters: 'Paramètres',
       'Default theme': 'Thème par défaut',
       'Default language': 'Langue par défaut',
@@ -226,18 +225,18 @@ const i18n = {
       'Add target teams': 'Ajouter des teams cibles',
       'Trigger after': 'Se déclenche après',
       'Create a new inject': 'Créer un nouveau stimuli',
-      'Remove from the team': "Retirer de l'team",
-      'Update the team': "Modifier l'team",
+      'Remove from the team': "Retirer de l'équipe",
+      'Update the team': "Modifier l'équipe",
       'Update the exercise': "Modifier l'exercice",
       'Update the inject': 'Modifier le stimuli',
       'Do you want to remove the player from the team?':
-        'Souhaitez-vous retirer le joueur de cette team ?',
-      'Add players in this team': 'Ajouter des joueurs dans cette team',
-      'Create a new team': 'Créer une nouvelle team',
+        'Souhaitez-vous retirer le joueur de cette équipe ?',
+      'Add players in this team': 'Ajouter des joueurs dans cette équipe',
+      'Create a new team': 'Créer une nouvelle équipe',
       'Remove from the inject': 'Retirer du stimuli',
       'Remove from the element': "Retirer de l'élément",
       'Do you want to remove the team from the inject?':
-        "Souhaitez-vous retirer l'team du stimuli ?",
+        "Souhaitez-vous retirer l'équipe du stimuli ?",
       'Do you want to delete this exercise?':
         'Souhaitez-vous supprimer cet exercice ?',
       'Number of injects': 'Nombre de stimulis',
@@ -282,23 +281,26 @@ const i18n = {
       Attachments: 'Pièces jointes',
       Attachment: 'Pièce jointe',
       Content: 'Contenu',
-      Teams: 'Teams',
+      Teams: 'Equipes',
+      Contextual: 'Contextuelle',
       'Send email': 'Envoyer le mail',
-      'Add documents in this media pressure':
+      'Add documents in this channel pressure':
         'Ajouter des documents à cette pression médiatique',
       'Expect teams to read the article(s)':
-        'Les teams doivent lire le(s) article(s)',
-      'Add media pressure': 'Ajouter de la pression médiatique',
-      'Remove from the medias pressure': 'Supprimer de la pression médiatique',
+        'Les équipes doivent lire le(s) article(s)',
+      'Add channel pressure': 'Ajouter de la pression médiatique',
+      'Remove from the media pressure': 'Supprimer de la pression médiatique',
       'Raw request data': 'Données brutes de la requête',
-      'Media pressure to publish': 'Pression médiatique à publier',
+      'Channel pressure to publish': 'Pression médiatique à publier',
       'Form request data': 'Données de formulaire de la requête',
       Key: 'Clé',
       Headers: 'En-têtes',
-      team: 'Team',
+      team: 'Equipe',
       attachment: 'Document',
       'Executed in': 'Exécuté en',
       'Use basic authentication': 'Utiliser une authentification basique',
+      'Only in the context of this simulation': 'Seulement dans le contexte de cette simulation',
+      Medias: 'Médias',
       Success: 'Succès',
       m: 'm',
       h: 'h',
@@ -334,15 +336,15 @@ const i18n = {
       'Do you want to enable this inject?':
         'Souhaitez-vous activer ce stimuli ?',
       'Do you want to disable this team?':
-        'Souhaitez-vous désactiver cette team ?',
+        'Souhaitez-vous désactiver cette équipe ?',
       'Do you want to enable this team?':
-        'Souhaitez-vous activer cette team ?',
+        'Souhaitez-vous activer cette équipe ?',
       Trigger: 'Déclencheur',
       'Manage content': 'Gérer le contenu',
       Controls: 'Contrôles',
       'Lessons learned': 'Expérience',
       Planning: 'Planification',
-      'Media pressure': 'Pression médiatique',
+      'Channel pressure': 'Pression médiatique',
       Comchecks: 'Vérifications',
       Dryruns: 'Simulations',
       'Messages header': 'En-tête des messages',
@@ -391,7 +393,7 @@ const i18n = {
       Failure: 'Echec',
       Expired: 'Expiré',
       Anonymized: 'Anonymisé',
-      'No media pressure entry in this media yet.':
+      'No channel pressure entry in this channel yet.':
         'Encore aucune entrée de pression médiatique dans ce média.',
       'Your communication check is': 'Votre test de communication est',
       successful: 'un succès',
@@ -473,8 +475,8 @@ const i18n = {
       'Change logo': 'Changer le logo',
       'Scheduled / in use': 'Planifié / utilisé',
       'Not used in the exercise': "Pas utilisé dans l'exercice",
-      'Update the media pressure': 'Modifier la pression médiatique',
-      'Do you want to delete this media pressure?':
+      'Update the channel pressure': 'Modifier la pression médiatique',
+      'Do you want to delete this channel pressure?':
         'Souhaitez-vous supprimer cette pression médiatique ?',
       'Do you want to delete this challenge?':
         'Souhaitez-vous supprimer ce challenge ?',
@@ -482,7 +484,7 @@ const i18n = {
         "Souhaitez-vous supprimer cette catégorie de retour d'expérience ?",
       'Update the lessons learned category':
         "Modifier une catégorie de retour d'expérience",
-      'Create a new media pressure': 'Créer une nouvelle pression médiatique',
+      'Create a new channel pressure': 'Créer une nouvelle pression médiatique',
       'Create a new lessons learned question':
         "Créer une nouvelle question de retour d'expérience",
       'Collaborative lessons learned': "Retour d'expérience collaboratif",
@@ -506,7 +508,7 @@ const i18n = {
       'Anonymize answers': 'Anonymiser les réponses',
       'No explanation': 'Aucune explication',
       'Add target teams in this lessons learned category':
-        "Ajouter des teams cibles à cette catégorie de retour d'expérience",
+        "Ajouter des équipes cibles à cette catégorie de retour d'expérience",
       'Sending the questionnaire will emit an email to each player with a unique link to access and fill it.':
         'Envoyer le questionnaire va émettre un email à chaque joueur avec un lien unique pour y accéder et le remplir.',
       'Do you want to empty lessons learned categories and questions?':
@@ -530,7 +532,7 @@ const i18n = {
         "Modifier le template de retour d'expérience",
       'Do you want to delete this lessons learned template?':
         "Souhaitez-vous supprimer ce template de retour d'expérience ?",
-      Media: 'Média',
+      Channel: 'Média',
       Author: 'Auteur',
       'Max number of attempts': "Nombre maximum d'essais",
       'Add documents in this challenge': 'Ajouter un document à ce challenge',
@@ -542,7 +544,7 @@ const i18n = {
       'Challenges to publish': 'Challenges à publier',
       'Add challenge in this inject': 'Ajouter des challenges à ce stimuli',
       'Add challenges': 'Ajouter des challenges',
-      'Do you want to remove this media pressure from the inject?':
+      'Do you want to remove this channel pressure from the inject?':
         'Souhaitez-vous retirer cette pression médiatique de ce stimuli ?',
       'Do you want to remove this challenge from the inject?':
         'Souhaitez-vous retirer ce challenge de ce stimuli ?',
@@ -553,18 +555,18 @@ const i18n = {
       'No challenge in this exercise yet.':
         'Encore aucun challenge dans cet exercice.',
       'Distribution of expectations by team':
-        'Distribution des attendus par team',
+        'Distribution des attendus par équipe',
       'Distribution of expectations by inject type':
         'Distribution des attendus par type de stimuli',
       'Distribution of expected total score by inject type':
         'Distribution du score total attendu par type de stimuli',
       '-': 'Aucun',
       'Each team should upload a document':
-        'Chaque team doit uploader un document',
+        'Chaque équipe doit uploader un document',
       'Each team should submit a text response':
-        'Chaque team doit soumettre une réponse texte',
+        'Chaque équipe doit soumettre une réponse texte',
       // -- Expectation start --
-      'This expectation is handled automatically by the platform and triggered when team reads articles': 'Cet attendu est géré automatiquement par la plateforme et déclenché lorsque une team lit les articles',
+      'This expectation is handled automatically by the platform and triggered when team reads articles': 'Cet attendu est géré automatiquement par la plateforme et déclenché lorsque une équipe lit les articles',
       'Add expectations': 'Ajouter des attendus',
       'Add expectation in this inject': 'Ajouter des attendus dans ce stimuli',
       'Update the expectation': 'Modifier l\'attendu',
@@ -577,13 +579,13 @@ const i18n = {
       ARTICLE: 'Attendu lié à aux articles',
       // -- Expectation end --
       'Distribution of expected total score by team':
-        'Distribution du score total attendu par team',
+        'Distribution du score total attendu par équipe',
       'Exercise definition and scenario':
         "Définition de l'exercice et scénario",
       'Exercise results': "Résultats de l'exercice",
       'Exercise data': "Données de l'exercice",
       'Distribution of total score by team':
-        'Distribution du score total par team',
+        'Distribution du score total par équipe',
       'Distribution of total score by organization':
         'Distribution du score total par organisation',
       'Total expected score': 'Score total attendu',
@@ -593,9 +595,9 @@ const i18n = {
         'Distribution du score total par stimuli',
       'Distribution of injects by type': 'Distribution des stimulis par type',
       'Distribution of injects by team':
-        'Distribution des stimulis par team',
+        'Distribution des stimulis par équipe',
       'Distribution of mails by team':
-        'Distribution des mails par team',
+        'Distribution des mails par équipe',
       'Distribution of mails by player': 'Distribution des mails par joueur',
       'Distribution of mails by inject': 'Distribution des mails par stimuli',
       'Sent injects over time': 'Stimulis envoyés dans le temps',
@@ -603,11 +605,11 @@ const i18n = {
       'No data to display or the exercise has not started yet':
         "Aucune donnée disponible ou l'exercice n'a pas encore commencé",
       'Back to administration': "Retour à l'administration",
-      'Teams scores over time': 'Score des teams dans le temps',
+      'Teams scores over time': 'Score des équipes dans le temps',
       'Inject types scores over time':
         'Score des types de stimuli dans le temps',
       'The animation team can validate the team reaction':
-        "L'équipe d'animation peut valider la réaction de l'team",
+        "L'équipe d'animation peut valider la réaction de l'équipe",
       Description: 'Description',
       'No description': 'Aucune description',
       'Only injects with manual validation':
@@ -664,7 +666,7 @@ const i18n = {
       'Quick inject definition': 'Définition rapide de l’injection',
       Order: 'Ordre',
       Details: 'Détails',
-      Team: 'Public',
+      Team: 'Equipe',
       Template: 'Modèle',
       Questionnaire: 'Questionnaire',
       User: 'Utilisateur',
@@ -702,7 +704,6 @@ const i18n = {
       Body: 'Email body',
       Encrypted: 'Encrypt this email',
       Attachments: 'Attachments',
-      Teams: 'Teams',
       team: 'Team',
       text: 'Text field',
       textarea: 'Text area',

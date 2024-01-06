@@ -46,7 +46,7 @@ import { fetchPlayerDocuments } from '../../../actions/Document';
 import Loader from '../../../components/Loader';
 import Empty from '../../../components/Empty';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
-import DocumentType from '../../../admin/components/documents/DocumentType';
+import DocumentType from '../../../admin/components/medias/documents/DocumentType';
 import ItemTags from '../../../components/ItemTags';
 import TextField from '../../../components/TextField';
 import Transition from '../../../components/common/Transition';

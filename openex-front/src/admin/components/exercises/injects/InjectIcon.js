@@ -96,7 +96,7 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
           sx={{ color: color || '#00bcd4' }}
         />
       );
-    case 'openex_media':
+    case 'openex_channel':
       return (
         <NewspaperVariantMultipleOutline
           style={style}

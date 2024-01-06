@@ -157,7 +157,7 @@ public class LessonsApi extends RestBehavior {
     lessonsCategoryRepository.deleteById(lessonsCategoryId);
   }
 
-  @PutMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/audiences")
+  @PutMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/teams")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public LessonsCategory updateExerciseLessonsCategoryTeams(@PathVariable String exerciseId,
       @PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsCategoryTeamsInput input) {

@@ -22,24 +22,31 @@ import static io.openex.config.SessionHelper.currentUser;
 import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.helper.DatabaseHelper.updateRelation;
 import static io.openex.helper.StreamHelper.fromIterable;
+import static java.time.Instant.from;
 import static java.time.Instant.now;
 
 @RestController
 @RolesAllowed(ROLE_USER)
 public class TeamApi extends RestBehavior {
+    private ExerciseRepository exerciseRepository;
     private TeamRepository teamRepository;
     private UserRepository userRepository;
     private OrganizationRepository organizationRepository;
     private TagRepository tagRepository;
 
     @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public void setExerciseRepository(ExerciseRepository exerciseRepository) {
+        this.exerciseRepository = exerciseRepository;
     }
 
     @Autowired
     public void setTeamRepository(TeamRepository teamRepository) {
         this.teamRepository = teamRepository;
+    }
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Autowired
@@ -85,10 +92,14 @@ public class TeamApi extends RestBehavior {
     @PostMapping("/api/teams")
     @PreAuthorize("isPlanner()")
     public Team createTeam(@Valid @RequestBody TeamCreateInput input) {
+        if (input.getContextual() && input.getExerciseIds().toArray().length > 1) {
+            throw new UnsupportedOperationException("Contextual team can only be associated to one exercise");
+        }
         Team team = new Team();
         team.setUpdateAttributes(input);
         team.setOrganization(updateRelation(input.getOrganizationId(), team.getOrganization(), organizationRepository));
         team.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        team.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
         return teamRepository.save(team);
     }
 

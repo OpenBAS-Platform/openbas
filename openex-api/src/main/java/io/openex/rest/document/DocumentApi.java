@@ -201,9 +201,9 @@ public class DocumentApi extends RestBehavior {
   }
 
   private List<Document> getExercisePlayerDocuments(Exercise exercise) {
-    Stream<Document> mediasDocs = exercise.getArticles().stream()
-        .map(Article::getMedia)
-        .flatMap(media -> media.getLogos().stream());
+    Stream<Document> channelsDocs = exercise.getArticles().stream()
+        .map(Article::getChannel)
+        .flatMap(channel -> channel.getLogos().stream());
     Stream<Document> articlesDocs = exercise.getArticles().stream()
         .flatMap(article -> article.getDocuments().stream());
     List<String> challenges = exercise.getInjects().stream()
@@ -220,7 +220,7 @@ public class DocumentApi extends RestBehavior {
         .toList();
     Stream<Document> challengesDocs = fromIterable(challengeRepository.findAllById(challenges)).stream()
         .flatMap(challenge -> challenge.getDocuments().stream());
-    return Stream.of(mediasDocs, articlesDocs, challengesDocs).flatMap(documentStream -> documentStream).distinct()
+    return Stream.of(channelsDocs, articlesDocs, challengesDocs).flatMap(documentStream -> documentStream).distinct()
         .toList();
   }
 

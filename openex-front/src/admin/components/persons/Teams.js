@@ -297,7 +297,7 @@ const Teams = () => {
               }
             />
             <ListItemSecondaryAction>
-              <TeamPopover team={team} />
+              <TeamPopover team={team} managePlayers={() => setSelectedTeam(team.team_id)} />
             </ListItemSecondaryAction>
           </ListItem>
         ))}

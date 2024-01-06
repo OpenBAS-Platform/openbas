@@ -18,12 +18,14 @@ interface TeamPopoverProps {
   team: TeamStore;
   exerciseId?: string;
   onRemoveTeam?: (teamId: string | undefined) => void,
+  managePlayers?: () => void,
 }
 
 const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   team,
   exerciseId,
   onRemoveTeam,
+  managePlayers,
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -115,7 +117,16 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
         onClose={handlePopoverClose}
       >
         <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
-        {exerciseId && !onRemoveTeam && (
+        {managePlayers && (
+        <MenuItem onClick={() => {
+          handlePopoverClose();
+          managePlayers();
+        }}
+        >
+          {t('Manage players')}
+        </MenuItem>
+        )}
+        {exerciseId && !team.team_contextual && !onRemoveTeam && (
           <MenuItem onClick={handleOpenRemove}>
             {t('Remove from the exercise')}
           </MenuItem>
