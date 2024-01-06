@@ -10,7 +10,7 @@ import type { Theme } from '../../../../components/Theme';
 import { Option } from '../../../../utils/Option';
 import type { TeamInputForm } from './Team';
 import TeamForm from './TeamForm';
-import { TeamCreateInput } from '../../../../utils/api-types';
+import type { TeamCreateInput } from '../../../../utils/api-types';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {

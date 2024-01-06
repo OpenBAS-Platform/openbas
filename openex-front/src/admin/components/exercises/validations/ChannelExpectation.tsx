@@ -6,7 +6,7 @@ import type { InjectExpectationsStore } from '../injects/expectations/Expectatio
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import colorStyles from '../../../../components/Color';
-import ChannelIcon from '../../channels/channels/ChannelIcon.js';
+import ChannelIcon from '../../medias/channels/ChannelIcon';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {

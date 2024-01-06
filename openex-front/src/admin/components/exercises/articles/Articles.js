@@ -15,7 +15,7 @@ import { fetchExerciseArticles, fetchChannels } from '../../../../actions/Channe
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import SearchFilter from '../../../../components/SearchFilter';
 import { useFormatter } from '../../../../components/i18n';
-import ChannelsFilter from '../../medias/channels/ChannelsFilter;
+import ChannelsFilter from '../../medias/channels/ChannelsFilter';
 import { fetchDocuments } from '../../../../actions/Document';
 import ArticlePopover from './ArticlePopover';
 import ChannelIcon from '../../medias/channels/ChannelIcon';

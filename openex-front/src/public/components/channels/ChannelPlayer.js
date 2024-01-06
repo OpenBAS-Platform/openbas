@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '@mui/material';
-import { fetchPlayerChannel } from '../../../actions/Channel.js';
+import { fetchPlayerChannel } from '../../../actions/Channel';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
 import ChannelNewspaper from './ChannelNewspaper';

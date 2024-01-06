@@ -7,18 +7,18 @@ import { connect } from 'react-redux';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, DescriptionOutlined, FileDownloadOutlined, RowingOutlined } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { CSVLink } from 'react-csv';
-import inject18n from '../../../components/i18n.js';
-import { fetchDocuments } from '../../../actions/Document.js';
-import { fetchTags } from '../../../actions/Tag.js';
-import { fetchExercises } from '../../../actions/Exercise.js';
-import ItemTags from '../../../components/ItemTags.js';
-import SearchFilter from '../../../components/SearchFilter.js';
-import TagsFilter from '../../../components/TagsFilter.js';
-import { storeHelper } from '../../../actions/Schema.js';
-import CreateDocument from './documents/CreateDocument.js';
-import DocumentPopover from './documents/DocumentPopover.js';
-import DocumentType from './documents/DocumentType.js';
-import { exportData } from '../../../utils/Environment.js';
+import inject18n from '../../../components/i18n';
+import { fetchDocuments } from '../../../actions/Document';
+import { fetchTags } from '../../../actions/Tag';
+import { fetchExercises } from '../../../actions/Exercise';
+import ItemTags from '../../../components/ItemTags';
+import SearchFilter from '../../../components/SearchFilter';
+import TagsFilter from '../../../components/TagsFilter';
+import { storeHelper } from '../../../actions/Schema';
+import CreateDocument from './documents/CreateDocument';
+import DocumentPopover from './documents/DocumentPopover';
+import DocumentType from './documents/DocumentType';
+import { exportData } from '../../../utils/Environment';
 
 const styles = (theme) => ({
   parameters: {
@@ -346,12 +346,12 @@ class Documents extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.document_exercises}
                     >
-                      {R.take(3, document.document_exercises).map((e) => {
+                      {R.take(3, document.document_exercises).map((e, i) => {
                         const exercise = exercisesMap[e];
-                        if (exercise === undefined) return <div />;
+                        if (exercise === undefined) return <div key={i} />;
                         return (
                           <Tooltip
-                            key={exercise.exercise_id}
+                            key={i}
                             title={exercise.exercise_name}
                           >
                             <Chip

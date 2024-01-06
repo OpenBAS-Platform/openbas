@@ -13,7 +13,7 @@ import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../..
 import SearchFilter from '../../../../components/SearchFilter';
 import Loader from '../../../../components/Loader';
 import { useFormatter } from '../../../../components/i18n';
-import { fetchExerciseArticles, fetchChannels } from '../../../../actions/Channel.js';
+import { fetchExerciseArticles, fetchChannels } from '../../../../actions/Channel';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import TagsFilter from '../../../../components/TagsFilter';
 import InjectIcon from '../injects/InjectIcon';
