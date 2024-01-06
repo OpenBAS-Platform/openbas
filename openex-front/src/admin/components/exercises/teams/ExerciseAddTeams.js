@@ -107,6 +107,7 @@ class TeamAddTeams extends Component {
       teamsMap,
       exerciseTeamsIds,
       organizationsMap,
+      exerciseId,
     } = this.props;
     const { keyword, teamsIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
@@ -204,6 +205,7 @@ class TeamAddTeams extends Component {
                   <CreateTeam
                     inline={true}
                     onCreate={this.onCreate.bind(this)}
+                    exerciseId={exerciseId}
                   />
                 </List>
               </Grid>

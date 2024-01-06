@@ -102,7 +102,7 @@ public class ChallengeExecutor extends Injector {
                 throw new UnsupportedOperationException("Unknown contract " + contract.getId());
             }
         } catch (Exception e) {
-            execution.addTrace(traceError("media", e.getMessage(), e));
+            execution.addTrace(traceError("channel", e.getMessage(), e));
         }
         return List.of();
     }

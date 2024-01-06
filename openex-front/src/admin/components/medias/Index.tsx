@@ -1,16 +1,11 @@
-import React from 'react';
-import { Route, Routes, useParams } from 'react-router-dom';
+import React, { Suspense, lazy } from 'react';
 import { makeStyles } from '@mui/styles';
-import { fetchMedia } from '../../../actions/Media';
-import Loader from '../../../components/Loader';
-import TopBar from '../nav/TopBar';
-import Media from './Media';
-import MediaHeader from './MediaHeader';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { errorWrapper } from '../../../components/Error';
-import useDataLoader from '../../../utils/ServerSideEvent';
-import { useHelper } from '../../../store';
-import { useAppDispatch } from '../../../utils/hooks';
-import type { MediasHelper } from '../../../actions/helper';
+import Loader from '../../../components/Loader';
+
+const Channels = lazy(() => import('./Channels'));
+const Documents = lazy(() => import('./Documents'));
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -20,30 +15,15 @@ const useStyles = makeStyles(() => ({
 
 const Index = () => {
   const classes = useStyles();
-  const dispatch = useAppDispatch();
-  const { mediaId } = useParams();
-  const { media } = useHelper((helper: MediasHelper) => ({
-    media: helper.getMedia(mediaId),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchMedia(mediaId));
-  });
-  if (media) {
-    return (
-      <div className={classes.root}>
-        <TopBar />
-        <MediaHeader />
-        <div className="clearfix" />
-        <Routes>
-          <Route path="" element={errorWrapper(Media)()} />
-        </Routes>
-      </div>
-    );
-  }
   return (
     <div className={classes.root}>
-      <TopBar />
-      <Loader />
+      <Suspense fallback={<Loader />}>
+        <Routes>
+          <Route path="" element={<Navigate to="channels" replace={true} />} />
+          <Route path="channels" element={errorWrapper(Channels)()} />
+          <Route path="documents" element={errorWrapper(Documents)()} />
+        </Routes>
+      </Suspense>
     </div>
   );
 };

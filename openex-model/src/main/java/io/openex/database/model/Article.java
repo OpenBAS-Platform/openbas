@@ -66,10 +66,10 @@ public class Article implements Base {
     private Exercise exercise;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "article_media")
+    @JoinColumn(name = "article_channel")
     @JsonSerialize(using = MonoIdDeserializer.class)
-    @JsonProperty("article_media")
-    private Media media;
+    @JsonProperty("article_channel")
+    private Channel channel;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "articles_documents",
@@ -174,12 +174,12 @@ public class Article implements Base {
         this.exercise = exercise;
     }
 
-    public Media getMedia() {
-        return media;
+    public Channel getChannel() {
+        return channel;
     }
 
-    public void setMedia(Media media) {
-        this.media = media;
+    public void setChannel(Channel channel) {
+        this.channel = channel;
     }
 
     @Transient

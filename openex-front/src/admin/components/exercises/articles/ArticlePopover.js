@@ -4,7 +4,7 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, B
 import { MoreVert } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { useFormatter } from '../../../../components/i18n';
-import { deleteExerciseArticle, updateExerciseArticle } from '../../../../actions/Media';
+import { deleteExerciseArticle, updateExerciseArticle } from '../../../../actions/Channel';
 import ArticleForm from './ArticleForm';
 
 const Transition = React.forwardRef((props, ref) => (
@@ -34,7 +34,7 @@ const ArticlePopover = ({ exercise, article, documents, onRemoveArticle }) => {
   };
   const handleCloseEdit = () => setOpenEdit(false);
   const onSubmitEdit = (data) => {
-    const inputValues = { ...data, article_media: data.article_media.id };
+    const inputValues = { ...data, article_channel: data.article_channel.id };
     return dispatch(
       updateExerciseArticle(
         exercise.exercise_id,
@@ -74,7 +74,7 @@ const ArticlePopover = ({ exercise, article, documents, onRemoveArticle }) => {
       'article_shares',
       'article_likes',
       'article_comments',
-      'article_media',
+      'article_channel',
     ]),
   )(article);
   return (
@@ -103,7 +103,7 @@ const ArticlePopover = ({ exercise, article, documents, onRemoveArticle }) => {
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to delete this media pressure?')}
+            {t('Do you want to delete this channel pressure?')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -121,7 +121,7 @@ const ArticlePopover = ({ exercise, article, documents, onRemoveArticle }) => {
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
-        <DialogTitle>{t('Update the media pressure')}</DialogTitle>
+        <DialogTitle>{t('Update the channel pressure')}</DialogTitle>
         <DialogContent style={{ overflowX: 'hidden' }}>
           <ArticleForm
             editing={true}
@@ -141,7 +141,7 @@ const ArticlePopover = ({ exercise, article, documents, onRemoveArticle }) => {
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to remove this media pressure from the inject?')}
+            {t('Do you want to remove this channel pressure from the inject?')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

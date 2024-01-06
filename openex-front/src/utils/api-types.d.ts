@@ -11,6 +11,7 @@
 
 export interface Article {
   article_author?: string;
+  article_channel?: Channel;
   /** @format int32 */
   article_comments?: number;
   article_content?: string;
@@ -22,7 +23,6 @@ export interface Article {
   article_is_scheduled?: boolean;
   /** @format int32 */
   article_likes?: number;
-  article_media?: Media;
   article_name?: string;
   /** @format int32 */
   article_shares?: number;
@@ -35,13 +35,13 @@ export interface Article {
 
 export interface ArticleCreateInput {
   article_author?: string;
+  article_channel: string;
   /** @format int32 */
   article_comments?: number;
   article_content?: string;
   article_documents?: string[];
   /** @format int32 */
   article_likes?: number;
-  article_media: string;
   article_name: string;
   article_published?: boolean;
   /** @format int32 */
@@ -50,13 +50,13 @@ export interface ArticleCreateInput {
 
 export interface ArticleUpdateInput {
   article_author?: string;
+  article_channel: string;
   /** @format int32 */
   article_comments?: number;
   article_content?: string;
   article_documents?: string[];
   /** @format int32 */
   article_likes?: number;
-  article_media: string;
   article_name: string;
   article_published?: boolean;
   /** @format int32 */
@@ -145,6 +145,55 @@ export interface ChallengesReader {
 export interface ChangePasswordInput {
   password: string;
   password_validation: string;
+}
+
+export interface Channel {
+  /** @format date-time */
+  channel_created_at?: string;
+  channel_description?: string;
+  channel_id?: string;
+  channel_logo_dark?: Document;
+  channel_logo_light?: Document;
+  channel_mode?: string;
+  channel_name?: string;
+  channel_primary_color_dark?: string;
+  channel_primary_color_light?: string;
+  channel_secondary_color_dark?: string;
+  channel_secondary_color_light?: string;
+  channel_type?: string;
+  /** @format date-time */
+  channel_updated_at?: string;
+  logos?: Document[];
+  updateAttributes?: object;
+}
+
+export interface ChannelCreateInput {
+  channel_description: string;
+  channel_name: string;
+  channel_type: string;
+}
+
+export interface ChannelReader {
+  channel_articles?: Article[];
+  channel_exercise?: Exercise;
+  channel_id?: string;
+  channel_information?: Channel;
+}
+
+export interface ChannelUpdateInput {
+  channel_description: string;
+  channel_mode?: string;
+  channel_name: string;
+  channel_primary_color_dark?: string;
+  channel_primary_color_light?: string;
+  channel_secondary_color_dark?: string;
+  channel_secondary_color_light?: string;
+  channel_type: string;
+}
+
+export interface ChannelUpdateLogoInput {
+  channel_logo_dark?: string;
+  channel_logo_light?: string;
 }
 
 export interface Comcheck {
@@ -896,55 +945,6 @@ export interface LoginUserInput {
   password: string;
 }
 
-export interface Media {
-  logos?: Document[];
-  /** @format date-time */
-  media_created_at?: string;
-  media_description?: string;
-  media_id?: string;
-  media_logo_dark?: Document;
-  media_logo_light?: Document;
-  media_mode?: string;
-  media_name?: string;
-  media_primary_color_dark?: string;
-  media_primary_color_light?: string;
-  media_secondary_color_dark?: string;
-  media_secondary_color_light?: string;
-  media_type?: string;
-  /** @format date-time */
-  media_updated_at?: string;
-  updateAttributes?: object;
-}
-
-export interface MediaCreateInput {
-  media_description: string;
-  media_name: string;
-  media_type: string;
-}
-
-export interface MediaReader {
-  media_articles?: Article[];
-  media_exercise?: Exercise;
-  media_id?: string;
-  media_information?: Media;
-}
-
-export interface MediaUpdateInput {
-  media_description: string;
-  media_mode?: string;
-  media_name: string;
-  media_primary_color_dark?: string;
-  media_primary_color_light?: string;
-  media_secondary_color_dark?: string;
-  media_secondary_color_light?: string;
-  media_type: string;
-}
-
-export interface MediaUpdateLogoInput {
-  media_logo_dark?: string;
-  media_logo_light?: string;
-}
-
 export interface Objective {
   /** @format date-time */
   objective_created_at?: string;
@@ -1138,6 +1138,7 @@ export interface TagUpdateInput {
 
 export interface Team {
   team_communications?: Communication[];
+  team_contextual?: boolean;
   /** @format date-time */
   team_created_at?: string;
   team_description?: string;
@@ -1166,7 +1167,9 @@ export interface Team {
 }
 
 export interface TeamCreateInput {
+  team_contextual?: boolean;
   team_description?: string;
+  team_exercises?: string[];
   team_name: string;
   team_organization?: string;
   team_tags?: string[];

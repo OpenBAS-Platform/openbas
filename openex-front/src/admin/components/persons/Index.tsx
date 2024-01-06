@@ -19,7 +19,7 @@ const Index = () => {
     <div className={classes.root}>
       <Suspense fallback={<Loader />}>
         <Routes>
-          <Route path="" element={<Navigate to="players" />} />
+          <Route path="" element={<Navigate to="players" replace={true} />} />
           <Route path="players" element={errorWrapper(Players)()} />
           <Route path="teams" element={errorWrapper(Teams)()} />
         </Routes>

@@ -17,7 +17,7 @@ const RootPublic = lazy(() => import('./public/Root'));
 const IndexPrivate = lazy(() => import('./private/Index'));
 const IndexAdmin = lazy(() => import('./admin/Index'));
 const Comcheck = lazy(() => import('./public/components/comcheck/Comcheck'));
-const Media = lazy(() => import('./public/components/medias/Media'));
+const Channel = lazy(() => import('./public/components/channels/Channel'));
 const Challenges = lazy(() => import('./public/components/challenges/Challenges'));
 const Lessons = lazy(() => import('./public/components/lessons/Lessons'));
 
@@ -46,12 +46,12 @@ const Root = () => {
         <ConnectedIntlProvider>
           <Suspense fallback={<Loader />}>
             <Routes>
-              <Route path="" element={logged.isOnlyPlayer ? <Navigate to="private" /> : <Navigate to="admin" />} />
+              <Route path="" element={logged.isOnlyPlayer ? <Navigate to="private" replace={true} /> : <Navigate to="admin" replace={true} />} />
               <Route path="private/*" element={errorWrapper(IndexPrivate)()} />
               <Route path="admin/*" element={errorWrapper(IndexAdmin)()} />
               {/* Routes from /public/Index that need to be accessible for logged user are duplicated here */}
               <Route path="comcheck/:statusId" element={errorWrapper(Comcheck)()} />
-              <Route path="medias/:exerciseId/:mediaId" element={errorWrapper(Media)()} />
+              <Route path="channels/:exerciseId/:channelId" element={errorWrapper(Channel)()} />
               <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
               <Route path="lessons/:exerciseId" element={errorWrapper(Lessons)()} />
               {/* Not found */}

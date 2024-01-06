@@ -63,7 +63,7 @@ public class ChallengeContract extends Contractor {
                 .mandatory(textField("subject", "Subject", "New challenges published for ${user.email}"))
                 .mandatory(richTextareaField("body", "Body", messageBody))
                 .optional(checkboxField("encrypted", "Encrypted", false))
-                .mandatory(teamField("audiences", "Audiences", Multiple))
+                .mandatory(teamField("teams", "Teams", Multiple))
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .build();
         Contract publishChallenge = executableContract(contractConfig,

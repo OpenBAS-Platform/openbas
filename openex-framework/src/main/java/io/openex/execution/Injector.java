@@ -10,7 +10,7 @@ import io.openex.database.repository.InjectExpectationRepository;
 import io.openex.model.Expectation;
 import io.openex.model.expectation.ChallengeExpectation;
 import io.openex.model.expectation.ManualExpectation;
-import io.openex.model.expectation.MediaExpectation;
+import io.openex.model.expectation.ChannelExpectation;
 import io.openex.service.FileService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +59,7 @@ public abstract class Injector {
         expectationExecution.setExpectedScore(expectation.getScore());
         expectationExecution.setScore(0);
         switch (expectation.type()) {
-            case ARTICLE -> expectationExecution.setArticle(((MediaExpectation) expectation).getArticle());
+            case ARTICLE -> expectationExecution.setArticle(((ChannelExpectation) expectation).getArticle());
             case CHALLENGE -> expectationExecution.setChallenge(((ChallengeExpectation) expectation).getChallenge());
             case DOCUMENT -> expectationExecution.setType(EXPECTATION_TYPE.DOCUMENT);
             case TEXT -> expectationExecution.setType(EXPECTATION_TYPE.TEXT);

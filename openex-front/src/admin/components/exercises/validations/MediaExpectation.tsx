@@ -1,12 +1,12 @@
 import React, { FunctionComponent } from 'react';
 import { ListItem, ListItemIcon, ListItemText, Chip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import type { Article, Media } from '../../../../utils/api-types';
+import type { Article, Channel } from '../../../../utils/api-types';
 import type { InjectExpectationsStore } from '../injects/expectations/Expectation';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import colorStyles from '../../../../components/Color';
-import MediaIcon from '../../medias/MediaIcon';
+import ChannelIcon from '../../channels/channels/ChannelIcon.js';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -42,13 +42,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  media: Media;
+  channel: Channel;
   article: Article;
   expectation: InjectExpectationsStore;
 }
 
-const MediaExpectation: FunctionComponent<Props> = ({
-  media,
+const ChannelExpectation: FunctionComponent<Props> = ({
+  channel,
   article,
   expectation,
 }) => {
@@ -64,19 +64,19 @@ const MediaExpectation: FunctionComponent<Props> = ({
   return (
     <>
       <ListItem
-        key={media.media_id}
+        key={channel.channel_id}
         divider
         sx={{ pl: 8 }}
         classes={{ root: classes.item }}
       >
         <ListItemIcon>
-          <MediaIcon type={media.media_type} size="small" />
+          <ChannelIcon type={channel.channel_type} size="small" />
         </ListItemIcon>
         <ListItemText
           primary={
             <div className={classes.container}>
               <div className={classes.details}>
-                <div className={classes.title}> {media.media_name} </div>
+                <div className={classes.title}> {channel.channel_name} </div>
                 {article.article_name}
               </div>
               <div className={classes.chip}>
@@ -102,4 +102,4 @@ const MediaExpectation: FunctionComponent<Props> = ({
   );
 };
 
-export default MediaExpectation;
+export default ChannelExpectation;

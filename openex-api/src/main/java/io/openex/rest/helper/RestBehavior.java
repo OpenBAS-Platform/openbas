@@ -97,7 +97,7 @@ public class RestBehavior {
     return errorBag;
   }
 
-  // --- Open media access
+  // --- Open channel access
   public User impersonateUser(UserRepository userRepository, Optional<String> userId) {
     if (currentUser().getId().equals(ANONYMOUS)) {
       if (userId.isPresent()) {

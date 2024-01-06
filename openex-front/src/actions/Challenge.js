@@ -39,9 +39,9 @@ export const validateChallenge = (exerciseId, challengeId, userId, data) => (dis
   data,
 )(dispatch);
 
-export const deleteChallenge = (mediaId) => (dispatch) => {
-  const uri = `/api/challenges/${mediaId}`;
-  return delReferential(uri, 'challenges', mediaId)(dispatch);
+export const deleteChallenge = (channelId) => (dispatch) => {
+  const uri = `/api/challenges/${channelId}`;
+  return delReferential(uri, 'challenges', channelId)(dispatch);
 };
 
 export const fetchPlayerChallenges = (exerciseId, userId) => (dispatch) => {

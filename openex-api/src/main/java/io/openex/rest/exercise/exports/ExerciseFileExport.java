@@ -23,7 +23,7 @@ public class ExerciseFileExport {
   @JsonProperty("exercise_information")
   private Exercise exercise;
 
-  @JsonProperty("exercise_audiences")
+  @JsonProperty("exercise_teams")
   private List<Team> teams = new ArrayList<>();
 
   @JsonProperty("exercise_objectives")
@@ -44,8 +44,8 @@ public class ExerciseFileExport {
   @JsonProperty("exercise_documents")
   private List<Document> documents = new ArrayList<>();
 
-  @JsonProperty("exercise_medias")
-  private List<Media> medias = new ArrayList<>();
+  @JsonProperty("exercise_channels")
+  private List<Channel> channels = new ArrayList<>();
 
   @JsonProperty("exercise_articles")
   private List<Article> articles = new ArrayList<>();

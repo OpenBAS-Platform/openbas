@@ -12,12 +12,12 @@ import TopMenuExercise from './TopMenuExercise';
 import TopMenuPersons from './TopMenuPersons';
 import TopMenuOrganizations from './TopMenuOrganizations';
 import TopMenuDocuments from './TopMenuDocuments';
-import TopMenuMedias from '../medias/TopMenuMedias';
+import TopMenuMedias from './TopMenuMedias';
 import TopMenuIntegrations from './TopMenuIntegrations';
 import TopMenuChallenges from './TopMenuChallenges';
 import TopMenuLessons from './TopMenuLessons';
 import ImportUploader from '../exercises/ImportUploader';
-import TopMenuMedia from './TopMenuMedia';
+import TopMenuChannel from './TopMenuChannel';
 import TopMenuProfile from './TopMenuProfile';
 import type { Theme } from '../../../components/Theme';
 import { useAppDispatch } from '../../../utils/hooks';
@@ -124,11 +124,9 @@ const TopBar: React.FC = () => {
           {location.pathname.includes('/admin/documents') && (
             <TopMenuDocuments />
           )}
-          {location.pathname === '/admin/medias' && <TopMenuMedias />}
-          {location.pathname.includes('/admin/medias/') && <TopMenuMedia />}
-          {location.pathname.includes('/admin/challenges') && (
-            <TopMenuChallenges />
-          )}
+          {location.pathname.includes('/admin/medias') && <TopMenuMedias />}
+          {location.pathname.includes('/admin/medias/channels/') && <TopMenuChannel />}
+          {location.pathname.includes('/admin/challenges') && (<TopMenuChallenges />)}
           {location.pathname.includes('/admin/lessons') && <TopMenuLessons />}
           {location.pathname.includes('/admin/integrations') && (
             <TopMenuIntegrations />

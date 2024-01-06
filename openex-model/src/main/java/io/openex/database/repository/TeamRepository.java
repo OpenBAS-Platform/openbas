@@ -24,4 +24,7 @@ public interface TeamRepository extends CrudRepository<Team, String>, JpaSpecifi
 
     @Query("select team from Team team where team.organization is null or team.organization.id in :organizationIds")
     List<Team> teamsAccessibleFromOrganizations(@Param("organizationIds") List<String> organizationIds);
+
+    @Query("select team from Team team where team.contextual is true")
+    List<Team> teamsNotContextual();
 }

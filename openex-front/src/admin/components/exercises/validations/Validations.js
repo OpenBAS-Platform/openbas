@@ -13,14 +13,14 @@ import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../..
 import SearchFilter from '../../../../components/SearchFilter';
 import Loader from '../../../../components/Loader';
 import { useFormatter } from '../../../../components/i18n';
-import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
+import { fetchExerciseArticles, fetchChannels } from '../../../../actions/Channel.js';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import TagsFilter from '../../../../components/TagsFilter';
 import InjectIcon from '../injects/InjectIcon';
 import ItemTags from '../../../../components/ItemTags';
 import ManualExpectations from './ManualExpectations';
 import ChallengeExpectation from './ChallengeExpectation';
-import MediaExpectation from './MediaExpectation';
+import ChannelExpectation from './ChannelExpectation';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -66,7 +66,7 @@ const Validations = () => {
     teamsMap,
     challengesMap,
     articlesMap,
-    mediasMap,
+    channelsMap,
   } = useHelper((helper) => {
     return {
       exercise: helper.getExercise(exerciseId),
@@ -76,11 +76,11 @@ const Validations = () => {
       teamsMap: helper.getTeamsMap(),
       challengesMap: helper.getChallengesMap(),
       articlesMap: helper.getArticlesMap(),
-      mediasMap: helper.getMediasMap(),
+      channelsMap: helper.getChannelsMap(),
     };
   });
   useDataLoader(() => {
-    dispatch(fetchMedias());
+    dispatch(fetchChannels());
     dispatch(fetchInjectTypes());
     dispatch(fetchExerciseInjectExpectations(exerciseId));
     dispatch(fetchExerciseInjects(exerciseId));
@@ -242,9 +242,9 @@ const Validations = () => {
                             if (expectationType === 'ARTICLE') {
                               const expectation = es[0];
                               const article = articlesMap[expectation.inject_expectation_article] || {};
-                              const media = mediasMap[article.article_media] || {};
+                              const channel = channelsMap[article.article_channel] || {};
                               return (
-                                <MediaExpectation key={expectationType} media={media} article={article} expectation={expectation} />
+                                <ChannelExpectation key={expectationType} channel={channel} article={article} expectation={expectation} />
                               );
                             } if (expectationType === 'CHALLENGE') {
                               const expectation = es[0];

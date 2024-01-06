@@ -10,6 +10,7 @@ import OrganizationField from '../../../../components/OrganizationField';
 import type { Theme } from '../../../../components/Theme';
 import type { TeamInputForm } from './Team';
 import { schemaValidator } from '../../../../utils/Zod';
+import CheckboxField from '../../../../components/CheckboxField';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -24,6 +25,7 @@ interface TeamFormProps {
   handleClose: () => void;
   onSubmit: (data: TeamInputForm) => void;
   editing?: boolean;
+  exerciseId?: string;
 }
 
 const TeamForm: FunctionComponent<TeamFormProps> = ({
@@ -31,6 +33,7 @@ const TeamForm: FunctionComponent<TeamFormProps> = ({
   onSubmit,
   initialValues,
   handleClose,
+  exerciseId,
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
@@ -76,6 +79,14 @@ const TeamForm: FunctionComponent<TeamFormProps> = ({
             setFieldValue={form.mutators.setValue}
             style={{ marginTop: 20 }}
           />
+          {exerciseId && (
+          <CheckboxField
+            name="team_contextual"
+            value={exerciseId}
+            label={t('Only in the context of this simulation')}
+            style={{ marginTop: 20 }}
+          />
+          )}
           <div className={classes.container} style={{ marginTop: 20 }}>
             <Button onClick={handleClose} disabled={submitting}>
               {t('Cancel')}

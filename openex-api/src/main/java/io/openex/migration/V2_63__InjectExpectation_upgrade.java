@@ -2,7 +2,7 @@ package io.openex.migration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.injects.email.model.EmailContent;
-import io.openex.injects.media.model.MediaContent;
+import io.openex.injects.channel.model.ChannelContent;
 import io.openex.model.inject.form.Expectation;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -56,8 +56,8 @@ public class V2_63__InjectExpectation_upgrade extends BaseJavaMigration {
           EmailContentOld email = mapper.readValue(content, EmailContentOld.class);
           content = mapper.writeValueAsString(email.toNewContent());
         } else if (Objects.equals(type, "openex_media")) {
-          MediaContentOld media = mapper.readValue(content, MediaContentOld.class);
-          content = mapper.writeValueAsString(media.toNewContent());
+          MediaContentOld channel = mapper.readValue(content, MediaContentOld.class);
+          content = mapper.writeValueAsString(channel.toNewContent());
         }
         statement.setString(1, content);
         statement.setString(2, id);
@@ -125,8 +125,8 @@ public class V2_63__InjectExpectation_upgrade extends BaseJavaMigration {
     private Integer expectationScore;
     private boolean emailing;
 
-    MediaContent toNewContent() {
-      MediaContent content = new MediaContent();
+    ChannelContent toNewContent() {
+      ChannelContent content = new ChannelContent();
       content.setBody(this.getBody());
       content.setSubject(this.getSubject());
       content.setInReplyTo(this.getInReplyTo());

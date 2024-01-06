@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import { Typography, Card, CardHeader, CardContent, CardMedia, Grid, Avatar, Tooltip, Chip, Button, IconButton } from '@mui/material';
+import { Typography, Card, CardHeader, CardContent, CardChannel, Grid, Avatar, Tooltip, Chip, Button, IconButton } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import * as R from 'ramda';
@@ -11,14 +11,14 @@ import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import { useHelper } from '../../../../store';
 import CreateArticle from './CreateArticle';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
+import { fetchExerciseArticles, fetchChannels } from '../../../../actions/Channel';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import SearchFilter from '../../../../components/SearchFilter';
 import { useFormatter } from '../../../../components/i18n';
-import MediasFilter from '../../medias/MediasFilter';
+import ChannelsFilter from '../../medias/channels/ChannelsFilter;
 import { fetchDocuments } from '../../../../actions/Document';
 import ArticlePopover from './ArticlePopover';
-import MediaIcon from '../../medias/MediaIcon';
+import ChannelIcon from '../../medias/channels/ChannelIcon';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 
 const useStyles = makeStyles(() => ({
@@ -26,7 +26,7 @@ const useStyles = makeStyles(() => ({
     margin: '10px 0 50px 0',
     padding: '0 200px 0 0',
   },
-  media: {
+  channel: {
     fontSize: 12,
     float: 'left',
     marginRight: 7,
@@ -51,27 +51,27 @@ const Articles = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
-  const [medias, setMedias] = useState([]);
-  const handleAddMedia = (value) => {
-    setMedias(R.uniq(R.append(value, medias)));
+  const [channels, setChannels] = useState([]);
+  const handleAddChannel = (value) => {
+    setChannels(R.uniq(R.append(value, channels)));
   };
-  const handleRemoveMedia = (value) => {
-    const remainingTags = R.filter((n) => n.id !== value, medias);
-    setMedias(remainingTags);
+  const handleRemoveChannel = (value) => {
+    const remainingTags = R.filter((n) => n.id !== value, channels);
+    setChannels(remainingTags);
   };
   // Fetching data
   const { exerciseId } = useParams();
-  const { exercise, articles, mediasMap, documentsMap } = useHelper(
+  const { exercise, articles, channelsMap, documentsMap } = useHelper(
     (helper) => ({
       exercise: helper.getExercise(exerciseId),
-      mediasMap: helper.getMediasMap(),
+      channelsMap: helper.getChannelsMap(),
       documentsMap: helper.getDocumentsMap(),
       articles: helper.getExerciseArticles(exerciseId),
     }),
   );
   useDataLoader(() => {
     dispatch(fetchExerciseArticles(exerciseId));
-    dispatch(fetchMedias());
+    dispatch(fetchChannels());
     dispatch(fetchDocuments());
   });
   // Filter and sort hook
@@ -80,14 +80,14 @@ const Articles = () => {
   // Rendering
   const fullArticles = articles.map((item) => ({
     ...item,
-    article_fullmedia: mediasMap[item.article_media] || {},
+    article_fullchannel: channelsMap[item.article_channel] || {},
   }));
   const sortedArticles = R.filter(
-    (n) => medias.length === 0
-      || medias.map((o) => o.id).includes(n.article_fullmedia.media_id),
+    (n) => channels.length === 0
+      || channels.map((o) => o.id).includes(n.article_fullchannel.channel_id),
     filtering.filterAndSort(fullArticles),
   );
-  const mediaColor = (type) => {
+  const channelColor = (type) => {
     switch (type) {
       case 'newspaper':
         return '#3f51b5';
@@ -111,10 +111,10 @@ const Articles = () => {
           />
         </div>
         <div style={{ float: 'left', marginRight: 20 }}>
-          <MediasFilter
-            onAddMedia={handleAddMedia}
-            onRemoveMedia={handleRemoveMedia}
-            currentMedias={medias}
+          <ChannelsFilter
+            onAddChannel={handleAddChannel}
+            onRemoveChannel={handleRemoveChannel}
+            currentChannels={channels}
           />
         </div>
       </div>
@@ -127,9 +127,9 @@ const Articles = () => {
           const images = docs.filter((d) => d.document_type.includes('image/'));
           const videos = docs.filter((d) => d.document_type.includes('video/'));
           let headersDocs = [];
-          if (article.article_fullmedia.media_type === 'newspaper') {
+          if (article.article_fullchannel.channel_type === 'newspaper') {
             headersDocs = images;
-          } else if (article.article_fullmedia.media_type === 'tv') {
+          } else if (article.article_fullchannel.channel_type === 'tv') {
             headersDocs = videos;
           } else {
             headersDocs = [...images, ...videos];
@@ -154,8 +154,8 @@ const Articles = () => {
                   avatar={
                     <Avatar
                       sx={{
-                        bgcolor: mediaColor(
-                          article.article_fullmedia.media_type,
+                        bgcolor: channelColor(
+                          article.article_fullchannel.channel_type,
                         ),
                       }}
                     >
@@ -180,7 +180,7 @@ const Articles = () => {
                         aria-haspopup="true"
                         size="large"
                         component={Link}
-                        to={`/medias/${exerciseId}/${article.article_fullmedia.media_id}?preview=true`}
+                        to={`/channels/${exerciseId}/${article.article_fullchannel.channel_id}?preview=true`}
                       >
                         <VisibilityOutlined />
                       </IconButton>
@@ -196,14 +196,14 @@ const Articles = () => {
                   {headersDocs.map((doc) => (
                     <Grid key={doc.document_id} item={true} xs={columns}>
                       {doc.document_type.includes('image/') && (
-                        <CardMedia
+                        <CardChannel
                           component="img"
                           height="150"
                           src={`/api/documents/${doc.document_id}/file`}
                         />
                       )}
                       {doc.document_type.includes('video/') && (
-                        <CardMedia
+                        <CardChannel
                           component="video"
                           height="150"
                           src={`/api/documents/${doc.document_id}/file`}
@@ -229,25 +229,25 @@ const Articles = () => {
                   />
                   <div className={classes.footer}>
                     <div style={{ float: 'left' }}>
-                      <Tooltip title={article.article_fullmedia.media_name}>
+                      <Tooltip title={article.article_fullchannel.channel_name}>
                         <Chip
                           icon={
-                            <MediaIcon
-                              type={article.article_fullmedia.media_type}
+                            <ChannelIcon
+                              type={article.article_fullchannel.channel_type}
                               variant="chip"
                             />
                           }
-                          classes={{ root: classes.media }}
+                          classes={{ root: classes.channel }}
                           style={{
-                            color: mediaColor(
-                              article.article_fullmedia.media_type,
+                            color: channelColor(
+                              article.article_fullchannel.channel_type,
                             ),
-                            borderColor: mediaColor(
-                              article.article_fullmedia.media_type,
+                            borderColor: channelColor(
+                              article.article_fullchannel.channel_type,
                             ),
                           }}
                           variant="outlined"
-                          label={article.article_fullmedia.media_name}
+                          label={article.article_fullchannel.channel_name}
                         />
                       </Tooltip>
                     </div>

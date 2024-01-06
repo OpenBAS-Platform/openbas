@@ -36,7 +36,7 @@ import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
 import { addInject } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
-import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
+import { fetchExerciseArticles, fetchChannels } from '../../../../actions/Channel.js';
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
@@ -48,12 +48,12 @@ import TextField from '../../../../components/TextField';
 import SwitchField from '../../../../components/SwitchField';
 import EnrichedTextField from '../../../../components/EnrichedTextField';
 import InjectAddDocuments from './InjectAddDocuments';
-import DocumentType from '../../documents/DocumentType';
-import DocumentPopover from '../../documents/DocumentPopover';
+import DocumentType from '../../channels/documents/DocumentType';
+import DocumentPopover from '../../channels/documents/DocumentPopover';
 import Select from '../../../../components/Select';
 import ArticlePopover from '../articles/ArticlePopover';
 import InjectAddArticles from './InjectAddArticles';
-import MediaIcon from '../../medias/MediaIcon';
+import ChannelIcon from '../../channels/channels/ChannelIcon.js';
 import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
@@ -141,13 +141,13 @@ const inlineStylesHeaders = {
     fontSize: 12,
     fontWeight: '700',
   },
-  article_media_type: {
+  article_channel_type: {
     float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
-  article_media_name: {
+  article_channel_name: {
     float: 'left',
     width: '20%',
     fontSize: 12,
@@ -240,7 +240,7 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  article_media_type: {
+  article_channel_type: {
     float: 'left',
     width: '15%',
     height: 20,
@@ -248,7 +248,7 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  article_media_name: {
+  article_channel_name: {
     float: 'left',
     width: '20%',
     height: 20,
@@ -354,7 +354,7 @@ class QuickInject extends Component {
     const { exerciseId } = this.props;
     this.props.fetchDocuments();
     this.props.fetchExerciseArticles(exerciseId);
-    this.props.fetchMedias();
+    this.props.fetchChannels();
     this.props.fetchChallenges();
   }
 
@@ -1043,7 +1043,7 @@ class QuickInject extends Component {
       exercisesMap,
       tagsMap,
       articlesMap,
-      mediasMap,
+      channelsMap,
       challengesMap,
     } = this.props;
     const {
@@ -1085,8 +1085,8 @@ class QuickInject extends Component {
       .filter((a) => a !== undefined)
       .map((a) => ({
         ...a,
-        article_media_type: mediasMap[a.article_media]?.media_type || '',
-        article_media_name: mediasMap[a.article_media]?.media_name || '',
+        article_channel_type: channelsMap[a.article_channel]?.channel_type || '',
+        article_channel_name: channelsMap[a.article_channel]?.channel_name || '',
       }));
     const sortArticles = R.sortWith(
       articlesOrderAsc
@@ -1450,7 +1450,7 @@ class QuickInject extends Component {
                       variant="h2"
                       style={{ marginTop: hasTeams ? 30 : 0 }}
                     >
-                      {t('Media pressure to publish')}
+                      {t('Channel pressure to publish')}
                     </Typography>
                     <List>
                       <ListItem
@@ -1473,13 +1473,13 @@ class QuickInject extends Component {
                           primary={
                             <div>
                               {this.articlesSortHeader(
-                                'article_media_type',
+                                'article_channel_type',
                                 'Type',
                                 true,
                               )}
                               {this.articlesSortHeader(
-                                'article_media_name',
-                                'Media',
+                                'article_channel_name',
+                                'Channel',
                                 true,
                               )}
                               {this.articlesSortHeader(
@@ -1506,8 +1506,8 @@ class QuickInject extends Component {
                           divider={true}
                         >
                           <ListItemIcon>
-                            <MediaIcon
-                              type={article.article_media_type}
+                            <ChannelIcon
+                              type={article.article_channel_type}
                               variant="inline"
                             />
                           </ListItemIcon>
@@ -1516,15 +1516,15 @@ class QuickInject extends Component {
                               <div>
                                 <div
                                   className={classes.bodyItem}
-                                  style={inlineStyles.article_media_type}
+                                  style={inlineStyles.article_channel_type}
                                 >
-                                  {t(article.article_media_type || 'Unknown')}
+                                  {t(article.article_channel_type || 'Unknown')}
                                 </div>
                                 <div
                                   className={classes.bodyItem}
-                                  style={inlineStyles.article_media_name}
+                                  style={inlineStyles.article_channel_name}
                                 >
-                                  {article.article_media_name}
+                                  {article.article_channel_name}
                                 </div>
                                 <div
                                   className={classes.bodyItem}
@@ -1958,7 +1958,7 @@ QuickInject.propTypes = {
   exercise: PropTypes.object,
   fetchInjectTeams: PropTypes.func,
   fetchExerciseArticles: PropTypes.func,
-  fetchMedias: PropTypes.func,
+  fetchChannels: PropTypes.func,
   fetchChallenges: PropTypes.func,
   addInject: PropTypes.func,
   handleClose: PropTypes.func,
@@ -1972,14 +1972,14 @@ const select = (state) => {
   const helper = storeHelper(state);
   const documentsMap = helper.getDocumentsMap();
   const teamsMap = helper.getTeamsMap();
-  const mediasMap = helper.getMediasMap();
+  const channelsMap = helper.getChannelsMap();
   const articlesMap = helper.getArticlesMap();
   const challengesMap = helper.getChallengesMap();
   return {
     documentsMap,
     teamsMap,
     articlesMap,
-    mediasMap,
+    channelsMap,
     challengesMap,
   };
 };
@@ -1988,7 +1988,7 @@ export default R.compose(
   connect(select, {
     fetchDocuments,
     fetchExerciseArticles,
-    fetchMedias,
+    fetchChannels,
     fetchChallenges,
     addInject,
   }),

@@ -8,12 +8,12 @@ import withStyles from '@mui/styles/withStyles';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
-import { fetchMedias, fetchExerciseArticles } from '../../../../actions/Media';
+import { fetchChannels, fetchExerciseArticles } from '../../../../actions/Channel';
 import CreateArticle from '../articles/CreateArticle';
 import { truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { Transition } from '../../../../utils/Environment';
-import MediaIcon from '../../medias/MediaIcon';
+import ChannelIcon from '../../medias/channels/ChannelIcon';
 
 const styles = (theme) => ({
   createButton: {
@@ -52,7 +52,7 @@ class InjectAddArticles extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchMedias();
+    this.props.fetchChannels();
     this.props.fetchExerciseArticles(this.props.exerciseId);
   }
 
@@ -98,7 +98,7 @@ class InjectAddArticles extends Component {
       exerciseId,
       exercise,
       articlesMap,
-      mediasMap,
+      channelsMap,
     } = this.props;
     const { keyword, articlesIds } = this.state;
     const filterByKeyword = (n) => keyword === ''
@@ -107,12 +107,12 @@ class InjectAddArticles extends Component {
       || (n.article_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
-      || (n.article_fullmedia?.media_name || '')
+      || (n.article_fullchannel?.channel_name || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
     const fullArticles = articles.map((item) => ({
       ...item,
-      article_fullmedia: mediasMap[item.article_media] || {},
+      article_fullchannel: channelsMap[item.article_channel] || {},
     }));
     const filteredArticles = R.pipe(
       R.filter(filterByKeyword),
@@ -132,7 +132,7 @@ class InjectAddArticles extends Component {
             <ControlPointOutlined color="primary" />
           </ListItemIcon>
           <ListItemText
-            primary={t('Add media pressure')}
+            primary={t('Add channel pressure')}
             classes={{ primary: classes.text }}
           />
         </ListItem>
@@ -150,7 +150,7 @@ class InjectAddArticles extends Component {
             },
           }}
         >
-          <DialogTitle>{t('Add media pressure in this inject')}</DialogTitle>
+          <DialogTitle>{t('Add channel pressure in this inject')}</DialogTitle>
           <DialogContent>
             <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
               <Grid item={true} xs={8}>
@@ -176,8 +176,8 @@ class InjectAddArticles extends Component {
                         onClick={this.addArticle.bind(this, article.article_id)}
                       >
                         <ListItemIcon>
-                          <MediaIcon
-                            type={article.article_fullmedia.media_type}
+                          <ChannelIcon
+                            type={article.article_fullchannel.channel_type}
                             variant="inline"
                           />
                         </ListItemIcon>
@@ -199,8 +199,8 @@ class InjectAddArticles extends Component {
                 <Box className={classes.box}>
                   {this.state.articlesIds.map((articleId) => {
                     const article = articlesMap[articleId];
-                    const media = article
-                      ? mediasMap[article.article_media] || {}
+                    const channel = article
+                      ? channelsMap[article.article_channel] || {}
                       : {};
                     return (
                       <Chip
@@ -208,7 +208,7 @@ class InjectAddArticles extends Component {
                         onDelete={this.removeArticle.bind(this, articleId)}
                         label={truncate(article?.article_name, 22)}
                         icon={
-                          <MediaIcon type={media.media_type} variant="chip" />
+                          <ChannelIcon type={channel.channel_type} variant="chip" />
                         }
                         classes={{ root: classes.chip }}
                       />
@@ -251,12 +251,12 @@ const select = (state, ownProps) => {
   const exercise = helper.getExercise(exerciseId);
   const articles = helper.getExerciseArticles(exerciseId);
   const articlesMap = helper.getArticlesMap();
-  const mediasMap = helper.getMediasMap();
-  return { exercise, articles, articlesMap, mediasMap };
+  const channelsMap = helper.getChannelsMap();
+  return { exercise, articles, articlesMap, channelsMap };
 };
 
 export default R.compose(
-  connect(select, { fetchExerciseArticles, fetchMedias }),
+  connect(select, { fetchExerciseArticles, fetchChannels }),
   inject18n,
   withStyles(styles),
 )(InjectAddArticles);

@@ -7,7 +7,7 @@ import io.openex.database.repository.*;
 import io.openex.injects.challenge.model.ChallengeContent;
 import io.openex.injects.email.EmailContract;
 import io.openex.injects.manual.ManualContract;
-import io.openex.injects.media.model.MediaContent;
+import io.openex.injects.channel.model.ChannelContent;
 import io.openex.rest.exercise.exports.ExerciseFileExport;
 import io.openex.rest.exercise.exports.VariableWithValueMixin;
 import io.openex.service.FileService;
@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 
 import static io.openex.helper.StreamHelper.fromIterable;
 import static io.openex.injects.challenge.ChallengeContract.CHALLENGE_PUBLISH;
-import static io.openex.injects.media.MediaContract.MEDIA_PUBLISH;
+import static io.openex.injects.channel.ChannelContract.CHANNEL_PUBLISH;
 import static java.util.Optional.ofNullable;
 
 @Component
@@ -46,7 +46,7 @@ public class V1_DataImporter implements Importer {
     private UserRepository userRepository;
     private InjectDocumentRepository injectDocumentRepository;
     private ChallengeRepository challengeRepository;
-    private MediaRepository mediaRepository;
+    private ChannelRepository channelRepository;
     private ArticleRepository articleRepository;
     private LessonsCategoryRepository lessonsCategoryRepository;
     private LessonsQuestionRepository lessonsQuestionRepository;
@@ -70,8 +70,8 @@ public class V1_DataImporter implements Importer {
     }
 
     @Autowired
-    public void setMediaRepository(MediaRepository mediaRepository) {
-        this.mediaRepository = mediaRepository;
+    public void setChannelRepository(ChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
     }
 
     @Autowired
@@ -156,16 +156,16 @@ public class V1_DataImporter implements Importer {
                     return null;
                 }
             }
-            // Media articles exists in exercise only through inject content definition
-            // So we need to rewrite content for medias to remap the media ids
-            case MEDIA_PUBLISH -> {
+            // Channel articles exists in exercise only through inject content definition
+            // So we need to rewrite content for channels to remap the channel ids
+            case CHANNEL_PUBLISH -> {
                 try {
                     JsonNode jsonNode = mapper.readTree(content);
-                    MediaContent mediaContent = mapper.treeToValue(jsonNode, MediaContent.class);
-                    List<String> remappedIds = mediaContent.getArticles().stream()
+                    ChannelContent channelContent = mapper.treeToValue(jsonNode, ChannelContent.class);
+                    List<String> remappedIds = channelContent.getArticles().stream()
                             .map(baseIds::get).filter(Objects::nonNull).map(Base::getId).toList();
-                    mediaContent.setArticles(remappedIds);
-                    content = mapper.writeValueAsString(mediaContent);
+                    channelContent.setArticles(remappedIds);
+                    content = mapper.writeValueAsString(channelContent);
                 } catch (Exception e) {
                     // Error rewriting content, inject cant be created
                     return null;
@@ -479,35 +479,35 @@ public class V1_DataImporter implements Importer {
             }
         });
 
-        // ------------ Handling medias
-        Stream<JsonNode> mediasStream = resolveJsonElements(importNode, "exercise_medias");
-        mediasStream.forEach(nodeMedia -> {
-            String id = nodeMedia.get("media_id").textValue();
-            String mediaName = nodeMedia.get("media_name").textValue();
-            // Prevent duplication of media, based on the media name
-            List<Media> existingMedias = mediaRepository.findByNameIgnoreCase(mediaName);
-            if (existingMedias.size() == 1) {
-                baseIds.put(id, existingMedias.get(0));
+        // ------------ Handling channels
+        Stream<JsonNode> channelsStream = resolveJsonElements(importNode, "exercise_channels");
+        channelsStream.forEach(nodeChannel -> {
+            String id = nodeChannel.get("channel_id").textValue();
+            String channelName = nodeChannel.get("channel_name").textValue();
+            // Prevent duplication of channel, based on the channel name
+            List<Channel> existingChannels = channelRepository.findByNameIgnoreCase(channelName);
+            if (existingChannels.size() == 1) {
+                baseIds.put(id, existingChannels.get(0));
             } else {
-                Media media = new Media();
-                media.setName(mediaName);
-                media.setType(nodeMedia.get("media_type").textValue());
-                media.setDescription(nodeMedia.get("media_description").textValue());
-                media.setMode(nodeMedia.get("media_mode").textValue());
-                media.setPrimaryColorDark(nodeMedia.get("media_primary_color_dark").textValue());
-                media.setPrimaryColorLight(nodeMedia.get("media_primary_color_light").textValue());
-                media.setSecondaryColorDark(nodeMedia.get("media_secondary_color_dark").textValue());
-                media.setSecondaryColorLight(nodeMedia.get("media_secondary_color_light").textValue());
-                String mediaLogoDark = nodeMedia.get("media_logo_dark").textValue();
-                if (mediaLogoDark != null) {
-                    media.setLogoDark((Document) baseIds.get(mediaLogoDark));
+                Channel channel = new Channel();
+                channel.setName(channelName);
+                channel.setType(nodeChannel.get("channel_type").textValue());
+                channel.setDescription(nodeChannel.get("channel_description").textValue());
+                channel.setMode(nodeChannel.get("channel_mode").textValue());
+                channel.setPrimaryColorDark(nodeChannel.get("channel_primary_color_dark").textValue());
+                channel.setPrimaryColorLight(nodeChannel.get("channel_primary_color_light").textValue());
+                channel.setSecondaryColorDark(nodeChannel.get("channel_secondary_color_dark").textValue());
+                channel.setSecondaryColorLight(nodeChannel.get("channel_secondary_color_light").textValue());
+                String channelLogoDark = nodeChannel.get("channel_logo_dark").textValue();
+                if (channelLogoDark != null) {
+                    channel.setLogoDark((Document) baseIds.get(channelLogoDark));
                 }
-                String mediaLogoLight = nodeMedia.get("media_logo_light").textValue();
-                if (mediaLogoLight != null) {
-                    media.setLogoLight((Document) baseIds.get(mediaLogoLight));
+                String channelLogoLight = nodeChannel.get("channel_logo_light").textValue();
+                if (channelLogoLight != null) {
+                    channel.setLogoLight((Document) baseIds.get(channelLogoLight));
                 }
-                Media savedMedia = mediaRepository.save(media);
-                baseIds.put(id, savedMedia);
+                Channel savedChannel = channelRepository.save(channel);
+                baseIds.put(id, savedChannel);
             }
         });
 
@@ -529,9 +529,9 @@ public class V1_DataImporter implements Importer {
                     .filter(Objects::nonNull)
                     .toList();
             article.setDocuments(articleDocuments);
-            String articleMediaId = nodeArticle.get("article_media").textValue();
-            Media articleMedia = (Media) baseIds.get(articleMediaId);
-            article.setMedia(articleMedia);
+            String articleChannelId = nodeArticle.get("article_channel").textValue();
+            Channel articleChannel = (Channel) baseIds.get(articleChannelId);
+            article.setChannel(articleChannel);
             Article savedArticle = articleRepository.save(article);
             baseIds.put(id, savedArticle);
         });

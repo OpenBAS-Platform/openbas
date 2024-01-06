@@ -122,19 +122,19 @@ public class ExerciseExportMixins {
     }
 
     @JsonIncludeProperties(value = {
-            "media_id",
-            "media_type",
-            "media_name",
-            "media_description",
-            "media_mode",
-            "media_primary_color_dark",
-            "media_primary_color_light",
-            "media_secondary_color_dark",
-            "media_secondary_color_light",
-            "media_logo_dark",
-            "media_logo_light",
+            "channel_id",
+            "channel_type",
+            "channel_name",
+            "channel_description",
+            "channel_mode",
+            "channel_primary_color_dark",
+            "channel_primary_color_light",
+            "channel_secondary_color_dark",
+            "channel_secondary_color_light",
+            "channel_logo_dark",
+            "channel_logo_light",
     })
-    public static class Media {
+    public static class Channel {
     }
 
     @JsonIncludeProperties(value = {
@@ -145,7 +145,7 @@ public class ExerciseExportMixins {
             "article_shares",
             "article_likes",
             "article_comments",
-            "article_media",
+            "article_channel",
             "article_documents",
             "article_exercise",
     })

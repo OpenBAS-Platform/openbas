@@ -144,10 +144,10 @@ export const statistics = new schema.Entity(
 export const log = new schema.Entity('logs', {}, { idAttribute: 'log_id' });
 export const arrayOfLogs = new schema.Array(log);
 
-export const mediaReader = new schema.Entity(
-  'mediareaders',
+export const channelReader = new schema.Entity(
+  'channelreaders',
   {},
-  { idAttribute: 'media_id' },
+  { idAttribute: 'channel_id' },
 );
 export const challengesReader = new schema.Entity(
   'challengesreaders',
@@ -296,7 +296,7 @@ export const storeHelper = (state) => ({
   getComcheckStatuses: (id) => entities('comcheckstatuses', state).filter(
     (i) => i.comcheckstatus_comcheck === id,
   ),
-  getMediaReader: (id) => entity(id, 'mediareaders', state),
+  getChannelReader: (id) => entity(id, 'channelreaders', state),
   getChallengesReader: (id) => entity(id, 'challengesreaders', state),
   // users
   getUsers: () => entities('users', state),
@@ -354,7 +354,7 @@ export const storeHelper = (state) => ({
   getTeamInjects: (id) => entities('injects', state).filter((i) => (entity(id, 'teams', state) || {}).team_injects?.includes(
     i.inject_id,
   )),
-  getTeams: () => entities('teams', state),
+  getTeams: () => entities('teams', state).filter((i) => !i.team_contextual),
   getTeamsMap: () => maps('teams', state),
   getSettings: () => {
     return R.mergeAll(
@@ -363,10 +363,10 @@ export const storeHelper = (state) => ({
       ),
     );
   },
-  // medias
-  getMedias: () => entities('medias', state),
-  getMedia: (id) => entity(id, 'medias', state),
-  getMediasMap: () => maps('medias', state),
+  // channels
+  getChannels: () => entities('channels', state),
+  getChannel: (id) => entity(id, 'channels', state),
+  getChannelsMap: () => maps('channels', state),
   // articles
   getArticles: () => entities('articles', state),
   getArticle: (id) => entity(id, 'articles', state),
