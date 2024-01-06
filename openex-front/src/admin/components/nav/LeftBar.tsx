@@ -8,7 +8,7 @@ import {
   HubOutlined,
   ExtensionOutlined,
   SettingsOutlined,
-  DomainOutlined,
+  AccountBalanceOutlined,
   Groups3Outlined,
   EmojiEventsOutlined,
   ChevronLeft,
@@ -317,7 +317,7 @@ const LeftBar = () => {
             classes={{ root: classes.menuItem }}
           >
             <ListItemIcon style={{ minWidth: 20 }}>
-              <DomainOutlined />
+              <AccountBalanceOutlined />
             </ListItemIcon>
             <ListItemText
               classes={{ primary: classes.menuItemText }}

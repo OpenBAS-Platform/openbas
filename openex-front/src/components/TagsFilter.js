@@ -20,7 +20,7 @@ const useStyles = makeStyles(() => ({
   },
   filters: {
     float: 'left',
-    margin: '5px 0 0 15px',
+    margin: '5px 0 0 0',
   },
   filter: {
     marginRight: 10,
@@ -73,6 +73,7 @@ const TagsFilter = (props) => {
             label={t('Tags')}
             size="small"
             fullWidth={true}
+            variant="outlined"
             {...params}
           />
         )}

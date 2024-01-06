@@ -19,20 +19,19 @@ const TopMenuDashboard: React.FC = () => {
   const location = useLocation();
   const classes = useStyles();
   const { t } = useFormatter();
-
   return (
-    <div>
+    <>
       <Button
         component={Link}
         to="/admin"
         variant={location.pathname === '/admin' ? 'contained' : 'text'}
         size="small"
-        color={location.pathname === '/admin' ? 'secondary' : 'primary'}
+        color="primary"
         classes={{ root: classes.button }}
       >
         {t('Dashboard')}
       </Button>
-    </div>
+    </>
   );
 };
 

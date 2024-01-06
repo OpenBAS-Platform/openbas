@@ -64,7 +64,7 @@ const Index = () => {
             <Route path="controls/dryruns/:dryrunId" element={errorWrapper(Dryrun)()} />
             <Route path="controls/comchecks/:comcheckId" element={errorWrapper(Comcheck)()} />
             <Route path="definition/teams" element={errorWrapper(Teams)()} />
-            <Route path="definition/channel" element={errorWrapper(Articles)()} />
+            <Route path="definition/articles" element={errorWrapper(Articles)()} />
             <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
             <Route path="definition/variables" element={errorWrapper(Variables)()} />
             <Route path="scenario" element={errorWrapper(Injects)()} />

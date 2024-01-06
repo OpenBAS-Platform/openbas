@@ -1,8 +1,8 @@
 ---
 name: Feature request
-about: Ask for a new feature to be implemented in OpenEx
+about: Ask for a new feature to be implemented in OpenBAS
 title: ''
-labels: ''
+labels: feature, needs triage
 assignees: ''
 
 ---
@@ -13,11 +13,11 @@ assignees: ''
 
 ## Current Workaround
 
-<!-- Please describe how you currently solve or work around this problem, given OpenEx's limitation. -->
+<!-- Please describe how you currently solve or work around this problem, given OpenBAS's limitation. -->
 
 ## Proposed Solution
 
-<!-- Please describe the solution you would like OpenEx to provide, to solve the problem above. -->
+<!-- Please describe the solution you would like OpenBAS to provide, to solve the problem above. -->
 
 ## Additional Information
 

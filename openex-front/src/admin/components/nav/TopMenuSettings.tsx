@@ -27,48 +27,20 @@ const TopMenuSettings: React.FC = () => {
         to="/admin/settings"
         variant={location.pathname === '/admin/settings' ? 'contained' : 'text'}
         size="small"
-        color={
-          location.pathname === '/admin/settings' ? 'secondary' : 'primary'
-        }
+        color="primary"
         classes={{ root: classes.button }}
       >
         {t('Parameters')}
       </Button>
       <Button
         component={Link}
-        to="/admin/settings/users"
-        variant={
-          location.pathname.includes('/admin/settings/users')
-            ? 'contained'
-            : 'text'
-        }
+        to="/admin/settings/security"
+        variant={location.pathname.includes('/admin/settings/security') ? 'contained' : 'text'}
         size="small"
-        color={
-          location.pathname.includes('/admin/settings/users')
-            ? 'secondary'
-            : 'primary'
-        }
+        color="primary"
         classes={{ root: classes.button }}
       >
-        {t('Users')}
-      </Button>
-      <Button
-        component={Link}
-        to="/admin/settings/groups"
-        variant={
-          location.pathname.includes('/admin/settings/groups')
-            ? 'contained'
-            : 'text'
-        }
-        size="small"
-        color={
-          location.pathname.includes('/admin/settings/groups')
-            ? 'secondary'
-            : 'primary'
-        }
-        classes={{ root: classes.button }}
-      >
-        {t('Groups')}
+        {t('Security')}
       </Button>
       <Button
         component={Link}

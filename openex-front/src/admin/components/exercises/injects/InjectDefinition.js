@@ -1885,7 +1885,7 @@ class InjectDefinition extends Component {
                                       ? t('Yes')
                                       : t('No')
                                   }
-                                  variant="list"
+                                  variant="inList"
                                   onClick={(event) => {
                                     event.preventDefault();
                                     this.toggleAttachment(document.document_id);

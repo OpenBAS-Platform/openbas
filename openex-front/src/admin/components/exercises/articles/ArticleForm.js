@@ -205,7 +205,6 @@ const ArticleForm = ({
               {t('Information')}
             </Typography>
             <Autocomplete
-              variant="standard"
               size="small"
               name="article_channel"
               label={t('Channel')}
@@ -223,7 +222,6 @@ const ArticleForm = ({
               classes={{ clearIndicator: classes.autoCompleteIndicator }}
             />
             <TextField
-              variant="standard"
               name="article_name"
               fullWidth={true}
               style={{ marginTop: 20 }}

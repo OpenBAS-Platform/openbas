@@ -107,9 +107,9 @@ const Channels = () => {
   return (
     <div>
       <div className={classes.parameters}>
-        <div style={{ float: 'left', marginRight: 20 }}>
+        <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
-            small={true}
+            variant="small"
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
           />

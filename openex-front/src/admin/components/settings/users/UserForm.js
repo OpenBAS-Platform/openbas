@@ -38,21 +38,18 @@ const UserForm = (props) => {
       {({ handleSubmit, form, values, submitting, pristine }) => (
         <form id="userForm" onSubmit={handleSubmit}>
           <TextField
-            variant="standard"
             name="user_email"
             fullWidth={true}
             label={t('Email address')}
             disabled={initialValues.user_email === 'admin@openex.io'}
           />
           <TextField
-            variant="standard"
             name="user_firstname"
             fullWidth={true}
             label={t('Firstname')}
             style={{ marginTop: 20 }}
           />
           <TextField
-            variant="standard"
             name="user_lastname"
             fullWidth={true}
             label={t('Lastname')}

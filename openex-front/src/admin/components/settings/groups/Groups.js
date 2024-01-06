@@ -5,7 +5,7 @@ import withStyles from '@mui/styles/withStyles';
 import { Tooltip, List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
 import { connect } from 'react-redux';
 import { interval } from 'rxjs';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined, CheckCircleOutlined, GroupOutlined } from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, CheckCircleOutlined, GroupsOutlined } from '@mui/icons-material';
 import inject18n from '../../../../components/i18n';
 import { fetchUsers } from '../../../../actions/User';
 import { fetchOrganizations } from '../../../../actions/Organization';
@@ -17,15 +17,20 @@ import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchTags } from '../../../../actions/Tag';
 import GroupPopover from './GroupPopover';
 import { storeHelper } from '../../../../actions/Schema';
+import SecurityMenu from '../SecurityMenu';
 
 const interval$ = interval(FIVE_SECONDS);
 
 const styles = (theme) => ({
+  container: {
+    margin: 0,
+    padding: '0 200px 50px 0',
+  },
   parameters: {
     float: 'left',
     marginTop: -10,
   },
-  container: {
+  list: {
     marginTop: 10,
   },
   itemHead: {
@@ -243,18 +248,19 @@ class Groups extends Component {
       sort,
     )(groups);
     return (
-      <div>
+      <div className={classes.container}>
+        <SecurityMenu />
         <div className={classes.parameters}>
-          <div style={{ float: 'left', marginRight: 20 }}>
+          <div style={{ float: 'left', marginRight: 10 }}>
             <SearchFilter
-              small={true}
+              variant="small"
               onChange={this.handleSearch.bind(this)}
               keyword={keyword}
             />
           </div>
         </div>
         <div className="clearfix" />
-        <List classes={{ root: classes.container }}>
+        <List classes={{ root: classes.list }}>
           <ListItem
             classes={{ root: classes.itemHead }}
             divider={false}
@@ -304,7 +310,7 @@ class Groups extends Component {
               divider={true}
             >
               <ListItemIcon>
-                <GroupOutlined color="primary" />
+                <GroupsOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary={

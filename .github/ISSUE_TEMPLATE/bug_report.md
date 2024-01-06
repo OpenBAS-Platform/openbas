@@ -1,8 +1,8 @@
 ---
 name: Bug report
-about: Create a report to help us improve OpenEx
+about: Create a bug report to help us improve OpenBAS
 title: ''
-labels: ''
+labels: bug, needs triage
 assignees: ''
 
 ---
@@ -13,9 +13,9 @@ assignees: ''
 
 ## Environment
 
-1. OS (where OpenEx server runs): { e.g. Mac OS 10, Windows 10, Ubuntu 16.4, etc. }
-2. OpenEx version: { e.g. OpenEx 1.0.2 }
-3. OpenEx client: { e.g. frontend or python }
+1. OS (where OpenBAS server runs): { e.g. Mac OS 10, Windows 10, Ubuntu 16.4, etc. }
+2. OpenBAS version: { e.g. OpenBAS 1.0.2 }
+3. OpenBAS client: { e.g. frontend or python }
 4. Other environment details:
 
 ## Reproducible Steps
@@ -32,7 +32,7 @@ Steps to create the smallest reproducible scenario:
 ## Actual Output
 
 <!-- Please describe what actually happened. -->
- 
+
 ## Additional information
 
 <!-- Any additional information, including logs or screenshots if you have any. -->

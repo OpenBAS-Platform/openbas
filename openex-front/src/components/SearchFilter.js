@@ -8,30 +8,49 @@ import inject18n from './i18n';
 
 const styles = (theme) => ({
   searchRoot: {
+    borderRadius: 5,
+    padding: '0 10px 0 10px',
     backgroundColor: theme.palette.background.paper,
+  },
+  searchRootTopBar: {
+    borderRadius: 5,
+    padding: '1px 10px 0 10px',
+    marginRight: 5,
+    backgroundColor: theme.palette.background.paper,
+  },
+  searchRootInDrawer: {
+    borderRadius: 5,
+    padding: '0 10px 0 10px',
+    height: 30,
+  },
+  searchRootThin: {
+    borderRadius: 5,
+    padding: '0 10px 0 10px',
+    height: 30,
+    backgroundColor: theme.palette.background.paper,
+  },
+  searchRootNoAnimation: {
+    borderRadius: 5,
+    padding: '0 10px 0 10px',
+    backgroundColor: theme.palette.background.default,
   },
   searchInput: {
     transition: theme.transitions.create('width'),
-    width: 300,
-  },
-  searchInputFocused: {
-    width: 400,
+    width: 200,
+    '&:focus': {
+      width: 350,
+    },
   },
   searchInputSmall: {
     transition: theme.transitions.create('width'),
-    width: 200,
-  },
-  searchInputThin: {
-    transition: theme.transitions.create('width'),
-    width: 200,
-    height: 30,
-  },
-  searchInputFocusedSmall: {
-    width: 300,
+    width: 150,
+    '&:focus': {
+      width: 250,
+    },
   },
 });
 
-class SearchFilter extends Component {
+class SearchInput extends Component {
   render() {
     const {
       t,
@@ -41,26 +60,26 @@ class SearchFilter extends Component {
       variant,
       keyword,
       fullWidth,
-      small,
-      thin,
+      placeholder = `${t('Search these results')}...`,
     } = this.props;
-    let { searchInput } = classes;
-    if (small) {
-      searchInput = classes.searchInputSmall;
-    } else if (thin) {
-      searchInput = classes.searchInputThin;
+    let classRoot = classes.searchRoot;
+    if (variant === 'inDrawer') {
+      classRoot = classes.searchRootInDrawer;
+    } else if (variant === 'noAnimation') {
+      classRoot = classes.searchRootNoAnimation;
+    } else if (variant === 'topBar') {
+      classRoot = classes.searchRootTopBar;
+    } else if (variant === 'thin') {
+      classRoot = classes.searchRootThin;
     }
-    const searchInputFocused = small
-      ? classes.searchInputFocusedSmall
-      : classes.searchInputFocused;
     return (
       <TextField
-        variant={variant}
-        size="small"
         fullWidth={fullWidth}
         name="keyword"
         defaultValue={keyword}
-        placeholder={`${t('Search')}...`}
+        variant="outlined"
+        size="small"
+        placeholder={placeholder}
         onChange={(event) => {
           const { value } = event.target;
           if (typeof onChange === 'function') {
@@ -76,35 +95,35 @@ class SearchFilter extends Component {
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <Search />
+              <Search fontSize="small" />
             </InputAdornment>
           ),
-          // eslint-disable-next-line no-nested-ternary
-          classes: !fullWidth
-            ? {
-              root: searchInput,
-              focused: searchInputFocused,
-            }
-            : thin
-              ? { root: searchInput }
-              : null,
+          classes: {
+            root: classRoot,
+            input:
+              // eslint-disable-next-line no-nested-ternary
+              variant === 'small' || variant === 'thin'
+                ? classes.searchInputSmall
+                : variant !== 'noAnimation'
+                  ? classes.searchInput
+                  : classes.searchInputNoAnimation,
+          },
         }}
-        classes={fullWidth ? null : { root: classes.searchRoot }}
         autoComplete="off"
       />
     );
   }
 }
 
-SearchFilter.propTypes = {
+SearchInput.propTypes = {
   keyword: PropTypes.string,
   t: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
   onChange: PropTypes.func,
   onSubmit: PropTypes.func,
-  small: PropTypes.bool,
   variant: PropTypes.string,
   fullWidth: PropTypes.bool,
+  placeholder: PropTypes.string,
 };
 
-export default compose(inject18n, withStyles(styles))(SearchFilter);
+export default compose(inject18n, withStyles(styles))(SearchInput);

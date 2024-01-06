@@ -31,13 +31,11 @@ class TagForm extends Component {
         {({ handleSubmit, pristine, submitting }) => (
           <form id="tagForm" onSubmit={handleSubmit}>
             <TextField
-              variant="standard"
               name="tag_name"
               fullWidth={true}
               label={t('Value')}
             />
             <ColorPickerField
-              variant="standard"
               name="tag_color"
               fullWidth={true}
               label={t('Color')}

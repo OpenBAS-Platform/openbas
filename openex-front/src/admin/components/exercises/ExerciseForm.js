@@ -37,20 +37,17 @@ class ExerciseForm extends Component {
         {({ handleSubmit, form, values, submitting, pristine }) => (
           <form id="exerciseForm" onSubmit={handleSubmit}>
             <TextField
-              variant="standard"
               name="exercise_name"
               fullWidth={true}
               label={t('Name')}
             />
             <TextField
-              variant="standard"
               name="exercise_subtitle"
               fullWidth={true}
               label={t('Subtitle')}
               style={{ marginTop: 20 }}
             />
             <TextField
-              variant="standard"
               name="exercise_description"
               fullWidth={true}
               multiline={true}

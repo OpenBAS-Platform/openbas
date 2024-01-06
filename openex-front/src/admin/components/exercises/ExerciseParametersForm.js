@@ -35,14 +35,12 @@ class ExerciseParametersForm extends Component {
         {({ handleSubmit, submitting, pristine }) => (
           <form id="exerciseParametersForm" onSubmit={handleSubmit}>
             <TextField
-              variant="standard"
               name="exercise_mail_from"
               fullWidth={true}
               label={t('Sender email address')}
               disabled={disabled}
             />
             <TextField
-              variant="standard"
               name="exercise_message_header"
               label={t('Messages header')}
               multiline={true}

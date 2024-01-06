@@ -3,12 +3,13 @@ import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { withStyles } from '@mui/styles';
 import { connect, useDispatch } from 'react-redux';
-import { Typography, Grid, Paper, List, ListItem, ListItemText, Chip } from '@mui/material';
+import { Typography, Grid, Paper, List, ListItem, ListItemText, Switch, TextField } from '@mui/material';
 import ParametersForm from './ParametersForm';
 import inject18n from '../../../components/i18n';
 import { storeHelper } from '../../../actions/Schema';
 import { updateParameters, fetchParameters } from '../../../actions/Application';
 import useDataLoader from '../../../utils/ServerSideEvent';
+import ItemBoolean from '../../../components/ItemBoolean';
 
 const styles = () => ({
   root: {
@@ -52,25 +53,50 @@ const Parameters = (props) => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
-          <Typography variant="h4">{t('Components version')}</Typography>
+          <Typography variant="h4">{t('OpenEx platform')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <List style={{ paddingTop: 0 }}>
               <ListItem divider={true}>
-                <ListItemText primary={t('OpenEx platform')} />
-
-                <Chip label={settings?.platform_version} color="primary" />
+                <ListItemText primary={t('Version')} />
+                <ItemBoolean variant="inList" status={null} neutralLabel={settings?.platform_version.replace('-SNAPSHOT', '')} />
               </ListItem>
               <ListItem divider={true}>
+                <ListItemText primary={t('Edition')} />
+                <ItemBoolean variant="inList" status={null} neutralLabel='Community' />
+              </ListItem>
+              <ListItem divider={true}>
+                <TextField fullWidth={true} label={t('Filigran support key')} variant="standard" disabled={true} />
+              </ListItem>
+              <ListItem divider={true}>
+                <ListItemText primary={t('Remove Filigran logos')} />
+                <Switch disabled={true} />
+              </ListItem>
+            </List>
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+          <Typography variant="h4">{t('Dark theme')}</Typography>
+          <Paper variant="outlined" classes={{ root: classes.paper }}>
+            &nbsp;
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+          <Typography variant="h4">{t('Light theme')}</Typography>
+          <Paper variant="outlined" classes={{ root: classes.paper }}>
+            &nbsp;
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+          <Typography variant="h4">{t('Tools')}</Typography>
+          <Paper variant="outlined" classes={{ root: classes.paper }}>
+            <List style={{ paddingTop: 0 }}>
+              <ListItem divider={true}>
                 <ListItemText primary={t('JAVA Virtual Machine')} />
-                <Chip label={settings?.java_version} color="primary" />
+                <ItemBoolean status={null} neutralLabel={settings?.java_version} />
               </ListItem>
               <ListItem divider={true}>
                 <ListItemText primary={t('PostgreSQL')} />
-                <Chip label={settings?.postgre_version} color="primary" />
-              </ListItem>
-              <ListItem divider={true}>
-                <ListItemText primary={t('Minio (S3)')} />
-                <Chip label={t('Latest stable build')} color="primary" />
+                <ItemBoolean status={null} neutralLabel={settings?.postgre_version} />
               </ListItem>
             </List>
           </Paper>

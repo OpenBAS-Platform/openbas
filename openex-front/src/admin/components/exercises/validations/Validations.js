@@ -158,14 +158,14 @@ const Validations = () => {
     return (
       <div className={classes.container}>
         <AnimationMenu exerciseId={exerciseId} />
-        <div style={{ float: 'left', marginRight: 20 }}>
+        <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
-            small={true}
+            variant="small"
             onChange={handleSearch}
             keyword={keyword}
           />
         </div>
-        <div style={{ float: 'left', marginRight: 20 }}>
+        <div style={{ float: 'left', marginRight: 10 }}>
           <TagsFilter
             onAddTag={handleAddTag}
             onRemoveTag={handleRemoveTag}

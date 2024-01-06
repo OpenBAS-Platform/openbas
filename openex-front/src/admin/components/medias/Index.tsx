@@ -5,7 +5,7 @@ import { errorWrapper } from '../../../components/Error';
 import Loader from '../../../components/Loader';
 
 const Channels = lazy(() => import('./Channels'));
-const IndexChannel = lazy(() => import('./channels'));
+const IndexChannel = lazy(() => import('./channels/Index'));
 const Documents = lazy(() => import('./Documents'));
 
 const useStyles = makeStyles(() => ({

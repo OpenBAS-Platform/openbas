@@ -174,13 +174,11 @@ const ChallengeForm = (props) => {
       {({ form, handleSubmit, submitting, errors, values }) => (
         <form id="challengeForm" onSubmit={handleSubmit}>
           <TextField
-            variant="standard"
             name="challenge_name"
             fullWidth={true}
             label={t('Name')}
           />
           <TextField
-            variant="standard"
             name="challenge_category"
             fullWidth={true}
             label={t('Category')}
@@ -195,7 +193,6 @@ const ChallengeForm = (props) => {
           <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
             <Grid item={true} xs={6}>
               <TextField
-                variant="standard"
                 name="challenge_score"
                 fullWidth={true}
                 type="number"
@@ -204,7 +201,6 @@ const ChallengeForm = (props) => {
             </Grid>
             <Grid item={true} xs={6}>
               <TextField
-                variant="standard"
                 name="challenge_max_attempts"
                 fullWidth={true}
                 type="number"
@@ -334,7 +330,6 @@ const ChallengeForm = (props) => {
                       divider={false}
                     >
                       <Select
-                        variant="standard"
                         name={`${name}.flag_type`}
                         label={t('Flag type')}
                         fullWidth={true}
@@ -351,7 +346,6 @@ const ChallengeForm = (props) => {
                         </MenuItem>
                       </Select>
                       <TextField
-                        variant="standard"
                         name={`${name}.flag_value`}
                         validate={required}
                         fullWidth={true}

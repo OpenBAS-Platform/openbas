@@ -1352,7 +1352,7 @@ class QuickInject extends Component {
                                   <ItemBoolean
                                     status={true}
                                     label={t('Enabled')}
-                                    variant="list"
+                                    variant="inList"
                                   />
                                 </div>
                                 <div
@@ -1405,7 +1405,7 @@ class QuickInject extends Component {
                                             ? t('Enabled')
                                             : t('Disabled')
                                         }
-                                        variant="list"
+                                        variant="inList"
                                       />
                                     </div>
                                     <div
@@ -1882,7 +1882,7 @@ class QuickInject extends Component {
                                       ? t('Yes')
                                       : t('No')
                                   }
-                                  variant="list"
+                                  variant="inList"
                                   onClick={(event) => {
                                     event.preventDefault();
                                     this.toggleAttachment(document.document_id);

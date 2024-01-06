@@ -13,7 +13,7 @@ const styles = () => ({
     marginRight: 7,
     textTransform: 'uppercase',
     borderRadius: '0',
-    width: 130,
+    width: 120,
   },
   chipInList: {
     fontSize: 12,
@@ -22,7 +22,7 @@ const styles = () => ({
     float: 'left',
     textTransform: 'uppercase',
     borderRadius: '0',
-    width: 90,
+    width: 100,
   },
 });
 
@@ -58,7 +58,7 @@ const inlineStyles = {
 class ItemBoolean extends Component {
   render() {
     const { classes, label, neutralLabel, status, variant, t, reverse, onClick, disabled } = this.props;
-    const style = variant === 'list' ? classes.chipInList : classes.chip;
+    const style = variant === 'inList' ? classes.chipInList : classes.chip;
     const inlineStyleRed = onClick
       ? inlineStyles.redClickable
       : inlineStyles.red;

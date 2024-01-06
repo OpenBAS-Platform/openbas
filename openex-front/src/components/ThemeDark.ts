@@ -104,6 +104,13 @@ const ThemeDark = (
     },
   },
   components: {
+    MuiAccordion: {
+      defaultProps: {
+        TransitionProps: {
+          unmountOnExit: true,
+        },
+      },
+    },
     MuiTooltip: {
       styleOverrides: {
         tooltip: {
@@ -112,6 +119,21 @@ const ThemeDark = (
         arrow: {
           color: 'rgba(0,0,0,0.7)',
         },
+      },
+    },
+    MuiFormControl: {
+      defaultProps: {
+        variant: 'standard',
+      },
+    },
+    MuiTextField: {
+      defaultProps: {
+        variant: 'standard',
+      },
+    },
+    MuiSelect: {
+      defaultProps: {
+        variant: 'standard',
       },
     },
     MuiCssBaseline: {
@@ -159,8 +181,13 @@ const ThemeDark = (
             borderTopRightRadius: 'inherit',
           },
           pre: {
+            fontFamily: 'Consolas, monaco, monospace',
             color: '#ffffff !important',
             background: `${accent || '#01478d'} !important`,
+          },
+          'pre.light': {
+            fontFamily: 'Consolas, monaco, monospace',
+            background: `${nav || '#071a2e'} !important`,
           },
           code: {
             fontFamily: 'Consolas, monaco, monospace',

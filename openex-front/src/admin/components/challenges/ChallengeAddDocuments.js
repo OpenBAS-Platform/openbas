@@ -159,6 +159,7 @@ class ChallengeAddDocuments extends Component {
                 <Grid container={true} spacing={3}>
                   <Grid item={true} xs={6}>
                     <SearchFilter
+                      variant="small"
                       onChange={this.handleSearchDocuments.bind(this)}
                       fullWidth={true}
                     />

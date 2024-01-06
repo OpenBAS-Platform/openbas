@@ -37,9 +37,9 @@ const ThemeLight = (
       contrastText: '#ffffff',
     },
     background: {
-      default: background || '#f3f6f9',
+      default: background || '#f8f8f8',
       paper: paper || '#ffffff',
-      nav: nav || '#ffffff',
+      nav: nav || '#f5f5f5',
       accent: accent || '#d3eaff',
       shadow: 'rgba(0, 0, 0, .05)',
     },
@@ -97,6 +97,13 @@ const ThemeLight = (
     },
   },
   components: {
+    MuiAccordion: {
+      defaultProps: {
+        TransitionProps: {
+          unmountOnExit: true,
+        },
+      },
+    },
     MuiTooltip: {
       styleOverrides: {
         tooltip: {
@@ -105,6 +112,21 @@ const ThemeLight = (
         arrow: {
           color: 'rgba(0,0,0,0.7)',
         },
+      },
+    },
+    MuiFormControl: {
+      defaultProps: {
+        variant: 'standard',
+      },
+    },
+    MuiTextField: {
+      defaultProps: {
+        variant: 'standard',
+      },
+    },
+    MuiSelect: {
+      defaultProps: {
+        variant: 'standard',
       },
     },
     MuiCssBaseline: {
@@ -152,13 +174,18 @@ const ThemeLight = (
             borderTopRightRadius: 'inherit',
           },
           pre: {
-            background: `${accent || '#c0dfff'} !important`,
+            fontFamily: 'Consolas, monaco, monospace',
             color: '#000000 !important',
+            background: `${accent || '#c0dfff'} !important`,
+          },
+          'pre.light': {
+            fontFamily: 'Consolas, monaco, monospace',
+            background: `${nav || '#f9feff'} !important`,
           },
           code: {
             fontFamily: 'Consolas, monaco, monospace',
-            background: `${accent || '#c0dfff'} !important`,
             color: '#000000 !important',
+            background: `${accent || '#c0dfff'} !important`,
             padding: 3,
             fontSize: 12,
             fontWeight: 400,

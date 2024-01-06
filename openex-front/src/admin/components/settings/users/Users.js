@@ -14,13 +14,18 @@ import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
 import UserPopover from './UserPopover';
+import SecurityMenu from '../SecurityMenu';
 
 const useStyles = makeStyles(() => ({
+  container: {
+    margin: 0,
+    padding: '0 200px 50px 0',
+  },
   parameters: {
     float: 'left',
     marginTop: -10,
   },
-  container: {
+  list: {
     marginTop: 10,
   },
   itemHead: {
@@ -154,16 +159,17 @@ const Users = () => {
     dispatch(fetchUsers());
   });
   return (
-    <div>
+    <div className={classes.container}>
+      <SecurityMenu />
       <div className={classes.parameters}>
-        <div style={{ float: 'left', marginRight: 20 }}>
+        <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
-            small={true}
+            variant="small"
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
           />
         </div>
-        <div style={{ float: 'left', marginRight: 20 }}>
+        <div style={{ float: 'left', marginRight: 10 }}>
           <TagsFilter
             onAddTag={filtering.handleAddTag}
             onRemoveTag={filtering.handleRemoveTag}
@@ -172,7 +178,7 @@ const Users = () => {
         </div>
       </div>
       <div className="clearfix" />
-      <List classes={{ root: classes.container }}>
+      <List classes={{ root: classes.list }}>
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}

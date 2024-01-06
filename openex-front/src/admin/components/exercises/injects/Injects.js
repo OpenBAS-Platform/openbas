@@ -202,14 +202,14 @@ const Injects = () => {
     return (
       <div className={classes.container}>
         <div>
-          <div style={{ float: 'left', marginRight: 20 }}>
+          <div style={{ float: 'left', marginRight: 10 }}>
             <SearchFilter
-              small={true}
+              variant="small"
               onChange={filtering.handleSearch}
               keyword={filtering.keyword}
             />
           </div>
-          <div style={{ float: 'left', marginRight: 20 }}>
+          <div style={{ float: 'left', marginRight: 10 }}>
             <TagsFilter
               onAddTag={filtering.handleAddTag}
               onRemoveTag={filtering.handleRemoveTag}
@@ -395,7 +395,7 @@ const Injects = () => {
                               : inject.inject_enabled
                           }
                           label={injectStatus}
-                          variant="list"
+                          variant="inList"
                         />
                       </div>
                       <div

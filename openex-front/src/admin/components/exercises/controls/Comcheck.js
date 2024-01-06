@@ -289,14 +289,14 @@ const Comcheck = () => {
         style={{ marginTop: 30 }}
       >
         <div className={classes.parameters}>
-          <div style={{ float: 'left', marginRight: 20 }}>
+          <div style={{ float: 'left', marginRight: 10 }}>
             <SearchFilter
-              small={true}
+              variant="small"
               onChange={filtering.handleSearch}
               keyword={filtering.keyword}
             />
           </div>
-          <div style={{ float: 'left', marginRight: 20 }}>
+          <div style={{ float: 'left', marginRight: 10 }}>
             <TagsFilter
               onAddTag={filtering.handleAddTag}
               onRemoveTag={filtering.handleRemoveTag}

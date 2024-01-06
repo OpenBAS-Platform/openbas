@@ -357,7 +357,7 @@ class TeamsPlayers extends Component {
                         status={user.user_enabled}
                         label={user.user_enabled ? t('Enabled') : t('Disabled')}
                         onClick={this.handleToggleUser.bind(this, user.user_id, user.user_enabled)}
-                        variant="list"
+                        variant="inList"
                       />
                     </div>
                     )}
