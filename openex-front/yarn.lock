@@ -8431,13 +8431,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-dom-parser@npm:5.0.4":
-  version: 5.0.4
-  resolution: "html-dom-parser@npm:5.0.4"
+"html-dom-parser@npm:5.0.6":
+  version: 5.0.6
+  resolution: "html-dom-parser@npm:5.0.6"
   dependencies:
     domhandler: 5.0.3
     htmlparser2: 9.0.0
-  checksum: fd2747752dd3cebc9c4c1d6cf148eed3cc788ea0665c10572363b226b654f41af9169374f5418afe9173bcbbaed384dd28362e21ad2001050fb87645fb59f4de
+  checksum: 6c647102f8ae686608b098ae4894112d43263970abdfcc31da296bfab2cfc8fb373e602adf4d4d9b0a089c8541bb5d0845e001fa667d02db552859ffa331424d
   languageName: node
   linkType: hard
 
@@ -8450,17 +8450,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-react-parser@npm:5.0.7":
-  version: 5.0.7
-  resolution: "html-react-parser@npm:5.0.7"
+"html-react-parser@npm:5.0.11":
+  version: 5.0.11
+  resolution: "html-react-parser@npm:5.0.11"
   dependencies:
     domhandler: 5.0.3
-    html-dom-parser: 5.0.4
+    html-dom-parser: 5.0.6
     react-property: 2.0.2
     style-to-js: 1.1.10
   peerDependencies:
     react: 0.14 || 15 || 16 || 17 || 18
-  checksum: 44ed21eaa2b650573fe48bdf359685fc8a04c7c13f97cbb73dc99b71230820f2dbf69eb89e92ec64a964388c5d90865535a8de085e7c4d603736d07a5f86e942
+  checksum: 79c543284a8954cd6ae06d53f16e2eb7228b23334fd0a3acb9aeddff83cb91ec6175e0e24a896a4436777b664bab028876bbf84c826d666b69550fc2fb159bf5
   languageName: node
   linkType: hard
 
@@ -11028,7 +11028,7 @@ __metadata:
     fs-extra: 11.2.0
     globals: 13.23.0
     history: 5.3.0
-    html-react-parser: 5.0.7
+    html-react-parser: 5.0.11
     html-to-image: 1.11.11
     http-proxy-middleware: 2.0.6
     js-file-download: 0.4.12
