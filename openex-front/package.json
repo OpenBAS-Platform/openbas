@@ -94,7 +94,7 @@
     "globals": "13.23.0",
     "jsdom": "23.0.1",
     "swagger-typescript-api": "13.0.3",
-    "typescript": "5.3.2",
+    "typescript": "5.3.3",
     "vite": "5.0.6",
     "vitest": "1.1.1"
   },
