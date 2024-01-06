@@ -299,6 +299,8 @@ const i18n = {
       attachment: 'Document',
       'Executed in': 'Exécuté en',
       'Use basic authentication': 'Utiliser une authentification basique',
+      'Only in the context of this simulation': 'Seulement dans le contexte de cette simulation',
+      Medias: 'Médias',
       Success: 'Succès',
       m: 'm',
       h: 'h',

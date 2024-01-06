@@ -352,7 +352,7 @@ const ArticleForm = ({
                         document={document}
                         exercisesMap={exercisesMap}
                         tagsMap={tagsMap}
-                        removeChoice={t('Remove from the channels pressure')}
+                        removeChoice={t('Remove from the media pressure')}
                         onRemoveDocument={handleRemoveDocument}
                       />
                     </ListItemSecondaryAction>

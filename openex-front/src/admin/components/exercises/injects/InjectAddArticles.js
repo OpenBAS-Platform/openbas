@@ -150,7 +150,7 @@ class InjectAddArticles extends Component {
             },
           }}
         >
-          <DialogTitle>{t('Add channel pressure in this inject')}</DialogTitle>
+          <DialogTitle>{t('Add media pressure in this inject')}</DialogTitle>
           <DialogContent>
             <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
               <Grid item={true} xs={8}>
