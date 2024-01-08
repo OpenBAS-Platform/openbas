@@ -2,9 +2,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { ApiOutlined, EmailOutlined, EmojiEventsOutlined, HelpOutlined, NotificationsActiveOutlined, SmsOutlined, SpeakerNotesOutlined } from '@mui/icons-material';
 import { Mastodon, NewspaperVariantMultipleOutline, Twitter } from 'mdi-material-ui';
-import Airbus from '../../../../static/images/contracts/airbus.png';
 import CustomTooltip from '../../../../components/CustomTooltip';
-import { fileUri } from '../../../../utils/Environment';
 import { useHelper } from '../../../../store';
 
 const iconSelector = (type, variant, fontSize, done, disabled, contractImage) => {
@@ -65,7 +63,7 @@ const iconSelector = (type, variant, fontSize, done, disabled, contractImage) =>
     case 'openex_lade':
       return (
         <img
-          src={fileUri(Airbus)}
+          src={contractImage}
           alt="Airbus Lade"
           style={{
             width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
