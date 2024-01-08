@@ -43,6 +43,11 @@
             <version>${jackson.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.hypersistence</groupId>
+            <artifactId>hypersistence-utils-hibernate-55</artifactId>
+            <version>3.7.0</version>
+        </dependency>
+        <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
             <version>${minio.version}</version>

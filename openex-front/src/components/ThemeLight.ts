@@ -58,7 +58,6 @@ const ThemeLight = (
     h1: {
       margin: '0 0 10px 0',
       padding: 0,
-      color: primary || '#007fff',
       fontWeight: 400,
       fontSize: 22,
     },
@@ -72,7 +71,7 @@ const ThemeLight = (
     h3: {
       margin: '0 0 10px 0',
       padding: 0,
-      color: primary || '#007fff',
+      color: '#757575',
       fontWeight: 400,
       fontSize: 13,
     },

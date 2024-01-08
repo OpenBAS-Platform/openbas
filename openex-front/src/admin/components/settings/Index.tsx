@@ -12,7 +12,8 @@ const Index = () => (
     <Route path="security" element={<Navigate to="groups" replace={true} />} />
     <Route path="security/groups" element={errorWrapper(Groups)()} />
     <Route path="security/users" element={errorWrapper(Users)()} />
-    <Route path="tags" element={errorWrapper(Tags)()} />
+    <Route path="taxonomies" element={<Navigate to="tags" replace={true} />} />
+    <Route path="taxonomies/tags" element={errorWrapper(Tags)()} />
   </Routes>
 );
 

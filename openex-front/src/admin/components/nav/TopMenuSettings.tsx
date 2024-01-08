@@ -44,21 +44,13 @@ const TopMenuSettings: React.FC = () => {
       </Button>
       <Button
         component={Link}
-        to="/admin/settings/tags"
-        variant={
-          location.pathname.includes('/admin/settings/tags')
-            ? 'contained'
-            : 'text'
-        }
+        to="/admin/settings/taxonomies"
+        variant={location.pathname.includes('/admin/settings/taxonomies') ? 'contained' : 'text'}
         size="small"
-        color={
-          location.pathname.includes('/admin/settings/tags')
-            ? 'secondary'
-            : 'primary'
-        }
+        color="primary"
         classes={{ root: classes.button }}
       >
-        {t('Tags')}
+        {t('Taxonomies')}
       </Button>
     </div>
   );

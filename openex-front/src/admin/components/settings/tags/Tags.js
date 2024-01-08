@@ -13,15 +13,20 @@ import SearchFilter from '../../../../components/SearchFilter';
 import CreateTag from './CreateTag';
 import TagPopover from './TagPopover';
 import { storeHelper } from '../../../../actions/Schema';
+import TaxonomiesMenu from '../TaxonomiesMenu';
 
 const interval$ = interval(FIVE_SECONDS);
 
 const styles = (theme) => ({
+  container: {
+    margin: 0,
+    padding: '0 200px 50px 0',
+  },
   parameters: {
     float: 'left',
     marginTop: -10,
   },
-  container: {
+  list: {
     marginTop: 10,
   },
   itemHead: {
@@ -169,7 +174,8 @@ class Tags extends Component {
     );
     const sortedTags = R.pipe(R.filter(filterByKeyword), sort)(tags);
     return (
-      <div>
+      <div className={classes.container}>
+        <TaxonomiesMenu />
         <div className={classes.parameters}>
           <div style={{ float: 'left', marginRight: 10 }}>
             <SearchFilter
@@ -180,7 +186,7 @@ class Tags extends Component {
           </div>
         </div>
         <div className="clearfix" />
-        <List classes={{ root: classes.container }}>
+        <List classes={{ root: classes.list }}>
           <ListItem
             classes={{ root: classes.itemHead }}
             divider={false}

@@ -2,6 +2,7 @@ package io.openex.rest.group.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.Grant;
+import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
+@Getter
 public class GroupCreateInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)

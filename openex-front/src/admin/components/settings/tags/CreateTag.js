@@ -2,23 +2,19 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { Dialog, DialogTitle, DialogContent, Slide, Fab } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Fab } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import withStyles from '@mui/styles/withStyles';
 import { addTag } from '../../../../actions/Tag';
 import TagForm from './TagForm';
 import inject18n from '../../../../components/i18n';
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
+import Transition from '../../../../components/common/Transition';
 
 const styles = () => ({
   createButton: {
     position: 'fixed',
     bottom: 30,
-    right: 30,
+    right: 230,
   },
 });
 
