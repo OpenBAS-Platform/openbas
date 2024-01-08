@@ -58,7 +58,7 @@ const Parameters = (props) => {
             <List style={{ paddingTop: 0 }}>
               <ListItem divider={true}>
                 <ListItemText primary={t('Version')} />
-                <ItemBoolean variant="inList" status={null} neutralLabel={settings?.platform_version.replace('-SNAPSHOT', '')} />
+                <ItemBoolean variant="inList" status={null} neutralLabel={settings?.platform_version?.replace('-SNAPSHOT', '')} />
               </ListItem>
               <ListItem divider={true}>
                 <ListItemText primary={t('Edition')} />

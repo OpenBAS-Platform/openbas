@@ -14,6 +14,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.Set;
 
+import static io.openex.injects.email.EmailContract.EMAIL_DEFAULT;
+import static io.openex.injects.email.EmailContract.TYPE;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -31,6 +33,7 @@ public class InjectCrudTest {
     // -- PREPARE --
     Exercise exercise = new Exercise();
     exercise.setName("Exercice name");
+    exercise.setReplyTo("test@test.com");
     Exercise exerciseCreated = this.exerciseRepository.save(exercise);
     Inject inject = new Inject();
     inject.setExercise(exerciseCreated);
@@ -56,8 +59,12 @@ public class InjectCrudTest {
     // -- PREPARE --
     Exercise exercise = new Exercise();
     exercise.setName("Exercice name");
+    exercise.setReplyTo("test@test.com");
     Exercise exerciseCreated = this.exerciseRepository.save(exercise);
     Inject inject = new Inject();
+    inject.setTitle("test");
+    inject.setType(TYPE);
+    inject.setContract(EMAIL_DEFAULT);
     inject.setExercise(exerciseCreated);
     inject.setDependsDuration(0L);
 
