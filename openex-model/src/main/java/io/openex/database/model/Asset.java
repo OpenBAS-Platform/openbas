@@ -1,13 +1,17 @@
 package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
+import io.openex.helper.MultiIdDeserializer;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.time.Instant.now;
 
@@ -38,6 +42,18 @@ public class Asset implements Base {
   @Column(name = "asset_description")
   @JsonProperty("asset_description")
   private String description;
+
+  // -- TAG --
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(name = "assets_tags",
+      joinColumns = @JoinColumn(name = "asset_id"),
+      inverseJoinColumns = @JoinColumn(name = "tag_id"))
+  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonProperty("asset_tags")
+  private List<Tag> tags = new ArrayList<>();
+
+  // -- AUDIT --
 
   @Column(name = "asset_created_at")
   @JsonProperty("asset_created_at")

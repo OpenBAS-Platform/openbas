@@ -1,7 +1,9 @@
 package io.openex.service;
 
-import io.openex.database.model.Endpoint;
 import io.openex.database.model.AssetGroup;
+import io.openex.database.model.Endpoint;
+import io.openex.database.model.Tag;
+import io.openex.database.repository.TagRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +22,8 @@ public class AssetGroupServiceTest {
   private AssetGroupService assetGroupService;
   @Autowired
   private AssetEndpointService assetEndpointService;
+  @Autowired
+  private TagRepository tagRepository;
 
   static String ASSET_GROUP_ID;
 
@@ -74,13 +78,32 @@ public class AssetGroupServiceTest {
 
     // -- EXECUTE --
     AssetGroup assetGroupUpdated = this.assetGroupService.updateAssetGroup(assetGroup);
-    assertNotNull(assetGroup);
+    assertNotNull(assetGroupUpdated);
     assertEquals(value, assetGroupUpdated.getName());
+  }
+
+  @DisplayName("Update asset group with tag")
+  @Test
+  @Order(4)
+  void updateAssetGroupWithTagTest() {
+    // -- PREPARE --
+    Tag tag = new Tag();
+    String tagName = "endpoint";
+    tag.setName(tagName);
+    tag.setColor("blue");
+    Tag tagCreated = this.tagRepository.save(tag);
+    AssetGroup assetGroup = this.assetGroupService.assetGroup(ASSET_GROUP_ID);
+    assetGroup.setTags(List.of(tagCreated));
+
+    // -- EXECUTE --
+    AssetGroup assetGroupUpdated = this.assetGroupService.updateAssetGroup(assetGroup);
+    assertNotNull(assetGroupUpdated);
+    assertEquals(tagName, assetGroupUpdated.getTags().get(0).getName());
   }
 
   @DisplayName("Delete asset group")
   @Test
-  @Order(4)
+  @Order(5)
   void deleteAssetGroupTest() {
     this.assetGroupService.deleteAssetGroup(ASSET_GROUP_ID);
     assertThrows(NoSuchElementException.class, () -> this.assetGroupService.assetGroup(ASSET_GROUP_ID));

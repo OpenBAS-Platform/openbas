@@ -45,6 +45,18 @@ public class AssetGroup implements Base {
   @JsonProperty("asset_group_assets")
   private List<Asset> assets = new ArrayList<>();
 
+  // -- TAG --
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(name = "asset_groups_tags",
+      joinColumns = @JoinColumn(name = "asset_group_id"),
+      inverseJoinColumns = @JoinColumn(name = "tag_id"))
+  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonProperty("asset_group_tags")
+  private List<Tag> tags = new ArrayList<>();
+
+  // -- AUDIT --
+
   @Column(name = "asset_group_created_at")
   @JsonProperty("asset_group_created_at")
   private Instant createdAt = now();
