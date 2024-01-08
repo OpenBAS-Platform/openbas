@@ -242,7 +242,7 @@ const maps = (key, state) => state.referential.entities[key].asMutable({ deep: t
 const entities = (key, state) => Object.values(maps(key, state));
 const entity = (id, key, state) => state.referential.entities[key][id]?.asMutable({ deep: true });
 const me = (state) => state.referential.entities.users[R.path(['logged', 'user'], state.app)];
-const contractImages = (state) => state.app['contractImages']
+const contractImages = (state) => state.app.contractImages;
 
 export const storeHelper = (state) => ({
   logged: () => state.app.logged,
@@ -408,5 +408,5 @@ export const storeHelper = (state) => ({
   getLessonsTemplateCategoryQuestions: (id) => entities('lessonstemplatequestions', state).filter(
     (c) => c.lessons_template_question_category === id,
   ),
-  getContractImages: () => contractImages(state)
+  getContractImages: () => contractImages(state),
 });

@@ -5,7 +5,7 @@ import { Mastodon, NewspaperVariantMultipleOutline, Twitter } from 'mdi-material
 import Airbus from '../../../../static/images/contracts/airbus.png';
 import CustomTooltip from '../../../../components/CustomTooltip';
 import { fileUri } from '../../../../utils/Environment';
-import { useHelper } from "../../../../store.ts";
+import { useHelper } from '../../../../store';
 
 const iconSelector = (type, variant, fontSize, done, disabled, contractImage) => {
   let style;
@@ -130,9 +130,8 @@ const iconSelector = (type, variant, fontSize, done, disabled, contractImage) =>
 };
 
 const InjectIcon = (props) => {
-  const { type, size, variant, tooltip, done, disabled} = props;
+  const { type, size, variant, tooltip, done, disabled } = props;
 
-  let contractImage;
   const {
     contractImages,
   } = useHelper((helper) => {
@@ -140,7 +139,7 @@ const InjectIcon = (props) => {
       contractImages: helper.getContractImages(),
     };
   });
-  contractImage = "data:image/png;charset=utf-8;base64, "+contractImages[type];
+  const contractImage = `data:image/png;charset=utf-8;base64, ${contractImages[type]}`;
   const fontSize = size || 'medium';
   if (tooltip) {
     return (
@@ -150,7 +149,7 @@ const InjectIcon = (props) => {
     );
   }
   return iconSelector(type, variant, fontSize, done, disabled, contractImage);
-}
+};
 
 InjectIcon.propTypes = {
   type: PropTypes.string,

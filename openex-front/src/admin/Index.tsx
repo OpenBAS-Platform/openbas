@@ -11,7 +11,7 @@ import { useHelper } from '../store';
 import type { Theme } from '../components/Theme';
 import type { LoggedHelper } from '../actions/helper';
 import Loader from '../components/Loader';
-import { contractImages } from '../actions/Contract';
+import contractImages from '../actions/Contract';
 import { useAppDispatch } from '../utils/hooks';
 
 const IndexExercise = lazy(() => import('./components/exercises/Index'));
