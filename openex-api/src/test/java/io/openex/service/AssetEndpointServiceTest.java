@@ -1,5 +1,6 @@
 package io.openex.service;
 
+import io.openex.database.model.Asset;
 import io.openex.database.model.Endpoint;
 import io.openex.database.model.Tag;
 import io.openex.database.repository.TagRepository;
@@ -21,6 +22,8 @@ public class AssetEndpointServiceTest {
   @Autowired
   private AssetEndpointService assetEndpointService;
   @Autowired
+  private AssetService assetService;
+  @Autowired
   private TagRepository tagRepository;
 
   static String ENDPOINT_ID;
@@ -33,7 +36,7 @@ public class AssetEndpointServiceTest {
     Endpoint endpoint = new Endpoint();
     String name = "Personal PC";
     endpoint.setName(name);
-    endpoint.setIps(List.of("wrong ip"));
+    endpoint.setIps(new String[]{"wrong ip"});
     endpoint.setHostname("hostname");
     endpoint.setPlatform(LINUX);
     endpoint.setHostname("hostname");
@@ -51,7 +54,7 @@ public class AssetEndpointServiceTest {
     Endpoint endpoint = new Endpoint();
     String name = "Personal PC";
     endpoint.setName(name);
-    endpoint.setIps(List.of("127.0.0.1"));
+    endpoint.setIps(new String[]{"127.0.0.1"});
     endpoint.setHostname("hostname");
     endpoint.setPlatform(LINUX);
     endpoint.setHostname("hostname");
@@ -71,6 +74,9 @@ public class AssetEndpointServiceTest {
   @Test
   @Order(3)
   void retrieveEndpointTest() {
+    List<Asset> assets = this.assetService.assets(List.of("Endpoint"));
+    assertTrue(assets.stream().map(Asset::getId).toList().contains(ENDPOINT_ID));
+
     Endpoint endpoint = this.assetEndpointService.endpoint(ENDPOINT_ID);
     assertNotNull(endpoint);
 

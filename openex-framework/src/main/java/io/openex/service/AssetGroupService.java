@@ -1,5 +1,6 @@
 package io.openex.service;
 
+import io.openex.database.model.Asset;
 import io.openex.database.model.AssetGroup;
 import io.openex.database.repository.AssetGroupRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,8 @@ import static java.time.Instant.now;
 public class AssetGroupService {
 
   private final AssetGroupRepository assetGroupRepository;
+
+  // -- ASSET GROUP --
 
   public AssetGroup createAssetGroup(@NotNull final AssetGroup assetGroup) {
     return this.assetGroupRepository.save(assetGroup);
@@ -37,6 +40,12 @@ public class AssetGroupService {
 
   public void deleteAssetGroup(@NotBlank final String assetGroupId) {
     this.assetGroupRepository.deleteById(assetGroupId);
+  }
+
+  // -- ASSET --
+
+  public List<Asset> assetsFromAssetGroup(@NotBlank final String assetGroupId) {
+    return this.assetGroupRepository.assetsFromAssetGroup(assetGroupId);
   }
 
 }

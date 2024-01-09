@@ -5,16 +5,15 @@ import io.openex.annotation.Ipv4OrIpv6Constraint;
 import io.openex.database.audit.ModelBaseListener;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.time.Instant;
-import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@Table(name = "endpoints")
+@DiscriminatorValue("Endpoint")
 @EntityListeners(ModelBaseListener.class)
 public class Endpoint extends Asset {
 
@@ -25,12 +24,10 @@ public class Endpoint extends Asset {
   }
 
   @Ipv4OrIpv6Constraint
-  @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "ips", joinColumns = @JoinColumn(name = "endpoint_id"))
-  @Column(name = "ip")
+  @Type(type = "io.openex.database.converter.PostgreSqlStringArrayType")
+  @Column(name = "endpoint_ips")
   @JsonProperty("endpoint_ips")
-  @Size(min = 1)
-  private List<String> ips;
+  private String[] ips;
 
   @Column(name = "endpoint_hostname")
   @JsonProperty("endpoint_hostname")
@@ -45,10 +42,9 @@ public class Endpoint extends Asset {
   @JsonProperty("endpoint_last_seen")
   private Instant lastSeen;
 
-  @ElementCollection(fetch = FetchType.LAZY)
-  @CollectionTable(name = "macadresses", joinColumns = @JoinColumn(name = "endpoint_id"))
-  @Column(name = "mac_adress")
+  @Type(type = "io.openex.database.converter.PostgreSqlStringArrayType")
+  @Column(name = "endpoint_mac_adresses")
   @JsonProperty("endpoint_mac_adresses")
-  private List<String> macAdresses;
+  private String[] macAdresses;
 
 }

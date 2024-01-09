@@ -66,7 +66,7 @@ public class AssetGroupServiceTest {
     Endpoint endpoint = new Endpoint();
     String name = "Personal PC";
     endpoint.setName(name);
-    endpoint.setIps(List.of("127.0.0.1"));
+    endpoint.setIps(new String[]{"127.0.0.1"});
     endpoint.setHostname("hostname");
     endpoint.setPlatform(LINUX);
     Endpoint endpointCreated = this.assetEndpointService.createEndpoint(endpoint);

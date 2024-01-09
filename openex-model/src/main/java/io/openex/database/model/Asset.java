@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MultiIdDeserializer;
 import lombok.Data;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -14,11 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.Instant.now;
+import static javax.persistence.DiscriminatorType.STRING;
+import static lombok.AccessLevel.NONE;
 
 @Data
 @Entity
 @Table(name = "assets")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name="asset_type", discriminatorType = STRING)
 @EntityListeners(ModelBaseListener.class)
 public class Asset implements Base {
 
@@ -30,9 +34,14 @@ public class Asset implements Base {
   @NotBlank
   private String id;
 
+  @Column(name = "asset_type", insertable = false, updatable = false)
+  @JsonProperty("asset_type")
+  @Setter(NONE)
+  private String type;
+
   @Column(name = "asset_external_id")
   @JsonProperty("asset_external_id")
-  private String externalId;
+  private String externalId; // TODO: Map with k: platform, v: ID
 
   @NotBlank
   @Column(name = "asset_name")

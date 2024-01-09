@@ -18,6 +18,7 @@ public class V2_66__Assets_Asset_Groups extends BaseJavaMigration {
     select.execute("""
         CREATE TABLE IF NOT EXISTS assets (
             asset_id varchar(255) not null constraint assets_pkey primary key,
+            asset_type varchar(255) not null,
             asset_external_id varchar(255),
             asset_name varchar(255) not null,
             asset_description text,
@@ -26,33 +27,13 @@ public class V2_66__Assets_Asset_Groups extends BaseJavaMigration {
         );
         CREATE INDEX IF NOT EXISTS idx_assets on assets (asset_id);
         """);
-    // Create table endpoint
+    // Add column for endpoint type
     select.execute("""
-        CREATE TABLE IF NOT EXISTS endpoints (
-            endpoint_hostname varchar(255),
-            endpoint_platform varchar(255),
-            endpoint_last_seen timestamp
-        ) INHERITS (assets);
-        ALTER TABLE endpoints
-            ADD CONSTRAINT endpoints_pkey PRIMARY KEY (asset_id) ;
-        """);
-    // Create table ips
-    select.execute("""
-        CREATE TABLE IF NOT EXISTS ips (
-            endpoint_id varchar(255) not null,
-            ip varchar(255) not null
-        );
-        ALTER TABLE ips
-            ADD CONSTRAINT fk_ips_on_assets FOREIGN KEY (endpoint_id) REFERENCES endpoints(asset_id) ;
-        """);
-    // Create table mac adresses
-    select.execute("""
-        CREATE TABLE IF NOT EXISTS macadresses (
-            endpoint_id varchar(255) not null,
-            mac_adress varchar(255) not null
-        );
-        ALTER TABLE macadresses
-            ADD CONSTRAINT fk_mac_adresses_on_assets FOREIGN KEY (endpoint_id) REFERENCES endpoints(asset_id) ;
+        ALTER TABLE assets ADD COLUMN endpoint_ips text[];
+        ALTER TABLE assets ADD COLUMN endpoint_hostname varchar(255);
+        ALTER TABLE assets ADD COLUMN endpoint_platform varchar(255);
+        ALTER TABLE assets ADD COLUMN endpoint_last_seen timestamp;
+        ALTER TABLE assets ADD COLUMN endpoint_mac_adresses text[];
         """);
     // Add association table between asset and tag
     select.execute("""
@@ -85,11 +66,11 @@ public class V2_66__Assets_Asset_Groups extends BaseJavaMigration {
         CREATE INDEX idx_asset_groups_tags_asset_group on asset_groups_tags (asset_group_id);
         CREATE INDEX idx_asset_groups_tags_tag on asset_groups_tags (tag_id);
         """);
-      // Add association table between asset and asset groups
-      select.execute("""
+    // Add association table between asset and asset groups
+    select.execute("""
         CREATE TABLE IF NOT EXISTS asset_groups_assets (
             asset_group_id varchar(255) not null constraint asset_group_id_fk references asset_groups on delete cascade,
-            asset_id varchar(255) not null constraint asset_id_fk references endpoints on delete cascade,
+            asset_id varchar(255) not null constraint asset_id_fk references assets on delete cascade,
             constraint asset_groups_assets_pkey primary key (asset_group_id, asset_id)
         );
         CREATE INDEX IF NOT EXISTS idx_asset_groups_assets_asset_group on asset_groups_assets (asset_group_id);
