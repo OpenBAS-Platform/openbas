@@ -3,7 +3,7 @@ package io.openex.rest.asset.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 

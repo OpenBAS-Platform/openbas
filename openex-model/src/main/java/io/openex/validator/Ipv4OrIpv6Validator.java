@@ -3,8 +3,8 @@ package io.openex.validator;
 import io.openex.annotation.Ipv4OrIpv6Constraint;
 import org.apache.commons.validator.routines.InetAddressValidator;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.Arrays;
 import java.util.List;
 

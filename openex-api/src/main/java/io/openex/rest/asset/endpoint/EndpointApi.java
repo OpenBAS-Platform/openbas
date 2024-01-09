@@ -4,12 +4,12 @@ import io.openex.database.model.Endpoint;
 import io.openex.rest.asset.endpoint.form.EndpointInput;
 import io.openex.service.AssetEndpointService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
@@ -23,7 +23,7 @@ public class EndpointApi {
   private final AssetEndpointService assetEndpointService;
 
   @PostMapping(ENDPOINT_URI)
-  @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(input);
@@ -38,7 +38,7 @@ public class EndpointApi {
   }
 
   @PutMapping(ENDPOINT_URI + "/{endpointId}")
-  @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
   public Endpoint updateEndpoint(
       @PathVariable @NotBlank final String endpointId,
       @Valid @RequestBody final EndpointInput input) {
@@ -49,7 +49,7 @@ public class EndpointApi {
   }
 
   @DeleteMapping(ENDPOINT_URI + "/{endpointId}")
-  @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
   public void deleteEndpoint(@PathVariable @NotBlank final String endpointId) {
     this.assetEndpointService.deleteEndpoint(endpointId);
   }

@@ -34,7 +34,7 @@ public class Execution {
     @Setter
     @Getter
     @JsonProperty("execution_async_ids")
-    @Type(type = "io.openex.database.converter.PostgreSqlStringArrayType")
+    @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
     private String[] asyncIds;
 
     @Getter

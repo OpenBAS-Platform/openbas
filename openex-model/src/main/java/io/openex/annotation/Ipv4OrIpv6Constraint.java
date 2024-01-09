@@ -2,9 +2,9 @@ package io.openex.annotation;
 
 import io.openex.validator.Ipv4OrIpv6Validator;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
-import javax.validation.ReportAsSingleViolation;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+import jakarta.validation.ReportAsSingleViolation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 

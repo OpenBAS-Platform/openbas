@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.Instant;
 
 @EqualsAndHashCode(callSuper = true)
@@ -24,7 +24,7 @@ public class Endpoint extends Asset {
   }
 
   @Ipv4OrIpv6Constraint
-  @Type(type = "io.openex.database.converter.PostgreSqlStringArrayType")
+  @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
   @Column(name = "endpoint_ips")
   @JsonProperty("endpoint_ips")
   private String[] ips;
@@ -42,7 +42,7 @@ public class Endpoint extends Asset {
   @JsonProperty("endpoint_last_seen")
   private Instant lastSeen;
 
-  @Type(type = "io.openex.database.converter.PostgreSqlStringArrayType")
+  @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
   @Column(name = "endpoint_mac_adresses")
   @JsonProperty("endpoint_mac_adresses")
   private String[] macAdresses;

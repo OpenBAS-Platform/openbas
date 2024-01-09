@@ -33,7 +33,7 @@ public class InjectStatus implements Base {
 
   @Column(name = "status_async_ids")
   @JsonProperty("status_async_ids")
-  @Type(type = "io.openex.database.converter.PostgreSqlStringArrayType")
+  @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
   private String[] asyncIds;
 
   @Column(name = "status_reporting")

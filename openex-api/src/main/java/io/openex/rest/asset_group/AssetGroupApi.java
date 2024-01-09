@@ -4,12 +4,12 @@ import io.openex.database.model.AssetGroup;
 import io.openex.rest.asset_group.form.AssetGroupInput;
 import io.openex.service.AssetGroupService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
@@ -23,7 +23,7 @@ public class AssetGroupApi {
   private final AssetGroupService assetGroupService;
 
   @PostMapping(ASSET_GROUP_URI)
-  @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
   public AssetGroup createAssetGroup(@Valid @RequestBody final AssetGroupInput input) {
     AssetGroup assetGroup = new AssetGroup();
     assetGroup.setUpdateAttributes(input);
@@ -37,7 +37,7 @@ public class AssetGroupApi {
   }
 
   @PutMapping(ASSET_GROUP_URI + "/{assetGroupId}")
-  @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
   public AssetGroup updateAssetGroup(
       @PathVariable @NotBlank final String assetGroupId,
       @Valid @RequestBody final AssetGroupInput input) {
@@ -47,7 +47,7 @@ public class AssetGroupApi {
   }
 
   @DeleteMapping(ASSET_GROUP_URI + "/{assetGroupId}")
-  @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
   public void deleteAssetGroup(@PathVariable @NotBlank final String assetGroupId) {
     this.assetGroupService.deleteAssetGroup(assetGroupId);
   }

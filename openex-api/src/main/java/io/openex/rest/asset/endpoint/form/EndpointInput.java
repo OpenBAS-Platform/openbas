@@ -6,7 +6,7 @@ import io.openex.rest.asset.form.AssetInput;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 import java.time.Instant;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;

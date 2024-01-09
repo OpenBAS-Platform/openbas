@@ -5,10 +5,11 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MultiIdDeserializer;
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import org.hibernate.annotations.UuidGenerator;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ public class AssetGroup implements Base {
   @Id
   @Column(name = "asset_group_id")
   @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+  @UuidGenerator
   @JsonProperty("asset_group_id")
   private String id;
 
