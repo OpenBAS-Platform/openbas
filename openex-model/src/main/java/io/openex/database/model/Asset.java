@@ -2,20 +2,25 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.hypersistence.utils.hibernate.type.basic.PostgreSQLHStoreType;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MultiIdDeserializer;
 import lombok.Data;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UuidGenerator;
+
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.time.Instant.now;
-import static javax.persistence.DiscriminatorType.STRING;
+import static jakarta.persistence.DiscriminatorType.STRING;
 import static lombok.AccessLevel.NONE;
 
 @Data
@@ -29,7 +34,7 @@ public class Asset implements Base {
   @Id
   @Column(name = "asset_id")
   @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+  @UuidGenerator
   @JsonProperty("asset_id")
   @NotBlank
   private String id;
@@ -39,9 +44,10 @@ public class Asset implements Base {
   @Setter(NONE)
   private String type;
 
-  @Column(name = "asset_external_id")
-  @JsonProperty("asset_external_id")
-  private String externalId; // TODO: Map with k: platform, v: ID
+  @Column(name = "asset_sources")
+  @JsonProperty("asset_sources")
+  @Type(PostgreSQLHStoreType.class)
+  private Map<String, String> sources = new HashMap<>();
 
   @NotBlank
   @Column(name = "asset_name")

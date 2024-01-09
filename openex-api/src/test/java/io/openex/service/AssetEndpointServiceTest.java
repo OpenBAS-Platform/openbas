@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.TransactionSystemException;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -59,6 +60,10 @@ public class AssetEndpointServiceTest {
     endpoint.setPlatform(LINUX);
     endpoint.setHostname("hostname");
     endpoint.setPlatform(LINUX);
+    endpoint.setSources(new HashMap<>(){{
+      put("Manual", "manual");
+      put("Caldera", "caldera-id");
+    }});
 
     // -- EXECUTE --
     Endpoint endpointCreated = this.assetEndpointService.createEndpoint(endpoint);

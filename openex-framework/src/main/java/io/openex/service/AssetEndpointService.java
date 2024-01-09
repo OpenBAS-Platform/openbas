@@ -31,8 +31,10 @@ public class AssetEndpointService {
     return this.endpointRepository.findById(endpointId).orElseThrow();
   }
 
-  public Optional<Endpoint> endpointFromExternalId(@NotBlank final String externalId) {
-    return this.endpointRepository.findByExternalId(externalId);
+  public Optional<Endpoint> findBySource(
+      @NotBlank final String sourceKey,
+      @NotBlank final String sourceValue) {
+    return this.endpointRepository.findBySource(sourceKey, sourceValue);
   }
 
   public List<Endpoint> endpoints() {

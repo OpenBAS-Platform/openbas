@@ -14,12 +14,16 @@ public class V2_68__Assets_Asset_Groups extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
+    // Add extension
+    select.execute("""
+        CREATE EXTENSION IF NOT EXISTS hstore;
+        """);
     // Create table asset
     select.execute("""
         CREATE TABLE IF NOT EXISTS assets (
             asset_id varchar(255) not null constraint assets_pkey primary key,
             asset_type varchar(255) not null,
-            asset_external_id varchar(255),
+            asset_sources hstore,
             asset_name varchar(255) not null,
             asset_description text,
             asset_created_at timestamp not null default now(),
