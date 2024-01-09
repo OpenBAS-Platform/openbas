@@ -4,9 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.audit.ModelBaseListener;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+import org.hibernate.annotations.UuidGenerator;
+
 import java.time.Instant;
 import java.util.Objects;
 
@@ -21,7 +22,7 @@ public class KillChainPhase implements Base {
     @Id
     @Column(name = "phase_id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @UuidGenerator
     @JsonProperty("phase_id")
     private String id;
 
