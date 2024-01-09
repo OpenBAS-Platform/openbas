@@ -8,7 +8,7 @@ RUN yarn install
 COPY openex-front /opt/openex-build/openex-front
 RUN yarn build
 
-FROM maven:3.8.7-openjdk-18 AS api-builder
+FROM maven:3.9.6-eclipse-temurin-21 AS api-builder
 
 WORKDIR /opt/openex-build/openex
 COPY openex-model ./openex-model
@@ -20,7 +20,7 @@ COPY pom.xml ./pom.xml
 COPY --from=front-builder /opt/openex-build/openex-front/builder/prod/build ./openex-front/builder/prod/build
 RUN mvn install -DskipTests -Pdev
 
-FROM openjdk:18-slim AS app
+FROM eclipse-temurin:21-jre AS app
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y tini;
 COPY --from=api-builder /opt/openex-build/openex/openex-api/target/openex-api.jar ./

@@ -10,11 +10,10 @@ import io.openex.database.specification.LessonsTemplateCategorySpecification;
 import io.openex.database.specification.LessonsTemplateQuestionSpecification;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.lessons_template.form.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.security.RolesAllowed;
-import javax.validation.Valid;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.helper.StreamHelper.fromIterable;
@@ -47,7 +46,7 @@ public class LessonsTemplateApi extends RestBehavior {
         return fromIterable(lessonsTemplateRepository.findAll()).stream().toList();
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PostMapping("/api/lessons_templates")
     public LessonsTemplate createLessonsTemplate(@Valid @RequestBody LessonsTemplateCreateInput input) {
         LessonsTemplate lessonsTemplate = new LessonsTemplate();
@@ -55,7 +54,7 @@ public class LessonsTemplateApi extends RestBehavior {
         return lessonsTemplateRepository.save(lessonsTemplate);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PutMapping("/api/lessons_templates/{lessonsTemplateId}")
     public LessonsTemplate updateLessonsTemplate(@PathVariable String lessonsTemplateId,
                                                  @Valid @RequestBody LessonsTemplateUpdateInput input) {
@@ -65,7 +64,7 @@ public class LessonsTemplateApi extends RestBehavior {
         return lessonsTemplateRepository.save(lessonsTemplate);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @DeleteMapping("/api/lessons_templates/{lessonsTemplateId}")
     public void deleteLessonsTemplate(@PathVariable String lessonsTemplateId) {
         lessonsTemplateRepository.deleteById(lessonsTemplateId);
@@ -76,7 +75,7 @@ public class LessonsTemplateApi extends RestBehavior {
         return lessonsTemplateCategoryRepository.findAll(LessonsTemplateCategorySpecification.fromTemplate(lessonsTemplateId));
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PostMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories")
     public LessonsTemplateCategory createLessonsTemplateCategory(@PathVariable String lessonsTemplateId, @Valid @RequestBody LessonsTemplateCategoryCreateInput input) {
         LessonsTemplate lessonsTemplate = lessonsTemplateRepository.findById(lessonsTemplateId).orElseThrow();
@@ -86,7 +85,7 @@ public class LessonsTemplateApi extends RestBehavior {
         return lessonsTemplateCategoryRepository.save(lessonsTemplateCategory);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PutMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories/{lessonsTemplateCategoryId}")
     public LessonsTemplateCategory updateLessonsTemplateCategory(@PathVariable String lessonsTemplateCategoryId, @Valid @RequestBody LessonsTemplateCategoryUpdateInput input) {
         LessonsTemplateCategory lessonsTemplateCategory = lessonsTemplateCategoryRepository.findById(lessonsTemplateCategoryId).orElseThrow();
@@ -95,7 +94,7 @@ public class LessonsTemplateApi extends RestBehavior {
         return lessonsTemplateCategoryRepository.save(lessonsTemplateCategory);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @DeleteMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories/{lessonsTemplateCategoryId}")
     public void deleteLessonsTemplateCategory(@PathVariable String lessonsTemplateCategoryId) {
         lessonsTemplateCategoryRepository.deleteById(lessonsTemplateCategoryId);
@@ -112,7 +111,7 @@ public class LessonsTemplateApi extends RestBehavior {
         return lessonsTemplateQuestionRepository.findAll(LessonsTemplateQuestionSpecification.fromCategory(lessonsTemplateCategoryId));
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PostMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories/{lessonsTemplateCategoryId}/lessons_template_questions")
     public LessonsTemplateQuestion createLessonsTemplateQuestion(@PathVariable String lessonsTemplateCategoryId, @Valid @RequestBody LessonsTemplateQuestionCreateInput input) {
         LessonsTemplateCategory lessonsTemplateCategory = lessonsTemplateCategoryRepository.findById(lessonsTemplateCategoryId).orElseThrow();
@@ -122,7 +121,7 @@ public class LessonsTemplateApi extends RestBehavior {
         return lessonsTemplateQuestionRepository.save(lessonsTemplateQuestion);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PutMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories/{lessonsTemplateCategoryId}/lessons_template_questions/{lessonsTemplateQuestionId}")
     public LessonsTemplateQuestion updateLessonsTemplateQuestion(@PathVariable String lessonsTemplateQuestionId, @Valid @RequestBody LessonsTemplateQuestionUpdateInput input) {
         LessonsTemplateQuestion lessonsTemplateQuestion = lessonsTemplateQuestionRepository.findById(lessonsTemplateQuestionId).orElseThrow();
@@ -131,7 +130,7 @@ public class LessonsTemplateApi extends RestBehavior {
         return lessonsTemplateQuestionRepository.save(lessonsTemplateQuestion);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @DeleteMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories/{lessonsTemplateCategoryId}/lessons_template_questions/{lessonsTemplateQuestionId}")
     public void deleteLessonsTemplateQuestion(@PathVariable String lessonsTemplateQuestionId) {
         lessonsTemplateQuestionRepository.deleteById(lessonsTemplateQuestionId);

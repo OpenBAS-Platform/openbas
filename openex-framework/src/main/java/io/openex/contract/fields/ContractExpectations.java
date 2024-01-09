@@ -4,9 +4,9 @@ import io.openex.contract.ContractType;
 import io.openex.model.inject.form.Expectation;
 import lombok.Getter;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 import static io.openex.contract.ContractCardinality.Multiple;

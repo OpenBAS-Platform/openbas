@@ -14,16 +14,16 @@ import io.openex.rest.user.form.user.CreateUserInput;
 import io.openex.rest.user.form.user.UpdateUserInput;
 import io.openex.service.MailingService;
 import io.openex.service.UserService;
+import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.annotation.security.RolesAllowed;
-import javax.transaction.Transactional;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -129,13 +129,13 @@ public class UserApi extends RestBehavior {
         return resetTokenMap.get(token) != null;
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @GetMapping("/api/users")
     public Iterable<User> users() {
         return userRepository.findAll();
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PutMapping("/api/users/{userId}/password")
     public User changePassword(@PathVariable String userId,
                                @Valid @RequestBody ChangePasswordInput input) {
@@ -145,13 +145,13 @@ public class UserApi extends RestBehavior {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PostMapping("/api/users")
     public User createUser(@Valid @RequestBody CreateUserInput input) {
         return userService.createUser(input, 1);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PutMapping("/api/users/{userId}")
     public User updateUser(@PathVariable String userId, @Valid @RequestBody UpdateUserInput input) {
         User user = userRepository.findById(userId).orElseThrow();
@@ -163,7 +163,7 @@ public class UserApi extends RestBehavior {
         return savedUser;
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @DeleteMapping("/api/users/{userId}")
     public void deleteUser(@PathVariable String userId) {
         sessionManager.invalidateUserSession(userId);

@@ -16,9 +16,9 @@ import io.openex.service.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.activation.MimetypesFileTypeMap;
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
+import jakarta.activation.MimetypesFileTypeMap;
+import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -238,7 +238,7 @@ public class V1_DataImporter implements Importer {
             String injectDependsOn = jsonNode.get("inject_depends_on").asText();
             return injected.contains(injectDependsOn);
         }).toList();
-        if (childInjects.size() > 0) {
+        if (!childInjects.isEmpty()) {
             importInjects(baseIds, exercise, childInjects);
         }
     }

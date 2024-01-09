@@ -1,32 +1,30 @@
 package io.openex.rest.team;
 
 import io.openex.config.OpenexPrincipal;
-import io.openex.database.model.*;
+import io.openex.database.model.Organization;
+import io.openex.database.model.Team;
+import io.openex.database.model.User;
 import io.openex.database.repository.*;
+import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.team.form.TeamCreateInput;
-import io.openex.rest.team.form.TeamUpdateActivationInput;
 import io.openex.rest.team.form.TeamUpdateInput;
 import io.openex.rest.team.form.UpdateUsersTeamInput;
-import io.openex.rest.helper.RestBehavior;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
-import javax.validation.Valid;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import static io.openex.config.SessionHelper.currentUser;
 import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.helper.DatabaseHelper.updateRelation;
 import static io.openex.helper.StreamHelper.fromIterable;
-import static java.time.Instant.from;
 import static java.time.Instant.now;
 
 @RestController
-@RolesAllowed(ROLE_USER)
+@Secured(ROLE_USER)
 public class TeamApi extends RestBehavior {
     private ExerciseRepository exerciseRepository;
     private TeamRepository teamRepository;

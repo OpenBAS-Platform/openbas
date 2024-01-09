@@ -5,16 +5,16 @@ import io.openex.database.repository.AttackPatternRepository;
 import io.openex.rest.attack_pattern.form.AttackPatternCreateInput;
 import io.openex.rest.helper.RestBehavior;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.database.model.User.ROLE_USER;
 
 @RestController
-@RolesAllowed(ROLE_USER)
+@Secured(ROLE_USER)
 public class AttackPatternApi extends RestBehavior {
 
     private AttackPatternRepository attackPatternRepository;
@@ -34,7 +34,7 @@ public class AttackPatternApi extends RestBehavior {
         return attackPatternRepository.findById(attackPatternId).orElseThrow();
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PostMapping("/api/attack_patterns")
     public AttackPattern createAttackPattern(@Valid @RequestBody AttackPatternCreateInput input) {
         AttackPattern attackPattern = new AttackPattern();
@@ -43,7 +43,7 @@ public class AttackPatternApi extends RestBehavior {
         return attackPatternRepository.save(attackPattern);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @DeleteMapping("/api/attack_patterns/{attackPatternId}")
     public void deleteAttackPattern(@PathVariable String attackPatternId) {
         attackPatternRepository.deleteById(attackPatternId);

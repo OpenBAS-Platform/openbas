@@ -1,7 +1,7 @@
 package io.openex.database.repository;
 
 import io.openex.database.model.Token;
-import io.openex.database.model.User;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -9,7 +9,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -29,7 +28,7 @@ public interface TokenRepository extends CrudRepository<Token, String>, JpaSpeci
       + "values (:id, :user, :value, :createdAt)", nativeQuery = true)
   void createToken(
       @Param("id") String tokenId,
-      @Param("user") User adminUser,
+      @Param("user") String adminUser,
       @Param("value") String tokenValue,
       @Param("createdAt") Instant createdAt
   );

@@ -5,11 +5,10 @@ import io.openex.database.repository.TagRepository;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.tag.form.TagCreateInput;
 import io.openex.rest.tag.form.TagUpdateInput;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.security.RolesAllowed;
-import javax.validation.Valid;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
 
@@ -28,7 +27,7 @@ public class TagApi extends RestBehavior {
         return tagRepository.findAll();
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PutMapping("/api/tags/{tagId}")
     public Tag updateTag(@PathVariable String tagId,
                          @Valid @RequestBody TagUpdateInput input) {
@@ -37,7 +36,7 @@ public class TagApi extends RestBehavior {
         return tagRepository.save(tag);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @PostMapping("/api/tags")
     public Tag createTag(@Valid @RequestBody TagCreateInput input) {
         Tag tag = new Tag();
@@ -45,7 +44,7 @@ public class TagApi extends RestBehavior {
         return tagRepository.save(tag);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @Secured(ROLE_ADMIN)
     @DeleteMapping("/api/tags/{tagId}")
     public void deleteTag(@PathVariable String tagId) {
         tagRepository.deleteById(tagId);

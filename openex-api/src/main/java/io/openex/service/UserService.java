@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,7 +32,7 @@ import static java.time.Instant.now;
 @Service
 public class UserService {
 
-  private final Argon2PasswordEncoder passwordEncoder = new Argon2PasswordEncoder();
+  private final Argon2PasswordEncoder passwordEncoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
   private UserRepository userRepository;
   private TokenRepository tokenRepository;
   private TagRepository tagRepository;

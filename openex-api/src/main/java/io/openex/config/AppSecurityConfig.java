@@ -11,14 +11,17 @@ import io.openex.security.SsoRefererAuthenticationFailureHandler;
 import io.openex.security.SsoRefererAuthenticationSuccessHandler;
 import io.openex.security.TokenAuthenticationFilter;
 import io.openex.service.UserService;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -38,14 +41,13 @@ import org.springframework.security.saml2.provider.service.authentication.Saml2A
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticationException;
 import org.springframework.security.saml2.provider.service.metadata.OpenSamlMetadataResolver;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
-import org.springframework.security.saml2.provider.service.servlet.filter.Saml2WebSsoAuthenticationFilter;
 import org.springframework.security.saml2.provider.service.web.DefaultRelyingPartyRegistrationResolver;
-import org.springframework.security.saml2.provider.service.web.RelyingPartyRegistrationResolver;
 import org.springframework.security.saml2.provider.service.web.Saml2MetadataFilter;
+import org.springframework.security.saml2.provider.service.web.authentication.Saml2WebSsoAuthenticationFilter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -61,8 +63,9 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.util.StringUtils.hasLength;
 
+@Configuration
 @EnableWebSecurity
-public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
+public class AppSecurityConfig {
 
   private static final Logger LOGGER = Logger.getLogger(AppSecurityConfig.class.getName());
 
@@ -97,54 +100,59 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
   @Autowired(required = false)
   private RelyingPartyRegistrationRepository relyingPartyRegistrationRepository;
 
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-        .requestCache()
-        /**/.requestCache(new HttpSessionRequestCache())
-        .and()
-        .csrf()
-        /**/.disable()
-        .formLogin()
-        /**/.disable()
-        .authorizeRequests()
-        /**/.antMatchers("/api/comcheck/**").permitAll()
-        /**/.antMatchers("/api/player/**").permitAll()
-        /**/.antMatchers("/api/settings").permitAll()
-        /**/.antMatchers("/api/login").permitAll()
-        /**/.antMatchers("/api/reset/**").permitAll()
-        /**/.antMatchers("/api/**").authenticated()
-        .and()
-        .logout()
-        /**/.invalidateHttpSession(true)
-        /**/.deleteCookies("JSESSIONID", openExConfig.getCookieName())
-        /**/.logoutSuccessUrl(env.getProperty("openex.logout-success-url", String.class, "/"));
+        .requestCache(Customizer.withDefaults())
+        /**/.requestCache((cache) -> cache.requestCache(new HttpSessionRequestCache()))
+        .csrf(AbstractHttpConfigurer::disable)
+        .formLogin(AbstractHttpConfigurer::disable)
+        .securityContext((securityContext) -> securityContext.requireExplicitSave(false))
+        .authorizeHttpRequests(
+            rq -> rq.requestMatchers("/api/comcheck/**").permitAll()
+                .requestMatchers("/api/player/**").permitAll()
+                .requestMatchers("/api/settings").permitAll()
+                .requestMatchers("/api/login").permitAll()
+                .requestMatchers("/api/reset/**").permitAll()
+                .requestMatchers("/api/**").authenticated()
+        )
+        .logout(
+            logout -> logout.invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID", openExConfig.getCookieName())
+                .logoutSuccessUrl(env.getProperty("openex.logout-success-url", String.class, "/"))
+        );
 
     if (openExConfig.isAuthOpenidEnable()) {
-      http.oauth2Login()
-          .successHandler(new SsoRefererAuthenticationSuccessHandler())
-          .failureHandler(new SsoRefererAuthenticationFailureHandler());
+      http.oauth2Login(
+          login -> login.successHandler(new SsoRefererAuthenticationSuccessHandler())
+              .failureHandler(new SsoRefererAuthenticationFailureHandler())
+      );
     }
 
     if (openExConfig.isAuthSaml2Enable()) {
       DefaultRelyingPartyRegistrationResolver relyingPartyRegistrationResolver = new DefaultRelyingPartyRegistrationResolver(
           this.relyingPartyRegistrationRepository);
       Saml2MetadataFilter filter = new Saml2MetadataFilter(
-          (RelyingPartyRegistrationResolver) relyingPartyRegistrationResolver,
+          relyingPartyRegistrationResolver,
           new OpenSamlMetadataResolver());
 
       OpenSaml4AuthenticationProvider authenticationProvider = getOpenSaml4AuthenticationProvider();
 
-      http
-          .addFilterBefore(filter, Saml2WebSsoAuthenticationFilter.class)
-          .saml2Login()
-          .authenticationManager(new ProviderManager(authenticationProvider))
-          .successHandler(new SsoRefererAuthenticationSuccessHandler());
+      http.addFilterBefore(filter, Saml2WebSsoAuthenticationFilter.class)
+          .saml2Login(
+              saml2Login -> saml2Login
+                  .authenticationManager(new ProviderManager(authenticationProvider))
+                  .successHandler(new SsoRefererAuthenticationSuccessHandler())
+          );
     }
 
     // Rewrite 403 code to 401
-    http.exceptionHandling().authenticationEntryPoint(
-        (request, response, authException) -> response.setStatus(HttpStatus.UNAUTHORIZED.value()));
+    http.exceptionHandling(
+        exceptionHandling -> exceptionHandling.authenticationEntryPoint(
+            (request, response, authException) -> response.setStatus(HttpStatus.UNAUTHORIZED.value()))
+    );
+
+    return http.build();
   }
 
   @Bean
@@ -157,6 +165,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     });
     if (accessToken != null) {
       String rolesPathConfig = "openex.provider." + registrationId + ".roles_path";
+      //noinspection unchecked
       List<String> rolesPath = env.getProperty(rolesPathConfig, List.class, new ArrayList<String>());
       try {
         String[] chunks = accessToken.getTokenValue().split("\\.");
@@ -182,12 +191,14 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
   private List<String> extractRolesFromUser(Saml2AuthenticatedPrincipal user, String registrationId) {
     String rolesPathConfig = "openex.provider." + registrationId + ".roles_path";
+    //noinspection unchecked
     List<String> rolesPath = env.getProperty(rolesPathConfig, List.class, new ArrayList<String>());
     try {
       return rolesPath.stream()
           .flatMap(path -> {
             try {
               List<String> roles = user.getAttribute(path);
+              assert roles != null;
               return roles.stream();
             } catch (NullPointerException e) {
               return Stream.empty();
@@ -207,6 +218,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
       String lastName) {
     String email = ofNullable(emailAttribute).orElseThrow();
     String rolesAdminConfig = "openex.provider." + registrationId + ".roles_admin";
+    //noinspection unchecked
     List<String> rolesAdmin = this.env.getProperty(rolesAdminConfig, List.class, new ArrayList<String>());
     boolean isAdmin = rolesAdmin.stream().anyMatch(rolesFromToken::contains);
     if (hasLength(email)) {

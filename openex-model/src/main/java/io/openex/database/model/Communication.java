@@ -6,10 +6,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ public class Communication implements Base {
     @Id
     @Column(name = "communication_id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @UuidGenerator
     @JsonProperty("communication_id")
     private String id;
 
@@ -53,7 +53,7 @@ public class Communication implements Base {
     @JsonProperty("communication_content_html")
     private String contentHtml;
 
-    @Type(type = "io.openex.database.converter.PostgreSqlStringArrayType")
+    @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
     @Column(name = "communication_attachments", columnDefinition = "text[]")
     @JsonProperty("communication_attachments")
     private String[] attachments;

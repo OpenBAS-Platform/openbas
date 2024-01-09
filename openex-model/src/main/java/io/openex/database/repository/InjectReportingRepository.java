@@ -1,7 +1,7 @@
 package io.openex.database.repository;
 
 import io.openex.database.model.InjectStatus;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

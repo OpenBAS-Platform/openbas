@@ -9,19 +9,19 @@ import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.settings.form.SettingsUpdateInput;
 import io.openex.rest.settings.response.OAuthProvider;
 import io.openex.rest.settings.response.PlatformSetting;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
-import javax.annotation.security.RolesAllowed;
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -158,7 +158,7 @@ public class SettingsApi extends RestBehavior {
     return settings;
   }
 
-  @RolesAllowed(ROLE_ADMIN)
+  @Secured(ROLE_ADMIN)
   @PutMapping("/api/settings")
   public List<PlatformSetting> updateSettings(@Valid @RequestBody SettingsUpdateInput input) {
     Map<String, Setting> dbSettings = mapOfSettings();

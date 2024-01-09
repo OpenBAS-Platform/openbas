@@ -2,7 +2,7 @@ package io.openex.rest.exercise.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.FutureOrPresent;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 

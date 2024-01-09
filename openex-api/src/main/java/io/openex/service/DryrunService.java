@@ -10,7 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.List;
 
 import static java.time.Instant.now;
@@ -59,7 +59,7 @@ public class DryrunService {
     public Dryrun provisionDryrun(Exercise exercise, List<User> users, String name) {
         Specification<Inject> injectFilters = InjectSpecification.forDryrun(exercise.getId());
         List<Inject> injects = injectRepository.findAll(injectFilters);
-        Assert.isTrue(injects.size() > 0, "Cant create dryrun without injects");
+        Assert.isTrue(!injects.isEmpty(), "Cant create dryrun without injects");
         Dryrun dryrun = createDryRun(exercise, users, name);
         List<? extends DryInject> dryInjects = toDryInjects(injects, dryrun);
         dryInjectRepository.saveAll(dryInjects);

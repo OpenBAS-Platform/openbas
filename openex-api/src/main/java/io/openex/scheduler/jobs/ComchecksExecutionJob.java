@@ -22,9 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import javax.transaction.Transactional;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -136,7 +136,7 @@ public class ComchecksExecutionJob implements Job {
                 List<ComcheckStatus> statusToUpdate = comcheckStatuses.stream()
                         .filter(comcheckStatus -> usersSuccessfullyNotified.contains(comcheckStatus.getUser().getId()))
                         .toList();
-                if (statusToUpdate.size() > 0) {
+                if (!statusToUpdate.isEmpty()) {
                     comcheckStatusRepository.saveAll(statusToUpdate.stream()
                             .peek(comcheckStatus -> comcheckStatus.setLastSent(now))
                             .toList());

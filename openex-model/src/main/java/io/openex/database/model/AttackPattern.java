@@ -2,16 +2,15 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.hypersistence.utils.hibernate.type.array.ListArrayType;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UuidGenerator;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,7 @@ public class AttackPattern implements Base {
     @Id
     @Column(name = "attack_pattern_id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @UuidGenerator
     @JsonProperty("attack_pattern_id")
     @NotBlank
     private String id;
@@ -57,18 +56,14 @@ public class AttackPattern implements Base {
 
     @Getter
     @Setter
-    @Type(type = "list-array")
-    // @Type(ListArrayType.class)
-    // TODO: For migration to Hibernate 6
+    @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
     @Column(name = "attack_pattern_platforms", columnDefinition = "text[]")
     @JsonProperty("attack_pattern_platforms")
     private List<String> platforms = new ArrayList<>();
 
     @Getter
     @Setter
-    @Type(type = "list-array")
-    // @Type(ListArrayType.class)
-    // TODO: For migration to Hibernate 6
+    @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
     @Column(name = "attack_pattern_permissions_required")
     @JsonProperty("attack_pattern_permissions_required")
     private ArrayList<String> permissionsRequired = new ArrayList<>();

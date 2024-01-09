@@ -1,6 +1,7 @@
 package io.openex.database.model;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;

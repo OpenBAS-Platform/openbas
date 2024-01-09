@@ -13,15 +13,15 @@ import io.openex.rest.user.form.me.UpdateProfileInput;
 import io.openex.rest.user.form.user.RenewTokenInput;
 import io.openex.rest.user.form.user.UpdateUserInfoInput;
 import io.openex.service.UserService;
+import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.annotation.security.RolesAllowed;
-import javax.transaction.Transactional;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,19 +61,19 @@ public class MeApi extends RestBehavior {
     this.tokenRepository = tokenRepository;
   }
 
-  @RolesAllowed(ROLE_USER)
+  @Secured(ROLE_USER)
   @GetMapping("/api/logout")
   public ResponseEntity<Object> logout() {
     return ResponseEntity.ok().build();
   }
 
-  @RolesAllowed(ROLE_USER)
+  @Secured(ROLE_USER)
   @GetMapping("/api/me")
   public User me() {
     return userRepository.findById(currentUser().getId()).orElseThrow();
   }
 
-  @RolesAllowed(ROLE_USER)
+  @Secured(ROLE_USER)
   @PutMapping("/api/me/profile")
   public User updateProfile(@Valid @RequestBody UpdateProfileInput input) {
     User user = userRepository.findById(currentUser().getId()).orElseThrow();
@@ -84,7 +84,7 @@ public class MeApi extends RestBehavior {
     return savedUser;
   }
 
-  @RolesAllowed(ROLE_USER)
+  @Secured(ROLE_USER)
   @PutMapping("/api/me/information")
   public User updateInformation(@Valid @RequestBody UpdateUserInfoInput input) {
     User user = userRepository.findById(currentUser().getId()).orElseThrow();
@@ -94,7 +94,7 @@ public class MeApi extends RestBehavior {
     return savedUser;
   }
 
-  @RolesAllowed(ROLE_USER)
+  @Secured(ROLE_USER)
   @PutMapping("/api/me/password")
   public User updatePassword(@Valid @RequestBody UpdateMePasswordInput input) throws InputValidationException {
     User user = userRepository.findById(currentUser().getId()).orElseThrow();
@@ -106,7 +106,7 @@ public class MeApi extends RestBehavior {
     }
   }
 
-  @RolesAllowed(ROLE_USER)
+  @Secured(ROLE_USER)
   @PostMapping("/api/me/token/refresh")
   @Transactional(rollbackOn = Exception.class)
   public Token renewToken(@Valid @RequestBody RenewTokenInput input) throws InputValidationException {
@@ -119,7 +119,7 @@ public class MeApi extends RestBehavior {
     return tokenRepository.save(token);
   }
 
-  @RolesAllowed(ROLE_USER)
+  @Secured(ROLE_USER)
   @GetMapping("/api/me/tokens")
   public List<Token> tokens() {
     return tokenRepository.findAll(fromUser(currentUser().getId()));

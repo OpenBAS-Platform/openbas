@@ -2,29 +2,28 @@ package io.openex.helper;
 
 import io.openex.contract.Contract;
 import io.openex.database.model.*;
-import io.openex.database.repository.TeamRepository;
 import io.openex.database.repository.DryInjectRepository;
 import io.openex.database.repository.InjectRepository;
+import io.openex.database.repository.TeamRepository;
 import io.openex.database.specification.DryInjectSpecification;
 import io.openex.database.specification.InjectSpecification;
 import io.openex.execution.ExecutableInject;
 import io.openex.execution.ExecutionContext;
 import io.openex.service.ContractService;
 import io.openex.service.ExecutionContextService;
+import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
-import javax.transaction.Transactional;
-import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.openex.helper.StreamHelper.fromIterable;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Stream.concat;
 

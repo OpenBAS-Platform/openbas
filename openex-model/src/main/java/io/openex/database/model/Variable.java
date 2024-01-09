@@ -5,12 +5,12 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import java.time.Instant;
 
 import static java.time.Instant.now;
@@ -32,7 +32,7 @@ public class Variable implements Base {
   @Id
   @Column(name = "variable_id")
   @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+  @UuidGenerator
   @JsonProperty("variable_id")
   @NotBlank
   private String id;
@@ -52,6 +52,7 @@ public class Variable implements Base {
   private String description;
 
   @Column(name = "variable_type")
+  @Enumerated(EnumType.STRING)
   @JsonProperty("variable_type")
   @NotNull
   private VariableType type = VariableType.String;

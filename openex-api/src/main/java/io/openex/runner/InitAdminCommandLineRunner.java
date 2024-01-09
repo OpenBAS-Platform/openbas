@@ -59,7 +59,7 @@ public class InitAdminCommandLineRunner implements CommandLineRunner {
   // -- USER --
 
   private String encodedPassword() {
-    Argon2PasswordEncoder passwordEncoder = new Argon2PasswordEncoder();
+    Argon2PasswordEncoder passwordEncoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
     return passwordEncoder.encode(this.adminPassword);
   }
 
@@ -103,7 +103,7 @@ public class InitAdminCommandLineRunner implements CommandLineRunner {
       throw new IllegalArgumentException("Config properties 'openex.admin.token' should be a valid UUID");
     }
 
-    this.tokenRepository.createToken(ADMIN_TOKEN_UUID, user, this.adminToken, Instant.now());
+    this.tokenRepository.createToken(ADMIN_TOKEN_UUID, user.getId(), this.adminToken, Instant.now());
   }
 
   private void updateToken(@NotNull final Token token) {

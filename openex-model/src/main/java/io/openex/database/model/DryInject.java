@@ -6,9 +6,9 @@ import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.Objects;
@@ -21,14 +21,14 @@ import static java.util.Optional.of;
 @EntityListeners(ModelBaseListener.class)
 public class DryInject implements Base, Injection {
 
-  public static Comparator<DryInject> executionComparator = Comparator.comparing(o -> o.getDate().orElseThrow());
+  public static final Comparator<DryInject> executionComparator = Comparator.comparing(o -> o.getDate().orElseThrow());
 
   @Getter
   @Setter
   @Id
   @Column(name = "dryinject_id")
   @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+  @UuidGenerator
   @JsonProperty("dryinject_id")
   private String id;
 
