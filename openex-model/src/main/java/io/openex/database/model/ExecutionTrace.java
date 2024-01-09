@@ -2,12 +2,15 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Getter
 public class ExecutionTrace {
 
     @JsonProperty("trace_identifier")
@@ -16,12 +19,15 @@ public class ExecutionTrace {
     @JsonProperty("trace_users")
     private List<String> userIds = new ArrayList<>();
 
+    @Setter
     @JsonProperty("trace_message")
     private String message;
 
+    @Setter
     @JsonProperty("trace_status")
     private ExecutionStatus status;
 
+    @Setter
     @JsonProperty("trace_time")
     private Instant traceTime;
 
@@ -60,38 +66,6 @@ public class ExecutionTrace {
 
     public static ExecutionTrace traceError(String identifier, String message) {
         return new ExecutionTrace(ExecutionStatus.ERROR, identifier, List.of(), message, null);
-    }
-
-    public ExecutionStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ExecutionStatus status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Instant getTraceTime() {
-        return traceTime;
-    }
-
-    public void setTraceTime(Instant traceTime) {
-        this.traceTime = traceTime;
-    }
-
-    public Exception getException() {
-        return exception;
-    }
-
-    public List<String> getUserIds() {
-        return userIds;
     }
 
     @Override
