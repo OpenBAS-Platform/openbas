@@ -115,6 +115,7 @@ public class AppSecurityConfig {
                 .requestMatchers("/api/login").permitAll()
                 .requestMatchers("/api/reset/**").permitAll()
                 .requestMatchers("/api/**").authenticated()
+                .anyRequest().permitAll()
         )
         .logout(
             logout -> logout.invalidateHttpSession(true)
