@@ -14,32 +14,27 @@ public class ContractDef {
         //private constructor
     }
 
+    public static ContractDef contractBuilder() {
+        return new ContractDef();
+    }
+
     public ContractDef addFields(List<ContractElement> fields) {
         this.fields.addAll(fields);
         return this;
     }
 
-    public static ContractDef contractBuilder() {
-        return new ContractDef();
-    }
-
     public ContractDef mandatory(ContractElement element) {
-        fields.add(element);
-        return this;
-    }
-
-    public ContractDef mandatory(String key, String label) {
-        fields.add(new ContractText(key, label));
+        this.fields.add(element);
         return this;
     }
 
     public ContractDef optional(ContractElement element) {
         element.setMandatory(false);
-        fields.add(element);
+        this.fields.add(element);
         return this;
     }
 
     public List<ContractElement> build() {
-        return fields;
+        return this.fields;
     }
 }
