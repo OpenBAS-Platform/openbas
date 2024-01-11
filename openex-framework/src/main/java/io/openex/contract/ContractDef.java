@@ -1,9 +1,9 @@
 package io.openex.contract;
 
 import io.openex.contract.fields.ContractElement;
-import io.openex.contract.fields.ContractText;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ContractDef {
@@ -25,6 +25,16 @@ public class ContractDef {
 
     public ContractDef mandatory(ContractElement element) {
         this.fields.add(element);
+        return this;
+    }
+
+    public ContractDef mandatoryGroup(ContractElement... elements) {
+        List<String> keys = Arrays.stream(elements).map(ContractElement::getKey).toList();
+        for (ContractElement element : elements) {
+            element.setMandatory(false);
+            element.setMandatoryGroups(keys);
+            this.fields.add(element);
+        }
         return this;
     }
 

@@ -477,6 +477,7 @@ const i18n = {
       'To fill': 'A remplir',
       Username: "Nom d'utilisateur",
       Unknown: 'Inconnu',
+      'No value': 'Aucune valeur',
       'Primary color (dark)': 'Couleur primaire (sombre)',
       'Secondary color (dark)': 'Couleur secondaire (sombre)',
       'Primary color (light)': 'Couleur primaire (clair)',

@@ -19,7 +19,7 @@
         <commons-email.version>1.5</commons-email.version>
         <flyway.version>9.0.3</flyway.version>
         <opensaml.version>4.1.1</opensaml.version>
-        <springdoc.version>1.7.0</springdoc.version>
+        <springdoc.version>2.3.0</springdoc.version>
         <springdoc-plugin.version>1.4</springdoc-plugin.version>
         <jacoco-plugin.version>0.8.11</jacoco-plugin.version>
     </properties>
@@ -116,12 +116,12 @@
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springdoc.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-webflux-ui</artifactId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
             <version>${springdoc.version}</version>
         </dependency>
         <dependency>
@@ -287,6 +287,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <!-- UI Api Docs: http://localhost:8080/swagger-ui/index.html -->
                     <apiDocsUrl>http://localhost:8080/api-docs</apiDocsUrl>
                     <outputFileName>swagger.json</outputFileName>
                     <outputDir>.</outputDir>

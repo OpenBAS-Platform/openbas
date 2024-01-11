@@ -58,6 +58,7 @@ import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
 import InjectExpectations from './expectations/InjectExpectations';
+import mandatoryGroupsValidator from './InjectDefinitionUtils';
 
 const styles = (theme) => ({
   header: {
@@ -679,6 +680,14 @@ class InjectDefinition extends Component {
           const value = values[field.key];
           if (field.mandatory && (value === undefined || R.isEmpty(value))) {
             errors[field.key] = t('This field is required.');
+          }
+          if (field.mandatoryGroups) {
+            const conditionOk = mandatoryGroupsValidator(field, values);
+            if (!conditionOk) {
+              const { mandatoryGroups } = field;
+              const labels = mandatoryGroups.map((key) => injectType.fields.find((f) => f.key === key).label).join(', ');
+              errors[field.key] = t(`One of this field is required : ${labels}.`);
+            }
           }
         });
     }

@@ -67,9 +67,11 @@ export interface Asset {
   /** @format date-time */
   asset_created_at?: string;
   asset_description?: string;
-  asset_external_id?: string;
   asset_id: string;
   asset_name: string;
+  asset_sources?: Record<string, string>;
+  asset_tags?: Tag[];
+  asset_type?: string;
   /** @format date-time */
   asset_updated_at?: string;
   updateAttributes?: object;
@@ -82,6 +84,7 @@ export interface AssetGroup {
   asset_group_description?: string;
   asset_group_id?: string;
   asset_group_name: string;
+  asset_group_tags?: Tag[];
   /** @format date-time */
   asset_group_updated_at?: string;
   updateAttributes?: object;
@@ -90,6 +93,30 @@ export interface AssetGroup {
 export interface AssetGroupInput {
   asset_group_description?: string;
   asset_group_name: string;
+}
+
+export interface AttackPattern {
+  /** @format date-time */
+  attack_pattern_created_at?: string;
+  attack_pattern_description?: string;
+  attack_pattern_external_id: string;
+  attack_pattern_id: string;
+  attack_pattern_name: string;
+  attack_pattern_parent?: AttackPattern;
+  attack_pattern_permissions_required?: string[];
+  attack_pattern_platforms?: string[];
+  /** @format date-time */
+  attack_pattern_updated_at?: string;
+  updateAttributes?: object;
+}
+
+export interface AttackPatternCreateInput {
+  attack_pattern_description?: string;
+  attack_pattern_external_id: string;
+  attack_pattern_name: string;
+  attack_pattern_parent?: string;
+  attack_pattern_permissions_required?: string[];
+  attack_pattern_platforms?: string[];
 }
 
 export interface Challenge {
@@ -310,6 +337,7 @@ export interface ContractElement {
   linkedFields?: LinkedFieldModel[];
   linkedValues?: string[];
   mandatory?: boolean;
+  mandatoryGroups?: string[];
   type?:
     | "text"
     | "number"
@@ -438,16 +466,14 @@ export interface Endpoint {
   /** @format date-time */
   asset_created_at?: string;
   asset_description?: string;
-  asset_external_id?: string;
   asset_id: string;
   asset_name: string;
+  asset_sources?: Record<string, string>;
+  asset_tags?: Tag[];
+  asset_type?: string;
   /** @format date-time */
   asset_updated_at?: string;
   endpoint_hostname?: string;
-  /**
-   * @maxItems 2147483647
-   * @minItems 1
-   */
   endpoint_ips?: string[];
   /** @format date-time */
   endpoint_last_seen?: string;
@@ -458,7 +484,6 @@ export interface Endpoint {
 
 export interface EndpointInput {
   asset_description?: string;
-  asset_external_id?: string;
   asset_name: string;
   endpoint_hostname?: string;
   /**
@@ -491,7 +516,7 @@ export interface EvaluationInput {
 }
 
 export interface Execution {
-  execution_async_id?: string;
+  execution_async_ids?: string[];
   execution_runtime?: boolean;
   /** @format date-time */
   execution_start?: string;
@@ -770,7 +795,7 @@ export interface InjectInput {
 }
 
 export interface InjectStatus {
-  status_async_id?: string;
+  status_async_ids?: string[];
   /** @format date-time */
   status_date?: string;
   /** @format int32 */
@@ -797,6 +822,26 @@ export interface InjectUpdateStatusInput {
 export interface InjectUpdateTriggerInput {
   /** @format int64 */
   inject_depends_duration?: number;
+}
+
+export interface KillChainPhase {
+  /** @format date-time */
+  phase_created_at?: string;
+  phase_id?: string;
+  phase_kill_chain_name?: string;
+  phase_name?: string;
+  /** @format int64 */
+  phase_order?: number;
+  /** @format date-time */
+  phase_updated_at?: string;
+  updateAttributes?: object;
+}
+
+export interface KillChainPhaseCreateInput {
+  phase_kill_chain_name?: string;
+  phase_name: string;
+  /** @format int64 */
+  phase_order?: number;
 }
 
 export interface LessonsAnswer {
