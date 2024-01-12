@@ -3,10 +3,11 @@ package io.openex.rest.asset.endpoint.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.Endpoint;
 import io.openex.rest.asset.form.AssetInput;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import jakarta.validation.constraints.Size;
 import java.time.Instant;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
@@ -15,7 +16,7 @@ import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 @Data
 public class EndpointInput extends AssetInput {
 
-
+  @NotEmpty(message = MANDATORY_MESSAGE)
   @Size(min = 1, message = MANDATORY_MESSAGE)
   @JsonProperty("endpoint_ips")
   private String[] ips;

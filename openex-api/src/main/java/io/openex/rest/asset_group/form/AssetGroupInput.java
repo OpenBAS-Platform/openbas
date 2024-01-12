@@ -6,6 +6,9 @@ import lombok.Setter;
 
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
 @Getter
@@ -18,4 +21,7 @@ public class AssetGroupInput {
 
     @JsonProperty("asset_group_description")
     private String description;
+
+    @JsonProperty("asset_group_tags")
+    private List<String> tagIds = new ArrayList<>();
 }

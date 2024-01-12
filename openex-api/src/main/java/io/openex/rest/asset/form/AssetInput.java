@@ -5,6 +5,9 @@ import lombok.Data;
 
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
 @Data
@@ -16,5 +19,8 @@ public abstract class AssetInput {
 
   @JsonProperty("asset_description")
   private String description;
+
+  @JsonProperty("asset_tags")
+  private List<String> tagIds = new ArrayList<>();
 
 }

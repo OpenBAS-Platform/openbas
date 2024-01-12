@@ -27,6 +27,7 @@ public class AssetGroup implements Base {
   @GeneratedValue(generator = "UUID")
   @UuidGenerator
   @JsonProperty("asset_group_id")
+  @NotBlank
   private String id;
 
   @NotBlank

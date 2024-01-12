@@ -45,12 +45,11 @@ const TagsFilter = (props) => {
   return (
     <div>
       <Autocomplete
-        sx={{ width: fullWidth ? '100%' : 250, float: 'left' }}
+        sx={{ width: fullWidth ? '100%' : 250, float: 'left', marginRight: '10px' }}
         selectOnFocus={true}
         openOnFocus={true}
         autoSelect={false}
         autoHighlight={true}
-        hiddenLabel={true}
         size="small"
         options={tagsOptions}
         onChange={(event, value, reason) => {

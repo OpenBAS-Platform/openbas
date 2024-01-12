@@ -10,6 +10,7 @@ import TopMenuSettings from './TopMenuSettings';
 import TopMenuExercises from './TopMenuExercises';
 import TopMenuExercise from './TopMenuExercise';
 import TopMenuPersons from './TopMenuPersons';
+import TopMenuAssets from './TopMenuAssets';
 import TopMenuOrganizations from './TopMenuOrganizations';
 import TopMenuDocuments from './TopMenuDocuments';
 import TopMenuMedias from './TopMenuMedias';
@@ -116,6 +117,7 @@ const TopBar: React.FC = () => {
           {location.pathname.includes('/admin/exercises/') && (
             <TopMenuExercise />
           )}
+          {location.pathname.includes('/admin/assets') && <TopMenuAssets />}
           {location.pathname.includes('/admin/persons') && <TopMenuPersons />}
           {location.pathname.includes('/admin/organizations') && (
             <TopMenuOrganizations />

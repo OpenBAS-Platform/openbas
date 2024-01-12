@@ -296,7 +296,7 @@ export const storeHelper = (state) => ({
   ),
   getExerciseUserLessonsAnswers: (exerciseId, userId) => entities('lessonsanswers', state).filter(
     (l) => l.lessons_answer_exercise === exerciseId
-        && l.lessons_answer_user === userId,
+      && l.lessons_answer_user === userId,
   ),
   getExerciseReports: (exerciseId) => entities('reports', state).filter((l) => l.report_exercise === exerciseId),
   // report
@@ -336,7 +336,7 @@ export const storeHelper = (state) => ({
     entities('inject_types', state)
       .map((t) => ({
         hasTeams:
-            t.fields.filter((f) => f.key === 'teams').length > 0,
+          t.fields.filter((f) => f.key === 'teams').length > 0,
         ...t,
       }))
       .filter((t) => !t.hasTeams)
@@ -408,5 +408,11 @@ export const storeHelper = (state) => ({
   getLessonsTemplateCategoryQuestions: (id) => entities('lessonstemplatequestions', state).filter(
     (c) => c.lessons_template_question_category === id,
   ),
+  // assets
+  getEndpoints: () => entities('endpoints', state),
+  getEndpointsMap: () => maps('endpoints', state),
+  // asset groups
+  getAssetGroups: () => entities('asset_groups', state),
+  // contracts
   getContractImages: () => contractImages(state),
 });

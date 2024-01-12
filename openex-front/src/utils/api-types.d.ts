@@ -82,7 +82,7 @@ export interface AssetGroup {
   /** @format date-time */
   asset_group_created_at?: string;
   asset_group_description?: string;
-  asset_group_id?: string;
+  asset_group_id: string;
   asset_group_name: string;
   asset_group_tags?: Tag[];
   /** @format date-time */
@@ -93,6 +93,7 @@ export interface AssetGroup {
 export interface AssetGroupInput {
   asset_group_description?: string;
   asset_group_name: string;
+  asset_group_tags?: string[];
 }
 
 export interface AttackPattern {
@@ -474,27 +475,28 @@ export interface Endpoint {
   /** @format date-time */
   asset_updated_at?: string;
   endpoint_hostname?: string;
-  endpoint_ips?: string[];
+  endpoint_ips: string[];
   /** @format date-time */
   endpoint_last_seen?: string;
   endpoint_mac_adresses?: string[];
-  endpoint_platform?: "LINUX" | "WINDOWS" | "DARWIN";
+  endpoint_platform?: "Linux" | "Windows" | "Darwin";
   updateAttributes?: object;
 }
 
 export interface EndpointInput {
   asset_description?: string;
   asset_name: string;
+  asset_tags?: string[];
   endpoint_hostname?: string;
   /**
    * @maxItems 2147483647
    * @minItems 1
    */
-  endpoint_ips?: string[];
+  endpoint_ips: string[];
   /** @format date-time */
   endpoint_last_seen?: string;
   endpoint_mac_adresses?: string[];
-  endpoint_platform?: "LINUX" | "WINDOWS" | "DARWIN";
+  endpoint_platform?: "Linux" | "Windows" | "Darwin";
 }
 
 export interface Evaluation {
@@ -1232,7 +1234,7 @@ export interface StatisticElement {
 
 export interface Tag {
   tag_color?: string;
-  tag_id?: string;
+  tag_id: string;
   tag_name?: string;
   tags_documents?: Document[];
   updateAttributes?: object;
@@ -1301,6 +1303,10 @@ export interface Token {
   token_user?: User;
   token_value?: string;
   updateAttributes?: object;
+}
+
+export interface UpdateAssetsOnAssetGroupInput {
+  asset_group_assets?: string[];
 }
 
 export interface UpdateMePasswordInput {

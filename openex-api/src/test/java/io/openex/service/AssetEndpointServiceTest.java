@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static io.openex.database.model.Endpoint.PLATFORM_TYPE.LINUX;
+import static io.openex.database.model.Endpoint.PLATFORM_TYPE.Linux;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -39,9 +39,9 @@ public class AssetEndpointServiceTest {
     endpoint.setName(name);
     endpoint.setIps(new String[]{"wrong ip"});
     endpoint.setHostname("hostname");
-    endpoint.setPlatform(LINUX);
+    endpoint.setPlatform(Linux);
     endpoint.setHostname("hostname");
-    endpoint.setPlatform(LINUX);
+    endpoint.setPlatform(Linux);
 
     // -- EXECUTE --
     assertThrows(TransactionSystemException.class, () -> this.assetEndpointService.createEndpoint(endpoint));
@@ -57,9 +57,9 @@ public class AssetEndpointServiceTest {
     endpoint.setName(name);
     endpoint.setIps(new String[]{"127.0.0.1"});
     endpoint.setHostname("hostname");
-    endpoint.setPlatform(LINUX);
+    endpoint.setPlatform(Linux);
     endpoint.setHostname("hostname");
-    endpoint.setPlatform(LINUX);
+    endpoint.setPlatform(Linux);
     endpoint.setSources(new HashMap<>(){{
       put("Manual", "manual");
       put("Caldera", "caldera-id");

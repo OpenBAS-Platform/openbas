@@ -18,4 +18,8 @@ public class AssetService {
     return this.assetRepository.findByType(types);
   }
 
+  public Iterable<Asset> assetFromIds(@NotNull final List<String> assetIds) {
+    return this.assetRepository.findAllById(assetIds);
+  }
+
 }

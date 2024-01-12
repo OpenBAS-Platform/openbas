@@ -3,19 +3,19 @@ import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import withStyles from '@mui/styles/withStyles';
 import {
+  Button,
+  FormControlLabel,
+  FormGroup,
+  IconButton,
+  InputLabel,
   List,
   ListItem,
-  MenuItem,
   ListItemIcon,
-  ListItemText,
-  InputLabel,
   ListItemSecondaryAction,
-  IconButton,
-  Typography,
-  FormGroup,
-  FormControlLabel,
+  ListItemText,
+  MenuItem,
   Switch,
-  Button,
+  Typography,
 } from '@mui/material';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
@@ -23,11 +23,11 @@ import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
   AttachmentOutlined,
-  GroupsOutlined,
   CloseRounded,
   ControlPointOutlined,
   DeleteOutlined,
   EmojiEventsOutlined,
+  GroupsOutlined,
   HelpOutlineOutlined,
 } from '@mui/icons-material';
 import arrayMutators from 'final-form-arrays';
@@ -35,7 +35,7 @@ import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
 import { fetchInjectTeams, updateInject } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
-import { fetchExerciseArticles, fetchChannels } from '../../../../actions/Channel';
+import { fetchChannels, fetchExerciseArticles } from '../../../../actions/Channel';
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
@@ -58,7 +58,6 @@ import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
 import InjectExpectations from './expectations/InjectExpectations';
-import mandatoryGroupsValidator from './InjectDefinitionUtils';
 
 const styles = (theme) => ({
   header: {
@@ -682,9 +681,13 @@ class InjectDefinition extends Component {
             errors[field.key] = t('This field is required.');
           }
           if (field.mandatoryGroups) {
-            const conditionOk = mandatoryGroupsValidator(field, values);
+            const { mandatoryGroups } = field;
+            const conditionOk = mandatoryGroups?.some((mandatoryKey) => {
+              const v = values[mandatoryKey];
+              return v !== undefined && !R.isEmpty(v);
+            });
+            // If condition are not filled
             if (!conditionOk) {
-              const { mandatoryGroups } = field;
               const labels = mandatoryGroups.map((key) => injectType.fields.find((f) => f.key === key).label).join(', ');
               errors[field.key] = t(`One of this field is required : ${labels}.`);
             }

@@ -18,6 +18,7 @@ import static java.time.Instant.now;
 public class AssetGroupService {
 
   private final AssetGroupRepository assetGroupRepository;
+  private final AssetService assetService;
 
   // -- ASSET GROUP --
 
@@ -34,6 +35,15 @@ public class AssetGroupService {
   }
 
   public AssetGroup updateAssetGroup(@NotNull final AssetGroup assetGroup) {
+    assetGroup.setUpdatedAt(now());
+    return this.assetGroupRepository.save(assetGroup);
+  }
+
+  public AssetGroup updateAssetsOnAssetGroup(
+      @NotNull final AssetGroup assetGroup,
+      @NotNull final List<String> assetIds) {
+    Iterable<Asset> assets = this.assetService.assetFromIds(assetIds);
+    assetGroup.setAssets(fromIterable(assets));
     assetGroup.setUpdatedAt(now());
     return this.assetGroupRepository.save(assetGroup);
   }

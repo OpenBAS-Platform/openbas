@@ -3,6 +3,7 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.annotation.Ipv4OrIpv6Constraint;
 import io.openex.database.audit.ModelBaseListener;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
@@ -18,11 +19,15 @@ import java.time.Instant;
 public class Endpoint extends Asset {
 
   public enum PLATFORM_TYPE {
-    LINUX,
-    WINDOWS,
-    DARWIN,
+    @JsonProperty("Linux")
+    Linux,
+    @JsonProperty("Windows")
+    Windows,
+    @JsonProperty("Darwin")
+    Darwin,
   }
 
+  @NotEmpty
   @Ipv4OrIpv6Constraint
   @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
   @Column(name = "endpoint_ips")
