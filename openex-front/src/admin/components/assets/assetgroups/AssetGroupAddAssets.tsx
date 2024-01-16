@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
-import { Add, PersonOutlined } from '@mui/icons-material';
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Fab, Grid, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { PersonOutlined } from '@mui/icons-material';
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useAppDispatch } from '../../../../utils/hooks';
