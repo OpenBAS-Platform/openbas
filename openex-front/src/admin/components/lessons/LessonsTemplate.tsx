@@ -12,7 +12,7 @@ import LessonsTemplateCategoryPopover from './categories/LessonsTemplateCategory
 import CreateLessonsTemplateQuestion from './categories/questions/CreateLessonsTemplateQuestion';
 import LessonsTemplateQuestionPopover from './categories/questions/LessonsTemplateQuestionPopover';
 import { useAppDispatch } from '../../../utils/hooks';
-import type { LessonsTemplatesHelper } from '../../../actions/lessons/lesson';
+import type { LessonsTemplatesHelper } from '../../../actions/lessons/lesson-helper';
 import type { UsersHelper } from '../../../actions/helper';
 import type { LessonsTemplateCategory, LessonsTemplateQuestion } from '../../../utils/api-types';
 
