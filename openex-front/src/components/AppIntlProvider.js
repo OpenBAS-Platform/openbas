@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import * as PropTypes from 'prop-types';
 import { IntlProvider } from 'react-intl';
 import moment from 'moment';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import frLocale from 'date-fns/locale/fr';
 import enLocale from 'date-fns/locale/en-US';
