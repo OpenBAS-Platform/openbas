@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.Endpoint;
 import io.openex.rest.asset.form.AssetInput;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,6 +26,7 @@ public class EndpointInput extends AssetInput {
   private String hostname;
 
   @JsonProperty("endpoint_platform")
+  @NotNull
   private Endpoint.PLATFORM_TYPE platform;
 
   @JsonProperty("endpoint_last_seen")

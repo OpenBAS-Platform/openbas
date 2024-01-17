@@ -41,6 +41,12 @@ public class AssetGroupApi {
     return this.assetGroupService.assetGroups();
   }
 
+  @GetMapping(ASSET_GROUP_URI + "/{assetGroupId}")
+  @PreAuthorize("isObserver()")
+  public AssetGroup assetGroup(@PathVariable @NotBlank final String assetGroupId) {
+    return this.assetGroupService.assetGroup(assetGroupId);
+  }
+
   @PutMapping(ASSET_GROUP_URI + "/{assetGroupId}")
   @Secured(ROLE_ADMIN)
   public AssetGroup updateAssetGroup(

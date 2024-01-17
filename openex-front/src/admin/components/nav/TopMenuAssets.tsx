@@ -39,7 +39,7 @@ const TopMenuAssets: React.FC = () => {
         color="primary"
         classes={{ root: classes.button }}
       >
-        {t('Asset group')}
+        {t('Asset groups')}
       </Button>
     </>
   );

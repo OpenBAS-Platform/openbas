@@ -59,6 +59,11 @@ const TagField: FunctionComponent<Props> = ({
     dispatch(fetchTags());
   });
 
+  // Handle tag creation
+  const [tagCreation, setTagCreation] = useState(false);
+  const handleOpenTagCreation = () => setTagCreation(true);
+  const handleCloseTagCreation = () => setTagCreation(false);
+
   // Form
   const tagsOptions = tags.map(
     (n) => ({
@@ -90,11 +95,6 @@ const TagField: FunctionComponent<Props> = ({
         return result;
       });
   };
-
-  // Handle tag creation
-  const [tagCreation, setTagCreation] = useState(false);
-  const handleOpenTagCreation = () => setTagCreation(true);
-  const handleCloseTagCreation = () => setTagCreation(false);
 
   return (
     <div style={{ position: 'relative' }}>

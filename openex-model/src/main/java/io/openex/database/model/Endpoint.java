@@ -3,12 +3,13 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.annotation.Ipv4OrIpv6Constraint;
 import io.openex.database.audit.ModelBaseListener;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
 
-import jakarta.persistence.*;
 import java.time.Instant;
 
 @EqualsAndHashCode(callSuper = true)
@@ -41,6 +42,7 @@ public class Endpoint extends Asset {
   @Column(name = "endpoint_platform")
   @JsonProperty("endpoint_platform")
   @Enumerated(EnumType.STRING)
+  @NotNull
   private PLATFORM_TYPE platform;
 
   @Column(name = "endpoint_last_seen")

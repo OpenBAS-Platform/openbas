@@ -35,7 +35,7 @@ public class V2_68__Assets_Asset_Groups extends BaseJavaMigration {
     select.execute("""
         ALTER TABLE assets ADD COLUMN endpoint_ips text[];
         ALTER TABLE assets ADD COLUMN endpoint_hostname varchar(255);
-        ALTER TABLE assets ADD COLUMN endpoint_platform varchar(255);
+        ALTER TABLE assets ADD COLUMN endpoint_platform varchar(255) not null;
         ALTER TABLE assets ADD COLUMN endpoint_last_seen timestamp;
         ALTER TABLE assets ADD COLUMN endpoint_mac_adresses text[];
         """);

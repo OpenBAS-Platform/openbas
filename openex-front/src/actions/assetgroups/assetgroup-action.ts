@@ -33,3 +33,8 @@ export const deleteAssetGroup = (assetGroupId: AssetGroup['asset_group_id']) => 
 export const fetchAssetGroups = () => (dispatch: Dispatch) => {
   return getReferential(arrayOfAssetGroups, ASSET_GROUP_URI)(dispatch);
 };
+
+export const fetchAssetGroup = (assetGroupId: AssetGroup['asset_group_id']) => (dispatch: Dispatch) => {
+  const uri = `${ASSET_GROUP_URI}/${assetGroupId}`;
+  return getReferential(assetGroup, uri)(dispatch);
+};

@@ -107,8 +107,7 @@ const EndpointPopover: React.FC<Props> = ({
         open={Boolean(anchorEl)}
         onClose={() => setAnchorEl(null)}
       >
-        <MenuItem onClick={handleEdit}
-        >
+        <MenuItem onClick={handleEdit}>
           {t('Update')}
         </MenuItem>
         {assetGroupId && (

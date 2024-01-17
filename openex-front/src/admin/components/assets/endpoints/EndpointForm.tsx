@@ -57,10 +57,7 @@ const EndpointForm: React.FC<Props> = ({
             /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9a-fA-F]{4}.[0-9a-fA-F]{4}.[0-9a-fA-F]{4})$/,
             t('Invalid MAC address'),
           ).array().optional(),
-        // @ts-expect-error: find a better way to handle optional enum
-        endpoint_platform: z.enum(['Linux', 'Windows', 'Darwin']).or(z.string())
-          .transform((val) => (val === '' ? undefined : val))
-          .nullish(),
+        endpoint_platform: z.enum(['Linux', 'Windows', 'Darwin']),
       }),
     ),
     defaultValues: initialValues,
@@ -212,8 +209,8 @@ const EndpointForm: React.FC<Props> = ({
             error={!!errors.endpoint_platform}
             helperText={errors.endpoint_platform?.message}
             inputProps={register('endpoint_platform')}
+            InputLabelProps={{ required: true }}
           >
-            <MenuItem value={''}>{t('No value')}</MenuItem>
             <MenuItem value={'Linux'}>{t('Linux')}</MenuItem>
             <MenuItem value={'Windows'}>{t('Windows')}</MenuItem>
             <MenuItem value={'Darwin'}>{t('Darwin')}</MenuItem>

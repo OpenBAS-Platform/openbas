@@ -139,7 +139,7 @@ const AssetGroups = () => {
             currentTags={filtering.tags}
           />
         </div>
-        <div style={{ marginRight: '15px'}}>
+        <div style={{ marginRight: '15px' }}>
           {sortedAssetGroups.length > 0 ? (
             <CSVLink
               data={exportData(

@@ -479,7 +479,7 @@ export interface Endpoint {
   /** @format date-time */
   endpoint_last_seen?: string;
   endpoint_mac_adresses?: string[];
-  endpoint_platform?: "Linux" | "Windows" | "Darwin";
+  endpoint_platform: "Linux" | "Windows" | "Darwin";
   updateAttributes?: object;
 }
 
@@ -496,7 +496,7 @@ export interface EndpointInput {
   /** @format date-time */
   endpoint_last_seen?: string;
   endpoint_mac_adresses?: string[];
-  endpoint_platform?: "Linux" | "Windows" | "Darwin";
+  endpoint_platform: "Linux" | "Windows" | "Darwin";
 }
 
 export interface Evaluation {

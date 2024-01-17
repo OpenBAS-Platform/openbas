@@ -26,12 +26,12 @@ public class AssetGroupService {
     return this.assetGroupRepository.save(assetGroup);
   }
 
-  public AssetGroup assetGroup(@NotBlank final String assetGroupId) {
-    return this.assetGroupRepository.findById(assetGroupId).orElseThrow();
-  }
-
   public List<AssetGroup> assetGroups() {
     return fromIterable(this.assetGroupRepository.findAll());
+  }
+
+  public AssetGroup assetGroup(@NotBlank final String assetGroupId) {
+    return this.assetGroupRepository.findById(assetGroupId).orElseThrow();
   }
 
   public AssetGroup updateAssetGroup(@NotNull final AssetGroup assetGroup) {

@@ -19,6 +19,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
 import type { EndpointStore } from '../endpoints/Endpoint';
 import EndpointPopover from '../endpoints/EndpointPopover';
+import { fetchAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
 
 const useStyles = makeStyles((theme: Theme) => ({
   // Drawer Header
@@ -117,6 +118,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
   useDataLoader(() => {
+    dispatch(fetchAssetGroup(assetGroup.asset_group_id));
     dispatch(fetchEndpoints());
   });
 
