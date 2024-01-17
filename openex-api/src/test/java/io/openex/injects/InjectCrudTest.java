@@ -71,6 +71,10 @@ public class InjectCrudTest {
     // -- EXECUTE --
     Inject injectCreated = this.injectRepository.save(inject);
     assertNotNull(injectCreated);
+
+    // -- CLEAN --
+    this.exerciseRepository.delete(exercise);
+    this.injectRepository.delete(inject);
   }
 
 }

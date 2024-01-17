@@ -54,6 +54,7 @@ const headerStyles: {
   asset_name: CSSProperties;
   endpoint_hostname: CSSProperties;
   endpoint_platform: CSSProperties;
+  endpoint_collected_by: CSSProperties;
   asset_tags: CSSProperties;
 } = {
   iconSort: {
@@ -70,19 +71,25 @@ const headerStyles: {
   },
   endpoint_hostname: {
     float: 'left',
-    width: '25%',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
   endpoint_platform: {
     float: 'left',
-    width: '25%',
+    width: '15%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  endpoint_collected_by: {
+    float: 'left',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
   asset_tags: {
     float: 'left',
-    width: '25%',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -92,21 +99,29 @@ const inlineStyles: {
   asset_name: CSSProperties;
   endpoint_hostname: CSSProperties;
   endpoint_platform: CSSProperties;
+  endpoint_collected_by: CSSProperties;
   asset_tags: CSSProperties;
 } = {
   asset_name: {
     width: '25%',
   },
   endpoint_hostname: {
-    width: '25%',
+    width: '20%',
   },
   endpoint_platform: {
-    width: '25%',
+    width: '15%',
+  },
+  endpoint_collected_by: {
+    width: '20%',
   },
   asset_tags: {
-    width: '25%',
+    width: '20%',
   },
 };
+
+const collectedBy = (endpoint: EndpointStore) => {
+  return Object.keys(endpoint.asset_sources ?? {}).filter((e) => e !== 'Manual').join(', ')
+}
 
 const Endpoints = () => {
   // Standard hooks
@@ -161,7 +176,7 @@ const Endpoints = () => {
                 sortedEndpoints,
                 tagsMap,
               )}
-              filename={`${t('Endpoints')}.csv`}
+              filename={'Endpoints.csv'}
             >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
@@ -215,6 +230,12 @@ const Endpoints = () => {
                   headerStyles,
                 )}
                 {filtering.buildHeader(
+                  'endpoint_collected_by',
+                  'Collected by',
+                  false,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
                   'asset_tags',
                   'Tags',
                   true,
@@ -254,6 +275,12 @@ const Endpoints = () => {
                     style={inlineStyles.endpoint_platform}
                   >
                     {endpoint.endpoint_platform}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.endpoint_collected_by}
+                  >
+                    {collectedBy(endpoint)}
                   </div>
                   <div
                     className={classes.bodyItem}

@@ -29,7 +29,7 @@ const TopMenuAssets: React.FC = () => {
         color="primary"
         classes={{ root: classes.button }}
       >
-        {t('Endpoints')}
+        {'Endpoints'}
       </Button>
       <Button
         component={Link}
