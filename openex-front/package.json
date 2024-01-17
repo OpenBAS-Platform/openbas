@@ -99,7 +99,7 @@
     "vitest": "1.1.1"
   },
   "engines": {
-    "node": ">= 16.*"
+    "node": ">= 20.10.0"
   },
   "scripts": {
     "start": "vite",
