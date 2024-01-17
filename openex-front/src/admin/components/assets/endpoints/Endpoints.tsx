@@ -120,8 +120,8 @@ const inlineStyles: {
 };
 
 const collectedBy = (endpoint: EndpointStore) => {
-  return Object.keys(endpoint.asset_sources ?? {}).filter((e) => e !== 'Manual').join(', ')
-}
+  return Object.keys(endpoint.asset_sources ?? {}).filter((e) => e !== 'Manual').join(', ');
+};
 
 const Endpoints = () => {
   // Standard hooks

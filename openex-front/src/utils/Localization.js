@@ -726,7 +726,7 @@ const i18n = {
       'Collected by': 'Collecté par',
       // Asset groups
       'Asset groups': 'Groupe d\'assets',
-      'AssetGroups': 'Groupe-d-assets',
+      AssetGroups: 'Groupe-d-assets',
       'Create a new asset group': 'Créer un nouvel asset group',
       'Update the asset group': 'Modifier l\'asset group',
       'Manage assets': 'Gérer les actifs',
