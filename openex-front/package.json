@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "7.23.3",
-    "@eslint/eslintrc": "2.1.4",
+    "@eslint/eslintrc": "3.0.0",
     "@eslint/js": "8.55.0",
     "@stylistic/eslint-plugin": "1.5.0",
     "@testing-library/react": "14.0.0",
@@ -99,7 +99,7 @@
     "vitest": "1.1.1"
   },
   "engines": {
-    "node": ">= 16.*"
+    "node": ">= 20.10.0"
   },
   "scripts": {
     "start": "vite",
