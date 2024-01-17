@@ -45,7 +45,7 @@ const EndpointPopover: React.FC<Props> = ({
     endpoint_hostname,
     endpoint_ips,
     endpoint_last_seen: endpoint_last_seen ?? undefined,
-    endpoint_mac_adresses,
+    endpoint_mac_adresses: endpoint_mac_adresses ?? [],
     endpoint_platform,
   }))(endpoint);
 

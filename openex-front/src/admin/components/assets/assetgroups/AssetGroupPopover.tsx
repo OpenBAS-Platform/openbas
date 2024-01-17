@@ -101,7 +101,8 @@ const AssetGroupPopover: React.FC<Props> = ({
           {t('Manage assets')}
         </MenuItem>
         <MenuItem
-          onClick={handleDelete}>
+          onClick={handleDelete}
+        >
           {t('Delete')}
         </MenuItem>
       </Menu>
@@ -135,7 +136,7 @@ const AssetGroupPopover: React.FC<Props> = ({
       >
         {selected !== undefined && (
           <AssetGroupManagement
-            assetGroup={assetGroup}
+            assetGroupId={assetGroup.asset_group_id}
             handleClose={() => setSelected(undefined)}
           />
         )}

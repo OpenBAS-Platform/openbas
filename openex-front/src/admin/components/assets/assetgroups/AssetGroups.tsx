@@ -2,7 +2,7 @@ import { makeStyles } from '@mui/styles';
 import React, { CSSProperties, useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { Drawer as MuiDrawer, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
-import { FileDownloadOutlined, HubOutlined } from '@mui/icons-material';
+import { FileDownloadOutlined, LanOutlined } from '@mui/icons-material';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
@@ -220,7 +220,7 @@ const AssetGroups = () => {
             onClick={() => setSelected(assetGroup)}
           >
             <ListItemIcon>
-              <HubOutlined color="primary" />
+              <LanOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={
@@ -264,7 +264,7 @@ const AssetGroups = () => {
       >
         {selected !== undefined && (
           <AssetGroupManagement
-            assetGroup={selected}
+            assetGroupId={selected.asset_group_id}
             handleClose={() => setSelected(undefined)}
           />
         )}

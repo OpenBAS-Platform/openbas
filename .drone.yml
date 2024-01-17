@@ -51,6 +51,7 @@ services:
 
 ---
 kind: pipeline
+type: docker
 name: openex-tests-master
 
 trigger:

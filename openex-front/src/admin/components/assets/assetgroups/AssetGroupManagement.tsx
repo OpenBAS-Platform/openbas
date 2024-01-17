@@ -6,7 +6,6 @@ import { makeStyles } from '@mui/styles';
 import type { Theme } from '../../../../components/Theme';
 import TagsFilter from '../../../../components/TagsFilter';
 import SearchFilter from '../../../../components/SearchFilter';
-import type { AssetGroupStore } from './AssetGroup';
 import { Option } from '../../../../utils/Option';
 import ItemTags from '../../../../components/ItemTags';
 import SortHeadersList, { Header } from '../../../../components/common/SortHeadersList';
@@ -20,6 +19,7 @@ import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
 import type { EndpointStore } from '../endpoints/Endpoint';
 import EndpointPopover from '../endpoints/EndpointPopover';
 import { fetchAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
+import type { AssetGroupsHelper } from '../../../../actions/assetgroups/assetgroup-helper';
 
 const useStyles = makeStyles((theme: Theme) => ({
   // Drawer Header
@@ -100,12 +100,12 @@ const inlineStyles = {
 };
 
 interface Props {
-  assetGroup: AssetGroupStore;
+  assetGroupId: string;
   handleClose: () => void;
 }
 
 const AssetGroupManagement: FunctionComponent<Props> = ({
-  assetGroup,
+  assetGroupId,
   handleClose,
 }) => {
   // Standard hooks
@@ -113,12 +113,13 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
 
   // Fetching data
-  const { endpointsMap, userAdmin } = useHelper((helper: EndpointsHelper & UsersHelper) => ({
+  const { assetGroup, endpointsMap, userAdmin } = useHelper((helper: AssetGroupsHelper & EndpointsHelper & UsersHelper) => ({
+    assetGroup: helper.getAssetGroup(assetGroupId),
     endpointsMap: helper.getEndpointsMap(),
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
   useDataLoader(() => {
-    dispatch(fetchAssetGroup(assetGroup.asset_group_id));
+    dispatch(fetchAssetGroup(assetGroupId));
     dispatch(fetchEndpoints());
   });
 
@@ -209,7 +210,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {assetGroup.asset_group_assets?.map((assetId) => {
+        {assetGroup.asset_group_assets?.map((assetId: string) => {
           const endpoint: EndpointStore = endpointsMap[assetId];
           return (
             <ListItem

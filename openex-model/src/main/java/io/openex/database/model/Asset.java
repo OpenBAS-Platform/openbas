@@ -31,6 +31,8 @@ import static lombok.AccessLevel.NONE;
 @EntityListeners(ModelBaseListener.class)
 public class Asset implements Base {
 
+  public static final String MANUAL_SOURCE = "Manual";
+
   @Id
   @Column(name = "asset_id")
   @GeneratedValue(generator = "UUID")

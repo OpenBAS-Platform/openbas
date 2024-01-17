@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Map;
 
+import static io.openex.database.model.Asset.MANUAL_SOURCE;
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.helper.StreamHelper.fromIterable;
+import static org.springframework.util.StringUtils.hasText;
 
 @RequiredArgsConstructor
 @RestController
@@ -32,6 +35,11 @@ public class EndpointApi {
     endpoint.setUpdateAttributes(input);
     endpoint.setPlatform(input.getPlatform());
     endpoint.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
+    // Set source to manual by API
+    Map<String, String> sources = endpoint.getSources();
+    sources.put(MANUAL_SOURCE, "manual");
+    endpoint.setSources(sources);
+
     return this.assetEndpointService.createEndpoint(endpoint);
   }
 
@@ -50,6 +58,12 @@ public class EndpointApi {
     endpoint.setUpdateAttributes(input);
     endpoint.setPlatform(input.getPlatform());
     endpoint.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
+    // Set source to manual by API
+    Map<String, String> sources = endpoint.getSources();
+    if (!hasText(sources.get(MANUAL_SOURCE)))
+      sources.put(MANUAL_SOURCE, "manual");
+    endpoint.setSources(sources);
+
     return this.assetEndpointService.updateEndpoint(endpoint);
   }
 

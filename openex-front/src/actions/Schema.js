@@ -413,7 +413,7 @@ export const storeHelper = (state) => ({
   getEndpointsMap: () => maps('endpoints', state),
   // asset groups
   getAssetGroups: () => entities('asset_groups', state),
-  getAssetGroup: (id) => entities('asset_groups', state).filter((a) => a.asset_group_id === id),
+  getAssetGroup: (id) => entity(id, 'asset_groups', state),
   // contracts
   getContractImages: () => contractImages(state),
 });
