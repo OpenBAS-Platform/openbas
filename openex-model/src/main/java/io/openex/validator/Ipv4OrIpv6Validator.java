@@ -1,12 +1,11 @@
 package io.openex.validator;
 
 import io.openex.annotation.Ipv4OrIpv6Constraint;
-import org.apache.commons.validator.routines.InetAddressValidator;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import org.apache.commons.validator.routines.InetAddressValidator;
+
 import java.util.Arrays;
-import java.util.List;
 
 public class Ipv4OrIpv6Validator implements ConstraintValidator<Ipv4OrIpv6Constraint, String[]> {
 
