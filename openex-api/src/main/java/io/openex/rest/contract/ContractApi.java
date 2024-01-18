@@ -36,7 +36,7 @@ public class ContractApi extends RestBehavior {
         String encodedString = Base64.getEncoder().encodeToString(fileContent);
         map.put(contract.getType(), encodedString);
       } catch (Exception e) {
-        log.info("Logo not found for contract : " + contract.getType());
+        log.debug("Logo not found for contract : " + contract.getType());
       }
     }));
     return map;

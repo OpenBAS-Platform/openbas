@@ -22,6 +22,7 @@ import static io.openex.rest.asset_group.AssetGroupApi.ASSET_GROUP_URI;
 import static io.openex.rest.utils.JsonUtils.asJsonString;
 import static io.openex.rest.utils.JsonUtils.asStringJson;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,6 +40,8 @@ public class AssetGroupApiTest {
   private AssetGroupRepository assetGroupRepository;
   @Autowired
   private EndpointRepository endpointRepository;
+
+  static String ASSET_GROUP_ID;
 
   @AfterAll
   public void teardown() {
@@ -67,16 +70,17 @@ public class AssetGroupApiTest {
         .getResponse()
         .getContentAsString();
     AssetGroup assetGroupResponse = asStringJson(response, AssetGroup.class);
+    ASSET_GROUP_ID = assetGroupResponse.getId();
 
     // -- ASSERT --
     assertEquals(name, assetGroupResponse.getName());
   }
 
-  @DisplayName("Retrieve asset group succeed")
+  @DisplayName("Retrieve asset groups succeed")
   @Test
   @Order(2)
   @WithMockObserverUser
-  void retrieveAssetGroupTest() throws Exception {
+  void retrieveAssetGroupsTest() throws Exception {
     // -- EXECUTE --
     String response = this.mvc
         .perform(get(ASSET_GROUP_URI).accept(MediaType.APPLICATION_JSON))
@@ -91,9 +95,28 @@ public class AssetGroupApiTest {
     assertEquals(1, assetGroupsResponse.size());
   }
 
-  @DisplayName("Update asset group succeed")
+  @DisplayName("Retrieve asset group succeed")
   @Test
   @Order(3)
+  @WithMockObserverUser
+  void retrieveAssetGroupTest() throws Exception {
+    // -- EXECUTE --
+    String response = this.mvc
+        .perform(get(ASSET_GROUP_URI + "/" + ASSET_GROUP_ID).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+    AssetGroup assetGroupResponse = asStringJson(response, new TypeReference<>() {
+    });
+
+    // -- ASSERT --
+    assertNotNull(assetGroupResponse);
+  }
+
+  @DisplayName("Update asset group succeed")
+  @Test
+  @Order(4)
   @WithMockUser(roles = {"ADMIN"})
   void updateGroupAssetTest() throws Exception {
     // -- PREPARE --
@@ -120,7 +143,7 @@ public class AssetGroupApiTest {
 
   @DisplayName("Delete asset group failed")
   @Test
-  @Order(4)
+  @Order(5)
   @WithMockPlannerUser
   void deleteAssetGroupFailedTest() throws Exception {
     // -- PREPARE --
@@ -135,7 +158,7 @@ public class AssetGroupApiTest {
 
   @DisplayName("Delete asset group succeed")
   @Test
-  @Order(5)
+  @Order(6)
   @WithMockUser(roles = {"ADMIN"})
   void deleteAssetGroupSucceedTest() throws Exception {
     // -- PREPARE --
