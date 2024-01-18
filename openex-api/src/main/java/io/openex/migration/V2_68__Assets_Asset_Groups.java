@@ -63,8 +63,8 @@ public class V2_68__Assets_Asset_Groups extends BaseJavaMigration {
     // Add association table between asset group and tag
     select.execute("""
         CREATE TABLE asset_groups_tags (
-          asset_group_id varchar(255) not null constraint asset_group_id_fk references asset_groups,
-          tag_id varchar(255) not null constraint tag_id_fk references tags,
+          asset_group_id varchar(255) not null constraint asset_group_id_fk references asset_groups on delete cascade,
+          tag_id varchar(255) not null constraint tag_id_fk references tags on delete cascade,
           constraint asset_groups_tags_pkey primary key (asset_group_id, tag_id)
         );
         CREATE INDEX idx_asset_groups_tags_asset_group on asset_groups_tags (asset_group_id);
