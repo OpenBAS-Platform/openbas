@@ -56,6 +56,75 @@ services:
       POSTGRES_DB: openex
 
 ---
+
+kind: pipeline
+type: docker
+name: openex-e2e-tests-pull-request
+concurrency: {
+  limit: 2
+}
+
+trigger:
+  event:
+    - pull_request
+
+steps:
+  - name: e2e-tests
+    image: node:20.11.0
+    commands:
+      - apt-get update
+      - apt-get -y install netcat-traditional
+      - while ! nc -z app-start 8080 ; do sleep 1 ; done
+      - cd openex-front
+      - yarn install
+      - yarn playwright install --with-deps chromium
+      - APP_URL=http://app-start:8080 yarn test:e2e
+
+services:
+  - name: minio
+    image: minio/minio:RELEASE.2023-12-02T10-51-33Z-cpuv1
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: [ server, /data ]
+  - name: pgsql
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: openex
+      POSTGRES_PASSWORD: openex
+      POSTGRES_DB: openex
+  - name: app-start
+    image: maven:3.9.6-eclipse-temurin-21
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql:5432/openex
+      SPRING_DATASOURCE_USERNAME: openex
+      SPRING_DATASOURCE_PASSWORD: openex
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_ACCESS_SECRET: minioadmin
+      OPENEX_ADMIN_EMAIL: admin@openex.io
+      OPENEX_ADMIN_PASSWORD: admin
+      OPENEX_ADMIN_TOKEN: 0d17ce9a-f3a8-4c6d-9721-c98dc3dc023f
+    commands:
+      - apt-get update && apt-get install -y gnupg
+      - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+      - echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+      - curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+      - apt-get update
+      - apt-get install -y yarn
+      - apt-get install -y nodejs
+      - apt-get install -y git
+      - git submodule update --init --recursive
+      - cd openex-front
+      - yarn install
+      - yarn build
+      - cd ..
+      - mvn install -DskipTests=true
+      - java -jar openex-api/target/openex-api.jar
+
+---
+
 kind: pipeline
 type: docker
 name: openex-tests-master

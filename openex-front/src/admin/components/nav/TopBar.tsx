@@ -303,11 +303,10 @@ const TopBar: React.FC = () => {
               </Box>
             </Popover>
             <IconButton
+              aria-label="account-menu"
               onClick={handleOpenMenu}
               size='medium'
-              color={
-              location.pathname === '/admin/profile' ? 'secondary' : 'inherit'
-            }
+              color={location.pathname === '/admin/profile' ? 'secondary' : 'inherit'}
             >
               <AccountCircleOutlined fontSize='medium' />
             </IconButton>
@@ -323,7 +322,7 @@ const TopBar: React.FC = () => {
               >
                 {t('Profile')}
               </MenuItem>
-              <MenuItem onClick={handleLogout}>{t('Logout')}</MenuItem>
+              <MenuItem aria-label="logout-item" onClick={handleLogout}>{t('Logout')}</MenuItem>
             </Menu>
           </div>
         </div>

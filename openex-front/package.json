@@ -67,6 +67,7 @@
     "@babel/plugin-transform-modules-commonjs": "7.23.3",
     "@eslint/eslintrc": "3.0.1",
     "@eslint/js": "8.56.0",
+    "@playwright/test": "1.41.2",
     "@stylistic/eslint-plugin": "1.6.1",
     "@testing-library/react": "14.2.1",
     "@types/node": "20.11.17",
@@ -94,9 +95,11 @@
     "fs-extra": "11.2.0",
     "globals": "14.0.0",
     "jsdom": "24.0.0",
+    "nyc": "15.1.0",
     "swagger-typescript-api": "13.0.3",
     "typescript": "5.3.3",
     "vite": "5.1.1",
+    "vite-plugin-istanbul": "5.0.0",
     "vitest": "1.2.2"
   },
   "engines": {
@@ -111,7 +114,11 @@
     "test": "vitest run",
     "check-ts": "tsc --noEmit",
     "i18n-checker": "node i18n-checker.js",
-    "generate-types-from-api": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n api-types.d.ts --sort-types"
+    "generate-types-from-api": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n api-types.d.ts --sort-types",
+    "test:e2e": "yarn playwright test",
+    "test:e2e:ui": "yarn playwright test --ui",
+    "generate-test-e2e": "npx playwright codegen http://localhost:3001/",
+    "test:e2e:coverage": "npx nyc report --reporter=html && start \"\" coverage/index.html"
   },
   "resolutions": {
     "mini-css-extract-plugin": "2.8.0",

@@ -67,7 +67,7 @@ const Login = (props) => {
   }
   const marginTop = dimension.height / 2 - loginHeight / 2 - 200;
   return (
-    <div className={classes.container} style={{ marginTop }}>
+    <div data-testid="login-page" className={classes.container} style={{ marginTop }}>
       <img src={fileUri(theme.palette.mode === 'dark' ? logoDark : logoLight)} alt="logo" className={classes.logo} />
       {isLocal && !reset && (
         <Paper variant="outlined">
