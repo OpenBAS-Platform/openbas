@@ -68,7 +68,7 @@
     "@eslint/eslintrc": "3.0.0",
     "@eslint/js": "8.56.0",
     "@stylistic/eslint-plugin": "1.5.0",
-    "@testing-library/react": "14.0.0",
+    "@testing-library/react": "14.1.2",
     "@types/node": "20.11.5",
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
