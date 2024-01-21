@@ -2612,10 +2612,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:8.55.0":
-  version: 8.55.0
-  resolution: "@eslint/js@npm:8.55.0"
-  checksum: fa33ef619f0646ed15649b0c2e313e4d9ccee8425884bdbfc78020d6b6b64c0c42fa9d83061d0e6158e1d4274f03f0f9008786540e2efab8fcdc48082259908c
+"@eslint/js@npm:8.56.0":
+  version: 8.56.0
+  resolution: "@eslint/js@npm:8.56.0"
+  checksum: 5804130574ef810207bdf321c265437814e7a26f4e6fac9b496de3206afd52f533e09ec002a3be06cd9adcc9da63e727f1883938e663c4e4751c007d5b58e539
   languageName: node
   linkType: hard
 
@@ -10990,7 +10990,7 @@ __metadata:
     "@emotion/react": 11.11.3
     "@emotion/styled": 11.11.0
     "@eslint/eslintrc": 3.0.0
-    "@eslint/js": 8.55.0
+    "@eslint/js": 8.56.0
     "@hookform/resolvers": 3.3.4
     "@mui/icons-material": 5.14.19
     "@mui/lab": 5.0.0-alpha.155
