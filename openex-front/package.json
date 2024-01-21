@@ -75,7 +75,7 @@
     "@types/seamless-immutable": "7.1.19",
     "@typescript-eslint/eslint-plugin": "6.13.2",
     "@typescript-eslint/parser": "6.13.2",
-    "@vitejs/plugin-react": "4.1.0",
+    "@vitejs/plugin-react": "4.2.1",
     "chokidar": "3.5.3",
     "compression": "1.7.4",
     "cross-env": "7.0.3",
