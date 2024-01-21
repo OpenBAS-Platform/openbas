@@ -17,7 +17,7 @@
     "@mui/utils": "5.15.5",
     "@mui/x-date-pickers": "6.19.0",
     "@redux-devtools/extension": "3.3.0",
-    "@uiw/react-md-editor": "4.0.1",
+    "@uiw/react-md-editor": "4.0.3",
     "apexcharts": "3.45.1",
     "axios": "1.6.2",
     "ckeditor5-custom-build": "link:packages/ckeditor5-custom-build",
