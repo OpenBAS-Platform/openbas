@@ -1,4 +1,4 @@
-FROM node:20.10.0-alpine3.18 AS front-builder
+FROM node:20.11.0-alpine3.18 AS front-builder
 
 WORKDIR /opt/openex-build/openex-front
 COPY openex-front/packages ./packages
