@@ -4730,9 +4730,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"apexcharts@npm:3.44.2":
-  version: 3.44.2
-  resolution: "apexcharts@npm:3.44.2"
+"apexcharts@npm:3.45.1":
+  version: 3.45.1
+  resolution: "apexcharts@npm:3.45.1"
   dependencies:
     "@yr/monotone-cubic-spline": ^1.0.3
     svg.draggable.js: ^2.2.2
@@ -4741,7 +4741,7 @@ __metadata:
     svg.pathmorphing.js: ^0.1.3
     svg.resize.js: ^1.4.3
     svg.select.js: ^3.0.1
-  checksum: 19274467dbd339f366f6fcfa8ac06595336a80fba2659ea34ae7de793602c60537cc60af4b8553f7b84ae36475aa49ae2dc32a47713609840bcbce5776fe2812
+  checksum: 1d9b5ee77c8596f8067397915d499af0c099cdeccfca50c000dfd071f38eb6f5a38b3615425297c20cc1caf41ade65714d05865a22b913447db5cd4ffc89d360
   languageName: node
   linkType: hard
 
@@ -11009,7 +11009,7 @@ __metadata:
     "@typescript-eslint/parser": 6.13.2
     "@uiw/react-md-editor": 4.0.1
     "@vitejs/plugin-react": 4.1.0
-    apexcharts: 3.44.2
+    apexcharts: 3.45.1
     axios: 1.6.2
     chokidar: 3.5.3
     ckeditor5-custom-build: "link:packages/ckeditor5-custom-build"
