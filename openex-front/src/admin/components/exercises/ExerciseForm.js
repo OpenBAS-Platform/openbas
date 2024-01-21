@@ -60,12 +60,10 @@ class ExerciseForm extends Component {
                 name="exercise_start_date"
                 label={t('Start date (optional)')}
                 autoOk={true}
-                slotProps={{
-                  textField: {
-                    variant: 'standard',
-                    fullWidth: true,
-                    style: { marginTop: 20 },
-                  },
+                textFieldProps={{
+                  variant: 'standard',
+                  fullWidth: true,
+                  style: { marginTop: 20 },
                 }}
               />
             )}

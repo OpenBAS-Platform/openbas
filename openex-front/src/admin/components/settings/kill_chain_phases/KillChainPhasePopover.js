@@ -4,13 +4,12 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { updateObjective, deleteObjective } from '../../../../actions/Objective';
-import ObjectiveForm from './ObjectiveForm';
+import { updateKillChainPhase, deleteKillChainPhase } from '../../../../actions/KillChainPhase';
+import KillChainPhaseForm from './KillChainPhaseForm';
 import inject18n from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
-import { isExerciseReadOnly } from '../../../../utils/Exercise';
 
-class ObjectivePopover extends Component {
+class KillChainPhasePopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -40,11 +39,7 @@ class ObjectivePopover extends Component {
 
   onSubmitEdit(data) {
     return this.props
-      .updateObjective(
-        this.props.exerciseId,
-        this.props.objective.objective_id,
-        data,
-      )
+      .updateKillChainPhase(this.props.killChainPhase.phase_id, data)
       .then(() => this.handleCloseEdit());
   }
 
@@ -58,18 +53,14 @@ class ObjectivePopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteObjective(
-      this.props.exerciseId,
-      this.props.objective.objective_id,
-    );
+    this.props.deleteKillChainPhase(this.props.killChainPhase.phase_id);
     this.handleCloseDelete();
   }
 
   render() {
-    const { t, objective, exercise } = this.props;
-    const initialValues = R.pick(
-      ['objective_title', 'objective_description', 'objective_priority'],
-      objective,
+    const { t } = this.props;
+    const initialValues = R.pipe(R.pick(['killChainPhase_name', 'killChainPhase_color']))(
+      this.props.killChainPhase,
     );
     return (
       <div>
@@ -77,7 +68,6 @@ class ObjectivePopover extends Component {
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
           size="large"
-          disabled={isExerciseReadOnly(exercise, true)}
         >
           <MoreVert />
         </IconButton>
@@ -101,7 +91,7 @@ class ObjectivePopover extends Component {
         >
           <DialogContent>
             <DialogContentText>
-              {t('Do you want to delete this objective?')}
+              {t('Do you want to delete this kill chain phase?')}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -121,9 +111,9 @@ class ObjectivePopover extends Component {
           maxWidth="md"
           PaperProps={{ elevation: 1 }}
         >
-          <DialogTitle>{t('Update the objective')}</DialogTitle>
+          <DialogTitle>{t('Update the kill chain phase')}</DialogTitle>
           <DialogContent>
-            <ObjectiveForm
+            <KillChainPhaseForm
               initialValues={initialValues}
               editing={true}
               onSubmit={this.onSubmitEdit.bind(this)}
@@ -136,15 +126,14 @@ class ObjectivePopover extends Component {
   }
 }
 
-ObjectivePopover.propTypes = {
+KillChainPhasePopover.propTypes = {
   t: PropTypes.func,
-  exercise: PropTypes.object,
-  objective: PropTypes.object,
-  updateObjective: PropTypes.func,
-  deleteObjective: PropTypes.func,
+  killChainPhase: PropTypes.object,
+  updateKillChainPhase: PropTypes.func,
+  deleteKillChainPhase: PropTypes.func,
 };
 
 export default R.compose(
-  connect(null, { updateObjective, deleteObjective }),
+  connect(null, { updateKillChainPhase, deleteKillChainPhase }),
   inject18n,
-)(ObjectivePopover);
+)(KillChainPhasePopover);

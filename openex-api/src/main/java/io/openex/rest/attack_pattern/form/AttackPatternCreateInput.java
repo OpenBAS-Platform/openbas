@@ -29,51 +29,34 @@ public class AttackPatternCreateInput {
     @JsonProperty("attack_pattern_permissions_required")
     private List<String> permissionsRequired = new ArrayList<>();
 
+    @JsonProperty("attack_pattern_kill_chain_phases")
+    private List<String> killChainPhasesIds = new ArrayList<>();
+
     @JsonProperty("attack_pattern_parent")
     private String parentId;
 
-    public String getName() {
-        return name;
-    }
-
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public String getExternalId() {
-        return externalId;
-    }
-
     public void setExternalId(String externalId) {
         this.externalId = externalId;
-    }
-
-    public List<String> getPlatforms() {
-        return platforms;
     }
 
     public void setPlatforms(List<String> platforms) {
         this.platforms = platforms;
     }
 
-    public List<String> getPermissionsRequired() {
-        return permissionsRequired;
-    }
-
     public void setPermissionsRequired(List<String> permissionsRequired) {
         this.permissionsRequired = permissionsRequired;
     }
 
-    public String getParentId() {
-        return parentId;
+    public void setKillChainPhasesIds(List<String> killChainPhasesIds) {
+        this.killChainPhasesIds = killChainPhasesIds;
     }
 
     public void setParentId(String parentId) {

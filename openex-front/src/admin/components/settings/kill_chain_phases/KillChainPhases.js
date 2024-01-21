@@ -1,20 +1,17 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { CheckCircleOutlined, PersonOutlined } from '@mui/icons-material';
-import { fetchUsers } from '../../../../actions/User';
-import { fetchOrganizations } from '../../../../actions/Organization';
-import ItemTags from '../../../../components/ItemTags';
+import { RouteOutlined } from '@mui/icons-material';
+import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import SearchFilter from '../../../../components/SearchFilter';
-import CreateUser from './CreateUser';
-import { fetchTags } from '../../../../actions/Tag';
-import TagsFilter from '../../../../components/TagsFilter';
+import CreateKillChainPhase from './CreateKillChainPhase';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
-import UserPopover from './UserPopover';
-import SecurityMenu from '../SecurityMenu';
+import KillChainPhasePopover from './KillChainPhasePopover';
+import TaxonomiesMenu from '../TaxonomiesMenu';
+import { useFormatter } from '../../../../components/i18n';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -50,45 +47,34 @@ const headerStyles = {
     padding: 0,
     top: '0px',
   },
-  user_email: {
+  phase_kill_chain_name: {
     float: 'left',
     width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
-  user_firstname: {
+  phase_name: {
+    float: 'left',
+    width: '30%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  phase_order: {
     float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
-  user_lastname: {
+  phase_created_at: {
     float: 'left',
     width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_organization: {
-    float: 'left',
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_admin: {
-    float: 'left',
-    width: '10%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_tags: {
-    float: 'left',
     fontSize: 12,
     fontWeight: '700',
   },
 };
 
 const inlineStyles = {
-  user_email: {
+  phase_kill_chain_name: {
     float: 'left',
     width: '25%',
     height: 20,
@@ -96,7 +82,15 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  user_firstname: {
+  phase_name: {
+    float: 'left',
+    width: '30%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  phase_order: {
     float: 'left',
     width: '15%',
     height: 20,
@@ -104,32 +98,9 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  user_lastname: {
+  phase_created_at: {
     float: 'left',
     width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  user_organization: {
-    float: 'left',
-    width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  user_admin: {
-    float: 'left',
-    width: '10%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  user_tags: {
-    float: 'left',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -137,43 +108,30 @@ const inlineStyles = {
   },
 };
 
-const Users = () => {
+const KillChainPhases = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const { nsdt } = useFormatter();
   const searchColumns = [
-    'email',
-    'firstname',
-    'lastname',
-    'phone',
-    'organization',
+    'kill_chain_name',
+    'name',
   ];
-  const filtering = useSearchAnFilter('user', 'email', searchColumns);
-  const { users, tagsMap, organizationsMap } = useHelper((helper) => ({
-    users: helper.getUsers(),
-    organizationsMap: helper.getOrganizationsMap(),
-    tagsMap: helper.getTagsMap(),
+  const filtering = useSearchAnFilter('phase', 'order', searchColumns);
+  const { killChainPhases } = useHelper((helper) => ({
+    killChainPhases: helper.getKillChainPhases(),
   }));
   useDataLoader(() => {
-    dispatch(fetchTags());
-    dispatch(fetchOrganizations());
-    dispatch(fetchUsers());
+    dispatch(fetchKillChainPhases());
   });
   return (
     <div className={classes.container}>
-      <SecurityMenu />
+      <TaxonomiesMenu />
       <div className={classes.parameters}>
         <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
             variant="small"
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
-          />
-        </div>
-        <div style={{ float: 'left', marginRight: 10 }}>
-          <TagsFilter
-            onAddTag={filtering.handleAddTag}
-            onRemoveTag={filtering.handleRemoveTag}
-            currentTags={filtering.tags}
           />
         </div>
       </div>
@@ -197,114 +155,84 @@ const Users = () => {
           </ListItemIcon>
           <ListItemText
             primary={
-              <>
+              <div>
                 {filtering.buildHeader(
-                  'user_email',
-                  'Email address',
+                  'phase_kill_chain_name',
+                  'Kill chain',
                   true,
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'user_firstname',
-                  'Firstname',
+                  'phase_name',
+                  'Name',
                   true,
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'user_lastname',
-                  'Lastname',
+                  'phase_order',
+                  'Order',
                   true,
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'user_organization',
-                  'Organization',
+                  'phase_created_at',
+                  'Created',
                   true,
                   headerStyles,
                 )}
-                {filtering.buildHeader(
-                  'user_admin',
-                  'Administrator',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader('user_tags', 'Tags', true, headerStyles)}
-              </>
+              </div>
             }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {filtering.filterAndSort(users ?? []).map((user) => (
+        {filtering.filterAndSort(killChainPhases ?? []).map((killChainPhase) => (
           <ListItem
-            key={user.user_id}
+            key={killChainPhase.killChainPhase_id}
             classes={{ root: classes.item }}
             divider={true}
           >
             <ListItemIcon>
-              <PersonOutlined color="primary" />
+              <RouteOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={
                 <div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.user_email}
+                    style={inlineStyles.phase_kill_chain_name}
                   >
-                    {user.user_email}
+                    {killChainPhase.phase_kill_chain_name}
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.user_firstname}
+                    style={inlineStyles.phase_name}
                   >
-                    {user.user_firstname}
+                    {killChainPhase.phase_name}
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.user_lastname}
+                    style={inlineStyles.phase_order}
                   >
-                    {user.user_lastname}
+                    {killChainPhase.phase_order}
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.user_organization}
+                    style={inlineStyles.phase_created_at}
                   >
-                    {
-                      organizationsMap[user.user_organization]
-                        ?.organization_name
-                    }
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.user_admin}
-                  >
-                    {user.user_admin ? (
-                      <CheckCircleOutlined fontSize="small" />
-                    ) : (
-                      '-'
-                    )}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.user_tags}
-                  >
-                    <ItemTags variant="list" tags={user.user_tags} />
+                    {nsdt(killChainPhase.phase_created_at)}
                   </div>
                 </div>
               }
             />
             <ListItemSecondaryAction>
-              <UserPopover
-                user={user}
-                tagsMap={tagsMap}
-                organizationsMap={organizationsMap}
-              />
+              <KillChainPhasePopover killChainPhase={killChainPhase} />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
-      <CreateUser />
+      <CreateKillChainPhase />
     </div>
   );
 };
 
-export default Users;
+export default KillChainPhases;

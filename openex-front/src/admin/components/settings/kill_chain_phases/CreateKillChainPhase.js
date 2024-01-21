@@ -2,22 +2,23 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
+import { Fab, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import { IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import { Add } from '@mui/icons-material';
-import ObjectiveForm from './ObjectiveForm';
-import { addObjective } from '../../../../actions/Objective';
+import { addKillChainPhase } from '../../../../actions/KillChainPhase';
+import KillChainPhaseForm from './KillChainPhaseForm';
 import inject18n from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 
 const styles = () => ({
   createButton: {
-    float: 'left',
-    marginTop: -15,
+    position: 'fixed',
+    bottom: 30,
+    right: 230,
   },
 });
 
-class CreateObjective extends Component {
+class CreateKillChainPhase extends Component {
   constructor(props) {
     super(props);
     this.state = { open: false };
@@ -33,7 +34,7 @@ class CreateObjective extends Component {
 
   onSubmit(data) {
     return this.props
-      .addObjective(this.props.exerciseId, data)
+      .addKillChainPhase(data)
       .then((result) => (result.result ? this.handleClose() : result));
   }
 
@@ -41,15 +42,14 @@ class CreateObjective extends Component {
     const { classes, t } = this.props;
     return (
       <div>
-        <IconButton
-          color="secondary"
-          aria-label="Add"
+        <Fab
           onClick={this.handleOpen.bind(this)}
-          classes={{ root: classes.createButton }}
-          size="large"
+          color="primary"
+          aria-label="Add"
+          className={classes.createButton}
         >
-          <Add fontSize="small" />
-        </IconButton>
+          <Add />
+        </Fab>
         <Dialog
           open={this.state.open}
           TransitionComponent={Transition}
@@ -58,10 +58,10 @@ class CreateObjective extends Component {
           maxWidth="md"
           PaperProps={{ elevation: 1 }}
         >
-          <DialogTitle>{t('Create a new objective')}</DialogTitle>
+          <DialogTitle>{t('Create a new kill chain phase')}</DialogTitle>
           <DialogContent>
-            <ObjectiveForm
-              initialValues={{ objective_priority: 1 }}
+            <KillChainPhaseForm
+              editing={false}
               onSubmit={this.onSubmit.bind(this)}
               handleClose={this.handleClose.bind(this)}
             />
@@ -72,15 +72,17 @@ class CreateObjective extends Component {
   }
 }
 
-CreateObjective.propTypes = {
-  classes: PropTypes.object,
+CreateKillChainPhase.propTypes = {
   t: PropTypes.func,
-  exerciseId: PropTypes.string,
-  addObjective: PropTypes.func,
+  addKillChainPhase: PropTypes.func,
 };
 
+const select = (state) => ({
+  organizations: state.referential.entities.organizations,
+});
+
 export default R.compose(
-  connect(null, { addObjective }),
+  connect(select, { addKillChainPhase }),
   inject18n,
   withStyles(styles),
-)(CreateObjective);
+)(CreateKillChainPhase);

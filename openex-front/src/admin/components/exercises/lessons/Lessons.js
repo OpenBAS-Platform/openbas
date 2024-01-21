@@ -34,7 +34,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchObjectives } from '../../../../actions/Objective';
-import { Transition } from '../../../../utils/Environment';
+import Transition from '../../../../components/common/Transition';
 import ObjectiveEvaluations from './ObjectiveEvaluations';
 import ResultsMenu from '../ResultsMenu';
 import { fetchInjects } from '../../../../actions/Inject';

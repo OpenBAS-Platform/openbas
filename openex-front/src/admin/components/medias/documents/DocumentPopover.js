@@ -8,7 +8,7 @@ import { updateDocument, deleteDocument } from '../../../../actions/Document';
 import DocumentForm from './DocumentForm';
 import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
-import { Transition } from '../../../../utils/Environment';
+import Transition from '../../../../components/common/Transition';
 import { exerciseOptions, tagOptions } from '../../../../utils/Option';
 
 class DocumentPopover extends Component {

@@ -56,7 +56,7 @@ const ChannelsFilter = (props) => {
   });
   const channelsOptions = channels.map(channelTransform);
   return (
-    <div>
+    <>
       <Autocomplete
         sx={{ width: fullWidth ? '100%' : 250, float: 'left' }}
         selectOnFocus={true}
@@ -105,7 +105,7 @@ const ChannelsFilter = (props) => {
           )}
         </div>
       )}
-    </div>
+    </>
   );
 };
 

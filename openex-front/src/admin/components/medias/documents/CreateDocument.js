@@ -8,7 +8,7 @@ import { Add, ControlPointOutlined } from '@mui/icons-material';
 import DocumentForm from './DocumentForm';
 import { addDocument, fetchDocument } from '../../../../actions/Document';
 import inject18n from '../../../../components/i18n';
-import { Transition } from '../../../../utils/Environment';
+import Transition from '../../../../components/common/Transition';
 
 const styles = (theme) => ({
   createButton: {

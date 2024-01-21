@@ -273,6 +273,13 @@ const i18n = {
         'Aucun stimuli en attente dans cet exercice.',
       'Add media pressure in this inject':
         'Ajouter de la pression médiatique dans ce stimuli',
+      'External ID': 'ID externe',
+      'Update the attack pattern': "Modifier le motif d'attaque",
+      'Create a new attack pattern': "Créer un nouveau motif d'attaque",
+      'Create a new kill chain phase': 'Créer une nouvelle phase de kill chain',
+      'Phase name': 'Nom de la phase',
+      'Kill chain name': 'Nom de la kill chain',
+      'Update the kill chain phase': 'Modifier la phase de la kill chain',
       openex_email: 'Email',
       openex_ovh_sms: 'SMS (OVH)',
       openex_mastodon: 'Mastodon',

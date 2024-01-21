@@ -3,18 +3,14 @@ import { useDispatch } from 'react-redux';
 import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CheckCircleOutlined, PersonOutlined } from '@mui/icons-material';
-import { fetchUsers } from '../../../../actions/User';
-import { fetchOrganizations } from '../../../../actions/Organization';
-import ItemTags from '../../../../components/ItemTags';
+import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import SearchFilter from '../../../../components/SearchFilter';
-import CreateUser from './CreateUser';
-import { fetchTags } from '../../../../actions/Tag';
-import TagsFilter from '../../../../components/TagsFilter';
+import CreateAttackPattern from './CreateAttackPattern';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
-import UserPopover from './UserPopover';
-import SecurityMenu from '../SecurityMenu';
+import AttackPatternPopover from './AttackPatternPopover';
+import TaxonomiesMenu from '../TaxonomiesMenu';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -50,45 +46,40 @@ const headerStyles = {
     padding: 0,
     top: '0px',
   },
-  user_email: {
+  kill_chain_phase: {
     float: 'left',
     width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
-  user_firstname: {
+  attack_pattern_external_id: {
     float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
-  user_lastname: {
+  attack_pattern_name: {
     float: 'left',
-    width: '15%',
+    width: '35%',
     fontSize: 12,
     fontWeight: '700',
   },
-  user_organization: {
+  attack_pattern_created_at: {
     float: 'left',
-    width: '20%',
+    width: '12%',
     fontSize: 12,
     fontWeight: '700',
   },
-  user_admin: {
+  attack_pattern_updated_at: {
     float: 'left',
-    width: '10%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_tags: {
-    float: 'left',
+    width: '12%',
     fontSize: 12,
     fontWeight: '700',
   },
 };
 
 const inlineStyles = {
-  user_email: {
+  kill_chain_phase: {
     float: 'left',
     width: '25%',
     height: 20,
@@ -96,7 +87,7 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  user_firstname: {
+  attack_pattern_external_id: {
     float: 'left',
     width: '15%',
     height: 20,
@@ -104,32 +95,25 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  user_lastname: {
+  attack_pattern_name: {
     float: 'left',
-    width: '15%',
+    width: '35%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  user_organization: {
+  attack_pattern_created_at: {
     float: 'left',
-    width: '20%',
+    width: '12%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  user_admin: {
+  attack_pattern_updated_at: {
     float: 'left',
-    width: '10%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  user_tags: {
-    float: 'left',
+    width: '12%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -137,43 +121,30 @@ const inlineStyles = {
   },
 };
 
-const Users = () => {
+const AttackPatterns = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const searchColumns = [
-    'email',
-    'firstname',
-    'lastname',
-    'phone',
-    'organization',
+    'name',
+    'description',
+    'external_id',
   ];
-  const filtering = useSearchAnFilter('user', 'email', searchColumns);
-  const { users, tagsMap, organizationsMap } = useHelper((helper) => ({
-    users: helper.getUsers(),
-    organizationsMap: helper.getOrganizationsMap(),
-    tagsMap: helper.getTagsMap(),
+  const filtering = useSearchAnFilter('attack_pattern', 'external_id', searchColumns);
+  const { attackPatterns, tagsMap, organizationsMap } = useHelper((helper) => ({
+    attackPatterns: helper.getAttackPatterns(),
   }));
   useDataLoader(() => {
-    dispatch(fetchTags());
-    dispatch(fetchOrganizations());
-    dispatch(fetchUsers());
+    dispatch(fetchAttackPatterns());
   });
   return (
     <div className={classes.container}>
-      <SecurityMenu />
+      <TaxonomiesMenu />
       <div className={classes.parameters}>
         <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
             variant="small"
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
-          />
-        </div>
-        <div style={{ float: 'left', marginRight: 10 }}>
-          <TagsFilter
-            onAddTag={filtering.handleAddTag}
-            onRemoveTag={filtering.handleRemoveTag}
-            currentTags={filtering.tags}
           />
         </div>
       </div>
@@ -199,44 +170,43 @@ const Users = () => {
             primary={
               <>
                 {filtering.buildHeader(
-                  'user_email',
-                  'Email address',
+                  'kill_chain_phase',
+                  'Kill chain phase',
+                  false,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'attack_pattern_external_id',
+                  'External ID',
                   true,
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'user_firstname',
-                  'Firstname',
+                  'attack_pattern_name',
+                  'Name',
                   true,
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'user_lastname',
-                  'Lastname',
+                  'attack_pattern_created_at',
+                  'Created',
                   true,
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'user_organization',
-                  'Organization',
+                  'attack_pattern_updated_at',
+                  'Updated',
                   true,
                   headerStyles,
                 )}
-                {filtering.buildHeader(
-                  'user_admin',
-                  'Administrator',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader('user_tags', 'Tags', true, headerStyles)}
               </>
             }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {filtering.filterAndSort(users ?? []).map((user) => (
+        {filtering.filterAndSort(attackPatterns ?? []).map((attackPattern) => (
           <ListItem
-            key={user.user_id}
+            key={attackPattern.attackPattern_id}
             classes={{ root: classes.item }}
             divider={true}
           >
@@ -248,36 +218,36 @@ const Users = () => {
                 <div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.user_email}
+                    style={inlineStyles.attackPattern_email}
                   >
-                    {user.user_email}
+                    {attackPattern.attackPattern_email}
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.user_firstname}
+                    style={inlineStyles.attackPattern_firstname}
                   >
-                    {user.user_firstname}
+                    {attackPattern.attackPattern_firstname}
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.user_lastname}
+                    style={inlineStyles.attackPattern_lastname}
                   >
-                    {user.user_lastname}
+                    {attackPattern.attackPattern_lastname}
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.user_organization}
+                    style={inlineStyles.attackPattern_organization}
                   >
                     {
-                      organizationsMap[user.user_organization]
+                      organizationsMap[attackPattern.attackPattern_organization]
                         ?.organization_name
                     }
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.user_admin}
+                    style={inlineStyles.attackPattern_admin}
                   >
-                    {user.user_admin ? (
+                    {attackPattern.attackPattern_admin ? (
                       <CheckCircleOutlined fontSize="small" />
                     ) : (
                       '-'
@@ -285,16 +255,16 @@ const Users = () => {
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.user_tags}
+                    style={inlineStyles.attackPattern_lastname}
                   >
-                    <ItemTags variant="list" tags={user.user_tags} />
+                    {attackPattern.attackPattern_lastname}
                   </div>
                 </div>
               }
             />
             <ListItemSecondaryAction>
-              <UserPopover
-                user={user}
+              <AttackPatternPopover
+                attackPattern={attackPattern}
                 tagsMap={tagsMap}
                 organizationsMap={organizationsMap}
               />
@@ -302,9 +272,9 @@ const Users = () => {
           </ListItem>
         ))}
       </List>
-      <CreateUser />
+      <CreateAttackPattern />
     </div>
   );
 };
 
-export default Users;
+export default AttackPatterns;

@@ -12,7 +12,7 @@ import { fetchTeams } from '../../../../actions/Team';
 import CreateTeam from '../../persons/teams/CreateTeam';
 import { truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
-import { Transition } from '../../../../utils/Environment';
+import Transition from '../../../../components/common/Transition';
 import TagsFilter from '../../../../components/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
 

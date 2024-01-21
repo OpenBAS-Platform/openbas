@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
+import io.openex.helper.MultiIdDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -64,7 +65,7 @@ public class AttackPattern implements Base {
     @Getter
     @Setter
     @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
-    @Column(name = "attack_pattern_permissions_required")
+    @Column(name = "attack_pattern_permissions_required", columnDefinition = "text[]")
     @JsonProperty("attack_pattern_permissions_required")
     private ArrayList<String> permissionsRequired = new ArrayList<>();
 
@@ -87,6 +88,16 @@ public class AttackPattern implements Base {
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("attack_pattern_parent")
     private AttackPattern parent;
+
+    @Getter
+    @Setter
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "attack_patterns_kill_chain_phases",
+            joinColumns = @JoinColumn(name = "attack_pattern_id"),
+            inverseJoinColumns = @JoinColumn(name = "phase_id"))
+    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonProperty("attack_pattern_kill_chain_phases")
+    private List<KillChainPhase> killChainPhases = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -158,6 +169,14 @@ public class AttackPattern implements Base {
 
     public void setParent(AttackPattern parent) {
         this.parent = parent;
+    }
+
+    public List<KillChainPhase> getKillChainPhases() {
+        return killChainPhases;
+    }
+
+    public void setKillChainPhases(List<KillChainPhase> killChainPhases) {
+        this.killChainPhases = killChainPhases;
     }
 
     @Override

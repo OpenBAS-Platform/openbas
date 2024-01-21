@@ -20,24 +20,12 @@ public class KillChainPhaseCreateInput {
     @JsonProperty("phase_order")
     private Long order;
 
-    public String getName() {
-        return name;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
 
-    public String getKillChainName() {
-        return killChainName;
-    }
-
     public void setKillChainName(String killChainName) {
         this.killChainName = killChainName;
-    }
-
-    public Long getOrder() {
-        return order;
     }
 
     public void setOrder(Long order) {

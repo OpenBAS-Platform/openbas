@@ -2,22 +2,23 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
+import { Fab, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import { IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import { Add } from '@mui/icons-material';
-import ObjectiveForm from './ObjectiveForm';
-import { addObjective } from '../../../../actions/Objective';
+import { addAttackPattern } from '../../../../actions/AttackPattern';
+import AttackPatternForm from './AttackPatternForm';
 import inject18n from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 
 const styles = () => ({
   createButton: {
-    float: 'left',
-    marginTop: -15,
+    position: 'fixed',
+    bottom: 30,
+    right: 230,
   },
 });
 
-class CreateObjective extends Component {
+class CreateAttackPattern extends Component {
   constructor(props) {
     super(props);
     this.state = { open: false };
@@ -32,8 +33,11 @@ class CreateObjective extends Component {
   }
 
   onSubmit(data) {
+    const inputValues = R.pipe(
+      R.assoc('attack_pattern_kill_chain_phases', R.pluck('id', data.attack_pattern_kill_chain_phases)),
+    )(data);
     return this.props
-      .addObjective(this.props.exerciseId, data)
+      .addAttackPattern(inputValues)
       .then((result) => (result.result ? this.handleClose() : result));
   }
 
@@ -41,15 +45,14 @@ class CreateObjective extends Component {
     const { classes, t } = this.props;
     return (
       <div>
-        <IconButton
-          color="secondary"
-          aria-label="Add"
+        <Fab
           onClick={this.handleOpen.bind(this)}
-          classes={{ root: classes.createButton }}
-          size="large"
+          color="primary"
+          aria-label="Add"
+          className={classes.createButton}
         >
-          <Add fontSize="small" />
-        </IconButton>
+          <Add />
+        </Fab>
         <Dialog
           open={this.state.open}
           TransitionComponent={Transition}
@@ -58,11 +61,12 @@ class CreateObjective extends Component {
           maxWidth="md"
           PaperProps={{ elevation: 1 }}
         >
-          <DialogTitle>{t('Create a new objective')}</DialogTitle>
+          <DialogTitle>{t('Create a new attack pattern')}</DialogTitle>
           <DialogContent>
-            <ObjectiveForm
-              initialValues={{ objective_priority: 1 }}
+            <AttackPatternForm
+              editing={false}
               onSubmit={this.onSubmit.bind(this)}
+              initialValues={{ attack_pattern_kill_chain_phases: [] }}
               handleClose={this.handleClose.bind(this)}
             />
           </DialogContent>
@@ -72,15 +76,14 @@ class CreateObjective extends Component {
   }
 }
 
-CreateObjective.propTypes = {
-  classes: PropTypes.object,
+CreateAttackPattern.propTypes = {
   t: PropTypes.func,
-  exerciseId: PropTypes.string,
-  addObjective: PropTypes.func,
+  organizations: PropTypes.array,
+  addAttackPattern: PropTypes.func,
 };
 
 export default R.compose(
-  connect(null, { addObjective }),
+  connect(null, { addAttackPattern }),
   inject18n,
   withStyles(styles),
-)(CreateObjective);
+)(CreateAttackPattern);

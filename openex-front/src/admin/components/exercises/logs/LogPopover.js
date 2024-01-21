@@ -7,7 +7,7 @@ import { MoreVert } from '@mui/icons-material';
 import { updateLog, deleteLog } from '../../../../actions/Log';
 import LogForm from './LogForm';
 import inject18n from '../../../../components/i18n';
-import { Transition } from '../../../../utils/Environment';
+import Transition from '../../../../components/common/Transition';
 import { storeHelper } from '../../../../actions/Schema';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { tagOptions } from '../../../../utils/Option';

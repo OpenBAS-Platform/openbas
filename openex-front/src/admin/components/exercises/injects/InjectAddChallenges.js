@@ -12,7 +12,7 @@ import { fetchChallenges } from '../../../../actions/Challenge';
 import CreateChallenge from '../../challenges/CreateChallenge';
 import { truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
-import { Transition } from '../../../../utils/Environment';
+import Transition from '../../../../components/common/Transition';
 import TagsFilter from '../../../../components/TagsFilter';
 
 const styles = (theme) => ({

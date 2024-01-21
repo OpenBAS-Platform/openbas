@@ -40,6 +40,8 @@ export const entitiesInitializer = Immutable({
     lessonsanswers: Immutable({}),
     reports: Immutable({}),
     variables: Immutable({}),
+    killchainphases: Immutable({}),
+    attackpatterns: Immutable({}),
   }),
 });
 
