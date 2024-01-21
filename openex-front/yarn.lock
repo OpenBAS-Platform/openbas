@@ -8457,13 +8457,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-dom-parser@npm:5.0.6":
-  version: 5.0.6
-  resolution: "html-dom-parser@npm:5.0.6"
+"html-dom-parser@npm:5.0.7":
+  version: 5.0.7
+  resolution: "html-dom-parser@npm:5.0.7"
   dependencies:
     domhandler: 5.0.3
-    htmlparser2: 9.0.0
-  checksum: 6c647102f8ae686608b098ae4894112d43263970abdfcc31da296bfab2cfc8fb373e602adf4d4d9b0a089c8541bb5d0845e001fa667d02db552859ffa331424d
+    htmlparser2: 9.1.0
+  checksum: 92a40338753520d77e356b943524353acb822d5149929384533367a5a3e9c44c69699c1a7725a7ba65d1216266f40599702f60891c20baae2cea1ec06fe6be35
   languageName: node
   linkType: hard
 
@@ -8476,17 +8476,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-react-parser@npm:5.0.11":
-  version: 5.0.11
-  resolution: "html-react-parser@npm:5.0.11"
+"html-react-parser@npm:5.1.1":
+  version: 5.1.1
+  resolution: "html-react-parser@npm:5.1.1"
   dependencies:
     domhandler: 5.0.3
-    html-dom-parser: 5.0.6
+    html-dom-parser: 5.0.7
     react-property: 2.0.2
     style-to-js: 1.1.10
   peerDependencies:
     react: 0.14 || 15 || 16 || 17 || 18
-  checksum: 79c543284a8954cd6ae06d53f16e2eb7228b23334fd0a3acb9aeddff83cb91ec6175e0e24a896a4436777b664bab028876bbf84c826d666b69550fc2fb159bf5
+  checksum: 3a4b615bdb704f4b0dbca73eed9db98598fb2ef6b75542801331bc42730ca34952d2198f0681cda9ad5b258c6e68c347084a9f77c026775b115ab18a100f8a2f
   languageName: node
   linkType: hard
 
@@ -8511,15 +8511,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"htmlparser2@npm:9.0.0":
-  version: 9.0.0
-  resolution: "htmlparser2@npm:9.0.0"
+"htmlparser2@npm:9.1.0":
+  version: 9.1.0
+  resolution: "htmlparser2@npm:9.1.0"
   dependencies:
     domelementtype: ^2.3.0
     domhandler: ^5.0.3
     domutils: ^3.1.0
     entities: ^4.5.0
-  checksum: a234c3add821cae8308ca61ce4b8ad3e88af83cf9c3c2003059adc89c46a06ffc39cc2a92b39af8d16c3705e1055df6769d80877acb6529983867f0d7e74098d
+  checksum: e5f8d5193967e4a500226f37bdf2c0f858cecb39dde14d0439f24bf2c461a4342778740d988fbaba652b0e4cb6052f7f2e99e69fc1a329a86c629032bb76e7c8
   languageName: node
   linkType: hard
 
@@ -11047,7 +11047,7 @@ __metadata:
     fs-extra: 11.2.0
     globals: 13.24.0
     history: 5.3.0
-    html-react-parser: 5.0.11
+    html-react-parser: 5.1.1
     html-to-image: 1.11.11
     http-proxy-middleware: 2.0.6
     js-file-download: 0.4.12
