@@ -477,7 +477,7 @@ export interface Endpoint {
   endpoint_hostname?: string;
   endpoint_ips: string[];
   /** @format date-time */
-  endpoint_last_seen?: string;
+  asset_last_seen?: string;
   endpoint_mac_adresses?: string[];
   endpoint_platform: "Linux" | "Windows" | "Darwin";
   updateAttributes?: object;
@@ -494,7 +494,7 @@ export interface EndpointInput {
    */
   endpoint_ips: string[];
   /** @format date-time */
-  endpoint_last_seen?: string;
+  asset_last_seen?: string;
   endpoint_mac_adresses?: string[];
   endpoint_platform: "Linux" | "Windows" | "Darwin";
 }

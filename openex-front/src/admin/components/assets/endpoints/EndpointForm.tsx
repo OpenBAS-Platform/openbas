@@ -23,10 +23,10 @@ const EndpointForm: React.FC<Props> = ({
   initialValues = {
     asset_name: '',
     asset_description: '',
+    asset_last_seen: undefined,
     asset_tags: [],
     endpoint_hostname: '',
     endpoint_ips: [],
-    endpoint_last_seen: undefined,
     endpoint_mac_adresses: [],
     endpoint_platform: undefined,
   },
@@ -47,10 +47,10 @@ const EndpointForm: React.FC<Props> = ({
       zodImplement<EndpointInput>().with({
         asset_name: z.string().min(1, { message: t('Should not be empty') }),
         asset_description: z.string().optional(),
+        asset_last_seen: z.string().datetime().optional(),
         asset_tags: z.string().array().optional(),
         endpoint_hostname: z.string().optional(),
         endpoint_ips: z.string().ip({ message: t('Invalid Ip Address') }).array().min(1),
-        endpoint_last_seen: z.string().datetime().optional(),
         endpoint_mac_adresses: z
           .string()
           .regex(
@@ -85,6 +85,34 @@ const EndpointForm: React.FC<Props> = ({
         helperText={errors.asset_description?.message}
         inputProps={register('asset_description')}
       />
+
+      <Controller
+        control={control}
+        name="asset_last_seen"
+        render={({ field }) => (
+          <MuiDateTimePicker
+            value={field.value ? new Date(field.value) : ''}
+            label={t('Last Seen')}
+            slotProps={{
+              textField: {
+                variant: 'standard',
+                fullWidth: true,
+                style: { marginTop: 20 },
+                error: !!errors.asset_last_seen,
+                helperText: errors.asset_last_seen && errors.asset_last_seen?.message,
+              },
+            }}
+            onChange={(date) => {
+              if (date instanceof Date) {
+                field.onChange(date?.toISOString());
+              }
+            }}
+            ampm={false}
+            format="yyyy-MM-dd HH:mm:ss"
+          />
+        )}
+      />
+
       <TextField
         variant="standard"
         fullWidth
@@ -130,33 +158,6 @@ const EndpointForm: React.FC<Props> = ({
             </>
           );
         }}
-      />
-
-      <Controller
-        control={control}
-        name="endpoint_last_seen"
-        render={({ field }) => (
-          <MuiDateTimePicker
-            value={field.value ? new Date(field.value) : ''}
-            label={t('Last Seen')}
-            slotProps={{
-              textField: {
-                variant: 'standard',
-                fullWidth: true,
-                style: { marginTop: 20 },
-                error: !!errors.endpoint_last_seen,
-                helperText: errors.endpoint_last_seen && errors.endpoint_last_seen?.message,
-              },
-            }}
-            onChange={(date) => {
-              if (date instanceof Date) {
-                field.onChange(date?.toISOString());
-              }
-            }}
-            ampm={false}
-            format="yyyy-MM-dd HH:mm:ss"
-          />
-        )}
       />
 
       <Controller

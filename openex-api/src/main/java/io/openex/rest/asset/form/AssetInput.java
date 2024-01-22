@@ -5,6 +5,7 @@ import lombok.Data;
 
 import jakarta.validation.constraints.NotBlank;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,9 @@ public abstract class AssetInput {
 
   @JsonProperty("asset_description")
   private String description;
+
+  @JsonProperty("asset_last_seen")
+  private Instant lastSeen;
 
   @JsonProperty("asset_tags")
   private List<String> tagIds = new ArrayList<>();

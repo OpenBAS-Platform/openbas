@@ -32,19 +32,19 @@ const EndpointPopover: React.FC<Props> = ({
   const initialValues = (({
     asset_name,
     asset_description,
+    asset_last_seen,
     asset_tags,
     endpoint_hostname,
     endpoint_ips,
-    endpoint_last_seen,
     endpoint_mac_adresses,
     endpoint_platform,
   }) => ({
     asset_name,
     asset_description,
+    asset_last_seen: asset_last_seen ?? undefined,
     asset_tags,
     endpoint_hostname,
     endpoint_ips,
-    endpoint_last_seen: endpoint_last_seen ?? undefined,
     endpoint_mac_adresses: endpoint_mac_adresses ?? [],
     endpoint_platform,
   }))(endpoint);

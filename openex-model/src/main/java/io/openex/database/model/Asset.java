@@ -31,8 +31,6 @@ import static lombok.AccessLevel.NONE;
 @EntityListeners(ModelBaseListener.class)
 public class Asset implements Base {
 
-  public static final String MANUAL_SOURCE = "Manual";
-
   @Id
   @Column(name = "asset_id")
   @GeneratedValue(generator = "UUID")
@@ -51,6 +49,11 @@ public class Asset implements Base {
   @Type(PostgreSQLHStoreType.class)
   private Map<String, String> sources = new HashMap<>();
 
+  @Column(name = "asset_blobs")
+  @JsonProperty("asset_blobs")
+  @Type(PostgreSQLHStoreType.class)
+  private Map<String, String> blobs = new HashMap<>();
+
   @NotBlank
   @Column(name = "asset_name")
   @JsonProperty("asset_name")
@@ -59,6 +62,10 @@ public class Asset implements Base {
   @Column(name = "asset_description")
   @JsonProperty("asset_description")
   private String description;
+
+  @Column(name = "asset_last_seen")
+  @JsonProperty("asset_last_seen")
+  private Instant lastSeen;
 
   // -- TAG --
 

@@ -10,8 +10,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
 
-import java.time.Instant;
-
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
@@ -45,13 +43,9 @@ public class Endpoint extends Asset {
   @NotNull
   private PLATFORM_TYPE platform;
 
-  @Column(name = "endpoint_last_seen")
-  @JsonProperty("endpoint_last_seen")
-  private Instant lastSeen;
-
   @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
-  @Column(name = "endpoint_mac_adresses")
-  @JsonProperty("endpoint_mac_adresses")
-  private String[] macAdresses;
+  @Column(name = "endpoint_mac_addresses")
+  @JsonProperty("endpoint_mac_addresses")
+  private String[] macAddresses;
 
 }

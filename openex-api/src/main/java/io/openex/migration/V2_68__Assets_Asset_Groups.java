@@ -24,8 +24,10 @@ public class V2_68__Assets_Asset_Groups extends BaseJavaMigration {
             asset_id varchar(255) not null constraint assets_pkey primary key,
             asset_type varchar(255) not null,
             asset_sources hstore,
+            asset_blobs hstore,
             asset_name varchar(255) not null,
             asset_description text,
+            asset_last_seen timestamp,
             asset_created_at timestamp not null default now(),
             asset_updated_at timestamp not null default now()
         );
@@ -36,8 +38,7 @@ public class V2_68__Assets_Asset_Groups extends BaseJavaMigration {
         ALTER TABLE assets ADD COLUMN endpoint_ips text[];
         ALTER TABLE assets ADD COLUMN endpoint_hostname varchar(255);
         ALTER TABLE assets ADD COLUMN endpoint_platform varchar(255) not null;
-        ALTER TABLE assets ADD COLUMN endpoint_last_seen timestamp;
-        ALTER TABLE assets ADD COLUMN endpoint_mac_adresses text[];
+        ALTER TABLE assets ADD COLUMN endpoint_mac_addresses text[];
         """);
     // Add association table between asset and tag
     select.execute("""

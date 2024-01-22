@@ -120,7 +120,7 @@ const inlineStyles: {
 };
 
 const collectedBy = (endpoint: EndpointStore) => {
-  return Object.keys(endpoint.asset_sources ?? {}).filter((e) => e !== 'Manual').join(', ');
+  return Object.keys(endpoint.asset_sources ?? {}).join(', ');
 };
 
 const Endpoints = () => {
@@ -166,10 +166,10 @@ const Endpoints = () => {
                 [
                   'asset_name',
                   'asset_description',
+                  'asset_last_seen',
                   'endpoint_ips',
                   'endpoint_hostname',
                   'endpoint_platform',
-                  'endpoint_last_seen',
                   'endpoint_mac_adresses',
                   'asset_tags',
                 ],

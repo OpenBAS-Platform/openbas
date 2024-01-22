@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V2_69__Inject_async_ids extends BaseJavaMigration {
+public class V2_69__Modify_Inject_async_ids extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {

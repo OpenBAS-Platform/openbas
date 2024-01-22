@@ -9,8 +9,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.time.Instant;
-
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
 @EqualsAndHashCode(callSuper = true)
@@ -28,9 +26,6 @@ public class EndpointInput extends AssetInput {
   @NotNull(message = MANDATORY_MESSAGE)
   @JsonProperty("endpoint_platform")
   private Endpoint.PLATFORM_TYPE platform;
-
-  @JsonProperty("endpoint_last_seen")
-  private Instant lastSeen;
 
   @JsonProperty("endpoint_mac_adresses")
   private String[] macAdresses;
