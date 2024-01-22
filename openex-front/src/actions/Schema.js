@@ -242,6 +242,7 @@ const maps = (key, state) => state.referential.entities[key].asMutable({ deep: t
 const entities = (key, state) => Object.values(maps(key, state));
 const entity = (id, key, state) => state.referential.entities[key][id]?.asMutable({ deep: true });
 const me = (state) => state.referential.entities.users[R.path(['logged', 'user'], state.app)];
+const contractImages = (state) => state.app.contractImages;
 
 export const storeHelper = (state) => ({
   logged: () => state.app.logged,
@@ -295,7 +296,7 @@ export const storeHelper = (state) => ({
   ),
   getExerciseUserLessonsAnswers: (exerciseId, userId) => entities('lessonsanswers', state).filter(
     (l) => l.lessons_answer_exercise === exerciseId
-        && l.lessons_answer_user === userId,
+      && l.lessons_answer_user === userId,
   ),
   getExerciseReports: (exerciseId) => entities('reports', state).filter((l) => l.report_exercise === exerciseId),
   // report
@@ -335,7 +336,7 @@ export const storeHelper = (state) => ({
     entities('inject_types', state)
       .map((t) => ({
         hasTeams:
-            t.fields.filter((f) => f.key === 'teams').length > 0,
+          t.fields.filter((f) => f.key === 'teams').length > 0,
         ...t,
       }))
       .filter((t) => !t.hasTeams)
@@ -407,4 +408,12 @@ export const storeHelper = (state) => ({
   getLessonsTemplateCategoryQuestions: (id) => entities('lessonstemplatequestions', state).filter(
     (c) => c.lessons_template_question_category === id,
   ),
+  // assets
+  getEndpoints: () => entities('endpoints', state),
+  getEndpointsMap: () => maps('endpoints', state),
+  // asset groups
+  getAssetGroups: () => entities('asset_groups', state),
+  getAssetGroup: (id) => entity(id, 'asset_groups', state),
+  // contracts
+  getContractImages: () => contractImages(state),
 });

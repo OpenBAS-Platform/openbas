@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Form } from 'react-final-form';
-import { Button, Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import TextField from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';
@@ -127,7 +127,7 @@ class InjectForm extends Component {
               renderOption={(renderProps, option) => (
                 <Box component="li" {...renderProps}>
                   <div className={classes.icon}>
-                    <InjectIcon type={option.type} />
+                    <InjectIcon type={option.type}/>
                   </div>
                   <div className={classes.text}>{t(option.label)}</div>
                 </Box>

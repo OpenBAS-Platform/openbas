@@ -14,6 +14,7 @@ export interface OrganizationsHelper {
 }
 
 export interface TagsHelper {
+  getTags: () => Tag[];
   getTagsMap: () => Record<string, Tag>;
 }
 

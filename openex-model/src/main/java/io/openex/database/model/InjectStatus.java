@@ -6,6 +6,7 @@ import io.openex.database.converter.ExecutionConverter;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.Type;
 
 import jakarta.persistence.*;
 import java.time.Instant;
@@ -13,12 +14,12 @@ import java.util.Objects;
 
 import static java.time.Instant.now;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "injects_statuses")
 public class InjectStatus implements Base {
 
-  @Getter
-  @Setter
   @Id
   @Column(name = "status_id")
   @GeneratedValue(generator = "UUID")
@@ -26,39 +27,28 @@ public class InjectStatus implements Base {
   @JsonProperty("status_id")
   private String id;
 
-  @Getter
-  @Setter
   @Column(name = "status_name")
   @JsonProperty("status_name")
   private String name;
 
-  @Getter
-  @Setter
-  @Column(name = "status_async_id")
-  @JsonProperty("status_async_id")
-  private String asyncId;
+  @Column(name = "status_async_ids")
+  @JsonProperty("status_async_ids")
+  @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
+  private String[] asyncIds;
 
-  @Getter
-  @Setter
   @Column(name = "status_reporting")
   @Convert(converter = ExecutionConverter.class)
   @JsonProperty("status_reporting")
   private Execution reporting;
 
-  @Getter
-  @Setter
   @Column(name = "status_date")
   @JsonProperty("status_date")
   private Instant date;
 
-  @Getter
-  @Setter
   @Column(name = "status_execution")
   @JsonProperty("status_execution")
   private Integer executionTime;
 
-  @Getter
-  @Setter
   @OneToOne
   @JoinColumn(name = "status_inject")
   @JsonIgnore
@@ -67,7 +57,7 @@ public class InjectStatus implements Base {
   // region transient
   public static InjectStatus fromExecution(Execution execution, Inject inject) {
     InjectStatus injectStatus = new InjectStatus();
-    injectStatus.setAsyncId(execution.getAsyncId());
+    injectStatus.setAsyncIds(execution.getAsyncIds());
     injectStatus.setInject(inject);
     injectStatus.setDate(now());
     if (execution.isSynchronous()) {

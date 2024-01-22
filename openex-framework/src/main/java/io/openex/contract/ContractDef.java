@@ -1,9 +1,9 @@
 package io.openex.contract;
 
 import io.openex.contract.fields.ContractElement;
-import io.openex.contract.fields.ContractText;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ContractDef {
@@ -14,32 +14,37 @@ public class ContractDef {
         //private constructor
     }
 
+    public static ContractDef contractBuilder() {
+        return new ContractDef();
+    }
+
     public ContractDef addFields(List<ContractElement> fields) {
         this.fields.addAll(fields);
         return this;
     }
 
-    public static ContractDef contractBuilder() {
-        return new ContractDef();
-    }
-
     public ContractDef mandatory(ContractElement element) {
-        fields.add(element);
+        this.fields.add(element);
         return this;
     }
 
-    public ContractDef mandatory(String key, String label) {
-        fields.add(new ContractText(key, label));
+    public ContractDef mandatoryGroup(ContractElement... elements) {
+        List<String> keys = Arrays.stream(elements).map(ContractElement::getKey).toList();
+        for (ContractElement element : elements) {
+            element.setMandatory(false);
+            element.setMandatoryGroups(keys);
+            this.fields.add(element);
+        }
         return this;
     }
 
     public ContractDef optional(ContractElement element) {
         element.setMandatory(false);
-        fields.add(element);
+        this.fields.add(element);
         return this;
     }
 
     public List<ContractElement> build() {
-        return fields;
+        return this.fields;
     }
 }

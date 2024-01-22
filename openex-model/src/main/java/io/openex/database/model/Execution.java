@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -32,8 +33,9 @@ public class Execution {
 
     @Setter
     @Getter
-    @JsonProperty("execution_async_id")
-    private String asyncId;
+    @JsonProperty("execution_async_ids")
+    @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
+    private String[] asyncIds;
 
     @Getter
     @Setter
@@ -60,7 +62,7 @@ public class Execution {
 
     @JsonIgnore
     public boolean isSynchronous() {
-        return asyncId == null;
+        return asyncIds == null;
     }
 
     public static Execution executionError(boolean runtime, String identifier, String message) {

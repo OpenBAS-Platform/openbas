@@ -1,6 +1,6 @@
-import React, { Suspense, lazy } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { useTheme, makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import { Box } from '@mui/material';
 import TopBar from './components/nav/TopBar';
 import LeftBar from './components/nav/LeftBar';
@@ -11,11 +11,14 @@ import { useHelper } from '../store';
 import type { Theme } from '../components/Theme';
 import type { LoggedHelper } from '../actions/helper';
 import Loader from '../components/Loader';
+import contractImages from '../actions/Contract';
+import { useAppDispatch } from '../utils/hooks';
 
 const IndexExercise = lazy(() => import('./components/exercises/Index'));
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));
 const Exercises = lazy(() => import('./components/exercises/Exercises'));
+const Assets = lazy(() => import('./components/assets/Index'));
 const Persons = lazy(() => import('./components/persons/Index'));
 const Organizations = lazy(() => import('./components/organizations/Organizations'));
 const Medias = lazy(() => import('./components/medias/Index'));
@@ -48,6 +51,10 @@ const Index = () => {
     overflowX: 'hidden',
   };
   useDataLoader();
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    dispatch(contractImages());
+  }, []);
   return (
     <>
       <Box
@@ -67,6 +74,7 @@ const Index = () => {
               <Route path="exercises" element={errorWrapper(Exercises)()} />
               <Route path="" element={errorWrapper(Dashboard)()} />
               <Route path="exercises/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
+              <Route path="assets/*" element={errorWrapper(Assets)()} />
               <Route path="persons/*" element={errorWrapper(Persons)()} />
               <Route path="organizations" element={errorWrapper(Organizations)()} />
               <Route path="medias/*" element={errorWrapper(Medias)()} />

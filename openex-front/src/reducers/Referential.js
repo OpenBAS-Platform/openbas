@@ -42,6 +42,8 @@ export const entitiesInitializer = Immutable({
     variables: Immutable({}),
     killchainphases: Immutable({}),
     attackpatterns: Immutable({}),
+    endpoints: Immutable({}),
+    asset_groups: Immutable({}),
   }),
 });
 

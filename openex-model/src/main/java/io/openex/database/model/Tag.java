@@ -5,9 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MultiIdDeserializer;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
-import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,78 +19,69 @@ import java.util.Objects;
 @Table(name = "tags")
 @EntityListeners(ModelBaseListener.class)
 public class Tag implements Base {
-    @Id
-    @Column(name = "tag_id")
-    @GeneratedValue(generator = "UUID")
-    @UuidGenerator
-    @JsonProperty("tag_id")
-    private String id;
 
-    @Column(name = "tag_name")
-    @JsonProperty("tag_name")
-    private String name;
+  @Setter
+  @Id
+  @Column(name = "tag_id")
+  @GeneratedValue(generator = "UUID")
+  @UuidGenerator
+  @JsonProperty("tag_id")
+  @NotBlank
+  private String id;
 
-    @Column(name = "tag_color")
-    @JsonProperty("tag_color")
-    private String color;
+  @Getter
+  @Column(name = "tag_name")
+  @JsonProperty("tag_name")
+  private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "documents_tags",
-            joinColumns = @JoinColumn(name = "tag_id"),
-            inverseJoinColumns = @JoinColumn(name = "document_id"))
-    @JsonSerialize(using = MultiIdDeserializer.class)
-    @JsonProperty("tags_documents")
-    private List<Document> documents = new ArrayList<>();
+  @Getter
+  @Column(name = "tag_color")
+  @JsonProperty("tag_color")
+  private String color;
 
-    @JsonIgnore
-    @Override
-    public boolean isUserHasAccess(User user) {
-        return true;
+  @Setter
+  @Getter
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(name = "documents_tags",
+      joinColumns = @JoinColumn(name = "tag_id"),
+      inverseJoinColumns = @JoinColumn(name = "document_id"))
+  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonProperty("tags_documents")
+  private List<Document> documents = new ArrayList<>();
+
+  @JsonIgnore
+  @Override
+  public boolean isUserHasAccess(User user) {
+    return true;
+  }
+
+  @Override
+  public String getId() {
+    return id;
+  }
+
+  public void setName(String name) {
+    this.name = name.toLowerCase();
+  }
+
+  public void setColor(String color) {
+    this.color = color.toLowerCase();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    @Override
-    public String getId() {
-        return id;
+    if (o == null || !Base.class.isAssignableFrom(o.getClass())) {
+      return false;
     }
+    Base base = (Base) o;
+    return id.equals(base.getId());
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name.toLowerCase();
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color.toLowerCase();
-    }
-
-    public List<Document> getDocuments() {
-        return documents;
-    }
-
-    public void setDocuments(List<Document> documents) {
-        this.documents = documents;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
-        Base base = (Base) o;
-        return id.equals(base.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 }
