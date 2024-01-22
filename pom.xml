@@ -20,7 +20,7 @@
     <properties>
         <minio.version>8.5.7</minio.version>
         <commons-io.version>2.15.1</commons-io.version>
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
     </properties>
 
     <distributionManagement>
