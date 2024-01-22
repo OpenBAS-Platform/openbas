@@ -17,7 +17,7 @@
         <bcpg-jdk15on.version>1.70</bcpg-jdk15on.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <commons-email.version>1.5</commons-email.version>
-        <commons-validator.version>1.7</commons-validator.version>
+        <commons-validator.version>1.8.0</commons-validator.version>
         <flyway.version>9.0.3</flyway.version>
         <opensaml.version>4.1.1</opensaml.version>
         <springdoc.version>1.7.0</springdoc.version>
