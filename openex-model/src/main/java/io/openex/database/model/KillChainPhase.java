@@ -42,7 +42,7 @@ public class KillChainPhase implements Base {
     @Setter
     @Column(name = "phase_order")
     @JsonProperty("phase_order")
-    private Long order;
+    private Long order = 0L;
 
     @Getter
     @Setter

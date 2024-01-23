@@ -60,14 +60,14 @@ public class AttackPattern implements Base {
     @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
     @Column(name = "attack_pattern_platforms", columnDefinition = "text[]")
     @JsonProperty("attack_pattern_platforms")
-    private List<String> platforms = new ArrayList<>();
+    private String[] platforms = new String[0];
 
     @Getter
     @Setter
     @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
     @Column(name = "attack_pattern_permissions_required", columnDefinition = "text[]")
     @JsonProperty("attack_pattern_permissions_required")
-    private ArrayList<String> permissionsRequired = new ArrayList<>();
+    private String[] permissionsRequired = new String[0];
 
     @Getter
     @Setter
@@ -131,19 +131,19 @@ public class AttackPattern implements Base {
         this.externalId = externalId;
     }
 
-    public List<String> getPlatforms() {
+    public String[] getPlatforms() {
         return platforms;
     }
 
-    public void setPlatforms(List<String> platforms) {
+    public void setPlatforms(String[] platforms) {
         this.platforms = platforms;
     }
 
-    public ArrayList<String> getPermissionsRequired() {
+    public String[] getPermissionsRequired() {
         return permissionsRequired;
     }
 
-    public void setPermissionsRequired(ArrayList<String> permissionsRequired) {
+    public void setPermissionsRequired(String[] permissionsRequired) {
         this.permissionsRequired = permissionsRequired;
     }
 
