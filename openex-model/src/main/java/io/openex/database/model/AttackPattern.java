@@ -37,6 +37,13 @@ public class AttackPattern implements Base {
 
     @Getter
     @Setter
+    @Column(name = "attack_pattern_stix_id")
+    @JsonProperty("attack_pattern_stix_id")
+    @NotBlank
+    private String stixId;
+
+    @Getter
+    @Setter
     @Column(name = "attack_pattern_name")
     @JsonProperty("attack_pattern_name")
     @NotBlank
@@ -105,6 +112,14 @@ public class AttackPattern implements Base {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getStixId() {
+        return stixId;
+    }
+
+    public void setStixId(String stixId) {
+        this.stixId = stixId;
     }
 
     public String getName() {

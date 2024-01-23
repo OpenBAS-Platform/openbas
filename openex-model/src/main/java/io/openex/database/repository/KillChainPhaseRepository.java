@@ -20,6 +20,7 @@ public interface KillChainPhaseRepository extends CrudRepository<KillChainPhase,
     @NotNull
     Optional<KillChainPhase> findById(@NotNull String id);
 
-    @Query("select killChainPhase from KillChainPhase killChainPhase where killChainPhase.killChainName = :killChainName and killChainPhase.name = :phaseName")
-    KillChainPhase findKillChainPhaseByKillChainNameAndPhaseName( @Param("killChainName") String killChainName,  @Param("phaseName") String phaseName);
+    Optional<KillChainPhase> findByStixId(@NotNull String stixId);
+
+    Optional<KillChainPhase> findByKillChainNameAndShortName(@NotNull String killChainName, @NotNull String shortName);
 }
