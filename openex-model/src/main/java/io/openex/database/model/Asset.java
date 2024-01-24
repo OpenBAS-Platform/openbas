@@ -5,11 +5,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLHStoreType;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MultiIdDeserializer;
-import lombok.Data;
-import lombok.Setter;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -19,15 +18,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.time.Instant.now;
 import static jakarta.persistence.DiscriminatorType.STRING;
+import static java.time.Instant.now;
 import static lombok.AccessLevel.NONE;
 
 @Data
 @Entity
 @Table(name = "assets")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="asset_type", discriminatorType = STRING)
+@DiscriminatorColumn(name = "asset_type", discriminatorType = STRING)
 @EntityListeners(ModelBaseListener.class)
 public class Asset implements Base {
 

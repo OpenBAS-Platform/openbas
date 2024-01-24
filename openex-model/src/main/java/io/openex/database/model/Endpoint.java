@@ -1,6 +1,7 @@
 package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openex.annotation.Ipv4OrIpv6Constraint;
 import io.openex.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
@@ -28,7 +29,7 @@ public class Endpoint extends Asset {
 
   @NotEmpty
   @Ipv4OrIpv6Constraint
-  @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
+  @Type(StringArrayType.class)
   @Column(name = "endpoint_ips")
   @JsonProperty("endpoint_ips")
   private String[] ips;
@@ -43,7 +44,7 @@ public class Endpoint extends Asset {
   @NotNull
   private PLATFORM_TYPE platform;
 
-  @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
+  @Type(StringArrayType.class)
   @Column(name = "endpoint_mac_addresses")
   @JsonProperty("endpoint_mac_addresses")
   private String[] macAddresses;
