@@ -233,7 +233,7 @@ export const attackPattern = new schema.Entity(
   {},
   { idAttribute: 'attack_pattern_id' },
 );
-export const arrayOfAttacKPatterns = new schema.Array(attackPattern);
+export const arrayOfAttackPatterns = new schema.Array(attackPattern);
 
 token.define({ token_user: user });
 user.define({ user_organization: organization });
@@ -381,6 +381,7 @@ export const storeHelper = (state) => ({
   // kill chain phases
   getKillChainPhase: (id) => entity(id, 'killchainphases', state),
   getKillChainPhases: () => entities('killchainphases', state),
+  getKillChainPhasesMap: () => maps('killchainphases', state),
   // attack patterns
   getAttackPattern: (id) => entity(id, 'attackpatterns', state),
   getAttackPatterns: () => entities('attackpatterns', state),

@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { CheckCircleOutlined, PersonOutlined } from '@mui/icons-material';
+import { LockPattern } from 'mdi-material-ui';
 import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import SearchFilter from '../../../../components/SearchFilter';
 import CreateAttackPattern from './CreateAttackPattern';
@@ -11,6 +11,7 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
 import AttackPatternPopover from './AttackPatternPopover';
 import TaxonomiesMenu from '../TaxonomiesMenu';
+import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -48,7 +49,7 @@ const headerStyles = {
   },
   kill_chain_phase: {
     float: 'left',
-    width: '25%',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -81,7 +82,7 @@ const headerStyles = {
 const inlineStyles = {
   kill_chain_phase: {
     float: 'left',
-    width: '25%',
+    width: '20%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -130,11 +131,13 @@ const AttackPatterns = () => {
     'external_id',
   ];
   const filtering = useSearchAnFilter('attack_pattern', 'external_id', searchColumns);
-  const { attackPatterns, tagsMap, organizationsMap } = useHelper((helper) => ({
+  const { attackPatterns, killChainPhasesMap } = useHelper((helper) => ({
     attackPatterns: helper.getAttackPatterns(),
+    killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchAttackPatterns());
+    dispatch(fetchKillChainPhases());
   });
   return (
     <div className={classes.container}>
@@ -211,62 +214,52 @@ const AttackPatterns = () => {
             divider={true}
           >
             <ListItemIcon>
-              <PersonOutlined color="primary" />
+              <LockPattern color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={
                 <div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.attackPattern_email}
-                  >
-                    {attackPattern.attackPattern_email}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.attackPattern_firstname}
-                  >
-                    {attackPattern.attackPattern_firstname}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.attackPattern_lastname}
-                  >
-                    {attackPattern.attackPattern_lastname}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.attackPattern_organization}
+                    style={inlineStyles.kill_chain_phase}
                   >
                     {
-                      organizationsMap[attackPattern.attackPattern_organization]
-                        ?.organization_name
+                      attackPattern.attack_pattern_kill_chain_phases.at(0)
+                        ? `[${killChainPhasesMap[attackPattern.attack_pattern_kill_chain_phases.at(0)]?.phase_kill_chain_name}] ${killChainPhasesMap[attackPattern.attack_pattern_kill_chain_phases.at(0)]?.phase_name}`
+                        : '-'
                     }
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.attackPattern_admin}
+                    style={inlineStyles.attack_pattern_external_id}
                   >
-                    {attackPattern.attackPattern_admin ? (
-                      <CheckCircleOutlined fontSize="small" />
-                    ) : (
-                      '-'
-                    )}
+                    {attackPattern.attack_pattern_external_id}
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.attackPattern_lastname}
+                    style={inlineStyles.attack_pattern_name}
                   >
-                    {attackPattern.attackPattern_lastname}
+                    {attackPattern.attack_pattern_name}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.attack_pattern_created_at}
+                  >
+                    {attackPattern.attack_pattern_created_at}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.attack_pattern_updated_at}
+                  >
+                    {attackPattern.attack_pattern_updated_at}
                   </div>
                 </div>
               }
             />
             <ListItemSecondaryAction>
               <AttackPatternPopover
+                killChainPhasesMap={killChainPhasesMap}
                 attackPattern={attackPattern}
-                tagsMap={tagsMap}
-                organizationsMap={organizationsMap}
               />
             </ListItemSecondaryAction>
           </ListItem>

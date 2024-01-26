@@ -2,6 +2,7 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
@@ -64,14 +65,14 @@ public class AttackPattern implements Base {
 
     @Getter
     @Setter
-    @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
+    @Type(StringArrayType.class)
     @Column(name = "attack_pattern_platforms", columnDefinition = "text[]")
     @JsonProperty("attack_pattern_platforms")
     private String[] platforms = new String[0];
 
     @Getter
     @Setter
-    @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
+    @Type(StringArrayType.class)
     @Column(name = "attack_pattern_permissions_required", columnDefinition = "text[]")
     @JsonProperty("attack_pattern_permissions_required")
     private String[] permissionsRequired = new String[0];
