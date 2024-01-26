@@ -2,11 +2,12 @@ package io.openex.service;
 
 import io.openex.database.model.Endpoint;
 import io.openex.database.repository.EndpointRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +32,7 @@ public class AssetEndpointService {
     return this.endpointRepository.findById(endpointId).orElseThrow();
   }
 
+  @Transactional(readOnly = true)
   public Optional<Endpoint> findBySource(
       @NotBlank final String sourceKey,
       @NotBlank final String sourceValue) {
