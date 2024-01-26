@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import countries from '../static/geo/countries.json';
-import type { Exercise, Organization, Tag } from './api-types';
+import type { Exercise, KillChainPhase, Organization, Tag } from './api-types';
 
 export interface Option {
   id: string;
@@ -19,6 +19,19 @@ export const tagOptions = (
       id: tagItem.tag_id,
       label: tagItem.tag_name,
       color: tagItem.tag_color,
+    }) as Option,
+  );
+
+export const killChainPhasesOptions = (
+  kill_chain_phase_ids: string[] | undefined,
+  killChainPhasesMap: Record<string, KillChainPhase>,
+) => (kill_chain_phase_ids ?? [])
+  .map((killChainPhaseId) => killChainPhasesMap[killChainPhaseId])
+  .filter((killChainPhaseItem) => killChainPhaseItem !== undefined)
+  .map(
+    (killChainPhaseItem) => ({
+      id: killChainPhaseItem.phase_id,
+      label: `[${killChainPhaseItem.phase_kill_chain_name}] ${killChainPhaseItem.phase_name}`,
     }) as Option,
   );
 

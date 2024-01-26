@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import * as R from 'ramda';
-import { LabelOutlined } from '@mui/icons-material';
+import { RouteOutlined } from '@mui/icons-material';
 import { Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import { connect } from 'react-redux';
@@ -98,7 +98,7 @@ class KillChainPhaseField extends Component {
           renderOption={(props, option) => (
             <Box component="li" {...props}>
               <div className={classes.icon}>
-                <LabelOutlined />
+                <RouteOutlined />
               </div>
               <div className={classes.text}>{option.label}</div>
             </Box>

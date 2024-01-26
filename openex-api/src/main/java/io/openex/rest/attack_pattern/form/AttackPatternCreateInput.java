@@ -24,10 +24,10 @@ public class AttackPatternCreateInput {
     private String externalId;
 
     @JsonProperty("attack_pattern_platforms")
-    private List<String> platforms = new ArrayList<>();
+    private String[] platforms = new String[0];
 
     @JsonProperty("attack_pattern_permissions_required")
-    private List<String> permissionsRequired = new ArrayList<>();
+    private String[] permissionsRequired = new String[0];
 
     @JsonProperty("attack_pattern_kill_chain_phases")
     private List<String> killChainPhasesIds = new ArrayList<>();
@@ -35,31 +35,61 @@ public class AttackPatternCreateInput {
     @JsonProperty("attack_pattern_parent")
     private String parentId;
 
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
+    public String getExternalId() {
+        return externalId;
+    }
+
     public void setExternalId(String externalId) {
         this.externalId = externalId;
     }
 
-    public void setPlatforms(List<String> platforms) {
+    public String[] getPlatforms() {
+        return platforms;
+    }
+
+    public void setPlatforms(String[] platforms) {
         this.platforms = platforms;
     }
 
-    public void setPermissionsRequired(List<String> permissionsRequired) {
+    public String[] getPermissionsRequired() {
+        return permissionsRequired;
+    }
+
+    public void setPermissionsRequired(String[] permissionsRequired) {
         this.permissionsRequired = permissionsRequired;
+    }
+
+    public List<String> getKillChainPhasesIds() {
+        return killChainPhasesIds;
     }
 
     public void setKillChainPhasesIds(List<String> killChainPhasesIds) {
         this.killChainPhasesIds = killChainPhasesIds;
     }
 
+    public String getParentId() {
+        return parentId;
+    }
+
     public void setParentId(String parentId) {
         this.parentId = parentId;
     }
 }
+
+

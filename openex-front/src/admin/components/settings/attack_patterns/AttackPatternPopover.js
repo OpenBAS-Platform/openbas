@@ -6,10 +6,10 @@ import { MoreVert } from '@mui/icons-material';
 import { updateAttackPattern, deleteAttackPattern } from '../../../../actions/AttackPattern';
 import AttackPatternForm from './AttackPatternForm';
 import { useFormatter } from '../../../../components/i18n';
-import { tagOptions } from '../../../../utils/Option';
+import { killChainPhasesOptions } from '../../../../utils/Option';
 import Transition from '../../../../components/common/Transition';
 
-const AttackPatternPopover = ({ attackPattern, organizationsMap, tagsMap }) => {
+const AttackPatternPopover = ({ attackPattern, killChainPhasesMap }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -27,47 +27,27 @@ const AttackPatternPopover = ({ attackPattern, organizationsMap, tagsMap }) => {
   const handleCloseEdit = () => setOpenEdit(false);
   const onSubmitEdit = (data) => {
     const inputValues = R.pipe(
-      R.assoc(
-        'attackPattern_organization',
-        data.attackPattern_organization && data.attackPattern_organization.id
-          ? data.attackPattern_organization.id
-          : data.attackPattern_organization,
-      ),
-      R.assoc('attackPattern_tags', R.pluck('id', data.attackPattern_tags)),
+      R.assoc('attack_pattern_kill_chain_phases', R.pluck('id', data.attack_pattern_kill_chain_phases)),
     )(data);
-    return dispatch(updateAttackPattern(attackPattern.attackPattern_id, inputValues)).then(() => handleCloseEdit());
+    return dispatch(updateAttackPattern(attackPattern.attack_pattern_id, inputValues)).then(() => handleCloseEdit());
   };
 
   const handleOpenDelete = () => {
     setOpenDelete(true);
     handlePopoverClose();
   };
-
   const handleCloseDelete = () => setOpenDelete(false);
-
   const submitDelete = () => {
-    dispatch(deleteAttackPattern(attackPattern.attackPattern_id));
+    dispatch(deleteAttackPattern(attackPattern.attack_pattern_id));
     handleCloseDelete();
   };
-
-  const org = organizationsMap[attackPattern.attackPattern_organization];
-  const attackPatternOrganization = org
-    ? { id: org.organization_id, label: org.organization_name }
-    : null;
-  const attackPatternTags = tagOptions(attackPattern.attackPattern_tags, tagsMap);
+  const attackPatternKillChainPhases = killChainPhasesOptions(attackPattern.attack_pattern_kill_chain_phases, killChainPhasesMap);
   const initialValues = R.pipe(
-    R.assoc('attackPattern_organization', attackPatternOrganization),
-    R.assoc('attackPattern_tags', attackPatternTags),
+    R.assoc('attack_pattern_kill_chain_phases', attackPatternKillChainPhases),
     R.pick([
-      'attackPattern_firstname',
-      'attackPattern_lastname',
-      'attackPattern_email',
-      'attackPattern_organization',
-      'attackPattern_phone',
-      'attackPattern_phone2',
-      'attackPattern_pgp_key',
-      'attackPattern_tags',
-      'attackPattern_admin',
+      'attack_pattern_external_id',
+      'attack_pattern_name',
+      'attack_pattern_description',
     ]),
   )(attackPattern);
   return (
