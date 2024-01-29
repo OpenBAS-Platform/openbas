@@ -108,6 +108,7 @@ const ExpectationLine: FunctionComponent<Props> = ({
         divider
         sx={{ pl: 8 }}
         classes={{ root: classes.item }}
+        // @ts-ignore
         button={!!onClick}
         onClick={onClick}
       >
