@@ -118,11 +118,11 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
               style={{ marginTop: 20 }}
               control={<Switch
                 checked={value}
-                onChange={(v) => {onChange(v)}}
-              />}
+                onChange={(v) => { onChange(v); }}
+                       />}
             />
           )}
-        />
+           />
       }
 
       <div className={classes.buttons}>

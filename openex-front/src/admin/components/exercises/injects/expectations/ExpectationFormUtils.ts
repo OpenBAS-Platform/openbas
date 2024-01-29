@@ -25,4 +25,4 @@ export const formProps = (initialValues: ExpectationInput, t: (key: string) => s
 
 export const isTechnicalExpectation = (expectation: ExpectationInput) => {
   return expectation.expectation_type === 'TECHNICAL';
-}
+};

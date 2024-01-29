@@ -62,7 +62,7 @@ const TechnicalExpectation: FunctionComponent<Props> = ({
             {!!expectation.inject_expectation_result
               && <>
                 <pre>
-                  {Object.entries(JSON.parse(expectation.inject_expectation_result ?? ''))
+                  {Object.entries(JSON.parse(expectation.inject_expectation_result))
                     .map(([key, value]) => {
                       return (
                         <div key={key} style={{ display: 'flex' }}>

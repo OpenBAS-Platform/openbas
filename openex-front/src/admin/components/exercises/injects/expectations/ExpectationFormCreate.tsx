@@ -1,6 +1,6 @@
 import React, { FunctionComponent, SyntheticEvent, useEffect } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, FormControlLabel, InputLabel, MenuItem, Select as MUISelect, Switch, Switch as MuiSwitch, TextField as MuiTextField } from '@mui/material';
+import { Alert, Button, FormControlLabel, InputLabel, MenuItem, Select as MUISelect, Switch, TextField as MuiTextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import type { ExpectationInput } from './Expectation';
 import { formProps, infoMessage, isTechnicalExpectation } from './ExpectationFormUtils';
@@ -149,11 +149,11 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
               style={{ marginTop: 20 }}
               control={<Switch
                 checked={value}
-                onChange={(v) => {onChange(v)}}
-              />}
+                onChange={(v) => { onChange(v); }}
+                       />}
             />
           )}
-        />
+           />
       }
 
       <div className={classes.buttons}>
