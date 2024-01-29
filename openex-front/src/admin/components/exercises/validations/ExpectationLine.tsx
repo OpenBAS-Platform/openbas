@@ -108,6 +108,7 @@ const ExpectationLine: FunctionComponent<Props> = ({
         divider
         sx={{ pl: 8 }}
         classes={{ root: classes.item }}
+        /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
         // @ts-ignore
         button={!!onClick}
         onClick={onClick}
