@@ -8,7 +8,7 @@ public interface Expectation {
     Integer getScore();
 
     default boolean isExpectationGroup() {
-        return true;
+        return false;
     }
 
 }

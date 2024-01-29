@@ -79,7 +79,15 @@ steps:
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
     commands:
-      - mvn install
+      - mvn install -DskipTests
+      - cd openex-api
+      - mvn test
+      - cd ../openex-framework
+      - mvn test
+      - cd ../openex-injectors
+      - mvn test
+    depends_on:
+      - submodules
   - name: frontend-tests
     image: node:20.11.0-alpine3.18
     commands:

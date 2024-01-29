@@ -28,6 +28,6 @@ public class EndpointInput extends AssetInput {
   private Endpoint.PLATFORM_TYPE platform;
 
   @JsonProperty("endpoint_mac_addresses")
-  private String[] macAdresses;
+  private String[] macAddresses;
 
 }

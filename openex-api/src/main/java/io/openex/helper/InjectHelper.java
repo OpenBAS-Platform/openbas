@@ -58,9 +58,11 @@ public class InjectHelper {
       // But those team can be used in other exercises with different players enabled
       // So we need to focus on team players only enabled in the context of the current exercise
       return teams.stream().flatMap(team ->
-          team.getExerciseTeamUsers().stream()
+          team.getExerciseTeamUsers()
+              .stream()
               .filter(
-                  exerciseTeamUser -> exerciseTeamUser.getExercise().getId().equals(injection.getExercise().getId()))
+                  exerciseTeamUser -> exerciseTeamUser.getExercise().getId().equals(injection.getExercise().getId())
+              )
               .map(exerciseTeamUser -> Tuples.of(exerciseTeamUser.getUser(), team.getName()))
       );
     }
@@ -105,7 +107,7 @@ public class InjectHelper {
           Inject inject = dry.getInject();
           Contract contract = this.contractService.resolveContract(inject);
           List<Team> teams = new ArrayList<>(); // No teams in dry run, only direct users
-          List<Asset> assets = inject.getAssets();
+          List<Asset> assets = getAssets(inject).stream().toList(); // Force lazy load to execute
           return new ExecutableInject(false, false, dry, inject, contract, teams, assets, usersFromInjection(dry));
         });
     // Combine injects and dry

@@ -59,7 +59,10 @@ public abstract class Injector {
         InjectExpectation expectationExecution = new InjectExpectation();
         return this.expectationConverter(expectationExecution, executableInject, expectation);
     }
-    private InjectExpectation expectationConverter(Team team, ExecutableInject executableInject, Expectation expectation) {
+    private InjectExpectation expectationConverter(
+        @NotNull final Team team,
+        @NotNull final ExecutableInject executableInject,
+        Expectation expectation) {
         InjectExpectation expectationExecution = new InjectExpectation();
         expectationExecution.setTeam(team);
         return this.expectationConverter(expectationExecution, executableInject, expectation);

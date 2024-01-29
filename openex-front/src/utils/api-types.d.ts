@@ -110,6 +110,7 @@ export interface AttackPattern {
   attack_pattern_parent?: AttackPattern;
   attack_pattern_permissions_required?: string[];
   attack_pattern_platforms?: string[];
+  attack_pattern_stix_id: string;
   /** @format date-time */
   attack_pattern_updated_at?: string;
   updateAttributes?: object;
@@ -839,11 +840,15 @@ export interface InjectUpdateTriggerInput {
 export interface KillChainPhase {
   /** @format date-time */
   phase_created_at?: string;
+  phase_description?: string;
+  phase_external_id?: string;
   phase_id?: string;
   phase_kill_chain_name?: string;
   phase_name?: string;
   /** @format int64 */
   phase_order?: number;
+  phase_shortname?: string;
+  phase_stix_id?: string;
   /** @format date-time */
   phase_updated_at?: string;
   updateAttributes?: object;

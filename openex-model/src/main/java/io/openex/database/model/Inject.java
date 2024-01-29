@@ -203,8 +203,8 @@ public class Inject implements Base, Injection {
   @JsonIgnore
   public void clean() {
     this.status = null;
-//    this.communications.clear();
-//    this.expectations.clear();
+    this.communications.clear();
+    this.expectations.clear();
   }
 
   @JsonProperty("inject_users_number")
