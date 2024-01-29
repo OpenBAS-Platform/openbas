@@ -28,6 +28,11 @@
             <artifactId>openex-framework</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.openex</groupId>
+            <artifactId>openex-injector-caldera</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
