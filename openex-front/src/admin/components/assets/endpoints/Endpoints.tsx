@@ -170,7 +170,7 @@ const Endpoints = () => {
                   'endpoint_ips',
                   'endpoint_hostname',
                   'endpoint_platform',
-                  'endpoint_mac_adresses',
+                  'endpoint_mac_addresses',
                   'asset_tags',
                 ],
                 sortedEndpoints,

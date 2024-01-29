@@ -501,7 +501,7 @@ export interface EndpointInput {
    * @minItems 1
    */
   endpoint_ips: string[];
-  endpoint_mac_adresses?: string[];
+  endpoint_mac_addresses?: string[];
   endpoint_platform: "Linux" | "Windows" | "Darwin";
 }
 

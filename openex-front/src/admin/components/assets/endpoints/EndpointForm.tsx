@@ -27,7 +27,7 @@ const EndpointForm: React.FC<Props> = ({
     asset_tags: [],
     endpoint_hostname: '',
     endpoint_ips: [],
-    endpoint_mac_adresses: [],
+    endpoint_mac_addresses: [],
     endpoint_platform: undefined,
   },
 }) => {
@@ -51,7 +51,7 @@ const EndpointForm: React.FC<Props> = ({
         asset_tags: z.string().array().optional(),
         endpoint_hostname: z.string().optional(),
         endpoint_ips: z.string().ip({ message: t('Invalid Ip Address') }).array().min(1),
-        endpoint_mac_adresses: z
+        endpoint_mac_addresses: z
           .string()
           .regex(
             /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9a-fA-F]{4}.[0-9a-fA-F]{4}.[0-9a-fA-F]{4})$/,
@@ -162,13 +162,13 @@ const EndpointForm: React.FC<Props> = ({
 
       <Controller
         control={control}
-        name="endpoint_mac_adresses"
+        name="endpoint_mac_addresses"
         render={({ field: { onChange, onBlur, value } }) => {
           const value2 = value?.reduce((accumulator: string, current: string) => (accumulator === '' ? current : `${accumulator}\n${current}`), '');
           const onChange2: FormEventHandler<HTMLTextAreaElement | HTMLInputElement> = (event) => {
             if (event.currentTarget.value === '') {
-              setValue('endpoint_mac_adresses', []);
-              trigger('endpoint_mac_adresses');
+              setValue('endpoint_mac_addresses', []);
+              trigger('endpoint_mac_addresses');
             } else {
               onChange(event.currentTarget.value.split('\n'));
             }
@@ -182,8 +182,8 @@ const EndpointForm: React.FC<Props> = ({
                 rows={3}
                 label={t('MAC Addresses')}
                 style={{ marginTop: 20 }}
-                error={!!errors.endpoint_mac_adresses}
-                helperText={errors.endpoint_mac_adresses?.reduce?.((accumulator, current, index) => `${accumulator !== '' ? `${accumulator}, ` : ''}${index + 1} - ${current?.message}`, '')}
+                error={!!errors.endpoint_mac_addresses}
+                helperText={errors.endpoint_mac_addresses?.reduce?.((accumulator, current, index) => `${accumulator !== '' ? `${accumulator}, ` : ''}${index + 1} - ${current?.message}`, '')}
                 inputProps={{
                   onChange: onChange2,
                   onBlur,

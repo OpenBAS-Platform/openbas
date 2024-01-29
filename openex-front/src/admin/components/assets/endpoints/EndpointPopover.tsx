@@ -36,7 +36,7 @@ const EndpointPopover: React.FC<Props> = ({
     asset_tags,
     endpoint_hostname,
     endpoint_ips,
-    endpoint_mac_adresses,
+    endpoint_mac_addresses,
     endpoint_platform,
   }) => ({
     asset_name,
@@ -45,7 +45,7 @@ const EndpointPopover: React.FC<Props> = ({
     asset_tags,
     endpoint_hostname,
     endpoint_ips,
-    endpoint_mac_adresses: endpoint_mac_adresses ?? [],
+    endpoint_mac_addresses: endpoint_mac_addresses ?? [],
     endpoint_platform,
   }))(endpoint);
 

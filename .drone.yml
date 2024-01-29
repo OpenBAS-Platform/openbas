@@ -26,6 +26,8 @@ steps:
       - mvn test
       - cd ../openex-framework
       - mvn test
+      - cd ../openex-injectors
+      - mvn test
     depends_on:
       - submodules
   - name: frontend-tests
@@ -93,7 +95,10 @@ steps:
     settings:
       token:
         from_secret: CODECOV_TOKEN
-      files: openex-jacoco-coverage-aggregation/target/site/jacoco-aggregate/jacoco.xml
+      files:
+        - openex-api/target/site/jacoco/jacoco.xml
+        - openex-framework/target/site/jacoco/jacoco.xml
+        - openex-injectors/openex-caldera/target/site/jacoco/jacoco.xml
   - name: build-circleci
     image: curlimages/curl
     commands:
