@@ -192,9 +192,4 @@ public abstract class Injector {
     }
     // endregion
 
-    // -- ASSETS --
-
-    public List<Asset> assets(@NotNull final Inject inject) {
-        return new ArrayList<>();
-    }
 }

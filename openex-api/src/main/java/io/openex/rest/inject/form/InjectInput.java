@@ -34,6 +34,12 @@ public class InjectInput {
     @JsonProperty("inject_teams")
     private List<String> teams = new ArrayList<>();
 
+    @JsonProperty("inject_assets")
+    private List<String> assets = new ArrayList<>();
+
+    @JsonProperty("inject_asset_groups")
+    private List<String> assetGroups = new ArrayList<>();
+
     @JsonProperty("inject_documents")
     private List<InjectDocumentInput> documents = new ArrayList<>();
 

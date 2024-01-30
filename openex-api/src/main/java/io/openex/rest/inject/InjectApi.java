@@ -9,6 +9,8 @@ import io.openex.execution.ExecutionContext;
 import io.openex.execution.Injector;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.inject.form.*;
+import io.openex.service.AssetGroupService;
+import io.openex.service.AssetService;
 import io.openex.service.ContractService;
 import io.openex.service.ExecutionContextService;
 import jakarta.transaction.Transactional;
@@ -44,6 +46,8 @@ public class InjectApi extends RestBehavior {
   private InjectRepository injectRepository;
   private InjectDocumentRepository injectDocumentRepository;
   private TeamRepository teamRepository;
+  private AssetService assetService;
+  private AssetGroupService assetGroupService;
   private TagRepository tagRepository;
   private DocumentRepository documentRepository;
   private ApplicationContext context;
@@ -83,6 +87,17 @@ public class InjectApi extends RestBehavior {
   @Autowired
   public void setTeamRepository(TeamRepository teamRepository) {
     this.teamRepository = teamRepository;
+  }
+
+  @Autowired
+  public void setAssetService(@NotNull final AssetService assetService) {
+    this.assetService = assetService;
+  }
+
+
+  @Autowired
+  public void setAssetGroupService(@NotNull final AssetGroupService assetGroupService) {
+    this.assetGroupService = assetGroupService;
   }
 
   @Autowired
@@ -140,10 +155,8 @@ public class InjectApi extends RestBehavior {
     // Set dependencies
     inject.setDependsOn(updateRelation(input.getDependsOn(), inject.getDependsOn(), injectRepository));
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
-
-    Contract contract = contractService.resolveContract(inject);
-    Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
-    inject.setAssets(executor.assets(inject));
+    inject.setAssets(fromIterable(this.assetService.assets(input.getAssets())));
+    inject.setAssetGroups(fromIterable(this.assetGroupService.assetGroups(input.getAssetGroups())));
 
     inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
     List<InjectDocumentInput> documents = input.getDocuments();

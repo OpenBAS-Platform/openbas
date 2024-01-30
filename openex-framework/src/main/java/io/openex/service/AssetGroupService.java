@@ -31,6 +31,10 @@ public class AssetGroupService {
     return fromIterable(this.assetGroupRepository.findAll());
   }
 
+  public List<AssetGroup> assetGroups(@NotBlank final List<String> assetGroupIds) {
+    return fromIterable(this.assetGroupRepository.findAllById(assetGroupIds));
+  }
+
   public AssetGroup assetGroup(@NotBlank final String assetGroupId) {
     return this.assetGroupRepository.findById(assetGroupId).orElseThrow();
   }

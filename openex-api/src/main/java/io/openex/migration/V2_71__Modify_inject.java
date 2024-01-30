@@ -17,6 +17,7 @@ public class V2_71__Modify_inject extends BaseJavaMigration {
     // Add table link asset to inject
     select.execute("""
         ALTER TABLE injects ADD COLUMN inject_assets varchar(256);
+        ALTER TABLE injects ADD COLUMN injects_asset_groups varchar(256);
         """);
     // Add association table between asset and inject
     select.execute("""
@@ -27,6 +28,16 @@ public class V2_71__Modify_inject extends BaseJavaMigration {
         );
         CREATE INDEX idx_injects_assets_inject on injects_assets (inject_id);
         CREATE INDEX idx_injects_assets_asset on injects_assets (asset_id);
+        """);
+    // Add association table between asset group and inject
+    select.execute("""
+        CREATE TABLE injects_asset_groups (
+          inject_id varchar(255) not null constraint inject_id_fk references injects on delete cascade,
+          asset_group_id varchar(255) not null constraint asset_group_id_fk references asset_groups on delete cascade,
+          constraint injects_asset_groups_pkey primary key (inject_id, asset_group_id)
+        );
+        CREATE INDEX idx_injects_asset_groups_inject on injects_asset_groups (inject_id);
+        CREATE INDEX idx_injects_asset_groups_asset_groups on injects_asset_groups (asset_group_id);
         """);
     // Add asset to inject expectation
     select.execute("""
