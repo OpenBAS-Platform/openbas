@@ -49,14 +49,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const headerStyles: {
-  iconSort: CSSProperties;
-  asset_name: CSSProperties;
-  endpoint_hostname: CSSProperties;
-  endpoint_platform: CSSProperties;
-  endpoint_collected_by: CSSProperties;
-  asset_tags: CSSProperties;
-} = {
+const inlineStylesHeaders: Record<string, CSSProperties> = {
   iconSort: {
     position: 'absolute',
     margin: '0 0 0 5px',
@@ -95,13 +88,7 @@ const headerStyles: {
   },
 };
 
-const inlineStyles: {
-  asset_name: CSSProperties;
-  endpoint_hostname: CSSProperties;
-  endpoint_platform: CSSProperties;
-  endpoint_collected_by: CSSProperties;
-  asset_tags: CSSProperties;
-} = {
+const inlineStyles: Record<string, CSSProperties> = {
   asset_name: {
     width: '25%',
   },
@@ -128,11 +115,10 @@ const Endpoints = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
+
   // Filter and sort hook
-  const searchColumns = [
-    'name',
-  ];
-  const filtering = useSearchAnFilter('asset', 'name', searchColumns);
+  const filtering = useSearchAnFilter('asset', 'name', ['name']);
+
   // Fetching data
   const { endpoints, userAdmin, tagsMap } = useHelper((helper: EndpointsHelper & UsersHelper & TagsHelper) => ({
     endpoints: helper.getEndpoints(),
@@ -142,7 +128,9 @@ const Endpoints = () => {
   useDataLoader(() => {
     dispatch(fetchEndpoints());
   });
-  const sortedEndpoints: [EndpointStore] = filtering.filterAndSort(endpoints);
+
+  const sortedEndpoints: EndpointStore[] = filtering.filterAndSort(endpoints);
+
   return (
     <>
       <div className={classes.parameters}>
@@ -215,31 +203,31 @@ const Endpoints = () => {
                   'asset_name',
                   'Name',
                   true,
-                  headerStyles,
+                  inlineStylesHeaders,
                 )}
                 {filtering.buildHeader(
                   'endpoint_hostname',
                   'Hostname',
                   true,
-                  headerStyles,
+                  inlineStylesHeaders,
                 )}
                 {filtering.buildHeader(
                   'endpoint_platform',
                   'Platform',
                   true,
-                  headerStyles,
+                  inlineStylesHeaders,
                 )}
                 {filtering.buildHeader(
                   'endpoint_collected_by',
                   'Collected by',
                   false,
-                  headerStyles,
+                  inlineStylesHeaders,
                 )}
                 {filtering.buildHeader(
                   'asset_tags',
                   'Tags',
                   true,
-                  headerStyles,
+                  inlineStylesHeaders,
                 )}
               </div>
             }

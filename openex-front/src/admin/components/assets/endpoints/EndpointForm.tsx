@@ -1,6 +1,6 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Button, FormHelperText, MenuItem, TextField } from '@mui/material';
-import React, { FormEventHandler } from 'react';
+import React, { FormEventHandler, SyntheticEvent } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
@@ -63,8 +63,14 @@ const EndpointForm: React.FC<Props> = ({
     defaultValues: initialValues,
   });
 
+  const handleSubmitWithoutPropagation = (e: SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleSubmit(onSubmit)(e);
+  };
+
   return (
-    <form id="endpointForm" onSubmit={handleSubmit(onSubmit)}>
+    <form id="endpointForm" onSubmit={handleSubmitWithoutPropagation}>
       <TextField
         variant="standard"
         fullWidth

@@ -2,34 +2,10 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import withStyles from '@mui/styles/withStyles';
-import {
-  Button,
-  FormControlLabel,
-  FormGroup,
-  IconButton,
-  InputLabel,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemSecondaryAction,
-  ListItemText,
-  MenuItem,
-  Switch,
-  Typography,
-} from '@mui/material';
+import { Button, FormControlLabel, FormGroup, IconButton, InputLabel, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Switch, Typography, } from '@mui/material';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
-import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-  AttachmentOutlined,
-  CloseRounded,
-  ControlPointOutlined,
-  DeleteOutlined,
-  EmojiEventsOutlined,
-  GroupsOutlined,
-  HelpOutlineOutlined,
-} from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, CloseRounded, ControlPointOutlined, DeleteOutlined, EmojiEventsOutlined, GroupsOutlined, HelpOutlineOutlined, } from '@mui/icons-material';
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
@@ -58,6 +34,12 @@ import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
 import InjectExpectations from './expectations/InjectExpectations';
+import EndpointsList from "../../assets/endpoints/EndpointsList";
+import EndpointPopover from "../../assets/endpoints/EndpointPopover";
+import InjectAddEndpoints from "./endpoints/InjectAddEndpoints";
+import AssetGroupsList from "../../assets/assetgroups/AssetGroupsList";
+import AssetGroupPopover from "../../assets/assetgroups/AssetGroupPopover";
+import InjectAddAssetGroups from "./assetgroups/InjectAddAssetGroups";
 
 const styles = (theme) => ({
   header: {
@@ -330,6 +312,8 @@ class InjectDefinition extends Component {
     this.state = {
       allTeams: props.inject.inject_all_teams,
       teamsIds: props.inject.inject_teams,
+      assetIds: props.inject.inject_assets,
+      assetGroupIds: props.inject.inject_asset_groups,
       documents: props.inject.inject_documents,
       expectations: props.inject.inject_content?.expectations || [],
       teamsSortBy: 'team_name',
@@ -367,6 +351,7 @@ class InjectDefinition extends Component {
     this.setState({ openVariables: false });
   }
 
+  // Teams
   handleAddTeams(teamsIds) {
     this.setState({
       teamsIds: [...this.state.teamsIds, ...teamsIds],
@@ -379,6 +364,33 @@ class InjectDefinition extends Component {
     });
   }
 
+  // Assets
+  handleAddAssets(assetIds) {
+    this.setState({
+      assetIds: assetIds,
+    });
+  }
+
+  handleRemoveAsset(assetId) {
+    this.setState({
+      assetIds: this.state.assetIds.filter((a) => a !== assetId),
+    });
+  }
+
+  // Asset Groups
+  handleAddAssetGroups(assetGroupIds) {
+    this.setState({
+      assetGroupIds: assetGroupIds,
+    });
+  }
+
+  handleRemoveAssetGroup(assetGroupId) {
+    this.setState({
+      assetGroupIds: this.state.assetGroupIds.filter((a) => a !== assetGroupId),
+    });
+  }
+
+  // Articles
   handleAddArticles(articlesIds) {
     this.setState({
       articlesIds: [...this.state.articlesIds, ...articlesIds],
@@ -391,6 +403,7 @@ class InjectDefinition extends Component {
     });
   }
 
+  // Challenges
   handleAddChallenges(challengesIds) {
     this.setState({
       challengesIds: [...this.state.challengesIds, ...challengesIds],
@@ -403,6 +416,7 @@ class InjectDefinition extends Component {
     });
   }
 
+  // Documents
   handleAddDocuments(documents) {
     this.setState({
       documents: [...this.state.documents, ...documents],
@@ -417,6 +431,7 @@ class InjectDefinition extends Component {
     });
   }
 
+  // Expectations
   handleExpectations(expectations) {
     this.setState({ expectations });
   }
@@ -596,7 +611,7 @@ class InjectDefinition extends Component {
     }
     injectType.fields
       .filter(
-        (f) => !['teams', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+        (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
           f.key,
         ),
       )
@@ -644,7 +659,7 @@ class InjectDefinition extends Component {
           finalData[field.key] = data[field.key];
         }
       });
-    const { allTeams, teamsIds, documents } = this.state;
+    const { allTeams, teamsIds, assetIds, assetGroupIds, documents } = this.state;
     const values = {
       inject_title: inject.inject_title,
       inject_contract: inject.inject_contract,
@@ -655,6 +670,8 @@ class InjectDefinition extends Component {
       inject_content: finalData,
       inject_all_teams: allTeams,
       inject_teams: teamsIds,
+      inject_assets: assetIds,
+      inject_asset_groups: assetGroupIds,
       inject_documents: documents,
     };
     return this.props
@@ -671,7 +688,7 @@ class InjectDefinition extends Component {
     if (injectType && Array.isArray(injectType.fields)) {
       injectType.fields
         .filter(
-          (f) => !['teams', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+          (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
             f.key,
           ),
         )
@@ -1054,6 +1071,8 @@ class InjectDefinition extends Component {
       exercise,
       injectTypes,
       teamsMap,
+      endpointsMap,
+      assetGroupsMap,
       documentsMap,
       exercisesMap,
       tagsMap,
@@ -1067,6 +1086,8 @@ class InjectDefinition extends Component {
     const {
       allTeams,
       teamsIds,
+      assetIds,
+      assetGroupIds,
       documents,
       expectations,
       teamsSortBy,
@@ -1100,6 +1121,20 @@ class InjectDefinition extends Component {
     const hasTeams = injectType.fields
       .map((f) => f.key)
       .includes('teams');
+    // -- ASSETS --
+    const hasAssets = injectType.fields
+      .map((f) => f.key)
+      .includes('assets');
+    const assets = assetIds
+      .map((a) => endpointsMap[a])
+      .filter((a) => a !== undefined);
+    // -- ASSET GROUPS --
+    const hasAssetGroups = injectType.fields
+      .map((f) => f.key)
+      .includes('assetgroups');
+    const assetGroups = assetGroupIds
+      .map((a) => assetGroupsMap[a])
+      .filter((a) => a !== undefined);
     // -- ARTICLES --
     const articles = articlesIds
       .map((a) => articlesMap[a])
@@ -1165,6 +1200,8 @@ class InjectDefinition extends Component {
     // Enrich initialValues with default contract value
     const builtInFields = [
       'teams',
+      'assets',
+      'assetgroups',
       'articles',
       'challenges',
       'attachments',
@@ -1459,6 +1496,34 @@ class InjectDefinition extends Component {
                     </List>
                   </div>
                 )}
+                {hasAssets && (
+                  <>
+                    <Typography variant="h2" style={{ float: 'left' }}>
+                      {t('Targeted endpoints')}
+                    </Typography>
+                    <EndpointsList
+                      endpoints={assets}
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore: Endpoint property handle by EndpointsList
+                      actions={<EndpointPopover inline onRemoveEndpointFromInject={this.handleRemoveAsset.bind(this)} />}
+                    />
+                    <InjectAddEndpoints exercise={exercise} endpointIds={assetIds} onSubmit={this.handleAddAssets.bind(this)} />
+                  </>
+                )}
+                {hasAssetGroups && (
+                  <>
+                    <Typography variant="h2" style={{ float: 'left', marginTop: hasAssets ? 30 : 0 }}>
+                      {t('Targeted asset groups')}
+                    </Typography>
+                    <AssetGroupsList
+                      assetGroups={assetGroups}
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore: Endpoint property handle by EndpointsList
+                      actions={<AssetGroupPopover inline onRemoveAssetGroupFromInject={this.handleRemoveAssetGroup.bind(this)} />}
+                    />
+                    <InjectAddAssetGroups exercise={exercise} assetGroupIds={assetGroupIds} onSubmit={this.handleAddAssetGroups.bind(this)} />
+                  </>
+                )}
                 {hasArticles && (
                   <div>
                     <Typography
@@ -1684,7 +1749,7 @@ class InjectDefinition extends Component {
                     </List>
                   </div>
                 )}
-                <div style={{ marginTop: hasTeams ? 30 : 0 }}>
+                <div style={{ marginTop: (hasTeams || hasAssets || hasAssetGroups) ? 30 : 0 }}>
                   <div style={{ float: 'left' }}>
                     <Typography variant="h2">{t('Inject data')}</Typography>
                   </div>
@@ -1991,6 +2056,8 @@ const select = (state, ownProps) => {
   const inject = helper.getInject(injectId);
   const documentsMap = helper.getDocumentsMap();
   const teamsMap = helper.getTeamsMap();
+  const endpointsMap = helper.getEndpointsMap();
+  const assetGroupsMap = helper.getAssetGroupMaps();
   const channelsMap = helper.getChannelsMap();
   const articlesMap = helper.getArticlesMap();
   const challengesMap = helper.getChallengesMap();
@@ -1998,6 +2065,8 @@ const select = (state, ownProps) => {
     inject,
     documentsMap,
     teamsMap,
+    endpointsMap,
+    assetGroupsMap,
     articlesMap,
     channelsMap,
     challengesMap,

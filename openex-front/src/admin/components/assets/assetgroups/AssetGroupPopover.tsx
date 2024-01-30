@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { Drawer as MuiDrawer, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 
@@ -12,6 +12,8 @@ import type { AssetGroupStore } from './AssetGroup';
 import { deleteAssetGroup, updateAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
 import AssetGroupForm from './AssetGroupForm';
 import AssetGroupManagement from './AssetGroupManagement';
+import Dialog from '../../../../components/common/Dialog';
+import EndpointForm from '../endpoints/EndpointForm';
 
 const useStyles = makeStyles(() => ({
   drawerPaper: {
@@ -22,11 +24,17 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
+  inline?: boolean;
+  manageEndpoint?: boolean;
   assetGroup: AssetGroupStore;
+  onRemoveAssetGroupFromInject?: (assetGroupId: string) => void;
 }
 
-const AssetGroupPopover: React.FC<Props> = ({
+const AssetGroupPopover: FunctionComponent<Props> = ({
+  inline,
+  manageEndpoint,
   assetGroup,
+  onRemoveAssetGroupFromInject,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -57,7 +65,7 @@ const AssetGroupPopover: React.FC<Props> = ({
     setEdition(false);
   };
 
-  // Manage assets
+  // Manage endpoints
   const [selected, setSelected] = useState<string | undefined>(undefined);
 
   const handleManage = () => {
@@ -97,9 +105,16 @@ const AssetGroupPopover: React.FC<Props> = ({
         <MenuItem onClick={handleEdit}>
           {t('Update')}
         </MenuItem>
-        <MenuItem onClick={handleManage}>
-          {t('Manage assets')}
-        </MenuItem>
+        {manageEndpoint &&
+          <MenuItem onClick={handleManage}>
+            {t('Manage endpoints')}
+          </MenuItem>
+        }
+        {onRemoveAssetGroupFromInject && (
+          <MenuItem onClick={() => onRemoveAssetGroupFromInject(assetGroup.asset_group_id)}>
+            {t('Remove from the inject')}
+          </MenuItem>
+        )}
         <MenuItem
           onClick={handleDelete}
         >
@@ -113,18 +128,35 @@ const AssetGroupPopover: React.FC<Props> = ({
         handleSubmit={submitDelete}
         text={t('Do you want to delete the asset group ?')}
       />
-      <Drawer
-        open={edition}
-        handleClose={() => setEdition(false)}
-        title={t('Update the asset group')}
-      >
-        <AssetGroupForm
-          initialValues={initialValues}
-          editing={true}
-          onSubmit={submitEdit}
+
+      {inline ? (
+        <Dialog
+          open={edition}
           handleClose={() => setEdition(false)}
-        />
-      </Drawer>
+          title={t('Update the asset group')}
+        >
+          <AssetGroupForm
+            initialValues={initialValues}
+            editing={true}
+            onSubmit={submitEdit}
+            handleClose={() => setEdition(false)}
+          />
+        </Dialog>
+      ) : (
+        <Drawer
+          open={edition}
+          handleClose={() => setEdition(false)}
+          title={t('Update the asset group')}
+        >
+          <AssetGroupForm
+            initialValues={initialValues}
+            editing={true}
+            onSubmit={submitEdit}
+            handleClose={() => setEdition(false)}
+          />
+        </Drawer>
+      )}
+
       <MuiDrawer
         open={selected !== undefined}
         keepMounted={false}

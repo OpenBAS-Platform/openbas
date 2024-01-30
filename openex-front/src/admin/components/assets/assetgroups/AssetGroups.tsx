@@ -122,7 +122,7 @@ const AssetGroups = () => {
   useDataLoader(() => {
     dispatch(fetchAssetGroups());
   });
-  const sortedAssetGroups: [AssetGroupStore] = filtering.filterAndSort(assetGroups);
+  const sortedAssetGroups: AssetGroupStore[] = filtering.filterAndSort(assetGroups);
   const [selected, setSelected] = useState<AssetGroupStore | undefined>(undefined);
   return (
     <>
@@ -247,7 +247,7 @@ const AssetGroups = () => {
               }
             />
             <ListItemSecondaryAction>
-              <AssetGroupPopover assetGroup={assetGroup} />
+              <AssetGroupPopover manageEndpoint assetGroup={assetGroup} />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
