@@ -1,11 +1,11 @@
 import { makeStyles } from '@mui/styles';
+import React, { FunctionComponent, useState } from 'react';
+import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { ControlPointOutlined } from '@mui/icons-material';
 import type { Theme } from '../../../../../components/Theme';
 import type { Exercise } from '../../../../../utils/api-types';
-import React, { FunctionComponent, useState } from 'react';
 import { useFormatter } from '../../../../../components/i18n';
-import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { isExerciseReadOnly } from '../../../../../utils/Exercise';
-import { ControlPointOutlined } from '@mui/icons-material';
 import AssetGroupDialogAdding from '../../../assets/assetgroups/AssetGroupDialogAdding';
 
 const useStyles = makeStyles((theme: Theme) => ({

@@ -1,17 +1,17 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import Transition from '../../../../components/common/Transition';
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { ComputerOutlined } from '@mui/icons-material';
+import * as R from 'ramda';
+import { makeStyles } from '@mui/styles';
+import Transition from '../../../../components/common/Transition';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
-import { ComputerOutlined } from '@mui/icons-material';
 import ItemTags from '../../../../components/ItemTags';
 import EndpointCreation from './EndpointCreation';
 import type { EndpointStore } from './Endpoint';
 import { truncate } from '../../../../utils/String';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
-import * as R from 'ramda';
-import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../store';
 import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
 import useDataLoader from '../../../../utils/ServerSideEvent';
@@ -84,7 +84,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   const handleSubmit = () => {
     onSubmit(endpointIds);
     handleClose();
-  }
+  };
 
   return (
     <Dialog

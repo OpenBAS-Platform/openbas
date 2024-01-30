@@ -599,8 +599,8 @@ const i18n = {
       ARTICLE: 'Automatique - Déclenché lorsque l\'équipe a lu l\'article',
       TECHNICAL: 'Automatique - Déclenché lorsque l\'injection est traitée',
       'Not blocked': 'Non bloqué',
-      'Blocked': 'Bloqué',
-      'Failed': 'Echoué',
+      Blocked: 'Bloqué',
+      Failed: 'Echoué',
       'Pending result': 'Résultat en attente',
       // -- Expectation end --
       'Distribution of expected total score by team':

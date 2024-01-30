@@ -2,10 +2,34 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import withStyles from '@mui/styles/withStyles';
-import { Button, FormControlLabel, FormGroup, IconButton, InputLabel, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Switch, Typography, } from '@mui/material';
+import {
+  Button,
+  FormControlLabel,
+  FormGroup,
+  IconButton,
+  InputLabel,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+  MenuItem,
+  Switch,
+  Typography,
+} from '@mui/material';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, CloseRounded, ControlPointOutlined, DeleteOutlined, EmojiEventsOutlined, GroupsOutlined, HelpOutlineOutlined, } from '@mui/icons-material';
+import {
+  ArrowDropDownOutlined,
+  ArrowDropUpOutlined,
+  AttachmentOutlined,
+  CloseRounded,
+  ControlPointOutlined,
+  DeleteOutlined,
+  EmojiEventsOutlined,
+  GroupsOutlined,
+  HelpOutlineOutlined,
+} from '@mui/icons-material';
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
@@ -34,12 +58,12 @@ import ChallengePopover from '../../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
 import InjectExpectations from './expectations/InjectExpectations';
-import EndpointsList from "../../assets/endpoints/EndpointsList";
-import EndpointPopover from "../../assets/endpoints/EndpointPopover";
-import InjectAddEndpoints from "./endpoints/InjectAddEndpoints";
-import AssetGroupsList from "../../assets/assetgroups/AssetGroupsList";
-import AssetGroupPopover from "../../assets/assetgroups/AssetGroupPopover";
-import InjectAddAssetGroups from "./assetgroups/InjectAddAssetGroups";
+import EndpointsList from '../../assets/endpoints/EndpointsList';
+import EndpointPopover from '../../assets/endpoints/EndpointPopover';
+import InjectAddEndpoints from './endpoints/InjectAddEndpoints';
+import AssetGroupsList from '../../assets/assetgroups/AssetGroupsList';
+import AssetGroupPopover from '../../assets/assetgroups/AssetGroupPopover';
+import InjectAddAssetGroups from './assetgroups/InjectAddAssetGroups';
 
 const styles = (theme) => ({
   header: {
@@ -367,7 +391,7 @@ class InjectDefinition extends Component {
   // Assets
   handleAddAssets(assetIds) {
     this.setState({
-      assetIds: assetIds,
+      assetIds,
     });
   }
 
@@ -380,7 +404,7 @@ class InjectDefinition extends Component {
   // Asset Groups
   handleAddAssetGroups(assetGroupIds) {
     this.setState({
-      assetGroupIds: assetGroupIds,
+      assetGroupIds,
     });
   }
 

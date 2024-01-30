@@ -1,20 +1,20 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import Transition from '../../../../components/common/Transition';
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { ComputerOutlined } from '@mui/icons-material';
+import * as R from 'ramda';
+import { makeStyles } from '@mui/styles';
+import Transition from '../../../../components/common/Transition';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
-import { ComputerOutlined } from '@mui/icons-material';
 import ItemTags from '../../../../components/ItemTags';
 import { truncate } from '../../../../utils/String';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
-import * as R from 'ramda';
-import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { AssetGroupsHelper } from '../../../../actions/assetgroups/assetgroup-helper';
+import type { AssetGroupsHelper } from '../../../../actions/assetgroups/assetgroup-helper';
 import { fetchAssetGroups } from '../../../../actions/assetgroups/assetgroup-action';
-import { AssetGroupStore } from './AssetGroup';
+import type { AssetGroupStore } from './AssetGroup';
 import AssetGroupCreation from './AssetGroupCreation';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 

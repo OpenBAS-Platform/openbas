@@ -1,12 +1,10 @@
 import { IconButton, Typography } from '@mui/material';
 import { CloseRounded } from '@mui/icons-material';
-import * as R from 'ramda';
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../../../../components/Theme';
 import TagsFilter from '../../../../components/TagsFilter';
 import SearchFilter from '../../../../components/SearchFilter';
-import { Option } from '../../../../utils/Option';
 import AssetGroupAddEndpoints from './AssetGroupAddEndpoints';
 import { useHelper } from '../../../../store';
 import type { UsersHelper } from '../../../../actions/helper';
@@ -121,10 +119,10 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore: Endpoint property handle by EndpointsList
             ? (<EndpointPopover
-              inline
-              assetGroupId={assetGroup.asset_group_id}
-              assetGroupEndpointIds={assetGroup.asset_group_assets ?? []}
-            />)
+                inline
+                assetGroupId={assetGroup.asset_group_id}
+                assetGroupEndpointIds={assetGroup.asset_group_assets ?? []}
+               />)
             : <span> &nbsp; </span>
           }
       />
@@ -132,7 +130,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
         && (<AssetGroupAddEndpoints
           assetGroupId={assetGroup.asset_group_id}
           assetGroupEndpointIds={assetGroup.asset_group_assets ?? []}
-        />)
+            />)
       }
     </>
   );

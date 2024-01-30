@@ -13,7 +13,6 @@ import { deleteAssetGroup, updateAssetGroup } from '../../../../actions/assetgro
 import AssetGroupForm from './AssetGroupForm';
 import AssetGroupManagement from './AssetGroupManagement';
 import Dialog from '../../../../components/common/Dialog';
-import EndpointForm from '../endpoints/EndpointForm';
 
 const useStyles = makeStyles(() => ({
   drawerPaper: {
@@ -105,8 +104,8 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
         <MenuItem onClick={handleEdit}>
           {t('Update')}
         </MenuItem>
-        {manageEndpoint &&
-          <MenuItem onClick={handleManage}>
+        {manageEndpoint
+          && <MenuItem onClick={handleManage}>
             {t('Manage endpoints')}
           </MenuItem>
         }

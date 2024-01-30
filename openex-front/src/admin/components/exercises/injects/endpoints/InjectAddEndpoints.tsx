@@ -1,13 +1,11 @@
 import React, { FunctionComponent, useState } from 'react';
-import { isExerciseReadOnly } from '../../../../../utils/Exercise';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
-import { useFormatter } from '../../../../../components/i18n';
 import { makeStyles } from '@mui/styles';
+import { useFormatter } from '../../../../../components/i18n';
+import { isExerciseReadOnly } from '../../../../../utils/Exercise';
 import type { Theme } from '../../../../../components/Theme';
 import type { Exercise } from '../../../../../utils/api-types';
-import ExpectationFormCreate from '../expectations/ExpectationFormCreate';
-import Dialog from '../../../../../components/common/Dialog';
 import EndpointsDialogAdding from '../../../assets/endpoints/EndpointsDialogAdding';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -60,10 +58,11 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
         />
       </ListItemButton>
       <EndpointsDialogAdding initialState={endpointIds} open={openDialog}
-                             onClose={handleClose} onSubmit={onSubmit}
-                             title={t('Add endpoints in this inject')} />
-      </>
+        onClose={handleClose} onSubmit={onSubmit}
+        title={t('Add endpoints in this inject')}
+      />
+    </>
   );
-}
+};
 
 export default InjectAddEndpoints;

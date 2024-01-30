@@ -11,7 +11,6 @@ import { addAssetGroup } from '../../../../actions/assetgroups/assetgroup-action
 import AssetGroupForm from './AssetGroupForm';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Dialog from '../../../../components/common/Dialog';
-import EndpointForm from '../endpoints/EndpointForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
   text: {

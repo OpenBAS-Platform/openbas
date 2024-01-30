@@ -1,15 +1,10 @@
 import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import SortHeadersList, { Header } from '../../../../components/common/SortHeadersList';
-import { ComputerOutlined, LanOutlined } from '@mui/icons-material';
-import ItemTags from '../../../../components/ItemTags';
+import { LanOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import { AssetGroupsHelper } from '../../../../actions/assetgroups/assetgroup-helper';
-import { fetchAssetGroups } from '../../../../actions/assetgroups/assetgroup-action';
-import { AssetGroupStore } from './AssetGroup';
+import SortHeadersList, { Header } from '../../../../components/common/SortHeadersList';
+import ItemTags from '../../../../components/ItemTags';
+import type { AssetGroupStore } from './AssetGroup';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -64,9 +59,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 interface Props {
   assetGroups: AssetGroupStore[];
-  actions:
-    | React.ReactElement
-    | null;
+  actions: React.ReactElement;
 }
 
 const AssetGroupsList: FunctionComponent<Props> = ({
@@ -75,15 +68,6 @@ const AssetGroupsList: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useAppDispatch();
-
-  // Fetching data
-  const { assetGroupsMap } = useHelper((helper: AssetGroupsHelper) => ({
-    assetGroupsMap: helper.getAssetGroupMaps(),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchAssetGroups());
-  });
 
   // Headers
   const headers: Header[] = [
@@ -92,14 +76,12 @@ const AssetGroupsList: FunctionComponent<Props> = ({
   ];
 
   const component = (assetGroup: AssetGroupStore) => {
-    if (actions) {
-      return React.cloneElement(actions as React.ReactElement, { assetGroup: assetGroup });
-    }
+    return React.cloneElement(actions as React.ReactElement, { assetGroup });
   };
 
   const [sortedAssetGroups, setSortedAssetGroups] = useState(assetGroups);
   useEffect(() => {
-    setSortedAssetGroups(assetGroups)
+    setSortedAssetGroups(assetGroups);
   }, [assetGroups]);
 
   return (
@@ -110,15 +92,15 @@ const AssetGroupsList: FunctionComponent<Props> = ({
         style={{ paddingTop: 0 }}
       >
         <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
+          <span
+            style={{
+              padding: '0 8px 0 8px',
+              fontWeight: 700,
+              fontSize: 12,
+            }}
+          >
                 &nbsp;
-            </span>
+          </span>
         </ListItemIcon>
         <ListItemText
           primary={

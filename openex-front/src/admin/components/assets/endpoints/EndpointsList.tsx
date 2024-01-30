@@ -1,11 +1,10 @@
 import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { ComputerOutlined } from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
 import SortHeadersList, { Header } from '../../../../components/common/SortHeadersList';
 import type { EndpointStore } from './Endpoint';
-import { ComputerOutlined } from '@mui/icons-material';
 import ItemTags from '../../../../components/ItemTags';
-import { makeStyles } from '@mui/styles';
-import { MESSAGING$ } from '../../../../utils/Environment';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -60,9 +59,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 interface Props {
   endpoints: EndpointStore[];
-  actions:
-    | React.ReactElement
-    | null;
+  actions: React.ReactElement;
 }
 
 const EndpointsList: FunctionComponent<Props> = ({
@@ -79,14 +76,12 @@ const EndpointsList: FunctionComponent<Props> = ({
   ];
 
   const component = (endpoint: EndpointStore) => {
-    if (actions) {
-      return React.cloneElement(actions as React.ReactElement, { endpoint: endpoint });
-    }
+    return React.cloneElement(actions as React.ReactElement, { endpoint });
   };
 
   const [sortedEndpoints, setSortedEndpoints] = useState(endpoints);
   useEffect(() => {
-    setSortedEndpoints(endpoints)
+    setSortedEndpoints(endpoints);
   }, [endpoints]);
 
   return (
@@ -97,15 +92,15 @@ const EndpointsList: FunctionComponent<Props> = ({
         style={{ paddingTop: 0 }}
       >
         <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
+          <span
+            style={{
+              padding: '0 8px 0 8px',
+              fontWeight: 700,
+              fontSize: 12,
+            }}
+          >
                 &nbsp;
-            </span>
+          </span>
         </ListItemIcon>
         <ListItemText
           primary={

@@ -1,8 +1,8 @@
 import React, { CSSProperties, FunctionComponent, useState } from 'react';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../i18n';
 import * as R from 'ramda';
+import { useFormatter } from '../i18n';
 
 const useStyles = makeStyles(() => ({
   iconSort: {
@@ -23,7 +23,9 @@ interface Props {
   headers: Header[];
   inlineStylesHeaders: Record<string, CSSProperties>;
   initialSortBy: string;
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   datas: any[];
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   setDatas: (datas: any[]) => void;
 }
 
