@@ -75,7 +75,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
     dispatch(fetchEndpoints());
   });
 
-  const endpoints = assetGroup.asset_group_assets.filter((endpointId: string) => !!endpointsMap[endpointId]).map((endpointId: string) => endpointsMap[endpointId]);
+  const endpoints = assetGroup.asset_group_assets?.filter((endpointId: string) => !!endpointsMap[endpointId]).map((endpointId: string) => endpointsMap[endpointId]);
   const sortedAsset: EndpointStore[] = filtering.filterAndSort(endpoints);
 
   return (
