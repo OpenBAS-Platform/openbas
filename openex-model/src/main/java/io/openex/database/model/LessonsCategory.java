@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
@@ -15,6 +17,8 @@ import java.util.Objects;
 
 import static java.time.Instant.now;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "lessons_categories")
 @EntityListeners(ModelBaseListener.class)
@@ -31,6 +35,12 @@ public class LessonsCategory implements Base {
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("lessons_category_exercise")
     private Exercise exercise;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lessons_category_scenario")
+    @JsonSerialize(using = MonoIdDeserializer.class)
+    @JsonProperty("lessons_category_scenario")
+    private Scenario scenario;
 
     @Column(name = "lessons_category_created_at")
     @JsonProperty("lessons_category_created_at")
@@ -71,79 +81,6 @@ public class LessonsCategory implements Base {
         return getTeams().stream().flatMap(team -> team.getUsers().stream().map(User::getId)).toList();
     }
     // endregion
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Exercise getExercise() {
-        return exercise;
-    }
-
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
-    }
-
-    public Instant getCreated() {
-        return created;
-    }
-
-    public void setCreated(Instant created) {
-        this.created = created;
-    }
-
-    public Instant getUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(Instant updated) {
-        this.updated = updated;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
-
-    public List<Team> getTeams() {
-        return teams;
-    }
-
-    public void setTeams(List<Team> teams) {
-        this.teams = teams;
-    }
-
-    public List<LessonsQuestion> getQuestions() {
-        return questions;
-    }
-
-    public void setQuestions(List<LessonsQuestion> questions) {
-        this.questions = questions;
-    }
 
     @Override
     public boolean isUserHasAccess(User user) {

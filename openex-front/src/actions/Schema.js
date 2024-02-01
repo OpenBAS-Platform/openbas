@@ -418,4 +418,7 @@ export const storeHelper = (state) => ({
   getAssetGroup: (id) => entity(id, 'asset_groups', state),
   // contracts
   getContractImages: () => contractImages(state),
+  // scenarios
+  getScenarios: () => entities('scenarios', state),
+  getScenario: (id) => entity(id, 'scenarios', state)
 });

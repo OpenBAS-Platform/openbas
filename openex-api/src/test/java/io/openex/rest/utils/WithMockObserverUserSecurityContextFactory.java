@@ -58,6 +58,7 @@ public class WithMockObserverUserSecurityContextFactory implements WithSecurityC
     // Create group
     Group group = new Group();
     group.setName("Observer group");
+    group.setScenariosDefaultGrants(List.of(OBSERVER));
     group = this.groupRepository.save(group);
     // Create grant
     Grant grant = new Grant();

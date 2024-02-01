@@ -4,22 +4,23 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
+import io.openex.helper.InjectStatisticsHelper;
 import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
 import io.openex.helper.MultiModelDeserializer;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
 
 import static io.openex.database.model.Grant.GRANT_TYPE.OBSERVER;
 import static io.openex.database.model.Grant.GRANT_TYPE.PLANNER;
+import static io.openex.helper.UserHelper.getUsersByType;
 import static java.time.Instant.now;
-import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 
 @Setter
@@ -196,16 +197,7 @@ public class Exercise implements Base {
     // region transient
     @JsonProperty("exercise_injects_statistics")
     public Map<String, Long> getInjectStatistics() {
-        Map<String, Long> stats = new HashMap<>();
-        long total = injects.size();
-        stats.put("total_count", total);
-        long executed = injects.stream().filter(inject -> inject.getStatus().isPresent()).count();
-        stats.put("total_executed", executed);
-        stats.put("total_remaining", injects.stream().filter(Inject::isNotExecuted).count());
-        stats.put("total_past", injects.stream().filter(Inject::isPastInject).count());
-        stats.put("total_future", injects.stream().filter(Inject::isFutureInject).count());
-        stats.put("total_progress", total > 0 ? (executed * 100 / total) : 0);
-        return stats;
+        return InjectStatisticsHelper.getInjectStatistics(this.getInjects());
     }
 
     @JsonProperty("exercise_lessons_answers_number")
@@ -214,26 +206,16 @@ public class Exercise implements Base {
                 .stream().flatMap(lessonsQuestion -> lessonsQuestion.getAnswers().stream())).count();
     }
 
-    private List<User> getUsersByType(Grant.GRANT_TYPE... types) {
-        List<Grant> grants = getGrants();
-        return grants.stream()
-                .filter(grant -> asList(types).contains(grant.getName()))
-                .map(Grant::getGroup)
-                .flatMap(group -> group.getUsers().stream())
-                .distinct()
-                .toList();
-    }
-
     @JsonProperty("exercise_planners")
     @JsonSerialize(using = MultiIdDeserializer.class)
     public List<User> getPlanners() {
-        return getUsersByType(PLANNER);
+        return getUsersByType(this.getGrants(), PLANNER);
     }
 
     @JsonProperty("exercise_observers")
     @JsonSerialize(using = MultiIdDeserializer.class)
     public List<User> getObservers() {
-        return getUsersByType(PLANNER, OBSERVER);
+        return getUsersByType(this.getGrants(), PLANNER, OBSERVER);
     }
 
     @JsonProperty("exercise_next_inject_date")

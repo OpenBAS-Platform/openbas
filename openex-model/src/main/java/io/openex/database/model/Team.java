@@ -20,6 +20,8 @@ import java.util.function.Predicate;
 
 import static java.time.Instant.now;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "teams")
 @EntityListeners(ModelBaseListener.class)
@@ -29,25 +31,22 @@ public class Team implements Base {
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("team_id")
+    @NotBlank
     private String id;
 
-    @Setter
     @Column(name = "team_name")
     @NotBlank
     @JsonProperty("team_name")
     private String name;
 
-    @Setter
     @Column(name = "team_description")
     @JsonProperty("team_description")
     private String description;
 
-    @Setter
     @Column(name = "team_created_at")
     @JsonProperty("team_created_at")
     private Instant createdAt = now();
 
-    @Setter
     @Column(name = "team_updated_at")
     @JsonProperty("team_updated_at")
     private Instant updatedAt = now();
@@ -60,7 +59,6 @@ public class Team implements Base {
     @JsonProperty("team_tags")
     private List<Tag> tags = new ArrayList<>();
 
-    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_organization")
     @JsonSerialize(using = MonoIdDeserializer.class)
@@ -82,13 +80,18 @@ public class Team implements Base {
     @JsonProperty("team_exercises")
     private List<Exercise> exercises = new ArrayList<>();
 
-    @Setter
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "scenarios_teams",
+        joinColumns = @JoinColumn(name = "team_id"),
+        inverseJoinColumns = @JoinColumn(name = "scenario_id"))
+    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonProperty("team_scenarios")
+    private List<Scenario> scenarios = new ArrayList<>();
+
     @Column(name = "team_contextual")
     @JsonProperty("team_contextual")
     private Boolean contextual = false;
 
-    @Getter
-    @Setter
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty("team_exercises_users")
     @JsonSerialize(using = MultiModelDeserializer.class)
@@ -132,102 +135,6 @@ public class Team implements Base {
         return getInjectExpectations().stream().mapToLong(InjectExpectation::getExpectedScore).sum();
     }
     // endregion
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public Boolean getContextual() {
-        return contextual;
-    }
-
-    public void setContextual(Boolean contextual) {
-        this.contextual = contextual;
-    }
-
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
-    public Organization getOrganization() {
-        return organization;
-    }
-
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
-    }
-
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
-
-    public List<Exercise> getExercises() {
-        return exercises;
-    }
-
-    public void setExercises(List<Exercise> exercises) {
-        this.exercises = exercises;
-    }
-
-    public List<ExerciseTeamUser> getExerciseTeamUsers() {
-        return exerciseTeamUsers;
-    }
-
-    public void setExerciseTeamUsers(List<ExerciseTeamUser> exerciseTeamUsers) {
-        this.exerciseTeamUsers = exerciseTeamUsers;
-    }
-
-    public List<InjectExpectation> getInjectExpectations() {
-        return injectExpectations;
-    }
-
-    public void setInjectExpectations(List<InjectExpectation> injectExpectations) {
-        this.injectExpectations = injectExpectations;
-    }
 
     @JsonProperty("team_communications")
     public List<Communication> getCommunications() {

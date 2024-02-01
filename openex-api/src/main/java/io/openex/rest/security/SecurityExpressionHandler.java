@@ -2,6 +2,7 @@ package io.openex.rest.security;
 
 import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.UserRepository;
+import io.openex.service.ScenarioService;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -16,12 +17,17 @@ import java.util.function.Supplier;
 public class SecurityExpressionHandler extends DefaultMethodSecurityExpressionHandler {
 
   private final AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
-  private final ExerciseRepository exerciseRepository;
   private final UserRepository userRepository;
+  private final ExerciseRepository exerciseRepository;
+  private final ScenarioService scenarioService;
 
-  public SecurityExpressionHandler(UserRepository userRepository, ExerciseRepository exerciseRepository) {
+  public SecurityExpressionHandler(
+      final UserRepository userRepository,
+      final ExerciseRepository exerciseRepository,
+      final ScenarioService scenarioService) {
     this.userRepository = userRepository;
     this.exerciseRepository = exerciseRepository;
+    this.scenarioService = scenarioService;
   }
 
   @Override
@@ -32,7 +38,7 @@ public class SecurityExpressionHandler extends DefaultMethodSecurityExpressionHa
     MethodSecurityExpressionOperations delegate = (MethodSecurityExpressionOperations) context.getRootObject()
         .getValue();
     assert delegate != null;
-    SecurityExpression root = new SecurityExpression(delegate.getAuthentication(), userRepository, exerciseRepository);
+    SecurityExpression root = new SecurityExpression(delegate.getAuthentication(), this.userRepository, this.exerciseRepository, this.scenarioService);
     root.setPermissionEvaluator(getPermissionEvaluator());
     root.setTrustResolver(this.trustResolver);
     root.setRoleHierarchy(getRoleHierarchy());

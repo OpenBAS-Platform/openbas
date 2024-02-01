@@ -24,6 +24,7 @@ export interface Article {
   /** @format int32 */
   article_likes?: number;
   article_name?: string;
+  article_scenario?: Scenario;
   /** @format int32 */
   article_shares?: number;
   /** @format date-time */
@@ -403,6 +404,7 @@ export interface Document {
   document_exercises?: Exercise[];
   document_id?: string;
   document_name?: string;
+  document_scenarios?: Scenario[];
   document_tags?: Tag[];
   document_target?: string;
   document_type?: string;
@@ -504,6 +506,7 @@ export interface EndpointInput {
    * @minItems 1
    */
   endpoint_ips: string[];
+  endpoint_mac_adresses?: string[];
   endpoint_mac_addresses?: string[];
   endpoint_platform: "Linux" | "Windows" | "Darwin";
 }
@@ -677,6 +680,7 @@ export interface Grant {
   grant_group?: Group;
   grant_id?: string;
   grant_name?: "OBSERVER" | "PLANNER";
+  grant_scenario?: Scenario;
   updateAttributes?: object;
 }
 
@@ -684,6 +688,7 @@ export interface Group {
   group_default_exercise_assign?: ("OBSERVER" | "PLANNER")[];
   group_default_exercise_observer?: boolean;
   group_default_exercise_planner?: boolean;
+  group_default_scenario_assign?: ("OBSERVER" | "PLANNER")[];
   group_default_user_assign?: boolean;
   group_description?: string;
   group_grants?: Grant[];
@@ -742,6 +747,7 @@ export interface Inject {
   inject_exercise?: Exercise;
   inject_expectations?: InjectExpectation[];
   inject_id?: string;
+  inject_scenario?: Scenario;
   /** @format date-time */
   inject_sent_at?: string;
   inject_status?: InjectStatus;
@@ -898,6 +904,7 @@ export interface LessonsCategory {
   /** @format int32 */
   lessons_category_order?: number;
   lessons_category_questions?: LessonsQuestion[];
+  lessons_category_scenario?: Scenario;
   lessons_category_teams?: Team[];
   /** @format date-time */
   lessons_category_updated_at?: string;
@@ -1090,6 +1097,7 @@ export interface Objective {
   objective_id?: string;
   /** @format int32 */
   objective_priority?: number;
+  objective_scenario?: Scenario;
   /** @format double */
   objective_score?: number;
   objective_title?: string;
@@ -1241,6 +1249,43 @@ export interface ResetUserInput {
   login: string;
 }
 
+export interface Scenario {
+  scenario_articles?: Article[];
+  /** @format date-time */
+  scenario_created_at?: string;
+  scenario_description?: string;
+  scenario_documents?: Document[];
+  scenario_id: string;
+  scenario_injects?: Inject[];
+  scenario_lessons_categories?: LessonsCategory[];
+  scenario_mail_from: string;
+  scenario_message_footer?: string;
+  scenario_message_header?: string;
+  scenario_name: string;
+  scenario_observers?: User[];
+  scenario_planners?: User[];
+  scenario_subtitle?: string;
+  scenario_tags?: Tag[];
+  scenario_teams?: Team[];
+  /** @format date-time */
+  scenario_updated_at?: string;
+  updateAttributes?: object;
+}
+
+export interface ScenarioCreateInput {
+  scenario_description?: string;
+  scenario_name: string;
+  scenario_subtitle?: string;
+  scenario_tags?: string[];
+}
+
+export interface ScenarioSimple {
+  scenario_id?: string;
+  scenario_name?: string;
+  scenario_subtitle?: string;
+  scenario_tags?: Tag[];
+}
+
 export interface SettingsUpdateInput {
   platform_lang: string;
   platform_name: string;
@@ -1293,6 +1338,7 @@ export interface Team {
   team_injects_number?: number;
   team_name: string;
   team_organization?: Organization;
+  team_scenarios?: Scenario[];
   team_tags?: Tag[];
   /** @format date-time */
   team_updated_at?: string;

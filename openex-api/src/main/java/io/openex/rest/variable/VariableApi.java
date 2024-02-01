@@ -33,7 +33,7 @@ public class VariableApi extends RestBehavior {
   @GetMapping("/api/exercises/{exerciseId}/variables")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Variable> variables(@PathVariable @NotBlank final String exerciseId) {
-    return this.variableService.variables(exerciseId);
+    return this.variableService.variablesFromExercise(exerciseId);
   }
 
   @PutMapping("/api/exercises/{exerciseId}/variables/{variableId}")

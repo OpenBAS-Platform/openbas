@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MultiIdDeserializer;
 import io.openex.helper.MultiModelDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UuidGenerator;
@@ -43,6 +45,15 @@ public class Group implements Base {
     @CollectionTable(name = "groups_exercises_default_grants",
             joinColumns = @JoinColumn(name = "group_id"))
     private List<Grant.GRANT_TYPE> exercisesDefaultGrants = new ArrayList<>();
+
+    @Getter
+    @Setter
+    @JsonProperty("group_default_scenario_assign")
+    @Enumerated(EnumType.STRING)
+    @ElementCollection
+    @CollectionTable(name = "groups_scenarios_default_grants",
+        joinColumns = @JoinColumn(name = "group_id"))
+    private List<Grant.GRANT_TYPE> scenariosDefaultGrants = new ArrayList<>();
 
     @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
     @JsonProperty("group_grants")

@@ -1,14 +1,14 @@
-import React from 'react';
 import TopMenu, { MenuEntry } from '../../../components/common/TopMenu';
+import React from 'react';
 
-const TopMenuExercises = () => {
+const TopMenuScenarios = () => {
   const entries: MenuEntry[] = [
     {
-      path: '/admin/exercises',
-      label: 'Exercises',
+      path: '/admin/scenarios',
+      label: 'Scenarios',
     },
   ];
   return <TopMenu entries={entries} />;
 };
 
-export default TopMenuExercises;
+export default TopMenuScenarios;

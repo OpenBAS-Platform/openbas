@@ -30,6 +30,7 @@ import oermLight from '../../../static/images/xtm/oerm_light.png';
 import omtdDark from '../../../static/images/xtm/omtd_dark.png';
 import omtdLight from '../../../static/images/xtm/omtd_light.png';
 import useAuth from '../../../utils/hooks/useAuth';
+import TopMenuScenarios from '../scenarios/TopMenuScenarios';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   appBar: {
@@ -178,6 +179,7 @@ const TopBar: React.FC = () => {
             <TopMenuDashboard />
           )}
           {location.pathname === '/admin/exercises' && <TopMenuExercises />}
+          {location.pathname === '/admin/scenarios' && <TopMenuScenarios />}
           {location.pathname.includes('/admin/exercises/') && (
             <TopMenuExercise />
           )}

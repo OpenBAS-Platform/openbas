@@ -3,11 +3,15 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoIdDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
 import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "grants")
 public class Grant implements Base {
@@ -41,41 +45,15 @@ public class Grant implements Base {
     @JsonProperty("grant_exercise")
     private Exercise exercise;
 
-    public String getId() {
-        return id;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "grant_scenario")
+    @JsonSerialize(using = MonoIdDeserializer.class)
+    @JsonProperty("grant_scenario")
+    private Scenario scenario; // TODO: verify is used
 
     @Override
     public boolean isUserHasAccess(User user) {
         return user.isAdmin();
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public GRANT_TYPE getName() {
-        return name;
-    }
-
-    public void setName(GRANT_TYPE name) {
-        this.name = name;
-    }
-
-    public Group getGroup() {
-        return group;
-    }
-
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
-    public Exercise getExercise() {
-        return exercise;
-    }
-
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
     }
 
     @Override

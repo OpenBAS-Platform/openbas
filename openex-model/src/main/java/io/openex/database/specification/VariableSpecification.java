@@ -10,4 +10,8 @@ public class VariableSpecification {
     return (root, query, cb) -> cb.equal(root.get("exercise").get("id"), exerciseId);
   }
 
+  public static Specification<Variable> fromScenario(@NotNull final String scenarioId) {
+    return (root, query, cb) -> cb.equal(root.get("scenario").get("id"), scenarioId);
+  }
+
 }
