@@ -1,12 +1,11 @@
 import { Chip } from '@mui/material';
 import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
-import type { Theme } from '../../../../../components/Theme';
 import colorStyles from '../../../../../components/Color';
 import { useFormatter } from '../../../../../components/i18n';
 import type { InjectExpectationsStore } from '../../injects/expectations/Expectation';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   chipInList: {
     height: 20,
     borderRadius: '0',

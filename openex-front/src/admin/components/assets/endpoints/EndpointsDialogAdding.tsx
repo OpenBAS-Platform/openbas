@@ -44,7 +44,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   onClose,
   onSubmit,
   title,
-  filter = (e: EndpointStore) => true,
+  filter = () => true,
 }) => {
   // Standard hooks
   const classes = useStyles();

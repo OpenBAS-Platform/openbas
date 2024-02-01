@@ -7,7 +7,7 @@ import { isExerciseReadOnly } from '../../../../../utils/Exercise';
 import type { Theme } from '../../../../../components/Theme';
 import type { Exercise } from '../../../../../utils/api-types';
 import EndpointsDialogAdding from '../../../assets/endpoints/EndpointsDialogAdding';
-import { EndpointStore } from '../../../assets/endpoints/Endpoint';
+import type { EndpointStore } from '../../../assets/endpoints/Endpoint';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -61,9 +61,9 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
         />
       </ListItemButton>
       <EndpointsDialogAdding initialState={endpointIds} open={openDialog}
-                             onClose={handleClose} onSubmit={onSubmit}
-                             title={t('Add assets in this inject')}
-                             filter={filter}
+        onClose={handleClose} onSubmit={onSubmit}
+        title={t('Add assets in this inject')}
+        filter={filter}
       />
     </>
   );

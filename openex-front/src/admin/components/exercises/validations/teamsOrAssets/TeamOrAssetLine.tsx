@@ -1,17 +1,16 @@
 import React, { FunctionComponent } from 'react';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { CastForEducationOutlined, DnsOutlined, LanOutlined } from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
 import ChannelExpectation from '../expectations/ChannelExpectation';
 import ChallengeExpectation from '../expectations/ChallengeExpectation';
 import TechnicalExpectationAsset from '../expectations/TechnicalExpectationAsset';
 import TechnicalExpectationAssetGroup from '../expectations/TechnicalExpectationAssetGroup';
 import ManualExpectations from '../expectations/ManualExpectations';
-import { makeStyles } from '@mui/styles';
-import type { Theme } from '../../../../../components/Theme';
-import { EndpointStore } from '../../../assets/endpoints/Endpoint';
-import { AssetGroupStore } from '../../../assets/assetgroups/AssetGroup';
-import { Contract, Inject, Team } from '../../../../../utils/api-types';
-import { InjectExpectationsStore } from '../../injects/expectations/Expectation';
+import type { EndpointStore } from '../../../assets/endpoints/Endpoint';
+import type { AssetGroupStore } from '../../../assets/assetgroups/AssetGroup';
+import type { Contract, Inject, Team } from '../../../../../utils/api-types';
+import type { InjectExpectationsStore } from '../../injects/expectations/Expectation';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
@@ -20,11 +19,11 @@ import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { fetchExerciseChallenges } from '../../../../../actions/Challenge';
 import { fetchEndpoints } from '../../../../../actions/assets/endpoint-actions';
 import { fetchAssetGroups } from '../../../../../actions/assetgroups/assetgroup-action';
-import { AssetGroupsHelper } from '../../../../../actions/assetgroups/assetgroup-helper';
-import { EndpointsHelper } from '../../../../../actions/assets/asset-helper';
-import { ArticlesHelper, ChallengesHelper, ChannelsHelper, TeamsHelper } from '../../../../../actions/helper';
+import type { AssetGroupsHelper } from '../../../../../actions/assetgroups/assetgroup-helper';
+import type { EndpointsHelper } from '../../../../../actions/assets/asset-helper';
+import type { ArticlesHelper, ChallengesHelper, ChannelsHelper, TeamsHelper } from '../../../../../actions/helper';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   item: {
     height: 40,
   },
@@ -87,8 +86,8 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
   const asset: EndpointStore = assetsMap[id];
   const assetGroup: AssetGroupStore = assetGroupsMap[id];
 
-  const groupedByExpectationType = (expectations: InjectExpectationsStore[]) => {
-    return expectations.reduce((group, expectation) => {
+  const groupedByExpectationType = (es: InjectExpectationsStore[]) => {
+    return es.reduce((group, expectation) => {
       const { inject_expectation_type } = expectation;
       if (inject_expectation_type) {
         const values = group.get(inject_expectation_type) ?? [];
@@ -99,8 +98,8 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
     }, new Map());
   };
 
-  const groupedByAsset = (expectations: InjectExpectationsStore[]) => {
-    return expectations.reduce((group, expectation) => {
+  const groupedByAsset = (es: InjectExpectationsStore[]) => {
+    return es.reduce((group, expectation) => {
       const { inject_expectation_asset } = expectation;
       if (inject_expectation_asset) {
         const values = group.get(inject_expectation_asset) ?? [];
@@ -150,23 +149,25 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
           }
           if (expectationType === 'TECHNICAL') {
             const expectation = es[0];
-            if (!!asset) {
+            if (asset) {
               return (
                 <TechnicalExpectationAsset key={expectationType}
-                                           expectation={expectation}
-                                           injectContract={injectContract} />
+                  expectation={expectation}
+                  injectContract={injectContract}
+                />
               );
-            } else if (!!assetGroup) {
-              const relatedExpectations = expectationsByInject.filter(e => assetGroup.asset_group_assets?.includes(e.inject_expectation_asset ?? '')) ?? [] ;
+            } if (assetGroup) {
+              const relatedExpectations = expectationsByInject.filter((e) => assetGroup.asset_group_assets?.includes(e.inject_expectation_asset ?? '')) ?? [];
 
               return (
                 <>
                   <TechnicalExpectationAssetGroup key={expectationType}
-                                                  expectation={expectation}
-                                                  injectContract={injectContract}
-                                                  relatedExpectations={relatedExpectations} />
-                  {Array.from(groupedByAsset(relatedExpectations)).map(([id, expectations]) => {
-                    const asset: EndpointStore = assetsMap[id];
+                    expectation={expectation}
+                    injectContract={injectContract}
+                    relatedExpectations={relatedExpectations}
+                  />
+                  {Array.from(groupedByAsset(relatedExpectations)).map(([groupedId, groupedExpectations]) => {
+                    const relatedAsset: EndpointStore = assetsMap[groupedId];
                     return (
                       <>
                         <ListItem
@@ -175,27 +176,26 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
                           classes={{ root: classes.item }}
                         >
                           <ListItemIcon>
-                            {!!asset && <DnsOutlined fontSize="small" />}
+                            {!!relatedAsset && <DnsOutlined fontSize="small" />}
                           </ListItemIcon>
                           <ListItemText
                             primary={
                               <div className={classes.bodyItem} style={{ width: '20%' }}>
-                                {team?.team_name || asset?.asset_name || assetGroup?.asset_group_name}
+                                {team?.team_name || relatedAsset?.asset_name || assetGroup?.asset_group_name}
                               </div>
                             }
                           />
                         </ListItem>
-                        {expectations.map((e: InjectExpectationsStore) => (
-                          <TechnicalExpectationAsset expectation={e} injectContract={injectContract} gap={16}/>
+                        {groupedExpectations.map((e: InjectExpectationsStore) => (
+                          <TechnicalExpectationAsset key={e.injectexpectation_id} expectation={e} injectContract={injectContract} gap={16}/>
                         ))}
                       </>
                     );
                   })}
                 </>
               );
-            } else {
-              return (<></>);
             }
+            return (<></>);
           }
           return (
             <ManualExpectations key={expectationType} exerciseId={exerciseId} inject={inject} expectations={es} />

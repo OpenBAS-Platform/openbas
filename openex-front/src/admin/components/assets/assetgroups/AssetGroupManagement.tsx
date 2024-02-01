@@ -119,10 +119,10 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore: Endpoint property handle by EndpointsList
             ? (<EndpointPopover
-              inline
-              assetGroupId={assetGroup.asset_group_id}
-              assetGroupEndpointIds={assetGroup.asset_group_assets ?? []}
-            />)
+                inline
+                assetGroupId={assetGroup.asset_group_id}
+                assetGroupEndpointIds={assetGroup.asset_group_assets ?? []}
+               />)
             : <span> &nbsp; </span>
           }
       />
@@ -130,7 +130,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
         && (<AssetGroupAddEndpoints
           assetGroupId={assetGroup.asset_group_id}
           assetGroupEndpointIds={assetGroup.asset_group_assets ?? []}
-        />)
+            />)
       }
     </>
   );

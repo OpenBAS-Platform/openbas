@@ -62,7 +62,7 @@ const ExpectationLine: FunctionComponent<Props> = ({
           primary={
             <div className={classes.container}>
               <div className={classes.details}>
-                <div style={{ width: gap ? 135 : 200}}> {info} </div>
+                <div style={{ width: gap ? 135 : 200 }}> {info} </div>
                 {title}
               </div>
               <div className={classes.chip}>

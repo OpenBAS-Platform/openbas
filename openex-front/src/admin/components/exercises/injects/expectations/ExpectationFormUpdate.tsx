@@ -1,6 +1,6 @@
 import React, { FunctionComponent, SyntheticEvent } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, FormControlLabel, FormLabel, InputLabel, MenuItem, Radio, RadioGroup, Select as MUISelect, Switch, TextField as MuiTextField } from '@mui/material';
+import { Alert, Button, FormControlLabel, FormLabel, InputLabel, MenuItem, Radio, RadioGroup, Select as MUISelect, TextField as MuiTextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { formProps, infoMessage, isTechnicalExpectation } from './ExpectationFormUtils';
 import type { ExpectationInput } from './Expectation';
@@ -126,7 +126,7 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
               </RadioGroup>
             </div>
           )}
-        />
+           />
       }
 
       <div className={classes.buttons}>

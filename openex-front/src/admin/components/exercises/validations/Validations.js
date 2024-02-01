@@ -15,7 +15,7 @@ import { useFormatter } from '../../../../components/i18n';
 import TagsFilter from '../../../../components/TagsFilter';
 import InjectIcon from '../injects/InjectIcon';
 import ItemTags from '../../../../components/ItemTags';
-import TeamOrAssetLine from "./teamsOrAssets/TeamOrAssetLine";
+import TeamOrAssetLine from './teamsOrAssets/TeamOrAssetLine';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -202,8 +202,9 @@ const Validations = () => {
                 <List component="div" disablePadding>
                   {Object.entries(groupedByTeamOrAsset(expectationsByInject)).map(([id, expectations]) => {
                     return (
-                      <TeamOrAssetLine exerciseId={exerciseId} inject={inject} injectContract={injectContract}
-                                       expectationsByInject={expectationsByInject} id={id} expectations={expectations} />
+                      <TeamOrAssetLine key={id} exerciseId={exerciseId} inject={inject} injectContract={injectContract}
+                        expectationsByInject={expectationsByInject} id={id} expectations={expectations}
+                      />
                     );
                   })}
                 </List>

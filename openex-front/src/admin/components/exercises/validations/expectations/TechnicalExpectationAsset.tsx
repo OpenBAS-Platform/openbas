@@ -66,8 +66,8 @@ const TechnicalExpectationAsset: FunctionComponent<Props> = ({
             {!!expectation.inject_expectation_result
               && <>
                 <pre>
-                  {expectation.inject_expectation_asset &&
-                    Object.entries(JSON.parse(expectation.inject_expectation_result))
+                  {expectation.inject_expectation_asset
+                    && Object.entries(JSON.parse(expectation.inject_expectation_result))
                       .map(([key, value]) => {
                         return (
                           <div key={key} style={{ display: 'flex' }}>

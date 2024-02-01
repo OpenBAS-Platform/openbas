@@ -263,10 +263,10 @@ const AssetGroups = () => {
         elevation={1}
       >
         {selected !== undefined && (
-            <AssetGroupManagement
-              assetGroupId={selected.asset_group_id}
-              handleClose={() => setSelected(undefined)}
-            />
+        <AssetGroupManagement
+          assetGroupId={selected.asset_group_id}
+          handleClose={() => setSelected(undefined)}
+        />
         )}
       </MuiDrawer>
     </>
