@@ -7,6 +7,7 @@ import { isExerciseReadOnly } from '../../../../../utils/Exercise';
 import type { Theme } from '../../../../../components/Theme';
 import type { Exercise } from '../../../../../utils/api-types';
 import EndpointsDialogAdding from '../../../assets/endpoints/EndpointsDialogAdding';
+import { EndpointStore } from '../../../assets/endpoints/Endpoint';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -24,12 +25,14 @@ interface Props {
   exercise: Exercise;
   endpointIds: string[];
   onSubmit: (endpointIds: string[]) => void;
+  filter: (endpoint: EndpointStore) => boolean;
 }
 
 const InjectAddEndpoints: FunctionComponent<Props> = ({
   exercise,
   endpointIds,
   onSubmit,
+  filter,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -53,13 +56,14 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
           <ControlPointOutlined color="primary" />
         </ListItemIcon>
         <ListItemText
-          primary={t('Add endpoints')}
+          primary={t('Add assets')}
           classes={{ primary: classes.text }}
         />
       </ListItemButton>
       <EndpointsDialogAdding initialState={endpointIds} open={openDialog}
-        onClose={handleClose} onSubmit={onSubmit}
-        title={t('Add endpoints in this inject')}
+                             onClose={handleClose} onSubmit={onSubmit}
+                             title={t('Add assets in this inject')}
+                             filter={filter}
       />
     </>
   );

@@ -1523,7 +1523,7 @@ class InjectDefinition extends Component {
                 {hasAssets && (
                   <>
                     <Typography variant="h2" style={{ float: 'left' }}>
-                      {t('Targeted endpoints')}
+                      {t('Targeted assets')}
                     </Typography>
                     <EndpointsList
                       endpoints={assets}
@@ -1531,7 +1531,12 @@ class InjectDefinition extends Component {
                       // @ts-ignore: Endpoint property handle by EndpointsList
                       actions={<EndpointPopover inline onRemoveEndpointFromInject={this.handleRemoveAsset.bind(this)} />}
                     />
-                    <InjectAddEndpoints exercise={exercise} endpointIds={assetIds} onSubmit={this.handleAddAssets.bind(this)} />
+                    <InjectAddEndpoints
+                      exercise={exercise}
+                      endpointIds={assetIds}
+                      onSubmit={this.handleAddAssets.bind(this)}
+                      filter={(e) => Object.keys(e.asset_sources).length > 0 && injectType.context['collector-ids']?.includes(Object.keys(e.asset_sources))}
+                    />
                   </>
                 )}
                 {hasAssetGroups && (

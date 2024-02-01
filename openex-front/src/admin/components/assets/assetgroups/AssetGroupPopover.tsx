@@ -9,10 +9,11 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import Drawer from '../../../../components/common/Drawer';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import type { AssetGroupStore } from './AssetGroup';
-import { deleteAssetGroup, updateAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
+import { deleteAssetGroup, updateAssetGroup, updateAssetsOnAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
 import AssetGroupForm from './AssetGroupForm';
 import AssetGroupManagement from './AssetGroupManagement';
 import Dialog from '../../../../components/common/Dialog';
+import EndpointsDialogAdding from '../endpoints/EndpointsDialogAdding';
 
 const useStyles = makeStyles(() => ({
   drawerPaper: {
@@ -24,14 +25,12 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   inline?: boolean;
-  manageEndpoint?: boolean;
   assetGroup: AssetGroupStore;
   onRemoveAssetGroupFromInject?: (assetGroupId: string) => void;
 }
 
 const AssetGroupPopover: FunctionComponent<Props> = ({
   inline,
-  manageEndpoint,
   assetGroup,
   onRemoveAssetGroupFromInject,
 }) => {
@@ -64,12 +63,17 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
     setEdition(false);
   };
 
-  // Manage endpoints
-  const [selected, setSelected] = useState<string | undefined>(undefined);
+  // Manage assets
+  const [selected, setSelected] = useState<boolean>(false);
 
   const handleManage = () => {
-    setSelected(assetGroup.asset_group_id);
+    setSelected(true);
     setAnchorEl(null);
+  };
+  const sumitManage = (endpointIds: string[]) => {
+    return dispatch(updateAssetsOnAssetGroup(assetGroup.asset_group_id, {
+      asset_group_assets: endpointIds,
+    }));
   };
 
   // Deletion
@@ -104,11 +108,9 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
         <MenuItem onClick={handleEdit}>
           {t('Update')}
         </MenuItem>
-        {manageEndpoint
-          && <MenuItem onClick={handleManage}>
-            {t('Manage endpoints')}
-          </MenuItem>
-        }
+        <MenuItem onClick={handleManage}>
+          {t('Manage assets')}
+        </MenuItem>
         {onRemoveAssetGroupFromInject && (
           <MenuItem onClick={() => onRemoveAssetGroupFromInject(assetGroup.asset_group_id)}>
             {t('Remove from the inject')}
@@ -156,22 +158,34 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
         </Drawer>
       )}
 
-      <MuiDrawer
-        open={selected !== undefined}
-        keepMounted={false}
-        anchor="right"
-        sx={{ zIndex: 1202 }}
-        classes={{ paper: classes.drawerPaper }}
-        onClose={() => setSelected(undefined)}
-        elevation={1}
-      >
-        {selected !== undefined && (
-          <AssetGroupManagement
-            assetGroupId={assetGroup.asset_group_id}
-            handleClose={() => setSelected(undefined)}
-          />
-        )}
-      </MuiDrawer>
+      {inline ? (
+        <>
+          {selected !== undefined && (
+            <EndpointsDialogAdding
+              initialState={assetGroup.asset_group_assets ?? []} open={selected}
+              onClose={() => setSelected(false)} onSubmit={sumitManage}
+              title={t('Add assets in this asset group')}
+            />
+          )}
+        </>
+      ) : (
+        <MuiDrawer
+          open={selected}
+          keepMounted={false}
+          anchor="right"
+          sx={{ zIndex: 1202 }}
+          classes={{ paper: classes.drawerPaper }}
+          onClose={() => setSelected(false)}
+          elevation={1}
+        >
+          {selected !== undefined && (
+            <AssetGroupManagement
+              assetGroupId={assetGroup.asset_group_id}
+              handleClose={() => setSelected(false)}
+            />
+          )}
+        </MuiDrawer>
+      )}
     </div>
   );
 };

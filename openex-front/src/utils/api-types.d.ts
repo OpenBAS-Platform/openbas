@@ -357,7 +357,9 @@ export interface ContractElement {
     | "dependency-select"
     | "attachment"
     | "team"
-    | "expectation";
+    | "expectation"
+    | "asset"
+    | "asset-group";
 }
 
 export interface ContractVariable {
@@ -713,6 +715,7 @@ export interface Inject {
   footer?: string;
   header?: string;
   inject_all_teams?: boolean;
+  inject_asset_groups?: AssetGroup[];
   inject_assets?: Asset[];
   inject_city?: string;
   inject_communications?: Communication[];
@@ -768,14 +771,15 @@ export interface InjectDocumentInput {
 export interface InjectExpectation {
   inject_expectation_article?: Article;
   inject_expectation_asset?: Asset;
+  inject_expectation_asset_group?: AssetGroup;
   inject_expectation_challenge?: Challenge;
   /** @format date-time */
   inject_expectation_created_at?: string;
   inject_expectation_description?: string;
   inject_expectation_exercise?: Exercise;
-  inject_expectation_expectation_group?: boolean;
   /** @format int32 */
   inject_expectation_expected_score?: number;
+  inject_expectation_group?: boolean;
   inject_expectation_inject?: Inject;
   inject_expectation_name?: string;
   inject_expectation_result?: string;
@@ -787,12 +791,13 @@ export interface InjectExpectation {
   inject_expectation_updated_at?: string;
   inject_expectation_user?: User;
   injectexpectation_id: string;
-  technical?: Asset;
   updateAttributes?: object;
 }
 
 export interface InjectInput {
   inject_all_teams?: boolean;
+  inject_asset_groups?: string[];
+  inject_assets?: string[];
   inject_city?: string;
   inject_content?: object;
   inject_contract?: string;
@@ -1046,7 +1051,9 @@ export interface LinkedFieldModel {
     | "dependency-select"
     | "attachment"
     | "team"
-    | "expectation";
+    | "expectation"
+    | "asset"
+    | "asset-group";
 }
 
 export interface Log {

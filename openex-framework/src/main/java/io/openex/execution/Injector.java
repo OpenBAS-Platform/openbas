@@ -81,7 +81,10 @@ public abstract class Injector {
             case CHALLENGE -> expectationExecution.setChallenge(((ChallengeExpectation) expectation).getChallenge());
             case DOCUMENT -> expectationExecution.setType(EXPECTATION_TYPE.DOCUMENT);
             case TEXT -> expectationExecution.setType(EXPECTATION_TYPE.TEXT);
-            case TECHNICAL -> expectationExecution.setTechnical(((TechnicalExpectation) expectation).getAsset());
+            case TECHNICAL -> {
+                TechnicalExpectation technicalExpectation = (TechnicalExpectation) expectation;
+                expectationExecution.setTechnical(technicalExpectation.getAsset(), technicalExpectation.getAssetGroup());
+            }
             case MANUAL -> {
                 expectationExecution.setType(EXPECTATION_TYPE.MANUAL);
                 expectationExecution.setName(((ManualExpectation) expectation).getName());
@@ -115,6 +118,7 @@ public abstract class Injector {
             // Create the expectations
             List<Team> teams = executableInject.getTeams();
             List<Asset> assets = executableInject.getAssets();
+            List<AssetGroup> assetGroups = executableInject.getAssetGroups();
             if (isScheduledInject && !expectations.isEmpty()) {
                 if (!teams.isEmpty()) {
                     List<InjectExpectation> injectExpectations = teams.stream()
@@ -122,7 +126,7 @@ public abstract class Injector {
                             .map(expectation -> expectationConverter(team, executableInject, expectation)))
                         .toList();
                     this.injectExpectationRepository.saveAll(injectExpectations);
-                } else if (!assets.isEmpty()) {
+                } else if (!assets.isEmpty() || !assetGroups.isEmpty()) {
                     List<InjectExpectation> injectExpectations = expectations.stream()
                         .map(expectation -> expectationConverter(executableInject, expectation))
                         .toList();
@@ -151,11 +155,6 @@ public abstract class Injector {
 
     public <T> T contentConvert(@NotNull final ExecutableInject injection, @NotNull final Class<T> converter) throws Exception {
         Inject inject = injection.getInject();
-        ObjectNode content = inject.getContent();
-        return this.mapper.treeToValue(content, converter);
-    }
-
-    public <T> T contentConvert(@NotNull final Inject inject, @NotNull final Class<T> converter) throws Exception {
         ObjectNode content = inject.getContent();
         return this.mapper.treeToValue(content, converter);
     }

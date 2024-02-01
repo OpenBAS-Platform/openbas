@@ -135,8 +135,7 @@ public class InjectApi extends RestBehavior {
     if (contract == null) {
       throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
     }
-    List<Asset> assets = inject.getAssets();
-    ExecutableInject injection = new ExecutableInject(false, true, inject, contract, List.of(), assets, userInjectContexts);
+    ExecutableInject injection = new ExecutableInject(false, true, inject, contract, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
     Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
     Execution execution = executor.executeInjection(injection);
     return InjectStatus.fromExecution(execution, inject);
@@ -270,8 +269,7 @@ public class InjectApi extends RestBehavior {
     Iterable<User> users = userRepository.findAllById(input.getUserIds());
     List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
         .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
-    List<Asset> assets = inject.getAssets();
-    ExecutableInject injection = new ExecutableInject(true, true, inject, contract, List.of(), assets, userInjectContexts);
+    ExecutableInject injection = new ExecutableInject(true, true, inject, contract, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
     file.ifPresent(injection::addDirectAttachment);
     Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
     Execution execution = executor.executeInjection(injection);

@@ -247,7 +247,7 @@ const AssetGroups = () => {
               }
             />
             <ListItemSecondaryAction>
-              <AssetGroupPopover manageEndpoint assetGroup={assetGroup} />
+              <AssetGroupPopover assetGroup={assetGroup} />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
@@ -263,10 +263,10 @@ const AssetGroups = () => {
         elevation={1}
       >
         {selected !== undefined && (
-          <AssetGroupManagement
-            assetGroupId={selected.asset_group_id}
-            handleClose={() => setSelected(undefined)}
-          />
+            <AssetGroupManagement
+              assetGroupId={selected.asset_group_id}
+              handleClose={() => setSelected(undefined)}
+            />
         )}
       </MuiDrawer>
     </>

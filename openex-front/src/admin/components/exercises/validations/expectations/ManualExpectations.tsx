@@ -2,13 +2,13 @@ import React, { FunctionComponent, useState } from 'react';
 import { List, ListItemButton, ListItemIcon, ListItemText, Chip } from '@mui/material';
 import { AssignmentTurnedIn } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import type { Team, Inject } from '../../../../utils/api-types';
-import { useHelper } from '../../../../store';
-import type { TeamsHelper } from '../../../../actions/helper';
-import type { InjectExpectationsStore } from '../injects/expectations/Expectation';
-import { useFormatter } from '../../../../components/i18n';
-import type { Theme } from '../../../../components/Theme';
-import colorStyles from '../../../../components/Color';
+import type { Team, Inject } from '../../../../../utils/api-types';
+import { useHelper } from '../../../../../store';
+import type { TeamsHelper } from '../../../../../actions/helper';
+import type { InjectExpectationsStore } from '../../injects/expectations/Expectation';
+import { useFormatter } from '../../../../../components/i18n';
+import type { Theme } from '../../../../../components/Theme';
+import colorStyles from '../../../../../components/Color';
 import ManualExpectationsValidation from './ManualExpectationsValidation';
 
 const useStyles = makeStyles((theme: Theme) => ({

@@ -6,7 +6,6 @@ import io.openex.database.repository.AssetGroupRepository;
 import io.openex.database.repository.EndpointRepository;
 import io.openex.rest.asset_group.form.AssetGroupInput;
 import io.openex.rest.utils.WithMockObserverUser;
-import io.openex.rest.utils.WithMockPlannerUser;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -144,7 +143,7 @@ public class AssetGroupApiTest {
   @DisplayName("Delete asset group failed")
   @Test
   @Order(5)
-  @WithMockPlannerUser
+  @WithMockObserverUser
   void deleteAssetGroupFailedTest() throws Exception {
     // -- PREPARE --
     AssetGroup assetGroupReponse = getFirstAssetGroup();

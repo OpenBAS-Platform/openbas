@@ -1,4 +1,4 @@
-import type { Team, Exercise, InjectExpectation, Channel, Organization, Tag, User } from '../utils/api-types';
+import type { Team, Exercise, InjectExpectation, Channel, Organization, Tag, User, Challenge, Article } from '../utils/api-types';
 
 export interface ExercicesHelper {
   getExercise: (exerciseId: Exercise['exercise_id']) => Exercise;
@@ -25,10 +25,19 @@ export interface TeamsHelper {
 
 export interface ChannelsHelper {
   getChannel: (channelId: Channel['channel_id']) => Channel;
+  getChannelsMap: () => Record<string, Channel>;
 }
 
 export interface LoggedHelper {
   // TODO type logged object
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logged: () => any;
+}
+
+export interface ArticlesHelper {
+  getArticlesMap: () => Record<string, Article>;
+}
+
+export interface ChallengesHelper {
+  getChallengesMap: () => Record<string, Challenge>;
 }

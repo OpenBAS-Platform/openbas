@@ -5,7 +5,6 @@ import io.openex.database.model.Endpoint;
 import io.openex.database.repository.EndpointRepository;
 import io.openex.rest.asset.endpoint.form.EndpointInput;
 import io.openex.rest.utils.WithMockObserverUser;
-import io.openex.rest.utils.WithMockPlannerUser;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,7 +124,7 @@ public class EndpointApiTest {
   @DisplayName("Delete endpoint failed")
   @Test
   @Order(3)
-  @WithMockPlannerUser
+  @WithMockObserverUser
   void deleteEndpointFailedTest() throws Exception {
     // -- PREPARE --
     Endpoint endpointResponse = getFirstEndpoint();

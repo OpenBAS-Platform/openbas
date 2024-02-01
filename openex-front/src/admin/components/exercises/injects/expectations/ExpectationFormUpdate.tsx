@@ -1,6 +1,6 @@
 import React, { FunctionComponent, SyntheticEvent } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, FormControlLabel, InputLabel, MenuItem, Select as MUISelect, Switch, TextField as MuiTextField } from '@mui/material';
+import { Alert, Button, FormControlLabel, FormLabel, InputLabel, MenuItem, Radio, RadioGroup, Select as MUISelect, Switch, TextField as MuiTextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { formProps, infoMessage, isTechnicalExpectation } from './ExpectationFormUtils';
 import type { ExpectationInput } from './Expectation';
@@ -112,17 +112,21 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
           control={control}
           name="expectation_expectation_group"
           render={({ field: { onChange, value } }) => (
-            <FormControlLabel
-              value={value}
-              label={t('Can be done in group')}
-              style={{ marginTop: 20 }}
-              control={<Switch
-                checked={value}
-                onChange={(v) => { onChange(v); }}
-                       />}
-            />
+            <div className={classes.marginTop_2}>
+              <FormLabel>{t('Validation type')}</FormLabel>
+              <RadioGroup
+                defaultValue={false}
+                value={value}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  onChange((event.target as HTMLInputElement).value === 'true');
+                }}
+              >
+                <FormControlLabel value={false} control={<Radio />} label="All assets must validate the expectation" />
+                <FormControlLabel value={true} control={<Radio />} label="At least one asset must validate the expectation" />
+              </RadioGroup>
+            </div>
           )}
-           />
+        />
       }
 
       <div className={classes.buttons}>

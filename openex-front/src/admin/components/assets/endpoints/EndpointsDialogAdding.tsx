@@ -7,7 +7,6 @@ import Transition from '../../../../components/common/Transition';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
-import EndpointCreation from './EndpointCreation';
 import type { EndpointStore } from './Endpoint';
 import { truncate } from '../../../../utils/String';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -31,11 +30,12 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  initialState: string[]
+  initialState: string[];
   open: boolean;
   onClose: () => void;
   onSubmit: (endpointIds: string[]) => void;
   title: string;
+  filter?: (endpoint: EndpointStore) => boolean;
 }
 
 const EndpointsDialogAdding: FunctionComponent<Props> = ({
@@ -44,6 +44,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   onClose,
   onSubmit,
   title,
+  filter = (e: EndpointStore) => true,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -61,7 +62,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
     dispatch(fetchEndpoints());
   });
 
-  const sortedEndpoints: EndpointStore[] = filtering.filterAndSort(R.values(endpointsMap));
+  const sortedEndpoints: EndpointStore[] = filtering.filterAndSort(R.values(endpointsMap).filter(filter));
 
   const [endpointIds, setEndpointIds] = useState<string[]>(initialState);
   useEffect(() => {
@@ -144,10 +145,6 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
                   </ListItemButton>
                 );
               })}
-              <EndpointCreation
-                inline
-                onCreate={(result) => addEndpoint(result)}
-              />
             </List>
           </Grid>
           <Grid item xs={4}>

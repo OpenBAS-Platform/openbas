@@ -41,8 +41,9 @@ public class V2_71__Modify_inject extends BaseJavaMigration {
         """);
     // Add asset to inject expectation
     select.execute("""
-        ALTER TABLE injects_expectations ADD COLUMN inject_expectation_expectation_group bool;
+        ALTER TABLE injects_expectations ADD COLUMN inject_expectation_group bool;
         ALTER TABLE injects_expectations ADD COLUMN asset_id varchar(256) constraint fk_asset references assets on delete cascade;
+        ALTER TABLE injects_expectations ADD COLUMN asset_group_id varchar(256) constraint fk_asset_group references asset_groups on delete cascade;
         ALTER TABLE injects_expectations ALTER COLUMN team_id DROP NOT NULL;
         """);
   }

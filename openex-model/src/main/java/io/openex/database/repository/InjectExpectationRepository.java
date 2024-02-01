@@ -39,15 +39,14 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
                                                @Param("teamIds") List<String> teamIds,
                                                @Param("challengeId") String challengeId);
 
-    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END FROM public.injects_expectations i "
-        + "WHERE i.exercise_id = :exerciseId and i.asset_id = :assetId and i.inject_expectation_result is not null", nativeQuery = true)
-    boolean computedTechnicalExpectation(@Param("exerciseId") String exerciseId, @Param("assetId") String assetId);
-
     @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId and i.asset.id = :assetId")
-    InjectExpectation findTechnicalExpectation(@Param("exerciseId") String exerciseId, @Param("assetId") String assetId);
+    InjectExpectation findTechnicalExpectationForAsset(@Param("exerciseId") String exerciseId, @Param("assetId") String assetId);
 
     @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId and i.asset.id IN :assetIds")
-    List<InjectExpectation> findTechnicalExpectations(@Param("exerciseId") String exerciseId, @Param("assetIds") List<String> assetIds);
+    List<InjectExpectation> findTechnicalExpectationsForAssets(@Param("exerciseId") String exerciseId, @Param("assetIds") List<String> assetIds);
+
+    @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId and i.assetGroup.id IN :assetGroupId")
+    InjectExpectation findTechnicalExpectationForAssetGroup(@Param("exerciseId") String exerciseId, @Param("assetGroupId") String assetGroupId);
 
     @Modifying
     @Query(value = "delete from InjectExpectation i where i.exercise.id = :exerciseId")

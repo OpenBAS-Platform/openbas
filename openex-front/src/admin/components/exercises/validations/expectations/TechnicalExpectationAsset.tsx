@@ -1,13 +1,13 @@
 import React, { FunctionComponent, useState } from 'react';
-import { PlumbingOutlined } from '@mui/icons-material';
+import { PublishedWithChangesOutlined } from '@mui/icons-material';
 import { Alert, Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import type { InjectExpectationsStore } from '../injects/expectations/Expectation';
-import type { Contract } from '../../../../utils/api-types';
+import type { InjectExpectationsStore } from '../../injects/expectations/Expectation';
+import type { Contract } from '../../../../../utils/api-types';
 import ExpectationLine from './ExpectationLine';
-import Drawer from '../../../../components/common/Drawer';
-import { useFormatter } from '../../../../components/i18n';
-import type { Theme } from '../../../../components/Theme';
+import Drawer from '../../../../../components/common/Drawer';
+import { useFormatter } from '../../../../../components/i18n';
+import type { Theme } from '../../../../../components/Theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   buttons: {
@@ -27,11 +27,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   expectation: InjectExpectationsStore;
   injectContract: Contract;
+  gap?: number;
 }
 
-const TechnicalExpectation: FunctionComponent<Props> = ({
+const TechnicalExpectationAsset: FunctionComponent<Props> = ({
   expectation,
   injectContract,
+  gap,
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
@@ -40,11 +42,13 @@ const TechnicalExpectation: FunctionComponent<Props> = ({
 
   return (
     <>
-      <ExpectationLine expectation={expectation}
+      <ExpectationLine
+        expectation={expectation}
         info={injectContract.config.label?.en}
         title={injectContract.label.en}
-        icon={<PlumbingOutlined fontSize="small" />}
+        icon={<PublishedWithChangesOutlined fontSize="small" />}
         onClick={() => setOpen(true)}
+        gap={gap}
       />
       <Drawer
         open={open}
@@ -62,14 +66,16 @@ const TechnicalExpectation: FunctionComponent<Props> = ({
             {!!expectation.inject_expectation_result
               && <>
                 <pre>
-                  {Object.entries(JSON.parse(expectation.inject_expectation_result))
-                    .map(([key, value]) => {
-                      return (
-                        <div key={key} style={{ display: 'flex' }}>
-                          <span>{key} : </span>
-                          <span>{value?.toString()}</span>
-                        </div>);
-                    })}
+                  {expectation.inject_expectation_asset &&
+                    Object.entries(JSON.parse(expectation.inject_expectation_result))
+                      .map(([key, value]) => {
+                        return (
+                          <div key={key} style={{ display: 'flex' }}>
+                            <span>{key} : </span>
+                            <span>{value?.toString()}</span>
+                          </div>);
+                      })
+                  }
                 </pre>
               </>
             }
@@ -89,4 +95,4 @@ const TechnicalExpectation: FunctionComponent<Props> = ({
   );
 };
 
-export default TechnicalExpectation;
+export default TechnicalExpectationAsset;

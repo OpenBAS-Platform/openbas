@@ -58,8 +58,7 @@ public class EmailExecutorTest {
     Iterable<User> users = this.userRepository.findAll();
     List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
         .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
-    ExecutableInject executableInject = new ExecutableInject(true, true, inject, contract, List.of(), List.of(),
-        userInjectContexts);
+    ExecutableInject executableInject = new ExecutableInject(true, true, inject, contract, userInjectContexts);
     Execution execution = new Execution(executableInject.isRuntime());
 
     // -- EXECUTE --

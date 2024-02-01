@@ -13,6 +13,7 @@ import io.openex.service.ExecutionContextService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -40,10 +41,6 @@ public class InjectHelper {
   private List<Team> getInjectTeams(@NotNull final Inject inject) {
     Exercise exercise = inject.getExercise();
     return inject.isAllTeams() ? exercise.getTeams() : inject.getTeams();
-  }
-
-  private List<Asset> getAssets(@NotNull final Inject inject) {
-    return inject.getAssets();
   }
 
   // -- INJECTION --
@@ -95,8 +92,9 @@ public class InjectHelper {
         .map(inject -> {
           Contract contract = this.contractService.resolveContract(inject);
           List<Team> teams = getInjectTeams(inject);
-          List<Asset> assets = getAssets(inject).stream().toList(); // Force lazy load to execute
-          return new ExecutableInject(true, false, inject, contract, teams, assets, usersFromInjection(inject));
+          Hibernate.initialize(inject.getAssets()); // Force lazy load to execute
+          Hibernate.initialize(inject.getAssetGroups()); // Force lazy load to execute
+          return new ExecutableInject(true, false, inject, contract, teams, inject.getAssets(), inject.getAssetGroups(), usersFromInjection(inject));
         });
     // Get dry injects
     List<DryInject> dryInjects = this.dryInjectRepository.findAll(DryInjectSpecification.executable());
@@ -107,8 +105,9 @@ public class InjectHelper {
           Inject inject = dry.getInject();
           Contract contract = this.contractService.resolveContract(inject);
           List<Team> teams = new ArrayList<>(); // No teams in dry run, only direct users
-          List<Asset> assets = getAssets(inject).stream().toList(); // Force lazy load to execute
-          return new ExecutableInject(false, false, dry, inject, contract, teams, assets, usersFromInjection(dry));
+          Hibernate.initialize(inject.getAssets()); // Force lazy load to execute
+          Hibernate.initialize(inject.getAssetGroups()); // Force lazy load to execute
+          return new ExecutableInject(false, false, dry, inject, contract, teams, inject.getAssets(), inject.getAssetGroups(), usersFromInjection(dry));
         });
     // Combine injects and dry
     return concat(executableInjects, executableDryInjects)
