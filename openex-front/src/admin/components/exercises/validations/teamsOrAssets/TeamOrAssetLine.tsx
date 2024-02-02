@@ -164,7 +164,6 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
                   <TechnicalExpectationAssetGroup
                     expectation={expectation}
                     injectContract={injectContract}
-                    relatedExpectations={relatedExpectations}
                   />
                   {Array.from(groupedByAsset(relatedExpectations)).map(([groupedId, groupedExpectations]) => {
                     const relatedAsset: EndpointStore = assetsMap[groupedId];

@@ -4,6 +4,7 @@ export interface InjectExpectationsStore extends Omit<InjectExpectation, 'inject
   inject_expectation_team: string | undefined;
   inject_expectation_article: string | undefined;
   inject_expectation_challenge: string | undefined;
+  inject_expectation_asset: string | undefined;
 }
 
 export interface ExpectationInput {
