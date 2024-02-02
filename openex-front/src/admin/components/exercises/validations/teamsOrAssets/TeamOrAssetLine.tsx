@@ -160,8 +160,8 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
               const relatedExpectations = expectationsByInject.filter((e) => assetGroup.asset_group_assets?.includes(e.inject_expectation_asset ?? '')) ?? [];
 
               return (
-                <>
-                  <TechnicalExpectationAssetGroup key={expectationType}
+                <div key={expectationType}>
+                  <TechnicalExpectationAssetGroup
                     expectation={expectation}
                     injectContract={injectContract}
                     relatedExpectations={relatedExpectations}
@@ -169,7 +169,7 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
                   {Array.from(groupedByAsset(relatedExpectations)).map(([groupedId, groupedExpectations]) => {
                     const relatedAsset: EndpointStore = assetsMap[groupedId];
                     return (
-                      <>
+                      <div key={relatedAsset?.asset_id}>
                         <ListItem
                           divider
                           sx={{ pl: 12 }}
@@ -189,13 +189,13 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
                         {groupedExpectations.map((e: InjectExpectationsStore) => (
                           <TechnicalExpectationAsset key={e.injectexpectation_id} expectation={e} injectContract={injectContract} gap={16}/>
                         ))}
-                      </>
+                      </div>
                     );
                   })}
-                </>
+                </div>
               );
             }
-            return (<></>);
+            return (<div key={expectationType}></div>);
           }
           return (
             <ManualExpectations key={expectationType} exerciseId={exerciseId} inject={inject} expectations={es} />
