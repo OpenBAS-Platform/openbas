@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { Drawer as MuiDrawer, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 
@@ -9,9 +9,11 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import Drawer from '../../../../components/common/Drawer';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import type { AssetGroupStore } from './AssetGroup';
-import { deleteAssetGroup, updateAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
+import { deleteAssetGroup, updateAssetGroup, updateAssetsOnAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
 import AssetGroupForm from './AssetGroupForm';
 import AssetGroupManagement from './AssetGroupManagement';
+import Dialog from '../../../../components/common/Dialog';
+import EndpointsDialogAdding from '../endpoints/EndpointsDialogAdding';
 
 const useStyles = makeStyles(() => ({
   drawerPaper: {
@@ -22,11 +24,15 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
+  inline?: boolean;
   assetGroup: AssetGroupStore;
+  onRemoveAssetGroupFromInject?: (assetGroupId: string) => void;
 }
 
-const AssetGroupPopover: React.FC<Props> = ({
+const AssetGroupPopover: FunctionComponent<Props> = ({
+  inline,
   assetGroup,
+  onRemoveAssetGroupFromInject,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -58,11 +64,16 @@ const AssetGroupPopover: React.FC<Props> = ({
   };
 
   // Manage assets
-  const [selected, setSelected] = useState<string | undefined>(undefined);
+  const [selected, setSelected] = useState<boolean>(false);
 
   const handleManage = () => {
-    setSelected(assetGroup.asset_group_id);
+    setSelected(true);
     setAnchorEl(null);
+  };
+  const sumitManage = (endpointIds: string[]) => {
+    return dispatch(updateAssetsOnAssetGroup(assetGroup.asset_group_id, {
+      asset_group_assets: endpointIds,
+    }));
   };
 
   // Deletion
@@ -100,6 +111,11 @@ const AssetGroupPopover: React.FC<Props> = ({
         <MenuItem onClick={handleManage}>
           {t('Manage assets')}
         </MenuItem>
+        {onRemoveAssetGroupFromInject && (
+          <MenuItem onClick={() => onRemoveAssetGroupFromInject(assetGroup.asset_group_id)}>
+            {t('Remove from the inject')}
+          </MenuItem>
+        )}
         <MenuItem
           onClick={handleDelete}
         >
@@ -113,34 +129,63 @@ const AssetGroupPopover: React.FC<Props> = ({
         handleSubmit={submitDelete}
         text={t('Do you want to delete the asset group ?')}
       />
-      <Drawer
-        open={edition}
-        handleClose={() => setEdition(false)}
-        title={t('Update the asset group')}
-      >
-        <AssetGroupForm
-          initialValues={initialValues}
-          editing={true}
-          onSubmit={submitEdit}
+
+      {inline ? (
+        <Dialog
+          open={edition}
           handleClose={() => setEdition(false)}
-        />
-      </Drawer>
-      <MuiDrawer
-        open={selected !== undefined}
-        keepMounted={false}
-        anchor="right"
-        sx={{ zIndex: 1202 }}
-        classes={{ paper: classes.drawerPaper }}
-        onClose={() => setSelected(undefined)}
-        elevation={1}
-      >
-        {selected !== undefined && (
-          <AssetGroupManagement
-            assetGroupId={assetGroup.asset_group_id}
-            handleClose={() => setSelected(undefined)}
+          title={t('Update the asset group')}
+        >
+          <AssetGroupForm
+            initialValues={initialValues}
+            editing={true}
+            onSubmit={submitEdit}
+            handleClose={() => setEdition(false)}
           />
-        )}
-      </MuiDrawer>
+        </Dialog>
+      ) : (
+        <Drawer
+          open={edition}
+          handleClose={() => setEdition(false)}
+          title={t('Update the asset group')}
+        >
+          <AssetGroupForm
+            initialValues={initialValues}
+            editing={true}
+            onSubmit={submitEdit}
+            handleClose={() => setEdition(false)}
+          />
+        </Drawer>
+      )}
+
+      {inline ? (
+        <>
+          {selected !== undefined && (
+            <EndpointsDialogAdding
+              initialState={assetGroup.asset_group_assets ?? []} open={selected}
+              onClose={() => setSelected(false)} onSubmit={sumitManage}
+              title={t('Add assets in this asset group')}
+            />
+          )}
+        </>
+      ) : (
+        <MuiDrawer
+          open={selected}
+          keepMounted={false}
+          anchor="right"
+          sx={{ zIndex: 1202 }}
+          classes={{ paper: classes.drawerPaper }}
+          onClose={() => setSelected(false)}
+          elevation={1}
+        >
+          {selected !== undefined && (
+            <AssetGroupManagement
+              assetGroupId={assetGroup.asset_group_id}
+              handleClose={() => setSelected(false)}
+            />
+          )}
+        </MuiDrawer>
+      )}
     </div>
   );
 };

@@ -18,6 +18,11 @@ export const formProps = (initialValues: ExpectationInput, t: (key: string) => s
     expectation_name: z.string().min(1, { message: t('Should not be empty') }),
     expectation_description: z.string().optional(),
     expectation_score: z.coerce.number(),
+    expectation_expectation_group: z.coerce.boolean(),
   })),
   defaultValues: initialValues,
 });
+
+export const isTechnicalExpectation = (expectation: ExpectationInput) => {
+  return expectation.expectation_type === 'TECHNICAL';
+};

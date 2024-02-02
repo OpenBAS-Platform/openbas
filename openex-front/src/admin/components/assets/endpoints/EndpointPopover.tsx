@@ -11,17 +11,22 @@ import Drawer from '../../../../components/common/Drawer';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import type { EndpointStore } from './Endpoint';
 import { updateAssetsOnAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
+import Dialog from '../../../../components/common/Dialog';
 
 interface Props {
+  inline?: boolean;
   endpoint: EndpointStore;
   assetGroupId?: string;
-  assetGroupAssetIds?: string[];
+  assetGroupEndpointIds?: string[];
+  onRemoveEndpointFromInject?: (assetId: string) => void;
 }
 
 const EndpointPopover: React.FC<Props> = ({
+  inline,
   endpoint,
   assetGroupId,
-  assetGroupAssetIds,
+  assetGroupEndpointIds,
+  onRemoveEndpointFromInject,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -36,7 +41,7 @@ const EndpointPopover: React.FC<Props> = ({
     asset_tags,
     endpoint_hostname,
     endpoint_ips,
-    endpoint_mac_adresses,
+    endpoint_mac_addresses,
     endpoint_platform,
   }) => ({
     asset_name,
@@ -45,7 +50,7 @@ const EndpointPopover: React.FC<Props> = ({
     asset_tags,
     endpoint_hostname,
     endpoint_ips,
-    endpoint_mac_adresses: endpoint_mac_adresses ?? [],
+    endpoint_mac_addresses: endpoint_mac_addresses ?? [],
     endpoint_platform,
   }))(endpoint);
 
@@ -72,7 +77,7 @@ const EndpointPopover: React.FC<Props> = ({
     if (assetGroupId) {
       dispatch(
         updateAssetsOnAssetGroup(assetGroupId, {
-          asset_group_assets: assetGroupAssetIds?.filter((id) => id !== endpoint.asset_id),
+          asset_group_assets: assetGroupEndpointIds?.filter((id) => id !== endpoint.asset_id),
         }),
       ).then(() => setRemoval(false));
     }
@@ -115,23 +120,43 @@ const EndpointPopover: React.FC<Props> = ({
             {t('Remove from the asset group')}
           </MenuItem>
         )}
+        {onRemoveEndpointFromInject && (
+          <MenuItem onClick={() => onRemoveEndpointFromInject(endpoint.asset_id)}>
+            {t('Remove from the inject')}
+          </MenuItem>
+        )}
         <MenuItem onClick={handleDelete}>
           {t('Delete')}
         </MenuItem>
       </Menu>
 
-      <Drawer
-        open={edition}
-        handleClose={() => setEdition(false)}
-        title={t('Update the endpoint')}
-      >
-        <EndpointForm
-          initialValues={initialValues}
-          editing={true}
-          onSubmit={submitEdit}
+      {inline ? (
+        <Dialog
+          open={edition}
           handleClose={() => setEdition(false)}
-        />
-      </Drawer>
+          title={t('Update the endpoint')}
+        >
+          <EndpointForm
+            initialValues={initialValues}
+            editing={true}
+            onSubmit={submitEdit}
+            handleClose={() => setEdition(false)}
+          />
+        </Dialog>
+      ) : (
+        <Drawer
+          open={edition}
+          handleClose={() => setEdition(false)}
+          title={t('Update the endpoint')}
+        >
+          <EndpointForm
+            initialValues={initialValues}
+            editing={true}
+            onSubmit={submitEdit}
+            handleClose={() => setEdition(false)}
+          />
+        </Drawer>
+      )}
       <DialogDelete
         open={removal}
         handleClose={() => setRemoval(false)}

@@ -13,11 +13,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static io.openex.database.model.User.ROLE_ADMIN;
+import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.helper.StreamHelper.fromIterable;
 
 @RequiredArgsConstructor
 @RestController
+@Secured(ROLE_USER)
 public class EndpointApi {
 
   public static final String ENDPOINT_URI = "/api/endpoints";
@@ -26,7 +27,7 @@ public class EndpointApi {
   private final TagRepository tagRepository;
 
   @PostMapping(ENDPOINT_URI)
-  @Secured(ROLE_ADMIN)
+  @PreAuthorize("isPlanner()")
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(input);
@@ -42,7 +43,7 @@ public class EndpointApi {
   }
 
   @PutMapping(ENDPOINT_URI + "/{endpointId}")
-  @Secured(ROLE_ADMIN)
+  @PreAuthorize("isPlanner()")
   public Endpoint updateEndpoint(
       @PathVariable @NotBlank final String endpointId,
       @Valid @RequestBody final EndpointInput input) {
@@ -54,7 +55,7 @@ public class EndpointApi {
   }
 
   @DeleteMapping(ENDPOINT_URI + "/{endpointId}")
-  @Secured(ROLE_ADMIN)
+  @PreAuthorize("isPlanner()")
   public void deleteEndpoint(@PathVariable @NotBlank final String endpointId) {
     this.assetEndpointService.deleteEndpoint(endpointId);
   }

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -46,7 +45,7 @@ public class EndpointApiTest {
   @DisplayName("Create endpoint succeed")
   @Test
   @Order(1)
-  @WithMockUser(roles = {"ADMIN"})
+  @WithMockPlannerUser
   void createEndpointTest() throws Exception {
     // -- PREPARE --
     EndpointInput endpointInput = new EndpointInput();
@@ -94,7 +93,7 @@ public class EndpointApiTest {
   @DisplayName("Update endpoint succeed")
   @Test
   @Order(3)
-  @WithMockUser(roles = {"ADMIN"})
+  @WithMockPlannerUser
   void updateEndpointTest() throws Exception {
     // -- PREPARE --
     Endpoint endpointResponse = getFirstEndpoint();
@@ -125,7 +124,7 @@ public class EndpointApiTest {
   @DisplayName("Delete endpoint failed")
   @Test
   @Order(3)
-  @WithMockPlannerUser
+  @WithMockObserverUser
   void deleteEndpointFailedTest() throws Exception {
     // -- PREPARE --
     Endpoint endpointResponse = getFirstEndpoint();
@@ -140,7 +139,7 @@ public class EndpointApiTest {
   @DisplayName("Delete endpoint succeed")
   @Test
   @Order(5)
-  @WithMockUser(roles = {"ADMIN"})
+  @WithMockPlannerUser
   void deleteEndpointSucceedTest() throws Exception {
     // -- PREPARE --
     Endpoint endpointResponse = getFirstEndpoint();

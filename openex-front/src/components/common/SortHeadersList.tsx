@@ -1,6 +1,7 @@
 import React, { CSSProperties, FunctionComponent, useState } from 'react';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
 import { useFormatter } from '../i18n';
 
 const useStyles = makeStyles(() => ({
@@ -13,21 +14,27 @@ const useStyles = makeStyles(() => ({
 }));
 
 export interface Header {
-  field: string
-  label: string
-  isSortable: boolean
+  field: string;
+  label: string;
+  isSortable: boolean;
 }
 
 interface Props {
-  headers: Header[]
-  inlineStylesHeaders: Record<string, CSSProperties>
-  initialSortBy: string
+  headers: Header[];
+  inlineStylesHeaders: Record<string, CSSProperties>;
+  initialSortBy: string;
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  datas: any[];
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  setDatas: (datas: any[]) => void;
 }
 
 const SortHeadersList: FunctionComponent<Props> = ({
   headers,
   inlineStylesHeaders,
   initialSortBy,
+  datas,
+  setDatas,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -36,16 +43,23 @@ const SortHeadersList: FunctionComponent<Props> = ({
   const [sortBy, setSortBy] = useState(initialSortBy);
   const [sortAsc, setSortAsc] = useState(true);
 
+  const sort = R.sortWith(
+    sortAsc
+      ? [R.ascend(R.prop(sortBy))]
+      : [R.descend(R.prop(sortBy))],
+  );
+
   const reverseBy = (field: string) => {
     setSortBy(field);
     setSortAsc(!sortAsc);
+    setDatas(sort(datas));
   };
 
   const sortComponent = (asc: boolean) => {
     return asc ? (
-      <ArrowDropDownOutlined className={classes.iconSort}/>
+      <ArrowDropDownOutlined className={classes.iconSort} />
     ) : (
-      <ArrowDropUpOutlined className={classes.iconSort}/>
+      <ArrowDropUpOutlined className={classes.iconSort} />
     );
   };
 

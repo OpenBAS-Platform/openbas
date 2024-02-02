@@ -73,7 +73,7 @@ public class MailingService {
     exercise.ifPresent(inject::setExercise);
     List<ExecutionContext> userInjectContexts = users.stream().distinct()
         .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
-    ExecutableInject injection = new ExecutableInject(false, true, inject, contract, List.of(), userInjectContexts);
+    ExecutableInject injection = new ExecutableInject(false, true, inject, contract, userInjectContexts);
     Injector executor = this.context.getBean(contract.getConfig().getType(), Injector.class);
     executor.executeInjection(injection);
   }

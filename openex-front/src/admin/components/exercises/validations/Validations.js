@@ -4,23 +4,18 @@ import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
 import { FormControlLabel, List, ListItem, ListItemIcon, ListItemText, Slide, Switch } from '@mui/material';
-import { CastForEducationOutlined } from '@mui/icons-material';
 import AnimationMenu from '../AnimationMenu';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchExerciseInjects, fetchInjectTypes } from '../../../../actions/Inject';
-import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../actions/Exercise';
+import { fetchExerciseInjectExpectations } from '../../../../actions/Exercise';
 import SearchFilter from '../../../../components/SearchFilter';
 import Loader from '../../../../components/Loader';
 import { useFormatter } from '../../../../components/i18n';
-import { fetchExerciseArticles, fetchChannels } from '../../../../actions/Channel';
-import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import TagsFilter from '../../../../components/TagsFilter';
 import InjectIcon from '../injects/InjectIcon';
 import ItemTags from '../../../../components/ItemTags';
-import ManualExpectations from './ManualExpectations';
-import ChallengeExpectation from './ChallengeExpectation';
-import ChannelExpectation from './ChannelExpectation';
+import TeamOrAssetLine from './teamsOrAssets/TeamOrAssetLine';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -63,30 +58,18 @@ const Validations = () => {
     injectTypesMap,
     injectExpectations,
     injectsMap,
-    teamsMap,
-    challengesMap,
-    articlesMap,
-    channelsMap,
   } = useHelper((helper) => {
     return {
       exercise: helper.getExercise(exerciseId),
       injectsMap: helper.getInjectsMap(),
       injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
       injectTypesMap: helper.getInjectTypesMap(),
-      teamsMap: helper.getTeamsMap(),
-      challengesMap: helper.getChallengesMap(),
-      articlesMap: helper.getArticlesMap(),
-      channelsMap: helper.getChannelsMap(),
     };
   });
   useDataLoader(() => {
-    dispatch(fetchChannels());
     dispatch(fetchInjectTypes());
     dispatch(fetchExerciseInjectExpectations(exerciseId));
     dispatch(fetchExerciseInjects(exerciseId));
-    dispatch(fetchExerciseTeams(exerciseId));
-    dispatch(fetchExerciseArticles(exerciseId));
-    dispatch(fetchExerciseChallenges(exerciseId));
   });
   const filterByKeyword = (n) => keyword === ''
     || (n.inject_expectation_inject?.inject_title || '')
@@ -129,25 +112,25 @@ const Validations = () => {
     return group;
   }, {});
 
-  const groupedByTeam = (injects) => {
-    return injects.reduce((group, expectation) => {
+  const groupedByTeamOrAsset = (expectations) => {
+    return expectations.reduce((group, expectation) => {
       const { inject_expectation_team } = expectation;
+      const { inject_expectation_asset } = expectation;
+      const { inject_expectation_asset_group } = expectation;
       if (inject_expectation_team) {
         const values = group[inject_expectation_team] ?? [];
         values.push(expectation);
         group[inject_expectation_team] = values;
       }
-      return group;
-    }, {});
-  };
-
-  const groupedByExpectation = (expectations) => {
-    return expectations.reduce((group, expectation) => {
-      const { inject_expectation_type } = expectation;
-      if (inject_expectation_type) {
-        const values = group[inject_expectation_type] ?? [];
+      if (inject_expectation_asset && !expectation.inject_expectation_group) {
+        const values = group[inject_expectation_asset] ?? [];
         values.push(expectation);
-        group[inject_expectation_type] = values;
+        group[inject_expectation_asset] = values;
+      }
+      if (inject_expectation_asset_group) {
+        const values = group[inject_expectation_asset_group] ?? [];
+        values.push(expectation);
+        group[inject_expectation_asset_group] = values;
       }
       return group;
     }, {});
@@ -185,7 +168,7 @@ const Validations = () => {
         </div>
         <div className="clearfix" />
         <List>
-          {Object.entries(groupedByInject).map(([injectId, teams]) => {
+          {Object.entries(groupedByInject).map(([injectId, expectationsByInject]) => {
             const inject = injectsMap[injectId] || {};
             const injectContract = injectTypesMap[inject.inject_contract] || {};
             return (
@@ -217,48 +200,11 @@ const Validations = () => {
                   />
                 </ListItem>
                 <List component="div" disablePadding>
-                  {Object.entries(groupedByTeam(teams)).map(([teamId, expectations]) => {
-                    const team = teamsMap[teamId] || {};
+                  {Object.entries(groupedByTeamOrAsset(expectationsByInject)).map(([id, expectations]) => {
                     return (
-                      <div key={team.team_id}>
-                        <ListItem
-                          divider={true}
-                          sx={{ pl: 4 }}
-                          classes={{ root: classes.item }}
-                        >
-                          <ListItemIcon>
-                            <CastForEducationOutlined fontSize="small" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <div className={classes.bodyItem} style={{ width: '20%' }}>
-                                {team.team_name}
-                              </div>
-                            }
-                          />
-                        </ListItem>
-                        <List component="div" disablePadding>
-                          {Object.entries(groupedByExpectation(expectations)).map(([expectationType, es]) => {
-                            if (expectationType === 'ARTICLE') {
-                              const expectation = es[0];
-                              const article = articlesMap[expectation.inject_expectation_article] || {};
-                              const channel = channelsMap[article.article_channel] || {};
-                              return (
-                                <ChannelExpectation key={expectationType} channel={channel} article={article} expectation={expectation} />
-                              );
-                            } if (expectationType === 'CHALLENGE') {
-                              const expectation = es[0];
-                              const challenge = challengesMap[expectation.inject_expectation_challenge] || {};
-                              return (
-                                <ChallengeExpectation key={expectationType} challenge={challenge} expectation={expectation} />
-                              );
-                            }
-                            return (
-                              <ManualExpectations key={expectationType} exerciseId={exerciseId} inject={inject} expectations={es} />
-                            );
-                          })}
-                        </List>
-                      </div>
+                      <TeamOrAssetLine key={id} exerciseId={exerciseId} inject={inject} injectContract={injectContract}
+                        expectationsByInject={expectationsByInject} id={id} expectations={expectations}
+                      />
                     );
                   })}
                 </List>

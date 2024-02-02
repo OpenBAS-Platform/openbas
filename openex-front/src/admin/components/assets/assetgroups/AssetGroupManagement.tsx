@@ -1,25 +1,23 @@
-import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
-import { CloseRounded, ComputerOutlined } from '@mui/icons-material';
-import * as R from 'ramda';
-import React, { CSSProperties, FunctionComponent, useState } from 'react';
+import { IconButton, Typography } from '@mui/material';
+import { CloseRounded } from '@mui/icons-material';
+import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../../../../components/Theme';
 import TagsFilter from '../../../../components/TagsFilter';
 import SearchFilter from '../../../../components/SearchFilter';
-import { Option } from '../../../../utils/Option';
-import ItemTags from '../../../../components/ItemTags';
-import SortHeadersList, { Header } from '../../../../components/common/SortHeadersList';
-import AssetGroupAddAssets from './AssetGroupAddAssets';
+import AssetGroupAddEndpoints from './AssetGroupAddEndpoints';
 import { useHelper } from '../../../../store';
 import type { UsersHelper } from '../../../../actions/helper';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
-import type { EndpointStore } from '../endpoints/Endpoint';
-import EndpointPopover from '../endpoints/EndpointPopover';
 import { fetchAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
 import type { AssetGroupsHelper } from '../../../../actions/assetgroups/assetgroup-helper';
+import EndpointsList from '../endpoints/EndpointsList';
+import EndpointPopover from '../endpoints/EndpointPopover';
+import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import type { EndpointStore } from '../endpoints/Endpoint';
+import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
 
 const useStyles = makeStyles((theme: Theme) => ({
   // Drawer Header
@@ -48,56 +46,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: 200,
     marginRight: 20,
   },
-
-  container: {
-    marginTop: 10,
-  },
-  itemHead: {
-    textTransform: 'uppercase',
-    cursor: 'pointer',
-  },
-  item: {
-    height: 50,
-  },
-  bodyItem: {
-    fontSize: 13,
-    float: 'left',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
 }));
-
-const inlineStylesHeaders: Record<string, CSSProperties> = {
-  iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 5px',
-    padding: 0,
-    top: '0px',
-  },
-  asset_name: {
-    float: 'left',
-    width: '50%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  asset_tags: {
-    float: 'left',
-    width: '50%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-};
-
-const inlineStyles = {
-  asset_name: {
-    width: '50%',
-  },
-  asset_tags: {
-    width: '50%',
-  },
-};
 
 interface Props {
   assetGroupId: string;
@@ -112,6 +61,9 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
+  // Filter and sort hook
+  const filtering = useSearchAnFilter('asset', 'name', ['name']);
+
   // Fetching data
   const { assetGroup, endpointsMap, userAdmin } = useHelper((helper: AssetGroupsHelper & EndpointsHelper & UsersHelper) => ({
     assetGroup: helper.getAssetGroup(assetGroupId),
@@ -123,28 +75,8 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
     dispatch(fetchEndpoints());
   });
 
-  // Filter
-  const [keyword, setKeyword] = useState('');
-  const handleSearch = (value: string) => {
-    setKeyword(value);
-  };
-
-  const [tags, setTags] = useState<Option[]>([]);
-  const handleAddTag = (value: Option) => {
-    if (value) {
-      setTags(R.uniq(R.append(value, tags)));
-    }
-  };
-  const handleRemoveTag = (value: string) => {
-    setTags(tags.filter((n) => n.id !== value));
-  };
-
-  // Headers
-
-  const headers: Header[] = [
-    { field: 'asset_name', label: 'Name', isSortable: true },
-    { field: 'asset_tags', label: 'Tags', isSortable: true },
-  ];
+  const endpoints = assetGroup.asset_group_assets?.filter((endpointId: string) => !!endpointsMap[endpointId]).map((endpointId: string) => endpointsMap[endpointId]);
+  const sortedAsset: EndpointStore[] = filtering.filterAndSort(endpoints);
 
   return (
     <>
@@ -164,99 +96,40 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
         <div className={classes.parameters}>
           <div className={classes.tags}>
             <TagsFilter
-              onAddTag={handleAddTag}
-              onRemoveTag={handleRemoveTag}
-              currentTags={tags}
+              onAddTag={filtering.handleAddTag}
+              onRemoveTag={filtering.handleRemoveTag}
+              currentTags={filtering.tags}
               thin
             />
           </div>
           <div className={classes.search}>
             <SearchFilter
               fullWidth
-              onChange={handleSearch}
-              keyword={keyword}
+              onChange={filtering.handleSearch}
+              keyword={filtering.keyword}
             />
           </div>
         </div>
         <div className="clearfix" />
       </div>
-      <List classes={{ root: classes.container }}>
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-        >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-                &nbsp;
-            </span>
-          </ListItemIcon>
-          <ListItemText
-            primary={
-              <div>
-                <SortHeadersList
-                  headers={headers}
-                  inlineStylesHeaders={inlineStylesHeaders}
-                  initialSortBy={'asset_name'}
-                />
-              </div>
-            }
-          />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
-        </ListItem>
-        {assetGroup.asset_group_assets?.map((assetId: string) => {
-          const endpoint: EndpointStore = endpointsMap[assetId];
-          return (
-            <ListItem
-              key={endpoint.asset_id}
-              classes={{ root: classes.item }}
-              divider={true}
-            >
-              <ListItemIcon>
-                <ComputerOutlined color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.asset_name}
-                    >
-                      {endpoint.asset_name}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.asset_tags}
-                    >
-                      <ItemTags variant="list" tags={endpoint.asset_tags} />
-                    </div>
-                  </>
-                }
-              />
-              <ListItemSecondaryAction>
-                {userAdmin
-                  ? (<EndpointPopover
-                      endpoint={endpoint}
-                      assetGroupId={assetGroup.asset_group_id}
-                      assetGroupAssetIds={assetGroup.asset_group_assets ?? []}
-                     />)
-                  : <span> &nbsp; </span>
-                }
-              </ListItemSecondaryAction>
-            </ListItem>
-          );
-        })}
-      </List>
+      <EndpointsList
+        endpoints={sortedAsset}
+        actions=
+          {userAdmin
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore: Endpoint property handle by EndpointsList
+            ? (<EndpointPopover
+                inline
+                assetGroupId={assetGroup.asset_group_id}
+                assetGroupEndpointIds={assetGroup.asset_group_assets ?? []}
+               />)
+            : <span> &nbsp; </span>
+          }
+      />
       {userAdmin
-        && (<AssetGroupAddAssets
+        && (<AssetGroupAddEndpoints
           assetGroupId={assetGroup.asset_group_id}
-          assetGroupAssetIds={assetGroup.asset_group_assets ?? []}
+          assetGroupEndpointIds={assetGroup.asset_group_assets ?? []}
             />)
       }
     </>

@@ -26,5 +26,9 @@ public enum ContractType {
     @JsonProperty("team")
     Team,
     @JsonProperty("expectation")
-    Expectation
+    Expectation,
+    @JsonProperty("asset")
+    Asset,
+    @JsonProperty("asset-group")
+    AssetGroup,
 }

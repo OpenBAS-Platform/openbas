@@ -2,8 +2,6 @@ package io.openex.service;
 
 import io.openex.database.model.Asset;
 import io.openex.database.model.Endpoint;
-import io.openex.database.model.Tag;
-import io.openex.database.repository.TagRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,8 +22,6 @@ public class AssetEndpointServiceTest {
   private AssetEndpointService assetEndpointService;
   @Autowired
   private AssetService assetService;
-  @Autowired
-  private TagRepository tagRepository;
 
   static String ENDPOINT_ID;
 
@@ -79,7 +75,7 @@ public class AssetEndpointServiceTest {
   @Test
   @Order(3)
   void retrieveEndpointTest() {
-    List<Asset> assets = this.assetService.assets(List.of("Endpoint"));
+    List<Asset> assets = this.assetService.assetsFromTypes(List.of("Endpoint"));
     assertTrue(assets.stream().map(Asset::getId).toList().contains(ENDPOINT_ID));
 
     Endpoint endpoint = this.assetEndpointService.endpoint(ENDPOINT_ID);
@@ -105,28 +101,9 @@ public class AssetEndpointServiceTest {
     assertEquals(value, endpointUpdated.getName());
   }
 
-  @DisplayName("Update endpoint with tag")
-  @Test
-  @Order(5)
-  void updateEndpointWithTagTest() {
-    // -- PREPARE --
-    Tag tag = new Tag();
-    String tagName = "endpoint";
-    tag.setName(tagName);
-    tag.setColor("blue");
-    Tag tagCreated = this.tagRepository.save(tag);
-    Endpoint endpoint = this.assetEndpointService.endpoint(ENDPOINT_ID);
-    endpoint.setTags(List.of(tagCreated));
-
-    // -- EXECUTE --
-    Endpoint endpointUpdated = this.assetEndpointService.updateEndpoint(endpoint);
-    assertNotNull(endpointUpdated);
-    assertEquals(tagName, endpointUpdated.getTags().get(0).getName());
-  }
-
   @DisplayName("Delete endpoint")
   @Test
-  @Order(6)
+  @Order(5)
   void deleteEndpointTest() {
     this.assetEndpointService.deleteEndpoint(ENDPOINT_ID);
     assertThrows(NoSuchElementException.class, () -> this.assetEndpointService.endpoint(ENDPOINT_ID));

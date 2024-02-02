@@ -14,11 +14,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static io.openex.database.model.User.ROLE_ADMIN;
+import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.helper.StreamHelper.fromIterable;
 
 @RestController
 @RequiredArgsConstructor
+@Secured(ROLE_USER)
 public class AssetGroupApi {
 
   public static final String ASSET_GROUP_URI = "/api/asset_groups";
@@ -27,7 +28,7 @@ public class AssetGroupApi {
   private final TagRepository tagRepository;
 
   @PostMapping(ASSET_GROUP_URI)
-  @Secured(ROLE_ADMIN)
+  @PreAuthorize("isPlanner()")
   public AssetGroup createAssetGroup(@Valid @RequestBody final AssetGroupInput input) {
     AssetGroup assetGroup = new AssetGroup();
     assetGroup.setUpdateAttributes(input);
@@ -48,7 +49,7 @@ public class AssetGroupApi {
   }
 
   @PutMapping(ASSET_GROUP_URI + "/{assetGroupId}")
-  @Secured(ROLE_ADMIN)
+  @PreAuthorize("isPlanner()")
   public AssetGroup updateAssetGroup(
       @PathVariable @NotBlank final String assetGroupId,
       @Valid @RequestBody final AssetGroupInput input) {
@@ -59,7 +60,7 @@ public class AssetGroupApi {
   }
 
   @PutMapping(ASSET_GROUP_URI + "/{assetGroupId}/assets")
-  @Secured(ROLE_ADMIN)
+  @PreAuthorize("isPlanner()")
   public AssetGroup updateAssetsOnAssetGroup(
       @PathVariable @NotBlank final String assetGroupId,
       @Valid @RequestBody final UpdateAssetsOnAssetGroupInput input) {
@@ -68,7 +69,7 @@ public class AssetGroupApi {
   }
 
   @DeleteMapping(ASSET_GROUP_URI + "/{assetGroupId}")
-  @Secured(ROLE_ADMIN)
+  @PreAuthorize("isPlanner()")
   public void deleteAssetGroup(@PathVariable @NotBlank final String assetGroupId) {
     this.assetGroupService.deleteAssetGroup(assetGroupId);
   }

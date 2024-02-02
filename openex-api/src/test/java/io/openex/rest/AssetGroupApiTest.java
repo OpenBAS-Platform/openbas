@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -52,7 +51,7 @@ public class AssetGroupApiTest {
   @DisplayName("Create asset group succeed")
   @Test
   @Order(1)
-  @WithMockUser(roles = {"ADMIN"})
+  @WithMockPlannerUser
   void createAssetGroupTest() throws Exception {
     // -- PREPARE --
     AssetGroupInput assetGroupInput = new AssetGroupInput();
@@ -117,7 +116,7 @@ public class AssetGroupApiTest {
   @DisplayName("Update asset group succeed")
   @Test
   @Order(4)
-  @WithMockUser(roles = {"ADMIN"})
+  @WithMockPlannerUser
   void updateGroupAssetTest() throws Exception {
     // -- PREPARE --
     AssetGroup assetGroupReponse = getFirstAssetGroup();
@@ -144,7 +143,7 @@ public class AssetGroupApiTest {
   @DisplayName("Delete asset group failed")
   @Test
   @Order(5)
-  @WithMockPlannerUser
+  @WithMockObserverUser
   void deleteAssetGroupFailedTest() throws Exception {
     // -- PREPARE --
     AssetGroup assetGroupReponse = getFirstAssetGroup();
@@ -159,7 +158,7 @@ public class AssetGroupApiTest {
   @DisplayName("Delete asset group succeed")
   @Test
   @Order(6)
-  @WithMockUser(roles = {"ADMIN"})
+  @WithMockPlannerUser
   void deleteAssetGroupSucceedTest() throws Exception {
     // -- PREPARE --
     AssetGroup assetGroupReponse = getFirstAssetGroup();

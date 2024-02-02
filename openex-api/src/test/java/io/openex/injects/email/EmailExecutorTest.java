@@ -13,11 +13,11 @@ import io.openex.injects.email.model.EmailContent;
 import io.openex.model.inject.form.Expectation;
 import io.openex.service.ContractService;
 import io.openex.service.ExecutionContextService;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 
 import static io.openex.helper.StreamHelper.fromIterable;
@@ -58,8 +58,7 @@ public class EmailExecutorTest {
     Iterable<User> users = this.userRepository.findAll();
     List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
         .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
-    ExecutableInject executableInject = new ExecutableInject(true, true, inject, contract, List.of(),
-        userInjectContexts);
+    ExecutableInject executableInject = new ExecutableInject(true, true, inject, contract, userInjectContexts);
     Execution execution = new Execution(executableInject.isRuntime());
 
     // -- EXECUTE --

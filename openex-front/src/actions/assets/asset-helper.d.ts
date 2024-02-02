@@ -1,6 +1,6 @@
 import type { EndpointStore } from '../../admin/components/assets/endpoints/Endpoint';
 
 export interface EndpointsHelper {
-  getEndpoints: () => [EndpointStore];
+  getEndpoints: () => EndpointStore[];
   getEndpointsMap: () => Record<string, EndpointStore>;
 }

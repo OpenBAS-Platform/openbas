@@ -2,6 +2,7 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openex.database.converter.ExecutionConverter;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,7 +34,7 @@ public class InjectStatus implements Base {
 
   @Column(name = "status_async_ids")
   @JsonProperty("status_async_ids")
-  @Type(value = io.openex.database.converter.PostgreSqlStringArrayType.class)
+  @Type(StringArrayType.class)
   private String[] asyncIds;
 
   @Column(name = "status_reporting")

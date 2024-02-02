@@ -64,10 +64,13 @@ export interface ArticleUpdateInput {
 }
 
 export interface Asset {
+  asset_blobs?: Record<string, string>;
   /** @format date-time */
   asset_created_at?: string;
   asset_description?: string;
   asset_id: string;
+  /** @format date-time */
+  asset_last_seen?: string;
   asset_name: string;
   asset_sources?: Record<string, string>;
   asset_tags?: Tag[];
@@ -102,10 +105,12 @@ export interface AttackPattern {
   attack_pattern_description?: string;
   attack_pattern_external_id: string;
   attack_pattern_id: string;
+  attack_pattern_kill_chain_phases?: KillChainPhase[];
   attack_pattern_name: string;
   attack_pattern_parent?: AttackPattern;
   attack_pattern_permissions_required?: string[];
   attack_pattern_platforms?: string[];
+  attack_pattern_stix_id: string;
   /** @format date-time */
   attack_pattern_updated_at?: string;
   updateAttributes?: object;
@@ -114,6 +119,7 @@ export interface AttackPattern {
 export interface AttackPatternCreateInput {
   attack_pattern_description?: string;
   attack_pattern_external_id: string;
+  attack_pattern_kill_chain_phases?: string[];
   attack_pattern_name: string;
   attack_pattern_parent?: string;
   attack_pattern_permissions_required?: string[];
@@ -351,7 +357,9 @@ export interface ContractElement {
     | "dependency-select"
     | "attachment"
     | "team"
-    | "expectation";
+    | "expectation"
+    | "asset"
+    | "asset-group";
 }
 
 export interface ContractVariable {
@@ -464,10 +472,13 @@ export interface DryrunCreateInput {
 }
 
 export interface Endpoint {
+  asset_blobs?: Record<string, string>;
   /** @format date-time */
   asset_created_at?: string;
   asset_description?: string;
   asset_id: string;
+  /** @format date-time */
+  asset_last_seen?: string;
   asset_name: string;
   asset_sources?: Record<string, string>;
   asset_tags?: Tag[];
@@ -476,15 +487,15 @@ export interface Endpoint {
   asset_updated_at?: string;
   endpoint_hostname?: string;
   endpoint_ips: string[];
-  /** @format date-time */
-  asset_last_seen?: string;
-  endpoint_mac_adresses?: string[];
+  endpoint_mac_addresses?: string[];
   endpoint_platform: "Linux" | "Windows" | "Darwin";
   updateAttributes?: object;
 }
 
 export interface EndpointInput {
   asset_description?: string;
+  /** @format date-time */
+  asset_last_seen?: string;
   asset_name: string;
   asset_tags?: string[];
   endpoint_hostname?: string;
@@ -493,9 +504,7 @@ export interface EndpointInput {
    * @minItems 1
    */
   endpoint_ips: string[];
-  /** @format date-time */
-  asset_last_seen?: string;
-  endpoint_mac_adresses?: string[];
+  endpoint_mac_addresses?: string[];
   endpoint_platform: "Linux" | "Windows" | "Darwin";
 }
 
@@ -706,6 +715,8 @@ export interface Inject {
   footer?: string;
   header?: string;
   inject_all_teams?: boolean;
+  inject_asset_groups?: AssetGroup[];
+  inject_assets?: Asset[];
   inject_city?: string;
   inject_communications?: Communication[];
   /** @format int64 */
@@ -759,6 +770,8 @@ export interface InjectDocumentInput {
 
 export interface InjectExpectation {
   inject_expectation_article?: Article;
+  inject_expectation_asset?: Asset;
+  inject_expectation_asset_group?: AssetGroup;
   inject_expectation_challenge?: Challenge;
   /** @format date-time */
   inject_expectation_created_at?: string;
@@ -766,13 +779,14 @@ export interface InjectExpectation {
   inject_expectation_exercise?: Exercise;
   /** @format int32 */
   inject_expectation_expected_score?: number;
+  inject_expectation_group?: boolean;
   inject_expectation_inject?: Inject;
   inject_expectation_name?: string;
   inject_expectation_result?: string;
   /** @format int32 */
   inject_expectation_score?: number;
   inject_expectation_team?: Team;
-  inject_expectation_type?: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL";
+  inject_expectation_type?: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "TECHNICAL";
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: User;
@@ -782,6 +796,8 @@ export interface InjectExpectation {
 
 export interface InjectInput {
   inject_all_teams?: boolean;
+  inject_asset_groups?: string[];
+  inject_assets?: string[];
   inject_city?: string;
   inject_content?: object;
   inject_contract?: string;
@@ -829,11 +845,15 @@ export interface InjectUpdateTriggerInput {
 export interface KillChainPhase {
   /** @format date-time */
   phase_created_at?: string;
+  phase_description?: string;
+  phase_external_id?: string;
   phase_id?: string;
   phase_kill_chain_name?: string;
   phase_name?: string;
   /** @format int64 */
   phase_order?: number;
+  phase_shortname?: string;
+  phase_stix_id?: string;
   /** @format date-time */
   phase_updated_at?: string;
   updateAttributes?: object;
@@ -1031,7 +1051,9 @@ export interface LinkedFieldModel {
     | "dependency-select"
     | "attachment"
     | "team"
-    | "expectation";
+    | "expectation"
+    | "asset"
+    | "asset-group";
 }
 
 export interface Log {

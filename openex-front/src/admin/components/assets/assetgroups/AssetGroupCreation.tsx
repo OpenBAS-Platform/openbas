@@ -10,6 +10,7 @@ import Drawer from '../../../../components/common/Drawer';
 import { addAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
 import AssetGroupForm from './AssetGroupForm';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
+import Dialog from '../../../../components/common/Dialog';
 
 const useStyles = makeStyles((theme: Theme) => ({
   text: {
@@ -21,9 +22,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   inline?: boolean;
+  onCreate?: (result: string) => void;
 }
 
-const AssetGroupCreation: FunctionComponent<Props> = ({ inline }) => {
+const AssetGroupCreation: FunctionComponent<Props> = ({
+  inline,
+  onCreate,
+}) => {
   // Standard hooks
   const classes = useStyles();
   const [open, setOpen] = useState(false);
@@ -31,8 +36,17 @@ const AssetGroupCreation: FunctionComponent<Props> = ({ inline }) => {
 
   const dispatch = useAppDispatch();
   const onSubmit = (data: AssetGroupInput) => {
-    dispatch(addAssetGroup(data));
-    setOpen(false);
+    dispatch(addAssetGroup(data)).then(
+      (result: { result: string }) => {
+        if (result.result) {
+          if (onCreate) {
+            onCreate(result.result);
+          }
+          setOpen(false);
+        }
+        return result;
+      },
+    );
   };
 
   return (
@@ -54,16 +68,30 @@ const AssetGroupCreation: FunctionComponent<Props> = ({ inline }) => {
       ) : (
         <ButtonCreate onClick={() => setOpen(true)} />
       )}
-      <Drawer
-        open={open}
-        handleClose={() => setOpen(false)}
-        title={t('Create a new asset group')}
-      >
-        <AssetGroupForm
-          onSubmit={onSubmit}
+
+      {inline ? (
+        <Dialog
+          open={open}
           handleClose={() => setOpen(false)}
-        />
-      </Drawer>
+          title={t('Create a new asset group')}
+        >
+          <AssetGroupForm
+            onSubmit={onSubmit}
+            handleClose={() => setOpen(false)}
+          />
+        </Dialog>
+      ) : (
+        <Drawer
+          open={open}
+          handleClose={() => setOpen(false)}
+          title={t('Create a new asset group')}
+        >
+          <AssetGroupForm
+            onSubmit={onSubmit}
+            handleClose={() => setOpen(false)}
+          />
+        </Drawer>
+      )}
     </div>
   );
 };

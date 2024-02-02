@@ -81,7 +81,7 @@ public class ChannelExecutor extends Injector {
         // Send the publication message.
         if (content.isEmailing()) {
           String replyTo = exercise.getReplyTo();
-          List<ExecutionContext> users = injection.getUsers();
+          List<ExecutionContext> users = injection.getContextUser();
           List<Document> documents = injection.getInject().getDocuments().stream()
               .filter(InjectDocument::isAttached).map(InjectDocument::getDocument).toList();
           List<DataAttachment> attachments = resolveAttachments(execution, injection, documents);

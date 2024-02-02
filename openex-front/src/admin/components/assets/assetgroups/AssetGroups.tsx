@@ -122,7 +122,7 @@ const AssetGroups = () => {
   useDataLoader(() => {
     dispatch(fetchAssetGroups());
   });
-  const sortedAssetGroups: [AssetGroupStore] = filtering.filterAndSort(assetGroups);
+  const sortedAssetGroups: AssetGroupStore[] = filtering.filterAndSort(assetGroups);
   const [selected, setSelected] = useState<AssetGroupStore | undefined>(undefined);
   return (
     <>
@@ -263,10 +263,10 @@ const AssetGroups = () => {
         elevation={1}
       >
         {selected !== undefined && (
-          <AssetGroupManagement
-            assetGroupId={selected.asset_group_id}
-            handleClose={() => setSelected(undefined)}
-          />
+        <AssetGroupManagement
+          assetGroupId={selected.asset_group_id}
+          handleClose={() => setSelected(undefined)}
+        />
         )}
       </MuiDrawer>
     </>

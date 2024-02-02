@@ -1,6 +1,6 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Button, TextField } from '@mui/material';
-import React from 'react';
+import React, { SyntheticEvent } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useFormatter } from '../../../../components/i18n';
@@ -45,8 +45,14 @@ const AssetGroupForm: React.FC<Props> = ({
     defaultValues: initialValues,
   });
 
+  const handleSubmitWithoutPropagation = (e: SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleSubmit(onSubmit)(e);
+  };
+
   return (
-    <form id="assetGroupId" onSubmit={handleSubmit(onSubmit)}>
+    <form id="assetGroupId" onSubmit={handleSubmitWithoutPropagation}>
       <TextField
         variant="standard"
         fullWidth
