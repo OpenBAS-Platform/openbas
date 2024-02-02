@@ -601,6 +601,9 @@ const i18n = {
       Blocked: 'Bloqué',
       Failed: 'Echoué',
       'Pending result': 'Résultat en attente',
+      'Validation type': 'Type de validation',
+      'All assets must validate the expectation': 'Tous les actifs doivent valider l\'attente',
+      'At least one asset must validate the expectation': 'Au moins un actif doit valider l\'attente',
       // -- Expectation end --
       'Distribution of expected total score by team':
         'Distribution du score total attendu par équipe',
@@ -741,6 +744,7 @@ const i18n = {
       'Manage assets': 'Gérer les actifs',
       'Add assets in this asset group': 'Ajouter des actifs dans ce groupe d\'actifs',
       'Remove from the asset group': 'Retirer de ce groupe d\'asset',
+      'Targeted assets': 'Assets ciblés',
       'Targeted asset groups': 'Groupes d\'assets ciblés',
       'Add asset groups': 'Ajouter des groupes d\'assets',
       'Add asset groups in this inject': 'Ajouter des groupes d\'assets dans ce stimuli',

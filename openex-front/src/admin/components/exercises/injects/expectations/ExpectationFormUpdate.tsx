@@ -121,8 +121,8 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
                   onChange((event.target as HTMLInputElement).value === 'true');
                 }}
               >
-                <FormControlLabel value={false} control={<Radio />} label="All assets must validate the expectation" />
-                <FormControlLabel value={true} control={<Radio />} label="At least one asset must validate the expectation" />
+                <FormControlLabel value={false} control={<Radio />} label={t('All assets must validate the expectation')} />
+                <FormControlLabel value={true} control={<Radio />} label={t('At least one asset must validate the expectation')} />
               </RadioGroup>
             </div>
           )}
