@@ -597,13 +597,12 @@ const i18n = {
       MANUAL: 'Manuel',
       ARTICLE: 'Automatique - Déclenché lorsque l\'équipe a lu l\'article',
       TECHNICAL: 'Automatique - Déclenché lorsque l\'injection est traitée',
-      'Not blocked': 'Non bloqué',
-      Blocked: 'Bloqué',
       Failed: 'Echoué',
       'Pending result': 'Résultat en attente',
-      'Validation type': 'Type de validation',
-      'All assets must validate the expectation': 'Tous les actifs doivent valider l\'attente',
-      'At least one asset must validate the expectation': 'Au moins un actif doit valider l\'attente',
+      'Validation mode': 'Type de validation',
+      'All assets (per group) must validate the expectation': 'Tous les actifs (par groupe) doivent valider l\'attente',
+      'At least one asset (per group) must validate the expectation': 'Au moins un actif (par groupe) doit valider l\'attente',
+      'An isolated asset is considered as a group of one asset': 'Un actif isolé est considéré comme un groupe d\'un seul actif',
       // -- Expectation end --
       'Distribution of expected total score by team':
         'Distribution du score total attendu par équipe',

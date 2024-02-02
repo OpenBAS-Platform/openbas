@@ -144,7 +144,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
           name="expectation_expectation_group"
           render={({ field: { onChange, value } }) => (
             <div className={classes.marginTop_2}>
-              <FormLabel>{t('Validation type')}</FormLabel>
+              <FormLabel>{t('Validation mode')}</FormLabel>
               <RadioGroup
                 defaultValue={false}
                 value={value}
@@ -152,8 +152,8 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
                   onChange((event.target as HTMLInputElement).value === 'true');
                 }}
               >
-                <FormControlLabel value={false} control={<Radio />} label="All assets must validate the expectation" />
-                <FormControlLabel value={true} control={<Radio />} label="At least one asset must validate the expectation" />
+                <FormControlLabel value={false} control={<Radio />} label={t('All assets (per group) must validate the expectation')} />
+                <FormControlLabel value={true} control={<Radio />} label={t('At least one asset (per group) must validate the expectation')} />
               </RadioGroup>
             </div>
           )}

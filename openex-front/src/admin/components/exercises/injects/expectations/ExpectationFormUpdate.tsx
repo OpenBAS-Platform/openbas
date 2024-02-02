@@ -1,7 +1,8 @@
 import React, { FunctionComponent, SyntheticEvent } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, FormControlLabel, FormLabel, InputLabel, MenuItem, Radio, RadioGroup, Select as MUISelect, TextField as MuiTextField } from '@mui/material';
+import { Alert, Button, FormControlLabel, FormLabel, InputLabel, MenuItem, Radio, RadioGroup, Select as MUISelect, TextField as MuiTextField, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { InfoOutlined } from '@mui/icons-material';
 import { formProps, infoMessage, isTechnicalExpectation } from './ExpectationFormUtils';
 import type { ExpectationInput } from './Expectation';
 import { useFormatter } from '../../../../../components/i18n';
@@ -16,6 +17,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     placeContent: 'end',
     gap: theme.spacing(2),
     marginTop: theme.spacing(2),
+  },
+  container: {
+    display: 'flex',
+    alignItems: 'end',
+    gap: 5,
   },
 }));
 
@@ -113,7 +119,20 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
           name="expectation_expectation_group"
           render={({ field: { onChange, value } }) => (
             <div className={classes.marginTop_2}>
-              <FormLabel>{t('Validation type')}</FormLabel>
+              <FormLabel className={classes.container}>
+                {t('Validation mode')}
+                <Tooltip
+                  title={t(
+                    'An isolated asset is considered as a group of one asset',
+                  )}
+                >
+                  <InfoOutlined
+                    fontSize="small"
+                    color="primary"
+                    style={{ marginTop: 8 }}
+                  />
+                </Tooltip>
+              </FormLabel>
               <RadioGroup
                 defaultValue={false}
                 value={value}
@@ -121,8 +140,8 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
                   onChange((event.target as HTMLInputElement).value === 'true');
                 }}
               >
-                <FormControlLabel value={false} control={<Radio />} label={t('All assets must validate the expectation')} />
-                <FormControlLabel value={true} control={<Radio />} label={t('At least one asset must validate the expectation')} />
+                <FormControlLabel value={false} control={<Radio />} label={t('All assets (per group) must validate the expectation')} />
+                <FormControlLabel value={true} control={<Radio />} label={t('At least one asset (per group) must validate the expectation')} />
               </RadioGroup>
             </div>
           )}

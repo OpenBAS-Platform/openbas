@@ -42,13 +42,7 @@ const ResultChip: FunctionComponent<Props> = ({
   const label = () => {
     if (result) {
       if (isFail()) {
-        if (expectation.inject_expectation_type === 'TECHNICAL') {
-          return `${t('Not blocked')} (${expectation.inject_expectation_score})`;
-        }
         return `${t('Failed')} (${expectation.inject_expectation_score})`;
-      }
-      if (expectation.inject_expectation_type === 'TECHNICAL') {
-        return `${t('Blocked')} (${expectation.inject_expectation_score})`;
       }
       return `${t('Validated')} (${expectation.inject_expectation_score})`;
     }
