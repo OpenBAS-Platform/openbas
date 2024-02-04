@@ -2,10 +2,14 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { ApiOutlined, EmailOutlined, EmojiEventsOutlined, HelpOutlined, NotificationsActiveOutlined, SmsOutlined, SpeakerNotesOutlined } from '@mui/icons-material';
 import { Mastodon, NewspaperVariantMultipleOutline, Twitter } from 'mdi-material-ui';
+import { useTheme } from '@mui/styles';
 import CustomTooltip from '../../../../components/CustomTooltip';
 import { useHelper } from '../../../../store';
+import octiDark from '../../../../static/images/xtm/octi_dark.png';
+import octiLight from '../../../../static/images/xtm/octi_light.png';
 
 const iconSelector = (type, variant, fontSize, done, disabled, contractImage) => {
+  const theme = useTheme();
   let style;
   switch (variant) {
     case 'inline':
@@ -65,6 +69,17 @@ const iconSelector = (type, variant, fontSize, done, disabled, contractImage) =>
         <img
           src={contractImage}
           alt="Airbus Lade"
+          style={{
+            width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
+            height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
+          }}
+        />
+      );
+    case 'openex_opencti':
+      return (
+        <img
+          src={theme.palette.mode === 'dark' ? octiDark : octiLight}
+          alt="OpenCTI"
           style={{
             width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
             height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
