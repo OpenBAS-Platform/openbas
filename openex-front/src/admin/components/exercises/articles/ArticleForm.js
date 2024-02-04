@@ -13,11 +13,11 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchChannels } from '../../../../actions/Channel';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
-import ChannelIcon from '../../medias/channels/ChannelIcon';
+import ChannelIcon from '../../components/channels/ChannelIcon';
 import MarkDownField from '../../../../components/MarkDownField';
-import DocumentType from '../../medias/documents/DocumentType';
+import DocumentType from '../../components/documents/DocumentType';
 import ItemTags from '../../../../components/ItemTags';
-import DocumentPopover from '../../medias/documents/DocumentPopover';
+import DocumentPopover from '../../components/documents/DocumentPopover';
 import ArticleAddDocuments from './ArticleAddDocuments';
 
 const useStyles = makeStyles(() => ({

@@ -14,7 +14,6 @@ a,
 a:hover,
 a:visited,
 a:focus {
-  cursor: pointer;
   text-decoration: none;
 }
 

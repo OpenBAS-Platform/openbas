@@ -37,8 +37,8 @@ public class HomeApi {
         String index = readResourceAsString(classPathResource);
         String basePath = this.contextPath.endsWith("/") ? this.contextPath.substring(0, this.contextPath.length() - 1) : this.contextPath;
         String newIndex = index.
-            replaceAll("%APP_TITLE%", "OpenEx - Crisis Exercises and Adversary Simulation Platform").
-            replaceAll("%APP_DESCRIPTION%", "OpenEx is an open source platform allowing organizations to plan, schedule and conduct crisis exercises as well as adversary simulation campaign.").
+            replaceAll("%APP_TITLE%", "OpenBAS - Open Breach & Attack Simulation Platform").
+            replaceAll("%APP_DESCRIPTION%", "OpenBAS is an open source platform allowing organizations to plan, schedule and conduct adversary simulation campaigns and cyber crisis exercises.").
             replaceAll("%APP_FAVICON%", basePath + "/static/ext/favicon.png").
             replaceAll("%APP_MANIFEST%", basePath + "/static/ext/manifest.json").
             replaceAll("%BASE_PATH%", basePath);

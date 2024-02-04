@@ -19,11 +19,9 @@ const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));
 const Exercises = lazy(() => import('./components/exercises/Exercises'));
 const Assets = lazy(() => import('./components/assets/Index'));
-const Persons = lazy(() => import('./components/persons/Index'));
-const Organizations = lazy(() => import('./components/organizations/Organizations'));
-const Medias = lazy(() => import('./components/medias/Index'));
+const Teams = lazy(() => import('./components/teams/Index'));
+const IndexComponents = lazy(() => import('./components/components/Index'));
 const IndexIntegrations = lazy(() => import('./components/integrations/Index'));
-const Challenges = lazy(() => import('./components/challenges/Challenges'));
 const LessonsTemplates = lazy(() => import('./components/lessons/LessonsTemplates'));
 const IndexLessonsTemplate = lazy(() => import('./components/lessons/Index'));
 const IndexSettings = lazy(() => import('./components/settings/Index'));
@@ -37,7 +35,6 @@ const Index = () => {
   const classes = useStyles();
   const navigate = useNavigate();
   const logged = useHelper((helper: LoggedHelper) => helper.logged());
-
   if (logged.isOnlyPlayer) {
     navigate('/private');
   }
@@ -75,10 +72,8 @@ const Index = () => {
               <Route path="" element={errorWrapper(Dashboard)()} />
               <Route path="exercises/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
               <Route path="assets/*" element={errorWrapper(Assets)()} />
-              <Route path="persons/*" element={errorWrapper(Persons)()} />
-              <Route path="organizations" element={errorWrapper(Organizations)()} />
-              <Route path="medias/*" element={errorWrapper(Medias)()} />
-              <Route path="challenges" element={errorWrapper(Challenges)()} />
+              <Route path="teams/*" element={errorWrapper(Teams)()} />
+              <Route path="components/*" element={errorWrapper(IndexComponents)()} />
               <Route path="lessons" element={errorWrapper(LessonsTemplates)()} />
               <Route path="lessons/:lessonsTemplateId/*" element={errorWrapper(IndexLessonsTemplate)()} />
               <Route path="integrations/*" element={errorWrapper(IndexIntegrations)()} />

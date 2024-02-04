@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import { Typography, Card, CardHeader, CardContent, CardChannel, Grid, Avatar, Tooltip, Chip, Button, IconButton } from '@mui/material';
+import { Typography, Card, CardHeader, CardContent, CardMedia, Grid, Avatar, Tooltip, Chip, Button, IconButton } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import * as R from 'ramda';
@@ -15,10 +15,10 @@ import { fetchExerciseArticles, fetchChannels } from '../../../../actions/Channe
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import SearchFilter from '../../../../components/SearchFilter';
 import { useFormatter } from '../../../../components/i18n';
-import ChannelsFilter from '../../medias/channels/ChannelsFilter';
+import ChannelsFilter from '../../components/channels/ChannelsFilter';
 import { fetchDocuments } from '../../../../actions/Document';
 import ArticlePopover from './ArticlePopover';
-import ChannelIcon from '../../medias/channels/ChannelIcon';
+import ChannelIcon from '../../components/channels/ChannelIcon';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 
 const useStyles = makeStyles(() => ({
@@ -196,14 +196,14 @@ const Articles = () => {
                   {headersDocs.map((doc) => (
                     <Grid key={doc.document_id} item={true} xs={columns}>
                       {doc.document_type.includes('image/') && (
-                        <CardChannel
+                        <CardMedia
                           component="img"
                           height="150"
                           src={`/api/documents/${doc.document_id}/file`}
                         />
                       )}
                       {doc.document_type.includes('video/') && (
-                        <CardChannel
+                        <CardMedia
                           component="video"
                           height="150"
                           src={`/api/documents/${doc.document_id}/file`}
