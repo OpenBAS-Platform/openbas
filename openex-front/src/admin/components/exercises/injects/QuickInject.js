@@ -40,7 +40,7 @@ import { fetchExerciseArticles, fetchChannels } from '../../../../actions/Channe
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
-import TeamPopover from '../../persons/teams/TeamPopover';
+import TeamPopover from '../../teams/teams/TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddTeams from './InjectAddTeams';
 import { isExerciseUpdatable, isExerciseReadOnly, secondsFromToNow } from '../../../../utils/Exercise';
