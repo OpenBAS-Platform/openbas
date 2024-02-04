@@ -8,7 +8,6 @@ import io.openex.contract.fields.ContractElement;
 import io.openex.contract.fields.ContractExpectations;
 import io.openex.database.model.Variable.VariableType;
 import io.openex.injects.opencti.config.OpenCTIConfig;
-import io.openex.injects.ovh_sms.config.OvhSmsConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
