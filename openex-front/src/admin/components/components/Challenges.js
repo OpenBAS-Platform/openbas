@@ -7,7 +7,7 @@ import * as R from 'ramda';
 import { Link } from 'react-router-dom';
 import SearchFilter from '../../../components/SearchFilter';
 import useDataLoader from '../../../utils/ServerSideEvent';
-import { useHelper } from '../../../store.ts';
+import { useHelper } from '../../../store';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { fetchChallenges } from '../../../actions/Challenge';
 import ChallengePopover from './challenges/ChallengePopover';
