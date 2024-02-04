@@ -13,7 +13,6 @@ import { useAppDispatch } from './utils/hooks';
 import type { LoggedHelper } from './actions/helper';
 import Loader from './components/Loader';
 import { UserContext } from './utils/hooks/useAuth';
-import { ParametersHelper } from './actions/helper';
 
 const RootPublic = lazy(() => import('./public/Root'));
 const IndexPrivate = lazy(() => import('./private/Index'));
