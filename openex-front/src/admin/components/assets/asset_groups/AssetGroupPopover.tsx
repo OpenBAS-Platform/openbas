@@ -89,8 +89,9 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
   };
 
   return (
-    <div>
+    <>
       <IconButton
+        color="primary"
         onClick={(ev) => {
           ev.stopPropagation();
           setAnchorEl(ev.currentTarget);
@@ -186,7 +187,7 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
           )}
         </MuiDrawer>
       )}
-    </div>
+    </>
   );
 };
 

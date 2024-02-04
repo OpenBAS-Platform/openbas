@@ -51,8 +51,8 @@ const AttackPatternPopover = ({ attackPattern, killChainPhasesMap }) => {
     ]),
   )(attackPattern);
   return (
-    <div>
-      <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large">
+    <>
+      <IconButton color="primary" onClick={handlePopoverOpen} aria-haspopup="true" size="large">
         <MoreVert />
       </IconButton>
       <Menu
@@ -99,7 +99,7 @@ const AttackPatternPopover = ({ attackPattern, killChainPhasesMap }) => {
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 };
 

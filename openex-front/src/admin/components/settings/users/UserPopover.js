@@ -93,8 +93,8 @@ const UserPopover = ({ user, organizationsMap, tagsMap }) => {
     ]),
   )(user);
   return (
-    <div>
-      <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large">
+    <>
+      <IconButton color="primary" onClick={handlePopoverOpen} aria-haspopup="true" size="large">
         <MoreVert />
       </IconButton>
       <Menu
@@ -162,7 +162,7 @@ const UserPopover = ({ user, organizationsMap, tagsMap }) => {
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 };
 

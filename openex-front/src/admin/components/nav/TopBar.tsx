@@ -219,21 +219,14 @@ const TopBar: React.FC = () => {
           </div>
           <Divider className={classes.divider} orientation="vertical"/>
           <div className={classes.barRightContainer}>
-            <Tooltip title={t('Notifications and triggers')}>
+            <Tooltip title={t('Notifications')}>
               <IconButton
                 size="medium"
                 classes={{ root: classes.button }}
                 aria-haspopup="true"
                 component={Link}
                 to="/dashboard/profile/notifications"
-                color={
-                    [
-                      '/dashboard/profile/notifications',
-                      '/dashboard/profile/triggers',
-                    ].includes(location.pathname)
-                      ? 'primary'
-                      : 'default'
-                  }
+                color={location.pathname === '/dashboard/profile/notifications' ? 'primary' : 'default'}
               >
                 <NotificationsOutlined fontSize="medium"/>
               </IconButton>
