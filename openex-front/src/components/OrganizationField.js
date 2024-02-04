@@ -4,7 +4,7 @@ import { DomainOutlined } from '@mui/icons-material';
 import { Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import { connect } from 'react-redux';
-import OrganizationForm from '../admin/components/organizations/OrganizationForm';
+import OrganizationForm from '../admin/components/teams/organizations/OrganizationForm';
 import { fetchOrganizations, addOrganization } from '../actions/Organization';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';

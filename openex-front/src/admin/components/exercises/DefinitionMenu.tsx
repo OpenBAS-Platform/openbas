@@ -57,17 +57,17 @@ const DefinitionMenu: React.FC<Props> = ({ exerciseId }) => {
         </MenuItem>
         <MenuItem
           component={Link}
-          to={`/admin/exercises/${exerciseId}/definition/channel`}
+          to={`/admin/exercises/${exerciseId}/definition/articles`}
           selected={
             location.pathname
-            === `/admin/exercises/${exerciseId}/definition/channel`
+            === `/admin/exercises/${exerciseId}/definition/articles`
           }
           classes={{ root: classes.item }}
         >
           <ListItemIcon>
             <NewspaperVariantMultipleOutline />
           </ListItemIcon>
-          <ListItemText primary={t('Channel pressure')} />
+          <ListItemText primary={t('Media pressure')} />
         </MenuItem>
         <MenuItem
           component={Link}

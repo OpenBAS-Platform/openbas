@@ -1,4 +1,4 @@
-import type { AssetGroupStore } from '../../admin/components/assets/assetgroups/AssetGroup';
+import type { AssetGroupStore } from '../../admin/components/assets/asset_groups/AssetGroup';
 
 export interface AssetGroupsHelper {
   getAssetGroups: () => AssetGroupStore[];

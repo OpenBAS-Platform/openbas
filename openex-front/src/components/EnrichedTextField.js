@@ -8,8 +8,6 @@ import { makeStyles } from '@mui/styles';
 import classNames from 'classnames';
 import { useHelper } from '../store';
 import locale from '../utils/BrowserLanguage';
-import '../static/css/CKEditorDark.css';
-import '../static/css/CKEditorLight.css';
 
 const useStyles = makeStyles((theme) => ({
   errorColor: {

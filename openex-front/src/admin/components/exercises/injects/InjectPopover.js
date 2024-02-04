@@ -10,7 +10,6 @@ import {
   DialogActions,
   Button,
   IconButton,
-  Slide,
   Menu,
   MenuItem,
   Alert,
@@ -26,11 +25,7 @@ import inject18n from '../../../../components/i18n';
 import { splitDuration } from '../../../../utils/Time';
 import { isExerciseReadOnly, secondsFromToNow } from '../../../../utils/Exercise';
 import { tagOptions } from '../../../../utils/Option';
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
+import Transition from '../../../../components/common/Transition';
 
 class InjectPopover extends Component {
   constructor(props) {

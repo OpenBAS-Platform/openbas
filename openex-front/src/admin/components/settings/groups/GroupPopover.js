@@ -271,8 +271,9 @@ class GroupPopover extends Component {
       R.take(10),
     )(R.values(usersMap));
     return (
-      <div>
+      <>
         <IconButton
+          color="primary"
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
           size="large"
@@ -550,7 +551,7 @@ class GroupPopover extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-      </div>
+      </>
     );
   }
 }

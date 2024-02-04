@@ -8,7 +8,7 @@ import TechnicalExpectationAsset from '../expectations/TechnicalExpectationAsset
 import TechnicalExpectationAssetGroup from '../expectations/TechnicalExpectationAssetGroup';
 import ManualExpectations from '../expectations/ManualExpectations';
 import type { EndpointStore } from '../../../assets/endpoints/Endpoint';
-import type { AssetGroupStore } from '../../../assets/assetgroups/AssetGroup';
+import type { AssetGroupStore } from '../../../assets/asset_groups/AssetGroup';
 import type { Contract, Inject, Team } from '../../../../../utils/api-types';
 import type { InjectExpectationsStore } from '../../injects/expectations/Expectation';
 import { useAppDispatch } from '../../../../../utils/hooks';

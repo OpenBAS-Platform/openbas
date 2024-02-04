@@ -63,8 +63,9 @@ class KillChainPhasePopover extends Component {
       this.props.killChainPhase,
     );
     return (
-      <div>
+      <>
         <IconButton
+          color="primary"
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
           size="large"
@@ -121,7 +122,7 @@ class KillChainPhasePopover extends Component {
             />
           </DialogContent>
         </Dialog>
-      </div>
+      </>
     );
   }
 }

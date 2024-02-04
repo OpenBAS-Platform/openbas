@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-
 import { useFormatter } from '../../../../components/i18n';
 import type { EndpointInput } from '../../../../utils/api-types';
 import EndpointForm from './EndpointForm';
@@ -96,8 +95,9 @@ const EndpointPopover: React.FC<Props> = ({
   };
 
   return (
-    <div>
+    <>
       <IconButton
+        color="primary"
         onClick={(ev) => {
           ev.stopPropagation();
           setAnchorEl(ev.currentTarget);
@@ -169,7 +169,7 @@ const EndpointPopover: React.FC<Props> = ({
         handleSubmit={submitDelete}
         text={t('Do you want to delete the endpoint ?')}
       />
-    </div>
+    </>
   );
 };
 

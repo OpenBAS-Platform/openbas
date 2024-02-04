@@ -50,7 +50,7 @@ const EndpointCreation: FunctionComponent<Props> = ({
   };
 
   return (
-    <div>
+    <>
       {inline ? (
         <ListItemButton
           divider
@@ -92,7 +92,7 @@ const EndpointCreation: FunctionComponent<Props> = ({
           />
         </Drawer>
       )}
-    </div>
+    </>
   );
 };
 

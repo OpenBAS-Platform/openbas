@@ -5,7 +5,7 @@ import { errorWrapper } from '../../../components/Error';
 import Loader from '../../../components/Loader';
 
 const Endpoints = lazy(() => import('./endpoints/Endpoints'));
-const AssetGroups = lazy(() => import('./assetgroups/AssetGroups'));
+const AssetGroups = lazy(() => import('./asset_groups/AssetGroups'));
 
 const useStyles = makeStyles(() => ({
   root: {

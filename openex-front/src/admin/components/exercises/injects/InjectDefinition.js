@@ -39,7 +39,7 @@ import { fetchChannels, fetchExerciseArticles } from '../../../../actions/Channe
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
-import TeamPopover from '../../persons/teams/TeamPopover';
+import TeamPopover from '../../teams/teams/TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddTeams from './InjectAddTeams';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
@@ -48,21 +48,21 @@ import SwitchField from '../../../../components/SwitchField';
 import EnrichedTextField from '../../../../components/EnrichedTextField';
 import InjectAddDocuments from './InjectAddDocuments';
 import Loader from '../../../../components/Loader';
-import DocumentType from '../../medias/documents/DocumentType';
-import DocumentPopover from '../../medias/documents/DocumentPopover';
+import DocumentType from '../../components/documents/DocumentType';
+import DocumentPopover from '../../components/documents/DocumentPopover';
 import Select from '../../../../components/Select';
 import ArticlePopover from '../articles/ArticlePopover';
 import InjectAddArticles from './InjectAddArticles';
-import ChannelIcon from '../../medias/channels/ChannelIcon';
-import ChallengePopover from '../../challenges/ChallengePopover';
+import ChannelIcon from '../../components/channels/ChannelIcon';
+import ChallengePopover from '../../components/challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
 import InjectExpectations from './expectations/InjectExpectations';
 import EndpointsList from '../../assets/endpoints/EndpointsList';
 import EndpointPopover from '../../assets/endpoints/EndpointPopover';
 import InjectAddEndpoints from './endpoints/InjectAddEndpoints';
-import AssetGroupsList from '../../assets/assetgroups/AssetGroupsList';
-import AssetGroupPopover from '../../assets/assetgroups/AssetGroupPopover';
+import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
+import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
 import InjectAddAssetGroups from './assetgroups/InjectAddAssetGroups';
 
 const styles = (theme) => ({

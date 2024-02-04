@@ -4,7 +4,9 @@ import { connect } from 'react-redux';
 import withStyles from '@mui/styles/withStyles';
 import { Paper, Box } from '@mui/material';
 import * as R from 'ramda';
-import logo from '../../../static/images/logo.png';
+import { useTheme } from '@mui/styles';
+import logoDark from '../../../static/images/logo_dark.png';
+import logoLight from '../../../static/images/logo_light.png';
 import { askToken, checkKerberos, fetchParameters } from '../../../actions/Application';
 import LoginForm from './LoginForm';
 import inject18n from '../../../components/i18n';
@@ -31,6 +33,7 @@ const styles = () => ({
 });
 
 const Login = (props) => {
+  const theme = useTheme();
   const { classes, parameters, t } = props;
   const {
     auth_openid_enable: isOpenId,
@@ -65,7 +68,7 @@ const Login = (props) => {
   const marginTop = dimension.height / 2 - loginHeight / 2 - 200;
   return (
     <div className={classes.container} style={{ marginTop }}>
-      <img src={fileUri(logo)} alt="logo" className={classes.logo} />
+      <img src={fileUri(theme.palette.mode === 'dark' ? logoDark : logoLight)} alt="logo" className={classes.logo} />
       {isLocal && !reset && (
         <Paper variant="outlined">
           <LoginForm onSubmit={onSubmit} />

@@ -13,7 +13,7 @@ import CreateArticle from '../articles/CreateArticle';
 import { truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import Transition from '../../../../components/common/Transition';
-import ChannelIcon from '../../medias/channels/ChannelIcon';
+import ChannelIcon from '../../components/channels/ChannelIcon';
 
 const styles = (theme) => ({
   createButton: {

@@ -67,8 +67,9 @@ class TagPopover extends Component {
       this.props.tag,
     );
     return (
-      <div>
+      <>
         <IconButton
+          color="primary"
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
           size="large"
@@ -125,7 +126,7 @@ class TagPopover extends Component {
             />
           </DialogContent>
         </Dialog>
-      </div>
+      </>
     );
   }
 }

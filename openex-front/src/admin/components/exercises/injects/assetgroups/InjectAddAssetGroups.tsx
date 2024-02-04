@@ -6,7 +6,7 @@ import type { Theme } from '../../../../../components/Theme';
 import type { Exercise } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
 import { isExerciseReadOnly } from '../../../../../utils/Exercise';
-import AssetGroupDialogAdding from '../../../assets/assetgroups/AssetGroupDialogAdding';
+import AssetGroupDialogAdding from '../../../assets/asset_groups/AssetGroupDialogAdding';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {

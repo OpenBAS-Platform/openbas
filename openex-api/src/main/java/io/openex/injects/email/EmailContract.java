@@ -29,60 +29,60 @@ import static io.openex.helper.SupportedLanguage.fr;
 @Component
 public class EmailContract extends Contractor {
 
-  public static final String TYPE = "openex_email";
-  public static final String EMAIL_DEFAULT = "138ad8f8-32f8-4a22-8114-aaa12322bd09";
-  public static final String EMAIL_GLOBAL = "2790bd39-37d4-4e39-be7e-53f3ca783f86";
+    public static final String TYPE = "openex_email";
+    public static final String EMAIL_DEFAULT = "138ad8f8-32f8-4a22-8114-aaa12322bd09";
+    public static final String EMAIL_GLOBAL = "2790bd39-37d4-4e39-be7e-53f3ca783f86";
 
-  @Override
-  public boolean isExpose() {
-    return true;
-  }
+    @Override
+    public boolean isExpose() {
+        return true;
+    }
 
-  @Override
-  public String getType() {
-    return TYPE;
-  }
+    @Override
+    public String getType() {
+        return TYPE;
+    }
 
-  @Override
-  public ContractConfig getConfig() {
-    return new ContractConfig(TYPE, Map.of(en, "Email", fr, "Email"), "#cddc39", "/img/email.png", isExpose());
-  }
-  
-  @Override
-  public List<Contract> contracts() {
-    // variables
-    ContractVariable documentUriVariable = variable("document_uri",
-        "Http user link to upload the document (only for document expectation)", VariableType.String, One);
-    // Contracts
-    ContractExpectations expectationsField = expectationsField(
-        "expectations", "Expectations"
-    );
-    ContractConfig contractConfig = getConfig();
-    // Standard contract
-    List<ContractElement> standardInstance = contractBuilder()
-        .mandatory(teamField("teams", "Teams", Multiple))
-        .mandatory(textField("subject", "Subject"))
-        .mandatory(richTextareaField("body", "Body"))
-        // .optional(textField("inReplyTo", "InReplyTo", "HIDDEN")) - Use for direct injection
-        .optional(checkboxField("encrypted", "Encrypted", false))
-        .optional(attachmentField("attachments", "Attachments", Multiple))
-        .optional(expectationsField)
-        .build();
-    Contract standardEmail = executableContract(contractConfig, EMAIL_DEFAULT,
-        Map.of(en, "Send individual mails", fr, "Envoyer des mails individuels"), standardInstance);
-    standardEmail.addVariable(documentUriVariable);
-    // Global contract
-    List<ContractElement> globalInstance = contractBuilder()
-        .mandatory(teamField("teams", "Teams", Multiple))
-        .mandatory(textField("subject", "Subject"))
-        .mandatory(richTextareaField("body", "Body"))
-        // .mandatory(textField("inReplyTo", "InReplyTo", "HIDDEN"))  - Use for direct injection
-        .optional(attachmentField("attachments", "Attachments", Multiple))
-        .optional(expectationsField)
-        .build();
-    Contract globalEmail = executableContract(contractConfig, EMAIL_GLOBAL,
-        Map.of(en, "Send multi-recipients mail", fr, "Envoyer un mail multi-destinataires"), globalInstance);
-    globalEmail.addVariable(documentUriVariable);
-    return List.of(standardEmail, globalEmail);
-  }
+    @Override
+    public ContractConfig getConfig() {
+        return new ContractConfig(TYPE, Map.of(en, "Email", fr, "Email"), "#cddc39", "#cddc39", "/img/email.png", isExpose());
+    }
+
+    @Override
+    public List<Contract> contracts() {
+        // variables
+        ContractVariable documentUriVariable = variable("document_uri",
+                "Http user link to upload the document (only for document expectation)", VariableType.String, One);
+        // Contracts
+        ContractExpectations expectationsField = expectationsField(
+                "expectations", "Expectations"
+        );
+        ContractConfig contractConfig = getConfig();
+        // Standard contract
+        List<ContractElement> standardInstance = contractBuilder()
+                .mandatory(teamField("teams", "Teams", Multiple))
+                .mandatory(textField("subject", "Subject"))
+                .mandatory(richTextareaField("body", "Body"))
+                // .optional(textField("inReplyTo", "InReplyTo", "HIDDEN")) - Use for direct injection
+                .optional(checkboxField("encrypted", "Encrypted", false))
+                .optional(attachmentField("attachments", "Attachments", Multiple))
+                .optional(expectationsField)
+                .build();
+        Contract standardEmail = executableContract(contractConfig, EMAIL_DEFAULT,
+                Map.of(en, "Send individual mails", fr, "Envoyer des mails individuels"), standardInstance);
+        standardEmail.addVariable(documentUriVariable);
+        // Global contract
+        List<ContractElement> globalInstance = contractBuilder()
+                .mandatory(teamField("teams", "Teams", Multiple))
+                .mandatory(textField("subject", "Subject"))
+                .mandatory(richTextareaField("body", "Body"))
+                // .mandatory(textField("inReplyTo", "InReplyTo", "HIDDEN"))  - Use for direct injection
+                .optional(attachmentField("attachments", "Attachments", Multiple))
+                .optional(expectationsField)
+                .build();
+        Contract globalEmail = executableContract(contractConfig, EMAIL_GLOBAL,
+                Map.of(en, "Send multi-recipients mail", fr, "Envoyer un mail multi-destinataires"), globalInstance);
+        globalEmail.addVariable(documentUriVariable);
+        return List.of(standardEmail, globalEmail);
+    }
 }

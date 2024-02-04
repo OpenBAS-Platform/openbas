@@ -67,7 +67,7 @@ const Drawer: FunctionComponent<DrawerProps> = ({
         >
           <Close fontSize="small" color="primary" />
         </IconButton>
-        <Typography variant="h6">{title}</Typography>
+        <Typography variant="subtitle2">{title}</Typography>
       </div>
       <div className={classes.container}>{component}</div>
     </DrawerMUI>
