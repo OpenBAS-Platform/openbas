@@ -258,9 +258,9 @@ const TopBar: React.FC = () => {
                 <div className={classes.subtitle}>{t('Filigran eXtended Threat Management')}</div>
                 <Grid container={true} spacing={3}>
                   <Grid item={true} xs={6}>
-                    <Tooltip title={settings.xtm_opencti_url ? t('Platform connected') : t('Get OpenCTI now')}>
-                      <a className={classes.xtmItem} href={settings.xtm_opencti_url || 'https://filigran.io/solutions/products/opencti-threat-intelligence/'} target="_blank" rel="noreferrer">
-                        <Badge variant="dot" color={settings.xtm_opencti_url ? 'success' : 'warning'}>
+                    <Tooltip title={settings.xtm_opencti_enable && settings.xtm_opencti_url ? t('Platform connected') : t('Get OpenCTI now')}>
+                      <a className={classes.xtmItem} href={settings.xtm_opencti_enable && settings.xtm_opencti_url ? settings.xtm_opencti_url : 'https://filigran.io/solutions/products/opencti-threat-intelligence/'} target="_blank" rel="noreferrer">
+                        <Badge variant="dot" color={settings.xtm_opencti_enable && settings.xtm_opencti_url ? 'success' : 'warning'}>
                           <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? octiDark : octiLight} alt="OCTI" />
                         </Badge>
                         <div className={classes.product}>OpenCTI</div>

@@ -44,9 +44,6 @@ public class OpenExConfig {
   @JsonProperty("default_mailer")
   private String defaultMailer;
 
-  @JsonProperty("xtm_opencti_url")
-  private String xtmOpenCTIUrl;
-
   @JsonIgnore
   private String cookieName = "openex_token";
 

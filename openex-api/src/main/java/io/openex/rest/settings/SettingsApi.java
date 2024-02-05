@@ -153,6 +153,7 @@ public class SettingsApi extends RestBehavior {
       settings.add(new PlatformSetting("map_tile_server_light", openExConfig.getMapTileServerLight()));
       settings.add(new PlatformSetting("map_tile_server_dark", openExConfig.getMapTileServerDark()));
       settings.add(buildPlatformSetting(dbSettings, PLATFORM_NAME));
+      settings.add(new PlatformSetting("xtm_opencti_enable", openCTIConfig.getEnable()));
       settings.add(new PlatformSetting("xtm_opencti_url", openCTIConfig.getUrl()));
       // Build admin settings
       if (user.isAdmin()) {

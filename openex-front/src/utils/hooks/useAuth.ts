@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 
 export interface Settings {
+  xtm_opencti_enable?: boolean | null;
   xtm_opencti_url?: string | null;
 }
 
