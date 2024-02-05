@@ -20,7 +20,7 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
   @NotNull
   Optional<User> findById(@NotNull String id);
 
-  Optional<User> findByEmail(String email);
+  Optional<User> findByEmailIgnoreCase(String email);
 
   List<User> findAllByEmailIn(List<String> emails);
 
