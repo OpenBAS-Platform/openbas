@@ -58,13 +58,22 @@ class UserApiTest extends IntegrationTest {
             }
             @Test
             void given_known_login_user_in_uppercase_input_should_throw_AccessDeniedException() throws Exception {
-                LoginUserInput loginUserInput = UserFixture.getLoginUserInput();
+                LoginUserInput loginUserInput = UserFixture.getDefault().login("USER@filigran.io").build();
 
                 mvc.perform(post("/api/login")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(loginUserInput)))
-                        .andExpect(status().is4xxClientError());
+                        .andExpect(status().is2xxSuccessful());
 
+            }
+            @Test
+            void given_known_login_user_in_alternatingcase_input_should_throw_AccessDeniedException() throws Exception {
+                LoginUserInput loginUserInput = UserFixture.getDefault().login("uSeR@filigran.io").build();
+
+                mvc.perform(post("/api/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(loginUserInput)))
+                        .andExpect(status().is2xxSuccessful());
             }
         }
     }
