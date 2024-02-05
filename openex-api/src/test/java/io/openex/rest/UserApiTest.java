@@ -43,7 +43,27 @@ class UserApiTest extends IntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(loginUserInput)))
                         .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("login").value("email@test.io"));
+                        .andExpect(jsonPath("login").value("\"user@filigran.io"));
+
+            }
+            @Test
+            void given_unknown_login_user_input_should_throw_AccessDeniedException() throws Exception {
+                LoginUserInput loginUserInput = UserFixture.getLoginUserInput();
+
+                mvc.perform(post("/api/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(loginUserInput)))
+                        .andExpect(status().is4xxClientError());
+
+            }
+            @Test
+            void given_known_login_user_in_uppercase_input_should_throw_AccessDeniedException() throws Exception {
+                LoginUserInput loginUserInput = UserFixture.getLoginUserInput();
+
+                mvc.perform(post("/api/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(loginUserInput)))
+                        .andExpect(status().is4xxClientError());
 
             }
         }
