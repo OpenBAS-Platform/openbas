@@ -43,12 +43,13 @@ class UserApiTest extends IntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(loginUserInput)))
                         .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("login").value("\"user@filigran.io"));
+                        .andExpect(jsonPath("login").value("user@filigran.io"));
 
             }
+
             @Test
             void given_unknown_login_user_input_should_throw_AccessDeniedException() throws Exception {
-                LoginUserInput loginUserInput = UserFixture.getLoginUserInput();
+                LoginUserInput loginUserInput = UserFixture.getDefault().login("unknown@filigran.io").password("dontcare").build();
 
                 mvc.perform(post("/api/login")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -56,24 +57,28 @@ class UserApiTest extends IntegrationTest {
                         .andExpect(status().is4xxClientError());
 
             }
+
             @Test
             void given_known_login_user_in_uppercase_input_should_return_user() throws Exception {
-                LoginUserInput loginUserInput = UserFixture.getDefault().login("USER@filigran.io").build();
+                LoginUserInput loginUserInput = UserFixture.getDefaultWithPwd().login("USER@filigran.io").build();
 
                 mvc.perform(post("/api/login")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(loginUserInput)))
-                        .andExpect(status().is2xxSuccessful());
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(jsonPath("login").value("user@filigran.io"));
 
             }
+
             @Test
             void given_known_login_user_in_alternatingcase_input_should_return_user() throws Exception {
-                LoginUserInput loginUserInput = UserFixture.getDefault().login("uSeR@filigran.io").build();
+                LoginUserInput loginUserInput = UserFixture.getDefaultWithPwd().login("uSeR@filigran.io").build();
 
                 mvc.perform(post("/api/login")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(loginUserInput)))
-                        .andExpect(status().is2xxSuccessful());
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(jsonPath("login").value("user@filigran.io"));
             }
         }
     }
