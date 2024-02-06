@@ -27,11 +27,11 @@ class UserApiTest extends IntegrationTest {
     private UserRepository userRepository;
 
     @BeforeAll
-    public void setup(){
+    public void setup() {
         // Create user
         User user = new User();
-        user.setPassword(UserFixture.PASSWORD);
         user.setEmail(UserFixture.EMAIL);
+        user.setPassword(UserFixture.ENCODED_PASSWORD);
 
         this.userRepository.save(user);
     }
