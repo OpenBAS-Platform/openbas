@@ -2,11 +2,15 @@ package io.openex.rest.user.form.login;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
+import lombok.*;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
 @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoginUserInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
@@ -17,19 +21,4 @@ public class LoginUserInput {
     @JsonProperty("user_password")
     private String password;
 
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
