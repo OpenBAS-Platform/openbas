@@ -14,11 +14,10 @@ import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 public class LoginUserInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("user_login")
     private String login;
 
     @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("user_password")
+    @JsonProperty
     private String password;
 
 }
