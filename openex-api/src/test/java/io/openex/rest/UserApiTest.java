@@ -48,6 +48,7 @@ class UserApiTest extends IntegrationTest {
         @Nested
         @DisplayName("Logging in by email")
         class LoggingInByEmail {
+            @DisplayName("Retrieve user by email in lowercase succeed")
             @Test
             @WithMockUser
             void given_known_login_user_input_should_return_user() throws Exception {
@@ -61,6 +62,7 @@ class UserApiTest extends IntegrationTest {
 
             }
 
+            @DisplayName("Retrieve user by email failed")
             @Test
             @WithMockUser
             void given_unknown_login_user_input_should_throw_AccessDeniedException() throws Exception {
@@ -73,6 +75,7 @@ class UserApiTest extends IntegrationTest {
 
             }
 
+            @DisplayName("Retrieve user by email in uppercase succeed")
             @Test
             @WithMockUser
             void given_known_login_user_in_uppercase_input_should_return_user() throws Exception {
@@ -86,6 +89,7 @@ class UserApiTest extends IntegrationTest {
 
             }
 
+            @DisplayName("Retrieve user by email in alternatingcase succeed")
             @Test
             @WithMockUser
             void given_known_login_user_in_alternatingcase_input_should_return_user() throws Exception {
