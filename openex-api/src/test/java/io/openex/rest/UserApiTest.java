@@ -1,6 +1,7 @@
 package io.openex.rest;
 
 import io.openex.IntegrationTest;
+import io.openex.database.model.User;
 import io.openex.database.repository.UserRepository;
 import io.openex.rest.user.form.login.LoginUserInput;
 import io.openex.rest.utils.fixtures.UserFixture;
@@ -24,6 +25,16 @@ class UserApiTest extends IntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @BeforeAll
+    public void setup(){
+        // Create user
+        User user = new User();
+        user.setPassword(UserFixture.PASSWORD);
+        user.setEmail(UserFixture.EMAIL);
+
+        this.userRepository.save(user);
+    }
 
 
     @AfterAll
