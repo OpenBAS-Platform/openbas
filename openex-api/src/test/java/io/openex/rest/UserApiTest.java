@@ -57,7 +57,7 @@ class UserApiTest extends IntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(loginUserInput)))
                         .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("login").value(UserFixture.EMAIL));
+                        .andExpect(jsonPath("user_email").value(UserFixture.EMAIL));
 
             }
 
@@ -82,7 +82,7 @@ class UserApiTest extends IntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(loginUserInput)))
                         .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("login").value(UserFixture.EMAIL));
+                        .andExpect(jsonPath("user_email").value(UserFixture.EMAIL));
 
             }
 
@@ -95,7 +95,7 @@ class UserApiTest extends IntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(loginUserInput)))
                         .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("login").value(UserFixture.EMAIL));
+                        .andExpect(jsonPath("user_email").value(UserFixture.EMAIL));
             }
         }
     }
