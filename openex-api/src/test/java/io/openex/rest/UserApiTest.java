@@ -20,6 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestInstance(PER_CLASS)
 class UserApiTest extends IntegrationTest {
 
+    private User savedUser;
+
     @Autowired
     private MockMvc mvc;
 
@@ -33,13 +35,13 @@ class UserApiTest extends IntegrationTest {
         user.setEmail(UserFixture.EMAIL);
         user.setPassword(UserFixture.ENCODED_PASSWORD);
 
-        this.userRepository.save(user);
+        savedUser = this.userRepository.save(user);
     }
 
 
     @AfterAll
     public void teardown() {
-        this.userRepository.deleteAll();
+        this.userRepository.deleteById(savedUser.getId());
     }
 
     @Nested
