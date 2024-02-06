@@ -4,6 +4,7 @@ import io.openex.IntegrationTest;
 import io.openex.database.model.User;
 import io.openex.database.repository.UserRepository;
 import io.openex.rest.user.form.login.LoginUserInput;
+import io.openex.rest.utils.WithMockObserverUser;
 import io.openex.rest.utils.fixtures.UserFixture;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,7 @@ class UserApiTest extends IntegrationTest {
         @DisplayName("Logging in by email")
         class LoggingInByEmail {
             @Test
+            @WithMockObserverUser
             void given_known_login_user_input_should_return_user() throws Exception {
                 LoginUserInput loginUserInput = UserFixture.getLoginUserInput();
 
@@ -59,6 +61,7 @@ class UserApiTest extends IntegrationTest {
             }
 
             @Test
+            @WithMockObserverUser
             void given_unknown_login_user_input_should_throw_AccessDeniedException() throws Exception {
                 LoginUserInput loginUserInput = UserFixture.getDefault().login("unknown@filigran.io").password("dontcare").build();
 
@@ -70,6 +73,7 @@ class UserApiTest extends IntegrationTest {
             }
 
             @Test
+            @WithMockObserverUser
             void given_known_login_user_in_uppercase_input_should_return_user() throws Exception {
                 LoginUserInput loginUserInput = UserFixture.getDefaultWithPwd().login("USER@filigran.io").build();
 
@@ -82,6 +86,7 @@ class UserApiTest extends IntegrationTest {
             }
 
             @Test
+            @WithMockObserverUser
             void given_known_login_user_in_alternatingcase_input_should_return_user() throws Exception {
                 LoginUserInput loginUserInput = UserFixture.getDefaultWithPwd().login("uSeR@filigran.io").build();
 
