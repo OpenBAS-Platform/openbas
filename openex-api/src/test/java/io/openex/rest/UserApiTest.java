@@ -1,16 +1,16 @@
 package io.openex.rest;
 
 import io.openex.IntegrationTest;
-import io.openex.database.model.User;
 import io.openex.database.repository.UserRepository;
 import io.openex.rest.user.form.login.LoginUserInput;
-import io.openex.rest.utils.WithMockObserverUser;
 import io.openex.rest.utils.fixtures.UserFixture;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.rest.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -26,15 +26,6 @@ class UserApiTest extends IntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
-    @BeforeAll
-    public void setup() {
-        // Create user
-        User user = new User();
-        user.setPassword(UserFixture.PASSWORD);
-        user.setEmail(UserFixture.EMAIL);
-
-        this.userRepository.save(user);
-    }
 
     @AfterAll
     public void teardown() {
@@ -48,7 +39,7 @@ class UserApiTest extends IntegrationTest {
         @DisplayName("Logging in by email")
         class LoggingInByEmail {
             @Test
-            @WithMockObserverUser
+            @WithMockUser(roles = ROLE_USER)
             void given_known_login_user_input_should_return_user() throws Exception {
                 LoginUserInput loginUserInput = UserFixture.getLoginUserInput();
 
@@ -61,7 +52,7 @@ class UserApiTest extends IntegrationTest {
             }
 
             @Test
-            @WithMockObserverUser
+            @WithMockUser(roles = ROLE_USER)
             void given_unknown_login_user_input_should_throw_AccessDeniedException() throws Exception {
                 LoginUserInput loginUserInput = UserFixture.getDefault().login("unknown@filigran.io").password("dontcare").build();
 
@@ -73,7 +64,7 @@ class UserApiTest extends IntegrationTest {
             }
 
             @Test
-            @WithMockObserverUser
+            @WithMockUser(roles = ROLE_USER)
             void given_known_login_user_in_uppercase_input_should_return_user() throws Exception {
                 LoginUserInput loginUserInput = UserFixture.getDefaultWithPwd().login("USER@filigran.io").build();
 
@@ -86,7 +77,7 @@ class UserApiTest extends IntegrationTest {
             }
 
             @Test
-            @WithMockObserverUser
+            @WithMockUser(roles = ROLE_USER)
             void given_known_login_user_in_alternatingcase_input_should_return_user() throws Exception {
                 LoginUserInput loginUserInput = UserFixture.getDefaultWithPwd().login("uSeR@filigran.io").build();
 
