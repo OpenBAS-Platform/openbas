@@ -1,3 +1,5 @@
 import { Scenario } from '../../utils/api-types';
 
-export type ScenarioStore = Scenario;
+export type ScenarioStore = Omit<Scenario, 'scenario_tags'> & {
+  scenario_tags: string[] | undefined;
+};

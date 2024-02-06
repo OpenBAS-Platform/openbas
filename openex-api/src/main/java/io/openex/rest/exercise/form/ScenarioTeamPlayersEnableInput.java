@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class ExerciseUpdateTeamsInput {
+public class ScenarioTeamPlayersEnableInput {
 
-    @JsonProperty("exercise_teams")
-    private List<String> teamIds = new ArrayList<>();
+    @JsonProperty("scenario_team_players")
+    private List<String> playersIds = new ArrayList<>();
 
 }

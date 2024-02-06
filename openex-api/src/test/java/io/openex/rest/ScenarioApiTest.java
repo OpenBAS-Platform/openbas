@@ -1,7 +1,7 @@
 package io.openex.rest;
 
 import com.jayway.jsonpath.JsonPath;
-import io.openex.rest.scenario.form.ScenarioCreateInput;
+import io.openex.rest.scenario.form.ScenarioInput;
 import io.openex.rest.utils.WithMockObserverUser;
 import io.openex.rest.utils.WithMockPlannerUser;
 import org.junit.jupiter.api.*;
@@ -37,24 +37,24 @@ public class ScenarioApiTest {
   @WithMockUser
   void createScenarioTest() throws Exception {
     // -- PREPARE --
-    ScenarioCreateInput scenarioCreateInput = new ScenarioCreateInput();
+    ScenarioInput scenarioInput = new ScenarioInput();
 
     // -- EXECUTE & ASSERT --
     this.mvc
         .perform(post(SCENARIO_URI)
-            .content(asJsonString(scenarioCreateInput))
+            .content(asJsonString(scenarioInput))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is4xxClientError());
 
     // -- PREPARE --
     String name = "My scenario";
-    scenarioCreateInput.setName(name);
+    scenarioInput.setName(name);
 
     // -- EXECUTE --
     String response = this.mvc
         .perform(post(SCENARIO_URI)
-            .content(asJsonString(scenarioCreateInput))
+            .content(asJsonString(scenarioInput))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful())

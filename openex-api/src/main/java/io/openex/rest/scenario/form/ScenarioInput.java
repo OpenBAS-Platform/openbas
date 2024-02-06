@@ -10,7 +10,7 @@ import java.util.List;
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
 @Data
-public class ScenarioCreateInput {
+public class ScenarioInput {
 
   @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("scenario_name")

@@ -5,8 +5,7 @@ import { useAppDispatch } from '../../../utils/hooks';
 import { addScenario } from '../../../actions/scenarios/scenario-actions';
 import Drawer from '../../../components/common/Drawer';
 import ScenarioForm from './ScenarioForm';
-import { ScenarioCreateInput } from '../../../utils/api-types';
-
+import { ScenarioInput } from '../../../utils/api-types';
 
 interface Props {
 
@@ -18,7 +17,7 @@ const ScenarioCreation: FunctionComponent<Props> = ({}) => {
   const { t } = useFormatter();
 
   const dispatch = useAppDispatch();
-  const onSubmit = (data: ScenarioCreateInput) => {
+  const onSubmit = (data: ScenarioInput) => {
     dispatch(addScenario(data));
     setOpen(false);
   };

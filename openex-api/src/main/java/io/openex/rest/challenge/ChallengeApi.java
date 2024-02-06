@@ -11,8 +11,10 @@ import io.openex.rest.challenge.response.ChallengeResult;
 import io.openex.rest.challenge.response.ChallengesReader;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.service.ChallengeService;
+import io.openex.service.ScenarioService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +29,7 @@ import java.util.regex.Pattern;
 import static io.openex.config.OpenExAnonymous.ANONYMOUS;
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.helper.StreamHelper.fromIterable;
+import static io.openex.rest.scenario.ScenarioApi.SCENARIO_URI;
 
 @RestController
 public class ChallengeApi extends RestBehavior {
@@ -39,6 +42,7 @@ public class ChallengeApi extends RestBehavior {
   private InjectExpectationRepository injectExpectationRepository;
   private ChallengeService challengeService;
   private UserRepository userRepository;
+  private ScenarioService scenarioService;
 
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
@@ -78,6 +82,11 @@ public class ChallengeApi extends RestBehavior {
   @Autowired
   public void setExerciseRepository(ExerciseRepository exerciseRepository) {
     this.exerciseRepository = exerciseRepository;
+  }
+
+  @Autowired
+  public void setScenarioService(final ScenarioService scenarioService) {
+    this.scenarioService = scenarioService;
   }
 
   @GetMapping("/api/challenges")
@@ -228,4 +237,14 @@ public class ChallengeApi extends RestBehavior {
     }
     return playerChallenges(exerciseId, userId);
   }
+
+  // -- SCENARIOS --
+
+  @PreAuthorize("isScenarioObserver(#scenarioId)")
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/challenges")
+  public Iterable<Challenge> scenarioChallenges(@PathVariable @NotBlank final String scenarioId) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    return this.challengeService.getScenarioChallenges(scenario);
+  }
+
 }

@@ -146,6 +146,7 @@ export interface Challenge {
   challenge_updated_at?: string;
   /** @format date-time */
   challenge_virtual_publication?: string;
+  scenarioIds?: string[];
   updateAttributes?: object;
 }
 
@@ -1257,6 +1258,7 @@ export interface Scenario {
   scenario_documents?: Document[];
   scenario_id: string;
   scenario_injects?: Inject[];
+  scenario_injects_statistics?: Record<string, number>;
   scenario_lessons_categories?: LessonsCategory[];
   scenario_mail_from: string;
   scenario_message_footer?: string;
@@ -1267,12 +1269,21 @@ export interface Scenario {
   scenario_subtitle?: string;
   scenario_tags?: Tag[];
   scenario_teams?: Team[];
+  scenario_teams_users?: ScenarioTeamUser[];
   /** @format date-time */
   scenario_updated_at?: string;
+  /** @format int64 */
+  scenario_users_number?: number;
   updateAttributes?: object;
 }
 
-export interface ScenarioCreateInput {
+export interface ScenarioInformationsInput {
+  scenario_mail_from: string;
+  scenario_message_footer?: string;
+  scenario_message_header?: string;
+}
+
+export interface ScenarioInput {
   scenario_description?: string;
   scenario_name: string;
   scenario_subtitle?: string;
@@ -1284,6 +1295,12 @@ export interface ScenarioSimple {
   scenario_name?: string;
   scenario_subtitle?: string;
   scenario_tags?: Tag[];
+}
+
+export interface ScenarioTeamUser {
+  scenario_id?: Scenario;
+  team_id?: Team;
+  user_id?: User;
 }
 
 export interface SettingsUpdateInput {
@@ -1325,7 +1342,7 @@ export interface Team {
   team_description?: string;
   team_exercises?: Exercise[];
   team_exercises_users?: ExerciseTeamUser[];
-  team_id?: string;
+  team_id: string;
   team_inject_expectations?: InjectExpectation[];
   team_injects?: Inject[];
   /** @format int64 */
@@ -1491,6 +1508,7 @@ export interface Variable {
   variable_id: string;
   /** @pattern ^[a-z_]+$ */
   variable_key: string;
+  variable_scenario?: Scenario;
   variable_type: "String" | "Object";
   /** @format date-time */
   variable_updated_at?: string;

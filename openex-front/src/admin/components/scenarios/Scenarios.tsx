@@ -1,4 +1,9 @@
 import { makeStyles } from '@mui/styles';
+import { CSVLink } from 'react-csv';
+import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { ChevronRightOutlined, FileDownloadOutlined, MovieFilterOutlined } from '@mui/icons-material';
+import React, { CSSProperties } from 'react';
+import { Link } from 'react-router-dom';
 import { useAppDispatch } from '../../../utils/hooks';
 import { useFormatter } from '../../../components/i18n';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
@@ -10,13 +15,8 @@ import { fetchScenarios } from '../../../actions/scenarios/scenario-actions';
 import { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
-import { CSVLink } from 'react-csv';
 import { exportData } from '../../../utils/Environment';
-import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
-import { ChevronRightOutlined, FileDownloadOutlined, MovieFilterOutlined } from '@mui/icons-material';
 import ItemTags from '../../../components/ItemTags';
-import React, { CSSProperties } from 'react';
-import { Link } from 'react-router-dom';
 import ScenarioCreation from './ScenarioCreation';
 
 const useStyles = makeStyles(() => ({
@@ -182,12 +182,16 @@ const Scenarios = () => {
             primary={
               <div>
                 {fields.map((header) => (
-                  filtering.buildHeader(
-                    header.name,
-                    header.label,
-                    header.isSortable,
-                    inlineStylesHeaders,
-                  )
+                  <div key={header.name}>
+                    {
+                      filtering.buildHeader(
+                        header.name,
+                        header.label,
+                        header.isSortable,
+                        inlineStylesHeaders,
+                      )
+                    }
+                  </div>
                 ))
                 }
               </div>
@@ -211,8 +215,10 @@ const Scenarios = () => {
                 <div>
                   {fields.map((field) => (
                     <div
+                      key={field.name}
                       className={classes.bodyItem}
-                      style={inlineStyles[field.name]}>
+                      style={inlineStyles[field.name]}
+                    >
                       {field.value(scenario)}
                     </div>
                   ))}

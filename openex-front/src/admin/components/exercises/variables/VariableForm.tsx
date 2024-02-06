@@ -54,7 +54,7 @@ const VariableForm: React.FC<Props> = ({
     <form id="variableForm" onSubmit={handleSubmit(onSubmit)}>
       <MuiTextField
         variant="standard"
-        fullWidth={true}
+        fullWidth
         label={t('Key')}
         error={!!errors.variable_key}
         helperText={errors.variable_key && errors.variable_key?.message}
@@ -71,8 +71,8 @@ const VariableForm: React.FC<Props> = ({
       />
       <MuiTextField
         variant="standard"
-        fullWidth={true}
-        multiline={true}
+        fullWidth
+        multiline
         rows={2}
         label={t('Description')}
         style={{ marginTop: 20 }}

@@ -15,6 +15,7 @@ import TopMenuComponents from './TopMenuComponents';
 import TopMenuIntegrations from './TopMenuIntegrations';
 import TopMenuChallenges from './TopMenuChallenges';
 import TopMenuLessons from './TopMenuLessons';
+import ImportUploaderExercise from '../exercises/ImportUploaderExercise';
 import TopMenuChannel from './TopMenuChannel';
 import TopMenuProfile from './TopMenuProfile';
 import type { Theme } from '../../../components/Theme';
@@ -31,6 +32,8 @@ import omtdDark from '../../../static/images/xtm/omtd_dark.png';
 import omtdLight from '../../../static/images/xtm/omtd_light.png';
 import useAuth from '../../../utils/hooks/useAuth';
 import TopMenuScenarios from '../scenarios/TopMenuScenarios';
+import TopMenuScenario from '../scenarios/scenario/TopMenuScenario';
+import ImportUploaderScenario from '../scenarios/ImportUploaderScenario';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   appBar: {
@@ -179,9 +182,12 @@ const TopBar: React.FC = () => {
             <TopMenuDashboard />
           )}
           {location.pathname === '/admin/exercises' && <TopMenuExercises />}
-          {location.pathname === '/admin/scenarios' && <TopMenuScenarios />}
           {location.pathname.includes('/admin/exercises/') && (
             <TopMenuExercise />
+          )}
+          {location.pathname === '/admin/scenarios' && <TopMenuScenarios />}
+          {location.pathname.includes('/admin/scenarios/') && (
+            <TopMenuScenario />
           )}
           {location.pathname.includes('/admin/assets') && <TopMenuAssets />}
           {location.pathname.includes('/admin/teams') && <TopMenuTeams />}

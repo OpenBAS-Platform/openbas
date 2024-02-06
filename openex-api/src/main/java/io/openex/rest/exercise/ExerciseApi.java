@@ -57,6 +57,8 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 @Secured(ROLE_USER)
 public class ExerciseApi extends RestBehavior {
 
+  public static final String EXERCISE_URI = "/api/exercises";
+
   private static final Logger LOGGER = Logger.getLogger(ExerciseApi.class.getName());
 
   // region properties
@@ -75,8 +77,6 @@ public class ExerciseApi extends RestBehavior {
   private TagRepository tagRepository;
   private UserRepository userRepository;
   private PauseRepository pauseRepository;
-  private GroupRepository groupRepository;
-  private GrantRepository grantRepository;
   private GrantService grantService;
   private DocumentRepository documentRepository;
   private ExerciseRepository exerciseRepository;
@@ -140,18 +140,8 @@ public class ExerciseApi extends RestBehavior {
   }
 
   @Autowired
-  public void setGrantRepository(GrantRepository grantRepository) {
-    this.grantRepository = grantRepository;
-  }
-
-  @Autowired
   public void setGrantService(@NotBlank final GrantService grantService)  {
     this.grantService = grantService;
-  }
-
-  @Autowired
-  public void setGroupRepository(GroupRepository groupRepository) {
-    this.groupRepository = groupRepository;
   }
 
   @Autowired

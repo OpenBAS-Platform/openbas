@@ -109,13 +109,11 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_exercise")
   private Exercise exercise;
 
-  @Getter
-  @Setter
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "inject_scenario")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_scenario")
-  private Scenario scenario; // TODO: verify is used
+  private Scenario scenario;
 
   @Getter
   @ManyToOne(fetch = FetchType.LAZY)

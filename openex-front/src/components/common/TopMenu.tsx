@@ -1,9 +1,9 @@
 import { makeStyles } from '@mui/styles';
-import type { Theme } from '../Theme';
 import React, { FunctionComponent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useFormatter } from '../i18n';
 import { Button } from '@mui/material';
+import { useFormatter } from '../i18n';
+import type { Theme } from '../Theme';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   button: {
@@ -23,30 +23,38 @@ export interface MenuEntry {
   label: string;
 }
 
-const TopMenu: FunctionComponent<{ entries: MenuEntry[] }> = ({
-  entries
+const TopMenu: FunctionComponent<{ entries: MenuEntry[], contextual?: boolean }> = ({
+  entries,
+  contextual,
 }) => {
   const location = useLocation();
   const classes = useStyles();
   const { t } = useFormatter();
 
+  const buttons = () => (
+    entries.map((entry, idx) => {
+      return (
+        <Button
+          key={idx}
+          component={Link}
+          to={entry.path}
+          size="small"
+          variant={location.pathname === entry.path ? 'contained' : 'text'}
+          color={location.pathname === entry.path ? 'secondary' : 'primary'}
+          classes={{ root: classes.button }}
+        >
+          {t(entry.label)}
+        </Button>
+      );
+    })
+  );
+
+  if (contextual) {
+    return <>{buttons()}</>;
+  }
   return (
     <div className={classes.bar}>
-      {entries.map((entry, idx) => {
-        return (
-          <Button
-            key={idx}
-            component={Link}
-            to={entry.path}
-            size="small"
-            variant={location.pathname === entry.path ? 'contained' : 'text'}
-            color={location.pathname === entry.path ? 'secondary' : 'primary'}
-            classes={{ root: classes.button }}
-          >
-            {t(entry.label)}
-          </Button>
-        );
-      })}
+      {buttons()}
     </div>
   );
 };

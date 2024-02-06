@@ -41,7 +41,7 @@ public class VariableServiceTest {
     variable.setKey(variableKey);
 
     // -- EXECUTE --
-    Variable variableCreated = this.variableService.createVariable(exerciseCreated.getId(), variable);
+    Variable variableCreated = this.variableService.createVariableForExercise(exerciseCreated.getId(), variable);
     VARIABLE_ID = variableCreated.getId();
     assertNotNull(variableCreated);
     assertNotNull(variableCreated.getId());
@@ -58,7 +58,7 @@ public class VariableServiceTest {
     Variable variable = this.variableService.variable(VARIABLE_ID);
     assertNotNull(variable);
 
-    List<Variable> variables = this.variableService.variables(EXERCISE_ID);
+    List<Variable> variables = this.variableService.variablesFromExercise(EXERCISE_ID);
     assertNotNull(variable);
     assertEquals(VARIABLE_ID, variables.get(0).getId());
   }

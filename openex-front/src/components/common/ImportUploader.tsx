@@ -1,22 +1,24 @@
-import React, { ChangeEvent, useRef, useState } from 'react';
+import React, { ChangeEvent, FunctionComponent, useRef, useState } from 'react';
+import { useFormatter } from '../i18n';
+import { useHelper } from '../../store';
+import type { UsersHelper } from '../../actions/helper';
+import { CircularProgress, IconButton, Tooltip } from '@mui/material';
 import { CloudUploadOutlined } from '@mui/icons-material';
-import { IconButton, Tooltip, CircularProgress, CircularProgressProps } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { useFormatter } from '../../../components/i18n';
-import { importingExercise } from '../../../actions/Exercise';
-import { useHelper } from '../../../store';
-import type { UsersHelper } from '../../../actions/helper';
-import { useAppDispatch } from '../../../utils/hooks';
+import { CircularProgressProps } from '@mui/material/CircularProgress/CircularProgress';
 
 interface Props {
-  color: CircularProgressProps['color'];
+  title: string;
+  handleUpload: (formData: FormData) => void;
+  color?: CircularProgressProps['color'];
 }
 
-const ImportUploader: React.FC<Props> = (props) => {
-  const { color } = props;
+const ImportUploader: FunctionComponent<Props> = ({
+  title,
+  handleUpload,
+  color,
+}) => {
+  // Standard hooks
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const uploadRef = useRef<HTMLInputElement | null>(null);
   const [upload, setUpload] = useState(false);
   const handleOpenUpload = () => uploadRef.current && uploadRef.current.click();
@@ -25,17 +27,16 @@ const ImportUploader: React.FC<Props> = (props) => {
     return me?.user_admin ?? false;
   });
 
-  const handleUpload = async (file: File) => {
+  const onUpload = async (file: File) => {
     setUpload(true);
     const formData = new FormData();
     formData.append('file', file);
-    await dispatch(importingExercise(formData));
     setUpload(false);
-    navigate('/admin/exercises');
+    handleUpload(formData);
   };
 
   return (
-    <React.Fragment>
+    <>
       <input
         ref={uploadRef}
         type="file"
@@ -44,7 +45,7 @@ const ImportUploader: React.FC<Props> = (props) => {
           const target = event.target as HTMLInputElement;
           const file: File = (target.files as FileList)[0];
           if (target.validity.valid) {
-            handleUpload(file);
+            onUpload(file);
           }
         }}
       />
@@ -63,8 +64,8 @@ const ImportUploader: React.FC<Props> = (props) => {
         </Tooltip>
       ) : (
         <Tooltip
-          title={t('Import an exercise')}
-          aria-label="Import an exercise"
+          title={t(title)}
+          aria-label={title}
         >
           <IconButton
             onClick={handleOpenUpload}
@@ -77,7 +78,7 @@ const ImportUploader: React.FC<Props> = (props) => {
           </IconButton>
         </Tooltip>
       )}
-    </React.Fragment>
+    </>
   );
 };
 

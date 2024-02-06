@@ -13,6 +13,11 @@ import io.openex.service.AssetGroupService;
 import io.openex.service.AssetService;
 import io.openex.service.ContractService;
 import io.openex.service.ExecutionContextService;
+import io.openex.service.ScenarioService;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -33,6 +38,7 @@ import static io.openex.database.specification.CommunicationSpecification.fromIn
 import static io.openex.helper.DatabaseHelper.resolveOptionalRelation;
 import static io.openex.helper.DatabaseHelper.updateRelation;
 import static io.openex.helper.StreamHelper.fromIterable;
+import static io.openex.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static java.time.Instant.now;
 
 @RestController
@@ -53,6 +59,7 @@ public class InjectApi extends RestBehavior {
   private ApplicationContext context;
   private ContractService contractService;
   private ExecutionContextService executionContextService;
+  private ScenarioService scenarioService;
 
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
@@ -108,6 +115,11 @@ public class InjectApi extends RestBehavior {
   @Autowired
   public void setInjectRepository(InjectRepository injectRepository) {
     this.injectRepository = injectRepository;
+  }
+
+  @Autowired
+  public void setScenarioService(ScenarioService scenarioService) {
+    this.scenarioService = scenarioService;
   }
 
   @Autowired
@@ -349,4 +361,61 @@ public class InjectApi extends RestBehavior {
         // Collect the result
         .toList();
   }
+
+  // -- SCENARIOS --
+
+  @PostMapping(SCENARIO_URI + "/{scenarioId}/injects")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public Inject createInjectForScenario(
+      @PathVariable @NotBlank final String scenarioId,
+      @Valid @RequestBody InjectInput input) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    // Get common attributes
+    Inject inject = input.toInject();
+    inject.setType(contractService.getContractType(input.getContract()));
+    inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
+    inject.setScenario(scenario);
+    // Set dependencies
+    inject.setDependsOn(resolveOptionalRelation(input.getDependsOn(), injectRepository));
+    inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
+    inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+    List<InjectDocument> injectDocuments = input.getDocuments().stream()
+        .map(i -> {
+          InjectDocument injectDocument = new InjectDocument();
+          injectDocument.setInject(inject);
+          injectDocument.setDocument(documentRepository.findById(i.getDocumentId()).orElseThrow());
+          injectDocument.setAttached(i.isAttached());
+          return injectDocument;
+        }).toList();
+    inject.setDocuments(injectDocuments);
+    return injectRepository.save(inject);
+  }
+
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/injects")
+  @PreAuthorize("isScenarioObserver(#scenarioId)")
+  public Iterable<Inject> scenarioInjects(@PathVariable @NotBlank final String scenarioId) {
+    return this.injectRepository.findAll(InjectSpecification.fromScenario(scenarioId))
+        .stream()
+        .sorted(Inject.executionComparator)
+        .toList();
+  }
+
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
+  @PreAuthorize("isScenarioObserver(#scenarioId)")
+  public Inject scenarioInject(
+      @PathVariable @NotBlank final String scenarioId,
+      @PathVariable @NotBlank final String injectId) {
+    return injectRepository.findById(injectId).orElseThrow();
+  }
+
+  @Transactional(rollbackOn = Exception.class)
+  @DeleteMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public void deleteInjectForScenario(
+      @PathVariable @NotBlank final String scenarioId,
+      @PathVariable @NotBlank final String injectId) {
+    this.injectDocumentRepository.deleteDocumentsFromInject(injectId);
+    this.injectRepository.deleteById(injectId);
+  }
+
 }

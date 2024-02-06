@@ -1,5 +1,5 @@
-import TopMenu, { MenuEntry } from '../../../components/common/TopMenu';
 import React from 'react';
+import TopMenu, { MenuEntry } from '../../../components/common/TopMenu';
 
 const TopMenuScenarios = () => {
   const entries: MenuEntry[] = [

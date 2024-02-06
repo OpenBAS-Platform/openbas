@@ -25,6 +25,7 @@ import static java.time.Instant.now;
 public class ImportService {
 
     public final static String EXPORT_ENTRY_EXERCISE = "Exercise";
+    public final static String EXPORT_ENTRY_SCENARIO = "Scenario";
     public final static String EXPORT_ENTRY_ATTACHMENT = "Attachment";
 
     private final Map<Integer, Importer> dataImporters = new HashMap<>();
@@ -72,8 +73,8 @@ public class ImportService {
                 }
                 InputStream zipInputStream = zipFile.getInputStream(entry);
                 switch (entryType) {
-                    case EXPORT_ENTRY_EXERCISE -> dataImports.add(zipInputStream);
-                    case EXPORT_ENTRY_ATTACHMENT -> docReferences.put(entry.getName(), new ImportEntry(entry, zipInputStream));
+                    case EXPORT_ENTRY_EXERCISE, EXPORT_ENTRY_SCENARIO -> dataImports.add(zipInputStream);
+                  case EXPORT_ENTRY_ATTACHMENT -> docReferences.put(entry.getName(), new ImportEntry(entry, zipInputStream));
                     default -> throw new UnsupportedOperationException("Import file contains an unsupported type: " + entryType);
                 }
             }

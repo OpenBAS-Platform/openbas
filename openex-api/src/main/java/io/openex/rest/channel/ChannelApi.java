@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
 import io.openex.injects.channel.model.ChannelContent;
-import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.channel.form.*;
 import io.openex.rest.channel.model.VirtualArticle;
 import io.openex.rest.channel.response.ChannelReader;
+import io.openex.rest.helper.RestBehavior;
+import io.openex.service.ScenarioService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +26,7 @@ import static io.openex.database.model.Inject.SPEED_STANDARD;
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.helper.StreamHelper.fromIterable;
 import static io.openex.injects.channel.ChannelContract.CHANNEL_PUBLISH;
+import static io.openex.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsFirst;
 
@@ -31,6 +34,7 @@ import static java.util.Comparator.nullsFirst;
 public class ChannelApi extends RestBehavior {
 
   private ExerciseRepository exerciseRepository;
+  private ScenarioService scenarioService;
   private ArticleRepository articleRepository;
   private ChannelRepository channelRepository;
   private DocumentRepository documentRepository;
@@ -61,6 +65,11 @@ public class ChannelApi extends RestBehavior {
   @Autowired
   public void setExerciseRepository(ExerciseRepository exerciseRepository) {
     this.exerciseRepository = exerciseRepository;
+  }
+
+  @Autowired
+  public void setScenarioService(ScenarioService scenarioService) {
+    this.scenarioService = scenarioService;
   }
 
   @Autowired
@@ -117,9 +126,9 @@ public class ChannelApi extends RestBehavior {
     channelRepository.deleteById(channelId);
   }
 
-  private List<Article> enrichArticleWithVirtualPublication(Exercise exercise, List<Article> articles) {
+  private List<Article> enrichArticleWithVirtualPublication(List<Inject> injects, List<Article> articles) {
     Instant now = Instant.now();
-    Map<String, Instant> toPublishArticleIdsMap = exercise.getInjects().stream()
+    Map<String, Instant> toPublishArticleIdsMap = injects.stream()
         .filter(inject -> inject.getContract().equals(CHANNEL_PUBLISH))
         .filter(inject -> inject.getContent() != null)
         // TODO take into account depends_another here, depends_duration is not enough to order articles
@@ -143,8 +152,8 @@ public class ChannelApi extends RestBehavior {
             .thenComparing(Article::getCreatedAt).reversed()).toList();
   }
 
-  private Article enrichArticleWithVirtualPublication(Exercise exercise, Article article) {
-    return enrichArticleWithVirtualPublication(exercise, List.of(article)).stream().findFirst().orElseThrow();
+  private Article enrichArticleWithVirtualPublication(List<Inject> injects, Article article) {
+    return enrichArticleWithVirtualPublication(injects, List.of(article)).stream().findFirst().orElseThrow();
   }
 
   // region articles
@@ -172,7 +181,7 @@ public class ChannelApi extends RestBehavior {
       }
     });
     savedArticle.setDocuments(finalArticleDocuments);
-    return enrichArticleWithVirtualPublication(exercise, savedArticle);
+    return enrichArticleWithVirtualPublication(exercise.getInjects(), savedArticle);
   }
 
   @PreAuthorize("isExercisePlanner(#exerciseId)")
@@ -207,14 +216,14 @@ public class ChannelApi extends RestBehavior {
     });
     article.setDocuments(articleDocuments);
     Article savedArticle = articleRepository.save(article);
-    return enrichArticleWithVirtualPublication(exercise, savedArticle);
+    return enrichArticleWithVirtualPublication(exercise.getInjects(), savedArticle);
   }
 
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @GetMapping("/api/exercises/{exerciseId}/articles")
   public Iterable<Article> exerciseArticles(@PathVariable String exerciseId) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-    return enrichArticleWithVirtualPublication(exercise, exercise.getArticles());
+    return enrichArticleWithVirtualPublication(exercise.getInjects(), exercise.getArticles());
   }
 
   @Transactional(rollbackOn = Exception.class)
@@ -232,7 +241,7 @@ public class ChannelApi extends RestBehavior {
     Channel channel = channelRepository.findById(channelId).orElseThrow();
     ChannelReader channelReader = new ChannelReader(channel, exercise);
     List<Article> publishedArticles = exercise.getArticlesForChannel(channel);
-    List<Article> articles = enrichArticleWithVirtualPublication(exercise, publishedArticles);
+    List<Article> articles = enrichArticleWithVirtualPublication(exercise.getInjects(), publishedArticles);
     channelReader.setChannelArticles(articles);
     return channelReader;
   }
@@ -288,5 +297,89 @@ public class ChannelApi extends RestBehavior {
       });
     }
     return channelReader;
+  }
+
+  // -- SCENARIOS --
+
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  @PostMapping(SCENARIO_URI + "/{scenarioId}/articles")
+  public Article createArticleForScenario(
+      @PathVariable @NotBlank final String scenarioId,
+      @Valid @RequestBody ArticleCreateInput input) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    Article article = new Article();
+    article.setUpdateAttributes(input);
+    article.setChannel(channelRepository.findById(input.getChannelId()).orElseThrow());
+    article.setScenario(scenario);
+    Article savedArticle = articleRepository.save(article);
+    List<String> articleDocuments = input.getDocuments();
+    List<Document> finalArticleDocuments = new ArrayList<>();
+    articleDocuments.forEach(articleDocument -> {
+      Optional<Document> doc = documentRepository.findById(articleDocument);
+      if (doc.isPresent()) {
+        Document document = doc.get();
+        finalArticleDocuments.add(document);
+        // If Document not yet linked directly to the exercise, attached it
+        if (!document.getScenarios().contains(scenario)) {
+          scenario.getDocuments().add(document);
+          this.scenarioService.updateScenario(scenario);
+        }
+      }
+    });
+    savedArticle.setDocuments(finalArticleDocuments);
+    return enrichArticleWithVirtualPublication(scenario.getInjects(), savedArticle);
+  }
+
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/articles/{articleId}")
+  public Article updateArticleForScenario(
+      @PathVariable @NotBlank final String scenarioId,
+      @PathVariable @NotBlank final String articleId,
+      @Valid @RequestBody ArticleUpdateInput input) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    Article article = articleRepository.findById(articleId).orElseThrow();
+    List<String> newDocumentsIds = input.getDocuments();
+    List<String> currentDocumentIds = article.getDocuments().stream().map(Document::getId).toList();
+    article.setChannel(channelRepository.findById(input.getChannelId()).orElseThrow());
+    article.setUpdateAttributes(input);
+    // Original List
+    List<Document> articleDocuments = new ArrayList<>(article.getDocuments());
+    // region Set documents
+    // To delete
+    article.getDocuments().stream()
+        .filter(articleDoc -> !newDocumentsIds.contains(articleDoc.getId()))
+        .forEach(articleDocuments::remove);
+    // To add
+    newDocumentsIds.stream().filter(doc -> !currentDocumentIds.contains(doc)).forEach(in -> {
+      Optional<Document> doc = documentRepository.findById(in);
+      if (doc.isPresent()) {
+        Document document = doc.get();
+        articleDocuments.add(document);
+        // If Document not yet linked directly to the exercise, attached it
+        if (!document.getScenarios().contains(scenario)) {
+          scenario.getDocuments().add(document);
+          this.scenarioService.updateScenario(scenario);
+        }
+      }
+    });
+    article.setDocuments(articleDocuments);
+    Article savedArticle = articleRepository.save(article);
+    return enrichArticleWithVirtualPublication(scenario.getInjects(), savedArticle);
+  }
+
+  @PreAuthorize("isScenarioObserver(#scenarioId)")
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/articles")
+  public Iterable<Article> scenarioArticles(@PathVariable @NotBlank final String scenarioId) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    return enrichArticleWithVirtualPublication(scenario.getInjects(), scenario.getArticles());
+  }
+
+  @Transactional(rollbackOn = Exception.class)
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  @DeleteMapping(SCENARIO_URI + "/{scenarioId}/articles/{articleId}")
+  public void deleteArticleForScenario(
+      @PathVariable @NotBlank final String scenarioId,
+      @PathVariable @NotBlank final String articleId) {
+    articleRepository.deleteById(articleId);
   }
 }

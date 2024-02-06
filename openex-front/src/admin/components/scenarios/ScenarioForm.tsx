@@ -1,18 +1,18 @@
 import React, { FunctionComponent } from 'react';
-import { useFormatter } from '../../../components/i18n';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import type { ScenarioCreateInput } from '../../../utils/api-types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { zodImplement } from '../../../utils/Zod';
 import { z } from 'zod';
 import { Button, TextField } from '@mui/material';
+import { zodImplement } from '../../../utils/Zod';
+import type { ScenarioInput } from '../../../utils/api-types';
+import { useFormatter } from '../../../components/i18n';
 import TagField from '../../../components/field/TagField';
 
 interface Props {
-  onSubmit: SubmitHandler<ScenarioCreateInput>;
+  onSubmit: SubmitHandler<ScenarioInput>;
   handleClose: () => void;
   editing?: boolean;
-  initialValues?: ScenarioCreateInput;
+  initialValues?: ScenarioInput;
 }
 
 const ScenarioForm: FunctionComponent<Props> = ({
@@ -34,10 +34,10 @@ const ScenarioForm: FunctionComponent<Props> = ({
     control,
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
-  } = useForm<ScenarioCreateInput>({
+  } = useForm<ScenarioInput>({
     mode: 'onTouched',
     resolver: zodResolver(
-      zodImplement<ScenarioCreateInput>().with({
+      zodImplement<ScenarioInput>().with({
         scenario_name: z.string().min(1, { message: t('Should not be empty') }),
         scenario_subtitle: z.string().optional(),
         scenario_description: z.string().optional(),

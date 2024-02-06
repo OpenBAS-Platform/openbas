@@ -55,6 +55,7 @@ import { deleteComcheck, fetchComchecks } from '../../../actions/Comcheck';
 import { deleteDryrun, fetchDryruns } from '../../../actions/Dryrun';
 import DryrunStatus from './controls/DryrunStatus';
 import ComcheckState from './controls/ComcheckState';
+import InjectsDistribution from "../injects/InjectsDistribution";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -153,7 +154,6 @@ const iconStatus = (status) => {
 
 const Exercise = () => {
   const classes = useStyles();
-  const theme = useTheme();
   const dispatch = useDispatch();
   const { exerciseId } = useParams();
   const permissions = usePermissions(exerciseId);
@@ -195,31 +195,6 @@ const Exercise = () => {
       'exercise_mail_from',
     ]),
   )(exercise);
-  const mapIndexed = R.addIndex(R.map);
-  const teamsColors = R.pipe(
-    mapIndexed((a, index) => [
-      a.team_id,
-      colors(theme.palette.mode === 'dark' ? 400 : 600)[index],
-    ]),
-    R.fromPairs,
-  )(teams);
-  const topTeams = R.pipe(
-    R.sortWith([R.descend(R.prop('team_injects_number'))]),
-    R.take(6),
-  )(teams || []);
-  const distributionChartData = [
-    {
-      name: t('Number of injects'),
-      data: topTeams.map((a) => ({
-        x: a.team_name,
-        y: a.team_injects_number,
-        fillColor: teamsColors[a.team_id],
-      })),
-    },
-  ];
-  const maxInjectsNumber = Math.max(
-    ...topTeams.map((a) => a.team_injects_number),
-  );
   const nextInjectDate = exercise.exercise_next_inject_date
     ? new Date(exercise.exercise_next_inject_date).getTime()
     : Date.now();
@@ -441,20 +416,7 @@ const Exercise = () => {
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Injects distribution')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            {topTeams.length > 0 ? (
-              <Chart
-                options={horizontalBarsChartOptions(
-                  theme,
-                  maxInjectsNumber < 2,
-                )}
-                series={distributionChartData}
-                type="bar"
-                width="100%"
-                height={50 + topTeams.length * 50}
-              />
-            ) : (
-              <Empty message={t('No teams in this exercise.')} />
-            )}
+            <InjectsDistribution teams={teams}/>
           </Paper>
         </Grid>
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>
