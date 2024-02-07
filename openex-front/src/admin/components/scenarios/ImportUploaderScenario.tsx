@@ -9,7 +9,7 @@ interface Props {
   color: CircularProgressProps['color'];
 }
 
-const ImportUploaderScenario: React.FC<Props> = (props) => {
+const ImportUploaderScenario: React.FC<Props> = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
   const navigate = useNavigate();

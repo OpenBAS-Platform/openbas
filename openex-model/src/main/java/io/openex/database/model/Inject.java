@@ -109,6 +109,7 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_exercise")
   private Exercise exercise;
 
+  @Getter
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "inject_scenario")
   @JsonSerialize(using = MonoIdDeserializer.class)

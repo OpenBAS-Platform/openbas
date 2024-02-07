@@ -1,40 +1,39 @@
 import React, { useState } from 'react';
-import Chart from 'react-apexcharts';
-import { makeStyles, styled, useTheme } from '@mui/styles';
+import { makeStyles, styled } from '@mui/styles';
 import {
-  Typography,
-  Grid,
-  Paper,
-  Button,
   Alert,
-  LinearProgress,
-  linearProgressClasses,
+  Button,
   Dialog,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
+  Grid,
+  IconButton,
+  LinearProgress,
+  linearProgressClasses,
   List,
   ListItem,
   ListItemIcon,
-  ListItemText,
   ListItemSecondaryAction,
-  IconButton,
+  ListItemText,
+  Paper,
+  Typography,
 } from '@mui/material';
 import { Link, useParams } from 'react-router-dom';
 import {
-  GroupsOutlined,
-  NotificationsOutlined,
-  CheckCircleOutlineOutlined,
-  ScheduleOutlined,
-  HighlightOffOutlined,
-  CastOutlined,
-  PlayArrowOutlined,
   CancelOutlined,
-  PauseOutlined,
-  RestartAltOutlined,
-  VideoSettingsOutlined,
+  CastOutlined,
+  CheckCircleOutlineOutlined,
   DeleteOutlined,
+  GroupsOutlined,
+  HighlightOffOutlined,
   MarkEmailReadOutlined,
+  NotificationsOutlined,
+  PauseOutlined,
+  PlayArrowOutlined,
+  RestartAltOutlined,
+  ScheduleOutlined,
+  VideoSettingsOutlined,
 } from '@mui/icons-material';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
@@ -46,7 +45,6 @@ import ExerciseParametersForm from './ExerciseParametersForm';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import Empty from '../../../components/Empty';
 import Countdown from '../../../components/Countdown';
-import { colors, horizontalBarsChartOptions } from '../../../utils/Charts';
 import { usePermissions } from '../../../utils/Exercise';
 import Transition from '../../../components/common/Transition';
 import ExerciseDatePopover from './ExerciseDatePopover';
@@ -55,7 +53,7 @@ import { deleteComcheck, fetchComchecks } from '../../../actions/Comcheck';
 import { deleteDryrun, fetchDryruns } from '../../../actions/Dryrun';
 import DryrunStatus from './controls/DryrunStatus';
 import ComcheckState from './controls/ComcheckState';
-import InjectsDistribution from "../injects/InjectsDistribution";
+import InjectsDistribution from '../injects/InjectsDistribution';
 
 const useStyles = makeStyles((theme) => ({
   root: {

@@ -1,14 +1,14 @@
 import React, { FunctionComponent } from 'react';
-import { Button, TextField as MuiTextField, Theme } from '@mui/material';
+import { Button, TextField as MuiTextField } from '@mui/material';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useFormatter } from '../../../../components/i18n';
-import { ScenarioInformationsInput } from '../../../../utils/api-types';
-import { zodImplement } from '../../../../utils/Zod';
 import { makeStyles } from '@mui/styles';
+import { useFormatter } from '../../../../components/i18n';
+import type { ScenarioInformationsInput } from '../../../../utils/api-types';
+import { zodImplement } from '../../../../utils/Zod';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   buttons: {
     display: 'flex',
     justifyContent: 'end',

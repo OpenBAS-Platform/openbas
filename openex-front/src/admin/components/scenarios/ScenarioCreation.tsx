@@ -5,13 +5,13 @@ import { useAppDispatch } from '../../../utils/hooks';
 import { addScenario } from '../../../actions/scenarios/scenario-actions';
 import Drawer from '../../../components/common/Drawer';
 import ScenarioForm from './ScenarioForm';
-import { ScenarioInput } from '../../../utils/api-types';
+import type { ScenarioInput } from '../../../utils/api-types';
 
 interface Props {
 
 }
 
-const ScenarioCreation: FunctionComponent<Props> = ({}) => {
+const ScenarioCreation: FunctionComponent<Props> = () => {
   // Standard hooks
   const [open, setOpen] = useState(false);
   const { t } = useFormatter();

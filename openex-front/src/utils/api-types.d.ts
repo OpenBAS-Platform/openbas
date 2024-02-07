@@ -333,7 +333,8 @@ export interface Contract {
 }
 
 export interface ContractConfig {
-  color?: string;
+  color_dark?: string;
+  color_light?: string;
   expose?: boolean;
   icon?: string;
   label?: Record<string, string>;
@@ -507,7 +508,6 @@ export interface EndpointInput {
    * @minItems 1
    */
   endpoint_ips: string[];
-  endpoint_mac_adresses?: string[];
   endpoint_mac_addresses?: string[];
   endpoint_platform: "Linux" | "Windows" | "Darwin";
 }
@@ -1277,7 +1277,7 @@ export interface Scenario {
   updateAttributes?: object;
 }
 
-export interface ScenarioInformationsInput {
+export interface ScenarioInformationInput {
   scenario_mail_from: string;
   scenario_message_footer?: string;
   scenario_message_header?: string;
@@ -1297,10 +1297,18 @@ export interface ScenarioSimple {
   scenario_tags?: Tag[];
 }
 
+export interface ScenarioTeamPlayersEnableInput {
+  scenario_team_players?: string[];
+}
+
 export interface ScenarioTeamUser {
   scenario_id?: Scenario;
   team_id?: Team;
   user_id?: User;
+}
+
+export interface ScenarioUpdateTeamsInput {
+  scenario_teams?: string[];
 }
 
 export interface SettingsUpdateInput {

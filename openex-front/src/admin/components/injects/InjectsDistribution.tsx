@@ -1,12 +1,12 @@
 import Chart from 'react-apexcharts';
-import { colors, horizontalBarsChartOptions } from '../../../utils/Charts';
-import Empty from '../../../components/Empty';
 import React, { FunctionComponent } from 'react';
 import * as R from 'ramda';
-import { TeamStore } from '../persons/teams/Team';
-import { useFormatter } from '../../../components/i18n';
 import { useTheme } from '@mui/styles';
-import { Theme } from '../../../components/Theme';
+import { colors, horizontalBarsChartOptions } from '../../../utils/Charts';
+import Empty from '../../../components/Empty';
+import type { TeamStore } from '../persons/teams/Team';
+import { useFormatter } from '../../../components/i18n';
+import type { Theme } from '../../../components/Theme';
 
 interface Props {
   teams: TeamStore[];

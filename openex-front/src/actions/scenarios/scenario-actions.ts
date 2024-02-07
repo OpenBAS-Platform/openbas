@@ -1,7 +1,7 @@
 import { Dispatch } from 'redux';
 import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
 import { arrayOfScenarios, scenario } from './scenario-schema';
-import { Scenario, ScenarioInformationsInput, ScenarioInput } from '../../utils/api-types';
+import type { Scenario, ScenarioInformationsInput, ScenarioInput } from '../../utils/api-types';
 import * as schema from '../Schema';
 
 const SCENARIO_URI = '/api/scenarios';

@@ -1,9 +1,9 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { type ScenarioInput } from '../../../../utils/api-types';
+import type { ScenarioInput } from '../../../../utils/api-types';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { ScenarioStore } from '../../../../actions/scenarios/Scenario';
+import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import { deleteScenario, exportScenarioUri, updateScenario } from '../../../../actions/scenarios/scenario-actions';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import Drawer from '../../../../components/common/Drawer';

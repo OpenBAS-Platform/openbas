@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, IconButton, Menu, MenuItem, Divider, Tooltip, Popover, Box, Grid, Badge } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { AppBar, Badge, Box, Divider, Grid, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 import { AccountCircleOutlined, AppsOutlined, BiotechOutlined, NotificationsOutlined } from '@mui/icons-material';
 import { makeStyles, useTheme } from '@mui/styles';
@@ -15,7 +15,6 @@ import TopMenuComponents from './TopMenuComponents';
 import TopMenuIntegrations from './TopMenuIntegrations';
 import TopMenuChallenges from './TopMenuChallenges';
 import TopMenuLessons from './TopMenuLessons';
-import ImportUploaderExercise from '../exercises/ImportUploaderExercise';
 import TopMenuChannel from './TopMenuChannel';
 import TopMenuProfile from './TopMenuProfile';
 import type { Theme } from '../../../components/Theme';
@@ -33,7 +32,6 @@ import omtdLight from '../../../static/images/xtm/omtd_light.png';
 import useAuth from '../../../utils/hooks/useAuth';
 import TopMenuScenarios from '../scenarios/TopMenuScenarios';
 import TopMenuScenario from '../scenarios/scenario/TopMenuScenario';
-import ImportUploaderScenario from '../scenarios/ImportUploaderScenario';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   appBar: {

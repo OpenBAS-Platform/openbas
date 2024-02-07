@@ -1,7 +1,7 @@
 import { Button } from '@mui/material';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowForwardIosOutlined, MovieFilterOutlined } from '@mui/icons-material';
-import React, { FunctionComponent } from 'react';
+import React from 'react';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../../../../components/Theme';
 import { useFormatter } from '../../../../components/i18n';
@@ -26,7 +26,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
 const TopMenuScenario = () => {
   // Standard hooks
   const classes = useStyles();
-  const test = useParams();
   const { scenarioId } = useParams();
   const { t } = useFormatter();
   const entries: MenuEntry[] = [

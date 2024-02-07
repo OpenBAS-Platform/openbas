@@ -1,21 +1,21 @@
-import { useAppDispatch } from '../../../../utils/hooks';
 import { useParams } from 'react-router-dom';
+import React, { FunctionComponent } from 'react';
+import { Grid, Paper, Theme, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { GroupsOutlined, NotificationsOutlined } from '@mui/icons-material';
+import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
-import { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
+import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchScenario, fetchScenarioTeams, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
 import NotFound from '../../../../components/NotFound';
-import React, { FunctionComponent } from 'react';
-import { Grid, Paper, Theme, Typography, } from '@mui/material';
 import { useFormatter } from '../../../../components/i18n';
-import { makeStyles } from '@mui/styles';
-import { GroupsOutlined, NotificationsOutlined } from '@mui/icons-material';
-import { ScenarioStore } from '../../../../actions/scenarios/Scenario';
-import { ScenarioInformationsInput } from '../../../../utils/api-types';
-import { TeamStore } from '../../persons/teams/Team';
+import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import ScenarioSettingsForm from './ScenarioSettingsForm';
-import { useScenarioPermissions } from '../../../../utils/Scenario';
+import useScenarioPermissions from '../../../../utils/Scenario';
 import InjectsDistribution from '../../injects/InjectsDistribution';
+import type { TeamStore } from '../../teams/teams/Team';
+import type { ScenarioInformationInput } from '../../../../utils/api-types';
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -68,7 +68,7 @@ const ScenarioComponent: FunctionComponent<{ scenarioId: string }> = ({ scenario
     scenario_message_footer,
   }))(scenario);
 
-  const submitUpdate = (data: ScenarioInformationsInput) => dispatch(updateScenarioInformation(scenarioId, data));
+  const submitUpdate = (data: ScenarioInformationInput) => dispatch(updateScenarioInformation(scenarioId, data));
 
   return (
     <>

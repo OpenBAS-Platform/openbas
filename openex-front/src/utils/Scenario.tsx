@@ -1,9 +1,9 @@
 import * as R from 'ramda';
 import { useHelper } from '../store';
-import { ScenariosHelper } from '../actions/scenarios/scenario-helper';
-import { LoggedHelper, UsersHelper } from '../actions/helper';
+import type { ScenariosHelper } from '../actions/scenarios/scenario-helper';
+import type { LoggedHelper, UsersHelper } from '../actions/helper';
 
-export const useScenarioPermissions = (scenarioId: string, fullScenario = null) => {
+const useScenarioPermissions = (scenarioId: string, fullScenario = null) => {
   const { scenario, me, logged } = useHelper((helper: ScenariosHelper & UsersHelper & LoggedHelper) => {
     return {
       scenario: helper.getScenario(scenarioId),
@@ -54,3 +54,5 @@ export const useScenarioPermissions = (scenarioId: string, fullScenario = null) 
     isLoggedIn: !R.isEmpty(logged),
   };
 };
+
+export default useScenarioPermissions;

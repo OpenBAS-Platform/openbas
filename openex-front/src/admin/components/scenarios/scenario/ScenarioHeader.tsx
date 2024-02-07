@@ -4,11 +4,11 @@ import { Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
-import { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
+import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
 import NotFound from '../../../../components/NotFound';
-import { ScenarioStore } from '../../../../actions/scenarios/Scenario';
+import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import ScenarioPopover from './ScenarioPopover';
 
 const useStyles = makeStyles(() => ({
