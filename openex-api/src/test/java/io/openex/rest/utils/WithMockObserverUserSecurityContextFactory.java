@@ -33,7 +33,7 @@ public class WithMockObserverUserSecurityContextFactory implements WithSecurityC
 
   @Override
   public SecurityContext createSecurityContext(WithMockObserverUser customUser) {
-    User user = this.userRepository.findByEmail(customUser.email()).orElseThrow();
+    User user = this.userRepository.findByEmailIgnoreCase(customUser.email()).orElseThrow();
     Authentication authentication = buildAuthenticationToken(user);
     SecurityContext context = SecurityContextHolder.createEmptyContext();
     context.setAuthentication(authentication);
@@ -47,11 +47,11 @@ public class WithMockObserverUserSecurityContextFactory implements WithSecurityC
 
   @PreDestroy
   public void preDestroy() {
-    this.userRepository.deleteById(this.userRepository.findByEmail(MOCK_USER_OBSERVER_EMAIL).orElseThrow().getId());
+    this.userRepository.deleteById(this.userRepository.findByEmailIgnoreCase(MOCK_USER_OBSERVER_EMAIL).orElseThrow().getId());
   }
 
   private void createObserverMockUser() {
-    if (this.userRepository.findByEmail(MOCK_USER_OBSERVER_EMAIL).isPresent()) {
+    if (this.userRepository.findByEmailIgnoreCase(MOCK_USER_OBSERVER_EMAIL).isPresent()) {
       return;
     }
 

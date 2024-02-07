@@ -69,7 +69,7 @@ public class UserApi extends RestBehavior {
 
     @PostMapping("/api/login")
     public User login(@Valid @RequestBody LoginUserInput input) {
-        Optional<User> optionalUser = userRepository.findByEmail(input.getLogin());
+        Optional<User> optionalUser = userRepository.findByEmailIgnoreCase(input.getLogin());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             if (userService.isUserPasswordValid(user, input.getPassword())) {
@@ -82,7 +82,7 @@ public class UserApi extends RestBehavior {
 
     @PostMapping("/api/reset")
     public void passwordReset(@Valid @RequestBody ResetUserInput input) {
-        Optional<User> optionalUser = userRepository.findByEmail(input.getLogin());
+        Optional<User> optionalUser = userRepository.findByEmailIgnoreCase(input.getLogin());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             String resetToken = RandomStringUtils.randomNumeric(8);
