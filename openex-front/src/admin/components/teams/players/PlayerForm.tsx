@@ -1,8 +1,9 @@
 import React, { FunctionComponent } from 'react';
 import { Form } from 'react-final-form';
-import { Button } from '@mui/material';
+import { Button, InputAdornment, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { z } from 'zod';
+import { InfoOutlined } from '@mui/icons-material';
 import TextField from '../../../../components/TextField';
 import { useFormatter } from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
@@ -42,16 +43,16 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
     user_phone: z
       .string()
       .regex(
-        /^\+/,
-        t('Invalid input. Please use \'+\' character and country identifier.'),
+        /^[+]{1}(?:[0-9\-\\(\\)\\/.]\s?){6,15}[0-9]{1}$/,
+        t('Phone number invalid'),
       )
       .optional()
       .nullable(),
     user_phone2: z
       .string()
       .regex(
-        /^\+/,
-        t('Invalid input. Please use \'+\' character and country identifier.'),
+        /^[+]{1}(?:[0-9\-\\(\\)\\/.]\s?){6,15}[0-9]{1}$/,
+        t('Phone number invalid'),
       )
       .optional()
       .nullable(),
@@ -103,6 +104,15 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
           />
           {editing && (
             <TextField
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="start">
+                    <Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{t('phone_number_tooltip')}</span>}>
+                      <InfoOutlined />
+                    </Tooltip>
+                  </InputAdornment>
+                ),
+              }}
               variant="standard"
               name="user_phone"
               fullWidth={true}
@@ -112,12 +122,22 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
           )}
           {editing && (
             <TextField
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="start">
+                    <Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{t('phone_number_tooltip')}</span>}>
+                      <InfoOutlined />
+                    </Tooltip>
+                  </InputAdornment>
+                ),
+              }}
               variant="standard"
               name="user_phone2"
               fullWidth={true}
-              label={t('Phone number (fix)')}
+              label={t('Phone number (landline)')}
               style={{ marginTop: 20 }}
             />
+
           )}
           {editing && (
             <TextField
