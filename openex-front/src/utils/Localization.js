@@ -763,9 +763,7 @@ const i18n = {
       Personas: 'Personas',
       'Phone number invalid': 'Numéro de téléphone invalide',
       phone_number_tooltip: 'Le numéro de téléphone devrait commencer par un signe plus ( + )\n'
-        + 'Il devrait être suivi du code pays et du numéro national.\n'
-        + 'Il peut contenir des espaces blancs ou un tiret ( – ).\n'
-        + 'La longueur du numéro de téléphone peut varier de 7 à 15 chiffres.',
+        + 'Il peut contenir des espaces ou des tirets ( – ) ou des parenthèses.\n',
     },
     en: {
       openex_email: 'Email',
@@ -807,9 +805,7 @@ const i18n = {
       'Ip Address': 'Ip Address',
       'Ip Address {index}': 'Ip Address {index}',
       phone_number_tooltip: 'Phone number should start with a plus sign ( + )\n'
-        + 'It should be followed by Country code and National number.\n'
-        + 'It may contain white spaces or a hyphen ( – ).\n'
-        + 'The length of phone number may vary from 7 digits to 15 digits.',
+        + 'It may contain white spaces or hyphens ( – ) or parenthesis.\n',
     },
   },
 };
