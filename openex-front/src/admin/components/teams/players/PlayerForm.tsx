@@ -43,7 +43,15 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
       .string()
       .regex(
         /^\+/,
-        t("Invalid input. Please use '+' character and country identifier."),
+        t('Invalid input. Please use \'+\' character and country identifier.'),
+      )
+      .optional()
+      .nullable(),
+    user_phone2: z
+      .string()
+      .regex(
+        /^\+/,
+        t('Invalid input. Please use \'+\' character and country identifier.'),
       )
       .optional()
       .nullable(),
