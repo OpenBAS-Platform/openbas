@@ -41,6 +41,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     borderLeft: 0,
     borderRight: 0,
     borderTop: 0,
+    color: theme.palette.text?.primary,
   },
   logoContainer: {
     margin: '2px 0 0 -8px',
@@ -209,7 +210,7 @@ const TopBar: React.FC = () => {
                     location.pathname.includes('/dashboard/search')
                     && !location.pathname.includes('/dashboard/search_bulk')
                       ? 'secondary'
-                      : 'default'
+                      : 'inherit'
                   }
                 size='medium'
               >
@@ -226,12 +227,13 @@ const TopBar: React.FC = () => {
                 aria-haspopup="true"
                 component={Link}
                 to="/dashboard/profile/notifications"
-                color={location.pathname === '/dashboard/profile/notifications' ? 'primary' : 'default'}
+                color={location.pathname === '/dashboard/profile/notifications' ? 'primary' : 'inherit'}
               >
                 <NotificationsOutlined fontSize="medium"/>
               </IconButton>
             </Tooltip>
             <IconButton
+              color="inherit"
               size="medium"
               classes={{ root: classes.button }}
               aria-owns={xtmOpen.open ? 'menu-appbar' : undefined}
@@ -304,7 +306,7 @@ const TopBar: React.FC = () => {
               onClick={handleOpenMenu}
               size='medium'
               color={
-              location.pathname === '/admin/profile' ? 'secondary' : 'default'
+              location.pathname === '/admin/profile' ? 'secondary' : 'inherit'
             }
             >
               <AccountCircleOutlined fontSize='medium' />
