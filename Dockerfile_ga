@@ -1,0 +1,8 @@
+FROM openjdk:19-jdk-alpine AS app
+
+WORKDIR /opt
+RUN apk add tini git
+COPY openex-build ./
+
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["java", "-jar", "openex-api.jar"]
