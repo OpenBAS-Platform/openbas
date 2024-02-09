@@ -37,11 +37,11 @@ public class UpdateUserInput {
   private String pgpKey;
 
   @JsonProperty("user_phone")
-  @Pattern(regexp = "^\\+[\\d\\s\\-.()]+", message = PHONE_FORMAT)
+  @Pattern(regexp = "^\\+[\\d\\s\\-.()]+$", message = PHONE_FORMAT)
   private String phone;
 
   @JsonProperty("user_phone2")
-  @Pattern(regexp = "^\\+[\\d\\s\\-.()]+", message = PHONE_FORMAT)
+  @Pattern(regexp = "^\\+[\\d\\s\\-.()]+$", message = PHONE_FORMAT)
   private String phone2;
 
   @JsonProperty("user_tags")

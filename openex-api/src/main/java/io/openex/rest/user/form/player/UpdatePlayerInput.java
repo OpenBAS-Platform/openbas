@@ -13,11 +13,11 @@ import static io.openex.config.AppConfig.PHONE_FORMAT;
 public class UpdatePlayerInput extends CreatePlayerInput {
 
   @JsonProperty("user_phone")
-  @Pattern(regexp = "^\\+[\\d\\s\\-.()]+", message = PHONE_FORMAT)
+  @Pattern(regexp = "^\\+[\\d\\s\\-.()]+$", message = PHONE_FORMAT)
   private String phone;
 
   @JsonProperty("user_phone2")
-  @Pattern(regexp = "^\\+[\\d\\s\\-.()]+", message = PHONE_FORMAT)
+  @Pattern(regexp = "^\\+[\\d\\s\\-.()]+$", message = PHONE_FORMAT)
   private String phone2;
 
   @JsonProperty("user_pgp_key")

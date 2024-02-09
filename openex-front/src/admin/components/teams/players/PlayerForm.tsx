@@ -43,7 +43,7 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
     user_phone: z
       .string()
       .regex(
-        /^\+[\d\s\-.()]+/,
+        /^\+[\d\s\-.()]+$/,
         t('Phone number invalid'),
       )
       .optional()
@@ -51,7 +51,7 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
     user_phone2: z
       .string()
       .regex(
-        /^\+[\d\s\-.()]+/,
+        /^\+[\d\s\-.()]+$/,
         t('Phone number invalid'),
       )
       .optional()
