@@ -64,7 +64,7 @@ jobs:
 
   deploy:
     name: deploy
-    needs: [platform, worker]
+    needs: [platform]
     runs-on: ubuntu-latest
     steps:
       - name: Docker meta
