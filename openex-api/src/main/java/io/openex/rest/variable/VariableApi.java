@@ -1,7 +1,9 @@
 package io.openex.rest.variable;
 
+import io.openex.database.model.Exercise;
 import io.openex.database.model.Scenario;
 import io.openex.database.model.Variable;
+import io.openex.database.repository.ExerciseRepository;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.variable.form.VariableInput;
 import io.openex.service.ScenarioService;
@@ -26,6 +28,7 @@ public class VariableApi extends RestBehavior {
 
   private final VariableService variableService;
   private final ScenarioService scenarioService;
+  private final ExerciseRepository exerciseRepository;
 
   // -- EXERCISES --
 
@@ -36,7 +39,9 @@ public class VariableApi extends RestBehavior {
       @Valid @RequestBody final VariableInput input) {
     Variable variable = new Variable();
     variable.setUpdateAttributes(input);
-    return this.variableService.createVariableForExercise(exerciseId, variable);
+    Exercise exercise = this.exerciseRepository.findById(exerciseId).orElseThrow();
+    variable.setExercise(exercise);
+    return this.variableService.createVariable(variable);
   }
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/variables")
@@ -52,6 +57,7 @@ public class VariableApi extends RestBehavior {
       @PathVariable @NotBlank final String variableId,
       @Valid @RequestBody final VariableInput input) {
     Variable variable = this.variableService.variable(variableId);
+    assert exerciseId.equals(variable.getExercise().getId());
     variable.setUpdateAttributes(input);
     return this.variableService.updateVariable(variable);
   }
@@ -61,6 +67,8 @@ public class VariableApi extends RestBehavior {
   public void deleteVariableForExercise(
       @PathVariable @NotBlank final String exerciseId,
       @PathVariable @NotBlank final String variableId) {
+    Variable variable = this.variableService.variable(variableId);
+    assert exerciseId.equals(variable.getExercise().getId());
     this.variableService.deleteVariable(variableId);
   }
 
@@ -84,22 +92,25 @@ public class VariableApi extends RestBehavior {
     return this.variableService.variablesFromScenario(scenarioId);
   }
 
-  @PutMapping(SCENARIO_URI + "{scenarioId}/variables/{variableId}")
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/variables/{variableId}")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Variable updateVariableForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String variableId,
       @Valid @RequestBody final VariableInput input) {
     Variable variable = this.variableService.variable(variableId);
+    assert scenarioId.equals(variable.getScenario().getId());
     variable.setUpdateAttributes(input);
     return this.variableService.updateVariable(variable);
   }
 
-  @DeleteMapping(SCENARIO_URI + "/{exerciseId}/variables/{variableId}")
-  @PreAuthorize("isScenarioPlanner(#exerciseId)")
+  @DeleteMapping(SCENARIO_URI + "/{scenarioId}/variables/{variableId}")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public void deleteVariableForScenario(
-      @PathVariable @NotBlank final String exerciseId,
+      @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String variableId) {
+    Variable variable = this.variableService.variable(variableId);
+    assert scenarioId.equals(variable.getScenario().getId());
     this.variableService.deleteVariable(variableId);
   }
 

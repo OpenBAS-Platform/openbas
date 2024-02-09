@@ -1,11 +1,13 @@
 package io.openex.rest;
 
 import com.jayway.jsonpath.JsonPath;
+import io.openex.database.model.Scenario;
+import io.openex.database.model.Variable;
 import io.openex.database.repository.ScenarioRepository;
-import io.openex.rest.scenario.form.ScenarioInformationInput;
-import io.openex.rest.scenario.form.ScenarioInput;
+import io.openex.database.repository.VariableRepository;
 import io.openex.rest.utils.WithMockObserverUser;
 import io.openex.rest.utils.WithMockPlannerUser;
+import io.openex.service.ScenarioService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -26,66 +28,79 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
-public class ScenarioApiTest {
+public class VariableApiTest {
 
   @Autowired
   private MockMvc mvc;
 
   @Autowired
+  private ScenarioService scenarioService;
+  @Autowired
   private ScenarioRepository scenarioRepository;
+  @Autowired
+  private VariableRepository variableRepository;
 
+  static String VARIABLE_ID;
   static String SCENARIO_ID;
 
   @AfterAll
   void afterAll() {
     this.scenarioRepository.deleteById(SCENARIO_ID);
+    this.variableRepository.deleteById(SCENARIO_ID);
   }
 
-  @DisplayName("Create scenario succeed")
+  // -- SCENARIOS --
+
+  @DisplayName("Create variable for scenario succeed")
   @Test
   @Order(1)
   @WithMockPlannerUser
-  void createScenarioTest() throws Exception {
+  void createVariableForScenarioTest() throws Exception {
     // -- PREPARE --
-    ScenarioInput scenarioInput = new ScenarioInput();
+    Scenario scenario = new Scenario();
+    scenario.setName("Scenario name");
+    Scenario scenarioCreated = this.scenarioService.createScenario(scenario);
+    SCENARIO_ID = scenarioCreated.getId();
+    Variable variable = new Variable();
 
     // -- EXECUTE & ASSERT --
     this.mvc
-        .perform(post(SCENARIO_URI)
-            .content(asJsonString(scenarioInput))
+        .perform(post(SCENARIO_URI + "/" + SCENARIO_ID + "/variables")
+            .content(asJsonString(variable))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is4xxClientError());
 
     // -- PREPARE --
-    String name = "My scenario";
-    scenarioInput.setName(name);
+    String variableKey = "key";
+    variable.setKey(variableKey);
+    variable.setScenario(scenario);
 
     // -- EXECUTE --
     String response = this.mvc
-        .perform(post(SCENARIO_URI)
-            .content(asJsonString(scenarioInput))
+        .perform(post(SCENARIO_URI + "/" + SCENARIO_ID + "/variables")
+            .content(asJsonString(variable))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful())
-        .andExpect(jsonPath("$.scenario_name").value(name))
+        .andExpect(jsonPath("$.variable_key").value(variableKey))
         .andReturn()
         .getResponse()
         .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
-    SCENARIO_ID = JsonPath.read(response, "$.scenario_id");
+    VARIABLE_ID = JsonPath.read(response, "$.variable_id");
   }
 
-  @DisplayName("Retrieve scenarios")
+  @DisplayName("Retrieve variables for scenario")
   @Test
   @Order(2)
   @WithMockObserverUser
-  void retrieveScenariosTest() throws Exception {
+  void retrieveVariableForScenarioTest() throws Exception {
     // -- EXECUTE --
     String response = this.mvc
-        .perform(get(SCENARIO_URI)
+        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID + "/variables")
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful())
         .andReturn()
@@ -96,47 +111,29 @@ public class ScenarioApiTest {
     assertNotNull(response);
   }
 
-  @DisplayName("Retrieve scenario")
+  @DisplayName("Update variable for scenario")
   @Test
   @Order(3)
-  @WithMockObserverUser
-  void retrieveScenarioTest() throws Exception {
-    // -- EXECUTE --
-    String response = this.mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
-
-    // -- ASSERT --
-    assertNotNull(response);
-  }
-
-  @DisplayName("Update scenario")
-  @Test
-  @Order(4)
   @WithMockPlannerUser
-  void updateScenarioTest() throws Exception {
+  void updateVariableForScenarioTest() throws Exception {
     // -- PREPARE --
     String response = this.mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID)
+        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID + "/variables")
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful())
         .andReturn()
         .getResponse()
         .getContentAsString();
 
-    ScenarioInput scenarioInput = new ScenarioInput();
-    String subtitle = "A subtitle";
-    scenarioInput.setName(JsonPath.read(response, "$.scenario_name"));
-    scenarioInput.setSubtitle(subtitle);
+    Variable variable = new Variable();
+    String variableValue = "variable-value";
+    variable.setKey(JsonPath.read(response, "$[0].variable_key"));
+    variable.setValue("variable-value");
 
     // -- EXECUTE --
     response = this.mvc
-        .perform(put(SCENARIO_URI + "/" + SCENARIO_ID)
-            .content(asJsonString(scenarioInput))
+        .perform(put(SCENARIO_URI + "/" + SCENARIO_ID + "/variables/" + VARIABLE_ID)
+            .content(asJsonString(variable))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful())
@@ -146,43 +143,16 @@ public class ScenarioApiTest {
 
     // -- ASSERT --
     assertNotNull(response);
-    assertEquals(subtitle, JsonPath.read(response, "$.scenario_subtitle"));
+    assertEquals(variableValue, JsonPath.read(response, "$.variable_value"));
   }
 
-  @DisplayName("Update scenario information")
+  @DisplayName("Delete variable for scenario")
   @Test
-  @Order(5)
+  @Order(4)
   @WithMockPlannerUser
-  void updateScenarioInformationTest() throws Exception {
-    // -- PREPARE --
-    ScenarioInformationInput scenarioInformationInput = new ScenarioInformationInput();
-    String header = "NEW HEADER";
-    scenarioInformationInput.setReplyTo("no-reply@filigran.io");
-    scenarioInformationInput.setHeader(header);
-
-    // -- EXECUTE --
-    String response = this.mvc
-        .perform(put(SCENARIO_URI + "/" + SCENARIO_ID + "/information")
-            .content(asJsonString(scenarioInformationInput))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
-
-    // -- ASSERT --
-    assertNotNull(response);
-    assertEquals(header, JsonPath.read(response, "$.scenario_message_header"));
-  }
-
-  @DisplayName("Delete scenario")
-  @Test
-  @Order(6)
-  @WithMockPlannerUser
-  void deleteScenarioTest() throws Exception {
+  void deleteVariableForScenarioTest() throws Exception {
     // -- EXECUTE 1 ASSERT --
-    this.mvc.perform(delete(SCENARIO_URI + "/" + SCENARIO_ID))
+    this.mvc.perform(delete(SCENARIO_URI + "/" + SCENARIO_ID + "/variables/" + VARIABLE_ID))
         .andExpect(status().is2xxSuccessful());
   }
 

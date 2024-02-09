@@ -1,8 +1,6 @@
 package io.openex.service;
 
-import io.openex.database.model.Exercise;
 import io.openex.database.model.Variable;
-import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.VariableRepository;
 import io.openex.database.specification.VariableSpecification;
 import jakarta.validation.constraints.NotBlank;
@@ -19,15 +17,6 @@ import static java.time.Instant.now;
 public class VariableService {
 
   private final VariableRepository variableRepository;
-  private final ExerciseRepository exerciseRepository;
-
-  public Variable createVariableForExercise(
-      @NotBlank final String exerciseId,
-      @NotNull final Variable variable) {
-    Exercise exercise = this.exerciseRepository.findById(exerciseId).orElseThrow();
-    variable.setExercise(exercise);
-    return this.variableRepository.save(variable);
-  }
 
   public Variable createVariable(@NotNull final Variable variable) {
     return this.variableRepository.save(variable);

@@ -309,13 +309,13 @@ public class ChannelApi extends RestBehavior {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     Article article = new Article();
     article.setUpdateAttributes(input);
-    article.setChannel(channelRepository.findById(input.getChannelId()).orElseThrow());
+    article.setChannel(this.channelRepository.findById(input.getChannelId()).orElseThrow());
     article.setScenario(scenario);
-    Article savedArticle = articleRepository.save(article);
+    Article savedArticle = this.articleRepository.save(article);
     List<String> articleDocuments = input.getDocuments();
     List<Document> finalArticleDocuments = new ArrayList<>();
     articleDocuments.forEach(articleDocument -> {
-      Optional<Document> doc = documentRepository.findById(articleDocument);
+      Optional<Document> doc = this.documentRepository.findById(articleDocument);
       if (doc.isPresent()) {
         Document document = doc.get();
         finalArticleDocuments.add(document);
@@ -328,6 +328,13 @@ public class ChannelApi extends RestBehavior {
     });
     savedArticle.setDocuments(finalArticleDocuments);
     return enrichArticleWithVirtualPublication(scenario.getInjects(), savedArticle);
+  }
+
+  @PreAuthorize("isScenarioObserver(#scenarioId)")
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/articles")
+  public Iterable<Article> scenarioArticles(@PathVariable @NotBlank final String scenarioId) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    return enrichArticleWithVirtualPublication(scenario.getInjects(), scenario.getArticles());
   }
 
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
@@ -365,13 +372,6 @@ public class ChannelApi extends RestBehavior {
     article.setDocuments(articleDocuments);
     Article savedArticle = articleRepository.save(article);
     return enrichArticleWithVirtualPublication(scenario.getInjects(), savedArticle);
-  }
-
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
-  @GetMapping(SCENARIO_URI + "/{scenarioId}/articles")
-  public Iterable<Article> scenarioArticles(@PathVariable @NotBlank final String scenarioId) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    return enrichArticleWithVirtualPublication(scenario.getInjects(), scenario.getArticles());
   }
 
   @Transactional(rollbackOn = Exception.class)

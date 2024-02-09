@@ -39,9 +39,10 @@ public class VariableServiceTest {
     Variable variable = new Variable();
     String variableKey = "key";
     variable.setKey(variableKey);
+    variable.setExercise(exerciseCreated);
 
     // -- EXECUTE --
-    Variable variableCreated = this.variableService.createVariableForExercise(exerciseCreated.getId(), variable);
+    Variable variableCreated = this.variableService.createVariable(variable);
     VARIABLE_ID = variableCreated.getId();
     assertNotNull(variableCreated);
     assertNotNull(variableCreated.getId());

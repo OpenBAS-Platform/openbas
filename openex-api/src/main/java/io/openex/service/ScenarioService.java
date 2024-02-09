@@ -34,7 +34,8 @@ import java.util.zip.ZipOutputStream;
 
 import static io.openex.config.SessionHelper.currentUser;
 import static io.openex.helper.StreamHelper.fromIterable;
-import static io.openex.service.ImportService.*;
+import static io.openex.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
+import static io.openex.service.ImportService.EXPORT_ENTRY_SCENARIO;
 import static java.time.Instant.now;
 
 @RequiredArgsConstructor
@@ -148,7 +149,8 @@ public class ScenarioService {
 
     // Add Teams
     scenarioFileExport.setTeams(scenario.getTeams());
-    objectMapper.addMixIn(Team.class, isWithPlayers ? ExerciseExportMixins.Team.class : ExerciseExportMixins.EmptyTeam.class);
+    objectMapper.addMixIn(Team.class,
+        isWithPlayers ? ExerciseExportMixins.Team.class : ExerciseExportMixins.EmptyTeam.class);
     scenarioTags.addAll(scenario.getTeams().stream().flatMap(team -> team.getTags().stream()).toList());
 
     if (isWithPlayers) {
@@ -241,14 +243,17 @@ public class ScenarioService {
   public Iterable<Team> removeTeams(@NotBlank final String scenarioId, @NotNull final List<String> teamIds) {
     Scenario scenario = this.scenario(scenarioId);
     List<Team> teams = scenario.getTeams().stream().filter(team -> !teamIds.contains(team.getId())).toList();
-    scenario.setTeams(teams);
+    scenario.setTeams(new ArrayList<>() {{
+      addAll(teams);
+    }});
     this.updateScenario(scenario);
     // Remove all association between users / exercises / teams
     teamIds.forEach(this.scenarioTeamUserRepository::deleteTeamFromAllReferences);
     return teamRepository.findAllById(teamIds);
   }
 
-  public Scenario addPlayer(@NotBlank final String scenarioId, @NotBlank final String teamId, @NotNull final List<String> playerIds) {
+  public Scenario addPlayer(@NotBlank final String scenarioId, @NotBlank final String teamId,
+      @NotNull final List<String> playerIds) {
     Scenario scenario = this.scenario(scenarioId);
     Team team = this.teamRepository.findById(teamId).orElseThrow();
     playerIds.forEach(playerId -> {
@@ -261,7 +266,8 @@ public class ScenarioService {
     return scenario;
   }
 
-  public Scenario removePlayer(@NotBlank final String scenarioId, @NotBlank final String teamId, @NotNull final List<String> playerIds) {
+  public Scenario removePlayer(@NotBlank final String scenarioId, @NotBlank final String teamId,
+      @NotNull final List<String> playerIds) {
     playerIds.forEach(playerId -> {
       ScenarioTeamUserId scenarioTeamUserId = new ScenarioTeamUserId();
       scenarioTeamUserId.setScenarioId(scenarioId);

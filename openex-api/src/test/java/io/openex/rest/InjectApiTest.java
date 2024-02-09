@@ -1,11 +1,14 @@
 package io.openex.rest;
 
 import com.jayway.jsonpath.JsonPath;
+import io.openex.database.model.Inject;
+import io.openex.database.model.Scenario;
+import io.openex.database.repository.InjectRepository;
 import io.openex.database.repository.ScenarioRepository;
-import io.openex.rest.scenario.form.ScenarioInformationInput;
-import io.openex.rest.scenario.form.ScenarioInput;
+import io.openex.rest.inject.form.InjectInput;
 import io.openex.rest.utils.WithMockObserverUser;
 import io.openex.rest.utils.WithMockPlannerUser;
+import io.openex.service.ScenarioService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,79 +16,90 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static io.openex.injects.http.HttpContract.HTTP_GET_CONTRACT;
 import static io.openex.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openex.rest.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
-public class ScenarioApiTest {
+public class InjectApiTest {
 
   @Autowired
   private MockMvc mvc;
 
   @Autowired
+  private ScenarioService scenarioService;
+  @Autowired
   private ScenarioRepository scenarioRepository;
+  @Autowired
+  private InjectRepository injectRepository;
 
   static String SCENARIO_ID;
+  static String INJECT_ID;
 
   @AfterAll
   void afterAll() {
     this.scenarioRepository.deleteById(SCENARIO_ID);
+    this.injectRepository.deleteById(INJECT_ID);
   }
 
-  @DisplayName("Create scenario succeed")
+  // -- SCENARIOS --
+
+  @DisplayName("Add an inject for scenario")
   @Test
   @Order(1)
   @WithMockPlannerUser
-  void createScenarioTest() throws Exception {
+  void addInjectForScenarioTest() throws Exception {
     // -- PREPARE --
-    ScenarioInput scenarioInput = new ScenarioInput();
+    Scenario scenario = new Scenario();
+    scenario.setName("Scenario name");
+    Scenario scenarioCreated = this.scenarioService.createScenario(scenario);
+    SCENARIO_ID = scenarioCreated.getId();
 
-    // -- EXECUTE & ASSERT --
-    this.mvc
-        .perform(post(SCENARIO_URI)
-            .content(asJsonString(scenarioInput))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is4xxClientError());
-
-    // -- PREPARE --
-    String name = "My scenario";
-    scenarioInput.setName(name);
+    InjectInput input = new InjectInput();
+    input.setTitle("Test inject");
+    input.setContract(HTTP_GET_CONTRACT);
+    input.setDependsDuration(0L);
 
     // -- EXECUTE --
     String response = this.mvc
-        .perform(post(SCENARIO_URI)
-            .content(asJsonString(scenarioInput))
+        .perform(post(SCENARIO_URI + "/" + SCENARIO_ID + "/injects")
+            .content(asJsonString(input))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful())
-        .andExpect(jsonPath("$.scenario_name").value(name))
         .andReturn()
         .getResponse()
         .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
-    SCENARIO_ID = JsonPath.read(response, "$.scenario_id");
+    INJECT_ID = JsonPath.read(response, "$.inject_id");
+    response = this.mvc
+        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+    assertEquals(INJECT_ID, JsonPath.read(response, "$.scenario_injects[0]"));
   }
 
-  @DisplayName("Retrieve scenarios")
+  @DisplayName("Retrieve injects for scenario")
   @Test
   @Order(2)
   @WithMockObserverUser
-  void retrieveScenariosTest() throws Exception {
+  void retrieveInjectsForScenarioTest() throws Exception {
     // -- EXECUTE --
     String response = this.mvc
-        .perform(get(SCENARIO_URI)
+        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID + "/injects")
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful())
         .andReturn()
@@ -94,16 +108,17 @@ public class ScenarioApiTest {
 
     // -- ASSERT --
     assertNotNull(response);
+    assertEquals(INJECT_ID, JsonPath.read(response, "$[0].inject_id"));
   }
 
-  @DisplayName("Retrieve scenario")
+  @DisplayName("Retrieve inject for scenario")
   @Test
   @Order(3)
   @WithMockObserverUser
-  void retrieveScenarioTest() throws Exception {
+  void retrieveInjectForScenarioTest() throws Exception {
     // -- EXECUTE --
     String response = this.mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID)
+        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID + "/injects/" + INJECT_ID)
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful())
         .andReturn()
@@ -112,31 +127,26 @@ public class ScenarioApiTest {
 
     // -- ASSERT --
     assertNotNull(response);
+    assertEquals(INJECT_ID, JsonPath.read(response, "$.inject_id"));
   }
 
-  @DisplayName("Update scenario")
+  @DisplayName("Add an inject for scenario")
   @Test
   @Order(4)
   @WithMockPlannerUser
-  void updateScenarioTest() throws Exception {
+  void updateInjectForScenarioTest() throws Exception {
     // -- PREPARE --
-    String response = this.mvc
-        .perform(get(SCENARIO_URI + "/" + SCENARIO_ID)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
-
-    ScenarioInput scenarioInput = new ScenarioInput();
-    String subtitle = "A subtitle";
-    scenarioInput.setName(JsonPath.read(response, "$.scenario_name"));
-    scenarioInput.setSubtitle(subtitle);
+    Inject inject = this.injectRepository.findById(INJECT_ID).orElseThrow();
+    InjectInput input = new InjectInput();
+    String injectTitle = "A new title";
+    input.setTitle(injectTitle);
+    input.setContract(inject.getContract());
+    input.setDependsDuration(inject.getDependsDuration());
 
     // -- EXECUTE --
-    response = this.mvc
-        .perform(put(SCENARIO_URI + "/" + SCENARIO_ID)
-            .content(asJsonString(scenarioInput))
+    String response = this.mvc
+        .perform(put(SCENARIO_URI + "/" + SCENARIO_ID + "/injects/" + INJECT_ID)
+            .content(asJsonString(input))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful())
@@ -146,43 +156,16 @@ public class ScenarioApiTest {
 
     // -- ASSERT --
     assertNotNull(response);
-    assertEquals(subtitle, JsonPath.read(response, "$.scenario_subtitle"));
+    assertEquals(injectTitle, JsonPath.read(response, "$.inject_title"));
   }
 
-  @DisplayName("Update scenario information")
+  @DisplayName("Delete inject for scenario")
   @Test
   @Order(5)
   @WithMockPlannerUser
-  void updateScenarioInformationTest() throws Exception {
-    // -- PREPARE --
-    ScenarioInformationInput scenarioInformationInput = new ScenarioInformationInput();
-    String header = "NEW HEADER";
-    scenarioInformationInput.setReplyTo("no-reply@filigran.io");
-    scenarioInformationInput.setHeader(header);
-
-    // -- EXECUTE --
-    String response = this.mvc
-        .perform(put(SCENARIO_URI + "/" + SCENARIO_ID + "/information")
-            .content(asJsonString(scenarioInformationInput))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
-
-    // -- ASSERT --
-    assertNotNull(response);
-    assertEquals(header, JsonPath.read(response, "$.scenario_message_header"));
-  }
-
-  @DisplayName("Delete scenario")
-  @Test
-  @Order(6)
-  @WithMockPlannerUser
-  void deleteScenarioTest() throws Exception {
+  void deleteInjectForScenarioTest() throws Exception {
     // -- EXECUTE 1 ASSERT --
-    this.mvc.perform(delete(SCENARIO_URI + "/" + SCENARIO_ID))
+    this.mvc.perform(delete(SCENARIO_URI + "/" + SCENARIO_ID + "/injects/" + INJECT_ID))
         .andExpect(status().is2xxSuccessful());
   }
 

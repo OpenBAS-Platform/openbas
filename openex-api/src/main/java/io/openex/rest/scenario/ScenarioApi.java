@@ -40,6 +40,7 @@ public class ScenarioApi {
   private final ImportService importService;
 
   @PostMapping(SCENARIO_URI)
+  // TODO: Admin only ?
   public Scenario createScenario(@Valid @RequestBody final ScenarioInput input) {
     Scenario scenario = new Scenario();
     scenario.setUpdateAttributes(input);
@@ -69,7 +70,7 @@ public class ScenarioApi {
     return this.scenarioService.updateScenario(scenario);
   }
 
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/informations")
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/information")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario updateScenarioInformation(
       @PathVariable @NotBlank final String scenarioId,
@@ -108,13 +109,6 @@ public class ScenarioApi {
 
   // -- TEAMS --
 
-  @GetMapping(SCENARIO_URI + "/{scenarioId}/teams")
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
-  public Iterable<Team> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    return scenario.getTeams();
-  }
-
   @Transactional(rollbackOn = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/add")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
@@ -122,6 +116,13 @@ public class ScenarioApi {
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
     return this.scenarioService.addTeams(scenarioId, input.getTeamIds());
+  }
+
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/teams")
+  @PreAuthorize("isScenarioObserver(#scenarioId)")
+  public Iterable<Team> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    return scenario.getTeams();
   }
 
   @Transactional(rollbackOn = Exception.class)

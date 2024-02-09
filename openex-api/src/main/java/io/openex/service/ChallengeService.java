@@ -63,25 +63,21 @@ public class ChallengeService {
 
   public Iterable<Challenge> getExerciseChallenges(@NotBlank final String exerciseId) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-    List<String> challenges = exercise.getInjects().stream()
-        .filter(inject -> inject.getContract().equals(CHALLENGE_PUBLISH))
-        .filter(inject -> inject.getContent() != null)
-        .flatMap(inject -> {
-          try {
-            ChallengeContent content = mapper.treeToValue(inject.getContent(), ChallengeContent.class);
-            return content.getChallenges().stream();
-          } catch (JsonProcessingException e) {
-            return Stream.empty();
-          }
-        })
-        .distinct().toList();
-    return fromIterable(challengeRepository.findAllById(challenges)).stream()
-        .map(this::enrichChallengeWithExercises).toList();
+    return resolveChallenges(exercise.getInjects())
+        .map(this::enrichChallengeWithExercises)
+        .toList();
   }
 
   public Iterable<Challenge> getScenarioChallenges(@NotNull final Scenario scenario) {
-    List<String> challenges = scenario.getInjects()
-        .stream()
+    return resolveChallenges(scenario.getInjects())
+        .map(this::enrichChallengeWithScenarios)
+        .toList();
+  }
+
+  // -- PRIVATE --
+
+  private Stream<Challenge> resolveChallenges(@NotNull final List<Inject> injects) {
+    List<String> challenges = injects.stream()
         .filter(inject -> inject.getContract().equals(CHALLENGE_PUBLISH))
         .filter(inject -> inject.getContent() != null)
         .flatMap(inject -> {
@@ -93,9 +89,6 @@ public class ChallengeService {
           }
         })
         .distinct().toList();
-    return fromIterable(this.challengeRepository.findAllById(challenges))
-        .stream()
-        .map(this::enrichChallengeWithScenarios)
-        .toList();
+    return fromIterable(this.challengeRepository.findAllById(challenges)).stream();
   }
 }
