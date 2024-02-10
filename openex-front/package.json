@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "7.23.3",
-    "@eslint/eslintrc": "3.0.0",
+    "@eslint/eslintrc": "3.0.1",
     "@eslint/js": "8.56.0",
     "@stylistic/eslint-plugin": "1.5.4",
     "@testing-library/react": "14.1.2",
