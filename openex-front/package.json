@@ -68,7 +68,7 @@
     "@eslint/eslintrc": "3.0.1",
     "@eslint/js": "8.56.0",
     "@stylistic/eslint-plugin": "1.6.1",
-    "@testing-library/react": "14.1.2",
+    "@testing-library/react": "14.2.1",
     "@types/node": "20.11.17",
     "@types/react": "18.2.55",
     "@types/react-csv": "1.1.10",
