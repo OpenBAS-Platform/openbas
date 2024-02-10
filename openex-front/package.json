@@ -19,7 +19,7 @@
     "@redux-devtools/extension": "3.3.0",
     "@uiw/react-md-editor": "4.0.3",
     "apexcharts": "3.45.1",
-    "axios": "1.6.5",
+    "axios": "1.6.7",
     "ckeditor5-custom-build": "link:packages/ckeditor5-custom-build",
     "classnames": "2.5.1",
     "date-fns": "3.3.1",
