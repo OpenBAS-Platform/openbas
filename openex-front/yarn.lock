@@ -8172,9 +8172,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-react-parser@npm:5.1.1":
-  version: 5.1.1
-  resolution: "html-react-parser@npm:5.1.1"
+"html-react-parser@npm:5.1.2":
+  version: 5.1.2
+  resolution: "html-react-parser@npm:5.1.2"
   dependencies:
     domhandler: 5.0.3
     html-dom-parser: 5.0.7
@@ -8182,7 +8182,7 @@ __metadata:
     style-to-js: 1.1.10
   peerDependencies:
     react: 0.14 || 15 || 16 || 17 || 18
-  checksum: 3a4b615bdb704f4b0dbca73eed9db98598fb2ef6b75542801331bc42730ca34952d2198f0681cda9ad5b258c6e68c347084a9f77c026775b115ab18a100f8a2f
+  checksum: 5d0dd25f3ed48fd46e9044e78345dfce77d3bf318940fd9c95dd779fce6ac5100a153cd0c6939c05bceaa3ce014a681d015983ccea999ffcf4a6f37a78daba1d
   languageName: node
   linkType: hard
 
@@ -10737,7 +10737,7 @@ __metadata:
     fs-extra: 11.2.0
     globals: 13.24.0
     history: 5.3.0
-    html-react-parser: 5.1.1
+    html-react-parser: 5.1.2
     html-to-image: 1.11.11
     http-proxy-middleware: 2.0.6
     js-file-download: 0.4.12
