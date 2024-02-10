@@ -3670,12 +3670,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.11.5":
-  version: 20.11.5
-  resolution: "@types/node@npm:20.11.5"
+"@types/node@npm:20.11.17":
+  version: 20.11.17
+  resolution: "@types/node@npm:20.11.17"
   dependencies:
     undici-types: ~5.26.4
-  checksum: a542727de1334ae20a3ca034b0ecf4b464a57ca01efc4f9cf43bd9ab93896125ab3c2de060ecd8f6ae23b86c6bf3463f681b643e69c032c6a662d376c98a6092
+  checksum: 59c0dde187120adc97da30063c86511664b24b50fe777abfe1f557c217d0a0b84a68aaab5ef8ac44f5c2986b3f9cd605a15fa6e4f31195e594da96bbe9617c20
   languageName: node
   linkType: hard
 
@@ -10708,7 +10708,7 @@ __metadata:
     "@redux-devtools/extension": 3.3.0
     "@stylistic/eslint-plugin": 1.5.4
     "@testing-library/react": 14.1.2
-    "@types/node": 20.11.5
+    "@types/node": 20.11.17
     "@types/react": 18.2.55
     "@types/react-csv": 1.1.10
     "@types/react-dom": 18.2.19
