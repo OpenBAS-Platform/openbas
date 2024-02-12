@@ -74,7 +74,7 @@ const Index = () => {
               <Route path="exercises" element={errorWrapper(Exercises)()} />
               <Route path="exercises/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
               <Route path="scenarios" element={errorWrapper(Scenarios)()} />
-              <Route path="scenarios/:scenarioId" element={errorWrapper(IndexScenario)()} />
+              <Route path="scenarios/:scenarioId/*" element={errorWrapper(IndexScenario)()} />
               <Route path="assets/*" element={errorWrapper(Assets)()} />
               <Route path="teams/*" element={errorWrapper(Teams)()} />
               <Route path="components/*" element={errorWrapper(IndexComponents)()} />

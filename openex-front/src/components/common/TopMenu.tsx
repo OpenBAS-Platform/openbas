@@ -20,6 +20,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
 
 export interface MenuEntry {
   path: string;
+  match?: string;
   label: string;
 }
 
@@ -33,14 +34,20 @@ const TopMenu: FunctionComponent<{ entries: MenuEntry[], contextual?: boolean }>
 
   const buttons = () => (
     entries.map((entry, idx) => {
+      let isCurrentTab = false;
+      if (entry.match) {
+        isCurrentTab = location.pathname.includes(entry.match);
+      } else {
+        isCurrentTab = location.pathname === entry.path;
+      }
       return (
         <Button
           key={idx}
           component={Link}
           to={entry.path}
           size="small"
-          variant={location.pathname === entry.path ? 'contained' : 'text'}
-          color={location.pathname === entry.path ? 'secondary' : 'primary'}
+          variant={isCurrentTab ? 'contained' : 'text'}
+          color={isCurrentTab ? 'secondary' : 'primary'}
           classes={{ root: classes.button }}
         >
           {t(entry.label)}

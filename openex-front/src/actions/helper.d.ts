@@ -1,8 +1,13 @@
-import type { Team, Exercise, InjectExpectation, Channel, Organization, Tag, User, Challenge, Article, PlatformSetting } from '../utils/api-types';
+import type { Team, Exercise, InjectExpectation, Channel, Organization, Tag, User, Challenge, Article, PlatformSetting, Scenario } from '../utils/api-types';
 
 export interface ExercicesHelper {
   getExercise: (exerciseId: Exercise['exercise_id']) => Exercise;
   getExerciseInjectExpectations: (exerciseId: Exercise['exercise_id']) => InjectExpectation[];
+}
+
+export interface ScenariosHelper {
+  getScenario: (scenarioId: Scenario['scenario_id']) => Scenario;
+  getScenarioTeams: (scenarioId: Scenario['scenario_id']) => Team[];
 }
 
 export interface UsersHelper {
@@ -20,6 +25,7 @@ export interface TagsHelper {
 
 export interface TeamsHelper {
   getExerciseTeams: (exerciseId: Exercise['exercise_id']) => Team[];
+  getScenarioTeams: (exerciseId: Exercise['exercise_id']) => Team[];
   getTeamsMap: () => Record<string, Team>;
 }
 

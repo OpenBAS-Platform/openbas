@@ -26,12 +26,18 @@ const useStyles = makeStyles<Theme>((theme) => ({
 const TopMenuScenario = () => {
   // Standard hooks
   const classes = useStyles();
-  const { scenarioId } = useParams();
+  const { scenarioId } = useParams<'scenarioId'>();
   const { t } = useFormatter();
+
   const entries: MenuEntry[] = [
     {
       path: `/admin/scenarios/${scenarioId}`,
       label: 'Overview',
+    },
+    {
+      path: `/admin/scenarios/${scenarioId}/definition/teams`,
+      match: `/admin/scenarios/${scenarioId}/definition`,
+      label: 'Definition',
     },
   ];
   return (

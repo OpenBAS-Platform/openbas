@@ -12,6 +12,10 @@ import TopBar from '../../nav/TopBar';
 import ScenarioHeader from './ScenarioHeader';
 
 const Scenario = lazy(() => import('./Scenario'));
+const Teams = lazy(() => import('../../exercises/teams/Teams'));
+const Articles = lazy(() => import('../../exercises/articles/Articles'));
+const Challenges = lazy(() => import('../../exercises/challenges/Challenges'));
+const Variables = lazy(() => import('../../exercises/variables/Variables'));
 
 const IndexScenarioComponent: FunctionComponent<{ scenarioId: string }> = ({ scenarioId }) => {
   // Standard hooks
@@ -33,6 +37,10 @@ const IndexScenarioComponent: FunctionComponent<{ scenarioId: string }> = ({ sce
         <Suspense fallback={<Loader />}>
           <Routes>
             <Route path="" element={errorWrapper(Scenario)()} />
+            <Route path="definition/teams" element={errorWrapper(Teams)()} />
+            <Route path="definition/articles" element={errorWrapper(Articles)()} />
+            <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
+            <Route path="definition/variables" element={errorWrapper(Variables)()} />
           </Routes>
         </Suspense>
       </>

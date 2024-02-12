@@ -192,7 +192,7 @@ const TopBar: React.FC = () => {
           {(location.pathname.endsWith('/admin/components/channels')
               || location.pathname.endsWith('/admin/components/documents')
               || location.pathname.endsWith('/admin/components/challenges'))
-              && <TopMenuComponents />}
+            && <TopMenuComponents />}
           {location.pathname.includes('/admin/components/channels/') && <TopMenuChannel />}
           {location.pathname.includes('/admin/components/challenges/') && (<TopMenuChallenges />)}
           {location.pathname.includes('/admin/lessons') && <TopMenuLessons />}
@@ -213,18 +213,18 @@ const TopBar: React.FC = () => {
                 component={Link}
                 to="/dashboard/search"
                 color={
-                    location.pathname.includes('/dashboard/search')
-                    && !location.pathname.includes('/dashboard/search_bulk')
-                      ? 'secondary'
-                      : 'inherit'
-                  }
-                size='medium'
+                  location.pathname.includes('/dashboard/search')
+                  && !location.pathname.includes('/dashboard/search_bulk')
+                    ? 'secondary'
+                    : 'inherit'
+                }
+                size="medium"
               >
-                <BiotechOutlined fontSize='medium'/>
+                <BiotechOutlined fontSize="medium" />
               </IconButton>
             </Tooltip>
           </div>
-          <Divider className={classes.divider} orientation="vertical"/>
+          <Divider className={classes.divider} orientation="vertical" />
           <div className={classes.barRightContainer}>
             <Tooltip title={t('Notifications')}>
               <IconButton
@@ -235,7 +235,7 @@ const TopBar: React.FC = () => {
                 to="/dashboard/profile/notifications"
                 color={location.pathname === '/dashboard/profile/notifications' ? 'primary' : 'inherit'}
               >
-                <NotificationsOutlined fontSize="medium"/>
+                <NotificationsOutlined fontSize="medium" />
               </IconButton>
             </Tooltip>
             <IconButton
@@ -247,7 +247,7 @@ const TopBar: React.FC = () => {
               id="xtm-menu-button"
               onClick={handleOpenXtm}
             >
-              <AppsOutlined fontSize="medium"/>
+              <AppsOutlined fontSize="medium" />
             </IconButton>
             <Popover
               anchorEl={xtmOpen.anchorEl}
@@ -267,7 +267,10 @@ const TopBar: React.FC = () => {
                 <Grid container={true} spacing={3}>
                   <Grid item={true} xs={6}>
                     <Tooltip title={settings.xtm_opencti_enable && settings.xtm_opencti_url ? t('Platform connected') : t('Get OpenCTI now')}>
-                      <a className={classes.xtmItem} href={settings.xtm_opencti_enable && settings.xtm_opencti_url ? settings.xtm_opencti_url : 'https://filigran.io/solutions/products/opencti-threat-intelligence/'} target="_blank" rel="noreferrer">
+                      <a className={classes.xtmItem}
+                        href={settings.xtm_opencti_enable && settings.xtm_opencti_url ? settings.xtm_opencti_url : 'https://filigran.io/solutions/products/opencti-threat-intelligence/'}
+                        target="_blank" rel="noreferrer"
+                      >
                         <Badge variant="dot" color={settings.xtm_opencti_enable && settings.xtm_opencti_url ? 'success' : 'warning'}>
                           <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? octiDark : octiLight} alt="OCTI" />
                         </Badge>
@@ -309,12 +312,14 @@ const TopBar: React.FC = () => {
               </Box>
             </Popover>
             <IconButton
-              aria-label="account-menu"
+              aria-label='account-menu'
               onClick={handleOpenMenu}
               size='medium'
-              color={location.pathname === '/admin/profile' ? 'secondary' : 'inherit'}
+              color={
+                location.pathname === '/admin/profile' ? 'secondary' : 'inherit'
+              }
             >
-              <AccountCircleOutlined fontSize='medium' />
+              <AccountCircleOutlined fontSize="medium" />
             </IconButton>
             <Menu id="menu-appbar"
               anchorEl={menuOpen.anchorEl}
