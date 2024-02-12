@@ -11,6 +11,9 @@ import useDataLoader from '../../../../../utils/ServerSideEvent';
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import NotFound from '../../../../../components/NotFound';
+import ExerciseOrScenarioContext from '../../../../ExerciseOrScenarioContext';
+import { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
+import { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -30,9 +33,10 @@ const ScenarioVariablesComponent: FunctionComponent<Props> = ({
   const classes = useStyles();
   const dispatch = useAppDispatch();
   // Fetching data
-  const { variables }: { variables: Variable[] } = useHelper((helper: VariablesHelper) => {
+  const { variables, scenario }: { variables: Variable[], scenario: ScenarioStore } = useHelper((helper: VariablesHelper & ScenariosHelper) => {
     return {
       variables: helper.getScenarioVariables(scenarioId),
+      scenario: helper.getScenario(scenarioId),
     };
   });
   useDataLoader(() => {
@@ -42,7 +46,9 @@ const ScenarioVariablesComponent: FunctionComponent<Props> = ({
   return (
     <div className={classes.container}>
       <DefinitionMenu type={TechnicalScenarioSimulationEnum.Scenario} scenarioId={scenarioId} />
-      <Variables variables={variables} />
+      <ExerciseOrScenarioContext.Provider value={{ scenario }}>
+        <Variables variables={variables} />
+      </ExerciseOrScenarioContext.Provider>
     </div>
   );
 };
