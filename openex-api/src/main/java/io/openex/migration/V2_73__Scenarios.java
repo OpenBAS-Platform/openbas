@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V2_72__Scenarios extends BaseJavaMigration {
+public class V2_73__Scenarios extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
@@ -31,16 +31,16 @@ public class V2_72__Scenarios extends BaseJavaMigration {
         """);
     // Add association table between scenario and team and player
     select.execute("""  
-        CREATE TABLE scenarios_teams_users (
-            scenario_id varchar(255) not null constraint scenario_id_fk references scenarios on delete cascade,
-            team_id varchar(255) not null constraint team_id_fk references teams on delete cascade,
-            user_id varchar(255) not null constraint user_id_fk references users on delete cascade,
-            primary key (scenario_id, team_id, user_id)
-        );
-        CREATE INDEX idx_scenarios_teams_users_scenario on scenarios_teams_users (scenario_id);
-        CREATE INDEX idx_scenarios_teams_users_team on scenarios_teams_users (team_id);
-        CREATE INDEX idx_scenarios_teams_users_user on scenarios_teams_users (user_id);
-    """);
+            CREATE TABLE scenarios_teams_users (
+                scenario_id varchar(255) not null constraint scenario_id_fk references scenarios on delete cascade,
+                team_id varchar(255) not null constraint team_id_fk references teams on delete cascade,
+                user_id varchar(255) not null constraint user_id_fk references users on delete cascade,
+                primary key (scenario_id, team_id, user_id)
+            );
+            CREATE INDEX idx_scenarios_teams_users_scenario on scenarios_teams_users (scenario_id);
+            CREATE INDEX idx_scenarios_teams_users_team on scenarios_teams_users (team_id);
+            CREATE INDEX idx_scenarios_teams_users_user on scenarios_teams_users (user_id);
+        """);
     // Add scenario to grant
     select.execute("""
         ALTER TABLE grants ADD COLUMN grant_scenario varchar(255) constraint scenario_fk references scenarios on delete cascade ;
