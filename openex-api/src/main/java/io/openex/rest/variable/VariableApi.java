@@ -50,7 +50,7 @@ public class VariableApi extends RestBehavior {
     return this.variableService.variablesFromExercise(exerciseId);
   }
 
-  @PutMapping(EXERCISE_URI + "{exerciseId}/variables/{variableId}")
+  @PutMapping(EXERCISE_URI + "/{exerciseId}/variables/{variableId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Variable updateVariableForExercise(
       @PathVariable @NotBlank final String exerciseId,
