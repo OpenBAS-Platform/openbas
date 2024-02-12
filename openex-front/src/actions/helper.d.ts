@@ -6,6 +6,11 @@ export interface ExercicesHelper {
   getExerciseInjectExpectations: (exerciseId: Exercise['exercise_id']) => InjectExpectation[];
 }
 
+export interface ScenariosHelper {
+  getScenario: (scenarioId: Scenario['scenario_id']) => Scenario;
+  getScenarioTeams: (scenarioId: Scenario['scenario_id']) => Team[];
+}
+
 export interface UsersHelper {
   getMe: () => User;
 }

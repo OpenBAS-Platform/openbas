@@ -314,7 +314,7 @@ const TopBar: React.FC = () => {
             <IconButton
               aria-label='account-menu'
               onClick={handleOpenMenu}
-              size='medium'
+              size="medium"
               color={
                 location.pathname === '/admin/profile' ? 'secondary' : 'inherit'
               }
