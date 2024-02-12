@@ -1,33 +1,27 @@
 import React, { useState } from 'react';
-import { IconButton, Menu, MenuItem, Dialog, DialogContent, DialogContentText, DialogActions, Button, DialogTitle } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { useFormatter } from '../../../../components/i18n';
-import type { Exercise, Variable, VariableInput } from '../../../../utils/api-types';
+import type { Variable, VariableInput } from '../../../../utils/api-types';
 import VariableForm from './VariableForm';
-import { deleteVariable, updateVariable } from '../../../../actions/Variable';
-import { useAppDispatch } from '../../../../utils/hooks';
 import Transition from '../../../../components/common/Transition';
 
 interface Props {
-  disabled?: boolean;
-  exercise: Exercise;
   variable: Variable;
-  onDeleteVariable?: () => void;
+  disabled: boolean;
+  onEdit: (variable: Variable, data: VariableInput) => void;
+  onDelete: (variable: Variable) => void;
 }
 
 const VariablePopover: React.FC<Props> = ({
-  disabled,
-  exercise,
   variable,
-  onDeleteVariable,
+  disabled,
+  onEdit,
+  onDelete,
 }) => {
   // Standard hooks
-  const [editVar, setEditVar] = useState(false);
-  const [deleteVar, setDeleteVar] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
+  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const initialValues = (({
     variable_key,
@@ -35,14 +29,20 @@ const VariablePopover: React.FC<Props> = ({
     variable_value,
   }) => ({ variable_key, variable_description, variable_value }))(variable);
 
-  const submitDelete = () => {
-    dispatch(deleteVariable(exercise.exercise_id, variable.variable_id));
-    setDeleteVar(false);
+  // Edition
+
+  const [editVar, setEditVar] = useState(false);
+  const submitEdit = (data: VariableInput) => {
+    onEdit(variable, data);
+    setEditVar(false);
   };
 
-  const submitEdit = (data: VariableInput) => {
-    dispatch(updateVariable(exercise.exercise_id, variable.variable_id, data));
-    setEditVar(false);
+  // Deletion
+
+  const [deleteVar, setDeleteVar] = useState(false);
+  const submitDelete = () => {
+    onDelete(variable);
+    setDeleteVar(false);
   };
 
   return (
@@ -68,21 +68,19 @@ const VariablePopover: React.FC<Props> = ({
             setEditVar(true);
             setAnchorEl(null);
           }}
-          disabled={isExerciseReadOnly(exercise)}
+          disabled={disabled}
         >
           {t('Update')}
         </MenuItem>
-        {!onDeleteVariable && (
-          <MenuItem
-            onClick={() => {
-              setDeleteVar(true);
-              setAnchorEl(null);
-            }}
-            disabled={isExerciseReadOnly(exercise)}
-          >
-            {t('Delete')}
-          </MenuItem>
-        )}
+        <MenuItem
+          onClick={() => {
+            setDeleteVar(true);
+            setAnchorEl(null);
+          }}
+          disabled={disabled}
+        >
+          {t('Delete')}
+        </MenuItem>
       </Menu>
       <Dialog
         open={deleteVar}
@@ -106,7 +104,7 @@ const VariablePopover: React.FC<Props> = ({
         TransitionComponent={Transition}
         open={editVar}
         onClose={() => setEditVar(false)}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
@@ -114,7 +112,7 @@ const VariablePopover: React.FC<Props> = ({
         <DialogContent>
           <VariableForm
             initialValues={initialValues}
-            editing={true}
+            editing
             onSubmit={submitEdit}
             handleClose={() => setEditVar(false)}
           />

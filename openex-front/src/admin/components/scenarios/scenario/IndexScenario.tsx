@@ -15,7 +15,7 @@ const Scenario = lazy(() => import('./Scenario'));
 const Teams = lazy(() => import('../../exercises/teams/Teams'));
 const Articles = lazy(() => import('../../exercises/articles/Articles'));
 const Challenges = lazy(() => import('../../exercises/challenges/Challenges'));
-const Variables = lazy(() => import('../../exercises/variables/Variables'));
+const Variables = lazy(() => import('./variables/ScenarioVariables'));
 
 const IndexScenarioComponent: FunctionComponent<{ scenarioId: string }> = ({ scenarioId }) => {
   // Standard hooks

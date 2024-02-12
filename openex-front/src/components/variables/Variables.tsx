@@ -1,26 +1,14 @@
-import React, { CSSProperties } from 'react';
-import { makeStyles } from '@mui/styles';
-import { useParams } from 'react-router-dom';
-import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { AttachMoneyOutlined } from '@mui/icons-material';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import SearchFilter from '../../../../components/SearchFilter';
-import DefinitionMenu from '../DefinitionMenu';
-import { useHelper } from '../../../../store';
-import type { Exercise, Variable } from '../../../../utils/api-types';
-import { usePermissions } from '../../../../utils/Exercise';
-import CreateVariable from './CreateVariable';
-import VariablePopover from './VariablePopover';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchVariables, VariablesHelper } from '../../../../actions/Variable';
-import { useAppDispatch } from '../../../../utils/hooks';
-import type { ExercicesHelper } from '../../../../actions/helper';
+import VariablePopover from '../../admin/components/exercises/variables/VariablePopover';
+import React, { CSSProperties, FunctionComponent } from 'react';
+import { makeStyles } from '@mui/styles';
+import useSearchAnFilter from '../../utils/SortingFiltering';
+import type { Variable, VariableInput } from '../../utils/api-types';
+import SearchFilter from '../SearchFilter';
+import CreateVariable from '../../admin/components/exercises/variables/CreateVariable';
 
 const useStyles = makeStyles(() => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
   itemHead: {
     textTransform: 'uppercase',
     cursor: 'pointer',
@@ -97,31 +85,32 @@ const inlineStyles: {
   },
 };
 
-const Variables = () => {
+interface Props {
+  variables: Variable[];
+  permissions: { readOnly: boolean, canWrite: boolean };
+  onCreate: (data: VariableInput) => void;
+  onEdit: (variable: Variable, data: VariableInput) => void;
+  onDelete: (variable: Variable) => void;
+}
+
+const Variables: FunctionComponent<Props> = ({
+  variables,
+  permissions,
+  onCreate,
+  onEdit,
+  onDelete,
+}) => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   // Filter and sort hook
   const filtering = useSearchAnFilter('variable', 'key', [
     'key',
     'description',
   ]);
-  // Fetching data
-  const { exerciseId } = useParams<'exerciseId'>();
-  const { exercise, variables }: { exercise: Exercise; variables: [Variable] } = useHelper((helper: VariablesHelper & ExercicesHelper) => {
-    return {
-      exercise: helper.getExercise(exerciseId),
-      variables: helper.getExerciseVariables(exerciseId),
-    };
-  });
-  useDataLoader(() => {
-    dispatch(fetchVariables(exerciseId));
-  });
-  const permissions = usePermissions(exerciseId);
+
   const sortedVariables: [Variable] = filtering.filterAndSort(variables);
   return (
-    <div className={classes.container}>
-      <DefinitionMenu exerciseId={exerciseId} />
+    <>
       <div>
         <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
@@ -132,6 +121,7 @@ const Variables = () => {
         </div>
       </div>
       <div className="clearfix" />
+
       <List style={{ marginTop: 10 }}>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -175,7 +165,7 @@ const Variables = () => {
           <ListItem
             key={variable.variable_id}
             classes={{ root: classes.item }}
-            divider={true}
+            divider
           >
             <ListItemIcon>
               <AttachMoneyOutlined />
@@ -206,18 +196,19 @@ const Variables = () => {
             />
             <ListItemSecondaryAction>
               <VariablePopover
-                exercise={exercise}
                 variable={variable}
                 disabled={permissions.readOnly}
+                onEdit={onEdit}
+                onDelete={onDelete}
               />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
-      {permissions.canWrite && exerciseId && (
-        <CreateVariable exerciseId={exerciseId} />
+      {permissions.canWrite && (
+        <CreateVariable onCreate={onCreate} />
       )}
-    </div>
+    </>
   );
 };
 

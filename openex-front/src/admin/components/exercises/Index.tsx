@@ -29,7 +29,7 @@ const MailsInject = lazy(() => import('./mails/Inject'));
 const Logs = lazy(() => import('./logs/Logs'));
 const Chat = lazy(() => import('./chat/Chat'));
 const Validations = lazy(() => import('./validations/Validations'));
-const Variables = lazy(() => import('./variables/Variables'));
+const Variables = lazy(() => import('./variables/ExerciseVariables'));
 
 const useStyles = makeStyles(() => ({
   root: {

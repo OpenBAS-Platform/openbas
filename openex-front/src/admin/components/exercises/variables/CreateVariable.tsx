@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { Fab, Dialog, DialogTitle, DialogContent, ListItem, ListItemIcon, Theme, ListItemText } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Fab, ListItem, ListItemIcon, ListItemText, Theme } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
 import VariableForm from './VariableForm';
-import { addVariable } from '../../../../actions/Variable';
-import { useAppDispatch } from '../../../../utils/hooks';
-import type { VariableInput } from '../../../../utils/api-types';
+import type { Variable, VariableInput } from '../../../../utils/api-types';
 import Transition from '../../../../components/common/Transition';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -23,19 +21,21 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  exerciseId: string;
+  onCreate: (variable: VariableInput) => void;
   inline?: boolean;
 }
 
-const CreateVariable: React.FC<Props> = ({ exerciseId, inline }) => {
+const CreateVariable: React.FC<Props> = ({
+  onCreate,
+  inline
+}) => {
   // Standard hooks
   const classes = useStyles();
-  const [open, setOpen] = useState(false);
   const { t } = useFormatter();
 
-  const dispatch = useAppDispatch();
+  const [open, setOpen] = useState(false);
   const onSubmit = (data: VariableInput) => {
-    dispatch(addVariable(exerciseId, data));
+    onCreate(data);
     setOpen(false);
   };
 
@@ -43,8 +43,8 @@ const CreateVariable: React.FC<Props> = ({ exerciseId, inline }) => {
     <div>
       {inline ? (
         <ListItem
-          button={true}
-          divider={true}
+          button
+          divider
           onClick={() => setOpen(true)}
           color="primary"
         >
@@ -70,7 +70,7 @@ const CreateVariable: React.FC<Props> = ({ exerciseId, inline }) => {
         open={open}
         TransitionComponent={Transition}
         onClose={() => setOpen(false)}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
