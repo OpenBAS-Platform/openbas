@@ -1,7 +1,7 @@
 import { Dispatch } from 'redux';
 import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
 import { arrayOfScenarios, scenario } from './scenario-schema';
-import type { Scenario, ScenarioInformationsInput, ScenarioInput } from '../../utils/api-types';
+import type { Scenario, ScenarioInformationInput, ScenarioInput, Team } from '../../utils/api-types';
 import * as schema from '../Schema';
 
 const SCENARIO_URI = '/api/scenarios';
@@ -29,7 +29,7 @@ export const updateScenario = (
 
 export const updateScenarioInformation = (
   scenarioId: Scenario['scenario_id'],
-  data: ScenarioInformationsInput,
+  data: ScenarioInformationInput,
 ) => (dispatch: Dispatch) => {
   const uri = `${SCENARIO_URI}/${scenarioId}/informations`;
   return putReferential(scenario, uri, data)(dispatch);
@@ -55,3 +55,9 @@ export const fetchScenarioTeams = (scenarioId: Scenario['scenario_id']) => (disp
   const uri = `/api/scenarios/${scenarioId}/teams`;
   return getReferential(schema.arrayOfTeams, uri)(dispatch);
 };
+
+export const addScenarioTeams = (scenarioId: Scenario['scenario_id'], data: Team['team_id'][]) => (dispatch: Dispatch) => putReferential(
+  schema.arrayOfTeams,
+  `/api/scenarios/${scenarioId}/teams/add`,
+  data,
+)(dispatch);

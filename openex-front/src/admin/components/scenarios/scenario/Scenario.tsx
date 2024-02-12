@@ -162,12 +162,16 @@ const Scenario = () => {
   // Standard hooks
   const { scenarioId } = useParams();
 
+  console.log('scenarioId', scenarioId);
+
   if (scenarioId) {
     return (<ScenarioComponent scenarioId={scenarioId} />);
   }
 
+  console.log('WUT', scenarioId);
+
   return (
-    <NotFound></NotFound>
+    <div style={{ height: '100%', width: '100%', backgroundColor: 'red' }}></div>
   );
 };
 

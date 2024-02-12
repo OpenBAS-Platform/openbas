@@ -7,7 +7,6 @@ import { makeStyles } from '@mui/styles';
 import { useFormatter } from './i18n';
 import type { Exercise, Scenario } from '../utils/api-types';
 import type { Theme } from './Theme';
-import { TechnicalScenarioSimulationEnum } from '../utils/technical';
 
 const useStyles = makeStyles((theme: Theme) => ({
   drawer: {
@@ -26,18 +25,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  type: TechnicalScenarioSimulationEnum;
-  exerciseId?: Exercise['exercise_id'];
-  scenarioId?: Scenario['scenario_id'];
+  base: string;
+  id: Exercise['exercise_id'] | Scenario['scenario_id'];
 }
 
-const DefinitionMenu: React.FC<Props> = ({ type, exerciseId, scenarioId }) => {
+const DefinitionMenu: React.FC<Props> = ({ base, id }) => {
   const location = useLocation();
   const classes = useStyles();
   const { t } = useFormatter();
-
-  const base = type === TechnicalScenarioSimulationEnum.Scenario ? '/admin/scenarios' : '/admin/exercises';
-  const id = type === TechnicalScenarioSimulationEnum.Scenario ? scenarioId : exerciseId;
 
   return (
     <Drawer

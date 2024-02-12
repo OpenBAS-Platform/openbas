@@ -1,34 +1,49 @@
 import { useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import React from 'react';
+import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchExerciseTeams } from '../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { fetchScenarioTeams } from '../../../../actions/scenarios/scenario-actions';
-import ExerciseAddTeams from '../../exercises/teams/ExerciseAddTeams';
+import { addScenarioTeams, fetchScenarioTeams } from '../../../../actions/scenarios/scenario-actions';
 import DefinitionMenu from '../../../../components/DefinitionMenu';
-import { TechnicalScenarioSimulationEnum } from '../../../../utils/technical';
-import type { ScenariosHelper } from '../../../../actions/helper';
+import AddTeams from '../../../../components/AddTeams';
+import { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
+import useScenarioPermissions from '../../../../utils/Scenario';
+import { Scenario, Team } from '../../../../utils/api-types';
+import type { Theme } from '../../../../components/Theme';
+
+const useStyles = makeStyles((theme: Theme) => ({
+  container: {
+    margin: '10px 0 50px 0',
+    padding: '0 200px 0 0',
+  },
+}));
 
 const Teams = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
-  const { scenarioId } = useParams();
-  const { scenario, teams } = useHelper((helper: ScenariosHelper) => ({
+  const classes = useStyles();
+  const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
+  console.log('scenarioId', scenarioId);
+  const { scenario, teams }: { scenario: Scenario, teams: Team[] } = useHelper((helper: ScenariosHelper) => ({
     scenario: helper.getScenario(scenarioId),
     teams: helper.getScenarioTeams(scenarioId),
   }));
+  const permissions = useScenarioPermissions(scenarioId);
 
   useDataLoader(() => {
     dispatch(fetchScenarioTeams(scenarioId));
   });
 
+  const onAddTeams = (teamIds: Team['team_id'][]) => {
+    dispatch(addScenarioTeams(scenarioId, teamIds));
+  };
+
   return (
     <div className={classes.container}>
-      <DefinitionMenu type={TechnicalScenarioSimulationEnum.Scenario} scenarioId={scenarioId} />
+      <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
 
-      {permissions.canWrite && <AddTeams scenarioId={scenarioId} scenarioTeamsIds={teams.map((team) => team.team_id)} />}
+      {permissions.canWrite && scenarioId && <AddTeams currentTeamIds={teams.map((t) => t.team_id)} onAddTeams={onAddTeams} />}
     </div>
 
   );
