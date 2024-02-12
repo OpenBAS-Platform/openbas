@@ -8,11 +8,12 @@ import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import type { Contract, User, Variable } from '../../../../utils/api-types';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchVariables, VariablesHelper } from '../../../../actions/Variable';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { UsersHelper } from '../../../../actions/helper';
 import { copyToClipboard } from '../../../../utils/CopyToClipboard';
+import { fetchVariablesForExercise } from '../../../../actions/variables/variable-actions';
+import type { VariablesHelper } from '../../../../actions/variables/variable-helper';
 
 interface VariableChildItemProps {
   hasChildren?: boolean;
@@ -100,7 +101,7 @@ AvailableVariablesDialogProps
     },
   );
   useDataLoader(() => {
-    dispatch(fetchVariables(exerciseId));
+    dispatch(fetchVariablesForExercise(exerciseId));
   });
 
   return (

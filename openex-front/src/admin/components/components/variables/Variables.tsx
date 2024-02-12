@@ -1,12 +1,17 @@
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { AttachMoneyOutlined } from '@mui/icons-material';
-import VariablePopover from '../../admin/components/exercises/variables/VariablePopover';
-import React, { CSSProperties, FunctionComponent } from 'react';
+import React, { CSSProperties, FunctionComponent, useContext } from 'react';
 import { makeStyles } from '@mui/styles';
-import useSearchAnFilter from '../../utils/SortingFiltering';
-import type { Variable, VariableInput } from '../../utils/api-types';
-import SearchFilter from '../SearchFilter';
-import CreateVariable from '../../admin/components/exercises/variables/CreateVariable';
+import VariablePopover from '../../exercises/variables/VariablePopover';
+import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import type { Variable, VariableInput } from '../../../../utils/api-types';
+import SearchFilter from '../../../../components/SearchFilter';
+import CreateVariable from '../../exercises/variables/CreateVariable';
+import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
+import { deleteVariableForExercise, deleteVariableForScenario, updateVariableForExercise, updateVariableForScenario } from '../../../../actions/variables/variable-actions';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useScenarioPermissions from '../../../../utils/Scenario';
+import { usePermissions } from '../../../../utils/Exercise';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -87,21 +92,30 @@ const inlineStyles: {
 
 interface Props {
   variables: Variable[];
-  permissions: { readOnly: boolean, canWrite: boolean };
-  onCreate: (data: VariableInput) => void;
-  onEdit: (variable: Variable, data: VariableInput) => void;
-  onDelete: (variable: Variable) => void;
 }
 
 const Variables: FunctionComponent<Props> = ({
   variables,
-  permissions,
-  onCreate,
-  onEdit,
-  onDelete,
 }) => {
   // Standard hooks
   const classes = useStyles();
+  const dispatch = useAppDispatch();
+
+  // Context
+  const { exercise, scenario } = useContext(ExerciseOrScenarioContext);
+  let permissions: { readOnly: boolean, canWrite: boolean } = { readOnly: true, canWrite: false };
+  let onEdit: (variable: Variable, data: VariableInput) => void;
+  let onDelete: (variable: Variable) => void;
+  if (exercise) {
+    permissions = usePermissions(exercise.exercise_id);
+    onEdit = (variable: Variable, data: VariableInput) => dispatch(updateVariableForExercise(exercise.exercise_id, variable.variable_id, data));
+    onDelete = (variable: Variable) => dispatch(deleteVariableForExercise(exercise.exercise_id, variable.variable_id));
+  } else if (scenario) {
+    permissions = useScenarioPermissions(scenario.scenario_id);
+    onEdit = (variable: Variable, data: VariableInput) => dispatch(updateVariableForScenario(scenario.scenario_id, variable.variable_id, data));
+    onDelete = (variable: Variable) => dispatch(deleteVariableForScenario(scenario.scenario_id, variable.variable_id));
+  }
+
   // Filter and sort hook
   const filtering = useSearchAnFilter('variable', 'key', [
     'key',
@@ -206,7 +220,7 @@ const Variables: FunctionComponent<Props> = ({
         ))}
       </List>
       {permissions.canWrite && (
-        <CreateVariable onCreate={onCreate} />
+        <CreateVariable />
       )}
     </>
   );
