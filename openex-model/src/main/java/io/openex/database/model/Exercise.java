@@ -43,6 +43,7 @@ public class Exercise implements Base {
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("exercise_id")
+    @NotBlank
     private String id;
 
     @Getter

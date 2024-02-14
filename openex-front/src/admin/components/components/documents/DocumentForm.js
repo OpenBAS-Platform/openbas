@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Form } from 'react-final-form';
 import { Button, CircularProgress } from '@mui/material';
 import TextField from '../../../../components/TextField';
@@ -6,7 +6,6 @@ import { useFormatter } from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 import FileField from '../../../../components/FileField';
 import ExerciseField from '../../../../components/ExerciseField';
-import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
 import ScenarioField from '../../../../components/ScenarioField';
 
 const DocumentForm = (props) => {
@@ -19,9 +18,6 @@ const DocumentForm = (props) => {
     handleClose,
     filters,
   } = props;
-
-  // Context
-  const { exercise, scenario } = useContext(ExerciseOrScenarioContext);
 
   const validate = (values) => {
     const errors = {};
@@ -62,24 +58,20 @@ const DocumentForm = (props) => {
             rows={2}
             label={t('Description')}
           />
-          {!scenario
-            && <ExerciseField
-              name="document_exercises"
-              values={values}
-              label={t('Exercises')}
-              setFieldValue={form.mutators.setValue}
-              style={{ marginTop: 20 }}
-               />
-          }
-          {!exercise
-            && <ScenarioField
-              name="document_scenarios"
-              values={values}
-              label={t('Scenarios')}
-              setFieldValue={form.mutators.setValue}
-              style={{ marginTop: 20 }}
-               />
-          }
+          <ExerciseField
+            name="document_exercises"
+            values={values}
+            label={t('Exercises')}
+            setFieldValue={form.mutators.setValue}
+            style={{ marginTop: 20 }}
+          />
+          <ScenarioField
+            name="document_scenarios"
+            values={values}
+            label={t('Scenarios')}
+            setFieldValue={form.mutators.setValue}
+            style={{ marginTop: 20 }}
+          />
           <TagField
             name="document_tags"
             values={values}

@@ -52,7 +52,7 @@ import InjectAddDocuments from './InjectAddDocuments';
 import DocumentType from '../../components/documents/DocumentType';
 import DocumentPopover from '../../components/documents/DocumentPopover';
 import Select from '../../../../components/Select';
-import ArticlePopover from '../articles/ArticlePopover';
+import ArticlePopover from '../../components/articles/ArticlePopover';
 import InjectAddArticles from './InjectAddArticles';
 import ChannelIcon from '../../components/channels/ChannelIcon';
 import ChallengePopover from '../../components/challenges/ChallengePopover';
@@ -1041,8 +1041,6 @@ class QuickInject extends Component {
       injectTypes,
       teamsMap,
       documentsMap,
-      exercisesMap,
-      tagsMap,
       articlesMap,
       channelsMap,
       challengesMap,
@@ -1901,8 +1899,6 @@ class QuickInject extends Component {
                           <DocumentPopover
                             exerciseId={exerciseId}
                             document={document}
-                            exercisesMap={exercisesMap}
-                            tagsMap={tagsMap}
                             onRemoveDocument={this.handleRemoveDocument.bind(
                               this,
                             )}

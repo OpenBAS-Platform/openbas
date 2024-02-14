@@ -439,9 +439,6 @@ class Documents extends Component {
               <ListItemSecondaryAction>
                 <DocumentPopover
                   document={document}
-                  tagsMap={tagsMap}
-                  exercisesMap={exercisesMap}
-                  scenariosMap={scenariosMap}
                   disabled={!userAdmin}
                 />
               </ListItemSecondaryAction>

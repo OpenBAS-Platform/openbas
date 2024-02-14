@@ -10,7 +10,7 @@ import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchExerciseArticles } from '../../../../actions/channels/article-action';
-import CreateArticle from '../articles/CreateArticle';
+import CreateArticle from '../../components/articles/CreateArticle';
 import { truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import Transition from '../../../../components/common/Transition';

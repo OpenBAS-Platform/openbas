@@ -9,8 +9,6 @@ import useDataLoader from '../../../../../utils/ServerSideEvent';
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
-import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
-import type { Variable } from '../../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -29,11 +27,7 @@ const ScenarioVariables: FunctionComponent<Props> = () => {
   const dispatch = useAppDispatch();
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
-  const { variables }: { variables: Variable[] } = useHelper((helper: VariablesHelper & ScenariosHelper) => {
-    return {
-      variables: helper.getScenarioVariables(scenarioId),
-    };
-  });
+  const variables = useHelper((helper: VariablesHelper) => helper.getScenarioVariables(scenarioId));
   useDataLoader(() => {
     dispatch(fetchVariablesForScenario(scenarioId));
   });

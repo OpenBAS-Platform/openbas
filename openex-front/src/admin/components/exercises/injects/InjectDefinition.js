@@ -52,7 +52,7 @@ import Loader from '../../../../components/Loader';
 import DocumentType from '../../components/documents/DocumentType';
 import DocumentPopover from '../../components/documents/DocumentPopover';
 import Select from '../../../../components/Select';
-import ArticlePopover from '../articles/ArticlePopover';
+import ArticlePopover from '../../components/articles/ArticlePopover';
 import InjectAddArticles from './InjectAddArticles';
 import ChannelIcon from '../../components/channels/ChannelIcon';
 import ChallengePopover from '../../components/challenges/ChallengePopover';
@@ -1099,8 +1099,6 @@ class InjectDefinition extends Component {
       endpointsMap,
       assetGroupsMap,
       documentsMap,
-      exercisesMap,
-      tagsMap,
       articlesMap,
       channelsMap,
       challengesMap,
@@ -2010,8 +2008,6 @@ class InjectDefinition extends Component {
                           <DocumentPopover
                             exerciseId={exerciseId}
                             document={document}
-                            exercisesMap={exercisesMap}
-                            tagsMap={tagsMap}
                             onRemoveDocument={this.handleRemoveDocument.bind(
                               this,
                             )}

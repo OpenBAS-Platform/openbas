@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Form } from 'react-final-form';
-import { Button, Box, Grid, Typography, List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
+import { Box, Button, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
-import { AttachmentOutlined, ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import TextField from '../../../../components/TextField';
 import Autocomplete from '../../../../components/Autocomplete';
@@ -13,12 +13,13 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
-import ChannelIcon from '../../components/channels/ChannelIcon';
+import ChannelIcon from '../channels/ChannelIcon';
 import MarkDownField from '../../../../components/MarkDownField';
-import DocumentType from '../../components/documents/DocumentType';
+import DocumentType from '../documents/DocumentType';
 import ItemTags from '../../../../components/ItemTags';
-import DocumentPopover from '../../components/documents/DocumentPopover';
+import DocumentPopover from '../documents/DocumentPopover';
 import ArticleAddDocuments from './ArticleAddDocuments';
+import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 
 const useStyles = makeStyles(() => ({
   icon: {
@@ -127,17 +128,16 @@ const ArticleForm = ({
     return errors;
   };
   // Fetching data
-  const { channels, exercisesMap, documentsMap, tagsMap } = useHelper(
+  const { channels, documentsMap } = useHelper(
     (helper) => ({
       channels: helper.getChannels(),
-      exercisesMap: helper.getExercisesMap(),
       documentsMap: helper.getDocumentsMap(),
-      tagsMap: helper.getTagsMap(),
     }),
   );
   useDataLoader(() => {
     dispatch(fetchChannels());
     dispatch(fetchExercises());
+    dispatch(fetchScenarios());
     dispatch(fetchDocuments());
   });
   const handleAddDocuments = (docsIds) => setDocuments([...documents, ...docsIds]);
@@ -346,8 +346,6 @@ const ArticleForm = ({
                     <ListItemSecondaryAction>
                       <DocumentPopover
                         document={document}
-                        exercisesMap={exercisesMap}
-                        tagsMap={tagsMap}
                         removeChoice={t('Remove from the media pressure')}
                         onRemoveDocument={handleRemoveDocument}
                       />

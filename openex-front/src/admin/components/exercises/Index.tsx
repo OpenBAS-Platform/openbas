@@ -1,5 +1,5 @@
 import React, { FunctionComponent, lazy, Suspense } from 'react';
-import { Route, Routes, useParams } from 'react-router-dom';
+import { Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { fetchExercise } from '../../../actions/Exercise';
 import type { ExercicesHelper } from '../../../actions/helper';
 import { errorWrapper } from '../../../components/Error';
@@ -11,8 +11,10 @@ import TopBar from '../nav/TopBar';
 import ExerciseHeader from './ExerciseHeader';
 import ExerciseOrScenarioContext, { ExerciseOrScenario } from '../../ExerciseOrScenarioContext';
 import { usePermissions } from '../../../utils/Exercise';
-import type { Exercise, Variable, VariableInput } from '../../../utils/api-types';
+import type { ArticleCreateInput, ArticleUpdateInput, Exercise, Variable, VariableInput } from '../../../utils/api-types';
 import { addVariableForExercise, deleteVariableForExercise, updateVariableForExercise } from '../../../actions/variables/variable-actions';
+import type { ArticleStore, FullArticleStore } from '../../../actions/channels/Article';
+import { addExerciseArticle, deleteExerciseArticle, updateExerciseArticle } from '../../../actions/channels/article-action';
 
 const Exercise = lazy(() => import('./Exercise'));
 const Dryrun = lazy(() => import('./controls/Dryrun'));
@@ -38,6 +40,7 @@ const IndexComponent: FunctionComponent<{ exercise: Exercise }> = ({
 }) => {
   // Standard hooks
   const dispatch = useAppDispatch();
+  const location = useLocation();
 
   let withPadding = false;
   if (location.pathname.includes('/definition') || location.pathname.includes('/animation') || location.pathname.includes('/results')) {
@@ -46,9 +49,25 @@ const IndexComponent: FunctionComponent<{ exercise: Exercise }> = ({
 
   const context: ExerciseOrScenario = {
     permissions: usePermissions(exercise.exercise_id),
+
+    previewUrl: (article: FullArticleStore) => `/channels/${exercise.exercise_id}/${article.article_fullchannel.channel_id}?preview=true`,
+    onAddArticle: (data: ArticleCreateInput) => dispatch(addExerciseArticle(exercise.exercise_id, data)),
+    onUpdateArticle: (article: ArticleStore, data: ArticleUpdateInput) => dispatch(
+      updateExerciseArticle(exercise.exercise_id, article.article_id, data),
+    ),
+    onDeleteArticle: (article: ArticleStore) => dispatch(
+      deleteExerciseArticle(exercise.exercise_id, article.article_id),
+    ),
+
+    onInitDocument: () => ({
+      document_tags: [],
+      document_exercises: [{ id: exercise.exercise_id, label: exercise.exercise_name }],
+      document_scenarios: [],
+    }),
+
     onCreateVariable: (data: VariableInput) => dispatch(addVariableForExercise(exercise.exercise_id, data)),
     onEditVariable: (variable: Variable, data: VariableInput) => dispatch(updateVariableForExercise(exercise.exercise_id, variable.variable_id, data)),
-    onDeleteVariable: (variable: Variable) => dispatch(deleteVariableForExercise(exercise.exercise_id, variable.variable_id))
+    onDeleteVariable: (variable: Variable) => dispatch(deleteVariableForExercise(exercise.exercise_id, variable.variable_id)),
   };
 
   return (
@@ -87,7 +106,7 @@ const Index = () => {
   const dispatch = useAppDispatch();
 
   // Fetching data
-  const { exerciseId } = useParams();
+  const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const exercise = useHelper((helper: ExercicesHelper) => helper.getExercise(exerciseId));
   useDataLoader(() => {
     dispatch(fetchExercise(exerciseId));
@@ -104,6 +123,5 @@ const Index = () => {
     </>
   );
 };
-
 
 export default Index;

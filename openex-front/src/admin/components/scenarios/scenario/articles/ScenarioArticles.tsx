@@ -4,9 +4,7 @@ import React from 'react';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
 import { fetchScenarioArticles } from '../../../../../actions/channels/article-action';
-import ExerciseOrScenarioContext from '../../../../ExerciseOrScenarioContext';
 import Articles from '../../../components/articles/Articles';
-import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import DefinitionMenu from '../../../components/DefinitionMenu';
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
@@ -25,19 +23,15 @@ const ScenarioArticles = () => {
   const dispatch = useAppDispatch();
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
-  const { scenario, articles } = useHelper((helper: ScenariosHelper & ArticlesHelper) => ({
-    scenario: helper.getScenario(scenarioId),
-    articles: helper.getScenarioArticles(scenarioId),
-  }));
+  const articles = useHelper((helper: ArticlesHelper) => helper.getScenarioArticles(scenarioId));
   useDataLoader(() => {
     dispatch(fetchScenarioArticles(scenarioId));
   });
+
   return (
     <div className={classes.container}>
       <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
-      <ExerciseOrScenarioContext.Provider value={{ scenario }}>
-        <Articles articles={articles} />
-      </ExerciseOrScenarioContext.Provider>
+      <Articles articles={articles} />
     </div>
   );
 };

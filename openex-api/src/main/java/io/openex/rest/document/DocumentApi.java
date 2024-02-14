@@ -42,6 +42,7 @@ public class DocumentApi extends RestBehavior {
   private TagRepository tagRepository;
   private DocumentRepository documentRepository;
   private ExerciseRepository exerciseRepository;
+  private ScenarioRepository scenarioRepository;
   private InjectService injectService;
   private InjectDocumentRepository injectDocumentRepository;
   private ChallengeRepository challengeRepository;
@@ -65,6 +66,11 @@ public class DocumentApi extends RestBehavior {
   @Autowired
   public void setExerciseRepository(ExerciseRepository exerciseRepository) {
     this.exerciseRepository = exerciseRepository;
+  }
+
+  @Autowired
+  public void setScenarioRepository(ScenarioRepository scenarioRepository) {
+    this.scenarioRepository = scenarioRepository;
   }
 
   @Autowired
@@ -115,6 +121,17 @@ public class DocumentApi extends RestBehavior {
         });
         document.setExercises(exercises);
       }
+      // Compute scenarios
+      if (!document.getScenarios().isEmpty()) {
+        List<Scenario> scenarios = new ArrayList<>(document.getScenarios());
+        List<Scenario> inputScenarios = fromIterable(scenarioRepository.findAllById(input.getScenarioIds()));
+        inputScenarios.forEach(inputScenario -> {
+          if (!scenarios.contains(inputScenario)) {
+            scenarios.add(inputScenario);
+          }
+        });
+        document.setScenarios(scenarios);
+      }
       // Compute tags
       List<Tag> tags = new ArrayList<>(document.getTags());
       List<Tag> inputTags = fromIterable(tagRepository.findAllById(input.getTagIds()));
@@ -133,6 +150,9 @@ public class DocumentApi extends RestBehavior {
       document.setDescription(input.getDescription());
       if (!input.getExerciseIds().isEmpty()) {
         document.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
+      }
+      if (!input.getScenarioIds().isEmpty()) {
+        document.setScenarios(fromIterable(scenarioRepository.findAllById(input.getScenarioIds())));
       }
       document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
       document.setType(file.getContentType());
@@ -177,15 +197,25 @@ public class DocumentApi extends RestBehavior {
     document.setUpdateAttributes(input);
     document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
     // Get removed exercises
-    Stream<String> askIdsStream = document.getExercises().stream()
+    Stream<String> askExerciseIdsStream = document.getExercises().stream()
         .filter(exercise -> !exercise.isUserHasAccess(userRepository.findById(currentUser().getId()).orElseThrow()))
         .map(Exercise::getId);
-    List<String> askIds = Stream.concat(askIdsStream, input.getExerciseIds().stream()).distinct().toList();
+    List<String> askExerciseIds = Stream.concat(askExerciseIdsStream, input.getExerciseIds().stream()).distinct().toList();
     List<Exercise> removedExercises = document.getExercises().stream()
-        .filter(exercise -> !askIds.contains(exercise.getId())).toList();
-    document.setExercises(fromIterable(exerciseRepository.findAllById(askIds)));
+        .filter(exercise -> !askExerciseIds.contains(exercise.getId())).toList();
+    document.setExercises(fromIterable(exerciseRepository.findAllById(askExerciseIds)));
     // In case of exercise removal, all inject doc attachment for exercise
     removedExercises.forEach(exercise -> injectService.cleanInjectsDocExercise(exercise.getId(), documentId));
+    // Get removed scenarios
+    Stream<String> askScenarioIdsStream = document.getScenarios().stream()
+        .filter(scenario -> !scenario.isUserHasAccess(userRepository.findById(currentUser().getId()).orElseThrow()))
+        .map(Scenario::getId);
+    List<String> askScenarioIds = Stream.concat(askScenarioIdsStream, input.getScenarioIds().stream()).distinct().toList();
+    List<Scenario> removedScenarios = document.getScenarios().stream()
+        .filter(scenario -> !askScenarioIds.contains(scenario.getId())).toList();
+    document.setScenarios(fromIterable(scenarioRepository.findAllById(askScenarioIds)));
+    // In case of scenario removal, all inject doc attachment for scenario
+    removedScenarios.forEach(scenario -> injectService.cleanInjectsDocScenario(scenario.getId(), documentId));
     // Save and return
     return documentRepository.save(document);
   }

@@ -7,7 +7,7 @@ import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
 import SearchFilter from '../../../../components/SearchFilter';
 import ChannelsFilter from '../channels/ChannelsFilter';
-import ArticlePopover from '../../exercises/articles/ArticlePopover';
+import ArticlePopover from './ArticlePopover';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import ChannelIcon from '../channels/ChannelIcon';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
@@ -20,10 +20,8 @@ import { fetchDocuments } from '../../../../actions/Document';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import type { DocumentsHelper } from '../../../../actions/helper';
-import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
-import { usePermissions } from '../../../../utils/Exercise';
-import CreateArticle from '../../exercises/articles/CreateArticle';
-import useScenarioPermissions from '../../../../utils/Scenario';
+import ExerciseOrScenarioContext, { ArticleContext } from '../../../ExerciseOrScenarioContext';
+import CreateArticle from './CreateArticle';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
 
 const useStyles = makeStyles(() => ({
@@ -104,17 +102,7 @@ const Articles: FunctionComponent<Props> = ({
   };
 
   // Context
-  const { exercise, scenario } = useContext(ExerciseOrScenarioContext);
-  let permissions: { canWrite: boolean } = { canWrite: false };
-  let previewUrl: (article: FullArticleStore) => string;
-  if (exercise) {
-    permissions = usePermissions(exercise.exercise_id);
-    previewUrl = (article: FullArticleStore) => `/channels/${exercise.exercise_id}/${article.article_fullchannel.channel_id}?preview=true`;
-  } else if (scenario) {
-    permissions = useScenarioPermissions(scenario.scenario_id);
-    // TODO: problem here
-    previewUrl = (article: FullArticleStore) => `/channels/${scenario.scenario_id}/${article.article_fullchannel.channel_id}?preview=true`;
-  }
+  const { permissions, previewUrl } = useContext(ExerciseOrScenarioContext) as ArticleContext;
 
   return (
     <>

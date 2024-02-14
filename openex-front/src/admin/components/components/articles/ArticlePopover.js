@@ -2,9 +2,7 @@ import React, { useContext, useState } from 'react';
 import * as R from 'ramda';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Slide } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { useDispatch } from 'react-redux';
 import { useFormatter } from '../../../../components/i18n';
-import { deleteExerciseArticle, deleteScenarioArticle, updateExerciseArticle, updateScenarioArticle } from '../../../../actions/channels/article-action';
 import ArticleForm from './ArticleForm';
 import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
 
@@ -14,29 +12,11 @@ const Transition = React.forwardRef((props, ref) => (
 Transition.displayName = 'TransitionSlide';
 
 const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
-  // utils
-  const dispatch = useDispatch();
+  // Standard hooks
   const { t } = useFormatter();
 
   // Context
-  const { exercise, scenario } = useContext(ExerciseOrScenarioContext);
-  let onUpdate;
-  let onDelete;
-  if (exercise) {
-    onUpdate = (inputValues) => dispatch(
-      updateExerciseArticle(exercise.exercise_id, article.article_id, inputValues),
-    );
-    onDelete = () => dispatch(
-      deleteExerciseArticle(exercise.exercise_id, article.article_id),
-    );
-  } else if (scenario) {
-    onUpdate = (inputValues) => dispatch(
-      updateScenarioArticle(scenario.scenario_id, article.article_id, inputValues),
-    );
-    onDelete = () => dispatch(
-      deleteScenarioArticle(scenario.scenario_id, article.article_id),
-    );
-  }
+  const { onUpdateArticle, onDeleteArticle } = useContext(ExerciseOrScenarioContext);
 
   // states
   const [openDelete, setOpenDelete] = useState(false);
@@ -57,7 +37,7 @@ const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
   const handleCloseEdit = () => setOpenEdit(false);
   const onSubmitEdit = (data) => {
     const inputValues = { ...data, article_channel: data.article_channel.id };
-    return onUpdate(inputValues).then(() => handleCloseEdit());
+    return onUpdateArticle(inputValues).then(() => handleCloseEdit());
   };
   // Delete action
   const handleOpenDelete = () => {
@@ -66,7 +46,7 @@ const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
   };
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
-    return onDelete().then(() => handleCloseDelete());
+    return onDeleteArticle().then(() => handleCloseDelete());
   };
   const handleOpenRemove = () => {
     setOpenRemove(true);

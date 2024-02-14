@@ -37,4 +37,16 @@ public class InjectService {
         }).toList();
         injectDocumentRepository.deleteAll(updatedInjects);
     }
+
+    public void cleanInjectsDocScenario(String scenarioId, String documentId) {
+        // Delete document from all scenario injects
+        List<Inject> scenarioInjects = injectRepository.findAllForScenarioAndDoc(scenarioId, documentId);
+        List<InjectDocument> updatedInjects = scenarioInjects.stream().flatMap(inject -> {
+            @SuppressWarnings("UnnecessaryLocalVariable")
+            Stream<InjectDocument> filterDocuments = inject.getDocuments().stream()
+                .filter(document -> document.getDocument().getId().equals(documentId));
+            return filterDocuments;
+        }).toList();
+        injectDocumentRepository.deleteAll(updatedInjects);
+    }
 }

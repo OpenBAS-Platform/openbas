@@ -1,10 +1,8 @@
 import React, { useContext, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Fab, Dialog, DialogTitle, DialogContent, Slide, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Fab, ListItem, ListItemIcon, ListItemText, Slide } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
-import { addExerciseArticle, addScenarioArticle } from '../../../../actions/channels/article-action';
 import ArticleForm from './ArticleForm';
 import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
 
@@ -29,20 +27,13 @@ const useStyles = makeStyles((theme) => ({
 const CreateArticle = (props) => {
   const { onCreate, inline } = props;
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { t } = useFormatter();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   // Context
-  const { exercise, scenario } = useContext(ExerciseOrScenarioContext);
-  let onAddArticle;
-  if (exercise) {
-    onAddArticle = (inputValues) => dispatch(addExerciseArticle(exercise.exercise_id, inputValues));
-  } else if (scenario) {
-    onAddArticle = (inputValues) => dispatch(addScenarioArticle(scenario.scenario_id, inputValues));
-  }
+  const { onAddArticle } = useContext(ExerciseOrScenarioContext);
 
   const onSubmit = (data) => {
     const inputValues = { ...data, article_channel: data.article_channel.id };

@@ -2,10 +2,9 @@ import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 import { useHelper } from '../../../../store';
-import type { Exercise, Variable } from '../../../../utils/api-types';
+import type { Exercise } from '../../../../utils/api-types';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { ExercicesHelper } from '../../../../actions/helper';
 import Variables from '../../components/variables/Variables';
 import type { VariablesHelper } from '../../../../actions/variables/variable-helper';
 import { fetchVariablesForExercise } from '../../../../actions/variables/variable-actions';
@@ -24,11 +23,7 @@ const ExerciseVariables = () => {
   const dispatch = useAppDispatch();
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
-  const { variables }: { variables: Variable[] } = useHelper((helper: VariablesHelper & ExercicesHelper) => {
-    return {
-      variables: helper.getExerciseVariables(exerciseId),
-    };
-  });
+  const variables = useHelper((helper: VariablesHelper) => helper.getExerciseVariables(exerciseId));
   useDataLoader(() => {
     dispatch(fetchVariablesForExercise(exerciseId));
   });

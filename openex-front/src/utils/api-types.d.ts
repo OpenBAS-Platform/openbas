@@ -21,7 +21,6 @@ export interface Article {
   article_exercise?: Exercise;
   article_id?: string;
   article_is_scheduled?: boolean;
-  article_is_scheduled?: boolean;
   /** @format int32 */
   article_likes?: number;
   article_name?: string;
@@ -217,7 +216,7 @@ export interface Channel {
   /** @format date-time */
   channel_created_at?: string;
   channel_description?: string;
-  channel_id?: string;
+  channel_id: string;
   channel_logo_dark?: Document;
   channel_logo_light?: Document;
   channel_mode?: string;
@@ -417,6 +416,7 @@ export interface Document {
 export interface DocumentCreateInput {
   document_description?: string;
   document_exercises?: string[];
+  document_scenarios?: string[];
   document_tags?: string[];
 }
 
@@ -426,7 +426,8 @@ export interface DocumentTagUpdateInput {
 
 export interface DocumentUpdateInput {
   document_description?: string;
-  document_exercises: string[];
+  document_exercises?: string[];
+  document_scenarios?: string[];
   document_tags?: string[];
 }
 
@@ -565,7 +566,7 @@ export interface Exercise {
   exercise_documents?: Document[];
   /** @format date-time */
   exercise_end_date?: string;
-  exercise_id?: string;
+  exercise_id: string;
   exercise_injects?: Inject[];
   exercise_injects_statistics?: Record<string, number>;
   exercise_lessons_anonymized?: boolean;
@@ -1409,6 +1410,7 @@ export interface UpdateMePasswordInput {
 }
 
 export interface UpdatePlayerInput {
+  /** @pattern ^\+[\d\s\-.()]+$ */
   user_phone2?: string;
   user_country?: string;
   user_email: string;
@@ -1416,7 +1418,7 @@ export interface UpdatePlayerInput {
   user_lastname?: string;
   user_organization?: string;
   user_pgp_key?: string;
-  /** @pattern ^\+[\d\s]* */
+  /** @pattern ^\+[\d\s\-.()]+$ */
   user_phone?: string;
   user_tags?: string[];
 }
@@ -1438,6 +1440,7 @@ export interface UpdateUserInfoInput {
 }
 
 export interface UpdateUserInput {
+  /** @pattern ^\+[\d\s\-.()]+$ */
   user_phone2?: string;
   user_admin?: boolean;
   user_email?: string;
@@ -1445,6 +1448,7 @@ export interface UpdateUserInput {
   user_lastname?: string;
   user_organization?: string;
   user_pgp_key?: string;
+  /** @pattern ^\+[\d\s\-.()]+$ */
   user_phone?: string;
   user_tags?: string[];
 }

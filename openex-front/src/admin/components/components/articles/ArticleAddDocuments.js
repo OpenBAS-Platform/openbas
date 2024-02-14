@@ -6,9 +6,8 @@ import { makeStyles } from '@mui/styles';
 import SearchFilter from '../../../../components/SearchFilter';
 import { useFormatter } from '../../../../components/i18n';
 import { fetchDocuments } from '../../../../actions/Document';
-import CreateDocument from '../../components/documents/CreateDocument';
+import CreateDocument from '../documents/CreateDocument';
 import { truncate } from '../../../../utils/String';
-import { usePermissions } from '../../../../utils/Exercise';
 import Transition from '../../../../components/common/Transition';
 import TagsFilter from '../../../../components/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
@@ -16,7 +15,6 @@ import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../utils/hooks';
-import useScenarioPermissions from '../../../../utils/Scenario';
 
 const useStyles = makeStyles((theme) => ({
   box: {
@@ -143,13 +141,7 @@ const ArticleAddDocuments = (props) => {
   }
 
   // Context
-  const { exercise, scenario } = useContext(ExerciseOrScenarioContext);
-  let permissions = { canWrite: false };
-  if (exercise) {
-    permissions = usePermissions(exercise);
-  } else if (scenario) {
-    permissions = useScenarioPermissions(exercise);
-  }
+  const { permissions } = useContext(ExerciseOrScenarioContext);
 
   return (
     <div>
@@ -159,7 +151,7 @@ const ArticleAddDocuments = (props) => {
         divider
         onClick={handleOpen}
         color="primary"
-        disabled={permissions.canWrite}
+        disabled={!permissions.canWrite}
       >
         <ListItemIcon color="primary">
           <ControlPointOutlined color="primary" />
