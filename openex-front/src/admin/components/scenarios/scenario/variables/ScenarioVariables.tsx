@@ -8,7 +8,6 @@ import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
-import ExerciseOrScenarioContext from '../../../../ExerciseOrScenarioContext';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import type { Variable } from '../../../../../utils/api-types';
@@ -30,10 +29,9 @@ const ScenarioVariables: FunctionComponent<Props> = () => {
   const dispatch = useAppDispatch();
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
-  const { variables, scenario }: { variables: Variable[], scenario: ScenarioStore } = useHelper((helper: VariablesHelper & ScenariosHelper) => {
+  const { variables }: { variables: Variable[] } = useHelper((helper: VariablesHelper & ScenariosHelper) => {
     return {
       variables: helper.getScenarioVariables(scenarioId),
-      scenario: helper.getScenario(scenarioId),
     };
   });
   useDataLoader(() => {
@@ -43,9 +41,7 @@ const ScenarioVariables: FunctionComponent<Props> = () => {
   return (
     <div className={classes.container}>
       <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
-      <ExerciseOrScenarioContext.Provider value={{ scenario }}>
-        <Variables variables={variables} />
-      </ExerciseOrScenarioContext.Provider>
+      <Variables variables={variables} />
     </div>
   );
 };

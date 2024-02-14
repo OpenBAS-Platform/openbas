@@ -9,7 +9,6 @@ import type { ExercicesHelper } from '../../../../actions/helper';
 import Variables from '../../components/variables/Variables';
 import type { VariablesHelper } from '../../../../actions/variables/variable-helper';
 import { fetchVariablesForExercise } from '../../../../actions/variables/variable-actions';
-import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
 import DefinitionMenu from '../../components/DefinitionMenu';
 
 const useStyles = makeStyles(() => ({
@@ -25,10 +24,9 @@ const ExerciseVariables = () => {
   const dispatch = useAppDispatch();
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
-  const { variables, exercise }: { variables: Variable[], exercise: Exercise } = useHelper((helper: VariablesHelper & ExercicesHelper) => {
+  const { variables }: { variables: Variable[] } = useHelper((helper: VariablesHelper & ExercicesHelper) => {
     return {
       variables: helper.getExerciseVariables(exerciseId),
-      exercise: helper.getExercise(exerciseId),
     };
   });
   useDataLoader(() => {
@@ -38,9 +36,7 @@ const ExerciseVariables = () => {
   return (
     <div className={classes.container}>
       <DefinitionMenu base="/admin/exercises" id={exerciseId} />
-      <ExerciseOrScenarioContext.Provider value={{ exercise }}>
-        <Variables variables={variables} />
-      </ExerciseOrScenarioContext.Provider>
+      <Variables variables={variables} />
     </div>
   );
 };

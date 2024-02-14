@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import React, { FunctionComponent } from 'react';
+import React from 'react';
 import { Grid, Paper, Theme, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { GroupsOutlined, NotificationsOutlined } from '@mui/icons-material';
@@ -8,11 +8,9 @@ import { useHelper } from '../../../../store';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchScenario, fetchScenarioTeams, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
-import NotFound from '../../../../components/NotFound';
 import { useFormatter } from '../../../../components/i18n';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import ScenarioSettingsForm from './ScenarioSettingsForm';
-import useScenarioPermissions from '../../../../utils/Scenario';
 import InjectsDistribution from '../../injects/InjectsDistribution';
 import type { TeamStore } from '../../teams/teams/Team';
 import type { ScenarioInformationInput } from '../../../../utils/api-types';
@@ -41,12 +39,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const ScenarioComponent: FunctionComponent<{ scenarioId: string }> = ({ scenarioId }) => {
+const Scenario = () => {
   // Standard hooks
   const classes = useStyles();
   const { t, fldt } = useFormatter();
   const dispatch = useAppDispatch();
-  const permissions = useScenarioPermissions(scenarioId);
+
+  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
 
   // Fetching data
   const { scenario, teams }: { scenario: ScenarioStore, teams: TeamStore[] } = useHelper((helper: ScenariosHelper) => ({
@@ -149,29 +148,12 @@ const ScenarioComponent: FunctionComponent<{ scenarioId: string }> = ({ scenario
             <ScenarioSettingsForm
               initialValues={initialValues}
               onSubmit={submitUpdate}
-              disabled={permissions.readOnly}
+              scenarioId={scenarioId}
             />
           </Paper>
         </Grid>
       </Grid>
     </>
-  );
-};
-
-const Scenario = () => {
-  // Standard hooks
-  const { scenarioId } = useParams();
-
-  console.log('scenarioId', scenarioId);
-
-  if (scenarioId) {
-    return (<ScenarioComponent scenarioId={scenarioId} />);
-  }
-
-  console.log('WUT', scenarioId);
-
-  return (
-    <div style={{ height: '100%', width: '100%', backgroundColor: 'red' }}></div>
   );
 };
 

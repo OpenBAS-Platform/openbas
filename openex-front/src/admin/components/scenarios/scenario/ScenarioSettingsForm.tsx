@@ -5,8 +5,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
-import type { ScenarioInformationsInput } from '../../../../utils/api-types';
+import type { ScenarioInformationInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
+import useScenarioPermissions from '../../../../utils/Scenario';
 
 const useStyles = makeStyles(() => ({
   buttons: {
@@ -16,9 +17,9 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  onSubmit: SubmitHandler<ScenarioInformationsInput>;
-  initialValues: ScenarioInformationsInput;
-  disabled: boolean;
+  onSubmit: SubmitHandler<ScenarioInformationInput>;
+  initialValues: ScenarioInformationInput;
+  scenarioId: string;
 }
 
 const ScenarioSettingsForm: FunctionComponent<Props> = ({
@@ -27,20 +28,21 @@ const ScenarioSettingsForm: FunctionComponent<Props> = ({
     scenario_mail_from: '',
     scenario_message_header: '',
   },
-  disabled,
+  scenarioId,
 }) => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
+  const permissions = useScenarioPermissions(scenarioId);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
-  } = useForm<ScenarioInformationsInput>({
+  } = useForm<ScenarioInformationInput>({
     mode: 'onTouched',
     resolver: zodResolver(
-      zodImplement<ScenarioInformationsInput>().with({
+      zodImplement<ScenarioInformationInput>().with({
         scenario_mail_from: z.string().email(t('Should be a valid email address')),
         scenario_message_header: z.string().optional(),
         scenario_message_footer: z.string().optional(),
@@ -58,7 +60,7 @@ const ScenarioSettingsForm: FunctionComponent<Props> = ({
         error={!!errors.scenario_mail_from}
         helperText={errors.scenario_mail_from && errors.scenario_mail_from?.message}
         inputProps={register('scenario_mail_from')}
-        disabled={disabled}
+        disabled={permissions.readOnly}
       />
       <MuiTextField
         variant="standard"
@@ -68,7 +70,7 @@ const ScenarioSettingsForm: FunctionComponent<Props> = ({
         error={!!errors.scenario_message_header}
         helperText={errors.scenario_message_header && errors.scenario_message_header?.message}
         inputProps={register('scenario_message_header')}
-        disabled={disabled}
+        disabled={permissions.readOnly}
       />
       <div className={classes.buttons} style={{ marginTop: 20 }}>
         <Button

@@ -11,43 +11,62 @@ import NotFound from '../../../../components/NotFound';
 import TopBar from '../../nav/TopBar';
 import ScenarioHeader from './ScenarioHeader';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
+import ExerciseOrScenarioContext, { ExerciseOrScenario } from '../../../ExerciseOrScenarioContext';
+import useScenarioPermissions from '../../../../utils/Scenario';
+import type { Variable, VariableInput } from '../../../../utils/api-types';
+import { addVariableForScenario, deleteVariableForScenario, updateVariableForScenario } from '../../../../actions/variables/variable-actions';
 
-const ScenarioComponent = lazy(() => import('./Scenario'));
+const Scenario = lazy(() => import('./Scenario'));
 const Teams = lazy(() => import('./teams/ScenarioTeams'));
 const Articles = lazy(() => import('./articles/ScenarioArticles'));
 const Challenges = lazy(() => import('../../exercises/challenges/Challenges'));
 const Variables = lazy(() => import('./variables/ScenarioVariables'));
 
-const IndexScenario: FunctionComponent<{ scenarioId: string }> = () => {
+const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = ({
+  scenario
+}) => {
+  // Standard hooks
+  const dispatch = useAppDispatch();
+
+  const context: ExerciseOrScenario = {
+    permissions: useScenarioPermissions(scenario.scenario_id),
+    onCreateVariable: (data: VariableInput) => dispatch(addVariableForScenario(scenario.scenario_id, data)),
+    onEditVariable: (variable: Variable, data: VariableInput) => dispatch(updateVariableForScenario(scenario.scenario_id, variable.variable_id, data)),
+    onDeleteVariable: (variable: Variable) => dispatch(deleteVariableForScenario(scenario.scenario_id, variable.variable_id))
+  };
+
+  return (
+    <ExerciseOrScenarioContext.Provider value={context}>
+      <TopBar />
+      <ScenarioHeader />
+      <Suspense fallback={<Loader />}>
+        <Routes>
+          <Route path="" element={errorWrapper(Scenario)()} />
+          <Route path="definition/teams" element={errorWrapper(Teams)()} />
+          <Route path="definition/articles" element={errorWrapper(Articles)()} />
+          <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
+          <Route path="definition/variables" element={errorWrapper(Variables)()} />
+        </Routes>
+      </Suspense>
+    </ExerciseOrScenarioContext.Provider>
+  );
+};
+
+const IndexScenario = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
 
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
-  const { scenario } = useHelper((helper: ScenariosHelper) => ({
-    scenario: helper.getScenario(scenarioId),
-  }));
+  const scenario = useHelper((helper: ScenariosHelper) => helper.getScenario(scenarioId));
   useDataLoader(() => {
     dispatch(fetchScenario(scenarioId));
   });
 
   if (scenario) {
-    return (
-      <>
-        <TopBar />
-        <ScenarioHeader />
-        <Suspense fallback={<Loader />}>
-          <Routes>
-            <Route path="" element={errorWrapper(ScenarioComponent)()} />
-            <Route path="definition/teams" element={errorWrapper(Teams)()} />
-            <Route path="definition/articles" element={errorWrapper(Articles)()} />
-            <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
-            <Route path="definition/variables" element={errorWrapper(Variables)()} />
-          </Routes>
-        </Suspense>
-      </>
-    );
+    return (<IndexScenarioComponent scenario={scenario} />);
   }
+
   return (
     <>
       <TopBar />

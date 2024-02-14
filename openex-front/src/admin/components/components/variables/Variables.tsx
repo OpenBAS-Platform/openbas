@@ -2,16 +2,12 @@ import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } f
 import { AttachMoneyOutlined } from '@mui/icons-material';
 import React, { CSSProperties, FunctionComponent, useContext } from 'react';
 import { makeStyles } from '@mui/styles';
-import VariablePopover from '../../exercises/variables/VariablePopover';
+import VariablePopover from './VariablePopover';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import type { Variable, VariableInput } from '../../../../utils/api-types';
+import type { Variable } from '../../../../utils/api-types';
 import SearchFilter from '../../../../components/SearchFilter';
-import CreateVariable from '../../exercises/variables/CreateVariable';
-import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
-import { deleteVariableForExercise, deleteVariableForScenario, updateVariableForExercise, updateVariableForScenario } from '../../../../actions/variables/variable-actions';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useScenarioPermissions from '../../../../utils/Scenario';
-import { usePermissions } from '../../../../utils/Exercise';
+import CreateVariable from './CreateVariable';
+import ExerciseOrScenarioContext, { VariableContext } from '../../../ExerciseOrScenarioContext';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -99,22 +95,9 @@ const Variables: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useAppDispatch();
 
   // Context
-  const { exercise, scenario } = useContext(ExerciseOrScenarioContext);
-  let permissions: { readOnly: boolean, canWrite: boolean } = { readOnly: true, canWrite: false };
-  let onEdit: (variable: Variable, data: VariableInput) => void;
-  let onDelete: (variable: Variable) => void;
-  if (exercise) {
-    permissions = usePermissions(exercise.exercise_id);
-    onEdit = (variable: Variable, data: VariableInput) => dispatch(updateVariableForExercise(exercise.exercise_id, variable.variable_id, data));
-    onDelete = (variable: Variable) => dispatch(deleteVariableForExercise(exercise.exercise_id, variable.variable_id));
-  } else if (scenario) {
-    permissions = useScenarioPermissions(scenario.scenario_id);
-    onEdit = (variable: Variable, data: VariableInput) => dispatch(updateVariableForScenario(scenario.scenario_id, variable.variable_id, data));
-    onDelete = (variable: Variable) => dispatch(deleteVariableForScenario(scenario.scenario_id, variable.variable_id));
-  }
+  const { permissions, onEditVariable, onDeleteVariable } = useContext(ExerciseOrScenarioContext) as VariableContext;
 
   // Filter and sort hook
   const filtering = useSearchAnFilter('variable', 'key', [
@@ -211,9 +194,9 @@ const Variables: FunctionComponent<Props> = ({
             <ListItemSecondaryAction>
               <VariablePopover
                 variable={variable}
-                disabled={permissions.readOnly}
-                onEdit={onEdit}
-                onDelete={onDelete}
+                disabled={permissions?.readOnly}
+                onEdit={onEditVariable}
+                onDelete={onDeleteVariable}
               />
             </ListItemSecondaryAction>
           </ListItem>

@@ -6,9 +6,7 @@ import { useFormatter } from '../../../../components/i18n';
 import VariableForm from './VariableForm';
 import type { VariableInput } from '../../../../utils/api-types';
 import Transition from '../../../../components/common/Transition';
-import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
-import { addVariableForExercise, addVariableForScenario } from '../../../../actions/variables/variable-actions';
-import { useAppDispatch } from '../../../../utils/hooks';
+import ExerciseOrScenarioContext, { VariableContext } from '../../../ExerciseOrScenarioContext';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {
@@ -33,21 +31,14 @@ const CreateVariable: React.FC<Props> = ({
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
 
   // Context
-  const { exercise, scenario } = useContext(ExerciseOrScenarioContext);
-  let onCreate: (variable: VariableInput) => void;
-  if (exercise) {
-    onCreate = (data: VariableInput) => dispatch(addVariableForExercise(exercise.exercise_id, data));
-  } else if (scenario) {
-    onCreate = (data: VariableInput) => dispatch(addVariableForScenario(scenario.scenario_id, data));
-  }
+  const { onCreateVariable } = useContext(ExerciseOrScenarioContext) as VariableContext;
 
   // Creation
   const [open, setOpen] = useState(false);
   const onSubmit = (data: VariableInput) => {
-    onCreate(data);
+    onCreateVariable(data);
     setOpen(false);
   };
 
