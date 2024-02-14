@@ -3,21 +3,21 @@ import * as R from 'ramda';
 import { Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Fab, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, GroupsOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { truncate } from '../utils/String';
-import ItemTags from './ItemTags';
-import TagsFilter from './TagsFilter';
-import { useAppDispatch } from '../utils/hooks';
-import useDataLoader from '../utils/ServerSideEvent';
-import type { Theme } from './Theme';
-import Transition from './common/Transition';
-import { useFormatter } from './i18n';
-import { useHelper } from '../store';
-import { OrganizationsHelper, TeamsHelper } from '../actions/helper';
-import { fetchTeams } from '../actions/Team';
-import SearchFilter from './SearchFilter';
-import CreateTeam from '../admin/components/teams/teams/CreateTeam';
-import type { Exercise, Organization, Scenario, Tag, Team } from '../utils/api-types';
-import { TeamStore } from '../admin/components/teams/teams/Team';
+import { truncate } from '../../../../utils/String';
+import ItemTags from '../../../../components/ItemTags';
+import TagsFilter from '../../../../components/TagsFilter';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import type { Theme } from '../../../../components/Theme';
+import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../components/i18n';
+import { useHelper } from '../../../../store';
+import { OrganizationsHelper, TeamsHelper } from '../../../../actions/helper';
+import { fetchTeams } from '../../../../actions/Team';
+import SearchFilter from '../../../../components/SearchFilter';
+import CreateTeam from '../../teams/teams/CreateTeam';
+import type { Exercise, Organization, Scenario, Tag, Team } from '../../../../utils/api-types';
+import { TeamStore } from '../../teams/teams/Team';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {

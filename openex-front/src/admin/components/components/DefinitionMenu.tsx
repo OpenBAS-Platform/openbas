@@ -4,9 +4,9 @@ import { Drawer, MenuList, MenuItem, ListItemIcon, ListItemText } from '@mui/mat
 import { AttachMoneyOutlined, GroupsOutlined, EmojiEventsOutlined } from '@mui/icons-material';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from './i18n';
-import type { Exercise, Scenario } from '../utils/api-types';
-import type { Theme } from './Theme';
+import { useFormatter } from '../../../components/i18n';
+import type { Exercise, Scenario } from '../../../utils/api-types';
+import type { Theme } from '../../../components/Theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   drawer: {

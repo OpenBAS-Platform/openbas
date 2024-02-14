@@ -1,4 +1,4 @@
-import type { Challenge, Exercise, InjectExpectation, Organization, PlatformSetting, Scenario, Tag, Team, User } from '../utils/api-types';
+import type { Challenge, Exercise, InjectExpectation, Organization, PlatformSetting, Tag, Team, User } from '../utils/api-types';
 
 export interface ExercicesHelper {
   getExercise: (exerciseId: Exercise['exercise_id']) => Exercise;

@@ -10,18 +10,20 @@ import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
 import NotFound from '../../../../components/NotFound';
 import TopBar from '../../nav/TopBar';
 import ScenarioHeader from './ScenarioHeader';
+import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 
-const Scenario = lazy(() => import('./Scenario'));
-const Teams = lazy(() => import('./Teams'));
+const ScenarioComponent = lazy(() => import('./Scenario'));
+const Teams = lazy(() => import('./teams/ScenarioTeams'));
 const Articles = lazy(() => import('./articles/ScenarioArticles'));
 const Challenges = lazy(() => import('../../exercises/challenges/Challenges'));
 const Variables = lazy(() => import('./variables/ScenarioVariables'));
 
-const IndexScenarioComponent: FunctionComponent<{ scenarioId: string }> = ({ scenarioId }) => {
+const IndexScenario: FunctionComponent<{ scenarioId: string }> = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
 
   // Fetching data
+  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
   const { scenario } = useHelper((helper: ScenariosHelper) => ({
     scenario: helper.getScenario(scenarioId),
   }));
@@ -36,7 +38,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenarioId: string }> = ({ sce
         <ScenarioHeader />
         <Suspense fallback={<Loader />}>
           <Routes>
-            <Route path="" element={errorWrapper(Scenario)()} />
+            <Route path="" element={errorWrapper(ScenarioComponent)()} />
             <Route path="definition/teams" element={errorWrapper(Teams)()} />
             <Route path="definition/articles" element={errorWrapper(Articles)()} />
             <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
@@ -51,19 +53,6 @@ const IndexScenarioComponent: FunctionComponent<{ scenarioId: string }> = ({ sce
       <TopBar />
       <NotFound />
     </>
-  );
-};
-
-const IndexScenario = () => {
-  // Standard hooks
-  const { scenarioId } = useParams();
-
-  if (scenarioId) {
-    return (<IndexScenarioComponent scenarioId={scenarioId} />);
-  }
-
-  return (
-    <NotFound></NotFound>
   );
 };
 

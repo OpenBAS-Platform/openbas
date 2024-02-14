@@ -1,7 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
-import DefinitionMenu from '../DefinitionMenu';
 import { useHelper } from '../../../../store';
 import type { Exercise, Variable } from '../../../../utils/api-types';
 import useDataLoader from '../../../../utils/ServerSideEvent';
@@ -11,6 +10,7 @@ import Variables from '../../components/variables/Variables';
 import type { VariablesHelper } from '../../../../actions/variables/variable-helper';
 import { fetchVariablesForExercise } from '../../../../actions/variables/variable-actions';
 import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
+import DefinitionMenu from '../../components/DefinitionMenu';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -24,7 +24,7 @@ const ExerciseVariables = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   // Fetching data
-  const { exerciseId } = useParams<'exerciseId'>();
+  const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const { variables, exercise }: { variables: Variable[], exercise: Exercise } = useHelper((helper: VariablesHelper & ExercicesHelper) => {
     return {
       variables: helper.getExerciseVariables(exerciseId),
@@ -37,7 +37,7 @@ const ExerciseVariables = () => {
 
   return (
     <div className={classes.container}>
-      <DefinitionMenu exerciseId={exerciseId} />
+      <DefinitionMenu base="/admin/exercises" id={exerciseId} />
       <ExerciseOrScenarioContext.Provider value={{ exercise }}>
         <Variables variables={variables} />
       </ExerciseOrScenarioContext.Provider>
