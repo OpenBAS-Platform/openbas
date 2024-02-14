@@ -102,7 +102,7 @@ const Articles: FunctionComponent<Props> = ({
   };
 
   // Context
-  const { permissions, previewUrl } = useContext(ExerciseOrScenarioContext) as ArticleContext;
+  const { permissions, previewArticleUrl } = useContext(ExerciseOrScenarioContext) as ArticleContext;
 
   return (
     <>
@@ -184,7 +184,7 @@ const Articles: FunctionComponent<Props> = ({
                         aria-haspopup="true"
                         size="large"
                         component={Link}
-                        to={previewUrl(article)}
+                        to={previewArticleUrl(article)}
                       >
                         <VisibilityOutlined />
                       </IconButton>

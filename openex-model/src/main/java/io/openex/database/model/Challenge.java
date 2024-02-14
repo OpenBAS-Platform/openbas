@@ -105,6 +105,11 @@ public class Challenge implements Base {
         return exerciseIds;
     }
 
+    @JsonProperty("challenge_scenarios")
+    public List<String> getScenarioIds() {
+        return scenarioIds;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

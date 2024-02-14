@@ -26,7 +26,7 @@ const Report = lazy(() => import('./reports/Report'));
 const Teams = lazy(() => import('./teams/Teams'));
 const Injects = lazy(() => import('./injects/Injects'));
 const Articles = lazy(() => import('./articles/ExerciseArticles'));
-const Challenges = lazy(() => import('./challenges/Challenges'));
+const Challenges = lazy(() => import('./challenges/ExerciseChallenges'));
 const Timeline = lazy(() => import('./timeline/Timeline'));
 const Mails = lazy(() => import('./mails/Mails'));
 const MailsInject = lazy(() => import('./mails/Inject'));
@@ -50,7 +50,7 @@ const IndexComponent: FunctionComponent<{ exercise: Exercise }> = ({
   const context: ExerciseOrScenario = {
     permissions: usePermissions(exercise.exercise_id),
 
-    previewUrl: (article: FullArticleStore) => `/channels/${exercise.exercise_id}/${article.article_fullchannel.channel_id}?preview=true`,
+    previewArticleUrl: (article: FullArticleStore) => `/channels/${exercise.exercise_id}/${article.article_fullchannel.channel_id}?preview=true`,
     onAddArticle: (data: ArticleCreateInput) => dispatch(addExerciseArticle(exercise.exercise_id, data)),
     onUpdateArticle: (article: ArticleStore, data: ArticleUpdateInput) => dispatch(
       updateExerciseArticle(exercise.exercise_id, article.article_id, data),
@@ -58,6 +58,8 @@ const IndexComponent: FunctionComponent<{ exercise: Exercise }> = ({
     onDeleteArticle: (article: ArticleStore) => dispatch(
       deleteExerciseArticle(exercise.exercise_id, article.article_id),
     ),
+
+    previewChallengeUrl: () => `/challenges/${exercise.exercise_id}?preview=true`,
 
     onInitDocument: () => ({
       document_tags: [],

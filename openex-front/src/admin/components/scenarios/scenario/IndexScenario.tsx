@@ -21,7 +21,7 @@ import { addScenarioArticle, deleteScenarioArticle, updateScenarioArticle } from
 const Scenario = lazy(() => import('./Scenario'));
 const Teams = lazy(() => import('./teams/ScenarioTeams'));
 const Articles = lazy(() => import('./articles/ScenarioArticles'));
-const Challenges = lazy(() => import('../../exercises/challenges/Challenges'));
+const Challenges = lazy(() => import('./challenges/ScenarioChallenges'));
 const Variables = lazy(() => import('./variables/ScenarioVariables'));
 
 const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = ({
@@ -33,7 +33,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
   const context: ExerciseOrScenario = {
     permissions: useScenarioPermissions(scenario.scenario_id),
 
-    previewUrl: (article: FullArticleStore) => `/channels/${scenario.scenario_id}/${article.article_fullchannel.channel_id}?preview=true`,
+    previewArticleUrl: (article: FullArticleStore) => `/channels/${scenario.scenario_id}/${article.article_fullchannel.channel_id}?preview=true`,
     onAddArticle: (data: ArticleCreateInput) => dispatch(addScenarioArticle(scenario.scenario_id, data)),
     onUpdateArticle: (article: ArticleStore, data: ArticleUpdateInput) => dispatch(
       updateScenarioArticle(scenario.scenario_id, article.article_id, data),
@@ -41,6 +41,8 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
     onDeleteArticle: (article: ArticleStore) => dispatch(
       deleteScenarioArticle(scenario.scenario_id, article.article_id),
     ),
+
+    previewChallengeUrl: () => `/challenges/${scenario.scenario_id}?preview=true`,
 
     onInitDocument: () => ({
       document_tags: [],

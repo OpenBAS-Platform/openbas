@@ -139,6 +139,7 @@ export interface Challenge {
   /** @format int32 */
   challenge_max_attempts?: number;
   challenge_name?: string;
+  challenge_scenarios?: string[];
   /** @format int32 */
   challenge_score?: number;
   challenge_tags?: Tag[];
@@ -146,7 +147,6 @@ export interface Challenge {
   challenge_updated_at?: string;
   /** @format date-time */
   challenge_virtual_publication?: string;
-  scenarioIds?: string[];
   updateAttributes?: object;
 }
 

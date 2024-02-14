@@ -1,26 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { makeStyles } from '@mui/styles';
-import { Typography, Card, CardHeader, CardContent, Grid, Avatar, Tooltip, Chip, Button } from '@mui/material';
-import { useDispatch } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { Avatar, Button, Card, CardContent, CardHeader, Chip, Grid, Tooltip, Typography } from '@mui/material';
+import { Link } from 'react-router-dom';
 import * as R from 'ramda';
-import { SportsScoreOutlined, CrisisAlertOutlined, DescriptionOutlined, OutlinedFlagOutlined, EmojiEventsOutlined, VisibilityOutlined } from '@mui/icons-material';
-import DefinitionMenu from '../DefinitionMenu';
-import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchExerciseChallenges } from '../../../../actions/Challenge';
+import { CrisisAlertOutlined, DescriptionOutlined, EmojiEventsOutlined, OutlinedFlagOutlined, SportsScoreOutlined, VisibilityOutlined } from '@mui/icons-material';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import SearchFilter from '../../../../components/SearchFilter';
-import { fetchDocuments } from '../../../../actions/Document';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import TagsFilter from '../../../../components/TagsFilter';
 import { useFormatter } from '../../../../components/i18n';
+import ExerciseOrScenarioContext from "../../../ExerciseOrScenarioContext";
 
 const useStyles = makeStyles(() => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
   flag: {
     fontSize: 12,
     float: 'left',
@@ -42,22 +33,14 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Challenges = () => {
+const Challenges = ({challenges}) => {
+  // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { t } = useFormatter();
-  // Fetching data
-  const { exerciseId } = useParams();
-  const { challenges } = useHelper((helper) => ({
-    exercise: helper.getExercise(exerciseId),
-    documentsMap: helper.getDocumentsMap(),
-    challenges: helper.getExerciseChallenges(exerciseId),
-  }));
-  useDataLoader(() => {
-    // dispatch(fetchExerciseChallenges(exerciseId));
-    dispatch(fetchExerciseChallenges(exerciseId));
-    dispatch(fetchDocuments());
-  });
+
+  // Context
+  const { previewChallengeUrl } = useContext(ExerciseOrScenarioContext);
+
   // Filter and sort hook
   const searchColumns = ['name', 'category', 'content'];
   const filtering = useSearchAnFilter('challenge', 'name', searchColumns);
@@ -65,8 +48,7 @@ const Challenges = () => {
   const groupChallenges = R.groupBy(R.prop('challenge_category'));
   const sortedChallenges = groupChallenges(filtering.filterAndSort(challenges));
   return (
-    <div className={classes.container}>
-      <DefinitionMenu exerciseId={exerciseId} />
+    <>
       <div>
         <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
@@ -88,7 +70,7 @@ const Challenges = () => {
             color="secondary"
             variant="outlined"
             component={Link}
-            to={`/challenges/${exerciseId}?preview=true`}
+            to={previewChallengeUrl()}
           >
             {t('Preview challenges page')}
           </Button>
@@ -176,7 +158,7 @@ const Challenges = () => {
           </div>
         );
       })}
-    </div>
+    </>
   );
 };
 

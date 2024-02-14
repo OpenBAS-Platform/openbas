@@ -8,11 +8,15 @@ export type PermissionsContext = {
 };
 
 export type ArticleContext = {
-  previewUrl: (article: FullArticleStore) => string;
+  previewArticleUrl: (article: FullArticleStore) => string;
   onAddArticle: (data: ArticleCreateInput) => string;
   onUpdateArticle: (article: ArticleStore, data: ArticleUpdateInput) => string;
   onDeleteArticle: (article: ArticleStore) => string;
 } & PermissionsContext;
+
+export type ChallengeContext = {
+  previewChallengeUrl: () => string
+}
 
 export type DocumentContext = {
   onInitDocument: () => {
@@ -37,7 +41,7 @@ export type TeamContext = {
   isContextual: boolean,
 } & PermissionsContext;
 
-export type ExerciseOrScenario = ArticleContext & DocumentContext & VariableContext & TeamContext;
+export type ExerciseOrScenario = ArticleContext & ChallengeContext & DocumentContext & VariableContext & TeamContext;
 
 const ExerciseOrScenarioContext = createContext<ExerciseOrScenario | null>(null);
 

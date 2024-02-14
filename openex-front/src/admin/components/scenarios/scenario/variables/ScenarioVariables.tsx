@@ -17,11 +17,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-interface Props {
-  scenarioId: string;
-}
-
-const ScenarioVariables: FunctionComponent<Props> = () => {
+const ScenarioVariables = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useAppDispatch();

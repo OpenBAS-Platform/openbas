@@ -53,3 +53,10 @@ export const fetchObserverChallenges = (exerciseId, userId) => (dispatch) => {
   const uri = `/api/observer/challenges/${exerciseId}?userId=${userId}`;
   return getReferential(challengesReader, uri)(dispatch);
 };
+
+// -- SCENARIOS --
+
+export const fetchScenarioChallenges = (scenarioId) => (dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/challenges`;
+  return getReferential(arrayOfChallenges, uri)(dispatch);
+};
