@@ -420,7 +420,9 @@ export const storeHelper = (state) => ({
   getContractImages: () => contractImages(state),
   // scenarios
   getScenarios: () => entities('scenarios', state),
+  getScenariosMap: () => maps('scenarios', state),
   getScenario: (id) => entity(id, 'scenarios', state),
   getScenarioTeams: (id) => entities('teams', state).filter((i) => i.team_scenarios.includes(id)),
   getScenarioVariables: (id) => entities('variables', state).filter((i) => i.variable_scenario === id),
+  getScenarioArticles: (id) => entities('articles', state).filter((i) => i.article_scenario === id),
 });

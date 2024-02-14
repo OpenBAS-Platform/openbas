@@ -203,8 +203,9 @@ class ChallengeAddDocuments extends Component {
                       </ListItem>
                     );
                   })}
+                  {/* // TODO: no exercise ? */}
                   <CreateDocument
-                    inline={true}
+                    inline
                     onCreate={this.onCreate.bind(this)}
                   />
                 </List>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
-import { Typography, Grid, Card, CardHeader, CardContent, Avatar, CardChannel, Button, Dialog, DialogTitle, DialogContent, Slide } from '@mui/material';
+import { Typography, Grid, Card, CardHeader, CardContent, Avatar, CardMedia, Button, Dialog, DialogTitle, DialogContent, Slide } from '@mui/material';
 import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, ShareOutlined, MoreHorizOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
 import Empty from '../../../components/Empty';
@@ -130,7 +130,7 @@ const ChannelNewspaper = ({ channelReader }) => {
                     item={true}
                     xs={firstArticleColumns}
                   >
-                    <CardChannel
+                    <CardMedia
                       component="img"
                       height="200"
                       src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
@@ -225,7 +225,7 @@ const ChannelNewspaper = ({ channelReader }) => {
                   <Grid container={true} spacing={3}>
                     {images.map((doc) => (
                       <Grid key={doc.document_id} item={true} xs={columns}>
-                        <CardChannel
+                        <CardMedia
                           component="img"
                           height="100"
                           src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
@@ -317,7 +317,7 @@ const ChannelNewspaper = ({ channelReader }) => {
                 <Grid container={true} spacing={3}>
                   {images.map((doc) => (
                     <Grid key={doc.document_id} item={true} xs={columns}>
-                      <CardChannel
+                      <CardMedia
                         component="img"
                         height="150"
                         src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}

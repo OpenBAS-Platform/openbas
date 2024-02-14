@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { Typography, Grid, Card, CardHeader, CardContent, Avatar, CardChannel, Button } from '@mui/material';
+import { Typography, Grid, Card, CardHeader, CardContent, Avatar, CardMedia, Button } from '@mui/material';
 import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, ShareOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
@@ -127,14 +127,14 @@ const ChannelMicroblogging = ({ channelReader }) => {
                 {docs.map((doc) => (
                   <Grid key={doc.document_id} item={true} xs={columns}>
                     {doc.document_type.includes('image/') && (
-                      <CardChannel
+                      <CardMedia
                         component="img"
                         height="150"
                         src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
                       />
                     )}
                     {doc.document_type.includes('video/') && (
-                      <CardChannel
+                      <CardMedia
                         component="video"
                         height="150"
                         src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}

@@ -1,7 +1,6 @@
 import React, { ChangeEvent, FunctionComponent, useRef, useState } from 'react';
-import { CircularProgress, IconButton, Tooltip } from '@mui/material';
+import { CircularProgress, IconButton, Tooltip, CircularProgressProps } from '@mui/material';
 import { CloudUploadOutlined } from '@mui/icons-material';
-import type { CircularProgressProps } from '@mui/material/CircularProgress/CircularProgress';
 import { useFormatter } from '../i18n';
 import { useHelper } from '../../store';
 import type { UsersHelper } from '../../actions/helper';

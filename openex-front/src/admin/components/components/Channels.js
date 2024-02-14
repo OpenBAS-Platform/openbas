@@ -8,7 +8,7 @@ import SearchFilter from '../../../components/SearchFilter';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
-import { fetchChannels } from '../../../actions/Channel';
+import { fetchChannels } from '../../../actions/channels/channel-action';
 import CreateChannel from './channels/CreateChannel';
 import { useFormatter } from '../../../components/i18n';
 import ChannelIcon from './channels/ChannelIcon';

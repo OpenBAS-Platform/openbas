@@ -21,6 +21,7 @@ export interface Article {
   article_exercise?: Exercise;
   article_id?: string;
   article_is_scheduled?: boolean;
+  article_is_scheduled?: boolean;
   /** @format int32 */
   article_likes?: number;
   article_name?: string;

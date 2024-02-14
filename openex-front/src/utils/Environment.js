@@ -44,6 +44,7 @@ export const exportData = (
   tagsMap,
   organizationsMap,
   exercisesMap,
+  scenariosMap,
 ) => {
   return data
     .map((d) => R.pick(keys, d))
@@ -60,6 +61,13 @@ export const exportData = (
         entry = R.assoc(
           `${type}_exercises`,
           entry[`${type}_exercises`].map((e) => exercisesMap[e]?.exercise_name),
+          entry,
+        );
+      }
+      if (entry[`${type}_scenarios`]) {
+        entry = R.assoc(
+          `${type}_scenarios`,
+          entry[`${type}_scenarios`].map((e) => scenariosMap[e]?.scenario_name),
           entry,
         );
       }

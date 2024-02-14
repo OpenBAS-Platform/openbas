@@ -219,8 +219,7 @@ class InjectAddDocuments extends Component {
                   })}
                   {userAdmin && (
                     <CreateDocument
-                      exercise={exercise}
-                      inline={true}
+                      inline
                       onCreate={this.onCreate.bind(this)}
                     />
                   )}

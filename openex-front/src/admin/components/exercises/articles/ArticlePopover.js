@@ -1,21 +1,43 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as R from 'ramda';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Slide, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Slide } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { useFormatter } from '../../../../components/i18n';
-import { deleteExerciseArticle, updateExerciseArticle } from '../../../../actions/Channel';
+import { deleteExerciseArticle, deleteScenarioArticle, updateExerciseArticle, updateScenarioArticle } from '../../../../actions/channels/article-action';
 import ArticleForm from './ArticleForm';
+import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';
 
-const ArticlePopover = ({ exercise, article, documents, onRemoveArticle }) => {
+const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
   // utils
   const dispatch = useDispatch();
   const { t } = useFormatter();
+
+  // Context
+  const { exercise, scenario } = useContext(ExerciseOrScenarioContext);
+  let onUpdate;
+  let onDelete;
+  if (exercise) {
+    onUpdate = (inputValues) => dispatch(
+      updateExerciseArticle(exercise.exercise_id, article.article_id, inputValues),
+    );
+    onDelete = () => dispatch(
+      deleteExerciseArticle(exercise.exercise_id, article.article_id),
+    );
+  } else if (scenario) {
+    onUpdate = (inputValues) => dispatch(
+      updateScenarioArticle(scenario.scenario_id, article.article_id, inputValues),
+    );
+    onDelete = () => dispatch(
+      deleteScenarioArticle(scenario.scenario_id, article.article_id),
+    );
+  }
+
   // states
   const [openDelete, setOpenDelete] = useState(false);
   const [openRemove, setOpenRemove] = useState(false);
@@ -35,13 +57,7 @@ const ArticlePopover = ({ exercise, article, documents, onRemoveArticle }) => {
   const handleCloseEdit = () => setOpenEdit(false);
   const onSubmitEdit = (data) => {
     const inputValues = { ...data, article_channel: data.article_channel.id };
-    return dispatch(
-      updateExerciseArticle(
-        exercise.exercise_id,
-        article.article_id,
-        inputValues,
-      ),
-    ).then(() => handleCloseEdit());
+    return onUpdate(inputValues).then(() => handleCloseEdit());
   };
   // Delete action
   const handleOpenDelete = () => {
@@ -50,9 +66,7 @@ const ArticlePopover = ({ exercise, article, documents, onRemoveArticle }) => {
   };
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
-    return dispatch(
-      deleteExerciseArticle(exercise.exercise_id, article.article_id),
-    ).then(() => handleCloseDelete());
+    return onDelete().then(() => handleCloseDelete());
   };
   const handleOpenRemove = () => {
     setOpenRemove(true);
@@ -77,6 +91,7 @@ const ArticlePopover = ({ exercise, article, documents, onRemoveArticle }) => {
       'article_channel',
     ]),
   )(article);
+
   return (
     <React.Fragment>
       <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large">
@@ -124,10 +139,9 @@ const ArticlePopover = ({ exercise, article, documents, onRemoveArticle }) => {
         <DialogTitle>{t('Update the channel pressure')}</DialogTitle>
         <DialogContent style={{ overflowX: 'hidden' }}>
           <ArticleForm
-            editing={true}
+            editing
             onSubmit={onSubmitEdit}
             handleClose={handleCloseEdit}
-            exerciseId={exercise.exercise_id}
             initialValues={initialValues}
             documentsIds={(documents || []).map((i) => i.document_id)}
           />

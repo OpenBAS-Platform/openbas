@@ -1,7 +1,7 @@
 import React, { lazy } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
-import { fetchChannel } from '../../../../actions/Channel';
+import { fetchChannel } from '../../../../actions/channels/channel-action';
 import Loader from '../../../../components/Loader';
 import TopBar from '../../nav/TopBar';
 import ChannelHeader from './ChannelHeader';

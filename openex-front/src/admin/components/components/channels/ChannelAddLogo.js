@@ -143,7 +143,8 @@ class ChannelAddLogo extends Component {
                   </ListItem>
                 );
               })}
-              <CreateDocument inline={true} image={true} />
+              {/* // TODO: no exercise ? */}
+              <CreateDocument inline image />
             </List>
           </DialogContent>
         </Dialog>

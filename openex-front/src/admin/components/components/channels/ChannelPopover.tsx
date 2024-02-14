@@ -4,7 +4,7 @@ import { MoreVert } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
-import { updateChannel } from '../../../../actions/Channel';
+import { updateChannel } from '../../../../actions/channels/channel-action';
 import ChannelForm from './ChannelForm';
 import { useAppDispatch } from '../../../../utils/hooks';
 import Transition from '../../../../components/common/Transition';

@@ -13,7 +13,7 @@ import ScenarioHeader from './ScenarioHeader';
 
 const Scenario = lazy(() => import('./Scenario'));
 const Teams = lazy(() => import('./Teams'));
-const Articles = lazy(() => import('../../exercises/articles/Articles'));
+const Articles = lazy(() => import('./articles/ScenarioArticles'));
 const Challenges = lazy(() => import('../../exercises/challenges/Challenges'));
 const Variables = lazy(() => import('./variables/ScenarioVariables'));
 

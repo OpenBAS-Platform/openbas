@@ -3,7 +3,7 @@ import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
 import { Box, Autocomplete, TextField, Chip } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { fetchChannels } from '../../../../actions/Channel';
+import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import ChannelIcon from './ChannelIcon';

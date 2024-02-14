@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Fab, Dialog, DialogTitle, DialogContent, Slide, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
-import { addExerciseArticle } from '../../../../actions/Channel';
+import { addExerciseArticle, addScenarioArticle } from '../../../../actions/channels/article-action';
 import ArticleForm from './ArticleForm';
+import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -26,16 +27,26 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CreateArticle = (props) => {
-  const { exerciseId, onCreate, inline } = props;
+  const { onCreate, inline } = props;
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  // Context
+  const { exercise, scenario } = useContext(ExerciseOrScenarioContext);
+  let onAddArticle;
+  if (exercise) {
+    onAddArticle = (inputValues) => dispatch(addExerciseArticle(exercise.exercise_id, inputValues));
+  } else if (scenario) {
+    onAddArticle = (inputValues) => dispatch(addScenarioArticle(scenario.scenario_id, inputValues));
+  }
+
   const onSubmit = (data) => {
     const inputValues = { ...data, article_channel: data.article_channel.id };
-    return dispatch(addExerciseArticle(exerciseId, inputValues)).then(
+    return onAddArticle(inputValues).then(
       (result) => {
         if (result.result) {
           if (onCreate) {
@@ -51,8 +62,8 @@ const CreateArticle = (props) => {
     <div>
       {inline === true ? (
         <ListItem
-          button={true}
-          divider={true}
+          button
+          divider
           onClick={handleOpen}
           color="primary"
         >
@@ -78,7 +89,7 @@ const CreateArticle = (props) => {
         open={open}
         TransitionComponent={Transition}
         onClose={handleClose}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
@@ -88,7 +99,6 @@ const CreateArticle = (props) => {
             editing={false}
             onSubmit={onSubmit}
             handleClose={handleClose}
-            exerciseId={exerciseId}
             initialValues={{ article_name: '', article_channel: '' }}
           />
         </DialogContent>

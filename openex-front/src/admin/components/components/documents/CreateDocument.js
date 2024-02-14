@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
@@ -9,6 +9,7 @@ import DocumentForm from './DocumentForm';
 import { addDocument, fetchDocument } from '../../../../actions/Document';
 import inject18n from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
+import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
 
 const styles = (theme) => ({
   createButton: {
@@ -24,13 +25,46 @@ const styles = (theme) => ({
 });
 
 const CreateDocument = (props) => {
-  const { classes, t, inline, exercise, filters } = props;
+  const { classes, t, inline, filters } = props;
   const [open, setOpen] = useState(false);
-  const onSubmit = (data) => {
-    const inputValues = R.pipe(
+
+  // Context
+  const { exercise, scenario } = useContext(ExerciseOrScenarioContext);
+  let initialValues;
+  let computeInputValues;
+  if (exercise) {
+    computeInputValues = (data) => R.pipe(
       R.assoc('document_tags', R.pluck('id', data.document_tags)),
       R.assoc('document_exercises', R.pluck('id', data.document_exercises)),
     )(data);
+    initialValues = {
+      document_tags: [],
+      document_exercises: [{ id: exercise.exercise_id, label: exercise.exercise_name }],
+      document_scenarios: [],
+    };
+  } else if (scenario) {
+    computeInputValues = (data) => R.pipe(
+      R.assoc('document_tags', R.pluck('id', data.document_tags)),
+      R.assoc('document_scenarios', R.pluck('id', data.document_scenarios)),
+    )(data);
+    initialValues = {
+      document_tags: [],
+      document_scenarios: scenario ? [{ id: scenario.scenario_id, label: scenario.scenario_name }] : [],
+      document_exercises: [],
+    };
+  } else {
+    computeInputValues = (data) => R.pipe(
+      R.assoc('document_tags', R.pluck('id', data.document_tags)),
+    )(data);
+    initialValues = {
+      document_tags: [],
+      document_exercises: [],
+      document_scenarios: [],
+    };
+  }
+
+  const onSubmit = (data) => {
+    const inputValues = computeInputValues(data);
     const formData = new FormData();
     formData.append('file', data.document_file[0]);
     const blob = new Blob([JSON.stringify(inputValues)], {
@@ -51,8 +85,8 @@ const CreateDocument = (props) => {
     <>
       {inline === true ? (
         <ListItem
-          button={true}
-          divider={true}
+          button
+          divider
           onClick={() => setOpen(true)}
           color="primary"
         >
@@ -77,7 +111,7 @@ const CreateDocument = (props) => {
       <Dialog
         open={open}
         TransitionComponent={Transition}
-        fullWidth={true}
+        fullWidth
         maxWidth="md"
         onClose={() => setOpen(false)}
         PaperProps={{ elevation: 1 }}
@@ -85,11 +119,8 @@ const CreateDocument = (props) => {
         <DialogTitle>{t('Create a new document')}</DialogTitle>
         <DialogContent>
           <DocumentForm
+            initialValues={initialValues}
             onSubmit={onSubmit}
-            initialValues={{
-              document_tags: [],
-              document_exercises: exercise ? [{ id: exercise.exercise_id, label: exercise.exercise_name }] : [],
-            }}
             handleClose={() => setOpen(false)}
             filters={filters}
           />
@@ -105,7 +136,6 @@ CreateDocument.propTypes = {
   addDocument: PropTypes.func,
   fetchDocument: PropTypes.func,
   inline: PropTypes.bool,
-  exercise: PropTypes.object,
   filters: PropTypes.array,
 };
 

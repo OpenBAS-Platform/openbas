@@ -1,31 +1,32 @@
-import React, { useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { Typography, Card, CardHeader, CardContent, CardMedia, Grid, Avatar, Tooltip, Chip, Button, IconButton } from '@mui/material';
-import { useDispatch } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
-import * as R from 'ramda';
+import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, Chip, Grid, IconButton, Tooltip, Typography } from '@mui/material';
 import { green, orange } from '@mui/material/colors';
-import { ChatBubbleOutlineOutlined, ShareOutlined, FavoriteBorderOutlined, VisibilityOutlined } from '@mui/icons-material';
-import DefinitionMenu from '../DefinitionMenu';
-import { isExerciseUpdatable } from '../../../../utils/Exercise';
-import { useHelper } from '../../../../store';
-import CreateArticle from './CreateArticle';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchExerciseArticles, fetchChannels } from '../../../../actions/Channel';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import React, { FunctionComponent, useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, ShareOutlined, VisibilityOutlined } from '@mui/icons-material';
+import * as R from 'ramda';
+import { makeStyles } from '@mui/styles';
 import SearchFilter from '../../../../components/SearchFilter';
-import { useFormatter } from '../../../../components/i18n';
-import ChannelsFilter from '../../components/channels/ChannelsFilter';
-import { fetchDocuments } from '../../../../actions/Document';
-import ArticlePopover from './ArticlePopover';
-import ChannelIcon from '../../components/channels/ChannelIcon';
+import ChannelsFilter from '../channels/ChannelsFilter';
+import ArticlePopover from '../../exercises/articles/ArticlePopover';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
+import ChannelIcon from '../channels/ChannelIcon';
+import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import type { ArticleStore, FullArticleStore } from '../../../../actions/channels/Article';
+import type { ChannelOption } from '../channels/ChannelOption';
+import { useHelper } from '../../../../store';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import { fetchChannels } from '../../../../actions/channels/channel-action';
+import { fetchDocuments } from '../../../../actions/Document';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { useFormatter } from '../../../../components/i18n';
+import type { DocumentsHelper } from '../../../../actions/helper';
+import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
+import { usePermissions } from '../../../../utils/Exercise';
+import CreateArticle from '../../exercises/articles/CreateArticle';
+import useScenarioPermissions from '../../../../utils/Scenario';
+import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
 
 const useStyles = makeStyles(() => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
   channel: {
     fontSize: 12,
     float: 'left',
@@ -47,47 +48,49 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Articles = () => {
+interface Props {
+  articles: ArticleStore[];
+}
+
+const Articles: FunctionComponent<Props> = ({
+  articles,
+}) => {
+  // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { t } = useFormatter();
-  const [channels, setChannels] = useState([]);
-  const handleAddChannel = (value) => {
-    setChannels(R.uniq(R.append(value, channels)));
-  };
-  const handleRemoveChannel = (value) => {
-    const remainingTags = R.filter((n) => n.id !== value, channels);
-    setChannels(remainingTags);
-  };
+
   // Fetching data
-  const { exerciseId } = useParams();
-  const { exercise, articles, channelsMap, documentsMap } = useHelper(
-    (helper) => ({
-      exercise: helper.getExercise(exerciseId),
-      channelsMap: helper.getChannelsMap(),
-      documentsMap: helper.getDocumentsMap(),
-      articles: helper.getExerciseArticles(exerciseId),
-    }),
-  );
+  const { channelsMap, documentsMap } = useHelper((helper: ChannelsHelper & DocumentsHelper) => ({
+    channelsMap: helper.getChannelsMap(),
+    documentsMap: helper.getDocumentsMap(),
+  }));
   useDataLoader(() => {
-    dispatch(fetchExerciseArticles(exerciseId));
     dispatch(fetchChannels());
     dispatch(fetchDocuments());
   });
   // Filter and sort hook
+  const [channels, setChannels] = useState<ChannelOption[]>([]);
+  const handleAddChannel = (value: ChannelOption) => {
+    setChannels(R.uniq(R.append(value, channels)));
+  };
+  const handleRemoveChannel = (value: string) => {
+    const remainingTags = R.filter((n: ChannelOption) => n.id !== value, channels);
+    setChannels(remainingTags);
+  };
   const searchColumns = ['name', 'type', 'content'];
   const filtering = useSearchAnFilter('article', 'name', searchColumns);
   // Rendering
   const fullArticles = articles.map((item) => ({
     ...item,
-    article_fullchannel: channelsMap[item.article_channel] || {},
+    article_fullchannel: item.article_channel ? channelsMap[item.article_channel] : {},
   }));
-  const sortedArticles = R.filter(
-    (n) => channels.length === 0
-      || channels.map((o) => o.id).includes(n.article_fullchannel.channel_id),
+  const sortedArticles: FullArticleStore[] = R.filter(
+    (n: FullArticleStore) => channels.length === 0
+      || channels.map((o) => o.id).includes(n.article_fullchannel.channel_id ?? ''),
     filtering.filterAndSort(fullArticles),
   );
-  const channelColor = (type) => {
+  const channelColor = (type: string | undefined) => {
     switch (type) {
       case 'newspaper':
         return '#3f51b5';
@@ -99,9 +102,22 @@ const Articles = () => {
         return '#ef41e1';
     }
   };
+
+  // Context
+  const { exercise, scenario } = useContext(ExerciseOrScenarioContext);
+  let permissions: { canWrite: boolean } = { canWrite: false };
+  let previewUrl: (article: FullArticleStore) => string;
+  if (exercise) {
+    permissions = usePermissions(exercise.exercise_id);
+    previewUrl = (article: FullArticleStore) => `/channels/${exercise.exercise_id}/${article.article_fullchannel.channel_id}?preview=true`;
+  } else if (scenario) {
+    permissions = useScenarioPermissions(scenario.scenario_id);
+    // TODO: problem here
+    previewUrl = (article: FullArticleStore) => `/channels/${scenario.scenario_id}/${article.article_fullchannel.channel_id}?preview=true`;
+  }
+
   return (
-    <div className={classes.container}>
-      <DefinitionMenu exerciseId={exerciseId} />
+    <>
       <div>
         <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
@@ -119,9 +135,9 @@ const Articles = () => {
         </div>
       </div>
       <div className="clearfix" />
-      <Grid container={true} spacing={3}>
+      <Grid container spacing={3}>
         {sortedArticles.map((article) => {
-          const docs = article.article_documents
+          const docs = (article.article_documents ?? [])
             .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
             .filter((d) => d !== undefined);
           const images = docs.filter((d) => d.document_type.includes('image/'));
@@ -144,7 +160,7 @@ const Articles = () => {
           }
           // const shouldBeTruncated = (article.article_content || '').length > 500;
           return (
-            <Grid key={article.article_id} item={true} xs={4}>
+            <Grid key={article.article_id} item xs={4}>
               <Card
                 variant="outlined"
                 classes={{ root: classes.card }}
@@ -170,7 +186,7 @@ const Articles = () => {
                       </span>
                     ) : (
                       <span style={{ color: orange[500] }}>
-                        {t('Not used in the exercise')}
+                        {t('Not used in the context')}
                       </span>
                     )
                   }
@@ -180,12 +196,11 @@ const Articles = () => {
                         aria-haspopup="true"
                         size="large"
                         component={Link}
-                        to={`/channels/${exerciseId}/${article.article_fullchannel.channel_id}?preview=true`}
+                        to={previewUrl(article)}
                       >
                         <VisibilityOutlined />
                       </IconButton>
                       <ArticlePopover
-                        exercise={exercise}
                         article={article}
                         documents={docs}
                       />
@@ -194,7 +209,7 @@ const Articles = () => {
                 />
                 <Grid container={true} spacing={3}>
                   {headersDocs.map((doc) => (
-                    <Grid key={doc.document_id} item={true} xs={columns}>
+                    <Grid key={doc.document_id} item xs={columns}>
                       {doc.document_type.includes('image/') && (
                         <CardMedia
                           component="img"
@@ -207,7 +222,7 @@ const Articles = () => {
                           component="video"
                           height="150"
                           src={`/api/documents/${doc.document_id}/file`}
-                          controls={true}
+                          controls
                         />
                       )}
                     </Grid>
@@ -223,9 +238,9 @@ const Articles = () => {
                     {article.article_name}
                   </Typography>
                   <ExpandableMarkdown
-                    source={article.article_content}
+                    source={article.article_content ?? ''}
                     limit={500}
-                    controlled={true}
+                    controlled
                   />
                   <div className={classes.footer}>
                     <div style={{ float: 'left' }}>
@@ -281,10 +296,10 @@ const Articles = () => {
           );
         })}
       </Grid>
-      {isExerciseUpdatable(exercise) && (
-        <CreateArticle exerciseId={exercise.exercise_id} />
+      {permissions.canWrite && (
+        <CreateArticle />
       )}
-    </div>
+    </>
   );
 };
 

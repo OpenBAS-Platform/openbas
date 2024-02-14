@@ -9,7 +9,7 @@ import DocumentForm from './DocumentForm';
 import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
 import Transition from '../../../../components/common/Transition';
-import { exerciseOptions, tagOptions } from '../../../../utils/Option';
+import { exerciseOptions, scenarioOptions, tagOptions } from '../../../../utils/Option';
 
 class DocumentPopover extends Component {
   constructor(props) {
@@ -44,6 +44,7 @@ class DocumentPopover extends Component {
     const inputValues = R.pipe(
       R.assoc('document_tags', R.pluck('id', data.document_tags)),
       R.assoc('document_exercises', R.pluck('id', data.document_exercises)),
+      R.assoc('document_scenarios', R.pluck('id', data.document_scenarios)),
     )(data);
     return this.props
       .updateDocument(this.props.document.document_id, inputValues)
@@ -92,6 +93,7 @@ class DocumentPopover extends Component {
       attached,
       tagsMap,
       exercisesMap,
+      scenariosMap,
       disabled,
     } = this.props;
     const documentTags = tagOptions(document.document_tags, tagsMap);
@@ -99,15 +101,21 @@ class DocumentPopover extends Component {
       document.document_exercises,
       exercisesMap,
     );
+    const documentScenarios = scenarioOptions(
+      document.document_scenarios,
+      scenariosMap,
+    );
     const initialValues = R.pipe(
       R.assoc('document_tags', documentTags),
       R.assoc('document_exercises', documentExercises),
+      R.assoc('document_scenarios', documentScenarios),
       R.pick([
         'document_name',
         'document_description',
         'document_type',
         'document_tags',
         'document_exercises',
+        'document_scenarios',
       ]),
     )(document);
     return (
@@ -225,6 +233,7 @@ DocumentPopover.propTypes = {
   userAdmin: PropTypes.bool,
   tagsMap: PropTypes.object,
   exercisesMap: PropTypes.object,
+  scenariosMap: PropTypes.object,
   onRemoveDocument: PropTypes.func,
   onToggleAttach: PropTypes.func,
   attached: PropTypes.bool,

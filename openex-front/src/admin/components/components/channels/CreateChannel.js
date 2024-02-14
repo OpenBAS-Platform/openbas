@@ -6,7 +6,7 @@ import withStyles from '@mui/styles/withStyles';
 import { Fab, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import inject18n from '../../../../components/i18n';
-import { addChannel } from '../../../../actions/Channel';
+import { addChannel } from '../../../../actions/channels/channel-action';
 import ChannelForm from './ChannelForm';
 import Transition from '../../../../components/common/Transition';
 

@@ -1,12 +1,12 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
 import { Kayaking } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Autocomplete from './Autocomplete';
 import useDataLoader from '../utils/ServerSideEvent';
 import { useHelper } from '../store';
-import { fetchExercises } from '../actions/Exercise';
+import { fetchScenarios } from '../actions/scenarios/scenario-actions';
+import { useAppDispatch } from '../utils/hooks';
 
 const useStyles = makeStyles(() => ({
   icon: {
@@ -23,17 +23,20 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ExerciseField = (props) => {
+const ScenarioField = (props) => {
+  // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
-  const exercises = useHelper((helper) => helper.getExercises());
+  const dispatch = useAppDispatch();
+  // Fetching data
+  const scenarios = useHelper((helper) => helper.getScenarios());
   useDataLoader(() => {
-    dispatch(fetchExercises());
+    dispatch(fetchScenarios());
   });
+
   const { name, onKeyDown, style, label, placeholder, noMargin } = props;
-  const exerciseOptions = (exercises || []).map((n) => ({
-    id: n.exercise_id,
-    label: n.exercise_name,
+  const scenarioOptions = (scenarios || []).map((n) => ({
+    id: n.scenario_id,
+    label: n.scenario_name,
   }));
   return (
     <Autocomplete
@@ -45,7 +48,7 @@ const ExerciseField = (props) => {
       multiple
       label={label}
       placeholder={placeholder}
-      options={exerciseOptions}
+      options={scenarioOptions}
       style={style}
       onKeyDown={onKeyDown}
       renderOption={(renderProps, option) => (
@@ -61,4 +64,4 @@ const ExerciseField = (props) => {
   );
 };
 
-export default ExerciseField;
+export default ScenarioField;

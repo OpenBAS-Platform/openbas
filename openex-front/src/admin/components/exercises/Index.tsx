@@ -21,7 +21,7 @@ const Reports = lazy(() => import('./reports/Reports'));
 const Report = lazy(() => import('./reports/Report'));
 const Teams = lazy(() => import('./teams/Teams'));
 const Injects = lazy(() => import('./injects/Injects'));
-const Articles = lazy(() => import('./articles/Articles'));
+const Articles = lazy(() => import('./articles/ExerciseArticles'));
 const Challenges = lazy(() => import('./challenges/Challenges'));
 const Timeline = lazy(() => import('./timeline/Timeline'));
 const Mails = lazy(() => import('./mails/Mails'));

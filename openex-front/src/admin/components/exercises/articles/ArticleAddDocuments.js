@@ -1,27 +1,24 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import React, { useContext, useState } from 'react';
 import * as R from 'ramda';
-import { Button, Chip, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, Box, ListItemIcon, Grid } from '@mui/material';
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { ControlPointOutlined, DescriptionOutlined } from '@mui/icons-material';
-import withStyles from '@mui/styles/withStyles';
+import { makeStyles } from '@mui/styles';
 import SearchFilter from '../../../../components/SearchFilter';
-import article18n from '../../../../components/i18n';
-import { storeHelper } from '../../../../actions/Schema';
+import { useFormatter } from '../../../../components/i18n';
 import { fetchDocuments } from '../../../../actions/Document';
 import CreateDocument from '../../components/documents/CreateDocument';
 import { truncate } from '../../../../utils/String';
-import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import { usePermissions } from '../../../../utils/Exercise';
 import Transition from '../../../../components/common/Transition';
 import TagsFilter from '../../../../components/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
+import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
+import { useHelper } from '../../../../store';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useScenarioPermissions from '../../../../utils/Scenario';
 
-const styles = (theme) => ({
-  createButton: {
-    position: 'fixed',
-    bottom: 30,
-    right: 30,
-  },
+const useStyles = makeStyles((theme) => ({
   box: {
     width: '100%',
     minHeight: '100%',
@@ -40,261 +37,236 @@ const styles = (theme) => ({
     color: theme.palette.primary.main,
     fontWeight: 500,
   },
-});
+}));
 
-class ArticleAddDocuments extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      open: false,
-      keyword: '',
-      documentsIds: [],
-      tags: [],
-    };
-  }
+const ArticleAddDocuments = (props) => {
+  const { handleAddDocuments, articleDocumentsIds, channelType } = props;
+  // Standard hooks
+  const classes = useStyles();
+  const dispatch = useAppDispatch();
+  const { t } = useFormatter();
 
-  componentDidMount() {
-    this.props.fetchDocuments();
-  }
+  const [open, setOpen] = useState(false);
+  const [keyword, setKeyword] = useState('');
+  const [documentsIds, setDocumentsIds] = useState([]);
+  const [tags, setTags] = useState([]);
 
-  handleOpen() {
-    this.setState({ open: true });
-  }
+  // Fetching data
+  const { documents } = useHelper((helper) => ({
+    documents: helper.getDocumentsMap(),
+  }));
+  useDataLoader(() => {
+    dispatch(fetchDocuments());
+  });
 
-  handleClose() {
-    this.setState({ open: false, keyword: '', documentsIds: [] });
-  }
+  const handleOpen = () => {
+    setOpen(true);
+  };
 
-  handleSearchDocuments(value) {
-    this.setState({ keyword: value });
-  }
+  const handleClose = () => {
+    setOpen(false);
+    setKeyword('');
+    setDocumentsIds([]);
+  };
 
-  handleAddTag(value) {
+  const handleSearchDocuments = (value) => {
+    setKeyword(value);
+  };
+
+  const handleAddTag = (value) => {
     if (value) {
-      this.setState({ tags: [value] });
+      setTags([value]);
     }
-  }
+  };
 
-  handleClearTag() {
-    this.setState({ tags: [] });
-  }
+  const handleClearTag = () => {
+    setTags([]);
+  };
 
-  addDocument(documentId) {
-    this.setState({
-      documentsIds: R.append(documentId, this.state.documentsIds),
-    });
-  }
+  const addDocument = (documentId) => {
+    setDocumentsIds(R.append(documentId, documentsIds));
+  };
 
-  removeDocument(documentId) {
-    this.setState({
-      documentsIds: R.filter((u) => u !== documentId, this.state.documentsIds),
-    });
-  }
+  const removeDocument = (documentId) => {
+    setDocumentsIds(R.filter((u) => u !== documentId, documentsIds));
+  };
 
-  submitAddDocuments() {
-    this.props.handleAddDocuments(this.state.documentsIds);
-    this.handleClose();
-  }
+  const submitAddDocuments = () => {
+    handleAddDocuments(documentsIds);
+    handleClose();
+  };
 
-  onCreate(result) {
-    this.addDocument(result);
-  }
-
-  render() {
-    const {
-      classes,
-      t,
-      documents,
-      articleDocumentsIds,
-      exercise,
-      channelType,
-    } = this.props;
-    const { keyword, documentsIds, tags } = this.state;
-    const filterByKeyword = (n) => keyword === ''
-      || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.document_description || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1
-      || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1;
-    const filteredDocuments = R.pipe(
-      R.filter(
-        (n) => tags.length === 0
-          || R.any(
-            (filter) => R.includes(filter, n.document_tags),
-            R.pluck('id', tags),
-          ),
-      ),
-      R.filter(filterByKeyword),
-    )(Object.values(documents));
-    let finalDocuments = R.take(10, filteredDocuments);
-    let filters = null;
-    if (channelType === 'newspaper') {
-      finalDocuments = R.take(
-        10,
-        filteredDocuments.filter((d) => d.document_type.includes('image/')),
-      );
-      filters = ['image/'];
-    } else if (channelType === 'microblogging') {
-      finalDocuments = R.take(
-        10,
-        filteredDocuments.filter(
-          (d) => d.document_type.includes('image/')
-            || d.document_type.includes('video/'),
+  const onCreate = (result) => {
+    addDocument(result);
+  };
+  const filterByKeyword = (n) => keyword === ''
+    || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
+    !== -1
+    || (n.document_description || '')
+      .toLowerCase()
+      .indexOf(keyword.toLowerCase()) !== -1
+    || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
+    !== -1;
+  const filteredDocuments = R.pipe(
+    R.filter(
+      (n) => tags.length === 0
+        || R.any(
+          (filter) => R.includes(filter, n.document_tags),
+          R.pluck('id', tags),
         ),
-      );
-      filters = ['image/', 'video/'];
-    } else if (channelType === 'tv') {
-      finalDocuments = R.take(
-        10,
-        filteredDocuments.filter((d) => d.document_type.includes('video/')),
-      );
-      filters = ['video/'];
-    }
-    return (
-      <div>
-        <ListItem
-          classes={{ root: classes.item }}
-          button={true}
-          divider={true}
-          onClick={this.handleOpen.bind(this)}
-          color="primary"
-          disabled={isExerciseReadOnly(exercise)}
-        >
-          <ListItemIcon color="primary">
-            <ControlPointOutlined color="primary" />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('Add documents')}
-            classes={{ primary: classes.text }}
-          />
-        </ListItem>
-        <Dialog
-          open={this.state.open}
-          TransitionComponent={Transition}
-          onClose={this.handleClose.bind(this)}
-          fullWidth={true}
-          maxWidth="lg"
-          PaperProps={{
-            elevation: 1,
-            sx: {
-              minHeight: 580,
-              maxHeight: 580,
-            },
-          }}
-        >
-          <DialogTitle>{t('Add documents in this channel pressure')}</DialogTitle>
-          <DialogContent>
-            <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
-              <Grid item={true} xs={8}>
-                <Grid container={true} spacing={3}>
-                  <Grid item={true} xs={6}>
-                    <SearchFilter
-                      onChange={this.handleSearchDocuments.bind(this)}
-                      fullWidth={true}
-                    />
-                  </Grid>
-                  <Grid item={true} xs={6}>
-                    <TagsFilter
-                      onAddTag={this.handleAddTag.bind(this)}
-                      onClearTag={this.handleClearTag.bind(this)}
-                      currentTags={tags}
-                      fullWidth={true}
-                    />
-                  </Grid>
-                </Grid>
-                <List>
-                  {finalDocuments.map((document) => {
-                    const disabled = documentsIds.includes(document.document_id)
-                      || articleDocumentsIds.includes(document.document_id);
-                    return (
-                      <ListItem
-                        key={document.document_id}
-                        disabled={disabled}
-                        button={true}
-                        divider={true}
-                        dense={true}
-                        onClick={this.addDocument.bind(
-                          this,
-                          document.document_id,
-                        )}
-                      >
-                        <ListItemIcon>
-                          <DescriptionOutlined />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={document.document_name}
-                          secondary={document.document_description}
-                        />
-                        <ItemTags
-                          variant="list"
-                          tags={document.document_tags}
-                        />
-                      </ListItem>
-                    );
-                  })}
-                  <CreateDocument
-                    exercise={exercise}
-                    inline={true}
-                    onCreate={this.onCreate.bind(this)}
-                    filters={filters}
-                  />
-                </List>
-              </Grid>
-              <Grid item={true} xs={4}>
-                <Box className={classes.box}>
-                  {this.state.documentsIds.map((documentId) => {
-                    const document = documents[documentId];
-                    return (
-                      <Chip
-                        key={documentId}
-                        onDelete={this.removeDocument.bind(this, documentId)}
-                        label={truncate(document.document_name, 22)}
-                        icon={<DescriptionOutlined />}
-                        classes={{ root: classes.chip }}
-                      />
-                    );
-                  })}
-                </Box>
-              </Grid>
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleClose.bind(this)}>{t('Cancel')}</Button>
-            <Button
-              color="secondary"
-              onClick={this.submitAddDocuments.bind(this)}
-            >
-              {t('Add')}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+    ),
+    R.filter(filterByKeyword),
+  )(Object.values(documents));
+  let finalDocuments = R.take(10, filteredDocuments);
+  let filters = null;
+  if (channelType === 'newspaper') {
+    finalDocuments = R.take(
+      10,
+      filteredDocuments.filter((d) => d.document_type.includes('image/')),
     );
+    filters = ['image/'];
+  } else if (channelType === 'microblogging') {
+    finalDocuments = R.take(
+      10,
+      filteredDocuments.filter(
+        (d) => d.document_type.includes('image/')
+          || d.document_type.includes('video/'),
+      ),
+    );
+    filters = ['image/', 'video/'];
+  } else if (channelType === 'tv') {
+    finalDocuments = R.take(
+      10,
+      filteredDocuments.filter((d) => d.document_type.includes('video/')),
+    );
+    filters = ['video/'];
   }
-}
 
-ArticleAddDocuments.propTypes = {
-  t: PropTypes.func,
-  exerciseId: PropTypes.string,
-  exercise: PropTypes.object,
-  fetchDocuments: PropTypes.func,
-  documents: PropTypes.object,
-  articleDocumentsIds: PropTypes.array,
-  handleAddDocuments: PropTypes.func,
+  // Context
+  const { exercise, scenario } = useContext(ExerciseOrScenarioContext);
+  let permissions = { canWrite: false };
+  if (exercise) {
+    permissions = usePermissions(exercise);
+  } else if (scenario) {
+    permissions = useScenarioPermissions(exercise);
+  }
+
+  return (
+    <div>
+      <ListItem
+        classes={{ root: classes.item }}
+        button
+        divider
+        onClick={handleOpen}
+        color="primary"
+        disabled={permissions.canWrite}
+      >
+        <ListItemIcon color="primary">
+          <ControlPointOutlined color="primary" />
+        </ListItemIcon>
+        <ListItemText
+          primary={t('Add documents')}
+          classes={{ primary: classes.text }}
+        />
+      </ListItem>
+      <Dialog
+        open={open}
+        TransitionComponent={Transition}
+        onClose={handleClose}
+        fullWidth
+        maxWidth="lg"
+        PaperProps={{
+          elevation: 1,
+          sx: {
+            minHeight: 580,
+            maxHeight: 580,
+          },
+        }}
+      >
+        <DialogTitle>{t('Add documents in this channel pressure')}</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={3} style={{ marginTop: -15 }}>
+            <Grid item xs={8}>
+              <Grid container spacing={3}>
+                <Grid item xs={6}>
+                  <SearchFilter
+                    onChange={handleSearchDocuments}
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TagsFilter
+                    onAddTag={handleAddTag}
+                    onClearTag={handleClearTag}
+                    currentTags={tags}
+                    fullWidth
+                  />
+                </Grid>
+              </Grid>
+              <List>
+                {finalDocuments.map((document) => {
+                  const disabled = documentsIds.includes(document.document_id)
+                    || articleDocumentsIds.includes(document.document_id);
+                  return (
+                    <ListItem
+                      key={document.document_id}
+                      disabled={disabled}
+                      button
+                      divider
+                      dense
+                      onClick={() => addDocument(document.document_id)}
+                    >
+                      <ListItemIcon>
+                        <DescriptionOutlined />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={document.document_name}
+                        secondary={document.document_description}
+                      />
+                      <ItemTags
+                        variant="list"
+                        tags={document.document_tags}
+                      />
+                    </ListItem>
+                  );
+                })}
+                <CreateDocument
+                  inline
+                  onCreate={onCreate}
+                  filters={filters}
+                />
+              </List>
+            </Grid>
+            <Grid item xs={4}>
+              <Box className={classes.box}>
+                {documentsIds.map((documentId) => {
+                  const document = documents[documentId];
+                  return (
+                    <Chip
+                      key={documentId}
+                      onDelete={() => removeDocument(documentId)}
+                      label={truncate(document.document_name, 22)}
+                      icon={<DescriptionOutlined />}
+                      classes={{ root: classes.chip }}
+                    />
+                  );
+                })}
+              </Box>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>{t('Cancel')}</Button>
+          <Button
+            color="secondary"
+            onClick={submitAddDocuments}
+          >
+            {t('Add')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
 };
 
-const select = (state, ownProps) => {
-  const helper = storeHelper(state);
-  const { exerciseId } = ownProps;
-  const exercise = helper.getExercise(exerciseId);
-  const documents = helper.getDocumentsMap();
-  return { exercise, documents };
-};
-
-export default R.compose(
-  connect(select, { fetchDocuments }),
-  article18n,
-  withStyles(styles),
-)(ArticleAddDocuments);
+export default ArticleAddDocuments;

@@ -12,8 +12,8 @@ import { fetchVariablesForScenario } from '../../../../../actions/variables/vari
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import NotFound from '../../../../../components/NotFound';
 import ExerciseOrScenarioContext from '../../../../ExerciseOrScenarioContext';
-import { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
-import { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
+import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
+import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 
 const useStyles = makeStyles(() => ({
   container: {

@@ -10,7 +10,7 @@ import TextField from '../../../../components/TextField';
 import Autocomplete from '../../../../components/Autocomplete';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchChannels } from '../../../../actions/Channel';
+import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
 import ChannelIcon from '../../components/channels/ChannelIcon';
@@ -103,7 +103,6 @@ const inlineStyles = {
 };
 
 const ArticleForm = ({
-  exerciseId,
   onSubmit,
   handleClose,
   initialValues,
@@ -188,7 +187,7 @@ const ArticleForm = ({
   // Rendering
   return (
     <Form
-      keepDirtyOnReinitialize={true}
+      keepDirtyOnReinitialize
       initialValues={formData}
       onSubmit={submitForm}
       validate={validate}
@@ -208,7 +207,7 @@ const ArticleForm = ({
               size="small"
               name="article_channel"
               label={t('Channel')}
-              fullWidth={true}
+              fullWidth
               multiple={false}
               options={sortedChannels}
               renderOption={(renderProps, option) => (
@@ -223,47 +222,47 @@ const ArticleForm = ({
             />
             <TextField
               name="article_name"
-              fullWidth={true}
+              fullWidth
               style={{ marginTop: 20 }}
               label={t('Title')}
             />
             <TextField
               variant="standard"
               name="article_author"
-              fullWidth={true}
+              fullWidth
               style={{ marginTop: 20 }}
               label={t('Author')}
             />
             <MarkDownField
               name="article_content"
               label={t('Content')}
-              fullWidth={true}
+              fullWidth
               style={{ marginTop: 20 }}
             />
-            <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
-              <Grid item={true} xs={4}>
+            <Grid container spacing={3} style={{ marginTop: 0 }}>
+              <Grid item xs={4}>
                 <TextField
                   variant="standard"
                   name="article_comments"
-                  fullWidth={true}
+                  fullWidth
                   type="number"
                   label={t('Comments')}
                 />
               </Grid>
-              <Grid item={true} xs={4}>
+              <Grid item xs={4}>
                 <TextField
                   variant="standard"
                   name="article_shares"
-                  fullWidth={true}
+                  fullWidth
                   type="number"
                   label={t('Shares')}
                 />
               </Grid>
-              <Grid item={true} xs={4}>
+              <Grid item xs={4}>
                 <TextField
                   variant="standard"
                   name="article_likes"
-                  fullWidth={true}
+                  fullWidth
                   type="number"
                   label={t('Likes')}
                 />
@@ -306,8 +305,8 @@ const ArticleForm = ({
                   <ListItem
                     key={document.document_id}
                     classes={{ root: classes.item }}
-                    divider={true}
-                    button={true}
+                    divider
+                    button
                     component="a"
                     href={`/api/documents/${document.document_id}/file`}
                   >
@@ -346,7 +345,6 @@ const ArticleForm = ({
                     />
                     <ListItemSecondaryAction>
                       <DocumentPopover
-                        exerciseId={exerciseId}
                         document={document}
                         exercisesMap={exercisesMap}
                         tagsMap={tagsMap}
@@ -359,7 +357,6 @@ const ArticleForm = ({
               })}
               {values.article_channel?.type && (
                 <ArticleAddDocuments
-                  exerciseId={exerciseId}
                   articleDocumentsIds={documents}
                   handleAddDocuments={handleAddDocuments}
                   channelType={values.article_channel.type}

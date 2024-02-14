@@ -14,14 +14,16 @@ import type { InjectExpectationsStore } from '../../injects/expectations/Expecta
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
-import { fetchChannels, fetchExerciseArticles } from '../../../../../actions/Channel';
+import { fetchChannels, fetchExerciseArticles } from '../../../../../actions/channels/channel-action';
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { fetchExerciseChallenges } from '../../../../../actions/Challenge';
 import { fetchEndpoints } from '../../../../../actions/assets/endpoint-actions';
 import { fetchAssetGroups } from '../../../../../actions/assetgroups/assetgroup-action';
 import type { AssetGroupsHelper } from '../../../../../actions/assetgroups/assetgroup-helper';
 import type { EndpointsHelper } from '../../../../../actions/assets/asset-helper';
-import type { ArticlesHelper, ChallengesHelper, ChannelsHelper, TeamsHelper } from '../../../../../actions/helper';
+import type { ChallengesHelper, TeamsHelper } from '../../../../../actions/helper';
+import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
+import type { ChannelsHelper } from '../../../../../actions/channels/channel-helper';
 
 const useStyles = makeStyles(() => ({
   item: {
