@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as R from 'ramda';
 import { Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Fab, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, GroupsOutlined } from '@mui/icons-material';
@@ -8,18 +8,19 @@ import ItemTags from '../../../../components/ItemTags';
 import TagsFilter from '../../../../components/TagsFilter';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import type { Theme } from '../../../../components/Theme';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import { OrganizationsHelper, TeamsHelper } from '../../../../actions/helper';
+import type { OrganizationsHelper, TeamsHelper } from '../../../../actions/helper';
 import { fetchTeams } from '../../../../actions/Team';
 import SearchFilter from '../../../../components/SearchFilter';
-import CreateTeam from '../../teams/teams/CreateTeam';
-import type { Exercise, Organization, Scenario, Tag, Team } from '../../../../utils/api-types';
-import { TeamStore } from '../../teams/teams/Team';
+import CreateTeam from './CreateTeam';
+import type { Organization, Team } from '../../../../utils/api-types';
+import type { TeamStore } from '../../../../actions/teams/Team';
+import ExerciseOrScenarioContext, { TeamContext } from '../../../ExerciseOrScenarioContext';
+import type { Option } from '../../../../utils/Option';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   createButton: {
     position: 'fixed',
     bottom: 30,
@@ -38,22 +39,23 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   currentTeamIds: Team['team_id'][];
-  onAddTeams: (teamIds: Team['team_id'][]) => void;
 }
 
-interface TeamWithOrganization extends TeamStore {
+interface TeamStoreExtended extends TeamStore {
   organization_name: Organization['organization_name'];
   organization_description: Organization['organization_description']
 }
 
-const AddTeams: React.FC<Props> = ({ currentTeamIds, onAddTeams }) => {
+const AddTeams: React.FC<Props> = ({ currentTeamIds }) => {
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [keyword, setKeyword] = useState('');
   const [teamIds, setTeamIds] = useState<Team['team_id'][]>([]);
-  const [tags, setTags] = useState<Tag[]>([]);
+  const [tags, setTags] = useState<Option[]>([]);
+
+  const { onAddTeams } = useContext(ExerciseOrScenarioContext) as TeamContext;
 
   const { teamsMap, organizationsMap }: {
     organizationsMap: Record<string, Organization>,
@@ -71,7 +73,7 @@ const AddTeams: React.FC<Props> = ({ currentTeamIds, onAddTeams }) => {
     onAddTeams(teamIds);
   };
 
-  const filterByKeyword = (n: TeamWithOrganization) => keyword === ''
+  const filterByKeyword = (n: TeamStoreExtended) => keyword === ''
     || (n.team_name || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
     || (n.team_description || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
     || (n.organization_name || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
@@ -86,9 +88,9 @@ const AddTeams: React.FC<Props> = ({ currentTeamIds, onAddTeams }) => {
       ...u,
     })),
     R.filter(
-      (n: TeamWithOrganization) => tags.length === 0
+      (n: TeamStoreExtended) => tags.length === 0
         || R.any(
-          (filter) => R.includes(filter, n.team_tags),
+          (filter: Option['id']) => R.includes(filter, n.team_tags),
           R.pluck('id', tags),
         ),
     ),
@@ -137,7 +139,7 @@ const AddTeams: React.FC<Props> = ({ currentTeamIds, onAddTeams }) => {
                 </Grid>
                 <Grid item={true} xs={6}>
                   <TagsFilter
-                    onAddTag={(value: Tag) => {
+                    onAddTag={(value: Option) => {
                       if (value) {
                         setTags([...tags, value]);
                       }
@@ -149,7 +151,7 @@ const AddTeams: React.FC<Props> = ({ currentTeamIds, onAddTeams }) => {
                 </Grid>
               </Grid>
               <List>
-                {filteredTeams.map((team: TeamWithOrganization) => {
+                {filteredTeams.map((team: TeamStoreExtended) => {
                   const disabled = teamIds.includes(team.team_id)
                     || currentTeamIds.includes(team.team_id);
                   return (
@@ -175,7 +177,6 @@ const AddTeams: React.FC<Props> = ({ currentTeamIds, onAddTeams }) => {
                 <CreateTeam
                   inline={true}
                   onCreate={(teamId) => setTeamIds([...teamIds, teamId])}
-                  exerciseId={exerciseId}
                 />
               </List>
             </Grid>
@@ -193,7 +194,7 @@ const AddTeams: React.FC<Props> = ({ currentTeamIds, onAddTeams }) => {
                         setTeamIds(teamIdsTmp);
                       }}
                       label={truncate(team.team_name, 22)}
-                      avatar={<Avatar src={teamGravatar} size={32} />}
+                      avatar={<Avatar src={teamGravatar} sx={{ height: '32px', width: '32px' }} />}
                       classes={{ root: classes.chip }}
                     />
                   );

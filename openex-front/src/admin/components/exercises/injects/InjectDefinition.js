@@ -40,7 +40,7 @@ import { fetchExerciseArticles } from '../../../../actions/channels/article-acti
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
-import TeamPopover from '../../teams/teams/TeamPopover';
+import TeamPopover from '../../components/teams/TeamPopover.js';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddTeams from './InjectAddTeams';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';

@@ -7,8 +7,6 @@ import { CSVLink } from 'react-csv';
 import { fetchTeams } from '../../../actions/Team';
 import { fetchOrganizations } from '../../../actions/Organization';
 import ItemTags from '../../../components/ItemTags';
-import CreateTeam from './teams/CreateTeam';
-import TeamPopover from './teams/TeamPopover';
 import TagsFilter from '../../../components/TagsFilter';
 import SearchFilter from '../../../components/SearchFilter';
 import { fetchTags } from '../../../actions/Tag';
@@ -18,6 +16,8 @@ import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { useFormatter } from '../../../components/i18n';
 import { exportData } from '../../../utils/Environment';
 import TeamPlayers from './teams/TeamPlayers';
+import CreateTeam from '../components/teams/CreateTeam';
+import TeamPopover from '../components/teams/TeamPopover';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -312,11 +312,11 @@ const Teams = () => {
         elevation={1}
       >
         {selectedTeam !== null && (
-        <TeamPlayers
-          teamId={selectedTeam}
-          handleClose={() => setSelectedTeam(null)}
-          tagsMap={tagsMap}
-        />
+          <TeamPlayers
+            teamId={selectedTeam}
+            handleClose={() => setSelectedTeam(null)}
+            tagsMap={tagsMap}
+          />
         )}
       </Drawer>
       {isPlanner && <CreateTeam />}

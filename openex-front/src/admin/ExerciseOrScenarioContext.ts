@@ -1,6 +1,7 @@
 import { createContext } from 'react';
-import type { ArticleCreateInput, ArticleUpdateInput, Variable, VariableInput } from '../utils/api-types';
+import type { ArticleCreateInput, ArticleUpdateInput,Exercise, Team, TeamCreateInput, TeamUpdateInput, Variable, VariableInput } from '../utils/api-types';
 import type { ArticleStore, FullArticleStore } from '../actions/channels/Article';
+import type { ScenarioStore } from '../actions/scenarios/Scenario';
 
 export type PermissionsContext = {
   permissions: { readOnly: boolean, canWrite: boolean }
@@ -27,7 +28,16 @@ export type VariableContext = {
   onDeleteVariable: (variable: Variable) => void,
 } & PermissionsContext;
 
-export type ExerciseOrScenario = ArticleContext & DocumentContext & VariableContext;
+export type TeamContext = {
+  onAddTeams: (teamIds: Team['team_id'][]) => void,
+  onCreateTeam: (team: TeamCreateInput) => Promise<() => ({ result: { result: string } })>,
+  onEditTeam: (teamId: Team['team_id'], data: TeamUpdateInput) => void,
+  onRemoveTeamFromExerciseScenario: (teamId: Team['team_id']) => void,
+  exerciseScenarioName: Exercise['exercise_name'] | ScenarioStore['scenario_name'],
+  isContextual: boolean,
+} & PermissionsContext;
+
+export type ExerciseOrScenario = ArticleContext & DocumentContext & VariableContext & TeamContext;
 
 const ExerciseOrScenarioContext = createContext<ExerciseOrScenario | null>(null);
 

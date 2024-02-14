@@ -21,6 +21,7 @@ export interface TagsHelper {
 export interface TeamsHelper {
   getExerciseTeams: (exerciseId: Exercise['exercise_id']) => Team[];
   getScenarioTeams: (exerciseId: Exercise['exercise_id']) => Team[];
+  getTeams: () => Team[],
   getTeamsMap: () => Record<string, Team>;
 }
 

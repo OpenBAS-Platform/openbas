@@ -9,7 +9,7 @@ import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
 import { fetchTeams } from '../../../../actions/Team';
-import CreateTeam from '../../teams/teams/CreateTeam';
+import CreateTeam from '../../components/teams/CreateTeam.js';
 import { truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import Transition from '../../../../components/common/Transition';
@@ -113,7 +113,7 @@ class InjectAddTeams extends Component {
     const { keyword, teamsIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.team_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.team_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;

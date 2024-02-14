@@ -1,30 +1,23 @@
-import React, { useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { List, ListItem, Drawer, ListItemIcon, ListItemText, ListItemSecondaryAction, Tooltip, IconButton } from '@mui/material';
-import { useDispatch } from 'react-redux';
-import { GroupsOutlined, FileDownloadOutlined, CheckCircleOutlined } from '@mui/icons-material';
-import { useParams } from 'react-router-dom';
 import { CSVLink } from 'react-csv';
-import { useFormatter } from '../../../../components/i18n';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import ItemTags from '../../../../components/ItemTags';
+import { Drawer, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { CheckCircleOutlined, FileDownloadOutlined, GroupsOutlined } from '@mui/icons-material';
+import React, { CSSProperties, useContext, useState } from 'react';
+import { makeStyles } from '@mui/styles';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
-import { fetchExerciseTeams } from '../../../../actions/Exercise';
-import TeamPopover from '../../components/teams/TeamPopover.js';
-import TeamPlayers from '../../teams/teams/TeamPlayers';
-import { useHelper } from '../../../../store';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import { usePermissions } from '../../../../utils/Exercise';
 import { exportData } from '../../../../utils/Environment';
-import DefinitionMenu from '../DefinitionMenu';
-import ExerciseAddTeams from './ExerciseAddTeams';
+import ItemTags from '../../../../components/ItemTags';
+import TeamPopover from './TeamPopover';
+import TeamPlayers from '../../teams/teams/TeamPlayers';
+import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import { useHelper } from '../../../../store';
+import { useFormatter } from '../../../../components/i18n';
+import type { TagsHelper, TeamsHelper } from '../../../../actions/helper';
+import type { TeamStore } from '../../../../actions/teams/Team';
+import type { Tag, Team } from '../../../../utils/api-types';
+import ExerciseOrScenarioContext, { TeamContext } from '../../../ExerciseOrScenarioContext';
 
 const useStyles = makeStyles(() => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
   itemHead: {
     textTransform: 'uppercase',
     cursor: 'pointer',
@@ -43,7 +36,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const headerStyles = {
+const headerStyles: Record<string, CSSProperties> = {
   iconSort: {
     position: 'absolute',
     margin: '0 0 0 5px',
@@ -94,7 +87,7 @@ const headerStyles = {
   },
 };
 
-const inlineStyles = {
+const inlineStyles: Record<string, CSSProperties> = {
   team_name: {
     float: 'left',
     width: '20%',
@@ -145,35 +138,38 @@ const inlineStyles = {
   },
 };
 
-const Teams = () => {
+interface Props {
+  currentTeamIds: Team['team_id'][];
+}
+
+interface TeamStoreExtended extends TeamStore {
+  team_users_enabled_number: number
+}
+
+const Teams: React.FC<Props> = ({ currentTeamIds }) => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { t } = useFormatter();
-  const [selectedTeam, setSelectedTeam] = useState(null);
+  const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
+  const { teams, tagsMap }: { teams: TeamStore[], tagsMap: Record<string, Tag> } = useHelper((helper: TagsHelper & TeamsHelper) => ({
+    teams: helper.getTeams(),
+    tagsMap: helper.getTagsMap(),
+  }));
+  const { exerciseScenarioName, permissions } = useContext(ExerciseOrScenarioContext) as TeamContext;
+
   // Filter and sort hook
   const filtering = useSearchAnFilter('team', 'name', [
     'name',
     'description',
   ]);
-  // Fetching data
-  const { exerciseId } = useParams();
-  const permissions = usePermissions(exerciseId);
-  const { exercise, teams, tagsMap } = useHelper((helper) => ({
-    exercise: helper.getExercise(exerciseId),
-    teams: helper.getExerciseTeams(exerciseId),
-    tagsMap: helper.getTagsMap(),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchExerciseTeams(exerciseId));
-  });
+
   const sortedTeams = filtering.filterAndSort(teams.map((n) => ({
-    team_users_enabled_number: exercise.exercise_teams_users.filter((o) => o.exercise_id === exerciseId && o.team_id === n.team_id).length,
+    team_users_enabled_number: currentTeamIds.filter((currentTeamId) => currentTeamId === n.team_id).length,
     ...n,
   })));
+
   return (
-    <div className={classes.container}>
-      <DefinitionMenu exerciseId={exerciseId} />
+    <>
       <div>
         <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
@@ -207,7 +203,7 @@ const Teams = () => {
                 sortedTeams,
                 tagsMap,
               )}
-              filename={`[${exercise.exercise_name}] ${t('Teams')}.csv`}
+              filename={`[${exerciseScenarioName}] ${t('Teams')}.csv`}
             >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
@@ -280,7 +276,7 @@ const Teams = () => {
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
-        {sortedTeams.map((team) => (
+        {sortedTeams.map((team: TeamStoreExtended) => (
           <ListItem
             key={team.team_id}
             classes={{ root: classes.item }}
@@ -339,7 +335,6 @@ const Teams = () => {
             />
             <ListItemSecondaryAction>
               <TeamPopover
-                exerciseId={exerciseId}
                 team={team}
                 managePlayers={() => setSelectedTeam(team.team_id)}
                 disabled={permissions.readOnly}
@@ -360,14 +355,12 @@ const Teams = () => {
         {selectedTeam !== null && (
           <TeamPlayers
             teamId={selectedTeam}
-            exerciseId={exerciseId}
             handleClose={() => setSelectedTeam(null)}
             tagsMap={tagsMap}
           />
         )}
       </Drawer>
-      {permissions.canWrite && <ExerciseAddTeams exerciseId={exerciseId} exerciseTeamsIds={teams.map((team) => team.team_id)} />}
-    </div>
+    </>
   );
 };
 

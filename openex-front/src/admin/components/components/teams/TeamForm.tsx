@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useContext } from 'react';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -8,9 +8,10 @@ import { useFormatter } from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 import OrganizationField from '../../../../components/OrganizationField';
 import type { Theme } from '../../../../components/Theme';
-import type { TeamInputForm } from './Team';
+import type { TeamInputForm } from '../../../../actions/teams/Team';
 import { schemaValidator } from '../../../../utils/Zod';
 import CheckboxField from '../../../../components/CheckboxField';
+import ExerciseOrScenarioContext, { TeamContext } from '../../../ExerciseOrScenarioContext';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -25,7 +26,6 @@ interface TeamFormProps {
   handleClose: () => void;
   onSubmit: (data: TeamInputForm) => void;
   editing?: boolean;
-  exerciseId?: string;
 }
 
 const TeamForm: FunctionComponent<TeamFormProps> = ({
@@ -33,10 +33,10 @@ const TeamForm: FunctionComponent<TeamFormProps> = ({
   onSubmit,
   initialValues,
   handleClose,
-  exerciseId,
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
+  const { isContextual } = useContext(ExerciseOrScenarioContext) as TeamContext;
   const teamFormSchemaValidation = z.object({
     team_name: z.string().min(2, t('This field is mandatory')),
   });
@@ -79,13 +79,13 @@ const TeamForm: FunctionComponent<TeamFormProps> = ({
             setFieldValue={form.mutators.setValue}
             style={{ marginTop: 20 }}
           />
-          {exerciseId && (
-          <CheckboxField
-            name="team_contextual"
-            value={exerciseId}
-            label={t('Only in the context of this simulation')}
-            style={{ marginTop: 20 }}
-          />
+          {/* check if we are not editing and we are not in the create team for the platform */}
+          {!editing && isContextual && (
+            <CheckboxField
+              name="team_contextual"
+              label={t('Only in this context')}
+              style={{ marginTop: 20 }}
+            />
           )}
           <div className={classes.container} style={{ marginTop: 20 }}>
             <Button onClick={handleClose} disabled={submitting}>

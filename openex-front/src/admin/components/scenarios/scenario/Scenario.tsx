@@ -12,7 +12,7 @@ import { useFormatter } from '../../../../components/i18n';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import ScenarioSettingsForm from './ScenarioSettingsForm';
 import InjectsDistribution from '../../injects/InjectsDistribution';
-import type { TeamStore } from '../../teams/teams/Team';
+import type { TeamStore } from '../../../../actions/teams/Team';
 import type { ScenarioInformationInput } from '../../../../utils/api-types';
 
 const useStyles = makeStyles((theme: Theme) => ({

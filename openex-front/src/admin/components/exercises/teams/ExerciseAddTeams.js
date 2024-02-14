@@ -10,7 +10,7 @@ import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
 import { fetchTeams } from '../../../../actions/Team';
-import CreateTeam from '../../teams/teams/CreateTeam';
+import CreateTeam from '../../components/teams/CreateTeam.js';
 import { truncate } from '../../../../utils/String';
 import ItemTags from '../../../../components/ItemTags';
 import TagsFilter from '../../../../components/TagsFilter';

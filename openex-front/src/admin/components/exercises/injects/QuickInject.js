@@ -41,7 +41,7 @@ import { fetchExerciseArticles } from '../../../../actions/channels/article-acti
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
-import TeamPopover from '../../teams/teams/TeamPopover';
+import TeamPopover from '../../components/teams/TeamPopover.js';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddTeams from './InjectAddTeams';
 import { isExerciseUpdatable, isExerciseReadOnly, secondsFromToNow } from '../../../../utils/Exercise';
@@ -816,26 +816,26 @@ class QuickInject extends Component {
                                 && values[field.key]
                                 && values[field.key][index]
                                 && values[field.key][index].type
-                                  === 'attachment' ? (
-                                    <Select
-                                      variant="standard"
-                                      name={`${name}.value`}
-                                      fullWidth={true}
-                                      label={t('Value')}
-                                      style={{ marginRight: 20 }}
-                                      disabled={isExerciseReadOnly(exercise)}
-                                    >
-                                      {attachedDocs.map((doc) => (
-                                        <MenuItem
-                                          key={doc.document_id}
-                                          value={doc.document_id}
-                                        >
-                                          <ListItemText>
-                                            {doc.document_name}
-                                          </ListItemText>
-                                        </MenuItem>
-                                      ))}
-                                    </Select>
+                                === 'attachment' ? (
+                                  <Select
+                                    variant="standard"
+                                    name={`${name}.value`}
+                                    fullWidth={true}
+                                    label={t('Value')}
+                                    style={{ marginRight: 20 }}
+                                    disabled={isExerciseReadOnly(exercise)}
+                                  >
+                                    {attachedDocs.map((doc) => (
+                                      <MenuItem
+                                        key={doc.document_id}
+                                        value={doc.document_id}
+                                      >
+                                        <ListItemText>
+                                          {doc.document_name}
+                                        </ListItemText>
+                                      </MenuItem>
+                                    ))}
+                                  </Select>
                                   ) : (
                                     <TextField
                                       variant="standard"

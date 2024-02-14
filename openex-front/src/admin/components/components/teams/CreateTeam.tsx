@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useContext, useState } from 'react';
 import { Fab, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
@@ -8,9 +8,10 @@ import Dialog from '../../../../components/common/Dialog';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { Theme } from '../../../../components/Theme';
 import { Option } from '../../../../utils/Option';
-import type { TeamInputForm } from './Team';
+import type { TeamInputForm } from '../../../../actions/teams/Team';
 import TeamForm from './TeamForm';
 import type { TeamCreateInput } from '../../../../utils/api-types';
+import ExerciseOrScenarioContext, { TeamContext } from '../../../ExerciseOrScenarioContext';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {
@@ -28,18 +29,16 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface CreateTeamProps {
   inline: boolean;
   onCreate: (result: string) => void;
-  exerciseId?: string;
 }
 
 const CreateTeam: FunctionComponent<CreateTeamProps> = ({
   inline,
   onCreate,
-  exerciseId,
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   const [openDialog, setOpenDialog] = useState(false);
+  const { onCreateTeam } = useContext(ExerciseOrScenarioContext) as TeamContext;
   const handleOpen = () => setOpenDialog(true);
   const handleClose = () => setOpenDialog(false);
   const onSubmit = (data: TeamInputForm) => {
@@ -48,10 +47,11 @@ const CreateTeam: FunctionComponent<CreateTeamProps> = ({
       team_organization: data.team_organization?.id,
       team_tags: data.team_tags?.map((tag: Option) => tag.id),
     };
-    if (inputValues.team_contextual && exerciseId) {
-      inputValues.team_exercises = [exerciseId];
-    }
-    return dispatch(addTeam(inputValues)).then(
+    // if (inputValues.team_contextual && exerciseId) {
+    //   inputValues.team_exercises = [exerciseId];
+    // }
+    // dispatch(addTeam(inputValues))
+    return onCreateTeam(inputValues).then(
       (result: { result: string }) => {
         if (result.result) {
           if (onCreate) {
@@ -93,7 +93,6 @@ const CreateTeam: FunctionComponent<CreateTeamProps> = ({
       >
         <TeamForm
           initialValues={{ team_tags: [] }}
-          exerciseId={exerciseId}
           handleClose={handleClose}
           onSubmit={onSubmit}
         />

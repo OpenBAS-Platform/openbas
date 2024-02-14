@@ -1,9 +1,8 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useContext, useState } from 'react';
 import { Dialog as MuiDialog, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import Dialog from '../../../../components/common/Dialog';
 import { deleteTeam, updateTeam } from '../../../../actions/Team';
-import { removeExerciseTeams } from '../../../../actions/Exercise';
 import TeamForm from './TeamForm';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -12,20 +11,19 @@ import type { TeamUpdateInput } from '../../../../utils/api-types';
 import { Option, organizationOption, tagOptions } from '../../../../utils/Option';
 import { useHelper } from '../../../../store';
 import type { ExercicesHelper, OrganizationsHelper, TagsHelper, TeamsHelper } from '../../../../actions/helper';
-import type { TeamInputForm, TeamStore } from './Team';
+import type { TeamInputForm, TeamStore } from '../../../../actions/teams/Team';
+import ExerciseOrScenarioContext, { TeamContext } from '../../../ExerciseOrScenarioContext';
 
 interface TeamPopoverProps {
   team: TeamStore;
-  exerciseId?: string;
-  onRemoveTeam?: (teamId: string | undefined) => void,
   managePlayers?: () => void,
+  disabled?: boolean,
 }
 
 const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   team,
-  exerciseId,
-  onRemoveTeam,
   managePlayers,
+  disabled,
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -39,6 +37,8 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
       };
     },
   );
+
+  const { onRemoveTeamFromExerciseScenario } = useContext(ExerciseOrScenarioContext) as TeamContext;
 
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -92,9 +92,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
 
   const submitRemove = () => {
     return dispatch(
-      removeExerciseTeams(exerciseId, {
-        exercise_teams: [team.team_id],
-      }),
+      onRemoveTeamFromExerciseScenario(team.team_id),
     ).then(() => handleCloseRemove());
   };
 
@@ -106,9 +104,10 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
     ),
     team_tags: tagOptions(team.team_tags, tagsMap),
   };
+
   return (
     <>
-      <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large" color="primary">
+      <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large" color="primary" disabled={disabled}>
         <MoreVert />
       </IconButton>
       <Menu
@@ -118,24 +117,20 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
       >
         <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
         {managePlayers && (
-        <MenuItem onClick={() => {
-          handlePopoverClose();
-          managePlayers();
-        }}
-        >
-          {t('Manage players')}
-        </MenuItem>
-        )}
-        {exerciseId && !team.team_contextual && !onRemoveTeam && (
-          <MenuItem onClick={handleOpenRemove}>
-            {t('Remove from the exercise')}
+          <MenuItem onClick={() => {
+            handlePopoverClose();
+            managePlayers();
+          }}
+          >
+            {t('Manage players')}
           </MenuItem>
         )}
-        {onRemoveTeam && (
-        <MenuItem onClick={() => onRemoveTeam(team.team_id)}>
-          {t('Remove from the inject')}
-        </MenuItem>
-        )}
+        {
+          !team.team_contextual
+          && <MenuItem onClick={handleOpenRemove}>
+            {t('Remove from the context')}
+          </MenuItem>
+        }
         <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
       </Menu>
       <MuiDialog
@@ -176,7 +171,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to remove the team from the simulation?')}
+            {t('Do you want to remove the team from this context?')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
