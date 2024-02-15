@@ -26,7 +26,7 @@ class ProfileForm extends Component {
               variant="standard"
               name="user_phone2"
               fullWidth={true}
-              label={t('Phone number (fix)')}
+              label={t('Phone number (landline)')}
               style={{ marginTop: 20 }}
             />
             <TextField
