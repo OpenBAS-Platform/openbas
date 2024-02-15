@@ -33,6 +33,8 @@ jobs:
 
       - name: Build into Alpine
         run: |
+          echo $JAVA_HOME
+          which java
           cd openex-front
           yarn install
           yarn build
