@@ -33,8 +33,7 @@ jobs:
           mvn install -DskipTests -Pdev
         shell: alpine.sh {0}
 
-      - run: mkdir -p openex-build/{openex-front}
-      - run: cp -a ./openex-platform/openex-front/builder/prod/build openex-build/openex-front/builder/prod/build
+      - run: mkdir -p openex-build/
       - run: cp ./openex-platform/openex/openex-api/target/openex-api.jar openex-build/
 
       - name: Docker meta
