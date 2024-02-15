@@ -83,7 +83,7 @@ jobs:
           ansible-tower-user: ${{ secrets.AWX_USER }}
           ansible-tower-pass: ${{ secrets.AWX_PASSWORD }}
           ansible-tower-url: ${{ secrets.AWX_URL }}
-          template-id: "26"
+          template-id: "34"
           additional-vars: |
             { "openex_version": "${{steps.meta.outputs.version}}", "openex_config": ${{ inputs.openex_config }} }
       - name: display URL
