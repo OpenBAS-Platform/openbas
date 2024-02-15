@@ -17,7 +17,7 @@ jobs:
         with:
           branch: v3.18
           packages: >
-            nodejs npm git tini gcc g++ make musl-dev cargo default-jre maven postfix postfix-pcre
+            nodejs npm git tini gcc g++ make musl-dev cargo openjdk21-jdk maven postfix postfix-pcre
 
       - name: Setup Node.js
         run: |

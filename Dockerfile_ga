@@ -1,4 +1,4 @@
-FROM openjdk:19-jdk-alpine AS app
+FROM openjdk:21-jdk-slim AS app
 
 WORKDIR /opt
 RUN apk add tini git
