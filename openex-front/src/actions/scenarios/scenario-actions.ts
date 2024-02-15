@@ -1,7 +1,7 @@
 import { Dispatch } from 'redux';
 import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
 import { arrayOfScenarios, scenario } from './scenario-schema';
-import type { Scenario, ScenarioInformationInput, ScenarioInput, Team } from '../../utils/api-types';
+import { Scenario, ScenarioInformationInput, ScenarioInput, ScenarioUpdateTagsInput, Team } from '../../utils/api-types';
 import * as schema from '../Schema';
 
 const SCENARIO_URI = '/api/scenarios';
@@ -48,6 +48,13 @@ export const importScenario = (formData: FormData) => (dispatch: Dispatch) => {
   const uri = `${SCENARIO_URI}/import`;
   return postReferential(null, uri, formData)(dispatch);
 };
+
+// -- TAGS --
+
+export const updateScenarioTags = (scenarioId: Scenario['scenario_id'], data: ScenarioUpdateTagsInput) => {
+  const uri = `${SCENARIO_URI}/${scenarioId}/tags`;
+  return putReferential(scenario, uri, data);
+}
 
 // -- TEAMS --
 

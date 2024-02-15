@@ -4,10 +4,7 @@ import io.openex.database.model.Scenario;
 import io.openex.database.model.Team;
 import io.openex.database.repository.TagRepository;
 import io.openex.rest.exercise.form.ScenarioTeamPlayersEnableInput;
-import io.openex.rest.scenario.form.ScenarioInformationInput;
-import io.openex.rest.scenario.form.ScenarioInput;
-import io.openex.rest.scenario.form.ScenarioSimple;
-import io.openex.rest.scenario.form.ScenarioUpdateTeamsInput;
+import io.openex.rest.scenario.form.*;
 import io.openex.service.ImportService;
 import io.openex.service.ScenarioService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -84,6 +81,18 @@ public class ScenarioApi {
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public void deleteScenario(@PathVariable @NotBlank final String scenarioId) {
     this.scenarioService.deleteScenario(scenarioId);
+  }
+
+  // -- TEAMS --
+
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/tags")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public Scenario updateScenarioTags(
+      @PathVariable @NotBlank final String scenarioId,
+      @Valid @RequestBody final ScenarioUpdateTagsInput input) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    scenario.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
+    return scenarioService.updateScenario(scenario);
   }
 
   // -- EXPORT --

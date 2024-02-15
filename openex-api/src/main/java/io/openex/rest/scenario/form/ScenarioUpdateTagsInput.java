@@ -1,4 +1,4 @@
-package io.openex.rest.exercise.form;
+package io.openex.rest.scenario.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -9,9 +9,9 @@ import java.util.List;
 
 @Setter
 @Getter
-public class ExerciseUpdateTagsInput {
+public class ScenarioUpdateTagsInput {
 
-    @JsonProperty("exercise_tags")
-    private List<String> tagIds = new ArrayList<>();
+  @JsonProperty("scenario_tags")
+  private List<String> tagIds = new ArrayList<>();
 
 }

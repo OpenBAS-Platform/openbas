@@ -1315,6 +1315,10 @@ export interface ScenarioTeamUser {
   user_id?: User;
 }
 
+export interface ScenarioUpdateTagsInput {
+  scenario_tags?: string[];
+}
+
 export interface ScenarioUpdateTeamsInput {
   scenario_teams?: string[];
 }

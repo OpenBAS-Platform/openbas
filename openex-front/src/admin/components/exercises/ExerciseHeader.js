@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
-import { Typography, Chip, Button, IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Button, Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material';
 import { AddOutlined } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { Form } from 'react-final-form';
@@ -13,39 +13,23 @@ import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import Transition from '../../../components/common/Transition';
 import { usePermissions } from '../../../utils/Exercise';
+import TagChip from "../components/tags/TagChip";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
+  container: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: theme.spacing(2)
+  },
+  containerTitle: {
+    display: 'inline-flex',
+    alignItems: 'center',
+  },
   title: {
     textTransform: 'uppercase',
     marginBottom: 0,
   },
-  container: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  tags: {
-    marginTop: -4,
-    float: 'right',
-  },
-  tag: {
-    marginLeft: 5,
-  },
 }));
-
-const TagChip = ({ tagId, isReadOnly, deleteTag }) => {
-  const classes = useStyles();
-  const tag = useHelper((helper) => helper.getTag(tagId));
-  return tag ? (
-    <Chip
-      key={tag.tag_id}
-      classes={{ root: classes.tag }}
-      label={tag.tag_name}
-      onDelete={isReadOnly ? null : () => deleteTag(tag.tag_id)}
-    />
-  ) : (
-    <div />
-  );
-};
 
 const ExerciseHeader = () => {
   const classes = useStyles();
@@ -84,8 +68,8 @@ const ExerciseHeader = () => {
   };
   const { exercise_tags: tags } = exercise;
   return (
-    <div ref={containerRef}>
-      <div className={classes.container}>
+    <div className={classes.container}>
+      <div className={classes.containerTitle}>
         <Typography
           variant="h1"
           gutterBottom
@@ -95,38 +79,27 @@ const ExerciseHeader = () => {
         </Typography>
         <ExercisePopover exercise={exercise} tagsMap={tagsMap} />
       </div>
-      <div className={classes.tags}>
-        {R.take(5, tags ?? []).map((tag) => (
-          <TagChip
-            key={tag}
-            tagId={tag}
-            isReadOnly={permissions.readOnlyBypassStatus}
-            deleteTag={deleteTag}
-          />
-        ))}
-        <div style={{ float: 'left', marginTop: -5 }}>
-          <IconButton
-            style={{ float: 'left' }}
-            color="primary"
-            aria-label="Tag"
-            onClick={handleToggleAddTag}
-            isReadOnly={permissions.readOnlyBypassStatus}
-          >
-            <AddOutlined />
-          </IconButton>
-        </div>
+      <div>
+        <IconButton
+          color="primary"
+          aria-label="Tag"
+          onClick={handleToggleAddTag}
+          disabled={permissions.readOnlyBypassStatus}
+        >
+          <AddOutlined />
+        </IconButton>
         <Dialog
           TransitionComponent={Transition}
           open={openTagAdd}
           onClose={handleToggleAddTag}
-          fullWidth={true}
+          fullWidth
           maxWidth="xs"
           PaperProps={{ elevation: 1 }}
         >
           <DialogTitle>{t('Add tags to this exercise')}</DialogTitle>
           <DialogContent>
             <Form
-              keepDirtyOnReinitialize={true}
+              keepDirtyOnReinitialize
               initialValues={{ exercise_tags: [] }}
               onSubmit={submitTags}
               mutators={{
@@ -164,6 +137,14 @@ const ExerciseHeader = () => {
             </Form>
           </DialogContent>
         </Dialog>
+        {R.take(5, tags ?? []).map((tag) => (
+          <TagChip
+            key={tag}
+            tagId={tag}
+            isReadOnly={permissions.readOnlyBypassStatus}
+            deleteTag={deleteTag}
+          />
+        ))}
       </div>
     </div>
   );

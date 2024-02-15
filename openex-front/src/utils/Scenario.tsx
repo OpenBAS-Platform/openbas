@@ -16,11 +16,7 @@ const useScenarioPermissions = (scenarioId: string, fullScenario = null) => {
       canRead: false,
       canWrite: false,
       canPlay: false,
-      canReadBypassStatus: false,
-      canWriteBypassStatus: false,
-      canPlayBypassStatus: false,
       readOnly: true,
-      readOnlyBypassStatus: true,
       isLoggedIn: !R.isEmpty(logged),
     };
   }
