@@ -26,15 +26,9 @@ jobs:
           npm install -g  yarn
         shell: alpine.sh --root {0}
 
-      - name: Setup Java config
-        run: |
-          JAVA_HOME=$(which java)
-        shell: alpine.sh --root {0}
-
       - name: Build into Alpine
         run: |
-          echo $JAVA_HOME
-          which java
+          export JAVA_HOME=/usr/lib/jvm/default-jvm/bin/
           cd openex-front
           yarn install
           yarn build
