@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - uses: jirutka/setup-alpine@v1
         with:
           branch: v3.18
@@ -29,7 +31,6 @@ jobs:
       - name: Build into Alpine
         run: |
           export JAVA_HOME=/usr/lib/jvm/default-jvm/
-          ls -al /usr/lib/jvm/default-jvm/
           cd openex-front
           yarn install
           yarn build
