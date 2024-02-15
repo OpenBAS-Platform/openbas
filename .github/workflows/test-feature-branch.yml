@@ -16,6 +16,8 @@ jobs:
       - uses: jirutka/setup-alpine@v1
         with:
           branch: v3.18
+          extra-repositories: |
+            https://dl-cdn.alpinelinux.org/alpine/edge/community/
           packages: >
             nodejs npm git tini gcc g++ make musl-dev cargo openjdk21-jdk maven postfix postfix-pcre
 
