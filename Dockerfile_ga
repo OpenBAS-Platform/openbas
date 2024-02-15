@@ -1,7 +1,7 @@
 FROM openjdk:21-jdk-slim AS app
 
 WORKDIR /opt
-RUN apk add tini git
+RUN apt install -y tini git
 COPY openex-build ./
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
