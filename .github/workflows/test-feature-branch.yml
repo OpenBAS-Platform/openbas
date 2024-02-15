@@ -28,7 +28,7 @@ jobs:
 
       - name: Build into Alpine
         run: |
-          cd openex-platform/openex-front
+          cd openex-front
           yarn install
           yarn build
           cd ../
@@ -36,7 +36,7 @@ jobs:
         shell: alpine.sh {0}
 
       - run: mkdir -p openex-build/
-      - run: cp ./openex-platform/openex/openex-api/target/openex-api.jar openex-build/
+      - run: cp openex-api/target/openex-api.jar openex-build/
 
       - name: Docker meta
         id: meta
