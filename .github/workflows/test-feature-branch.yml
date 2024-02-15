@@ -28,7 +28,8 @@ jobs:
 
       - name: Build into Alpine
         run: |
-          export JAVA_HOME=/usr/lib/jvm/default-jvm/bin/
+          export JAVA_HOME=/usr/lib/jvm/default-jvm/
+          ls -al /usr/lib/jvm/default-jvm/
           cd openex-front
           yarn install
           yarn build
