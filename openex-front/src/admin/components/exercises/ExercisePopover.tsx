@@ -1,40 +1,14 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-  IconButton,
-  Menu,
-  MenuItem,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Checkbox,
-  TableContainer,
-  PopoverProps,
-} from '@mui/material';
-import { MoreVert } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
+import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, PopoverProps, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';
 import ExerciseForm from './ExerciseForm';
 import { deleteExercise, updateExercise } from '../../../actions/Exercise';
-import { isExerciseReadOnly } from '../../../utils/Exercise';
+import { usePermissions } from '../../../utils/Exercise';
 import Transition from '../../../components/common/Transition';
 import type { Exercise, ExerciseUpdateInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
-
-const useStyles = makeStyles(() => ({
-  button: {
-    float: 'left',
-    margin: '-10px 0 0 5px',
-  },
-}));
+import ButtonPopover, { ButtonPopoverEntry } from '../../../components/common/ButtonPopover';
 
 interface ExercisePopoverProps {
   exercise: Exercise;
@@ -43,7 +17,6 @@ interface ExercisePopoverProps {
 const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   exercise,
 }) => {
-  const classes = useStyles();
   const { t } = useFormatter();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -117,37 +90,18 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     exercise_message_footer: exercise.exercise_message_footer,
   };
 
+  const permissions = usePermissions(exercise.exercise_id);
+
+  // Button Popover
+  const entries: ButtonPopoverEntry[] = [
+    { label: 'Update', action: handleOpenEdit, disabled: !permissions.canWriteBypassStatus },
+    { label: 'Export', action: handleOpenExport },
+    { label: 'Delete', action: handleOpenDelete, disabled: !permissions.canWriteBypassStatus },
+  ];
+
   return (
     <>
-      <IconButton
-        classes={{ root: classes.button }}
-        color="primary"
-        onClick={handlePopoverOpen}
-        aria-haspopup="true"
-        aria-label="More actions"
-        size="large"
-      >
-        <MoreVert />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handlePopoverClose}
-      >
-        <MenuItem
-          onClick={handleOpenEdit}
-          disabled={isExerciseReadOnly(exercise, true)}
-        >
-          {t('Update')}
-        </MenuItem>
-        <MenuItem onClick={handleOpenExport}>{t('Export')}</MenuItem>
-        <MenuItem
-          onClick={handleOpenDelete}
-          disabled={isExerciseReadOnly(exercise, true)}
-        >
-          {t('Delete')}
-        </MenuItem>
-      </Menu>
+      <ButtonPopover entries={entries} />
       <Dialog
         open={openDelete}
         TransitionComponent={Transition}

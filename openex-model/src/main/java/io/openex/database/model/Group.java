@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "groups")
 @EntityListeners(ModelBaseListener.class)
@@ -46,8 +48,6 @@ public class Group implements Base {
             joinColumns = @JoinColumn(name = "group_id"))
     private List<Grant.GRANT_TYPE> exercisesDefaultGrants = new ArrayList<>();
 
-    @Getter
-    @Setter
     @JsonProperty("group_default_scenario_assign")
     @Enumerated(EnumType.STRING)
     @ElementCollection
@@ -88,71 +88,17 @@ public class Group implements Base {
     public boolean isDefaultExerciseObserver() {
         return exercisesDefaultGrants.contains(Grant.GRANT_TYPE.OBSERVER);
     }
+
+    @JsonProperty("group_default_scenario_planner")
+    public boolean isDefaultScenarioPlanner() {
+        return scenariosDefaultGrants.contains(Grant.GRANT_TYPE.PLANNER);
+    }
+
+    @JsonProperty("group_default_scenario_observer")
+    public boolean isDefaultScenarioObserver() {
+        return scenariosDefaultGrants.contains(Grant.GRANT_TYPE.OBSERVER);
+    }
     // endregion
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
-
-    public List<Grant> getGrants() {
-        return grants;
-    }
-
-    public void setGrants(List<Grant> grants) {
-        this.grants = grants;
-    }
-
-    public boolean isDefaultUserAssignation() {
-        return defaultUserAssignation;
-    }
-
-    public void setDefaultUserAssignation(boolean defaultUserAssignation) {
-        this.defaultUserAssignation = defaultUserAssignation;
-    }
-
-    public List<Organization> getOrganizations() {
-        return organizations;
-    }
-
-    public void setOrganizations(List<Organization> organizations) {
-        this.organizations = organizations;
-    }
-
-    public List<Grant.GRANT_TYPE> getExercisesDefaultGrants() {
-        return exercisesDefaultGrants;
-    }
-
-    public void setExercisesDefaultGrants(List<Grant.GRANT_TYPE> defaultExerciseAssignations) {
-        this.exercisesDefaultGrants = defaultExerciseAssignations;
-    }
 
     @Override
     public boolean isUserHasAccess(User user) {

@@ -16,7 +16,7 @@ const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
   const { t } = useFormatter();
 
   // Context
-  const { onUpdateArticle, onDeleteArticle } = useContext(ExerciseOrScenarioContext);
+  const { permissions, onUpdateArticle, onDeleteArticle } = useContext(ExerciseOrScenarioContext);
 
   // states
   const [openDelete, setOpenDelete] = useState(false);
@@ -37,7 +37,7 @@ const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
   const handleCloseEdit = () => setOpenEdit(false);
   const onSubmitEdit = (data) => {
     const inputValues = { ...data, article_channel: data.article_channel.id };
-    return onUpdateArticle(inputValues).then(() => handleCloseEdit());
+    return onUpdateArticle(article, inputValues).then(() => handleCloseEdit());
   };
   // Delete action
   const handleOpenDelete = () => {
@@ -74,7 +74,10 @@ const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
 
   return (
     <React.Fragment>
-      <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large">
+      <IconButton disabled={!permissions.canWrite}
+                  onClick={handlePopoverOpen}
+                  aria-haspopup="true"
+                  size="large">
         <MoreVert />
       </IconButton>
       <Menu

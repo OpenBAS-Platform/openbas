@@ -155,4 +155,13 @@ public class Scenario implements Base {
     return getTeamUsers().stream().map(ScenarioTeamUser::getUser).distinct().count();
   }
 
+  @JsonProperty("scenario_users")
+  @JsonSerialize(using = MultiIdDeserializer.class)
+  public List<User> getUsers() {
+    return getTeamUsers().stream()
+        .map(ScenarioTeamUser::getUser)
+        .distinct()
+        .toList();
+  }
+
 }

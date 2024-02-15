@@ -168,14 +168,11 @@ class GroupPopover extends Component {
     this.setState({ tabSelect: tabKey });
   }
 
-  handleGrantCheck(exerciseId, grantId, grantName, event) {
+  handleGrantCheck(data, grantId, event) {
     const isChecked = event.target.checked;
     if (isChecked) {
       this.props
-        .addGrant(this.props.group.group_id, {
-          grant_name: grantName,
-          grant_exercise: exerciseId,
-        })
+        .addGrant(this.props.group.group_id, data)
         .then(() => {
           this.props.fetchGroup(this.props.group.group_id);
         });
@@ -186,6 +183,22 @@ class GroupPopover extends Component {
         this.props.fetchGroup(this.props.group.group_id);
       });
     }
+  }
+
+  handleGrantScenarioCheck(scenarioId, grantId, grantName, event) {
+    const data = {
+      grant_name: grantName,
+      grant_scenario: scenarioId,
+    };
+    this.handleGrantCheck(data, grantId, event);
+  }
+
+  handleGrantExerciseCheck(exerciseId, grantId, grantName, event) {
+    const data = {
+      grant_name: grantName,
+      grant_exercise: exerciseId,
+    };
+    this.handleGrantCheck(data, grantId, event);
   }
 
   handleGrantOrganization(organizationId, event) {
@@ -230,6 +243,8 @@ class GroupPopover extends Component {
         'group_name',
         'group_description',
         'group_default_user_assign',
+        'group_default_scenario_observer',
+        'group_default_scenario_planner',
         'group_default_exercise_planner',
         'group_default_exercise_observer',
       ],
@@ -440,10 +455,79 @@ class GroupPopover extends Component {
               indicatorColor="secondary"
               aria-label="secondary tabs example"
             >
+              <Tab label="Scenarios" />
               <Tab label="Exercises" />
               <Tab label="Organizations" />
             </Tabs>
             <TabPanel value={this.state.tabSelect} index={0}>
+              <Table selectable={false} size="small">
+                <TableHead adjustForCheckbox={false} displaySelectAll={false}>
+                  <TableRow>
+                    <TableCell>{t('Scenario')}</TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {t('Read/Write')}
+                    </TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {t('Read Only')}
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody displayRowCheckbox={false}>
+                  {this.props.scenarios.map((scenario) => {
+                    const grantPlanner = R.find(
+                      (g) => g.grant_scenario === scenario.scenario_id
+                        && g.grant_name === 'PLANNER',
+                    )(group.group_grants);
+                    const grantObserver = R.find(
+                      (g) => g.grant_scenario === scenario.scenario_id
+                        && g.grant_name === 'OBSERVER',
+                    )(group.group_grants);
+                    const grantPlannerId = R.propOr(
+                      null,
+                      'grant_id',
+                      grantPlanner,
+                    );
+                    const grantObserverId = R.propOr(
+                      null,
+                      'grant_id',
+                      grantObserver,
+                    );
+                    return (
+                      <TableRow key={scenario.scenario_id}>
+                        <TableCell style={{width: '60%'}}>{scenario.scenario_name}</TableCell>
+                        <TableCell style={{ width: '20%', textAlign: 'center' }}>
+                          <Checkbox
+                            checked={grantPlannerId !== null}
+                            onChange={this.handleGrantScenarioCheck.bind(
+                              this,
+                              scenario.scenario_id,
+                              grantPlannerId,
+                              'PLANNER',
+                            )}
+                          />
+                        </TableCell>
+                        <TableCell style={{ width: '20%', textAlign: 'center' }}>
+                          <Checkbox
+                            checked={
+                              grantObserverId !== null
+                              || grantPlannerId !== null
+                            }
+                            disabled={grantPlannerId !== null}
+                            onChange={this.handleGrantScenarioCheck.bind(
+                              this,
+                              scenario.scenario_id,
+                              grantObserverId,
+                              'OBSERVER',
+                            )}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TabPanel>
+            <TabPanel value={this.state.tabSelect} index={1}>
               <Table selectable={false} size="small">
                 <TableHead adjustForCheckbox={false} displaySelectAll={false}>
                   <TableRow>
@@ -478,11 +562,11 @@ class GroupPopover extends Component {
                     );
                     return (
                       <TableRow key={exercise.exercise_id}>
-                        <TableCell>{exercise.exercise_name}</TableCell>
-                        <TableCell style={{ textAlign: 'center' }}>
+                        <TableCell style={{width: '60%'}}>{exercise.exercise_name}</TableCell>
+                        <TableCell style={{ width: '20%', textAlign: 'center' }}>
                           <Checkbox
                             checked={grantPlannerId !== null}
-                            onChange={this.handleGrantCheck.bind(
+                            onChange={this.handleGrantExerciseCheck.bind(
                               this,
                               exercise.exercise_id,
                               grantPlannerId,
@@ -490,14 +574,14 @@ class GroupPopover extends Component {
                             )}
                           />
                         </TableCell>
-                        <TableCell style={{ textAlign: 'center' }}>
+                        <TableCell style={{ width: '20%', textAlign: 'center' }}>
                           <Checkbox
                             checked={
                               grantObserverId !== null
                               || grantPlannerId !== null
                             }
                             disabled={grantPlannerId !== null}
-                            onChange={this.handleGrantCheck.bind(
+                            onChange={this.handleGrantExerciseCheck.bind(
                               this,
                               exercise.exercise_id,
                               grantObserverId,
@@ -511,7 +595,7 @@ class GroupPopover extends Component {
                 </TableBody>
               </Table>
             </TabPanel>
-            <TabPanel value={this.state.tabSelect} index={1}>
+            <TabPanel value={this.state.tabSelect} index={2}>
               <Table selectable={false} size="small">
                 <TableHead adjustForCheckbox={false} displaySelectAll={false}>
                   <TableRow>
@@ -577,6 +661,7 @@ const select = (state) => {
     organizations: helper.getOrganizations(),
     organizationsMap: helper.getOrganizationsMap(),
     exercises: helper.getExercises(),
+    scenarios: helper.getScenarios(),
   };
 };
 

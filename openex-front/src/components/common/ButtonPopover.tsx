@@ -6,6 +6,7 @@ import { useFormatter } from '../i18n';
 export interface ButtonPopoverEntry {
   label: string;
   action: () => void;
+  disabled?: boolean;
 }
 
 interface Props {
@@ -41,10 +42,11 @@ const ButtonPopover: FunctionComponent<Props> = ({
         {entries.map((entry, idx) => {
           return (
             <MenuItem key={idx}
-              onClick={() => {
-                entry.action();
-                setAnchorEl(null);
-              }}
+                      disabled={entry.disabled}
+                      onClick={() => {
+                        entry.action();
+                        setAnchorEl(null);
+                      }}
             >
               {t(entry.label)}
             </MenuItem>

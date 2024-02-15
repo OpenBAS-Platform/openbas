@@ -692,6 +692,8 @@ export interface Group {
   group_default_exercise_observer?: boolean;
   group_default_exercise_planner?: boolean;
   group_default_scenario_assign?: ("OBSERVER" | "PLANNER")[];
+  group_default_scenario_observer?: boolean;
+  group_default_scenario_planner?: boolean;
   group_default_user_assign?: boolean;
   group_description?: string;
   group_grants?: Grant[];
@@ -705,14 +707,17 @@ export interface Group {
 export interface GroupCreateInput {
   group_default_exercise_observer?: boolean;
   group_default_exercise_planner?: boolean;
+  group_default_scenario_observer?: boolean;
+  group_default_scenario_planner?: boolean;
   group_default_user_assign?: boolean;
   group_description?: string;
   group_name: string;
 }
 
 export interface GroupGrantInput {
-  grant_exercise: string;
+  grant_exercise?: string;
   grant_name?: "OBSERVER" | "PLANNER";
+  grant_scenario?: string;
 }
 
 export interface GroupUpdateUsersInput {
@@ -1274,6 +1279,7 @@ export interface Scenario {
   scenario_teams_users?: ScenarioTeamUser[];
   /** @format date-time */
   scenario_updated_at?: string;
+  scenario_users?: User[];
   /** @format int64 */
   scenario_users_number?: number;
   updateAttributes?: object;

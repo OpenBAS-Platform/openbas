@@ -10,6 +10,7 @@ import Drawer from '../../../../components/common/Drawer';
 import ScenarioForm from '../ScenarioForm';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import ScenarioExportDialog from './ScenarioExportDialog';
+import useScenarioPermissions from '../../../../utils/Scenario';
 
 interface Props {
   scenario: ScenarioStore;
@@ -71,11 +72,13 @@ const ScenarioPopover: FunctionComponent<Props> = ({
     navigate('/admin/scenarios');
   };
 
+  const permissions = useScenarioPermissions(scenario.scenario_id);
+
   // Button Popover
   const entries: ButtonPopoverEntry[] = [
-    { label: 'Update', action: handleEdit },
+    { label: 'Update', action: handleEdit, disabled: !permissions.canWriteBypassStatus },
     { label: 'Export', action: handleExport },
-    { label: 'Delete', action: handleDelete },
+    { label: 'Delete', action: handleDelete, disabled: !permissions.canWriteBypassStatus },
   ];
 
   return (

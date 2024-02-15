@@ -11,7 +11,7 @@ import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import { fetchExerciseTeams } from '../../../../actions/Exercise';
-import TeamPopover from '../../components/teams/TeamPopover.js';
+import TeamPopover from '../../components/teams/TeamPopover';
 import TeamPlayers from '../../teams/teams/TeamPlayers';
 import { useHelper } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';

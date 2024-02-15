@@ -15,16 +15,13 @@ import Transition from '../../../components/common/Transition';
 import { usePermissions } from '../../../utils/Exercise';
 
 const useStyles = makeStyles(() => ({
-  container: {
-    width: '100%',
-  },
-  containerWithPadding: {
-    width: '100%',
-    paddingRight: 200,
-  },
   title: {
-    float: 'left',
     textTransform: 'uppercase',
+    marginBottom: 0,
+  },
+  container: {
+    display: 'flex',
+    alignItems: 'center',
   },
   tags: {
     marginTop: -4,
@@ -50,8 +47,7 @@ const TagChip = ({ tagId, isReadOnly, deleteTag }) => {
   );
 };
 
-const ExerciseHeader = (props) => {
-  const { withPadding } = props;
+const ExerciseHeader = () => {
   const classes = useStyles();
   const { t } = useFormatter();
   const { exerciseId } = useParams();
@@ -88,18 +84,17 @@ const ExerciseHeader = (props) => {
   };
   const { exercise_tags: tags } = exercise;
   return (
-    <div
-      className={withPadding ? classes.containerWithPadding : classes.container}
-      ref={containerRef}
-    >
-      <Typography
-        variant="h1"
-        gutterBottom={true}
-        classes={{ root: classes.title }}
-      >
-        {exercise.exercise_name}
-      </Typography>
-      <ExercisePopover exercise={exercise} tagsMap={tagsMap} />
+    <div ref={containerRef}>
+      <div className={classes.container}>
+        <Typography
+          variant="h1"
+          gutterBottom
+          classes={{ root: classes.title }}
+        >
+          {exercise.exercise_name}
+        </Typography>
+        <ExercisePopover exercise={exercise} tagsMap={tagsMap} />
+      </div>
       <div className={classes.tags}>
         {R.take(5, tags ?? []).map((tag) => (
           <TagChip

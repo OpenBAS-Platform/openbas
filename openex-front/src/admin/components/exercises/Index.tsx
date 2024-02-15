@@ -40,12 +40,6 @@ const IndexComponent: FunctionComponent<{ exercise: Exercise }> = ({
 }) => {
   // Standard hooks
   const dispatch = useAppDispatch();
-  const location = useLocation();
-
-  let withPadding = false;
-  if (location.pathname.includes('/definition') || location.pathname.includes('/animation') || location.pathname.includes('/results')) {
-    withPadding = true;
-  }
 
   const context: ExerciseOrScenario = {
     permissions: usePermissions(exercise.exercise_id),
@@ -75,7 +69,7 @@ const IndexComponent: FunctionComponent<{ exercise: Exercise }> = ({
   return (
     <ExerciseOrScenarioContext.Provider value={context}>
       <TopBar />
-      <ExerciseHeader withPadding={withPadding} />
+      <ExerciseHeader />
       <div className="clearfix" />
       <Suspense fallback={<Loader />}>
         <Routes>

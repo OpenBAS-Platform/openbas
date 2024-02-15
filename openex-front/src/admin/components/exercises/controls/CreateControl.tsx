@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import ComcheckForm from './ComcheckForm';
 import DryrunForm from './DryrunForm';
 import { resolveUserName } from '../../../../utils/String';
-import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import { isExerciseReadOnly, usePermissions } from '../../../../utils/Exercise';
 import type { Theme } from '../../../../components/Theme';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ComcheckInput, Exercise } from '../../../../utils/api-types';
@@ -73,6 +73,8 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
     );
   };
 
+  const permissions = usePermissions(exercise.exercise_id)
+
   return (
     <div>
       {variant === 'buttons' ? (
@@ -84,7 +86,7 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
               startIcon={<VideoSettingsOutlined />}
               color="info"
               onClick={() => setOpenDryrun(true)}
-              disabled={isExerciseReadOnly(exercise)}
+              disabled={!permissions.canWrite}
             >
               {t('Launch')}
             </Button>
@@ -96,7 +98,7 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
               startIcon={<MarkEmailReadOutlined />}
               color="secondary"
               onClick={() => setOpenComcheck(true)}
-              disabled={isExerciseReadOnly(exercise)}
+              disabled={!permissions.canWrite}
             >
               {t('Send')}
             </Button>

@@ -18,6 +18,7 @@ import { fetchTags } from '../../../../actions/Tag';
 import GroupPopover from './GroupPopover';
 import { storeHelper } from '../../../../actions/Schema';
 import SecurityMenu from '../SecurityMenu';
+import { fetchScenarios } from "../../../../actions/scenarios/scenario-actions";
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -74,17 +75,23 @@ const inlineStylesHeaders = {
   },
   group_name: {
     float: 'left',
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  group_description: {
-    float: 'left',
-    width: '25%',
+    width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
   group_default_user_assign: {
+    float: 'left',
+    width: '15%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  group_default_scenario_observer: {
+    float: 'left',
+    width: '15%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  group_default_scenario_planner: {
     float: 'left',
     width: '15%',
     fontSize: 12,
@@ -104,6 +111,7 @@ const inlineStylesHeaders = {
   },
   group_users_number: {
     float: 'left',
+    width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -112,21 +120,29 @@ const inlineStylesHeaders = {
 const inlineStyles = {
   group_name: {
     float: 'left',
-    width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  group_description: {
-    float: 'left',
-    width: '25%',
+    width: '15%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
   group_default_user_assign: {
+    float: 'left',
+    width: '15%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  group_default_scenario_observer: {
+    float: 'left',
+    width: '15%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  group_default_scenario_planner: {
     float: 'left',
     width: '15%',
     height: 20,
@@ -152,6 +168,7 @@ const inlineStyles = {
   },
   group_users_number: {
     float: 'left',
+    width: '10%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -175,12 +192,14 @@ class Groups extends Component {
     this.props.fetchUsers();
     this.props.fetchGroups();
     this.props.fetchExercises();
+    this.props.fetchScenarios();
     this.props.fetchTags();
     this.subscription = interval$.subscribe(() => {
       this.props.fetchOrganizations();
       this.props.fetchUsers();
       this.props.fetchGroups();
       this.props.fetchExercises();
+      this.props.fetchScenarios();
     });
   }
 
@@ -234,11 +253,7 @@ class Groups extends Component {
     const { classes, groups, t } = this.props;
     const { keyword, sortBy, orderAsc } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.group_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.group_description || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1;
+      || (n.group_name || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
@@ -281,20 +296,29 @@ class Groups extends Component {
               primary={
                 <>
                   {this.sortHeader('group_name', 'Name', true)}
-                  {this.sortHeader('group_description', 'Description', true)}
                   {this.sortHeader(
                     'group_default_user_assign',
                     'Auto assign',
                     true,
                   )}
                   {this.sortHeader(
+                    'group_default_scenario_observer',
+                    'Auto observer on scenarios',
+                    true,
+                  )}
+                  {this.sortHeader(
+                    'group_default_scenario_planner',
+                    'Auto planner on scenarios',
+                    true,
+                  )}
+                  {this.sortHeader(
                     'group_default_exercise_observer',
-                    'Auto observer',
+                    'Auto observer on exercises',
                     true,
                   )}
                   {this.sortHeader(
                     'group_default_exercise_planner',
-                    'Auto planner',
+                    'Auto planner on exercises',
                     true,
                   )}
                   {this.sortHeader('group_users_number', 'Users', true)}
@@ -323,18 +347,44 @@ class Groups extends Component {
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.group_description}
-                    >
-                      {group.group_description}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
                       style={inlineStyles.group_default_user_assign}
                     >
                       {group.group_default_user_assign ? (
                         <Tooltip
                           title={t(
                             'The new users will automatically be assigned to this group.',
+                          )}
+                        >
+                          <CheckCircleOutlined fontSize="small" />
+                        </Tooltip>
+                      ) : (
+                        '-'
+                      )}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.group_default_scenario_observer}
+                    >
+                      {group.group_default_scenario_observer ? (
+                        <Tooltip
+                          title={t(
+                            'This group will have observer permission on new scenarios.',
+                          )}
+                        >
+                          <CheckCircleOutlined fontSize="small" />
+                        </Tooltip>
+                      ) : (
+                        '-'
+                      )}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.group_default_scenario_planner}
+                    >
+                      {group.group_default_scenario_planner ? (
+                        <Tooltip
+                          title={t(
+                            'This group will have planner permission on new scenarios.',
                           )}
                         >
                           <CheckCircleOutlined fontSize="small" />
@@ -406,6 +456,7 @@ Groups.propTypes = {
   fetchUsers: PropTypes.func,
   fetchOrganizations: PropTypes.func,
   fetchExercises: PropTypes.func,
+  fetchScenarios: PropTypes.func,
   fetchGroups: PropTypes.func,
   fetchTags: PropTypes.func,
 };
@@ -419,6 +470,7 @@ export default R.compose(
   connect(select, {
     fetchGroups,
     fetchExercises,
+    fetchScenarios,
     fetchUsers,
     fetchOrganizations,
     fetchTags,
