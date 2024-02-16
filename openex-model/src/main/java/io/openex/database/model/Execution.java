@@ -2,8 +2,10 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -32,8 +34,9 @@ public class Execution {
 
     @Setter
     @Getter
-    @JsonProperty("execution_async_id")
-    private String asyncId;
+    @JsonProperty("execution_async_ids")
+    @Type(StringArrayType.class)
+    private String[] asyncIds;
 
     @Getter
     @Setter
@@ -60,7 +63,7 @@ public class Execution {
 
     @JsonIgnore
     public boolean isSynchronous() {
-        return asyncId == null;
+        return asyncIds == null;
     }
 
     public static Execution executionError(boolean runtime, String identifier, String message) {
@@ -88,7 +91,9 @@ public class Execution {
     public ExecutionStatus getStatus() {
         boolean hasSuccess = traces.stream().anyMatch(context -> context.getStatus().equals(ExecutionStatus.SUCCESS));
         boolean hasError = traces.stream().anyMatch(context -> context.getStatus().equals(ExecutionStatus.ERROR));
-        if (hasSuccess && hasError) {
+        if (!hasSuccess && !hasError) {
+            return ExecutionStatus.PENDING;
+        } else if (hasSuccess && hasError) {
             return ExecutionStatus.PARTIAL;
         } else {
             return hasSuccess ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR;

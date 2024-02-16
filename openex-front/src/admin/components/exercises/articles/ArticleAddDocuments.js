@@ -9,10 +9,10 @@ import SearchFilter from '../../../../components/SearchFilter';
 import article18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
 import { fetchDocuments } from '../../../../actions/Document';
-import CreateDocument from '../../medias/documents/CreateDocument';
+import CreateDocument from '../../components/documents/CreateDocument';
 import { truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
-import { Transition } from '../../../../utils/Environment';
+import Transition from '../../../../components/common/Transition';
 import TagsFilter from '../../../../components/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
 

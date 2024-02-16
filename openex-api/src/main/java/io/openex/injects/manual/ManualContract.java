@@ -35,7 +35,7 @@ public class ManualContract extends Contractor {
     @Override
     public ContractConfig getConfig() {
         Map<SupportedLanguage, String> label = Map.of(en, "Manual", fr, "Manuel");
-        return new ContractConfig(TYPE, label, "#009688", "/img/manual.png", isExpose());
+        return new ContractConfig(TYPE, label, "#009688", "#009688", "/img/manual.png", isExpose());
     }
 
     @Override

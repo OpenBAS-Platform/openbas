@@ -18,8 +18,7 @@ import java.util.UUID;
 
 import static io.openex.database.model.Token.ADMIN_TOKEN_UUID;
 import static io.openex.database.model.User.*;
-import static org.apache.logging.log4j.util.Strings.isBlank;
-import static org.apache.logging.log4j.util.Strings.isNotBlank;
+import static org.springframework.util.StringUtils.hasText;
 
 @Component
 public class InitAdminCommandLineRunner implements CommandLineRunner {
@@ -64,12 +63,12 @@ public class InitAdminCommandLineRunner implements CommandLineRunner {
   }
 
   private User createUser() {
-    if (isBlank(this.adminEmail)) {
+    if (!hasText(this.adminEmail)) {
       throw new IllegalArgumentException("Config properties 'openex.admin.email' cannot be null");
     } else if (!EmailValidator.getInstance().isValid(this.adminEmail)) {
       throw new IllegalArgumentException("Config properties 'openex.admin.email' should be a valid email address");
     }
-    if (isBlank(this.adminPassword)) {
+    if (!hasText(this.adminPassword)) {
       throw new IllegalArgumentException("Config properties 'openex.admin.password' cannot be null");
     }
 
@@ -78,13 +77,13 @@ public class InitAdminCommandLineRunner implements CommandLineRunner {
   }
 
   private User updateUser(@NotNull final User user) {
-    if (isNotBlank(this.adminEmail)) {
+    if (hasText(this.adminEmail)) {
       if (!EmailValidator.getInstance().isValid(this.adminEmail)) {
         throw new IllegalArgumentException("Config properties 'openex.admin.email' should be a valid email address");
       }
       user.setEmail(this.adminEmail);
     }
-    if (isNotBlank(this.adminPassword)) {
+    if (hasText(this.adminPassword)) {
       user.setPassword(encodedPassword());
     }
 
@@ -94,7 +93,7 @@ public class InitAdminCommandLineRunner implements CommandLineRunner {
   // -- TOKEN --
 
   private void createToken(@NotNull final User user) {
-    if (isBlank(this.adminToken)) {
+    if (!hasText(this.adminToken)) {
       throw new IllegalArgumentException("Config properties 'openex.admin.token' cannot be null");
     }
     try {
@@ -107,7 +106,7 @@ public class InitAdminCommandLineRunner implements CommandLineRunner {
   }
 
   private void updateToken(@NotNull final Token token) {
-    if (isNotBlank(this.adminToken)) {
+    if (hasText(this.adminToken)) {
       try {
         UUID.fromString(this.adminToken);
       } catch (IllegalArgumentException e) {

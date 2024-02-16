@@ -279,7 +279,7 @@ class Groups extends Component {
             </ListItemIcon>
             <ListItemText
               primary={
-                <div>
+                <>
                   {this.sortHeader('group_name', 'Name', true)}
                   {this.sortHeader('group_description', 'Description', true)}
                   {this.sortHeader(
@@ -298,7 +298,7 @@ class Groups extends Component {
                     true,
                   )}
                   {this.sortHeader('group_users_number', 'Users', true)}
-                </div>
+                </>
               }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>

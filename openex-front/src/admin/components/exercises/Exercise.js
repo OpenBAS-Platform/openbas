@@ -48,7 +48,7 @@ import Empty from '../../../components/Empty';
 import Countdown from '../../../components/Countdown';
 import { colors, horizontalBarsChartOptions } from '../../../utils/Charts';
 import { usePermissions } from '../../../utils/Exercise';
-import { Transition } from '../../../utils/Environment';
+import Transition from '../../../components/common/Transition';
 import ExerciseDatePopover from './ExerciseDatePopover';
 import CreateControl from './controls/CreateControl';
 import { deleteComcheck, fetchComchecks } from '../../../actions/Comcheck';

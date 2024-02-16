@@ -9,10 +9,10 @@ import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
 import { fetchChallenges } from '../../../../actions/Challenge';
-import CreateChallenge from '../../challenges/CreateChallenge';
+import CreateChallenge from '../../components/challenges/CreateChallenge';
 import { truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
-import { Transition } from '../../../../utils/Environment';
+import Transition from '../../../../components/common/Transition';
 import TagsFilter from '../../../../components/TagsFilter';
 
 const styles = (theme) => ({

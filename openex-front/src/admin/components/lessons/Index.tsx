@@ -10,7 +10,7 @@ import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
 import { fetchLessonsTemplates } from '../../../actions/Lessons';
 import { useAppDispatch } from '../../../utils/hooks';
-import type { LessonsTemplatesHelper } from '../../../actions/lessons/lesson';
+import type { LessonsTemplatesHelper } from '../../../actions/lessons/lesson-helper';
 
 const useStyles = makeStyles(() => ({
   root: {

@@ -120,8 +120,8 @@ esbuild
       const data = readFileSync(`${__dirname}/index.html`, "utf8");
       const withOptionValued = data
         .replace(/%BASE_PATH%/g, basePath)
-        .replace(/%APP_TITLE%/g, "OpenEx Dev")
-        .replace(/%APP_DESCRIPTION%/g, "OpenEx Development platform")
+        .replace(/%APP_TITLE%/g, "OpenBAS Dev")
+        .replace(/%APP_DESCRIPTION%/g, "OpenBAS Development platform")
         .replace(/%APP_FAVICON%/g, `${basePath}/static/ext/favicon.png`)
         .replace(/%APP_MANIFEST%/g, `${basePath}/static/ext/manifest.json`);
       res.header(

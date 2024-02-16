@@ -9,8 +9,13 @@ import io.openex.execution.ExecutionContext;
 import io.openex.execution.Injector;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.inject.form.*;
+import io.openex.service.AssetGroupService;
+import io.openex.service.AssetService;
 import io.openex.service.ContractService;
 import io.openex.service.ExecutionContextService;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
@@ -18,9 +23,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +46,8 @@ public class InjectApi extends RestBehavior {
   private InjectRepository injectRepository;
   private InjectDocumentRepository injectDocumentRepository;
   private TeamRepository teamRepository;
+  private AssetService assetService;
+  private AssetGroupService assetGroupService;
   private TagRepository tagRepository;
   private DocumentRepository documentRepository;
   private ApplicationContext context;
@@ -86,6 +90,17 @@ public class InjectApi extends RestBehavior {
   }
 
   @Autowired
+  public void setAssetService(@NotNull final AssetService assetService) {
+    this.assetService = assetService;
+  }
+
+
+  @Autowired
+  public void setAssetGroupService(@NotNull final AssetGroupService assetGroupService) {
+    this.assetGroupService = assetGroupService;
+  }
+
+  @Autowired
   public void setContractService(ContractService contractService) {
     this.contractService = contractService;
   }
@@ -120,7 +135,7 @@ public class InjectApi extends RestBehavior {
     if (contract == null) {
       throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
     }
-    ExecutableInject injection = new ExecutableInject(false, true, inject, contract, List.of(), userInjectContexts);
+    ExecutableInject injection = new ExecutableInject(false, true, inject, contract, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
     Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
     Execution execution = executor.executeInjection(injection);
     return InjectStatus.fromExecution(execution, inject);
@@ -139,6 +154,9 @@ public class InjectApi extends RestBehavior {
     // Set dependencies
     inject.setDependsOn(updateRelation(input.getDependsOn(), inject.getDependsOn(), injectRepository));
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
+    inject.setAssets(fromIterable(this.assetService.assets(input.getAssets())));
+    inject.setAssetGroups(fromIterable(this.assetGroupService.assetGroups(input.getAssetGroups())));
+
     inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
     List<InjectDocumentInput> documents = input.getDocuments();
     List<String> askedDocumentIds = documents.stream().map(InjectDocumentInput::getDocumentId).toList();
@@ -251,7 +269,7 @@ public class InjectApi extends RestBehavior {
     Iterable<User> users = userRepository.findAllById(input.getUserIds());
     List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
         .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
-    ExecutableInject injection = new ExecutableInject(true, true, inject, contract, List.of(), userInjectContexts);
+    ExecutableInject injection = new ExecutableInject(true, true, inject, contract, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
     file.ifPresent(injection::addDirectAttachment);
     Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
     Execution execution = executor.executeInjection(injection);

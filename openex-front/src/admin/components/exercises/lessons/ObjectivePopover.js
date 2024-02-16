@@ -7,7 +7,7 @@ import { MoreVert } from '@mui/icons-material';
 import { updateObjective, deleteObjective } from '../../../../actions/Objective';
 import ObjectiveForm from './ObjectiveForm';
 import inject18n from '../../../../components/i18n';
-import { Transition } from '../../../../utils/Environment';
+import Transition from '../../../../components/common/Transition';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 
 class ObjectivePopover extends Component {

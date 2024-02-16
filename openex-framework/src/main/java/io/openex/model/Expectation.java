@@ -6,4 +6,9 @@ public interface Expectation {
 
     EXPECTATION_TYPE type();
     Integer getScore();
+
+    default boolean isExpectationGroup() {
+        return false;
+    }
+
 }

@@ -19,4 +19,7 @@ public class Expectation {
   @JsonProperty("expectation_score")
   private Integer score;
 
+  @JsonProperty("expectation_expectation_group")
+  private boolean expectationGroup;
+
 }

@@ -20,9 +20,9 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
   @NotNull
   Optional<User> findById(@NotNull String id);
 
-  Optional<User> findByEmail(String email);
+  Optional<User> findByEmailIgnoreCase(String email);
 
-  List<User> findAllByEmailIn(List<String> emails);
+  List<User> findAllByEmailInIgnoreCase(List<String> emails);
 
   @Query("select user from User user where user.organization is null or user.organization.id in :organizationIds")
   List<User> usersAccessibleFromOrganizations(@Param("organizationIds") List<String> organizationIds);

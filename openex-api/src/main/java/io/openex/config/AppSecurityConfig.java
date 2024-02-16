@@ -223,7 +223,7 @@ public class AppSecurityConfig {
     List<String> rolesAdmin = this.env.getProperty(rolesAdminConfig, List.class, new ArrayList<String>());
     boolean isAdmin = rolesAdmin.stream().anyMatch(rolesFromToken::contains);
     if (hasLength(email)) {
-      Optional<User> optionalUser = userRepository.findByEmail(email);
+      Optional<User> optionalUser = userRepository.findByEmailIgnoreCase(email);
       // If user not exists, create it
       if (optionalUser.isEmpty()) {
         CreateUserInput createUserInput = new CreateUserInput();

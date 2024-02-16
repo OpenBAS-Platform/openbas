@@ -22,6 +22,7 @@ import static java.time.Instant.now;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 
+@Setter
 @Entity
 @Table(name = "exercises")
 @EntityListeners(ModelBaseListener.class)
@@ -35,6 +36,7 @@ public class Exercise implements Base {
         FINISHED
     }
 
+    @Getter
     @Id
     @Column(name = "exercise_id")
     @GeneratedValue(generator = "UUID")
@@ -42,20 +44,24 @@ public class Exercise implements Base {
     @JsonProperty("exercise_id")
     private String id;
 
+    @Getter
     @Column(name = "exercise_name")
     @JsonProperty("exercise_name")
     @NotBlank
     private String name;
 
+    @Getter
     @Column(name = "exercise_description")
     @JsonProperty("exercise_description")
     private String description;
 
+    @Getter
     @Column(name = "exercise_status")
     @JsonProperty("exercise_status")
     @Enumerated(EnumType.STRING)
     private STATUS status = STATUS.SCHEDULED;
 
+    @Getter
     @Column(name = "exercise_subtitle")
     @JsonProperty("exercise_subtitle")
     private String subtitle;
@@ -72,42 +78,51 @@ public class Exercise implements Base {
     @JsonProperty("exercise_end_date")
     private Instant end;
 
+    @Getter
     @Column(name = "exercise_message_header")
     @JsonProperty("exercise_message_header")
     private String header = "EXERCISE - EXERCISE - EXERCISE";
 
+    @Getter
     @Column(name = "exercise_message_footer")
     @JsonProperty("exercise_message_footer")
     private String footer = "EXERCISE - EXERCISE - EXERCISE";
 
+    @Getter
     @Column(name = "exercise_mail_from")
     @JsonProperty("exercise_mail_from")
     private String replyTo;
 
+    @Getter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_logo_dark")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("exercise_logo_dark")
     private Document logoDark;
 
+    @Getter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_logo_light")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("exercise_logo_light")
     private Document logoLight;
 
+    @Getter
     @Column(name = "exercise_lessons_anonymized")
     @JsonProperty("exercise_lessons_anonymized")
     private boolean lessonsAnonymized = false;
 
+    @Getter
     @Column(name = "exercise_created_at")
     @JsonProperty("exercise_created_at")
     private Instant createdAt = now();
 
+    @Getter
     @Column(name = "exercise_updated_at")
     @JsonProperty("exercise_updated_at")
     private Instant updatedAt = now();
 
+    @Getter
     @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Grant> grants = new ArrayList<>();
@@ -117,6 +132,7 @@ public class Exercise implements Base {
     @JsonSerialize(using = MultiIdDeserializer.class)
     private List<Inject> injects = new ArrayList<>();
 
+    @Getter
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "exercises_teams",
             joinColumns = @JoinColumn(name = "exercise_id"),
@@ -126,25 +142,28 @@ public class Exercise implements Base {
     private List<Team> teams = new ArrayList<>();
 
     @Getter
-    @Setter
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty("exercise_teams_users")
     @JsonSerialize(using = MultiModelDeserializer.class)
     private List<ExerciseTeamUser> teamUsers = new ArrayList<>();
 
+    @Getter
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Objective> objectives = new ArrayList<>();
 
+    @Getter
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Log> logs = new ArrayList<>();
 
+    @Getter
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonProperty("exercise_pauses")
     @JsonSerialize(using = MultiIdDeserializer.class)
     private List<Pause> pauses = new ArrayList<>();
 
+    @Getter
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "exercises_tags",
             joinColumns = @JoinColumn(name = "exercise_id"),
@@ -153,6 +172,7 @@ public class Exercise implements Base {
     @JsonProperty("exercise_tags")
     private List<Tag> tags = new ArrayList<>();
 
+    @Getter
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "exercises_documents",
             joinColumns = @JoinColumn(name = "exercise_id"),
@@ -161,11 +181,13 @@ public class Exercise implements Base {
     @JsonProperty("exercise_documents")
     private List<Document> documents = new ArrayList<>();
 
+    @Getter
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("exercise_articles")
     private List<Article> articles = new ArrayList<>();
 
+    @Getter
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("exercise_lessons_categories")
@@ -282,84 +304,8 @@ public class Exercise implements Base {
     }
     // endregion
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public STATUS getStatus() {
-        return status;
-    }
-
-    public void setStatus(STATUS status) {
-        this.status = status;
-    }
-
-    public String getHeader() {
-        return header;
-    }
-
-    public void setHeader(String header) {
-        this.header = header;
-    }
-
-    public String getFooter() {
-        return footer;
-    }
-
-    public void setFooter(String footer) {
-        this.footer = footer;
-    }
-
-    public String getReplyTo() {
-        return replyTo;
-    }
-
-    public void setReplyTo(String replyTo) {
-        this.replyTo = replyTo;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getSubtitle() {
-        return subtitle;
-    }
-
-    public void setSubtitle(String subtitle) {
-        this.subtitle = subtitle;
-    }
-
-    public boolean isLessonsAnonymized() {
-        return lessonsAnonymized;
-    }
-
-    public void setLessonsAnonymized(boolean lessonsAnonymized) {
-        this.lessonsAnonymized = lessonsAnonymized;
-    }
-
     public Optional<Instant> getStart() {
         return ofNullable(start);
-    }
-
-    public void setStart(Instant start) {
-        this.start = start;
     }
 
     public Optional<Instant> getEnd() {
@@ -370,136 +316,12 @@ public class Exercise implements Base {
         return ofNullable(currentPause);
     }
 
-    public void setCurrentPause(Instant currentPause) {
-        this.currentPause = currentPause;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public void setEnd(Instant end) {
-        this.end = end;
-    }
-
-    public Document getLogoDark() {
-        return logoDark;
-    }
-
-    public void setLogoDark(Document logoDark) {
-        this.logoDark = logoDark;
-    }
-
-    public Document getLogoLight() {
-        return logoLight;
-    }
-
-    public void setLogoLight(Document logoLight) {
-        this.logoLight = logoLight;
-    }
-
     public List<Inject> getInjects() {
         return injects.stream().sorted(Inject.executionComparator).toList();
     }
 
-    public void setInjects(List<Inject> injects) {
-        this.injects = injects;
-    }
-
-    public List<Team> getTeams() {
-        return teams;
-    }
-
-    public void setTeams(List<Team> teams) {
-        this.teams = teams;
-    }
-
-    public List<ExerciseTeamUser> getTeamUsers() {
-        return teamUsers;
-    }
-
-    public void setTeamUsers(List<ExerciseTeamUser> teamUsers) {
-        this.teamUsers = teamUsers;
-    }
-
-    public List<Pause> getPauses() {
-        return pauses;
-    }
-
-    public void setPauses(List<Pause> pauses) {
-        this.pauses = pauses;
-    }
-
-    public List<Grant> getGrants() {
-        return grants;
-    }
-
-    public void setGrants(List<Grant> grants) {
-        this.grants = grants;
-    }
-
-    public List<Objective> getObjectives() {
-        return objectives;
-    }
-
-    public void setObjectives(List<Objective> objectives) {
-        this.objectives = objectives;
-    }
-
-    public List<Log> getLogs() {
-        return logs;
-    }
-
-    public void setLogs(List<Log> logs) {
-        this.logs = logs;
-    }
-
-    public List<Document> getDocuments() {
-        return documents;
-    }
-
-    public void setDocuments(List<Document> documents) {
-        this.documents = documents;
-    }
-
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
-    public List<Article> getArticles() {
-        return articles;
-    }
-
     public List<Article> getArticlesForChannel(Channel channel) {
         return articles.stream().filter(article -> article.getChannel().equals(channel)).toList();
-    }
-
-    public void setArticles(List<Article> articles) {
-        this.articles = articles;
-    }
-
-    public List<LessonsCategory> getLessonsCategories() {
-        return lessonsCategories;
-    }
-
-    public void setLessonsCategories(List<LessonsCategory> lessonsCategories) {
-        this.lessonsCategories = lessonsCategories;
     }
 
     @Override

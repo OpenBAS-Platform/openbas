@@ -50,7 +50,7 @@ public class ChannelContract extends Contractor {
 
     @Override
     public ContractConfig getConfig() {
-        return new ContractConfig(TYPE, Map.of(en, "Media pressure", fr, "Pression médiatique"), "#ff9800", "/img/channel.png", isExpose());
+        return new ContractConfig(TYPE, Map.of(en, "Media pressure", fr, "Pression médiatique"), "#ff9800", "#ff9800", "/img/channel.png", isExpose());
     }
 
     @Override
@@ -74,7 +74,7 @@ public class ChannelContract extends Contractor {
         expectation.setName("Expect teams to read the article(s)");
         expectation.setScore(0);
         ContractExpectations expectationsField = expectationsField(
-            "expectations", "Expectations", List.of(expectation)
+                "expectations", "Expectations", List.of(expectation)
         );
         List<ContractElement> publishInstance = contractBuilder()
                 // built in

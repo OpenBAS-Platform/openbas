@@ -197,7 +197,7 @@ const Users = () => {
           </ListItemIcon>
           <ListItemText
             primary={
-              <div>
+              <>
                 {filtering.buildHeader(
                   'user_email',
                   'Email address',
@@ -229,7 +229,7 @@ const Users = () => {
                   headerStyles,
                 )}
                 {filtering.buildHeader('user_tags', 'Tags', true, headerStyles)}
-              </div>
+              </>
             }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>

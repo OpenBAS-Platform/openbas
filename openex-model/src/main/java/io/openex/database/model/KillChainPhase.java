@@ -28,9 +28,27 @@ public class KillChainPhase implements Base {
 
     @Getter
     @Setter
+    @Column(name = "phase_external_id")
+    @JsonProperty("phase_external_id")
+    private String externalId;
+
+    @Getter
+    @Setter
+    @Column(name = "phase_stix_id")
+    @JsonProperty("phase_stix_id")
+    private String stixId;
+
+    @Getter
+    @Setter
     @Column(name = "phase_name")
     @JsonProperty("phase_name")
     private String name;
+
+    @Getter
+    @Setter
+    @Column(name = "phase_shortname")
+    @JsonProperty("phase_shortname")
+    private String shortName;
 
     @Getter
     @Setter
@@ -40,9 +58,15 @@ public class KillChainPhase implements Base {
 
     @Getter
     @Setter
+    @Column(name = "phase_description")
+    @JsonProperty("phase_description")
+    private String description;
+
+    @Getter
+    @Setter
     @Column(name = "phase_order")
     @JsonProperty("phase_order")
-    private Long order;
+    private Long order = 0L;
 
     @Getter
     @Setter
@@ -64,6 +88,38 @@ public class KillChainPhase implements Base {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
+    public String getStixId() {
+        return stixId;
+    }
+
+    public void setStixId(String stixId) {
+        this.stixId = stixId;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getName() {

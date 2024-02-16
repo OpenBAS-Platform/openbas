@@ -24,10 +24,13 @@ public class AttackPatternCreateInput {
     private String externalId;
 
     @JsonProperty("attack_pattern_platforms")
-    private List<String> platforms = new ArrayList<>();
+    private String[] platforms = new String[0];
 
     @JsonProperty("attack_pattern_permissions_required")
-    private List<String> permissionsRequired = new ArrayList<>();
+    private String[] permissionsRequired = new String[0];
+
+    @JsonProperty("attack_pattern_kill_chain_phases")
+    private List<String> killChainPhasesIds = new ArrayList<>();
 
     @JsonProperty("attack_pattern_parent")
     private String parentId;
@@ -56,20 +59,28 @@ public class AttackPatternCreateInput {
         this.externalId = externalId;
     }
 
-    public List<String> getPlatforms() {
+    public String[] getPlatforms() {
         return platforms;
     }
 
-    public void setPlatforms(List<String> platforms) {
+    public void setPlatforms(String[] platforms) {
         this.platforms = platforms;
     }
 
-    public List<String> getPermissionsRequired() {
+    public String[] getPermissionsRequired() {
         return permissionsRequired;
     }
 
-    public void setPermissionsRequired(List<String> permissionsRequired) {
+    public void setPermissionsRequired(String[] permissionsRequired) {
         this.permissionsRequired = permissionsRequired;
+    }
+
+    public List<String> getKillChainPhasesIds() {
+        return killChainPhasesIds;
+    }
+
+    public void setKillChainPhasesIds(List<String> killChainPhasesIds) {
+        this.killChainPhasesIds = killChainPhasesIds;
     }
 
     public String getParentId() {
@@ -80,3 +91,5 @@ public class AttackPatternCreateInput {
         this.parentId = parentId;
     }
 }
+
+

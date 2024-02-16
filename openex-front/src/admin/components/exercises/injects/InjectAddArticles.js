@@ -12,8 +12,8 @@ import { fetchChannels, fetchExerciseArticles } from '../../../../actions/Channe
 import CreateArticle from '../articles/CreateArticle';
 import { truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
-import { Transition } from '../../../../utils/Environment';
-import ChannelIcon from '../../medias/channels/ChannelIcon';
+import Transition from '../../../../components/common/Transition';
+import ChannelIcon from '../../components/channels/ChannelIcon';
 
 const styles = (theme) => ({
   createButton: {

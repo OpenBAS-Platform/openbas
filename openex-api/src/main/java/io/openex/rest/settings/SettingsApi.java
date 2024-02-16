@@ -5,6 +5,7 @@ import io.openex.config.OpenexPrincipal;
 import io.openex.database.model.Setting;
 import io.openex.database.model.Setting.SETTING_KEYS;
 import io.openex.database.repository.SettingRepository;
+import io.openex.injects.opencti.config.OpenCTIConfig;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.settings.form.SettingsUpdateInput;
 import io.openex.rest.settings.response.OAuthProvider;
@@ -41,6 +42,7 @@ public class SettingsApi extends RestBehavior {
   private SettingRepository settingRepository;
   private ApplicationContext context;
   private Environment env;
+  private OpenCTIConfig openCTIConfig;
 
   @Resource
   private OpenExConfig openExConfig;
@@ -59,6 +61,9 @@ public class SettingsApi extends RestBehavior {
   public void setSettingRepository(SettingRepository settingRepository) {
     this.settingRepository = settingRepository;
   }
+
+  @Autowired
+  public void setOpenCTIConfig(OpenCTIConfig openCTIConfig) { this.openCTIConfig = openCTIConfig; }
 
   private List<OAuthProvider> buildOpenIdProviders() {
     if (!this.openExConfig.isAuthOpenidEnable()) {
@@ -148,6 +153,8 @@ public class SettingsApi extends RestBehavior {
       settings.add(new PlatformSetting("map_tile_server_light", openExConfig.getMapTileServerLight()));
       settings.add(new PlatformSetting("map_tile_server_dark", openExConfig.getMapTileServerDark()));
       settings.add(buildPlatformSetting(dbSettings, PLATFORM_NAME));
+      settings.add(new PlatformSetting("xtm_opencti_enable", openCTIConfig.getEnable()));
+      settings.add(new PlatformSetting("xtm_opencti_url", openCTIConfig.getUrl()));
       // Build admin settings
       if (user.isAdmin()) {
         settings.add(new PlatformSetting("platform_version", openExConfig.getVersion()));

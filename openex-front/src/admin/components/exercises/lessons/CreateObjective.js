@@ -8,7 +8,7 @@ import { Add } from '@mui/icons-material';
 import ObjectiveForm from './ObjectiveForm';
 import { addObjective } from '../../../../actions/Objective';
 import inject18n from '../../../../components/i18n';
-import { Transition } from '../../../../utils/Environment';
+import Transition from '../../../../components/common/Transition';
 
 const styles = () => ({
   createButton: {

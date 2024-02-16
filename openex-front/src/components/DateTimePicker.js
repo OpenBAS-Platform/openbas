@@ -1,6 +1,5 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { TextField } from '@mui/material';
 import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
 import { Field } from 'react-final-form';
 
@@ -33,14 +32,13 @@ const DateTimePickerBase = ({
         ? inputProps.onChange(date.toISOString())
         : inputProps.onChange(null))
       }
-      renderInput={(props) => (
-        <TextField
-          {...props}
-          {...textFieldProps}
-          error={Boolean(touched && error)}
-          helperText={touched && error}
-        />
-      )}
+      slotProps={{
+        textField: {
+          ...textFieldProps,
+          error: Boolean(touched && error),
+          helperText: touched && error,
+        },
+      }}
     />
   );
 };

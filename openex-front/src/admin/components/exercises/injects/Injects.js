@@ -201,7 +201,7 @@ const Injects = () => {
   if (exercise && injects && !R.isEmpty(injectTypesMap)) {
     return (
       <div className={classes.container}>
-        <div>
+        <>
           <div style={{ float: 'left', marginRight: 10 }}>
             <SearchFilter
               variant="small"
@@ -248,7 +248,7 @@ const Injects = () => {
               </IconButton>
             )}
           </div>
-        </div>
+        </>
         <div className="clearfix" />
         <List classes={{ root: classes.container }}>
           <ListItem
@@ -269,7 +269,7 @@ const Injects = () => {
             </ListItemIcon>
             <ListItemText
               primary={
-                <div>
+                <>
                   {filtering.buildHeader(
                     'inject_type',
                     'Type',
@@ -306,7 +306,7 @@ const Injects = () => {
                     true,
                     headerStyles,
                   )}
-                </div>
+                </>
               }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
@@ -349,7 +349,7 @@ const Injects = () => {
                 </ListItemIcon>
                 <ListItemText
                   primary={
-                    <div>
+                    <>
                       <div
                         className={classes.bodyItem}
                         style={inlineStyles.inject_type}
@@ -404,7 +404,7 @@ const Injects = () => {
                       >
                         <ItemTags variant="list" tags={inject.inject_tags} />
                       </div>
-                    </div>
+                    </>
                   }
                 />
                 <ListItemSecondaryAction>

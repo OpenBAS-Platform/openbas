@@ -14,7 +14,7 @@ import { fetchInjectCommunications } from '../../../../actions/Communication';
 import ItemTags from '../../../../components/ItemTags';
 import { fetchPlayers } from '../../../../actions/User';
 import Communication from './Communication';
-import { Transition } from '../../../../utils/Environment';
+import Transition from '../../../../components/common/Transition';
 import CommunicationForm from './CommunicationForm';
 
 const useStyles = makeStyles(() => ({

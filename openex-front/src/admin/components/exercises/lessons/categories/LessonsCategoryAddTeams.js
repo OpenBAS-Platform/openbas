@@ -9,11 +9,11 @@ import SearchFilter from '../../../../../components/SearchFilter';
 import inject18n from '../../../../../components/i18n';
 import { storeHelper } from '../../../../../actions/Schema';
 import { fetchTeams } from '../../../../../actions/Team';
-import CreateTeam from '../../../persons/teams/CreateTeam';
+import CreateTeam from '../../../teams/teams/CreateTeam';
 import { truncate } from '../../../../../utils/String';
-import { Transition } from '../../../../../utils/Environment';
 import TagsFilter from '../../../../../components/TagsFilter';
 import ItemTags from '../../../../../components/ItemTags';
+import Transition from '../../../../../components/common/Transition';
 
 const styles = (theme) => ({
   createButton: {

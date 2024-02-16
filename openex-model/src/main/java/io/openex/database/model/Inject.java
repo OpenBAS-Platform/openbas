@@ -23,6 +23,7 @@ import static java.time.Duration.between;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
 
+@Setter
 @Entity
 @Table(name = "injects")
 @EntityListeners(ModelBaseListener.class)
@@ -38,7 +39,6 @@ public class Inject implements Base, Injection {
   };
 
   @Getter
-  @Setter
   @Id
   @Column(name = "inject_id")
   @GeneratedValue(generator = "UUID")
@@ -47,74 +47,62 @@ public class Inject implements Base, Injection {
   private String id;
 
   @Getter
-  @Setter
   @Column(name = "inject_title")
   @JsonProperty("inject_title")
   private String title;
 
   @Getter
-  @Setter
   @Column(name = "inject_description")
   @JsonProperty("inject_description")
   private String description;
 
   @Getter
-  @Setter
   @Column(name = "inject_contract")
   @JsonProperty("inject_contract")
   private String contract;
 
   @Getter
-  @Setter
   @Column(name = "inject_country")
   @JsonProperty("inject_country")
   private String country;
 
   @Getter
-  @Setter
   @Column(name = "inject_city")
   @JsonProperty("inject_city")
   private String city;
 
   @Getter
-  @Setter
   @Column(name = "inject_enabled")
   @JsonProperty("inject_enabled")
   private boolean enabled = true;
 
   @Getter
-  @Setter
   @Column(name = "inject_type", updatable = false)
   @JsonProperty("inject_type")
   private String type;
 
   @Getter
-  @Setter
   @Column(name = "inject_content")
   @Convert(converter = ContentConverter.class)
   @JsonProperty("inject_content")
   private ObjectNode content;
 
   @Getter
-  @Setter
   @Column(name = "inject_created_at")
   @JsonProperty("inject_created_at")
   private Instant createdAt = now();
 
   @Getter
-  @Setter
   @Column(name = "inject_updated_at")
   @JsonProperty("inject_updated_at")
   private Instant updatedAt = now();
 
   @Getter
-  @Setter
   @Column(name = "inject_all_teams")
   @JsonProperty("inject_all_teams")
   private boolean allTeams;
 
   @Getter
-  @Setter
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "inject_exercise")
   @JsonSerialize(using = MonoIdDeserializer.class)
@@ -122,7 +110,6 @@ public class Inject implements Base, Injection {
   private Exercise exercise;
 
   @Getter
-  @Setter
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "inject_depends_from_another")
   @JsonSerialize(using = MonoIdDeserializer.class)
@@ -130,7 +117,6 @@ public class Inject implements Base, Injection {
   private Inject dependsOn;
 
   @Getter
-  @Setter
   @Column(name = "inject_depends_duration")
   @JsonProperty("inject_depends_duration")
   @NotNull
@@ -138,7 +124,6 @@ public class Inject implements Base, Injection {
   private Long dependsDuration;
 
   @Getter
-  @Setter
   @ManyToOne(fetch = FetchType.LAZY)
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JoinColumn(name = "inject_user")
@@ -146,13 +131,11 @@ public class Inject implements Base, Injection {
   private User user;
 
   // CascadeType.ALL is required here because inject status are embedded
-  @Setter
   @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonProperty("inject_status")
   private InjectStatus status;
 
   @Getter
-  @Setter
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "injects_tags",
       joinColumns = @JoinColumn(name = "inject_id"),
@@ -162,7 +145,6 @@ public class Inject implements Base, Injection {
   private List<Tag> tags = new ArrayList<>();
 
   @Getter
-  @Setter
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "injects_teams",
       joinColumns = @JoinColumn(name = "inject_id"),
@@ -171,9 +153,26 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_teams")
   private List<Team> teams = new ArrayList<>();
 
+  @Getter
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(name = "injects_assets",
+      joinColumns = @JoinColumn(name = "inject_id"),
+      inverseJoinColumns = @JoinColumn(name = "asset_id"))
+  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonProperty("inject_assets")
+  private List<Asset> assets = new ArrayList<>();
+
+  @Getter
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(name = "injects_asset_groups",
+      joinColumns = @JoinColumn(name = "inject_id"),
+      inverseJoinColumns = @JoinColumn(name = "asset_group_id"))
+  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonProperty("inject_asset_groups")
+  private List<AssetGroup> assetGroups = new ArrayList<>();
+
   // CascadeType.ALL is required here because of complex relationships
   @Getter
-  @Setter
   @OneToMany(mappedBy = "inject", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonProperty("inject_documents")
   @JsonSerialize(using = MultiModelDeserializer.class)
@@ -181,7 +180,6 @@ public class Inject implements Base, Injection {
 
   // CascadeType.ALL is required here because communications are embedded
   @Getter
-  @Setter
   @OneToMany(mappedBy = "inject", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonProperty("inject_communications")
   @JsonSerialize(using = MultiModelDeserializer.class)
@@ -189,7 +187,6 @@ public class Inject implements Base, Injection {
 
   // CascadeType.ALL is required here because expectations are embedded
   @Getter
-  @Setter
   @OneToMany(mappedBy = "inject", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonProperty("inject_expectations")
   @JsonSerialize(using = MultiModelDeserializer.class)

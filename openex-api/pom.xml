@@ -17,12 +17,10 @@
         <bcpg-jdk15on.version>1.70</bcpg-jdk15on.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <commons-email.version>1.5</commons-email.version>
-        <commons-validator.version>1.7</commons-validator.version>
         <flyway.version>9.0.3</flyway.version>
         <opensaml.version>4.1.1</opensaml.version>
-        <springdoc.version>1.7.0</springdoc.version>
+        <springdoc.version>2.3.0</springdoc.version>
         <springdoc-plugin.version>1.4</springdoc-plugin.version>
-        <jacoco-plugin.version>0.8.11</jacoco-plugin.version>
     </properties>
 
     <profiles>
@@ -51,7 +49,22 @@
                 </dependency>
                 <dependency>
                     <groupId>io.openex</groupId>
+                    <artifactId>openex-injector-caldera</artifactId>
+                    <version>3.5.0-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.openex</groupId>
                     <artifactId>openex-collector-users</artifactId>
+                    <version>3.5.0-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.openex</groupId>
+                    <artifactId>openex-collector-caldera</artifactId>
+                    <version>3.5.0-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.openex</groupId>
+                    <artifactId>openex-collector-mitre-attack</artifactId>
                     <version>3.5.0-SNAPSHOT</version>
                 </dependency>
             </dependencies>
@@ -90,10 +103,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
         </dependency>
         <dependency>
@@ -107,12 +116,12 @@
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springdoc.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-webflux-ui</artifactId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
             <version>${springdoc.version}</version>
         </dependency>
         <dependency>
@@ -135,11 +144,6 @@
             <artifactId>jakarta.validation-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-hibernate6</artifactId>
         </dependency>
@@ -151,12 +155,12 @@
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
-<!--        Waiting for migration from javax to jakarta-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.commons</groupId>-->
-<!--            <artifactId>commons-email</artifactId>-->
-<!--            <version>${commons-email.version}</version>-->
-<!--        </dependency>-->
+        <!--        Waiting for migration from javax to jakarta-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.commons</groupId>-->
+        <!--            <artifactId>commons-email</artifactId>-->
+        <!--            <version>${commons-email.version}</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
@@ -190,6 +194,12 @@
             <version>${opensaml.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>${httpclient5.version}</version>
+        </dependency>
+        <!-- TEST -->
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
@@ -199,6 +209,11 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -272,6 +287,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <!-- UI Api Docs: http://localhost:8080/swagger-ui/index.html -->
                     <apiDocsUrl>http://localhost:8080/api-docs</apiDocsUrl>
                     <outputFileName>swagger.json</outputFileName>
                     <outputDir>.</outputDir>

@@ -21,7 +21,13 @@ steps:
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
     commands:
-      - mvn install
+      - mvn install -DskipTests
+      - cd openex-api
+      - mvn test
+      - cd ../openex-framework
+      - mvn test
+      - cd ../openex-injectors
+      - mvn test
     depends_on:
       - submodules
   - name: frontend-tests
@@ -51,6 +57,7 @@ services:
 
 ---
 kind: pipeline
+type: docker
 name: openex-tests-master
 
 trigger:
@@ -58,7 +65,7 @@ trigger:
     - master
   event:
     exclude:
-      - pull_request
+    - pull_request
 
 steps:
   - name: submodules
@@ -72,7 +79,15 @@ steps:
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
     commands:
-      - mvn install
+      - mvn install -DskipTests
+      - cd openex-api
+      - mvn test
+      - cd ../openex-framework
+      - mvn test
+      - cd ../openex-injectors
+      - mvn test
+    depends_on:
+      - submodules
   - name: frontend-tests
     image: node:20.11.0-alpine3.18
     commands:
@@ -88,7 +103,10 @@ steps:
     settings:
       token:
         from_secret: CODECOV_TOKEN
-      files: openex-api/target/site/jacoco/jacoco.xml
+      files:
+        - openex-api/target/site/jacoco/jacoco.xml
+        - openex-framework/target/site/jacoco/jacoco.xml
+        - openex-injectors/openex-caldera/target/site/jacoco/jacoco.xml
   - name: build-circleci
     image: curlimages/curl
     commands:

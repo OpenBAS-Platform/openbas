@@ -10,6 +10,11 @@ import io.openex.database.repository.InjectRepository;
 import io.openex.database.repository.SettingRepository;
 import io.openex.database.repository.UserRepository;
 import io.openex.service.FileService;
+import jakarta.activation.DataSource;
+import jakarta.mail.*;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,11 +22,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import jakarta.activation.DataSource;
-import jakarta.mail.*;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.internet.MimeMultipart;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -216,7 +216,7 @@ public class ImapService {
                 String contentHtml = getHtmlFromMessage(message);
                 Inject inject = injectResolver(content, contentHtml);
                 List<String> participants = computeParticipants(message);
-                List<User> users = userRepository.findAllByEmailIn(participants);
+                List<User> users = userRepository.findAllByEmailInIgnoreCase(participants);
                 if (inject != null && !users.isEmpty()) {
                     String subject = message.getSubject();
                     String from = String.valueOf(Arrays.stream(message.getFrom()).toList().get(0));

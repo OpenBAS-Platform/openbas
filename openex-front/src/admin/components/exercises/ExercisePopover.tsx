@@ -118,9 +118,10 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   };
 
   return (
-    <div>
+    <>
       <IconButton
         classes={{ root: classes.button }}
+        color="primary"
         onClick={handlePopoverOpen}
         aria-haspopup="true"
         aria-label="More actions"
@@ -245,7 +246,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 };
 

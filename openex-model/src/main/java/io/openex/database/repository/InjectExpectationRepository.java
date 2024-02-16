@@ -39,6 +39,15 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
                                                @Param("teamIds") List<String> teamIds,
                                                @Param("challengeId") String challengeId);
 
+    @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId and i.asset.id = :assetId")
+    InjectExpectation findTechnicalExpectationForAsset(@Param("exerciseId") String exerciseId, @Param("assetId") String assetId);
+
+    @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId and i.asset.id IN :assetIds")
+    List<InjectExpectation> findTechnicalExpectationsForAssets(@Param("exerciseId") String exerciseId, @Param("assetIds") List<String> assetIds);
+
+    @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId and i.assetGroup.id IN :assetGroupId")
+    InjectExpectation findTechnicalExpectationForAssetGroup(@Param("exerciseId") String exerciseId, @Param("assetGroupId") String assetGroupId);
+
     @Modifying
     @Query(value = "delete from InjectExpectation i where i.exercise.id = :exerciseId")
     void deleteAllForExercise(@Param("exerciseId") String exerciseId);

@@ -11,7 +11,7 @@ import TagField from '../../../components/TagField';
 import ExercisePopover from './ExercisePopover';
 import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
-import { Transition } from '../../../utils/Environment';
+import Transition from '../../../components/common/Transition';
 import { usePermissions } from '../../../utils/Exercise';
 
 const useStyles = makeStyles(() => ({

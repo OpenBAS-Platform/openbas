@@ -221,6 +221,20 @@ export const variable = new schema.Entity(
 );
 export const arrayOfVariables = new schema.Array(variable);
 
+export const killChainPhase = new schema.Entity(
+  'killchainphases',
+  {},
+  { idAttribute: 'phase_id' },
+);
+export const arrayOfKillChainPhases = new schema.Array(killChainPhase);
+
+export const attackPattern = new schema.Entity(
+  'attackpatterns',
+  {},
+  { idAttribute: 'attack_pattern_id' },
+);
+export const arrayOfAttackPatterns = new schema.Array(attackPattern);
+
 token.define({ token_user: user });
 user.define({ user_organization: organization });
 
@@ -228,6 +242,7 @@ const maps = (key, state) => state.referential.entities[key].asMutable({ deep: t
 const entities = (key, state) => Object.values(maps(key, state));
 const entity = (id, key, state) => state.referential.entities[key][id]?.asMutable({ deep: true });
 const me = (state) => state.referential.entities.users[R.path(['logged', 'user'], state.app)];
+const contractImages = (state) => state.app.contractImages;
 
 export const storeHelper = (state) => ({
   logged: () => state.app.logged,
@@ -281,7 +296,7 @@ export const storeHelper = (state) => ({
   ),
   getExerciseUserLessonsAnswers: (exerciseId, userId) => entities('lessonsanswers', state).filter(
     (l) => l.lessons_answer_exercise === exerciseId
-        && l.lessons_answer_user === userId,
+      && l.lessons_answer_user === userId,
   ),
   getExerciseReports: (exerciseId) => entities('reports', state).filter((l) => l.report_exercise === exerciseId),
   // report
@@ -321,7 +336,7 @@ export const storeHelper = (state) => ({
     entities('inject_types', state)
       .map((t) => ({
         hasTeams:
-            t.fields.filter((f) => f.key === 'teams').length > 0,
+          t.fields.filter((f) => f.key === 'teams').length > 0,
         ...t,
       }))
       .filter((t) => !t.hasTeams)
@@ -363,6 +378,13 @@ export const storeHelper = (state) => ({
       ),
     );
   },
+  // kill chain phases
+  getKillChainPhase: (id) => entity(id, 'killchainphases', state),
+  getKillChainPhases: () => entities('killchainphases', state),
+  getKillChainPhasesMap: () => maps('killchainphases', state),
+  // attack patterns
+  getAttackPattern: (id) => entity(id, 'attackpatterns', state),
+  getAttackPatterns: () => entities('attackpatterns', state),
   // channels
   getChannels: () => entities('channels', state),
   getChannel: (id) => entity(id, 'channels', state),
@@ -387,4 +409,13 @@ export const storeHelper = (state) => ({
   getLessonsTemplateCategoryQuestions: (id) => entities('lessonstemplatequestions', state).filter(
     (c) => c.lessons_template_question_category === id,
   ),
+  // assets
+  getEndpoints: () => entities('endpoints', state),
+  getEndpointsMap: () => maps('endpoints', state),
+  // asset groups
+  getAssetGroups: () => entities('asset_groups', state),
+  getAssetGroupMaps: () => maps('asset_groups', state),
+  getAssetGroup: (id) => entity(id, 'asset_groups', state),
+  // contracts
+  getContractImages: () => contractImages(state),
 });
