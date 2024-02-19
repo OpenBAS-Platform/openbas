@@ -7,6 +7,7 @@ import io.openex.database.specification.InjectSpecification;
 import io.openex.execution.ExecutableInject;
 import io.openex.execution.ExecutionContext;
 import io.openex.execution.Injector;
+import io.openex.rest.contract.ContractApi;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.inject.form.*;
 import io.openex.service.*;
@@ -124,6 +125,10 @@ public class InjectApi extends RestBehavior {
     this.executionContextService = executionContextService;
   }
 
+  /**
+   * @deprecated Use {@link ContractApi#getContracts(int, int)} instead.
+   */
+  @Deprecated(since = "19/02/2024")
   @GetMapping("/api/inject_types")
   public Collection<Contract> injectTypes() {
     return contractService.getContracts().values();
