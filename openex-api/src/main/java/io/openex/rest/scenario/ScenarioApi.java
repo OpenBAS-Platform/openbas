@@ -1,5 +1,6 @@
 package io.openex.rest.scenario;
 
+import io.openex.database.model.Exercise;
 import io.openex.database.model.Scenario;
 import io.openex.database.model.Team;
 import io.openex.database.repository.TagRepository;
@@ -7,6 +8,7 @@ import io.openex.rest.exercise.form.ScenarioTeamPlayersEnableInput;
 import io.openex.rest.scenario.form.*;
 import io.openex.service.ImportService;
 import io.openex.service.ScenarioService;
+import io.openex.service.ScenarioToExerciseService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -33,6 +35,7 @@ public class ScenarioApi {
   public static final String SCENARIO_URI = "/api/scenarios";
 
   private final ScenarioService scenarioService;
+  private final ScenarioToExerciseService scenarioToExerciseService;
   private final TagRepository tagRepository;
   private final ImportService importService;
 
@@ -83,7 +86,16 @@ public class ScenarioApi {
     this.scenarioService.deleteScenario(scenarioId);
   }
 
-  // -- TEAMS --
+  // -- EXERCISES --
+
+  @PostMapping(SCENARIO_URI + "/{scenarioId}/exercises")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public Exercise toExercise(@PathVariable @NotBlank final String scenarioId) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    return this.scenarioToExerciseService.toExercise(scenario);
+  }
+
+  // -- TAGS --
 
   @PutMapping(SCENARIO_URI + "/{scenarioId}/tags")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")

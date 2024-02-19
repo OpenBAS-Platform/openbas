@@ -64,6 +64,7 @@ public class Team implements Base {
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("team_organization")
     private Organization organization;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_teams",
             joinColumns = @JoinColumn(name = "team_id"),

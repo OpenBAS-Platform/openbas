@@ -90,7 +90,8 @@ public class V2_73__Scenarios extends BaseJavaMigration {
         """);
     // Add scenario to lessons categories
     select.execute("""
-        ALTER TABLE lessons_categories ADD COLUMN lessons_category_scenario varchar(255) not null constraint scenario_fk references scenarios on delete cascade ;
+        ALTER TABLE lessons_categories ALTER COLUMN lessons_category_exercise DROP NOT NULL ;
+        ALTER TABLE lessons_categories ADD COLUMN lessons_category_scenario varchar(255) constraint scenario_fk references scenarios on delete cascade ;
         """);
     // Add scenario to group
     select.execute("""

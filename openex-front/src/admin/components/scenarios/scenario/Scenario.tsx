@@ -1,19 +1,21 @@
-import { useParams } from 'react-router-dom';
-import React from 'react';
-import { Grid, Paper, Theme, Typography } from '@mui/material';
+import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid, Paper, Theme, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { GroupsOutlined, NotificationsOutlined } from '@mui/icons-material';
+import { GroupsOutlined, NotificationsOutlined, PlayArrowOutlined } from '@mui/icons-material';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchScenario, fetchScenarioTeams, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
+import { fetchScenario, fetchScenarioTeams, toExercise, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
 import { useFormatter } from '../../../../components/i18n';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import ScenarioSettingsForm from './ScenarioSettingsForm';
 import InjectsDistribution from '../../injects/InjectsDistribution';
 import type { TeamStore } from '../../../../actions/teams/Team';
-import type { ScenarioInformationInput } from '../../../../utils/api-types';
+import type { Exercise, ScenarioInformationInput } from '../../../../utils/api-types';
+import useScenarioPermissions from '../../../../utils/Scenario';
+import Transition from '../../../../components/common/Transition';
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -44,6 +46,7 @@ const Scenario = () => {
   const classes = useStyles();
   const { t, fldt } = useFormatter();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
 
@@ -57,6 +60,9 @@ const Scenario = () => {
     dispatch(fetchScenarioTeams(scenarioId));
   });
 
+  const permissions = useScenarioPermissions(scenario.scenario_id);
+
+  // Update
   const initialValues = (({
     scenario_mail_from,
     scenario_message_header,
@@ -68,6 +74,17 @@ const Scenario = () => {
   }))(scenario);
 
   const submitUpdate = (data: ScenarioInformationInput) => dispatch(updateScenarioInformation(scenarioId, data));
+
+  // Exercise
+  const [open, setOpen] = useState(false);
+  const submitCreateExercise = () => {
+    dispatch(toExercise(scenario.scenario_id)).then((result: Exercise) => {
+      setOpen(false);
+      if (result) {
+        navigate('/admin/exercises/' + result.exercise_id);
+      }
+    });
+  };
 
   return (
     <>
@@ -130,7 +147,16 @@ const Scenario = () => {
         <Grid item xs={6} style={{ paddingBottom: 24 }}>
           <Typography variant="h4">{t('Execution')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            Create simulation section
+            <Typography variant="h3">{t('Create an exercise')}</Typography>
+            <Button
+              variant="contained"
+              startIcon={<PlayArrowOutlined />}
+              color="success"
+              disabled={permissions.readOnly}
+              onClick={() => setOpen(true)}
+            >
+              {t('Start')}
+            </Button>
           </Paper>
         </Grid>
       </Grid>
@@ -153,6 +179,29 @@ const Scenario = () => {
           </Paper>
         </Grid>
       </Grid>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        TransitionComponent={Transition}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t('Create an exercise from this scenario')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>
+            {t('Cancel')}
+          </Button>
+          <Button
+            color="secondary"
+            onClick={submitCreateExercise}
+          >
+            {t('Confirm')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

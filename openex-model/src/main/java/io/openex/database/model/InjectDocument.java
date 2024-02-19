@@ -6,8 +6,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoIdDeserializer;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "injects_documents")
 public class InjectDocument {
@@ -33,38 +38,6 @@ public class InjectDocument {
     @Column(name = "document_attached")
     @JsonProperty("document_attached")
     private boolean attached = true;
-
-    public boolean isAttached() {
-        return attached;
-    }
-
-    public void setAttached(boolean attached) {
-        this.attached = attached;
-    }
-
-    public InjectDocumentId getCompositeId() {
-        return compositeId;
-    }
-
-    public void setCompositeId(InjectDocumentId compositeId) {
-        this.compositeId = compositeId;
-    }
-
-    public Inject getInject() {
-        return inject;
-    }
-
-    public void setInject(Inject inject) {
-        this.inject = inject;
-    }
-
-    public Document getDocument() {
-        return document;
-    }
-
-    public void setDocument(Document document) {
-        this.document = document;
-    }
 
     @Override
     public boolean equals(Object o) {

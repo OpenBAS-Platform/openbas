@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
@@ -12,9 +14,12 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.time.Instant.now;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "lessons_questions")
 @EntityListeners(ModelBaseListener.class)
@@ -60,74 +65,9 @@ public class LessonsQuestion implements Base {
     // region transient
     @JsonProperty("lessons_question_exercise")
     public String getExercise() {
-        return getCategory().getExercise().getId();
+        return Optional.ofNullable(getCategory().getExercise()).map(Exercise::getId).orElse(null);
     }
     // endregion
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public LessonsCategory getCategory() {
-        return category;
-    }
-
-    public void setCategory(LessonsCategory category) {
-        this.category = category;
-    }
-
-    public Instant getCreated() {
-        return created;
-    }
-
-    public void setCreated(Instant created) {
-        this.created = created;
-    }
-
-    public Instant getUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(Instant updated) {
-        this.updated = updated;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getExplanation() {
-        return explanation;
-    }
-
-    public void setExplanation(String explanation) {
-        this.explanation = explanation;
-    }
-
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
-
-    public List<LessonsAnswer> getAnswers() {
-        return answers;
-    }
-
-    public void setAnswers(List<LessonsAnswer> answers) {
-        this.answers = answers;
-    }
 
     @Override
     public boolean isUserHasAccess(User user) {

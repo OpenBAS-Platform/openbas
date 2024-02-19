@@ -2,17 +2,13 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.helper.MultiIdDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -38,16 +34,6 @@ public class Tag implements Base {
   @Column(name = "tag_color")
   @JsonProperty("tag_color")
   private String color;
-
-  @Setter
-  @Getter
-  @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "documents_tags",
-      joinColumns = @JoinColumn(name = "tag_id"),
-      inverseJoinColumns = @JoinColumn(name = "document_id"))
-  @JsonSerialize(using = MultiIdDeserializer.class)
-  @JsonProperty("tags_documents")
-  private List<Document> documents = new ArrayList<>();
 
   @JsonIgnore
   @Override

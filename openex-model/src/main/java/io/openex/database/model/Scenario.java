@@ -79,12 +79,12 @@ public class Scenario implements Base {
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.EAGER)
   @JsonIgnore
-  private List<Grant> grants = new ArrayList<>(); // TODO: verify is used
+  private List<Grant> grants = new ArrayList<>(); // OK
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
   @JsonProperty("scenario_injects")
   @JsonSerialize(using = MultiIdDeserializer.class)
-  private List<Inject> injects = new ArrayList<>(); // TODO: verify is used
+  private List<Inject> injects = new ArrayList<>();
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "scenarios_teams",
@@ -92,16 +92,16 @@ public class Scenario implements Base {
       inverseJoinColumns = @JoinColumn(name = "team_id"))
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("scenario_teams")
-  private List<Team> teams = new ArrayList<>(); // TODO: verify is used
+  private List<Team> teams = new ArrayList<>(); // Ok
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonProperty("scenario_teams_users")
   @JsonSerialize(using = MultiModelDeserializer.class)
-  private List<ScenarioTeamUser> teamUsers = new ArrayList<>();
+  private List<ScenarioTeamUser> teamUsers = new ArrayList<>(); // Ok
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
   @JsonIgnore
-  private List<Objective> objectives = new ArrayList<>(); // TODO: verify is used
+  private List<Objective> objectives = new ArrayList<>(); // Ok
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "scenarios_tags",
@@ -109,7 +109,7 @@ public class Scenario implements Base {
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("scenario_tags")
-  private List<Tag> tags = new ArrayList<>();
+  private List<Tag> tags = new ArrayList<>(); // Ok
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "scenarios_documents",
@@ -117,27 +117,27 @@ public class Scenario implements Base {
       inverseJoinColumns = @JoinColumn(name = "document_id"))
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("scenario_documents")
-  private List<Document> documents = new ArrayList<>(); // TODO: verify is used
+  private List<Document> documents = new ArrayList<>(); // Ok
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("scenario_articles")
-  private List<Article> articles = new ArrayList<>(); // TODO: verify is used
+  private List<Article> articles = new ArrayList<>(); // Ok
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("scenario_lessons_categories")
-  private List<LessonsCategory> lessonsCategories = new ArrayList<>(); // TODO: verify is used
+  private List<LessonsCategory> lessonsCategories = new ArrayList<>(); // Ok
 
   // -- SECURITY --
 
-  @JsonProperty("scenario_planners")  // TODO: verify is used
+  @JsonProperty("scenario_planners")
   @JsonSerialize(using = MultiIdDeserializer.class)
   public List<User> getPlanners() {
     return getUsersByType(this.getGrants(), PLANNER);
   }
 
-  @JsonProperty("scenario_observers")  // TODO: verify is used
+  @JsonProperty("scenario_observers")
   @JsonSerialize(using = MultiIdDeserializer.class)
   public List<User> getObservers() {
     return getUsersByType(this.getGrants(), PLANNER, OBSERVER);

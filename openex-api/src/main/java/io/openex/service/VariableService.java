@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static io.openex.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
 
 @RequiredArgsConstructor
@@ -20,6 +21,10 @@ public class VariableService {
 
   public Variable createVariable(@NotNull final Variable variable) {
     return this.variableRepository.save(variable);
+  }
+
+  public List<Variable> createVariables(@NotNull final List<Variable> variables) {
+    return fromIterable(this.variableRepository.saveAll(variables));
   }
 
   public Variable variable(@NotBlank final String variableId) {

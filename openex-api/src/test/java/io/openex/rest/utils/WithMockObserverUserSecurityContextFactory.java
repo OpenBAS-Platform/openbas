@@ -75,7 +75,7 @@ public class WithMockObserverUserSecurityContextFactory implements WithSecurityC
       group = groupOpt.get();
     }
     // Create user
-    Optional<User> userOpt = this.userRepository.findByEmail(MOCK_USER_OBSERVER_EMAIL);
+    Optional<User> userOpt = this.userRepository.findByEmailIgnoreCase(MOCK_USER_OBSERVER_EMAIL);
     if (userOpt.isEmpty()) {
       User user = new User();
       user.setGroups(List.of(group));

@@ -1,5 +1,6 @@
 package io.openex.rest.utils.fixtures;
 
+import io.openex.database.model.User;
 import io.openex.rest.user.form.login.LoginUserInput;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 
@@ -24,6 +25,15 @@ public class UserFixture {
 
     public static LoginUserInput getLoginUserInput() {
         return LoginUserInput.builder().login(EMAIL).password(RAW_PASSWORD).build();
+    }
+
+    public static User getUser() {
+        User user = new User();
+        user.setFirstname("Firstname");
+        user.setLastname("Lastname");
+        user.setEmail(EMAIL);
+        user.setPassword(ENCODED_PASSWORD);
+        return user;
     }
 
 }

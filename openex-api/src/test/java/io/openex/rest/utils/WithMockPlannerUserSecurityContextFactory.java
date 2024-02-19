@@ -74,7 +74,7 @@ public class WithMockPlannerUserSecurityContextFactory implements WithSecurityCo
       group = groupOpt.get();
     }
     // Create user
-    Optional<User> userOpt = this.userRepository.findByEmail(MOCK_USER_PLANNER_EMAIL);
+    Optional<User> userOpt = this.userRepository.findByEmailIgnoreCase(MOCK_USER_PLANNER_EMAIL);
     if (userOpt.isEmpty()) {
       User user = new User();
       user.setGroups(List.of(group));
