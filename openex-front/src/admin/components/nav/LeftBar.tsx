@@ -7,15 +7,12 @@ import {
   HubOutlined,
   ExtensionOutlined,
   SettingsOutlined,
-  AutoAwesomeOutlined,
   Groups3Outlined,
-  VerifiedUserOutlined,
   ChevronLeft,
   ChevronRight,
   DnsOutlined,
-  DescriptionOutlined,
 } from '@mui/icons-material';
-import { NewspaperVariantMultipleOutline, Target } from 'mdi-material-ui';
+import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import { createStyles, makeStyles, styled, useTheme } from '@mui/styles';
 import { MESSAGING$ } from '../../../utils/Environment';
 import { useFormatter } from '../../../components/i18n';
