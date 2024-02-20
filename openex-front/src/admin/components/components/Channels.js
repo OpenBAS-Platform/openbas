@@ -159,10 +159,10 @@ const Channels = () => {
           <ListItem
             key={channel.channel_id}
             classes={{ root: classes.item }}
-            divider={true}
+            divider
             component={Link}
-            button={true}
-            to={`/admin/medias/channels/${channel.channel_id}`}
+            button
+            to={`/admin/components/channels/${channel.channel_id}`}
           >
             <ListItemIcon>
               <ChannelIcon

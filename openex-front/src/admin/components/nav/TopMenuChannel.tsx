@@ -39,7 +39,7 @@ const TopMenuExercise: React.FC = () => {
     <>
       <Button
         component={Link}
-        to="/admin/medias/channels"
+        to="/admin/components/channels"
         variant="contained"
         size="small"
         color="primary"
@@ -57,15 +57,15 @@ const TopMenuExercise: React.FC = () => {
       />
       <Button
         component={Link}
-        to={`/admin/medias/channels/${channelId}`}
+        to={`/admin/components/channels/${channelId}`}
         variant={
-          location.pathname === `/admin/medias/channels/${channelId}`
+          location.pathname === `/admin/components/channels/${channelId}`
             ? 'contained'
             : 'text'
         }
         size="small"
         color={
-          location.pathname === `/admin/medias/channels/${channelId}`
+          location.pathname === `/admin/components/channels/${channelId}`
             ? 'secondary'
             : 'primary'
         }
