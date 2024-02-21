@@ -31,28 +31,28 @@ const TopMenuComponents: React.FC = () => {
       >
         {t('Documents')}
       </Button>
-      {/*NOTE: not yet implemented*/}
-      {/*<Button*/}
-      {/*  component={Link}*/}
-      {/*  to="/admin/components/variables"*/}
-      {/*  variant={location.pathname === '/admin/components/variables' ? 'contained' : 'text'}*/}
-      {/*  size="small"*/}
-      {/*  color="primary"*/}
-      {/*  classes={{ root: classes.button }}*/}
-      {/*>*/}
-      {/*  {t('Custom variables')}*/}
-      {/*</Button>*/}
-      {/*NOTE: not yet implemented*/}
-      {/*<Button*/}
-      {/*  component={Link}*/}
-      {/*  to="/admin/components/personas"*/}
-      {/*  variant={location.pathname === '/admin/components/personas' ? 'contained' : 'text'}*/}
-      {/*  size="small"*/}
-      {/*  color="primary"*/}
-      {/*  classes={{ root: classes.button }}*/}
-      {/*>*/}
-      {/*  {t('Personas')}*/}
-      {/*</Button>*/}
+      {/* NOTE: not yet implemented */}
+      {/* <Button */}
+      {/*  component={Link} */}
+      {/*  to="/admin/components/variables" */}
+      {/*  variant={location.pathname === '/admin/components/variables' ? 'contained' : 'text'} */}
+      {/*  size="small" */}
+      {/*  color="primary" */}
+      {/*  classes={{ root: classes.button }} */}
+      {/* > */}
+      {/*  {t('Custom variables')} */}
+      {/* </Button> */}
+      {/* NOTE: not yet implemented */}
+      {/* <Button */}
+      {/*  component={Link} */}
+      {/*  to="/admin/components/personas" */}
+      {/*  variant={location.pathname === '/admin/components/personas' ? 'contained' : 'text'} */}
+      {/*  size="small" */}
+      {/*  color="primary" */}
+      {/*  classes={{ root: classes.button }} */}
+      {/* > */}
+      {/*  {t('Personas')} */}
+      {/* </Button> */}
       <Button
         component={Link}
         to="/admin/components/channels"
