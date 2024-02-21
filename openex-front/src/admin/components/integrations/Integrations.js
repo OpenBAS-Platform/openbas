@@ -79,7 +79,7 @@ const Integrations = () => {
   const sortedTypes = filtering.filterAndSort(types);
 
   // Pagination
-  const PAGE_SIZE = 5;
+  const PAGE_SIZE = 10;
   const BACKEND_PAGE_NORMALIZER = 1;
   const [numberOfPages, setNumberOfPages] = useState(0);
   const [page, setPage] = React.useState(1);
@@ -137,7 +137,7 @@ const Integrations = () => {
                       sx={{ height: 15, fontSize: 10 }}
                       label={field.mandatory ? t('Mandatory') : t('Optional')}
                       color={field.mandatory ? 'secondary' : 'primary'}
-                      />
+                    />
                   </ListItem>
                 ))}
               </List>
