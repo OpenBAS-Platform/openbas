@@ -2,7 +2,7 @@ import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
-import { Typography, Grid, Paper, List, ListItem, ListItemIcon, ListItemText, Chip } from '@mui/material';
+import { Typography, Grid, Paper, List, ListItem, ListItemIcon, ListItemText, Chip, Pagination, Stack } from '@mui/material';
 import {
   HelpOutlined,
   TitleOutlined,
@@ -16,7 +16,7 @@ import {
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
-import { fetchInjectTypes } from '../../../actions/Inject';
+import {fetchInjectTypes, fetchPageOfContracts} from '../../../actions/Inject';
 import SearchFilter from '../../../components/SearchFilter';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 
@@ -61,9 +61,9 @@ const Integrations = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t, tPick } = useFormatter();
-  const injectTypes = useHelper((store) => store.getInjectTypes());
+  const injectTypes = useHelper((store) => store.getPageOfContracts());
   useDataLoader(() => {
-    dispatch(fetchInjectTypes());
+    dispatch(fetchPageOfContracts(page, pageSize));
   });
   const filtering = useSearchAnFilter(null, null, [
     'ttype',
@@ -71,17 +71,28 @@ const Integrations = () => {
     'name',
     'type',
   ]);
-  const types = R.sortWith(
-    [R.ascend(R.prop('ttype')), R.ascend(R.prop('tname'))],
-    R.values(injectTypes)
-      .filter((type) => type.config.expose === true)
-      .map((type) => ({
-        tname: tPick(type.label),
-        ttype: tPick(type.config.label),
-        ...type,
-      })),
-  );
+  const types =
+      R.sortWith(
+        [R.ascend(R.prop('ttype')), R.ascend(R.prop('tname'))],
+        R.values(injectTypes[0] !== undefined ? injectTypes[0].content : [])
+          .filter((type) => type.config.expose === true)
+          .map((type) => ({
+            tname: tPick(type.label),
+            ttype: tPick(type.config.label),
+            ...type,
+          })),
+      );
   const sortedTypes = filtering.filterAndSort(types);
+
+  // Pagination
+  const [page, setPage] = React.useState(1);
+  const pageSize = 4 ;
+  const count = Math.ceil(injectTypes[0] !== undefined ? injectTypes[0].totalElements/pageSize : 5);
+  const handleChange = (event, value) => {
+    setPage(value);
+    useDataLoader();
+  };
+
   return (
     <div className={classes.root}>
       <div className={classes.parameters}>
@@ -91,6 +102,11 @@ const Integrations = () => {
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
           />
+        </div>
+        <div style={{ float: 'right', marginRight: 10 }}>
+          <Stack spacing={2}>
+            <Pagination count={count} page={page} onChange={handleChange}/>
+          </Stack>
         </div>
       </div>
       <div className="clearfix" />

@@ -71,6 +71,10 @@ export const executeInject = (exerciseId, values, files) => (dispatch) => {
 };
 
 export const fetchInjectTypes = () => (dispatch) => getReferential(schema.arrayOfInjectTypes, '/api/inject_types')(dispatch);
+export const fetchPageOfContracts = (page, size) => (dispatch) => {
+  const uri = `/api/contracts?page=${page}&size=${size}`;
+  return getReferential(schema.pageOfContracts, uri)(dispatch);
+}
 
 export const injectDone = (exerciseId, injectId) => (dispatch) => {
   const data = { status: 'SUCCESS', message: 'Manual validation' };

@@ -13,10 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.InputStream;
 import java.util.Base64;
@@ -27,9 +24,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RestController
 @Slf4j
+@RequestMapping("/api/contracts")
 public class ContractApi extends RestBehavior {
-
-    public static final String CONTRACT_URI = "/api/contracts";
 
     private final ContractService contractService;
 
@@ -48,11 +44,11 @@ public class ContractApi extends RestBehavior {
     )
     @ApiResponse(responseCode = "200", description = "Page of contracts")
     public Page<Contract> getContracts(@RequestParam(defaultValue = "0") int page,
-                                           @RequestParam(defaultValue = "10") int size) {
+                                       @RequestParam(defaultValue = "10") int size) {
         return contractService.getContracts(PageRequest.of(page, size));
     }
 
-    @GetMapping(value = CONTRACT_URI + "/images")
+    @GetMapping("/images")
     public @ResponseBody Map<String, String> contractIcon() {
         List<ContractConfig> contractTypes = this.contractService.getContractConfigs();
         Map<String, String> map = new HashMap<>();

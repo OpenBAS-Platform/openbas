@@ -19,6 +19,10 @@ export const injectType = new schema.Entity(
 );
 export const arrayOfInjectTypes = new schema.Array(injectType);
 
+export const pageOfContracts = new schema.Entity('page_of_contracts', {
+  contracts: [injectType]
+});
+
 export const injectStatus = new schema.Entity(
   'inject_statuses',
   {},
@@ -352,6 +356,7 @@ export const storeHelper = (state) => ({
   getInjectCommunications: (id) => entities('communications', state).filter(
     (i) => i.communication_inject === id,
   ),
+  getPageOfContracts: () => entities('page_of_contracts', state),
   // injectexpectation
   getInjectExpectations: () => entities('injectexpectations', state),
   getExerciseInjectExpectations: (id) => entities('injectexpectations', state).filter(
