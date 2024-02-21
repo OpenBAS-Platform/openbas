@@ -86,7 +86,7 @@ const Integrations = () => {
 
   // Pagination
   const [page, setPage] = React.useState(1);
-  const pageSize = 4 ;
+  const PAGE_SIZE = 10 ;
   const count = Math.ceil(injectTypes[0] !== undefined ? injectTypes[0].totalElements/pageSize : 5);
   const handleChange = (event, value) => {
     setPage(value);

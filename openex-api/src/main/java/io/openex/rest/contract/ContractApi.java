@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -42,9 +45,12 @@ public class ContractApi extends RestBehavior {
                     )
             }
     )
-    @ApiResponse(responseCode = "200", description = "Page of contracts")
-    public Page<Contract> getContracts(@RequestParam(defaultValue = "0") int page,
-                                       @RequestParam(defaultValue = "10") int size) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Page of contracts"),
+            @ApiResponse(responseCode = "400", description = "Bad parameters")
+    })
+    public Page<Contract> getContracts(@RequestParam @Min(0) int page,
+                                       @RequestParam @Max(10) int size) {
         return contractService.getContracts(PageRequest.of(page, size));
     }
 

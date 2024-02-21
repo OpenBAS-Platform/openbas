@@ -75,7 +75,7 @@ public class ContractService {
      * @return a {@link Page} containing the contracts for the requested page
      */
     public Page<Contract> getContracts(Pageable pageable) { //TODO Page<ContractDto>?
-        int currentPage = pageable.getPageNumber()-1;
+        int currentPage = pageable.getPageNumber();
         int pageSize = pageable.getPageSize();
         int totalContracts = getContracts().values().size();
         int startItem = currentPage * pageSize;
