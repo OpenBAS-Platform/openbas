@@ -39,6 +39,8 @@ public class ContractService {
             try {
                 Map<String, Contract> contractInstances = helper.contracts()
                         .stream()
+                        .filter(Objects::nonNull)
+                        .distinct()
                         .collect(Collectors.toMap(Contract::getId, Function.identity()));
                 this.contracts.putAll(contractInstances);
             } catch (Exception e) {
