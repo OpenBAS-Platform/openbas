@@ -49,7 +49,7 @@ public class ContractApi extends RestBehavior {
             @ApiResponse(responseCode = "200", description = "Page of contracts"),
             @ApiResponse(responseCode = "400", description = "Bad parameters")
     })
-    public Page<Contract> getContracts(@RequestParam @Min(0) int page,
+    public Page<Contract> getContracts(@RequestParam @Min(0) int page, //TODO Object for page
                                        @RequestParam @Max(10) int size) {
         return contractService.getContracts(PageRequest.of(page, size));
     }

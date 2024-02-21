@@ -16,7 +16,7 @@ import {
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
-import {fetchInjectTypes, fetchPageOfContracts} from '../../../actions/Inject';
+import { fetchPageOfContracts } from '../../../actions/Inject';
 import SearchFilter from '../../../components/SearchFilter';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 
@@ -63,7 +63,7 @@ const Integrations = () => {
   const { t, tPick } = useFormatter();
   const injectTypes = useHelper((store) => store.getPageOfContracts());
   useDataLoader(() => {
-    dispatch(fetchPageOfContracts(page, pageSize));
+    dispatch(fetchPageOfContracts(page, PAGE_SIZE));
   });
   const filtering = useSearchAnFilter(null, null, [
     'ttype',
@@ -87,8 +87,8 @@ const Integrations = () => {
   // Pagination
   const [page, setPage] = React.useState(1);
   const PAGE_SIZE = 10 ;
-  const count = Math.ceil(injectTypes[0] !== undefined ? injectTypes[0].totalElements/pageSize : 5);
-  const handleChange = (event, value) => {
+  const count = Math.ceil(injectTypes[0] !== undefined ? injectTypes[0].totalElements/PAGE_SIZE : 5);
+  const handlePagination = (event, value) => {
     setPage(value);
     useDataLoader();
   };
@@ -105,7 +105,10 @@ const Integrations = () => {
         </div>
         <div style={{ float: 'right', marginRight: 10 }}>
           <Stack spacing={2}>
-            <Pagination count={count} page={page} onChange={handleChange}/>
+            <Pagination
+                count={count}
+                page={page}
+                onChange={handlePagination}/>
           </Stack>
         </div>
       </div>
