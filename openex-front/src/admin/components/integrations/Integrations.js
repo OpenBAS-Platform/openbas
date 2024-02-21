@@ -1,6 +1,5 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { makeStyles } from '@mui/styles';
-import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
 import { Typography, Grid, Paper, List, ListItem, ListItemIcon, ListItemText, Chip, Pagination, Stack } from '@mui/material';
 import {
@@ -14,9 +13,7 @@ import {
   ListOutlined,
 } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
-import { useHelper } from '../../../store';
-import useDataLoader from '../../../utils/ServerSideEvent';
-import { fetchPageOfContracts } from '../../../actions/Inject';
+import {fetchPageOfContracts} from '../../../actions/Inject';
 import SearchFilter from '../../../components/SearchFilter';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 
@@ -59,12 +56,10 @@ const iconField = (type) => {
 
 const Integrations = () => {
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { t, tPick } = useFormatter();
-  const injectTypes = useHelper((store) => store.getPageOfContracts());
-  useDataLoader(() => {
-    dispatch(fetchPageOfContracts(page, PAGE_SIZE));
-  });
+
+  const [injectTypes, setInjectTypes] = useState([]);
+
   const filtering = useSearchAnFilter(null, null, [
     'ttype',
     'tname',
@@ -74,7 +69,7 @@ const Integrations = () => {
   const types =
       R.sortWith(
         [R.ascend(R.prop('ttype')), R.ascend(R.prop('tname'))],
-        R.values(injectTypes[0] !== undefined ? injectTypes[0].content : [])
+        R.values(injectTypes)
           .filter((type) => type.config.expose === true)
           .map((type) => ({
             tname: tPick(type.label),
@@ -85,12 +80,20 @@ const Integrations = () => {
   const sortedTypes = filtering.filterAndSort(types);
 
   // Pagination
-  const [page, setPage] = React.useState(1);
   const PAGE_SIZE = 10 ;
-  const count = Math.ceil(injectTypes[0] !== undefined ? injectTypes[0].totalElements/PAGE_SIZE : 5);
-  const handlePagination = (event, value) => {
+  const [numberOfPages, setNumberOfPages] = useState(0);
+  const [page, setPage] = React.useState(1);
+
+  useEffect(() => {
+    fetchPageOfContracts(page, PAGE_SIZE).then((result) => {
+      const data = result.data;
+      setInjectTypes(data.content);
+      setNumberOfPages(Math.ceil( data.totalElements/PAGE_SIZE));
+    });
+  }, [page]);
+
+  const handlePagination = (_event, value) => {
     setPage(value);
-    useDataLoader();
   };
 
   return (
@@ -104,12 +107,10 @@ const Integrations = () => {
           />
         </div>
         <div style={{ float: 'right', marginRight: 10 }}>
-          <Stack spacing={2}>
-            <Pagination
-                count={count}
-                page={page}
-                onChange={handlePagination}/>
-          </Stack>
+          <Pagination
+              count={numberOfPages}
+              page={page}
+              onChange={handlePagination}/>
         </div>
       </div>
       <div className="clearfix" />
