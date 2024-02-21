@@ -137,7 +137,7 @@ const Integrations = () => {
                       sx={{ height: 15, fontSize: 10 }}
                       label={field.mandatory ? t('Mandatory') : t('Optional')}
                       color={field.mandatory ? 'secondary' : 'primary'}
-                    />
+                     />
                   </ListItem>
                 ))}
               </List>
