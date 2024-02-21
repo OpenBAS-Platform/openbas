@@ -1,5 +1,5 @@
 import * as schema from './Schema';
-import {getReferential, putReferential, postReferential, delReferential, simpleCall} from '../utils/Action';
+import { getReferential, putReferential, postReferential, delReferential, simpleCall } from '../utils/Action';
 
 export const fetchInjects = (exerciseId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects`;
@@ -75,7 +75,7 @@ export const fetchInjectTypes = () => (dispatch) => getReferential(schema.arrayO
 export const fetchPageOfContracts = (page, size) => {
   const uri = `/api/contracts?page=${page}&size=${size}`;
   return simpleCall(uri);
-}
+};
 
 export const injectDone = (exerciseId, injectId) => (dispatch) => {
   const data = { status: 'SUCCESS', message: 'Manual validation' };
