@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import { Typography, Grid, Paper, List, ListItem, ListItemIcon, ListItemText, Chip, Pagination, Stack } from '@mui/material';
+import { Typography, Grid, Paper, List, ListItem, ListItemIcon, ListItemText, Chip, Pagination } from '@mui/material';
 import {
   HelpOutlined,
   TitleOutlined,
