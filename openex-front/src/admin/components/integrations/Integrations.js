@@ -133,10 +133,10 @@ const Integrations = () => {
                     <ListItemIcon>{iconField(field.type)}</ListItemIcon>
                     <ListItemText primary={t(field.label)}/>
                     <Chip
-                        size="small"
-                        sx={{ height: 15, fontSize: 10 }}
-                        label={field.mandatory ? t('Mandatory') : t('Optional')}
-                        color={field.mandatory ? 'secondary' : 'primary'}
+                      size="small"
+                      sx={{ height: 15, fontSize: 10 }}
+                      label={field.mandatory ? t('Mandatory') : t('Optional')}
+                      color={field.mandatory ? 'secondary' : 'primary'}
                       />
                   </ListItem>
                 ))}
