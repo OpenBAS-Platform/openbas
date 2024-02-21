@@ -20,9 +20,9 @@ import { fetchDocuments } from '../../../../actions/Document';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import type { DocumentsHelper } from '../../../../actions/helper';
-import ExerciseOrScenarioContext, { ArticleContext } from '../../../ExerciseOrScenarioContext';
 import CreateArticle from './CreateArticle';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
+import { ArticleContext, PermissionsContext } from '../Context';
 
 const useStyles = makeStyles(() => ({
   channel: {
@@ -102,7 +102,8 @@ const Articles: FunctionComponent<Props> = ({
   };
 
   // Context
-  const { permissions, previewArticleUrl } = useContext(ExerciseOrScenarioContext) as ArticleContext;
+  const { previewArticleUrl } = useContext(ArticleContext);
+  const { permissions } = useContext(PermissionsContext);
 
   return (
     <>

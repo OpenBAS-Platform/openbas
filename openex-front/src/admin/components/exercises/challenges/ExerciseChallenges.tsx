@@ -1,14 +1,15 @@
 import { makeStyles } from '@mui/styles';
-import DefinitionMenu from '../../components/DefinitionMenu';
 import React from 'react';
-import { useAppDispatch } from '../../../../utils/hooks';
 import { useParams } from 'react-router-dom';
+import DefinitionMenu from '../../components/DefinitionMenu';
+import { useAppDispatch } from '../../../../utils/hooks';
 import type { Exercise } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import Challenges from '../../components/challenges/Challenges';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
-import { ChallengesHelper } from '../../../../actions/helper';
+import type { ChallengesHelper } from '../../../../actions/helper';
+import { ChallengeContext, ChallengeContextType } from '../../components/Context';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -29,11 +30,17 @@ const ExerciseChallenges = () => {
     dispatch(fetchExerciseChallenges(exerciseId));
   });
 
+  const context: ChallengeContextType = {
+    previewChallengeUrl: () => `/challenges/${exerciseId}?preview=true`,
+  };
+
   return (
-    <div className={classes.container}>
-      <DefinitionMenu base="/admin/exercises" id={exerciseId} />
-      <Challenges challenges={challenges} />
-    </div>
+    <ChallengeContext.Provider value={context}>
+      <div className={classes.container}>
+        <DefinitionMenu base="/admin/exercises" id={exerciseId} />
+        <Challenges challenges={challenges} />
+      </div>
+    </ChallengeContext.Provider>
   );
 };
 

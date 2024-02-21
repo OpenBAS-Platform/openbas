@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 import Variables from '../../../components/variables/Variables';
@@ -6,9 +6,11 @@ import DefinitionMenu from '../../../components/DefinitionMenu';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
-import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
+import { addVariableForScenario, deleteVariableForScenario, fetchVariablesForScenario, updateVariableForScenario } from '../../../../../actions/variables/variable-actions';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
+import { VariableContext, VariableContextType } from '../../../components/Context';
+import type { Variable, VariableInput } from '../../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -28,11 +30,19 @@ const ScenarioVariables = () => {
     dispatch(fetchVariablesForScenario(scenarioId));
   });
 
+  const context: VariableContextType = {
+    onCreateVariable: (data: VariableInput) => dispatch(addVariableForScenario(scenarioId, data)),
+    onEditVariable: (variable: Variable, data: VariableInput) => dispatch(updateVariableForScenario(scenarioId, variable.variable_id, data)),
+    onDeleteVariable: (variable: Variable) => dispatch(deleteVariableForScenario(scenarioId, variable.variable_id)),
+  };
+
   return (
-    <div className={classes.container}>
-      <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
-      <Variables variables={variables} />
-    </div>
+    <VariableContext.Provider value={context}>
+      <div className={classes.container}>
+        <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
+        <Variables variables={variables} />
+      </div>
+    </VariableContext.Provider>
   );
 };
 

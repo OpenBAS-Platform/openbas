@@ -1,6 +1,20 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, PopoverProps, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, } from '@mui/material';
+import {
+  Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from '@mui/material';
 import { useFormatter } from '../../../components/i18n';
 import ExerciseForm from './ExerciseForm';
 import { deleteExercise, updateExercise } from '../../../actions/Exercise';
@@ -21,25 +35,15 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const [anchorEl, setAnchorEl] = useState<PopoverProps['anchorEl']>(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openExport, setOpenExport] = useState(false);
   const [exportPlayers, setExportPlayers] = useState(false);
   const [exportVariableValues, setExportVariableValues] = useState(false);
 
-  // Popover
-  const handlePopoverOpen = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handlePopoverClose = () => setAnchorEl(null);
-
   // Edition
   const handleOpenEdit = () => {
     setOpenEdit(true);
-    handlePopoverClose();
   };
 
   const handleCloseEdit = () => setOpenEdit(false);
@@ -51,7 +55,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   // Deletion
   const handleOpenDelete = () => {
     setOpenDelete(true);
-    handlePopoverClose();
   };
 
   const handleCloseDelete = () => setOpenDelete(false);
@@ -64,7 +67,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   // Export
   const handleOpenExport = () => {
     setOpenExport(true);
-    handlePopoverClose();
   };
 
   const handleCloseExport = () => setOpenExport(false);

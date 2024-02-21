@@ -8,14 +8,19 @@ import TagsFilter from '../../../../components/TagsFilter';
 import { exportData } from '../../../../utils/Environment';
 import ItemTags from '../../../../components/ItemTags';
 import TeamPopover from './TeamPopover';
-import TeamPlayers from '../../teams/teams/TeamPlayers';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { useHelper } from '../../../../store';
 import { useFormatter } from '../../../../components/i18n';
-import type { TagsHelper, TeamsHelper } from '../../../../actions/helper';
+import type { TagsHelper } from '../../../../actions/helper';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import type { Tag, Team } from '../../../../utils/api-types';
-import ExerciseOrScenarioContext, { TeamContext } from '../../../ExerciseOrScenarioContext';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import { fetchTeams } from '../../../../actions/teams/team-actions';
+import { useAppDispatch } from '../../../../utils/hooks';
+import type { TeamsHelper } from '../../../../actions/teams/team-helper';
+import TeamPlayers from './TeamPlayers';
+import { PermissionsContext, TeamContext } from '../Context';
+import AddTeams from './AddTeams';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -139,15 +144,16 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  currentTeamIds: Team['team_id'][];
+  currentTeamIds?: Team['team_id'][];
 }
 
 interface TeamStoreExtended extends TeamStore {
   team_users_enabled_number: number
 }
 
-const Teams: React.FC<Props> = ({ currentTeamIds }) => {
+const Teams: React.FC<Props> = ({ currentTeamIds = [] }) => {
   // Standard hooks
+  const dispatch = useAppDispatch();
   const classes = useStyles();
   const { t } = useFormatter();
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
@@ -155,7 +161,13 @@ const Teams: React.FC<Props> = ({ currentTeamIds }) => {
     teams: helper.getTeams(),
     tagsMap: helper.getTagsMap(),
   }));
-  const { exerciseScenarioName, permissions } = useContext(ExerciseOrScenarioContext) as TeamContext;
+
+  const { computeTeamUsersEnabled } = useContext(TeamContext);
+  const { permissions } = useContext(PermissionsContext);
+
+  useDataLoader(() => {
+    dispatch(fetchTeams());
+  });
 
   // Filter and sort hook
   const filtering = useSearchAnFilter('team', 'name', [
@@ -163,10 +175,15 @@ const Teams: React.FC<Props> = ({ currentTeamIds }) => {
     'description',
   ]);
 
-  const sortedTeams = filtering.filterAndSort(teams.map((n) => ({
-    team_users_enabled_number: currentTeamIds.filter((currentTeamId) => currentTeamId === n.team_id).length,
-    ...n,
-  })));
+  const sortedTeams = filtering.filterAndSort(teams.filter((team) => currentTeamIds.includes(team.team_id)).map((team) => {
+    if (computeTeamUsersEnabled) {
+      return ({
+        team_users_enabled_number: computeTeamUsersEnabled(team.team_id),
+        ...team,
+      });
+    }
+    return team;
+  }));
 
   return (
     <>
@@ -196,14 +213,14 @@ const Teams: React.FC<Props> = ({ currentTeamIds }) => {
                   'team_name',
                   'team_description',
                   'team_users_number',
-                  'team_users_enabled_number',
+                  ...(computeTeamUsersEnabled ? ['team_users_enabled_number'] : []),
                   'team_enabled',
                   'team_tags',
                 ],
                 sortedTeams,
                 tagsMap,
               )}
-              filename={`[${exerciseScenarioName}] ${t('Teams')}.csv`}
+              filename={`${t('Teams')}.csv`}
             >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
@@ -253,7 +270,7 @@ const Teams: React.FC<Props> = ({ currentTeamIds }) => {
                   true,
                   headerStyles,
                 )}
-                {filtering.buildHeader(
+                {computeTeamUsersEnabled && filtering.buildHeader(
                   'team_users_enabled_number',
                   'Enabled players',
                   true,
@@ -308,12 +325,14 @@ const Teams: React.FC<Props> = ({ currentTeamIds }) => {
                   >
                     {team.team_users_number}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.team_users_enabled_number}
-                  >
-                    {team.team_users_enabled_number}
-                  </div>
+                  {computeTeamUsersEnabled
+                    && <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.team_users_enabled_number}
+                       >
+                      {team.team_users_enabled_number}
+                    </div>
+                  }
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.team_tags}
@@ -356,10 +375,10 @@ const Teams: React.FC<Props> = ({ currentTeamIds }) => {
           <TeamPlayers
             teamId={selectedTeam}
             handleClose={() => setSelectedTeam(null)}
-            tagsMap={tagsMap}
           />
         )}
       </Drawer>
+      {permissions.canWrite && <AddTeams currentTeamIds={currentTeamIds} />}
     </>
   );
 };

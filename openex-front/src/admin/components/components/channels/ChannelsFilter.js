@@ -63,7 +63,7 @@ const ChannelsFilter = (props) => {
         openOnFocus={true}
         autoSelect={false}
         autoHighlight={true}
-        hiddenLabel={true}
+        hiddenlabel={true}
         size="small"
         options={channelsOptions}
         onChange={(event, value, reason) => {

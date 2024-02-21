@@ -3,12 +3,15 @@ import { useParams } from 'react-router-dom';
 import React from 'react';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
-import { fetchScenarioArticles } from '../../../../../actions/channels/article-action';
+import { addScenarioArticle, deleteScenarioArticle, fetchScenarioArticles, updateScenarioArticle } from '../../../../../actions/channels/article-action';
 import Articles from '../../../components/articles/Articles';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import DefinitionMenu from '../../../components/DefinitionMenu';
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
+import type { ArticleStore, FullArticleStore } from '../../../../../actions/channels/Article';
+import type { ArticleCreateInput, ArticleUpdateInput } from '../../../../../utils/api-types';
+import { ArticleContext, ArticleContextType } from '../../../components/Context';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -28,11 +31,24 @@ const ScenarioArticles = () => {
     dispatch(fetchScenarioArticles(scenarioId));
   });
 
+  const context: ArticleContextType = {
+    previewArticleUrl: (article: FullArticleStore) => `/channels/${scenarioId}/${article.article_fullchannel.channel_id}?preview=true`,
+    onAddArticle: (data: ArticleCreateInput) => dispatch(addScenarioArticle(scenarioId, data)),
+    onUpdateArticle: (article: ArticleStore, data: ArticleUpdateInput) => dispatch(
+      updateScenarioArticle(scenarioId, article.article_id, data),
+    ),
+    onDeleteArticle: (article: ArticleStore) => dispatch(
+      deleteScenarioArticle(scenarioId, article.article_id),
+    ),
+  };
+
   return (
-    <div className={classes.container}>
-      <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
-      <Articles articles={articles} />
-    </div>
+    <ArticleContext.Provider value={context}>
+      <div className={classes.container}>
+        <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
+        <Articles articles={articles} />
+      </div>
+    </ArticleContext.Provider>
   );
 };
 

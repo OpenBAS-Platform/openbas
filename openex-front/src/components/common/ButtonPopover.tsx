@@ -42,11 +42,11 @@ const ButtonPopover: FunctionComponent<Props> = ({
         {entries.map((entry, idx) => {
           return (
             <MenuItem key={idx}
-                      disabled={entry.disabled}
-                      onClick={() => {
-                        entry.action();
-                        setAnchorEl(null);
-                      }}
+              disabled={entry.disabled}
+              onClick={() => {
+                entry.action();
+                setAnchorEl(null);
+              }}
             >
               {t(entry.label)}
             </MenuItem>

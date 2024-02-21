@@ -2,6 +2,9 @@ import { useParams } from 'react-router-dom';
 import React, { useState } from 'react';
 import { Button, Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
+import { AddOutlined } from '@mui/icons-material';
+import { Form } from 'react-final-form';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
@@ -9,16 +12,12 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchScenario, updateScenarioTags } from '../../../../actions/scenarios/scenario-actions';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import ScenarioPopover from './ScenarioPopover';
-import * as R from 'ramda';
-import { AddOutlined } from '@mui/icons-material';
 import Transition from '../../../../components/common/Transition';
-import { Form } from 'react-final-form';
 import TagField from '../../../../components/TagField';
 import TagChip from '../../components/tags/TagChip';
 import useScenarioPermissions from '../../../../utils/Scenario';
 import { useFormatter } from '../../../../components/i18n';
 import { Option } from '../../../../utils/Option';
-import { Theme } from '../../../../components/Theme';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -47,14 +46,14 @@ const Tags = ({ scenario }: { scenario: ScenarioStore }) => {
   const permissions = useScenarioPermissions(scenario.scenario_id);
 
   const deleteTag = (tagId: string) => {
-    const tagIds = scenario.scenario_tags?.filter((id) => id !== tagId);
+    const tagIds = scenario.scenario_tags?.filter((id: string) => id !== tagId);
     dispatch(
       updateScenarioTags(scenario.scenario_id, {
         scenario_tags: tagIds,
       }),
     );
   };
-  const submitTags = (values: {scenario_tags : Option[]}) => {
+  const submitTags = (values: { scenario_tags: Option[] }) => {
     handleToggleAddTag();
     dispatch(
       updateScenarioTags(scenario.scenario_id, {

@@ -1,7 +1,15 @@
 import { Dispatch } from 'redux';
 import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
 import { arrayOfScenarios, scenario } from './scenario-schema';
-import { Scenario, ScenarioInformationInput, ScenarioInput, ScenarioUpdateTagsInput, Team } from '../../utils/api-types';
+import type {
+  Scenario,
+  ScenarioInformationInput,
+  ScenarioInput,
+  ScenarioTeamPlayersEnableInput,
+  ScenarioUpdateTagsInput,
+  ScenarioUpdateTeamsInput,
+  Team,
+} from '../../utils/api-types';
 import * as schema from '../Schema';
 
 const SCENARIO_URI = '/api/scenarios';
@@ -61,7 +69,7 @@ export const toExercise = (scenarioId: Scenario['scenario_id']) => (dispatch: Di
 export const updateScenarioTags = (scenarioId: Scenario['scenario_id'], data: ScenarioUpdateTagsInput) => {
   const uri = `${SCENARIO_URI}/${scenarioId}/tags`;
   return putReferential(scenario, uri, data);
-}
+};
 
 // -- TEAMS --
 
@@ -70,8 +78,26 @@ export const fetchScenarioTeams = (scenarioId: Scenario['scenario_id']) => (disp
   return getReferential(schema.arrayOfTeams, uri)(dispatch);
 };
 
-export const addScenarioTeams = (scenarioId: Scenario['scenario_id'], data: Team['team_id'][]) => (dispatch: Dispatch) => putReferential(
+export const addScenarioTeams = (scenarioId: Scenario['scenario_id'], data: ScenarioUpdateTeamsInput) => (dispatch: Dispatch) => putReferential(
   schema.arrayOfTeams,
   `/api/scenarios/${scenarioId}/teams/add`,
+  data,
+)(dispatch);
+
+export const removeScenarioTeams = (scenarioId: Scenario['scenario_id'], data: ScenarioUpdateTeamsInput) => (dispatch: Dispatch) => putReferential(
+  schema.arrayOfTeams,
+  `/api/scenarios/${scenarioId}/teams/remove`,
+  data,
+)(dispatch);
+
+export const addScenarioTeamPlayers = (scenarioId: Scenario['scenario_id'], teamId: Team['team_id'], data: ScenarioTeamPlayersEnableInput) => (dispatch: Dispatch) => putReferential(
+  schema.exercise,
+  `/api/scenarios/${scenarioId}/teams/${teamId}/players/add`,
+  data,
+)(dispatch);
+
+export const removeScenarioTeamPlayers = (scenarioId: Scenario['scenario_id'], teamId: Team['team_id'], data: ScenarioTeamPlayersEnableInput) => (dispatch: Dispatch) => putReferential(
+  schema.exercise,
+  `/api/scenarios/${scenarioId}/teams/${teamId}/players/remove`,
   data,
 )(dispatch);

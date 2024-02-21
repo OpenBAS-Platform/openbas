@@ -2,7 +2,7 @@ import React, { FunctionComponent, useContext, useState } from 'react';
 import { Dialog as MuiDialog, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import Dialog from '../../../../components/common/Dialog';
-import { deleteTeam, updateTeam } from '../../../../actions/Team';
+import { deleteTeam, updateTeam } from '../../../../actions/teams/team-actions';
 import TeamForm from './TeamForm';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -10,9 +10,10 @@ import Transition from '../../../../components/common/Transition';
 import type { TeamUpdateInput } from '../../../../utils/api-types';
 import { Option, organizationOption, tagOptions } from '../../../../utils/Option';
 import { useHelper } from '../../../../store';
-import type { ExercicesHelper, OrganizationsHelper, TagsHelper, TeamsHelper } from '../../../../actions/helper';
+import type { ExercicesHelper, OrganizationsHelper, TagsHelper } from '../../../../actions/helper';
 import type { TeamInputForm, TeamStore } from '../../../../actions/teams/Team';
-import ExerciseOrScenarioContext, { TeamContext } from '../../../ExerciseOrScenarioContext';
+import type { TeamsHelper } from '../../../../actions/teams/team-helper';
+import { TeamContext } from '../Context';
 
 interface TeamPopoverProps {
   team: TeamStore;
@@ -38,7 +39,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
     },
   );
 
-  const { onRemoveTeamFromExerciseScenario } = useContext(ExerciseOrScenarioContext) as TeamContext;
+  const { onRemoveTeam } = useContext(TeamContext);
 
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -92,7 +93,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
 
   const submitRemove = () => {
     return dispatch(
-      onRemoveTeamFromExerciseScenario(team.team_id),
+      onRemoveTeam!(team.team_id),
     ).then(() => handleCloseRemove());
   };
 
@@ -126,7 +127,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
           </MenuItem>
         )}
         {
-          !team.team_contextual
+          onRemoveTeam && !team.team_contextual
           && <MenuItem onClick={handleOpenRemove}>
             {t('Remove from the context')}
           </MenuItem>

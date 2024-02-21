@@ -11,14 +11,15 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { OrganizationsHelper, TeamsHelper } from '../../../../actions/helper';
-import { fetchTeams } from '../../../../actions/Team';
+import type { OrganizationsHelper } from '../../../../actions/helper';
+import { fetchTeams } from '../../../../actions/teams/team-actions';
 import SearchFilter from '../../../../components/SearchFilter';
 import CreateTeam from './CreateTeam';
 import type { Organization, Team } from '../../../../utils/api-types';
 import type { TeamStore } from '../../../../actions/teams/Team';
-import ExerciseOrScenarioContext, { TeamContext } from '../../../ExerciseOrScenarioContext';
 import type { Option } from '../../../../utils/Option';
+import type { TeamsHelper } from '../../../../actions/teams/team-helper';
+import { TeamContext } from '../Context';
 
 const useStyles = makeStyles(() => ({
   createButton: {
@@ -55,7 +56,7 @@ const AddTeams: React.FC<Props> = ({ currentTeamIds }) => {
   const [teamIds, setTeamIds] = useState<Team['team_id'][]>([]);
   const [tags, setTags] = useState<Option[]>([]);
 
-  const { onAddTeams } = useContext(ExerciseOrScenarioContext) as TeamContext;
+  const { onAddTeams } = useContext(TeamContext);
 
   const { teamsMap, organizationsMap }: {
     organizationsMap: Record<string, Organization>,
@@ -71,6 +72,7 @@ const AddTeams: React.FC<Props> = ({ currentTeamIds }) => {
 
   const submitAddTeams = () => {
     onAddTeams(teamIds);
+    setOpen(false);
   };
 
   const filterByKeyword = (n: TeamStoreExtended) => keyword === ''
@@ -126,7 +128,7 @@ const AddTeams: React.FC<Props> = ({ currentTeamIds }) => {
           },
         }}
       >
-        <DialogTitle>{t('Add teams in this exercise')}</DialogTitle>
+        <DialogTitle>{t('Add teams')}</DialogTitle>
         <DialogContent>
           <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
             <Grid item={true} xs={8}>
@@ -189,9 +191,7 @@ const AddTeams: React.FC<Props> = ({ currentTeamIds }) => {
                     <Chip
                       key={teamId}
                       onDelete={() => {
-                        const teamIdsTmp = teamIds;
-                        teamIdsTmp.splice(teamIdsTmp.indexOf(teamId));
-                        setTeamIds(teamIdsTmp);
+                        setTeamIds(teamIds.toSpliced(teamIds.indexOf(teamId), 1));
                       }}
                       label={truncate(team.team_name, 22)}
                       avatar={<Avatar src={teamGravatar} sx={{ height: '32px', width: '32px' }} />}

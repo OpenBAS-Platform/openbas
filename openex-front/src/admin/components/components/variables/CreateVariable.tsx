@@ -6,7 +6,7 @@ import { useFormatter } from '../../../../components/i18n';
 import VariableForm from './VariableForm';
 import type { VariableInput } from '../../../../utils/api-types';
 import Transition from '../../../../components/common/Transition';
-import ExerciseOrScenarioContext, { VariableContext } from '../../../ExerciseOrScenarioContext';
+import { VariableContext } from '../Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {
@@ -33,7 +33,7 @@ const CreateVariable: React.FC<Props> = ({
   const { t } = useFormatter();
 
   // Context
-  const { onCreateVariable } = useContext(ExerciseOrScenarioContext) as VariableContext;
+  const { onCreateVariable } = useContext(VariableContext);
 
   // Creation
   const [open, setOpen] = useState(false);

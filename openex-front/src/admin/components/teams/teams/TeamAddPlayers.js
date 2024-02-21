@@ -5,7 +5,7 @@ import * as R from 'ramda';
 import { Button, Slide, Chip, Avatar, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, Box, ListItemIcon, Grid, Fab } from '@mui/material';
 import { Add, PersonOutlined } from '@mui/icons-material';
 import withStyles from '@mui/styles/withStyles';
-import { updateTeamPlayers } from '../../../../actions/Team';
+import { updateTeamPlayers } from '../../../../actions/teams/team-actions';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';

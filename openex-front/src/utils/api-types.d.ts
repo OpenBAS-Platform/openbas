@@ -1340,7 +1340,6 @@ export interface Tag {
   tag_color?: string;
   tag_id: string;
   tag_name?: string;
-  tags_documents?: Document[];
   updateAttributes?: object;
 }
 

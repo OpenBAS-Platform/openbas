@@ -2,13 +2,14 @@ import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 import { useHelper } from '../../../../store';
-import type { Exercise } from '../../../../utils/api-types';
+import type { Exercise, Variable, VariableInput } from '../../../../utils/api-types';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../utils/hooks';
 import Variables from '../../components/variables/Variables';
 import type { VariablesHelper } from '../../../../actions/variables/variable-helper';
-import { fetchVariablesForExercise } from '../../../../actions/variables/variable-actions';
+import { addVariableForExercise, deleteVariableForExercise, fetchVariablesForExercise, updateVariableForExercise } from '../../../../actions/variables/variable-actions';
 import DefinitionMenu from '../../components/DefinitionMenu';
+import { VariableContext, VariableContextType } from '../../components/Context';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -28,11 +29,19 @@ const ExerciseVariables = () => {
     dispatch(fetchVariablesForExercise(exerciseId));
   });
 
+  const context: VariableContextType = {
+    onCreateVariable: (data: VariableInput) => dispatch(addVariableForExercise(exerciseId, data)),
+    onEditVariable: (variable: Variable, data: VariableInput) => dispatch(updateVariableForExercise(exerciseId, variable.variable_id, data)),
+    onDeleteVariable: (variable: Variable) => dispatch(deleteVariableForExercise(exerciseId, variable.variable_id)),
+  };
+
   return (
-    <div className={classes.container}>
-      <DefinitionMenu base="/admin/exercises" id={exerciseId} />
-      <Variables variables={variables} />
-    </div>
+    <VariableContext.Provider value={context}>
+      <div className={classes.container}>
+        <DefinitionMenu base="/admin/exercises" id={exerciseId} />
+        <Variables variables={variables} />
+      </div>
+    </VariableContext.Provider>
   );
 };
 

@@ -3,12 +3,14 @@ import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchExerciseArticles } from '../../../../actions/channels/article-action';
+import { addExerciseArticle, deleteExerciseArticle, fetchExerciseArticles, updateExerciseArticle } from '../../../../actions/channels/article-action';
 import Articles from '../../components/articles/Articles';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ArticlesHelper } from '../../../../actions/channels/article-helper';
-import type { Exercise } from '../../../../utils/api-types';
+import type { ArticleCreateInput, ArticleUpdateInput, Exercise } from '../../../../utils/api-types';
 import DefinitionMenu from '../../components/DefinitionMenu';
+import { ArticleContext, ArticleContextType } from '../../components/Context';
+import type { ArticleStore, FullArticleStore } from '../../../../actions/channels/Article';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -28,11 +30,24 @@ const ExerciseArticles = () => {
     dispatch(fetchExerciseArticles(exerciseId));
   });
 
+  const context: ArticleContextType = {
+    previewArticleUrl: (article: FullArticleStore) => `/channels/${exerciseId}/${article.article_fullchannel.channel_id}?preview=true`,
+    onAddArticle: (data: ArticleCreateInput) => dispatch(addExerciseArticle(exerciseId, data)),
+    onUpdateArticle: (article: ArticleStore, data: ArticleUpdateInput) => dispatch(
+      updateExerciseArticle(exerciseId, article.article_id, data),
+    ),
+    onDeleteArticle: (article: ArticleStore) => dispatch(
+      deleteExerciseArticle(exerciseId, article.article_id),
+    ),
+  };
+
   return (
-    <div className={classes.container}>
-      <DefinitionMenu base="/admin/exercises" id={exerciseId} />
-      <Articles articles={articles} />
-    </div>
+    <ArticleContext.Provider value={context}>
+      <div className={classes.container}>
+        <DefinitionMenu base="/admin/exercises" id={exerciseId} />
+        <Articles articles={articles} />
+      </div>
+    </ArticleContext.Provider>
   );
 };
 

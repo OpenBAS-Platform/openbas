@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
 import { Button, Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material';
@@ -13,13 +13,13 @@ import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import Transition from '../../../components/common/Transition';
 import { usePermissions } from '../../../utils/Exercise';
-import TagChip from "../components/tags/TagChip";
+import TagChip from '../components/tags/TagChip';
 
 const useStyles = makeStyles((theme) => ({
   container: {
     display: 'flex',
     justifyContent: 'space-between',
-    marginBottom: theme.spacing(2)
+    marginBottom: theme.spacing(2),
   },
   containerTitle: {
     display: 'inline-flex',
@@ -44,7 +44,6 @@ const ExerciseHeader = () => {
     };
   });
   const [openTagAdd, setOpenTagAdd] = useState(false);
-  const containerRef = useRef(null);
   const handleToggleAddTag = () => setOpenTagAdd(!openTagAdd);
 
   const deleteTag = (tagId) => {

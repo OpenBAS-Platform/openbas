@@ -14,16 +14,18 @@ import type { InjectExpectationsStore } from '../../injects/expectations/Expecta
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
-import { fetchChannels, fetchExerciseArticles } from '../../../../../actions/channels/channel-action';
+import { fetchChannels } from '../../../../../actions/channels/channel-action';
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { fetchExerciseChallenges } from '../../../../../actions/Challenge';
 import { fetchEndpoints } from '../../../../../actions/assets/endpoint-actions';
 import { fetchAssetGroups } from '../../../../../actions/assetgroups/assetgroup-action';
 import type { AssetGroupsHelper } from '../../../../../actions/assetgroups/assetgroup-helper';
 import type { EndpointsHelper } from '../../../../../actions/assets/asset-helper';
-import type { ChallengesHelper, TeamsHelper } from '../../../../../actions/helper';
+import type { ChallengesHelper } from '../../../../../actions/helper';
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
 import type { ChannelsHelper } from '../../../../../actions/channels/channel-helper';
+import { TeamsHelper } from '../../../../../actions/teams/team-helper';
+import { fetchExerciseArticles } from '../../../../../actions/channels/article-action';
 
 const useStyles = makeStyles(() => ({
   item: {
@@ -158,7 +160,8 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
                   injectContract={injectContract}
                 />
               );
-            } if (assetGroup) {
+            }
+            if (assetGroup) {
               const relatedExpectations = expectationsByInject.filter((e) => assetGroup.asset_group_assets?.includes(e.inject_expectation_asset ?? '')) ?? [];
 
               return (
@@ -188,7 +191,7 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
                           />
                         </ListItem>
                         {groupedExpectations.map((e: InjectExpectationsStore) => (
-                          <TechnicalExpectationAsset key={e.injectexpectation_id} expectation={e} injectContract={injectContract} gap={16}/>
+                          <TechnicalExpectationAsset key={e.injectexpectation_id} expectation={e} injectContract={injectContract} gap={16} />
                         ))}
                       </div>
                     );

@@ -18,7 +18,7 @@ import { fetchTags } from '../../../../actions/Tag';
 import GroupPopover from './GroupPopover';
 import { storeHelper } from '../../../../actions/Schema';
 import SecurityMenu from '../SecurityMenu';
-import { fetchScenarios } from "../../../../actions/scenarios/scenario-actions";
+import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -253,7 +253,7 @@ class Groups extends Component {
     const { classes, groups, t } = this.props;
     const { keyword, sortBy, orderAsc } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.group_name || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || (n.group_name || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );

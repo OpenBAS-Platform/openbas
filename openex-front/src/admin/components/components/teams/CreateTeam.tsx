@@ -2,16 +2,16 @@ import React, { FunctionComponent, useContext, useState } from 'react';
 import { Fab, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { addTeam } from '../../../../actions/Team';
 import { useFormatter } from '../../../../components/i18n';
 import Dialog from '../../../../components/common/Dialog';
-import { useAppDispatch } from '../../../../utils/hooks';
 import type { Theme } from '../../../../components/Theme';
 import { Option } from '../../../../utils/Option';
 import type { TeamInputForm } from '../../../../actions/teams/Team';
 import TeamForm from './TeamForm';
 import type { TeamCreateInput } from '../../../../utils/api-types';
-import ExerciseOrScenarioContext, { TeamContext } from '../../../ExerciseOrScenarioContext';
+import { addTeam } from '../../../../actions/teams/team-actions';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { TeamContext } from '../Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {
@@ -35,33 +35,32 @@ const CreateTeam: FunctionComponent<CreateTeamProps> = ({
   inline,
   onCreate,
 }) => {
+  const dispatch = useAppDispatch();
   const classes = useStyles();
   const { t } = useFormatter();
   const [openDialog, setOpenDialog] = useState(false);
-  const { onCreateTeam } = useContext(ExerciseOrScenarioContext) as TeamContext;
+  const { onCreateTeam } = useContext(TeamContext);
   const handleOpen = () => setOpenDialog(true);
   const handleClose = () => setOpenDialog(false);
-  const onSubmit = (data: TeamInputForm) => {
+  const onSubmit = async (data: TeamInputForm) => {
     const inputValues: TeamCreateInput = {
       ...data,
       team_organization: data.team_organization?.id,
       team_tags: data.team_tags?.map((tag: Option) => tag.id),
     };
-    // if (inputValues.team_contextual && exerciseId) {
-    //   inputValues.team_exercises = [exerciseId];
-    // }
-    // dispatch(addTeam(inputValues))
-    return onCreateTeam(inputValues).then(
-      (result: { result: string }) => {
-        if (result.result) {
-          if (onCreate) {
-            onCreate(result.result);
-          }
-          return handleClose();
-        }
-        return result;
-      },
-    );
+    let value;
+    if (inputValues.team_contextual) {
+      value = await onCreateTeam!(inputValues);
+    } else {
+      value = await dispatch(addTeam(inputValues));
+    }
+    if (value.result) {
+      if (onCreate) {
+        onCreate(value.result);
+      }
+      handleClose();
+    }
+    return value;
   };
 
   return (

@@ -9,7 +9,7 @@ import DocumentForm from './DocumentForm';
 import { addDocument, fetchDocument } from '../../../../actions/Document';
 import inject18n from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
-import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
+import { DocumentContext } from '../Context';
 
 const styles = (theme) => ({
   createButton: {
@@ -29,7 +29,7 @@ const CreateDocument = (props) => {
   const [open, setOpen] = useState(false);
 
   // Context
-  const context = useContext(ExerciseOrScenarioContext);
+  const context = useContext(DocumentContext);
   const initialValues = context
     ? context.onInitDocument()
     // TODO: should be platform

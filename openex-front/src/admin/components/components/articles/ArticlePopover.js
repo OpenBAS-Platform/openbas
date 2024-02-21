@@ -4,7 +4,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { MoreVert } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import ArticleForm from './ArticleForm';
-import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
+import { ArticleContext, PermissionsContext } from '../Context';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -16,7 +16,8 @@ const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
   const { t } = useFormatter();
 
   // Context
-  const { permissions, onUpdateArticle, onDeleteArticle } = useContext(ExerciseOrScenarioContext);
+  const { onUpdateArticle, onDeleteArticle } = useContext(ArticleContext);
+  const { permissions } = useContext(PermissionsContext);
 
   // states
   const [openDelete, setOpenDelete] = useState(false);
@@ -75,9 +76,10 @@ const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
   return (
     <React.Fragment>
       <IconButton disabled={!permissions.canWrite}
-                  onClick={handlePopoverOpen}
-                  aria-haspopup="true"
-                  size="large">
+        onClick={handlePopoverOpen}
+        aria-haspopup="true"
+        size="large"
+      >
         <MoreVert />
       </IconButton>
       <Menu

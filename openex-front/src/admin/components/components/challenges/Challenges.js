@@ -9,7 +9,7 @@ import SearchFilter from '../../../../components/SearchFilter';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import TagsFilter from '../../../../components/TagsFilter';
 import { useFormatter } from '../../../../components/i18n';
-import ExerciseOrScenarioContext from "../../../ExerciseOrScenarioContext";
+import { ChallengeContext } from '../Context';
 
 const useStyles = makeStyles(() => ({
   flag: {
@@ -33,13 +33,13 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Challenges = ({challenges}) => {
+const Challenges = ({ challenges }) => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
 
   // Context
-  const { previewChallengeUrl } = useContext(ExerciseOrScenarioContext);
+  const { previewChallengeUrl } = useContext(ChallengeContext);
 
   // Filter and sort hook
   const searchColumns = ['name', 'category', 'content'];

@@ -1,8 +1,8 @@
-import { useHelper } from '../../../../store';
 import { Chip } from '@mui/material';
 import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
-import { TagsHelper } from '../../../../actions/helper';
+import { useHelper } from '../../../../store';
+import type { TagsHelper } from '../../../../actions/helper';
 
 const useStyles = makeStyles(() => ({
   tag: {
@@ -19,7 +19,7 @@ interface Props {
 const TagChip: FunctionComponent<Props> = ({
   tagId,
   isReadOnly,
-  deleteTag
+  deleteTag,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -35,8 +35,10 @@ const TagChip: FunctionComponent<Props> = ({
       classes={{ root: classes.tag }}
       label={tag.tag_name}
       onDelete={isReadOnly
-        ? (() => {})
-        : () => deleteTag(tag.tag_id)} />
+        ? (() => {
+        })
+        : () => deleteTag(tag.tag_id)}
+    />
   );
 };
 

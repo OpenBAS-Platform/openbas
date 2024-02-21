@@ -1,5 +1,5 @@
-import type { Challenge, Exercise, InjectExpectation, Organization, PlatformSetting, Scenario, Tag, Team, User } from '../utils/api-types';
-import { ScenarioStore } from './scenarios/Scenario';
+import type { Challenge, Exercise, InjectExpectation, Organization, PlatformSetting, Tag, User } from '../utils/api-types';
+import type { ScenarioStore } from './scenarios/Scenario';
 
 export interface ExercicesHelper {
   getExercise: (exerciseId: Exercise['exercise_id']) => Exercise;
@@ -18,13 +18,6 @@ export interface TagsHelper {
   getTag: (tagId: Tag['tag_id']) => Tag;
   getTags: () => Tag[];
   getTagsMap: () => Record<string, Tag>;
-}
-
-export interface TeamsHelper {
-  getExerciseTeams: (exerciseId: Exercise['exercise_id']) => Team[];
-  getScenarioTeams: (exerciseId: Exercise['exercise_id']) => Team[];
-  getTeams: () => Team[],
-  getTeamsMap: () => Record<string, Team>;
 }
 
 export interface LoggedHelper {

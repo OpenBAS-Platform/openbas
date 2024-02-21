@@ -4,14 +4,16 @@ import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
+import { addScenarioTeamPlayers, addScenarioTeams, fetchScenarioTeams, removeScenarioTeamPlayers, removeScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
 import DefinitionMenu from '../../../components/DefinitionMenu';
-import AddTeams from '../../../components/teams/AddTeams';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
-import useScenarioPermissions from '../../../../../utils/Scenario';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import type { TeamStore } from '../../../../../actions/teams/Team';
 import Teams from '../../../components/teams/Teams';
+import { TeamContext, TeamContextType } from '../../../components/Context';
+import type { Team, TeamCreateInput } from '../../../../../utils/api-types';
+import { addTeam } from '../../../../../actions/teams/team-actions';
+import type { UserStore } from '../../../teams/players/Player';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -20,7 +22,11 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ScenarioTeams = () => {
+interface Props {
+  scenarioTeamsUsers: ScenarioStore['scenario_teams_users'],
+}
+
+const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
   // Standard hooks
   const dispatch = useAppDispatch();
   const classes = useStyles();
@@ -29,18 +35,43 @@ const ScenarioTeams = () => {
   const { teams }: { scenario: ScenarioStore, teams: TeamStore[] } = useHelper((helper: ScenariosHelper) => ({
     teams: helper.getScenarioTeams(scenarioId),
   }));
-  const permissions = useScenarioPermissions(scenarioId);
 
   useDataLoader(() => {
     dispatch(fetchScenarioTeams(scenarioId));
   });
 
+  const context: TeamContextType = {
+    onCreateTeam(team: TeamCreateInput): Promise<{ result: string }> {
+      return dispatch(addTeam({ ...team, team_scenarios: [scenarioId] }));
+    },
+    checkUserEnabled(teamId: Team['team_id'], userId: UserStore['user_id']): boolean {
+      return scenarioTeamsUsers.filter((o: ScenarioStore['scenario_teams_users']) => o.scenario_id === scenarioId && o.team_id === teamId && userId === o.user_id).length > 0;
+    },
+    computeTeamUsersEnabled(teamId: Team['team_id']) {
+      return scenarioTeamsUsers.filter((o: ScenarioStore['scenario_teams_users']) => o.team_id === teamId).length;
+    },
+    onAddTeams(teamIds: Team['team_id'][]): void {
+      dispatch(addScenarioTeams(scenarioId, { scenario_teams: teamIds }));
+    },
+    onRemoveTeam(teamId: Team['team_id']): void {
+      dispatch(removeScenarioTeams(scenarioId, { scenario_teams: [teamId] }));
+    },
+    onToggleUser(teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean): void {
+      if (userEnabled) {
+        dispatch(removeScenarioTeamPlayers(scenarioId, teamId, { scenario_team_players: [userId] }));
+      } else {
+        dispatch(addScenarioTeamPlayers(scenarioId, teamId, { scenario_team_players: [userId] }));
+      }
+    },
+  };
+
   return (
-    <div className={classes.container}>
-      <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
-      <Teams currentTeamIds={teams.map((t) => t.team_id)} />
-      {permissions.canWrite && <AddTeams currentTeamIds={teams.map((t) => t.team_id)} />}
-    </div>
+    <TeamContext.Provider value={context}>
+      <div className={classes.container}>
+        <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
+        <Teams currentTeamIds={teams.map((t) => t.team_id)} />
+      </div>
+    </TeamContext.Provider>
   );
 };
 

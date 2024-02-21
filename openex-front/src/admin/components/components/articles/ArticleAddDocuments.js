@@ -11,10 +11,10 @@ import { truncate } from '../../../../utils/String';
 import Transition from '../../../../components/common/Transition';
 import TagsFilter from '../../../../components/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
-import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { PermissionsContext } from '../Context';
 
 const useStyles = makeStyles((theme) => ({
   box: {
@@ -141,7 +141,7 @@ const ArticleAddDocuments = (props) => {
   }
 
   // Context
-  const { permissions } = useContext(ExerciseOrScenarioContext);
+  const { permissions } = useContext(PermissionsContext);
 
   return (
     <div>

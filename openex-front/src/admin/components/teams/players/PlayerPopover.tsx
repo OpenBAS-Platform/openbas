@@ -2,7 +2,7 @@ import React, { FunctionComponent, useState } from 'react';
 import { Dialog as MuiDialog, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import Dialog from '../../../../components/common/Dialog';
-import { updateTeamPlayers } from '../../../../actions/Team';
+import { updateTeamPlayers } from '../../../../actions/teams/team-actions';
 import { deletePlayer, updatePlayer } from '../../../../actions/User';
 import PlayerForm from './PlayerForm';
 import { useFormatter } from '../../../../components/i18n';
@@ -93,8 +93,8 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
 
   const submitRemove = () => {
     return dispatch(
-      updateTeamPlayers(teamId, {
-        team_users: teamUsersIds?.filter((id) => id !== user.user_id),
+      updateTeamPlayers(teamId!, {
+        team_users: teamUsersIds?.filter((id) => id !== user.user_id) || [],
       }),
     ).then(() => handleCloseRemove());
   };

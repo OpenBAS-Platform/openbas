@@ -8,7 +8,7 @@ import withStyles from '@mui/styles/withStyles';
 import SearchFilter from '../../../../../components/SearchFilter';
 import inject18n from '../../../../../components/i18n';
 import { storeHelper } from '../../../../../actions/Schema';
-import { fetchTeams } from '../../../../../actions/Team';
+import { fetchTeams } from '../../../../../actions/teams/team-actions';
 import CreateTeam from '../../../components/teams/CreateTeam';
 import { truncate } from '../../../../../utils/String';
 import TagsFilter from '../../../../../components/TagsFilter';

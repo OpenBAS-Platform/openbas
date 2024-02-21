@@ -4,9 +4,9 @@ import * as R from 'ramda';
 import { useTheme } from '@mui/styles';
 import { colors, horizontalBarsChartOptions } from '../../../utils/Charts';
 import Empty from '../../../components/Empty';
-import type { TeamStore } from '../persons/teams/Team';
 import { useFormatter } from '../../../components/i18n';
 import type { Theme } from '../../../components/Theme';
+import type { TeamStore } from '../../../actions/teams/Team';
 
 interface Props {
   teams: TeamStore[];

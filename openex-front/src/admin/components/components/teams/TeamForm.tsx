@@ -11,7 +11,7 @@ import type { Theme } from '../../../../components/Theme';
 import type { TeamInputForm } from '../../../../actions/teams/Team';
 import { schemaValidator } from '../../../../utils/Zod';
 import CheckboxField from '../../../../components/CheckboxField';
-import ExerciseOrScenarioContext, { TeamContext } from '../../../ExerciseOrScenarioContext';
+import { TeamContext, TeamContextType } from '../Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -36,7 +36,7 @@ const TeamForm: FunctionComponent<TeamFormProps> = ({
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
-  const { isContextual } = useContext(ExerciseOrScenarioContext) as TeamContext;
+  const { onCreateTeam } = useContext<TeamContextType>(TeamContext);
   const teamFormSchemaValidation = z.object({
     team_name: z.string().min(2, t('This field is mandatory')),
   });
@@ -79,8 +79,8 @@ const TeamForm: FunctionComponent<TeamFormProps> = ({
             setFieldValue={form.mutators.setValue}
             style={{ marginTop: 20 }}
           />
-          {/* check if we are not editing and we are not in the create team for the platform */}
-          {!editing && isContextual && (
+          {/* check if we are not editing and we have a onCreateTeam function in context */}
+          {!editing && onCreateTeam && (
             <CheckboxField
               name="team_contextual"
               label={t('Only in this context')}

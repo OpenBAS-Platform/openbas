@@ -7,7 +7,7 @@ import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import type { Variable } from '../../../../utils/api-types';
 import SearchFilter from '../../../../components/SearchFilter';
 import CreateVariable from './CreateVariable';
-import ExerciseOrScenarioContext, { VariableContext } from '../../../ExerciseOrScenarioContext';
+import { PermissionsContext, VariableContext } from '../Context';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -97,7 +97,8 @@ const Variables: FunctionComponent<Props> = ({
   const classes = useStyles();
 
   // Context
-  const { permissions, onEditVariable, onDeleteVariable } = useContext(ExerciseOrScenarioContext) as VariableContext;
+  const { onEditVariable, onDeleteVariable } = useContext(VariableContext);
+  const { permissions } = useContext(PermissionsContext);
 
   // Filter and sort hook
   const filtering = useSearchAnFilter('variable', 'key', [

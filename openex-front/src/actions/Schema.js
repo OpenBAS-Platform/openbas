@@ -369,7 +369,7 @@ export const storeHelper = (state) => ({
   getTeamInjects: (id) => entities('injects', state).filter((i) => (entity(id, 'teams', state) || {}).team_injects?.includes(
     i.inject_id,
   )),
-  getTeams: () => entities('teams', state).filter((i) => !i.team_contextual),
+  getTeams: () => entities('teams', state),
   getTeamsMap: () => maps('teams', state),
   getSettings: () => {
     return R.mergeAll(

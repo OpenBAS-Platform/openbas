@@ -55,6 +55,7 @@ const Scenario = () => {
     scenario: helper.getScenario(scenarioId),
     teams: helper.getScenarioTeams(scenarioId),
   }));
+
   useDataLoader(() => {
     dispatch(fetchScenario(scenarioId));
     dispatch(fetchScenarioTeams(scenarioId));
@@ -81,7 +82,7 @@ const Scenario = () => {
     dispatch(toExercise(scenario.scenario_id)).then((result: Exercise) => {
       setOpen(false);
       if (result) {
-        navigate('/admin/exercises/' + result.exercise_id);
+        navigate(`/admin/exercises/${result.exercise_id}`);
       }
     });
   };

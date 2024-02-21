@@ -16,7 +16,8 @@ import { addDryrun } from '../../../../actions/Dryrun';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import { useHelper } from '../../../../store';
-import type { TeamsHelper, ExercicesHelper, UsersHelper } from '../../../../actions/helper';
+import type { ExercicesHelper, UsersHelper } from '../../../../actions/helper';
+import { TeamsHelper } from '../../../../actions/teams/team-helper';
 
 const useStyles = makeStyles<Theme>(() => ({
   createButton: {
@@ -73,7 +74,7 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
     );
   };
 
-  const permissions = usePermissions(exercise.exercise_id)
+  const permissions = usePermissions(exercise.exercise_id);
 
   return (
     <div>
@@ -140,7 +141,7 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
               comcheck_subject: t('[${exercise.name}] Communication check'),
               comcheck_message: `${t('Hello')},<br /><br />${t(
                 'This is a communication check before the beginning of the exercise. Please click on the following link'
-                  + ' in order to confirm you successfully received this message: <a href="${comcheck.url}">${comcheck.url}</a>.',
+                + ' in order to confirm you successfully received this message: <a href="${comcheck.url}">${comcheck.url}</a>.',
               )}<br /><br />${t('Best regards')},<br />${t(
                 'The exercise control team',
               )}`,

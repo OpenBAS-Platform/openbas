@@ -6,7 +6,7 @@ import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Ic
 import { connect } from 'react-redux';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, CloseRounded, EmailOutlined, KeyOutlined, PersonOutlined, SmartphoneOutlined } from '@mui/icons-material';
 import inject18n from '../../../../components/i18n';
-import { fetchTeamPlayers } from '../../../../actions/Team';
+import { fetchTeamPlayers } from '../../../../actions/teams/team-actions';
 import { fetchOrganizations } from '../../../../actions/Organization';
 import { addExerciseTeamPlayers, removeExerciseTeamPlayers } from '../../../../actions/Exercise';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -352,14 +352,14 @@ class TeamsPlayers extends Component {
                 primary={
                   <>
                     {exerciseId && (
-                    <div className={classes.bodyItem} style={inlineStyles.user_enabled}>
-                      <ItemBoolean
-                        status={user.user_enabled}
-                        label={user.user_enabled ? t('Enabled') : t('Disabled')}
-                        onClick={this.handleToggleUser.bind(this, user.user_id, user.user_enabled)}
-                        variant="inList"
-                      />
-                    </div>
+                      <div className={classes.bodyItem} style={inlineStyles.user_enabled}>
+                        <ItemBoolean
+                          status={user.user_enabled}
+                          label={user.user_enabled ? t('Enabled') : t('Disabled')}
+                          onClick={this.handleToggleUser.bind(this, user.user_id, user.user_enabled)}
+                          variant="inList"
+                        />
+                      </div>
                     )}
                     <div
                       className={classes.bodyItem}
@@ -446,10 +446,10 @@ class TeamsPlayers extends Component {
           ))}
         </List>
         {isWritePermission
-            && (<TeamAddPlayers
-              teamId={teamId}
-              teamUsersIds={users.map((u) => u.user_id)}
-                />)
+          && (<TeamAddPlayers
+            teamId={teamId}
+            teamUsersIds={users.map((u) => u.user_id)}
+              />)
         }
       </>
     );

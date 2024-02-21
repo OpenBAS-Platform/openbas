@@ -4,7 +4,7 @@ import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
 import ArticleForm from './ArticleForm';
-import ExerciseOrScenarioContext from '../../../ExerciseOrScenarioContext';
+import { ArticleContext } from '../Context';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -33,7 +33,7 @@ const CreateArticle = (props) => {
   const handleClose = () => setOpen(false);
 
   // Context
-  const { onAddArticle } = useContext(ExerciseOrScenarioContext);
+  const { onAddArticle } = useContext(ArticleContext);
 
   const onSubmit = (data) => {
     const inputValues = { ...data, article_channel: data.article_channel.id };

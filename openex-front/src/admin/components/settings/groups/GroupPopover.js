@@ -253,13 +253,13 @@ class GroupPopover extends Component {
     const { keyword, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.organization_name || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
@@ -494,7 +494,7 @@ class GroupPopover extends Component {
                     );
                     return (
                       <TableRow key={scenario.scenario_id}>
-                        <TableCell style={{width: '60%'}}>{scenario.scenario_name}</TableCell>
+                        <TableCell style={{ width: '60%' }}>{scenario.scenario_name}</TableCell>
                         <TableCell style={{ width: '20%', textAlign: 'center' }}>
                           <Checkbox
                             checked={grantPlannerId !== null}
@@ -562,7 +562,7 @@ class GroupPopover extends Component {
                     );
                     return (
                       <TableRow key={exercise.exercise_id}>
-                        <TableCell style={{width: '60%'}}>{exercise.exercise_name}</TableCell>
+                        <TableCell style={{ width: '60%' }}>{exercise.exercise_name}</TableCell>
                         <TableCell style={{ width: '20%', textAlign: 'center' }}>
                           <Checkbox
                             checked={grantPlannerId !== null}
