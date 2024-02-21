@@ -85,7 +85,7 @@ const Integrations = () => {
   const [page, setPage] = React.useState(1);
 
   useEffect(() => {
-    fetchPageOfContracts(page, PAGE_SIZE).then((result) => {
+    fetchPageOfContracts(page-1, PAGE_SIZE).then((result) => {
       const data = result.data;
       setInjectTypes(data.content);
       setNumberOfPages(Math.ceil( data.totalElements/PAGE_SIZE));
