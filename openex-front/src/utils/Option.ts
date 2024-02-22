@@ -1,6 +1,18 @@
 import * as R from 'ramda';
-import countries from '../static/geo/countries.json';
+import countriesJson from '../static/geo/countries.json';
 import type { Exercise, KillChainPhase, Organization, Scenario, Tag } from './api-types';
+
+interface Countries {
+  features: [{
+    properties: {
+      ISO3: string,
+      NAME: string,
+    }
+  }]
+}
+
+//  eslint-disable-next-line @typescript-eslint/no-explicit-any
+const countries: Countries = countriesJson as any;
 
 export interface Option {
   id: string;
