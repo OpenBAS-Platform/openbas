@@ -76,13 +76,15 @@ public class ContractService {
      * @param pageable the pagination information
      * @return a {@link Page} containing the contracts for the requested page
      */
-    public Page<Contract> getContracts(Pageable pageable) { //TODO Page<ContractDto>?
+    public Page<Contract> getExposedContracts(Pageable pageable) {
+        Collection<Contract> exposedContracts = getContracts().values();
+
         int currentPage = pageable.getPageNumber();
         int pageSize = pageable.getPageSize();
-        int totalContracts = getContracts().values().size();
+        int totalContracts = exposedContracts.size();
         int startItem = currentPage * pageSize;
 
-        List<Contract> contractList = new ArrayList<>(getContracts().values());
+        List<Contract> contractList = new ArrayList<>(exposedContracts);
 
         if (startItem >= totalContracts) {
             return new PageImpl<>(Collections.emptyList(), pageable, totalContracts);
