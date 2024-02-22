@@ -11,4 +11,6 @@ public interface OpenexPrincipal {
   Collection<? extends GrantedAuthority> getAuthorities();
 
   boolean isAdmin();
+
+  String getLang();
 }

@@ -7,6 +7,8 @@ import io.openex.database.model.User;
 import io.openex.database.repository.*;
 import io.openex.database.specification.GroupSpecification;
 import io.openex.rest.user.form.user.CreateUserInput;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,8 +20,6 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -138,6 +138,11 @@ public class UserService {
       @Override
       public boolean isAdmin() {
         return user.isAdmin();
+      }
+
+      @Override
+      public String getLang() {
+        return user.getLang();
       }
     }, "", roles);
   }

@@ -41,4 +41,9 @@ public class OpenExSaml2User implements OpenexPrincipal, Saml2AuthenticatedPrinc
     return user.isAdmin();
   }
 
+  @Override
+  public String getLang() {
+    return user.getLang();
+  }
+
 }

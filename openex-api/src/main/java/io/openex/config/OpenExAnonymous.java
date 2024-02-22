@@ -8,6 +8,8 @@ import java.util.Collection;
 public class OpenExAnonymous implements OpenexPrincipal {
 
   public final static String ANONYMOUS = "anonymous";
+  public static final String LANG_AUTO = "auto";
+
 
   @Override
   public String getId() {
@@ -17,6 +19,11 @@ public class OpenExAnonymous implements OpenexPrincipal {
   @Override
   public boolean isAdmin() {
     return false;
+  }
+
+  @Override
+  public String getLang() {
+    return LANG_AUTO;
   }
 
   @Override

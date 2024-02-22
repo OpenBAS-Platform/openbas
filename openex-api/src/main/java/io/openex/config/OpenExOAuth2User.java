@@ -49,6 +49,11 @@ public class OpenExOAuth2User implements OpenexPrincipal, OAuth2User {
   }
 
   @Override
+  public String getLang() {
+    return this.user.getLang();
+  }
+
+  @Override
   public String getName() {
     return this.user.getFirstname() + " " + this.user.getLastname();
   }
