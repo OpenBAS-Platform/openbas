@@ -26,104 +26,112 @@ import static java.time.Instant.now;
 @RestController
 @Secured(ROLE_USER)
 public class TeamApi extends RestBehavior {
-    private ExerciseRepository exerciseRepository;
-    private TeamRepository teamRepository;
-    private UserRepository userRepository;
-    private OrganizationRepository organizationRepository;
-    private TagRepository tagRepository;
 
-    @Autowired
-    public void setExerciseRepository(ExerciseRepository exerciseRepository) {
-        this.exerciseRepository = exerciseRepository;
-    }
+  private ExerciseRepository exerciseRepository;
+  private ScenarioRepository scenarioRepository;
+  private TeamRepository teamRepository;
+  private UserRepository userRepository;
+  private OrganizationRepository organizationRepository;
+  private TagRepository tagRepository;
 
-    @Autowired
-    public void setTeamRepository(TeamRepository teamRepository) {
-        this.teamRepository = teamRepository;
-    }
+  @Autowired
+  public void setExerciseRepository(ExerciseRepository exerciseRepository) {
+    this.exerciseRepository = exerciseRepository;
+  }
 
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+  @Autowired
+  public void setScenarioRepository(ScenarioRepository scenarioRepository) {
+    this.scenarioRepository = scenarioRepository;
+  }
 
-    @Autowired
-    public void setOrganizationRepository(OrganizationRepository organizationRepository) {
-        this.organizationRepository = organizationRepository;
-    }
+  @Autowired
+  public void setTeamRepository(TeamRepository teamRepository) {
+    this.teamRepository = teamRepository;
+  }
 
-    @Autowired
-    public void setTagRepository(TagRepository tagRepository) {
-        this.tagRepository = tagRepository;
-    }
+  @Autowired
+  public void setUserRepository(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
 
-    @GetMapping("/api/teams")
-    @PreAuthorize("isObserver()")
-    public Iterable<Team> getTeams() {
-        List<Team> teams;
-        OpenexPrincipal currentUser = currentUser();
-        if (currentUser.isAdmin()) {
-            teams = fromIterable(teamRepository.findAll());
-        } else {
-            User local = userRepository.findById(currentUser.getId()).orElseThrow();
-            List<String> organizationIds = local.getGroups().stream()
-                    .flatMap(group -> group.getOrganizations().stream())
-                    .map(Organization::getId)
-                    .toList();
-            teams = teamRepository.teamsAccessibleFromOrganizations(organizationIds);
-        }
-        return teams;
-    }
+  @Autowired
+  public void setOrganizationRepository(OrganizationRepository organizationRepository) {
+    this.organizationRepository = organizationRepository;
+  }
 
-    @GetMapping("/api/teams/{teamId}")
-    @PreAuthorize("isObserver()")
-    public Team getTeam(@PathVariable String teamId) {
-        return teamRepository.findById(teamId).orElseThrow();
-    }
+  @Autowired
+  public void setTagRepository(TagRepository tagRepository) {
+    this.tagRepository = tagRepository;
+  }
 
-    @GetMapping("/api/teams/{teamId}/players")
-    @PreAuthorize("isObserver()")
-    public Iterable<User> getTeamPlayers(@PathVariable String teamId) {
-        return teamRepository.findById(teamId).orElseThrow().getUsers();
+  @GetMapping("/api/teams")
+  @PreAuthorize("isObserver()")
+  public Iterable<Team> getTeams() {
+    List<Team> teams;
+    OpenexPrincipal currentUser = currentUser();
+    if (currentUser.isAdmin()) {
+      teams = fromIterable(teamRepository.findAll());
+    } else {
+      User local = userRepository.findById(currentUser.getId()).orElseThrow();
+      List<String> organizationIds = local.getGroups().stream()
+          .flatMap(group -> group.getOrganizations().stream())
+          .map(Organization::getId)
+          .toList();
+      teams = teamRepository.teamsAccessibleFromOrganizations(organizationIds);
     }
+    return teams;
+  }
 
-    @PostMapping("/api/teams")
-    @PreAuthorize("isPlanner()")
-    public Team createTeam(@Valid @RequestBody TeamCreateInput input) {
-        if (input.getContextual() && input.getExerciseIds().toArray().length > 1) {
-            throw new UnsupportedOperationException("Contextual team can only be associated to one exercise");
-        }
-        Team team = new Team();
-        team.setUpdateAttributes(input);
-        team.setOrganization(updateRelation(input.getOrganizationId(), team.getOrganization(), organizationRepository));
-        team.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
-        team.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
-        return teamRepository.save(team);
-    }
+  @GetMapping("/api/teams/{teamId}")
+  @PreAuthorize("isObserver()")
+  public Team getTeam(@PathVariable String teamId) {
+    return teamRepository.findById(teamId).orElseThrow();
+  }
 
-    @DeleteMapping("/api/teams/{teamId}")
-    @PreAuthorize("isPlanner()")
-    public void deleteTeam(@PathVariable String teamId) {
-        teamRepository.deleteById(teamId);
-    }
+  @GetMapping("/api/teams/{teamId}/players")
+  @PreAuthorize("isObserver()")
+  public Iterable<User> getTeamPlayers(@PathVariable String teamId) {
+    return teamRepository.findById(teamId).orElseThrow().getUsers();
+  }
 
-    @PutMapping("/api/teams/{teamId}")
-    @PreAuthorize("isPlanner()")
-    public Team updateTeam(@PathVariable String teamId, @Valid @RequestBody TeamUpdateInput input) {
-        Team team = teamRepository.findById(teamId).orElseThrow();
-        team.setUpdateAttributes(input);
-        team.setUpdatedAt(now());
-        team.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
-        team.setOrganization(updateRelation(input.getOrganizationId(), team.getOrganization(), organizationRepository));
-        return teamRepository.save(team);
+  @PostMapping("/api/teams")
+  @PreAuthorize("isPlanner()")
+  public Team createTeam(@Valid @RequestBody TeamCreateInput input) {
+    if (input.getContextual() && input.getExerciseIds().toArray().length > 1) {
+      throw new UnsupportedOperationException("Contextual team can only be associated to one exercise");
     }
+    Team team = new Team();
+    team.setUpdateAttributes(input);
+    team.setOrganization(updateRelation(input.getOrganizationId(), team.getOrganization(), organizationRepository));
+    team.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+    team.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
+    team.setScenarios(fromIterable(scenarioRepository.findAllById(input.getScenarioIds())));
+    return teamRepository.save(team);
+  }
 
-    @PutMapping("/api/teams/{teamId}/players")
-    @PreAuthorize("isPlanner()")
-    public Team updateTeamUsers(@PathVariable String teamId, @Valid @RequestBody UpdateUsersTeamInput input) {
-        Team team = teamRepository.findById(teamId).orElseThrow();
-        Iterable<User> teamUsers = userRepository.findAllById(input.getUserIds());
-        team.setUsers(fromIterable(teamUsers));
-        return teamRepository.save(team);
-    }
+  @DeleteMapping("/api/teams/{teamId}")
+  @PreAuthorize("isPlanner()")
+  public void deleteTeam(@PathVariable String teamId) {
+    teamRepository.deleteById(teamId);
+  }
+
+  @PutMapping("/api/teams/{teamId}")
+  @PreAuthorize("isPlanner()")
+  public Team updateTeam(@PathVariable String teamId, @Valid @RequestBody TeamUpdateInput input) {
+    Team team = teamRepository.findById(teamId).orElseThrow();
+    team.setUpdateAttributes(input);
+    team.setUpdatedAt(now());
+    team.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+    team.setOrganization(updateRelation(input.getOrganizationId(), team.getOrganization(), organizationRepository));
+    return teamRepository.save(team);
+  }
+
+  @PutMapping("/api/teams/{teamId}/players")
+  @PreAuthorize("isPlanner()")
+  public Team updateTeamUsers(@PathVariable String teamId, @Valid @RequestBody UpdateUsersTeamInput input) {
+    Team team = teamRepository.findById(teamId).orElseThrow();
+    Iterable<User> teamUsers = userRepository.findAllById(input.getUserIds());
+    team.setUsers(fromIterable(teamUsers));
+    return teamRepository.save(team);
+  }
 }

@@ -1390,6 +1390,7 @@ export interface TeamCreateInput {
   team_exercises?: string[];
   team_name: string;
   team_organization?: string;
+  team_scenarios?: string[];
   team_tags?: string[];
 }
 

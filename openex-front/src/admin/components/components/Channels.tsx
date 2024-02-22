@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
-import { useDispatch } from 'react-redux';
 import { ChevronRightOutlined } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import SearchFilter from '../../../components/SearchFilter';
@@ -12,6 +11,10 @@ import { fetchChannels } from '../../../actions/channels/channel-action';
 import CreateChannel from './channels/CreateChannel';
 import { useFormatter } from '../../../components/i18n';
 import ChannelIcon from './channels/ChannelIcon';
+import type { ChannelsHelper } from '../../../actions/channels/channel-helper';
+import type { UsersHelper } from '../../../actions/helper';
+import { useAppDispatch } from '../../../utils/hooks';
+import type { Channel } from '../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -35,7 +38,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const headerStyles = {
+const headerStyles: Record<string, CSSProperties> = {
   iconSort: {
     position: 'absolute',
     margin: '0 0 0 5px',
@@ -61,7 +64,7 @@ const headerStyles = {
   },
 };
 
-const inlineStyles = {
+const inlineStyles: Record<string, CSSProperties> = {
   channel_type: {
     float: 'left',
     width: '15%',
@@ -90,20 +93,20 @@ const inlineStyles = {
 const Channels = () => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { t } = useFormatter();
   // Filter and sort hook
   const searchColumns = ['type', 'name', 'description'];
   const filtering = useSearchAnFilter('channel', 'name', searchColumns);
   // Fetching data
-  const { channels, userAdmin } = useHelper((helper) => ({
+  const { channels, userAdmin }: { channels: Channel[], userAdmin: boolean } = useHelper((helper: ChannelsHelper & UsersHelper) => ({
     channels: helper.getChannels(),
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
   useDataLoader(() => {
     dispatch(fetchChannels());
   });
-  const sortedChannels = filtering.filterAndSort(channels);
+  const sortedChannels: Channel[] = filtering.filterAndSort(channels);
   return (
     <div>
       <div className={classes.parameters}>
