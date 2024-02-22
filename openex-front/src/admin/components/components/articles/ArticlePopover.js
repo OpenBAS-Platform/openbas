@@ -47,7 +47,7 @@ const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
   };
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
-    return onDeleteArticle().then(() => handleCloseDelete());
+    return onDeleteArticle(article).then(() => handleCloseDelete());
   };
   const handleOpenRemove = () => {
     setOpenRemove(true);

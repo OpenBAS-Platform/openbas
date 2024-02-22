@@ -12,13 +12,14 @@ import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 import { fetchExercises } from '../../../../actions/Exercise';
+import Drawer from "../../../../components/common/Drawer";
 
 const DocumentPopover = (props) => {
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
 
-  const { document, disabled, onRemoveDocument, attached, onToggleAttach } = props;
+  const { document, disabled, onRemoveDocument, attached, onToggleAttach, inline } = props;
 
   // Fetching data
   const { tagsMap, exercisesMap, scenariosMap } = useHelper((helper) => ({
@@ -174,24 +175,35 @@ const DocumentPopover = (props) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog
-        TransitionComponent={Transition}
-        open={openEdit}
-        onClose={handleCloseEdit}
-        fullWidth
-        maxWidth="md"
-        PaperProps={{ elevation: 1 }}
-      >
-        <DialogTitle>{t('Update the document')}</DialogTitle>
-        <DialogContent>
+
+      {inline ? (
+        <Dialog
+          open={openEdit}
+          handleClose={handleCloseEdit}
+          title={t('Update the document')}
+        >
           <DocumentForm
             initialValues={initialValues}
             editing
             onSubmit={onSubmitEdit}
             handleClose={handleCloseEdit}
           />
-        </DialogContent>
-      </Dialog>
+        </Dialog>
+      ) : (
+        <Drawer
+          open={openEdit}
+          handleClose={handleCloseEdit}
+          title={t('Update the document')}
+        >
+          <DocumentForm
+            initialValues={initialValues}
+            editing
+            onSubmit={onSubmitEdit}
+            handleClose={handleCloseEdit}
+          />
+        </Drawer>
+      )}
+
       <Dialog
         open={openRemove}
         TransitionComponent={Transition}

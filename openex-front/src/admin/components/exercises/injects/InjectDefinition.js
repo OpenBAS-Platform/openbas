@@ -1758,6 +1758,7 @@ class InjectDefinition extends Component {
                           />
                           <ListItemSecondaryAction>
                             <ChallengePopover
+                              inline
                               challenge={challenge}
                               onRemoveChallenge={this.handleRemoveChallenge.bind(
                                 this,
@@ -2006,6 +2007,7 @@ class InjectDefinition extends Component {
                         />
                         <ListItemSecondaryAction>
                           <DocumentPopover
+                            inline
                             exerciseId={exerciseId}
                             document={document}
                             onRemoveDocument={this.handleRemoveDocument.bind(

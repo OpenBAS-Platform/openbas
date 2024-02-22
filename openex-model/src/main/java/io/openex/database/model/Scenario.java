@@ -164,4 +164,12 @@ public class Scenario implements Base {
         .toList();
   }
 
+  // -- CHANNELS --
+
+  public List<Article> getArticlesForChannel(Channel channel) {
+    return this.articles.stream()
+        .filter(article -> article.getChannel().equals(channel))
+        .toList();
+  }
+
 }

@@ -1649,6 +1649,7 @@ class QuickInject extends Component {
                           />
                           <ListItemSecondaryAction>
                             <ChallengePopover
+                              inline
                               challenge={challenge}
                               onRemoveChallenge={this.handleRemoveChallenge.bind(
                                 this,
@@ -1897,6 +1898,7 @@ class QuickInject extends Component {
                         />
                         <ListItemSecondaryAction>
                           <DocumentPopover
+                            inline
                             exerciseId={exerciseId}
                             document={document}
                             onRemoveDocument={this.handleRemoveDocument.bind(

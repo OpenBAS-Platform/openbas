@@ -290,6 +290,7 @@ const ChallengeForm = (props) => {
                   />
                   <ListItemSecondaryAction>
                     <DocumentPopover
+                      inline
                       document={document}
                       onRemoveDocument={handleRemoveDocument}
                     />

@@ -8,13 +8,14 @@ import { useFormatter } from '../../../../components/i18n';
 import { deleteChallenge, updateChallenge } from '../../../../actions/Challenge';
 import { useHelper } from '../../../../store';
 import { tagOptions } from '../../../../utils/Option';
+import Drawer from "../../../../components/common/Drawer";
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';
 
-const ChallengePopover = ({ challenge, documents, onRemoveChallenge }) => {
+const ChallengePopover = ({ challenge, documents, onRemoveChallenge, inline }) => {
   // utils
   const dispatch = useDispatch();
   const { t } = useFormatter();
@@ -116,25 +117,37 @@ const ChallengePopover = ({ challenge, documents, onRemoveChallenge }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog
-        TransitionComponent={Transition}
-        open={openEdit}
-        onClose={handleCloseEdit}
-        fullWidth={true}
-        maxWidth="md"
-        PaperProps={{ elevation: 1 }}
-      >
-        <DialogTitle>{t('Update the challenge')}</DialogTitle>
-        <DialogContent>
+
+      {inline ? (
+        <Dialog
+          open={openEdit}
+          handleClose={handleCloseEdit}
+          title={t('Update the challenge')}
+        >
           <ChallengeForm
-            editing={true}
+            editing
             onSubmit={onSubmitEdit}
             handleClose={handleCloseEdit}
             initialValues={initialValues}
             documentsIds={(documents || []).map((i) => i.document_id)}
           />
-        </DialogContent>
-      </Dialog>
+        </Dialog>
+      ) : (
+        <Drawer
+          open={openEdit}
+          handleClose={handleCloseEdit}
+          title={t('Update the challenge')}
+        >
+          <ChallengeForm
+            editing
+            onSubmit={onSubmitEdit}
+            handleClose={handleCloseEdit}
+            initialValues={initialValues}
+            documentsIds={(documents || []).map((i) => i.document_id)}
+          />
+        </Drawer>
+      )}
+
       <Dialog
         open={openRemove}
         TransitionComponent={Transition}

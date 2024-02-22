@@ -151,7 +151,7 @@ const EndpointPopover: React.FC<Props> = ({
         >
           <EndpointForm
             initialValues={initialValues}
-            editing={true}
+            editing
             onSubmit={submitEdit}
             handleClose={() => setEdition(false)}
           />

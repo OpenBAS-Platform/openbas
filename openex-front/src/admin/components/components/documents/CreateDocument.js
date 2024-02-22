@@ -3,13 +3,14 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import withStyles from '@mui/styles/withStyles';
-import { Dialog, DialogContent, DialogTitle, Fab, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Fab, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import DocumentForm from './DocumentForm';
 import { addDocument, fetchDocument } from '../../../../actions/Document';
 import inject18n from '../../../../components/i18n';
-import Transition from '../../../../components/common/Transition';
 import { DocumentContext } from '../Context';
+import Drawer from "../../../../components/common/Drawer";
+import Dialog from "../../../../components/common/Dialog";
 
 const styles = (theme) => ({
   createButton: {
@@ -89,24 +90,33 @@ const CreateDocument = (props) => {
           <Add />
         </Fab>
       )}
-      <Dialog
-        open={open}
-        TransitionComponent={Transition}
-        fullWidth
-        maxWidth="md"
-        onClose={() => setOpen(false)}
-        PaperProps={{ elevation: 1 }}
-      >
-        <DialogTitle>{t('Create a new document')}</DialogTitle>
-        <DialogContent>
+      {inline ? (
+        <Dialog
+          open={open}
+          handleClose={() => setOpen(false)}
+          title={t('Create a new document')}
+        >
           <DocumentForm
             initialValues={initialValues}
             onSubmit={onSubmit}
             handleClose={() => setOpen(false)}
             filters={filters}
           />
-        </DialogContent>
-      </Dialog>
+        </Dialog>
+      ) : (
+        <Drawer
+          open={open}
+          handleClose={() => setOpen(false)}
+          title={t('Create a new document')}
+        >
+          <DocumentForm
+            initialValues={initialValues}
+            onSubmit={onSubmit}
+            handleClose={() => setOpen(false)}
+            filters={filters}
+          />
+        </Drawer>
+      )}
     </>
   );
 };

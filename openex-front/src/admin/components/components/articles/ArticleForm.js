@@ -345,6 +345,7 @@ const ArticleForm = ({
                     />
                     <ListItemSecondaryAction>
                       <DocumentPopover
+                        inline
                         document={document}
                         removeChoice={t('Remove from the media pressure')}
                         onRemoveDocument={handleRemoveDocument}

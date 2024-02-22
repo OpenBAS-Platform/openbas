@@ -445,7 +445,6 @@ class Documents extends Component {
             </ListItem>
           ))}
         </List>
-        {/* // TODO: no exercise ? */}
         {userAdmin && <CreateDocument />}
       </div>
     );

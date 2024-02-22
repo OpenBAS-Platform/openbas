@@ -1,17 +1,13 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Fab, Dialog, DialogTitle, DialogContent, Slide, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Dialog, Fab, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useFormatter } from '../../../../components/i18n';
 import { addChallenge } from '../../../../actions/Challenge';
 import ChallengeForm from './ChallengeForm';
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
+import Drawer from "../../../../components/common/Drawer";
 
 const useStyles = makeStyles((theme) => ({
   createButton: {
@@ -75,24 +71,34 @@ const CreateChallenge = (props) => {
           <Add />
         </Fab>
       )}
-      <Dialog
-        open={open}
-        TransitionComponent={Transition}
-        onClose={handleClose}
-        fullWidth={true}
-        maxWidth="md"
-        PaperProps={{ elevation: 1 }}
-      >
-        <DialogTitle>{t('Create a new challenge')}</DialogTitle>
-        <DialogContent>
+
+      {inline ? (
+        <Dialog
+          open={open}
+          handleClose={() => setOpen(false)}
+          title={t('Create a new challenge')}
+        >
           <ChallengeForm
             editing={false}
             onSubmit={onSubmit}
             handleClose={handleClose}
             initialValues={{ challenge_tags: [] }}
           />
-        </DialogContent>
-      </Dialog>
+        </Dialog>
+      ) : (
+        <Drawer
+          open={open}
+          handleClose={() => setOpen(false)}
+          title={t('Create a new challenge')}
+        >
+          <ChallengeForm
+            editing={false}
+            onSubmit={onSubmit}
+            handleClose={handleClose}
+            initialValues={{ challenge_tags: [] }}
+          />
+        </Drawer>
+      )}
     </div>
   );
 };
