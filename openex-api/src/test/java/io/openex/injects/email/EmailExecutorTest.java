@@ -2,6 +2,7 @@ package io.openex.injects.email;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.contract.Contract;
+import io.openex.contract.ContractService;
 import io.openex.database.model.Execution;
 import io.openex.database.model.Inject;
 import io.openex.database.model.InjectExpectation;
@@ -11,7 +12,6 @@ import io.openex.execution.ExecutableInject;
 import io.openex.execution.ExecutionContext;
 import io.openex.injects.email.model.EmailContent;
 import io.openex.model.inject.form.Expectation;
-import io.openex.service.ContractService;
 import io.openex.service.ExecutionContextService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
