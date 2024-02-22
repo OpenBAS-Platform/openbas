@@ -1,6 +1,7 @@
 package io.openex.helper;
 
 import io.openex.contract.Contract;
+import io.openex.contract.ContractService;
 import io.openex.database.model.*;
 import io.openex.database.repository.DryInjectRepository;
 import io.openex.database.repository.InjectRepository;
@@ -8,7 +9,6 @@ import io.openex.database.specification.DryInjectSpecification;
 import io.openex.database.specification.InjectSpecification;
 import io.openex.execution.ExecutableInject;
 import io.openex.execution.ExecutionContext;
-import io.openex.service.ContractService;
 import io.openex.service.ExecutionContextService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;

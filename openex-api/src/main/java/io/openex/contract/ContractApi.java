@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.InputStream;
@@ -49,9 +51,19 @@ public class ContractApi extends RestBehavior {
             @ApiResponse(responseCode = "200", description = "Page of contracts"),
             @ApiResponse(responseCode = "400", description = "Bad parameters")
     })
-    public Page<Contract> getExposedContracts(@RequestParam @Min(0) int page, //TODO Object for page
-                                              @RequestParam @Max(10) int size) {
-        return contractService.getExposedContracts(PageRequest.of(page, size));
+    //TODO ContractDTO
+    public Page<Contract> searchExposedContracts(@RequestParam(required = false) String type,
+                                                 @RequestParam(defaultValue = "true") boolean exposedContractsOnly,
+                                                 @RequestParam(required = false) String textSearch,
+                                                 @RequestParam(defaultValue = "type") String sortBy,
+                                                 @RequestParam(defaultValue = "asc") String sortOrder,
+                                                 @RequestParam @Min(0) int page,
+                                                 @RequestParam @Max(10) int size) {
+
+        Sort sort = sortOrder.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return contractService.searchContracts(type, exposedContractsOnly, textSearch, pageable);
     }
 
     @GetMapping("/images")

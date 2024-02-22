@@ -2,6 +2,7 @@ package io.openex.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.contract.Contract;
+import io.openex.contract.ContractService;
 import io.openex.database.model.Exercise;
 import io.openex.database.model.Inject;
 import io.openex.database.model.User;
@@ -11,12 +12,12 @@ import io.openex.execution.ExecutionContext;
 import io.openex.execution.Injector;
 import io.openex.injects.email.EmailContract;
 import io.openex.injects.email.model.EmailContent;
+import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
