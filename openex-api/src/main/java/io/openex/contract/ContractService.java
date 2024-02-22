@@ -1,9 +1,5 @@
-package io.openex.service;
+package io.openex.contract;
 
-import io.openex.config.SessionHelper;
-import io.openex.contract.Contract;
-import io.openex.contract.ContractConfig;
-import io.openex.contract.Contractor;
 import io.openex.contract.fields.ContractElement;
 import io.openex.database.model.Inject;
 import io.openex.helper.SupportedLanguage;
@@ -13,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -27,10 +22,9 @@ import java.util.stream.Collectors;
 public class ContractService {
 
     private static final Logger LOGGER = Logger.getLogger(ContractService.class.getName());
-    private SupportedLanguage supportedLanguage;
-
     @Getter
     private final Map<String, Contract> contracts = new HashMap<>();
+    private SupportedLanguage supportedLanguage;
     private List<Contractor> baseContracts;
 
     @Autowired
@@ -76,21 +70,25 @@ public class ContractService {
         return this.contracts.get(inject.getContract());
     }
 
-
     /**
      * Retrieves a paginated list of contracts.
      *
-     * @param pageable the pagination information
+     * @param type                 The type of contract to search for. Can be {@code null}.
+     * @param exposedContractsOnly Whether to include only contracts that are exposed.
+     * @param textSearch           The text to search for within contracts. Can be {@code null}.
+     * @param pageable             The pagination information
      * @return a {@link Page} containing the contracts for the requested page
      */
     public Page<Contract> searchContracts(String type,
                                           boolean exposedContractsOnly,
                                           String textSearch,
+                                          String sortBy,
+                                          String sortOrder,
                                           Pageable pageable) {
 
-        supportedLanguage = SupportedLanguage.valueOf(SessionHelper.currentUser().getLang());
+        supportedLanguage = SupportedLanguage.en;
 
-        List<Contract> exposedContracts = searchContracts(type, exposedContractsOnly, textSearch, pageable.getSort());
+        List<Contract> exposedContracts = searchContracts(type, exposedContractsOnly, textSearch, sortBy, sortOrder);
 
         int currentPage = pageable.getPageNumber();
         int pageSize = pageable.getPageSize();
@@ -114,24 +112,52 @@ public class ContractService {
      * @param textSearch           The text to search for within contracts. Can be {@code null}.
      * @return A list of contracts matching the search criteria.
      */
-    private List<Contract> searchContracts(String type, boolean exposedContractsOnly, String textSearch, Sort sort) {
+    private List<Contract> searchContracts(String type, boolean exposedContractsOnly, String textSearch, String sortBy, String sortOrder) {
         return getContracts().values().stream()
                 .filter(contract -> (!exposedContractsOnly || contract.getConfig().isExpose())
-                        && Optional.ofNullable(type).map(t -> contractContainsType(contract, t)).orElse(true)
-                        && Optional.ofNullable(textSearch).map(ts -> contractContainsText(contract, ts)).orElse(true))
-                .sorted(Comparator.comparing(c -> c.getConfig().getLabel().get(supportedLanguage)))
+                        && Optional.ofNullable(type).map(typeLabel -> contractContainsType(contract, typeLabel)).orElse(true)
+                        && Optional.ofNullable(textSearch).map(text -> contractContainsText(contract, text)).orElse(true))
+                .sorted(getComparator(sortBy, sortOrder))
                 .toList();
+    }
+
+    /**
+     * Gets a comparator based on the specified sorting criteria.
+     *
+     * @param sortBy    The property by which to sort contracts.
+     * @param sortOrder The sorting order. Use "asc" for ascending order, "desc" for descending order.
+     * @return A comparator for sorting contracts based on the specified criteria.
+     */
+    private Comparator<Contract> getComparator(String sortBy, String sortOrder) {
+        Comparator<Contract> comparator = Comparator.comparing(contract -> getValueForComparisonFromCustomKeyExtractor(contract, sortBy));
+        return sortOrder.equalsIgnoreCase("desc") ? comparator.reversed() : comparator;
+    }
+
+    /**
+     * Retrieves the value for comparison based on the specified key extractor.
+     *
+     * @param contract The contract object from which to extract the value.
+     * @param sortBy   The property by which to sort the contracts.
+     * @return The value extracted from the contract for comparison based on the specified key extractor.
+     */
+    private String getValueForComparisonFromCustomKeyExtractor(Contract contract, String sortBy) {
+        switch (sortBy) {
+            case "label":
+                return contract.getLabel().get(supportedLanguage);
+            default: //"type"
+                return contract.getConfig().getLabel().get(supportedLanguage);
+        }
     }
 
     /**
      * Checks if the specified type is contained within the given Contract.
      *
-     * @param contract The Contract object to search within.
-     * @param type     The type to check for within the Contract.
+     * @param contract  The Contract object to search within.
+     * @param typeLabel The type to check for within the Contract.
      * @return {@code true} if the type is found within the Contract, {@code false} otherwise.
      */
-    private boolean contractContainsType(Contract contract, String type) {
-        return contract.getConfig().getLabel().get(supportedLanguage).equals(type);
+    private boolean contractContainsType(Contract contract, String typeLabel) {
+        return contract.getConfig().getLabel().get(supportedLanguage).equals(typeLabel);
     }
 
     /**

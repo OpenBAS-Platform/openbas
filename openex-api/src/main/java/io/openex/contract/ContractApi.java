@@ -1,9 +1,6 @@
-package io.openex.rest.contract;
+package io.openex.contract;
 
-import io.openex.contract.Contract;
-import io.openex.contract.ContractConfig;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.service.ContractService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
@@ -17,7 +14,6 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.InputStream;
@@ -60,10 +56,8 @@ public class ContractApi extends RestBehavior {
                                                  @RequestParam @Min(0) int page,
                                                  @RequestParam @Max(10) int size) {
 
-        Sort sort = sortOrder.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        return contractService.searchContracts(type, exposedContractsOnly, textSearch, pageable);
+        Pageable pageable = PageRequest.of(page, size);
+        return contractService.searchContracts(type, exposedContractsOnly, textSearch, sortBy, sortOrder, pageable);
     }
 
     @GetMapping("/images")
