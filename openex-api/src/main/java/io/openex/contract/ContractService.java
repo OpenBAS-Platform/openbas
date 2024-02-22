@@ -18,14 +18,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import static io.openex.config.SessionHelper.currentUser;
+
 @Service
 public class ContractService {
 
     private static final Logger LOGGER = Logger.getLogger(ContractService.class.getName());
+    public static final String DESCENDING = "desc";
+    public static final String LABEL = "label";
+
     @Getter
     private final Map<String, Contract> contracts = new HashMap<>();
-    private SupportedLanguage supportedLanguage;
     private List<Contractor> baseContracts;
+    private SupportedLanguage supportedLanguage;
 
     @Autowired
     public void setBaseContracts(List<Contractor> baseContracts) {
@@ -86,7 +91,7 @@ public class ContractService {
                                           String sortOrder,
                                           Pageable pageable) {
 
-        supportedLanguage = SupportedLanguage.en;
+        supportedLanguage = SupportedLanguage.valueOf(currentUser().getLang());//SupportedLanguage.en;
 
         List<Contract> exposedContracts = searchContracts(type, exposedContractsOnly, textSearch, sortBy, sortOrder);
 
@@ -130,7 +135,7 @@ public class ContractService {
      */
     private Comparator<Contract> getComparator(String sortBy, String sortOrder) {
         Comparator<Contract> comparator = Comparator.comparing(contract -> getValueForComparisonFromCustomKeyExtractor(contract, sortBy));
-        return sortOrder.equalsIgnoreCase("desc") ? comparator.reversed() : comparator;
+        return sortOrder.equalsIgnoreCase(DESCENDING) ? comparator.reversed() : comparator;
     }
 
     /**
@@ -142,7 +147,7 @@ public class ContractService {
      */
     private String getValueForComparisonFromCustomKeyExtractor(Contract contract, String sortBy) {
         switch (sortBy) {
-            case "label":
+            case LABEL:
                 return contract.getLabel().get(supportedLanguage);
             default: //"type"
                 return contract.getConfig().getLabel().get(supportedLanguage);
