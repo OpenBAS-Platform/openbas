@@ -30,6 +30,9 @@
     "src/static/ext/*",
     "__generated__"
   ],
+  "exclude": [
+    "src/static/geo/countries.json"
+  ],
   "references": [
     {
       "path": "./tsconfig.node.json"

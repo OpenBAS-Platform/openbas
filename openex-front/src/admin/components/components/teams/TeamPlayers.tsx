@@ -10,7 +10,7 @@ import SearchFilter from '../../../../components/SearchFilter';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import ItemTags from '../../../../components/ItemTags';
 import PlayerPopover from '../../teams/players/PlayerPopover';
-import TeamAddPlayers from '../../teams/teams/TeamAddPlayers';
+import TeamAddPlayers from './TeamAddPlayers';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchTeamPlayers } from '../../../../actions/teams/team-actions';
 import { fetchOrganizations } from '../../../../actions/Organization';
@@ -204,10 +204,15 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
         ),
     ),
     R.filter(filterByKeyword),
-    checkUserEnabled && R.map((user: UserStore) => ({
-      user_enabled: checkUserEnabled(teamId, user.user_id),
-      ...user,
-    })),
+    R.map((user: UserStore) => {
+      if (checkUserEnabled) {
+        return ({
+          user_enabled: checkUserEnabled(teamId, user.user_id),
+          ...user,
+        });
+      }
+      return user;
+    }),
     sort,
   )(users);
 

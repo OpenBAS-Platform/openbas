@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface CreateTeamProps {
-  inline: boolean;
+  inline?: boolean;
   onCreate: (result: string) => void;
 }
 

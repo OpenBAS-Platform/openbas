@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import React from 'react';
+import React, { useContext } from 'react';
 import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
@@ -10,10 +10,11 @@ import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import type { TeamStore } from '../../../../../actions/teams/Team';
 import Teams from '../../../components/teams/Teams';
-import { TeamContext, TeamContextType } from '../../../components/Context';
+import { PermissionsContext, TeamContext, TeamContextType } from '../../../components/Context';
 import type { Team, TeamCreateInput } from '../../../../../utils/api-types';
 import { addTeam } from '../../../../../actions/teams/team-actions';
 import type { UserStore } from '../../../teams/players/Player';
+import AddTeams from '../../../components/teams/AddTeams';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -35,6 +36,8 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
   const { teams }: { scenario: ScenarioStore, teams: TeamStore[] } = useHelper((helper: ScenariosHelper) => ({
     teams: helper.getScenarioTeams(scenarioId),
   }));
+
+  const { permissions } = useContext(PermissionsContext);
 
   useDataLoader(() => {
     dispatch(fetchScenarioTeams(scenarioId));
@@ -65,11 +68,14 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
     },
   };
 
+  const teamIds = teams.map((t) => t.team_id);
+
   return (
     <TeamContext.Provider value={context}>
       <div className={classes.container}>
         <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
-        <Teams currentTeamIds={teams.map((t) => t.team_id)} />
+        <Teams teamIds={teamIds} />
+        {permissions.canWrite && <AddTeams addedTeamIds={teamIds} />}
       </div>
     </TeamContext.Provider>
   );

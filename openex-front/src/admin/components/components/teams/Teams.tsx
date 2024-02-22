@@ -20,7 +20,6 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import TeamPlayers from './TeamPlayers';
 import { PermissionsContext, TeamContext } from '../Context';
-import AddTeams from './AddTeams';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -144,14 +143,14 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  currentTeamIds?: Team['team_id'][];
+  teamIds: Team['team_id'][];
 }
 
 interface TeamStoreExtended extends TeamStore {
   team_users_enabled_number: number
 }
 
-const Teams: React.FC<Props> = ({ currentTeamIds = [] }) => {
+const Teams: React.FC<Props> = ({ teamIds }) => {
   // Standard hooks
   const dispatch = useAppDispatch();
   const classes = useStyles();
@@ -175,7 +174,7 @@ const Teams: React.FC<Props> = ({ currentTeamIds = [] }) => {
     'description',
   ]);
 
-  const sortedTeams = filtering.filterAndSort(teams.filter((team) => currentTeamIds.includes(team.team_id)).map((team) => {
+  const sortedTeams = filtering.filterAndSort(teams.filter((team) => teamIds.includes(team.team_id)).map((team) => {
     if (computeTeamUsersEnabled) {
       return ({
         team_users_enabled_number: computeTeamUsersEnabled(team.team_id),
@@ -378,7 +377,6 @@ const Teams: React.FC<Props> = ({ currentTeamIds = [] }) => {
           />
         )}
       </Drawer>
-      {permissions.canWrite && <AddTeams currentTeamIds={currentTeamIds} />}
     </>
   );
 };

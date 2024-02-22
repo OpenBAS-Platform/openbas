@@ -11,7 +11,7 @@ import TopBar from '../nav/TopBar';
 import ExerciseHeader from './ExerciseHeader';
 import type { Exercise as ExerciseType } from '../../../utils/api-types';
 import { DocumentContext, DocumentContextType, PermissionsContext, PermissionsContextType } from '../components/Context';
-import useScenarioPermissions from '../../../utils/Scenario';
+import { usePermissions } from '../../../utils/Exercise';
 
 const Exercise = lazy(() => import('./Exercise'));
 const Dryrun = lazy(() => import('./controls/Dryrun'));
@@ -20,7 +20,7 @@ const Dashboard = lazy(() => import('./dashboard/Dashboard'));
 const Lessons = lazy(() => import('./lessons/Lessons'));
 const Reports = lazy(() => import('./reports/Reports'));
 const Report = lazy(() => import('./reports/Report'));
-const Teams = lazy(() => import('./teams/Teams'));
+const ExerciseTeams = lazy(() => import('./teams/ExerciseTeams'));
 const Injects = lazy(() => import('./injects/Injects'));
 const Articles = lazy(() => import('./articles/ExerciseArticles'));
 const Challenges = lazy(() => import('./challenges/ExerciseChallenges'));
@@ -36,7 +36,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
   exercise,
 }) => {
   const permissionsContext: PermissionsContextType = {
-    permissions: useScenarioPermissions(exercise.exercise_id),
+    permissions: usePermissions(exercise.exercise_id),
   };
   const documentContext: DocumentContextType = {
     onInitDocument: () => ({
@@ -57,7 +57,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
             <Route path="" element={errorWrapper(Exercise)()} />
             <Route path="controls/dryruns/:dryrunId" element={errorWrapper(Dryrun)()} />
             <Route path="controls/comchecks/:comcheckId" element={errorWrapper(Comcheck)()} />
-            <Route path="definition/teams" element={errorWrapper(Teams)()} />
+            <Route path="definition/teams" element={errorWrapper(ExerciseTeams)()} />
             <Route path="definition/articles" element={errorWrapper(Articles)()} />
             <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
             <Route path="definition/variables" element={errorWrapper(Variables)()} />

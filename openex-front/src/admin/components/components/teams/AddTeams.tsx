@@ -39,7 +39,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  currentTeamIds: Team['team_id'][];
+  addedTeamIds: Team['team_id'][];
 }
 
 interface TeamStoreExtended extends TeamStore {
@@ -47,7 +47,7 @@ interface TeamStoreExtended extends TeamStore {
   organization_description: Organization['organization_description']
 }
 
-const AddTeams: React.FC<Props> = ({ currentTeamIds }) => {
+const AddTeams: React.FC<Props> = ({ addedTeamIds }) => {
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
   const classes = useStyles();
@@ -155,7 +155,7 @@ const AddTeams: React.FC<Props> = ({ currentTeamIds }) => {
               <List>
                 {filteredTeams.map((team: TeamStoreExtended) => {
                   const disabled = teamIds.includes(team.team_id)
-                    || currentTeamIds.includes(team.team_id);
+                    || addedTeamIds.includes(team.team_id);
                   return (
                     <ListItem
                       key={team.team_id}

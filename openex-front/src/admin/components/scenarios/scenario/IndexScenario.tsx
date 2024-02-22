@@ -42,7 +42,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
         <Suspense fallback={<Loader />}>
           <Routes>
             <Route path="" element={errorWrapper(Scenario)()} />
-            <Route path="definition/teams" element={errorWrapper(Teams)()} />
+            <Route path="definition/teams" element={errorWrapper(Teams)({ scenarioTeamsUsers: scenario.scenario_teams_users })} />
             <Route path="definition/articles" element={errorWrapper(Articles)()} />
             <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
             <Route path="definition/variables" element={errorWrapper(Variables)()} />
