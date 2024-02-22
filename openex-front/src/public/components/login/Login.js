@@ -68,16 +68,18 @@ const Login = (props) => {
   const marginTop = dimension.height / 2 - loginHeight / 2 - 200;
   return (
     <div data-testid="login-page" className={classes.container} style={{ marginTop }}>
-      <img src={fileUri(theme.palette.mode === 'dark' ? logoDark : logoLight)} alt="logo" className={classes.logo} />
+      <img src={fileUri(theme.palette.mode === 'dark' ? logoDark : logoLight)} alt="logo"
+        className={classes.logo}
+      />
       {isLocal && !reset && (
         <Paper variant="outlined">
-          <LoginForm onSubmit={onSubmit} />
-          <div style={{ marginBottom: 10 }}>
+          <LoginForm onSubmit={onSubmit}/>
+          <div style={{ marginBottom: 10, cursor: 'pointer' }}>
             <a onClick={() => setReset(true)}>{t('I forgot my password')}</a>
           </div>
         </Paper>
       )}
-      {isLocal && reset && <Reset onCancel={() => setReset(false)} />}
+      {isLocal && reset && <Reset onCancel={() => setReset(false)}/>}
       <Box
         sx={{
           marginTop: 2.5,
@@ -88,16 +90,16 @@ const Login = (props) => {
         }}
       >
         {(isOpenId || isSaml2)
-          && [...(openidProviders ?? []), ...(saml2Providers ?? [])].map(
-            (provider) => (
-              <LoginSSOButton
-                key={provider.provider_name}
-                providerName={provider.provider_login}
-                providerUri={provider.provider_uri}
-              />
-            ),
-          )}
-        <LoginError />
+                    && [...(openidProviders ?? []), ...(saml2Providers ?? [])].map(
+                      (provider) => (
+                        <LoginSSOButton
+                          key={provider.provider_name}
+                          providerName={provider.provider_login}
+                          providerUri={provider.provider_uri}
+                        />
+                      ),
+                    )}
+        <LoginError/>
       </Box>
     </div>
   );
