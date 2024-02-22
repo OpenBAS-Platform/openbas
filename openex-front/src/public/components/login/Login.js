@@ -72,7 +72,7 @@ const Login = (props) => {
       {isLocal && !reset && (
         <Paper variant="outlined">
           <LoginForm onSubmit={onSubmit} />
-          <div style={{ marginBottom: 10 }}>
+          <div style={{ marginBottom: 10, cursor:"pointer" }}>
             <a onClick={() => setReset(true)}>{t('I forgot my password')}</a>
           </div>
         </Paper>
