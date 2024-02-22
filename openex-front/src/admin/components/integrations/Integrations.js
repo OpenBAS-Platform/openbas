@@ -15,7 +15,6 @@ import {
 import { useFormatter } from '../../../components/i18n';
 import { fetchPageOfContracts } from '../../../actions/Inject';
 import SearchFilter from '../../../components/SearchFilter';
-import useSearchAnFilter from '../../../utils/SortingFiltering';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -58,25 +57,19 @@ const Integrations = () => {
   const classes = useStyles();
   const { t, tPick } = useFormatter();
 
-  const [injectTypes, setInjectTypes] = useState([]);
+  const [contracts, setContracts] = useState([]);
 
-  const filtering = useSearchAnFilter(null, null, [
-    'ttype',
-    'tname',
-    'name',
-    'type',
-  ]);
-  const types = R.sortWith(
-    [R.ascend(R.prop('ttype')), R.ascend(R.prop('tname'))],
-    R.values(injectTypes)
-      .filter((type) => type.config.expose === true)
-      .map((type) => ({
-        tname: tPick(type.label),
-        ttype: tPick(type.config.label),
-        ...type,
-      })),
-  );
-  const sortedTypes = filtering.filterAndSort(types);
+  const renderedContracts = R.values(contracts).map((type) => ({
+    tname: tPick(type.label),
+    ttype: tPick(type.config.label),
+    ...type,
+  }));
+
+  // Text Search
+  const [textSearch, setTextSearch] = React.useState(null);
+  const handleTextSearch = (event, _value) => {
+    setTextSearch(event);
+  };
 
   // Pagination
   const PAGE_SIZE = 10;
@@ -84,17 +77,23 @@ const Integrations = () => {
   const [numberOfPages, setNumberOfPages] = useState(0);
   const [page, setPage] = React.useState(1);
 
-  useEffect(() => {
-    fetchPageOfContracts(page - BACKEND_PAGE_NORMALIZER, PAGE_SIZE).then((result) => {
-      const { data } = result;
-      setInjectTypes(data.content);
-      setNumberOfPages(Math.ceil(data.totalElements / PAGE_SIZE));
-    });
-  }, [page]);
-
   const handlePagination = (_event, value) => {
     setPage(value);
   };
+
+  useEffect(() => {
+    fetchPageOfContracts(
+      textSearch,
+      'label',
+      'desc',
+      page - BACKEND_PAGE_NORMALIZER,
+      PAGE_SIZE,
+    ).then((result) => {
+      const { data } = result;
+      setContracts(data.content);
+      setNumberOfPages(Math.ceil(data.totalElements / PAGE_SIZE));
+    });
+  }, [page, textSearch]);
 
   return (
     <div className={classes.root}>
@@ -102,8 +101,8 @@ const Integrations = () => {
         <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
             variant="small"
-            onChange={filtering.handleSearch}
-            keyword={filtering.keyword}
+            onChange={handleTextSearch}
+            keyword={textSearch}
           />
         </div>
         <div style={{ float: 'right', marginRight: 10 }}>
@@ -114,9 +113,9 @@ const Integrations = () => {
           />
         </div>
       </div>
-      <div className="clearfix"/>
+      <div className="clearfix" />
       <Grid container={true} spacing={3}>
-        {sortedTypes.map((type) => (
+        {renderedContracts.map((type) => (
           <Grid
             key={type.contract_id}
             item={true}
@@ -131,13 +130,13 @@ const Integrations = () => {
                 {type.fields.map((field) => (
                   <ListItem key={field.key} divider={true} dense={true}>
                     <ListItemIcon>{iconField(field.type)}</ListItemIcon>
-                    <ListItemText primary={t(field.label)}/>
+                    <ListItemText primary={t(field.label)} />
                     <Chip
                       size="small"
                       sx={{ height: 15, fontSize: 10 }}
                       label={field.mandatory ? t('Mandatory') : t('Optional')}
                       color={field.mandatory ? 'secondary' : 'primary'}
-                     />
+                    />
                   </ListItem>
                 ))}
               </List>
