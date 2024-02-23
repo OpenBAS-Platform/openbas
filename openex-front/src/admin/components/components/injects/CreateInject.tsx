@@ -5,7 +5,7 @@ import InjectForm from './InjectForm';
 import { useFormatter } from '../../../../components/i18n';
 import type { Contract } from '../../../../utils/api-types';
 import Transition from '../../../../components/common/Transition';
-import { InjectContext } from '../../components/Context';
+import { InjectContext } from '../Context';
 import type { InjectInput } from '../../../../actions/injects/Inject';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 

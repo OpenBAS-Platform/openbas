@@ -18,7 +18,7 @@ import Transition from '../../../../components/common/Transition';
 import { useHelper } from '../../../../store';
 import type { UsersHelper } from '../../../../actions/helper';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
-import { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
+import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 
 const useStyles = makeStyles<Theme>(() => ({
   createButton: {

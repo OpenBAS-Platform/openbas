@@ -39,7 +39,7 @@ import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
-import TeamPopover from '../../components/teams/TeamPopover';
+import TeamPopover from '../teams/TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddTeams from './InjectAddTeams';
 import TextField from '../../../../components/TextField';
@@ -47,22 +47,22 @@ import SwitchField from '../../../../components/SwitchField';
 import EnrichedTextField from '../../../../components/EnrichedTextField';
 import InjectAddDocuments from './InjectAddDocuments';
 import Loader from '../../../../components/Loader';
-import DocumentType from '../../components/documents/DocumentType';
-import DocumentPopover from '../../components/documents/DocumentPopover';
+import DocumentType from '../documents/DocumentType';
+import DocumentPopover from '../documents/DocumentPopover';
 import Select from '../../../../components/Select';
-import ArticlePopover from '../../components/articles/ArticlePopover';
+import ArticlePopover from '../articles/ArticlePopover';
 import InjectAddArticles from './InjectAddArticles';
-import ChannelIcon from '../../components/channels/ChannelIcon';
-import ChallengePopover from '../../components/challenges/ChallengePopover';
+import ChannelIcon from '../channels/ChannelIcon';
+import ChallengePopover from '../challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
-import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
+import AvailableVariablesDialog from '../../exercises/variables/AvailableVariablesDialog';
 import InjectExpectations from './expectations/InjectExpectations';
 import EndpointsList from '../../assets/endpoints/EndpointsList';
 import EndpointPopover from '../../assets/endpoints/EndpointPopover';
-import InjectAddEndpoints from './endpoints/InjectAddEndpoints';
+import InjectAddEndpoints from '../../exercises/injects/endpoints/InjectAddEndpoints';
 import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
 import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
-import InjectAddAssetGroups from './assetgroups/InjectAddAssetGroups';
+import InjectAddAssetGroups from '../../exercises/injects/assetgroups/InjectAddAssetGroups';
 
 const styles = (theme) => ({
   header: {
@@ -1416,22 +1416,22 @@ class InjectDefinition extends Component {
                                 >
                                   <i>{t('All teams')}</i>
                                 </div>
-                                 <div
+                                <div
                                   className={classes.bodyItem}
                                   style={inlineStyles.team_users_number}
-                                 >
+                                >
                                   <strong>
                                     {this.props.allUsersNumber}
                                   </strong>
-                                 </div>
-                                 <div
+                                </div>
+                                <div
                                   className={classes.bodyItem}
                                   style={inlineStyles.team_users_enabled_number}
-                                 >
+                                >
                                   <strong>
                                     {this.props.usersNumber}
                                   </strong>
-                                 </div>
+                                </div>
                                 <div
                                   className={classes.bodyItem}
                                   style={inlineStyles.team_tags}
@@ -1471,12 +1471,12 @@ class InjectDefinition extends Component {
                                     >
                                       {team.team_users_number}
                                     </div>
-                                     <div
+                                    <div
                                       className={classes.bodyItem}
                                       style={inlineStyles.team_users_enabled_number}
-                                     >
+                                    >
                                       {team.team_users_enabled_number}
-                                     </div>
+                                    </div>
                                     <div
                                       className={classes.bodyItem}
                                       style={inlineStyles.team_tags}

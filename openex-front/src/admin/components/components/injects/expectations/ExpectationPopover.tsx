@@ -6,7 +6,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import ExpectationFormUpdate from './ExpectationFormUpdate';
 import type { ExpectationInput } from './Expectation';
 import Dialog from '../../../../../components/common/Dialog';
-import { PermissionsContext } from '../../../components/Context';
+import { PermissionsContext } from '../../Context';
 
 interface ExpectationPopoverProps {
   index: number;

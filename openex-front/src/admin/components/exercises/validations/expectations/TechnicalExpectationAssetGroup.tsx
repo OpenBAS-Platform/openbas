@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { PublishedWithChangesOutlined } from '@mui/icons-material';
-import type { InjectExpectationsStore } from '../../injects/expectations/Expectation';
+import type { InjectExpectationsStore } from '../../../components/injects/expectations/Expectation';
 import type { Contract } from '../../../../../utils/api-types';
 import ExpectationLine from './ExpectationLine';
 

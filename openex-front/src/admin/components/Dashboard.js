@@ -21,7 +21,7 @@ import { storeHelper } from '../../actions/Schema';
 import ItemNumberDifference from '../../components/ItemNumberDifference';
 import Empty from '../../components/Empty';
 import { colors, horizontalBarsChartOptions } from '../../utils/Charts';
-import InjectIcon from './exercises/injects/InjectIcon';
+import InjectIcon from './components/injects/InjectIcon';
 import ProgressBarCountdown from '../../components/ProgressBarCountdown';
 import { computeLevel } from '../../utils/Countries';
 

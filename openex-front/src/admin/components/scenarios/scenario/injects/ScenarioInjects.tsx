@@ -21,7 +21,7 @@ import {
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
 import type { Inject } from '../../../../../utils/api-types';
-import Injects from '../../../exercises/injects/Injects';
+import Injects from '../../../components/injects/Injects';
 import { articleContextForScenario } from '../articles/ScenarioArticles';
 
 interface Props {
@@ -72,9 +72,10 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
     <InjectContext.Provider value={context}>
       <ArticleContext.Provider value={articleContext}>
         <Injects injects={injects} teams={teams} articles={articles}
-                 variables={variables} uriVariable={`/admin/scenarios/${scenarioId}/definition/variables`}
-                 allUsersNumber={scenario.scenario_all_users_number} usersNumber={scenario.scenario_users_number}
-                 teamsUsers={scenario.scenario_teams_users} />
+          variables={variables} uriVariable={`/admin/scenarios/${scenarioId}/definition/variables`}
+          allUsersNumber={scenario.scenario_all_users_number} usersNumber={scenario.scenario_users_number}
+          teamsUsers={scenario.scenario_teams_users}
+        />
       </ArticleContext.Provider>
     </InjectContext.Provider>
   );

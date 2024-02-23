@@ -1,23 +1,23 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
 import * as R from 'ramda';
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { ControlPointOutlined, EmojiEventsOutlined } from '@mui/icons-material';
+import { ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import SearchFilter from '../../../../components/SearchFilter';
 import { useFormatter } from '../../../../components/i18n';
-import { fetchChallenges } from '../../../../actions/Challenge';
-import CreateChallenge from '../../components/challenges/CreateChallenge';
+import { fetchChannels } from '../../../../actions/channels/channel-action';
+import CreateArticle from '../articles/CreateArticle';
 import { truncate } from '../../../../utils/String';
 import Transition from '../../../../components/common/Transition';
-import TagsFilter from '../../../../components/TagsFilter';
+import ChannelIcon from '../channels/ChannelIcon';
 import type { Theme } from '../../../../components/Theme';
-import type { Option } from '../../../../utils/Option';
-import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { PermissionsContext } from '../Context';
+import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
-import type { ChallengesHelper } from '../../../../actions/helper';
-import { PermissionsContext } from '../../components/Context';
-import type { Challenge } from '../../../../utils/api-types';
+import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
+import type { ArticlesHelper } from '../../../../actions/channels/article-helper';
+import type { ArticleStore, FullArticleStore } from '../../../../actions/channels/Article';
 
 const useStyles = makeStyles((theme: Theme) => ({
   box: {
@@ -41,13 +41,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  handleAddChallenges: (challengeIds: string[]) => void;
-  injectChallengesIds: string[];
+  articles: ArticleStore[];
+  handleAddArticles: (articleIds: string[]) => void;
+  injectArticlesIds: string[];
 }
 
-const InjectAddChallenges: FunctionComponent<Props> = ({
-  handleAddChallenges,
-  injectChallengesIds,
+const InjectAddArticles: FunctionComponent<Props> = ({
+  articles,
+  handleAddArticles,
+  injectArticlesIds,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -55,79 +57,58 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
 
-  const { challenges, challengesMap } = useHelper((helper: ChallengesHelper) => ({
-    challenges: helper.getChallenges(),
-    challengesMap: helper.getChallengesMap(),
+  const { articlesMap, channelsMap } = useHelper((helper: ArticlesHelper & ChannelsHelper) => ({
+    articlesMap: helper.getArticlesMap(),
+    channelsMap: helper.getChannelsMap(),
   }));
 
   useDataLoader(() => {
-    dispatch(fetchChallenges());
+    dispatch(fetchChannels());
   });
 
   const [open, setopen] = useState(false);
   const [keyword, setKeyword] = useState('');
-  const [challengesIds, setChallengesIds] = useState<string[]>([]);
-  const [tags, setTags] = useState<Option[]>([]);
+  const [articleIds, setArticleIds] = useState<string[]>([]);
 
   const handleOpen = () => setopen(true);
 
   const handleClose = () => {
     setopen(false);
     setKeyword('');
-    setChallengesIds([]);
+    setArticleIds([]);
   };
 
-  const handleSearchChallenges = (value: string) => {
+  const handleSearchArticles = (value: string) => {
     setKeyword(value);
   };
 
-  const handleAddTag = (value: Option) => {
-    if (value) {
-      setTags([value]);
-    }
-  };
+  const addArticle = (articleId: string) => setArticleIds(R.append(articleId, articleIds));
 
-  const handleClearTag = () => {
-    setTags([]);
-  };
+  const removeArticle = (articleId: string) => setArticleIds(articleIds.filter((u) => u !== articleId));
 
-  const addChallenge = (challengeId: string) => {
-    setChallengesIds(R.append(challengeId, challengesIds));
-  };
-
-  const removeChallenge = (challengeId: string) => {
-    setChallengesIds(challengesIds.filter((u) => u !== challengeId));
-  };
-
-  const submitAddChallenges = () => {
-    handleAddChallenges(challengesIds);
+  const submitAddArticles = () => {
+    handleAddArticles(articleIds);
     handleClose();
   };
 
   const onCreate = (result: string) => {
-    addChallenge(result);
+    addArticle(result);
   };
 
-  const filterByKeyword = (n: Challenge) => keyword === ''
-    || (n.challenge_name || '').toLowerCase().indexOf(keyword.toLowerCase())
+  const filterByKeyword = (n: FullArticleStore) => keyword === ''
+    || (n.article_name || '').toLowerCase().indexOf(keyword.toLowerCase())
     !== -1
-    || (n.challenge_content || '')
-      .toLowerCase()
-      .indexOf(keyword.toLowerCase()) !== -1
-    || (n.challenge_category || '')
+    || (n.article_fullchannel?.channel_name || '')
       .toLowerCase()
       .indexOf(keyword.toLowerCase()) !== -1;
-  const filteredChallenges = R.pipe(
-    R.filter(
-      (n: Challenge) => tags.length === 0
-        || R.any(
-          (filter: string) => R.includes(filter, n.challenge_tags),
-          R.pluck('id', tags),
-        ),
-    ),
+  const fullArticles = articles.map((item) => ({
+    ...item,
+    article_fullchannel: item.article_channel ? channelsMap[item.article_channel] : {},
+  }));
+  const filteredArticles = R.pipe(
     R.filter(filterByKeyword),
     R.take(10),
-  )(challenges);
+  )(fullArticles);
   return (
     <div>
       <ListItem
@@ -142,7 +123,7 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
           <ControlPointOutlined color="primary" />
         </ListItemIcon>
         <ListItemText
-          primary={t('Add challenges')}
+          primary={t('Add channel pressure')}
           classes={{ primary: classes.text }}
         />
       </ListItem>
@@ -160,50 +141,45 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
           },
         }}
       >
-        <DialogTitle>{t('Add challenge in this inject')}</DialogTitle>
+        <DialogTitle>{t('Add media pressure in this inject')}</DialogTitle>
         <DialogContent>
           <Grid container spacing={3} style={{ marginTop: -15 }}>
             <Grid item xs={8}>
               <Grid container spacing={3}>
                 <Grid item xs={6}>
                   <SearchFilter
-                    onChange={handleSearchChallenges}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TagsFilter
-                    onAddTag={handleAddTag}
-                    onClearTag={handleClearTag}
-                    currentTags={tags}
+                    onChange={handleSearchArticles}
                     fullWidth
                   />
                 </Grid>
               </Grid>
               <List>
-                {filteredChallenges.map((challenge: Challenge) => {
-                  const disabled = challengesIds.includes(challenge.challenge_id)
-                    || injectChallengesIds.includes(challenge.challenge_id);
+                {filteredArticles.map((article: FullArticleStore) => {
+                  const disabled = articleIds.includes(article.article_id)
+                    || injectArticlesIds.includes(article.article_id);
                   return (
                     <ListItem
-                      key={challenge.challenge_id}
+                      key={article.article_id}
                       disabled={disabled}
                       button
                       divider
                       dense
-                      onClick={() => addChallenge(challenge.challenge_id)}
+                      onClick={() => addArticle(article.article_id)}
                     >
                       <ListItemIcon>
-                        <EmojiEventsOutlined />
+                        <ChannelIcon
+                          type={article.article_fullchannel.channel_type}
+                          variant="inline"
+                        />
                       </ListItemIcon>
                       <ListItemText
-                        primary={challenge.challenge_name}
-                        secondary={challenge.challenge_category}
+                        primary={article.article_name}
+                        secondary={article.article_author}
                       />
                     </ListItem>
                   );
                 })}
-                <CreateChallenge
+                <CreateArticle
                   inline
                   onCreate={onCreate}
                 />
@@ -211,14 +187,19 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
             </Grid>
             <Grid item xs={4}>
               <Box className={classes.box}>
-                {challengesIds.map((challengeId) => {
-                  const challenge = challengesMap[challengeId];
+                {articleIds.map((articleId) => {
+                  const article = articlesMap[articleId];
+                  const channel = article
+                    ? channelsMap[article.article_channel] || {}
+                    : {};
                   return (
                     <Chip
-                      key={challengeId}
-                      onDelete={() => removeChallenge(challengeId)}
-                      label={truncate(challenge?.challenge_name || '', 22)}
-                      icon={<EmojiEventsOutlined />}
+                      key={articleId}
+                      onDelete={() => removeArticle(articleId)}
+                      label={truncate(article?.article_name, 22)}
+                      icon={
+                        <ChannelIcon type={channel.channel_type} variant="chip" />
+                      }
                       classes={{ root: classes.chip }}
                     />
                   );
@@ -231,7 +212,7 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
           <Button onClick={handleClose}>{t('Cancel')}</Button>
           <Button
             color="secondary"
-            onClick={submitAddChallenges}
+            onClick={submitAddArticles}
           >
             {t('Add')}
           </Button>
@@ -241,4 +222,4 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
   );
 };
 
-export default InjectAddChallenges;
+export default InjectAddArticles;

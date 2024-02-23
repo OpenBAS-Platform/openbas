@@ -14,7 +14,7 @@ import {
 } from '../../../../actions/Inject';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import Injects from './Injects';
+import Injects from '../../components/injects/Injects';
 import { secondsFromToNow } from '../../../../utils/Exercise';
 import { fetchExerciseTeams } from '../../../../actions/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
@@ -23,6 +23,7 @@ import type { ChallengesHelper } from '../../../../actions/helper';
 import type { VariablesHelper } from '../../../../actions/variables/variable-helper';
 import { fetchVariablesForExercise } from '../../../../actions/variables/variable-actions';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
+import { fetchExerciseArticles } from '../../../../actions/channels/article-action';
 
 interface Props {
 
@@ -47,6 +48,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
   useDataLoader(() => {
     dispatch(fetchExerciseInjects(exerciseId));
     dispatch(fetchExerciseTeams(exerciseId));
+    dispatch(fetchExerciseArticles(exerciseId));
     dispatch(fetchInjectTypes());
     dispatch(fetchVariablesForExercise(exerciseId));
   });
@@ -78,9 +80,10 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
   return (
     <InjectContext.Provider value={context}>
       <Injects injects={injects} teams={teams} articles={articles} variables={variables}
-               uriVariable={`/admin/exercises/${exerciseId}/definition/variables`}
-               allUsersNumber={exercise.exercise_all_users_number} usersNumber={exercise.exercise_users_number}
-               teamsUsers={exercise.exercise_teams_users}/>
+        uriVariable={`/admin/exercises/${exerciseId}/definition/variables`}
+        allUsersNumber={exercise.exercise_all_users_number} usersNumber={exercise.exercise_users_number}
+        teamsUsers={exercise.exercise_teams_users}
+      />
     </InjectContext.Provider>
   );
 };

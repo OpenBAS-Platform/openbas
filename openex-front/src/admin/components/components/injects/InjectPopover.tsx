@@ -23,7 +23,7 @@ import { splitDuration } from '../../../../utils/Time';
 import { tagOptions } from '../../../../utils/Option';
 import Transition from '../../../../components/common/Transition';
 import type { InjectInput, InjectStore } from '../../../../actions/injects/Inject';
-import { InjectContext, PermissionsContext } from '../../components/Context';
+import { InjectContext, PermissionsContext } from '../Context';
 import type { Contract, ExecutionTrace, Inject, InjectStatus, Tag } from '../../../../utils/api-types';
 import { tryInject } from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';

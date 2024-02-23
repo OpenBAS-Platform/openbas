@@ -19,7 +19,7 @@ import { useHelper } from '../../../../store';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import { exportData } from '../../../../utils/Environment';
 import Loader from '../../../../components/Loader';
-import { InjectContext, PermissionsContext } from '../../components/Context';
+import { InjectContext, PermissionsContext } from '../Context';
 
 const useStyles = makeStyles(() => ({
   container: {
