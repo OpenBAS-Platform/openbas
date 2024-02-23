@@ -16,7 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static io.openex.injects.http.HttpContract.HTTP_GET_CONTRACT;
+import static io.openex.injects.email.EmailContract.EMAIL_DEFAULT;
 import static io.openex.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openex.rest.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,7 +65,7 @@ public class InjectApiTest {
 
     InjectInput input = new InjectInput();
     input.setTitle("Test inject");
-    input.setContract(HTTP_GET_CONTRACT);
+    input.setContract(EMAIL_DEFAULT);
     input.setDependsDuration(0L);
 
     // -- EXECUTE --

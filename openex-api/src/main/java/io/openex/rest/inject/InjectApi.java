@@ -366,7 +366,7 @@ public class InjectApi extends RestBehavior {
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
-  @PreAuthorize("isExercisePlanner(#scenarioId)")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Inject updateInjectForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String injectId,
@@ -385,7 +385,7 @@ public class InjectApi extends RestBehavior {
   }
 
   @PutMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}/activation")
-  @PreAuthorize("isExercisePlanner(#scenarioId)")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Inject updateInjectActivationForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String injectId,
