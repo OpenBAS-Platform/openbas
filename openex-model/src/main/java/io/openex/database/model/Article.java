@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -30,6 +31,7 @@ public class Article implements Base {
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("article_id")
+    @NotBlank
     private String id;
 
     @Column(name = "article_created_at")

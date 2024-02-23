@@ -262,7 +262,7 @@ public class Inject implements Base, Injection {
 
   @JsonProperty("inject_date")
   public Optional<Instant> getDate() {
-    if (this.getExercise() == null || this.getScenario() == null) {
+    if (this.getExercise() == null && this.getScenario() == null) {
       log.log(Level.SEVERE, "Exercise OR Scenario should not be null");
     }
 

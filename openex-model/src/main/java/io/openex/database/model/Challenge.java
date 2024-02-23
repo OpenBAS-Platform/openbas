@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MultiIdDeserializer;
 import io.openex.helper.MultiModelDeserializer;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -29,6 +30,7 @@ public class Challenge implements Base {
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("challenge_id")
+    @NotBlank
     private String id;
 
     @Column(name = "challenge_created_at")
