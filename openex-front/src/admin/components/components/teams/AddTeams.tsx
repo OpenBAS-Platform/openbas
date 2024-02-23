@@ -81,6 +81,7 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds }) => {
     || (n.organization_name || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
     || (n.organization_description || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
   const filteredTeams = R.pipe(
+    R.filter((u: TeamStore) => !(u.team_contextual && !addedTeamIds.includes(u.team_id))),
     R.map((u: TeamStore) => ({
       organization_name:
         u.team_organization ? (organizationsMap[u.team_organization]?.organization_name ?? '-') : '-',
