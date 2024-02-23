@@ -30,7 +30,6 @@ public class ContractService {
     @Getter
     private final Map<String, Contract> contracts = new HashMap<>();
     private List<Contractor> baseContracts;
-    private SupportedLanguage supportedLanguage;
 
     @Autowired
     public void setBaseContracts(List<Contractor> baseContracts) {
@@ -91,8 +90,6 @@ public class ContractService {
                                           String sortOrder,
                                           Pageable pageable) {
 
-        supportedLanguage = SupportedLanguage.valueOf(currentUser().getLang());//SupportedLanguage.en;
-
         List<Contract> exposedContracts = searchContracts(type, exposedContractsOnly, textSearch, sortBy, sortOrder);
 
         int currentPage = pageable.getPageNumber();
@@ -107,6 +104,15 @@ public class ContractService {
         int toIndex = Math.min(startItem + pageSize, totalContracts);
         List<Contract> paginatedContracts = exposedContracts.subList(startItem, toIndex);
         return new PageImpl<>(paginatedContracts, pageable, totalContracts);
+    }
+
+    /**
+     * Retrieve lang from current user.
+     *
+     * @return A SupportLanguage
+     */
+    private SupportedLanguage getLang() {
+        return SupportedLanguage.valueOf(currentUser().getLang());//SupportedLanguage.en;
     }
 
     /**
@@ -146,11 +152,12 @@ public class ContractService {
      * @return The value extracted from the contract for comparison based on the specified key extractor.
      */
     private String getValueForComparisonFromCustomKeyExtractor(Contract contract, String sortBy) {
+        SupportedLanguage lang = getLang();
         switch (sortBy) {
             case LABEL:
-                return contract.getLabel().get(supportedLanguage);
+                return contract.getLabel().get(lang);
             default: //"type"
-                return contract.getConfig().getLabel().get(supportedLanguage);
+                return contract.getConfig().getLabel().get(lang);
         }
     }
 
@@ -162,7 +169,7 @@ public class ContractService {
      * @return {@code true} if the type is found within the Contract, {@code false} otherwise.
      */
     private boolean contractContainsType(Contract contract, String typeLabel) {
-        return contract.getConfig().getLabel().get(supportedLanguage).equals(typeLabel);
+        return contract.getConfig().getLabel().get(getLang()).equals(typeLabel);
     }
 
     /**
@@ -173,8 +180,9 @@ public class ContractService {
      * @return {@code true} if the contract contains the text, {@code false} otherwise.
      */
     private boolean contractContainsText(Contract contract, String text) {
-        return containsTextInLabel(contract.getLabel().get(supportedLanguage), text) ||
-                containsTextInLabel(contract.getConfig().getLabel().get(supportedLanguage), text) ||
+        SupportedLanguage lang = getLang();
+        return containsTextInLabel(contract.getLabel().get(lang), text) ||
+                containsTextInLabel(contract.getConfig().getLabel().get(lang), text) ||
                 containsTextInFields(contract.getFields(), text);
     }
 
