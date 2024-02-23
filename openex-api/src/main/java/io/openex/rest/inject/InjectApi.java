@@ -253,17 +253,16 @@ public class InjectApi extends RestBehavior {
 
   @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/activation")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject updateInjectActivation(@PathVariable String exerciseId, @PathVariable String injectId,
+  public Inject updateInjectActivationForExercise(
+      @PathVariable String exerciseId,
+      @PathVariable String injectId,
       @Valid @RequestBody InjectUpdateActivationInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    inject.setEnabled(input.isEnabled());
-    inject.setUpdatedAt(now());
-    return injectRepository.save(inject);
+    return updateInjectActivation(injectId, input);
   }
 
   @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/trigger")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject updateInjectActivation(@PathVariable String exerciseId, @PathVariable String injectId,
+  public Inject updateInjectTrigger(@PathVariable String exerciseId, @PathVariable String injectId,
       @Valid @RequestBody InjectUpdateTriggerInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow();
     inject.setDependsDuration(input.getDependsDuration());
@@ -385,6 +384,15 @@ public class InjectApi extends RestBehavior {
     return injectRepository.save(inject);
   }
 
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}/activation")
+  @PreAuthorize("isExercisePlanner(#scenarioId)")
+  public Inject updateInjectActivationForScenario(
+      @PathVariable @NotBlank final String scenarioId,
+      @PathVariable @NotBlank final String injectId,
+      @Valid @RequestBody InjectUpdateActivationInput input) {
+    return updateInjectActivation(injectId, input);
+  }
+
   @Transactional(rollbackOn = Exception.class)
   @DeleteMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
@@ -443,6 +451,13 @@ public class InjectApi extends RestBehavior {
     inject.setDocuments(injectDocuments);
 
     return inject;
+  }
+
+  private Inject updateInjectActivation(@NotBlank final String injectId, @NotNull final InjectUpdateActivationInput input) {
+    Inject inject = this.injectRepository.findById(injectId).orElseThrow();
+    inject.setEnabled(input.isEnabled());
+    inject.setUpdatedAt(now());
+    return injectRepository.save(inject);
   }
 
 }

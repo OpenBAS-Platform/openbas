@@ -92,13 +92,14 @@ public class ChallengeApi extends RestBehavior {
   @GetMapping("/api/challenges")
   public Iterable<Challenge> challenges() {
     return fromIterable(challengeRepository.findAll()).stream()
-        .map(challengeService::enrichChallengeWithExercises).toList();
+        .map(challengeService::enrichChallengeWithExercisesOrScenarios).toList();
   }
 
   @PreAuthorize("isPlanner()")
   @PutMapping("/api/challenges/{challengeId}")
   @Transactional(rollbackOn = Exception.class)
-  public Challenge updateChallenge(@PathVariable String challengeId,
+  public Challenge updateChallenge(
+      @PathVariable String challengeId,
       @Valid @RequestBody ChallengeUpdateInput input) {
     Challenge challenge = challengeRepository.findById(challengeId).orElseThrow();
     challenge.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
@@ -118,7 +119,7 @@ public class ChallengeApi extends RestBehavior {
       challengeFlags.add(challengeFlag);
     });
     Challenge saveChallenge = challengeRepository.save(challenge);
-    return challengeService.enrichChallengeWithExercises(saveChallenge);
+    return challengeService.enrichChallengeWithExercisesOrScenarios(saveChallenge);
   }
 
   @PreAuthorize("isPlanner()")

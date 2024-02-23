@@ -47,16 +47,11 @@ public class ChallengeService {
     this.exerciseRepository = exerciseRepository;
   }
 
-  public Challenge enrichChallengeWithExercises(@NotNull Challenge challenge) {
+  public Challenge enrichChallengeWithExercisesOrScenarios(@NotNull Challenge challenge) {
     List<Inject> injects = fromIterable(this.injectRepository.findAllForChallengeId("%" + challenge.getId() + "%"));
-    List<String> exerciseIds = injects.stream().map(i -> i.getExercise().getId()).distinct().toList();
+    List<String> exerciseIds = injects.stream().filter(i -> i.getExercise() != null).map(i -> i.getExercise().getId()).distinct().toList();
     challenge.setExerciseIds(exerciseIds);
-    return challenge;
-  }
-
-  public Challenge enrichChallengeWithScenarios(@NotNull Challenge challenge) {
-    List<Inject> injects = fromIterable(this.injectRepository.findAllForChallengeId("%" + challenge.getId() + "%"));
-    List<String> scenarioIds = injects.stream().map(i -> i.getScenario().getId()).distinct().toList();
+    List<String> scenarioIds = injects.stream().filter(i -> i.getScenario() != null).map(i -> i.getScenario().getId()).distinct().toList();
     challenge.setScenarioIds(scenarioIds);
     return challenge;
   }
@@ -64,13 +59,13 @@ public class ChallengeService {
   public Iterable<Challenge> getExerciseChallenges(@NotBlank final String exerciseId) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
     return resolveChallenges(exercise.getInjects())
-        .map(this::enrichChallengeWithExercises)
+        .map(this::enrichChallengeWithExercisesOrScenarios)
         .toList();
   }
 
   public Iterable<Challenge> getScenarioChallenges(@NotNull final Scenario scenario) {
     return resolveChallenges(scenario.getInjects())
-        .map(this::enrichChallengeWithScenarios)
+        .map(this::enrichChallengeWithExercisesOrScenarios)
         .toList();
   }
 
