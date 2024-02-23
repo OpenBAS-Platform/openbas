@@ -90,6 +90,7 @@ const i18n = {
       'Inject details': 'Détails du stimuli',
       'Export this list': 'Exporter cette liste',
       'Create a new exercise': 'Créer un nouvel exercice',
+      'Create a new scenario': 'Créer un nouveau scenario',
       'Do you want to delete this team?':
         'Souhaitez-vous supprimer cette team ?',
       'Do you want to delete this comcheck?':
@@ -216,13 +217,13 @@ const i18n = {
       'Attack patterns': "Motifs d'attaque",
       'Kill chain phases': 'Phases de kill chain',
       'This field is mandatory': 'Ce champ est requis',
-      'Remove from the exercise': 'Retirer de cet exercice',
+      'Remove from the context': 'Retirer de ce contexte',
       'Select a file': 'Sélectionner un fichier',
       'Do you want to delete this document?':
         'Souhaitez-vous supprimer ce document ?',
       'Update the document': 'Modifier le document',
       'Inject data': 'Données du stimuli',
-      'Add teams in this exercise': 'Ajouter une équipe dans cet exercice',
+      'Add teams': 'Ajouter une équipe',
       'Add target teams in this inject':
         'Ajouter des équipes cibles dans ce stimuli',
       'Targeted teams': 'Equipes ciblées',
@@ -234,6 +235,7 @@ const i18n = {
       'Remove from the team': "Retirer de l'équipe",
       'Update the team': "Modifier l'équipe",
       'Update the exercise': "Modifier l'exercice",
+      'Update the scenario': "Modifier le scenario",
       'Update the inject': 'Modifier le stimuli',
       'Do you want to remove the player from the team?':
         'Souhaitez-vous retirer le joueur de cette équipe ?',
@@ -316,7 +318,7 @@ const i18n = {
       attachment: 'Document',
       'Executed in': 'Exécuté en',
       'Use basic authentication': 'Utiliser une authentification basique',
-      'Only in the context of this simulation': 'Seulement dans le contexte de cette simulation',
+      'Only in this context': 'Seulement dans ce contexte',
       Medias: 'Médias',
       Tools: 'Outils',
       Success: 'Succès',
@@ -385,6 +387,7 @@ const i18n = {
       'Do you want to launch a new dryrun?':
         'Souhaitez-vous lancer une nouvelle simulation ?',
       'Add tags to this exercise': 'Ajouter des tags à cet exercice',
+      'Add tags to this scenario': 'Ajouter des tags à ce scenario',
       'No comcheck in this exercise.': 'Aucune vérification dans cet exercice',
       'There is nothing to see here...': "Il n'y a rien à voir ici...",
       'Send the lessons learned questionnaire':
@@ -469,6 +472,7 @@ const i18n = {
       'Import an exercise': 'Importer un exercice',
       Export: 'Exporter',
       'Export the exercise': 'Exporter cet exercice',
+      'Export the scenario': 'Exporter ce scenario',
       'Reset to default values': 'Réinitialiser les valeurs par défaut',
       Elements: 'Eléments',
       'Scenario (including attached files)':
@@ -493,7 +497,7 @@ const i18n = {
       'Create an image': 'Créer une image',
       'Change logo': 'Changer le logo',
       'Scheduled / in use': 'Planifié / utilisé',
-      'Not used in the exercise': "Pas utilisé dans l'exercice",
+      'Not used in the context': "Pas utilisé dans ce contexte",
       'Update the channel pressure': 'Modifier la pression médiatique',
       'Do you want to delete this channel pressure?':
         'Souhaitez-vous supprimer cette pression médiatique ?',
@@ -764,6 +768,8 @@ const i18n = {
       'Phone number invalid': 'Numéro de téléphone invalide',
       phone_number_tooltip: 'Le numéro de téléphone devrait commencer par un signe plus ( + )\n'
         + 'Il peut contenir des espaces ou des tirets ( – ) ou des parenthèses.\n',
+      'Create an exercise': 'Créer un nouvel exercise',
+      'Create an exercise from this scenario': 'Créer un nouvel exercise depuis ce scenario',
     },
     en: {
       openex_email: 'Email',
