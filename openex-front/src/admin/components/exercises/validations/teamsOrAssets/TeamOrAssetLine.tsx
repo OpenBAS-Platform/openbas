@@ -24,7 +24,7 @@ import type { EndpointsHelper } from '../../../../../actions/assets/asset-helper
 import type { ChallengesHelper } from '../../../../../actions/helper';
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
 import type { ChannelsHelper } from '../../../../../actions/channels/channel-helper';
-import { TeamsHelper } from '../../../../../actions/teams/team-helper';
+import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 import { fetchExerciseArticles } from '../../../../../actions/channels/article-action';
 
 const useStyles = makeStyles(() => ({

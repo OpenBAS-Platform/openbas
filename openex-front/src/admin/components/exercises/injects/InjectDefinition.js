@@ -33,17 +33,15 @@ import {
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
-import { fetchInjectTeams, updateInject } from '../../../../actions/Inject';
+import { fetchInjectTeams, updateInjectForExercise } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
-import { fetchExerciseArticles } from '../../../../actions/channels/article-action';
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
 import TeamPopover from '../../components/teams/TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddTeams from './InjectAddTeams';
-import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import TextField from '../../../../components/TextField';
 import SwitchField from '../../../../components/SwitchField';
 import EnrichedTextField from '../../../../components/EnrichedTextField';
@@ -356,10 +354,7 @@ class InjectDefinition extends Component {
   }
 
   componentDidMount() {
-    const { exerciseId, injectId } = this.props;
     this.props.fetchDocuments();
-    this.props.fetchInjectTeams(exerciseId, injectId);
-    this.props.fetchExerciseArticles(exerciseId);
     this.props.fetchChannels();
     this.props.fetchChallenges();
   }
@@ -700,7 +695,7 @@ class InjectDefinition extends Component {
       inject_documents: documents,
     };
     return this.props
-      .updateInject(this.props.exerciseId, this.props.inject.inject_id, values)
+      .onUpdateInject(this.props.inject.inject_id, values)
       .then(() => this.props.handleClose());
   }
 
@@ -740,7 +735,7 @@ class InjectDefinition extends Component {
   }
 
   renderFields(renderedFields, values, attachedDocs) {
-    const { exercise, classes, t } = this.props;
+    const { classes, t } = this.props;
     return (
       <div>
         {renderedFields.map((field) => {
@@ -753,7 +748,7 @@ class InjectDefinition extends Component {
                   label={t(field.label)}
                   fullWidth={true}
                   style={{ marginTop: 20, height: 250 }}
-                  disabled={isExerciseReadOnly(exercise)}
+                  disabled={this.props.permissions.readOnly}
                 />
               ) : (
                 <TextField
@@ -765,7 +760,7 @@ class InjectDefinition extends Component {
                   rows={10}
                   label={t(field.label)}
                   style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
+                  disabled={this.props.permissions.readOnly}
                 />
               );
             case 'number':
@@ -778,7 +773,7 @@ class InjectDefinition extends Component {
                   type="number"
                   label={t(field.label)}
                   style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
+                  disabled={this.props.permissions.readOnly}
                 />
               );
             case 'checkbox':
@@ -788,7 +783,7 @@ class InjectDefinition extends Component {
                   name={field.key}
                   label={t(field.label)}
                   style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
+                  disabled={this.props.permissions.readOnly}
                 />
               );
             case 'tuple':
@@ -801,7 +796,7 @@ class InjectDefinition extends Component {
                           <InputLabel
                             variant="standard"
                             shrink={true}
-                            disabled={isExerciseReadOnly(exercise)}
+                            disabled={this.props.permissions.readOnly}
                           >
                             {t(field.label)}
                             {field.cardinality === 'n' && (
@@ -815,7 +810,7 @@ class InjectDefinition extends Component {
                                 aria-haspopup="true"
                                 size="medium"
                                 style={{ marginTop: -2 }}
-                                disabled={isExerciseReadOnly(exercise)}
+                                disabled={this.props.permissions.readOnly}
                                 color="primary"
                               >
                                 <ControlPointOutlined />
@@ -842,7 +837,7 @@ class InjectDefinition extends Component {
                                   fullWidth={true}
                                   label={t('Type')}
                                   style={{ marginRight: 20 }}
-                                  disabled={isExerciseReadOnly(exercise)}
+                                  disabled={this.props.permissions.readOnly}
                                 >
                                   <MenuItem key="text" value="text">
                                     <ListItemText>{t('Text')}</ListItemText>
@@ -864,7 +859,7 @@ class InjectDefinition extends Component {
                                   fullWidth={true}
                                   label={t('Key')}
                                   style={{ marginRight: 20 }}
-                                  disabled={isExerciseReadOnly(exercise)}
+                                  disabled={this.props.permissions.readOnly}
                                 />
                                 {values
                                 && values[field.key]
@@ -877,7 +872,7 @@ class InjectDefinition extends Component {
                                     fullWidth={true}
                                     label={t('Value')}
                                     style={{ marginRight: 20 }}
-                                    disabled={isExerciseReadOnly(exercise)}
+                                    disabled={this.props.permissions.readOnly}
                                   >
                                     {attachedDocs.map((doc) => (
                                       <MenuItem
@@ -897,7 +892,7 @@ class InjectDefinition extends Component {
                                       fullWidth={true}
                                       label={t('Value')}
                                       style={{ marginRight: 20 }}
-                                      disabled={isExerciseReadOnly(exercise)}
+                                      disabled={this.props.permissions.readOnly}
                                     />
                                   )}
                                 {field.cardinality === 'n' && (
@@ -905,7 +900,7 @@ class InjectDefinition extends Component {
                                     onClick={() => fields.remove(index)}
                                     aria-haspopup="true"
                                     size="small"
-                                    disabled={isExerciseReadOnly(exercise)}
+                                    disabled={this.props.permissions.readOnly}
                                     color="primary"
                                   >
                                     <DeleteOutlined />
@@ -931,7 +926,7 @@ class InjectDefinition extends Component {
                   name={field.key}
                   fullWidth={true}
                   style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
+                  disabled={this.props.permissions.readOnly}
                 >
                   {Object.entries(field.choices)
                     .sort((a, b) => a[1].localeCompare(b[1]))
@@ -955,7 +950,7 @@ class InjectDefinition extends Component {
                   name={field.key}
                   fullWidth={true}
                   style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
+                  disabled={this.props.permissions.readOnly}
                 >
                   {Object.entries(field.choices)
                     .sort((a, b) => a[1].localeCompare(b[1]))
@@ -983,7 +978,7 @@ class InjectDefinition extends Component {
                   name={field.key}
                   fullWidth={true}
                   style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
+                  disabled={this.props.permissions.readOnly}
                 >
                   {Object.entries(choices)
                     .sort((a, b) => a[1].localeCompare(b[1]))
@@ -1000,7 +995,7 @@ class InjectDefinition extends Component {
                   key={field.key}
                   renderValue={(v) => (field.expectation ? t(choices[v] || 'Unknown') : choices[v])
                   }
-                  disabled={isExerciseReadOnly(exercise)}
+                  disabled={this.props.permissions.readOnly}
                   name={field.key}
                   fullWidth={true}
                   style={{ marginTop: 20 }}
@@ -1025,7 +1020,7 @@ class InjectDefinition extends Component {
                   fullWidth={true}
                   label={t(field.label)}
                   style={{ marginTop: 20 }}
-                  disabled={isExerciseReadOnly(exercise)}
+                  disabled={this.props.permissions.readOnly}
                 />
               );
           }
@@ -1092,8 +1087,6 @@ class InjectDefinition extends Component {
       classes,
       handleClose,
       inject,
-      exerciseId,
-      exercise,
       injectTypes,
       teamsMap,
       endpointsMap,
@@ -1102,6 +1095,8 @@ class InjectDefinition extends Component {
       articlesMap,
       channelsMap,
       challengesMap,
+      teamsFromExerciseOrScenario,
+      articlesFromExerciseOrScenario,
     } = this.props;
     if (!inject) {
       return <Loader variant="inElement" />;
@@ -1138,7 +1133,7 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(teamsSortBy))],
     );
     const sortedTeams = sortTeams(teams.map((n) => ({
-      team_users_enabled_number: exercise.exercise_teams_users.filter((o) => o.exercise_id === exerciseId && o.team_id === n.team_id).length,
+      team_users_enabled_number: this.props.teamsUsers.filter((o) => o.team_id === n.team_id).length,
       ...n,
     })));
     const hasTeams = injectType.fields
@@ -1350,7 +1345,7 @@ class InjectDefinition extends Component {
                             checked={allTeams}
                             onChange={this.toggleAll.bind(this)}
                             color="primary"
-                            disabled={isExerciseReadOnly(exercise)}
+                            disabled={this.props.permissions.readOnly}
                           />
                         }
                         label={<strong>{t('All teams')}</strong>}
@@ -1421,22 +1416,22 @@ class InjectDefinition extends Component {
                                 >
                                   <i>{t('All teams')}</i>
                                 </div>
-                                <div
+                                 <div
                                   className={classes.bodyItem}
                                   style={inlineStyles.team_users_number}
-                                >
+                                 >
                                   <strong>
-                                    {exercise.exercise_all_users_number}
+                                    {this.props.allUsersNumber}
                                   </strong>
-                                </div>
-                                <div
+                                 </div>
+                                 <div
                                   className={classes.bodyItem}
                                   style={inlineStyles.team_users_enabled_number}
-                                >
+                                 >
                                   <strong>
-                                    {exercise.exercise_users_number}
+                                    {this.props.usersNumber}
                                   </strong>
-                                </div>
+                                 </div>
                                 <div
                                   className={classes.bodyItem}
                                   style={inlineStyles.team_tags}
@@ -1476,12 +1471,12 @@ class InjectDefinition extends Component {
                                     >
                                       {team.team_users_number}
                                     </div>
-                                    <div
+                                     <div
                                       className={classes.bodyItem}
                                       style={inlineStyles.team_users_enabled_number}
-                                    >
+                                     >
                                       {team.team_users_enabled_number}
-                                    </div>
+                                     </div>
                                     <div
                                       className={classes.bodyItem}
                                       style={inlineStyles.team_tags}
@@ -1496,19 +1491,17 @@ class InjectDefinition extends Component {
                               />
                               <ListItemSecondaryAction>
                                 <TeamPopover
-                                  exerciseId={exerciseId}
-                                  injectId={inject.inject_id}
                                   team={team}
                                   onRemoveTeam={this.handleRemoveTeam.bind(
                                     this,
                                   )}
-                                  disabled={isExerciseReadOnly(exercise)}
+                                  disabled={this.props.permissions.readOnly}
                                 />
                               </ListItemSecondaryAction>
                             </ListItem>
                           ))}
                           <InjectAddTeams
-                            exerciseId={exerciseId}
+                            teams={teamsFromExerciseOrScenario}
                             injectTeamsIds={teamsIds}
                             handleAddTeams={this.handleAddTeams.bind(
                               this,
@@ -1531,7 +1524,6 @@ class InjectDefinition extends Component {
                       actions={<EndpointPopover inline onRemoveEndpointFromInject={this.handleRemoveAsset.bind(this)} />}
                     />
                     <InjectAddEndpoints
-                      exercise={exercise}
                       endpointIds={assetIds}
                       onSubmit={this.handleAddAssets.bind(this)}
                       filter={(e) => Object.keys(e.asset_sources).length > 0 && injectType.context['collector-ids']?.includes(Object.keys(e.asset_sources))}
@@ -1549,7 +1541,7 @@ class InjectDefinition extends Component {
                       // @ts-ignore: Endpoint property handle by EndpointsList
                       actions={<AssetGroupPopover inline onRemoveAssetGroupFromInject={this.handleRemoveAssetGroup.bind(this)} />}
                     />
-                    <InjectAddAssetGroups exercise={exercise} assetGroupIds={assetGroupIds} onSubmit={this.handleAddAssetGroups.bind(this)} />
+                    <InjectAddAssetGroups assetGroupIds={assetGroupIds} onSubmit={this.handleAddAssetGroups.bind(this)} />
                   </>
                 )}
                 {hasArticles && (
@@ -1651,19 +1643,17 @@ class InjectDefinition extends Component {
                           />
                           <ListItemSecondaryAction>
                             <ArticlePopover
-                              exerciseId={exerciseId}
-                              exercise={exercise}
                               article={article}
                               onRemoveArticle={this.handleRemoveArticle.bind(
                                 this,
                               )}
-                              disabled={isExerciseReadOnly(exercise)}
+                              disabled={this.props.permissions.readOnly}
                             />
                           </ListItemSecondaryAction>
                         </ListItem>
                       ))}
                       <InjectAddArticles
-                        exerciseId={exerciseId}
+                        articles={articlesFromExerciseOrScenario}
                         injectArticlesIds={articlesIds}
                         handleAddArticles={this.handleAddArticles.bind(this)}
                       />
@@ -1763,13 +1753,12 @@ class InjectDefinition extends Component {
                               onRemoveChallenge={this.handleRemoveChallenge.bind(
                                 this,
                               )}
-                              disabled={isExerciseReadOnly(exercise)}
+                              disabled={this.props.permissions.readOnly}
                             />
                           </ListItemSecondaryAction>
                         </ListItem>
                       ))}
                       <InjectAddChallenges
-                        exerciseId={exerciseId}
                         injectChallengesIds={challengesIds}
                         handleAddChallenges={this.handleAddChallenges.bind(
                           this,
@@ -1829,7 +1818,7 @@ class InjectDefinition extends Component {
                   <Button
                     color="secondary"
                     variant="outlined"
-                    disabled={submitting || isExerciseReadOnly(exercise)}
+                    disabled={submitting || this.props.permissions.readOnly}
                     onClick={this.resetDefaultvalues.bind(
                       this,
                       form.mutators.setValue,
@@ -1880,7 +1869,6 @@ class InjectDefinition extends Component {
                     )}
                     {hasExpectations
                       && <InjectExpectations
-                        exercise={exercise}
                         predefinedExpectationDatas={predefinedExpectations}
                         expectationDatas={expectations}
                         handleExpectations={this.handleExpectations.bind(this)}
@@ -1997,7 +1985,7 @@ class InjectDefinition extends Component {
                                     this.toggleAttachment(document.document_id);
                                   }}
                                   disabled={
-                                    isExerciseReadOnly(exercise)
+                                    this.props.permissions.readOnly
                                     || !hasAttachments
                                   }
                                 />
@@ -2008,7 +1996,6 @@ class InjectDefinition extends Component {
                         <ListItemSecondaryAction>
                           <DocumentPopover
                             inline
-                            exerciseId={exerciseId}
                             document={document}
                             onRemoveDocument={this.handleRemoveDocument.bind(
                               this,
@@ -2019,13 +2006,12 @@ class InjectDefinition extends Component {
                                 : null
                             }
                             attached={document.document_attached}
-                            disabled={isExerciseReadOnly(exercise)}
+                            disabled={this.props.permissions.readOnly}
                           />
                         </ListItemSecondaryAction>
                       </ListItem>
                     ))}
                     <InjectAddDocuments
-                      exerciseId={exerciseId}
                       injectDocumentsIds={documents
                         .filter((a) => !a.inject_document_attached)
                         .map((d) => d.document_id)}
@@ -2039,7 +2025,7 @@ class InjectDefinition extends Component {
                     variant="contained"
                     color="primary"
                     type="submit"
-                    disabled={submitting || isExerciseReadOnly(exercise)}
+                    disabled={submitting || this.props.permissions.readOnly}
                   >
                     {t('Update')}
                   </Button>
@@ -2049,9 +2035,10 @@ class InjectDefinition extends Component {
           </Form>
         </div>
         <AvailableVariablesDialog
+          uriVariable={this.props.uriVariable}
+          variables={this.props.variablesFromExerciseOrScenario}
           open={openVariables}
           handleClose={this.handleCloseVariables.bind(this)}
-          exerciseId={exerciseId}
           injectType={injectType}
         />
       </div>
@@ -2062,20 +2049,25 @@ class InjectDefinition extends Component {
 InjectDefinition.propTypes = {
   t: PropTypes.func,
   nsdt: PropTypes.func,
-  exerciseId: PropTypes.string,
-  exercise: PropTypes.object,
   injectId: PropTypes.string,
   inject: PropTypes.object,
   fetchInjectTeams: PropTypes.func,
-  fetchExerciseArticles: PropTypes.func,
   fetchChannels: PropTypes.func,
   fetchChallenges: PropTypes.func,
   updateInject: PropTypes.func,
   handleClose: PropTypes.func,
   injectTypes: PropTypes.array,
   fetchDocuments: PropTypes.func,
-  exercisesMap: PropTypes.object,
   tagsMap: PropTypes.object,
+  teamsFromExerciseOrScenario: PropTypes.array,
+  articlesFromExerciseOrScenario: PropTypes.array,
+  variablesFromExerciseOrScenario: PropTypes.array,
+  permissions: PropTypes.object,
+  onUpdateInject: PropTypes.func,
+  uriVariable: PropTypes.string,
+  allUsersNumber: PropTypes.number,
+  usersNumber: PropTypes.number,
+  teamsUsers: PropTypes.object,
 };
 
 const select = (state, ownProps) => {
@@ -2104,9 +2096,8 @@ const select = (state, ownProps) => {
 export default R.compose(
   connect(select, {
     fetchInjectTeams,
-    updateInject,
+    updateInject: updateInjectForExercise,
     fetchDocuments,
-    fetchExerciseArticles,
     fetchChannels,
     fetchChallenges,
   }),

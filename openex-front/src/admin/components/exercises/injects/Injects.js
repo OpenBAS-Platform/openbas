@@ -1,16 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Chip, Drawer, Tooltip, IconButton } from '@mui/material';
-import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { Chip, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import { CSVLink } from 'react-csv';
 import { FileDownloadOutlined } from '@mui/icons-material';
 import { splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
-import { fetchExerciseInjects, fetchInjectTypes } from '../../../../actions/Inject';
 import InjectIcon from './InjectIcon';
 import CreateInject from './CreateInject';
 import InjectPopover from './InjectPopover';
@@ -18,12 +15,11 @@ import InjectType from './InjectType';
 import InjectDefinition from './InjectDefinition';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { useFormatter } from '../../../../components/i18n';
-import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
-import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import { exportData } from '../../../../utils/Environment';
 import Loader from '../../../../components/Loader';
+import { InjectContext, PermissionsContext } from '../../components/Context';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -155,12 +151,23 @@ const inlineStyles = {
   },
 };
 
-const Injects = () => {
+const Injects = ({
+  injects,
+  teams,
+  articles,
+  variables,
+  uriVariable,
+  allUsersNumber,
+  usersNumber,
+  teamsUsers,
+}) => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { t, tPick } = useFormatter();
   const [selectedInject, setSelectedInject] = useState(null);
+  const { permissions } = useContext(PermissionsContext);
+  const { onUpdateInject } = useContext(InjectContext);
+
   // Filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
   const filtering = useSearchAnFilter(
@@ -169,28 +176,18 @@ const Injects = () => {
     searchColumns,
   );
   // Fetching data
-  const { exerciseId } = useParams();
   const {
-    exercise,
-    injects,
     injectTypesMap,
     tagsMap,
-    exercisesMap,
     injectTypesWithNoTeams,
   } = useHelper((helper) => {
     return {
-      exercise: helper.getExercise(exerciseId),
-      injects: helper.getExerciseInjects(exerciseId),
       injectTypesMap: helper.getInjectTypesMap(),
       tagsMap: helper.getTagsMap(),
-      exercisesMap: helper.getExercisesMap(),
       injectTypesWithNoTeams: helper.getInjectTypesWithNoTeams(),
     };
   });
-  useDataLoader(() => {
-    dispatch(fetchInjectTypes());
-    dispatch(fetchExerciseInjects(exerciseId));
-  });
+
   const injectTypes = Object.values(injectTypesMap);
   const sortedInjects = filtering.filterAndSort(injects);
   const types = injectTypes.map((type) => type.config.type);
@@ -198,7 +195,7 @@ const Injects = () => {
     .filter((type) => type.config.expose === false)
     .map((type) => type.config.type);
   // Rendering
-  if (exercise && injects && !R.isEmpty(injectTypesMap)) {
+  if (injects && !R.isEmpty(injectTypesMap)) {
     return (
       <div className={classes.container}>
         <>
@@ -234,7 +231,7 @@ const Injects = () => {
                   sortedInjects,
                   tagsMap,
                 )}
-                filename={`[${exercise.exercise_name}] ${t('Injects')}.csv`}
+                filename={`${t('Injects')}.csv`}
               >
                 <Tooltip title={t('Export this list')}>
                   <IconButton size="large">
@@ -409,8 +406,6 @@ const Injects = () => {
                 />
                 <ListItemSecondaryAction>
                   <InjectPopover
-                    exerciseId={exerciseId}
-                    exercise={exercise}
                     inject={inject}
                     injectTypesMap={injectTypesMap}
                     tagsMap={tagsMap}
@@ -434,18 +429,23 @@ const Injects = () => {
         >
           <InjectDefinition
             injectId={selectedInject}
-            exerciseId={exercise.exercise_id}
-            exercise={exercise}
             injectTypes={injectTypes}
             handleClose={() => setSelectedInject(null)}
-            exercisesMap={exercisesMap}
             tagsMap={tagsMap}
+            permissions={permissions}
+            teamsFromExerciseOrScenario={teams}
+            articlesFromExerciseOrScenario={articles}
+            variablesFromExerciseOrScenario={variables}
+            onUpdateInject={onUpdateInject}
+            uriVariable={uriVariable}
+            allUsersNumber={allUsersNumber}
+            usersNumber={usersNumber}
+            teamsUsers={teamsUsers}
           />
         </Drawer>
-        {isExerciseUpdatable(exercise) && (
+        {permissions.canWrite && (
           <CreateInject
             injectTypesMap={injectTypesMap}
-            exerciseId={exercise.exercise_id}
             onCreate={setSelectedInject}
           />
         )}

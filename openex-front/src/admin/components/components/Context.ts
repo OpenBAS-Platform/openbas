@@ -1,15 +1,15 @@
 import { createContext } from 'react';
 import type { ArticleStore, FullArticleStore } from '../../../actions/channels/Article';
-import type { ArticleCreateInput, ArticleUpdateInput, Team, TeamCreateInput, Variable, VariableInput } from '../../../utils/api-types';
+import type { ArticleCreateInput, ArticleUpdateInput, Inject, Team, TeamCreateInput, Variable, VariableInput } from '../../../utils/api-types';
 import type { UserStore } from '../teams/players/Player';
 
 export type PermissionsContextType = {
-  permissions: { readOnly: boolean, canWrite: boolean }
+  permissions: { readOnly: boolean, canWrite: boolean, isRunning: boolean }
 };
 
 export type ArticleContextType = {
   previewArticleUrl: (article: FullArticleStore) => string;
-  onAddArticle: (data: ArticleCreateInput) => string;
+  onAddArticle: (data: ArticleCreateInput) => Promise<{ result: string }>;
   onUpdateArticle: (article: ArticleStore, data: ArticleUpdateInput) => string;
   onDeleteArticle: (article: ArticleStore) => string;
 };
@@ -41,12 +41,21 @@ export type TeamContextType = {
   computeTeamUsersEnabled?: (teamId: Team['team_id']) => number,
 };
 
+export type InjectContextType = {
+  onAddInject: (inject: Inject) => Promise<{ result: string }>,
+  onUpdateInject: (injectId: Inject['inject_id'], inject: Inject) => Promise<{ result: string }>,
+  onUpdateInjectTrigger?: (injectId: Inject['inject_id']) => void,
+  onUpdateInjectActivation: (injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }) => void,
+  onInjectDone?: (injectId: Inject['inject_id']) => void,
+  onDeleteInject: (injectId: Inject['inject_id']) => void,
+};
+
 export const PermissionsContext = createContext<PermissionsContextType>({
-  permissions: { canWrite: false, readOnly: false },
+  permissions: { canWrite: false, readOnly: false, isRunning: false },
 });
 export const ArticleContext = createContext<ArticleContextType>({
-  onAddArticle(_data: ArticleCreateInput): string {
-    return '';
+  onAddArticle(_data: ArticleCreateInput): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
   },
   onDeleteArticle(_article: ArticleStore): string {
     return '';
@@ -78,5 +87,22 @@ export const VariableContext = createContext<VariableContextType>({
 });
 export const TeamContext = createContext<TeamContextType>({
   onAddTeams(_teamIds: Team['team_id'][]): void {
+  },
+});
+
+export const InjectContext = createContext<InjectContextType>({
+  onAddInject(_inject: Inject): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onUpdateInject(_injectId: Inject['inject_id'], _inject: Inject): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
+  },
+  onUpdateInjectTrigger(_injectId: Inject['inject_id']): void {
+  },
+  onUpdateInjectActivation(_injectId: Inject['inject_id'], _injectEnabled: { inject_enabled: boolean }): void {
+  },
+  onInjectDone(_injectId: Inject['inject_id']): void {
+  },
+  onDeleteInject(_injectId: Inject['inject_id']): void {
   },
 });

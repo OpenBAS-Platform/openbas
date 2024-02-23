@@ -161,7 +161,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
               <TableBody>
                 <TableRow>
                   <TableCell>
-                    {t('Scenario (including attached files)')}
+                    {t('Injects (including attached files)')}
                   </TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
                     <Checkbox checked={true} disabled={true} />

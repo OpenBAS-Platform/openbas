@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Dialog, Fab, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Fab, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useFormatter } from '../../../../components/i18n';
 import { addChallenge } from '../../../../actions/Challenge';
 import ChallengeForm from './ChallengeForm';
-import Drawer from "../../../../components/common/Drawer";
+import Drawer from '../../../../components/common/Drawer';
+import Transition from '../../../../components/common/Transition';
 
 const useStyles = makeStyles((theme) => ({
   createButton: {
@@ -75,15 +76,21 @@ const CreateChallenge = (props) => {
       {inline ? (
         <Dialog
           open={open}
-          handleClose={() => setOpen(false)}
-          title={t('Create a new challenge')}
+          TransitionComponent={Transition}
+          onClose={handleClose}
+          fullWidth
+          maxWidth="md"
+          PaperProps={{ elevation: 1 }}
         >
-          <ChallengeForm
-            editing={false}
-            onSubmit={onSubmit}
-            handleClose={handleClose}
-            initialValues={{ challenge_tags: [] }}
-          />
+          <DialogTitle>{t('Create a new challenge')}</DialogTitle>
+          <DialogContent>
+            <ChallengeForm
+              editing={false}
+              onSubmit={onSubmit}
+              handleClose={handleClose}
+              initialValues={{ challenge_tags: [] }}
+            />
+          </DialogContent>
         </Dialog>
       ) : (
         <Drawer

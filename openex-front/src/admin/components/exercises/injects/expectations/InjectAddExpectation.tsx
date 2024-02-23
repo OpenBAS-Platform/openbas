@@ -1,14 +1,13 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useContext, useState } from 'react';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { isExerciseReadOnly } from '../../../../../utils/Exercise';
-import type { Exercise } from '../../../../../utils/api-types';
 import type { Theme } from '../../../../../components/Theme';
 import { useFormatter } from '../../../../../components/i18n';
 import Dialog from '../../../../../components/common/Dialog';
 import ExpectationFormCreate from './ExpectationFormCreate';
 import type { ExpectationInput } from './Expectation';
+import { PermissionsContext } from '../../../components/Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -23,18 +22,18 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface InjectAddExpectationProps {
-  exercise: Exercise;
   predefinedExpectations: ExpectationInput[];
   handleAddExpectation: (data: ExpectationInput) => void;
 }
 
 const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
-  exercise,
   predefinedExpectations,
   handleAddExpectation,
 }) => {
+  // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
+  const { permissions } = useContext(PermissionsContext);
 
   // Dialog
   const [openDialog, setOpenDialog] = useState(false);
@@ -54,7 +53,7 @@ const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
         divider={true}
         onClick={handleOpen}
         color="primary"
-        disabled={isExerciseReadOnly(exercise)}
+        disabled={permissions.readOnly}
       >
         <ListItemIcon color="primary">
           <ControlPointOutlined color="primary" />

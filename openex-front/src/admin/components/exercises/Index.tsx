@@ -1,7 +1,6 @@
 import React, { FunctionComponent, lazy, Suspense } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 import { fetchExercise } from '../../../actions/Exercise';
-import type { ExercicesHelper } from '../../../actions/helper';
 import { errorWrapper } from '../../../components/Error';
 import Loader from '../../../components/Loader';
 import { useHelper } from '../../../store';
@@ -12,6 +11,7 @@ import ExerciseHeader from './ExerciseHeader';
 import type { Exercise as ExerciseType } from '../../../utils/api-types';
 import { DocumentContext, DocumentContextType, PermissionsContext, PermissionsContextType } from '../components/Context';
 import { usePermissions } from '../../../utils/Exercise';
+import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
 
 const Exercise = lazy(() => import('./Exercise'));
 const Dryrun = lazy(() => import('./controls/Dryrun'));
@@ -21,7 +21,7 @@ const Lessons = lazy(() => import('./lessons/Lessons'));
 const Reports = lazy(() => import('./reports/Reports'));
 const Report = lazy(() => import('./reports/Report'));
 const ExerciseTeams = lazy(() => import('./teams/ExerciseTeams'));
-const Injects = lazy(() => import('./injects/Injects'));
+const Injects = lazy(() => import('./injects/ExerciseInjects'));
 const Articles = lazy(() => import('./articles/ExerciseArticles'));
 const Challenges = lazy(() => import('./challenges/ExerciseChallenges'));
 const Timeline = lazy(() => import('./timeline/Timeline'));
@@ -61,7 +61,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
             <Route path="definition/articles" element={errorWrapper(Articles)()} />
             <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
             <Route path="definition/variables" element={errorWrapper(Variables)()} />
-            <Route path="scenario" element={errorWrapper(Injects)()} />
+            <Route path="injects" element={errorWrapper(Injects)()} />
             <Route path="animation/timeline" element={errorWrapper(Timeline)()} />
             <Route path="animation/mails" element={errorWrapper(Mails)()} />
             <Route path="animation/mails/:injectId" element={errorWrapper(MailsInject)()} />
@@ -85,7 +85,7 @@ const Index = () => {
 
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: ExerciseType['exercise_id'] };
-  const exercise = useHelper((helper: ExercicesHelper) => helper.getExercise(exerciseId));
+  const exercise = useHelper((helper: ExercisesHelper) => helper.getExercise(exerciseId));
   useDataLoader(() => {
     dispatch(fetchExercise(exerciseId));
   });

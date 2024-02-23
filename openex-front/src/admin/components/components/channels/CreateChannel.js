@@ -8,7 +8,7 @@ import { Add } from '@mui/icons-material';
 import inject18n from '../../../../components/i18n';
 import { addChannel } from '../../../../actions/channels/channel-action';
 import ChannelForm from './ChannelForm';
-import Drawer from "../../../../components/common/Drawer";
+import Drawer from '../../../../components/common/Drawer';
 
 const styles = () => ({
   createButton: {

@@ -1,17 +1,15 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useContext, useState } from 'react';
 import { Button, Dialog as DialogMUI, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import Transition from '../../../../../components/common/Transition';
-import { isExerciseReadOnly } from '../../../../../utils/Exercise';
-import type { Exercise } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
 import ExpectationFormUpdate from './ExpectationFormUpdate';
 import type { ExpectationInput } from './Expectation';
 import Dialog from '../../../../../components/common/Dialog';
+import { PermissionsContext } from '../../../components/Context';
 
 interface ExpectationPopoverProps {
   index: number;
-  exercise: Exercise;
   expectation: ExpectationInput;
   handleUpdate: (data: ExpectationInput, idx: number) => void;
   handleDelete: (idx: number) => void;
@@ -19,12 +17,13 @@ interface ExpectationPopoverProps {
 
 const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   index,
-  exercise,
   expectation,
   handleUpdate,
   handleDelete,
 }) => {
+  // Standard hooks
   const { t } = useFormatter();
+  const { permissions } = useContext(PermissionsContext);
 
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [openDelete, setOpenDelete] = useState(false);
@@ -67,7 +66,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
         onClick={(event) => handlePopoverOpen(event)}
         aria-haspopup="true"
         size="large"
-        disabled={isExerciseReadOnly(exercise)}
+        disabled={permissions.readOnly}
       >
         <MoreVert />
       </IconButton>

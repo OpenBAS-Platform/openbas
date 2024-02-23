@@ -19,7 +19,7 @@ export interface Article {
   article_created_at?: string;
   article_documents?: Document[];
   article_exercise?: Exercise;
-  article_id?: string;
+  article_id: string;
   article_is_scheduled?: boolean;
   /** @format int32 */
   article_likes?: number;
@@ -135,7 +135,7 @@ export interface Challenge {
   challenge_documents?: Document[];
   challenge_exercises?: string[];
   challenge_flags?: ChallengeFlag[];
-  challenge_id?: string;
+  challenge_id: string;
   /** @format int32 */
   challenge_max_attempts?: number;
   challenge_name?: string;
@@ -243,6 +243,7 @@ export interface ChannelReader {
   channel_exercise?: Exercise;
   channel_id?: string;
   channel_information?: Channel;
+  channel_scenario?: Scenario;
 }
 
 export interface ChannelUpdateInput {
@@ -404,7 +405,7 @@ export interface DirectInjectInput {
 export interface Document {
   document_description?: string;
   document_exercises?: Exercise[];
-  document_id?: string;
+  document_id: string;
   document_name?: string;
   document_scenarios?: Scenario[];
   document_tags?: Tag[];
@@ -1258,6 +1259,8 @@ export interface ResetUserInput {
 }
 
 export interface Scenario {
+  /** @format int64 */
+  scenario_all_users_number?: number;
   scenario_articles?: Article[];
   /** @format date-time */
   scenario_created_at?: string;

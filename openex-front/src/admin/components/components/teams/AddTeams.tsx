@@ -192,7 +192,7 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds }) => {
                     <Chip
                       key={teamId}
                       onDelete={() => {
-                        setTeamIds(teamIds.toSpliced(teamIds.indexOf(teamId), 1));
+                        setTeamIds(teamIds.splice(teamIds.indexOf(teamId), 1));
                       }}
                       label={truncate(team.team_name, 22)}
                       avatar={<Avatar src={teamGravatar} sx={{ height: '32px', width: '32px' }} />}

@@ -39,6 +39,10 @@ const TopMenuScenario = () => {
       match: `/admin/scenarios/${scenarioId}/definition`,
       label: 'Definition',
     },
+    {
+      path: `/admin/scenarios/${scenarioId}/injects`,
+      label: 'Injects',
+    },
   ];
   return (
     <div>

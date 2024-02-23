@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import * as R from 'ramda';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { deleteDocument, updateDocument } from '../../../../actions/Document';
 import DocumentForm from './DocumentForm';
@@ -12,7 +12,7 @@ import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 import { fetchExercises } from '../../../../actions/Exercise';
-import Drawer from "../../../../components/common/Drawer";
+import Drawer from '../../../../components/common/Drawer';
 
 const DocumentPopover = (props) => {
   // Standard hooks

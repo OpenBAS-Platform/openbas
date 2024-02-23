@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import * as R from 'ramda';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Slide, Menu, MenuItem } from '@mui/material';
+import { Dialog, DialogContent, DialogContentText, DialogActions, Button, IconButton, Slide, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import ChallengeForm from './ChallengeForm';
@@ -8,7 +8,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { deleteChallenge, updateChallenge } from '../../../../actions/Challenge';
 import { useHelper } from '../../../../store';
 import { tagOptions } from '../../../../utils/Option';
-import Drawer from "../../../../components/common/Drawer";
+import Drawer from '../../../../components/common/Drawer';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

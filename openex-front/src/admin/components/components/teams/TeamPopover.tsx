@@ -10,10 +10,11 @@ import Transition from '../../../../components/common/Transition';
 import type { TeamUpdateInput } from '../../../../utils/api-types';
 import { Option, organizationOption, tagOptions } from '../../../../utils/Option';
 import { useHelper } from '../../../../store';
-import type { ExercicesHelper, OrganizationsHelper, TagsHelper } from '../../../../actions/helper';
+import type { OrganizationsHelper, TagsHelper } from '../../../../actions/helper';
 import type { TeamInputForm, TeamStore } from '../../../../actions/teams/Team';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import { TeamContext } from '../Context';
+import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 
 interface TeamPopoverProps {
   team: TeamStore;
@@ -30,7 +31,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   const dispatch = useAppDispatch();
   const { organizationsMap, tagsMap } = useHelper(
     (
-      helper: ExercicesHelper & TeamsHelper & OrganizationsHelper & TagsHelper,
+      helper: ExercisesHelper & TeamsHelper & OrganizationsHelper & TagsHelper,
     ) => {
       return {
         organizationsMap: helper.getOrganizationsMap(),

@@ -1,12 +1,11 @@
 import { makeStyles } from '@mui/styles';
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useContext, useState } from 'react';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { ControlPointOutlined } from '@mui/icons-material';
 import type { Theme } from '../../../../../components/Theme';
-import type { Exercise } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
-import { isExerciseReadOnly } from '../../../../../utils/Exercise';
 import AssetGroupDialogAdding from '../../../assets/asset_groups/AssetGroupDialogAdding';
+import { PermissionsContext } from '../../../components/Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -21,19 +20,18 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  exercise: Exercise;
   assetGroupIds: string[];
   onSubmit: (assetGroupIds: string[]) => void;
 }
 
 const InjectAddAssetGroups: FunctionComponent<Props> = ({
-  exercise,
   assetGroupIds,
   onSubmit,
 }) => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
+  const { permissions } = useContext(PermissionsContext);
 
   // Dialog
   const [openDialog, setOpenDialog] = useState(false);
@@ -47,7 +45,7 @@ const InjectAddAssetGroups: FunctionComponent<Props> = ({
         divider={true}
         onClick={handleOpen}
         color="primary"
-        disabled={isExerciseReadOnly(exercise)}
+        disabled={permissions.readOnly}
       >
         <ListItemIcon color="primary">
           <ControlPointOutlined color="primary" />

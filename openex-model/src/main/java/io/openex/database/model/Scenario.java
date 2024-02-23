@@ -150,6 +150,11 @@ public class Scenario implements Base {
     return InjectStatisticsHelper.getInjectStatistics(this.getInjects());
   }
 
+  @JsonProperty("scenario_all_users_number")
+  public long usersAllNumber() {
+    return getTeams().stream().mapToLong(Team::getUsersNumber).sum();
+  }
+
   @JsonProperty("scenario_users_number")
   public long usersNumber() {
     return getTeamUsers().stream().map(ScenarioTeamUser::getUser).distinct().count();

@@ -18,6 +18,7 @@ const Teams = () => {
     permissions: {
       readOnly: false,
       canWrite: user.user_is_planner || false,
+      isRunning: false,
     },
   };
 

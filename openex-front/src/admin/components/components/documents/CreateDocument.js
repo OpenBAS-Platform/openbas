@@ -9,8 +9,8 @@ import DocumentForm from './DocumentForm';
 import { addDocument, fetchDocument } from '../../../../actions/Document';
 import inject18n from '../../../../components/i18n';
 import { DocumentContext } from '../Context';
-import Drawer from "../../../../components/common/Drawer";
-import Dialog from "../../../../components/common/Dialog";
+import Drawer from '../../../../components/common/Drawer';
+import Dialog from '../../../../components/common/Dialog';
 
 const styles = (theme) => ({
   createButton: {

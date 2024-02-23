@@ -36,6 +36,7 @@ export const usePermissions = (exerciseId, fullExercise = null) => {
       readOnly: true,
       readOnlyBypassStatus: true,
       isLoggedIn: !R.isEmpty(logged),
+      isRunning: false,
     };
   }
   const canReadBypassStatus = logged.admin
@@ -56,6 +57,7 @@ export const usePermissions = (exerciseId, fullExercise = null) => {
     || (exercise || fullExercise).exercise_status === 'FINISHED'
     || (exercise || fullExercise).exercise_status === 'CANCELED'
     || (exercise || fullExercise).exercise_users?.includes(me.user_id);
+  const isRunning = (exercise || fullExercise).exercise_status === 'RUNNING';
   return {
     canRead,
     canWrite,
@@ -66,6 +68,7 @@ export const usePermissions = (exerciseId, fullExercise = null) => {
     readOnly: !canWrite,
     readOnlyBypassStatus: !canWriteBypassStatus,
     isLoggedIn: !R.isEmpty(logged),
+    isRunning,
   };
 };
 

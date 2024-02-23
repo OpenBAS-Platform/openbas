@@ -6,7 +6,6 @@ import * as R from 'ramda';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import type { Theme } from '../../../../../components/Theme';
 import InjectAddExpectation from './InjectAddExpectation';
-import type { Exercise } from '../../../../../utils/api-types';
 import { useFormatter } from '../../../../../components/i18n';
 import { truncate } from '../../../../../utils/String';
 import ExpectationPopover from './ExpectationPopover';
@@ -36,18 +35,17 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface InjectExpectationsProps {
-  exercise: Exercise;
   predefinedExpectationDatas: ExpectationInput[];
   expectationDatas: ExpectationInput[];
   handleExpectations: (expectations: ExpectationInput[]) => void;
 }
 
 const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
-  exercise,
   predefinedExpectationDatas,
   expectationDatas,
   handleExpectations,
 }) => {
+  // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
 
@@ -205,7 +203,6 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
             <ListItemSecondaryAction>
               <ExpectationPopover
                 index={idx}
-                exercise={exercise}
                 expectation={expectation}
                 handleUpdate={handleUpdateExpectation}
                 handleDelete={handleRemoveExpectation}
@@ -215,7 +212,6 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
         ))}
       </List>
       <InjectAddExpectation
-        exercise={exercise}
         handleAddExpectation={handleAddExpectation}
         predefinedExpectations={predefinedExpectations}
       />

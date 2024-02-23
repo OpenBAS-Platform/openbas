@@ -19,6 +19,7 @@ const Teams = lazy(() => import('./teams/ScenarioTeams'));
 const Articles = lazy(() => import('./articles/ScenarioArticles'));
 const Challenges = lazy(() => import('./challenges/ScenarioChallenges'));
 const Variables = lazy(() => import('./variables/ScenarioVariables'));
+const Injects = lazy(() => import('./injects/ScenarioInjects'));
 
 const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = ({
   scenario,
@@ -46,6 +47,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
             <Route path="definition/articles" element={errorWrapper(Articles)()} />
             <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
             <Route path="definition/variables" element={errorWrapper(Variables)()} />
+            <Route path="injects" element={errorWrapper(Injects)()} />
           </Routes>
         </Suspense>
       </DocumentContext.Provider>

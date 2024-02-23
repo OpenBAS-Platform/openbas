@@ -11,7 +11,7 @@ import type { ArticlesHelper } from '../../../../../actions/channels/article-hel
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import type { ArticleStore, FullArticleStore } from '../../../../../actions/channels/Article';
 import type { ArticleCreateInput, ArticleUpdateInput } from '../../../../../utils/api-types';
-import { ArticleContext, ArticleContextType } from '../../../components/Context';
+import { ArticleContext } from '../../../components/Context';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -19,6 +19,21 @@ const useStyles = makeStyles(() => ({
     padding: '0 200px 0 0',
   },
 }));
+
+export const articleContextForScenario = (scenarioId: ScenarioStore['scenario_id']) => {
+  const dispatch = useAppDispatch();
+
+  return {
+    previewArticleUrl: (article: FullArticleStore) => `/channels/${scenarioId}/${article.article_fullchannel.channel_id}?preview=true`,
+    onAddArticle: (data: ArticleCreateInput) => dispatch(addScenarioArticle(scenarioId, data)),
+    onUpdateArticle: (article: ArticleStore, data: ArticleUpdateInput) => dispatch(
+      updateScenarioArticle(scenarioId, article.article_id, data),
+    ),
+    onDeleteArticle: (article: ArticleStore) => dispatch(
+      deleteScenarioArticle(scenarioId, article.article_id),
+    ),
+  };
+};
 
 const ScenarioArticles = () => {
   // Standard hooks
@@ -31,16 +46,7 @@ const ScenarioArticles = () => {
     dispatch(fetchScenarioArticles(scenarioId));
   });
 
-  const context: ArticleContextType = {
-    previewArticleUrl: (article: FullArticleStore) => `/channels/${scenarioId}/${article.article_fullchannel.channel_id}?preview=true`,
-    onAddArticle: (data: ArticleCreateInput) => dispatch(addScenarioArticle(scenarioId, data)),
-    onUpdateArticle: (article: ArticleStore, data: ArticleUpdateInput) => dispatch(
-      updateScenarioArticle(scenarioId, article.article_id, data),
-    ),
-    onDeleteArticle: (article: ArticleStore) => dispatch(
-      deleteScenarioArticle(scenarioId, article.article_id),
-    ),
-  };
+  const context = articleContextForScenario(scenarioId);
 
   return (
     <ArticleContext.Provider value={context}>

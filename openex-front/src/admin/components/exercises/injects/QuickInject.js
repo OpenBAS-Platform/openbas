@@ -34,7 +34,7 @@ import {
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
-import { addInject } from '../../../../actions/Inject';
+import { addInjectForExercise } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchExerciseArticles } from '../../../../actions/channels/article-action';
@@ -1432,7 +1432,7 @@ class QuickInject extends Component {
                             </ListItem>
                           ))}
                           <InjectAddTeams
-                            exerciseId={exerciseId}
+                            teams={teams}
                             injectTeamsIds={teamsIds}
                             handleAddTeams={this.handleAddTeams.bind(
                               this,
@@ -1989,7 +1989,7 @@ export default R.compose(
     fetchExerciseArticles,
     fetchChannels,
     fetchChallenges,
-    addInject,
+    addInject: addInjectForExercise,
   }),
   inject18n,
   withStyles(styles),

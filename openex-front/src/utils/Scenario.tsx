@@ -18,6 +18,7 @@ const useScenarioPermissions = (scenarioId: string, fullScenario = null) => {
       canPlay: false,
       readOnly: true,
       isLoggedIn: !R.isEmpty(logged),
+      isRunning: false,
     };
   }
   const canRead = logged.admin
@@ -32,6 +33,7 @@ const useScenarioPermissions = (scenarioId: string, fullScenario = null) => {
     canPlay,
     readOnly: !canWrite,
     isLoggedIn: !R.isEmpty(logged),
+    isRunning: false,
   };
 };
 
