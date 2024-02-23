@@ -57,7 +57,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
             <Route path="" element={errorWrapper(Exercise)()} />
             <Route path="controls/dryruns/:dryrunId" element={errorWrapper(Dryrun)()} />
             <Route path="controls/comchecks/:comcheckId" element={errorWrapper(Comcheck)()} />
-            <Route path="definition/teams" element={errorWrapper(ExerciseTeams)()} />
+            <Route path="definition/teams" element={errorWrapper(ExerciseTeams)({ exerciseTeamsUsers: exercise.exercise_teams_users })} />
             <Route path="definition/articles" element={errorWrapper(Articles)()} />
             <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
             <Route path="definition/variables" element={errorWrapper(Variables)()} />
