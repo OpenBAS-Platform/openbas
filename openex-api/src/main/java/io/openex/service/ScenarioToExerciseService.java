@@ -1,7 +1,12 @@
 package io.openex.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
+import io.openex.injects.channel.ChannelContract;
+import io.openex.injects.channel.model.ChannelContent;
+import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +23,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Service
 public class ScenarioToExerciseService {
+
+  @Resource
+  protected ObjectMapper mapper;
 
   private final ExerciseRepository exerciseRepository;
   private final GrantRepository grantRepository;
@@ -43,7 +51,7 @@ public class ScenarioToExerciseService {
     exercise.setReplyTo(scenario.getReplyTo());
 
     // Tags
-    exercise.setTags(copyTags(scenario.getTags()));
+    exercise.setTags(copy(scenario.getTags(), Tag.class));
 
     Exercise exerciseSaved = this.exerciseRepository.save(exercise);
 
@@ -66,9 +74,10 @@ public class ScenarioToExerciseService {
         Team team = new Team();
         team.setName(scenarioTeam.getName());
         team.setDescription(scenarioTeam.getDescription());
-        team.setTags(copyTags(scenarioTeam.getTags()));
+        team.setTags(copy(scenarioTeam.getTags(), Tag.class));
         team.setOrganization(scenarioTeam.getOrganization());
-        team.setUsers(scenarioTeam.getUsers());
+
+        team.setUsers(copy(scenarioTeam.getUsers(), User.class));
         team.setExercises(new ArrayList<>() {{
           add(exerciseSaved);
         }});
@@ -114,6 +123,7 @@ public class ScenarioToExerciseService {
     this.documentRepository.saveAll(scenarioDocuments);
 
     // Articles
+    Map<String, Article> articles = new HashMap<>();
     List<Article> scenarioArticles = scenario.getArticles();
     List<Article> exerciseArticles = scenarioArticles.stream()
         .map(scenarioArticle -> {
@@ -129,6 +139,7 @@ public class ScenarioToExerciseService {
 
           List<Document> articleDocuments = addExerciseToDocuments(scenarioArticle.getDocuments(), exerciseSaved);
           exerciseArticle.setDocuments(articleDocuments);
+          articles.put(scenarioArticle.getId(), exerciseArticle);
           return exerciseArticle;
         })
         .toList();
@@ -176,23 +187,39 @@ public class ScenarioToExerciseService {
       exerciseInject.setCity(scenarioInject.getCity());
       exerciseInject.setEnabled(scenarioInject.isEnabled());
       exerciseInject.setType(scenarioInject.getType());
-      exerciseInject.setContent(scenarioInject.getContent());
       exerciseInject.setAllTeams(scenarioInject.isAllTeams());
       exerciseInject.setExercise(exerciseSaved);
       exerciseInject.setDependsDuration(scenarioInject.getDependsDuration());
       exerciseInject.setUser(scenarioInject.getUser());
       exerciseInject.setStatus(scenarioInject.getStatus().orElse(null));
-      exerciseInject.setTags(copyTags(scenarioInject.getTags()));
+      exerciseInject.setTags(copy(scenarioInject.getTags(), Tag.class));
+
+      // Content
+      if (ChannelContract.TYPE.equals(scenarioInject.getType())) {
+        try {
+          ChannelContent content = mapper.treeToValue(scenarioInject.getContent(), ChannelContent.class);
+          content.setArticles(
+              content.getArticles().stream().map(articleId -> articles.get(articleId).getId()).toList()
+          );
+          exerciseInject.setContent(mapper.valueToTree(content));
+        } catch (JsonProcessingException e) {
+          throw new RuntimeException(e);
+        }
+      } else {
+        exerciseInject.setContent(scenarioInject.getContent());
+      }
 
       // Teams
       List<Team> teams = new ArrayList<>();
       scenarioInject.getTeams().forEach(team -> teams.add(computeTeam(team, contextualTeams)));
       exerciseInject.setTeams(teams);
 
-      exerciseInject.setAssets(scenarioInject.getAssets());
-      exerciseInject.setAssetGroups(scenarioInject.getAssetGroups());
+      // Assets & Asset Groups
+      exerciseInject.setAssets(copy(scenarioInject.getAssets(), Asset.class));
+      exerciseInject.setAssetGroups(copy(scenarioInject.getAssetGroups(), AssetGroup.class));
       Inject injectSaved = this.injectRepository.save(exerciseInject);
 
+      // Documents
       List<InjectDocument> exerciseInjectDocuments = new ArrayList<>();
       scenarioInject.getDocuments().forEach(injectDocument -> {
         InjectDocument exerciseInjectDocument = new InjectDocument();
@@ -222,29 +249,37 @@ public class ScenarioToExerciseService {
     return exerciseSaved;
   }
 
-  private List<Tag> copyTags(@NotNull final List<Tag> origTags) {
-    List<Tag> destTags = new ArrayList<>();
-    origTags.forEach(origTag -> {
+  private <T extends Base> List<T> copy(@NotNull final List<T> origins, Class<T> clazz) {
+    List<T> destinations = new ArrayList<>();
+    origins.forEach(origin -> {
       try {
-        Tag destTag = new Tag();
-        BeanUtils.copyProperties(destTag, origTag);
-        destTags.add(destTag);
-      } catch (IllegalAccessException | InvocationTargetException e) {
+        T destination = clazz.getDeclaredConstructor().newInstance();
+        BeanUtils.copyProperties(destination, origin);
+        destinations.add(destination);
+      } catch (IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException e) {
         throw new RuntimeException(e);
       }
     });
-    return destTags;
+    return destinations;
   }
 
   private List<Document> addExerciseToDocuments(
       @NotNull final List<Document> origDocuments,
       @NotNull final Exercise exercise) {
+    List<Document> destDocuments = new ArrayList<>();
     origDocuments.forEach(origDocument -> {
-      List<Exercise> exercises = origDocument.getExercises();
-      exercises.add(exercise);
-      origDocument.setExercises(exercises);
+      try {
+        Document destDocument = new Document();
+        BeanUtils.copyProperties(destDocument, origDocument);
+        List<Exercise> exercises = destDocument.getExercises();
+        exercises.add(exercise);
+        destDocument.setExercises(exercises);
+        destDocuments.add(destDocument);
+      } catch (IllegalAccessException | InvocationTargetException e) {
+        throw new RuntimeException(e);
+      }
     });
-    return origDocuments;
+    return destDocuments;
   }
 
   private Team computeTeam(@NotNull final Team origTeam, @NotNull final Map<String, Team> contextualTeams) {

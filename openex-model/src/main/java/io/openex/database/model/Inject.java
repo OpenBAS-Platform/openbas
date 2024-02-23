@@ -246,14 +246,20 @@ public class Inject implements Base, Injection {
         .orElse(source);
     Instant standardExecutionDate = dependingStart.plusSeconds(duration);
     // Compute execution dates with previous terminated pauses
-    long previousPauseDelay = exercise.getPauses().stream()
-        .filter(pause -> pause.getDate().isBefore(standardExecutionDate))
-        .mapToLong(pause -> pause.getDuration().orElse(0L)).sum();
+    long previousPauseDelay = 0L;
+    if (this.exercise != null) {
+      previousPauseDelay = this.exercise.getPauses().stream()
+          .filter(pause -> pause.getDate().isBefore(standardExecutionDate))
+          .mapToLong(pause -> pause.getDuration().orElse(0L)).sum();
+    }
     Instant afterPausesExecutionDate = standardExecutionDate.plusSeconds(previousPauseDelay);
     // Add current pause duration in date computation if needed
-    long currentPauseDelay = exercise.getCurrentPause()
-        .map(last -> last.isBefore(afterPausesExecutionDate) ? between(last, now()).getSeconds() : 0L)
-        .orElse(0L);
+    long currentPauseDelay = 0L;
+    if (this.exercise != null) {
+      currentPauseDelay = this.exercise.getCurrentPause()
+          .map(last -> last.isBefore(afterPausesExecutionDate) ? between(last, now()).getSeconds() : 0L)
+          .orElse(0L);
+    }
     long globalPauseDelay = previousPauseDelay + currentPauseDelay;
     long minuteAlignModulo = globalPauseDelay % 60;
     long alignedPauseDelay = minuteAlignModulo > 0 ? globalPauseDelay + (60 - minuteAlignModulo) : globalPauseDelay;

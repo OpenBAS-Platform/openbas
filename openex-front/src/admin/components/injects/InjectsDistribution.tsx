@@ -9,42 +9,32 @@ import type { Theme } from '../../../components/Theme';
 import type { TeamStore } from '../../../actions/teams/Team';
 
 interface Props {
-  teams: TeamStore[];
+  topTeams: TeamStore[];
+  distributionChartData: ApexAxisChartSeries;
+  maxInjectsNumber: number;
 }
 
-const InjectsDistribution: FunctionComponent<Props> = ({
-  teams,
-}) => {
-  // Standard hooks
-  const { t } = useFormatter();
+export const getTeamsColors: (teams: TeamStore[]) => Record<string, string> = (teams: TeamStore[]) => {
   const theme = useTheme<Theme>();
 
   const mapIndexed = R.addIndex(R.map);
-  const teamsColors = R.pipe(
+  return R.pipe(
     mapIndexed((a: TeamStore, index: number) => [
       a.team_id,
       colors(theme.palette.mode === 'dark' ? 400 : 600)[index],
     ]),
     R.fromPairs,
   )(teams);
+};
 
-  const topTeams = R.pipe(
-    R.sortWith([R.descend(R.prop('team_injects_number'))]),
-    R.take(6),
-  )(teams || []);
-  const distributionChartData = [
-    {
-      name: t('Number of injects'),
-      data: topTeams.map((a: TeamStore) => ({
-        x: a.team_name,
-        y: a.team_injects_number,
-        fillColor: teamsColors[a.team_id],
-      })),
-    },
-  ];
-  const maxInjectsNumber = Math.max(
-    ...topTeams.map((a: TeamStore) => a.team_injects_number),
-  );
+const InjectsDistribution: FunctionComponent<Props> = ({
+  topTeams,
+  distributionChartData,
+  maxInjectsNumber,
+}) => {
+  // Standard hooks
+  const { t } = useFormatter();
+  const theme = useTheme<Theme>();
 
   return (
     <>
@@ -63,7 +53,7 @@ const InjectsDistribution: FunctionComponent<Props> = ({
           height={50 + topTeams.length * 50}
         />
       ) : (
-        <Empty message={t('No teams in this exercise.')} />
+        <Empty message={t('No teams.')} />
       )}
     </>
   );

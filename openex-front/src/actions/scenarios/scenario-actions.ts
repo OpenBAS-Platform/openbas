@@ -91,13 +91,13 @@ export const removeScenarioTeams = (scenarioId: Scenario['scenario_id'], data: S
 )(dispatch);
 
 export const addScenarioTeamPlayers = (scenarioId: Scenario['scenario_id'], teamId: Team['team_id'], data: ScenarioTeamPlayersEnableInput) => (dispatch: Dispatch) => putReferential(
-  schema.exercise,
+  scenario,
   `/api/scenarios/${scenarioId}/teams/${teamId}/players/add`,
   data,
 )(dispatch);
 
 export const removeScenarioTeamPlayers = (scenarioId: Scenario['scenario_id'], teamId: Team['team_id'], data: ScenarioTeamPlayersEnableInput) => (dispatch: Dispatch) => putReferential(
-  schema.exercise,
+  scenario,
   `/api/scenarios/${scenarioId}/teams/${teamId}/players/remove`,
   data,
 )(dispatch);

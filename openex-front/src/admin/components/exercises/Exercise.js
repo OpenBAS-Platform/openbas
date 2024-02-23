@@ -53,7 +53,7 @@ import { deleteComcheck, fetchComchecks } from '../../../actions/Comcheck';
 import { deleteDryrun, fetchDryruns } from '../../../actions/Dryrun';
 import DryrunStatus from './controls/DryrunStatus';
 import ComcheckState from './controls/ComcheckState';
-import InjectsDistribution from '../injects/InjectsDistribution';
+import ExerciseInjectsDistribution from '../injects/ExerciseInjectsDistribution';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -414,7 +414,7 @@ const Exercise = () => {
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Injects distribution')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <InjectsDistribution teams={teams}/>
+            <ExerciseInjectsDistribution teams={teams}/>
           </Paper>
         </Grid>
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>

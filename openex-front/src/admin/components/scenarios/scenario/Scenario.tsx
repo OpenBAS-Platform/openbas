@@ -1,8 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import React, { useState } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid, Paper, Theme, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import { GroupsOutlined, NotificationsOutlined, PlayArrowOutlined } from '@mui/icons-material';
+import { Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, Grid, LinearProgress, linearProgressClasses, Paper, Theme, Typography } from '@mui/material';
+import { makeStyles, styled } from '@mui/styles';
+import { GroupsOutlined, NotificationsOutlined, PlayArrowOutlined, ScheduleOutlined } from '@mui/icons-material';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
@@ -11,11 +11,12 @@ import { fetchScenario, fetchScenarioTeams, toExercise, updateScenarioInformatio
 import { useFormatter } from '../../../../components/i18n';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import ScenarioSettingsForm from './ScenarioSettingsForm';
-import InjectsDistribution from '../../injects/InjectsDistribution';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import type { Exercise, ScenarioInformationInput } from '../../../../utils/api-types';
 import useScenarioPermissions from '../../../../utils/Scenario';
 import Transition from '../../../../components/common/Transition';
+import { inlineStyles } from '../../exercises/ExerciseStatus';
+import ScenarioInjectsDistribution from '../../injects/ScenarioInjectsDistribution';
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -29,6 +30,16 @@ const useStyles = makeStyles((theme: Theme) => ({
     alignItems: 'center',
     padding: '0 24px',
   },
+  chip: {
+    fontSize: 20,
+    fontWeight: 800,
+    textTransform: 'uppercase',
+    borderRadius: '0',
+  },
+  progress: {
+    margin: '0 50px',
+    flexGrow: 1,
+  },
   title: {
     textTransform: 'uppercase',
     fontSize: 12,
@@ -38,6 +49,15 @@ const useStyles = makeStyles((theme: Theme) => ({
   number: {
     fontSize: 30,
     fontWeight: 800,
+  },
+}));
+
+const BorderLinearProgress = styled(LinearProgress)(({ theme }: { theme: Theme }) => ({
+  height: 5,
+  borderRadius: 5,
+  [`& .${linearProgressClasses.bar}`]: {
+    borderRadius: 5,
+    backgroundColor: theme.palette.primary.main,
   },
 }));
 
@@ -91,9 +111,36 @@ const Scenario = () => {
     <>
       <Grid container spacing={3}>
         <Grid item xs={6}>
-          <Paper variant="outlined" classes={{ root: classes.container_metric }}>
-            Scenario status : reccurent, ect
+          <Paper
+            variant="outlined"
+            classes={{ root: classes.container_metric }}
+            style={{ display: 'flex' }}
+          >
+            <div>
+              <div className={classes.title}>{t('Status')}</div>
+              <Chip
+                classes={{ root: classes.chip }}
+                style={inlineStyles.grey}
+                label={t('None')}
+              />
+            </div>
+            <div className={classes.progress}>
+              <BorderLinearProgress
+                value={0}
+                variant="determinate"
+              />
+            </div>
+            <ScheduleOutlined color="primary" sx={{ fontSize: 50 }} />
           </Paper>
+          {/* <Paper variant="outlined" classes={{ root: classes.container_metric }}> */}
+          {/*  Scenario status : reccurent, ect */}
+          {/*  <div className={classes.progress}> */}
+          {/*    <BorderLinearProgress */}
+          {/*      value={0} */}
+          {/*      variant="determinate" */}
+          {/*    /> */}
+          {/*  </div> */}
+          {/* </Paper> */}
         </Grid>
         <Grid item xs={3}>
           <Paper variant="outlined" classes={{ root: classes.container_metric }}>
@@ -166,7 +213,7 @@ const Scenario = () => {
         <Grid item xs={6} style={{ paddingBottom: 24 }}>
           <Typography variant="h4">{t('Injects distribution')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <InjectsDistribution teams={teams} />
+            <ScenarioInjectsDistribution teams={teams} />
           </Paper>
         </Grid>
         <Grid item xs={6} style={{ paddingBottom: 24 }}>

@@ -54,7 +54,7 @@ const i18n = {
       'Create a new channel': 'Créer un nouveau canal',
       'Update the channel': 'Modifier le canal',
       'Recent exercises': 'Exercices récents',
-      'No teams in this exercise.': 'Aucune équipe dans cet exercice.',
+      'No teams.': 'Aucune équipe.',
       'No exercises in this platform.': 'Aucun exercice dans cette plateforme.',
       'Injects distribution': 'Distribution des stimulis',
       'Next injects to send': 'Prochains stimlis à envoyer',

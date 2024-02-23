@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { useParams } from 'react-router-dom';
 import type { Exercise, Inject } from '../../../../utils/api-types';
-import { InjectContext, InjectContextType } from '../../components/Context';
+import { ArticleContext, InjectContext, InjectContextType } from '../../components/Context';
 import { useAppDispatch } from '../../../../utils/hooks';
 import {
   addInjectForExercise,
@@ -24,6 +24,7 @@ import type { VariablesHelper } from '../../../../actions/variables/variable-hel
 import { fetchVariablesForExercise } from '../../../../actions/variables/variable-actions';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import { fetchExerciseArticles } from '../../../../actions/channels/article-action';
+import { articleContextForExercise } from '../articles/ExerciseArticles';
 
 interface Props {
 
@@ -53,6 +54,8 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
     dispatch(fetchVariablesForExercise(exerciseId));
   });
 
+  const articleContext = articleContextForExercise(exerciseId);
+
   const context: InjectContextType = {
     onAddInject(inject: Inject): Promise<{ result: string }> {
       return dispatch(addInjectForExercise(exerciseId, inject));
@@ -79,11 +82,13 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
 
   return (
     <InjectContext.Provider value={context}>
-      <Injects injects={injects} teams={teams} articles={articles} variables={variables}
-        uriVariable={`/admin/exercises/${exerciseId}/definition/variables`}
-        allUsersNumber={exercise.exercise_all_users_number} usersNumber={exercise.exercise_users_number}
-        teamsUsers={exercise.exercise_teams_users}
-      />
+      <ArticleContext.Provider value={articleContext}>
+        <Injects injects={injects} teams={teams} articles={articles} variables={variables}
+          uriVariable={`/admin/exercises/${exerciseId}/definition/variables`}
+          allUsersNumber={exercise.exercise_all_users_number} usersNumber={exercise.exercise_users_number}
+          teamsUsers={exercise.exercise_teams_users}
+        />
+      </ArticleContext.Provider>
     </InjectContext.Provider>
   );
 };

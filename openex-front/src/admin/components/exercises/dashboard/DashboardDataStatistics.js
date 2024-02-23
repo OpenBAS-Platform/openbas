@@ -57,7 +57,7 @@ const DashboardDataStatistics = ({
     R.map((n) => {
       cumulation = 0;
       return R.assoc(
-        'team_injects',
+        'team_exercise_injects',
         R.pipe(
           R.map((i) => injectsMap[i]),
           R.filter((i) => i && i.inject_sent_at !== null),
@@ -66,14 +66,14 @@ const DashboardDataStatistics = ({
             cumulation += 1;
             return R.assoc('inject_cumulated_number', cumulation, i);
           }),
-        )(n.team_injects),
+        )(n.team_exercise_injects),
         n,
       );
     }),
     R.map((a) => ({
       name: a.team_name,
       color: teamsColors[a.team_id],
-      data: a.team_injects.map((i) => ({
+      data: a.team_exercise_injects.map((i) => ({
         x: i.inject_sent_at,
         y: i.inject_cumulated_number,
       })),

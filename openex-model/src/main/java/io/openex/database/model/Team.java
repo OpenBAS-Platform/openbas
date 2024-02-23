@@ -104,16 +104,28 @@ public class Team implements Base {
     }
 
     // region transient
-    @JsonProperty("team_injects")
+    @JsonProperty("team_exercise_injects")
     @JsonSerialize(using = MultiIdDeserializer.class)
-    public List<Inject> getInjects() {
+    public List<Inject> getExercisesInjects() {
         Predicate<Inject> selectedInject = inject -> inject.isAllTeams() || inject.getTeams().contains(this);
         return getExercises().stream().map(exercise -> exercise.getInjects().stream().filter(selectedInject).distinct().toList()).flatMap(List::stream).toList();
     }
 
-    @JsonProperty("team_injects_number")
-    public long getInjectsNumber() {
-        return getInjects().size();
+    @JsonProperty("team_exercise_injects_number")
+    public long getExercisesInjectsNumber() {
+        return getExercisesInjects().size();
+    }
+
+    @JsonProperty("team_scenario_injects")
+    @JsonSerialize(using = MultiIdDeserializer.class)
+    public List<Inject> getScenariosInjects() {
+        Predicate<Inject> selectedInject = inject -> inject.isAllTeams() || inject.getTeams().contains(this);
+        return getScenarios().stream().map(scenario -> scenario.getInjects().stream().filter(selectedInject).distinct().toList()).flatMap(List::stream).toList();
+    }
+
+    @JsonProperty("team_scenario_injects_number")
+    public long getScenariosInjectsNumber() {
+        return getScenariosInjects().size();
     }
 
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
@@ -139,7 +151,7 @@ public class Team implements Base {
 
     @JsonProperty("team_communications")
     public List<Communication> getCommunications() {
-        return getInjects().stream().flatMap(inject -> inject.getCommunications().stream())
+        return getExercisesInjects().stream().flatMap(inject -> inject.getCommunications().stream())
                 .distinct()
                 .toList();
     }

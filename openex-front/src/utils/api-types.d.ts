@@ -1362,21 +1362,24 @@ export interface Team {
   /** @format date-time */
   team_created_at?: string;
   team_description?: string;
+  team_exercise_injects?: Inject[];
+  /** @format int64 */
+  team_exercise_injects_number?: number;
   team_exercises?: Exercise[];
   team_exercises_users?: ExerciseTeamUser[];
   team_id: string;
   team_inject_expectations?: InjectExpectation[];
-  team_injects?: Inject[];
   /** @format int64 */
   team_injects_expectations_number?: number;
   /** @format int64 */
   team_injects_expectations_total_expected_score?: number;
   /** @format int64 */
   team_injects_expectations_total_score?: number;
-  /** @format int64 */
-  team_injects_number?: number;
   team_name: string;
   team_organization?: Organization;
+  team_scenario_injects?: Inject[];
+  /** @format int64 */
+  team_scenario_injects_number?: number;
   team_scenarios?: Scenario[];
   team_tags?: Tag[];
   /** @format date-time */

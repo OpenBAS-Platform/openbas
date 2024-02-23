@@ -267,7 +267,7 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
                 }
               }}
               onRemoveTag={(value: Option['id']) => {
-                setTags(tags.toSpliced(tags.indexOf(value), 1));
+                setTags(tags.splice(tags.indexOf(value), 1));
               }}
               currentTags={tags}
               thin={true}
