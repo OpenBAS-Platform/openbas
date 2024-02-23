@@ -235,7 +235,7 @@ const i18n = {
       'Remove from the team': "Retirer de l'équipe",
       'Update the team': "Modifier l'équipe",
       'Update the exercise': "Modifier l'exercice",
-      'Update the scenario': "Modifier le scenario",
+      'Update the scenario': 'Modifier le scenario',
       'Update the inject': 'Modifier le stimuli',
       'Do you want to remove the player from the team?':
         'Souhaitez-vous retirer le joueur de cette équipe ?',
@@ -497,7 +497,7 @@ const i18n = {
       'Create an image': 'Créer une image',
       'Change logo': 'Changer le logo',
       'Scheduled / in use': 'Planifié / utilisé',
-      'Not used in the context': "Pas utilisé dans ce contexte",
+      'Not used in the context': 'Pas utilisé dans ce contexte',
       'Update the channel pressure': 'Modifier la pression médiatique',
       'Do you want to delete this channel pressure?':
         'Souhaitez-vous supprimer cette pression médiatique ?',
