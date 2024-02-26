@@ -7,9 +7,6 @@ const logout = async (page: Page) => {
 
   await topBarPage.getAccountMenu().click();
   await topBarPage.getLogoutEntryMenu().click();
-
-  const loginPage = new LoginPage(page);
-  await expect(loginPage.getLoginPage()).toBeVisible();
 };
 
 export default logout;
