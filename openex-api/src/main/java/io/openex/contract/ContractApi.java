@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.InputStream;
@@ -22,10 +23,12 @@ import java.util.List;
 import java.util.Map;
 
 import static io.openex.contract.ContractService.TYPE;
+import static io.openex.database.model.User.ROLE_ADMIN;
 
 @RequiredArgsConstructor
 @RestController
 @Slf4j
+@Secured(ROLE_ADMIN)
 @RequestMapping("/api/contracts")
 public class ContractApi extends RestBehavior {
 
