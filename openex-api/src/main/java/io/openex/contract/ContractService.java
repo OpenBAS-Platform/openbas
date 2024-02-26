@@ -5,6 +5,7 @@ import io.openex.database.model.Inject;
 import io.openex.helper.SupportedLanguage;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -113,7 +114,7 @@ public class ContractService {
     private List<Contract> searchContracts(ContractSearchInput contractSearchInput, Sort sort) {
         return getContracts().values().stream()
                 .filter(contract -> (!contractSearchInput.isExposedContractsOnly() || contract.getConfig().isExpose())
-                        && Optional.ofNullable(contractSearchInput.getType()).map(typeLabel -> contractContainsType(contract, typeLabel)).orElse(true)
+                        && Optional.ofNullable(contractSearchInput.getType()).map(typeLabel -> contractHasType(contract, typeLabel)).orElse(true)
                         && Optional.ofNullable(contractSearchInput.getTextSearch()).map(text -> contractContainsText(contract, text)).orElse(true))
                 .sorted(getComparator(sort))
                 .toList();
@@ -184,8 +185,8 @@ public class ContractService {
      * @param typeLabel The type to check for within the Contract.
      * @return {@code true} if the type is found within the Contract, {@code false} otherwise.
      */
-    private boolean contractContainsType(Contract contract, String typeLabel) {
-        return contract.getConfig().getLabel().get(getLang()).equals(typeLabel);
+    private boolean contractHasType(Contract contract, String typeLabel) {
+        return StringUtils.equalsIgnoreCase(contract.getConfig().getLabel().get(getLang()), typeLabel);
     }
 
     /**
@@ -210,7 +211,7 @@ public class ContractService {
      * @return {@code true} if the label contains the text, {@code false} otherwise.
      */
     private boolean containsTextInLabel(String label, String text) {
-        return label.contains(text);
+        return StringUtils.containsIgnoreCase(label, text);
     }
 
     /**
@@ -221,6 +222,6 @@ public class ContractService {
      * @return {@code true} if any contract element contains the text, {@code false} otherwise.
      */
     private boolean containsTextInFields(List<ContractElement> fields, String text) {
-        return fields.stream().anyMatch(field -> field.getLabel().contains(text));
+        return fields.stream().anyMatch(field -> StringUtils.containsIgnoreCase(field.getLabel(), text));
     }
 }

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -52,7 +53,8 @@ class ContratApiTest extends IntegrationTest {
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(contractSearchInput)))
-                        .andExpect(status().is2xxSuccessful());
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(3));
             }
         }
     }
