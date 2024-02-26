@@ -91,6 +91,9 @@ module.exports = {
         "devDependencies": [
           "**/*.test.tsx",
           "**/*.test.ts",
+          "vite.config.ts",
+          "vitest.config.ts",
+          "playwright.config.ts",
         ]
       }
     ]

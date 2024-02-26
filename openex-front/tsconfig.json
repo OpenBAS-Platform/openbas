@@ -20,9 +20,15 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": [
-    "src",
-    "tests_e2e"
+  "exclude": [
+    "node_modules",
+    "coverage",
+    "packages",
+    "public",
+    "builder/dev/build",
+    "builder/prod/build",
+    "src/static/ext/*",
+    "__generated__"
   ],
   "references": [
     {

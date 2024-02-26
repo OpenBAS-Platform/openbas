@@ -110,7 +110,7 @@
     "start": "vite",
     "deprecated-start": "node builder/dev/dev.js",
     "build": "node builder/prod/prod.js",
-    "lint": "cross-env DEBUG=eslint:cli-engine TIMING=1 eslint --max-warnings 0 --cache src tests_e2e",
+    "lint": "cross-env DEBUG=eslint:cli-engine TIMING=1 eslint --max-warnings 0 --cache .",
     "control": "yarn audit --groups dependencies --summary",
     "test": "vitest run",
     "check-ts": "tsc --noEmit",
