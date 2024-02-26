@@ -15,6 +15,6 @@ const login = async (page: Page) => {
 
   const topBarPage = new TopBarPage(page);
   await expect(topBarPage.getAccountMenu()).toBeVisible();
-}
+};
 
 export default login;

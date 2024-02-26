@@ -13,8 +13,8 @@ logger.error = (msg, options) => {
 
 const basePath = '';
 
-const backProxy = (backEndUrl: string) => ({
-  target: backEndUrl || 'http://localhost:8080',
+const backProxy = () => ({
+  target: 'http://localhost:8080',
   changeOrigin: true,
   ws: true,
 });
@@ -100,11 +100,11 @@ export default ({ mode }: { mode: string }) => {
     server: {
       port: 3001,
       proxy: {
-        '/api': backProxy(process.env.BACK_END_URL || ''),
-        '/login': backProxy(process.env.BACK_END_URL || ''),
-        '/logout': backProxy(process.env.BACK_END_URL || ''),
-        '/oauth2': backProxy(process.env.BACK_END_URL || ''),
-        '/saml2': backProxy(process.env.BACK_END_URL || ''),
+        '/api': backProxy(),
+        '/login': backProxy(),
+        '/logout': backProxy(),
+        '/oauth2': backProxy(),
+        '/saml2': backProxy(),
       },
     },
   });

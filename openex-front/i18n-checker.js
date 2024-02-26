@@ -55,7 +55,7 @@ const run = () => {
   if (results.length === 0) {
     process.exit(0);
   } else {
-    // eslint-ignore-next-line no-console
+    // eslint-disable-next-line no-console
     console.error(`Missing keys : ${results.join(', ')}`);
     process.exit(1);
   }
