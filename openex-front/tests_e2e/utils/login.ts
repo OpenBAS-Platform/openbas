@@ -1,6 +1,6 @@
 import { expect, Page } from '@playwright/test';
-import { LoginPage } from '../model/login.page';
-import { TopBarPage } from '../model/topBar.page';
+import LoginPage from '../model/login.page';
+import TopBarPage from '../model/topBar.page';
 import appUrl from './url';
 
 const login = async (page: Page) => {

@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import { TopBarPage } from '../model/topBar.page';
+import TopBarPage from '../model/topBar.page';
 
 const logout = async (page: Page) => {
   const topBarPage = new TopBarPage(page);

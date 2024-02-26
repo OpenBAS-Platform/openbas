@@ -1,7 +1,6 @@
 import { Page } from '@playwright/test';
 
-// eslint-disable-next-line import/prefer-default-export
-export class LoginPage {
+class LoginPage {
   constructor(private page: Page) {
   }
 
@@ -21,3 +20,5 @@ export class LoginPage {
     return this.page.getByRole('button', { name: 'Sign in' });
   }
 }
+
+export default LoginPage;

@@ -1,7 +1,6 @@
 import { Page } from '@playwright/test';
 
-// eslint-disable-next-line import/prefer-default-export
-export class TopBarPage {
+class TopBarPage {
   constructor(private page: Page) {
   }
 
@@ -13,3 +12,5 @@ export class TopBarPage {
     return this.page.getByLabel('logout-item');
   }
 }
+
+export default TopBarPage;
