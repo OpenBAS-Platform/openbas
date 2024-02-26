@@ -1,7 +1,7 @@
 import React, { lazy } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
-import { fetchChannel } from '../../../../actions/Channel';
+import { fetchChannel } from '../../../../actions/channels/channel-action';
 import Loader from '../../../../components/Loader';
 import TopBar from '../../nav/TopBar';
 import ChannelHeader from './ChannelHeader';
@@ -9,7 +9,8 @@ import { errorWrapper } from '../../../../components/Error';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { ChannelsHelper } from '../../../../actions/helper';
+import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
+import type { Channel as ChannelType } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -22,7 +23,7 @@ const Channel = lazy(() => import('./Channel'));
 const Index = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const { channelId } = useParams();
+  const { channelId } = useParams() as { channelId: ChannelType['channel_id'] };
   const { channel } = useHelper((helper: ChannelsHelper) => ({
     channel: helper.getChannel(channelId),
   }));

@@ -1,40 +1,28 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+  Button,
+  Checkbox,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
-  Button,
-  IconButton,
-  Menu,
-  MenuItem,
+  DialogTitle,
   Table,
+  TableBody,
+  TableCell,
+  TableContainer,
   TableHead,
   TableRow,
-  TableCell,
-  TableBody,
-  Checkbox,
-  TableContainer,
-  PopoverProps,
 } from '@mui/material';
-import { MoreVert } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../components/i18n';
 import ExerciseForm from './ExerciseForm';
 import { deleteExercise, updateExercise } from '../../../actions/Exercise';
-import { isExerciseReadOnly } from '../../../utils/Exercise';
+import { usePermissions } from '../../../utils/Exercise';
 import Transition from '../../../components/common/Transition';
 import type { Exercise, ExerciseUpdateInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
-
-const useStyles = makeStyles(() => ({
-  button: {
-    float: 'left',
-    margin: '-10px 0 0 5px',
-  },
-}));
+import ButtonPopover, { ButtonPopoverEntry } from '../../../components/common/ButtonPopover';
 
 interface ExercisePopoverProps {
   exercise: Exercise;
@@ -43,30 +31,19 @@ interface ExercisePopoverProps {
 const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   exercise,
 }) => {
-  const classes = useStyles();
   const { t } = useFormatter();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const [anchorEl, setAnchorEl] = useState<PopoverProps['anchorEl']>(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openExport, setOpenExport] = useState(false);
   const [exportPlayers, setExportPlayers] = useState(false);
   const [exportVariableValues, setExportVariableValues] = useState(false);
 
-  // Popover
-  const handlePopoverOpen = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handlePopoverClose = () => setAnchorEl(null);
-
   // Edition
   const handleOpenEdit = () => {
     setOpenEdit(true);
-    handlePopoverClose();
   };
 
   const handleCloseEdit = () => setOpenEdit(false);
@@ -78,7 +55,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   // Deletion
   const handleOpenDelete = () => {
     setOpenDelete(true);
-    handlePopoverClose();
   };
 
   const handleCloseDelete = () => setOpenDelete(false);
@@ -91,7 +67,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   // Export
   const handleOpenExport = () => {
     setOpenExport(true);
-    handlePopoverClose();
   };
 
   const handleCloseExport = () => setOpenExport(false);
@@ -117,37 +92,18 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     exercise_message_footer: exercise.exercise_message_footer,
   };
 
+  const permissions = usePermissions(exercise.exercise_id);
+
+  // Button Popover
+  const entries: ButtonPopoverEntry[] = [
+    { label: 'Update', action: handleOpenEdit, disabled: !permissions.canWriteBypassStatus },
+    { label: 'Export', action: handleOpenExport },
+    { label: 'Delete', action: handleOpenDelete, disabled: !permissions.canWriteBypassStatus },
+  ];
+
   return (
     <>
-      <IconButton
-        classes={{ root: classes.button }}
-        color="primary"
-        onClick={handlePopoverOpen}
-        aria-haspopup="true"
-        aria-label="More actions"
-        size="large"
-      >
-        <MoreVert />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handlePopoverClose}
-      >
-        <MenuItem
-          onClick={handleOpenEdit}
-          disabled={isExerciseReadOnly(exercise, true)}
-        >
-          {t('Update')}
-        </MenuItem>
-        <MenuItem onClick={handleOpenExport}>{t('Export')}</MenuItem>
-        <MenuItem
-          onClick={handleOpenDelete}
-          disabled={isExerciseReadOnly(exercise, true)}
-        >
-          {t('Delete')}
-        </MenuItem>
-      </Menu>
+      <ButtonPopover entries={entries} />
       <Dialog
         open={openDelete}
         TransitionComponent={Transition}
@@ -205,7 +161,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
               <TableBody>
                 <TableRow>
                   <TableCell>
-                    {t('Scenario (including attached files)')}
+                    {t('Injects (including attached files)')}
                   </TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
                     <Checkbox checked={true} disabled={true} />

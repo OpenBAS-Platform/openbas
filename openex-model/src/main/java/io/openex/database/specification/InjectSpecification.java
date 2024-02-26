@@ -13,6 +13,10 @@ public class InjectSpecification {
         return (root, query, cb) -> cb.equal(root.get("exercise").get("id"), exerciseId);
     }
 
+    public static Specification<Inject> fromScenario(String scenarioId) {
+        return (root, query, cb) -> cb.equal(root.get("scenario").get("id"), scenarioId);
+    }
+
     public static Specification<Inject> next() {
         return (root, query, cb) -> {
             Path<Object> exercisePath = root.get("exercise");

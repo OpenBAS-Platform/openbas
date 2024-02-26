@@ -9,7 +9,7 @@ import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import { fetchExerciseInjects, fetchInjectTypes } from '../../../../actions/Inject';
-import InjectIcon from '../injects/InjectIcon';
+import InjectIcon from '../../components/injects/InjectIcon';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { useFormatter } from '../../../../components/i18n';
 import useDataLoader from '../../../../utils/ServerSideEvent';

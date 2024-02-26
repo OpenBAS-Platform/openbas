@@ -9,20 +9,23 @@ import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchExerciseTeams } from '../../../../actions/Exercise';
-import { fetchInjects, fetchInjectTypes } from '../../../../actions/Inject';
+import { fetchInjects, fetchInjectTypes, updateInjectForExercise } from '../../../../actions/Inject';
 import Empty from '../../../../components/Empty';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import InjectIcon from '../injects/InjectIcon';
+import InjectIcon from '../../components/injects/InjectIcon';
 import { splitDuration } from '../../../../utils/Time';
-import InjectPopover from '../injects/InjectPopover';
-import InjectStatus from '../injects/InjectStatus';
+import InjectPopover from '../../components/injects/InjectPopover';
+import InjectStatus from '../../components/injects/InjectStatus';
 import { truncate } from '../../../../utils/String';
-import InjectDefinition from '../injects/InjectDefinition';
-import InjectStatusDetails from '../injects/InjectStatusDetails';
+import InjectDefinition from '../../components/injects/InjectDefinition';
+import InjectStatusDetails from '../../components/injects/InjectStatusDetails';
 import ProgressBarCountdown from '../../../../components/ProgressBarCountdown';
 import AnimationMenu from '../AnimationMenu';
+import { usePermissions } from '../../../../utils/Exercise';
+import { fetchExerciseArticles } from '../../../../actions/channels/article-action';
+import { fetchVariablesForExercise } from '../../../../actions/variables/variable-actions';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -136,6 +139,7 @@ const Timeline = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const { exerciseId } = useParams();
+  const permissions = usePermissions(exerciseId);
   const { t, fndt } = useFormatter();
   const {
     exercise,
@@ -143,10 +147,11 @@ const Timeline = () => {
     injects,
     injectTypesMap,
     injectTypesWithNoTeams,
-    exercisesMap,
     tagsMap,
     teamsInjectsMap,
     technicalInjectsMap,
+    articles,
+    variables,
   } = useHelper((helper) => {
     const exerciseTeams = helper.getExerciseTeams(exerciseId);
     const injectsPerTeam = R.mergeAll(
@@ -165,6 +170,8 @@ const Timeline = () => {
         helper.getExerciseTechnicalInjectsPerType(exerciseId),
       injectTypesMap: helper.getInjectTypesMap(),
       injectTypesWithNoTeams: helper.getInjectTypesWithNoTeams(),
+      articles: helper.getExerciseArticles(exerciseId),
+      variables: helper.getExerciseVariables(exerciseId),
     };
   });
   const technicalTeams = injectTypesWithNoTeams
@@ -183,6 +190,8 @@ const Timeline = () => {
     dispatch(fetchInjectTypes());
     dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchInjects(exerciseId));
+    dispatch(fetchExerciseArticles(exerciseId));
+    dispatch(fetchVariablesForExercise(exerciseId));
   });
   // Filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
@@ -232,6 +241,8 @@ const Timeline = () => {
   const grid15 = theme.palette.mode === 'light'
     ? '1px dashed rgba(0, 0, 0, 0.15)'
     : '1px dashed rgba(255, 255, 255, 0.15)';
+
+  const onUpdateInject = (injectId, inject) => dispatch(updateInjectForExercise(exerciseId, injectId, inject));
   return (
     <div className={classes.root}>
       <AnimationMenu exerciseId={exerciseId} />
@@ -545,16 +556,22 @@ const Timeline = () => {
         classes={{ paper: classes.drawerPaper }}
         onClose={() => setSelectedInject(null)}
         elevation={1}
-        disableEnforceFocus={true}
+        disableEnforceFocus
       >
         <InjectDefinition
           injectId={selectedInject}
-          exerciseId={exercise.exercise_id}
-          exercise={exercise}
           injectTypes={injectTypes}
           handleClose={() => setSelectedInject(null)}
-          exercisesMap={exercisesMap}
           tagsMap={tagsMap}
+          permissions={permissions}
+          teamsFromExerciseOrScenario={teams}
+          articlesFromExerciseOrScenario={articles}
+          variablesFromExerciseOrScenario={variables}
+          onUpdateInject={onUpdateInject}
+          uriVariable={`/admin/exercises/${exerciseId}/definition/variables`}
+          allUsersNumber={exercise.exercise_all_users_number}
+          usersNumber={exercise.exercise_users_number}
+          teamsUsers={exercise.exercise_teams_users}
         />
       </Drawer>
     </div>

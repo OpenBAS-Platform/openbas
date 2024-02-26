@@ -2,7 +2,7 @@ import React, { FunctionComponent, useState } from 'react';
 import { Dialog as MuiDialog, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import Dialog from '../../../../components/common/Dialog';
-import { updateTeamPlayers } from '../../../../actions/Team';
+import { updateTeamPlayers } from '../../../../actions/teams/team-actions';
 import { deletePlayer, updatePlayer } from '../../../../actions/User';
 import PlayerForm from './PlayerForm';
 import { useFormatter } from '../../../../components/i18n';
@@ -11,7 +11,7 @@ import Transition from '../../../../components/common/Transition';
 import type { UpdatePlayerInput } from '../../../../utils/api-types';
 import { countryOption, Option, organizationOption, tagOptions } from '../../../../utils/Option';
 import { useHelper } from '../../../../store';
-import type { ExercicesHelper, OrganizationsHelper, TagsHelper, UsersHelper } from '../../../../actions/helper';
+import type { OrganizationsHelper, TagsHelper, UsersHelper } from '../../../../actions/helper';
 import type { PlayerInputForm, UserStore } from './Player';
 
 interface PlayerPopoverProps {
@@ -30,7 +30,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   const dispatch = useAppDispatch();
   const { userAdmin, organizationsMap, tagsMap } = useHelper(
     (
-      helper: ExercicesHelper & UsersHelper & OrganizationsHelper & TagsHelper,
+      helper: UsersHelper & OrganizationsHelper & TagsHelper,
     ) => {
       return {
         userAdmin: helper.getMe()?.user_admin,
@@ -93,8 +93,8 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
 
   const submitRemove = () => {
     return dispatch(
-      updateTeamPlayers(teamId, {
-        team_users: teamUsersIds?.filter((id) => id !== user.user_id),
+      updateTeamPlayers(teamId!, {
+        team_users: teamUsersIds?.filter((id) => id !== user.user_id) || [],
       }),
     ).then(() => handleCloseRemove());
   };

@@ -1,6 +1,18 @@
 import * as R from 'ramda';
-import countries from '../static/geo/countries.json';
-import type { Exercise, KillChainPhase, Organization, Tag } from './api-types';
+import countriesJson from '../static/geo/countries.json';
+import type { Exercise, KillChainPhase, Organization, Scenario, Tag } from './api-types';
+
+interface Countries {
+  features: [{
+    properties: {
+      ISO3: string,
+      NAME: string,
+    }
+  }]
+}
+
+//  eslint-disable-next-line @typescript-eslint/no-explicit-any
+const countries: Countries = countriesJson as any;
 
 export interface Option {
   id: string;
@@ -45,6 +57,19 @@ export const exerciseOptions = (
     (exerciseItem) => ({
       id: exerciseItem.exercise_id,
       label: exerciseItem.exercise_name,
+    }) as Option,
+  );
+
+export const scenarioOptions = (
+  scenario_ids: string[],
+  scenariosMap: Record<string, Scenario>,
+) => (scenario_ids ?? [])
+  .map((scenarioId) => scenariosMap[scenarioId])
+  .filter((scenarioItem) => scenarioItem !== undefined)
+  .map(
+    (scenarioItem) => ({
+      id: scenarioItem.scenario_id,
+      label: scenarioItem.scenario_name,
     }) as Option,
   );
 

@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import ComcheckForm from './ComcheckForm';
 import DryrunForm from './DryrunForm';
 import { resolveUserName } from '../../../../utils/String';
-import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import { isExerciseReadOnly, usePermissions } from '../../../../utils/Exercise';
 import type { Theme } from '../../../../components/Theme';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ComcheckInput, Exercise } from '../../../../utils/api-types';
@@ -16,7 +16,9 @@ import { addDryrun } from '../../../../actions/Dryrun';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import { useHelper } from '../../../../store';
-import type { TeamsHelper, ExercicesHelper, UsersHelper } from '../../../../actions/helper';
+import type { UsersHelper } from '../../../../actions/helper';
+import type { TeamsHelper } from '../../../../actions/teams/team-helper';
+import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 
 const useStyles = makeStyles<Theme>(() => ({
   createButton: {
@@ -41,7 +43,7 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
   const dispatch = useAppDispatch();
 
   const { me, exercise, teams } = useHelper(
-    (helper: UsersHelper & ExercicesHelper & TeamsHelper) => {
+    (helper: UsersHelper & ExercisesHelper & TeamsHelper) => {
       return {
         me: helper.getMe(),
         exercise: helper.getExercise(exerciseId),
@@ -73,6 +75,8 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
     );
   };
 
+  const permissions = usePermissions(exercise.exercise_id);
+
   return (
     <div>
       {variant === 'buttons' ? (
@@ -84,7 +88,7 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
               startIcon={<VideoSettingsOutlined />}
               color="info"
               onClick={() => setOpenDryrun(true)}
-              disabled={isExerciseReadOnly(exercise)}
+              disabled={!permissions.canWrite}
             >
               {t('Launch')}
             </Button>
@@ -96,7 +100,7 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
               startIcon={<MarkEmailReadOutlined />}
               color="secondary"
               onClick={() => setOpenComcheck(true)}
-              disabled={isExerciseReadOnly(exercise)}
+              disabled={!permissions.canWrite}
             >
               {t('Send')}
             </Button>
@@ -138,7 +142,7 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
               comcheck_subject: t('[${exercise.name}] Communication check'),
               comcheck_message: `${t('Hello')},<br /><br />${t(
                 'This is a communication check before the beginning of the exercise. Please click on the following link'
-                  + ' in order to confirm you successfully received this message: <a href="${comcheck.url}">${comcheck.url}</a>.',
+                + ' in order to confirm you successfully received this message: <a href="${comcheck.url}">${comcheck.url}</a>.',
               )}<br /><br />${t('Best regards')},<br />${t(
                 'The exercise control team',
               )}`,

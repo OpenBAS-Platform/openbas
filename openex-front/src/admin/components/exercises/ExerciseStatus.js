@@ -23,7 +23,7 @@ const styles = () => ({
   },
 });
 
-const inlineStyles = {
+export const inlineStyles = {
   white: {
     backgroundColor: 'rgb(231, 133, 109, 0.08)',
     color: '#8d4e41',

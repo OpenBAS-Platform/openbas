@@ -63,6 +63,12 @@ public class Variable implements Base {
   @JsonProperty("variable_exercise")
   private Exercise exercise;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "variable_scenario")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("variable_scenario")
+  private Scenario scenario;
+
   // -- AUDIT --
 
   @Column(name = "variable_created_at")

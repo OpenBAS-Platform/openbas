@@ -33,7 +33,7 @@ const DashboardDefinitionStatistics = ({
     R.fromPairs,
   )(teams);
   const sortedTeamsByInjectsNumber = R.pipe(
-    R.sortWith([R.descend(R.prop('team_injects_number'))]),
+    R.sortWith([R.descend(R.prop('team_exercise_injects_number'))]),
     R.take(10),
   )(teams || []);
   const injectsByTeamData = [
@@ -41,7 +41,7 @@ const DashboardDefinitionStatistics = ({
       name: t('Number of injects'),
       data: sortedTeamsByInjectsNumber.map((a) => ({
         x: a.team_name,
-        y: a.team_injects_number,
+        y: a.team_exercise_injects_number,
         fillColor: teamsColors[a.team_id],
       })),
     },

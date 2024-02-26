@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
-import { Button, ListItem, ListItemIcon, List, MenuItem, Grid, Typography, ListItemText, ListItemSecondaryAction, IconButton } from '@mui/material';
+import { Button, Grid, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Typography } from '@mui/material';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
@@ -118,10 +118,8 @@ const ChallengeForm = (props) => {
   };
   const required = (value) => (value ? undefined : t('This field is required.'));
   const requiredArray = (value) => (value && value.length > 0 ? undefined : t('This field is required.'));
-  const { exercisesMap, documentsMap, tagsMap } = useHelper((helper) => ({
-    exercisesMap: helper.getExercisesMap(),
+  const { documentsMap } = useHelper((helper) => ({
     documentsMap: helper.getDocumentsMap(),
-    tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchExercises());
@@ -292,9 +290,8 @@ const ChallengeForm = (props) => {
                   />
                   <ListItemSecondaryAction>
                     <DocumentPopover
+                      inline
                       document={document}
-                      exercisesMap={exercisesMap}
-                      tagsMap={tagsMap}
                       onRemoveDocument={handleRemoveDocument}
                     />
                   </ListItemSecondaryAction>

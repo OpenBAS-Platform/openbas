@@ -1,4 +1,4 @@
-import { DialogContent, List, ListItem, ListItemText, Alert, DialogActions, ListItemButton, Tab, Button, Dialog } from '@mui/material';
+import { Alert, Button, Dialog, DialogActions, DialogContent, List, ListItem, ListItemButton, ListItemText, Tab } from '@mui/material';
 import React, { FunctionComponent, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { Link } from 'react-router-dom';
@@ -6,11 +6,8 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { CopyAllOutlined } from '@mui/icons-material';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import type { Contract, User, Variable } from '../../../../utils/api-types';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchVariables, VariablesHelper } from '../../../../actions/Variable';
+import type { Contract, Variable } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
-import { useAppDispatch } from '../../../../utils/hooks';
 import type { UsersHelper } from '../../../../actions/helper';
 import { copyToClipboard } from '../../../../utils/CopyToClipboard';
 
@@ -75,33 +72,23 @@ const useStyles = makeStyles(() => ({
 interface AvailableVariablesDialogProps {
   open: boolean;
   handleClose: () => void;
-  exerciseId: string;
+  variables: Variable[];
   injectType: Contract;
+  uriVariable: string;
 }
 
 const AvailableVariablesDialog: FunctionComponent<
 AvailableVariablesDialogProps
-> = ({ open, handleClose, exerciseId, injectType }) => {
+> = ({ open, handleClose, variables, injectType, uriVariable }) => {
   const classes = useStyles();
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   const [tab, setTab] = useState('1');
 
   const handleChange = (_event: React.SyntheticEvent, newTab: string) => {
     setTab(newTab);
   };
 
-  const { variables, me }: { variables: [Variable]; me: User } = useHelper(
-    (helper: VariablesHelper & UsersHelper) => {
-      return {
-        variables: helper.getExerciseVariables(exerciseId),
-        me: helper.getMe(),
-      };
-    },
-  );
-  useDataLoader(() => {
-    dispatch(fetchVariables(exerciseId));
-  });
+  const me = useHelper((helper: UsersHelper) => helper.getMe());
 
   return (
     <Dialog
@@ -184,7 +171,7 @@ AvailableVariablesDialogProps
               {/* @ts-ignore */}
               <Button
                 component={Link}
-                to={`/admin/exercises/${exerciseId}/definition/variables`}
+                to={uriVariable}
                 color="primary"
                 variant="text"
                 size="small"

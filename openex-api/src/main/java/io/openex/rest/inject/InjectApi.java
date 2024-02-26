@@ -9,12 +9,10 @@ import io.openex.execution.ExecutionContext;
 import io.openex.execution.Injector;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.inject.form.*;
-import io.openex.service.AssetGroupService;
-import io.openex.service.AssetService;
-import io.openex.service.ContractService;
-import io.openex.service.ExecutionContextService;
+import io.openex.service.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -33,6 +31,7 @@ import static io.openex.database.specification.CommunicationSpecification.fromIn
 import static io.openex.helper.DatabaseHelper.resolveOptionalRelation;
 import static io.openex.helper.DatabaseHelper.updateRelation;
 import static io.openex.helper.StreamHelper.fromIterable;
+import static io.openex.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static java.time.Instant.now;
 
 @RestController
@@ -53,6 +52,7 @@ public class InjectApi extends RestBehavior {
   private ApplicationContext context;
   private ContractService contractService;
   private ExecutionContextService executionContextService;
+  private ScenarioService scenarioService;
 
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
@@ -111,6 +111,11 @@ public class InjectApi extends RestBehavior {
   }
 
   @Autowired
+  public void setScenarioService(ScenarioService scenarioService) {
+    this.scenarioService = scenarioService;
+  }
+
+  @Autowired
   public void setContext(ApplicationContext context) {
     this.context = context;
   }
@@ -149,53 +154,15 @@ public class InjectApi extends RestBehavior {
       @PathVariable String injectId,
       @Valid @RequestBody InjectInput input) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    inject.setUpdateAttributes(input);
-    // Set dependencies
-    inject.setDependsOn(updateRelation(input.getDependsOn(), inject.getDependsOn(), injectRepository));
-    inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
-    inject.setAssets(fromIterable(this.assetService.assets(input.getAssets())));
-    inject.setAssetGroups(fromIterable(this.assetGroupService.assetGroups(input.getAssetGroups())));
+    Inject inject = updateInject(injectId, input);
 
-    inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
-    List<InjectDocumentInput> documents = input.getDocuments();
-    List<String> askedDocumentIds = documents.stream().map(InjectDocumentInput::getDocumentId).toList();
-    List<String> currentDocumentIds = inject.getDocuments().stream().map(document -> document.getDocument().getId())
-        .toList();
-    // region Set documents
-    List<InjectDocument> injectDocuments = inject.getDocuments();
-    // To delete
-    List<InjectDocument> toRemoveDocuments = inject.getDocuments().stream()
-        .filter(injectDoc -> !askedDocumentIds.contains(injectDoc.getDocument().getId()))
-        .toList();
-    injectDocuments.removeAll(toRemoveDocuments);
-    // To add
-    documents.stream().filter(doc -> !currentDocumentIds.contains(doc.getDocumentId())).forEach(in -> {
-      Optional<Document> doc = documentRepository.findById(in.getDocumentId());
-      if (doc.isPresent()) {
-        InjectDocument injectDocument = new InjectDocument();
-        injectDocument.setInject(inject);
-        Document document = doc.get();
-        injectDocument.setDocument(document);
-        injectDocument.setAttached(in.isAttached());
-        InjectDocument savedInjectDoc = injectDocumentRepository.save(injectDocument);
-        injectDocuments.add(savedInjectDoc);
-        // If Document not yet linked directly to the exercise, attached it
-        if (!document.getExercises().contains(exercise)) {
-          exercise.getDocuments().add(document);
-          exerciseRepository.save(exercise);
-        }
+    // If Documents not yet linked directly to the exercise, attached it
+    inject.getDocuments().forEach(document -> {
+      if (!document.getDocument().getExercises().contains(exercise)) {
+        exercise.getDocuments().add(document.getDocument());
       }
     });
-    // Remap the attached boolean
-    injectDocuments.forEach(injectDoc -> {
-      Optional<InjectDocumentInput> inputInjectDoc = input.getDocuments().stream()
-          .filter(id -> id.getDocumentId().equals(injectDoc.getDocument().getId())).findFirst();
-      Boolean attached = inputInjectDoc.map(InjectDocumentInput::isAttached).orElse(false);
-      injectDoc.setAttached(attached);
-    });
-    inject.setDocuments(injectDocuments);
-    // endregion
+    this.exerciseRepository.save(exercise);
     return injectRepository.save(inject);
   }
 
@@ -286,17 +253,16 @@ public class InjectApi extends RestBehavior {
 
   @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/activation")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject updateInjectActivation(@PathVariable String exerciseId, @PathVariable String injectId,
+  public Inject updateInjectActivationForExercise(
+      @PathVariable String exerciseId,
+      @PathVariable String injectId,
       @Valid @RequestBody InjectUpdateActivationInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    inject.setEnabled(input.isEnabled());
-    inject.setUpdatedAt(now());
-    return injectRepository.save(inject);
+    return updateInjectActivation(injectId, input);
   }
 
   @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/trigger")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject updateInjectActivation(@PathVariable String exerciseId, @PathVariable String injectId,
+  public Inject updateInjectTrigger(@PathVariable String exerciseId, @PathVariable String injectId,
       @Valid @RequestBody InjectUpdateTriggerInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow();
     inject.setDependsDuration(input.getDependsDuration());
@@ -349,4 +315,149 @@ public class InjectApi extends RestBehavior {
         // Collect the result
         .toList();
   }
+
+  // -- SCENARIOS --
+
+  @PostMapping(SCENARIO_URI + "/{scenarioId}/injects")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public Inject createInjectForScenario(
+      @PathVariable @NotBlank final String scenarioId,
+      @Valid @RequestBody InjectInput input) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    // Get common attributes
+    Inject inject = input.toInject();
+    inject.setType(this.contractService.getContractType(input.getContract()));
+    inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
+    inject.setScenario(scenario);
+    // Set dependencies
+    inject.setDependsOn(resolveOptionalRelation(input.getDependsOn(), this.injectRepository));
+    inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
+    inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+    List<InjectDocument> injectDocuments = input.getDocuments().stream()
+        .map(i -> {
+          InjectDocument injectDocument = new InjectDocument();
+          injectDocument.setInject(inject);
+          injectDocument.setDocument(documentRepository.findById(i.getDocumentId()).orElseThrow());
+          injectDocument.setAttached(i.isAttached());
+          return injectDocument;
+        }).toList();
+    inject.setDocuments(injectDocuments);
+    return injectRepository.save(inject);
+  }
+
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/injects")
+  @PreAuthorize("isScenarioObserver(#scenarioId)")
+  public Iterable<Inject> scenarioInjects(@PathVariable @NotBlank final String scenarioId) {
+    return this.injectRepository.findAll(InjectSpecification.fromScenario(scenarioId))
+        .stream()
+        .sorted(Inject.executionComparator)
+        .toList();
+  }
+
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
+  @PreAuthorize("isScenarioObserver(#scenarioId)")
+  public Inject scenarioInject(
+      @PathVariable @NotBlank final String scenarioId,
+      @PathVariable @NotBlank final String injectId) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    assert scenarioId.equals(scenario.getId());
+    return injectRepository.findById(injectId).orElseThrow();
+  }
+
+  @Transactional(rollbackOn = Exception.class)
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public Inject updateInjectForScenario(
+      @PathVariable @NotBlank final String scenarioId,
+      @PathVariable @NotBlank final String injectId,
+      @Valid @RequestBody @NotNull InjectInput input) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    Inject inject = updateInject(injectId, input);
+
+    // If Documents not yet linked directly to the exercise, attached it
+    inject.getDocuments().forEach(document -> {
+      if (!document.getDocument().getScenarios().contains(scenario)) {
+        scenario.getDocuments().add(document.getDocument());
+      }
+    });
+    this.scenarioService.updateScenario(scenario);
+    return injectRepository.save(inject);
+  }
+
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}/activation")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public Inject updateInjectActivationForScenario(
+      @PathVariable @NotBlank final String scenarioId,
+      @PathVariable @NotBlank final String injectId,
+      @Valid @RequestBody InjectUpdateActivationInput input) {
+    return updateInjectActivation(injectId, input);
+  }
+
+  @Transactional(rollbackOn = Exception.class)
+  @DeleteMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public void deleteInjectForScenario(
+      @PathVariable @NotBlank final String scenarioId,
+      @PathVariable @NotBlank final String injectId) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    assert scenarioId.equals(scenario.getId());
+    this.injectDocumentRepository.deleteDocumentsFromInject(injectId);
+    this.injectRepository.deleteById(injectId);
+  }
+
+  private Inject updateInject(@NotBlank final String injectId, @NotNull InjectInput input) {
+    Inject inject = this.injectRepository.findById(injectId).orElseThrow();
+    inject.setUpdateAttributes(input);
+
+    // Set dependencies
+    inject.setDependsOn(updateRelation(input.getDependsOn(), inject.getDependsOn(), this.injectRepository));
+    inject.setTeams(fromIterable(this.teamRepository.findAllById(input.getTeams())));
+    inject.setAssets(fromIterable(this.assetService.assets(input.getAssets())));
+    inject.setAssetGroups(fromIterable(this.assetGroupService.assetGroups(input.getAssetGroups())));
+    inject.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
+
+    // Set documents
+    List<InjectDocumentInput> inputDocuments = input.getDocuments();
+    List<InjectDocument> injectDocuments = inject.getDocuments();
+
+    List<String> askedDocumentIds = inputDocuments.stream().map(InjectDocumentInput::getDocumentId).toList();
+    List<String> currentDocumentIds = inject.getDocuments().stream().map(document -> document.getDocument().getId())
+        .toList();
+    // To delete
+    List<InjectDocument> toRemoveDocuments = injectDocuments.stream()
+        .filter(injectDoc -> !askedDocumentIds.contains(injectDoc.getDocument().getId()))
+        .toList();
+    injectDocuments.removeAll(toRemoveDocuments);
+    // To add
+    inputDocuments.stream().filter(doc -> !currentDocumentIds.contains(doc.getDocumentId())).forEach(in -> {
+      Optional<Document> doc = this.documentRepository.findById(in.getDocumentId());
+      if (doc.isPresent()) {
+        InjectDocument injectDocument = new InjectDocument();
+        injectDocument.setInject(inject);
+        Document document = doc.get();
+        injectDocument.setDocument(document);
+        injectDocument.setAttached(in.isAttached());
+        InjectDocument savedInjectDoc = this.injectDocumentRepository.save(injectDocument);
+        injectDocuments.add(savedInjectDoc);
+      }
+    });
+    // Remap the attached boolean
+    injectDocuments.forEach(injectDoc -> {
+      Optional<InjectDocumentInput> inputInjectDoc = input.getDocuments().stream()
+          .filter(id -> id.getDocumentId().equals(injectDoc.getDocument().getId())).findFirst();
+      Boolean attached = inputInjectDoc.map(InjectDocumentInput::isAttached).orElse(false);
+      injectDoc.setAttached(attached);
+    });
+    inject.setDocuments(injectDocuments);
+
+    return inject;
+  }
+
+  private Inject updateInjectActivation(@NotBlank final String injectId, @NotNull final InjectUpdateActivationInput input) {
+    Inject inject = this.injectRepository.findById(injectId).orElseThrow();
+    inject.setEnabled(input.isEnabled());
+    inject.setUpdatedAt(now());
+    return injectRepository.save(inject);
+  }
+
 }

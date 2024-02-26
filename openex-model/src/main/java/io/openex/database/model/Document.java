@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MultiIdDeserializer;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
@@ -12,15 +15,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "documents")
 @EntityListeners(ModelBaseListener.class)
 public class Document implements Base {
+
     @Id
     @Column(name = "document_id")
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("document_id")
+    @NotBlank
     private String id;
 
     @Column(name = "document_name")
@@ -55,73 +62,17 @@ public class Document implements Base {
     @JsonProperty("document_exercises")
     private List<Exercise> exercises = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "scenarios_documents",
+        joinColumns = @JoinColumn(name = "document_id"),
+        inverseJoinColumns = @JoinColumn(name = "scenario_id"))
+    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonProperty("document_scenarios")
+    private List<Scenario> scenarios = new ArrayList<>();
+
     @OneToMany(mappedBy = "document", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<InjectDocument> injectDocuments = new ArrayList<>();
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getTarget() {
-        return target;
-    }
-
-    public void setTarget(String target) {
-        this.target = target;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
-    public List<Exercise> getExercises() {
-        return exercises;
-    }
-
-    public void setExercises(List<Exercise> exercises) {
-        this.exercises = exercises;
-    }
-
-    public List<InjectDocument> getInjectDocuments() {
-        return injectDocuments;
-    }
-
-    public void setInjectDocuments(List<InjectDocument> injectDocuments) {
-        this.injectDocuments = injectDocuments;
-    }
 
     @Override
     public boolean isUserHasAccess(User user) {

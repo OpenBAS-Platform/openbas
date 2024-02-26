@@ -6,7 +6,7 @@ import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
 import { useHelper } from '../../../../store';
 import { useFormatter } from '../../../../components/i18n';
-import { updateChannel, updateChannelLogos } from '../../../../actions/Channel';
+import { updateChannel, updateChannelLogos } from '../../../../actions/channels/channel-action';
 import ChannelParametersForm from './ChannelParametersForm';
 import ChannelOverviewNewspaper from './ChannelOverviewNewspaper';
 import ChannelOverviewMicroblogging from './ChannelOverviewMicroblogging';

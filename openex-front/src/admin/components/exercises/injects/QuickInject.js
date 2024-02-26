@@ -3,20 +3,20 @@ import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import withStyles from '@mui/styles/withStyles';
 import {
+  Button,
+  FormControlLabel,
+  FormGroup,
+  IconButton,
+  InputLabel,
   List,
   ListItem,
-  MenuItem,
   ListItemIcon,
-  ListItemText,
-  InputLabel,
   ListItemSecondaryAction,
-  IconButton,
-  Typography,
-  FormGroup,
-  FormControlLabel,
-  Switch,
-  Button,
+  ListItemText,
+  MenuItem,
   Slide,
+  Switch,
+  Typography,
 } from '@mui/material';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
@@ -28,36 +28,30 @@ import {
   CloseRounded,
   ControlPointOutlined,
   DeleteOutlined,
-  EmojiEventsOutlined,
   HelpOutlineOutlined,
 } from '@mui/icons-material';
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
-import { addInject } from '../../../../actions/Inject';
+import { addInjectForExercise } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
-import { fetchExerciseArticles, fetchChannels } from '../../../../actions/Channel';
-import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
-import TeamPopover from '../../teams/teams/TeamPopover';
+import TeamPopover from '../../components/teams/TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
-import InjectAddTeams from './InjectAddTeams';
-import { isExerciseUpdatable, isExerciseReadOnly, secondsFromToNow } from '../../../../utils/Exercise';
+import InjectAddTeams from '../../components/injects/InjectAddTeams';
+import { isExerciseReadOnly, isExerciseUpdatable, secondsFromToNow } from '../../../../utils/Exercise';
 import TextField from '../../../../components/TextField';
 import SwitchField from '../../../../components/SwitchField';
 import EnrichedTextField from '../../../../components/EnrichedTextField';
-import InjectAddDocuments from './InjectAddDocuments';
+import InjectAddDocuments from '../../components/injects/InjectAddDocuments';
 import DocumentType from '../../components/documents/DocumentType';
 import DocumentPopover from '../../components/documents/DocumentPopover';
 import Select from '../../../../components/Select';
-import ArticlePopover from '../articles/ArticlePopover';
-import InjectAddArticles from './InjectAddArticles';
-import ChannelIcon from '../../components/channels/ChannelIcon';
-import ChallengePopover from '../../components/challenges/ChallengePopover';
-import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
-import InjectExpectations from './expectations/InjectExpectations';
+import InjectExpectations from '../../components/injects/expectations/InjectExpectations';
+import { fetchExerciseTeams } from '../../../../actions/Exercise';
+import { fetchVariablesForExercise } from '../../../../actions/variables/variable-actions';
 
 const EMAIL_CONTRACT = '138ad8f8-32f8-4a22-8114-aaa12322bd09';
 
@@ -141,46 +135,6 @@ const inlineStylesHeaders = {
     fontSize: 12,
     fontWeight: '700',
   },
-  article_channel_type: {
-    float: 'left',
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  article_channel_name: {
-    float: 'left',
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  article_name: {
-    float: 'left',
-    width: '30%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  article_author: {
-    float: 'left',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  challenge_category: {
-    float: 'left',
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  challenge_name: {
-    float: 'left',
-    width: '35%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  challenge_tags: {
-    float: 'left',
-    fontSize: 12,
-    fontWeight: '700',
-  },
   document_name: {
     float: 'left',
     width: '35%',
@@ -240,60 +194,6 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  article_channel_type: {
-    float: 'left',
-    width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  article_channel_name: {
-    float: 'left',
-    width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  article_name: {
-    float: 'left',
-    width: '30%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  article_author: {
-    float: 'left',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  challenge_category: {
-    float: 'left',
-    width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  challenge_name: {
-    float: 'left',
-    width: '35%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  challenge_tags: {
-    float: 'left',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
   document_name: {
     float: 'left',
     width: '35%',
@@ -340,12 +240,6 @@ class QuickInject extends Component {
       teamsOrderAsc: true,
       documentsSortBy: 'document_name',
       documentsOrderAsc: true,
-      articlesIds: [],
-      articlesSortBy: 'article_name',
-      articlesOrderAsc: true,
-      challengesIds: [],
-      challengesSortBy: 'challenge_name',
-      challengesOrderAsc: true,
       openVariables: false,
     };
   }
@@ -353,9 +247,8 @@ class QuickInject extends Component {
   componentDidMount() {
     const { exerciseId } = this.props;
     this.props.fetchDocuments();
-    this.props.fetchExerciseArticles(exerciseId);
-    this.props.fetchChannels();
-    this.props.fetchChallenges();
+    this.props.fetchExerciseTeams(exerciseId);
+    this.props.fetchVariablesForExercise(exerciseId);
   }
 
   toggleAll() {
@@ -379,30 +272,6 @@ class QuickInject extends Component {
   handleRemoveTeam(teamId) {
     this.setState({
       teamsIds: this.state.teamsIds.filter((a) => a !== teamId),
-    });
-  }
-
-  handleAddArticles(articlesIds) {
-    this.setState({
-      articlesIds: [...this.state.articlesIds, ...articlesIds],
-    });
-  }
-
-  handleRemoveArticle(articleId) {
-    this.setState({
-      articlesIds: this.state.articlesIds.filter((a) => a !== articleId),
-    });
-  }
-
-  handleAddChallenges(challengesIds) {
-    this.setState({
-      challengesIds: [...this.state.challengesIds, ...challengesIds],
-    });
-  }
-
-  handleRemoveChallenge(challengeId) {
-    this.setState({
-      challengesIds: this.state.challengesIds.filter((a) => a !== challengeId),
     });
   }
 
@@ -474,72 +343,6 @@ class QuickInject extends Component {
     );
   }
 
-  articlesReverseBy(field) {
-    this.setState({
-      articlesSortBy: field,
-      articlesOrderAsc: !this.state.articlesOrderAsc,
-    });
-  }
-
-  articlesSortHeader(field, label, isSortable) {
-    const { t } = this.props;
-    const { articlesSortBy, articlesOrderAsc } = this.state;
-    const sortComponent = articlesOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
-    if (isSortable) {
-      return (
-        <div
-          style={inlineStylesHeaders[field]}
-          onClick={this.articlesReverseBy.bind(this, field)}
-        >
-          <span>{t(label)}</span>
-          {articlesSortBy === field ? sortComponent : ''}
-        </div>
-      );
-    }
-    return (
-      <div style={inlineStylesHeaders[field]}>
-        <span>{t(label)}</span>
-      </div>
-    );
-  }
-
-  challengesReverseBy(field) {
-    this.setState({
-      challengesSortBy: field,
-      challengesOrderAsc: !this.state.challengesOrderAsc,
-    });
-  }
-
-  challengesSortHeader(field, label, isSortable) {
-    const { t } = this.props;
-    const { challengesSortBy, challengesOrderAsc } = this.state;
-    const sortComponent = challengesOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
-    if (isSortable) {
-      return (
-        <div
-          style={inlineStylesHeaders[field]}
-          onClick={this.challengesReverseBy.bind(this, field)}
-        >
-          <span>{t(label)}</span>
-          {challengesSortBy === field ? sortComponent : ''}
-        </div>
-      );
-    }
-    return (
-      <div style={inlineStylesHeaders[field]}>
-        <span>{t(label)}</span>
-      </div>
-    );
-  }
-
   documentsReverseBy(field) {
     this.setState({
       documentsSortBy: field,
@@ -579,18 +382,6 @@ class QuickInject extends Component {
       injectTypes.filter((i) => i.contract_id === EMAIL_CONTRACT),
     );
     const finalData = {};
-    const hasArticles = injectType.fields
-      .map((f) => f.key)
-      .includes('articles');
-    if (hasArticles) {
-      finalData.articles = this.state.articlesIds;
-    }
-    const hasChallenges = injectType.fields
-      .map((f) => f.key)
-      .includes('challenges');
-    if (hasChallenges) {
-      finalData.challenges = this.state.challengesIds;
-    }
     const hasExpectations = injectType.fields
       .map((f) => f.key)
       .includes('expectations');
@@ -599,7 +390,7 @@ class QuickInject extends Component {
     }
     injectType.fields
       .filter(
-        (f) => !['teams', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+        (f) => !['teams', 'attachments', 'expectations'].includes(
           f.key,
         ),
       )
@@ -613,14 +404,6 @@ class QuickInject extends Component {
           && data[field.key].length > 0
         ) {
           finalData[field.key] = data[field.key]
-            .replaceAll(
-              '&lt;#list challenges as challenge&gt;',
-              '<#list challenges as challenge>',
-            )
-            .replaceAll(
-              '&lt;#list articles as article&gt;',
-              '<#list articles as article>',
-            )
             .replaceAll('&lt;/#list&gt;', '</#list>');
         } else if (data[field.key] && field.type === 'tuple') {
           if (field.cardinality && field.cardinality === '1') {
@@ -675,7 +458,7 @@ class QuickInject extends Component {
     if (injectType && Array.isArray(injectType.fields)) {
       injectType.fields
         .filter(
-          (f) => !['teams', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+          (f) => !['teams', 'attachments', 'expectations'].includes(
             f.key,
           ),
         )
@@ -815,26 +598,26 @@ class QuickInject extends Component {
                                 && values[field.key]
                                 && values[field.key][index]
                                 && values[field.key][index].type
-                                  === 'attachment' ? (
-                                    <Select
-                                      variant="standard"
-                                      name={`${name}.value`}
-                                      fullWidth={true}
-                                      label={t('Value')}
-                                      style={{ marginRight: 20 }}
-                                      disabled={isExerciseReadOnly(exercise)}
-                                    >
-                                      {attachedDocs.map((doc) => (
-                                        <MenuItem
-                                          key={doc.document_id}
-                                          value={doc.document_id}
-                                        >
-                                          <ListItemText>
-                                            {doc.document_name}
-                                          </ListItemText>
-                                        </MenuItem>
-                                      ))}
-                                    </Select>
+                                === 'attachment' ? (
+                                  <Select
+                                    variant="standard"
+                                    name={`${name}.value`}
+                                    fullWidth={true}
+                                    label={t('Value')}
+                                    style={{ marginRight: 20 }}
+                                    disabled={isExerciseReadOnly(exercise)}
+                                  >
+                                    {attachedDocs.map((doc) => (
+                                      <MenuItem
+                                        key={doc.document_id}
+                                        value={doc.document_id}
+                                      >
+                                        <ListItemText>
+                                          {doc.document_name}
+                                        </ListItemText>
+                                      </MenuItem>
+                                    ))}
+                                  </Select>
                                   ) : (
                                     <TextField
                                       variant="standard"
@@ -995,14 +778,6 @@ class QuickInject extends Component {
             && defaultValue.length > 0
           ) {
             defaultValue = defaultValue
-              .replaceAll(
-                '<#list challenges as challenge>',
-                '&lt;#list challenges as challenge&gt;',
-              )
-              .replaceAll(
-                '<#list articles as article>',
-                '&lt;#list articles as article&gt;',
-              )
               .replaceAll('</#list>', '&lt;/#list&gt;');
           }
           setFieldValue(field.key, defaultValue);
@@ -1015,14 +790,6 @@ class QuickInject extends Component {
             && defaultValue.length > 0
           ) {
             defaultValue = defaultValue
-              .replaceAll(
-                '<#list challenges as challenge>',
-                '&lt;#list challenges as challenge&gt;',
-              )
-              .replaceAll(
-                '<#list articles as article>',
-                '&lt;#list articles as article&gt;',
-              )
               .replaceAll('</#list>', '&lt;/#list&gt;');
           }
           setFieldValue(field.key, defaultValue);
@@ -1040,11 +807,6 @@ class QuickInject extends Component {
       injectTypes,
       teamsMap,
       documentsMap,
-      exercisesMap,
-      tagsMap,
-      articlesMap,
-      channelsMap,
-      challengesMap,
     } = this.props;
     const {
       allTeams,
@@ -1055,12 +817,6 @@ class QuickInject extends Component {
       teamsOrderAsc,
       documentsSortBy,
       documentsOrderAsc,
-      articlesOrderAsc,
-      articlesSortBy,
-      articlesIds,
-      challengesOrderAsc,
-      challengesSortBy,
-      challengesIds,
       openVariables,
     } = this.state;
     const injectType = R.head(
@@ -1079,37 +835,6 @@ class QuickInject extends Component {
     const hasTeams = injectType.fields
       .map((f) => f.key)
       .includes('teams');
-    // -- ARTICLES --
-    const articles = articlesIds
-      .map((a) => articlesMap[a])
-      .filter((a) => a !== undefined)
-      .map((a) => ({
-        ...a,
-        article_channel_type: channelsMap[a.article_channel]?.channel_type || '',
-        article_channel_name: channelsMap[a.article_channel]?.channel_name || '',
-      }));
-    const sortArticles = R.sortWith(
-      articlesOrderAsc
-        ? [R.ascend(R.prop(articlesSortBy))]
-        : [R.descend(R.prop(articlesSortBy))],
-    );
-    const sortedArticles = sortArticles(articles);
-    const hasArticles = injectType.fields
-      .map((f) => f.key)
-      .includes('articles');
-    // -- CHALLENGES --
-    const challenges = challengesIds
-      .map((a) => challengesMap[a])
-      .filter((a) => a !== undefined);
-    const sortChallenges = R.sortWith(
-      challengesOrderAsc
-        ? [R.ascend(R.prop(challengesSortBy))]
-        : [R.descend(R.prop(challengesSortBy))],
-    );
-    const sortedChallenges = sortChallenges(challenges);
-    const hasChallenges = injectType.fields
-      .map((f) => f.key)
-      .includes('challenges');
     // -- DOCUMENTS --
     const docs = documents
       .map((d) => (documentsMap[d.document_id]
@@ -1143,8 +868,6 @@ class QuickInject extends Component {
     // Enrich initialValues with default contract value
     const builtInFields = [
       'teams',
-      'articles',
-      'challenges',
       'attachments',
       'expectations',
     ];
@@ -1170,14 +893,6 @@ class QuickInject extends Component {
           && initialValues[field.key].length > 0
         ) {
           initialValues[field.key] = initialValues[field.key]
-            .replaceAll(
-              '<#list challenges as challenge>',
-              '&lt;#list challenges as challenge&gt;',
-            )
-            .replaceAll(
-              '<#list articles as article>',
-              '&lt;#list articles as article&gt;',
-            )
             .replaceAll('</#list>', '&lt;/#list&gt;');
         } else if (field.type === 'tuple' && initialValues[field.key]) {
           if (field.cardinality && field.cardinality === '1') {
@@ -1433,7 +1148,7 @@ class QuickInject extends Component {
                             </ListItem>
                           ))}
                           <InjectAddTeams
-                            exerciseId={exerciseId}
+                            teams={this.props.exerciseTeams}
                             injectTeamsIds={teamsIds}
                             handleAddTeams={this.handleAddTeams.bind(
                               this,
@@ -1441,231 +1156,6 @@ class QuickInject extends Component {
                           />
                         </div>
                       )}
-                    </List>
-                  </div>
-                )}
-                {hasArticles && (
-                  <div>
-                    <Typography
-                      variant="h2"
-                      style={{ marginTop: hasTeams ? 30 : 0 }}
-                    >
-                      {t('Channel pressure to publish')}
-                    </Typography>
-                    <List>
-                      <ListItem
-                        classes={{ root: classes.itemHead }}
-                        divider={false}
-                        style={{ paddingTop: 0 }}
-                      >
-                        <ListItemIcon>
-                          <span
-                            style={{
-                              padding: '0 8px 0 8px',
-                              fontWeight: 700,
-                              fontSize: 12,
-                            }}
-                          >
-                            &nbsp;
-                          </span>
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <div>
-                              {this.articlesSortHeader(
-                                'article_channel_type',
-                                'Type',
-                                true,
-                              )}
-                              {this.articlesSortHeader(
-                                'article_channel_name',
-                                'Channel',
-                                true,
-                              )}
-                              {this.articlesSortHeader(
-                                'article_name',
-                                'Name',
-                                true,
-                              )}
-                              {this.articlesSortHeader(
-                                'article_author',
-                                'Author',
-                                true,
-                              )}
-                            </div>
-                          }
-                        />
-                        <ListItemSecondaryAction>
-                          &nbsp;
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                      {sortedArticles.map((article) => (
-                        <ListItem
-                          key={article.article_id}
-                          classes={{ root: classes.item }}
-                          divider={true}
-                        >
-                          <ListItemIcon>
-                            <ChannelIcon
-                              type={article.article_channel_type}
-                              variant="inline"
-                            />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.article_channel_type}
-                                >
-                                  {t(article.article_channel_type || 'Unknown')}
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.article_channel_name}
-                                >
-                                  {article.article_channel_name}
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.article_name}
-                                >
-                                  {article.article_name}
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.article_author}
-                                >
-                                  {article.article_author}
-                                </div>
-                              </div>
-                            }
-                          />
-                          <ListItemSecondaryAction>
-                            <ArticlePopover
-                              exerciseId={exerciseId}
-                              exercise={exercise}
-                              article={article}
-                              onRemoveArticle={this.handleRemoveArticle.bind(
-                                this,
-                              )}
-                              disabled={isExerciseReadOnly(exercise)}
-                            />
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                      ))}
-                      <InjectAddArticles
-                        exerciseId={exerciseId}
-                        injectArticlesIds={articlesIds}
-                        handleAddArticles={this.handleAddArticles.bind(this)}
-                      />
-                    </List>
-                  </div>
-                )}
-                {hasChallenges && (
-                  <div>
-                    <Typography
-                      variant="h2"
-                      style={{ marginTop: hasTeams ? 30 : 0 }}
-                    >
-                      {t('Challenges to publish')}
-                    </Typography>
-                    <List>
-                      <ListItem
-                        classes={{ root: classes.itemHead }}
-                        divider={false}
-                        style={{ paddingTop: 0 }}
-                      >
-                        <ListItemIcon>
-                          <span
-                            style={{
-                              padding: '0 8px 0 8px',
-                              fontWeight: 700,
-                              fontSize: 12,
-                            }}
-                          >
-                            &nbsp;
-                          </span>
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <div>
-                              {this.challengesSortHeader(
-                                'challenge_category',
-                                'Category',
-                                true,
-                              )}
-                              {this.challengesSortHeader(
-                                'challenge_name',
-                                'Name',
-                                true,
-                              )}
-                              {this.challengesSortHeader(
-                                'challenge_tags',
-                                'Tags',
-                                true,
-                              )}
-                            </div>
-                          }
-                        />
-                        <ListItemSecondaryAction>
-                          &nbsp;
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                      {sortedChallenges.map((challenge) => (
-                        <ListItem
-                          key={challenge.challenge_id}
-                          classes={{ root: classes.item }}
-                          divider={true}
-                        >
-                          <ListItemIcon>
-                            <EmojiEventsOutlined />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.challenge_category}
-                                >
-                                  {t(challenge.challenge_category || 'Unknown')}
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.challenge_name}
-                                >
-                                  {challenge.challenge_name}
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.challenge_tags}
-                                >
-                                  <ItemTags
-                                    variant="list"
-                                    tags={challenge.challenge_tags}
-                                  />
-                                </div>
-                              </div>
-                            }
-                          />
-                          <ListItemSecondaryAction>
-                            <ChallengePopover
-                              challenge={challenge}
-                              onRemoveChallenge={this.handleRemoveChallenge.bind(
-                                this,
-                              )}
-                              disabled={isExerciseReadOnly(exercise)}
-                            />
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                      ))}
-                      <InjectAddChallenges
-                        exerciseId={exerciseId}
-                        injectChallengesIds={challengesIds}
-                        handleAddChallenges={this.handleAddChallenges.bind(
-                          this,
-                        )}
-                      />
                     </List>
                   </div>
                 )}
@@ -1771,7 +1261,6 @@ class QuickInject extends Component {
                     )}
                     {hasExpectations
                       && <InjectExpectations
-                        exercise={exercise}
                         predefinedExpectationDatas={predefinedExpectations}
                         expectationDatas={expectations}
                         handleExpectations={this.handleExpectations.bind(this)}
@@ -1898,10 +1387,9 @@ class QuickInject extends Component {
                         />
                         <ListItemSecondaryAction>
                           <DocumentPopover
+                            inline
                             exerciseId={exerciseId}
                             document={document}
-                            exercisesMap={exercisesMap}
-                            tagsMap={tagsMap}
                             onRemoveDocument={this.handleRemoveDocument.bind(
                               this,
                             )}
@@ -1941,9 +1429,10 @@ class QuickInject extends Component {
           </Form>
         </div>
         <AvailableVariablesDialog
+          uriVariable={`/admin/exercises/${exerciseId}/definition/variables`}
+          variables={this.props.exerciseVariables}
           open={openVariables}
           handleClose={this.handleCloseVariables.bind(this)}
-          exerciseId={exerciseId}
           injectType={injectType}
         />
       </div>
@@ -1957,9 +1446,6 @@ QuickInject.propTypes = {
   exerciseId: PropTypes.string,
   exercise: PropTypes.object,
   fetchInjectTeams: PropTypes.func,
-  fetchExerciseArticles: PropTypes.func,
-  fetchChannels: PropTypes.func,
-  fetchChallenges: PropTypes.func,
   addInject: PropTypes.func,
   handleClose: PropTypes.func,
   injectTypes: PropTypes.array,
@@ -1968,29 +1454,27 @@ QuickInject.propTypes = {
   tagsMap: PropTypes.object,
 };
 
-const select = (state) => {
+const select = (state, ownProps) => {
   const helper = storeHelper(state);
   const documentsMap = helper.getDocumentsMap();
   const teamsMap = helper.getTeamsMap();
-  const channelsMap = helper.getChannelsMap();
-  const articlesMap = helper.getArticlesMap();
-  const challengesMap = helper.getChallengesMap();
+  const { exerciseId } = ownProps;
+  const exerciseTeams = helper.getExerciseTeams(exerciseId);
+  const exerciseVariables = helper.getExerciseVariables(exerciseId);
   return {
     documentsMap,
     teamsMap,
-    articlesMap,
-    channelsMap,
-    challengesMap,
+    exerciseTeams,
+    exerciseVariables,
   };
 };
 
 export default R.compose(
   connect(select, {
     fetchDocuments,
-    fetchExerciseArticles,
-    fetchChannels,
-    fetchChallenges,
-    addInject,
+    fetchExerciseTeams,
+    fetchVariablesForExercise,
+    addInject: addInjectForExercise,
   }),
   inject18n,
   withStyles(styles),

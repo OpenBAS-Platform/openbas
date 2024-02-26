@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
@@ -17,6 +20,8 @@ import java.util.Objects;
 
 import static java.time.Instant.now;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "articles")
 @EntityListeners(ModelBaseListener.class)
@@ -26,6 +31,7 @@ public class Article implements Base {
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("article_id")
+    @NotBlank
     private String id;
 
     @Column(name = "article_created_at")
@@ -67,6 +73,12 @@ public class Article implements Base {
     private Exercise exercise;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "article_scenario")
+    @JsonSerialize(using = MonoIdDeserializer.class)
+    @JsonProperty("article_scenario")
+    private Scenario scenario;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_channel")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("article_channel")
@@ -86,113 +98,12 @@ public class Article implements Base {
         return getExercise().isUserHasAccess(user);
     }
 
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public Integer getShares() {
-        return shares;
-    }
-
-    public void setShares(Integer shares) {
-        this.shares = shares;
-    }
-
-    public Integer getLikes() {
-        return likes;
-    }
-
-    public void setLikes(Integer likes) {
-        this.likes = likes;
-    }
-
-    public Integer getComments() {
-        return comments;
-    }
-
-    public void setComments(Integer comments) {
-        this.comments = comments;
-    }
-
-    public List<Document> getDocuments() {
-        return documents;
-    }
-
-    public void setDocuments(List<Document> documents) {
-        this.documents = documents;
-    }
-
-    public Exercise getExercise() {
-        return exercise;
-    }
-
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
-    }
-
-    public Channel getChannel() {
-        return channel;
-    }
-
-    public void setChannel(Channel channel) {
-        this.channel = channel;
-    }
-
     @Transient
     private Instant virtualPublication;
 
     @JsonProperty("article_virtual_publication")
     public Instant getVirtualPublication() {
         return virtualPublication;
-    }
-
-    public void setVirtualPublication(Instant virtualPublication) {
-        this.virtualPublication = virtualPublication;
     }
 
     @JsonProperty("article_is_scheduled")

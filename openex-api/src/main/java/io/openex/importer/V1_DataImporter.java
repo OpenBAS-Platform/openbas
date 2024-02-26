@@ -5,20 +5,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
 import io.openex.injects.challenge.model.ChallengeContent;
+import io.openex.injects.channel.model.ChannelContent;
 import io.openex.injects.email.EmailContract;
 import io.openex.injects.manual.ManualContract;
-import io.openex.injects.channel.model.ChannelContent;
 import io.openex.rest.exercise.exports.ExerciseFileExport;
 import io.openex.rest.exercise.exports.VariableWithValueMixin;
 import io.openex.service.FileService;
 import io.openex.service.ImportEntry;
-import io.openex.service.VariableService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
+import io.openex.service.ScenarioService;
 import jakarta.activation.MimetypesFileTypeMap;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -39,6 +39,7 @@ public class V1_DataImporter implements Importer {
     private DocumentRepository documentRepository;
     private TagRepository tagRepository;
     private ExerciseRepository exerciseRepository;
+    private ScenarioService scenarioService;
     private TeamRepository teamRepository;
     private ObjectiveRepository objectiveRepository;
     private InjectRepository injectRepository;
@@ -50,7 +51,7 @@ public class V1_DataImporter implements Importer {
     private ArticleRepository articleRepository;
     private LessonsCategoryRepository lessonsCategoryRepository;
     private LessonsQuestionRepository lessonsQuestionRepository;
-    private VariableService variableService;
+    private VariableRepository variableRepository;
     // endregion
 
     // region setter
@@ -120,6 +121,11 @@ public class V1_DataImporter implements Importer {
     }
 
     @Autowired
+    public void setScenarioService(final ScenarioService scenarioService) {
+        this.scenarioService = scenarioService;
+    }
+
+    @Autowired
     public void setTeamRepository(TeamRepository teamRepository) {
         this.teamRepository = teamRepository;
     }
@@ -130,8 +136,8 @@ public class V1_DataImporter implements Importer {
     }
 
     @Autowired
-    public void setVariableService(@NotNull final VariableService variableService) {
-        this.variableService = variableService;
+    public void setVariableRepository(@NotNull final VariableRepository variableRepository) {
+        this.variableRepository = variableRepository;
     }
     // endregion
 
@@ -175,7 +181,7 @@ public class V1_DataImporter implements Importer {
         return content;
     }
 
-    private void importInjects(Map<String, Base> baseIds, Exercise exercise, List<JsonNode> injects) {
+    private void importInjects(Map<String, Base> baseIds, String scenarioOrExerciseId, List<JsonNode> injects) {
         List<String> injected = new ArrayList<>();
         injects.forEach(injectNode -> {
             String injectId = UUID.randomUUID().toString();
@@ -209,7 +215,7 @@ public class V1_DataImporter implements Importer {
                 Long dependsDuration = injectNode.get("inject_depends_duration").asLong();
                 boolean allTeams = injectNode.get("inject_all_teams").booleanValue();
                 injectRepository.importSave(injectId, title, description, country, city, type, contract, allTeams,
-                        true, exercise.getId(), dependsOn, dependsDuration, content);
+                        true, scenarioOrExerciseId, dependsOn, dependsDuration, content);
                 baseIds.put(id, new BaseHolder(injectId));
                 // Tags
                 List<String> injectTagIds = resolveJsonIds(injectNode, "inject_tags");
@@ -239,7 +245,7 @@ public class V1_DataImporter implements Importer {
             return injected.contains(injectDependsOn);
         }).toList();
         if (!childInjects.isEmpty()) {
-            importInjects(baseIds, exercise, childInjects);
+            importInjects(baseIds, scenarioOrExerciseId, childInjects);
         }
     }
 
@@ -279,19 +285,43 @@ public class V1_DataImporter implements Importer {
 
         // ------------ Handling exercise
         JsonNode exerciseNode = importNode.get("exercise_information");
-        Exercise exercise = new Exercise();
-        exercise.setName(exerciseNode.get("exercise_name").textValue() + " (Import)");
-        exercise.setDescription(exerciseNode.get("exercise_description").textValue());
-        exercise.setSubtitle(exerciseNode.get("exercise_subtitle").textValue());
-        exercise.setHeader(exerciseNode.get("exercise_message_header").textValue());
-        exercise.setFooter(exerciseNode.get("exercise_message_footer").textValue());
-        exercise.setReplyTo(exerciseNode.get("exercise_mail_from").textValue());
-        List<String> exerciseTagIds = resolveJsonIds(exerciseNode, "exercise_tags");
-        List<Tag> tagsForExercise = exerciseTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
-        exercise.setTags(tagsForExercise);
-        Exercise savedExercise = exerciseRepository.save(exercise);
+        Exercise savedExercise;
+        if (exerciseNode != null) {
+            Exercise exercise = new Exercise();
+            exercise.setName(exerciseNode.get("exercise_name").textValue() + " (Import)");
+            exercise.setDescription(exerciseNode.get("exercise_description").textValue());
+            exercise.setSubtitle(exerciseNode.get("exercise_subtitle").textValue());
+            exercise.setHeader(exerciseNode.get("exercise_message_header").textValue());
+            exercise.setFooter(exerciseNode.get("exercise_message_footer").textValue());
+            exercise.setReplyTo(exerciseNode.get("exercise_mail_from").textValue());
+            List<String> exerciseTagIds = resolveJsonIds(exerciseNode, "exercise_tags");
+            List<Tag> tagsForExercise = exerciseTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
+            exercise.setTags(tagsForExercise);
+            savedExercise = this.exerciseRepository.save(exercise);
+        } else {
+          savedExercise = null;
+        }
 
-        // ------------ Handling documents
+      // ------------ Handling scenario
+        JsonNode scenarioNode = importNode.get("scenario_information");
+        Scenario savedScenario;
+        if (scenarioNode != null) {
+            Scenario scenario = new Scenario();
+            scenario.setName(scenarioNode.get("scenario_name").textValue() + " (Import)");
+            scenario.setDescription(scenarioNode.get("scenario_description").textValue());
+            scenario.setSubtitle(scenarioNode.get("scenario_subtitle").textValue());
+            scenario.setHeader(scenarioNode.get("scenario_message_header").textValue());
+            scenario.setFooter(scenarioNode.get("scenario_message_footer").textValue());
+            scenario.setReplyTo(scenarioNode.get("scenario_mail_from").textValue());
+            List<String> scenarioTagIds = resolveJsonIds(scenarioNode, "scenario_tags");
+            List<Tag> tagsForScenarios = scenarioTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
+            scenario.setTags(tagsForScenarios);
+            savedScenario = this.scenarioService.createScenario(scenario);
+        } else {
+          savedScenario = null;
+        }
+
+      // ------------ Handling documents
         Iterator<JsonNode> exerciseDocuments = importNode.get("exercise_documents").elements();
         exerciseDocuments.forEachRemaining(nodeDoc -> {
             String id = nodeDoc.get("document_id").textValue();
@@ -301,20 +331,26 @@ public class V1_DataImporter implements Importer {
             List<String> documentTagIds = resolveJsonIds(nodeDoc, "document_tags");
             ImportEntry entry = docReferences.get(target);
             if (entry != null) {
-                List<String> exerciseIds = List.of(savedExercise.getId());
                 String contentType = new MimetypesFileTypeMap().getContentType(entry.getEntry().getName());
                 Optional<Document> targetDocument = documentRepository.findByTarget(target);
                 if (targetDocument.isPresent()) {
                     Document document = targetDocument.get();
                     // Compute exercises
+                  if (savedExercise != null) {
                     List<Exercise> exercises = new ArrayList<>(document.getExercises());
-                    List<Exercise> inputExercises = fromIterable(exerciseRepository.findAllById(exerciseIds));
-                    inputExercises.forEach(inputExercise -> {
-                        if (!exercises.contains(inputExercise)) {
-                            exercises.add(inputExercise);
-                        }
-                    });
+                    if (!exercises.contains(savedExercise)) {
+                      exercises.add(savedExercise);
+                    }
                     document.setExercises(exercises);
+                  }
+                  // Compute scenario
+                  else if (savedScenario != null) {
+                    List<Scenario> scenarios = new ArrayList<>(document.getScenarios());
+                    if (!scenarios.contains(savedScenario)) {
+                      scenarios.add(savedScenario);
+                    }
+                    document.setScenarios(scenarios);
+                  }
                     // Compute tags
                     document.setTags(computeTagsCompletion(document.getTags(), documentTagIds, baseIds));
                     Document savedDocument = documentRepository.save(document);
@@ -329,7 +365,11 @@ public class V1_DataImporter implements Importer {
                     document.setTarget(target);
                     document.setName(name);
                     document.setDescription(description);
-                    document.setExercises(fromIterable(exerciseRepository.findAllById(exerciseIds)));
+                    if (savedExercise != null) {
+                      document.setExercises(List.of(savedExercise));
+                    } else if (savedScenario != null) {
+                      document.setScenarios(List.of(savedScenario));
+                    }
                     document.setTags(fromIterable(tagRepository.findAllById(documentTagIds)));
                     document.setType(contentType);
                     Document savedDocument = documentRepository.save(document);
@@ -429,9 +469,11 @@ public class V1_DataImporter implements Importer {
                 List<String> teamUserIds = resolveJsonIds(nodeTeam, "team_users");
                 List<User> usersForTeam = teamUserIds.stream().map(baseIds::get).map(base -> (User) base).toList();
                 team.setUsers(usersForTeam);
-                List<Exercise> savedExercises = new ArrayList<>();
-                savedExercises.add(savedExercise);
-                team.setExercises(savedExercises);
+                if (savedExercise != null) {
+                  team.setExercises(List.of(savedExercise));
+                } else if (savedScenario != null) {
+                  team.setScenarios(List.of(savedScenario));
+                }
                 Team savedTeam = teamRepository.save(team);
                 baseIds.put(id, savedTeam);
             }
@@ -522,7 +564,11 @@ public class V1_DataImporter implements Importer {
             article.setShares(nodeArticle.get("article_shares").intValue());
             article.setLikes(nodeArticle.get("article_likes").intValue());
             article.setComments(nodeArticle.get("article_comments").intValue());
-            article.setExercise(exercise);
+            if (savedExercise != null) {
+                article.setExercise(savedExercise);
+            } else if (savedScenario != null) {
+                article.setScenario(savedScenario);
+            }
             // Documents
             List<Document> articleDocuments = resolveJsonIds(nodeArticle, "article_documents")
                     .stream().map(docId -> (Document) baseIds.get(docId))
@@ -544,7 +590,11 @@ public class V1_DataImporter implements Importer {
             objective.setTitle(nodeObjective.get("objective_title").textValue());
             objective.setDescription(nodeObjective.get("objective_description").textValue());
             objective.setPriority((short) nodeObjective.get("objective_priority").asInt(0));
-            objective.setExercise(exercise);
+            if (savedExercise != null) {
+                objective.setExercise(savedExercise);
+            } else if (savedScenario != null) {
+                objective.setScenario(savedScenario);
+            }
             Objective savedObjective = objectiveRepository.save(objective);
             baseIds.put(id, savedObjective);
         });
@@ -557,7 +607,11 @@ public class V1_DataImporter implements Importer {
             lessonsCategory.setName(nodeLessonCategory.get("lessons_category_name").textValue());
             lessonsCategory.setDescription(nodeLessonCategory.get("lessons_category_description").textValue());
             lessonsCategory.setOrder(nodeLessonCategory.get("lessons_category_order").intValue());
-            lessonsCategory.setExercise(exercise);
+            if (savedExercise != null) {
+                lessonsCategory.setExercise(savedExercise);
+            } else if (savedScenario != null) {
+                lessonsCategory.setScenario(savedScenario);
+            }
             List<Team> lessonsCategoryTeams = resolveJsonIds(nodeLessonCategory, "lessons_category_teams")
                     .stream().map(teamId -> (Team) baseIds.get(teamId))
                     .filter(Objects::nonNull)
@@ -583,14 +637,23 @@ public class V1_DataImporter implements Importer {
         // ------------ Handling injects
         Stream<JsonNode> injectsStream = resolveJsonElements(importNode, "exercise_injects");
         Stream<JsonNode> injectsNoParent = injectsStream.filter(jsonNode -> jsonNode.get("inject_depends_on").isNull());
-        importInjects(baseIds, exercise, injectsNoParent.toList());
+      if (savedExercise != null) {
+        importInjects(baseIds, savedExercise.getId(), injectsNoParent.toList());
+      } else if (savedScenario != null) {
+        importInjects(baseIds, savedScenario.getId(), injectsNoParent.toList());
+      }
 
         // ------------ Handling variables
         Optional<Iterator<JsonNode>> variableNodesOpt = ofNullable(importNode.get(ExerciseFileExport.EXERCISE_VARIABLES)).map(JsonNode::elements);
         variableNodesOpt.ifPresent(variableNodes -> variableNodes.forEachRemaining(variableNode -> {
                 String id = VariableWithValueMixin.getId(variableNode);
                 Variable variable = VariableWithValueMixin.build(variableNode);
-                Variable variableSaved = this.variableService.createVariable(savedExercise.getId(), variable);
+          if (savedExercise != null) {
+            variable.setExercise(savedExercise);
+          } else if (savedScenario != null) {
+            variable.setScenario(savedScenario);
+          }
+                Variable variableSaved = this.variableRepository.save(variable);
                 baseIds.put(id, variableSaved);
             }));
     }

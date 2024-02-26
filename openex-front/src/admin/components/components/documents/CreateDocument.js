@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import withStyles from '@mui/styles/withStyles';
-import { Fab, Dialog, DialogTitle, DialogContent, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Fab, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import DocumentForm from './DocumentForm';
 import { addDocument, fetchDocument } from '../../../../actions/Document';
 import inject18n from '../../../../components/i18n';
-import Transition from '../../../../components/common/Transition';
+import { DocumentContext } from '../Context';
+import Drawer from '../../../../components/common/Drawer';
+import Dialog from '../../../../components/common/Dialog';
 
 const styles = (theme) => ({
   createButton: {
@@ -24,13 +26,27 @@ const styles = (theme) => ({
 });
 
 const CreateDocument = (props) => {
-  const { classes, t, inline, exercise, filters } = props;
+  const { classes, t, inline, filters } = props;
   const [open, setOpen] = useState(false);
+
+  // Context
+  const context = useContext(DocumentContext);
+  const initialValues = context
+    ? context.onInitDocument()
+    // TODO: should be platform
+    : {
+      document_tags: [],
+      document_exercises: [],
+      document_scenarios: [],
+    };
+  const computeInputValues = (data) => R.pipe(
+    R.assoc('document_tags', R.pluck('id', data.document_tags)),
+    R.assoc('document_exercises', R.pluck('id', data.document_exercises)),
+    R.assoc('document_scenarios', R.pluck('id', data.document_scenarios)),
+  )(data);
+
   const onSubmit = (data) => {
-    const inputValues = R.pipe(
-      R.assoc('document_tags', R.pluck('id', data.document_tags)),
-      R.assoc('document_exercises', R.pluck('id', data.document_exercises)),
-    )(data);
+    const inputValues = computeInputValues(data);
     const formData = new FormData();
     formData.append('file', data.document_file[0]);
     const blob = new Blob([JSON.stringify(inputValues)], {
@@ -51,8 +67,8 @@ const CreateDocument = (props) => {
     <>
       {inline === true ? (
         <ListItem
-          button={true}
-          divider={true}
+          button
+          divider
           onClick={() => setOpen(true)}
           color="primary"
         >
@@ -74,27 +90,33 @@ const CreateDocument = (props) => {
           <Add />
         </Fab>
       )}
-      <Dialog
-        open={open}
-        TransitionComponent={Transition}
-        fullWidth={true}
-        maxWidth="md"
-        onClose={() => setOpen(false)}
-        PaperProps={{ elevation: 1 }}
-      >
-        <DialogTitle>{t('Create a new document')}</DialogTitle>
-        <DialogContent>
+      {inline ? (
+        <Dialog
+          open={open}
+          handleClose={() => setOpen(false)}
+          title={t('Create a new document')}
+        >
           <DocumentForm
+            initialValues={initialValues}
             onSubmit={onSubmit}
-            initialValues={{
-              document_tags: [],
-              document_exercises: exercise ? [{ id: exercise.exercise_id, label: exercise.exercise_name }] : [],
-            }}
             handleClose={() => setOpen(false)}
             filters={filters}
           />
-        </DialogContent>
-      </Dialog>
+        </Dialog>
+      ) : (
+        <Drawer
+          open={open}
+          handleClose={() => setOpen(false)}
+          title={t('Create a new document')}
+        >
+          <DocumentForm
+            initialValues={initialValues}
+            onSubmit={onSubmit}
+            handleClose={() => setOpen(false)}
+            filters={filters}
+          />
+        </Drawer>
+      )}
     </>
   );
 };
@@ -105,7 +127,6 @@ CreateDocument.propTypes = {
   addDocument: PropTypes.func,
   fetchDocument: PropTypes.func,
   inline: PropTypes.bool,
-  exercise: PropTypes.object,
   filters: PropTypes.array,
 };
 

@@ -14,10 +14,12 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.java.Log;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.logging.Level;
 
 import static java.time.Duration.between;
 import static java.time.Instant.now;
@@ -27,6 +29,7 @@ import static java.util.Optional.ofNullable;
 @Entity
 @Table(name = "injects")
 @EntityListeners(ModelBaseListener.class)
+@Log
 public class Inject implements Base, Injection {
 
   public static final int SPEED_STANDARD = 1; // Standard speed define by the user.
@@ -108,6 +111,13 @@ public class Inject implements Base, Injection {
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_exercise")
   private Exercise exercise;
+
+  @Getter
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "inject_scenario")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("inject_scenario")
+  private Scenario scenario;
 
   @Getter
   @ManyToOne(fetch = FetchType.LAZY)
@@ -236,14 +246,20 @@ public class Inject implements Base, Injection {
         .orElse(source);
     Instant standardExecutionDate = dependingStart.plusSeconds(duration);
     // Compute execution dates with previous terminated pauses
-    long previousPauseDelay = exercise.getPauses().stream()
-        .filter(pause -> pause.getDate().isBefore(standardExecutionDate))
-        .mapToLong(pause -> pause.getDuration().orElse(0L)).sum();
+    long previousPauseDelay = 0L;
+    if (this.exercise != null) {
+      previousPauseDelay = this.exercise.getPauses().stream()
+          .filter(pause -> pause.getDate().isBefore(standardExecutionDate))
+          .mapToLong(pause -> pause.getDuration().orElse(0L)).sum();
+    }
     Instant afterPausesExecutionDate = standardExecutionDate.plusSeconds(previousPauseDelay);
     // Add current pause duration in date computation if needed
-    long currentPauseDelay = exercise.getCurrentPause()
-        .map(last -> last.isBefore(afterPausesExecutionDate) ? between(last, now()).getSeconds() : 0L)
-        .orElse(0L);
+    long currentPauseDelay = 0L;
+    if (this.exercise != null) {
+      currentPauseDelay = this.exercise.getCurrentPause()
+          .map(last -> last.isBefore(afterPausesExecutionDate) ? between(last, now()).getSeconds() : 0L)
+          .orElse(0L);
+    }
     long globalPauseDelay = previousPauseDelay + currentPauseDelay;
     long minuteAlignModulo = globalPauseDelay % 60;
     long alignedPauseDelay = minuteAlignModulo > 0 ? globalPauseDelay + (60 - minuteAlignModulo) : globalPauseDelay;
@@ -252,10 +268,19 @@ public class Inject implements Base, Injection {
 
   @JsonProperty("inject_date")
   public Optional<Instant> getDate() {
+    if (this.getExercise() == null && this.getScenario() == null) {
+      log.log(Level.SEVERE, "Exercise OR Scenario should not be null");
+    }
+
+    if (this.getScenario() != null) {
+      return Optional.empty();
+    }
+
     if (this.getExercise().getStatus().equals(Exercise.STATUS.CANCELED)) {
       return Optional.empty();
     }
-    return this.getExercise().getStart()
+    return this.getExercise()
+        .getStart()
         .map(source -> computeInjectDate(source, SPEED_STANDARD));
   }
 

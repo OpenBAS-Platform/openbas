@@ -2,81 +2,61 @@ package io.openex.rest.group.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.Grant;
-import lombok.Getter;
-
 import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
 @Getter
+@Setter
 public class GroupCreateInput {
 
-    @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("group_name")
-    private String name;
+  @NotBlank(message = MANDATORY_MESSAGE)
+  @JsonProperty("group_name")
+  private String name;
 
-    @JsonProperty("group_description")
-    private String description;
+  @JsonProperty("group_description")
+  private String description;
 
-    @JsonProperty("group_default_user_assign")
-    private boolean defaultUserAssignation;
+  @JsonProperty("group_default_user_assign")
+  private boolean defaultUserAssignation;
 
-    @JsonProperty("group_default_exercise_observer")
-    private boolean defaultExerciseObserver;
+  @JsonProperty("group_default_exercise_observer")
+  private boolean defaultExerciseObserver;
 
-    @JsonProperty("group_default_exercise_planner")
-    private boolean defaultExercisePlanner;
+  @JsonProperty("group_default_exercise_planner")
+  private boolean defaultExercisePlanner;
 
-    public List<Grant.GRANT_TYPE> defaultExerciseGrants() {
-        List<Grant.GRANT_TYPE> grants = new ArrayList<>();
-        if (defaultExercisePlanner) {
-            grants.add(Grant.GRANT_TYPE.PLANNER);
-        }
-        if (defaultExerciseObserver) {
-            grants.add(Grant.GRANT_TYPE.OBSERVER);
-        }
-        return grants;
+  @JsonProperty("group_default_scenario_observer")
+  private boolean defaultScenarioObserver;
+
+  @JsonProperty("group_default_scenario_planner")
+  private boolean defaultScenarioPlanner;
+
+  public List<Grant.GRANT_TYPE> defaultExerciseGrants() {
+    List<Grant.GRANT_TYPE> grants = new ArrayList<>();
+    if (this.defaultExercisePlanner) {
+      grants.add(Grant.GRANT_TYPE.PLANNER);
     }
-
-    public String getName() {
-        return name;
+    if (this.defaultExerciseObserver) {
+      grants.add(Grant.GRANT_TYPE.OBSERVER);
     }
+    return grants;
+  }
 
-    public void setName(String name) {
-        this.name = name;
+  public List<Grant.GRANT_TYPE> defaultScenarioGrants() {
+    List<Grant.GRANT_TYPE> grants = new ArrayList<>();
+    if (this.defaultScenarioPlanner) {
+      grants.add(Grant.GRANT_TYPE.PLANNER);
     }
+    if (this.defaultScenarioObserver) {
+      grants.add(Grant.GRANT_TYPE.OBSERVER);
+    }
+    return grants;
+  }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean isDefaultUserAssignation() {
-        return defaultUserAssignation;
-    }
-
-    public void setDefaultUserAssignation(boolean defaultUserAssignation) {
-        this.defaultUserAssignation = defaultUserAssignation;
-    }
-
-    public boolean isDefaultExerciseObserver() {
-        return defaultExerciseObserver;
-    }
-
-    public void setDefaultExerciseObserver(boolean defaultExerciseObserver) {
-        this.defaultExerciseObserver = defaultExerciseObserver;
-    }
-
-    public boolean isDefaultExercisePlanner() {
-        return defaultExercisePlanner;
-    }
-
-    public void setDefaultExercisePlanner(boolean defaultExercisePlanner) {
-        this.defaultExercisePlanner = defaultExercisePlanner;
-    }
 }

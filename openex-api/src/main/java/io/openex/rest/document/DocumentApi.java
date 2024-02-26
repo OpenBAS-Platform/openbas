@@ -42,6 +42,7 @@ public class DocumentApi extends RestBehavior {
   private TagRepository tagRepository;
   private DocumentRepository documentRepository;
   private ExerciseRepository exerciseRepository;
+  private ScenarioRepository scenarioRepository;
   private InjectService injectService;
   private InjectDocumentRepository injectDocumentRepository;
   private ChallengeRepository challengeRepository;
@@ -65,6 +66,11 @@ public class DocumentApi extends RestBehavior {
   @Autowired
   public void setExerciseRepository(ExerciseRepository exerciseRepository) {
     this.exerciseRepository = exerciseRepository;
+  }
+
+  @Autowired
+  public void setScenarioRepository(ScenarioRepository scenarioRepository) {
+    this.scenarioRepository = scenarioRepository;
   }
 
   @Autowired
@@ -115,6 +121,17 @@ public class DocumentApi extends RestBehavior {
         });
         document.setExercises(exercises);
       }
+      // Compute scenarios
+      if (!document.getScenarios().isEmpty()) {
+        List<Scenario> scenarios = new ArrayList<>(document.getScenarios());
+        List<Scenario> inputScenarios = fromIterable(scenarioRepository.findAllById(input.getScenarioIds()));
+        inputScenarios.forEach(inputScenario -> {
+          if (!scenarios.contains(inputScenario)) {
+            scenarios.add(inputScenario);
+          }
+        });
+        document.setScenarios(scenarios);
+      }
       // Compute tags
       List<Tag> tags = new ArrayList<>(document.getTags());
       List<Tag> inputTags = fromIterable(tagRepository.findAllById(input.getTagIds()));
@@ -133,6 +150,9 @@ public class DocumentApi extends RestBehavior {
       document.setDescription(input.getDescription());
       if (!input.getExerciseIds().isEmpty()) {
         document.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
+      }
+      if (!input.getScenarioIds().isEmpty()) {
+        document.setScenarios(fromIterable(scenarioRepository.findAllById(input.getScenarioIds())));
       }
       document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
       document.setType(file.getContentType());
@@ -176,16 +196,30 @@ public class DocumentApi extends RestBehavior {
     Document document = resolveDocument(documentId).orElseThrow();
     document.setUpdateAttributes(input);
     document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+
     // Get removed exercises
-    Stream<String> askIdsStream = document.getExercises().stream()
+    Stream<String> askExerciseIdsStream = document.getExercises()
+        .stream()
         .filter(exercise -> !exercise.isUserHasAccess(userRepository.findById(currentUser().getId()).orElseThrow()))
         .map(Exercise::getId);
-    List<String> askIds = Stream.concat(askIdsStream, input.getExerciseIds().stream()).distinct().toList();
+    List<String> askExerciseIds = Stream.concat(askExerciseIdsStream, input.getExerciseIds().stream()).distinct().toList();
     List<Exercise> removedExercises = document.getExercises().stream()
-        .filter(exercise -> !askIds.contains(exercise.getId())).toList();
-    document.setExercises(fromIterable(exerciseRepository.findAllById(askIds)));
+        .filter(exercise -> !askExerciseIds.contains(exercise.getId())).toList();
+    document.setExercises(fromIterable(exerciseRepository.findAllById(askExerciseIds)));
     // In case of exercise removal, all inject doc attachment for exercise
     removedExercises.forEach(exercise -> injectService.cleanInjectsDocExercise(exercise.getId(), documentId));
+
+    // Get removed scenarios
+    Stream<String> askScenarioIdsStream = document.getScenarios().stream()
+        .filter(scenario -> !scenario.isUserHasAccess(userRepository.findById(currentUser().getId()).orElseThrow()))
+        .map(Scenario::getId);
+    List<String> askScenarioIds = Stream.concat(askScenarioIdsStream, input.getScenarioIds().stream()).distinct().toList();
+    List<Scenario> removedScenarios = document.getScenarios().stream()
+        .filter(scenario -> !askScenarioIds.contains(scenario.getId())).toList();
+    document.setScenarios(fromIterable(scenarioRepository.findAllById(askScenarioIds)));
+    // In case of scenario removal, all inject doc attachment for scenario
+    removedScenarios.forEach(scenario -> injectService.cleanInjectsDocScenario(scenario.getId(), documentId));
+
     // Save and return
     return documentRepository.save(document);
   }
@@ -201,12 +235,24 @@ public class DocumentApi extends RestBehavior {
   }
 
   private List<Document> getExercisePlayerDocuments(Exercise exercise) {
-    Stream<Document> channelsDocs = exercise.getArticles().stream()
+    List<Article> articles = exercise.getArticles();
+    List<Inject> injects = exercise.getInjects();
+    return getPlayerDocuments(articles, injects);
+  }
+
+  private List<Document> getScenarioPlayerDocuments(Scenario scenario) {
+    List<Article> articles = scenario.getArticles();
+    List<Inject> injects = scenario.getInjects();
+    return getPlayerDocuments(articles, injects);
+  }
+
+  private List<Document> getPlayerDocuments(List<Article> articles, List<Inject> injects) {
+    Stream<Document> channelsDocs = articles.stream()
         .map(Article::getChannel)
         .flatMap(channel -> channel.getLogos().stream());
-    Stream<Document> articlesDocs = exercise.getArticles().stream()
+    Stream<Document> articlesDocs = articles.stream()
         .flatMap(article -> article.getDocuments().stream());
-    List<String> challenges = exercise.getInjects().stream()
+    List<String> challenges = injects.stream()
         .filter(inject -> inject.getContract().equals(CHALLENGE_PUBLISH))
         .filter(inject -> inject.getContent() != null)
         .flatMap(inject -> {
@@ -226,19 +272,33 @@ public class DocumentApi extends RestBehavior {
 
   @GetMapping("/api/player/{exerciseId}/documents")
   public List<Document> playerDocuments(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Optional<Exercise> exerciseOpt = this.exerciseRepository.findById(exerciseId);
+    Optional<Scenario> scenarioOpt = this.scenarioRepository.findById(exerciseId);
+
     final User user = impersonateUser(userRepository, userId);
     if (user.getId().equals(ANONYMOUS)) {
       throw new UnsupportedOperationException("User must be logged or dynamic player is required");
     }
-    if (!exercise.isUserHasAccess(user) && !exercise.getUsers().contains(user)) {
-      throw new UnsupportedOperationException("The given player is not in this exercise");
+
+    if (exerciseOpt.isPresent()) {
+      if (!exerciseOpt.get().isUserHasAccess(user) && !exerciseOpt.get().getUsers().contains(user)) {
+        throw new UnsupportedOperationException("The given player is not in this exercise");
+      }
+      return getExercisePlayerDocuments(exerciseOpt.get());
+    } else if (scenarioOpt.isPresent()) {
+      if (!scenarioOpt.get().isUserHasAccess(user) && !scenarioOpt.get().getUsers().contains(user)) {
+        throw new UnsupportedOperationException("The given player is not in this exercise");
+      }
+      return getScenarioPlayerDocuments(scenarioOpt.get());
+    } else {
+      throw new IllegalArgumentException("Exercise or scenario ID not found");
     }
-    return getExercisePlayerDocuments(exercise);
   }
 
   @GetMapping("/api/player/{exerciseId}/documents/{documentId}/file")
-  public void downloadPlayerDocument(@PathVariable String exerciseId, @PathVariable String documentId,
+  public void downloadPlayerDocument(
+      @PathVariable String exerciseId,
+      @PathVariable String documentId,
       @RequestParam Optional<String> userId, HttpServletResponse response) throws IOException {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
     final User user = impersonateUser(userRepository, userId);

@@ -29,7 +29,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.util.function.Tuples;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,6 +57,8 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 @Secured(ROLE_USER)
 public class ExerciseApi extends RestBehavior {
 
+  public static final String EXERCISE_URI = "/api/exercises";
+
   private static final Logger LOGGER = Logger.getLogger(ExerciseApi.class.getName());
 
   // region properties
@@ -76,8 +77,7 @@ public class ExerciseApi extends RestBehavior {
   private TagRepository tagRepository;
   private UserRepository userRepository;
   private PauseRepository pauseRepository;
-  private GroupRepository groupRepository;
-  private GrantRepository grantRepository;
+  private GrantService grantService;
   private DocumentRepository documentRepository;
   private ExerciseRepository exerciseRepository;
   private TeamRepository teamRepository;
@@ -140,13 +140,8 @@ public class ExerciseApi extends RestBehavior {
   }
 
   @Autowired
-  public void setGrantRepository(GrantRepository grantRepository) {
-    this.grantRepository = grantRepository;
-  }
-
-  @Autowired
-  public void setGroupRepository(GroupRepository groupRepository) {
-    this.groupRepository = groupRepository;
+  public void setGrantService(@NotBlank final GrantService grantService)  {
+    this.grantService = grantService;
   }
 
   @Autowired
@@ -402,20 +397,7 @@ public class ExerciseApi extends RestBehavior {
     } else {
       exercise.setReplyTo(openExConfig.getDefaultMailer());
     }
-    // Find automatic groups to grants
-    List<Group> groups = fromIterable(groupRepository.findAll());
-    List<Grant> grants = groups.stream().filter(group -> !group.getExercisesDefaultGrants().isEmpty())
-        .flatMap(group -> group.getExercisesDefaultGrants().stream().map(s -> Tuples.of(group, s))).map(tuple -> {
-          Grant grant = new Grant();
-          grant.setGroup(tuple.getT1());
-          grant.setName(tuple.getT2());
-          grant.setExercise(exercise);
-          return grant;
-        }).toList();
-    if (!grants.isEmpty()) {
-      Iterable<Grant> exerciseGrants = grantRepository.saveAll(grants);
-      exercise.setGrants(fromIterable(exerciseGrants));
-    }
+    this.grantService.computeGrant(exercise);
     return exerciseRepository.save(exercise);
   }
 
@@ -568,7 +550,6 @@ public class ExerciseApi extends RestBehavior {
   }
 
   @GetMapping("/api/exercises")
-  @Secured(ROLE_USER)
   public List<ExerciseSimple> exercises() {
     Iterable<Exercise> exercises = currentUser().isAdmin() ? exerciseRepository.findAll()
         : exerciseRepository.findAllGranted(currentUser().getId());
@@ -678,7 +659,7 @@ public class ExerciseApi extends RestBehavior {
     importExport.setTags(exerciseTags.stream().distinct().toList());
     objectMapper.addMixIn(Tag.class, ExerciseExportMixins.Tag.class);
     // -- Variables --
-    List<Variable> variables = this.variableService.variables(exerciseId);
+    List<Variable> variables = this.variableService.variablesFromExercise(exerciseId);
     importExport.setVariables(variables);
     if (isWithVariableValues) {
       objectMapper.addMixIn(Variable.class, VariableWithValueMixin.class);

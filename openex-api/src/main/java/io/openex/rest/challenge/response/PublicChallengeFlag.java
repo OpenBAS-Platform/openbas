@@ -2,7 +2,11 @@ package io.openex.rest.challenge.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.ChallengeFlag;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 public class PublicChallengeFlag {
 
     @JsonProperty("flag_id")
@@ -20,27 +24,4 @@ public class PublicChallengeFlag {
         this.challenge = challengeFlag.getChallenge().getId();
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public ChallengeFlag.FLAG_TYPE getType() {
-        return type;
-    }
-
-    public void setType(ChallengeFlag.FLAG_TYPE type) {
-        this.type = type;
-    }
-
-    public String getChallenge() {
-        return challenge;
-    }
-
-    public void setChallenge(String challenge) {
-        this.challenge = challenge;
-    }
 }

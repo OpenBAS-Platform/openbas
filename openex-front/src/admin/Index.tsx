@@ -14,10 +14,12 @@ import Loader from '../components/Loader';
 import contractImages from '../actions/Contract';
 import { useAppDispatch } from '../utils/hooks';
 
-const IndexExercise = lazy(() => import('./components/exercises/Index'));
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));
 const Exercises = lazy(() => import('./components/exercises/Exercises'));
+const IndexExercise = lazy(() => import('./components/exercises/Index'));
+const Scenarios = lazy(() => import('./components/scenarios/Scenarios'));
+const IndexScenario = lazy(() => import('./components/scenarios/scenario/IndexScenario'));
 const Assets = lazy(() => import('./components/assets/Index'));
 const Teams = lazy(() => import('./components/teams/Index'));
 const IndexComponents = lazy(() => import('./components/components/Index'));
@@ -68,9 +70,11 @@ const Index = () => {
           <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="profile/*" element={errorWrapper(IndexProfile)()} />
-              <Route path="exercises" element={errorWrapper(Exercises)()} />
               <Route path="" element={errorWrapper(Dashboard)()} />
+              <Route path="exercises" element={errorWrapper(Exercises)()} />
               <Route path="exercises/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
+              <Route path="scenarios" element={errorWrapper(Scenarios)()} />
+              <Route path="scenarios/:scenarioId/*" element={errorWrapper(IndexScenario)()} />
               <Route path="assets/*" element={errorWrapper(Assets)()} />
               <Route path="teams/*" element={errorWrapper(Teams)()} />
               <Route path="components/*" element={errorWrapper(IndexComponents)()} />

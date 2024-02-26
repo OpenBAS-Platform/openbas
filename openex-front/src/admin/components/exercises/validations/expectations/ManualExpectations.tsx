@@ -4,12 +4,12 @@ import { AssignmentTurnedIn } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import type { Team, Inject } from '../../../../../utils/api-types';
 import { useHelper } from '../../../../../store';
-import type { TeamsHelper } from '../../../../../actions/helper';
-import type { InjectExpectationsStore } from '../../injects/expectations/Expectation';
+import type { InjectExpectationsStore } from '../../../components/injects/expectations/Expectation';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import colorStyles from '../../../../../components/Color';
 import ManualExpectationsValidation from './ManualExpectationsValidation';
+import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {

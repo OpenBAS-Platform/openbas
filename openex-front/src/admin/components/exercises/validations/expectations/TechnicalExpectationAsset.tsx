@@ -2,7 +2,7 @@ import React, { FunctionComponent, useState } from 'react';
 import { PublishedWithChangesOutlined } from '@mui/icons-material';
 import { Alert, Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import type { InjectExpectationsStore } from '../../injects/expectations/Expectation';
+import type { InjectExpectationsStore } from '../../../components/injects/expectations/Expectation';
 import type { Contract } from '../../../../../utils/api-types';
 import ExpectationLine from './ExpectationLine';
 import Drawer from '../../../../../components/common/Drawer';

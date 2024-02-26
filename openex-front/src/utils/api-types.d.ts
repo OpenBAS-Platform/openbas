@@ -19,11 +19,12 @@ export interface Article {
   article_created_at?: string;
   article_documents?: Document[];
   article_exercise?: Exercise;
-  article_id?: string;
+  article_id: string;
   article_is_scheduled?: boolean;
   /** @format int32 */
   article_likes?: number;
   article_name?: string;
+  article_scenario?: Scenario;
   /** @format int32 */
   article_shares?: number;
   /** @format date-time */
@@ -134,10 +135,11 @@ export interface Challenge {
   challenge_documents?: Document[];
   challenge_exercises?: string[];
   challenge_flags?: ChallengeFlag[];
-  challenge_id?: string;
+  challenge_id: string;
   /** @format int32 */
   challenge_max_attempts?: number;
   challenge_name?: string;
+  challenge_scenarios?: string[];
   /** @format int32 */
   challenge_score?: number;
   challenge_tags?: Tag[];
@@ -214,7 +216,7 @@ export interface Channel {
   /** @format date-time */
   channel_created_at?: string;
   channel_description?: string;
-  channel_id?: string;
+  channel_id: string;
   channel_logo_dark?: Document;
   channel_logo_light?: Document;
   channel_mode?: string;
@@ -241,6 +243,7 @@ export interface ChannelReader {
   channel_exercise?: Exercise;
   channel_id?: string;
   channel_information?: Channel;
+  channel_scenario?: Scenario;
 }
 
 export interface ChannelUpdateInput {
@@ -331,7 +334,8 @@ export interface Contract {
 }
 
 export interface ContractConfig {
-  color?: string;
+  color_dark?: string;
+  color_light?: string;
   expose?: boolean;
   icon?: string;
   label?: Record<string, string>;
@@ -401,8 +405,9 @@ export interface DirectInjectInput {
 export interface Document {
   document_description?: string;
   document_exercises?: Exercise[];
-  document_id?: string;
+  document_id: string;
   document_name?: string;
+  document_scenarios?: Scenario[];
   document_tags?: Tag[];
   document_target?: string;
   document_type?: string;
@@ -412,6 +417,7 @@ export interface Document {
 export interface DocumentCreateInput {
   document_description?: string;
   document_exercises?: string[];
+  document_scenarios?: string[];
   document_tags?: string[];
 }
 
@@ -421,7 +427,8 @@ export interface DocumentTagUpdateInput {
 
 export interface DocumentUpdateInput {
   document_description?: string;
-  document_exercises: string[];
+  document_exercises?: string[];
+  document_scenarios?: string[];
   document_tags?: string[];
 }
 
@@ -560,7 +567,7 @@ export interface Exercise {
   exercise_documents?: Document[];
   /** @format date-time */
   exercise_end_date?: string;
-  exercise_id?: string;
+  exercise_id: string;
   exercise_injects?: Inject[];
   exercise_injects_statistics?: Record<string, number>;
   exercise_lessons_anonymized?: boolean;
@@ -677,6 +684,7 @@ export interface Grant {
   grant_group?: Group;
   grant_id?: string;
   grant_name?: "OBSERVER" | "PLANNER";
+  grant_scenario?: Scenario;
   updateAttributes?: object;
 }
 
@@ -684,6 +692,9 @@ export interface Group {
   group_default_exercise_assign?: ("OBSERVER" | "PLANNER")[];
   group_default_exercise_observer?: boolean;
   group_default_exercise_planner?: boolean;
+  group_default_scenario_assign?: ("OBSERVER" | "PLANNER")[];
+  group_default_scenario_observer?: boolean;
+  group_default_scenario_planner?: boolean;
   group_default_user_assign?: boolean;
   group_description?: string;
   group_grants?: Grant[];
@@ -697,14 +708,17 @@ export interface Group {
 export interface GroupCreateInput {
   group_default_exercise_observer?: boolean;
   group_default_exercise_planner?: boolean;
+  group_default_scenario_observer?: boolean;
+  group_default_scenario_planner?: boolean;
   group_default_user_assign?: boolean;
   group_description?: string;
   group_name: string;
 }
 
 export interface GroupGrantInput {
-  grant_exercise: string;
+  grant_exercise?: string;
   grant_name?: "OBSERVER" | "PLANNER";
+  grant_scenario?: string;
 }
 
 export interface GroupUpdateUsersInput {
@@ -742,6 +756,7 @@ export interface Inject {
   inject_exercise?: Exercise;
   inject_expectations?: InjectExpectation[];
   inject_id?: string;
+  inject_scenario?: Scenario;
   /** @format date-time */
   inject_sent_at?: string;
   inject_status?: InjectStatus;
@@ -898,6 +913,7 @@ export interface LessonsCategory {
   /** @format int32 */
   lessons_category_order?: number;
   lessons_category_questions?: LessonsQuestion[];
+  lessons_category_scenario?: Scenario;
   lessons_category_teams?: Team[];
   /** @format date-time */
   lessons_category_updated_at?: string;
@@ -1090,6 +1106,7 @@ export interface Objective {
   objective_id?: string;
   /** @format int32 */
   objective_priority?: number;
+  objective_scenario?: Scenario;
   /** @format double */
   objective_score?: number;
   objective_title?: string;
@@ -1241,6 +1258,74 @@ export interface ResetUserInput {
   login: string;
 }
 
+export interface Scenario {
+  /** @format int64 */
+  scenario_all_users_number?: number;
+  scenario_articles?: Article[];
+  /** @format date-time */
+  scenario_created_at?: string;
+  scenario_description?: string;
+  scenario_documents?: Document[];
+  scenario_id: string;
+  scenario_injects?: Inject[];
+  scenario_injects_statistics?: Record<string, number>;
+  scenario_lessons_categories?: LessonsCategory[];
+  scenario_mail_from: string;
+  scenario_message_footer?: string;
+  scenario_message_header?: string;
+  scenario_name: string;
+  scenario_observers?: User[];
+  scenario_planners?: User[];
+  scenario_subtitle?: string;
+  scenario_tags?: Tag[];
+  scenario_teams?: Team[];
+  scenario_teams_users?: ScenarioTeamUser[];
+  /** @format date-time */
+  scenario_updated_at?: string;
+  scenario_users?: User[];
+  /** @format int64 */
+  scenario_users_number?: number;
+  updateAttributes?: object;
+}
+
+export interface ScenarioInformationInput {
+  scenario_mail_from: string;
+  scenario_message_footer?: string;
+  scenario_message_header?: string;
+}
+
+export interface ScenarioInput {
+  scenario_description?: string;
+  scenario_name: string;
+  scenario_subtitle?: string;
+  scenario_tags?: string[];
+}
+
+export interface ScenarioSimple {
+  scenario_id?: string;
+  scenario_name?: string;
+  scenario_subtitle?: string;
+  scenario_tags?: Tag[];
+}
+
+export interface ScenarioTeamPlayersEnableInput {
+  scenario_team_players?: string[];
+}
+
+export interface ScenarioTeamUser {
+  scenario_id?: Scenario;
+  team_id?: Team;
+  user_id?: User;
+}
+
+export interface ScenarioUpdateTagsInput {
+  scenario_tags?: string[];
+}
+
+export interface ScenarioUpdateTeamsInput {
+  scenario_teams?: string[];
+}
+
 export interface SettingsUpdateInput {
   platform_lang: string;
   platform_name: string;
@@ -1258,7 +1343,6 @@ export interface Tag {
   tag_color?: string;
   tag_id: string;
   tag_name?: string;
-  tags_documents?: Document[];
   updateAttributes?: object;
 }
 
@@ -1278,21 +1362,25 @@ export interface Team {
   /** @format date-time */
   team_created_at?: string;
   team_description?: string;
+  team_exercise_injects?: Inject[];
+  /** @format int64 */
+  team_exercise_injects_number?: number;
   team_exercises?: Exercise[];
   team_exercises_users?: ExerciseTeamUser[];
-  team_id?: string;
+  team_id: string;
   team_inject_expectations?: InjectExpectation[];
-  team_injects?: Inject[];
   /** @format int64 */
   team_injects_expectations_number?: number;
   /** @format int64 */
   team_injects_expectations_total_expected_score?: number;
   /** @format int64 */
   team_injects_expectations_total_score?: number;
-  /** @format int64 */
-  team_injects_number?: number;
   team_name: string;
   team_organization?: Organization;
+  team_scenario_injects?: Inject[];
+  /** @format int64 */
+  team_scenario_injects_number?: number;
+  team_scenarios?: Scenario[];
   team_tags?: Tag[];
   /** @format date-time */
   team_updated_at?: string;
@@ -1308,6 +1396,7 @@ export interface TeamCreateInput {
   team_exercises?: string[];
   team_name: string;
   team_organization?: string;
+  team_scenarios?: string[];
   team_tags?: string[];
 }
 
@@ -1337,6 +1426,7 @@ export interface UpdateMePasswordInput {
 }
 
 export interface UpdatePlayerInput {
+  /** @pattern ^\+[\d\s\-.()]+$ */
   user_phone2?: string;
   user_country?: string;
   user_email: string;
@@ -1344,7 +1434,7 @@ export interface UpdatePlayerInput {
   user_lastname?: string;
   user_organization?: string;
   user_pgp_key?: string;
-  /** @pattern ^\+[\d\s]* */
+  /** @pattern ^\+[\d\s\-.()]+$ */
   user_phone?: string;
   user_tags?: string[];
 }
@@ -1366,6 +1456,7 @@ export interface UpdateUserInfoInput {
 }
 
 export interface UpdateUserInput {
+  /** @pattern ^\+[\d\s\-.()]+$ */
   user_phone2?: string;
   user_admin?: boolean;
   user_email?: string;
@@ -1373,6 +1464,7 @@ export interface UpdateUserInput {
   user_lastname?: string;
   user_organization?: string;
   user_pgp_key?: string;
+  /** @pattern ^\+[\d\s\-.()]+$ */
   user_phone?: string;
   user_tags?: string[];
 }
@@ -1445,6 +1537,7 @@ export interface Variable {
   variable_id: string;
   /** @pattern ^[a-z_]+$ */
   variable_key: string;
+  variable_scenario?: Scenario;
   variable_type: "String" | "Object";
   /** @format date-time */
   variable_updated_at?: string;

@@ -1,237 +1,231 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import React, { useState } from 'react';
 import * as R from 'ramda';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { updateDocument, deleteDocument } from '../../../../actions/Document';
+import { deleteDocument, updateDocument } from '../../../../actions/Document';
 import DocumentForm from './DocumentForm';
-import inject18n from '../../../../components/i18n';
-import { storeHelper } from '../../../../actions/Schema';
+import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
-import { exerciseOptions, tagOptions } from '../../../../utils/Option';
+import { exerciseOptions, scenarioOptions, tagOptions } from '../../../../utils/Option';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { useHelper } from '../../../../store';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
+import { fetchExercises } from '../../../../actions/Exercise';
+import Drawer from '../../../../components/common/Drawer';
 
-class DocumentPopover extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      openDelete: false,
-      openEdit: false,
-      openPopover: false,
-      openRemove: false,
-    };
-  }
+const DocumentPopover = (props) => {
+  // Standard hooks
+  const { t } = useFormatter();
+  const dispatch = useAppDispatch();
 
-  handlePopoverOpen(event) {
+  const { document, disabled, onRemoveDocument, attached, onToggleAttach, inline } = props;
+
+  // Fetching data
+  const { tagsMap, exercisesMap, scenariosMap } = useHelper((helper) => ({
+    tagsMap: helper.getTagsMap(),
+    exercisesMap: helper.getExercisesMap(),
+    scenariosMap: helper.getScenariosMap(),
+  }));
+  useDataLoader(() => {
+    dispatch(fetchExercises());
+    dispatch(fetchScenarios());
+  });
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openRemove, setOpenRemove] = useState(false);
+
+  const handlePopoverOpen = (event) => {
     event.stopPropagation();
-    this.setState({ anchorEl: event.currentTarget });
-  }
+    setAnchorEl(event.currentTarget);
+  };
 
-  handlePopoverClose() {
-    this.setState({ anchorEl: null });
-  }
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
 
-  handleOpenEdit() {
-    this.setState({ openEdit: true });
-    this.handlePopoverClose();
-  }
+  const handleOpenEdit = () => {
+    setOpenEdit(true);
+    handlePopoverClose();
+  };
 
-  handleCloseEdit() {
-    this.setState({ openEdit: false });
-  }
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+  };
 
-  onSubmitEdit(data) {
+  const onSubmitEdit = (data) => {
     const inputValues = R.pipe(
       R.assoc('document_tags', R.pluck('id', data.document_tags)),
       R.assoc('document_exercises', R.pluck('id', data.document_exercises)),
+      R.assoc('document_scenarios', R.pluck('id', data.document_scenarios)),
     )(data);
-    return this.props
-      .updateDocument(this.props.document.document_id, inputValues)
-      .then(() => this.handleCloseEdit());
-  }
-
-  handleOpenDelete() {
-    this.setState({ openDelete: true });
-    this.handlePopoverClose();
-  }
-
-  handleCloseDelete() {
-    this.setState({ openDelete: false });
-  }
-
-  submitDelete() {
-    this.props.deleteDocument(this.props.document.document_id);
-    this.handleCloseDelete();
-  }
-
-  handleOpenRemove() {
-    this.setState({ openRemove: true });
-    this.handlePopoverClose();
-  }
-
-  handleCloseRemove() {
-    this.setState({ openRemove: false });
-  }
-
-  submitRemove() {
-    this.props.onRemoveDocument(this.props.document.document_id);
-    this.handleCloseRemove();
-  }
-
-  handleToggleAttachement() {
-    this.props.onToggleAttach(this.props.document.document_id);
-    this.handlePopoverClose();
-  }
-
-  render() {
-    const {
-      t,
-      document,
-      onRemoveDocument,
-      onToggleAttach,
-      attached,
-      tagsMap,
-      exercisesMap,
-      disabled,
-    } = this.props;
-    const documentTags = tagOptions(document.document_tags, tagsMap);
-    const documentExercises = exerciseOptions(
-      document.document_exercises,
-      exercisesMap,
-    );
-    const initialValues = R.pipe(
-      R.assoc('document_tags', documentTags),
-      R.assoc('document_exercises', documentExercises),
-      R.pick([
-        'document_name',
-        'document_description',
-        'document_type',
-        'document_tags',
-        'document_exercises',
-      ]),
-    )(document);
-    return (
-      <div>
-        <IconButton
-          color="primary"
-          onClick={this.handlePopoverOpen.bind(this)}
-          aria-haspopup="true"
-          size="large"
-          disabled={disabled}
-        >
-          <MoreVert />
-        </IconButton>
-        <Menu
-          anchorEl={this.state.anchorEl}
-          open={Boolean(this.state.anchorEl)}
-          onClose={this.handlePopoverClose.bind(this)}
-        >
-          <MenuItem onClick={this.handleOpenEdit.bind(this)}>
-            {t('Update')}
-          </MenuItem>
-          {onToggleAttach && (
-            <MenuItem onClick={this.handleToggleAttachement.bind(this)}>
-              {attached ? t('Disable attachment') : t('Enable attachment')}
-            </MenuItem>
-          )}
-          {onRemoveDocument && (
-            <MenuItem onClick={this.handleOpenRemove.bind(this)}>
-              {t('Remove from the element')}
-            </MenuItem>
-          )}
-          {!onRemoveDocument && (
-            <MenuItem onClick={this.handleOpenDelete.bind(this)}>
-              {t('Delete')}
-            </MenuItem>
-          )}
-        </Menu>
-        <Dialog
-          open={this.state.openDelete}
-          TransitionComponent={Transition}
-          onClose={this.handleCloseDelete.bind(this)}
-          PaperProps={{ elevation: 1 }}
-        >
-          <DialogContent>
-            <DialogContentText>
-              {t('Do you want to delete this document?')}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleCloseDelete.bind(this)}>
-              {t('Cancel')}
-            </Button>
-            <Button color="secondary" onClick={this.submitDelete.bind(this)}>
-              {t('Delete')}
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog
-          TransitionComponent={Transition}
-          open={this.state.openEdit}
-          onClose={this.handleCloseEdit.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
-        >
-          <DialogTitle>{t('Update the document')}</DialogTitle>
-          <DialogContent>
-            <DocumentForm
-              initialValues={initialValues}
-              editing={true}
-              onSubmit={this.onSubmitEdit.bind(this)}
-              handleClose={this.handleCloseEdit.bind(this)}
-            />
-          </DialogContent>
-        </Dialog>
-        <Dialog
-          open={this.state.openRemove}
-          TransitionComponent={Transition}
-          onClose={this.handleCloseRemove.bind(this)}
-          PaperProps={{ elevation: 1 }}
-        >
-          <DialogContent>
-            <DialogContentText>
-              {t('Do you want to remove the document from the element?')}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleCloseRemove.bind(this)}>
-              {t('Cancel')}
-            </Button>
-            <Button color="secondary" onClick={this.submitRemove.bind(this)}>
-              {t('Remove')}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
-    );
-  }
-}
-
-const select = (state) => {
-  const helper = storeHelper(state);
-  const user = helper.getMe();
-  return {
-    user,
-    userAdmin: user?.user_admin,
+    return dispatch(updateDocument(document.document_id, inputValues))
+      .then(() => handleCloseEdit());
   };
+
+  const handleOpenDelete = () => {
+    setOpenDelete(true);
+    handlePopoverClose();
+  };
+
+  const handleCloseDelete = () => {
+    setOpenDelete(false);
+  };
+
+  const submitDelete = () => {
+    dispatch(deleteDocument(document.document_id));
+    handleCloseDelete();
+  };
+
+  const handleOpenRemove = () => {
+    setOpenRemove(true);
+    handlePopoverClose();
+  };
+
+  const handleCloseRemove = () => {
+    setOpenRemove(false);
+  };
+
+  const submitRemove = () => {
+    onRemoveDocument(document.document_id);
+    handleCloseRemove();
+  };
+
+  const handleToggleAttachement = () => {
+    onToggleAttach(document.document_id);
+    handlePopoverClose();
+  };
+
+  const documentTags = tagOptions(document.document_tags, tagsMap);
+  const documentExercises = exerciseOptions(
+    document.document_exercises,
+    exercisesMap,
+  );
+  const documentScenarios = scenarioOptions(
+    document.document_scenarios,
+    scenariosMap,
+  );
+  const initialValues = R.pipe(
+    R.assoc('document_tags', documentTags),
+    R.assoc('document_exercises', documentExercises),
+    R.assoc('document_scenarios', documentScenarios),
+    R.pick([
+      'document_name',
+      'document_description',
+      'document_type',
+      'document_tags',
+      'document_exercises',
+      'document_scenarios',
+    ]),
+  )(document);
+  return (
+    <div>
+      <IconButton
+        color="primary"
+        onClick={handlePopoverOpen}
+        aria-haspopup="true"
+        size="large"
+        disabled={disabled}
+      >
+        <MoreVert />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handlePopoverClose}
+      >
+        <MenuItem onClick={handleOpenEdit}>
+          {t('Update')}
+        </MenuItem>
+        {onToggleAttach && (
+          <MenuItem onClick={handleToggleAttachement}>
+            {attached ? t('Disable attachment') : t('Enable attachment')}
+          </MenuItem>
+        )}
+        {onRemoveDocument && (
+          <MenuItem onClick={handleOpenRemove}>
+            {t('Remove from the element')}
+          </MenuItem>
+        )}
+        {!onRemoveDocument && (
+          <MenuItem onClick={handleOpenDelete}>
+            {t('Delete')}
+          </MenuItem>
+        )}
+      </Menu>
+      <Dialog
+        open={openDelete}
+        TransitionComponent={Transition}
+        onClose={handleCloseDelete}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t('Do you want to delete this document?')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDelete}>
+            {t('Cancel')}
+          </Button>
+          <Button color="secondary" onClick={submitDelete}>
+            {t('Delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {inline ? (
+        <Dialog
+          open={openEdit}
+          handleClose={handleCloseEdit}
+          title={t('Update the document')}
+        >
+          <DocumentForm
+            initialValues={initialValues}
+            editing
+            onSubmit={onSubmitEdit}
+            handleClose={handleCloseEdit}
+          />
+        </Dialog>
+      ) : (
+        <Drawer
+          open={openEdit}
+          handleClose={handleCloseEdit}
+          title={t('Update the document')}
+        >
+          <DocumentForm
+            initialValues={initialValues}
+            editing
+            onSubmit={onSubmitEdit}
+            handleClose={handleCloseEdit}
+          />
+        </Drawer>
+      )}
+
+      <Dialog
+        open={openRemove}
+        TransitionComponent={Transition}
+        onClose={handleCloseRemove}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t('Do you want to remove the document from the element?')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseRemove}>
+            {t('Cancel')}
+          </Button>
+          <Button color="secondary" onClick={submitRemove}>
+            {t('Remove')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
 };
 
-DocumentPopover.propTypes = {
-  t: PropTypes.func,
-  document: PropTypes.object,
-  updateDocument: PropTypes.func,
-  deleteDocument: PropTypes.func,
-  userAdmin: PropTypes.bool,
-  tagsMap: PropTypes.object,
-  exercisesMap: PropTypes.object,
-  onRemoveDocument: PropTypes.func,
-  onToggleAttach: PropTypes.func,
-  attached: PropTypes.bool,
-  disabled: PropTypes.bool,
-};
-
-export default R.compose(
-  connect(select, { updateDocument, deleteDocument }),
-  inject18n,
-)(DocumentPopover);
+export default DocumentPopover;

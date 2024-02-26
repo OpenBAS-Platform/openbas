@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
 import io.openex.helper.MultiIdDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
@@ -15,6 +17,8 @@ import java.util.Objects;
 
 import static java.time.Instant.now;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "objectives")
 @EntityListeners(ModelBaseListener.class)
@@ -31,6 +35,12 @@ public class Objective implements Base {
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("objective_exercise")
     private Exercise exercise;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "objective_scenario")
+    @JsonSerialize(using = MonoIdDeserializer.class)
+    @JsonProperty("objective_scenario")
+    private Scenario scenario;
 
     @Column(name = "objective_title")
     @JsonProperty("objective_title")
@@ -63,70 +73,6 @@ public class Objective implements Base {
         return getEvaluations().stream().mapToDouble(Evaluation::getScore).average().orElse(0D);
     }
     // endregion
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Exercise getExercise() {
-        return exercise;
-    }
-
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Short getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Short priority) {
-        this.priority = priority;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public List<Evaluation> getEvaluations() {
-        return evaluations;
-    }
-
-    public void setEvaluations(List<Evaluation> evaluations) {
-        this.evaluations = evaluations;
-    }
 
     @Override
     public boolean isUserHasAccess(User user) {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoIdDeserializer;
+import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
@@ -23,6 +24,7 @@ public class Channel implements Base {
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("channel_id")
+    @NotBlank
     private String id;
 
     @Column(name = "channel_created_at")

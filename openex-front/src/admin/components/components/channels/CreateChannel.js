@@ -3,12 +3,12 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import withStyles from '@mui/styles/withStyles';
-import { Fab, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Fab } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import inject18n from '../../../../components/i18n';
-import { addChannel } from '../../../../actions/Channel';
+import { addChannel } from '../../../../actions/channels/channel-action';
 import ChannelForm from './ChannelForm';
-import Transition from '../../../../components/common/Transition';
+import Drawer from '../../../../components/common/Drawer';
 
 const styles = () => ({
   createButton: {
@@ -50,23 +50,17 @@ class CreateChannel extends Component {
         >
           <Add />
         </Fab>
-        <Dialog
+        <Drawer
           open={this.state.open}
-          TransitionComponent={Transition}
-          onClose={this.handleClose.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
+          handleClose={this.handleClose.bind(this)}
+          title={t('Create a new channel')}
         >
-          <DialogTitle>{t('Create a new channel')}</DialogTitle>
-          <DialogContent>
-            <ChannelForm
-              onSubmit={this.onSubmit.bind(this)}
-              initialValues={{}}
-              handleClose={this.handleClose.bind(this)}
-            />
-          </DialogContent>
-        </Dialog>
+          <ChannelForm
+            onSubmit={this.onSubmit.bind(this)}
+            initialValues={{}}
+            handleClose={this.handleClose.bind(this)}
+          />
+        </Drawer>
       </div>
     );
   }

@@ -96,21 +96,21 @@ const TopMenuExercise: React.FC = () => {
       </Button>
       <Button
         component={Link}
-        to={`/admin/exercises/${exerciseId}/scenario`}
+        to={`/admin/exercises/${exerciseId}/injects`}
         variant={
-          location.pathname.includes(`/admin/exercises/${exerciseId}/scenario`)
+          location.pathname.includes(`/admin/exercises/${exerciseId}/injects`)
             ? 'contained'
             : 'text'
         }
         size="small"
         color={
-          location.pathname.includes(`/admin/exercises/${exerciseId}/scenario`)
+          location.pathname.includes(`/admin/exercises/${exerciseId}/injects`)
             ? 'secondary'
             : 'primary'
         }
         classes={{ root: classes.button }}
       >
-        {t('Scenario')}
+        {t('Injects')}
       </Button>
       <Button
         component={Link}

@@ -41,8 +41,8 @@ const ExerciseField = (props) => {
       size="small"
       name={name}
       noMargin={noMargin}
-      fullWidth={true}
-      multiple={true}
+      fullWidth
+      multiple
       label={label}
       placeholder={placeholder}
       options={exerciseOptions}

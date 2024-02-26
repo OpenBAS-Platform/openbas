@@ -2,9 +2,12 @@ package io.openex.rest.security;
 
 import io.openex.config.OpenexPrincipal;
 import io.openex.database.model.Exercise;
+import io.openex.database.model.Scenario;
 import io.openex.database.model.User;
 import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.UserRepository;
+import io.openex.service.ScenarioService;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
@@ -17,17 +20,23 @@ import static io.openex.database.model.User.ROLE_ADMIN;
 
 public class SecurityExpression extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
 
-  private final ExerciseRepository exerciseRepository;
   private final UserRepository userRepository;
+  private final ExerciseRepository exerciseRepository;
+  private final ScenarioService scenarioService;
+
   private Object filterObject;
   private Object returnObject;
 
   // region utils
-  public SecurityExpression(Authentication authentication, UserRepository userRepository,
-      ExerciseRepository exerciseRepository) {
+  public SecurityExpression(
+      Authentication authentication,
+      final UserRepository userRepository,
+      final ExerciseRepository exerciseRepository,
+      final ScenarioService scenarioService) {
     super(authentication);
     this.exerciseRepository = exerciseRepository;
     this.userRepository = userRepository;
+    this.scenarioService = scenarioService;
   }
 
   private OpenexPrincipal getUser() {
@@ -41,7 +50,7 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
   }
   // endregion
 
-  // region annotations
+  // region exercise annotations
   @SuppressWarnings("unused")
   public boolean isExercisePlanner(String exerciseId) {
     if (isUserHasBypass()) {
@@ -81,13 +90,41 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
   public boolean isExerciseObserverOrPlayer(String exerciseId) {
     return isExerciseObserver(exerciseId) || isExercisePlayer(exerciseId);
   }
+  // endregion
 
+  // region scenario annotations
+  @SuppressWarnings("unused")
+  public boolean isScenarioPlanner(@NotBlank final String scenarioId) {
+    if (isUserHasBypass()) {
+      return true;
+    }
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    List<User> planners = scenario.getPlanners();
+    Optional<User> planner = planners.stream()
+        .filter(user -> user.getId().equals(getUser().getId())).findAny();
+    return planner.isPresent();
+  }
+
+  @SuppressWarnings("unused")
+  public boolean isScenarioObserver(@NotBlank final String scenarioId) {
+    if (isUserHasBypass()) {
+      return true;
+    }
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    List<User> observers = scenario.getObservers();
+    Optional<User> observer = observers.stream()
+        .filter(user -> user.getId().equals(getUser().getId())).findAny();
+    return observer.isPresent();
+  }
+  // endregion
+
+  // region user annotations
   @SuppressWarnings("unused")
   public boolean isPlanner() {
     if (isUserHasBypass()) {
       return true;
     }
-    User user = userRepository.findById(getUser().getId()).orElseThrow();
+    User user = this.userRepository.findById(getUser().getId()).orElseThrow();
     return user.isPlanner();
   }
 

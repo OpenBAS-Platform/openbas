@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import { Button, Grid, Tooltip } from '@mui/material';
+import { Button, Grid, Tooltip, Typography } from '@mui/material';
 import { InfoOutlined } from '@mui/icons-material';
 import TextField from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';
@@ -34,20 +34,20 @@ class GroupForm extends Component {
             <TextField
               variant="standard"
               name="group_name"
-              fullWidth={true}
+              fullWidth
               label={t('Name')}
             />
             <TextField
               variant="standard"
               name="group_description"
-              fullWidth={true}
-              multiline={true}
+              fullWidth
+              multiline
               rows={3}
               label={t('Description')}
               style={{ marginTop: 20 }}
             />
-            <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
-              <Grid item={true} xs={4} style={{ display: 'flex' }}>
+            <Grid container spacing={3} style={{ marginTop: 0 }}>
+              <Grid item xs={12} style={{ display: 'flex' }}>
                 <SwitchField
                   name="group_default_user_assign"
                   label={t('Auto assign')}
@@ -64,39 +64,91 @@ class GroupForm extends Component {
                   />
                 </Tooltip>
               </Grid>
-              <Grid item={true} xs={4} style={{ display: 'flex' }}>
-                <SwitchField
-                  name="group_default_exercise_observer"
-                  label={t('Auto observer')}
-                />
-                <Tooltip
-                  title={t(
-                    'This group will have observer permission on new exercises.',
-                  )}
-                >
-                  <InfoOutlined
-                    fontSize="small"
-                    color="primary"
-                    style={{ marginTop: 8 }}
-                  />
-                </Tooltip>
+              <Grid item xs={12}>
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <Typography variant="h2" style={{ marginBottom: 0 }}>
+                      {t('Scenario')}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} style={{ display: 'flex' }}>
+                    <SwitchField
+                      name="group_default_scenario_observer"
+                      label={t('Auto observer')}
+                    />
+                    <Tooltip
+                      title={t(
+                        'This group will have observer permission on new scenarios.',
+                      )}
+                    >
+                      <InfoOutlined
+                        fontSize="small"
+                        color="primary"
+                        style={{ marginTop: 8 }}
+                      />
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={6} style={{ display: 'flex' }}>
+                    <SwitchField
+                      name="group_default_scenario_planner"
+                      label={t('Auto planner')}
+                    />
+                    <Tooltip
+                      title={t(
+                        'This group will have planner permission on new scenarios.',
+                      )}
+                    >
+                      <InfoOutlined
+                        fontSize="small"
+                        color="primary"
+                        style={{ marginTop: 8 }}
+                      />
+                    </Tooltip>
+                  </Grid>
+                </Grid>
               </Grid>
-              <Grid item={true} xs={4} style={{ display: 'flex' }}>
-                <SwitchField
-                  name="group_default_exercise_planner"
-                  label={t('Auto planner')}
-                />
-                <Tooltip
-                  title={t(
-                    'This group will have planner permission on new exercises.',
-                  )}
-                >
-                  <InfoOutlined
-                    fontSize="small"
-                    color="primary"
-                    style={{ marginTop: 8 }}
-                  />
-                </Tooltip>
+              <Grid item xs={12}>
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <Typography variant="h2" style={{ marginBottom: 0 }}>
+                      {t('Exercise')}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} style={{ display: 'flex' }}>
+                    <SwitchField
+                      name="group_default_exercise_observer"
+                      label={t('Auto observer')}
+                    />
+                    <Tooltip
+                      title={t(
+                        'This group will have observer permission on new exercises.',
+                      )}
+                    >
+                      <InfoOutlined
+                        fontSize="small"
+                        color="primary"
+                        style={{ marginTop: 8 }}
+                      />
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={6} style={{ display: 'flex' }}>
+                    <SwitchField
+                      name="group_default_exercise_planner"
+                      label={t('Auto planner')}
+                    />
+                    <Tooltip
+                      title={t(
+                        'This group will have planner permission on new exercises.',
+                      )}
+                    >
+                      <InfoOutlined
+                        fontSize="small"
+                        color="primary"
+                        style={{ marginTop: 8 }}
+                      />
+                    </Tooltip>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
             <div style={{ float: 'right', marginTop: 20 }}>

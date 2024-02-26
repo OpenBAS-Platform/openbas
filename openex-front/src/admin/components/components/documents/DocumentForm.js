@@ -1,26 +1,29 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
+import React from 'react';
 import { Form } from 'react-final-form';
 import { Button, CircularProgress } from '@mui/material';
 import TextField from '../../../../components/TextField';
-import inject18n from '../../../../components/i18n';
+import { useFormatter } from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 import FileField from '../../../../components/FileField';
 import ExerciseField from '../../../../components/ExerciseField';
+import ScenarioField from '../../../../components/ScenarioField';
 
-class DocumentForm extends Component {
-  validate(values) {
-    const { t, editing, requireExercises } = this.props;
+const DocumentForm = (props) => {
+  // Standard hooks
+  const { t } = useFormatter();
+  const {
+    initialValues,
+    editing,
+    onSubmit,
+    handleClose,
+    filters,
+  } = props;
+
+  const validate = (values) => {
     const errors = {};
     let requiredFields = [];
-    if (editing && requireExercises) {
-      requiredFields = ['document_exercises'];
-    } else if (!editing) {
-      if (requireExercises) {
-        requiredFields = ['document_file', 'document_exercises'];
-      } else {
-        requiredFields = ['document_file'];
-      }
+    if (!editing) {
+      requiredFields = ['document_file'];
     }
     requiredFields.forEach((field) => {
       const data = values[field];
@@ -31,93 +34,82 @@ class DocumentForm extends Component {
       }
     });
     return errors;
-  }
+  };
 
-  render() {
-    const {
-      t,
-      editing,
-      onSubmit,
-      initialValues,
-      handleClose,
-      filters,
-    } = this.props;
-    return (
-      <Form
-        keepDirtyOnReinitialize={true}
-        initialValues={initialValues}
-        onSubmit={onSubmit}
-        validate={this.validate.bind(this)}
-        mutators={{
-          setValue: ([field, value], state, { changeValue }) => {
-            changeValue(state, field, () => value);
-          },
-        }}
-      >
-        {({ handleSubmit, form, values, submitting, pristine }) => (
-          <form id="documentForm" onSubmit={handleSubmit}>
-            <TextField
+  return (
+    <Form
+      keepDirtyOnReinitialize
+      initialValues={initialValues}
+      onSubmit={onSubmit}
+      validate={validate}
+      mutators={{
+        setValue: ([field, value], state, { changeValue }) => {
+          changeValue(state, field, () => value);
+        },
+      }}
+    >
+      {({ handleSubmit, form, values, submitting, pristine }) => (
+        <form id="documentForm" onSubmit={handleSubmit}>
+          <TextField
+            variant="standard"
+            name="document_description"
+            fullWidth
+            multiline
+            rows={2}
+            label={t('Description')}
+          />
+          <ExerciseField
+            name="document_exercises"
+            values={values}
+            label={t('Exercises')}
+            setFieldValue={form.mutators.setValue}
+            style={{ marginTop: 20 }}
+          />
+          <ScenarioField
+            name="document_scenarios"
+            values={values}
+            label={t('Scenarios')}
+            setFieldValue={form.mutators.setValue}
+            style={{ marginTop: 20 }}
+          />
+          <TagField
+            name="document_tags"
+            values={values}
+            label={t('Tags')}
+            setFieldValue={form.mutators.setValue}
+            style={{ marginTop: 20 }}
+          />
+          {!editing && (
+            <FileField
               variant="standard"
-              name="document_description"
-              fullWidth={true}
-              multiline={true}
-              rows={2}
-              label={t('Description')}
-            />
-            <ExerciseField
-              name="document_exercises"
-              values={values}
-              label={t('Exercises')}
-              setFieldValue={form.mutators.setValue}
+              type="file"
+              name="document_file"
+              label={t('File')}
               style={{ marginTop: 20 }}
+              filters={filters}
             />
-            <TagField
-              name="document_tags"
-              values={values}
-              label={t('Tags')}
-              setFieldValue={form.mutators.setValue}
-              style={{ marginTop: 20 }}
-            />
-            {!editing && (
-              <FileField
-                variant="standard"
-                type="file"
-                name="document_file"
-                label={t('File')}
-                style={{ marginTop: 20 }}
-                filters={filters}
-              />
-            )}
-            <div style={{ float: 'right', marginTop: 20 }}>
-              <Button
-                onClick={handleClose.bind(this)}
-                style={{ marginRight: 10 }}
-                disabled={submitting}
-              >
-                {t('Cancel')}
-              </Button>
-              <Button
-                color="secondary"
-                type="submit"
-                disabled={pristine || submitting}
-                startIcon={submitting && <CircularProgress size={20} />}
-              >
-                {editing ? t('Update') : t('Create')}
-              </Button>
-            </div>
-          </form>
-        )}
-      </Form>
-    );
-  }
-}
-
-DocumentForm.propTypes = {
-  t: PropTypes.func,
-  onSubmit: PropTypes.func.isRequired,
-  handleClose: PropTypes.func,
-  editing: PropTypes.bool,
-  filters: PropTypes.array,
+          )}
+          <div style={{ float: 'right', marginTop: 20 }}>
+            <Button
+              onClick={handleClose}
+              style={{ marginRight: 10 }}
+              disabled={submitting}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              color="secondary"
+              type="submit"
+              disabled={pristine || submitting}
+              startIcon={submitting && <CircularProgress size={20} />}
+            >
+              {editing ? t('Update') : t('Create')}
+            </Button>
+          </div>
+        </form>
+      )}
+    </Form>
+  );
 };
 
-export default inject18n(DocumentForm);
+export default DocumentForm;

@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
-import { Typography, Chip, Button, IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Button, Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material';
 import { AddOutlined } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { Form } from 'react-final-form';
@@ -13,45 +13,25 @@ import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import Transition from '../../../components/common/Transition';
 import { usePermissions } from '../../../utils/Exercise';
+import TagChip from '../components/tags/TagChip';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   container: {
-    width: '100%',
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: theme.spacing(2),
   },
-  containerWithPadding: {
-    width: '100%',
-    paddingRight: 200,
+  containerTitle: {
+    display: 'inline-flex',
+    alignItems: 'center',
   },
   title: {
-    float: 'left',
     textTransform: 'uppercase',
-  },
-  tags: {
-    marginTop: -4,
-    float: 'right',
-  },
-  tag: {
-    marginLeft: 5,
+    marginBottom: 0,
   },
 }));
 
-const TagChip = ({ tagId, isReadOnly, deleteTag }) => {
-  const classes = useStyles();
-  const tag = useHelper((helper) => helper.getTag(tagId));
-  return tag ? (
-    <Chip
-      key={tag.tag_id}
-      classes={{ root: classes.tag }}
-      label={tag.tag_name}
-      onDelete={isReadOnly ? null : () => deleteTag(tag.tag_id)}
-    />
-  ) : (
-    <div />
-  );
-};
-
-const ExerciseHeader = (props) => {
-  const { withPadding } = props;
+const ExerciseHeader = () => {
   const classes = useStyles();
   const { t } = useFormatter();
   const { exerciseId } = useParams();
@@ -64,7 +44,6 @@ const ExerciseHeader = (props) => {
     };
   });
   const [openTagAdd, setOpenTagAdd] = useState(false);
-  const containerRef = useRef(null);
   const handleToggleAddTag = () => setOpenTagAdd(!openTagAdd);
 
   const deleteTag = (tagId) => {
@@ -88,50 +67,38 @@ const ExerciseHeader = (props) => {
   };
   const { exercise_tags: tags } = exercise;
   return (
-    <div
-      className={withPadding ? classes.containerWithPadding : classes.container}
-      ref={containerRef}
-    >
-      <Typography
-        variant="h1"
-        gutterBottom={true}
-        classes={{ root: classes.title }}
-      >
-        {exercise.exercise_name}
-      </Typography>
-      <ExercisePopover exercise={exercise} tagsMap={tagsMap} />
-      <div className={classes.tags}>
-        {R.take(5, tags ?? []).map((tag) => (
-          <TagChip
-            key={tag}
-            tagId={tag}
-            isReadOnly={permissions.readOnlyBypassStatus}
-            deleteTag={deleteTag}
-          />
-        ))}
-        <div style={{ float: 'left', marginTop: -5 }}>
-          <IconButton
-            style={{ float: 'left' }}
-            color="primary"
-            aria-label="Tag"
-            onClick={handleToggleAddTag}
-            isReadOnly={permissions.readOnlyBypassStatus}
-          >
-            <AddOutlined />
-          </IconButton>
-        </div>
+    <div className={classes.container}>
+      <div className={classes.containerTitle}>
+        <Typography
+          variant="h1"
+          gutterBottom
+          classes={{ root: classes.title }}
+        >
+          {exercise.exercise_name}
+        </Typography>
+        <ExercisePopover exercise={exercise} tagsMap={tagsMap} />
+      </div>
+      <div>
+        <IconButton
+          color="primary"
+          aria-label="Tag"
+          onClick={handleToggleAddTag}
+          disabled={permissions.readOnlyBypassStatus}
+        >
+          <AddOutlined />
+        </IconButton>
         <Dialog
           TransitionComponent={Transition}
           open={openTagAdd}
           onClose={handleToggleAddTag}
-          fullWidth={true}
+          fullWidth
           maxWidth="xs"
           PaperProps={{ elevation: 1 }}
         >
           <DialogTitle>{t('Add tags to this exercise')}</DialogTitle>
           <DialogContent>
             <Form
-              keepDirtyOnReinitialize={true}
+              keepDirtyOnReinitialize
               initialValues={{ exercise_tags: [] }}
               onSubmit={submitTags}
               mutators={{
@@ -169,6 +136,14 @@ const ExerciseHeader = (props) => {
             </Form>
           </DialogContent>
         </Dialog>
+        {R.take(5, tags ?? []).map((tag) => (
+          <TagChip
+            key={tag}
+            tagId={tag}
+            isReadOnly={permissions.readOnlyBypassStatus}
+            deleteTag={deleteTag}
+          />
+        ))}
       </div>
     </div>
   );

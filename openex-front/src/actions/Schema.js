@@ -369,7 +369,7 @@ export const storeHelper = (state) => ({
   getTeamInjects: (id) => entities('injects', state).filter((i) => (entity(id, 'teams', state) || {}).team_injects?.includes(
     i.inject_id,
   )),
-  getTeams: () => entities('teams', state).filter((i) => !i.team_contextual),
+  getTeams: () => entities('teams', state),
   getTeamsMap: () => maps('teams', state),
   getSettings: () => {
     return R.mergeAll(
@@ -418,4 +418,13 @@ export const storeHelper = (state) => ({
   getAssetGroup: (id) => entity(id, 'asset_groups', state),
   // contracts
   getContractImages: () => contractImages(state),
+  // scenarios
+  getScenarios: () => entities('scenarios', state),
+  getScenariosMap: () => maps('scenarios', state),
+  getScenario: (id) => entity(id, 'scenarios', state),
+  getScenarioTeams: (id) => entities('teams', state).filter((i) => i.team_scenarios.includes(id)),
+  getScenarioVariables: (id) => entities('variables', state).filter((i) => i.variable_scenario === id),
+  getScenarioArticles: (id) => entities('articles', state).filter((i) => i.article_scenario === id),
+  getScenarioChallenges: (id) => entities('challenges', state).filter((c) => c.challenge_scenarios.includes(id)),
+  getScenarioInjects: (id) => entities('injects', state).filter((i) => i.inject_scenario === id),
 });

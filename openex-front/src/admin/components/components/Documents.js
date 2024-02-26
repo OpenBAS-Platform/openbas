@@ -19,6 +19,7 @@ import CreateDocument from './documents/CreateDocument';
 import DocumentPopover from './documents/DocumentPopover';
 import DocumentType from './documents/DocumentType';
 import { exportData } from '../../../utils/Environment';
+import { fetchScenarios } from '../../../actions/scenarios/scenario-actions';
 
 const styles = (theme) => ({
   parameters: {
@@ -64,6 +65,13 @@ const styles = (theme) => ({
     marginRight: 7,
     width: 120,
   },
+  scenario: {
+    fontSize: 12,
+    height: 20,
+    float: 'left',
+    marginRight: 7,
+    width: 120,
+  },
 });
 
 const inlineStylesHeaders = {
@@ -75,7 +83,7 @@ const inlineStylesHeaders = {
   },
   document_name: {
     float: 'left',
-    width: '25%',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -87,7 +95,13 @@ const inlineStylesHeaders = {
   },
   document_exercises: {
     float: 'left',
-    width: '25%',
+    width: '20%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  document_scenarios: {
+    float: 'left',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -99,7 +113,7 @@ const inlineStylesHeaders = {
   },
   document_tags: {
     float: 'left',
-    width: '20%',
+    width: '13%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -108,7 +122,7 @@ const inlineStylesHeaders = {
 const inlineStyles = {
   document_name: {
     float: 'left',
-    width: '25%',
+    width: '20%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -124,7 +138,15 @@ const inlineStyles = {
   },
   document_exercises: {
     float: 'left',
-    width: '25%',
+    width: '20%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  document_scenarios: {
+    float: 'left',
+    width: '20%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -140,7 +162,7 @@ const inlineStyles = {
   },
   document_tags: {
     float: 'left',
-    width: '20%',
+    width: '13%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -163,6 +185,7 @@ class Documents extends Component {
     this.props.fetchDocuments();
     this.props.fetchTags();
     this.props.fetchExercises();
+    this.props.fetchScenarios();
   }
 
   handleSearch(value) {
@@ -210,7 +233,7 @@ class Documents extends Component {
   }
 
   render() {
-    const { classes, documents, userAdmin, tagsMap, exercisesMap, t } = this.props;
+    const { classes, documents, userAdmin, tagsMap, exercisesMap, scenariosMap, t } = this.props;
     const { keyword, sortBy, orderAsc, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
@@ -260,6 +283,7 @@ class Documents extends Component {
                     'document_name',
                     'document_description',
                     'document_exercises',
+                    'document_scenarios',
                     'document_type',
                     'document_tags',
                   ],
@@ -267,6 +291,7 @@ class Documents extends Component {
                   tagsMap,
                   null,
                   exercisesMap,
+                  scenariosMap,
                 )}
                 filename={`${t('Documents')}.csv`}
               >
@@ -308,6 +333,7 @@ class Documents extends Component {
                   {this.sortHeader('document_name', 'Name', true)}
                   {this.sortHeader('document_description', 'Description', true)}
                   {this.sortHeader('document_exercises', 'Exercises', true)}
+                  {this.sortHeader('document_scenarios', 'Scenarios', true)}
                   {this.sortHeader('document_type', 'Type', true)}
                   {this.sortHeader('document_tags', 'Tags', true)}
                 </div>
@@ -369,6 +395,31 @@ class Documents extends Component {
                     </div>
                     <div
                       className={classes.bodyItem}
+                      style={inlineStyles.document_scenarios}
+                    >
+                      {R.take(3, document.document_scenarios).map((e, i) => {
+                        const scenario = scenariosMap[e];
+                        if (scenario === undefined) return <div key={i} />;
+                        return (
+                          <Tooltip
+                            key={i}
+                            title={scenario.scenario_name}
+                          >
+                            <Chip
+                              icon={<RowingOutlined style={{ fontSize: 12 }} />}
+                              classes={{ root: classes.scenario }}
+                              variant="outlined"
+                              label={scenario.scenario_name}
+                              component={Link}
+                              clickable={true}
+                              to={`/admin/scenarios/${scenario.scenario_id}`}
+                            />
+                          </Tooltip>
+                        );
+                      })}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
                       style={inlineStyles.document_type}
                     >
                       <DocumentType
@@ -388,8 +439,6 @@ class Documents extends Component {
               <ListItemSecondaryAction>
                 <DocumentPopover
                   document={document}
-                  tagsMap={tagsMap}
-                  exercisesMap={exercisesMap}
                   disabled={!userAdmin}
                 />
               </ListItemSecondaryAction>
@@ -409,6 +458,7 @@ Documents.propTypes = {
   fetchDocuments: PropTypes.func,
   fetchTags: PropTypes.func,
   fetchExercises: PropTypes.func,
+  fetchScenarios: PropTypes.func,
   userAdmin: PropTypes.bool,
 };
 
@@ -418,12 +468,13 @@ const select = (state) => {
     documents: helper.getDocuments(),
     tagsMap: helper.getTagsMap(),
     exercisesMap: helper.getExercisesMap(),
+    scenariosMap: helper.getScenariosMap(),
     userAdmin: helper.getMe()?.user_admin,
   };
 };
 
 export default R.compose(
-  connect(select, { fetchDocuments, fetchTags, fetchExercises }),
+  connect(select, { fetchDocuments, fetchTags, fetchExercises, fetchScenarios }),
   inject18n,
   withStyles(styles),
 )(Documents);

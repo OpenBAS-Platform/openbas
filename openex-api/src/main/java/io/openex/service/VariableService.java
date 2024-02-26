@@ -1,17 +1,16 @@
 package io.openex.service;
 
-import io.openex.database.model.Exercise;
 import io.openex.database.model.Variable;
-import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.VariableRepository;
 import io.openex.database.specification.VariableSpecification;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
+import static io.openex.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
 
 @RequiredArgsConstructor
@@ -19,22 +18,25 @@ import static java.time.Instant.now;
 public class VariableService {
 
   private final VariableRepository variableRepository;
-  private final ExerciseRepository exerciseRepository;
 
-  public Variable createVariable(
-      @NotBlank final String exerciseId,
-      @NotNull final Variable variable) {
-    Exercise exercise = this.exerciseRepository.findById(exerciseId).orElseThrow();
-    variable.setExercise(exercise);
+  public Variable createVariable(@NotNull final Variable variable) {
     return this.variableRepository.save(variable);
+  }
+
+  public List<Variable> createVariables(@NotNull final List<Variable> variables) {
+    return fromIterable(this.variableRepository.saveAll(variables));
   }
 
   public Variable variable(@NotBlank final String variableId) {
     return this.variableRepository.findById(variableId).orElseThrow();
   }
 
-  public List<Variable> variables(@NotBlank final String exerciseId) {
+  public List<Variable> variablesFromExercise(@NotBlank final String exerciseId) {
     return this.variableRepository.findAll(VariableSpecification.fromExercise(exerciseId));
+  }
+
+  public List<Variable> variablesFromScenario(@NotBlank final String scenarioId) {
+    return this.variableRepository.findAll(VariableSpecification.fromScenario(scenarioId));
   }
 
   public Variable updateVariable(@NotNull final Variable variable) {
