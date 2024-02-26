@@ -13,16 +13,16 @@ logger.error = (msg, options) => {
 
 const basePath = '';
 
-const backProxy = (backEndUrl: string) => ({
-  target: backEndUrl ? backEndUrl : 'http://localhost:8080',
+const backProxy = () => ({
+  target: 'http://localhost:8080',
   changeOrigin: true,
   ws: true,
 });
 
-export default ({ mode }) => {
+export default ({ mode }: { mode: string }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
 
-// https://vitejs.dev/config/
+  // https://vitejs.dev/config/
   return defineConfig({
     build: {
       target: ['chrome58'],
@@ -34,7 +34,7 @@ export default ({ mode }) => {
 
     optimizeDeps: {
       entries: [
-        './src/**/*.{js,tsx,ts,jsx}'
+        './src/**/*.{js,tsx,ts,jsx}',
       ],
       include: [
         'react-apexcharts',
@@ -75,7 +75,7 @@ export default ({ mode }) => {
             .replace(/%APP_DESCRIPTION%/g, 'OpenEx Development platform')
             .replace(/%APP_FAVICON%/g, `${basePath}/src/static/ext/favicon.png`)
             .replace(/%APP_MANIFEST%/g, `${basePath}/src/static/ext/manifest.json`);
-        }
+        },
       },
       {
         name: 'treat-js-files-as-jsx',
@@ -89,23 +89,23 @@ export default ({ mode }) => {
           });
         },
       },
-      react({jsxRuntime: 'classic'}),
+      react({ jsxRuntime: 'classic' }),
       [IstanbulPlugin({
         include: 'src/*',
         exclude: ['node_modules', 'test/'],
-        extension: [ '.js', '.jsx', '.ts','.tsx' ],
-      })]
+        extension: ['.js', '.jsx', '.ts', '.tsx'],
+      })],
     ],
 
     server: {
       port: 3001,
       proxy: {
-        '/api': backProxy(process.env.BACK_END_URL),
-        '/login': backProxy(process.env.BACK_END_URL),
-        '/logout': backProxy(process.env.BACK_END_URL),
-        '/oauth2': backProxy(process.env.BACK_END_URL),
-        '/saml2': backProxy(process.env.BACK_END_URL),
+        '/api': backProxy(),
+        '/login': backProxy(),
+        '/logout': backProxy(),
+        '/oauth2': backProxy(),
+        '/saml2': backProxy(),
       },
     },
   });
-}
+};

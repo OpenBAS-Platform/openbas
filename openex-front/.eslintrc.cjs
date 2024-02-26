@@ -1,4 +1,5 @@
 module.exports = {
+  "root": true,
   extends: [
     'airbnb-base',
     'airbnb-typescript/base',
@@ -20,7 +21,6 @@ module.exports = {
   },
   env: {
     browser: true,
-    jest: true
   },
   overrides: [
     {
@@ -55,11 +55,11 @@ module.exports = {
       }
     ],
     'no-restricted-imports': [
-      'error', { 
-        patterns: [{ 
+      'error', {
+        patterns: [{
           group: ['@mui/material/*', '!@mui/material/styles', '!@mui/material/colors', '!@mui/material/transitions'],
-          message: "Please use named import from @mui/material instead." 
-        }] 
+          message: "Please use named import from @mui/material instead."
+        }]
       }
     ],
     '@typescript-eslint/naming-convention': ['error', {
@@ -81,9 +81,21 @@ module.exports = {
         'caughtErrorsIgnorePattern': '^_'
       }
     ],
-    'import-newlines/enforce': ['error', { items: 20, 'max-len': 180 }],
+    'import-newlines/enforce': ['error', {items: 20, 'max-len': 180}],
     'react/jsx-indent': [2, 2],
     'react/jsx-indent-props': [2, 2],
     'react/jsx-closing-bracket-location': 'error',
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": [
+          "**/*.test.tsx",
+          "**/*.test.ts",
+          "vite.config.ts",
+          "vitest.config.ts",
+          "playwright.config.ts",
+        ]
+      }
+    ]
   }
 }

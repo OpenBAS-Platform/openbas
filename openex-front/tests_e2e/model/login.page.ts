@@ -1,8 +1,8 @@
 import { Page } from '@playwright/test';
 
-export class LoginPage {
-
-  constructor(private page: Page) {}
+class LoginPage {
+  constructor(private page: Page) {
+  }
 
   getLoginPage() {
     return this.page.getByTestId('login-page');
@@ -20,3 +20,5 @@ export class LoginPage {
     return this.page.getByRole('button', { name: 'Sign in' });
   }
 }
+
+export default LoginPage;

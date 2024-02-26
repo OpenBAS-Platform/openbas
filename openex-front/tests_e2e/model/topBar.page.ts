@@ -1,8 +1,8 @@
 import { Page } from '@playwright/test';
 
-export class TopBarPage {
-
-  constructor(private page: Page) {}
+class TopBarPage {
+  constructor(private page: Page) {
+  }
 
   getAccountMenu() {
     return this.page.getByLabel('account-menu');
@@ -11,5 +11,6 @@ export class TopBarPage {
   getLogoutEntryMenu() {
     return this.page.getByLabel('logout-item');
   }
-
 }
+
+export default TopBarPage;
