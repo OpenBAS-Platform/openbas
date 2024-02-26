@@ -1,4 +1,4 @@
-package io.openex.rest.utils;
+package io.openex.utils;
 
 import io.openex.database.model.User;
 import io.openex.database.repository.UserRepository;

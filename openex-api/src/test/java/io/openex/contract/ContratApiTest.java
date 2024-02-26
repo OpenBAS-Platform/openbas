@@ -1,8 +1,8 @@
-package io.openex.rest;
+package io.openex.contract;
 
 import io.openex.IntegrationTest;
-import io.openex.contract.ContractSearchInput;
-import io.openex.rest.utils.WithMockAdminUser;
+import io.openex.utils.WithMockAdminUser;
+import io.openex.utils.fixtures.ContractFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -38,17 +38,21 @@ class ContratApiTest extends IntegrationTest {
                 params.add("page", "1");
                 params.add("size", "10");
 
-                ContractSearchInput contractSearchInput = ContractSearchInput.builder().exposedContractsOnly(true).build();
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(contractSearchInput)))
+                                .content(asJsonString(ContractFixture.getDefault().build())))
                         .andExpect(status().is2xxSuccessful());
             }
 
             @DisplayName("Fetching first page of contracts by textsearch")
             @Test
             void given_search_input_with_textsearch_should_return_a_page_of_contrats() throws Exception {
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email").build();
 
+                mvc.perform(post("/api/contracts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(contractSearchInput)))
+                        .andExpect(status().is2xxSuccessful());
             }
         }
     }

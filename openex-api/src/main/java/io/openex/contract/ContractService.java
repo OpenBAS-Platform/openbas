@@ -78,15 +78,6 @@ public class ContractService {
 
 
     /**
-     * Retrieve lang from current user.
-     *
-     * @return A SupportLanguage
-     */
-    private SupportedLanguage getLang() {
-        return SupportedLanguage.valueOf(currentUser().getLang());//SupportedLanguage.en;
-    }
-
-    /**
      * Retrieves a paginated list of contracts.
      *
      * @param contractSearchInput Criteria for searching contracts.
@@ -158,6 +149,15 @@ public class ContractService {
      */
     private Comparator<Contract> getComparatorForField(String sortBy) {
         return Comparator.comparing(contract -> getValueForComparisonFromCustomKeyExtractor(contract, sortBy));
+    }
+
+    /**
+     * Retrieve lang from current user.
+     *
+     * @return A SupportLanguage
+     */
+    private static SupportedLanguage getLang() {
+        return SupportedLanguage.valueOf(currentUser().getLang());//SupportedLanguage.en;
     }
 
     /**

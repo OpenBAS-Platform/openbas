@@ -1,11 +1,11 @@
-package io.openex.rest.utils;
+package io.openex.utils;
 
 import org.springframework.security.test.context.support.WithSecurityContext;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import static io.openex.rest.utils.WithMockAdminUserSecurityContextFactory.MOCK_USER_ADMIN_EMAIL;
+import static io.openex.utils.WithMockAdminUserSecurityContextFactory.MOCK_USER_ADMIN_EMAIL;
 
 @Retention(RetentionPolicy.RUNTIME)
 @WithSecurityContext(factory = WithMockAdminUserSecurityContextFactory.class)
