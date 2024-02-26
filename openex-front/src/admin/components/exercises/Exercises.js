@@ -172,18 +172,18 @@ const Exercises = () => {
             >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
-                  <FileDownloadOutlined color="primary" />
+                  <FileDownloadOutlined color="primary"/>
                 </IconButton>
               </Tooltip>
             </CSVLink>
           ) : (
             <IconButton size="large" disabled={true}>
-              <FileDownloadOutlined />
+              <FileDownloadOutlined/>
             </IconButton>
           )}
         </div>
       </div>
-      <div className="clearfix" />
+      <div className="clearfix"/>
       <List classes={{ root: classes.container }}>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -235,7 +235,7 @@ const Exercises = () => {
                   headerStyles,
                 )}
               </div>
-            }
+                        }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
@@ -249,7 +249,7 @@ const Exercises = () => {
             to={`/admin/exercises/${exercise.exercise_id}`}
           >
             <ListItemIcon>
-              <Kayaking color="primary" />
+              <Kayaking color="primary"/>
             </ListItemIcon>
             <ListItemText
               primary={
@@ -289,18 +289,18 @@ const Exercises = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.exercise_tags}
                   >
-                    <ItemTags variant="list" tags={exercise.exercise_tags} />
+                    <ItemTags variant="list" tags={exercise.exercise_tags}/>
                   </div>
                 </div>
-              }
+                            }
             />
             <ListItemSecondaryAction>
-              <ChevronRightOutlined />
+              <ChevronRightOutlined/>
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
-      {userAdmin && <CreateExercise />}
+      {userAdmin && <CreateExercise/>}
     </div>
   );
 };
