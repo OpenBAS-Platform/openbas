@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.openex.contract.ContractService.TYPE;
+
 @RequiredArgsConstructor
 @RestController
 @Slf4j
@@ -77,19 +79,29 @@ public class ContractApi extends RestBehavior {
         return contractService.searchContracts(contractSearchInput, pageable);
     }
 
+    /**
+     * Converts a list of string sort fields into a sorting criteria as a Sort object.
+     *
+     * @param sortFields a list of strings representing sort fields
+     * @return a Sort object representing the sorting criteria
+     */
     private Sort convertToSort(List<String> sortFields) {
-        List<Sort.Order> orders = sortFields.stream()
-                .map(field -> {
-                    String[] propertyAndDirection = field.split(",");
-                    String property = propertyAndDirection[0];
-                    Sort.Direction direction = Sort.DEFAULT_DIRECTION;
-                    if (propertyAndDirection.length > 1) {
-                        String directionString = propertyAndDirection[1];
-                        direction = Sort.Direction.fromOptionalString(directionString)
-                                .orElse(Sort.DEFAULT_DIRECTION);
-                    }
-                    return new Sort.Order(direction, property);
-                }).toList();
+        List<Sort.Order> orders;
+
+        if (null == sortFields || sortFields.isEmpty()) {
+            orders = List.of(new Sort.Order(Sort.DEFAULT_DIRECTION, TYPE));
+        } else {
+            orders = sortFields.stream().map(field -> {
+                String[] propertyAndDirection = field.split(",");
+                String property = propertyAndDirection[0];
+                Sort.Direction direction = Sort.DEFAULT_DIRECTION;
+                if (propertyAndDirection.length > 1) {
+                    String directionString = propertyAndDirection[1];
+                    direction = Sort.Direction.fromOptionalString(directionString).orElse(Sort.DEFAULT_DIRECTION);
+                }
+                return new Sort.Order(direction, property);
+            }).toList();
+        }
 
         return Sort.by(orders);
     }

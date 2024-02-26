@@ -25,7 +25,7 @@ import static io.openex.config.SessionHelper.currentUser;
 public class ContractService {
 
     private static final Logger LOGGER = Logger.getLogger(ContractService.class.getName());
-    public static final String DESCENDING = "desc";
+
     public static final String TYPE = "type";
     public static final String LABEL = "label";
 
@@ -89,8 +89,8 @@ public class ContractService {
     /**
      * Retrieves a paginated list of contracts.
      *
-     * @param contractSearchInput  Criteria for searching contracts.
-     * @param pageable             The pagination information
+     * @param contractSearchInput Criteria for searching contracts.
+     * @param pageable            The pagination information
      * @return a {@link Page} containing the contracts for the requested page
      */
     public Page<Contract> searchContracts(ContractSearchInput contractSearchInput,
@@ -115,8 +115,8 @@ public class ContractService {
     /**
      * Searches for contracts based on specified criteria.
      *
-     * @param contractSearchInput   criteria for searching contracts
-     * @param sort
+     * @param contractSearchInput criteria for searching contracts
+     * @param sort                List of orders for sorting contracts
      * @return A list of contracts matching the search criteria.
      */
     private List<Contract> searchContracts(ContractSearchInput contractSearchInput, Sort sort) {
@@ -128,19 +128,22 @@ public class ContractService {
                 .toList();
     }
 
+    /**
+     * Constructs a comparator for sorting Contract objects based on the provided Sort orders.
+     *
+     * @param sort The Sort object containing sorting orders.
+     * @return A Comparator<Contract> object for sorting Contract objects according to the specified Sort orders.
+     */
     private Comparator<Contract> getComparator(Sort sort) {
-        Comparator<Contract> comparator = Comparator.comparing(contract -> getValueForComparisonFromCustomKeyExtractor(contract, TYPE)); // default comparator if no specific sort is provided
+        Comparator<Contract> comparator = null;
 
         for (Sort.Order order : sort) {
-            switch (order.getDirection()) {
-                case ASC:
-                    comparator = comparator.thenComparing(getComparatorForField(order.getProperty()));
-                    break;
-                case DESC:
-                    comparator = comparator.thenComparing(getComparatorForField(order.getProperty())).reversed();
-                    break;
-                default:
-                    break;
+            Comparator<Contract> fieldComparator = getComparatorForField(order.getProperty());
+
+            if (null == comparator) {
+                comparator = order.getDirection().equals(Sort.Direction.ASC) ? fieldComparator : fieldComparator.reversed();
+            } else {
+                comparator = comparator.thenComparing(order.getDirection().equals(Sort.Direction.ASC) ? fieldComparator : fieldComparator.reversed());
             }
         }
 
@@ -150,7 +153,7 @@ public class ContractService {
     /**
      * Gets a comparator based on the specified sorting criteria.
      *
-     * @param sortBy    The property by which to sort contracts.
+     * @param sortBy The property by which to sort contracts.
      * @return A comparator for sorting contracts based on the specified criteria.
      */
     private Comparator<Contract> getComparatorForField(String sortBy) {
@@ -169,7 +172,7 @@ public class ContractService {
         switch (sortBy) {
             case LABEL:
                 return contract.getLabel().get(lang);
-            default: //"type"
+            default: //"TYPE"
                 return contract.getConfig().getLabel().get(lang);
         }
     }
