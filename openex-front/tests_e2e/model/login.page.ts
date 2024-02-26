@@ -1,8 +1,9 @@
 import { Page } from '@playwright/test';
 
+// eslint-disable-next-line import/prefer-default-export
 export class LoginPage {
-
-  constructor(private page: Page) {}
+  constructor(private page: Page) {
+  }
 
   getLoginPage() {
     return this.page.getByTestId('login-page');

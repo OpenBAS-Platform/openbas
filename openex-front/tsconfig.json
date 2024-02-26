@@ -21,7 +21,8 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src"
+    "src",
+    "tests_e2e"
   ],
   "references": [
     {
