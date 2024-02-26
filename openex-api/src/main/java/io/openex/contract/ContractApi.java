@@ -6,14 +6,13 @@ import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.InputStream;
@@ -29,36 +28,6 @@ import java.util.Map;
 public class ContractApi extends RestBehavior {
 
     private final ContractService contractService;
-
-    @GetMapping
-    @Operation(
-            summary = "Retrieves a paginated list of contracts",
-            extensions = {
-                    @Extension(
-                            name = "contracts",
-                            properties = {
-                                    @ExtensionProperty(name = "httpMethod", value = "GET"),
-                                    @ExtensionProperty(name = "authorizer", value = "none") //TODO
-                            }
-                    )
-            }
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Page of contracts"),
-            @ApiResponse(responseCode = "400", description = "Bad parameters")
-    })
-    //TODO ContractDTO
-    public Page<Contract> searchExposedContracts(@RequestParam(required = false) String type,
-                                                 @RequestParam(defaultValue = "true") boolean exposedContractsOnly,
-                                                 @RequestParam(required = false) String textSearch,
-                                                 @RequestParam(defaultValue = "type") String sortBy,
-                                                 @RequestParam(defaultValue = "asc") String sortOrder,
-                                                 @RequestParam @Min(0) int page,
-                                                 @RequestParam @Max(10) int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-        return contractService.searchContracts(type, exposedContractsOnly, textSearch, sortBy, sortOrder, pageable);
-    }
 
     @GetMapping("/images")
     public @ResponseBody Map<String, String> contractIcon() {
@@ -78,6 +47,51 @@ public class ContractApi extends RestBehavior {
             }
         }));
         return map;
+    }
+
+    @PostMapping
+    @Operation(
+            summary = "Retrieves a paginated list of contracts",
+            extensions = {
+                    @Extension(
+                            name = "contracts",
+                            properties = {
+                                    @ExtensionProperty(name = "httpMethod", value = "POST"),
+                                    @ExtensionProperty(name = "authorizer", value = "none") //TODO
+                            }
+                    )
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Page of contracts"),
+            @ApiResponse(responseCode = "400", description = "Bad parameters")
+    })
+    //TODO ContractDTO
+    public Page<Contract> searchExposedContracts(@RequestBody ContractSearchInput contractSearchInput,
+                                                 @RequestParam(defaultValue = "0") int page,
+                                                 @RequestParam(defaultValue = "10") int size,
+                                                 @RequestParam(required = false) List<String> sort) {
+
+        Sort sortFromQuery = convertToSort(sort);
+        Pageable pageable = PageRequest.of(page, size, sortFromQuery);
+        return contractService.searchContracts(contractSearchInput, pageable);
+    }
+
+    private Sort convertToSort(List<String> sortFields) {
+        List<Sort.Order> orders = sortFields.stream()
+                .map(field -> {
+                    String[] propertyAndDirection = field.split(",");
+                    String property = propertyAndDirection[0];
+                    Sort.Direction direction = Sort.DEFAULT_DIRECTION;
+                    if (propertyAndDirection.length > 1) {
+                        String directionString = propertyAndDirection[1];
+                        direction = Sort.Direction.fromOptionalString(directionString)
+                                .orElse(Sort.DEFAULT_DIRECTION);
+                    }
+                    return new Sort.Order(direction, property);
+                }).toList();
+
+        return Sort.by(orders);
     }
 
 }

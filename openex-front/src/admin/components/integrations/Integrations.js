@@ -34,22 +34,22 @@ const useStyles = makeStyles(() => ({
 const iconField = (type) => {
   switch (type) {
     case 'text':
-      return <TitleOutlined color="primary"/>;
+      return <TitleOutlined color="primary" />;
     case 'textarea':
-      return <TextFieldsOutlined color="primary"/>;
+      return <TextFieldsOutlined color="primary" />;
     case 'checkbox':
-      return <ToggleOnOutlined color="primary"/>;
+      return <ToggleOnOutlined color="primary" />;
     case 'tuple':
-      return <SplitscreenOutlined color="primary"/>;
+      return <SplitscreenOutlined color="primary" />;
     case 'attachment':
-      return <DescriptionOutlined color="primary"/>;
+      return <DescriptionOutlined color="primary" />;
     case 'team':
-      return <CastForEducationOutlined color="primary"/>;
+      return <CastForEducationOutlined color="primary" />;
     case 'select':
     case 'dependency-select':
-      return <ListOutlined color="primary"/>;
+      return <ListOutlined color="primary" />;
     default:
-      return <HelpOutlined color="primary"/>;
+      return <HelpOutlined color="primary" />;
   }
 };
 
@@ -82,12 +82,20 @@ const Integrations = () => {
   };
 
   useEffect(() => {
-    fetchPageOfContracts(
+    const contractSearchInput = {
+      type: null,
+      label: null,
+      exposedContractsOnly: true,
       textSearch,
-      'label',
-      'desc',
+    };
+
+    const sort = ['type, DESC', 'label'];
+
+    fetchPageOfContracts(
+      contractSearchInput,
       page - BACKEND_PAGE_NORMALIZER,
       PAGE_SIZE,
+      sort,
     ).then((result) => {
       const { data } = result;
       setContracts(data.content);

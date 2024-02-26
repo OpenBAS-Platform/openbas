@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ public class ContractService {
 
     private static final Logger LOGGER = Logger.getLogger(ContractService.class.getName());
     public static final String DESCENDING = "desc";
+    public static final String TYPE = "type";
     public static final String LABEL = "label";
 
     @Getter
@@ -74,37 +76,6 @@ public class ContractService {
         return this.contracts.get(inject.getContract());
     }
 
-    /**
-     * Retrieves a paginated list of contracts.
-     *
-     * @param type                 The type of contract to search for. Can be {@code null}.
-     * @param exposedContractsOnly Whether to include only contracts that are exposed.
-     * @param textSearch           The text to search for within contracts. Can be {@code null}.
-     * @param pageable             The pagination information
-     * @return a {@link Page} containing the contracts for the requested page
-     */
-    public Page<Contract> searchContracts(String type,
-                                          boolean exposedContractsOnly,
-                                          String textSearch,
-                                          String sortBy,
-                                          String sortOrder,
-                                          Pageable pageable) {
-
-        List<Contract> exposedContracts = searchContracts(type, exposedContractsOnly, textSearch, sortBy, sortOrder);
-
-        int currentPage = pageable.getPageNumber();
-        int pageSize = pageable.getPageSize();
-        int totalContracts = exposedContracts.size();
-        int startItem = currentPage * pageSize;
-
-        if (startItem >= totalContracts) {
-            return new PageImpl<>(Collections.emptyList(), pageable, totalContracts);
-        }
-
-        int toIndex = Math.min(startItem + pageSize, totalContracts);
-        List<Contract> paginatedContracts = exposedContracts.subList(startItem, toIndex);
-        return new PageImpl<>(paginatedContracts, pageable, totalContracts);
-    }
 
     /**
      * Retrieve lang from current user.
@@ -116,32 +87,74 @@ public class ContractService {
     }
 
     /**
+     * Retrieves a paginated list of contracts.
+     *
+     * @param contractSearchInput  Criteria for searching contracts.
+     * @param pageable             The pagination information
+     * @return a {@link Page} containing the contracts for the requested page
+     */
+    public Page<Contract> searchContracts(ContractSearchInput contractSearchInput,
+                                          Pageable pageable) {
+
+        int currentPage = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
+        int startItem = currentPage * pageSize;
+
+        List<Contract> exposedContracts = searchContracts(contractSearchInput, pageable.getSort());
+
+        int totalContracts = exposedContracts.size();
+        if (startItem >= totalContracts) {
+            return new PageImpl<>(Collections.emptyList(), pageable, totalContracts);
+        }
+
+        int toIndex = Math.min(startItem + pageSize, totalContracts);
+        List<Contract> paginatedContracts = exposedContracts.subList(startItem, toIndex);
+        return new PageImpl<>(paginatedContracts, pageable, totalContracts);
+    }
+
+    /**
      * Searches for contracts based on specified criteria.
      *
-     * @param type                 The type of contract to search for. Can be {@code null}.
-     * @param exposedContractsOnly Whether to include only contracts that are exposed.
-     * @param textSearch           The text to search for within contracts. Can be {@code null}.
+     * @param contractSearchInput   criteria for searching contracts
+     * @param sort
      * @return A list of contracts matching the search criteria.
      */
-    private List<Contract> searchContracts(String type, boolean exposedContractsOnly, String textSearch, String sortBy, String sortOrder) {
+    private List<Contract> searchContracts(ContractSearchInput contractSearchInput, Sort sort) {
         return getContracts().values().stream()
-                .filter(contract -> (!exposedContractsOnly || contract.getConfig().isExpose())
-                        && Optional.ofNullable(type).map(typeLabel -> contractContainsType(contract, typeLabel)).orElse(true)
-                        && Optional.ofNullable(textSearch).map(text -> contractContainsText(contract, text)).orElse(true))
-                .sorted(getComparator(sortBy, sortOrder))
+                .filter(contract -> (!contractSearchInput.isExposedContractsOnly() || contract.getConfig().isExpose())
+                        && Optional.ofNullable(contractSearchInput.getType()).map(typeLabel -> contractContainsType(contract, typeLabel)).orElse(true)
+                        && Optional.ofNullable(contractSearchInput.getTextSearch()).map(text -> contractContainsText(contract, text)).orElse(true))
+                .sorted(getComparator(sort))
                 .toList();
+    }
+
+    private Comparator<Contract> getComparator(Sort sort) {
+        Comparator<Contract> comparator = Comparator.comparing(contract -> getValueForComparisonFromCustomKeyExtractor(contract, TYPE)); // default comparator if no specific sort is provided
+
+        for (Sort.Order order : sort) {
+            switch (order.getDirection()) {
+                case ASC:
+                    comparator = comparator.thenComparing(getComparatorForField(order.getProperty()));
+                    break;
+                case DESC:
+                    comparator = comparator.thenComparing(getComparatorForField(order.getProperty())).reversed();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return comparator;
     }
 
     /**
      * Gets a comparator based on the specified sorting criteria.
      *
      * @param sortBy    The property by which to sort contracts.
-     * @param sortOrder The sorting order. Use "asc" for ascending order, "desc" for descending order.
      * @return A comparator for sorting contracts based on the specified criteria.
      */
-    private Comparator<Contract> getComparator(String sortBy, String sortOrder) {
-        Comparator<Contract> comparator = Comparator.comparing(contract -> getValueForComparisonFromCustomKeyExtractor(contract, sortBy));
-        return sortOrder.equalsIgnoreCase(DESCENDING) ? comparator.reversed() : comparator;
+    private Comparator<Contract> getComparatorForField(String sortBy) {
+        return Comparator.comparing(contract -> getValueForComparisonFromCustomKeyExtractor(contract, sortBy));
     }
 
     /**
