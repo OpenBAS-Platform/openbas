@@ -84,12 +84,12 @@ export default ({ mode }) => {
           // Use the exposed transform from vite, instead of directly
           // transforming with esbuild
           return transformWithEsbuild(code, id, {
-            loader: 'tsx',
+            loader: 'jsx',
             jsx: 'automatic',
           });
         },
       },
-      react(),
+      react({jsxRuntime: 'classic'}),
       [IstanbulPlugin({
         include: 'src/*',
         exclude: ['node_modules', 'test/'],
