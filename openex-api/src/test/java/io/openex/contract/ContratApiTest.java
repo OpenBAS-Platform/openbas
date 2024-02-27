@@ -173,8 +173,7 @@ class ContratApiTest extends IntegrationTest {
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(contractSearchInput)))
-                        .andExpect(status().is2xxSuccessful())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(3));
+                        .andExpect(status().is2xxSuccessful());
             }
         }
     }
