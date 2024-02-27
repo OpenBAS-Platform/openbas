@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -73,8 +75,8 @@ public class ContractApi extends RestBehavior {
     })
     //TODO ContractDTO
     public Page<Contract> searchExposedContracts(@RequestBody ContractSearchInput contractSearchInput,
-                                                 @RequestParam(defaultValue = "0") int page,
-                                                 @RequestParam(defaultValue = "10") int size,
+                                                 @RequestParam(defaultValue = "0") @Min(0) int page,
+                                                 @RequestParam(defaultValue = "10") @Max(20) int size,
                                                  @RequestParam(required = false) List<String> sort) {
 
         Sort sortFromQuery = convertToSort(sort);

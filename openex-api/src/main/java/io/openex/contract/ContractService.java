@@ -115,6 +115,7 @@ public class ContractService {
         return getContracts().values().stream()
                 .filter(contract -> (!contractSearchInput.isExposedContractsOnly() || contract.getConfig().isExpose())
                         && Optional.ofNullable(contractSearchInput.getType()).map(typeLabel -> contractHasType(contract, typeLabel)).orElse(true)
+                        && Optional.ofNullable(contractSearchInput.getLabel()).map(label -> contractHasLabel(contract, label)).orElse(true)
                         && Optional.ofNullable(contractSearchInput.getTextSearch()).map(text -> contractContainsText(contract, text)).orElse(true))
                 .sorted(getComparator(sort))
                 .toList();
@@ -190,6 +191,17 @@ public class ContractService {
     }
 
     /**
+     * Checks if the specified label is contained within the given Contract.
+     *
+     * @param contract The Contract object to search within.
+     * @param label    The label to check for within the Contract.
+     * @return {@code true} if the label is found within the Contract, {@code false} otherwise.
+     */
+    private boolean contractHasLabel(Contract contract, String label) {
+        return StringUtils.equalsIgnoreCase(contract.getLabel().get(getLang()), label);
+    }
+
+    /**
      * Checks if the given contract contains the specified text.
      *
      * @param contract The contract to search within.
@@ -198,20 +210,20 @@ public class ContractService {
      */
     private boolean contractContainsText(Contract contract, String text) {
         SupportedLanguage lang = getLang();
-        return containsTextInLabel(contract.getLabel().get(lang), text) ||
-                containsTextInLabel(contract.getConfig().getLabel().get(lang), text) ||
+        return containsTextIn(contract.getLabel().get(lang), text) ||
+                containsTextIn(contract.getConfig().getLabel().get(lang), text) ||
                 containsTextInFields(contract.getFields(), text);
     }
 
     /**
      * Checks if the given label contains the specified text.
      *
-     * @param label The label to search within.
+     * @param tag The label to search within.
      * @param text  The text to search for.
      * @return {@code true} if the label contains the text, {@code false} otherwise.
      */
-    private boolean containsTextInLabel(String label, String text) {
-        return StringUtils.containsIgnoreCase(label, text);
+    private boolean containsTextIn(String tag, String text) {
+        return StringUtils.containsIgnoreCase(tag, text);
     }
 
     /**

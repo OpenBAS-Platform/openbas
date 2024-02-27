@@ -33,21 +33,118 @@ class ContratApiTest extends IntegrationTest {
         @DisplayName("Fetching a page of contracts")
         class FecthingPageOfContracts {
             @Test
-            @DisplayName("Fetching first page of contracts")
+            @DisplayName("Fetching first page of contracts succeed")
             void given_search_input_should_return_a_page_of_contrats() throws Exception {
                 MultiValueMap<String, String> params = new LinkedMultiValueMap();
                 params.add("page", "1");
                 params.add("size", "10");
 
                 mvc.perform(post("/api/contracts")
+                                .params(params)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(ContractFixture.getDefault().build())))
-                        .andExpect(status().is2xxSuccessful());
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(5));
             }
 
+            @Test
+            @DisplayName("Fetching first page of contracts failed with bad request")
+            void given_a_bad_search_input_should_throw_bad_request() throws Exception {
+                MultiValueMap<String, String> params = new LinkedMultiValueMap();
+                params.add("page", "1");
+                params.add("size", "21");
+
+                mvc.perform(post("/api/contracts")
+                                .params(params)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(ContractFixture.getDefault().build())))
+                        .andExpect(status().isBadRequest());
+            }
+        }
+
+        @Nested
+        @DisplayName("Filtering page of contracts")
+        class FilteringPageOfContracts {
             @DisplayName("Fetching first page of contracts by textsearch")
             @Test
             void given_search_input_with_textsearch_should_return_a_page_of_contrats() throws Exception {
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email").build();
+
+                mvc.perform(post("/api/contracts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(contractSearchInput)))
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(3));
+            }
+
+            @DisplayName("Fetching first page of contracts by type")
+            @Test
+            void given_search_input_with_type_should_return_a_page_of_contrats() throws Exception {
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().type("email").build();
+
+                mvc.perform(post("/api/contracts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(contractSearchInput)))
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(2));
+            }
+
+            @DisplayName("Fetching first page of contracts by label")
+            @Test
+            void given_search_input_with_label_should_return_a_page_of_contrats() throws Exception {
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().label("email").build();
+
+                mvc.perform(post("/api/contracts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(contractSearchInput)))
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(5));
+            }
+
+            @DisplayName("Fetching first page of contracts by label email ignoring case")
+            @Test
+            void given_search_input_with_label_should_return_a_page_of_contrats_ignoring_case() throws Exception {
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().label("EMail").build();
+
+                mvc.perform(post("/api/contracts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(contractSearchInput)))
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(5));
+            }
+
+        }
+
+        @Nested
+        @DisplayName("Sorting page of contracts")
+        class SortingPageOfContracts {
+            @DisplayName("Sorting by default")
+            @Test
+            void given_search_input_with_textsearch_should_return_a_page_of_contrats() throws Exception {
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email").build();
+
+                mvc.perform(post("/api/contracts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(contractSearchInput)))
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(3));
+            }
+
+            @DisplayName("Sorting by label asc")
+            @Test
+            void given_sort_input_should_return_a_page_of_contrats_sort_by_label_asc() throws Exception {
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email").build();
+
+                mvc.perform(post("/api/contracts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(contractSearchInput)))
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(3));
+            }
+
+            @DisplayName("Sorting by type desc")
+            @Test
+            void given_sort_input_should_return_a_page_of_contrats_sort_by_type_desc() throws Exception {
                 ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email").build();
 
                 mvc.perform(post("/api/contracts")
