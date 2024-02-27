@@ -114,8 +114,8 @@ public class ContractService {
     private List<Contract> searchContracts(ContractSearchInput contractSearchInput, Sort sort) {
         return getContracts().values().stream()
                 .filter(contract -> (!contractSearchInput.isExposedContractsOnly() || contract.getConfig().isExpose())
-                        && Optional.ofNullable(contractSearchInput.getType()).map(typeLabel -> contractHasType(contract, typeLabel)).orElse(true)
-                        && Optional.ofNullable(contractSearchInput.getLabel()).map(label -> contractHasLabel(contract, label)).orElse(true)
+                        && Optional.ofNullable(contractSearchInput.getType()).map(typeLabel -> contractHasProperty(TYPE, contract, typeLabel)).orElse(true)
+                        && Optional.ofNullable(contractSearchInput.getLabel()).map(label -> contractHasProperty(LABEL, contract, label)).orElse(true)
                         && Optional.ofNullable(contractSearchInput.getTextSearch()).map(text -> contractContainsText(contract, text)).orElse(true))
                 .sorted(getComparator(sort))
                 .toList();
@@ -131,35 +131,16 @@ public class ContractService {
         Comparator<Contract> comparator = null;
 
         for (Sort.Order order : sort) {
-            Comparator<Contract> fieldComparator = getComparatorForField(order.getProperty());
+            Comparator<Contract> propertyComparator = Comparator.comparing(contract -> getValueForComparison(contract, order.getProperty()));
 
             if (null == comparator) {
-                comparator = order.getDirection().equals(Sort.Direction.ASC) ? fieldComparator : fieldComparator.reversed();
+                comparator = order.getDirection().equals(Sort.Direction.ASC) ? propertyComparator : propertyComparator.reversed();
             } else {
-                comparator = comparator.thenComparing(order.getDirection().equals(Sort.Direction.ASC) ? fieldComparator : fieldComparator.reversed());
+                comparator = comparator.thenComparing(order.getDirection().equals(Sort.Direction.ASC) ? propertyComparator : propertyComparator.reversed());
             }
         }
 
         return comparator;
-    }
-
-    /**
-     * Gets a comparator based on the specified sorting criteria.
-     *
-     * @param sortBy The property by which to sort contracts.
-     * @return A comparator for sorting contracts based on the specified criteria.
-     */
-    private Comparator<Contract> getComparatorForField(String sortBy) {
-        return Comparator.comparing(contract -> getValueForComparisonFromCustomKeyExtractor(contract, sortBy));
-    }
-
-    /**
-     * Retrieve lang from current user.
-     *
-     * @return A SupportLanguage
-     */
-    private static SupportedLanguage getLang() {
-        return SupportedLanguage.valueOf(currentUser().getLang());//SupportedLanguage.en;
     }
 
     /**
@@ -169,36 +150,31 @@ public class ContractService {
      * @param sortBy   The property by which to sort the contracts.
      * @return The value extracted from the contract for comparison based on the specified key extractor.
      */
-    private String getValueForComparisonFromCustomKeyExtractor(Contract contract, String sortBy) {
-        SupportedLanguage lang = getLang();
+    private String getValueForComparison(Contract contract, String sortBy) {
+        SupportedLanguage lang = SupportedLanguage.valueOf(currentUser().getLang());
         switch (sortBy) {
             case LABEL:
-                return contract.getLabel().get(lang);
+                return Optional.ofNullable(contract.getLabel().get(lang)).orElse(contract.getLabel().get(SupportedLanguage.en));
             default: //"TYPE"
-                return contract.getConfig().getLabel().get(lang);
+                return Optional.ofNullable(contract.getConfig().getLabel().get(lang)).orElse(contract.getConfig().getLabel().get(SupportedLanguage.en));
         }
     }
 
     /**
      * Checks if the specified type is contained within the given Contract.
      *
-     * @param contract  The Contract object to search within.
-     * @param typeLabel The type to check for within the Contract.
+     * @param property The property where the value is searched.
+     * @param contract The Contract object to search within.
+     * @param value    The type to check for within the Contract.
      * @return {@code true} if the type is found within the Contract, {@code false} otherwise.
      */
-    private boolean contractHasType(Contract contract, String typeLabel) {
-        return StringUtils.equalsIgnoreCase(contract.getConfig().getLabel().get(getLang()), typeLabel);
-    }
-
-    /**
-     * Checks if the specified label is contained within the given Contract.
-     *
-     * @param contract The Contract object to search within.
-     * @param label    The label to check for within the Contract.
-     * @return {@code true} if the label is found within the Contract, {@code false} otherwise.
-     */
-    private boolean contractHasLabel(Contract contract, String label) {
-        return StringUtils.equalsIgnoreCase(contract.getLabel().get(getLang()), label);
+    private boolean contractHasProperty(String property, Contract contract, String value) {
+        switch (property) {
+            case LABEL:
+                return StringUtils.equalsIgnoreCase(getValueForComparison(contract, LABEL), value);
+            default:
+                return StringUtils.equalsIgnoreCase(getValueForComparison(contract, TYPE), value);
+        }
     }
 
     /**
@@ -209,21 +185,20 @@ public class ContractService {
      * @return {@code true} if the contract contains the text, {@code false} otherwise.
      */
     private boolean contractContainsText(Contract contract, String text) {
-        SupportedLanguage lang = getLang();
-        return containsTextIn(contract.getLabel().get(lang), text) ||
-                containsTextIn(contract.getConfig().getLabel().get(lang), text) ||
+        return containsTextIn(getValueForComparison(contract, LABEL), text) ||
+                containsTextIn(getValueForComparison(contract, TYPE), text) ||
                 containsTextInFields(contract.getFields(), text);
     }
 
     /**
      * Checks if the given label contains the specified text.
      *
-     * @param tag The label to search within.
-     * @param text  The text to search for.
+     * @param tag  The label to search within.
+     * @param text The text to search for.
      * @return {@code true} if the label contains the text, {@code false} otherwise.
      */
-    private boolean containsTextIn(String tag, String text) {
-        return StringUtils.containsIgnoreCase(tag, text);
+    private boolean containsTextIn(String value, String text) {
+        return StringUtils.containsIgnoreCase(value, text);
     }
 
     /**
