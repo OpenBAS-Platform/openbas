@@ -19,6 +19,7 @@ import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import TagsFilter from '../../../../components/TagsFilter';
 import type { EndpointStore } from './Endpoint';
 import ItemTags from '../../../../components/ItemTags';
+import AssetStatus from '../AssetStatus';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -302,7 +303,7 @@ const Endpoints = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.asset_status}
                   >
-                    {differenceInHours(new Date().toISOString(), endpoint.asset_last_seen) > 6 ? t('Active') : t('Inactive')}
+                    {differenceInHours(new Date().toISOString(), endpoint.asset_last_seen) > 6 ? <AssetStatus variant="list" status='Inactive'/> : <AssetStatus variant="list" status='Active'/>}
                   </div>
                 </div>
               }
