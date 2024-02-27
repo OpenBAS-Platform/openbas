@@ -89,7 +89,7 @@ const Integrations = () => {
       textSearch,
     };
 
-    const sort = ['type, DESC', 'label'];
+    const sort = ['type:DESC', 'label'];
 
     fetchPageOfContracts(
       contractSearchInput,
