@@ -144,15 +144,15 @@ public class ContractService {
     }
 
     /**
-     * Retrieves the value for comparison based on the specified key extractor.
+     * Retrieves the value for comparison based on the property and current user lang.
      *
      * @param contract The contract object from which to extract the value.
-     * @param sortBy   The property by which to sort the contracts.
-     * @return The value extracted from the contract for comparison based on the specified key extractor.
+     * @param property   The property by which to sort the contracts.
+     * @return The value extracted from the contract for comparison based on the property.
      */
-    private String getValueForComparison(Contract contract, String sortBy) {
-        SupportedLanguage lang = SupportedLanguage.valueOf(currentUser().getLang());
-        switch (sortBy) {
+    private String getValueForComparison(Contract contract, String property) {
+        SupportedLanguage lang = SupportedLanguage.of(currentUser().getLang());
+        switch (property) {
             case LABEL:
                 return Optional.ofNullable(contract.getLabel().get(lang)).orElse(contract.getLabel().get(SupportedLanguage.en));
             default: //"TYPE"
@@ -193,7 +193,7 @@ public class ContractService {
     /**
      * Checks if the given label contains the specified text.
      *
-     * @param tag  The label to search within.
+     * @param value  The label to search within.
      * @param text The text to search for.
      * @return {@code true} if the label contains the text, {@code false} otherwise.
      */
