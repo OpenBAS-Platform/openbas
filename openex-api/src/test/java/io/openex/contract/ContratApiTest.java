@@ -36,14 +36,13 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Fetching first page of contracts succeed")
             void given_search_input_should_return_a_page_of_contrats() throws Exception {
                 MultiValueMap<String, String> params = new LinkedMultiValueMap();
-                params.add("page", "1");
+                params.add("page", "0");
                 params.add("size", "10");
 
                 mvc.perform(post("/api/contracts")
                                 .params(params)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(ContractFixture.getDefault().build())))
-                        .andExpect(status().is2xxSuccessful())
+                                .content(asJsonString(ContractFixture.getDefault().build()))).andExpect(status().is2xxSuccessful())
                         .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(5));
             }
 
@@ -51,7 +50,7 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Fetching first page of contracts failed with bad request")
             void given_a_bad_search_input_should_throw_bad_request() throws Exception {
                 MultiValueMap<String, String> params = new LinkedMultiValueMap();
-                params.add("page", "1");
+                params.add("page", "0");
                 params.add("size", "21");
 
                 mvc.perform(post("/api/contracts")
@@ -68,7 +67,19 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Fetching first page of contracts by textsearch")
             @Test
             void given_search_input_with_textsearch_should_return_a_page_of_contrats() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email").build();
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("em").build();
+
+                mvc.perform(post("/api/contracts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(contractSearchInput)))
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(3));
+            }
+
+            @DisplayName("Fetching first page of contracts by textsearch ignoring case")
+            @Test
+            void given_search_input_with_textsearch_should_return_a_page_of_contrats_ignoring_case() throws Exception {
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("Em").build();
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -80,37 +91,49 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Fetching first page of contracts by type")
             @Test
             void given_search_input_with_type_should_return_a_page_of_contrats() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().type("email").build();
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().type("Challenge").build();
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(contractSearchInput)))
                         .andExpect(status().is2xxSuccessful())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(2));
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(1));
+            }
+
+            @DisplayName("Fetching first page of contracts by type ignoring case")
+            @Test
+            void given_search_input_with_type_should_return_a_page_of_contrats_ignoring_case() throws Exception {
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().type("CHALLENGE").build();
+
+                mvc.perform(post("/api/contracts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(contractSearchInput)))
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(1));
             }
 
             @DisplayName("Fetching first page of contracts by label")
             @Test
             void given_search_input_with_label_should_return_a_page_of_contrats() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().label("email").build();
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().label("Publish challenges").build();
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(contractSearchInput)))
                         .andExpect(status().is2xxSuccessful())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(5));
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(1));
             }
 
             @DisplayName("Fetching first page of contracts by label email ignoring case")
             @Test
             void given_search_input_with_label_should_return_a_page_of_contrats_ignoring_case() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().label("EMail").build();
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().label("PUBLISH challenges").build();
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(contractSearchInput)))
                         .andExpect(status().is2xxSuccessful())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(5));
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(1));
             }
 
         }
