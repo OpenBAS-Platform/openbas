@@ -97,7 +97,7 @@ public class ContractApi extends RestBehavior {
             orders = List.of(new Sort.Order(Sort.DEFAULT_DIRECTION, TYPE));
         } else {
             orders = sortFields.stream().map(field -> {
-                String[] propertyAndDirection = field.split(",");
+                String[] propertyAndDirection = field.split(":");
                 String property = propertyAndDirection[0];
                 Sort.Direction direction = Sort.DEFAULT_DIRECTION;
                 if (propertyAndDirection.length > 1) {

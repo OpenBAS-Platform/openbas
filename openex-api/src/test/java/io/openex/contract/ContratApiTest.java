@@ -10,13 +10,13 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import static io.openex.rest.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @TestInstance(PER_CLASS)
@@ -43,7 +43,7 @@ class ContratApiTest extends IntegrationTest {
                                 .params(params)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(ContractFixture.getDefault().build()))).andExpect(status().is2xxSuccessful())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(5));
+                        .andExpect(jsonPath("$.numberOfElements").value(5));
             }
 
             @Test
@@ -73,7 +73,7 @@ class ContratApiTest extends IntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(contractSearchInput)))
                         .andExpect(status().is2xxSuccessful())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(3));
+                        .andExpect(jsonPath("$.numberOfElements").value(3));
             }
 
             @DisplayName("Fetching first page of contracts by textsearch ignoring case")
@@ -85,7 +85,7 @@ class ContratApiTest extends IntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(contractSearchInput)))
                         .andExpect(status().is2xxSuccessful())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(3));
+                        .andExpect(jsonPath("$.numberOfElements").value(3));
             }
 
             @DisplayName("Fetching first page of contracts by type")
@@ -97,7 +97,7 @@ class ContratApiTest extends IntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(contractSearchInput)))
                         .andExpect(status().is2xxSuccessful())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(1));
+                        .andExpect(jsonPath("$.numberOfElements").value(1));
             }
 
             @DisplayName("Fetching first page of contracts by type ignoring case")
@@ -109,7 +109,7 @@ class ContratApiTest extends IntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(contractSearchInput)))
                         .andExpect(status().is2xxSuccessful())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(1));
+                        .andExpect(jsonPath("$.numberOfElements").value(1));
             }
 
             @DisplayName("Fetching first page of contracts by label")
@@ -121,7 +121,7 @@ class ContratApiTest extends IntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(contractSearchInput)))
                         .andExpect(status().is2xxSuccessful())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(1));
+                        .andExpect(jsonPath("$.numberOfElements").value(1));
             }
 
             @DisplayName("Fetching first page of contracts by label email ignoring case")
@@ -133,7 +133,7 @@ class ContratApiTest extends IntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(contractSearchInput)))
                         .andExpect(status().is2xxSuccessful())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(1));
+                        .andExpect(jsonPath("$.numberOfElements").value(1));
             }
 
         }
@@ -150,29 +150,71 @@ class ContratApiTest extends IntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(contractSearchInput)))
                         .andExpect(status().is2xxSuccessful())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(3));
+                        .andExpect(jsonPath("$.content.[0].config.label.en").value("Email"))
+                        .andExpect(jsonPath("$.content.[0].label.en").value("Send individual mails"))
+                        .andExpect(jsonPath("$.content.[1].config.label.en").value("Email"))
+                        .andExpect(jsonPath("$.content.[1].label.en").value("Send multi-recipients mail"))
+                        .andExpect(jsonPath("$.content.[2].config.label.en").value("Media pressure"))
+                        .andExpect(jsonPath("$.content.[2].label.en").value("Publish channel pressure"))
+                        .andExpect(jsonPath("$.content.[2].fields.[4].key").value("emailing"));
             }
 
             @DisplayName("Sorting by label asc")
             @Test
             void given_sort_input_should_return_a_page_of_contrats_sort_by_label_asc() throws Exception {
+                MultiValueMap<String, String> params = new LinkedMultiValueMap();
+                params.add("sort", "label:asc");
+
                 ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email").build();
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .params(params)
                                 .content(asJsonString(contractSearchInput)))
-                        .andExpect(status().is2xxSuccessful());
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(jsonPath("$.content.[0].label.en").value("Publish channel pressure"))
+                        .andExpect(jsonPath("$.content.[1].label.en").value("Send individual mails"))
+                        .andExpect(jsonPath("$.content.[2].label.en").value("Send multi-recipients mail"));
             }
 
-            @DisplayName("Sorting by type desc")
+            @DisplayName("Sorting by label desc")
             @Test
-            void given_sort_input_should_return_a_page_of_contrats_sort_by_type_desc() throws Exception {
+            void given_sort_input_should_return_a_page_of_contrats_sort_by_label_desc() throws Exception {
+                MultiValueMap<String, String> params = new LinkedMultiValueMap();
+                params.add("sort", "label:desc");
+
                 ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email").build();
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .params(params)
                                 .content(asJsonString(contractSearchInput)))
-                        .andExpect(status().is2xxSuccessful());
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(jsonPath("$.content.[0].label.en").value("Send multi-recipients mail"))
+                        .andExpect(jsonPath("$.content.[1].label.en").value("Send individual mails"))
+                        .andExpect(jsonPath("$.content.[2].label.en").value("Publish channel pressure"));
+
+            }
+
+            @DisplayName("Sorting by type asc and label desc")
+            @Test
+            void given_sort_input_should_return_a_page_of_contrats_sort_by_type_asc_label_desc() throws Exception {
+                MultiValueMap<String, String> params = new LinkedMultiValueMap();
+                params.add("sort", "type:asc, label:desc");
+
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email").build();
+
+                mvc.perform(post("/api/contracts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .params(params)
+                                .content(asJsonString(contractSearchInput)))
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(jsonPath("$.content.[0].config.label.en").value("Email"))
+                        .andExpect(jsonPath("$.content.[0].label.en").value("Send multi-recipients mail"))
+                        .andExpect(jsonPath("$.content.[1].config.label.en").value("Email"))
+                        .andExpect(jsonPath("$.content.[1].label.en").value("Send individual mails"))
+                        .andExpect(jsonPath("$.content.[2].config.label.en").value("Media pressure"))
+                        .andExpect(jsonPath("$.content.[2].label.en").value("Publish channel pressure"));
             }
         }
     }
