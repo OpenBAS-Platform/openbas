@@ -143,7 +143,7 @@ class ContratApiTest extends IntegrationTest {
         class SortingPageOfContracts {
             @DisplayName("Sorting by default")
             @Test
-            void given_search_input_with_textsearch_should_return_a_page_of_contrats() throws Exception {
+            void given_search_input_without_sort_should_return_a_page_of_contrats_with_default_sort() throws Exception {
                 ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email").build();
 
                 mvc.perform(post("/api/contracts")
