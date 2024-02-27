@@ -11,7 +11,10 @@ import io.openex.execution.ExecutionContext;
 import io.openex.execution.Injector;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.inject.form.*;
-import io.openex.service.*;
+import io.openex.service.AssetGroupService;
+import io.openex.service.AssetService;
+import io.openex.service.ExecutionContextService;
+import io.openex.service.ScenarioService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -127,7 +130,7 @@ public class InjectApi extends RestBehavior {
   }
 
   /**
-   * @deprecated Use {@link ContractApi#getContracts(int, int)} instead.
+   * @deprecated Use {@link ContractApi#searchExposedContracts} instead.
    */
   @Deprecated(since = "19/02/2024")
   @GetMapping("/api/inject_types")
