@@ -88,6 +88,18 @@ class ContratApiTest extends IntegrationTest {
                         .andExpect(jsonPath("$.numberOfElements").value(3));
             }
 
+            @DisplayName("Fetching first page of contracts by textsearch with spaces")
+            @Test
+            void given_search_input_with_textsearch_with_spaces_should_return_a_page_of_contracts() throws Exception {
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("E m").build();
+
+                mvc.perform(post("/api/contracts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(contractSearchInput)))
+                        .andExpect(status().is2xxSuccessful())
+                        .andExpect(jsonPath("$.numberOfElements").value(0));
+            }
+
             @DisplayName("Fetching first page of contracts by type")
             @Test
             void given_search_input_with_type_should_return_a_page_of_contrats() throws Exception {
