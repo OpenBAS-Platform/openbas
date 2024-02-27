@@ -148,6 +148,8 @@ const Endpoints = () => {
 
   const sortedEndpoints: EndpointStore[] = filtering.filterAndSort(endpoints);
 
+  const MAX_ALIVE_HOURS = 6;
+
   return (
     <>
       <div className={classes.parameters}>
@@ -303,7 +305,7 @@ const Endpoints = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.asset_status}
                   >
-                    {differenceInHours(new Date().toISOString(), endpoint.asset_last_seen) > 6 ? <AssetStatus variant="list" status='Inactive'/> : <AssetStatus variant="list" status='Active'/>}
+                    {differenceInHours(new Date().toISOString(), endpoint.asset_last_seen) > MAX_ALIVE_HOURS ? <AssetStatus variant="list" status='Inactive'/> : <AssetStatus variant="list" status='Active'/>}
                   </div>
                 </div>
               }
