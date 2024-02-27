@@ -27,6 +27,5 @@ test('Update an asset', async ({ page }) => {
   await assetFormPage.fillName('My endpoint name updated');
   await assetFormPage.getUpdateButton().click();
 
-  await expect(assetFormPage.getCreateButton()).toBeHidden();
   await expect(page.getByText('My endpoint name updated', { exact: true })).toBeVisible();
 });

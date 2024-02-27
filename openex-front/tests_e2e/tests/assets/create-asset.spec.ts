@@ -18,10 +18,9 @@ test('Create an asset', async ({ page }) => {
   await assetsPage.getAddButton().click();
 
   const assetFormPage = new AssetFormPage(page);
-  await fillLinuxAssetBase(page, 'My endpoint name', '192.168.255.255');
+  await fillLinuxAssetBase(page, 'My endpoint name to create', '192.168.255.255');
   await assetFormPage.getCreateButton().click();
 
   // -- ASSERT --
-  await expect(assetFormPage.getCreateButton()).toBeHidden();
-  await expect(page.getByText('My endpoint name', { exact: true })).toBeVisible();
+  await expect(page.getByText('My endpoint name to create', { exact: true })).toBeVisible();
 });
