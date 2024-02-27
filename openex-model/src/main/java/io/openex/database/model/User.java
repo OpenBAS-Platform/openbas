@@ -195,7 +195,7 @@ public class User implements Base {
   }
 
   public void setEmail(final String email) {
-    this.email = ofNullable(email).map(String::toLowerCase).orElse(null);
+    this.email = ofNullable(email).map(String::toLowerCase).orElseThrow(() -> new IllegalArgumentException("Email can't be null"));
   }
 
   private transient List<Inject> injects = new ArrayList<>();
