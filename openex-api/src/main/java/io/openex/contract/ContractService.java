@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import static io.openex.config.SessionHelper.currentUser;
 
+@Getter
 @Service
 public class ContractService {
 
@@ -30,7 +31,6 @@ public class ContractService {
     public static final String TYPE = "type";
     public static final String LABEL = "label";
 
-    @Getter
     private final Map<String, Contract> contracts = new HashMap<>();
     private List<Contractor> baseContracts;
 
@@ -104,13 +104,6 @@ public class ContractService {
         return new PageImpl<>(paginatedContracts, pageable, totalContracts);
     }
 
-    /**
-     * Searches for contracts based on specified criteria.
-     *
-     * @param contractSearchInput criteria for searching contracts
-     * @param sort                List of orders for sorting contracts
-     * @return A list of contracts matching the search criteria.
-     */
     private List<Contract> searchContracts(ContractSearchInput contractSearchInput, Sort sort) {
         return getContracts().values().stream()
                 .filter(contract -> (!contractSearchInput.isExposedContractsOnly() || contract.getConfig().isExpose())
@@ -121,12 +114,6 @@ public class ContractService {
                 .toList();
     }
 
-    /**
-     * Constructs a comparator for sorting Contract objects based on the provided Sort orders.
-     *
-     * @param sort The Sort object containing sorting orders.
-     * @return A Comparator<Contract> object for sorting Contract objects according to the specified Sort orders.
-     */
     private Comparator<Contract> getComparator(Sort sort) {
         Comparator<Contract> comparator = null;
 
@@ -143,13 +130,6 @@ public class ContractService {
         return comparator;
     }
 
-    /**
-     * Retrieves the value for comparison based on the property and current user lang.
-     *
-     * @param contract The contract object from which to extract the value.
-     * @param property   The property by which to sort the contracts.
-     * @return The value extracted from the contract for comparison based on the property.
-     */
     private String getValueForComparison(Contract contract, String property) {
         SupportedLanguage lang = SupportedLanguage.of(currentUser().getLang());
         switch (property) {
@@ -160,14 +140,6 @@ public class ContractService {
         }
     }
 
-    /**
-     * Checks if the specified type is contained within the given Contract.
-     *
-     * @param property The property where the value is searched.
-     * @param contract The Contract object to search within.
-     * @param value    The type to check for within the Contract.
-     * @return {@code true} if the type is found within the Contract, {@code false} otherwise.
-     */
     private boolean contractHasProperty(String property, Contract contract, String value) {
         switch (property) {
             case LABEL:
@@ -177,38 +149,18 @@ public class ContractService {
         }
     }
 
-    /**
-     * Checks if the given contract contains the specified text.
-     *
-     * @param contract The contract to search within.
-     * @param text     The text to search for.
-     * @return {@code true} if the contract contains the text, {@code false} otherwise.
-     */
     private boolean contractContainsText(Contract contract, String text) {
         return containsTextIn(getValueForComparison(contract, LABEL), text) ||
                 containsTextIn(getValueForComparison(contract, TYPE), text) ||
                 containsTextInFields(contract.getFields(), text);
     }
 
-    /**
-     * Checks if the given label contains the specified text.
-     *
-     * @param value  The label to search within.
-     * @param text The text to search for.
-     * @return {@code true} if the label contains the text, {@code false} otherwise.
-     */
     private boolean containsTextIn(String value, String text) {
         return StringUtils.containsIgnoreCase(value, text);
     }
 
-    /**
-     * Checks if any of the contract elements in the given list contain the specified text.
-     *
-     * @param fields The list of contract elements to search within.
-     * @param text   The text to search for.
-     * @return {@code true} if any contract element contains the text, {@code false} otherwise.
-     */
     private boolean containsTextInFields(List<ContractElement> fields, String text) {
         return fields.stream().anyMatch(field -> StringUtils.containsIgnoreCase(field.getLabel(), text));
     }
+
 }

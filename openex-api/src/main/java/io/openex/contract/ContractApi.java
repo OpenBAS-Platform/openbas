@@ -15,7 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.InputStream;
@@ -25,12 +25,11 @@ import java.util.List;
 import java.util.Map;
 
 import static io.openex.contract.ContractService.TYPE;
-import static io.openex.database.model.User.ROLE_ADMIN;
 
 @RequiredArgsConstructor
 @RestController
 @Slf4j
-@Secured(ROLE_ADMIN)
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 @RequestMapping("/api/contracts")
 public class ContractApi extends RestBehavior {
 
@@ -84,12 +83,6 @@ public class ContractApi extends RestBehavior {
         return contractService.searchContracts(contractSearchInput, pageable);
     }
 
-    /**
-     * Converts a list of string sort fields into a sorting criteria as a Sort object.
-     *
-     * @param sortFields a list of strings representing sort fields
-     * @return a Sort object representing the sorting criteria
-     */
     private Sort convertToSort(List<String> sortFields) {
         List<Sort.Order> orders;
 
