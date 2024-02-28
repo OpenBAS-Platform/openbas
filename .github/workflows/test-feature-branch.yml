@@ -1,0 +1,94 @@
+name: test-feature-branch
+on:
+  workflow_dispatch:
+    inputs:
+      openex_config:
+        type: string
+        default: '{}'
+        required: false
+
+jobs:
+  openbas-platform:
+    name: openbas-platform
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: jirutka/setup-alpine@v1
+        with:
+          branch: v3.18
+          extra-repositories: |
+            https://dl-cdn.alpinelinux.org/alpine/edge/community/
+          packages: >
+            nodejs npm git tini gcc g++ make musl-dev cargo openjdk21-jdk maven postfix postfix-pcre
+
+      - name: Setup Node.js
+        run: |
+          npm install -g  yarn
+        shell: alpine.sh --root {0}
+
+      - name: Build into Alpine
+        run: |
+          export JAVA_HOME=/usr/lib/jvm/default-jvm/
+          cd openex-front
+          yarn install
+          yarn build
+          cd ../
+          mvn install -DskipTests -Pdev
+        shell: alpine.sh {0}
+
+      - run: mkdir -p openex-build/
+      - run: cp openex-api/target/openex-api.jar openex-build/
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: filigran/openbas-platform
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+      - name: Login to DockerHub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile_ga
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    name: deploy
+    needs: [openbas-platform]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: filigran/openbas-platform
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+      - name: deploy via awx
+        uses: certara/github-action-ansible-tower-awx@master
+        with:
+          ansible-tower-user: ${{ secrets.AWX_USER }}
+          ansible-tower-pass: ${{ secrets.AWX_PASSWORD }}
+          ansible-tower-url: ${{ secrets.AWX_URL }}
+          template-id: "34"
+          additional-vars: |
+            { "openex_version": "${{steps.meta.outputs.version}}", "openex_config": ${{ inputs.openex_config }} }
+      - name: display URL
+        run: echo "https://${{steps.meta.outputs.version}}.oex.dev.filigran.io"
