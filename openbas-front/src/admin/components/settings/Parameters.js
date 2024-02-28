@@ -79,65 +79,12 @@ const Parameters = (props) => {
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Dark theme')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <Form>
-              <Field
-                component={ColorPickerField}
-                name="platform_theme_dark_background"
-                label={t('Background color')}
-                placeholder={t('Default')}
-              />
-              <Field
-                component={ColorPickerField}
-                name="platform_theme_dark_paper"
-                label={t('Paper color')}
-                placeholder={t('Default')}
-              />
-              <Field
-                component={ColorPickerField}
-                name="platform_theme_dark_nav"
-                label={t('Navigation color')}
-                placeholder={t('Default')}
-              />
-              <Field
-                component={ColorPickerField}
-                name="platform_theme_dark_primary"
-                label={t('Primary color')}
-                placeholder={t('Default')}
-              />
-              <Field
-                component={ColorPickerField}
-                name="platform_theme_dark_secondary"
-                label={t('Secondary color')}
-                placeholder={t('Default')}
-              />
-              <Field
-                component={ColorPickerField}
-                name="platform_theme_dark_accent"
-                label={t('Accent color')}
-                placeholder={t('Default')}
-              />
-              <Field
-                component={TextField}
-                variant="standard"
-                name="platform_theme_dark_logo"
-                label={t('Logo URL')}
-                placeholder={t('Default')}
-              />
-              <Field
-                component={TextField}
-                variant="standard"
-                name="platform_theme_dark_logo_collapsed"
-                label={t('Logo URL (collapsed)')}
-                placeholder={t('Default')}
-              />
-              <Field
-                component={TextField}
-                variant="standard"
-                name="platform_theme_dark_logo_login"
-                label={t('Logo URL (login)')}
-                placeholder={t('Default')}
-              />
-            </Form>
+            <List>
+              <ListItem divider={true}>
+                <ListItemText primary={t('Edition')} />
+                <ItemBoolean variant="inList" status={null} neutralLabel='Community' />
+              </ListItem>
+            </List>
           </Paper>
         </Grid>
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>
