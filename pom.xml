@@ -9,13 +9,13 @@
         <version>3.2.0</version>
     </parent>
 
-    <groupId>io.openex</groupId>
-    <artifactId>openex-platform</artifactId>
+    <groupId>io.openbas</groupId>
+    <artifactId>openbas-platform</artifactId>
     <version>3.5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>OpenEx platform</name>
-    <description>OpenEx platform</description>
+    <name>OpenBAS platform</name>
+    <description>OpenBAS platform</description>
 
     <properties>
         <minio.version>8.5.7</minio.version>
@@ -78,10 +78,10 @@
     </build>
 
     <modules>
-        <module>openex-model</module>
-        <module>openex-framework</module>
-        <module>openex-api</module>
-        <module>openex-injectors</module>
-        <module>openex-collectors</module>
+        <module>openbas-model</module>
+        <module>openbas-framework</module>
+        <module>openbas-api</module>
+        <module>openbas-injectors</module>
+        <module>openbas-collectors</module>
     </modules>
 </project>

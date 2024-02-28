@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: openex-tests-pull-request
+name: openbas-tests-pull-request
 concurrency: {
   limit: 2
 }
@@ -17,23 +17,23 @@ steps:
   - name: api-tests
     image: maven:3.9.6-eclipse-temurin-21
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql:5432/openex
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql:5432/openbas
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
     commands:
       - mvn install -DskipTests
-      - cd openex-api
+      - cd openbas-api
       - mvn test
-      - cd ../openex-framework
+      - cd ../openbas-framework
       - mvn test
-      - cd ../openex-injectors
+      - cd ../openbas-injectors
       - mvn test
     depends_on:
       - submodules
   - name: frontend-tests
     image: node:20.11.0-alpine3.18
     commands:
-      - cd openex-front
+      - cd openbas-front
       - yarn install
       - yarn build
       - yarn check-ts
@@ -51,15 +51,15 @@ services:
   - name: pgsql
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: openex
-      POSTGRES_PASSWORD: openex
-      POSTGRES_DB: openex
+      POSTGRES_USER: openbas
+      POSTGRES_PASSWORD: openbas
+      POSTGRES_DB: openbas
 
 ---
 
 kind: pipeline
 type: docker
-name: openex-e2e-tests-pull-request
+name: openbas-e2e-tests-pull-request
 concurrency: {
   limit: 2
 }
@@ -75,7 +75,7 @@ steps:
       - apt update
       - apt -y install netcat-traditional
       - while ! nc -z app-start 8080 ; do sleep 1 ; done
-      - cd openex-front
+      - cd openbas-front
       - yarn install
       - yarn playwright install --with-deps chromium
       - APP_URL=http://app-start:8080 yarn test:e2e
@@ -90,15 +90,15 @@ services:
   - name: pgsql
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: openex
-      POSTGRES_PASSWORD: openex
-      POSTGRES_DB: openex
+      POSTGRES_USER: openbas
+      POSTGRES_PASSWORD: openbas
+      POSTGRES_DB: openbas
   - name: app-start
     image: maven:3.9.6-eclipse-temurin-21
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql:5432/openex
-      SPRING_DATASOURCE_USERNAME: openex
-      SPRING_DATASOURCE_PASSWORD: openex
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql:5432/openbas
+      SPRING_DATASOURCE_USERNAME: openbas
+      SPRING_DATASOURCE_PASSWORD: openbas
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
       MINIO_ACCESS_KEY: minioadmin
@@ -116,18 +116,18 @@ services:
       - apt install -y nodejs
       - apt install -y git
       - git submodule update --init --recursive
-      - cd openex-front
+      - cd openbas-front
       - yarn install
       - yarn build
       - cd ..
       - mvn install -DskipTests=true
-      - java -jar openex-api/target/openex-api.jar
+      - java -jar openbas-api/target/openbas-api.jar
 
 ---
 
 kind: pipeline
 type: docker
-name: openex-tests-master
+name: openbas-tests-master
 
 trigger:
   branch:
@@ -144,23 +144,23 @@ steps:
   - name: api-tests
     image: maven:3.9.6-eclipse-temurin-21
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql:5432/openex
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql:5432/openbas
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
     commands:
       - mvn install -DskipTests
-      - cd openex-api
+      - cd openbas-api
       - mvn test
-      - cd ../openex-framework
+      - cd ../openbas-framework
       - mvn test
-      - cd ../openex-injectors
+      - cd ../openbas-injectors
       - mvn test
     depends_on:
       - submodules
   - name: frontend-tests
     image: node:20.11.0-alpine3.18
     commands:
-      - cd openex-front
+      - cd openbas-front
       - yarn install
       - yarn build
       - yarn check-ts
@@ -173,13 +173,13 @@ steps:
       token:
         from_secret: CODECOV_TOKEN
       files:
-        - openex-api/target/site/jacoco/jacoco.xml
-        - openex-framework/target/site/jacoco/jacoco.xml
-        - openex-injectors/openex-caldera/target/site/jacoco/jacoco.xml
+        - openbas-api/target/site/jacoco/jacoco.xml
+        - openbas-framework/target/site/jacoco/jacoco.xml
+        - openbas-injectors/openbas-caldera/target/site/jacoco/jacoco.xml
   - name: build-circleci
     image: curlimages/curl
     commands:
-      - curl -X POST --data "branch=master" https://circleci.com/api/v1.1/project/github/OpenEx-Platform/openex/build?circle-token=$CIRCLECI_TOKEN
+      - curl -X POST --data "branch=master" https://circleci.com/api/v1.1/project/github/OpenBAS-Platform/openbas/build?circle-token=$CIRCLECI_TOKEN
     environment:
       CIRCLECI_TOKEN:
         from_secret: circleci_token
@@ -190,7 +190,7 @@ steps:
   - name: build-circleci-release
     image: curlimages/curl
     commands:
-      - curl -X POST --data "tag=$DRONE_TAG" https://circleci.com/api/v1.1/project/github/OpenEx-Platform/openex/build?circle-token=$CIRCLECI_TOKEN
+      - curl -X POST --data "tag=$DRONE_TAG" https://circleci.com/api/v1.1/project/github/OpenBAS-Platform/openbas/build?circle-token=$CIRCLECI_TOKEN
     environment:
       CIRCLECI_TOKEN:
         from_secret: circleci_token
@@ -217,6 +217,6 @@ services:
   - name: pgsql
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: openex
-      POSTGRES_PASSWORD: openex
-      POSTGRES_DB: openex
+      POSTGRES_USER: openbas
+      POSTGRES_PASSWORD: openbas
+      POSTGRES_DB: openbas

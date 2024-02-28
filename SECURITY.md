@@ -7,7 +7,7 @@ Only the current stable major release (ie. X.X) is supported for update and bug 
 ## Reporting a Vulnerability
 
 Please report (suspected) security vulnerabilities via GitHub's security advisory reporting system:
-Submit your vulnerability via [this link](https://github.com/OpenEx-Platform/openex/security/advisories/new)
+Submit your vulnerability via [this link](https://github.com/OpenBAS-Platform/openbas/security/advisories/new)
 
 Please note the following requirements (all are required):
 
