@@ -1,19 +1,17 @@
-<h1 align="center">
-  <a href="https://openex.io"><img src="https://filigran.io/wp-content/uploads/2023/10/openex_github.png" alt="OpenEx"></a>
-</h1>
+# ![OpenBAS](./.github/img/logo_openbas_dark.png#gh-dark-mode-only) ![OpenBAS](./.github/img/logo_openbas_light.png#gh-light-mode-only)
 <p align="center">
-  <a href="https://openex.io" alt="Website"><img src="https://img.shields.io/badge/website-openex.io-blue.svg" /></a>
-  <a href="https://docs.openex.io" alt="Documentation"><img src="https://img.shields.io/badge/documentation-latest-orange.svg" /></a>
+  <a href="https://openbas.io" alt="Website"><img src="https://img.shields.io/badge/website-openbas.io-blue.svg" /></a>
+  <a href="https://docs.openbas.io" alt="Documentation"><img src="https://img.shields.io/badge/documentation-latest-orange.svg" /></a>
   <a href="https://community.filigran.io" alt="Slack"><img src="https://img.shields.io/badge/slack-3K%2B%20members-4A154B" /></a>
-  <a href="https://drone.filigran.io/OpenEx-Platform/openex"><img src="https://drone.filigran.io/api/badges/OpenEx-Platform/openex/status.svg" /></a>
-  <a href="https://codecov.io/gh/OpenEx-Platform/openex"><img src="https://codecov.io/gh/OpenEx-Platform/openex/graph/badge.svg" /></a>
+  <a href="https://drone.filigran.io/OpenBAS-Platform/openbas"><img src="https://drone.filigran.io/api/badges/OpenBAS-Platform/openbas/status.svg" /></a>
+  <a href="https://codecov.io/gh/OpenBAS-Platform/openbas"><img src="https://codecov.io/gh/OpenBAS-Platform/openbas/graph/badge.svg" /></a>
   <a href="https://deepscan.io/dashboard#view=project&tid=11710&pid=14631&bid=276803"><img src="https://deepscan.io/api/teams/11710/projects/14631/branches/276803/badge/grade.svg" alt="DeepScan grade"></a>
-  <a href="https://hub.docker.com/u/openexhq" alt="Docker pulls"><img src="https://img.shields.io/docker/pulls/openexhq/platform" /></a>
+  <a href="https://hub.docker.com/u/openbashq" alt="Docker pulls"><img src="https://img.shields.io/docker/pulls/openbashq/platform" /></a>
 </p>
 
 ## Introduction
 
-OpenEx is an open source platform allowing organizations to plan, schedule and conduct crisis exercises as well as adversary simulation campaign. OpenEx is an [ISO 22398](http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=50294) compliant product and has been designed as a modern web application including a RESTFul API and an UX oriented frontend.
+OpenBAS is an open source platform allowing organizations to plan, schedule and conduct crisis exercises as well as adversary simulation campaign. OpenBAS is an [ISO 22398](http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=50294) compliant product and has been designed as a modern web application including a RESTFul API and an UX oriented frontend.
 
 ![Screenshot](https://filigran.io/wp-content/uploads/2023/10/openex-dashboard.png "Screenshot")
 
@@ -21,73 +19,74 @@ OpenEx is an open source platform allowing organizations to plan, schedule and c
 
 The goal is to create a powerful, reliable and open source tool to effectively plan and play all types of training, exercises and simulation from the technical level to the strategic one. The need for rationalization and capitalization from one year to the next, as well as the publication of ISO 22398: 2013 standard necessarily lead to the need to acquire specific software. 
 
-OpenEx aims to respond to these issues, which not only concern state services but also many private organizations. With different modules (scenarios, teams, simulations, verification of means of communication, encryption, etc.), the platform offers advantages such as collaborative work, real-time monitoring, statistics or the management of feedback.
+OpenBAS aims to respond to these issues, which not only concern state services but also many private organizations. With different modules (scenarios, teams, simulations, verification of means of communication, encryption, etc.), the platform offers advantages such as collaborative work, real-time monitoring, statistics or the management of feedback.
 
-Finally, OpenEx supports different types of inject, allowing the tool to be integrated with emails, SMS platforms, social medias, alarm systems, etc. All currently supported integration can be found in the [OpenEx ecosystem](https://filigran.notion.site/OpenEx-Ecosystem-30d8eb73d7d04611843e758ddef8941b).
+Finally, OpenBAS supports different types of inject, allowing the tool to be integrated with emails, SMS platforms, social medias, alarm systems, etc. All currently supported integration can be found in the [OpenBAS ecosystem](https://filigran.notion.site/OpenBAS-Ecosystem-30d8eb73d7d04611843e758ddef8941b).
 
 ## Editions of the platform
 
-OpenEx platform has 2 different editions: Community (CE) and Enterprise (EE). The purpose of the Enterprise Edition is to provide [additional and powerful features](https://filigran.io/offering/subscribe) which require specific investments in research and development. You can enable the Enterprise Edition directly in the settings of the platform.
+OpenBAS platform has 2 different editions: Community (CE) and Enterprise (EE). The purpose of the Enterprise Edition is to provide [additional and powerful features](https://filigran.io/offering/subscribe) which require specific investments in research and development. You can enable the Enterprise Edition directly in the settings of the platform.
 
-* OpenEx Community Edition, licensed under the [Apache 2, Version 2.0 license](LICENSE).
-* OpenEx Enterprise Edition, licensed under the [Non-Commercial license](LICENSE).
+* OpenBAS Community Edition, licensed under the [Apache 2, Version 2.0 license](LICENSE).
+* OpenBAS Enterprise Edition, licensed under the [Non-Commercial license](LICENSE).
 
-To understand what OpenEx Enterprise Edition brings in terms of features, just check the [Enterprise Editions page](https://filigran.io/offering/subscribe) on the Filigran website. You can also try this edition by enabling it in the settings of the platform.
+To understand what OpenBAS Enterprise Edition brings in terms of features, just check the [Enterprise Editions page](https://filigran.io/offering/subscribe) on the Filigran website. You can also try this edition by enabling it in the settings of the platform.
 
 ## Documentation and demonstration
 
-If you want to know more on OpenEx, you can read the [documentation on the tool](https://docs.openex.io). If you wish to discover how the OpenEx platform is working, a [demonstration instance](https://demo.openex.io) is available and open to everyone. This instance is reset every night and is based on reference data maintained by the OpenEx developers.
+If you want to know more on OpenBAS, you can read the [documentation on the tool](https://docs.openbas.io). If you wish to discover how the OpenBAS platform is working, a [demonstration instance](https://demo.openbas.io) is available and open to everyone. This instance is reset every night and is based on reference data maintained by the OpenBAS developers.
 
 ## Releases download
 
-The releases are available on the [Github releases page](https://github.com/OpenEx-Platform/openex/releases). You can also access the [rolling release package](https://releases.openex.io) generated from the mater branch of the repository.
+The releases are available on the [Github releases page](https://github.com/OpenBAS-Platform/openbas/releases). You can also access the [rolling release package](https://releases.openbas.io) generated from the mater branch of the repository.
 
 ## Installation
 
-All you need to install the OpenEx platform can be found in the [official documentation](https://filigran.notion.site/OpenEx-Public-Knowledge-Base-bbc835446e9140999d6f2e10d96c2ee0). For installation, you can:
+All you need to install the OpenBAS platform can be found in the [official documentation](https://filigran.notion.site/OpenBAS-Public-Knowledge-Base-bbc835446e9140999d6f2e10d96c2ee0). For installation, you can:
 
-* [Use Docker](https://docs.openex.io/latest/deployment/installation/#using-docker)
-* [Install manually](https://docs.openex.io/latest/deployment/installation/#install-manually)
+* [Use Docker](https://docs.openbas.io/latest/deployment/installation/#using-docker)
+* [Install manually](https://docs.openbas.io/latest/deployment/installation/#install-manually)
 
 ## Contributing
 
 ### Code of Conduct
 
-OpenEx has adopted a [Code of Conduct](CODE_OF_CONDUCT.md) that we expect project participants to adhere to. Please read the [full text](CODE_OF_CONDUCT.md) so that you can understand what actions will and will not be tolerated.
+OpenBAS has adopted a [Code of Conduct](CODE_OF_CONDUCT.md) that we expect project participants to adhere to. Please read the [full text](CODE_OF_CONDUCT.md) so that you can understand what actions will and will not be tolerated.
 
 ### Contributing Guide
 
-Read our [contributing guide](CONTRIBUTING.md) to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes to OpenEx.
+Read our [contributing guide](CONTRIBUTING.md) to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes to OpenBAS.
 
 ### Beginner friendly issues
 
-To help you get you familiar with our contribution process, we have a list of [beginner friendly issues](https://github.com/OpenEx-Platform/openex/labels/beginner%20friendly%20issue) which are fairly easy to implement. This is a great place to get started.
+To help you get you familiar with our contribution process, we have a list of [beginner friendly issues](https://github.com/OpenBAS-Platform/openbas/labels/beginner%20friendly%20issue) which are fairly easy to implement. This is a great place to get started.
 
 ### Development
 
-If you want to actively help OpenEx, we created a [dedicated documentation](https://filigran.notion.site/Environment-setup-7b7754139072490aa9cb01f798ba8d5b) about the deployment of a development environement and how to start the source code modification.
+If you want to actively help OpenBAS, we created a [dedicated documentation](https://filigran.notion.site/Environment-setup-7b7754139072490aa9cb01f798ba8d5b) about the deployment of a development environement and how to start the source code modification.
 
 ## Community
 
 ### Status & bugs
 
-Currently OpenEx is under heavy development, if you wish to report bugs or ask for new features, you can directly use the [Github issues module](https://github.com/OpenEx-Platform/openex/issues).
+Currently OpenBAS is under heavy development, if you wish to report bugs or ask for new features, you can directly use the [Github issues module](https://github.com/OpenBAS-Platform/openbas/issues).
 
 ### Discussion
 
-If you need support or you wish to engage a discussion about the OpenEx platform, feel free to join us on our [Slack channel](https://community.filigran.io). You can also send us an email to contact@filigran.io.
+If you need support or you wish to engage a discussion about the OpenBAS platform, feel free to join us on our [Slack channel](https://community.filigran.io). You can also send us an email to contact@filigran.io.
 
 ## About
 
 ### Authors
 
-OpenEx is a product designed and developed by the company [Filigran](https://filigran.io).
+OpenBAS is a product designed and developed by the company [Filigran](https://filigran.io).
 
-<a href="https://filigran.io" alt="Filigran"><img src="https://filigran.io/wp-content/uploads/2023/08/filigran_text_medium.png" width="200" /></a>
+![Filigran](https://github.com/OpenCTI-Platform/opencti/raw/master/.github/img/logo_filigran_dark.png#gh-dark-mode-only)
+![Filigran](https://github.com/OpenCTI-Platform/opencti/raw/master/.github/img/logo_filigran_light.png#gh-light-mode-only)
 
-### GDPR and the OpenEx OpenStreetMap server
+### GDPR and the OpenBAS OpenStreetMap server
 
-In order to provide OpenEx users with cartography features, the platform uses a dedicated OpenStreetMap server (https://map.openex.io). To monitor usage and adapt services performances, Filigran collects access log to this server (including IP addresses).
+In order to provide OpenBAS users with cartography features, the platform uses a dedicated OpenStreetMap server (https://map.openbas.io). To monitor usage and adapt services performances, Filigran collects access log to this server (including IP addresses).
 
 By using this server, you authorize Filigran to collect this information. Otherwise, you are free to deploy your own OpenStreetMap server and modify the platform configuration accordingly.
 
