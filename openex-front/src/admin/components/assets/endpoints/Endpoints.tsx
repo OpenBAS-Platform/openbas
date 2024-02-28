@@ -305,7 +305,7 @@ const Endpoints = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.asset_status}
                   >
-                    {differenceInHours(new Date().toISOString(), endpoint.asset_last_seen) > MAX_ALIVE_HOURS ? <AssetStatus variant="list" status='Inactive'/> : <AssetStatus variant="list" status='Active'/>}
+                    <AssetStatus variant="list" status={(endpoint.asset_last_seen && differenceInHours(new Date().toISOString(), endpoint.asset_last_seen) > MAX_ALIVE_HOURS) ? 'Active' : 'Inactive'}/>
                   </div>
                 </div>
               }
