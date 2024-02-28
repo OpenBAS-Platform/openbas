@@ -62,8 +62,7 @@ public class ContractApi extends RestBehavior {
                     @Extension(
                             name = "contracts",
                             properties = {
-                                    @ExtensionProperty(name = "httpMethod", value = "POST"),
-                                    @ExtensionProperty(name = "authorizer", value = "none") //TODO
+                                    @ExtensionProperty(name = "httpMethod", value = "POST")
                             }
                     )
             }
