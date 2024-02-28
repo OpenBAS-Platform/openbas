@@ -4,12 +4,14 @@ import * as R from 'ramda';
 import { withStyles } from '@mui/styles';
 import { connect, useDispatch } from 'react-redux';
 import { Typography, Grid, Paper, List, ListItem, ListItemText, Switch, TextField } from '@mui/material';
+import { Field, Form } from 'react-final-form';
 import ParametersForm from './ParametersForm';
 import inject18n from '../../../components/i18n';
 import { storeHelper } from '../../../actions/Schema';
 import { updateParameters, fetchParameters } from '../../../actions/Application';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import ItemBoolean from '../../../components/ItemBoolean';
+import ColorPickerField from '../../../components/ColorPickerField';
 
 const styles = () => ({
   root: {
@@ -77,13 +79,72 @@ const Parameters = (props) => {
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Dark theme')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            &nbsp;
+            <Form>
+              <Field
+                component={ColorPickerField}
+                name="platform_theme_dark_background"
+                label={t('Background color')}
+                placeholder={t('Default')}
+              />
+              <Field
+                component={ColorPickerField}
+                name="platform_theme_dark_paper"
+                label={t('Paper color')}
+                placeholder={t('Default')}
+              />
+              <Field
+                component={ColorPickerField}
+                name="platform_theme_dark_nav"
+                label={t('Navigation color')}
+                placeholder={t('Default')}
+              />
+              <Field
+                component={ColorPickerField}
+                name="platform_theme_dark_primary"
+                label={t('Primary color')}
+                placeholder={t('Default')}
+              />
+              <Field
+                component={ColorPickerField}
+                name="platform_theme_dark_secondary"
+                label={t('Secondary color')}
+                placeholder={t('Default')}
+              />
+              <Field
+                component={ColorPickerField}
+                name="platform_theme_dark_accent"
+                label={t('Accent color')}
+                placeholder={t('Default')}
+              />
+              <Field
+                component={TextField}
+                variant="standard"
+                name="platform_theme_dark_logo"
+                label={t('Logo URL')}
+                placeholder={t('Default')}
+              />
+              <Field
+                component={TextField}
+                variant="standard"
+                name="platform_theme_dark_logo_collapsed"
+                label={t('Logo URL (collapsed)')}
+                placeholder={t('Default')}
+              />
+              <Field
+                component={TextField}
+                variant="standard"
+                name="platform_theme_dark_logo_login"
+                label={t('Logo URL (login)')}
+                placeholder={t('Default')}
+              />
+            </Form>
           </Paper>
         </Grid>
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Light theme')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             &nbsp;
+            ligth
           </Paper>
         </Grid>
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>
