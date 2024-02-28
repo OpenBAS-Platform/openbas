@@ -5,7 +5,7 @@ orbs:
   kubernetes: circleci/kubernetes@1.3.1
 jobs:
   build_frontend:
-    working_directory: ~/openex
+    working_directory: ~/openbas
     docker:
       - image: nikolaik/python-nodejs:python3.10-nodejs20
     resource_class: large
@@ -18,15 +18,15 @@ jobs:
             git submodule sync
             git submodule update --init --recursive --jobs 8
       - run:
-          working_directory: ~/openex/openex-front
+          working_directory: ~/openbas/openbas-front
           command: yarn install
       - run:
-          working_directory: ~/openex/openex-front
+          working_directory: ~/openbas/openbas-front
           command: NODE_OPTIONS=--max-old-space-size=8096 yarn build
           no_output_timeout: 30m
       - run:
           working_directory: ~/
-          command: cp -a openex openex_docker && cp -a openex openex_musl
+          command: cp -a openbas openbas_docker && cp -a openbas openbas_musl
       - slack/notify:
           event: fail
           template: basic_fail_1
@@ -36,19 +36,19 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - openex
-            - openex_docker
-            - openex_musl
+            - openbas
+            - openbas_docker
+            - openbas_musl
 
   build_platform:
-    working_directory: ~/openex
+    working_directory: ~/openbas
     docker:
       - image: maven:3.9.6-eclipse-temurin-21
     steps:
       - attach_workspace:
           at: ~/
       - run:
-          working_directory: ~/openex
+          working_directory: ~/openbas
           command: mvn install -DskipTests -Pdev
       - slack/notify:
           event: fail
@@ -59,10 +59,10 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - openex
+            - openbas
 
   build_platform_musl:
-    working_directory: ~/openex_musl
+    working_directory: ~/openbas_musl
     docker:
       - image: maven:3.9.6-eclipse-temurin-21-alpine
     resource_class: large
@@ -70,7 +70,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          working_directory: ~/openex_musl
+          working_directory: ~/openbas_musl
           command: mvn install -DskipTests -Pdev
       - slack/notify:
           event: fail
@@ -81,23 +81,23 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - openex_musl
+            - openbas_musl
 
   package_rolling:
-    working_directory: ~/openex
+    working_directory: ~/openbas
     docker:
       - image: maven:3.9.6-eclipse-temurin-21
     steps:
       - attach_workspace:
           at: ~/
-      - run: mkdir -p release/openex
-      - run: cp -a ./openex-api/target/openex-api.jar release/openex/ && cp -a ./openex-api/src/main/resources/application.properties release/openex/
+      - run: mkdir -p release/openbas
+      - run: cp -a ./openbas-api/target/openbas-api.jar release/openbas/ && cp -a ./openbas-api/src/main/resources/application.properties release/openbas/
       - run:
-          working_directory: ~/openex/release
-          command: tar -zcvf "openex-$(date '+%Y%m%d').tar.gz" openex
+          working_directory: ~/openbas/release
+          command: tar -zcvf "openbas-$(date '+%Y%m%d').tar.gz" openbas
       - run:
-          working_directory: ~/openex/release
-          command: curl -usamuel.hassine@filigran.io:$JFROG_TOKEN -T openex-$(date '+%Y%m%d').tar.gz "https://filigran.jfrog.io/artifactory/openex/openex-$(date '+%Y%m%d').tar.gz"
+          working_directory: ~/openbas/release
+          command: curl -usamuel.hassine@filigran.io:$JFROG_TOKEN -T openbas-$(date '+%Y%m%d').tar.gz "https://filigran.jfrog.io/artifactory/openbas/openbas-$(date '+%Y%m%d').tar.gz"
       - slack/notify:
           event: fail
           template: basic_fail_1
@@ -106,20 +106,20 @@ jobs:
           webhook_url: $MS_TEAMS_WEBHOOK_URL
 
   package_rolling_musl:
-    working_directory: ~/openex_musl
+    working_directory: ~/openbas_musl
     docker:
       - image: maven:3.9.6-eclipse-temurin-21
     steps:
       - attach_workspace:
           at: ~/
-      - run: mkdir -p release/openex
-      - run: cp -a ./openex-api/target/openex-api.jar release/openex/ && cp -a ./openex-api/src/main/resources/application.properties release/openex/
+      - run: mkdir -p release/openbas
+      - run: cp -a ./openbas-api/target/openbas-api.jar release/openbas/ && cp -a ./openbas-api/src/main/resources/application.properties release/openbas/
       - run:
-          working_directory: ~/openex_musl/release
-          command: tar -zcvf "openex-$(date '+%Y%m%d')_musl.tar.gz" openex
+          working_directory: ~/openbas_musl/release
+          command: tar -zcvf "openbas-$(date '+%Y%m%d')_musl.tar.gz" openbas
       - run:
-          working_directory: ~/openex_musl/release
-          command: curl -usamuel.hassine@filigran.io:$JFROG_TOKEN -T openex-$(date '+%Y%m%d')_musl.tar.gz "https://filigran.jfrog.io/artifactory/openex/openex-$(date '+%Y%m%d')_musl.tar.gz"
+          working_directory: ~/openbas_musl/release
+          command: curl -usamuel.hassine@filigran.io:$JFROG_TOKEN -T openbas-$(date '+%Y%m%d')_musl.tar.gz "https://filigran.jfrog.io/artifactory/openbas/openbas-$(date '+%Y%m%d')_musl.tar.gz"
       - slack/notify:
           event: fail
           template: basic_fail_1
@@ -136,7 +136,7 @@ jobs:
       - run: kubectl --server=https://api.staging.eu-west.filigran.io --token=$K8S_TOKEN -n customer-testing rollout restart deployment
 
   docker_build_platform:
-    working_directory: ~/openex_docker
+    working_directory: ~/openbas_docker
     machine:
       image: ubuntu-2004:202111-02
       resource_class: large
@@ -164,8 +164,8 @@ jobs:
           name: Login
           command: echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
       - run:
-          name: Build Docker image openex/platform
-          command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openexhq/platform:latest -t openexhq/platform:${CIRCLE_TAG} --push .
+          name: Build Docker image openbas/platform
+          command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openbas/platform:latest -t openbas/platform:${CIRCLE_TAG} --push .
           no_output_timeout: 30m
       - slack/notify:
           event: fail
@@ -175,7 +175,7 @@ jobs:
           webhook_url: $MS_TEAMS_WEBHOOK_URL
 
   docker_build_platform_rolling:
-    working_directory: ~/openex_docker
+    working_directory: ~/openbas_docker
     machine:
       image: ubuntu-2004:202111-02
       resource_class: large
@@ -204,9 +204,9 @@ jobs:
           name: Login
           command: echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
       - run:
-          working_directory: ~/openex_docker
-          name: Build Docker image openex/platform
-          command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openexhq/platform:rolling --push .
+          working_directory: ~/openbas_docker
+          name: Build Docker image openbas/platform
+          command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openbas/platform:rolling --push .
           no_output_timeout: 30
       - slack/notify:
           event: fail
@@ -239,7 +239,7 @@ jobs:
           webhook_url: $MS_TEAMS_WEBHOOK_URL
 
 workflows:
-  openex:
+  ²:
     jobs:
       - build_frontend:
           filters:

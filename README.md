@@ -6,7 +6,7 @@
   <a href="https://drone.filigran.io/OpenBAS-Platform/openbas"><img src="https://drone.filigran.io/api/badges/OpenBAS-Platform/openbas/status.svg" /></a>
   <a href="https://codecov.io/gh/OpenBAS-Platform/openbas"><img src="https://codecov.io/gh/OpenBAS-Platform/openbas/graph/badge.svg" /></a>
   <a href="https://deepscan.io/dashboard#view=project&tid=11710&pid=14631&bid=276803"><img src="https://deepscan.io/api/teams/11710/projects/14631/branches/276803/badge/grade.svg" alt="DeepScan grade"></a>
-  <a href="https://hub.docker.com/u/openbashq" alt="Docker pulls"><img src="https://img.shields.io/docker/pulls/openbashq/platform" /></a>
+  <a href="https://hub.docker.com/u/openbas" alt="Docker pulls"><img src="https://img.shields.io/docker/pulls/openbas/platform" /></a>
 </p>
 
 ## Introduction
