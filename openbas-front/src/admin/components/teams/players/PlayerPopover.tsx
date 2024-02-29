@@ -1,8 +1,7 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useContext, useState } from 'react';
 import { Dialog as MuiDialog, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import Dialog from '../../../../components/common/Dialog';
-import { updateTeamPlayers } from '../../../../actions/teams/team-actions';
 import { deletePlayer, updatePlayer } from '../../../../actions/User';
 import PlayerForm from './PlayerForm';
 import { useFormatter } from '../../../../components/i18n';
@@ -13,18 +12,17 @@ import { countryOption, Option, organizationOption, tagOptions } from '../../../
 import { useHelper } from '../../../../store';
 import type { OrganizationsHelper, TagsHelper, UsersHelper } from '../../../../actions/helper';
 import type { PlayerInputForm, UserStore } from './Player';
+import { TeamContext } from '../../components/Context';
 
 interface PlayerPopoverProps {
   user: UserStore;
   teamId?: string;
-  teamUsersIds?: string[];
   anchorEl?: string[];
 }
 
 const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   user,
   teamId,
-  teamUsersIds,
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -39,6 +37,8 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
       };
     },
   );
+
+  const { onRemoveUsersTeam } = useContext(TeamContext);
 
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -91,12 +91,9 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
 
   const handleCloseRemove = () => setOpenRemove(false);
 
-  const submitRemove = () => {
-    return dispatch(
-      updateTeamPlayers(teamId!, {
-        team_users: teamUsersIds?.filter((id) => id !== user.user_id) || [],
-      }),
-    ).then(() => handleCloseRemove());
+  const submitRemove = async () => {
+    await onRemoveUsersTeam(teamId!, [user.user_id]);
+    handleCloseRemove();
   };
 
   const initialValues: PlayerInputForm = {

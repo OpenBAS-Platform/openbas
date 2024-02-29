@@ -1,30 +1,30 @@
-import React, { useState } from 'react';
+import { makeStyles } from '@mui/styles';
+import React, { useContext, useState } from 'react';
 import * as R from 'ramda';
 import { Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Fab, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { Add, GroupsOutlined } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
-import { truncate } from '../../../../utils/String';
-import ItemTags from '../../../../components/ItemTags';
-import TagsFilter from '../../../../components/TagsFilter';
+import { Add, PersonOutlined } from '@mui/icons-material';
+import type { Organization, Team } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { OrganizationsHelper } from '../../../../actions/helper';
-import { fetchTeams } from '../../../../actions/teams/team-actions';
-import SearchFilter from '../../../../components/SearchFilter';
-import CreateTeam from './CreateTeam';
-import type { Organization, Team } from '../../../../utils/api-types';
-import type { TeamStore } from '../../../../actions/teams/Team';
+import type { OrganizationsHelper, UsersHelper } from '../../../../actions/helper';
+import type { UserStore } from '../../teams/players/Player';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import { fetchPlayers } from '../../../../actions/User';
 import type { Option } from '../../../../utils/Option';
-import type { TeamsHelper } from '../../../../actions/teams/team-helper';
+import SearchFilter from '../../../../components/SearchFilter';
+import TagsFilter from '../../../../components/TagsFilter';
+import { resolveUserName, truncate } from '../../../../utils/String';
+import ItemTags from '../../../../components/ItemTags';
+import CreatePlayer from '../../teams/players/CreatePlayer';
+import Transition from '../../../../components/common/Transition';
+import { TeamContext } from '../Context';
 
 const useStyles = makeStyles(() => ({
   createButton: {
     position: 'fixed',
     bottom: 30,
-    right: 230,
+    right: 30,
   },
   box: {
     width: '100%',
@@ -38,69 +38,74 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  addedTeamIds: Team['team_id'][];
-  onAddTeams: (teamIds: Team['team_id'][]) => Promise<void>,
+  addedUsersIds: UserStore['user_id'][];
+  teamId: Team['team_id']
 }
 
-interface TeamStoreExtended extends TeamStore {
+interface UserStoreExtended extends UserStore {
   organization_name: Organization['organization_name'];
   organization_description: Organization['organization_description']
 }
 
-const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
+const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [keyword, setKeyword] = useState('');
-  const [teamIds, setTeamIds] = useState<Team['team_id'][]>([]);
+  const [usersIds, setUsersIds] = useState<UserStore['user_id'][]>([]);
   const [tags, setTags] = useState<Option[]>([]);
 
-  const { teamsMap, organizationsMap }: {
+  const { onAddUsersTeam } = useContext(TeamContext);
+
+  const { usersMap, organizationsMap }: {
     organizationsMap: Record<string, Organization>,
-    teamsMap: Record<string, TeamStore>
-  } = useHelper((helper: TeamsHelper & OrganizationsHelper) => ({
-    teamsMap: helper.getTeamsMap(),
+    usersMap: Record<string, UserStore>
+  } = useHelper((helper: UsersHelper & OrganizationsHelper) => ({
+    usersMap: helper.getUsersMap(),
     organizationsMap: helper.getOrganizationsMap(),
   }));
 
   useDataLoader(() => {
-    dispatch(fetchTeams());
+    dispatch(fetchPlayers());
   });
 
-  const submitAddTeams = async () => {
-    await onAddTeams(teamIds);
-    setOpen(false);
-  };
-
-  const filterByKeyword = (n: TeamStoreExtended) => keyword === ''
-    || (n.team_name || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-    || (n.team_description || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+  const filterByKeyword = (n: UserStoreExtended) => keyword === ''
+    || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+    || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+    || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+    || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
     || (n.organization_name || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
     || (n.organization_description || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
-  const filteredTeams = R.pipe(
-    R.filter((u: TeamStore) => !(u.team_contextual && !addedTeamIds.includes(u.team_id))),
-    R.map((u: TeamStore) => ({
+  const filteredUsers = R.pipe(
+    R.map((u: UserStore) => ({
       organization_name:
-        u.team_organization ? (organizationsMap[u.team_organization]?.organization_name ?? '-') : '-',
+        u.user_organization ? (organizationsMap[u.user_organization]?.organization_name ?? '-') : '-',
       organization_description:
-        u.team_organization ? (organizationsMap[u.team_organization]?.organization_description
+        u.user_organization ? (organizationsMap[u.user_organization]?.organization_description
           ?? '-') : '-',
       ...u,
     })),
     R.filter(
-      (n: TeamStoreExtended) => tags.length === 0
+      (n: UserStoreExtended) => tags.length === 0
         || R.any(
-          (filter: Option['id']) => R.includes(filter, n.team_tags),
+          (filter: Option['id']) => R.includes(filter, n.user_tags),
           R.pluck('id', tags),
         ),
     ),
     R.filter(filterByKeyword),
     R.take(10),
-  )(R.values(teamsMap));
+  )(R.values(usersMap));
+
+  const submitAddUsers = async () => {
+    await onAddUsersTeam(teamId, usersIds);
+    setOpen(false);
+    setKeyword('');
+    setUsersIds([]);
+  };
 
   return (
-    <>
+    <div>
       <Fab
         onClick={() => setOpen(true)}
         color="primary"
@@ -115,7 +120,7 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
         onClose={() => {
           setOpen(false);
           setKeyword('');
-          setTeamIds([]);
+          setUsersIds([]);
         }}
         fullWidth={true}
         maxWidth="lg"
@@ -127,7 +132,7 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
           },
         }}
       >
-        <DialogTitle>{t('Add teams')}</DialogTitle>
+        <DialogTitle>{t('Add players in this team')}</DialogTitle>
         <DialogContent>
           <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
             <Grid item={true} xs={8}>
@@ -142,7 +147,7 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
                   <TagsFilter
                     onAddTag={(value: Option) => {
                       if (value) {
-                        setTags([...tags, value]);
+                        setTags([value]);
                       }
                     }}
                     onClearTag={() => setTags([])}
@@ -152,48 +157,48 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
                 </Grid>
               </Grid>
               <List>
-                {filteredTeams.map((team: TeamStoreExtended) => {
-                  const disabled = teamIds.includes(team.team_id)
-                    || addedTeamIds.includes(team.team_id);
+                {filteredUsers.map((user: UserStoreExtended) => {
+                  const disabled = usersIds.includes(user.user_id)
+                    || addedUsersIds.includes(user.user_id);
                   return (
                     <ListItem
-                      key={team.team_id}
+                      key={user.user_id}
                       disabled={disabled}
                       button={true}
                       divider={true}
                       dense={true}
-                      onClick={() => setTeamIds([...teamIds, team.team_id])}
+                      onClick={() => setUsersIds([...usersIds, user.user_id])}
                     >
                       <ListItemIcon>
-                        <GroupsOutlined />
+                        <PersonOutlined />
                       </ListItemIcon>
                       <ListItemText
-                        primary={team.team_name}
-                        secondary={team.organization_name}
+                        primary={resolveUserName(user)}
+                        secondary={user.organization_name}
                       />
-                      <ItemTags variant="list" tags={team.team_tags} />
+                      <ItemTags variant="list" tags={user.user_tags} />
                     </ListItem>
                   );
                 })}
-                <CreateTeam
+                <CreatePlayer
                   inline={true}
-                  onCreate={(teamId) => setTeamIds([...teamIds, teamId])}
+                  onCreate={(userId) => setUsersIds([...usersIds, userId])}
                 />
               </List>
             </Grid>
             <Grid item={true} xs={4}>
               <Box className={classes.box}>
-                {teamIds.map((teamId) => {
-                  const team = teamsMap[teamId];
-                  const teamGravatar = R.propOr('-', 'team_gravatar', team);
+                {usersIds.map((userId) => {
+                  const user = usersMap[userId];
+                  const userGravatar = R.propOr('-', 'user_gravatar', user);
                   return (
                     <Chip
-                      key={teamId}
+                      key={userId}
                       onDelete={() => {
-                        setTeamIds(teamIds.splice(teamIds.indexOf(teamId), 1));
+                        setUsersIds(usersIds.splice(usersIds.indexOf(userId), 1));
                       }}
-                      label={truncate(team.team_name, 22)}
-                      avatar={<Avatar src={teamGravatar} sx={{ height: '32px', width: '32px' }} />}
+                      label={truncate(resolveUserName(user), 22)}
+                      avatar={<Avatar src={userGravatar} sx={{ height: '32px', width: '32px' }} />}
                       classes={{ root: classes.chip }}
                     />
                   );
@@ -206,16 +211,16 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
           <Button onClick={() => {
             setOpen(false);
             setKeyword('');
-            setTeamIds([]);
+            setUsersIds([]);
           }}
           >{t('Cancel')}</Button>
-          <Button color="secondary" onClick={submitAddTeams}>
+          <Button color="secondary" onClick={submitAddUsers}>
             {t('Add')}
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </div>
   );
 };
 
-export default AddTeams;
+export default TeamAddPlayers;

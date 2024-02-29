@@ -409,11 +409,12 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
             />
             <ListItemSecondaryAction>
               {permissions.canWrite
-                ? (<PlayerPopover
+                ? (
+                  <PlayerPopover
                     user={user}
                     teamId={teamId}
-                    teamUsersIds={users.map((u) => u.user_id)}
-                   />)
+                  />
+                )
                 : <span> &nbsp; </span>
               }
             </ListItemSecondaryAction>
@@ -422,10 +423,12 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
       </List>
       {
         permissions.canWrite
-        && (<TeamAddPlayers
-          teamId={teamId}
-          teamUsersIds={users.map((u) => u.user_id)}
-            />)
+        && (
+          <TeamAddPlayers
+            teamId={teamId}
+            addedUsersIds={users.map((u) => u.user_id)}
+          />
+        )
       }
     </>
   );

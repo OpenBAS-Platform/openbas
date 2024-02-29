@@ -3,6 +3,7 @@ import type { ScenarioStore } from './scenarios/Scenario';
 
 export interface UsersHelper {
   getMe: () => User;
+  getUsersMap: () => Record<string, User>;
 }
 
 export interface OrganizationsHelper {
