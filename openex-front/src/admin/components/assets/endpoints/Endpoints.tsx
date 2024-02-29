@@ -3,6 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import { ComputerOutlined, FileDownloadOutlined } from '@mui/icons-material';
 import { CSVLink } from 'react-csv';
+import { differenceInHours } from 'date-fns';
 import EndpointCreation from './EndpointCreation';
 import EndpointPopover from './EndpointPopover';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -18,6 +19,7 @@ import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import TagsFilter from '../../../../components/TagsFilter';
 import type { EndpointStore } from './Endpoint';
 import ItemTags from '../../../../components/ItemTags';
+import AssetStatus from '../AssetStatus';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -46,6 +48,12 @@ const useStyles = makeStyles(() => ({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+  },
+  downloadButton: {
+    position: 'relative',
+    left: '490px',
+    border: 'solid 0.5px grey',
+    borderRadius: '5px',
   },
 }));
 
@@ -82,7 +90,13 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
   },
   asset_tags: {
     float: 'left',
-    width: '20%',
+    width: '10%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  asset_status: {
+    float: 'left',
+    width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -102,7 +116,10 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '20%',
   },
   asset_tags: {
-    width: '20%',
+    width: '10%',
+  },
+  asset_status: {
+    width: '10%',
   },
 };
 
@@ -131,6 +148,8 @@ const Endpoints = () => {
 
   const sortedEndpoints: EndpointStore[] = filtering.filterAndSort(endpoints);
 
+  const MAX_ALIVE_HOURS = 6;
+
   return (
     <>
       <div className={classes.parameters}>
@@ -146,7 +165,7 @@ const Endpoints = () => {
             currentTags={filtering.tags}
           />
         </div>
-        <div style={{ marginRight: '15px' }}>
+        <div className={classes.downloadButton}>
           {sortedEndpoints.length > 0 ? (
             <CSVLink
               data={exportData(
@@ -167,14 +186,14 @@ const Endpoints = () => {
               filename={'Endpoints.csv'}
             >
               <Tooltip title={t('Export this list')}>
-                <IconButton size="large">
-                  <FileDownloadOutlined color="primary" />
+                <IconButton>
+                  <FileDownloadOutlined color="primary"/>
                 </IconButton>
               </Tooltip>
             </CSVLink>
           ) : (
-            <IconButton size="large" disabled>
-              <FileDownloadOutlined />
+            <IconButton disabled>
+              <FileDownloadOutlined/>
             </IconButton>
           )}
         </div>
@@ -229,6 +248,12 @@ const Endpoints = () => {
                   true,
                   inlineStylesHeaders,
                 )}
+                {filtering.buildHeader(
+                  'asset_status',
+                  'Status',
+                  false,
+                  inlineStylesHeaders,
+                )}
               </div>
             }
           />
@@ -274,13 +299,19 @@ const Endpoints = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.asset_tags}
                   >
-                    <ItemTags variant="list" tags={endpoint.asset_tags} />
+                    <ItemTags variant="list" tags={endpoint.asset_tags}/>
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.asset_status}
+                  >
+                    <AssetStatus variant="list" status={(endpoint.asset_last_seen && differenceInHours(new Date().toISOString(), endpoint.asset_last_seen) > MAX_ALIVE_HOURS) ? 'Active' : 'Inactive'}/>
                   </div>
                 </div>
               }
             />
             <ListItemSecondaryAction>
-              <EndpointPopover endpoint={endpoint} />
+              <EndpointPopover endpoint={endpoint}/>
             </ListItemSecondaryAction>
           </ListItem>
         ))}

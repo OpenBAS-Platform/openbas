@@ -212,6 +212,8 @@ const i18n = {
       Detection: 'Détection',
       Detections: 'Détections',
       Assets: 'Actifs',
+      Active: 'Actif',
+      Inactive: 'Inactif',
       Persons: 'Personnes',
       Taxonomies: 'Taxonomies',
       'Attack patterns': "Motifs d'attaque",
