@@ -22,7 +22,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.StreamSupport.stream;
+import static lombok.AccessLevel.NONE;
 
 @Getter
 @Entity
@@ -57,17 +59,19 @@ public class User implements Base {
   @JsonProperty("user_lastname")
   private String lastname;
 
+  @Getter(NONE)
   @Setter
   @Column(name = "user_lang")
   @JsonProperty("user_lang")
   private String lang = LANG_AUTO;
 
+  @Getter(NONE)
   @Setter
   @Column(name = "user_theme")
   @JsonProperty("user_theme")
   private String theme = THEME_DEFAULT;
 
-  @Setter
+  @Getter(NONE)
   @Column(name = "user_email")
   @JsonProperty("user_email")
   @NotBlank
@@ -179,11 +183,19 @@ public class User implements Base {
   private List<ComcheckStatus> comcheckStatuses = new ArrayList<>();
 
   public String getLang() {
-    return Optional.ofNullable(this.lang).orElse(LANG_AUTO);
+    return ofNullable(this.lang).orElse(LANG_AUTO);
   }
 
   public String getTheme() {
-    return Optional.ofNullable(this.theme).orElse(THEME_DEFAULT);
+    return ofNullable(this.theme).orElse(THEME_DEFAULT);
+  }
+
+  public String getEmail() {
+    return ofNullable(this.email).map(String::toLowerCase).orElse(null);
+  }
+
+  public void setEmail(final String email) {
+    this.email = ofNullable(email).map(String::toLowerCase).orElseThrow(() -> new IllegalArgumentException("Email can't be null"));
   }
 
   private transient List<Inject> injects = new ArrayList<>();
