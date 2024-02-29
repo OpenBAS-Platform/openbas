@@ -1,7 +1,5 @@
 package io.openbas.database.model;
 
-import io.openbas.database.model.Exercise;
-
 import java.time.Instant;
 import java.util.Optional;
 

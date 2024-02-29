@@ -1,6 +1,5 @@
 package io.openbas.service;
 
-import io.openbas.helper.StreamHelper;
 import io.openbas.database.model.Asset;
 import io.openbas.database.repository.AssetRepository;
 import jakarta.validation.constraints.NotBlank;
@@ -9,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static io.openbas.helper.StreamHelper.fromIterable;
 
 @RequiredArgsConstructor
 @Service
@@ -21,7 +22,7 @@ public class AssetService {
   }
 
   public List<Asset> assets(@NotBlank final List<String> assetIds) {
-    return StreamHelper.fromIterable(this.assetRepository.findAllById(assetIds));
+    return fromIterable(this.assetRepository.findAllById(assetIds));
   }
 
   public List<Asset> assetsFromTypes(@NotNull final List<String> types) {

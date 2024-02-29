@@ -1,6 +1,5 @@
 package io.openbas.service;
 
-import io.openbas.helper.StreamHelper;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.EndpointRepository;
 import jakarta.validation.constraints.NotBlank;
@@ -12,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static io.openbas.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
 
 @RequiredArgsConstructor
@@ -40,7 +40,7 @@ public class AssetEndpointService {
   }
 
   public List<Endpoint> endpoints() {
-    return StreamHelper.fromIterable(this.endpointRepository.findAll());
+    return fromIterable(this.endpointRepository.findAll());
   }
 
   public Endpoint updateEndpoint(@NotNull final Endpoint endpoint) {

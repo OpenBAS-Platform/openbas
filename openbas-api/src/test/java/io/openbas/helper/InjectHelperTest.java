@@ -1,6 +1,5 @@
 package io.openbas.helper;
 
-import io.openbas.helper.InjectHelper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;

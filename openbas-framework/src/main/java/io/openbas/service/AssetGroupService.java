@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static io.openbas.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
 
 @RequiredArgsConstructor
@@ -28,11 +29,11 @@ public class AssetGroupService {
   }
 
   public List<AssetGroup> assetGroups() {
-    return StreamHelper.fromIterable(this.assetGroupRepository.findAll());
+    return fromIterable(this.assetGroupRepository.findAll());
   }
 
   public List<AssetGroup> assetGroups(@NotBlank final List<String> assetGroupIds) {
-    return StreamHelper.fromIterable(this.assetGroupRepository.findAllById(assetGroupIds));
+    return fromIterable(this.assetGroupRepository.findAllById(assetGroupIds));
   }
 
   public AssetGroup assetGroup(@NotBlank final String assetGroupId) {
@@ -48,7 +49,7 @@ public class AssetGroupService {
       @NotNull final AssetGroup assetGroup,
       @NotNull final List<String> assetIds) {
     Iterable<Asset> assets = this.assetService.assetFromIds(assetIds);
-    assetGroup.setAssets(StreamHelper.fromIterable(assets));
+    assetGroup.setAssets(fromIterable(assets));
     assetGroup.setUpdatedAt(now());
     return this.assetGroupRepository.save(assetGroup);
   }

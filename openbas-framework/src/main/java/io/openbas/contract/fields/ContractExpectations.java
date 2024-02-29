@@ -1,14 +1,15 @@
 package io.openbas.contract.fields;
 
-import io.openbas.contract.ContractCardinality;
 import io.openbas.contract.ContractType;
 import io.openbas.model.inject.form.Expectation;
-import lombok.Getter;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+
 import java.util.List;
+
+import static io.openbas.contract.ContractCardinality.Multiple;
 
 @Getter
 public class ContractExpectations extends ContractCardinalityElement {
@@ -19,7 +20,7 @@ public class ContractExpectations extends ContractCardinalityElement {
       @NotBlank final String key,
       @NotBlank final String label,
       @NotNull final List<Expectation> expectations) {
-    super(key, label, ContractCardinality.Multiple);
+    super(key, label, Multiple);
     this.predefinedExpectations = expectations;
   }
 
