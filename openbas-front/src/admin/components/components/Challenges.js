@@ -202,7 +202,7 @@ const Challenges = () => {
                 )}
                 {filtering.buildHeader(
                   'challenge_exercises',
-                  'Exercises',
+                  'Simulations',
                   true,
                   headerStyles,
                 )}

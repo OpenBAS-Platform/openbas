@@ -112,7 +112,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to delete this exercise?')}
+            {t('Do you want to delete this simulation?')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -130,7 +130,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
-        <DialogTitle>{t('Update the exercise')}</DialogTitle>
+        <DialogTitle>{t('Update the simulation')}</DialogTitle>
         <DialogContent>
           <ExerciseForm
             initialValues={initialValues}
@@ -146,7 +146,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         onClose={handleCloseExport}
         PaperProps={{ elevation: 1 }}
       >
-        <DialogTitle>{t('Export the exercise')}</DialogTitle>
+        <DialogTitle>{t('Export the simulation')}</DialogTitle>
         <DialogContent>
           <TableContainer>
             <Table aria-label="export table" size="small">

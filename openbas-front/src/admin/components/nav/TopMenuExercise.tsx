@@ -46,7 +46,7 @@ const TopMenuExercise: React.FC = () => {
         classes={{ root: classes.buttonHome }}
       >
         <RowingOutlined className={classes.icon} fontSize="small" />
-        {t('Exercises')}
+        {t('Simulations')}
       </Button>
       <ArrowForwardIosOutlined
         color="primary"

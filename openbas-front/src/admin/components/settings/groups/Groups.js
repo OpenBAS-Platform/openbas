@@ -400,7 +400,7 @@ class Groups extends Component {
                       {group.group_default_exercise_observer ? (
                         <Tooltip
                           title={t(
-                            'This group will have observer permission on new exercises.',
+                            'This group will have observer permission on new simulations.',
                           )}
                         >
                           <CheckCircleOutlined fontSize="small" />
@@ -416,7 +416,7 @@ class Groups extends Component {
                       {group.group_default_exercise_planner ? (
                         <Tooltip
                           title={t(
-                            'This group will have planner permission on new exercises.',
+                            'This group will have planner permission on new simulations.',
                           )}
                         >
                           <CheckCircleOutlined fontSize="small" />

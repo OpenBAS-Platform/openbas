@@ -95,7 +95,7 @@ const ExerciseHeader = () => {
           maxWidth="xs"
           PaperProps={{ elevation: 1 }}
         >
-          <DialogTitle>{t('Add tags to this exercise')}</DialogTitle>
+          <DialogTitle>{t('Add tags to this simulation')}</DialogTitle>
           <DialogContent>
             <Form
               keepDirtyOnReinitialize

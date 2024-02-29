@@ -92,7 +92,7 @@ const AnimationMenu: React.FC<Props> = ({ exerciseId }) => {
           <ListItemIcon>
             <NoteAltOutlined />
           </ListItemIcon>
-          <ListItemText primary={t('Exercise logs')} />
+          <ListItemText primary={t('Simulation logs')} />
         </MenuItem>
       </MenuList>
     </Drawer>

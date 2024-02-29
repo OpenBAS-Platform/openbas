@@ -61,7 +61,7 @@ const DocumentForm = (props) => {
           <ExerciseField
             name="document_exercises"
             values={values}
-            label={t('Exercises')}
+            label={t('Simulations')}
             setFieldValue={form.mutators.setValue}
             style={{ marginTop: 20 }}
           />

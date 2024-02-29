@@ -181,7 +181,7 @@ const Dashboard = (props) => {
               <div className={classes.icon}>
                 <RowingOutlined color="primary" fontSize="large" />
               </div>
-              <div className={classes.title}>{t('Exercises')}</div>
+              <div className={classes.title}>{t('Simulations')}</div>
               <div className={classes.number}>
                 {statistics?.exercises_count?.global_count ?? '-'}
               </div>
@@ -254,7 +254,7 @@ const Dashboard = (props) => {
           </Card>
         </Grid>
         <Grid item={true} xs={6}>
-          <Typography variant="h4">{t('Recent exercises')}</Typography>
+          <Typography variant="h4">{t('Recent simulations')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.list }}>
             {exercises.length > 0 ? (
               <List style={{ paddingTop: 0 }}>
@@ -305,7 +305,7 @@ const Dashboard = (props) => {
                 ))}
               </List>
             ) : (
-              <Empty message={t('No exercises in this platform.')} />
+              <Empty message={t('No simulations in this platform.')} />
             )}
           </Paper>
         </Grid>
@@ -384,7 +384,7 @@ const Dashboard = (props) => {
         </Grid>
         <Grid item={true} xs={6}>
           <Typography variant="h4">
-            {t('Organizations distribution across exercises')}
+            {t('Organizations distribution across simulations')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
             {topOrganizations.length > 0 ? (

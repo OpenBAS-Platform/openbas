@@ -206,7 +206,7 @@ const Dashboard = () => {
           {(report.report_stats_definition
             || report.report_stats_definition_score) && (
             <Typography variant="h1" style={{ marginTop: 40 }}>
-              {t('Exercise definition and scenario')}
+              {t('Simulation definition and scenario')}
             </Typography>
           )}
           {report.report_stats_definition && (
@@ -226,7 +226,7 @@ const Dashboard = () => {
           )}
           {report.report_stats_data && (
             <Typography variant="h1" style={{ marginTop: 60 }}>
-              {t('Exercise data')}
+              {t('Simulation data')}
             </Typography>
           )}
           {report.report_stats_data && (
@@ -240,7 +240,7 @@ const Dashboard = () => {
           )}
           {report.report_stats_results && (
             <Typography variant="h1" style={{ marginTop: 60 }}>
-              {t('Exercise results')}
+              {t('Simulation results')}
             </Typography>
           )}
           {report.report_stats_results && (

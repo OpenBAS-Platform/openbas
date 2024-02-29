@@ -531,7 +531,7 @@ class GroupPopover extends Component {
               <Table selectable={false} size="small">
                 <TableHead adjustForCheckbox={false} displaySelectAll={false}>
                   <TableRow>
-                    <TableCell>{t('Exercise')}</TableCell>
+                    <TableCell>{t('Simulation')}</TableCell>
                     <TableCell style={{ textAlign: 'center' }}>
                       {t('Read/Write')}
                     </TableCell>

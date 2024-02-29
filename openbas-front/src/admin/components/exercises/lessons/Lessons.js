@@ -194,7 +194,7 @@ const Lessons = () => {
             <div className={classes.icon}>
               <SpeakerNotesOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
-            <div className={classes.title}>{t('Exercise logs')}</div>
+            <div className={classes.title}>{t('Simulation logs')}</div>
             <div className={classes.number}>
               {exercise.exercise_logs_number}
             </div>
@@ -512,9 +512,9 @@ const Lessons = () => {
               subject: t('[${exercise.name}] Lessons learned questionnaire'),
               body: `${t('Hello')},<br /><br />${t(
                 // eslint-disable-next-line no-template-curly-in-string
-                'We would like thank your for your participation in this exercise. You are kindly requested to fill this lessons learned questionnaire: <a href="${lessons_uri}">${lessons_uri}</a>.',
+                'We would like thank your for your participation in this simulation. You are kindly requested to fill this lessons learned questionnaire: <a href="${lessons_uri}">${lessons_uri}</a>.',
               )}<br /><br />${t('Best regards')},<br />${t(
-                'The exercise control team',
+                'The simulation control team',
               )}`,
             }}
             handleClose={() => setOpenSendLessons(false)}

@@ -69,7 +69,7 @@ class CreateExercise extends Component {
           maxWidth="md"
           PaperProps={{ elevation: 1 }}
         >
-          <DialogTitle>{t('Create a new exercise')}</DialogTitle>
+          <DialogTitle>{t('Create a new simulation')}</DialogTitle>
           <DialogContent>
             <ExerciseForm
               onSubmit={this.onSubmit.bind(this)}

@@ -55,25 +55,25 @@ const ReportForm = (props) => {
             <Grid item={true} xs={6}>
               <CheckboxField
                 name="report_stats_definition"
-                label={t('Exercise definition statistics')}
+                label={t('Simulation definition statistics')}
               />
             </Grid>
             <Grid item={true} xs={6}>
               <CheckboxField
                 name="report_stats_definition_score"
-                label={t('Exercise definition scores')}
+                label={t('Simulation definition scores')}
               />
             </Grid>
             <Grid item={true} xs={6}>
               <CheckboxField
                 name="report_stats_data"
-                label={t('Exercise data statistics')}
+                label={t('Simulation data statistics')}
               />
             </Grid>
             <Grid item={true} xs={6}>
               <CheckboxField
                 name="report_stats_results"
-                label={t('Exercise results statistics')}
+                label={t('Simulation results statistics')}
               />
             </Grid>
             <Grid item={true} xs={6}>

@@ -480,7 +480,7 @@ const Timeline = () => {
                 })}
               </List>
             ) : (
-              <Empty message={t('No pending injects in this exercise.')} />
+              <Empty message={t('No pending injects in this simulation.')} />
             )}
           </Paper>
         </Grid>
@@ -543,7 +543,7 @@ const Timeline = () => {
                 ))}
               </List>
             ) : (
-              <Empty message={t('No processed injects in this exercise.')} />
+              <Empty message={t('No processed injects in this simulation.')} />
             )}
           </Paper>
         </Grid>

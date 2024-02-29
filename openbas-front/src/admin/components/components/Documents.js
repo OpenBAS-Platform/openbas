@@ -332,7 +332,7 @@ class Documents extends Component {
                 <div>
                   {this.sortHeader('document_name', 'Name', true)}
                   {this.sortHeader('document_description', 'Description', true)}
-                  {this.sortHeader('document_exercises', 'Exercises', true)}
+                  {this.sortHeader('document_exercises', 'Simulations', true)}
                   {this.sortHeader('document_scenarios', 'Scenarios', true)}
                   {this.sortHeader('document_type', 'Type', true)}
                   {this.sortHeader('document_tags', 'Tags', true)}

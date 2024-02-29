@@ -168,7 +168,7 @@ const Exercises = () => {
                 sortedExercises,
                 tagsMap,
               )}
-              filename={`${t('Exercises')}.csv`}
+              filename={`${t('Simulations')}.csv`}
             >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">

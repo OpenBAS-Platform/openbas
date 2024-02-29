@@ -195,7 +195,7 @@ const Scenario = () => {
         <Grid item xs={6} style={{ paddingBottom: 24 }}>
           <Typography variant="h4">{t('Execution')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <Typography variant="h3">{t('Create an exercise')}</Typography>
+            <Typography variant="h3">{t('Instantiate a simulation')}</Typography>
             <Button
               variant="contained"
               startIcon={<PlayArrowOutlined />}
@@ -235,7 +235,7 @@ const Scenario = () => {
       >
         <DialogContent>
           <DialogContentText>
-            {t('Create an exercise from this scenario')}
+            {t('Instantiate a simulation from this scenario')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
