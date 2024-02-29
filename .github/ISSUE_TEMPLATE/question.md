@@ -9,7 +9,7 @@ assignees: ''
 
 ## Prerequisites
 
-- [ ] I read the [Deployment and Setup](https://docs.openex.io/latest/deployment/overview) section of the OpenBAS documentation as well as the [Troubleshooting](https://docs.openex.io/latest/deployment/troubleshooting) page and didn't find anything relevant to my problem.
+- [ ] I read the [Deployment and Setup](https://docs.openbas.io/latest/deployment/overview) section of the OpenBAS documentation as well as the [Troubleshooting](https://docs.openbas.io/latest/deployment/troubleshooting) page and didn't find anything relevant to my problem.
 - [ ] I went through old GitHub issues and couldn't find anything relevant
 - [ ] I googled the issue and didn't find anything relevant
 

@@ -51,9 +51,9 @@ public class AppConfig {
         .info(new Info().title("OpenBAS API")
             .description("Software under open source licence designed to plan and conduct exercises")
             .version(this.openBASConfig.getVersion())
-            .license(new License().name("Apache 2.0").url("https://www.openex.io/")))
+            .license(new License().name("Apache 2.0").url("https://filigran.io//")))
         .externalDocs(new ExternalDocumentation()
             .description("OpenBAS documentation")
-            .url("https://docs.openex.io/"));
+            .url("https://docs.openbas.io/"));
   }
 }

@@ -103,9 +103,9 @@ services:
       MINIO_PORT: 9000
       MINIO_ACCESS_KEY: minioadmin
       MINIO_ACCESS_SECRET: minioadmin
-      OPENEX_ADMIN_EMAIL: admin@openex.io
-      OPENEX_ADMIN_PASSWORD: admin
-      OPENEX_ADMIN_TOKEN: 0d17ce9a-f3a8-4c6d-9721-c98dc3dc023f
+      OPENBAS_ADMIN_EMAIL: admin@openbas.io
+      OPENBAS_ADMIN_PASSWORD: admin
+      OPENBAS_ADMIN_TOKEN: 0d17ce9a-f3a8-4c6d-9721-c98dc3dc023f
     commands:
       - apt update && apt install -y gnupg
       - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -

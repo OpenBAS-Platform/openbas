@@ -1,6 +1,6 @@
 package io.openbas.service;
 
-import io.openbas.config.OpenBASCOnfig;
+import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Injection;
 import io.openbas.database.model.User;
@@ -23,7 +23,7 @@ import static io.openbas.contract.variables.VariableHelper.*;
 public class ExecutionContextService {
 
   @Resource
-  private final OpenBASCOnfig openBASCOnfig;
+  private final OpenBASConfig openBASCOnfig;
 
   private final VariableRepository variableRepository;
 
