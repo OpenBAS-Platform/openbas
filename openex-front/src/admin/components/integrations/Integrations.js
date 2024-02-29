@@ -1,17 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { makeStyles } from "@mui/styles";
-import * as R from "ramda";
-import {
-  Chip,
-  Grid,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Pagination,
-  Paper,
-  Typography,
-} from "@mui/material";
+import React, { useEffect, useState } from 'react';
+import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
+import { Chip, Grid, List, ListItem, ListItemIcon, ListItemText, Pagination, Paper, Typography } from '@mui/material';
 import {
   CastForEducationOutlined,
   DescriptionOutlined,
@@ -21,20 +11,20 @@ import {
   TextFieldsOutlined,
   TitleOutlined,
   ToggleOnOutlined,
-} from "@mui/icons-material";
-import { useFormatter } from "../../../components/i18n";
-import { fetchPageOfContracts } from "../../../actions/Inject";
-import SearchFilter from "../../../components/SearchFilter";
+} from '@mui/icons-material';
+import { useFormatter } from '../../../components/i18n';
+import { fetchPageOfContracts } from '../../../actions/Inject';
+import SearchFilter from '../../../components/SearchFilter';
 
 const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
   },
   paper: {
-    position: "relative",
+    position: 'relative',
     padding: 0,
-    overflow: "hidden",
-    height: "100%",
+    overflow: 'hidden',
+    height: '100%',
   },
   parameters: {
     marginTop: -10,
@@ -100,7 +90,7 @@ const Integrations = () => {
       textSearch,
     };
 
-    const sort = ["type", "label"];
+    const sort = ['type', 'label'];
 
     fetchPageOfContracts(
       contractSearchInput,
@@ -117,14 +107,14 @@ const Integrations = () => {
   return (
     <div className={classes.root}>
       <div className={classes.parameters}>
-        <div style={{ float: "left", marginRight: 10 }}>
+        <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
             variant="small"
             onChange={handleTextSearch}
             keyword={textSearch}
           />
         </div>
-        <div style={{ float: "right", marginRight: 10 }}>
+        <div style={{ float: 'right', marginRight: 10 }}>
           <Pagination
             count={numberOfPages}
             page={page}
@@ -153,8 +143,8 @@ const Integrations = () => {
                     <Chip
                       size="small"
                       sx={{ height: 15, fontSize: 10 }}
-                      label={field.mandatory ? t("Mandatory") : t("Optional")}
-                      color={field.mandatory ? "secondary" : "primary"}
+                      label={field.mandatory ? t('Mandatory') : t('Optional')}
+                      color={field.mandatory ? 'secondary' : 'primary'}
                     />
                   </ListItem>
                 ))}
