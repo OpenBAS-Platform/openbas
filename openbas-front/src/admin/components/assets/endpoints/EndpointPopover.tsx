@@ -102,6 +102,7 @@ const EndpointPopover: React.FC<Props> = ({
           ev.stopPropagation();
           setAnchorEl(ev.currentTarget);
         }}
+        aria-label={`endpoint menu for ${endpoint.asset_name}`}
         aria-haspopup="true"
         size="large"
       >
