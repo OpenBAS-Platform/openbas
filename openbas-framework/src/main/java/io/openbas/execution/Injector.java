@@ -2,16 +2,13 @@ package io.openbas.execution;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openbas.model.Expectation;
-import io.openbas.model.expectation.ChallengeExpectation;
-import io.openbas.model.expectation.ChannelExpectation;
-import io.openbas.model.expectation.ManualExpectation;
-import io.openbas.model.expectation.TechnicalExpectation;
 import io.openbas.contract.Contract;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
+import io.openbas.model.Expectation;
+import io.openbas.model.expectation.*;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
@@ -81,6 +78,10 @@ public abstract class Injector {
             case CHALLENGE -> expectationExecution.setChallenge(((ChallengeExpectation) expectation).getChallenge());
             case DOCUMENT -> expectationExecution.setType(EXPECTATION_TYPE.DOCUMENT);
             case TEXT -> expectationExecution.setType(EXPECTATION_TYPE.TEXT);
+            case DETECTION -> {
+                DetectionExpectation detectionExpectation = (DetectionExpectation) expectation;
+                expectationExecution.setDetection(detectionExpectation.getAsset(), detectionExpectation.getAssetGroup());
+            }
             case TECHNICAL -> {
                 TechnicalExpectation technicalExpectation = (TechnicalExpectation) expectation;
                 expectationExecution.setTechnical(technicalExpectation.getAsset(), technicalExpectation.getAssetGroup());

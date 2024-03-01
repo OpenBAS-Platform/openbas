@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Objects;
 
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.TECHNICAL;
@@ -20,11 +19,15 @@ public class TechnicalExpectation implements Expectation {
 
   private Integer score;
   private Asset asset;
-  private List<Asset> assets;
   private AssetGroup assetGroup;
   private boolean expectationGroup;
 
   private TechnicalExpectation() {}
+
+  @Override
+  public EXPECTATION_TYPE type() {
+    return TECHNICAL;
+  }
 
   public static TechnicalExpectation technicalExpectationForAsset(
       @Nullable final Integer score,
@@ -46,11 +49,6 @@ public class TechnicalExpectation implements Expectation {
     technicalExpectation.setAssetGroup(assetGroup);
     technicalExpectation.setExpectationGroup(expectationGroup);
     return technicalExpectation;
-  }
-
-  @Override
-  public EXPECTATION_TYPE type() {
-    return TECHNICAL;
   }
 
 }

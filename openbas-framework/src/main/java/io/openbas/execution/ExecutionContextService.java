@@ -1,4 +1,4 @@
-package io.openbas.service;
+package io.openbas.execution;
 
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Exercise;

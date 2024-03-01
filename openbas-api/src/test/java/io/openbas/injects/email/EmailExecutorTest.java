@@ -12,7 +12,7 @@ import io.openbas.execution.ExecutionContext;
 import io.openbas.injects.email.model.EmailContent;
 import io.openbas.model.inject.form.Expectation;
 import io.openbas.service.ContractService;
-import io.openbas.service.ExecutionContextService;
+import io.openbas.execution.ExecutionContextService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

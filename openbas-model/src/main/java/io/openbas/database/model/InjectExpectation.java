@@ -29,6 +29,7 @@ public class InjectExpectation implements Base {
     CHALLENGE,
     MANUAL,
     TECHNICAL,
+    DETECTION,
   }
 
   @Setter
@@ -156,6 +157,14 @@ public class InjectExpectation implements Base {
       @NotNull final Asset asset,
       @NotNull final AssetGroup assetGroup) {
     this.type = EXPECTATION_TYPE.TECHNICAL;
+    this.asset = asset;
+    this.assetGroup = assetGroup;
+  }
+
+  public void setDetection(
+      @NotNull final Asset asset,
+      @NotNull final AssetGroup assetGroup) {
+    this.type = EXPECTATION_TYPE.DETECTION;
     this.asset = asset;
     this.assetGroup = assetGroup;
   }

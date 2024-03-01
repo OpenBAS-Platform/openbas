@@ -1,11 +1,13 @@
 import React, { FunctionComponent, SyntheticEvent, useEffect } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, FormControlLabel, FormLabel, InputLabel, MenuItem, Radio, RadioGroup, Select as MUISelect, TextField as MuiTextField } from '@mui/material';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import type { ExpectationInput } from './Expectation';
-import { formProps, infoMessage, isTechnicalExpectation } from './ExpectationFormUtils';
+import { formProps, infoMessage } from './ExpectationFormUtils';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
+import { hasExpectationByGroup } from './ExpectationUtils';
+import ExpectationGroupField from './field/ExpectationGroupField';
 
 const useStyles = makeStyles((theme: Theme) => ({
   marginTop_2: {
@@ -138,26 +140,8 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         inputProps={register('expectation_score')}
       />
 
-      {isTechnicalExpectation(initialValues)
-        && <Controller
-          control={control}
-          name="expectation_expectation_group"
-          render={({ field: { onChange, value } }) => (
-            <div className={classes.marginTop_2}>
-              <FormLabel>{t('Validation mode')}</FormLabel>
-              <RadioGroup
-                defaultValue={false}
-                value={value}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  onChange((event.target as HTMLInputElement).value === 'true');
-                }}
-              >
-                <FormControlLabel value={false} control={<Radio />} label={t('All assets (per group) must validate the expectation')} />
-                <FormControlLabel value={true} control={<Radio />} label={t('At least one asset (per group) must validate the expectation')} />
-              </RadioGroup>
-            </div>
-          )}
-           />
+      {hasExpectationByGroup(initialValues)
+        && <ExpectationGroupField control={control} />
       }
 
       <div className={classes.buttons}>

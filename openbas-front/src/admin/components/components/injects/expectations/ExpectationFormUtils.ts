@@ -22,7 +22,3 @@ export const formProps = (initialValues: ExpectationInput, t: (key: string) => s
   })),
   defaultValues: initialValues,
 });
-
-export const isTechnicalExpectation = (expectation: ExpectationInput) => {
-  return expectation.expectation_type === 'TECHNICAL';
-};
