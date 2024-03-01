@@ -14,12 +14,22 @@
   "prConcurrentLimit": 2,
   "packageRules": [
     {
-      "matchUpdateTypes": ["minor"],
+      "matchUpdateTypes": [
+        "minor"
+      ],
       "prPriority": 5
     },
     {
-      "matchPackagePatterns": ["react-apexcharts", "org.flywaydb:flyway-core"],
+      "matchPackagePatterns": [
+        "react-apexcharts",
+        "org.flywaydb:flyway-core"
+      ],
       "commitMessage": "[DANGER] Do not merge, breaking changes incoming"
     }
-  ]
+  ],
+  "schedule": [
+    "after 10pm and before 5am every weekday",
+    "every weekend"
+  ],
+  "updateNotScheduled": false
 }
