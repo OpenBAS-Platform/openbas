@@ -11,7 +11,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.injects.email.model.EmailContent;
 import io.openbas.model.inject.form.Expectation;
-import io.openbas.service.ContractService;
+import io.openbas.contract.ContractService;
 import io.openbas.service.ExecutionContextService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;

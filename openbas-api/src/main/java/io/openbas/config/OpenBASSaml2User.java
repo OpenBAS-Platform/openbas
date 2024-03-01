@@ -41,4 +41,9 @@ public class OpenBASSaml2User implements OpenBASPrincipal, Saml2AuthenticatedPri
     return user.isAdmin();
   }
 
+  @Override
+  public String getLang() {
+    return user.getLang();
+  }
+
 }

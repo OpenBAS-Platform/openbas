@@ -32,6 +32,11 @@ public class OpenBASOidcUser implements OpenBASPrincipal, OidcUser {
   }
 
   @Override
+  public String getLang() {
+    return user.getLang();
+  }
+
+  @Override
   public Map<String, Object> getClaims() {
     return getAttributes();
   }

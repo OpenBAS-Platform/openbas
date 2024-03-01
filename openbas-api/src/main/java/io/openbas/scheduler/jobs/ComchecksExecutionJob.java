@@ -12,7 +12,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.injects.email.EmailContract;
 import io.openbas.injects.email.EmailExecutor;
-import io.openbas.service.ContractService;
+import io.openbas.contract.ContractService;
 import io.openbas.service.ExecutionContextService;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
