@@ -20,7 +20,7 @@ const ImportUploaderExercise: React.FC<Props> = () => {
   };
 
   return (
-    <ImportUploader title={'Import an exercise'} handleUpload={handleUpload} />
+    <ImportUploader title={'Import a simulation'} handleUpload={handleUpload} />
   );
 };
 

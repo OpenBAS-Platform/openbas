@@ -142,7 +142,7 @@ const Dashboard = () => {
       </Grid>
       <br />
       <Typography variant="h1" style={{ marginTop: 10 }}>
-        {t('Exercise definition and scenario')}
+        {t('Simulation definition and scenario')}
       </Typography>
       <DashboardDefinitionStatistics
         teams={teams}
@@ -156,7 +156,7 @@ const Dashboard = () => {
         challengesMap={challengesMap}
       />
       <Typography variant="h1" style={{ marginTop: 60 }}>
-        {t('Exercise data')}
+        {t('Simulation data')}
       </Typography>
       <DashboardDataStatistics
         teams={teams}
@@ -166,7 +166,7 @@ const Dashboard = () => {
         communications={communications}
       />
       <Typography variant="h1" style={{ marginTop: 60 }}>
-        {t('Exercise results')}
+        {t('Simulation results')}
       </Typography>
       <DashboardResultsStatistics
         usersMap={usersMap}

@@ -5,7 +5,7 @@ const TopMenuExercises = () => {
   const entries: MenuEntry[] = [
     {
       path: '/admin/exercises',
-      label: 'Exercises',
+      label: 'Simulations',
     },
   ];
   return <TopMenu entries={entries} />;

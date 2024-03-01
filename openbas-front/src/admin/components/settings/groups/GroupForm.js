@@ -111,7 +111,7 @@ class GroupForm extends Component {
                 <Grid container spacing={3}>
                   <Grid item xs={12}>
                     <Typography variant="h2" style={{ marginBottom: 0 }}>
-                      {t('Exercise')}
+                      {t('Simulation')}
                     </Typography>
                   </Grid>
                   <Grid item xs={6} style={{ display: 'flex' }}>
@@ -121,7 +121,7 @@ class GroupForm extends Component {
                     />
                     <Tooltip
                       title={t(
-                        'This group will have observer permission on new exercises.',
+                        'This group will have observer permission on new simulations.',
                       )}
                     >
                       <InfoOutlined
@@ -138,7 +138,7 @@ class GroupForm extends Component {
                     />
                     <Tooltip
                       title={t(
-                        'This group will have planner permission on new exercises.',
+                        'This group will have planner permission on new simulations.',
                       )}
                     >
                       <InfoOutlined

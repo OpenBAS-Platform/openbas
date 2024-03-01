@@ -85,7 +85,7 @@ const Logs = () => {
       <AnimationMenu exerciseId={exerciseId} />
       <div>
         <Typography variant="h4" style={{ float: 'left' }}>
-          {t('Exercise logs')}
+          {t('Simulation logs')}
         </Typography>
         {isExerciseUpdatable(exercise, true) && (
           <IconButton

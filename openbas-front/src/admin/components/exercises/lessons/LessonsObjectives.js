@@ -122,7 +122,7 @@ const LessonsObjectives = ({
               ))}
             </List>
           ) : (
-            <Empty message={t('No objectives in this exercise.')} />
+            <Empty message={t('No objectives in this simulation.')} />
           )}
         </Paper>
       </Grid>
@@ -142,7 +142,7 @@ const LessonsObjectives = ({
           ) : (
             <Empty
               message={t(
-                'No data to display or the exercise has not started yet',
+                'No data to display or the simulation has not started yet',
               )}
             />
           )}

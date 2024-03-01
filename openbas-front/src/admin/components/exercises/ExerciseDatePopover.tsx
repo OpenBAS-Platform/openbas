@@ -52,7 +52,7 @@ const ExerciseDatePopover: React.FC<Props> = ({ exercise }) => {
         onClose={() => setOpenEdit(false)}
         PaperProps={{ elevation: 1 }}
       >
-        <DialogTitle>{t('Update the exercise')}</DialogTitle>
+        <DialogTitle>{t('Update the simulation')}</DialogTitle>
         <DialogContent>
           <ExerciseDateForm
             initialValues={initialValues}

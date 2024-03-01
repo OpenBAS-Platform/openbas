@@ -405,7 +405,7 @@ const Exercise = () => {
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Alert severity="info">
               {t(
-                'Before starting the exercise, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.',
+                'Before starting the simulation, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.',
               )}
             </Alert>
             <CreateControl exerciseId={exerciseId} variant="buttons" />
@@ -495,7 +495,7 @@ const Exercise = () => {
                 ))}
               </List>
             ) : (
-              <Empty message={t('No dryrun in this exercise.')} />
+              <Empty message={t('No dryrun in this simulation.')} />
             )}
           </Paper>
         </Grid>
@@ -565,7 +565,7 @@ const Exercise = () => {
                 ))}
               </List>
             ) : (
-              <Empty message={t('No comcheck in this exercise.')} />
+              <Empty message={t('No comcheck in this simulation.')} />
             )}
           </Paper>
         </Grid>
@@ -578,7 +578,7 @@ const Exercise = () => {
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to change the status of this exercise?')}
+            {t('Do you want to change the status of this simulation?')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

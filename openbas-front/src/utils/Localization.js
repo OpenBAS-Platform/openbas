@@ -2,8 +2,6 @@
 const i18n = {
   messages: {
     fr: {
-      'OpenBAS - Crisis management exercises platform':
-        'OpenBAS - Plateforme d’exercices de crise',
       'Email address': 'Adresse email',
       Password: 'Mot de passe',
       'Password validation': 'Validation du mot de passe',
@@ -20,7 +18,6 @@ const i18n = {
       'Login with microsoft': "S'identifier avec microsoft",
       Continue: 'Continuer',
       Dashboard: 'Tableau de bord',
-      Exercises: 'Exercices',
       Players: 'Joueurs',
       Organizations: 'Organisations',
       Documents: 'Documents',
@@ -53,13 +50,13 @@ const i18n = {
       'Switch to player mode': 'Basculer en mode joueur',
       'Create a new channel': 'Créer un nouveau canal',
       'Update the channel': 'Modifier le canal',
-      'Recent exercises': 'Exercices récents',
+      'Recent simulations': 'Simulations récents',
       'No teams.': 'Aucune équipe.',
-      'No exercises in this platform.': 'Aucun exercice dans cette plateforme.',
+      'No simulations in this platform.': 'Aucune simulations dans cette plateforme.',
       'Injects distribution': 'Distribution des stimulis',
       'Next injects to send': 'Prochains stimlis à envoyer',
-      'Organizations distribution across exercises':
-        'Distribution des organisations dans les exercices',
+      'Organizations distribution across simulations':
+        'Distribution des organisations dans les simulations',
       'Players distribution': 'Distribution des joueurs',
       'Inject context': 'Contexte du stimuli',
       'added an entry on': 'a ajouté une entrée le',
@@ -89,7 +86,7 @@ const i18n = {
       'Targeted players': 'Joueurs ciblés',
       'Inject details': 'Détails du stimuli',
       'Export this list': 'Exporter cette liste',
-      'Create a new exercise': 'Créer un nouvel exercice',
+      'Create a new simulation': 'Créer une nouvelle simulation',
       'Create a new scenario': 'Créer un nouveau scenario',
       'Do you want to delete this team?':
         'Souhaitez-vous supprimer cette team ?',
@@ -149,7 +146,6 @@ const i18n = {
         'Souhaitez-vous supprimer ce groupe ?',
       'No tag': 'Aucun tag',
       'Update the user': "Modifier l'utilisateur",
-      Exercise: 'Exercice',
       'Read/Write': 'Lecture/Ecriture',
       'Read Only': 'Lecture Seule',
       'Update the group': 'Modifier le groupe',
@@ -236,7 +232,7 @@ const i18n = {
       'Create a new inject': 'Créer un nouveau stimuli',
       'Remove from the team': "Retirer de l'équipe",
       'Update the team': "Modifier l'équipe",
-      'Update the exercise': "Modifier l'exercice",
+      'Update the simulation': 'Modifier la simulation',
       'Update the scenario': 'Modifier le scenario',
       'Update the inject': 'Modifier le stimuli',
       'Do you want to remove the player from the team?':
@@ -247,34 +243,32 @@ const i18n = {
       'Remove from the element': "Retirer de l'élément",
       'Do you want to remove the team from the inject?':
         "Souhaitez-vous retirer l'équipe du stimuli ?",
-      'Do you want to delete this exercise?':
-        'Souhaitez-vous supprimer cet exercice ?',
+      'Do you want to delete this simulation?':
+        'Souhaitez-vous supprimer cette simulation ?',
       'Number of injects': 'Nombre de stimulis',
       'No organizations in this platform':
         'Aucune organisation dans cette plateforme.',
       'No injects to send in this platform.':
         'Aucun stimuli à envoyer dans cette plateforme.',
-      'Before starting the exercise, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.':
-        "Avant de démarrer l’exercice, vous pouvez lancer une vérification pour valider les adresses emails et une simulation pour envoyer les stimulis à l'équipe d’animation.",
-      'Applying a template will add all categories and questions of the selected template to this exercise.':
-        'Appliquer un template va ajouter toutes les catégories et questions du template sélectionné à cet exercice.',
+      'Before starting the simulation, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.':
+        "Avant de démarrer la simulation, vous pouvez lancer une vérification pour valider les adresses emails et une simulation pour envoyer les stimulis à l'équipe d’animation.",
       'Apply a template': 'Appliquer un template',
       'Auto assign': 'Auto assignation',
       'Auto observer': 'Auto observateur',
       'Auto planner': 'Auto planificateur',
       'The new users will automatically be assigned to this group.':
         'Les nouveaux utilisateurs seront automatiquement assignés à ce groupe.',
-      'This group will have observer permission on new exercises.':
-        "Ce groupe aura la permission d'observateur sur les nouveaux exercices.",
-      'This group will have planner permission on new exercises.':
-        'Ce groupe aura la permission de planificateur sur les nouveaux exercices.',
+      'This group will have observer permission on new simulations.':
+        "Ce groupe aura la permission d'observateur sur les nouvelles simulations.",
+      'This group will have planner permission on new simulations.':
+        'Ce groupe aura la permission de planificateur sur les nouvelles simulations.',
       'Processed injects': 'Stimulis traités',
       'Pending injects': 'Stimulis en attente',
       'No team': 'Aucune équipe',
-      'No processed injects in this exercise.':
-        'Aucun stimuli traité dans cet exercice.',
-      'No pending injects in this exercise.':
-        'Aucun stimuli en attente dans cet exercice.',
+      'No processed injects in this simulation.':
+        'Aucun stimuli traité dans cette simulation.',
+      'No pending injects in this simulation.':
+        'Aucun stimuli en attente dans cette simulation.',
       'Add media pressure in this inject':
         'Ajouter de la pression médiatique dans ce stimuli',
       'External ID': 'ID externe',
@@ -327,8 +321,8 @@ const i18n = {
       m: 'm',
       h: 'h',
       d: 'j',
-      'Do you want to change the status of this exercise?':
-        'Souhaitez-vous changer le statut de cet exercice ?',
+      'Do you want to change the status of this simulation?':
+        'Souhaitez-vous changer le statut de cette simulation ?',
       Confirm: 'Confirmer',
       Text: 'Texte',
       'Sender email address': "Adresse email de l'expéditeur",
@@ -378,19 +372,19 @@ const i18n = {
       Reports: 'Rapports',
       '[${exercise.name}] Communication check':
         '[${exercise.name}] Vérification des moyens de communication',
-      'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message: <a href="${comcheck.url}">${comcheck.url}</a>.':
-        'Ceci est une vérification des moyens de communication avant le début de l\'exercice. Merci de bien vouloir cliquer sur le lien ci-dessous afin de confirmer que vous avez reçu ce message avec succès : <a href="${comcheck.url}">${comcheck.url}</a>.',
-      'We would like thank your for your participation in this exercise. You are kindly requested to fill this lessons learned questionnaire: <a href="${lessons_uri}">${lessons_uri}</a>.':
-        "Nous souhaitons vous remercier pour votre participation à l'exercice. Vous êtes cordialement invités à remplir le formulaire de retour d'expérience : <a href=\"${lessons_uri}\">${lessons_uri}</a>.",
+      'This is a communication check before the beginning of the simulation. Please click on the following link in order to confirm you successfully received this message: <a href="${comcheck.url}">${comcheck.url}</a>.':
+        'Ceci est une vérification des moyens de communication avant le début de la simulation. Merci de bien vouloir cliquer sur le lien ci-dessous afin de confirmer que vous avez reçu ce message avec succès : <a href="${comcheck.url}">${comcheck.url}</a>.',
+      'We would like thank your for your participation in this simulation. You are kindly requested to fill this lessons learned questionnaire: <a href="${lessons_uri}">${lessons_uri}</a>.':
+        "Nous souhaitons vous remercier pour votre participation à la simulation. Vous êtes cordialement invités à remplir le formulaire de retour d'expérience : <a href=\"${lessons_uri}\">${lessons_uri}</a>.",
       '[${exercise.name}] Lessons learned questionnaire':
         "[${exercise.name}] Questionnaire de retour d'expérience",
       'Best regards': 'Bien cordialement',
-      'The exercise control team': "L'équipe d'animation de l'exercice",
+      'The simulation control team': "L'équipe d'animation de la simulation",
       'Do you want to launch a new dryrun?':
         'Souhaitez-vous lancer une nouvelle simulation ?',
-      'Add tags to this exercise': 'Ajouter des tags à cet exercice',
+      'Add tags to this simulation': 'Ajouter des tags à cette simulation',
       'Add tags to this scenario': 'Ajouter des tags à ce scenario',
-      'No comcheck in this exercise.': 'Aucune vérification dans cet exercice',
+      'No comcheck in this simulation.': 'Aucune vérification dans cette simulation',
       'There is nothing to see here...': "Il n'y a rien à voir ici...",
       'Send the lessons learned questionnaire':
         "Envoyer le questionnaire de retour d'expérience",
@@ -424,17 +418,16 @@ const i18n = {
       'of which': 'dont',
       'contain comments': 'contiennent des commentaires',
       'Verification done at': 'Vérification faite le',
-      'No dryrun in this exercise.': 'Aucune simulation dans cet exercice.',
-      'No objectives in this exercise.': 'Aucun objectif dans cet exercice.',
+      'No dryrun in this simulation.': 'Aucune simulation dans cette simulation.',
+      'No objectives in this simulation.': 'Aucun objectif dans cette simulation.',
       'There is no evaluation for this objective yet': 'Il n’y a pas encore d’évaluation pour cet objectif',
-      'No polls in this exercise.': 'Aucun sondage dans cet exercice',
       'Do you want to delete this dryrun?':
         'Souhaitez-vous supprimer cette simulation ?',
       'Overall objectives score': 'Score global des objectifs',
       'Do you want to delete this poll?':
         'Souhaitez-vous supprimer ce sondage ?',
       'Update the poll': 'Modifier le sondage',
-      'Exercise logs': "Journal d'exercice",
+      'Simulation logs': 'Journal de la simulation',
       'Poll replies': 'Réponses au sondage',
       Overview: 'Aperçu',
       Objectives: 'Objectifs',
@@ -471,9 +464,9 @@ const i18n = {
       'Disable attachment': 'Désativer la pièce jointe',
       'Do you want to remove the document from the element?':
         'Souhaitez-vous retirer ce document de cet élément ?',
-      'Import an exercise': 'Importer un exercice',
+      'Import a simulation': 'Importer une simulation',
       Export: 'Exporter',
-      'Export the exercise': 'Exporter cet exercice',
+      'Export the simulation': 'Exporter cette simulation',
       'Export the scenario': 'Exporter ce scenario',
       'Reset to default values': 'Réinitialiser les valeurs par défaut',
       Elements: 'Eléments',
@@ -577,8 +570,8 @@ const i18n = {
       VALUE_CASE: 'Texte (sensible à la casse)',
       REGEXP: 'Expression régulière',
       'No category': 'Aucune catégorie',
-      'No challenge in this exercise yet.':
-        'Encore aucun challenge dans cet exercice.',
+      'No challenge in this simulation yet.':
+        'Encore aucun challenge dans cette simulation.',
       'Distribution of expectations by team':
         'Distribution des attendus par équipe',
       'Distribution of expectations by inject type':
@@ -612,10 +605,10 @@ const i18n = {
       // -- Expectation end --
       'Distribution of expected total score by team':
         'Distribution du score total attendu par équipe',
-      'Exercise definition and scenario':
-        "Définition de l'exercice et scénario",
-      'Exercise results': "Résultats de l'exercice",
-      'Exercise data': "Données de l'exercice",
+      'Simulation definition and scenario':
+        'Définition de la simulation et scénario',
+      'Simulation results': 'Résultats de la simulation',
+      'Simulation data': 'Données de la simulation',
       'Distribution of total score by team':
         'Distribution du score total par équipe',
       'Distribution of total score by organization':
@@ -634,8 +627,8 @@ const i18n = {
       'Distribution of mails by inject': 'Distribution des mails par stimuli',
       'Sent injects over time': 'Stimulis envoyés dans le temps',
       'Sent mails over time': 'Emails envoyés dans le temps',
-      'No data to display or the exercise has not started yet':
-        "Aucune donnée disponible ou l'exercice n'a pas encore commencé",
+      'No data to display or the simulation has not started yet':
+        "Aucune donnée disponible ou la simulation n'a pas encore commencé",
       'Back to administration': "Retour à l'administration",
       'Teams scores over time': 'Score des équipes dans le temps',
       'Inject types scores over time':
@@ -703,10 +696,10 @@ const i18n = {
       Questionnaire: 'Questionnaire',
       User: 'Utilisateur',
       'General information': 'Informations générales',
-      'Exercise definition statistics': 'Statistiques de la définition de l’exercice',
-      'Exercise definition scores': 'Scores de la définition de l’exercice',
-      'Exercise data statistics': 'Statistiques des données de l’exercice',
-      'Exercise results statistics': 'Statistiques des résultats de l’exercice',
+      'Simulation definition statistics': 'Statistiques de la définition de la simulation',
+      'Simulation definition scores': 'Scores de la définition de la simulation',
+      'Simulation data statistics': 'Statistiques des données de la simulation',
+      'Simulation results statistics': 'Statistiques des résultats de la simulation',
       'Lessons learned objectives': 'Objectifs des leçons apprises',
       'Lessons learned statistics': 'Statistiques des leçons apprises',
       'Lessons learned details': 'Détails des leçons apprises',
@@ -770,8 +763,8 @@ const i18n = {
       'Phone number invalid': 'Numéro de téléphone invalide',
       phone_number_tooltip: 'Le numéro de téléphone devrait commencer par un signe plus ( + )\n'
         + 'Il peut contenir des espaces ou des tirets ( – ) ou des parenthèses.\n',
-      'Create an exercise': 'Créer un nouvel exercise',
-      'Create an exercise from this scenario': 'Créer un nouvel exercise depuis ce scenario',
+      'Instantiate a simulation': 'Créer une nouvelle simulation',
+      'Instantiate a simulation from this scenario': 'Créer une nouvelle simulation depuis ce scenario',
     },
     en: {
       openbas_email: 'Email',

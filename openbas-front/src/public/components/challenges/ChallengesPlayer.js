@@ -289,7 +289,7 @@ const ChallengesPlayer = () => {
           </Typography>
           {challenges.length === 0 && (
             <div style={{ marginTop: 150 }}>
-              <Empty message={t('No challenge in this exercise yet.')} />
+              <Empty message={t('No challenge in this simulation yet.')} />
             </div>
           )}
           {Object.keys(sortedChallenges).map((category) => {

@@ -138,7 +138,7 @@ const DashboardDefinitionScoreStatistics = ({
           ) : (
             <Empty
               message={t(
-                'No data to display or the exercise has not started yet',
+                'No data to display or the simulation has not started yet',
               )}
             />
           )}
@@ -160,7 +160,7 @@ const DashboardDefinitionScoreStatistics = ({
           ) : (
             <Empty
               message={t(
-                'No data to display or the exercise has not started yet',
+                'No data to display or the simulation has not started yet',
               )}
             />
           )}
