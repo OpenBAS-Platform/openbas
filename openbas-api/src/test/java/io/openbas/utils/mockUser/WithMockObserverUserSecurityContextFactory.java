@@ -1,4 +1,4 @@
-package io.openbas.rest.utils;
+package io.openbas.utils.mockUser;
 
 import io.openbas.database.model.Grant;
 import io.openbas.database.model.Group;
@@ -19,13 +19,13 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
-import static io.openbas.database.model.Grant.GRANT_TYPE.PLANNER;
+import static io.openbas.database.model.Grant.GRANT_TYPE.OBSERVER;
 import static io.openbas.service.UserService.buildAuthenticationToken;
 
 @Component
-public class WithMockPlannerUserSecurityContextFactory implements WithSecurityContextFactory<WithMockPlannerUser> {
+public class WithMockObserverUserSecurityContextFactory implements WithSecurityContextFactory<WithMockObserverUser> {
 
-  public static final String MOCK_USER_PLANNER_EMAIL = "planner@opencti.io";
+  public static final String MOCK_USER_OBSERVER_EMAIL = "observer@opencti.io";
   @Autowired
   private GrantRepository grantRepository;
   @Autowired
@@ -34,7 +34,7 @@ public class WithMockPlannerUserSecurityContextFactory implements WithSecurityCo
   private UserRepository userRepository;
 
   @Override
-  public SecurityContext createSecurityContext(WithMockPlannerUser customUser) {
+  public SecurityContext createSecurityContext(WithMockObserverUser customUser) {
     User user = this.userRepository.findByEmailIgnoreCase(customUser.email()).orElseThrow();
     Authentication authentication = buildAuthenticationToken(user);
     SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -44,41 +44,42 @@ public class WithMockPlannerUserSecurityContextFactory implements WithSecurityCo
 
   @PostConstruct
   private void postConstruct() {
-    this.createPlannerMockUser();
+    this.createObserverMockUser();
   }
 
   @PreDestroy
   public void preDestroy() {
-    this.userRepository.deleteById(this.userRepository.findByEmailIgnoreCase(MOCK_USER_PLANNER_EMAIL).orElseThrow().getId());
+    this.userRepository.deleteById(this.userRepository.findByEmailIgnoreCase(MOCK_USER_OBSERVER_EMAIL).orElseThrow().getId());
   }
 
-  private void createPlannerMockUser() {
-    if (this.userRepository.findByEmailIgnoreCase(MOCK_USER_PLANNER_EMAIL).isPresent()) {
+  private void createObserverMockUser() {
+    if (this.userRepository.findByEmailIgnoreCase(MOCK_USER_OBSERVER_EMAIL).isPresent()) {
       return;
     }
+
     // Create group
-    String groupName = "Planner group";
+    String groupName = "Observer group";
     Optional<Group> groupOpt = this.groupRepository.findOne(GroupSpecification.fromName(groupName));
     Group group;
     if (groupOpt.isEmpty()) {
       Group newGroup = new Group();
       newGroup.setName(groupName);
-      newGroup.setScenariosDefaultGrants(List.of(PLANNER));
+      newGroup.setScenariosDefaultGrants(List.of(OBSERVER));
       group = this.groupRepository.save(newGroup);
       // Create grant
       Grant grant = new Grant();
-      grant.setName(PLANNER);
+      grant.setName(OBSERVER);
       grant.setGroup(group);
       this.grantRepository.save(grant);
     } else {
       group = groupOpt.get();
     }
     // Create user
-    Optional<User> userOpt = this.userRepository.findByEmailIgnoreCase(MOCK_USER_PLANNER_EMAIL);
+    Optional<User> userOpt = this.userRepository.findByEmailIgnoreCase(MOCK_USER_OBSERVER_EMAIL);
     if (userOpt.isEmpty()) {
       User user = new User();
       user.setGroups(List.of(group));
-      user.setEmail(MOCK_USER_PLANNER_EMAIL);
+      user.setEmail(MOCK_USER_OBSERVER_EMAIL);
       this.userRepository.save(user);
     }
   }

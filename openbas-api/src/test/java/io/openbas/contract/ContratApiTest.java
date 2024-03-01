@@ -1,7 +1,7 @@
 package io.openbas.contract;
 
 import io.openbas.IntegrationTest;
-import io.openbas.utils.WithMockAdminUser;
+import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.fixtures.ContractFixture;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import static io.openbas.rest.utils.JsonUtils.asJsonString;
+import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

@@ -1,4 +1,4 @@
-package io.openbas.utils;
+package io.openbas.utils.mockUser;
 
 import io.openbas.database.model.User;
 import io.openbas.database.repository.UserRepository;

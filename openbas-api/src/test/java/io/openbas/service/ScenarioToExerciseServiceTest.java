@@ -12,15 +12,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.openbas.rest.utils.fixtures.ArticleFixture.ARTICLE_NAME;
-import static io.openbas.rest.utils.fixtures.ArticleFixture.getArticle;
-import static io.openbas.rest.utils.fixtures.DocumentFixture.getDocumentJpeg;
-import static io.openbas.rest.utils.fixtures.InjectFixture.getInjectForEmailContract;
-import static io.openbas.rest.utils.fixtures.ObjectiveFixture.OBJECTIVE_NAME;
-import static io.openbas.rest.utils.fixtures.ObjectiveFixture.getObjective;
-import static io.openbas.rest.utils.fixtures.TagFixture.getTag;
-import static io.openbas.rest.utils.fixtures.TeamFixture.getTeam;
-import static io.openbas.rest.utils.fixtures.UserFixture.getUser;
+import static io.openbas.utils.fixtures.ArticleFixture.ARTICLE_NAME;
+import static io.openbas.utils.fixtures.ArticleFixture.getArticle;
+import static io.openbas.utils.fixtures.DocumentFixture.getDocumentJpeg;
+import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
+import static io.openbas.utils.fixtures.ObjectiveFixture.OBJECTIVE_NAME;
+import static io.openbas.utils.fixtures.ObjectiveFixture.getObjective;
+import static io.openbas.utils.fixtures.TagFixture.getTag;
+import static io.openbas.utils.fixtures.TeamFixture.getTeam;
+import static io.openbas.utils.fixtures.UserFixture.getUser;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest

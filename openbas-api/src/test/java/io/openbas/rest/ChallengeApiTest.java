@@ -9,7 +9,7 @@ import io.openbas.database.repository.ChallengeRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.injects.challenge.model.ChallengeContent;
-import io.openbas.rest.utils.WithMockObserverUser;
+import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.service.ScenarioService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.*;

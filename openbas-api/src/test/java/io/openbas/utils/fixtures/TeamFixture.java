@@ -1,4 +1,4 @@
-package io.openbas.rest.utils.fixtures;
+package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.Team;
 import io.openbas.database.model.User;
