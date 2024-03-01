@@ -4,7 +4,7 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.user.form.login.LoginUserInput;
-import io.openex.rest.user.form.user.CreateUserInput;
+import io.openbas.rest.user.form.user.CreateUserInput;
 import io.openbas.rest.utils.fixtures.UserFixture;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static io.openbas.rest.utils.JsonUtils.asJsonString;
-import static io.openex.rest.utils.fixtures.UserFixture.EMAIL;
+import static io.openbas.rest.utils.fixtures.UserFixture.EMAIL;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
