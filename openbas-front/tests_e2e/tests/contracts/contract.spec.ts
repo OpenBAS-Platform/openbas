@@ -5,7 +5,7 @@ import LeftMenuPage from '../../model/left-menu.page';
 import ContractFormPage from '../../model/contracts/contract-form.page';
 
 test.describe('Contracts', () => {
-  let contractPage: ContractPage ;
+  let contractPage: ContractPage;
   let contractFormPage: ContractFormPage;
 
   test.beforeEach(async ({ page }) => {
@@ -19,7 +19,6 @@ test.describe('Contracts', () => {
     test.setTimeout(7000);
   });
   test('get first page of contract of 10 contracts with searchtext empty and sort by type,label asc', async ({
-    page,
   }) => {
     const contractTitles = contractFormPage.getContractTitles();
     await expect(contractTitles).toHaveCount(10);
@@ -35,17 +34,13 @@ test.describe('Contracts', () => {
 
     await contractPage.goToPreviousPage();
   });
-  test('get 1 page of 3 contract with searchtext : em and sort type,label asc', async ({
-    page,
-  }) => {
+  test('get 1 page of 3 contract with searchtext : em and sort type,label asc', async ({}) => {
     await contractPage.goToSearch();
     await contractPage.fillSearchWith('em');
     const contractTitles = contractFormPage.getContractTitles();
     await expect(contractTitles).toHaveCount(3);
   });
-  test('get 1 page of 3 contract with searchtext : EM and sort type,label asc', async ({
-    page,
-  }) => {
+  test('get 1 page of 3 contract with searchtext : EM and sort type,label asc', async ({}) => {
     await contractPage.goToSearch();
     await contractPage.fillSearchWith('EM');
     const contractTitles = contractFormPage.getContractTitles();

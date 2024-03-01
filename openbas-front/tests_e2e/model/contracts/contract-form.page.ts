@@ -7,7 +7,6 @@ class ContractFormPage {
   getContractTitles() {
     return this.page.getByRole('heading');
   }
-
 }
 
 export default ContractFormPage;

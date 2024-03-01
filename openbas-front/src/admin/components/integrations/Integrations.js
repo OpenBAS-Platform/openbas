@@ -93,10 +93,10 @@ const Integrations = () => {
     const sort = ['type', 'label'];
 
     fetchPageOfContracts(
-        contractSearchInput,
-        page - BACKEND_PAGE_NORMALIZER,
-        PAGE_SIZE,
-        sort,
+      contractSearchInput,
+      page - BACKEND_PAGE_NORMALIZER,
+      PAGE_SIZE,
+      sort,
     ).then((result) => {
       const { data } = result;
       setContracts(data.content);
@@ -105,55 +105,55 @@ const Integrations = () => {
   }, [page, textSearch]);
 
   return (
-      <div className={classes.root}>
-        <div className={classes.parameters}>
-          <div style={{ float: 'left', marginRight: 10 }}>
-            <SearchFilter
-                variant="small"
-                onChange={handleTextSearch}
-                keyword={textSearch}
-            />
-          </div>
-          <div style={{ float: 'right', marginRight: 10 }}>
-            <Pagination
-                count={numberOfPages}
-                page={page}
-                onChange={handlePagination}
-            />
-          </div>
+    <div className={classes.root}>
+      <div className={classes.parameters}>
+        <div style={{ float: 'left', marginRight: 10 }}>
+          <SearchFilter
+            variant="small"
+            onChange={handleTextSearch}
+            keyword={textSearch}
+          />
         </div>
-        <div className="clearfix" />
-        <Grid container={true} spacing={3}>
-          {renderedContracts.map((type) => (
-              <Grid
-                  key={type.contract_id}
-                  item={true}
-                  xs={6}
-                  style={{ marginBottom: 30 }}
-              >
-                <Typography variant="h4">
-                  [{type.ttype}] {type.tname}
-                </Typography>
-                <Paper variant="outlined" classes={{ root: classes.paper }}>
-                  <List style={{ paddingTop: 0 }}>
-                    {type.fields.map((field) => (
-                        <ListItem key={field.key} divider={true} dense={true}>
-                          <ListItemIcon>{iconField(field.type)}</ListItemIcon>
-                          <ListItemText primary={t(field.label)} />
-                          <Chip
-                              size="small"
-                              sx={{ height: 15, fontSize: 10 }}
-                              label={field.mandatory ? t('Mandatory') : t('Optional')}
-                              color={field.mandatory ? 'secondary' : 'primary'}
-                          />
-                        </ListItem>
-                    ))}
-                  </List>
-                </Paper>
-              </Grid>
-          ))}
-        </Grid>
+        <div style={{ float: 'right', marginRight: 10 }}>
+          <Pagination
+            count={numberOfPages}
+            page={page}
+            onChange={handlePagination}
+          />
+        </div>
       </div>
+      <div className="clearfix" />
+      <Grid container={true} spacing={3}>
+        {renderedContracts.map((type) => (
+          <Grid
+            key={type.contract_id}
+            item={true}
+            xs={6}
+            style={{ marginBottom: 30 }}
+          >
+            <Typography variant="h4">
+              [{type.ttype}] {type.tname}
+            </Typography>
+            <Paper variant="outlined" classes={{ root: classes.paper }}>
+              <List style={{ paddingTop: 0 }}>
+                {type.fields.map((field) => (
+                  <ListItem key={field.key} divider={true} dense={true}>
+                    <ListItemIcon>{iconField(field.type)}</ListItemIcon>
+                    <ListItemText primary={t(field.label)} />
+                    <Chip
+                      size="small"
+                      sx={{ height: 15, fontSize: 10 }}
+                      label={field.mandatory ? t('Mandatory') : t('Optional')}
+                      color={field.mandatory ? 'secondary' : 'primary'}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Paper>
+          </Grid>
+        ))}
+      </Grid>
+    </div>
   );
 };
 
