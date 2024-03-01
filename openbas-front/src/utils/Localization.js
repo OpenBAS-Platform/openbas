@@ -232,7 +232,7 @@ const i18n = {
       'Create a new inject': 'Créer un nouveau stimuli',
       'Remove from the team': "Retirer de l'équipe",
       'Update the team': "Modifier l'équipe",
-      'Update the simulation': "Modifier la simulation",
+      'Update the simulation': 'Modifier la simulation',
       'Update the scenario': 'Modifier le scenario',
       'Update the inject': 'Modifier le stimuli',
       'Do you want to remove the player from the team?':
@@ -427,7 +427,7 @@ const i18n = {
       'Do you want to delete this poll?':
         'Souhaitez-vous supprimer ce sondage ?',
       'Update the poll': 'Modifier le sondage',
-      'Simulation logs': "Journal de la simulation",
+      'Simulation logs': 'Journal de la simulation',
       'Poll replies': 'Réponses au sondage',
       Overview: 'Aperçu',
       Objectives: 'Objectifs',
@@ -606,9 +606,9 @@ const i18n = {
       'Distribution of expected total score by team':
         'Distribution du score total attendu par équipe',
       'Simulation definition and scenario':
-        "Définition de la simulation et scénario",
-      'Simulation results': "Résultats de la simulation",
-      'Simulation data': "Données de la simulation",
+        'Définition de la simulation et scénario',
+      'Simulation results': 'Résultats de la simulation',
+      'Simulation data': 'Données de la simulation',
       'Distribution of total score by team':
         'Distribution du score total par équipe',
       'Distribution of total score by organization':
