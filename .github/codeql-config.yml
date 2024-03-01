@@ -1,13 +1,13 @@
 name: "CodeQL config"
 paths:
-  - openex-api/src
-  - openex-front/src
-  - openex-framework/src
-  - openex-model/src
-  - openex-injectors/openex-http/src
-  - openex-injectors/openex-lade/src
-  - openex-injectors/openex-mastodon/src
-  - openex-injectors/openex-ovh/src
-  - openex-injectors/openex-ssh/src
+  - openbas-api/src
+  - openbas-front/src
+  - openbas-framework/src
+  - openbas-model/src
+  - openbas-injectors/openbas-http/src
+  - openbas-injectors/openbas-lade/src
+  - openbas-injectors/openbas-mastodon/src
+  - openbas-injectors/openbas-ovh/src
+  - openbas-injectors/openbas-ssh/src
 paths-ignore:
-  - openex-front/src/static
+  - openbas-front/src/static

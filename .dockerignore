@@ -10,13 +10,13 @@
 *__generated__*
 
 # Frontend
-openex-front/config/development.json
-openex-front/.DS_Store
-openex-front/.env.local
-openex-front/.env.development.local
-openex-front/.env.test.local
-openex-front/.env.production.local
+openbas-front/config/development.json
+openbas-front/.DS_Store
+openbas-front/.env.local
+openbas-front/.env.development.local
+openbas-front/.env.test.local
+openbas-front/.env.production.local
 
 # API
-openex-api/coverage
-openex-api/logs
+openbas-api/coverage
+openbas-api/logs
