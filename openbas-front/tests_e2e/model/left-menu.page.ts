@@ -7,6 +7,9 @@ class LeftMenuPage {
   goToAssets() {
     return this.page.getByLabel('Assets').click();
   }
+  goToContracts() {
+    return this.page.getByLabel('Integrations').click();
+  }
 }
 
 export default LeftMenuPage;
