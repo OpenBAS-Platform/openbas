@@ -1,4 +1,4 @@
-package io.openbas.service;
+package io.openbas.asset;
 
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.EndpointRepository;
@@ -16,7 +16,7 @@ import static java.time.Instant.now;
 
 @RequiredArgsConstructor
 @Service
-public class AssetEndpointService {
+public class EndpointService {
 
   private final EndpointRepository endpointRepository;
 

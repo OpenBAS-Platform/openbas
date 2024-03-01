@@ -29,7 +29,7 @@ steps:
     image: node:20-alpine
     volumes:
     - name: cache-node-frontend
-      path: /drone/src/openbas-front/node_modules    
+      path: /drone/src/openbas-front/node_modules
     commands:
       - cd openbas-front
       - yarn install
@@ -43,7 +43,7 @@ steps:
     image: node:20.11.1
     volumes:
     - name: cache-node-frontend-e2e
-      path: /drone/src/openbas-front/node_modules        
+      path: /drone/src/openbas-front/node_modules
     commands:
       - apt update
       - apt -y install netcat-traditional
@@ -54,7 +54,7 @@ steps:
       - APP_URL=http://app-e2e:8080 yarn test:e2e
     depends_on:
       - frontend-tests
-      
+
   - name: codecov
     image: robertstettner/drone-codecov
     settings:
@@ -65,8 +65,7 @@ steps:
         - openbas-framework/target/site/jacoco/jacoco.xml
         - openbas-injectors/openbas-caldera/target/site/jacoco/jacoco.xml
     depends_on:
-      - api-tests        
-
+      - api-tests
   - name: build-circleci
     image: curlimages/curl
     commands:
@@ -110,7 +109,7 @@ steps:
     depends_on:
       - api-tests
       - frontend-tests
-      - frontend-e2e-tests      
+      - frontend-e2e-tests
 
 services:
   - name: minio
@@ -130,13 +129,13 @@ services:
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
-    command: [ server, /data ]      
+    command: [ server, /data ]
   - name: pgsql-e2e
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: openbas
       POSTGRES_PASSWORD: openbas
-      POSTGRES_DB: openbas      
+      POSTGRES_DB: openbas
   - name: app-e2e
     image: maven:3.9.6-eclipse-temurin-21
     environment:
@@ -165,7 +164,7 @@ services:
       - yarn build
       - cd ..
       - mvn install -DskipTests=true
-      - java -jar openbas-api/target/openbas-api.jar      
+      - java -jar openbas-api/target/openbas-api.jar
 
 volumes:
   - name: cache-node-frontend

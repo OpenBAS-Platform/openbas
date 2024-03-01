@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
 import type { InjectExpectationsStore } from '../../../components/injects/expectations/Expectation';
 import { useFormatter } from '../../../../../components/i18n';
 import { updateInjectExpectation } from '../../../../../actions/Exercise';
@@ -54,7 +55,7 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({
   const dispatch = useAppDispatch();
 
   const isValid = (e: InjectExpectationsStore) => {
-    return e.inject_expectation_result !== null;
+    return !R.isEmpty(e.inject_expectation_results);
   };
 
   const [validated, setValidated] = useState(isValid(expectation));

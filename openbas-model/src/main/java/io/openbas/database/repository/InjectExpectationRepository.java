@@ -1,15 +1,14 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.InjectExpectation;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,16 +38,11 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
                                                @Param("teamIds") List<String> teamIds,
                                                @Param("challengeId") String challengeId);
 
-    @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId and i.asset.id = :assetId")
-    InjectExpectation findTechnicalExpectationForAsset(@Param("exerciseId") String exerciseId, @Param("assetId") String assetId);
+    // -- PREVENTION --
 
-    @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId and i.asset.id IN :assetIds")
-    List<InjectExpectation> findTechnicalExpectationsForAssets(@Param("exerciseId") String exerciseId, @Param("assetIds") List<String> assetIds);
+    @Query(value = "select i from InjectExpectation i where i.type = 'PREVENTION' and i.inject.id = :injectId and i.asset.id = :assetId")
+    InjectExpectation findPreventionExpectationForAsset(@Param("injectId") String injectId, @Param("assetId") String assetId);
 
-    @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId and i.assetGroup.id IN :assetGroupId")
-    InjectExpectation findTechnicalExpectationForAssetGroup(@Param("exerciseId") String exerciseId, @Param("assetGroupId") String assetGroupId);
-
-    @Modifying
-    @Query(value = "delete from InjectExpectation i where i.exercise.id = :exerciseId")
-    void deleteAllForExercise(@Param("exerciseId") String exerciseId);
+    @Query(value = "select i from InjectExpectation i where i.type = 'PREVENTION' and i.inject.id = :injectId and i.assetGroup.id IN :assetGroupId")
+    InjectExpectation findPreventionExpectationForAssetGroup(@Param("injectId") String injectId, @Param("assetGroupId") String assetGroupId);
 }

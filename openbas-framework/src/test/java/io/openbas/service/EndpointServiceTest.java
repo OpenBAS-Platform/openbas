@@ -1,5 +1,7 @@
 package io.openbas.service;
 
+import io.openbas.asset.AssetService;
+import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.Endpoint;
 import org.junit.jupiter.api.*;
@@ -16,10 +18,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class AssetEndpointServiceTest {
+public class EndpointServiceTest {
 
   @Autowired
-  private AssetEndpointService assetEndpointService;
+  private EndpointService endpointService;
   @Autowired
   private AssetService assetService;
 
@@ -40,7 +42,7 @@ public class AssetEndpointServiceTest {
     endpoint.setPlatform(Linux);
 
     // -- EXECUTE --
-    assertThrows(TransactionSystemException.class, () -> this.assetEndpointService.createEndpoint(endpoint));
+    assertThrows(TransactionSystemException.class, () -> this.endpointService.createEndpoint(endpoint));
   }
 
   @DisplayName("Create endpoint succeed")
@@ -62,7 +64,7 @@ public class AssetEndpointServiceTest {
     }});
 
     // -- EXECUTE --
-    Endpoint endpointCreated = this.assetEndpointService.createEndpoint(endpoint);
+    Endpoint endpointCreated = this.endpointService.createEndpoint(endpoint);
     ENDPOINT_ID = endpointCreated.getId();
     assertNotNull(endpointCreated);
     assertNotNull(endpointCreated.getId());
@@ -78,10 +80,10 @@ public class AssetEndpointServiceTest {
     List<Asset> assets = this.assetService.assetsFromTypes(List.of("Endpoint"));
     assertTrue(assets.stream().map(Asset::getId).toList().contains(ENDPOINT_ID));
 
-    Endpoint endpoint = this.assetEndpointService.endpoint(ENDPOINT_ID);
+    Endpoint endpoint = this.endpointService.endpoint(ENDPOINT_ID);
     assertNotNull(endpoint);
 
-    List<Endpoint> endpoints = this.assetEndpointService.endpoints();
+    List<Endpoint> endpoints = this.endpointService.endpoints();
     assertNotNull(endpoints);
     assertTrue(endpoints.stream().map(Endpoint::getId).toList().contains(ENDPOINT_ID));
   }
@@ -91,12 +93,12 @@ public class AssetEndpointServiceTest {
   @Order(4)
   void updateEndpointTest() {
     // -- PREPARE --
-    Endpoint endpoint = this.assetEndpointService.endpoint(ENDPOINT_ID);
+    Endpoint endpoint = this.endpointService.endpoint(ENDPOINT_ID);
     String value = "Professional PC";
     endpoint.setName(value);
 
     // -- EXECUTE --
-    Endpoint endpointUpdated = this.assetEndpointService.updateEndpoint(endpoint);
+    Endpoint endpointUpdated = this.endpointService.updateEndpoint(endpoint);
     assertNotNull(endpoint);
     assertEquals(value, endpointUpdated.getName());
   }
@@ -105,8 +107,8 @@ public class AssetEndpointServiceTest {
   @Test
   @Order(5)
   void deleteEndpointTest() {
-    this.assetEndpointService.deleteEndpoint(ENDPOINT_ID);
-    assertThrows(NoSuchElementException.class, () -> this.assetEndpointService.endpoint(ENDPOINT_ID));
+    this.endpointService.deleteEndpoint(ENDPOINT_ID);
+    assertThrows(NoSuchElementException.class, () -> this.endpointService.endpoint(ENDPOINT_ID));
   }
 
 }

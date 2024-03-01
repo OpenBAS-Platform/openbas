@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import jakarta.persistence.*;
@@ -9,9 +10,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static java.time.Instant.now;
@@ -28,13 +32,15 @@ public class InjectExpectation implements Base {
     ARTICLE,
     CHALLENGE,
     MANUAL,
-    TECHNICAL,
+    PREVENTION,
+    DETECTION,
   }
 
   @Setter
   @Column(name = "inject_expectation_type")
   @JsonProperty("inject_expectation_type")
   @Enumerated(EnumType.STRING)
+  @NotNull
   private EXPECTATION_TYPE type;
 
   // region basic
@@ -58,9 +64,10 @@ public class InjectExpectation implements Base {
   private String description;
 
   @Setter
-  @Column(name = "inject_expectation_result")
-  @JsonProperty("inject_expectation_result")
-  private String result;
+  @Type(JsonType.class)
+  @Column(name = "inject_expectation_results")
+  @JsonProperty("inject_expectation_results")
+  private List<InjectExpectationResult> results = new ArrayList<>();
 
   @Setter
   @Column(name = "inject_expectation_score")
@@ -152,10 +159,18 @@ public class InjectExpectation implements Base {
     this.challenge = challenge;
   }
 
-  public void setTechnical(
+  public void setPrevention(
       @NotNull final Asset asset,
       @NotNull final AssetGroup assetGroup) {
-    this.type = EXPECTATION_TYPE.TECHNICAL;
+    this.type = EXPECTATION_TYPE.PREVENTION;
+    this.asset = asset;
+    this.assetGroup = assetGroup;
+  }
+
+  public void setDetection(
+      @NotNull final Asset asset,
+      @NotNull final AssetGroup assetGroup) {
+    this.type = EXPECTATION_TYPE.DETECTION;
     this.asset = asset;
     this.assetGroup = assetGroup;
   }

@@ -1,6 +1,7 @@
 import { Chip } from '@mui/material';
 import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
 import colorStyles from '../../../../../components/Color';
 import { useFormatter } from '../../../../../components/i18n';
 import type { InjectExpectationsStore } from '../../../components/injects/expectations/Expectation';
@@ -31,11 +32,11 @@ const ResultChip: FunctionComponent<Props> = ({
   const classes = useStyles();
   const { t } = useFormatter();
 
-  const result = expectation.inject_expectation_result !== null;
+  const result = !R.isEmpty(expectation.inject_expectation_results);
 
   const isFail = () => {
     return result
-      && (expectation.inject_expectation_type === 'TECHNICAL'
+      && (expectation.inject_expectation_type === 'PREVENTION'
         && expectation.inject_expectation_expected_score !== expectation.inject_expectation_score);
   };
 
@@ -53,7 +54,7 @@ const ResultChip: FunctionComponent<Props> = ({
     if (expectation.inject_expectation_type === 'CHALLENGE') {
       return t('Pending submission');
     }
-    if (expectation.inject_expectation_type === 'TECHNICAL') {
+    if (expectation.inject_expectation_type === 'PREVENTION' || expectation.inject_expectation_type === 'DETECTION') {
       return t('Pending');
     }
 

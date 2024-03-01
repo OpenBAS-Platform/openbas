@@ -238,10 +238,12 @@ public class ChannelApi extends RestBehavior {
       List<InjectExpectation> expectationExecutions = publishedArticles.stream()
           .flatMap(article -> finalInjects.stream()
               .flatMap(inject -> inject.getUserExpectationsForArticle(user, article).stream()))
-          .filter(exec -> exec.getResult() == null).toList();
+          .filter(exec -> exec.getResults().isEmpty()).toList();
       expectationExecutions.forEach(injectExpectationExecution -> {
         injectExpectationExecution.setUser(user);
-        injectExpectationExecution.setResult(Instant.now().toString());
+        injectExpectationExecution.setResults(List.of(
+            InjectExpectationResult.builder().result(Instant.now().toString()).build()
+        ));
         injectExpectationExecution.setScore(injectExpectationExecution.getExpectedScore());
         injectExpectationExecution.setUpdatedAt(Instant.now());
         injectExpectationExecutionRepository.save(injectExpectationExecution);

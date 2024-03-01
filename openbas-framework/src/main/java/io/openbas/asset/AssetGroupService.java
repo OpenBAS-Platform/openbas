@@ -1,6 +1,5 @@
-package io.openbas.service;
+package io.openbas.asset;
 
-import io.openbas.helper.StreamHelper;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.repository.AssetGroupRepository;

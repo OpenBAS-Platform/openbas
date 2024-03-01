@@ -1,15 +1,15 @@
 import React, { FunctionComponent, useState } from 'react';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined, AssignmentTurnedIn, PublishedWithChangesOutlined } from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
-import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import type { Theme } from '../../../../../components/Theme';
 import InjectAddExpectation from './InjectAddExpectation';
 import { useFormatter } from '../../../../../components/i18n';
 import { truncate } from '../../../../../utils/String';
 import ExpectationPopover from './ExpectationPopover';
 import type { ExpectationInput } from './Expectation';
+import { isAutomatic, typeIcon } from './ExpectationUtils';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -141,20 +141,10 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
   // -- UTILS --
 
   const typeLabel = (type: string) => {
-    if (type === 'ARTICLE') {
+    if (isAutomatic(type)) {
       return t('Automatic');
     }
     return t('Manual');
-  };
-
-  const typeIcon = (type: string) => {
-    if (type === 'TECHNICAL') {
-      return <PublishedWithChangesOutlined />;
-    }
-    if (type === 'ARTICLE') {
-      return <NewspaperVariantMultipleOutline />;
-    }
-    return <AssignmentTurnedIn />;
   };
 
   return (

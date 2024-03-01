@@ -2,6 +2,7 @@ package io.openbas.service;
 
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.InjectExpectation;
+import io.openbas.database.model.InjectExpectationResult;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
@@ -30,7 +31,7 @@ public class ExerciseExpectationService {
       @NotBlank final String expectationId,
       @NotNull final ExpectationUpdateInput input) {
     InjectExpectation injectExpectation = this.injectExpectationRepository.findById(expectationId).orElseThrow();
-    injectExpectation.setResult("VALIDATED");
+    injectExpectation.setResults(List.of(InjectExpectationResult.builder().result("VALIDATED").build()));
     injectExpectation.setScore(input.getScore());
     injectExpectation.setUpdatedAt(now());
     return this.injectExpectationRepository.save(injectExpectation);

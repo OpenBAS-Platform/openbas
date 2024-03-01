@@ -79,7 +79,7 @@ public class Scenario implements Base {
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.EAGER)
   @JsonIgnore
-  private List<Grant> grants = new ArrayList<>(); // OK
+  private List<Grant> grants = new ArrayList<>();
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
   @JsonProperty("scenario_injects")
@@ -92,16 +92,16 @@ public class Scenario implements Base {
       inverseJoinColumns = @JoinColumn(name = "team_id"))
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("scenario_teams")
-  private List<Team> teams = new ArrayList<>(); // Ok
+  private List<Team> teams = new ArrayList<>();
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonProperty("scenario_teams_users")
   @JsonSerialize(using = MultiModelDeserializer.class)
-  private List<ScenarioTeamUser> teamUsers = new ArrayList<>(); // Ok
+  private List<ScenarioTeamUser> teamUsers = new ArrayList<>();
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
   @JsonIgnore
-  private List<Objective> objectives = new ArrayList<>(); // Ok
+  private List<Objective> objectives = new ArrayList<>();
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "scenarios_tags",
@@ -109,7 +109,7 @@ public class Scenario implements Base {
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("scenario_tags")
-  private List<Tag> tags = new ArrayList<>(); // Ok
+  private List<Tag> tags = new ArrayList<>();
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "scenarios_documents",
@@ -117,17 +117,17 @@ public class Scenario implements Base {
       inverseJoinColumns = @JoinColumn(name = "document_id"))
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("scenario_documents")
-  private List<Document> documents = new ArrayList<>(); // Ok
+  private List<Document> documents = new ArrayList<>();
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("scenario_articles")
-  private List<Article> articles = new ArrayList<>(); // Ok
+  private List<Article> articles = new ArrayList<>();
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("scenario_lessons_categories")
-  private List<LessonsCategory> lessonsCategories = new ArrayList<>(); // Ok
+  private List<LessonsCategory> lessonsCategories = new ArrayList<>();
 
   // -- SECURITY --
 

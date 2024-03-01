@@ -14,9 +14,11 @@ import org.hibernate.annotations.Type;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@DiscriminatorValue("Endpoint")
+@DiscriminatorValue(Endpoint.ENDPOINT_TYPE)
 @EntityListeners(ModelBaseListener.class)
 public class Endpoint extends Asset {
+
+  public static final String ENDPOINT_TYPE = "Endpoint";
 
   public enum PLATFORM_TYPE {
     @JsonProperty("Linux")
