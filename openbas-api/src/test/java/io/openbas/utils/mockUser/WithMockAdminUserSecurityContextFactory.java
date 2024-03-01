@@ -16,7 +16,7 @@ import static io.openbas.service.UserService.buildAuthenticationToken;
 @Component
 public class WithMockAdminUserSecurityContextFactory implements WithSecurityContextFactory<WithMockAdminUser> {
 
-    public static final String MOCK_USER_ADMIN_EMAIL = "admin@openbas.io";
+    public static final String MOCK_USER_ADMIN_EMAIL = "admin-email@openbas.io";
     private static final String LANG_EN = "en";
     @Autowired
     private UserRepository userRepository;
