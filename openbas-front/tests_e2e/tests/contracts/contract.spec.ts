@@ -20,6 +20,8 @@ test.describe('Contracts', () => {
 
     const leftMenuPage = new LeftMenuPage(page);
     await leftMenuPage.goToContracts();
+
+    test.setTimeout(7000);
   });
   test('get first page of contract of contracts with searchtext empty and sort by type,label asc', async () => {
     const contractTitles = contractFormPage.getContractTitles();
