@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,12 +23,13 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import static io.openbas.contract.ContractService.TYPE;
 
 @RequiredArgsConstructor
 @RestController
-@Slf4j
+@Log
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 @RequestMapping("/api/contracts")
 public class ContractApi extends RestBehavior {
@@ -39,7 +40,7 @@ public class ContractApi extends RestBehavior {
     public @ResponseBody Map<String, String> contractIcon() {
         List<ContractConfig> contractTypes = this.contractService.getContractConfigs();
         Map<String, String> map = new HashMap<>();
-        contractTypes.forEach((contract -> {
+        contractTypes.forEach(contract -> {
             try {
                 String fileName = contract.getIcon();
                 InputStream in = getClass().getResourceAsStream(fileName);
@@ -49,9 +50,9 @@ public class ContractApi extends RestBehavior {
                 String encodedString = Base64.getEncoder().encodeToString(fileContent);
                 map.put(contract.getType(), encodedString);
             } catch (Exception e) {
-                log.debug("Logo not found for contract : " + contract.getType());
+                log.log(Level.FINE, "Logo not found for contract : " + contract.getType());
             }
-        }));
+        });
         return map;
     }
 
@@ -71,7 +72,6 @@ public class ContractApi extends RestBehavior {
             @ApiResponse(responseCode = "200", description = "Page of contracts"),
             @ApiResponse(responseCode = "400", description = "Bad parameters")
     })
-    //TODO ContractDTO
     public Page<Contract> searchExposedContracts(@RequestBody ContractSearchInput contractSearchInput,
                                                  @RequestParam(defaultValue = "0") @Min(0) int page,
                                                  @RequestParam(defaultValue = "10") @Max(20) int size,
@@ -81,6 +81,7 @@ public class ContractApi extends RestBehavior {
         Pageable pageable = PageRequest.of(page, size, sortFromQuery);
         return contractService.searchContracts(contractSearchInput, pageable);
     }
+
 
     private Sort convertToSort(List<String> sortFields) {
         List<Sort.Order> orders;
