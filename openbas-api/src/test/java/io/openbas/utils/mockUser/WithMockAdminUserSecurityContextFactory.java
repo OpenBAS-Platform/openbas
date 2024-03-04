@@ -18,37 +18,16 @@ public class WithMockAdminUserSecurityContextFactory implements WithSecurityCont
 
     public static final String MOCK_USER_ADMIN_EMAIL = "admin-email@openbas.io";
     private static final String LANG_EN = "en";
-    @Autowired
-    private UserRepository userRepository;
 
     @Override
     public SecurityContext createSecurityContext(WithMockAdminUser customUser) {
-        User user = this.userRepository.findByEmailIgnoreCase(customUser.email()).orElseThrow();
-        Authentication authentication = buildAuthenticationToken(user);
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authentication);
-        return context;
-    }
-
-    @PostConstruct
-    private void postConstruct() {
-        this.createAdminMockUser();
-    }
-
-    @PreDestroy
-    public void preDestroy() {
-        this.userRepository.deleteById(this.userRepository.findByEmailIgnoreCase(MOCK_USER_ADMIN_EMAIL).orElseThrow().getId());
-    }
-
-    private void createAdminMockUser() {
-        if (this.userRepository.findByEmailIgnoreCase(MOCK_USER_ADMIN_EMAIL).isPresent()) {
-            return;
-        }
-        // Create user
         User user = new User();
         user.setEmail(MOCK_USER_ADMIN_EMAIL);
         user.setLang(LANG_EN);
         user.setAdmin(true);
-        this.userRepository.save(user);
+        Authentication authentication = buildAuthenticationToken(user);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        return context;
     }
 }
