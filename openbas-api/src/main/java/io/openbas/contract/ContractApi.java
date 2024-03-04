@@ -30,7 +30,7 @@ import static io.openbas.contract.ContractService.TYPE;
 @RequiredArgsConstructor
 @RestController
 @Log
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("isAdmin()")
 @RequestMapping("/api/contracts")
 public class ContractApi extends RestBehavior {
 
