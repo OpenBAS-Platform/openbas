@@ -36,11 +36,11 @@ class ContratApiTest extends IntegrationTest {
 
     @Nested
     @WithMockAdminUser
-    @DisplayName("Fecthing contracts")
-    class FecthingContracts {
+    @DisplayName("Fetching contracts")
+    class FetchingContracts {
         @Nested
         @DisplayName("Fetching a page of contracts")
-        class FecthingPageOfContracts {
+        class FetchingPageOfContracts {
             @Test
             @DisplayName("Fetching first page of contracts succeed")
             void given_search_input_should_return_a_page_of_contrats() throws Exception {
