@@ -5,7 +5,7 @@ class ContractApiMock {
   }
 
   async mockContracts() {
-    await this.page.route('http://localhost:3001/api/contracts*', async (route) => {
+    await this.page.route('*/**/api/contracts*', async (route) => {
       if (route.request().method() === 'POST') {
         const json = {
           content: [
@@ -13,8 +13,8 @@ class ContractApiMock {
               config: {
                 expose: true,
                 label: {
-                  en: 'Email',
-                  fr: 'Email',
+                  en: 'Email by Filigran',
+                  fr: 'Email par Filigran',
                 },
                 type: 'openex_email',
               },
