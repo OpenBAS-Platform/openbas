@@ -14,14 +14,6 @@ class ContractPage {
   async goToPage(page: number) {
     await this.page.getByLabel(`page ${page}`).click();
   }
-
-  async goToSearch() {
-    await this.page.getByPlaceholder('Search these results...').click();
-  }
-
-  async fillSearchWith(text: string) {
-    await this.page.getByPlaceholder('Search these results...').fill(text);
-  }
 }
 
 export default ContractPage;
