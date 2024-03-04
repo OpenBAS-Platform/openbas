@@ -1,8 +1,8 @@
 package io.openbas.contract;
 
 import io.openbas.IntegrationTest;
-import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.fixtures.ContractFixture;
+import io.openbas.utils.mockUser.WithMockAdminUser;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import java.util.List;
 
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
@@ -179,14 +181,13 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Sorting by label asc")
             @Test
             void given_sort_input_should_return_a_page_of_contrats_sort_by_label_asc() throws Exception {
-                MultiValueMap<String, String> params = new LinkedMultiValueMap();
-                params.add("sort", "label:asc");
 
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email").build();
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email")
+                        .sorts(List.of(SortField.builder().property("label").build())).
+                        build();
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .params(params)
                                 .content(asJsonString(contractSearchInput)))
                         .andExpect(status().is2xxSuccessful())
                         .andExpect(jsonPath("$.content.[0].label.en").value("Publish channel pressure"))
@@ -197,14 +198,13 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Sorting by label desc")
             @Test
             void given_sort_input_should_return_a_page_of_contrats_sort_by_label_desc() throws Exception {
-                MultiValueMap<String, String> params = new LinkedMultiValueMap();
-                params.add("sort", "label:desc");
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email")
+                        .sorts(List.of(SortField.builder().property("label").direction("desc").build())).
+                        build();
 
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email").build();
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .params(params)
                                 .content(asJsonString(contractSearchInput)))
                         .andExpect(status().is2xxSuccessful())
                         .andExpect(jsonPath("$.content.[0].label.en").value("Send multi-recipients mail"))
@@ -215,14 +215,14 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Sorting by type asc and label desc")
             @Test
             void given_sort_input_should_return_a_page_of_contrats_sort_by_type_asc_label_desc() throws Exception {
-                MultiValueMap<String, String> params = new LinkedMultiValueMap();
-                params.add("sort", "type:asc, label:desc");
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email")
+                        .sorts(List.of(SortField.builder().property("type").direction("asc").build(),
+                                SortField.builder().property("label").direction("desc").build())).
+                        build();
 
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email").build();
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .params(params)
                                 .content(asJsonString(contractSearchInput)))
                         .andExpect(status().is2xxSuccessful())
                         .andExpect(jsonPath("$.content.[0].config.label.en").value("Email"))
