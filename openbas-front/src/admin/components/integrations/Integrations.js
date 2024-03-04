@@ -88,15 +88,13 @@ const Integrations = () => {
       label: null,
       exposedContractsOnly: true,
       textSearch,
+      sorts: [{ property: 'type' }, { property: 'label' }],
     };
-
-    const sort = ['type', 'label'];
 
     fetchPageOfContracts(
       contractSearchInput,
       page - BACKEND_PAGE_NORMALIZER,
       PAGE_SIZE,
-      sort,
     ).then((result) => {
       const { data } = result;
       setContracts(data.content);
