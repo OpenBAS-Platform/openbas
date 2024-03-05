@@ -3,6 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { errorWrapper } from '../../../components/Error';
 import Loader from '../../../components/Loader';
+import NotFound from '../../../components/NotFound';
 
 const IndexChannel = lazy(() => import('./channels/Index'));
 const Channels = lazy(() => import('./Channels'));
@@ -26,6 +27,8 @@ const Index = () => {
           <Route path="channels" element={errorWrapper(Channels)()} />
           <Route path="channels/:channelId/*" element={errorWrapper(IndexChannel)()} />
           <Route path="challenges" element={errorWrapper(Challenges)()} />
+          {/* Not found */}
+          <Route path="*" element={<NotFound/>}/>
         </Routes>
       </Suspense>
     </div>

@@ -6,6 +6,7 @@ import { history, store } from './store';
 import RedirectManager from './components/RedirectManager';
 import Root from './root';
 import { APP_BASE_PATH } from './utils/Action';
+import NotFound from './components/NotFound';
 
 const App = () => (
   <Provider store={store}>
@@ -13,6 +14,8 @@ const App = () => (
       <RedirectManager>
         <Routes>
           <Route path="/*" element={<Root />} />
+          {/* Not found */}
+          <Route path="*" element={<NotFound/>}/>
         </Routes>
       </RedirectManager>
     </Router>

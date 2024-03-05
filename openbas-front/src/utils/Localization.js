@@ -647,6 +647,7 @@ const i18n = {
       Validate: 'Valider',
       Validated: 'Validé',
       Error: 'Erreur',
+      'This page is not found on this OpenBAS application.': 'Cette page est introuvable sur l\'application OpenBAS.',
       // Challenges
       Challenges: 'Challenges',
       // Variables
