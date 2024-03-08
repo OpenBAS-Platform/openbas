@@ -11,6 +11,7 @@ import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
 import type { Channel as ChannelType } from '../../../../utils/api-types';
+import NotFound from '../../../../components/NotFound';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -38,6 +39,8 @@ const Index = () => {
         <div className="clearfix" />
         <Routes>
           <Route path="" element={errorWrapper(Channel)()} />
+          {/* Not found */}
+          <Route path="*" element={<NotFound/>}/>
         </Routes>
       </div>
     );

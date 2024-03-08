@@ -12,6 +12,7 @@ import type { Exercise as ExerciseType } from '../../../utils/api-types';
 import { DocumentContext, DocumentContextType, PermissionsContext, PermissionsContextType } from '../components/Context';
 import { usePermissions } from '../../../utils/Exercise';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
+import NotFound from '../../../components/NotFound';
 
 const Exercise = lazy(() => import('./Exercise'));
 const Dryrun = lazy(() => import('./controls/Dryrun'));
@@ -72,6 +73,8 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
             <Route path="results/lessons" element={errorWrapper(Lessons)()} />
             <Route path="results/reports" element={errorWrapper(Reports)()} />
             <Route path="results/reports/:reportId" element={errorWrapper(Report)()} />
+            {/* Not found */}
+            <Route path="*" element={<NotFound/>}/>
           </Routes>
         </Suspense>
       </DocumentContext.Provider>

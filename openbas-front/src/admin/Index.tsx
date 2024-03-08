@@ -13,6 +13,7 @@ import type { LoggedHelper } from '../actions/helper';
 import Loader from '../components/Loader';
 import contractImages from '../actions/Contract';
 import { useAppDispatch } from '../utils/hooks';
+import NotFound from '../components/NotFound';
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));
@@ -82,6 +83,8 @@ const Index = () => {
               <Route path="lessons/:lessonsTemplateId/*" element={errorWrapper(IndexLessonsTemplate)()} />
               <Route path="integrations/*" element={errorWrapper(IndexIntegrations)()} />
               <Route path="settings/*" element={errorWrapper(IndexSettings)()} />
+              {/* Not found */}
+              <Route path="*" element={<NotFound/>}/>
             </Routes>
           </Suspense>
         </Box>

@@ -11,6 +11,7 @@ import { useHelper } from '../../../store';
 import { fetchLessonsTemplates } from '../../../actions/Lessons';
 import { useAppDispatch } from '../../../utils/hooks';
 import type { LessonsTemplatesHelper } from '../../../actions/lessons/lesson-helper';
+import NotFound from '../../../components/NotFound';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -36,6 +37,8 @@ const Index = () => {
         <div className="clearfix" />
         <Routes>
           <Route path="" element={errorWrapper(LessonsTemplate)()} />
+          {/* Not found */}
+          <Route path="*" element={<NotFound/>}/>
         </Routes>
       </div>
     );

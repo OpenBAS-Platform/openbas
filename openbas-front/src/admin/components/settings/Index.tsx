@@ -7,6 +7,7 @@ import Tags from './tags/Tags';
 import AttackPatterns from './attack_patterns/AttackPatterns';
 import KillChainPhases from './kill_chain_phases/KillChainPhases';
 import { errorWrapper } from '../../../components/Error';
+import NotFound from '../../../components/NotFound';
 
 const Index = () => (
   <Routes>
@@ -18,6 +19,8 @@ const Index = () => (
     <Route path="taxonomies/tags" element={errorWrapper(Tags)()} />
     <Route path="taxonomies/attack_patterns" element={errorWrapper(AttackPatterns)()} />
     <Route path="taxonomies/kill_chain_phases" element={errorWrapper(KillChainPhases)()} />
+    {/* Not found */}
+    <Route path="*" element={<NotFound/>}/>
   </Routes>
 );
 

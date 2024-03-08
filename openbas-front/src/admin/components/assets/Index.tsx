@@ -3,6 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { errorWrapper } from '../../../components/Error';
 import Loader from '../../../components/Loader';
+import NotFound from '../../../components/NotFound';
 
 const Endpoints = lazy(() => import('./endpoints/Endpoints'));
 const AssetGroups = lazy(() => import('./asset_groups/AssetGroups'));
@@ -22,6 +23,8 @@ const Index = () => {
           <Route path="" element={<Navigate to="endpoints" replace={true} />} />
           <Route path="endpoints" element={errorWrapper(Endpoints)()} />
           <Route path="asset_groups" element={errorWrapper(AssetGroups)()} />
+          {/* Not found */}
+          <Route path="*" element={<NotFound/>}/>
         </Routes>
       </Suspense>
     </div>

@@ -48,6 +48,8 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
             <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
             <Route path="definition/variables" element={errorWrapper(Variables)()} />
             <Route path="injects" element={errorWrapper(Injects)()} />
+            {/* Not found */}
+            <Route path="*" element={<NotFound/>}/>
           </Routes>
         </Suspense>
       </DocumentContext.Provider>

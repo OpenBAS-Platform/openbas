@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import useDataLoader from '../utils/ServerSideEvent';
 import { errorWrapper } from '../components/Error';
 import type { Theme } from '../components/Theme';
+import NotFound from '../components/NotFound';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
@@ -32,6 +33,8 @@ const Index = () => {
         <div className={classes.toolbar} />
         <Routes>
           <Route path="/" element={errorWrapper(Dashboard)()} />
+          {/* Not found */}
+          <Route path="*" element={<NotFound/>}/>
         </Routes>
       </main>
     </div>
