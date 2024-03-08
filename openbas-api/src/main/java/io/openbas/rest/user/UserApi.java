@@ -14,6 +14,7 @@ import io.openbas.rest.user.form.user.CreateUserInput;
 import io.openbas.rest.user.form.user.UpdateUserInput;
 import io.openbas.service.MailingService;
 import io.openbas.service.UserService;
+import io.openbas.telemetry.OpenTelemetryService;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -41,6 +42,7 @@ public class UserApi extends RestBehavior {
     private TagRepository tagRepository;
     private UserService userService;
     private MailingService mailingService;
+    private OpenTelemetryService openTelemetryService;
 
     @Autowired
     public void setMailingService(MailingService mailingService) {
@@ -67,6 +69,11 @@ public class UserApi extends RestBehavior {
         this.userRepository = userRepository;
     }
 
+    @Autowired
+    public void setOpenTelemetryService(OpenTelemetryService openTelemetryService) {
+        this.openTelemetryService = openTelemetryService;
+    }
+
     @PostMapping("/api/login")
     public User login(@Valid @RequestBody LoginUserInput input) {
         Optional<User> optionalUser = userRepository.findByEmailIgnoreCase(input.getLogin());
@@ -74,6 +81,7 @@ public class UserApi extends RestBehavior {
             User user = optionalUser.get();
             if (userService.isUserPasswordValid(user, input.getPassword())) {
                 userService.createUserSession(user);
+                this.openTelemetryService.login(user.getEmail());
                 return user;
             }
         }
