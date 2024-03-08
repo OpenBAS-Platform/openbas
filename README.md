@@ -1,4 +1,6 @@
-# ![OpenBAS](./.github/img/logo_openbas_dark.png#gh-dark-mode-only) ![OpenBAS](./.github/img/logo_openbas_light.png#gh-light-mode-only)
+<h1 align="center">
+  <a href="https://openbas.io"><img src="./.github/img/logo_openbas.png" alt="OpenBAS"></a>
+</h1>
 <p align="center">
   <a href="https://openbas.io" alt="Website"><img src="https://img.shields.io/badge/website-openbas.io-blue.svg" /></a>
   <a href="https://docs.openbas.io" alt="Documentation"><img src="https://img.shields.io/badge/documentation-latest-orange.svg" /></a>
@@ -11,13 +13,13 @@
 
 ## Introduction
 
-OpenBAS is an open source platform allowing organizations to plan, schedule and conduct crisis exercises as well as adversary simulation campaign. OpenBAS is an [ISO 22398](http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=50294) compliant product and has been designed as a modern web application including a RESTFul API and an UX oriented frontend.
+OpenBAS is an open source platform allowing organizations to plan, schedule and conduct cyber adversary simulation campaign and tests.
 
-![Screenshot](https://filigran.io/wp-content/uploads/2023/10/openbas-dashboard.png "Screenshot")
+![Screenshot](./.github/img/screenshot.png "Screenshot")
 
 ## Objective
 
-The goal is to create a powerful, reliable and open source tool to effectively plan and play all types of training, exercises and simulation from the technical level to the strategic one. The need for rationalization and capitalization from one year to the next, as well as the publication of ISO 22398: 2013 standard necessarily lead to the need to acquire specific software. 
+The goal is to create a powerful, reliable and open source tool to effectively plan and play all types of simulations, training and exercises from the technical level to the strategic one. Also, the platform is able to give you a proper overview of any security gaps regarding actual threats with knowledge coming from the [OpenCTI platform](https://opencti.io).
 
 OpenBAS aims to respond to these issues, which not only concern state services but also many private organizations. With different modules (scenarios, teams, simulations, verification of means of communication, encryption, etc.), the platform offers advantages such as collaborative work, real-time monitoring, statistics or the management of feedback.
 
@@ -28,7 +30,7 @@ Finally, OpenBAS supports different types of inject, allowing the tool to be int
 OpenBAS platform has 2 different editions: Community (CE) and Enterprise (EE). The purpose of the Enterprise Edition is to provide [additional and powerful features](https://filigran.io/offering/subscribe) which require specific investments in research and development. You can enable the Enterprise Edition directly in the settings of the platform.
 
 * OpenBAS Community Edition, licensed under the [Apache 2, Version 2.0 license](LICENSE).
-* OpenBAS Enterprise Edition, licensed under the [Non-Commercial license](LICENSE).
+* OpenBAS Enterprise Edition, licensed under the [Enterprise Edition license](LICENSE).
 
 To understand what OpenBAS Enterprise Edition brings in terms of features, just check the [Enterprise Editions page](https://filigran.io/offering/subscribe) on the Filigran website. You can also try this edition by enabling it in the settings of the platform.
 
@@ -81,8 +83,7 @@ If you need support or you wish to engage a discussion about the OpenBAS platfor
 
 OpenBAS is a product designed and developed by the company [Filigran](https://filigran.io).
 
-![Filigran](https://github.com/OpenCTI-Platform/opencti/raw/master/.github/img/logo_filigran_dark.png#gh-dark-mode-only)
-![Filigran](https://github.com/OpenCTI-Platform/opencti/raw/master/.github/img/logo_filigran_light.png#gh-light-mode-only)
+<a href="https://filigran.io" alt="Filigran"><img src="./.github/img/logo_filigran.png" width="300" /></a>
 
 ### GDPR and the OpenBAS OpenStreetMap server
 
@@ -91,4 +92,3 @@ In order to provide OpenBAS users with cartography features, the platform uses a
 By using this server, you authorize Filigran to collect this information. Otherwise, you are free to deploy your own OpenStreetMap server and modify the platform configuration accordingly.
 
 If you have started using the Filigran server and change your mind, you have the right to access, limit, rectify, erase and receive your data. To exercise your rights, please send your request to privacy@filigran.io.
-
