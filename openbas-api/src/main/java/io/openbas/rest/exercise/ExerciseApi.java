@@ -401,7 +401,7 @@ public class ExerciseApi extends RestBehavior {
       exerciseTeamUser.setUser(userRepository.findById(playerId).orElseThrow());
       exerciseTeamUserRepository.save(exerciseTeamUser);
     });
-    return exerciseRepository.findById(exerciseId).orElseThrow();
+    return exercise;
   }
 
   @Transactional(rollbackOn = Exception.class)
