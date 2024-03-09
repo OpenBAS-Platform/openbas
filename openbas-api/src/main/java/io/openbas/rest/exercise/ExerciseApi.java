@@ -140,7 +140,7 @@ public class ExerciseApi extends RestBehavior {
   }
 
   @Autowired
-  public void setGrantService(@NotBlank final GrantService grantService)  {
+  public void setGrantService(@NotBlank final GrantService grantService) {
     this.grantService = grantService;
   }
 
@@ -353,9 +353,9 @@ public class ExerciseApi extends RestBehavior {
   }
 
   @Transactional(rollbackOn = Exception.class)
-  @PutMapping("/api/exercises/{exerciseId}/teams/{teamId}/players/add")
+  @PutMapping("/api/exercises/{exerciseId}/teams/{teamId}/players/enable")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Exercise addExerciseTeamPlayers(@PathVariable String exerciseId, @PathVariable String teamId,
+  public Exercise enableExerciseTeamPlayers(@PathVariable String exerciseId, @PathVariable String teamId,
       @Valid @RequestBody ExerciseTeamPlayersEnableInput input) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
     Team team = teamRepository.findById(teamId).orElseThrow();
@@ -370,10 +370,49 @@ public class ExerciseApi extends RestBehavior {
   }
 
   @Transactional(rollbackOn = Exception.class)
+  @PutMapping("/api/exercises/{exerciseId}/teams/{teamId}/players/disable")
+  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  public Exercise disableExerciseTeamPlayers(@PathVariable String exerciseId, @PathVariable String teamId,
+      @Valid @RequestBody ExerciseTeamPlayersEnableInput input) {
+    input.getPlayersIds().forEach(playerId -> {
+      ExerciseTeamUserId exerciseTeamUserId = new ExerciseTeamUserId();
+      exerciseTeamUserId.setExerciseId(exerciseId);
+      exerciseTeamUserId.setTeamId(teamId);
+      exerciseTeamUserId.setUserId(playerId);
+      exerciseTeamUserRepository.deleteById(exerciseTeamUserId);
+    });
+    return exerciseRepository.findById(exerciseId).orElseThrow();
+  }
+
+  @Transactional(rollbackOn = Exception.class)
+  @PutMapping("/api/exercises/{exerciseId}/teams/{teamId}/players/add")
+  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  public Exercise addExerciseTeamPlayers(@PathVariable String exerciseId, @PathVariable String teamId,
+      @Valid @RequestBody ExerciseTeamPlayersEnableInput input) {
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Team team = teamRepository.findById(teamId).orElseThrow();
+    Iterable<User> teamUsers = userRepository.findAllById(input.getPlayersIds());
+    team.getUsers().addAll(fromIterable(teamUsers));
+    teamRepository.save(team);
+    input.getPlayersIds().forEach(playerId -> {
+      ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
+      exerciseTeamUser.setExercise(exercise);
+      exerciseTeamUser.setTeam(team);
+      exerciseTeamUser.setUser(userRepository.findById(playerId).orElseThrow());
+      exerciseTeamUserRepository.save(exerciseTeamUser);
+    });
+    return exercise;
+  }
+
+  @Transactional(rollbackOn = Exception.class)
   @PutMapping("/api/exercises/{exerciseId}/teams/{teamId}/players/remove")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Exercise removeExerciseTeamPlayers(@PathVariable String exerciseId, @PathVariable String teamId,
       @Valid @RequestBody ExerciseTeamPlayersEnableInput input) {
+    Team team = teamRepository.findById(teamId).orElseThrow();
+    Iterable<User> teamUsers = userRepository.findAllById(input.getPlayersIds());
+    team.getUsers().removeAll(fromIterable(teamUsers));
+    teamRepository.save(team);
     input.getPlayersIds().forEach(playerId -> {
       ExerciseTeamUserId exerciseTeamUserId = new ExerciseTeamUserId();
       exerciseTeamUserId.setExerciseId(exerciseId);
@@ -507,7 +546,9 @@ public class ExerciseApi extends RestBehavior {
       exercise.setCurrentPause(null);
       pauseRepository.deleteAll(pauseRepository.findAllForExercise(exerciseId));
       // Reset injects outcome, communications and expectations
-      this.injectStatusRepository.deleteAllById(exercise.getInjects().stream().map(Inject::getStatus).map(i -> i.map(InjectStatus::getId).orElse("")).toList());
+      this.injectStatusRepository.deleteAllById(
+          exercise.getInjects().stream().map(Inject::getStatus).map(i -> i.map(InjectStatus::getId).orElse(""))
+              .toList());
       exercise.getInjects().forEach(Inject::clean);
       // Reset lessons learned answers
       List<LessonsAnswer> lessonsAnswers = lessonsCategoryRepository.findAll(

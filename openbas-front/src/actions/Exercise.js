@@ -47,6 +47,18 @@ export const removeExerciseTeams = (exerciseId, data) => (dispatch) => putRefere
   data,
 )(dispatch);
 
+export const enableExerciseTeamPlayers = (exerciseId, teamId, data) => (dispatch) => putReferential(
+  schema.exercise,
+  `/api/exercises/${exerciseId}/teams/${teamId}/players/enable`,
+  data,
+)(dispatch);
+
+export const disableExerciseTeamPlayers = (exerciseId, teamId, data) => (dispatch) => putReferential(
+  schema.exercise,
+  `/api/exercises/${exerciseId}/teams/${teamId}/players/disable`,
+  data,
+)(dispatch);
+
 export const addExerciseTeamPlayers = (exerciseId, teamId, data) => (dispatch) => putReferential(
   schema.exercise,
   `/api/exercises/${exerciseId}/teams/${teamId}/players/add`,

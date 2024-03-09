@@ -252,7 +252,7 @@ public class ScenarioService {
     return teamRepository.findAllById(teamIds);
   }
 
-  public Scenario addPlayer(@NotBlank final String scenarioId, @NotBlank final String teamId,
+  public Scenario enablePlayers(@NotBlank final String scenarioId, @NotBlank final String teamId,
       @NotNull final List<String> playerIds) {
     Scenario scenario = this.scenario(scenarioId);
     Team team = this.teamRepository.findById(teamId).orElseThrow();
@@ -266,7 +266,7 @@ public class ScenarioService {
     return scenario;
   }
 
-  public Scenario removePlayer(@NotBlank final String scenarioId, @NotBlank final String teamId,
+  public Scenario disablePlayers(@NotBlank final String scenarioId, @NotBlank final String teamId,
       @NotNull final List<String> playerIds) {
     playerIds.forEach(playerId -> {
       ScenarioTeamUserId scenarioTeamUserId = new ScenarioTeamUserId();

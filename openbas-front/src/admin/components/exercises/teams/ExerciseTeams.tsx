@@ -11,8 +11,16 @@ import type { UserStore } from '../../teams/players/Player';
 import AddTeams from '../../components/teams/AddTeams';
 import type { Team, TeamCreateInput } from '../../../../utils/api-types';
 import type { TeamStore } from '../../../../actions/teams/Team';
-import { addExerciseTeamPlayers, addExerciseTeams, fetchExerciseTeams, removeExerciseTeamPlayers, removeExerciseTeams } from '../../../../actions/Exercise';
-import { addTeam } from '../../../../actions/teams/team-actions';
+import {
+  addExerciseTeamPlayers,
+  addExerciseTeams,
+  disableExerciseTeamPlayers,
+  enableExerciseTeamPlayers,
+  fetchExerciseTeams,
+  removeExerciseTeamPlayers,
+  removeExerciseTeams,
+} from '../../../../actions/Exercise';
+import { addTeam, fetchTeams } from '../../../../actions/teams/team-actions';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 
@@ -44,38 +52,48 @@ const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
   });
 
   const context: TeamContextType = {
+    async onAddUsersTeam(teamId: Team['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
+      await dispatch(addExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: userIds }));
+      return dispatch(fetchTeams());
+    },
+    async onRemoveUsersTeam(teamId: Team['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
+      await dispatch(removeExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: userIds }));
+      return dispatch(fetchTeams());
+    },
     onCreateTeam(team: TeamCreateInput): Promise<{ result: string }> {
       return dispatch(addTeam({ ...team, team_exercises: [exerciseId] }));
     },
+
     checkUserEnabled(teamId: Team['team_id'], userId: UserStore['user_id']): boolean {
       return exerciseTeamsUsers.filter((o: ExerciseStore['exercise_teams_users']) => o.exercise_id === exerciseId && o.team_id === teamId && userId === o.user_id).length > 0;
     },
     computeTeamUsersEnabled(teamId: Team['team_id']) {
       return exerciseTeamsUsers.filter((o: ExerciseStore['exercise_teams_users']) => o.team_id === teamId).length;
     },
-    onAddTeams(teamIds: Team['team_id'][]): void {
-      dispatch(addExerciseTeams(exerciseId, { exercise_teams: teamIds }));
-    },
     onRemoveTeam(teamId: Team['team_id']): void {
       dispatch(removeExerciseTeams(exerciseId, { exercise_teams: [teamId] }));
     },
     onToggleUser(teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean): void {
       if (userEnabled) {
-        dispatch(removeExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: [userId] }));
+        dispatch(disableExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: [userId] }));
       } else {
-        dispatch(addExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: [userId] }));
+        dispatch(enableExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: [userId] }));
       }
     },
   };
 
   const teamIds = teams.map((t) => t.team_id);
 
+  const onAddTeams = (ids: Team['team_id'][]) => {
+    return dispatch(addExerciseTeams(exerciseId, { exercise_teams: ids }));
+  };
+
   return (
     <TeamContext.Provider value={context}>
       <div className={classes.container}>
         <DefinitionMenu base="/admin/exercises" id={exerciseId} />
         <Teams teamIds={teamIds} />
-        {permissions.canWrite && <AddTeams addedTeamIds={teamIds} />}
+        {permissions.canWrite && <AddTeams addedTeamIds={teamIds} onAddTeams={onAddTeams} />}
       </div>
     </TeamContext.Provider>
   );

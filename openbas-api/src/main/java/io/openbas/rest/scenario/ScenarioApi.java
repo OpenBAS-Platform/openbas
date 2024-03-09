@@ -3,7 +3,10 @@ package io.openbas.rest.scenario;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Team;
+import io.openbas.database.model.User;
 import io.openbas.database.repository.TagRepository;
+import io.openbas.database.repository.TeamRepository;
+import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
 import io.openbas.rest.scenario.form.*;
 import io.openbas.service.ImportService;
@@ -15,6 +18,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +42,19 @@ public class ScenarioApi {
   private final ScenarioToExerciseService scenarioToExerciseService;
   private final TagRepository tagRepository;
   private final ImportService importService;
+
+  private TeamRepository teamRepository;
+  private UserRepository userRepository;
+
+  @Autowired
+  public void setTeamRepository(TeamRepository teamRepository) {
+    this.teamRepository = teamRepository;
+  }
+
+  @Autowired
+  public void setUserRepository(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
 
   @PostMapping(SCENARIO_URI)
   // TODO: Admin only ?
@@ -156,23 +173,51 @@ public class ScenarioApi {
   }
 
   @Transactional(rollbackOn = Exception.class)
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/add")
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/enable")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Scenario addScenarioTeamPlayer(
+  public Scenario enableScenarioTeamPlayers(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String teamId,
       @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
-    return this.scenarioService.addPlayer(scenarioId, teamId, input.getPlayersIds());
+    return this.scenarioService.enablePlayers(scenarioId, teamId, input.getPlayersIds());
+  }
+
+  @Transactional(rollbackOn = Exception.class)
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/disable")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public Scenario disableScenarioTeamPlayers(
+      @PathVariable @NotBlank final String scenarioId,
+      @PathVariable @NotBlank final String teamId,
+      @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
+    return this.scenarioService.disablePlayers(scenarioId, teamId, input.getPlayersIds());
+  }
+
+  @Transactional(rollbackOn = Exception.class)
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/add")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public Scenario addScenarioTeamPlayers(
+      @PathVariable @NotBlank final String scenarioId,
+      @PathVariable @NotBlank final String teamId,
+      @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
+    Team team = teamRepository.findById(teamId).orElseThrow();
+    Iterable<User> teamUsers = userRepository.findAllById(input.getPlayersIds());
+    team.getUsers().addAll(fromIterable(teamUsers));
+    teamRepository.save(team);
+    return this.scenarioService.enablePlayers(scenarioId, teamId, input.getPlayersIds());
   }
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/remove")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Scenario removeExerciseTeamPlayers(
+  public Scenario removeScenarioTeamPlayers(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String teamId,
       @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
-    return this.scenarioService.removePlayer(scenarioId, teamId, input.getPlayersIds());
+    Team team = teamRepository.findById(teamId).orElseThrow();
+    Iterable<User> teamUsers = userRepository.findAllById(input.getPlayersIds());
+    team.getUsers().removeAll(fromIterable(teamUsers));
+    teamRepository.save(team);
+    return this.scenarioService.disablePlayers(scenarioId, teamId, input.getPlayersIds());
   }
 
 }

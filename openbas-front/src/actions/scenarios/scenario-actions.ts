@@ -90,6 +90,18 @@ export const removeScenarioTeams = (scenarioId: Scenario['scenario_id'], data: S
   data,
 )(dispatch);
 
+export const enableScenarioTeamPlayers = (scenarioId: Scenario['scenario_id'], teamId: Team['team_id'], data: ScenarioTeamPlayersEnableInput) => (dispatch: Dispatch) => putReferential(
+  scenario,
+  `/api/scenarios/${scenarioId}/teams/${teamId}/players/enable`,
+  data,
+)(dispatch);
+
+export const disableScenarioTeamPlayers = (scenarioId: Scenario['scenario_id'], teamId: Team['team_id'], data: ScenarioTeamPlayersEnableInput) => (dispatch: Dispatch) => putReferential(
+  scenario,
+  `/api/scenarios/${scenarioId}/teams/${teamId}/players/disable`,
+  data,
+)(dispatch);
+
 export const addScenarioTeamPlayers = (scenarioId: Scenario['scenario_id'], teamId: Team['team_id'], data: ScenarioTeamPlayersEnableInput) => (dispatch: Dispatch) => putReferential(
   scenario,
   `/api/scenarios/${scenarioId}/teams/${teamId}/players/add`,
