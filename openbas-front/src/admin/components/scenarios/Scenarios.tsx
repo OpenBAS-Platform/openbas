@@ -18,6 +18,7 @@ import TagsFilter from '../../../components/TagsFilter';
 import { exportData } from '../../../utils/Environment';
 import ItemTags from '../../../components/ItemTags';
 import ScenarioCreation from './ScenarioCreation';
+import Breadcrumbs from '../../../components/Breadcrumbs';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -46,6 +47,9 @@ const useStyles = makeStyles(() => ({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+  },
+  downloadButton: {
+    marginRight: 15,
   },
 }));
 
@@ -124,6 +128,7 @@ const Scenarios = () => {
   const sortedScenarios: ScenarioStore[] = filtering.filterAndSort(scenarios);
   return (
     <>
+      <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter
@@ -137,7 +142,7 @@ const Scenarios = () => {
             currentTags={filtering.tags}
           />
         </div>
-        <div style={{ marginRight: '15px' }}>
+        <div className={classes.downloadButton}>
           {sortedScenarios.length > 0 ? (
             <CSVLink
               data={exportData(

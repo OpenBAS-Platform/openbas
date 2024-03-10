@@ -5,8 +5,10 @@ import withStyles from '@mui/styles/withStyles';
 import { Paper, Box } from '@mui/material';
 import * as R from 'ramda';
 import { useTheme } from '@mui/styles';
-import logoDark from '../../../static/images/logo_dark.png';
-import logoLight from '../../../static/images/logo_light.png';
+import logoDark from '../../../static/images/logo_text_dark.png';
+import logoLight from '../../../static/images/logo_text_light.png';
+import byFiligranDark from '../../../static/images/by_filigran_dark.png';
+import byFiligranLight from '../../../static/images/by_filigran_light.png';
 import { askToken, checkKerberos, fetchParameters } from '../../../actions/Application';
 import LoginForm from './LoginForm';
 import inject18n from '../../../components/i18n';
@@ -20,15 +22,25 @@ const styles = () => ({
   container: {
     textAlign: 'center',
     margin: '0 auto',
-    width: 400,
+    width: '80%',
+    paddingBottom: 50,
   },
   appBar: {
     borderTopLeftRadius: '10px',
     borderTopRightRadius: '10px',
   },
+  login: {
+    textAlign: 'center',
+    margin: '0 auto',
+    maxWidth: 500,
+  },
   logo: {
-    width: 200,
-    margin: '0px 0px 50px 0px',
+    width: 400,
+    margin: 0,
+  },
+  byFiligranLogo: {
+    width: 100,
+    margin: '-10px 0 0 295px',
   },
 });
 
@@ -59,20 +71,24 @@ const Login = (props) => {
     props.checkKerberos();
   }, []);
   const onSubmit = (data) => props.askToken(data.username, data.password);
-  let loginHeight = 260;
+  let loginHeight = 320;
   if ((isOpenId || isSaml2) && isLocal) {
-    loginHeight = 350;
+    loginHeight = 440;
   } else if (isOpenId || isSaml2) {
-    loginHeight = 150;
+    loginHeight = 190;
   }
-  const marginTop = dimension.height / 2 - loginHeight / 2 - 200;
+  const marginTop = dimension.height / 2 - loginHeight / 2 - 100;
   return (
     <div data-testid="login-page" className={classes.container} style={{ marginTop }}>
-      <img src={fileUri(theme.palette.mode === 'dark' ? logoDark : logoLight)} alt="logo"
-        className={classes.logo}
-      />
+      <img src={fileUri(theme.palette.mode === 'dark' ? logoDark : logoLight)} alt="logo" className={classes.logo} />
+      <div className={classes.byFiligran} style={{ marginBottom: 20 }}>
+        <img
+          src={fileUri(theme.palette.mode === 'dark' ? byFiligranDark : byFiligranLight)}
+          className={classes.byFiligranLogo}
+        />
+      </div>
       {isLocal && !reset && (
-        <Paper variant="outlined">
+        <Paper variant="outlined" classes={{ root: classes.login }}>
           <LoginForm onSubmit={onSubmit}/>
           <div style={{ marginBottom: 10, cursor: 'pointer' }}>
             <a onClick={() => setReset(true)}>{t('I forgot my password')}</a>
@@ -89,16 +105,15 @@ const Login = (props) => {
           gap: 2.5,
         }}
       >
-        {(isOpenId || isSaml2)
-                    && [...(openidProviders ?? []), ...(saml2Providers ?? [])].map(
-                      (provider) => (
-                        <LoginSSOButton
-                          key={provider.provider_name}
-                          providerName={provider.provider_login}
-                          providerUri={provider.provider_uri}
-                        />
-                      ),
-                    )}
+        {(isOpenId || isSaml2) && [...(openidProviders ?? []), ...(saml2Providers ?? [])].map(
+          (provider) => (
+            <LoginSSOButton
+              key={provider.provider_name}
+              providerName={provider.provider_login}
+              providerUri={provider.provider_uri}
+            />
+          ),
+        )}
         <LoginError/>
       </Box>
     </div>

@@ -20,23 +20,43 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import TeamPlayers from './TeamPlayers';
 import { PermissionsContext, TeamContext } from '../Context';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
 
 const useStyles = makeStyles(() => ({
+  parameters: {
+    marginTop: -10,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  filters: {
+    display: 'flex',
+    gap: '10px',
+  },
   itemHead: {
+    paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
+    paddingLeft: 10,
     height: 50,
   },
   bodyItem: {
-    height: '100%',
+    height: 20,
     fontSize: 13,
+    float: 'left',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
   drawerPaper: {
     minHeight: '100vh',
     width: '50%',
     padding: 0,
+  },
+  downloadButton: {
+    marginRight: 15,
   },
 }));
 
@@ -186,24 +206,21 @@ const Teams: React.FC<Props> = ({ teamIds }) => {
 
   return (
     <>
-      <div>
-        <div style={{ float: 'left', marginRight: 10 }}>
+      <Breadcrumbs variant="list" elements={[{ label: t('Teams') }, { label: t('Teams of players'), current: true }]} />
+      <div className={classes.parameters}>
+        <div className={classes.filters}>
           <SearchFilter
             variant="small"
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
           />
-        </div>
-        <div style={{ float: 'left', marginRight: 10 }}>
           <TagsFilter
             onAddTag={filtering.handleAddTag}
             onRemoveTag={filtering.handleRemoveTag}
             currentTags={filtering.tags}
           />
         </div>
-        <div
-          style={{ float: 'right', margin: '-5px 15px 0 0', maxHeight: '35px' }}
-        >
+        <div className={classes.downloadButton}>
           {sortedTeams.length > 0 ? (
             <CSVLink
               data={exportData(
@@ -235,7 +252,7 @@ const Teams: React.FC<Props> = ({ teamIds }) => {
         </div>
       </div>
       <div className="clearfix" />
-      <List style={{ marginTop: 10 }}>
+      <List>
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}

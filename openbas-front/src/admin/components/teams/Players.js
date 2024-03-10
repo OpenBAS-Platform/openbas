@@ -17,13 +17,18 @@ import { useHelper } from '../../../store';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { useFormatter } from '../../../components/i18n';
 import { exportData } from '../../../utils/Environment';
+import Breadcrumbs from '../../../components/Breadcrumbs';
 
 const useStyles = makeStyles(() => ({
   parameters: {
     marginTop: -10,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  container: {
-    marginTop: 10,
+  filters: {
+    display: 'flex',
+    gap: '10px',
   },
   itemHead: {
     paddingLeft: 10,
@@ -35,8 +40,15 @@ const useStyles = makeStyles(() => ({
     height: 50,
   },
   bodyItem: {
-    height: '100%',
+    height: 20,
     fontSize: 13,
+    float: 'left',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  downloadButton: {
+    marginRight: 15,
   },
 }));
 
@@ -151,22 +163,21 @@ const Players = () => {
   const sortedUsers = filtering.filterAndSort(users);
   return (
     <>
+      <Breadcrumbs variant="list" elements={[{ label: t('Teams') }, { label: t('Players'), current: true }]} />
       <div className={classes.parameters}>
-        <div style={{ float: 'left', marginRight: 10 }}>
+        <div className={classes.filters}>
           <SearchFilter
             variant="small"
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
           />
-        </div>
-        <div style={{ float: 'left', marginRight: 10 }}>
           <TagsFilter
             onAddTag={filtering.handleAddTag}
             onRemoveTag={filtering.handleRemoveTag}
             currentTags={filtering.tags}
           />
         </div>
-        <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
+        <div className={classes.downloadButton}>
           {sortedUsers.length > 0 ? (
             <CSVLink
               data={exportData(

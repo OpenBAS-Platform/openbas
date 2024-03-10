@@ -20,6 +20,7 @@ import TagsFilter from '../../../../components/TagsFilter';
 import type { EndpointStore } from './Endpoint';
 import ItemTags from '../../../../components/ItemTags';
 import AssetStatus from '../AssetStatus';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -50,10 +51,7 @@ const useStyles = makeStyles(() => ({
     textOverflow: 'ellipsis',
   },
   downloadButton: {
-    position: 'relative',
-    left: '490px',
-    border: 'solid 0.5px grey',
-    borderRadius: '5px',
+    marginRight: 15,
   },
 }));
 
@@ -152,10 +150,11 @@ const Endpoints = () => {
 
   return (
     <>
+      <Breadcrumbs variant="list" elements={[{ label: t('Assets') }, { label: t('Endpoints'), current: true }]} />
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter
-            small
+            variant="small"
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
           />
@@ -192,7 +191,7 @@ const Endpoints = () => {
               </Tooltip>
             </CSVLink>
           ) : (
-            <IconButton disabled>
+            <IconButton size="large" disabled>
               <FileDownloadOutlined/>
             </IconButton>
           )}

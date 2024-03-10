@@ -1,6 +1,6 @@
-import 'typeface-ibm-plex-sans';
-import 'typeface-roboto';
 import React from 'react';
+import '@fontsource/ibm-plex-sans';
+import '@fontsource/geologica';
 import { createRoot } from 'react-dom/client';
 import App from './app';
 import './static/css/index.css';

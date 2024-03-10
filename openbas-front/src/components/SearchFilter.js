@@ -8,15 +8,17 @@ import inject18n from './i18n';
 
 const styles = (theme) => ({
   searchRoot: {
-    borderRadius: 5,
+    borderRadius: 4,
     padding: '0 10px 0 10px',
     backgroundColor: theme.palette.background.paper,
   },
   searchRootTopBar: {
-    borderRadius: 5,
+    borderRadius: 4,
     padding: '1px 10px 0 10px',
     marginRight: 5,
     backgroundColor: theme.palette.background.paper,
+    minWidth: 550,
+    width: '50%',
   },
   searchRootInDrawer: {
     borderRadius: 5,

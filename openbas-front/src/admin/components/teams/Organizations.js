@@ -19,15 +19,20 @@ import { fetchTags } from '../../../actions/Tag';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
 import { exportData } from '../../../utils/Environment';
+import Breadcrumbs from '../../../components/Breadcrumbs';
 
 const interval$ = interval(FIVE_SECONDS);
 
 const styles = (theme) => ({
   parameters: {
     marginTop: -10,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  container: {
-    marginTop: 10,
+  filters: {
+    display: 'flex',
+    gap: '10px',
   },
   itemHead: {
     paddingLeft: 10,
@@ -39,8 +44,12 @@ const styles = (theme) => ({
     height: 50,
   },
   bodyItem: {
-    height: '100%',
+    height: 20,
     fontSize: 13,
+    float: 'left',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
   itemIcon: {
     color: theme.palette.primary.main,
@@ -58,6 +67,9 @@ const styles = (theme) => ({
   },
   icon: {
     color: theme.palette.primary.main,
+  },
+  downloadButton: {
+    marginRight: 15,
   },
 });
 
@@ -207,23 +219,22 @@ class Organizations extends Component {
       sort,
     )(organizations);
     return (
-      <div>
+      <>
+        <Breadcrumbs variant="list" elements={[{ label: t('Teams') }, { label: t('Organizations'), current: true }]} />
         <div className={classes.parameters}>
-          <div style={{ float: 'left', marginRight: 10 }}>
+          <div className={classes.filters}>
             <SearchFilter
               variant="small"
               onChange={this.handleSearch.bind(this)}
               keyword={keyword}
             />
-          </div>
-          <div style={{ float: 'left', marginRight: 10 }}>
             <TagsFilter
               onAddTag={this.handleAddTag.bind(this)}
               onRemoveTag={this.handleRemoveTag.bind(this)}
               currentTags={tags}
             />
           </div>
-          <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
+          <div className={classes.downloadButton}>
             {sortedOrganizations.length > 0 ? (
               <CSVLink
                 data={exportData(
@@ -252,7 +263,7 @@ class Organizations extends Component {
           </div>
         </div>
         <div className="clearfix" />
-        <List classes={{ root: classes.container }}>
+        <List>
           <ListItem
             classes={{ root: classes.itemHead }}
             divider={false}
@@ -333,7 +344,7 @@ class Organizations extends Component {
           ))}
         </List>
         {this.props.userAdmin && <CreateOrganization />}
-      </div>
+      </>
     );
   }
 }

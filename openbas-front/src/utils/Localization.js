@@ -717,6 +717,8 @@ const i18n = {
       By: 'Par',
       'Should not be empty': 'Ne doit pas être vide',
       // Assets
+      Endpoints: 'Endpoints',
+      'Teams of players': 'Equipes de joueurs',
       'Create a new endpoint': 'Créer un nouvel endpoint',
       'Update the endpoint': 'Modifier l\'endpoint',
       'Do you want to delete the endpoint ?': 'Souhaitez-vous supprimer cet endpoint ?',

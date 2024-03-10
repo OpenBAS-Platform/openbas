@@ -1,22 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { AppBar, Badge, Box, Divider, Grid, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
+import { AppBar, Badge, Box, Grid, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
-import { AccountCircleOutlined, AppsOutlined, BiotechOutlined, NotificationsOutlined } from '@mui/icons-material';
+import { AccountCircleOutlined, AppsOutlined, NotificationsOutlined } from '@mui/icons-material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { logout } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';
-import TopMenuDashboard from './TopMenuDashboard';
-import TopMenuSettings from './TopMenuSettings';
-import TopMenuExercises from './TopMenuExercises';
-import TopMenuExercise from './TopMenuExercise';
-import TopMenuTeams from './TopMenuTeams';
-import TopMenuAssets from './TopMenuAssets';
-import TopMenuComponents from './TopMenuComponents';
-import TopMenuIntegrations from './TopMenuIntegrations';
-import TopMenuChallenges from './TopMenuChallenges';
-import TopMenuLessons from './TopMenuLessons';
-import TopMenuChannel from './TopMenuChannel';
-import TopMenuProfile from './TopMenuProfile';
 import type { Theme } from '../../../components/Theme';
 import { useAppDispatch } from '../../../utils/hooks';
 import { MESSAGING$ } from '../../../utils/Environment';
@@ -30,8 +18,6 @@ import oermLight from '../../../static/images/xtm/oerm_light.png';
 import omtdDark from '../../../static/images/xtm/omtd_dark.png';
 import omtdLight from '../../../static/images/xtm/omtd_light.png';
 import useAuth from '../../../utils/hooks/useAuth';
-import TopMenuScenarios from '../scenarios/TopMenuScenarios';
-import TopMenuScenario from '../scenarios/scenario/TopMenuScenario';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   appBar: {
@@ -46,11 +32,12 @@ const useStyles = makeStyles<Theme>((theme) => ({
     color: theme.palette.text?.primary,
   },
   logoContainer: {
-    margin: '2px 0 0 -8px',
+    margin: '2px 0 0 10px',
   },
   logo: {
     cursor: 'pointer',
     height: 35,
+    marginRight: 3,
   },
   logoCollapsed: {
     cursor: 'pointer',
@@ -71,12 +58,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     float: 'left',
     height: '100%',
     paddingTop: 12,
-  },
-  divider: {
-    display: 'table-cell',
-    height: '100%',
-    float: 'left',
-    margin: '0 5px 0 5px',
   },
   subtitle: {
     color: theme.palette.text?.secondary,
@@ -163,8 +144,9 @@ const TopBar: React.FC = () => {
       position="fixed"
       className={classes.appBar}
       variant="outlined"
+      elevation={0}
     >
-      <Toolbar>
+      <Toolbar style={{ marginTop: 0, paddingLeft: 0 }}>
         <div className={classes.logoContainer}>
           <Link to="/admin">
             <img
@@ -175,56 +157,13 @@ const TopBar: React.FC = () => {
           </Link>
         </div>
         <div className={classes.menuContainer}>
-          {(location.pathname === '/admin'
-            || location.pathname.includes('/admin/import')) && (
-            <TopMenuDashboard />
-          )}
-          {location.pathname === '/admin/exercises' && <TopMenuExercises />}
-          {location.pathname.includes('/admin/exercises/') && (
-            <TopMenuExercise />
-          )}
-          {location.pathname === '/admin/scenarios' && <TopMenuScenarios />}
-          {location.pathname.includes('/admin/scenarios/') && (
-            <TopMenuScenario />
-          )}
-          {location.pathname.includes('/admin/assets') && <TopMenuAssets />}
-          {location.pathname.includes('/admin/teams') && <TopMenuTeams />}
-          {(location.pathname.endsWith('/admin/components/channels')
-              || location.pathname.endsWith('/admin/components/documents')
-              || location.pathname.endsWith('/admin/components/challenges'))
-            && <TopMenuComponents />}
-          {location.pathname.includes('/admin/components/channels/') && <TopMenuChannel />}
-          {location.pathname.includes('/admin/components/challenges/') && (<TopMenuChallenges />)}
-          {location.pathname.includes('/admin/lessons') && <TopMenuLessons />}
-          {location.pathname.includes('/admin/integrations') && (
-            <TopMenuIntegrations />
-          )}
-          {location.pathname.includes('/admin/settings') && <TopMenuSettings />}
-          {location.pathname.includes('/admin/profile') && <TopMenuProfile />}
+          <SearchInput
+            variant="topBar"
+            placeholder={`${t('Search the platform')}...`}
+            fullWidth={true}
+          />
         </div>
         <div className={classes.barRight}>
-          <div className={classes.barRightContainer}>
-            <SearchInput
-              variant="topBar"
-              placeholder={`${t('Search the platform')}...`}
-            />
-            <Tooltip title={t('Advanced search')}>
-              <IconButton
-                component={Link}
-                to="/dashboard/search"
-                color={
-                  location.pathname.includes('/dashboard/search')
-                  && !location.pathname.includes('/dashboard/search_bulk')
-                    ? 'secondary'
-                    : 'inherit'
-                }
-                size="medium"
-              >
-                <BiotechOutlined fontSize="medium" />
-              </IconButton>
-            </Tooltip>
-          </div>
-          <Divider className={classes.divider} orientation="vertical" />
           <div className={classes.barRightContainer}>
             <Tooltip title={t('Notifications')}>
               <IconButton
@@ -268,7 +207,7 @@ const TopBar: React.FC = () => {
                   <Grid item={true} xs={6}>
                     <Tooltip title={settings.xtm_opencti_enable && settings.xtm_opencti_url ? t('Platform connected') : t('Get OpenCTI now')}>
                       <a className={classes.xtmItem}
-                        href={settings.xtm_opencti_enable && settings.xtm_opencti_url ? settings.xtm_opencti_url : 'https://filigran.io/solutions/products/opencti-threat-intelligence/'}
+                        href={settings.xtm_opencti_enable && settings.xtm_opencti_url ? settings.xtm_opencti_url : 'https://filigran.io'}
                         target="_blank" rel="noreferrer"
                       >
                         <Badge variant="dot" color={settings.xtm_opencti_enable && settings.xtm_opencti_url ? 'success' : 'warning'}>
@@ -290,7 +229,7 @@ const TopBar: React.FC = () => {
                   </Grid>
                   <Grid item={true} xs={6}>
                     <Tooltip title={t('Platform under construction, subscribe to update!')}>
-                      <a className={classes.xtmItem} href="https://filigran.io/solutions/products/opencrisis-crisis-management/" target="_blank" rel="noreferrer">
+                      <a className={classes.xtmItem} href="https://filigran.io" target="_blank" rel="noreferrer">
                         <Badge variant="dot" color="info">
                           <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? oermDark : oermLight} alt="OERM" />
                         </Badge>
@@ -300,7 +239,7 @@ const TopBar: React.FC = () => {
                   </Grid>
                   <Grid item={true} xs={6}>
                     <Tooltip title={t('Platform under construction, subscribe to update!')}>
-                      <a className={classes.xtmItem} href="https://filigran.io/solutions/products/opencrisis-crisis-management/" target="_blank" rel="noreferrer">
+                      <a className={classes.xtmItem} href="https://filigran.io" target="_blank" rel="noreferrer">
                         <Badge variant="dot" color="info">
                           <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? omtdDark : omtdLight} alt="OMTD" />
                         </Badge>

@@ -16,13 +16,18 @@ import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { exportData } from '../../../utils/Environment';
+import Breadcrumbs from '../../../components/Breadcrumbs';
 
 const useStyles = makeStyles(() => ({
   parameters: {
     marginTop: -10,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  container: {
-    marginTop: 10,
+  filters: {
+    display: 'flex',
+    gap: '10px',
   },
   itemHead: {
     paddingLeft: 10,
@@ -36,6 +41,9 @@ const useStyles = makeStyles(() => ({
   bodyItem: {
     height: '100%',
     fontSize: 13,
+  },
+  downloadButton: {
+    marginRight: 15,
   },
 }));
 
@@ -137,23 +145,22 @@ const Exercises = () => {
   });
   const sortedExercises = filtering.filterAndSort(exercises);
   return (
-    <div>
+    <>
+      <Breadcrumbs variant="list" elements={[{ label: t('Simulations'), current: true }]} />
       <div className={classes.parameters}>
-        <div style={{ float: 'left', marginRight: 10 }}>
+        <div className={classes.filters}>
           <SearchFilter
             variant="small"
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
           />
-        </div>
-        <div style={{ float: 'left', marginRight: 10 }}>
           <TagsFilter
             onAddTag={filtering.handleAddTag}
             onRemoveTag={filtering.handleRemoveTag}
             currentTags={filtering.tags}
           />
         </div>
-        <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
+        <div className={classes.downloadButton}>
           {sortedExercises.length > 0 ? (
             <CSVLink
               data={exportData(
@@ -184,7 +191,7 @@ const Exercises = () => {
         </div>
       </div>
       <div className="clearfix"/>
-      <List classes={{ root: classes.container }}>
+      <List>
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
@@ -301,7 +308,7 @@ const Exercises = () => {
         ))}
       </List>
       {userAdmin && <CreateExercise/>}
-    </div>
+    </>
   );
 };
 

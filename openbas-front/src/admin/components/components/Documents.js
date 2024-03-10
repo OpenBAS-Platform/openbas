@@ -20,13 +20,18 @@ import DocumentPopover from './documents/DocumentPopover';
 import DocumentType from './documents/DocumentType';
 import { exportData } from '../../../utils/Environment';
 import { fetchScenarios } from '../../../actions/scenarios/scenario-actions';
+import Breadcrumbs from '../../../components/Breadcrumbs';
 
 const styles = (theme) => ({
   parameters: {
     marginTop: -10,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  container: {
-    marginTop: 10,
+  filters: {
+    display: 'flex',
+    gap: '10px',
   },
   itemHead: {
     paddingLeft: 10,
@@ -71,6 +76,9 @@ const styles = (theme) => ({
     float: 'left',
     marginRight: 7,
     width: 120,
+  },
+  downloadButton: {
+    marginRight: 15,
   },
 });
 
@@ -258,23 +266,22 @@ class Documents extends Component {
       sort,
     )(documents);
     return (
-      <div>
+      <>
+        <Breadcrumbs variant="list" elements={[{ label: t('Components') }, { label: t('Documents'), current: true }]} />
         <div className={classes.parameters}>
-          <div style={{ float: 'left', marginRight: 10 }}>
+          <div className={classes.filters}>
             <SearchFilter
               variant="small"
               onChange={this.handleSearch.bind(this)}
               keyword={keyword}
             />
-          </div>
-          <div style={{ float: 'left', marginRight: 10 }}>
             <TagsFilter
               onAddTag={this.handleAddTag.bind(this)}
               onRemoveTag={this.handleRemoveTag.bind(this)}
               currentTags={tags}
             />
           </div>
-          <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
+          <div className={classes.downloadButton}>
             {sortedDocuments.length > 0 ? (
               <CSVLink
                 data={exportData(
@@ -309,11 +316,10 @@ class Documents extends Component {
           </div>
         </div>
         <div className="clearfix" />
-        <List classes={{ root: classes.container }}>
+        <List>
           <ListItem
             classes={{ root: classes.itemHead }}
             divider={false}
-            button={true}
             style={{ paddingTop: 0 }}
           >
             <ListItemIcon>
@@ -446,7 +452,7 @@ class Documents extends Component {
           ))}
         </List>
         {userAdmin && <CreateDocument />}
-      </div>
+      </>
     );
   }
 }

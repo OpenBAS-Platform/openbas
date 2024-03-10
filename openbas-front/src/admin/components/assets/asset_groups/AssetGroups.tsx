@@ -19,6 +19,7 @@ import AssetGroupPopover from './AssetGroupPopover';
 import AssetGroupCreation from './AssetGroupCreation';
 import { fetchAssetGroups } from '../../../../actions/assetgroups/assetgroup-action';
 import AssetGroupManagement from './AssetGroupManagement';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -52,6 +53,9 @@ const useStyles = makeStyles(() => ({
     minHeight: '100vh',
     width: '50%',
     padding: 0,
+  },
+  downloadButton: {
+    marginRight: 15,
   },
 }));
 
@@ -126,10 +130,11 @@ const AssetGroups = () => {
   const [selected, setSelected] = useState<AssetGroupStore | undefined>(undefined);
   return (
     <>
+      <Breadcrumbs variant="list" elements={[{ label: t('Assets') }, { label: t('Asset groups'), current: true }]} />
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter
-            small
+            variant="small"
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
           />
@@ -139,7 +144,7 @@ const AssetGroups = () => {
             currentTags={filtering.tags}
           />
         </div>
-        <div style={{ marginRight: '15px' }}>
+        <div className={classes.downloadButton}>
           {sortedAssetGroups.length > 0 ? (
             <CSVLink
               data={exportData(
