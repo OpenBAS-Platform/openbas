@@ -1,17 +1,16 @@
 import { expect } from '@playwright/test';
 import { test } from '../../fixtures/baseFixtures';
 import appUrl from '../../utils/url';
-import LeftMenuPage from '../../model/left-menu.page';
 import AssetsPage from '../../model/assets/assets.page';
 import AssetFormPage from '../../model/assets/asset-form.page';
 import fillLinuxAssetBase from '../../fixtures/assetFixtures';
 
 test('Create an asset', async ({ page }) => {
   // -- PREPARE --
-  await page.goto(appUrl());
+  await page.goto(`${appUrl()}/admin/assets`);
 
-  const leftMenuPage = new LeftMenuPage(page);
-  await leftMenuPage.goToAssets();
+  // const leftMenuPage = new LeftMenuPage(page);
+  // await leftMenuPage.goToAssets();
 
   // -- EXECUTE --
   const assetsPage = new AssetsPage(page);

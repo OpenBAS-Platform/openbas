@@ -360,6 +360,7 @@ const LeftBar = () => {
             </MenuItem>
           </StyledTooltip>
           <MenuItem
+            aria-label="Assets"
             ref={anchors.assets}
             href='assets'
             selected={!navOpen && location.pathname.includes('/admin/assets')}

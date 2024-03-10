@@ -208,7 +208,7 @@ const TopBar: React.FC = () => {
                     <Tooltip title={settings.xtm_opencti_enable && settings.xtm_opencti_url ? t('Platform connected') : t('Get OpenCTI now')}>
                       <a className={classes.xtmItem}
                         href={settings.xtm_opencti_enable && settings.xtm_opencti_url ? settings.xtm_opencti_url : 'https://filigran.io'}
-                        target="_blank" rel="noreferrer"
+                        target="_blank" rel="noreferrer" onClick={handleCloseXtm}
                       >
                         <Badge variant="dot" color={settings.xtm_opencti_enable && settings.xtm_opencti_url ? 'success' : 'warning'}>
                           <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? octiDark : octiLight} alt="OCTI" />
@@ -229,7 +229,7 @@ const TopBar: React.FC = () => {
                   </Grid>
                   <Grid item={true} xs={6}>
                     <Tooltip title={t('Platform under construction, subscribe to update!')}>
-                      <a className={classes.xtmItem} href="https://filigran.io" target="_blank" rel="noreferrer">
+                      <a className={classes.xtmItem} href="https://filigran.io" target="_blank" rel="noreferrer" onClick={handleCloseXtm}>
                         <Badge variant="dot" color="info">
                           <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? oermDark : oermLight} alt="OERM" />
                         </Badge>
@@ -239,7 +239,7 @@ const TopBar: React.FC = () => {
                   </Grid>
                   <Grid item={true} xs={6}>
                     <Tooltip title={t('Platform under construction, subscribe to update!')}>
-                      <a className={classes.xtmItem} href="https://filigran.io" target="_blank" rel="noreferrer">
+                      <a className={classes.xtmItem} href="https://filigran.io" target="_blank" rel="noreferrer" onClick={handleCloseXtm}>
                         <Badge variant="dot" color="info">
                           <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? omtdDark : omtdLight} alt="OMTD" />
                         </Badge>

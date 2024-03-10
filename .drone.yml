@@ -1,19 +1,13 @@
+---
 kind: pipeline
-type: docker
-name: openbas-tests-pull-request
-concurrency: {
-  limit: 2
-}
-
-trigger:
-  event:
-    - pull_request
+name: openbas-tests
 
 steps:
   - name: submodules
     image: alpine/git
     commands:
       - git submodule update --init --recursive
+
   - name: api-tests
     image: maven:3.9.6-eclipse-temurin-21
     environment:
@@ -30,8 +24,12 @@ steps:
       - mvn test
     depends_on:
       - submodules
+
   - name: frontend-tests
-    image: node:20.11.0-alpine3.18
+    image: node:20-alpine
+    volumes:
+    - name: cache-node-frontend
+      path: /drone/src/openbas-front/node_modules    
     commands:
       - cd openbas-front
       - yarn install
@@ -41,44 +39,78 @@ steps:
       - yarn i18n-checker
       - NODE_OPTIONS=--max_old_space_size=8192 yarn test
 
-services:
-  - name: minio
-    image: minio/minio:RELEASE.2023-12-02T10-51-33Z-cpuv1
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    command: [ server, /data ]
-  - name: pgsql
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: openbas
-      POSTGRES_PASSWORD: openbas
-      POSTGRES_DB: openbas
-
----
-
-kind: pipeline
-type: docker
-name: openbas-e2e-tests-pull-request
-concurrency: {
-  limit: 2
-}
-
-trigger:
-  event:
-    - pull_request
-
-steps:
-  - name: e2e-tests
-    image: node:20.11.0
+  - name: frontend-e2e-tests
+    image: node:20.11.1
+    volumes:
+    - name: cache-node-frontend-e2e
+      path: /drone/src/openbas-front/node_modules        
     commands:
       - apt update
       - apt -y install netcat-traditional
-      - while ! nc -z app-start 8080 ; do sleep 1 ; done
+      - while ! nc -z app-e2e 8080 ; do sleep 1 ; done
       - cd openbas-front
       - yarn install
       - yarn playwright install --with-deps chromium
-      - APP_URL=http://app-start:8080 yarn test:e2e
+      - APP_URL=http://app-e2e:8080 yarn test:e2e
+    depends_on:
+      - frontend-tests
+      
+  - name: codecov
+    image: robertstettner/drone-codecov
+    settings:
+      token:
+        from_secret: codecov_token
+      files:
+        - openbas-api/target/site/jacoco/jacoco.xml
+        - openbas-framework/target/site/jacoco/jacoco.xml
+        - openbas-injectors/openbas-caldera/target/site/jacoco/jacoco.xml
+    depends_on:
+      - api-tests        
+
+  - name: build-circleci
+    image: curlimages/curl
+    commands:
+      - curl -X POST --data "branch=master" https://circleci.com/api/v1.1/project/github/OpenBAS-Platform/openbas/build?circle-token=$CIRCLECI_TOKEN
+    environment:
+      CIRCLECI_TOKEN:
+        from_secret: circleci_token
+    when:
+      event:
+        exclude:
+          - tag
+    depends_on:
+      - api-tests
+      - frontend-tests
+      - frontend-e2e-tests
+
+  - name: build-circleci-release
+    image: curlimages/curl
+    commands:
+      - curl -X POST --data "tag=$DRONE_TAG" https://circleci.com/api/v1.1/project/github/OpenBAS-Platform/openbas/build?circle-token=$CIRCLECI_TOKEN
+    environment:
+      CIRCLECI_TOKEN:
+        from_secret: circleci_token
+    when:
+      event:
+        - tag
+    depends_on:
+      - api-tests
+      - frontend-tests
+      - frontend-e2e-tests
+
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_webhook
+      username: drone
+      channel: notifications
+    when:
+      status: [ success, failure ]
+    depends_on:
+      - api-tests
+      - frontend-tests
+      - frontend-e2e-tests      
 
 services:
   - name: minio
@@ -93,13 +125,25 @@ services:
       POSTGRES_USER: openbas
       POSTGRES_PASSWORD: openbas
       POSTGRES_DB: openbas
-  - name: app-start
+  - name: minio-e2e
+    image: minio/minio:RELEASE.2023-12-02T10-51-33Z-cpuv1
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: [ server, /data ]      
+  - name: pgsql-e2e
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: openbas
+      POSTGRES_PASSWORD: openbas
+      POSTGRES_DB: openbas      
+  - name: app-e2e
     image: maven:3.9.6-eclipse-temurin-21
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql:5432/openbas
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql-e2e:5432/openbas
       SPRING_DATASOURCE_USERNAME: openbas
       SPRING_DATASOURCE_PASSWORD: openbas
-      MINIO_ENDPOINT: minio
+      MINIO_ENDPOINT: minio-e2e
       MINIO_PORT: 9000
       MINIO_ACCESS_KEY: minioadmin
       MINIO_ACCESS_SECRET: minioadmin
@@ -121,102 +165,15 @@ services:
       - yarn build
       - cd ..
       - mvn install -DskipTests=true
-      - java -jar openbas-api/target/openbas-api.jar
+      - java -jar openbas-api/target/openbas-api.jar      
 
----
-
-kind: pipeline
-type: docker
-name: openbas-tests-master
-
-trigger:
-  branch:
-    - master
-  event:
-    exclude:
-    - pull_request
-
-steps:
-  - name: submodules
-    image: alpine/git
-    commands:
-      - git submodule update --init --recursive
-  - name: api-tests
-    image: maven:3.9.6-eclipse-temurin-21
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql:5432/openbas
-      MINIO_ENDPOINT: minio
-      MINIO_PORT: 9000
-    commands:
-      - mvn install -DskipTests
-      - cd openbas-api
-      - mvn test
-      - cd ../openbas-framework
-      - mvn test
-      - cd ../openbas-injectors
-      - mvn test
-    depends_on:
-      - submodules
-  - name: frontend-tests
-    image: node:20.11.0-alpine3.18
-    commands:
-      - cd openbas-front
-      - yarn install
-      - yarn build
-      - yarn check-ts
-      - yarn lint
-      - yarn i18n-checker
-      - NODE_OPTIONS=--max_old_space_size=8192 yarn test
-  - name: codecov
-    image: robertstettner/drone-codecov
-    settings:
-      token:
-        from_secret: CODECOV_TOKEN
-      files:
-        - openbas-api/target/site/jacoco/jacoco.xml
-        - openbas-framework/target/site/jacoco/jacoco.xml
-        - openbas-injectors/openbas-caldera/target/site/jacoco/jacoco.xml
-  - name: build-circleci
-    image: curlimages/curl
-    commands:
-      - curl -X POST --data "branch=master" https://circleci.com/api/v1.1/project/github/OpenBAS-Platform/openbas/build?circle-token=$CIRCLECI_TOKEN
-    environment:
-      CIRCLECI_TOKEN:
-        from_secret: circleci_token
-    when:
-      event:
-        exclude:
-          - tag
-  - name: build-circleci-release
-    image: curlimages/curl
-    commands:
-      - curl -X POST --data "tag=$DRONE_TAG" https://circleci.com/api/v1.1/project/github/OpenBAS-Platform/openbas/build?circle-token=$CIRCLECI_TOKEN
-    environment:
-      CIRCLECI_TOKEN:
-        from_secret: circleci_token
-    when:
-      event:
-        - tag
-  - name: slack
-    image: plugins/slack
-    settings:
-      webhook:
-        from_secret: slack_webhook
-      username: drone
-      channel: notifications
-    when:
-      status: [ success, failure ]
-
-services:
-  - name: minio
-    image: minio/minio:RELEASE.2023-12-02T10-51-33Z-cpuv1
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    command: [ server, /data ]
-  - name: pgsql
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: openbas
-      POSTGRES_PASSWORD: openbas
-      POSTGRES_DB: openbas
+volumes:
+  - name: cache-node-frontend
+    host:
+      path: /tmp/cache-node-frontend
+  - name: cache-node-frontend-e2e
+    host:
+      path: /tmp/cache-node-frontend-e2e
+  - name: cache-python
+    host:
+      path: /tmp/cache-python
