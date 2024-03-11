@@ -33,7 +33,7 @@ public class EmailService {
     @Value("${openbas.mail.imap.enabled}")
     private boolean imapEnabled;
 
-    @Value("${mail.username}")
+    @Value("${spring.mail.username}")
     private String replayTo;
 
     private ImapService imapService;
