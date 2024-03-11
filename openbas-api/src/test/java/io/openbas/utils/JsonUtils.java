@@ -1,4 +1,4 @@
-package io.openbas.rest.utils;
+package io.openbas.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

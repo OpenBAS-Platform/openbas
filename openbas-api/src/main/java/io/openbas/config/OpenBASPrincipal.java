@@ -11,4 +11,6 @@ public interface OpenBASPrincipal {
   Collection<? extends GrantedAuthority> getAuthorities();
 
   boolean isAdmin();
+
+  String getLang();
 }

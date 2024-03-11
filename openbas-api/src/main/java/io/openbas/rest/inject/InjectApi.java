@@ -1,6 +1,7 @@
 package io.openbas.rest.inject;
 
 import io.openbas.contract.Contract;
+import io.openbas.contract.ContractService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;

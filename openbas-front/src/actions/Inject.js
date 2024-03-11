@@ -1,5 +1,5 @@
 import * as schema from './Schema';
-import { getReferential, putReferential, postReferential, delReferential } from '../utils/Action';
+import { getReferential, putReferential, postReferential, delReferential, simplePostCall } from '../utils/Action';
 
 export const fetchInjects = (exerciseId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects`;
@@ -72,6 +72,11 @@ export const executeInject = (exerciseId, values, files) => (dispatch) => {
 
 export const fetchInjectTypes = () => (dispatch) => getReferential(schema.arrayOfInjectTypes, '/api/inject_types')(dispatch);
 
+export const fetchPageOfContracts = (contractSearchInput, page, size) => {
+  const data = contractSearchInput;
+  const uri = `/api/contracts?page=${page}&size=${size}`;
+  return simplePostCall(uri, data);
+};
 export const injectDone = (exerciseId, injectId) => (dispatch) => {
   const data = { status: 'SUCCESS', message: 'Manual validation' };
   const uri = `/api/exercises/${exerciseId}/injects/${injectId}/status`;

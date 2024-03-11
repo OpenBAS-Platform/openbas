@@ -42,6 +42,9 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
   private OpenBASPrincipal getUser() {
     return (OpenBASPrincipal) this.getPrincipal();
   }
+  public boolean isAdmin() {
+    return isUserHasBypass();
+  }
 
   private boolean isUserHasBypass() {
     OpenBASPrincipal principal = getUser();

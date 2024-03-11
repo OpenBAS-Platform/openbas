@@ -49,6 +49,10 @@ public class OpenBASOAuth2User implements OpenBASPrincipal, OAuth2User {
   }
 
   @Override
+  public String getLang() {
+    return this.user.getLang();
+  }
+  @Override
   public String getName() {
     return this.user.getFirstname() + " " + this.user.getLastname();
   }

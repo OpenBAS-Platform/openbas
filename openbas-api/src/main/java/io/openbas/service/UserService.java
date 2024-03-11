@@ -139,6 +139,11 @@ public class UserService {
       public boolean isAdmin() {
         return user.isAdmin();
       }
+
+      @Override
+      public String getLang() {
+        return user.getLang();
+      }
     }, "", roles);
   }
 }
