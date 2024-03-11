@@ -3,13 +3,20 @@ import { useLocation } from 'react-router-dom';
 import Message from '../../../components/Message';
 import { MESSAGING$ } from '../../../utils/Environment';
 
+const ERROR_KEY = 'error=';
+
 const LoginError: FunctionComponent = () => {
   const { search } = useLocation();
-  const error = search.substring(search.indexOf('error=') + 'error='.length);
-  if (error) {
-    MESSAGING$.notifyError(decodeURIComponent(error));
-  }
-
+  const params: string[] = search.split('&');
+  let error = '';
+  params.forEach((param) => {
+    if (param.includes(ERROR_KEY)) {
+      error = param.substring(param.indexOf(ERROR_KEY) + ERROR_KEY.length);
+    }
+    if (error) {
+      MESSAGING$.notifyError(decodeURIComponent(error));
+    }
+  });
   return <Message sticky={false} />;
 };
 
