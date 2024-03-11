@@ -3,6 +3,7 @@ package io.openbas.injects.email.service;
 import io.openbas.database.model.DataAttachment;
 import io.openbas.database.model.Execution;
 import io.openbas.execution.ExecutionContext;
+import jakarta.mail.Address;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,9 @@ public class EmailService {
 
     @Value("${openbas.mail.imap.enabled}")
     private boolean imapEnabled;
+
+    @Value("${mail.username}")
+    private String replayTo;
 
     private ImapService imapService;
 
@@ -98,7 +102,9 @@ public class EmailService {
             recipients.add(new InternetAddress(userContext.getUser().getEmail()));
         }
         mimeMessage.setRecipients(Message.RecipientType.TO, recipients.toArray(InternetAddress[]::new));
+        mimeMessage.setReplyTo(new Address[]{new InternetAddress(replayTo)});
         emailSender.send(mimeMessage);
+
         String emails = usersContext.stream().map(c -> c.getUser().getEmail()).collect(joining(", "));
         List<String> userIds = usersContext.stream().map(c -> c.getUser().getId()).toList();
         execution.addTrace(traceSuccess("email", "Mail sent to " + emails, userIds));
@@ -114,6 +120,7 @@ public class EmailService {
         String contextualBody = buildContextualContent(message, userContext);
         MimeMessage mimeMessage = buildMimeMessage(from, inReplyTo, contextualSubject, contextualBody, attachments);
         mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
+        mimeMessage.setReplyTo(new Address[]{new InternetAddress(replayTo)});
         // Crypt if needed
         if (mustBeEncrypted) {
             PGPPublicKey userPgpKey = emailPgp.getUserPgpKey(userContext.getUser());
