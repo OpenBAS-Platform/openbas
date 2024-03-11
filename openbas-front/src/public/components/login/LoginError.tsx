@@ -9,7 +9,7 @@ const LoginError: FunctionComponent = () => {
   const { search } = useLocation();
   const params: string[] = search.split('&');
   let error = '';
-  params.forEach(param => {
+  params.forEach((param) => {
     if (param.includes(ERROR_KEY)) {
       error = param.substring(param.indexOf(ERROR_KEY) + ERROR_KEY.length);
     }
