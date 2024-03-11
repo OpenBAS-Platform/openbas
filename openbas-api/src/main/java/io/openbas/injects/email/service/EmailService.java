@@ -55,47 +55,6 @@ public class EmailService {
         this.emailPgp = emailPgp;
     }
 
-    private void storeMessageImap(Execution execution, MimeMessage mimeMessage) {
-        if (execution.isRuntime() && imapEnabled) {
-            for (int i = 0; i < 3; i++) {
-                try {
-                    imapService.storeSentMessage(mimeMessage);
-                    execution.addTrace(traceSuccess("imap", "Mail successfully stored in IMAP"));
-                    return;
-                } catch (Exception ignored) {
-                }
-            }
-            execution.addTrace(traceError("imap", "Fail to store mail in IMAP after 3 attempts"));
-        }
-    }
-
-    private MimeMessage buildMimeMessage(String from, String inReplyTo, String subject, String body,
-                                         List<DataAttachment> attachments) throws Exception {
-        MimeMessage mimeMessage = emailSender.createMimeMessage();
-        mimeMessage.setFrom(from);
-        if (inReplyTo != null) {
-            mimeMessage.setHeader("In-Reply-To", inReplyTo);
-            mimeMessage.setHeader("References", inReplyTo);
-        }
-        mimeMessage.setSubject(subject, "utf-8");
-        Multipart mailMultipart = new MimeMultipart("mixed");
-        // Add mail content
-        MimeBodyPart bodyPart = new MimeBodyPart();
-        bodyPart.setContent(body, "text/html;charset=utf-8");
-        mailMultipart.addBodyPart(bodyPart);
-        // Add Attachments
-        for (DataAttachment attachment : attachments) {
-            MimeBodyPart aBodyPart = new MimeBodyPart();
-            aBodyPart.setFileName(attachment.name());
-            aBodyPart.setHeader("Content-Type", attachment.contentType());
-            ByteArrayDataSource bds = new ByteArrayDataSource(attachment.data(), attachment.contentType());
-            aBodyPart.setDataHandler(new DataHandler(bds));
-            mailMultipart.addBodyPart(aBodyPart);
-        }
-        mimeMessage.setContent(mailMultipart);
-        return mimeMessage;
-    }
-
     public void sendEmail(Execution execution, List<ExecutionContext> usersContext, String from, String inReplyTo,
                           String subject, String message, List<DataAttachment> attachments) throws Exception {
         MimeMessage mimeMessage = buildMimeMessage(from, inReplyTo, subject, message, attachments);
@@ -137,6 +96,46 @@ public class EmailService {
         storeMessageImap(execution, mimeMessage);
     }
 
+    private void storeMessageImap(Execution execution, MimeMessage mimeMessage) {
+        if (execution.isRuntime() && imapEnabled) {
+            for (int i = 0; i < 3; i++) {
+                try {
+                    imapService.storeSentMessage(mimeMessage);
+                    execution.addTrace(traceSuccess("imap", "Mail successfully stored in IMAP"));
+                    return;
+                } catch (Exception ignored) {
+                }
+            }
+            execution.addTrace(traceError("imap", "Fail to store mail in IMAP after 3 attempts"));
+        }
+    }
+
+    private MimeMessage buildMimeMessage(String from, String inReplyTo, String subject, String body,
+                                         List<DataAttachment> attachments) throws Exception {
+        MimeMessage mimeMessage = emailSender.createMimeMessage();
+        mimeMessage.setFrom(from);
+        if (inReplyTo != null) {
+            mimeMessage.setHeader("In-Reply-To", inReplyTo);
+            mimeMessage.setHeader("References", inReplyTo);
+        }
+        mimeMessage.setSubject(subject, "utf-8");
+        Multipart mailMultipart = new MimeMultipart("mixed");
+        // Add mail content
+        MimeBodyPart bodyPart = new MimeBodyPart();
+        bodyPart.setContent(body, "text/html;charset=utf-8");
+        mailMultipart.addBodyPart(bodyPart);
+        // Add Attachments
+        for (DataAttachment attachment : attachments) {
+            MimeBodyPart aBodyPart = new MimeBodyPart();
+            aBodyPart.setFileName(attachment.name());
+            aBodyPart.setHeader("Content-Type", attachment.contentType());
+            ByteArrayDataSource bds = new ByteArrayDataSource(attachment.data(), attachment.contentType());
+            aBodyPart.setDataHandler(new DataHandler(bds));
+            mailMultipart.addBodyPart(aBodyPart);
+        }
+        mimeMessage.setContent(mailMultipart);
+        return mimeMessage;
+    }
     private MimeMessage getEncryptedMimeMessage(ExecutionContext userContext, String from, String subject, String email, MimeMessage mimeMessage) throws IOException, MessagingException {
         PGPPublicKey userPgpKey = emailPgp.getUserPgpKey(userContext.getUser());
         // Need to create another email that will wrap everything.
