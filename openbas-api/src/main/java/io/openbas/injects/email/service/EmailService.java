@@ -4,7 +4,9 @@ import io.openbas.database.model.DataAttachment;
 import io.openbas.database.model.Execution;
 import io.openbas.execution.ExecutionContext;
 import jakarta.mail.Address;
+import jakarta.mail.MessagingException;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,6 +18,7 @@ import jakarta.mail.Multipart;
 import jakarta.mail.internet.*;
 import jakarta.mail.util.ByteArrayDataSource;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,35 +121,13 @@ public class EmailService {
         String email = userContext.getUser().getEmail();
         String contextualSubject = buildContextualContent(subject, userContext);
         String contextualBody = buildContextualContent(message, userContext);
+
         MimeMessage mimeMessage = buildMimeMessage(from, inReplyTo, contextualSubject, contextualBody, attachments);
         mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
         mimeMessage.setReplyTo(new Address[]{new InternetAddress(replayTo)});
         // Crypt if needed
         if (mustBeEncrypted) {
-            PGPPublicKey userPgpKey = emailPgp.getUserPgpKey(userContext.getUser());
-            // Need to create another email that will wrap everything.
-            MimeMessage encMessage = emailSender.createMimeMessage();
-            encMessage.setFrom(from);
-            encMessage.setSubject(subject, "utf-8");
-            encMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
-            Multipart encMultipart = new MimeMultipart("encrypted; protocol=\"application/pgp-encrypted\"");
-            // This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)
-            InternetHeaders headers = new InternetHeaders();
-            headers.addHeader("Content-Type", "application/pgp-encrypted");
-            MimeBodyPart mimeExPart = new MimeBodyPart(headers, "Version: 1".getBytes());
-            mimeExPart.setDescription("PGP/MIME version identification");
-            encMultipart.addBodyPart(mimeExPart);
-            // Export and crypt to basic email
-            ByteArrayOutputStream multiEncStream = new ByteArrayOutputStream();
-            mimeMessage.writeTo(multiEncStream);
-            String encryptedEmail = emailPgp.encrypt(userPgpKey, multiEncStream.toString());
-            MimeBodyPart encBodyPart = new MimeBodyPart();
-            encBodyPart.setDisposition("inline");
-            encBodyPart.setFileName("openpgp-encrypted-message.asc");
-            encBodyPart.setContent(encryptedEmail, "application/octet-stream");
-            encMultipart.addBodyPart(encBodyPart);
-            // Fill the message with the multipart content
-            encMessage.setContent(encMultipart);
+            MimeMessage encMessage = getEncryptedMimeMessage(userContext, from, subject, email, mimeMessage);
             emailSender.send(encMessage);
         } else {
             emailSender.send(mimeMessage);
@@ -155,5 +136,38 @@ public class EmailService {
         execution.addTrace(traceSuccess("email", "Mail sent to " + email, userIds));
         // Store message in Imap after sending
         storeMessageImap(execution, mimeMessage);
+    }
+
+    private MimeMessage getEncryptedMimeMessage(ExecutionContext userContext, String from, String subject, String email, MimeMessage mimeMessage) throws IOException, MessagingException {
+        PGPPublicKey userPgpKey = emailPgp.getUserPgpKey(userContext.getUser());
+        // Need to create another email that will wrap everything.
+        MimeMessage encMessage = emailSender.createMimeMessage();
+        encMessage.setFrom(from);
+        encMessage.setSubject(subject, "utf-8");
+        encMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
+
+        Multipart encMultipart = new MimeMultipart("encrypted; protocol=\"application/pgp-encrypted\"");
+        // This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)
+        InternetHeaders headers = new InternetHeaders();
+        headers.addHeader("Content-Type", "application/pgp-encrypted");
+
+        MimeBodyPart mimeExPart = new MimeBodyPart(headers, "Version: 1".getBytes());
+        mimeExPart.setDescription("PGP/MIME version identification");
+        encMultipart.addBodyPart(mimeExPart);
+
+        // Export and crypt to basic email
+        ByteArrayOutputStream multiEncStream = new ByteArrayOutputStream();
+        mimeMessage.writeTo(multiEncStream);
+
+        String encryptedEmail = emailPgp.encrypt(userPgpKey, multiEncStream.toString());
+
+        MimeBodyPart encBodyPart = new MimeBodyPart();
+        encBodyPart.setDisposition("inline");
+        encBodyPart.setFileName("openpgp-encrypted-message.asc");
+        encBodyPart.setContent(encryptedEmail, "application/octet-stream");
+        encMultipart.addBodyPart(encBodyPart);
+        // Fill the message with the multipart content
+        encMessage.setContent(encMultipart);
+        return encMessage;
     }
 }
