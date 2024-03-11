@@ -35,9 +35,6 @@ public class EmailService {
     @Value("${openbas.mail.imap.enabled}")
     private boolean imapEnabled;
 
-    @Value("${spring.mail.username}")
-    private String replayTo;
-
     private ImapService imapService;
 
     @Autowired
@@ -63,7 +60,7 @@ public class EmailService {
             recipients.add(new InternetAddress(userContext.getUser().getEmail()));
         }
         mimeMessage.setRecipients(Message.RecipientType.TO, recipients.toArray(InternetAddress[]::new));
-        mimeMessage.setReplyTo(new Address[]{new InternetAddress(replayTo)});
+        mimeMessage.setReplyTo(new Address[]{new InternetAddress(from)});
         emailSender.send(mimeMessage);
 
         String emails = usersContext.stream().map(c -> c.getUser().getEmail()).collect(joining(", "));
@@ -82,7 +79,7 @@ public class EmailService {
 
         MimeMessage mimeMessage = buildMimeMessage(from, inReplyTo, contextualSubject, contextualBody, attachments);
         mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
-        mimeMessage.setReplyTo(new Address[]{new InternetAddress(replayTo)});
+        mimeMessage.setReplyTo(new Address[]{new InternetAddress(from)});
         // Crypt if needed
         if (mustBeEncrypted) {
             MimeMessage encMessage = getEncryptedMimeMessage(userContext, from, subject, email, mimeMessage);
