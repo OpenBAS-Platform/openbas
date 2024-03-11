@@ -1,6 +1,5 @@
 package io.openbas.helper;
 
-import io.openbas.contract.Contract;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.DryInjectRepository;
 import io.openbas.database.repository.InjectRepository;
@@ -8,6 +7,7 @@ import io.openbas.database.specification.DryInjectSpecification;
 import io.openbas.database.specification.InjectSpecification;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
+import io.openbas.service.ExecutionContextService;
 import io.openbas.contract.ContractService;
 import io.openbas.execution.ExecutionContextService;
 import jakarta.transaction.Transactional;
@@ -33,7 +33,6 @@ public class InjectHelper {
 
   private final InjectRepository injectRepository;
   private final DryInjectRepository dryInjectRepository;
-  private final ContractService contractService;
   private final ExecutionContextService executionContextService;
 
   // -- INJECT --
@@ -90,11 +89,10 @@ public class InjectHelper {
         .filter(this::isBeforeOrEqualsNow)
         .sorted(Inject.executionComparator)
         .map(inject -> {
-          Contract contract = this.contractService.resolveContract(inject);
           List<Team> teams = getInjectTeams(inject);
           Hibernate.initialize(inject.getAssets()); // Force lazy load to execute
           Hibernate.initialize(inject.getAssetGroups()); // Force lazy load to execute
-          return new ExecutableInject(true, false, inject, contract, teams, inject.getAssets(), inject.getAssetGroups(), usersFromInjection(inject));
+          return new ExecutableInject(true, false, inject, teams, inject.getAssets(), inject.getAssetGroups(), usersFromInjection(inject));
         });
     // Get dry injects
     List<DryInject> dryInjects = this.dryInjectRepository.findAll(DryInjectSpecification.executable());
@@ -103,17 +101,12 @@ public class InjectHelper {
         .sorted(DryInject.executionComparator)
         .map(dry -> {
           Inject inject = dry.getInject();
-          Contract contract = this.contractService.resolveContract(inject);
           List<Team> teams = new ArrayList<>(); // No teams in dry run, only direct users
           Hibernate.initialize(inject.getAssets()); // Force lazy load to execute
           Hibernate.initialize(inject.getAssetGroups()); // Force lazy load to execute
-          return new ExecutableInject(false, false, dry, inject, contract, teams, inject.getAssets(), inject.getAssetGroups(), usersFromInjection(dry));
+          return new ExecutableInject(false, false, dry, teams, inject.getAssets(), inject.getAssetGroups(), usersFromInjection(dry));
         });
     // Combine injects and dry
-    return concat(executableInjects, executableDryInjects)
-        .filter(
-            executableInject -> executableInject.getContract() == null || !executableInject.getContract().isManual()
-        )
-        .collect(Collectors.toList());
+    return concat(executableInjects, executableDryInjects).collect(Collectors.toList());
   }
 }

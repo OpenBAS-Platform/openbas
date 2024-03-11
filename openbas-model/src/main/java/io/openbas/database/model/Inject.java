@@ -285,6 +285,11 @@ public class Inject implements Base, Injection {
   }
 
   @JsonIgnore
+  public Inject getInject() {
+    return this;
+  }
+
+  @JsonIgnore
   public boolean isNotExecuted() {
     return this.getStatus().isEmpty();
   }

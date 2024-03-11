@@ -1,12 +1,10 @@
 package io.openbas.scheduler.jobs;
 
-import io.openbas.contract.Contract;
-import io.openbas.database.model.*;
+import io.openbas.database.model.Exercise;
 import io.openbas.database.repository.DryInjectRepository;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.execution.ExecutableInject;
-import io.openbas.execution.Injector;
 import io.openbas.helper.InjectHelper;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
@@ -21,7 +19,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static io.openbas.database.model.Execution.executionError;
 import static java.time.Instant.now;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -82,27 +79,26 @@ public class InjectsExecutionJob implements Job {
     }
 
     public void executeInject(ExecutableInject executableInject) {
-        Injection source = executableInject.getSource();
-        Contract contract = executableInject.getContract();
-        Execution execution;
-        if (contract == null) {
-            execution = executionError(executableInject.isRuntime(), "injector", "Inject is not available for execution");
-        } else {
-            Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
-            execution = executor.executeInjection(executableInject);
-        }
+        // Injection source = executableInject.getSource();
+        // Execution execution;
+        // if (contract == null) {
+        //     execution = executionError(executableInject.isRuntime(), "injector", "Inject is not available for execution");
+        // } else {
+        //     Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
+        //     execution = executor.executeInjection(executableInject);
+        // }
         // Report inject execution
-        if (source instanceof Inject) {
-            Inject executedInject = injectRepository.findById(source.getId()).orElseThrow();
-            executedInject.setStatus(InjectStatus.fromExecution(execution, executedInject));
-            injectRepository.save(executedInject);
-        }
-        // Report dry inject execution
-        if (source instanceof DryInject) {
-            DryInject executedDry = dryInjectRepository.findById(source.getId()).orElseThrow();
-            executedDry.setStatus(DryInjectStatus.fromExecution(execution, executedDry));
-            dryInjectRepository.save(executedDry);
-        }
+        // if (source instanceof Inject) {
+        //     Inject executedInject = injectRepository.findById(source.getId()).orElseThrow();
+        //     executedInject.setStatus(InjectStatus.fromExecution(execution, executedInject));
+        //     injectRepository.save(executedInject);
+        // }
+        // // Report dry inject execution
+        // if (source instanceof DryInject) {
+        //     DryInject executedDry = dryInjectRepository.findById(source.getId()).orElseThrow();
+        //     executedDry.setStatus(DryInjectStatus.fromExecution(execution, executedDry));
+        //     dryInjectRepository.save(executedDry);
+        // }
     }
 
     public void updateExercise(String exerciseId) {
@@ -118,7 +114,7 @@ public class InjectsExecutionJob implements Job {
             handleAutoStartExercises();
             // Get all injects to execute grouped by exercise.
             List<ExecutableInject> injects = injectHelper.getInjectsToRun();
-            Map<Exercise, List<ExecutableInject>> byExercises = injects.stream().collect(groupingBy(ex -> ex.getInject().getExercise()));
+            Map<Exercise, List<ExecutableInject>> byExercises = injects.stream().collect(groupingBy(ex -> ex.getInjection().getExercise()));
             // Execute injects in parallel for each exercise.
             byExercises.entrySet().stream().parallel().forEach(entry -> {
                 Exercise exercise = entry.getKey();

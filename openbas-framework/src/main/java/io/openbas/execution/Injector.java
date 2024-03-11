@@ -9,6 +9,15 @@ import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.*;
+import io.openbas.database.model.*;
+import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
+import io.openbas.database.repository.DocumentRepository;
+import io.openbas.database.repository.InjectExpectationRepository;
+import io.openbas.model.Expectation;
+import io.openbas.model.expectation.ChallengeExpectation;
+import io.openbas.model.expectation.ChannelExpectation;
+import io.openbas.model.expectation.ManualExpectation;
+import io.openbas.model.expectation.TechnicalExpectation;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
@@ -48,7 +57,7 @@ public abstract class Injector {
         this.fileService = fileService;
     }
 
-    public abstract List<Expectation> process(Execution execution, ExecutableInject injection, Contract contract) throws Exception;
+    public abstract List<Expectation> process(Execution execution, ExecutableInject injection) throws Exception;
 
     private InjectExpectation expectationConverter(
         @NotNull final ExecutableInject executableInject,
@@ -68,8 +77,8 @@ public abstract class Injector {
         @NotNull InjectExpectation expectationExecution,
         @NotNull final ExecutableInject executableInject,
         @NotNull final Expectation expectation) {
-        expectationExecution.setExercise(executableInject.getInject().getExercise());
-        expectationExecution.setInject(executableInject.getInject());
+        expectationExecution.setExercise(executableInject.getInjection().getExercise());
+        expectationExecution.setInject(executableInject.getInjection().getInject());
         expectationExecution.setExpectedScore(expectation.getScore());
         expectationExecution.setScore(0);
         expectationExecution.setExpectationGroup(expectation.isExpectationGroup());
@@ -99,23 +108,17 @@ public abstract class Injector {
     private Execution execute(ExecutableInject executableInject) {
         Execution execution = new Execution(executableInject.isRuntime());
         try {
-            // Inject contract must exist
-            Contract contract = executableInject.getContract();
             boolean isScheduledInject = !executableInject.isDirect();
-            // Inject contract must be exposed
-            if (!contract.getConfig().isExpose()) {
-                throw new UnsupportedOperationException("Inject is not activated for execution");
-            }
             // If empty content, inject must be rejected
-            if (executableInject.getInject().getContent() == null) {
+            if (executableInject.getInjection().getInject().getContent() == null) {
                 throw new UnsupportedOperationException("Inject is empty");
             }
             // If inject is too old, reject the execution
-            if (isScheduledInject && !isInInjectableRange(executableInject.getSource())) {
+            if (isScheduledInject && !isInInjectableRange(executableInject.getInjection())) {
                 throw new UnsupportedOperationException("Inject is now too old for execution");
             }
             // Process the execution
-            List<Expectation> expectations = process(execution, executableInject, contract);
+            List<Expectation> expectations = process(execution, executableInject);
             // Create the expectations
             List<Team> teams = executableInject.getTeams();
             List<Asset> assets = executableInject.getAssets();
@@ -155,7 +158,7 @@ public abstract class Injector {
     }
 
     public <T> T contentConvert(@NotNull final ExecutableInject injection, @NotNull final Class<T> converter) throws Exception {
-        Inject inject = injection.getInject();
+        Inject inject = injection.getInjection().getInject();
         ObjectNode content = inject.getContent();
         return this.mapper.treeToValue(content, converter);
     }
@@ -163,7 +166,7 @@ public abstract class Injector {
     public List<DataAttachment> resolveAttachments(Execution execution, ExecutableInject injection, List<Document> documents) {
         List<DataAttachment> resolved = new ArrayList<>();
         // Add attachments from direct configuration
-        injection.getDirectAttachments().forEach(doc -> {
+        injection.getAttachments().forEach(doc -> {
             try {
                 byte[] content = IOUtils.toByteArray(doc.getInputStream());
                 resolved.add(new DataAttachment(doc.getName(), doc.getOriginalFilename(), content, doc.getContentType()));

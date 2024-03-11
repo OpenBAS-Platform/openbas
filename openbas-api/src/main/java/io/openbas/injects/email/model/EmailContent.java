@@ -40,7 +40,7 @@ public class EmailContent {
 
   public String buildMessage(ExecutableInject injection, boolean imapEnabled) {
     // String footer = inject.getFooter();
-    String header = injection.getInject().getHeader();
+    String header = injection.getInjection().getInject().getHeader();
     StringBuilder data = new StringBuilder();
     if (StringUtils.hasLength(header)) {
       data.append(HEADER_DIV).append(header).append(END_DIV);
@@ -52,7 +52,7 @@ public class EmailContent {
           .append("<br/><br/><br/><br/>")
           .append("---------------------------------------------------------------------------------<br/>")
           .append("OpenBAS internal information, do not remove!<br/>")
-          .append("[inject_id=").append(injection.getInject().getId()).append("]<br/>")
+          .append("[inject_id=").append(injection.getInjection().getId()).append("]<br/>")
           .append("---------------------------------------------------------------------------------<br/>")
           .append(END_DIV);
     }

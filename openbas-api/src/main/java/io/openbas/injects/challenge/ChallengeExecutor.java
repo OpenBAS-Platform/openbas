@@ -1,7 +1,6 @@
 package io.openbas.injects.challenge;
 
 import io.openbas.config.OpenBASConfig;
-import io.openbas.contract.Contract;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ChallengeRepository;
 import io.openbas.execution.ExecutableInject;
@@ -12,12 +11,12 @@ import io.openbas.injects.challenge.model.ChallengeVariable;
 import io.openbas.injects.email.service.EmailService;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ChallengeExpectation;
+import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,32 +49,32 @@ public class ChallengeExecutor extends Injector {
         this.emailService = emailService;
     }
 
-    private String buildChallengeUri(ExecutionContext context, Challenge challenge) {
+    private String buildChallengeUri(ExecutionContext context, Exercise exercise, Challenge challenge) {
         String userId = context.getUser().getId();
         String challengeId = challenge.getId();
-        String exerciseId = context.getExercise().getId();
+        String exerciseId = exercise.getId();
         return openBASConfig.getBaseUrl() + "/challenges/" + exerciseId + "?user=" + userId + "&challenge=" + challengeId;
     }
 
     @Override
     public List<Expectation> process(
         @NotNull final Execution execution,
-        @NotNull final ExecutableInject injection,
-        @NotNull final Contract contract) {
+        @NotNull final ExecutableInject injection) {
         try {
             ChallengeContent content = contentConvert(injection, ChallengeContent.class);
             List<Challenge> challenges = fromIterable(challengeRepository.findAllById(content.getChallenges()));
-            if (contract.getId().equals(CHALLENGE_PUBLISH)) {
+            String contract = injection.getInjection().getInject().getContract();
+            if (contract.equals(CHALLENGE_PUBLISH)) {
                 // Challenge publishing is only linked to execution date of this inject.
                 String challengeNames = challenges.stream().map(Challenge::getName).collect(Collectors.joining(","));
                 String publishedMessage = "Challenges (" + challengeNames + ") marked as published";
                 execution.addTrace(traceSuccess("challenge", publishedMessage));
                 // Send the publication message.
-                Exercise exercise = injection.getSource().getExercise();
+                Exercise exercise = injection.getInjection().getExercise();
                 String from = exercise.getFrom();
                 List<String> replyTos = exercise.getReplyTos();
-                List<ExecutionContext> users = injection.getContextUser();
-                List<Document> documents = injection.getInject().getDocuments().stream()
+                List<ExecutionContext> users = injection.getUsers();
+                List<Document> documents = injection.getInjection().getInject().getDocuments().stream()
                         .filter(InjectDocument::isAttached).map(InjectDocument::getDocument).toList();
                 List<DataAttachment> attachments = resolveAttachments(execution, injection, documents);
                 String message = content.buildMessage(injection, imapEnabled);
@@ -85,7 +84,7 @@ public class ChallengeExecutor extends Injector {
                         // Put the challenges variables in the injection context
                         List<ChallengeVariable> challengeVariables = challenges.stream()
                                 .map(challenge -> new ChallengeVariable(challenge.getId(), challenge.getName(),
-                                        buildChallengeUri(userInjectContext, challenge)))
+                                        buildChallengeUri(userInjectContext, exercise, challenge)))
                                 .toList();
                         userInjectContext.put("challenges", challengeVariables);
                         // Send the email.
@@ -100,7 +99,7 @@ public class ChallengeExecutor extends Injector {
                 challenges.forEach(challenge -> expectations.add(new ChallengeExpectation(challenge.getScore(), challenge)));
                 return expectations;
             } else {
-                throw new UnsupportedOperationException("Unknown contract " + contract.getId());
+                throw new UnsupportedOperationException("Unknown contract " + contract);
             }
         } catch (Exception e) {
             execution.addTrace(traceError("channel", e.getMessage(), e));

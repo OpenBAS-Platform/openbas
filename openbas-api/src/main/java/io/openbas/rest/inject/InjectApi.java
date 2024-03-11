@@ -2,18 +2,25 @@ package io.openbas.rest.inject;
 
 import io.openbas.asset.AssetGroupService;
 import io.openbas.asset.AssetService;
-import io.openbas.contract.Contract;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.contract.ContractService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
+import io.openbas.execution.Executor;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Injector;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
-import io.openbas.service.*;
+import io.openbas.service.AssetGroupService;
+import io.openbas.service.AssetService;
+import io.openbas.service.ExecutionContextService;
+import io.openbas.service.ScenarioService;
+import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -25,6 +32,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +51,8 @@ public class InjectApi extends RestBehavior {
 
   private static final int MAX_NEXT_INJECTS = 6;
 
+  private Executor executor;
+  private InjectorRepository injectorRepository;
   private CommunicationRepository communicationRepository;
   private ExerciseRepository exerciseRepository;
   private UserRepository userRepository;
@@ -54,9 +64,21 @@ public class InjectApi extends RestBehavior {
   private TagRepository tagRepository;
   private DocumentRepository documentRepository;
   private ApplicationContext context;
-  private ContractService contractService;
   private ExecutionContextService executionContextService;
   private ScenarioService scenarioService;
+
+  @Resource
+  protected ObjectMapper mapper;
+
+  @Autowired
+  public void setExecutor(Executor executor) {
+    this.executor = executor;
+  }
+
+  @Autowired
+  public void setInjectorRepository(InjectorRepository injectorRepository) {
+    this.injectorRepository = injectorRepository;
+  }
 
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
@@ -105,11 +127,6 @@ public class InjectApi extends RestBehavior {
   }
 
   @Autowired
-  public void setContractService(ContractService contractService) {
-    this.contractService = contractService;
-  }
-
-  @Autowired
   public void setInjectRepository(InjectRepository injectRepository) {
     this.injectRepository = injectRepository;
   }
@@ -129,8 +146,19 @@ public class InjectApi extends RestBehavior {
   }
 
   @GetMapping("/api/inject_types")
-  public Collection<Contract> injectTypes() {
-    return contractService.getContracts().values();
+  public Collection<JsonNode> injectTypes() {
+    List<JsonNode> contracts = new ArrayList<>();
+    fromIterable(injectorRepository.findAll()).forEach(injector -> {
+        try {
+            JsonNode arrNode = mapper.readTree(injector.getContracts());
+            for (final JsonNode objNode : arrNode) {
+              contracts.add(objNode);
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    });
+    return contracts;
   }
 
   @GetMapping("/api/injects/try/{injectId}")
@@ -140,13 +168,8 @@ public class InjectApi extends RestBehavior {
     List<ExecutionContext> userInjectContexts = List.of(
         this.executionContextService.executionContext(user, inject, "Direct test")
     );
-    Contract contract = contractService.resolveContract(inject);
-    if (contract == null) {
-      throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
-    }
-    ExecutableInject injection = new ExecutableInject(false, true, inject, contract, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
-    Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
-    Execution execution = executor.executeInjection(injection);
+    ExecutableInject injection = new ExecutableInject(false, true, inject, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
+    Execution execution = executor.execute(injection);
     return InjectStatus.fromExecution(execution, inject);
   }
 
@@ -205,7 +228,6 @@ public class InjectApi extends RestBehavior {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
     // Get common attributes
     Inject inject = input.toInject();
-    inject.setType(contractService.getContractType(input.getContract()));
     inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setExercise(exercise);
     // Set dependencies
@@ -230,19 +252,14 @@ public class InjectApi extends RestBehavior {
       @Valid @RequestPart("input") DirectInjectInput input,
       @RequestPart("file") Optional<MultipartFile> file) {
     Inject inject = input.toInject();
-    Contract contract = contractService.resolveContract(inject);
-    if (contract == null) {
-      throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
-    }
-    inject.setType(contract.getConfig().getType());
     inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
     Iterable<User> users = userRepository.findAllById(input.getUserIds());
     List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
         .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
-    ExecutableInject injection = new ExecutableInject(true, true, inject, contract, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
+    ExecutableInject injection = new ExecutableInject(true, true, inject, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
     file.ifPresent(injection::addDirectAttachment);
-    Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
+    Injector executor = context.getBean(inject.getType(), Injector.class);
     Execution execution = executor.executeInjection(injection);
     return InjectStatus.fromExecution(execution, inject);
   }
@@ -330,7 +347,6 @@ public class InjectApi extends RestBehavior {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     // Get common attributes
     Inject inject = input.toInject();
-    inject.setType(this.contractService.getContractType(input.getContract()));
     inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setScenario(scenario);
     // Set dependencies

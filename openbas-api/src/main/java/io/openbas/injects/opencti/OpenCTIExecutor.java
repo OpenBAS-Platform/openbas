@@ -1,7 +1,5 @@
 package io.openbas.injects.opencti;
 
-import io.openbas.config.OpenBASConfig;
-import io.openbas.contract.Contract;
 import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.Injector;
@@ -9,7 +7,6 @@ import io.openbas.injects.opencti.model.CaseContent;
 import io.openbas.injects.opencti.service.OpenCTIService;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ManualExpectation;
-import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,9 +19,6 @@ import static io.openbas.injects.opencti.OpenCTIContract.OPENCTI_CREATE_CASE;
 
 @Component(OpenCTIContract.TYPE)
 public class OpenCTIExecutor extends Injector {
-
-  @Resource
-  private OpenBASConfig openBASConfig;
 
   private OpenCTIService openCTIService;
 
@@ -52,18 +46,16 @@ public class OpenCTIExecutor extends Injector {
   @Override
   public List<Expectation> process(
       @NotNull final Execution execution,
-      @NotNull final ExecutableInject injection,
-      @NotNull final Contract contract)
+      @NotNull final ExecutableInject injection)
       throws Exception {
-    Inject inject = injection.getInject();
+    Inject inject = injection.getInjection().getInject();
     CaseContent content = contentConvert(injection, CaseContent.class);
     List<Document> documents = inject.getDocuments().stream().filter(InjectDocument::isAttached)
         .map(InjectDocument::getDocument).toList();
     List<DataAttachment> attachments = resolveAttachments(execution, injection, documents);
     String name = content.getName();
     String description = content.getDescription();
-    Exercise exercise = injection.getSource().getExercise();
-    switch (contract.getId()) {
+    switch (inject.getContract()) {
       case OPENCTI_CREATE_CASE -> createCase(execution, name, description, attachments);
       default -> createReport(execution, name, description, attachments);
     }
