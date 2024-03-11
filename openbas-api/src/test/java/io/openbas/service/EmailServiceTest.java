@@ -29,7 +29,7 @@ class EmailServiceTest {
     private EmailService emailService;
 
     @Test
-    void shouldSetReplayToInHeader() throws Exception {
+    void shouldSetReplayToInHeaderEqualsToFrom() throws Exception {
         ArgumentCaptor<MimeMessage> argument = ArgumentCaptor.forClass(MimeMessage.class);
 
         Execution execution = new Execution();
