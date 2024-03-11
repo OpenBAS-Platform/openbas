@@ -3,20 +3,19 @@ package io.openbas.injects.email.service;
 import io.openbas.database.model.DataAttachment;
 import io.openbas.database.model.Execution;
 import io.openbas.execution.ExecutionContext;
+import jakarta.activation.DataHandler;
 import jakarta.mail.Address;
+import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.internet.*;
+import jakarta.mail.util.ByteArrayDataSource;
 import org.bouncycastle.openpgp.PGPPublicKey;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
-import jakarta.activation.DataHandler;
-import jakarta.mail.Message;
-import jakarta.mail.Multipart;
-import jakarta.mail.internet.*;
-import jakarta.mail.util.ByteArrayDataSource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,7 +70,7 @@ public class EmailService {
     }
 
     private MimeMessage buildMimeMessage(String from, String inReplyTo, String subject, String body,
-            List<DataAttachment> attachments) throws Exception {
+                                         List<DataAttachment> attachments) throws Exception {
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         mimeMessage.setFrom(from);
         if (inReplyTo != null) {
@@ -98,7 +97,7 @@ public class EmailService {
     }
 
     public void sendEmail(Execution execution, List<ExecutionContext> usersContext, String from, String inReplyTo,
-            String subject, String message, List<DataAttachment> attachments) throws Exception {
+                          String subject, String message, List<DataAttachment> attachments) throws Exception {
         MimeMessage mimeMessage = buildMimeMessage(from, inReplyTo, subject, message, attachments);
         List<InternetAddress> recipients = new ArrayList<>();
         for (ExecutionContext userContext : usersContext) {
@@ -116,7 +115,7 @@ public class EmailService {
     }
 
     public void sendEmail(Execution execution, ExecutionContext userContext, String from, String inReplyTo,
-            boolean mustBeEncrypted, String subject, String message, List<DataAttachment> attachments)
+                          boolean mustBeEncrypted, String subject, String message, List<DataAttachment> attachments)
             throws Exception {
         String email = userContext.getUser().getEmail();
         String contextualSubject = buildContextualContent(subject, userContext);
