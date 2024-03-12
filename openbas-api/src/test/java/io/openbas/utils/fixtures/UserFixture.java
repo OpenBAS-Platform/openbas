@@ -37,12 +37,8 @@ public class UserFixture {
     }
 
     public static User getSavedUser() {
-        User user = new User();
+        User user = getUser();
         user.setId("saved-user-id");
-        user.setFirstname("Firstname");
-        user.setLastname("Lastname");
-        user.setEmail(EMAIL);
-        user.setPassword(ENCODED_PASSWORD);
         return user;
     }
 }
