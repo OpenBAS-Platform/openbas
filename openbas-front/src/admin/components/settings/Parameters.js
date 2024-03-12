@@ -4,14 +4,13 @@ import * as R from 'ramda';
 import { withStyles } from '@mui/styles';
 import { connect, useDispatch } from 'react-redux';
 import { Typography, Grid, Paper, List, ListItem, ListItemText, Switch, TextField } from '@mui/material';
-import { Field, Form } from 'react-final-form';
 import ParametersForm from './ParametersForm';
 import inject18n from '../../../components/i18n';
 import { storeHelper } from '../../../actions/Schema';
 import { updateParameters, fetchParameters } from '../../../actions/Application';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import ItemBoolean from '../../../components/ItemBoolean';
-import ColorPickerField from '../../../components/ColorPickerField';
+import ThemeForm from './ThemeForm';
 
 const styles = () => ({
   root: {
@@ -37,6 +36,7 @@ const Parameters = (props) => {
   useDataLoader(() => {
     dispatch(fetchParameters());
   });
+
   const onUpdate = (data) => connectedUpdateParameters(data);
   return (
     <div className={classes.root}>
@@ -79,19 +79,13 @@ const Parameters = (props) => {
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Dark theme')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <List>
-              <ListItem divider={true}>
-                <ListItemText primary={t('Edition')} />
-                <ItemBoolean variant="inList" status={null} neutralLabel='Community' />
-              </ListItem>
-            </List>
+            <ThemeForm />
           </Paper>
         </Grid>
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Light theme')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            &nbsp;
-            ligth
+            <ThemeForm />
           </Paper>
         </Grid>
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>

@@ -136,6 +136,7 @@ public class SettingsApi extends RestBehavior {
 
   @GetMapping("/api/settings")
   public List<PlatformSetting> settings() {
+
     List<PlatformSetting> settings = new ArrayList<>();
     // Get setting from database
     Map<String, Setting> dbSettings = mapOfSettings();
