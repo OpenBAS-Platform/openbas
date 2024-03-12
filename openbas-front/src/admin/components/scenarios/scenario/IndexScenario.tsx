@@ -1,5 +1,6 @@
 import React, { FunctionComponent, lazy, Suspense } from 'react';
-import { Route, Routes, useParams } from 'react-router-dom';
+import { Link, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
+import { Box, Tab, Tabs } from '@mui/material';
 import Loader from '../../../../components/Loader';
 import { errorWrapper } from '../../../../components/Error';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -13,6 +14,7 @@ import ScenarioHeader from './ScenarioHeader';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import useScenarioPermissions from '../../../../utils/Scenario';
 import { DocumentContext, DocumentContextType, PermissionsContext, PermissionsContextType } from '../../components/Context';
+import { useFormatter } from '../../../../components/i18n';
 
 const Scenario = lazy(() => import('./Scenario'));
 const Teams = lazy(() => import('./teams/ScenarioTeams'));
@@ -24,6 +26,8 @@ const Injects = lazy(() => import('./injects/ScenarioInjects'));
 const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = ({
   scenario,
 }) => {
+  const { t } = useFormatter();
+  const location = useLocation();
   const permissionsContext: PermissionsContextType = {
     permissions: useScenarioPermissions(scenario.scenario_id),
   };
@@ -34,15 +38,47 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
       document_exercises: [],
     }),
   };
-
+  let tabValue = location.pathname;
+  if (location.pathname.includes(`/admin/scenarios/${scenario.scenario_id}/definition`)) {
+    tabValue = `/admin/scenarios/${scenario.scenario_id}/definition`;
+  }
   return (
     <PermissionsContext.Provider value={permissionsContext}>
       <DocumentContext.Provider value={documentContext}>
         <TopBar />
         <ScenarioHeader />
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: 'divider',
+            marginBottom: 4,
+          }}
+        >
+          <Tabs value={tabValue}>
+            <Tab
+              component={Link}
+              to={`/admin/scenarios/${scenario.scenario_id}`}
+              value={`/admin/scenarios/${scenario.scenario_id}`}
+              label={t('Overview')}
+            />
+            <Tab
+              component={Link}
+              to={`/admin/scenarios/${scenario.scenario_id}/definition`}
+              value={`/admin/scenarios/${scenario.scenario_id}/definition`}
+              label={t('Definition')}
+            />
+            <Tab
+              component={Link}
+              to={`/admin/scenarios/${scenario.scenario_id}/injects`}
+              value={`/admin/scenarios/${scenario.scenario_id}/injects`}
+              label={t('Injects')}
+            />
+          </Tabs>
+        </Box>
         <Suspense fallback={<Loader />}>
           <Routes>
             <Route path="" element={errorWrapper(Scenario)()} />
+            <Route path="definition" element={<Navigate to="teams" replace={true}/>}/>
             <Route path="definition/teams" element={errorWrapper(Teams)({ scenarioTeamsUsers: scenario.scenario_teams_users })} />
             <Route path="definition/articles" element={errorWrapper(Articles)()} />
             <Route path="definition/challenges" element={errorWrapper(Challenges)()} />

@@ -15,11 +15,10 @@ import Transition from '../../../components/common/Transition';
 import { usePermissions } from '../../../utils/Exercise';
 import TagChip from '../components/tags/TagChip';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   container: {
     display: 'flex',
     justifyContent: 'space-between',
-    marginBottom: theme.spacing(2),
   },
   containerTitle: {
     display: 'inline-flex',

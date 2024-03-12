@@ -164,13 +164,14 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 interface Props {
   teamIds: Team['team_id'][];
+  contextual?: boolean
 }
 
 interface TeamStoreExtended extends TeamStore {
   team_users_enabled_number: number
 }
 
-const Teams: React.FC<Props> = ({ teamIds }) => {
+const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
   // Standard hooks
   const dispatch = useAppDispatch();
   const classes = useStyles();
@@ -206,7 +207,7 @@ const Teams: React.FC<Props> = ({ teamIds }) => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Teams') }, { label: t('Teams of players'), current: true }]} />
+      {!contextual && <Breadcrumbs variant="list" elements={[{ label: t('Teams') }, { label: t('Teams of players'), current: true }]} />}
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter

@@ -1,5 +1,6 @@
 import React, { FunctionComponent, lazy, Suspense } from 'react';
-import { Route, Routes, useParams } from 'react-router-dom';
+import { Route, Routes, useLocation, useParams, Link, Navigate } from 'react-router-dom';
+import { Box, Tabs, Tab } from '@mui/material';
 import { fetchExercise } from '../../../actions/Exercise';
 import { errorWrapper } from '../../../components/Error';
 import Loader from '../../../components/Loader';
@@ -13,6 +14,7 @@ import { DocumentContext, DocumentContextType, PermissionsContext, PermissionsCo
 import { usePermissions } from '../../../utils/Exercise';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
 import NotFound from '../../../components/NotFound';
+import { useFormatter } from '../../../components/i18n';
 
 const Exercise = lazy(() => import('./Exercise'));
 const Dryrun = lazy(() => import('./controls/Dryrun'));
@@ -36,6 +38,8 @@ const Variables = lazy(() => import('./variables/ExerciseVariables'));
 const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
   exercise,
 }) => {
+  const { t } = useFormatter();
+  const location = useLocation();
   const permissionsContext: PermissionsContextType = {
     permissions: usePermissions(exercise.exercise_id),
   };
@@ -46,29 +50,78 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
       document_exercises: exercise ? [{ id: exercise.exercise_id, label: exercise.exercise_name }] : [],
     }),
   };
-
+  let tabValue = location.pathname;
+  if (location.pathname.includes(`/admin/exercises/${exercise.exercise_id}/definition`)) {
+    tabValue = `/admin/exercises/${exercise.exercise_id}/definition`;
+  } else if (location.pathname.includes(`/admin/exercises/${exercise.exercise_id}/animation`)) {
+    tabValue = `/admin/exercises/${exercise.exercise_id}/animation`;
+  } else if (location.pathname.includes(`/admin/exercises/${exercise.exercise_id}/results`)) {
+    tabValue = `/admin/exercises/${exercise.exercise_id}/results`;
+  }
   return (
     <PermissionsContext.Provider value={permissionsContext}>
       <DocumentContext.Provider value={documentContext}>
         <TopBar />
         <ExerciseHeader />
-        <div className="clearfix" />
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: 'divider',
+            marginBottom: 4,
+          }}
+        >
+          <Tabs value={tabValue}>
+            <Tab
+              component={Link}
+              to={`/admin/exercises/${exercise.exercise_id}`}
+              value={`/admin/exercises/${exercise.exercise_id}`}
+              label={t('Overview')}
+            />
+            <Tab
+              component={Link}
+              to={`/admin/exercises/${exercise.exercise_id}/definition`}
+              value={`/admin/exercises/${exercise.exercise_id}/definition`}
+              label={t('Definition')}
+            />
+            <Tab
+              component={Link}
+              to={`/admin/exercises/${exercise.exercise_id}/injects`}
+              value={`/admin/exercises/${exercise.exercise_id}/injects`}
+              label={t('Scenario')}
+            />
+            <Tab
+              component={Link}
+              to={`/admin/exercises/${exercise.exercise_id}/animation`}
+              value={`/admin/exercises/${exercise.exercise_id}/animation`}
+              label={t('Animation')}
+            />
+            <Tab
+              component={Link}
+              to={`/admin/exercises/${exercise.exercise_id}/results`}
+              value={`/admin/exercises/${exercise.exercise_id}/results`}
+              label={t('Results')}
+            />
+          </Tabs>
+        </Box>
         <Suspense fallback={<Loader />}>
           <Routes>
             <Route path="" element={errorWrapper(Exercise)()} />
             <Route path="controls/dryruns/:dryrunId" element={errorWrapper(Dryrun)()} />
             <Route path="controls/comchecks/:comcheckId" element={errorWrapper(Comcheck)()} />
+            <Route path="definition" element={<Navigate to="teams" replace={true}/>}/>
             <Route path="definition/teams" element={errorWrapper(ExerciseTeams)({ exerciseTeamsUsers: exercise.exercise_teams_users })} />
             <Route path="definition/articles" element={errorWrapper(Articles)()} />
             <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
             <Route path="definition/variables" element={errorWrapper(Variables)()} />
             <Route path="injects" element={errorWrapper(Injects)()} />
+            <Route path="animation" element={<Navigate to="timeline" replace={true}/>}/>
             <Route path="animation/timeline" element={errorWrapper(Timeline)()} />
             <Route path="animation/mails" element={errorWrapper(Mails)()} />
             <Route path="animation/mails/:injectId" element={errorWrapper(MailsInject)()} />
             <Route path="animation/logs" element={errorWrapper(Logs)()} />
             <Route path="animation/chat" element={errorWrapper(Chat)()} />
             <Route path="animation/validations" element={errorWrapper(Validations)()} />
+            <Route path="results" element={<Navigate to="dashboard" replace={true}/>}/>
             <Route path="results/dashboard" element={errorWrapper(Dashboard)()} />
             <Route path="results/lessons" element={errorWrapper(Lessons)()} />
             <Route path="results/reports" element={errorWrapper(Reports)()} />

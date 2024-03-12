@@ -89,7 +89,7 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
     <TeamContext.Provider value={context}>
       <div className={classes.container}>
         <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
-        <Teams teamIds={teamIds} />
+        <Teams teamIds={teamIds} contextual={true} />
         {permissions.canWrite && <AddTeams addedTeamIds={teamIds} onAddTeams={onAddTeams} />}
       </div>
     </TeamContext.Provider>
