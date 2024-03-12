@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Chip, Tooltip, IconButton } from '@mui/material';
 import { connect } from 'react-redux';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, DescriptionOutlined, FileDownloadOutlined, RowingOutlined } from '@mui/icons-material';
@@ -245,12 +245,12 @@ class Documents extends Component {
     const { keyword, sortBy, orderAsc, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.document_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
       || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1;
+      !== -1;
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );

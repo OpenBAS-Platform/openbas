@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Form } from 'react-final-form';
 import { Box, Button } from '@mui/material';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import TextField from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
@@ -127,7 +127,7 @@ class InjectForm extends Component {
               renderOption={(renderProps, option) => (
                 <Box component="li" {...renderProps}>
                   <div className={classes.icon}>
-                    <InjectIcon type={option.type}/>
+                    <InjectIcon type={option.type} />
                   </div>
                   <div className={classes.text}>{t(option.label)}</div>
                 </Box>

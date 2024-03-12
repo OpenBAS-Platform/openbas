@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Dialog, DialogTitle, DialogContent, Fab } from '@mui/material';
 import { Add } from '@mui/icons-material';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import { addTag } from '../../../../actions/Tag';
 import TagForm from './TagForm';
 import inject18n from '../../../../components/i18n';

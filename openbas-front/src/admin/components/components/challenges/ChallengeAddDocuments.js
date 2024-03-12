@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Button, Chip, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, Box, ListItemIcon, Grid } from '@mui/material';
 import { ControlPointOutlined, DescriptionOutlined } from '@mui/icons-material';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
@@ -104,12 +104,12 @@ class ChallengeAddDocuments extends Component {
     const { keyword, documentsIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
+      !== -1
       || (n.document_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
       || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1;
+      !== -1;
     const filteredDocuments = R.pipe(
       R.filter(
         (n) => tags.length === 0

@@ -31,7 +31,7 @@ import {
   Typography,
 } from '@mui/material';
 import { MoreVert, PersonOutlined } from '@mui/icons-material';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import { fetchGroup, deleteGroup, updateGroupUsers, updateGroupInformation } from '../../../../actions/Group';
 import { addGrant, deleteGrant, addGroupOrganization, deleteGroupOrganization } from '../../../../actions/Grant';
 import GroupForm from './GroupForm';

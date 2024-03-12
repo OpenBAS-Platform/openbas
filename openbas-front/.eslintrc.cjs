@@ -56,10 +56,16 @@ module.exports = {
     ],
     'no-restricted-imports': [
       'error', {
-        patterns: [{
-          group: ['@mui/material/*', '!@mui/material/styles', '!@mui/material/colors', '!@mui/material/transitions'],
-          message: "Please use named import from @mui/material instead."
-        }]
+        patterns: [
+          {
+            group: ['@mui/material/*', '!@mui/material/styles', '!@mui/material/colors', '!@mui/material/transitions'],
+            message: "Please use named import from @mui/material instead."
+          },
+          {
+            group: ['@mui/styles/*'],
+            message: "Please use named import from @mui/styles instead."
+          }
+        ]
       }
     ],
     '@typescript-eslint/naming-convention': ['error', {

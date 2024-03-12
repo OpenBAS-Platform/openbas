@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as R from 'ramda';
 import { RouteOutlined } from '@mui/icons-material';
 import { Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import { connect } from 'react-redux';
 import KillChainPhaseForm from '../admin/components/settings/kill_chain_phases/KillChainPhaseForm';
 import { fetchKillChainPhases, addKillChainPhase } from '../actions/KillChainPhase';

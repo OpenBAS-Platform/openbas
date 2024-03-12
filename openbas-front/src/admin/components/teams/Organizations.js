@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import { List, ListItem, ListItemIcon, ListItemText, Tooltip, ListItemSecondaryAction, IconButton } from '@mui/material';
 import { CSVLink } from 'react-csv';
 import { connect } from 'react-redux';

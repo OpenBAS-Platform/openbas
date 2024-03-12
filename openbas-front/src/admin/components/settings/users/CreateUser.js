@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Fab, Dialog, DialogTitle, DialogContent, Slide } from '@mui/material';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import { Add } from '@mui/icons-material';
 import { addUser } from '../../../../actions/User';
 import UserForm from './UserForm';

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import { IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import ObjectiveForm from './ObjectiveForm';

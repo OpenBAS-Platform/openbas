@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Fab, Dialog, DialogTitle, DialogContent } from '@mui/material';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import { Add } from '@mui/icons-material';
 import { addKillChainPhase } from '../../../../actions/KillChainPhase';
 import KillChainPhaseForm from './KillChainPhaseForm';
