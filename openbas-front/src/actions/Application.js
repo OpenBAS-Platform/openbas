@@ -15,6 +15,26 @@ export const updateParameters = (data) => (dispatch) => {
   )(dispatch);
 };
 
+export const fetchPlatformParameters = () => (dispatch) => {
+  return getReferential(schema.arrayOfParameters, '/api/platform/settings')(dispatch);
+};
+
+export const updatePlatformLightParameters = (data) => (dispatch) => {
+  return putReferential(
+    schema.arrayOfParameters,
+    '/api/settings/theme/light',
+    data,
+  )(dispatch);
+};
+
+export const updatePlatformDarkParameters = (data) => (dispatch) => {
+  return putReferential(
+    schema.arrayOfParameters,
+    '/api/settings/theme/dark',
+    data,
+  )(dispatch);
+};
+
 export const askReset = (username, locale) => (dispatch) => {
   const data = { login: username, lang: locale };
   return postReferential(schema.user, '/api/reset', data)(dispatch);
