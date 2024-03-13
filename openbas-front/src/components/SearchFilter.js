@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import { TextField, InputAdornment } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import { compose } from 'ramda';
@@ -103,7 +103,7 @@ class SearchInput extends Component {
           classes: {
             root: classRoot,
             input:
-              // eslint-disable-next-line no-nested-ternary
+            // eslint-disable-next-line no-nested-ternary
               variant === 'small' || variant === 'thin'
                 ? classes.searchInputSmall
                 : variant !== 'noAnimation'

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { compose } from 'ramda';
 import * as PropTypes from 'prop-types';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import { ArrowUpwardOutlined, ArrowDownwardOutlined, ArrowForwardOutlined } from '@mui/icons-material';
 import inject18n from './i18n';
 

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Button, Chip, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, Box, ListItemIcon, Grid, IconButton } from '@mui/material';
 import { Add, CastForEducationOutlined } from '@mui/icons-material';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import SearchFilter from '../../../../../components/SearchFilter';
 import inject18n from '../../../../../components/i18n';
 import { storeHelper } from '../../../../../actions/Schema';

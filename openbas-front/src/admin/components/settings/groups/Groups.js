@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import { Tooltip, List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
 import { connect } from 'react-redux';
 import { interval } from 'rxjs';

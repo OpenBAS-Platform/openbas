@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as R from 'ramda';
 import { LabelOutlined } from '@mui/icons-material';
 import { Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import { connect } from 'react-redux';
 import TagForm from '../admin/components/settings/tags/TagForm';
 import { fetchTags, addTag } from '../actions/Tag';

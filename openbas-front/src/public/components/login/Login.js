@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles, useTheme } from '@mui/styles';
 import { Paper, Box } from '@mui/material';
 import * as R from 'ramda';
-import { useTheme } from '@mui/styles';
 import logoDark from '../../../static/images/logo_text_dark.png';
 import logoLight from '../../../static/images/logo_text_light.png';
 import byFiligranDark from '../../../static/images/by_filigran_dark.png';
@@ -89,13 +88,13 @@ const Login = (props) => {
       </div>
       {isLocal && !reset && (
         <Paper variant="outlined" classes={{ root: classes.login }}>
-          <LoginForm onSubmit={onSubmit}/>
+          <LoginForm onSubmit={onSubmit} />
           <div style={{ marginBottom: 10, cursor: 'pointer' }}>
             <a onClick={() => setReset(true)}>{t('I forgot my password')}</a>
           </div>
         </Paper>
       )}
-      {isLocal && reset && <Reset onCancel={() => setReset(false)}/>}
+      {isLocal && reset && <Reset onCancel={() => setReset(false)} />}
       <Box
         sx={{
           marginTop: 2.5,
@@ -114,7 +113,7 @@ const Login = (props) => {
             />
           ),
         )}
-        <LoginError/>
+        <LoginError />
       </Box>
     </div>
   );

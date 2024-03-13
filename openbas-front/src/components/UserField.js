@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as R from 'ramda';
 import { PersonOutlined } from '@mui/icons-material';
 import { Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import { connect } from 'react-redux';
 import PlayerForm from '../admin/components/teams/players/PlayerForm';
 import { fetchUsers, addUser } from '../actions/User';

@@ -56,6 +56,7 @@ export default ({ mode }: { mode: string }) => {
         '@mui/material/transitions',
         '@ckeditor/ckeditor5-react',
         'react-hook-form',
+        'date-fns',
         '@hookform/resolvers/zod',
         'zod',
         'ckeditor5-custom-build/build/ckeditor',
