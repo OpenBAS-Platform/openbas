@@ -51,7 +51,9 @@ public class PlatformSettingsApi extends RestBehavior {
   private OpenBASConfig openBASConfig;
 
   @Autowired
-  public void setOpenCTIConfig(OpenCTIConfig openCTIConfig) { this.openCTIConfig = openCTIConfig; }
+  public void setOpenCTIConfig(OpenCTIConfig openCTIConfig) {
+    this.openCTIConfig = openCTIConfig;
+  }
 
   @Autowired
   public void setSettingRepository(SettingRepository settingRepository) {
@@ -165,27 +167,27 @@ public class PlatformSettingsApi extends RestBehavior {
 
     // THEME
     ThemeInput themeLight = new ThemeInput();
-    themeLight.setBackgroundColor(mapOfSettings().get("ligth."+Theme.THEME_KEYS.BACKGROUND_COLOR).getValue());
-    themeLight.setAccentColor(mapOfSettings().get("ligth."+Theme.THEME_KEYS.PAPER_COLOR).getValue());
-    themeLight.setNavigationColor(mapOfSettings().get("ligth."+Theme.THEME_KEYS.NAVIGATION_COLOR).getValue());
-    themeLight.setPrimaryColor(mapOfSettings().get("ligth."+Theme.THEME_KEYS.PRIMARY_COLOR).getValue());
-    themeLight.setSecondaryColor(mapOfSettings().get("ligth."+Theme.THEME_KEYS.SECONDARY_COLOR).getValue());
-    themeLight.setAccentColor(mapOfSettings().get("ligth."+Theme.THEME_KEYS.ACCENT_COLOR).getValue());
-    themeLight.setLogoUrl(mapOfSettings().get("ligth."+Theme.THEME_KEYS.LOGO_URL).getValue());
-    themeLight.setLogoLoginUrl(mapOfSettings().get("ligth."+Theme.THEME_KEYS.LOGO_LOGIN_URL).getValue());
-    themeLight.setLogoUrlCollapsed(mapOfSettings().get("ligth."+Theme.THEME_KEYS.LOGO_URL_COLLAPSED).getValue());
+    themeLight.setBackgroundColor(mapOfSettings().get("ligth." + Theme.THEME_KEYS.BACKGROUND_COLOR).getValue());
+    themeLight.setAccentColor(mapOfSettings().get("ligth." + Theme.THEME_KEYS.PAPER_COLOR).getValue());
+    themeLight.setNavigationColor(mapOfSettings().get("ligth." + Theme.THEME_KEYS.NAVIGATION_COLOR).getValue());
+    themeLight.setPrimaryColor(mapOfSettings().get("ligth." + Theme.THEME_KEYS.PRIMARY_COLOR).getValue());
+    themeLight.setSecondaryColor(mapOfSettings().get("ligth." + Theme.THEME_KEYS.SECONDARY_COLOR).getValue());
+    themeLight.setAccentColor(mapOfSettings().get("ligth." + Theme.THEME_KEYS.ACCENT_COLOR).getValue());
+    themeLight.setLogoUrl(mapOfSettings().get("ligth." + Theme.THEME_KEYS.LOGO_URL).getValue());
+    themeLight.setLogoLoginUrl(mapOfSettings().get("ligth." + Theme.THEME_KEYS.LOGO_LOGIN_URL).getValue());
+    themeLight.setLogoUrlCollapsed(mapOfSettings().get("ligth." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED).getValue());
     platformSettings.setThemeLight(themeLight);
 
     ThemeInput themeDark = new ThemeInput();
-    themeDark.setBackgroundColor(mapOfSettings().get("ligth."+Theme.THEME_KEYS.BACKGROUND_COLOR).getValue());
-    themeDark.setAccentColor(mapOfSettings().get("ligth."+Theme.THEME_KEYS.PAPER_COLOR).getValue());
-    themeDark.setNavigationColor(mapOfSettings().get("ligth."+Theme.THEME_KEYS.NAVIGATION_COLOR).getValue());
-    themeDark.setPrimaryColor(mapOfSettings().get("ligth."+Theme.THEME_KEYS.PRIMARY_COLOR).getValue());
-    themeDark.setSecondaryColor(mapOfSettings().get("ligth."+Theme.THEME_KEYS.SECONDARY_COLOR).getValue());
-    themeDark.setAccentColor(mapOfSettings().get("ligth."+Theme.THEME_KEYS.ACCENT_COLOR).getValue());
-    themeDark.setLogoUrl(mapOfSettings().get("ligth."+Theme.THEME_KEYS.LOGO_URL).getValue());
-    themeDark.setLogoLoginUrl(mapOfSettings().get("ligth."+Theme.THEME_KEYS.LOGO_LOGIN_URL).getValue());
-    themeDark.setLogoUrlCollapsed(mapOfSettings().get("ligth."+Theme.THEME_KEYS.LOGO_URL_COLLAPSED).getValue());
+    themeDark.setBackgroundColor(mapOfSettings().get("ligth." + Theme.THEME_KEYS.BACKGROUND_COLOR).getValue());
+    themeDark.setAccentColor(mapOfSettings().get("ligth." + Theme.THEME_KEYS.PAPER_COLOR).getValue());
+    themeDark.setNavigationColor(mapOfSettings().get("ligth." + Theme.THEME_KEYS.NAVIGATION_COLOR).getValue());
+    themeDark.setPrimaryColor(mapOfSettings().get("ligth." + Theme.THEME_KEYS.PRIMARY_COLOR).getValue());
+    themeDark.setSecondaryColor(mapOfSettings().get("ligth." + Theme.THEME_KEYS.SECONDARY_COLOR).getValue());
+    themeDark.setAccentColor(mapOfSettings().get("ligth." + Theme.THEME_KEYS.ACCENT_COLOR).getValue());
+    themeDark.setLogoUrl(mapOfSettings().get("ligth." + Theme.THEME_KEYS.LOGO_URL).getValue());
+    themeDark.setLogoLoginUrl(mapOfSettings().get("ligth." + Theme.THEME_KEYS.LOGO_LOGIN_URL).getValue());
+    themeDark.setLogoUrlCollapsed(mapOfSettings().get("ligth." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED).getValue());
     platformSettings.setThemeDark(themeDark);
 
     return platformSettings;
@@ -196,15 +198,19 @@ public class PlatformSettingsApi extends RestBehavior {
   public PlatformSettings updateThemeLight(@Valid @RequestBody ThemeInput input) {
     Map<String, Setting> dbSettings = mapOfSettings();
     List<Setting> settingsToSave = new ArrayList<>();
-    settingsToSave.add(resolveFromMap(dbSettings, "ligth."+Theme.THEME_KEYS.BACKGROUND_COLOR, input.getBackgroundColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, "ligth."+Theme.THEME_KEYS.PAPER_COLOR, input.getPaperColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, "ligth."+Theme.THEME_KEYS.NAVIGATION_COLOR, input.getNavigationColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, "ligth."+Theme.THEME_KEYS.PRIMARY_COLOR, input.getPrimaryColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, "ligth."+Theme.THEME_KEYS.SECONDARY_COLOR, input.getSecondaryColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, "ligth."+Theme.THEME_KEYS.ACCENT_COLOR, input.getAccentColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, "ligth."+Theme.THEME_KEYS.LOGO_URL, input.getLogoUrl()));
-    settingsToSave.add(resolveFromMap(dbSettings, "ligth."+Theme.THEME_KEYS.LOGO_URL_COLLAPSED, input.getLogoUrlCollapsed()));
-    settingsToSave.add(resolveFromMap(dbSettings, "ligth."+Theme.THEME_KEYS.LOGO_LOGIN_URL, input.getLogoLoginUrl()));
+    settingsToSave.add(
+        resolveFromMap(dbSettings, "ligth." + Theme.THEME_KEYS.BACKGROUND_COLOR, input.getBackgroundColor()));
+    settingsToSave.add(resolveFromMap(dbSettings, "ligth." + Theme.THEME_KEYS.PAPER_COLOR, input.getPaperColor()));
+    settingsToSave.add(
+        resolveFromMap(dbSettings, "ligth." + Theme.THEME_KEYS.NAVIGATION_COLOR, input.getNavigationColor()));
+    settingsToSave.add(resolveFromMap(dbSettings, "ligth." + Theme.THEME_KEYS.PRIMARY_COLOR, input.getPrimaryColor()));
+    settingsToSave.add(
+        resolveFromMap(dbSettings, "ligth." + Theme.THEME_KEYS.SECONDARY_COLOR, input.getSecondaryColor()));
+    settingsToSave.add(resolveFromMap(dbSettings, "ligth." + Theme.THEME_KEYS.ACCENT_COLOR, input.getAccentColor()));
+    settingsToSave.add(resolveFromMap(dbSettings, "ligth." + Theme.THEME_KEYS.LOGO_URL, input.getLogoUrl()));
+    settingsToSave.add(
+        resolveFromMap(dbSettings, "ligth." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED, input.getLogoUrlCollapsed()));
+    settingsToSave.add(resolveFromMap(dbSettings, "ligth." + Theme.THEME_KEYS.LOGO_LOGIN_URL, input.getLogoLoginUrl()));
     settingRepository.saveAll(settingsToSave);
     return settings();
   }
@@ -214,15 +220,19 @@ public class PlatformSettingsApi extends RestBehavior {
   public PlatformSettings updateThemeDark(@Valid @RequestBody ThemeInput input) {
     Map<String, Setting> dbSettings = mapOfSettings();
     List<Setting> settingsToSave = new ArrayList<>();
-    settingsToSave.add(resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.BACKGROUND_COLOR, input.getBackgroundColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, "dark."+Theme.THEME_KEYS.PAPER_COLOR, input.getPaperColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, "dark."+Theme.THEME_KEYS.NAVIGATION_COLOR, input.getNavigationColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, "dark."+Theme.THEME_KEYS.PRIMARY_COLOR, input.getPrimaryColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, "dark."+Theme.THEME_KEYS.SECONDARY_COLOR, input.getSecondaryColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, "dark."+Theme.THEME_KEYS.ACCENT_COLOR, input.getAccentColor()));
-    settingsToSave.add(resolveFromMap(dbSettings, "dark."+Theme.THEME_KEYS.LOGO_URL, input.getLogoUrl()));
-    settingsToSave.add(resolveFromMap(dbSettings, "dark."+Theme.THEME_KEYS.LOGO_URL_COLLAPSED, input.getLogoUrlCollapsed()));
-    settingsToSave.add(resolveFromMap(dbSettings, "dark."+Theme.THEME_KEYS.LOGO_LOGIN_URL, input.getLogoLoginUrl()));
+    settingsToSave.add(
+        resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.BACKGROUND_COLOR, input.getBackgroundColor()));
+    settingsToSave.add(resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.PAPER_COLOR, input.getPaperColor()));
+    settingsToSave.add(
+        resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.NAVIGATION_COLOR, input.getNavigationColor()));
+    settingsToSave.add(resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.PRIMARY_COLOR, input.getPrimaryColor()));
+    settingsToSave.add(
+        resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.SECONDARY_COLOR, input.getSecondaryColor()));
+    settingsToSave.add(resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.ACCENT_COLOR, input.getAccentColor()));
+    settingsToSave.add(resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.LOGO_URL, input.getLogoUrl()));
+    settingsToSave.add(
+        resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED, input.getLogoUrlCollapsed()));
+    settingsToSave.add(resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.LOGO_LOGIN_URL, input.getLogoLoginUrl()));
     settingRepository.saveAll(settingsToSave);
     return settings();
   }
