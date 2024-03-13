@@ -1,18 +1,18 @@
 import React from 'react';
-import * as PropTypes from 'prop-types';
-import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
-import { connect, useDispatch } from 'react-redux';
+import { makeStyles } from '@mui/styles';
 import { Typography, Grid, Paper, List, ListItem, ListItemText, Switch, TextField } from '@mui/material';
 import ParametersForm from './ParametersForm';
-import inject18n from '../../../components/i18n';
-import { storeHelper } from '../../../actions/Schema';
+import { useFormatter } from '../../../components/i18n';
 import { updateParameters, fetchParameters } from '../../../actions/Application';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import ItemBoolean from '../../../components/ItemBoolean';
 import ThemeForm from './ThemeForm';
+import { useAppDispatch } from '../../../utils/hooks';
+import { useHelper } from '../../../store';
+import type { LoggedHelper } from '../../../actions/helper';
+import type { SettingsUpdateInput } from '../../../utils/api-types';
 
-const styles = () => ({
+const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
     paddingBottom: 50,
@@ -23,21 +23,21 @@ const styles = () => ({
     overflow: 'hidden',
     height: '100%',
   },
-});
+}));
 
-const Parameters = (props) => {
-  const {
-    updateParameters: connectedUpdateParameters,
-    t,
-    classes,
-    settings,
-  } = props;
-  const dispatch = useDispatch();
+const Parameters = () => {
+  const classes = useStyles();
+  const dispatch = useAppDispatch();
+  const { t } = useFormatter();
+
+  const { settings } = useHelper((helper: LoggedHelper) => ({
+    settings: helper.getSettings(),
+  }));
   useDataLoader(() => {
     dispatch(fetchParameters());
   });
 
-  const onUpdate = (data) => connectedUpdateParameters(data);
+  const onUpdate = (data: SettingsUpdateInput) => dispatch(updateParameters(data));
   return (
     <div className={classes.root}>
       <Grid container={true} spacing={3}>
@@ -108,23 +108,4 @@ const Parameters = (props) => {
   );
 };
 
-Parameters.propTypes = {
-  t: PropTypes.func,
-  nsdt: PropTypes.func,
-  updateParameters: PropTypes.func,
-  userAdmin: PropTypes.bool,
-};
-
-const select = (state) => {
-  const helper = storeHelper(state);
-  return {
-    userAdmin: helper.getMe()?.user_admin,
-    settings: helper.getSettings(),
-  };
-};
-
-export default R.compose(
-  connect(select, { updateParameters }),
-  inject18n,
-  withStyles(styles),
-)(Parameters);
+export default Parameters;
