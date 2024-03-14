@@ -3,13 +3,11 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.converter.ExecutionConverter;
+import jakarta.persistence.*;
 import org.hibernate.annotations.UuidGenerator;
 
-import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.Objects;
-
-import static java.time.Instant.now;
 
 @Entity
 @Table(name = "dryinjects_statuses")
@@ -44,18 +42,6 @@ public class DryInjectStatus implements Base {
     @JsonIgnore
     private DryInject dryInject;
 
-    // region transient
-    @JsonIgnore
-    public static DryInjectStatus fromExecution(Execution execution, DryInject dry) {
-        DryInjectStatus injectStatus = new DryInjectStatus();
-        injectStatus.setDryInject(dry);
-        injectStatus.setDate(now());
-        injectStatus.setExecutionTime(execution.getExecutionTime());
-        injectStatus.setName(execution.getStatus());
-        injectStatus.setReporting(execution);
-        return injectStatus;
-    }
-    // endregion
 
     public String getId() {
         return id;

@@ -209,9 +209,9 @@ public class ChannelApi extends RestBehavior {
     Map<String, Instant> toPublishArticleIdsMap = injects.stream()
         .filter(inject -> inject.getContract().equals(CHANNEL_PUBLISH))
         .filter(inject -> inject.getStatus().isPresent())
-        .sorted(Comparator.comparing(inject -> inject.getStatus().get().getDate()))
+        .sorted(Comparator.comparing(inject -> inject.getStatus().get().getTrackingSentDate()))
         .flatMap(inject -> {
-          Instant virtualInjectDate = inject.getStatus().get().getDate();
+          Instant virtualInjectDate = inject.getStatus().get().getTrackingSentDate();
           try {
             ChannelContent content = mapper.treeToValue(inject.getContent(), ChannelContent.class);
             if (content.getArticles() != null) {

@@ -339,7 +339,7 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_sent_at")
   public Instant getSentAt() {
     if (this.getStatus().isPresent()) {
-      return this.getStatus().orElseThrow().getDate();
+      return this.getStatus().orElseThrow().getTrackingSentDate();
     }
     return null;
   }
