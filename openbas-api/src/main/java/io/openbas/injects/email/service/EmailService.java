@@ -53,14 +53,12 @@ public class EmailService {
 
     public void sendEmail(Execution execution, List<ExecutionContext> usersContext, String from, List<String> replyTos, String inReplyTo,
                           String subject, String message, List<DataAttachment> attachments) throws Exception {
-        MimeMessage mimeMessage = buildMimeMessage(from, inReplyTo, subject, message, attachments);
+        MimeMessage mimeMessage = buildMimeMessage(from, replyTos, inReplyTo, subject, message, attachments);
         List<InternetAddress> recipients = new ArrayList<>();
         for (ExecutionContext userContext : usersContext) {
             recipients.add(new InternetAddress(userContext.getUser().getEmail()));
         }
         mimeMessage.setRecipients(Message.RecipientType.TO, recipients.toArray(InternetAddress[]::new));
-        mimeMessage.setFrom(new InternetAddress(from));
-        mimeMessage.setReplyTo(replyTos.stream().map(this::getInternetAddress).toArray(InternetAddress[]::new));
 
         emailSender.send(mimeMessage);
 
@@ -78,13 +76,11 @@ public class EmailService {
         String contextualSubject = buildContextualContent(subject, userContext);
         String contextualBody = buildContextualContent(message, userContext);
 
-        MimeMessage mimeMessage = buildMimeMessage(from, inReplyTo, contextualSubject, contextualBody, attachments);
+        MimeMessage mimeMessage = buildMimeMessage(from, replyTos, inReplyTo, contextualSubject, contextualBody, attachments);
         mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
-        mimeMessage.setFrom(new InternetAddress(from));
-        mimeMessage.setReplyTo(replyTos.stream().map(this::getInternetAddress).toArray(InternetAddress[]::new));
         // Crypt if needed
         if (mustBeEncrypted) {
-            MimeMessage encMessage = getEncryptedMimeMessage(userContext, from, subject, email, mimeMessage);
+            MimeMessage encMessage = getEncryptedMimeMessage(userContext, from, replyTos, subject, email, mimeMessage);
             emailSender.send(encMessage);
         } else {
             emailSender.send(mimeMessage);
@@ -117,10 +113,12 @@ public class EmailService {
         }
     }
 
-    private MimeMessage buildMimeMessage(String from, String inReplyTo, String subject, String body,
+    private MimeMessage buildMimeMessage(String from, List<String> replyTos, String inReplyTo, String subject, String body,
                                          List<DataAttachment> attachments) throws Exception {
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         mimeMessage.setFrom(from);
+        mimeMessage.setReplyTo(replyTos.stream().map(this::getInternetAddress).toArray(InternetAddress[]::new));
+
         if (inReplyTo != null) {
             mimeMessage.setHeader("In-Reply-To", inReplyTo);
             mimeMessage.setHeader("References", inReplyTo);
@@ -144,11 +142,12 @@ public class EmailService {
         return mimeMessage;
     }
 
-    private MimeMessage getEncryptedMimeMessage(ExecutionContext userContext, String from, String subject, String email, MimeMessage mimeMessage) throws IOException, MessagingException {
+    private MimeMessage getEncryptedMimeMessage(ExecutionContext userContext, String from, List<String> replyTos, String subject, String email, MimeMessage mimeMessage) throws IOException, MessagingException {
         PGPPublicKey userPgpKey = emailPgp.getUserPgpKey(userContext.getUser());
         // Need to create another email that will wrap everything.
         MimeMessage encMessage = emailSender.createMimeMessage();
         encMessage.setFrom(from);
+        encMessage.setReplyTo(replyTos.stream().map(this::getInternetAddress).toArray(InternetAddress[]::new));
         encMessage.setSubject(subject, "utf-8");
         encMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
 
