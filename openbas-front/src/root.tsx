@@ -4,7 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { StyledEngineProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { useHelper } from './store';
-import { fetchMe, fetchParameters } from './actions/Application';
+import { fetchMe, fetchParameters, fetchPlatformParameters } from './actions/Application';
 import NotFound from './components/NotFound';
 import ConnectedThemeProvider from './components/AppThemeProvider';
 import ConnectedIntlProvider from './components/AppIntlProvider';
@@ -24,12 +24,12 @@ const Lessons = lazy(() => import('./public/components/lessons/Lessons'));
 
 const Root = () => {
   const { logged, me, settings } = useHelper((helper: LoggedHelper) => {
-    return { logged: helper.logged(), me: helper.getMe(), settings: helper.getSettings() };
+    return { logged: helper.logged(), me: helper.getMe(), settings: helper.getPlatformSettings() };
   });
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(fetchMe());
-    dispatch(fetchParameters());
+    dispatch(fetchPlatformParameters());
   }, []);
   if (R.isEmpty(logged)) {
     return <div />;
@@ -50,22 +50,22 @@ const Root = () => {
     >
       <StyledEngineProvider injectFirst={true}>
         <ConnectedThemeProvider>
-          <CssBaseline/>
+          <CssBaseline />
           <ConnectedIntlProvider>
-            <Suspense fallback={<Loader/>}>
+            <Suspense fallback={<Loader />}>
               <Routes>
-                <Route path="" element={logged.isOnlyPlayer ? <Navigate to="private" replace={true}/>
-                  : <Navigate to="admin" replace={true}/>}
+                <Route path="" element={logged.isOnlyPlayer ? <Navigate to="private" replace={true} />
+                  : <Navigate to="admin" replace={true} />}
                 />
-                <Route path="private/*" element={errorWrapper(IndexPrivate)()}/>
-                <Route path="admin/*" element={errorWrapper(IndexAdmin)()}/>
+                <Route path="private/*" element={errorWrapper(IndexPrivate)()} />
+                <Route path="admin/*" element={errorWrapper(IndexAdmin)()} />
                 {/* Routes from /public/Index that need to be accessible for logged user are duplicated here */}
-                <Route path="comcheck/:statusId" element={errorWrapper(Comcheck)()}/>
-                <Route path="channels/:exerciseId/:channelId" element={errorWrapper(Channel)()}/>
-                <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()}/>
-                <Route path="lessons/:exerciseId" element={errorWrapper(Lessons)()}/>
+                <Route path="comcheck/:statusId" element={errorWrapper(Comcheck)()} />
+                <Route path="channels/:exerciseId/:channelId" element={errorWrapper(Channel)()} />
+                <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
+                <Route path="lessons/:exerciseId" element={errorWrapper(Lessons)()} />
                 {/* Not found */}
-                <Route path="*" element={<NotFound/>}/>
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
           </ConnectedIntlProvider>

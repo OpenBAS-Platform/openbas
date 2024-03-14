@@ -15,17 +15,7 @@ interface Props {
 
 const ThemeForm: React.FC<Props> = ({
   onSubmit,
-  initialValues = {
-    accent_color: '',
-    background_color: '',
-    logo_login_url: '',
-    logo_url: '',
-    logo_url_collapsed: '',
-    navigation_color: '',
-    paper_color: '',
-    primary_color: '',
-    secondary_color: '',
-  },
+  initialValues,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -39,15 +29,15 @@ const ThemeForm: React.FC<Props> = ({
     mode: 'onTouched',
     resolver: zodResolver(
       zodImplement<ThemeInput>().with({
-        accent_color: z.string().optional(),
-        background_color: z.string().optional(),
-        logo_login_url: z.string().optional(),
-        logo_url: z.string().optional(),
-        logo_url_collapsed: z.string().optional(),
-        navigation_color: z.string().optional(),
-        paper_color: z.string().optional(),
-        primary_color: z.string().optional(),
-        secondary_color: z.string().optional(),
+        accent_color: z.string().optional().nullable(),
+        background_color: z.string().optional().nullable(),
+        logo_login_url: z.string().optional().nullable(),
+        logo_url: z.string().optional().nullable(),
+        logo_url_collapsed: z.string().optional().nullable(),
+        navigation_color: z.string().optional().nullable(),
+        paper_color: z.string().optional().nullable(),
+        primary_color: z.string().optional().nullable(),
+        secondary_color: z.string().optional().nullable(),
       }),
     ),
     defaultValues: initialValues,

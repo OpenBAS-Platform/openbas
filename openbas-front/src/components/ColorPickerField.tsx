@@ -36,7 +36,7 @@ const ColorPickerField: React.FC<Props> = (props) => {
           ),
         }}
         onChange={field.onChange}
-        value={field.value}
+        value={field.value || ''}
         {...props}
       />
       <Popover
@@ -53,7 +53,7 @@ const ColorPickerField: React.FC<Props> = (props) => {
         }}
       >
         <SketchPicker
-          color={field.value}
+          color={field.value || ''}
           onChange={(color: Color) => field.onChange(color.hex)}
         />
       </Popover>

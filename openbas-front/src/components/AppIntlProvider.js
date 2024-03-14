@@ -23,7 +23,7 @@ const AppIntlProvider = (props) => {
   const { children } = props;
   const { platformName, lang } = useHelper((helper) => {
     const me = helper.getMe();
-    const settings = helper.getSettings();
+    const settings = helper.getPlatformSettings();
     const name = settings.platform_name ?? 'OpenBAS - Crisis Drills Planning Platform';
     const rawPlatformLang = settings.platform_lang ?? 'auto';
     const rawUserLang = me?.user_lang ?? 'auto';

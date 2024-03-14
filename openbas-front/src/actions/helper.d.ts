@@ -22,6 +22,7 @@ export interface LoggedHelper {
   logged: () => any;
   getMe: () => User;
   getSettings: () => PlatformSettings;
+  getPlatformSettings: () => PlatformSettings;
 }
 
 export interface ChallengesHelper {

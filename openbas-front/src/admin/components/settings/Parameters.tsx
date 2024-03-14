@@ -10,7 +10,7 @@ import ThemeForm from './ThemeForm';
 import { useAppDispatch } from '../../../utils/hooks';
 import { useHelper } from '../../../store';
 import type { LoggedHelper } from '../../../actions/helper';
-import type { SettingsUpdateInput, ThemeInput } from '../../../utils/api-types';
+import type { PlatformSettings, SettingsUpdateInput, ThemeInput } from '../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -29,15 +29,12 @@ const Parameters = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
-  const { settings } = useHelper((helper: LoggedHelper) => ({
+  const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({
     settings: helper.getPlatformSettings(),
   }));
 
-  console.log(settings);
-
   useDataLoader(() => {
     dispatch(fetchPlatformParameters());
-    dispatch(fetchParameters());
   });
 
   const onUpdate = (data: SettingsUpdateInput) => dispatch(updateParameters(data));
@@ -86,17 +83,7 @@ const Parameters = () => {
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <ThemeForm
               onSubmit={onUpdateDarkParameters}
-              initialValues={{
-                accent_color: settings?.accent_color || '',
-                background_color: settings?.background_color || '',
-                logo_login_url: settings?.logo_login_url || '',
-                logo_url: settings?.logo_url || '',
-                logo_url_collapsed: settings?.logo_url_collapsed || '',
-                navigation_color: settings?.navigation_color || '',
-                paper_color: settings?.paper_color || '',
-                primary_color: settings?.primary_color || '',
-                secondary_color: settings?.secondary_color || '',
-              }}
+              initialValues={settings.platform_dark_theme}
             />
           </Paper>
         </Grid>
@@ -105,18 +92,9 @@ const Parameters = () => {
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <ThemeForm
               onSubmit={onUpdateLigthParameters}
-              initialValues={{
-                accent_color: settings?.accent_color || '',
-                background_color: settings?.background_color || '',
-                logo_login_url: settings?.logo_login_url || '',
-                logo_url: settings?.logo_url || '',
-                logo_url_collapsed: settings?.logo_url_collapsed || '',
-                navigation_color: settings?.navigation_color || '',
-                paper_color: settings?.paper_color || '',
-                primary_color: settings?.primary_color || '',
-                secondary_color: settings?.secondary_color || '',
-              }}
+              initialValues={settings.platform_light_theme}
             />
+
           </Paper>
         </Grid>
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>

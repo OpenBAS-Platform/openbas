@@ -20,7 +20,7 @@ const AppThemeProvider: React.FC<Props> = ({
     light: PlatformSettings['platform_light_theme']
   } = useHelper((helper: LoggedHelper) => {
     const me = helper.getMe();
-    const settings = helper.getSettings();
+    const settings = helper.getPlatformSettings();
     const rawPlatformTheme = settings.platform_theme ?? 'auto';
     const rawUserTheme = me?.user_theme ?? 'default';
     return { theme: rawUserTheme !== 'default' ? rawUserTheme : rawPlatformTheme, dark: settings.platform_dark_theme, light: settings.platform_light_theme };
@@ -28,6 +28,9 @@ const AppThemeProvider: React.FC<Props> = ({
   useEffect(() => {
     document.body.setAttribute('data-theme', theme);
   });
+
+  console.log('dark', dark);
+
   let muiTheme = createTheme(
     themeDark(
       dark?.logo_url,

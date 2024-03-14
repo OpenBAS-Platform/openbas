@@ -130,7 +130,7 @@ Login.propTypes = {
 
 const select = (state) => {
   const helper = storeHelper(state);
-  const parameters = helper.getSettings() ?? {};
+  const parameters = helper.getPlatformSettings() ?? {};
   return { parameters };
 };
 
