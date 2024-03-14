@@ -3,14 +3,14 @@ import { makeStyles } from '@mui/styles';
 import { Typography, Grid, Paper, List, ListItem, ListItemText, Switch, TextField } from '@mui/material';
 import ParametersForm from './ParametersForm';
 import { useFormatter } from '../../../components/i18n';
-import { updateParameters, fetchParameters } from '../../../actions/Application';
+import { updateParameters, updatePlatformLightParameters, updatePlatformDarkParameters, fetchPlatformParameters, fetchParameters } from '../../../actions/Application';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import ItemBoolean from '../../../components/ItemBoolean';
 import ThemeForm from './ThemeForm';
 import { useAppDispatch } from '../../../utils/hooks';
 import { useHelper } from '../../../store';
 import type { LoggedHelper } from '../../../actions/helper';
-import type { SettingsUpdateInput } from '../../../utils/api-types';
+import type { SettingsUpdateInput, ThemeInput } from '../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -29,15 +29,20 @@ const Parameters = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
-
   const { settings } = useHelper((helper: LoggedHelper) => ({
-    settings: helper.getSettings(),
+    settings: helper.getPlatformSettings(),
   }));
+
+  console.log(settings);
+
   useDataLoader(() => {
+    dispatch(fetchPlatformParameters());
     dispatch(fetchParameters());
   });
 
   const onUpdate = (data: SettingsUpdateInput) => dispatch(updateParameters(data));
+  const onUpdateLigthParameters = (data: ThemeInput) => dispatch(updatePlatformLightParameters(data));
+  const onUpdateDarkParameters = (data: ThemeInput) => dispatch(updatePlatformDarkParameters(data));
   return (
     <div className={classes.root}>
       <Grid container={true} spacing={3}>
@@ -64,7 +69,7 @@ const Parameters = () => {
               </ListItem>
               <ListItem divider={true}>
                 <ListItemText primary={t('Edition')} />
-                <ItemBoolean variant="inList" status={null} neutralLabel='Community' />
+                <ItemBoolean variant="inList" status={null} neutralLabel="Community" />
               </ListItem>
               <ListItem divider={true}>
                 <TextField fullWidth={true} label={t('Filigran support key')} variant="standard" disabled={true} />
@@ -79,13 +84,39 @@ const Parameters = () => {
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Dark theme')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <ThemeForm />
+            <ThemeForm
+              onSubmit={onUpdateDarkParameters}
+              initialValues={{
+                accent_color: settings?.accent_color || '',
+                background_color: settings?.background_color || '',
+                logo_login_url: settings?.logo_login_url || '',
+                logo_url: settings?.logo_url || '',
+                logo_url_collapsed: settings?.logo_url_collapsed || '',
+                navigation_color: settings?.navigation_color || '',
+                paper_color: settings?.paper_color || '',
+                primary_color: settings?.primary_color || '',
+                secondary_color: settings?.secondary_color || '',
+              }}
+            />
           </Paper>
         </Grid>
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Light theme')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <ThemeForm />
+            <ThemeForm
+              onSubmit={onUpdateLigthParameters}
+              initialValues={{
+                accent_color: settings?.accent_color || '',
+                background_color: settings?.background_color || '',
+                logo_login_url: settings?.logo_login_url || '',
+                logo_url: settings?.logo_url || '',
+                logo_url_collapsed: settings?.logo_url_collapsed || '',
+                navigation_color: settings?.navigation_color || '',
+                paper_color: settings?.paper_color || '',
+                primary_color: settings?.primary_color || '',
+                secondary_color: settings?.secondary_color || '',
+              }}
+            />
           </Paper>
         </Grid>
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>

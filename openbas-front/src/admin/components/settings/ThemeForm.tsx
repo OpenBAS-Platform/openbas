@@ -9,7 +9,6 @@ import { zodImplement } from '../../../utils/Zod';
 import ColorPickerField from '../../../components/ColorPickerField';
 
 interface Props {
-  errors: string;
   onSubmit: SubmitHandler<ThemeInput>;
   initialValues?: ThemeInput;
 }
@@ -67,7 +66,7 @@ const ThemeForm: React.FC<Props> = ({
         control={control}
         name="background_color"
       />
-
+      &nbsp;
       <ColorPickerField
         variant="standard"
         fullWidth
@@ -78,7 +77,7 @@ const ThemeForm: React.FC<Props> = ({
         control={control}
         name="paper_color"
       />
-
+      &nbsp;
       <ColorPickerField
         variant="standard"
         fullWidth
@@ -89,7 +88,7 @@ const ThemeForm: React.FC<Props> = ({
         control={control}
         name="navigation_color"
       />
-
+      &nbsp;
       <ColorPickerField
         variant="standard"
         fullWidth
@@ -100,6 +99,7 @@ const ThemeForm: React.FC<Props> = ({
         control={control}
         name="primary_color"
       />
+      &nbsp;
       <ColorPickerField
         variant="standard"
         fullWidth
@@ -110,7 +110,7 @@ const ThemeForm: React.FC<Props> = ({
         control={control}
         name="secondary_color"
       />
-
+      &nbsp;
       <ColorPickerField
         variant="standard"
         fullWidth
@@ -121,7 +121,7 @@ const ThemeForm: React.FC<Props> = ({
         control={control}
         name="accent_color"
       />
-
+      &nbsp;
       <MuiTextField
         variant="standard"
         fullWidth
@@ -131,7 +131,7 @@ const ThemeForm: React.FC<Props> = ({
         helperText={errors.logo_url && errors.logo_url?.message}
         inputProps={register('logo_url')}
       />
-
+      &nbsp;
       <MuiTextField
         variant="standard"
         fullWidth
@@ -141,7 +141,7 @@ const ThemeForm: React.FC<Props> = ({
         helperText={errors.logo_url_collapsed && errors.logo_url_collapsed?.message}
         inputProps={register('logo_url_collapsed')}
       />
-
+      &nbsp;
       <MuiTextField
         variant="standard"
         fullWidth

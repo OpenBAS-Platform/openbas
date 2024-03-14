@@ -1,6 +1,5 @@
 /* eslint-disable */
 /* tslint:disable */
-
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -169,7 +168,7 @@ export interface ChallengeFlag {
   /** @format date-time */
   flag_created_at?: string;
   flag_id?: string;
-  flag_type?: 'VALUE' | 'VALUE_CASE' | 'REGEXP';
+  flag_type?: "VALUE" | "VALUE_CASE" | "REGEXP";
   /** @format date-time */
   flag_updated_at?: string;
   flag_value?: string;
@@ -272,7 +271,7 @@ export interface Comcheck {
   comcheck_name?: string;
   /** @format date-time */
   comcheck_start_date?: string;
-  comcheck_state?: 'RUNNING' | 'EXPIRED' | 'FINISHED';
+  comcheck_state?: "RUNNING" | "EXPIRED" | "FINISHED";
   comcheck_statuses?: ComcheckStatus[];
   comcheck_subject?: string;
   /** @format int64 */
@@ -298,7 +297,7 @@ export interface ComcheckStatus {
   comcheckstatus_sent_date?: string;
   /** @format int32 */
   comcheckstatus_sent_retry?: number;
-  comcheckstatus_state?: 'RUNNING' | 'SUCCESS' | 'FAILURE';
+  comcheckstatus_state?: "RUNNING" | "SUCCESS" | "FAILURE";
   comcheckstatus_user?: User;
   updateAttributes?: object;
 }
@@ -351,28 +350,42 @@ export interface ContractElement {
   mandatory?: boolean;
   mandatoryGroups?: string[];
   type?:
-    | 'text'
-    | 'number'
-    | 'tuple'
-    | 'checkbox'
-    | 'textarea'
-    | 'select'
-    | 'article'
-    | 'challenge'
-    | 'dependency-select'
-    | 'attachment'
-    | 'team'
-    | 'expectation'
-    | 'asset'
-    | 'asset-group';
+    | "text"
+    | "number"
+    | "tuple"
+    | "checkbox"
+    | "textarea"
+    | "select"
+    | "article"
+    | "challenge"
+    | "dependency-select"
+    | "attachment"
+    | "team"
+    | "expectation"
+    | "asset"
+    | "asset-group";
+}
+
+export interface ContractSearchInput {
+  /** Indicate if the contract can be exposed */
+  exposedContractsOnly?: boolean;
+  /** Label contract */
+  label?: string;
+  sort?: SortObject;
+  /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
+  sorts?: SortField[];
+  /** Text to search within contract attributes such as fields, config.label, and label */
+  textSearch?: string;
+  /** Label Type from contract config */
+  type?: string;
 }
 
 export interface ContractVariable {
-  cardinality: '1' | 'n';
+  cardinality: "1" | "n";
   children?: ContractVariable[];
   key: string;
   label: string;
-  type: 'String' | 'Object';
+  type: "String" | "Object";
 }
 
 export interface CreatePlayerInput {
@@ -450,7 +463,7 @@ export interface DryInjectStatus {
   /** @format int32 */
   status_execution?: number;
   status_id?: string;
-  status_name?: 'INFO' | 'PENDING' | 'PARTIAL' | 'ERROR' | 'SUCCESS';
+  status_name?: "INFO" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_reporting?: Execution;
   updateAttributes?: object;
 }
@@ -496,7 +509,7 @@ export interface Endpoint {
   endpoint_hostname?: string;
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: 'Linux' | 'Windows' | 'Darwin';
+  endpoint_platform: "Linux" | "Windows" | "Darwin";
   updateAttributes?: object;
 }
 
@@ -513,7 +526,7 @@ export interface EndpointInput {
    */
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: 'Linux' | 'Windows' | 'Darwin';
+  endpoint_platform: "Linux" | "Windows" | "Darwin";
 }
 
 export interface Evaluation {
@@ -544,13 +557,13 @@ export interface Execution {
   /** @format int32 */
   execution_time?: number;
   execution_traces?: ExecutionTrace[];
-  status?: 'INFO' | 'PENDING' | 'PARTIAL' | 'ERROR' | 'SUCCESS';
+  status?: "INFO" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
 }
 
 export interface ExecutionTrace {
   trace_identifier?: string;
   trace_message?: string;
-  trace_status?: 'INFO' | 'PENDING' | 'PARTIAL' | 'ERROR' | 'SUCCESS';
+  trace_status?: "INFO" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   /** @format date-time */
   trace_time?: string;
   trace_users?: string[];
@@ -585,7 +598,7 @@ export interface Exercise {
   exercise_name: string;
   /** @format date-time */
   exercise_next_inject_date?: string;
-  exercise_next_possible_status?: ('SCHEDULED' | 'CANCELED' | 'RUNNING' | 'PAUSED' | 'FINISHED')[];
+  exercise_next_possible_status?: ("SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED")[];
   exercise_observers?: User[];
   exercise_pauses?: Pause[];
   exercise_planners?: User[];
@@ -593,7 +606,7 @@ export interface Exercise {
   exercise_score?: number;
   /** @format date-time */
   exercise_start_date?: string;
-  exercise_status?: 'SCHEDULED' | 'CANCELED' | 'RUNNING' | 'PAUSED' | 'FINISHED';
+  exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   exercise_subtitle?: string;
   exercise_tags?: Tag[];
   exercise_teams?: Team[];
@@ -624,7 +637,7 @@ export interface ExerciseSimple {
   exercise_name?: string;
   /** @format date-time */
   exercise_start_date?: string;
-  exercise_status?: 'SCHEDULED' | 'CANCELED' | 'RUNNING' | 'PAUSED' | 'FINISHED';
+  exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   exercise_subtitle?: string;
   exercise_tags?: Tag[];
 }
@@ -659,7 +672,7 @@ export interface ExerciseUpdateStartDateInput {
 }
 
 export interface ExerciseUpdateStatusInput {
-  exercise_status?: 'SCHEDULED' | 'CANCELED' | 'RUNNING' | 'PAUSED' | 'FINISHED';
+  exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
 }
 
 export interface ExerciseUpdateTagsInput {
@@ -684,16 +697,16 @@ export interface Grant {
   grant_exercise?: Exercise;
   grant_group?: Group;
   grant_id?: string;
-  grant_name?: 'OBSERVER' | 'PLANNER';
+  grant_name?: "OBSERVER" | "PLANNER";
   grant_scenario?: Scenario;
   updateAttributes?: object;
 }
 
 export interface Group {
-  group_default_exercise_assign?: ('OBSERVER' | 'PLANNER')[];
+  group_default_exercise_assign?: ("OBSERVER" | "PLANNER")[];
   group_default_exercise_observer?: boolean;
   group_default_exercise_planner?: boolean;
-  group_default_scenario_assign?: ('OBSERVER' | 'PLANNER')[];
+  group_default_scenario_assign?: ("OBSERVER" | "PLANNER")[];
   group_default_scenario_observer?: boolean;
   group_default_scenario_planner?: boolean;
   group_default_user_assign?: boolean;
@@ -718,7 +731,7 @@ export interface GroupCreateInput {
 
 export interface GroupGrantInput {
   grant_exercise?: string;
-  grant_name?: 'OBSERVER' | 'PLANNER';
+  grant_name?: "OBSERVER" | "PLANNER";
   grant_scenario?: string;
 }
 
@@ -802,7 +815,7 @@ export interface InjectExpectation {
   /** @format int32 */
   inject_expectation_score?: number;
   inject_expectation_team?: Team;
-  inject_expectation_type?: 'TEXT' | 'DOCUMENT' | 'ARTICLE' | 'CHALLENGE' | 'MANUAL' | 'TECHNICAL';
+  inject_expectation_type?: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "TECHNICAL";
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: User;
@@ -1057,20 +1070,20 @@ export interface LessonsTemplateUpdateInput {
 export interface LinkedFieldModel {
   key?: string;
   type?:
-    | 'text'
-    | 'number'
-    | 'tuple'
-    | 'checkbox'
-    | 'textarea'
-    | 'select'
-    | 'article'
-    | 'challenge'
-    | 'dependency-select'
-    | 'attachment'
-    | 'team'
-    | 'expectation'
-    | 'asset'
-    | 'asset-group';
+    | "text"
+    | "number"
+    | "tuple"
+    | "checkbox"
+    | "textarea"
+    | "select"
+    | "article"
+    | "challenge"
+    | "dependency-select"
+    | "attachment"
+    | "team"
+    | "expectation"
+    | "asset"
+    | "asset-group";
 }
 
 export interface Log {
@@ -1160,6 +1173,37 @@ export interface OrganizationUpdateInput {
   organization_tags?: string[];
 }
 
+export interface PageContract {
+  content?: Contract[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject;
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageableObject {
+  /** @format int64 */
+  offset?: number;
+  /** @format int32 */
+  pageNumber?: number;
+  /** @format int32 */
+  pageSize?: number;
+  paged?: boolean;
+  sort?: SortObject;
+  unpaged?: boolean;
+}
+
 export interface Pause {
   log_id?: string;
   /** @format date-time */
@@ -1221,7 +1265,7 @@ export interface PublicChallenge {
 export interface PublicChallengeFlag {
   flag_challenge?: string;
   flag_id?: string;
-  flag_type?: 'VALUE' | 'VALUE_CASE' | 'REGEXP';
+  flag_type?: "VALUE" | "VALUE_CASE" | "REGEXP";
 }
 
 export interface PublicExercise {
@@ -1357,6 +1401,18 @@ export interface SettingsUpdateInput {
   platform_lang: string;
   platform_name: string;
   platform_theme: string;
+}
+
+/** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
+export interface SortField {
+  direction?: string;
+  property?: string;
+}
+
+export interface SortObject {
+  empty?: boolean;
+  sorted?: boolean;
+  unsorted?: boolean;
 }
 
 export interface StatisticElement {
@@ -1577,7 +1633,7 @@ export interface Variable {
   /** @pattern ^[a-z_]+$ */
   variable_key: string;
   variable_scenario?: Scenario;
-  variable_type: 'String' | 'Object';
+  variable_type: "String" | "Object";
   /** @format date-time */
   variable_updated_at?: string;
   variable_value?: string;

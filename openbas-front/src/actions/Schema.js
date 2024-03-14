@@ -34,6 +34,10 @@ export const parameters = new schema.Entity(
 
 export const arrayOfParameters = new schema.Array(parameters);
 
+export const platformParameters = new schema.Entity(
+  'platformParameters',
+);
+
 export const token = new schema.Entity(
   'tokens',
   {},
@@ -377,6 +381,10 @@ export const storeHelper = (state) => ({
         ([k, v]) => ({ [k]: v.setting_value }),
       ),
     );
+  },
+  getPlatformSettings: () => {
+    console.log(state.referential);
+    return state.referential.entities.platformParameters;
   },
   // kill chain phases
   getKillChainPhase: (id) => entity(id, 'killchainphases', state),
