@@ -1,26 +1,20 @@
-import React from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useState } from 'react';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { RouteOutlined } from '@mui/icons-material';
-import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
-import SearchFilter from '../../../../components/SearchFilter';
+import { searchKillChainPhases } from '../../../../actions/KillChainPhase';
 import CreateKillChainPhase from './CreateKillChainPhase';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import { useHelper } from '../../../../store';
 import KillChainPhasePopover from './KillChainPhasePopover';
 import TaxonomiesMenu from '../TaxonomiesMenu';
 import { useFormatter } from '../../../../components/i18n';
+import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
+import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+import { initSorting } from '../../../../components/common/pagination/PaginationField';
 
 const useStyles = makeStyles(() => ({
   container: {
     margin: 0,
     padding: '0 200px 50px 0',
-  },
-  parameters: {
-    float: 'left',
-    marginTop: -10,
   },
   list: {
     marginTop: 10,
@@ -109,32 +103,31 @@ const inlineStyles = {
 };
 
 const KillChainPhases = () => {
+  // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { nsdt } = useFormatter();
-  const searchColumns = [
-    'kill_chain_name',
-    'name',
+
+  // Headers
+  const headers = [
+    { field: 'phase_kill_chain_name', label: 'Kill chain', isSortable: true },
+    { field: 'phase_name', label: 'Name', isSortable: true },
+    { field: 'phase_order', label: 'Order', isSortable: true },
+    { field: 'phase_created_at', label: 'Created', isSortable: true },
   ];
-  const filtering = useSearchAnFilter('phase', 'order', searchColumns);
-  const { killChainPhases } = useHelper((helper) => ({
-    killChainPhases: helper.getKillChainPhases(),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchKillChainPhases());
+
+  const [killChainPhases, setKillChainPhases] = useState([]);
+  const [paginationField, setPaginationField] = useState({
+    sorts: initSorting('phase_kill_chain_name'),
   });
+
   return (
     <div className={classes.container}>
       <TaxonomiesMenu />
-      <div className={classes.parameters}>
-        <div style={{ float: 'left', marginRight: 10 }}>
-          <SearchFilter
-            variant="small"
-            onChange={filtering.handleSearch}
-            keyword={filtering.keyword}
-          />
-        </div>
-      </div>
+      <PaginationComponent
+        fetch={searchKillChainPhases}
+        paginationField={paginationField}
+        setContent={setKillChainPhases}
+      />
       <div className="clearfix" />
       <List classes={{ root: classes.list }}>
         <ListItem
@@ -155,39 +148,19 @@ const KillChainPhases = () => {
           </ListItemIcon>
           <ListItemText
             primary={
-              <div>
-                {filtering.buildHeader(
-                  'phase_kill_chain_name',
-                  'Kill chain',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'phase_name',
-                  'Name',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'phase_order',
-                  'Order',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'phase_created_at',
-                  'Created',
-                  true,
-                  headerStyles,
-                )}
-              </div>
+              <SortHeadersComponent
+                headers={headers}
+                inlineStylesHeaders={headerStyles}
+                paginationField={paginationField}
+                setPaginationField={setPaginationField}
+              />
             }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {filtering.filterAndSort(killChainPhases ?? []).map((killChainPhase) => (
+        {killChainPhases.map((killChainPhase) => (
           <ListItem
-            key={killChainPhase.killChainPhase_id}
+            key={killChainPhase.phase_id}
             classes={{ root: classes.item }}
             divider={true}
           >

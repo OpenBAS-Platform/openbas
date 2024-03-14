@@ -3,6 +3,8 @@ package io.openbas.contract;
 import io.openbas.IntegrationTest;
 import io.openbas.utils.fixtures.ContractFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+import io.openbas.utils.pagination.PaginationField;
+import io.openbas.utils.pagination.SortField;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,214 +26,223 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestInstance(PER_CLASS)
 class ContratApiTest extends IntegrationTest {
 
-    @Autowired
-    private MockMvc mvc;
+  @Autowired
+  private MockMvc mvc;
 
-    @MockBean
-    private ContractService contractService;
+  @MockBean
+  private ContractService contractService;
 
-    @BeforeEach
-    public void before() {
-        Mockito.when(contractService.getContracts()).thenReturn(ContractFixture.getContracts());
-        Mockito.when(contractService.searchContracts(any(), any())).thenCallRealMethod();
+  @BeforeEach
+  public void before() {
+    Mockito.when(contractService.getContracts()).thenReturn(ContractFixture.getContracts());
+    Mockito.when(contractService.searchContracts(any(), any())).thenCallRealMethod();
+  }
+
+  @Nested
+  @WithMockAdminUser
+  @DisplayName("Fetching contracts")
+  class FetchingContracts {
+
+    @Nested
+    @DisplayName("Fetching a page of contracts")
+    class FetchingPageOfContracts {
+
+      @Test
+      @DisplayName("Fetching first page of contracts succeed")
+      void given_search_input_should_return_a_page_of_contrats() throws Exception {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap();
+        params.add("page", "0");
+        params.add("size", "10");
+
+        mvc.perform(post("/api/contracts/search")
+                .params(params)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(ContractFixture.getDefault().build()))).andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.numberOfElements").value(5));
+      }
+
+      @Test
+      @DisplayName("Fetching first page of contracts failed with bad request")
+      void given_a_bad_search_input_should_throw_bad_request() throws Exception {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap();
+        params.add("page", "0");
+        params.add("size", "110");
+
+        mvc.perform(post("/api/contracts/search")
+                .params(params)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(ContractFixture.getDefault().build())))
+            .andExpect(status().isBadRequest());
+      }
     }
 
     @Nested
-    @WithMockAdminUser
-    @DisplayName("Fetching contracts")
-    class FetchingContracts {
-        @Nested
-        @DisplayName("Fetching a page of contracts")
-        class FetchingPageOfContracts {
-            @Test
-            @DisplayName("Fetching first page of contracts succeed")
-            void given_search_input_should_return_a_page_of_contrats() throws Exception {
-                MultiValueMap<String, String> params = new LinkedMultiValueMap();
-                params.add("page", "0");
-                params.add("size", "10");
+    @DisplayName("Filtering page of contracts")
+    class FilteringPageOfContracts {
 
-                mvc.perform(post("/api/contracts")
-                                .params(params)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(ContractFixture.getDefault().build()))).andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("$.numberOfElements").value(5));
-            }
+      @DisplayName("Fetching first page of contracts by textsearch")
+      @Test
+      void given_search_input_with_textsearch_should_return_a_page_of_contrats() throws Exception {
+        PaginationField paginationField = ContractFixture.getDefault().textSearch("em").build();
 
-            @Test
-            @DisplayName("Fetching first page of contracts failed with bad request")
-            void given_a_bad_search_input_should_throw_bad_request() throws Exception {
-                MultiValueMap<String, String> params = new LinkedMultiValueMap();
-                params.add("page", "0");
-                params.add("size", "21");
+        mvc.perform(post("/api/contracts/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(paginationField)))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.numberOfElements").value(2));
+      }
 
-                mvc.perform(post("/api/contracts")
-                                .params(params)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(ContractFixture.getDefault().build())))
-                        .andExpect(status().isBadRequest());
-            }
-        }
+      @DisplayName("Fetching first page of contracts by textsearch ignoring case")
+      @Test
+      void given_search_input_with_textsearch_should_return_a_page_of_contrats_ignoring_case() throws Exception {
+        PaginationField paginationField = ContractFixture.getDefault().textSearch("http req").build();
 
-        @Nested
-        @DisplayName("Filtering page of contracts")
-        class FilteringPageOfContracts {
-            @DisplayName("Fetching first page of contracts by textsearch")
-            @Test
-            void given_search_input_with_textsearch_should_return_a_page_of_contrats() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("em").build();
+        mvc.perform(post("/api/contracts/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(paginationField)))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.numberOfElements").value(1));
+      }
 
-                mvc.perform(post("/api/contracts")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(contractSearchInput)))
-                        .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("$.numberOfElements").value(3));
-            }
+      @DisplayName("Fetching first page of contracts by textsearch with spaces")
+      @Test
+      void given_search_input_with_textsearch_with_spaces_should_return_a_page_of_contracts() throws Exception {
+        PaginationField paginationField = ContractFixture.getDefault().textSearch("E m").build();
 
-            @DisplayName("Fetching first page of contracts by textsearch ignoring case")
-            @Test
-            void given_search_input_with_textsearch_should_return_a_page_of_contrats_ignoring_case() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("Em").build();
+        mvc.perform(post("/api/contracts/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(paginationField)))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.numberOfElements").value(0));
+      }
 
-                mvc.perform(post("/api/contracts")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(contractSearchInput)))
-                        .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("$.numberOfElements").value(3));
-            }
+      @DisplayName("Fetching first page of contracts by type")
+      @Test
+      void given_search_input_with_type_should_return_a_page_of_contrats() throws Exception {
+        PaginationField.Filter filter = new PaginationField.Filter();
+        filter.setKey("config.type");
+        filter.setValues(List.of("openbas_http"));
+        PaginationField.FilterGroup filterGroup = new PaginationField.FilterGroup();
+        filterGroup.setFilters(List.of(filter));
+        PaginationField paginationField = ContractFixture.getDefault()
+            .filterGroup(filterGroup)
+            .build();
 
-            @DisplayName("Fetching first page of contracts by textsearch with spaces")
-            @Test
-            void given_search_input_with_textsearch_with_spaces_should_return_a_page_of_contracts() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("E m").build();
+        mvc.perform(post("/api/contracts/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(paginationField)))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.numberOfElements").value(1));
+      }
 
-                mvc.perform(post("/api/contracts")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(contractSearchInput)))
-                        .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("$.numberOfElements").value(0));
-            }
+      @DisplayName("Fetching first page of contracts by label type ignoring case")
+      @Test
+      void given_search_input_with_label_type_should_return_a_page_of_contrats_ignoring_case() throws Exception {
+        PaginationField.Filter filter = new PaginationField.Filter();
+        filter.setKey("config.label");
+        filter.setValues(List.of("http request"));
+        PaginationField.FilterGroup filterGroup = new PaginationField.FilterGroup();
+        filterGroup.setFilters(List.of(filter));
+        PaginationField paginationField = ContractFixture.getDefault()
+            .filterGroup(filterGroup)
+            .build();
 
-            @DisplayName("Fetching first page of contracts by type")
-            @Test
-            void given_search_input_with_type_should_return_a_page_of_contrats() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().type("HTTP Request").build();
+        mvc.perform(post("/api/contracts/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(paginationField)))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.numberOfElements").value(1));
+      }
 
-                mvc.perform(post("/api/contracts")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(contractSearchInput)))
-                        .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("$.numberOfElements").value(1));
-            }
+      @DisplayName("Fetching first page of contracts by label")
+      @Test
+      void given_search_input_with_label_should_return_a_page_of_contrats() throws Exception {
+        PaginationField.Filter filter = new PaginationField.Filter();
+        filter.setKey("label");
+        filter.setValues(List.of("HTTP Request - POST (raw body)"));
+        PaginationField.FilterGroup filterGroup = new PaginationField.FilterGroup();
+        filterGroup.setFilters(List.of(filter));
+        PaginationField paginationField = ContractFixture.getDefault()
+            .filterGroup(filterGroup)
+            .build();
 
-            @DisplayName("Fetching first page of contracts by type ignoring case")
-            @Test
-            void given_search_input_with_type_should_return_a_page_of_contrats_ignoring_case() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().type("http request").build();
+        mvc.perform(post("/api/contracts/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(paginationField)))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.numberOfElements").value(1));
+      }
 
-                mvc.perform(post("/api/contracts")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(contractSearchInput)))
-                        .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("$.numberOfElements").value(1));
-            }
+      @DisplayName("Fetching first page of contracts by label email ignoring case")
+      @Test
+      void given_search_input_with_label_should_return_a_page_of_contrats_ignoring_case() throws Exception {
+        PaginationField.Filter filter = new PaginationField.Filter();
+        filter.setKey("label");
+        filter.setValues(List.of("http request - post (raw body)"));
+        PaginationField.FilterGroup filterGroup = new PaginationField.FilterGroup();
+        filterGroup.setFilters(List.of(filter));
+        PaginationField paginationField = ContractFixture.getDefault()
+            .filterGroup(filterGroup)
+            .build();
 
-            @DisplayName("Fetching first page of contracts by label")
-            @Test
-            void given_search_input_with_label_should_return_a_page_of_contrats() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().label("HTTP Request - POST (raw body)").build();
-
-                mvc.perform(post("/api/contracts")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(contractSearchInput)))
-                        .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("$.numberOfElements").value(1));
-            }
-
-            @DisplayName("Fetching first page of contracts by label email ignoring case")
-            @Test
-            void given_search_input_with_label_should_return_a_page_of_contrats_ignoring_case() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().label("http request - post (raw body)").build();
-
-                mvc.perform(post("/api/contracts")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(contractSearchInput)))
-                        .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("$.numberOfElements").value(1));
-            }
-        }
-
-        @Nested
-        @DisplayName("Sorting page of contracts")
-        class SortingPageOfContracts {
-            @DisplayName("Sorting by default")
-            @Test
-            void given_search_input_without_sort_should_return_a_page_of_contrats_with_default_sort() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("Email").build();
-
-                mvc.perform(post("/api/contracts")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(contractSearchInput)))
-                        .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("$.content.[0].config.label.en").value("Email"))
-                        .andExpect(jsonPath("$.content.[1].config.label.en").value("Email"))
-                        .andExpect(jsonPath("$.content.[2].config.label.en").value("Media pressure"))
-                        .andExpect(jsonPath("$.content.[2].fields.[0].label").value("Subject email"));
-            }
-
-            @DisplayName("Sorting by label asc")
-            @Test
-            void given_sort_input_should_return_a_page_of_contrats_sort_by_label_asc() throws Exception {
-
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email")
-                        .sorts(List.of(SortField.builder().property("label").build())).
-                        build();
-
-                mvc.perform(post("/api/contracts")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(contractSearchInput)))
-                        .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("$.content.[0].label.en").value("Publish channel pressure"))
-                        .andExpect(jsonPath("$.content.[1].label.en").value("Send individual mails"))
-                        .andExpect(jsonPath("$.content.[2].label.en").value("Send multi-recipients mail"));
-            }
-
-            @DisplayName("Sorting by label desc")
-            @Test
-            void given_sort_input_should_return_a_page_of_contrats_sort_by_label_desc() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email")
-                        .sorts(List.of(SortField.builder().property("label").direction("desc").build())).
-                        build();
-
-
-                mvc.perform(post("/api/contracts")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(contractSearchInput)))
-                        .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("$.content.[0].label.en").value("Send multi-recipients mail"))
-                        .andExpect(jsonPath("$.content.[1].label.en").value("Send individual mails"))
-                        .andExpect(jsonPath("$.content.[2].label.en").value("Publish channel pressure"));
-            }
-
-            @DisplayName("Sorting by type asc and label desc")
-            @Test
-            void given_sort_input_should_return_a_page_of_contrats_sort_by_type_asc_label_desc() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email")
-                        .sorts(List.of(SortField.builder().property("type").direction("asc").build(),
-                                SortField.builder().property("label").direction("desc").build())).
-                        build();
-
-
-                mvc.perform(post("/api/contracts")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(contractSearchInput)))
-                        .andExpect(status().is2xxSuccessful())
-                        .andExpect(jsonPath("$.content.[0].config.label.en").value("Email"))
-                        .andExpect(jsonPath("$.content.[0].label.en").value("Send multi-recipients mail"))
-                        .andExpect(jsonPath("$.content.[1].config.label.en").value("Email"))
-                        .andExpect(jsonPath("$.content.[1].label.en").value("Send individual mails"))
-                        .andExpect(jsonPath("$.content.[2].config.label.en").value("Media pressure"))
-                        .andExpect(jsonPath("$.content.[2].label.en").value("Publish channel pressure"));
-            }
-        }
+        mvc.perform(post("/api/contracts/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(paginationField)))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.numberOfElements").value(1));
+      }
     }
+
+    @Nested
+    @DisplayName("Sorting page of contracts")
+    class SortingPageOfContracts {
+
+      @DisplayName("Sorting by default")
+      @Test
+      void given_search_input_without_sort_should_return_a_page_of_contrats_with_default_sort() throws Exception {
+        PaginationField paginationField = ContractFixture.getDefault().textSearch("Email").build();
+
+        mvc.perform(post("/api/contracts/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(paginationField)))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.content.[0].config.label.en").value("Email"))
+            .andExpect(jsonPath("$.content.[1].config.label.en").value("Email"))
+            .andExpect(jsonPath("$.content.[1].fields.[0].label").value("Teams"));
+      }
+
+      @DisplayName("Sorting by label desc")
+      @Test
+      void given_sort_input_should_return_a_page_of_contrats_sort_by_label_desc() throws Exception {
+        PaginationField paginationField = ContractFixture.getDefault().textSearch("email")
+            .sorts(List.of(SortField.builder().property("label").direction("desc").build())).
+            build();
+
+        mvc.perform(post("/api/contracts/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(paginationField)))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.content.[0].label.en").value("Send multi-recipients mail"))
+            .andExpect(jsonPath("$.content.[1].label.en").value("Send individual mails"));
+      }
+
+      @DisplayName("Sorting by type asc and label desc")
+      @Test
+      void given_sort_input_should_return_a_page_of_contrats_sort_by_type_asc_label_desc() throws Exception {
+        PaginationField paginationField = ContractFixture.getDefault().textSearch("email")
+            .sorts(List.of(SortField.builder().property("config.type").direction("asc").build(),
+                SortField.builder().property("label").direction("desc").build())).
+            build();
+
+        mvc.perform(post("/api/contracts/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(paginationField)))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.content.[0].config.label.en").value("Email"))
+            .andExpect(jsonPath("$.content.[0].label.en").value("Send multi-recipients mail"))
+            .andExpect(jsonPath("$.content.[1].config.label.en").value("Email"))
+            .andExpect(jsonPath("$.content.[1].label.en").value("Send individual mails"));
+      }
+    }
+  }
 }

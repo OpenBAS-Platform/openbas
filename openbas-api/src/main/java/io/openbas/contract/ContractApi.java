@@ -1,6 +1,7 @@
 package io.openbas.contract;
 
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.utils.pagination.PaginationField;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
@@ -53,7 +54,7 @@ public class ContractApi extends RestBehavior {
         return map;
     }
 
-    @PostMapping
+    @PostMapping("/search")
     @Operation(
             summary = "Retrieves a paginated list of contracts",
             extensions = {
@@ -69,11 +70,11 @@ public class ContractApi extends RestBehavior {
             @ApiResponse(responseCode = "200", description = "Page of contracts"),
             @ApiResponse(responseCode = "400", description = "Bad parameters")
     })
-    public Page<Contract> searchExposedContracts(@RequestBody ContractSearchInput contractSearchInput,
+    public Page<Contract> searchExposedContracts(@RequestBody PaginationField paginationField,
                                                  @RequestParam(defaultValue = "0") @Min(0) int page,
-                                                 @RequestParam(defaultValue = "10") @Max(20) int size) {
+                                                 @RequestParam(defaultValue = "10") @Max(100) int size) {
 
-        Pageable pageable = PageRequest.of(page, size, contractSearchInput.getSort());
-        return contractService.searchContracts(contractSearchInput, pageable);
+        Pageable pageable = PageRequest.of(page, size, paginationField.getSort());
+        return contractService.searchContracts(paginationField, pageable);
     }
 }
