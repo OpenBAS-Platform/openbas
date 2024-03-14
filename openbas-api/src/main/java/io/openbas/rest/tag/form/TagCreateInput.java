@@ -3,9 +3,13 @@ package io.openbas.rest.tag.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
+@Setter
+@Getter
 public class TagCreateInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
@@ -16,19 +20,4 @@ public class TagCreateInput {
     @JsonProperty("tag_color")
     private String color;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
 }
