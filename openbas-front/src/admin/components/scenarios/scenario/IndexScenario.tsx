@@ -9,12 +9,12 @@ import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-hel
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
 import NotFound from '../../../../components/NotFound';
-import TopBar from '../../nav/TopBar';
 import ScenarioHeader from './ScenarioHeader';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import useScenarioPermissions from '../../../../utils/Scenario';
 import { DocumentContext, DocumentContextType, PermissionsContext, PermissionsContextType } from '../../components/Context';
 import { useFormatter } from '../../../../components/i18n';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
 
 const Scenario = lazy(() => import('./Scenario'));
 const Teams = lazy(() => import('./teams/ScenarioTeams'));
@@ -45,49 +45,55 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
   return (
     <PermissionsContext.Provider value={permissionsContext}>
       <DocumentContext.Provider value={documentContext}>
-        <TopBar />
-        <ScenarioHeader />
-        <Box
-          sx={{
-            borderBottom: 1,
-            borderColor: 'divider',
-            marginBottom: 4,
-          }}
-        >
-          <Tabs value={tabValue}>
-            <Tab
-              component={Link}
-              to={`/admin/scenarios/${scenario.scenario_id}`}
-              value={`/admin/scenarios/${scenario.scenario_id}`}
-              label={t('Overview')}
-            />
-            <Tab
-              component={Link}
-              to={`/admin/scenarios/${scenario.scenario_id}/definition`}
-              value={`/admin/scenarios/${scenario.scenario_id}/definition`}
-              label={t('Definition')}
-            />
-            <Tab
-              component={Link}
-              to={`/admin/scenarios/${scenario.scenario_id}/injects`}
-              value={`/admin/scenarios/${scenario.scenario_id}/injects`}
-              label={t('Injects')}
-            />
-          </Tabs>
-        </Box>
-        <Suspense fallback={<Loader />}>
-          <Routes>
-            <Route path="" element={errorWrapper(Scenario)()} />
-            <Route path="definition" element={<Navigate to="teams" replace={true}/>}/>
-            <Route path="definition/teams" element={errorWrapper(Teams)({ scenarioTeamsUsers: scenario.scenario_teams_users })} />
-            <Route path="definition/articles" element={errorWrapper(Articles)()} />
-            <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
-            <Route path="definition/variables" element={errorWrapper(Variables)()} />
-            <Route path="injects" element={errorWrapper(Injects)()} />
-            {/* Not found */}
-            <Route path="*" element={<NotFound/>}/>
-          </Routes>
-        </Suspense>
+        <div style={{ paddingRight: ['/definition'].some((el) => location.pathname.includes(el)) ? 200 : 0 }}>
+          <Breadcrumbs variant="object" elements={[
+            { label: t('Scenarios') },
+            { label: scenario.scenario_name, current: true },
+          ]}
+          />
+          <ScenarioHeader />
+          <Box
+            sx={{
+              borderBottom: 1,
+              borderColor: 'divider',
+              marginBottom: 4,
+            }}
+          >
+            <Tabs value={tabValue}>
+              <Tab
+                component={Link}
+                to={`/admin/scenarios/${scenario.scenario_id}`}
+                value={`/admin/scenarios/${scenario.scenario_id}`}
+                label={t('Overview')}
+              />
+              <Tab
+                component={Link}
+                to={`/admin/scenarios/${scenario.scenario_id}/definition`}
+                value={`/admin/scenarios/${scenario.scenario_id}/definition`}
+                label={t('Definition')}
+              />
+              <Tab
+                component={Link}
+                to={`/admin/scenarios/${scenario.scenario_id}/injects`}
+                value={`/admin/scenarios/${scenario.scenario_id}/injects`}
+                label={t('Injects')}
+              />
+            </Tabs>
+          </Box>
+          <Suspense fallback={<Loader />}>
+            <Routes>
+              <Route path="" element={errorWrapper(Scenario)()} />
+              <Route path="definition" element={<Navigate to="teams" replace={true}/>}/>
+              <Route path="definition/teams" element={errorWrapper(Teams)({ scenarioTeamsUsers: scenario.scenario_teams_users })} />
+              <Route path="definition/articles" element={errorWrapper(Articles)()} />
+              <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
+              <Route path="definition/variables" element={errorWrapper(Variables)()} />
+              <Route path="injects" element={errorWrapper(Injects)()} />
+              {/* Not found */}
+              <Route path="*" element={<NotFound/>}/>
+            </Routes>
+          </Suspense>
+        </div>
       </DocumentContext.Provider>
     </PermissionsContext.Provider>
   );
@@ -96,24 +102,16 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
 const IndexScenario = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
-
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
   const scenario = useHelper((helper: ScenariosHelper) => helper.getScenario(scenarioId));
   useDataLoader(() => {
     dispatch(fetchScenario(scenarioId));
   });
-
   if (scenario) {
-    return (<IndexScenarioComponent scenario={scenario} />);
+    return <IndexScenarioComponent scenario={scenario} />;
   }
-
-  return (
-    <>
-      <TopBar />
-      <NotFound />
-    </>
-  );
+  return <Loader />;
 };
 
 export default IndexScenario;

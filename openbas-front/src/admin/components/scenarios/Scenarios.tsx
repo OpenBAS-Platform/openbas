@@ -1,7 +1,7 @@
 import { makeStyles } from '@mui/styles';
 import { CSVLink } from 'react-csv';
-import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
-import { ChevronRightOutlined, FileDownloadOutlined, MovieFilterOutlined } from '@mui/icons-material';
+import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { FileDownloadOutlined, KeyboardArrowRight, MovieFilterOutlined } from '@mui/icons-material';
 import React, { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch } from '../../../utils/hooks';
@@ -47,6 +47,11 @@ const useStyles = makeStyles(() => ({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    paddingRight: 10,
+  },
+  goIcon: {
+    position: 'absolute',
+    right: -10,
   },
   downloadButton: {
     marginRight: 15,
@@ -185,7 +190,7 @@ const Scenarios = () => {
           </ListItemIcon>
           <ListItemText
             primary={
-              <div>
+              <>
                 {fields.map((header) => (
                   <div key={header.name}>
                     {
@@ -199,10 +204,9 @@ const Scenarios = () => {
                   </div>
                 ))
                 }
-              </div>
+              </>
             }
           />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {sortedScenarios.map((scenario) => (
           <ListItemButton
@@ -217,7 +221,7 @@ const Scenarios = () => {
             </ListItemIcon>
             <ListItemText
               primary={
-                <div>
+                <>
                   {fields.map((field) => (
                     <div
                       key={field.name}
@@ -227,12 +231,12 @@ const Scenarios = () => {
                       {field.value(scenario)}
                     </div>
                   ))}
-                </div>
+                </>
               }
             />
-            <ListItemSecondaryAction>
-              <ChevronRightOutlined />
-            </ListItemSecondaryAction>
+            <ListItemIcon classes={{ root: classes.goIcon }}>
+              <KeyboardArrowRight />
+            </ListItemIcon>
           </ListItemButton>
         ))}
       </List>

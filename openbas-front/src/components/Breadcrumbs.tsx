@@ -22,7 +22,7 @@ const useStyles = makeStyles(() => ({
   },
   breadcrumbsObject: {
     marginTop: -5,
-    marginBottom: 15,
+    marginBottom: 5,
   },
   breadcrumbsStandard: {
     marginTop: -5,

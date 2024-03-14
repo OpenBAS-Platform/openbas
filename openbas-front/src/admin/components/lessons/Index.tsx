@@ -2,7 +2,6 @@ import React from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import Loader from '../../../components/Loader';
-import TopBar from '../nav/TopBar';
 import LessonsTemplate from './LessonsTemplate';
 import LessonsTemplateHeader from './LessonsTemplateHeader';
 import { errorWrapper } from '../../../components/Error';
@@ -32,7 +31,6 @@ const Index = () => {
   if (lessonsTemplate) {
     return (
       <div className={classes.root}>
-        <TopBar />
         <LessonsTemplateHeader />
         <div className="clearfix" />
         <Routes>
@@ -43,12 +41,7 @@ const Index = () => {
       </div>
     );
   }
-  return (
-    <div className={classes.root}>
-      <TopBar />
-      <Loader />
-    </div>
-  );
+  return <Loader />;
 };
 
 export default Index;

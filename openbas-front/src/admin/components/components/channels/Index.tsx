@@ -3,7 +3,6 @@ import { Route, Routes, useParams } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { fetchChannel } from '../../../../actions/channels/channel-action';
 import Loader from '../../../../components/Loader';
-import TopBar from '../../nav/TopBar';
 import ChannelHeader from './ChannelHeader';
 import { errorWrapper } from '../../../../components/Error';
 import useDataLoader from '../../../../utils/ServerSideEvent';
@@ -34,7 +33,6 @@ const Index = () => {
   if (channel) {
     return (
       <div className={classes.root}>
-        <TopBar />
         <ChannelHeader />
         <div className="clearfix" />
         <Routes>
@@ -45,12 +43,7 @@ const Index = () => {
       </div>
     );
   }
-  return (
-    <div className={classes.root}>
-      <TopBar />
-      <Loader />
-    </div>
-  );
+  return <Loader />;
 };
 
 export default Index;

@@ -1,9 +1,9 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
-import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Tooltip, IconButton } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemText, Tooltip, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { ChevronRightOutlined, FileDownloadOutlined, Kayaking } from '@mui/icons-material';
+import { FileDownloadOutlined, Kayaking, KeyboardArrowRight } from '@mui/icons-material';
 import { CSVLink } from 'react-csv';
 import { useFormatter } from '../../../components/i18n';
 import { fetchExercises } from '../../../actions/Exercise';
@@ -41,6 +41,10 @@ const useStyles = makeStyles(() => ({
   bodyItem: {
     height: '100%',
     fontSize: 13,
+  },
+  goIcon: {
+    position: 'absolute',
+    right: -10,
   },
   downloadButton: {
     marginRight: 15,
@@ -244,7 +248,6 @@ const Exercises = () => {
               </div>
                         }
           />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {sortedExercises.map((exercise) => (
           <ListItem
@@ -301,9 +304,9 @@ const Exercises = () => {
                 </div>
                             }
             />
-            <ListItemSecondaryAction>
-              <ChevronRightOutlined/>
-            </ListItemSecondaryAction>
+            <ListItemIcon classes={{ root: classes.goIcon }}>
+              <KeyboardArrowRight />
+            </ListItemIcon>
           </ListItem>
         ))}
       </List>
