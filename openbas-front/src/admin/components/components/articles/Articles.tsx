@@ -69,8 +69,10 @@ const Articles: FunctionComponent<Props> = ({
   });
   // Filter and sort hook
   const [channels, setChannels] = useState<ChannelOption[]>([]);
-  const handleAddChannel = (value: ChannelOption) => {
-    setChannels(R.uniq(R.append(value, channels)));
+  const handleAddChannel = (value?: ChannelOption) => {
+    if (value) {
+      setChannels(R.uniq(R.append(value, channels)));
+    }
   };
   const handleRemoveChannel = (value: string) => {
     const remainingTags = R.filter((n: ChannelOption) => n.id !== value, channels);
