@@ -4,7 +4,6 @@ import io.openbas.database.model.DataAttachment;
 import io.openbas.database.model.Execution;
 import io.openbas.execution.ExecutionContext;
 import jakarta.activation.DataHandler;
-import jakarta.mail.Address;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
@@ -52,7 +51,7 @@ public class EmailService {
         this.emailPgp = emailPgp;
     }
 
-    public void sendEmail(Execution execution, List<ExecutionContext> usersContext, String from, String inReplyTo,
+    public void sendEmail(Execution execution, List<ExecutionContext> usersContext, String from, List<String> replyTos, String inReplyTo,
                           String subject, String message, List<DataAttachment> attachments) throws Exception {
         MimeMessage mimeMessage = buildMimeMessage(from, inReplyTo, subject, message, attachments);
         List<InternetAddress> recipients = new ArrayList<>();
@@ -60,7 +59,9 @@ public class EmailService {
             recipients.add(new InternetAddress(userContext.getUser().getEmail()));
         }
         mimeMessage.setRecipients(Message.RecipientType.TO, recipients.toArray(InternetAddress[]::new));
-        mimeMessage.setReplyTo(new Address[]{new InternetAddress(from)});
+        mimeMessage.setFrom(new InternetAddress(from));
+        mimeMessage.setReplyTo(replyTos.stream().map(this::getInternetAddress).toArray(InternetAddress[]::new));
+
         emailSender.send(mimeMessage);
 
         String emails = usersContext.stream().map(c -> c.getUser().getEmail()).collect(joining(", "));
@@ -70,7 +71,7 @@ public class EmailService {
         storeMessageImap(execution, mimeMessage);
     }
 
-    public void sendEmail(Execution execution, ExecutionContext userContext, String from, String inReplyTo,
+    public void sendEmail(Execution execution, ExecutionContext userContext, String from, List<String> replyTos, String inReplyTo,
                           boolean mustBeEncrypted, String subject, String message, List<DataAttachment> attachments)
             throws Exception {
         String email = userContext.getUser().getEmail();
@@ -79,7 +80,8 @@ public class EmailService {
 
         MimeMessage mimeMessage = buildMimeMessage(from, inReplyTo, contextualSubject, contextualBody, attachments);
         mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
-        mimeMessage.setReplyTo(new Address[]{new InternetAddress(from)});
+        mimeMessage.setFrom(new InternetAddress(from));
+        mimeMessage.setReplyTo(replyTos.stream().map(this::getInternetAddress).toArray(InternetAddress[]::new));
         // Crypt if needed
         if (mustBeEncrypted) {
             MimeMessage encMessage = getEncryptedMimeMessage(userContext, from, subject, email, mimeMessage);
@@ -91,6 +93,14 @@ public class EmailService {
         execution.addTrace(traceSuccess("email", "Mail sent to " + email, userIds));
         // Store message in Imap after sending
         storeMessageImap(execution, mimeMessage);
+    }
+
+    private InternetAddress getInternetAddress(String email){
+        try {
+            return new InternetAddress(email);
+        } catch (AddressException e) {
+            throw new IllegalArgumentException("Invalid email address: " + email, e);
+        }
     }
 
     private void storeMessageImap(Execution execution, MimeMessage mimeMessage) {
@@ -133,6 +143,7 @@ public class EmailService {
         mimeMessage.setContent(mailMultipart);
         return mimeMessage;
     }
+
     private MimeMessage getEncryptedMimeMessage(ExecutionContext userContext, String from, String subject, String email, MimeMessage mimeMessage) throws IOException, MessagingException {
         PGPPublicKey userPgpKey = emailPgp.getUserPgpKey(userContext.getUser());
         // Need to create another email that will wrap everything.

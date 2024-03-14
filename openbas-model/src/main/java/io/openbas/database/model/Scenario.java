@@ -63,7 +63,13 @@ public class Scenario implements Base {
   @JsonProperty("scenario_mail_from")
   @Email
   @NotBlank
-  private String replyTo;
+  private String from;
+
+  @ElementCollection
+  @CollectionTable(name = "scenario_mails_reply_to", joinColumns = @JoinColumn(name = "scenario_id"))
+  @Column(name = "scenario_reply_to", nullable=false)
+  @JsonProperty("scenario_mail_reply_to")
+  private List<String> replyTo  = new ArrayList<>();
 
   // Audit
 

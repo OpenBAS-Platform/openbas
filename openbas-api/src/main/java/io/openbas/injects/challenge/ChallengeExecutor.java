@@ -72,7 +72,8 @@ public class ChallengeExecutor extends Injector {
                 execution.addTrace(traceSuccess("challenge", publishedMessage));
                 // Send the publication message.
                 Exercise exercise = injection.getSource().getExercise();
-                String replyTo = exercise.getReplyTo();
+                String from = exercise.getFrom();
+                List<String> replyTos = exercise.getReplyTos();
                 List<ExecutionContext> users = injection.getContextUser();
                 List<Document> documents = injection.getInject().getDocuments().stream()
                         .filter(InjectDocument::isAttached).map(InjectDocument::getDocument).toList();
@@ -88,7 +89,7 @@ public class ChallengeExecutor extends Injector {
                                 .toList();
                         userInjectContext.put("challenges", challengeVariables);
                         // Send the email.
-                        emailService.sendEmail(execution, userInjectContext, replyTo, content.getInReplyTo(), encrypted,
+                        emailService.sendEmail(execution, userInjectContext, from, replyTos, content.getInReplyTo(), encrypted,
                                 content.getSubject(), message, attachments);
                     } catch (Exception e) {
                         execution.addTrace(traceError("email", e.getMessage(), e));

@@ -48,7 +48,8 @@ public class ScenarioToExerciseService {
     exercise.setSubtitle(scenario.getSubtitle());
     exercise.setHeader(scenario.getHeader());
     exercise.setFooter(scenario.getFooter());
-    exercise.setReplyTo(scenario.getReplyTo());
+    exercise.setFrom(scenario.getFrom());
+    exercise.setReplyTos(scenario.getReplyTo());
 
     // Tags
     exercise.setTags(copy(scenario.getTags(), Tag.class));

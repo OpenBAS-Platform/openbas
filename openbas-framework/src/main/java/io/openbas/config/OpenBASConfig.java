@@ -44,6 +44,9 @@ public class OpenBASConfig {
   @JsonProperty("default_mailer")
   private String defaultMailer;
 
+  @JsonProperty("default_reply_to")
+  private String defaultReplyTo;
+
   @JsonIgnore
   private String cookieName = "openbas_token";
 

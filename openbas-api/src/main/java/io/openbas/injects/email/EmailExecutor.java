@@ -38,20 +38,20 @@ public class EmailExecutor extends Injector {
     this.emailService = emailService;
   }
 
-  private void sendMulti(Execution execution, List<ExecutionContext> users, String replyTo, String inReplyTo,
+  private void sendMulti(Execution execution, List<ExecutionContext> users, String from, List<String> replyTos, String inReplyTo,
       String subject, String message, List<DataAttachment> attachments) {
     try {
-      emailService.sendEmail(execution, users, replyTo, inReplyTo, subject, message, attachments);
+      emailService.sendEmail(execution, users, from, replyTos, inReplyTo, subject, message, attachments);
     } catch (Exception e) {
       execution.addTrace(traceError("email", e.getMessage(), e));
     }
   }
 
-  private void sendSingle(Execution execution, List<ExecutionContext> users, String replyTo, String inReplyTo,
+  private void sendSingle(Execution execution, List<ExecutionContext> users, String from, List<String> replyTos, String inReplyTo,
       boolean mustBeEncrypted, String subject, String message, List<DataAttachment> attachments) {
     users.stream().parallel().forEach(user -> {
       try {
-        emailService.sendEmail(execution, user, replyTo, inReplyTo, mustBeEncrypted, subject, message, attachments);
+        emailService.sendEmail(execution, user, from, replyTos, inReplyTo, mustBeEncrypted, subject, message, attachments);
       } catch (Exception e) {
         execution.addTrace(traceError("email", e.getMessage(), e));
       }
@@ -79,11 +79,12 @@ public class EmailExecutor extends Injector {
       throw new UnsupportedOperationException("Email needs at least one user");
     }
     Exercise exercise = injection.getSource().getExercise();
-    String replyTo = exercise != null ? exercise.getReplyTo() : this.openBASConfig.getDefaultMailer();
+    String from = exercise != null ? exercise.getFrom() : this.openBASConfig.getDefaultMailer();
+    List<String> replyTos = exercise != null ? exercise.getReplyTos() : List.of(this.openBASConfig.getDefaultReplyTo());
     //noinspection SwitchStatementWithTooFewBranches
     switch (contract.getId()) {
-      case EMAIL_GLOBAL -> sendMulti(execution, users, replyTo, inReplyTo, subject, message, attachments);
-      default -> sendSingle(execution, users, replyTo, inReplyTo, mustBeEncrypted, subject, message, attachments);
+      case EMAIL_GLOBAL -> sendMulti(execution, users, from, replyTos, inReplyTo, subject, message, attachments);
+      default -> sendSingle(execution, users, from, replyTos, inReplyTo, mustBeEncrypted, subject, message, attachments);
     }
     return content.getExpectations()
         .stream()

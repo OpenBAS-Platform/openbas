@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -36,8 +37,9 @@ class EmailServiceTest {
         ExecutionContext userContext = new ExecutionContext(UserFixture.getSavedUser(), null, null);
 
         when(emailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
-        emailService.sendEmail(execution, userContext, "user@openbas.io", null, false, "subject", "message", Collections.emptyList());
+        emailService.sendEmail(execution, userContext, "user@openbas.io", List.of("user-reply-to@openbas.io"), null, false, "subject", "message", Collections.emptyList());
         verify(emailSender).send(argument.capture());
-        assertEquals("user@openbas.io", argument.getValue().getHeader("Reply-To")[0]);
+        assertEquals("user@openbas.io", argument.getValue().getHeader("From")[0]);
+        assertEquals("user-reply-to@openbas.io", argument.getValue().getHeader("Reply-To")[0]);
     }
 }

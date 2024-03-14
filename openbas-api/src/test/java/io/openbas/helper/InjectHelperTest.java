@@ -49,7 +49,8 @@ public class InjectHelperTest {
         Exercise exercise = new Exercise();
         exercise.setName("Exercice name");
         exercise.setStart(Instant.now());
-        exercise.setReplyTo("test@test.com");
+        exercise.setFrom("test@test.com");
+        exercise.setReplyTos(List.of("test@test.com"));
         exercise.setStatus(RUNNING);
         Exercise exerciseSaved = this.exerciseRepository.save(exercise);
         List<Exercise> exercises = new ArrayList<>();

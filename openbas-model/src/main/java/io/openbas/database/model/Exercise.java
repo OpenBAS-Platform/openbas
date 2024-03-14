@@ -9,6 +9,7 @@ import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -93,7 +94,16 @@ public class Exercise implements Base {
     @Getter
     @Column(name = "exercise_mail_from")
     @JsonProperty("exercise_mail_from")
-    private String replyTo;
+    @Email
+    @NotBlank
+    private String from;
+
+    @Getter
+    @ElementCollection
+    @CollectionTable(name = "exercise_mails_reply_to", joinColumns = @JoinColumn(name = "exercise_id"))
+    @Column(name = "exercise_reply_to", nullable=false)
+    @JsonProperty("exercise_mails_reply_to")
+    private List<String> replyTos = new ArrayList<>();
 
     @Getter
     @ManyToOne(fetch = FetchType.LAZY)
