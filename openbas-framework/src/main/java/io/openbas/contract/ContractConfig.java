@@ -1,5 +1,6 @@
 package io.openbas.contract;
 
+import io.openbas.annotation.Searchable;
 import io.openbas.helper.SupportedLanguage;
 import lombok.Getter;
 
@@ -7,8 +8,13 @@ import java.util.Map;
 
 @Getter
 public class ContractConfig {
+
+    @Searchable
     private final String type;
+
     private final boolean expose;
+
+    @Searchable
     private final Map<SupportedLanguage, String> label;
     private final String color_dark;
     private final String color_light;

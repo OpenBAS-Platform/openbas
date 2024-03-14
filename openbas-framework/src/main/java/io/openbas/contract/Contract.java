@@ -1,15 +1,16 @@
 package io.openbas.contract;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.annotation.Searchable;
+import io.openbas.contract.fields.ContractElement;
 import io.openbas.contract.variables.VariableHelper;
 import io.openbas.helper.SupportedLanguage;
-import io.openbas.contract.fields.ContractElement;
-import lombok.Getter;
-import lombok.Setter;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Map;
 public class Contract {
 
     @NotNull
+    @Searchable
     private final ContractConfig config;
 
     @NotBlank

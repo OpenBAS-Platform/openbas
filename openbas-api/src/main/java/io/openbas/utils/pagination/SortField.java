@@ -1,4 +1,4 @@
-package io.openbas.contract;
+package io.openbas.utils.pagination;
 
 import lombok.Builder;
 
