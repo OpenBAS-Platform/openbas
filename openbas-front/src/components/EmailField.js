@@ -19,6 +19,13 @@ class EmailField extends Component {
     }
   };
 
+  handleDeleteEmail = (emailToDelete) => {
+    const newEmails = this.state.emails.filter((email) => email !== emailToDelete);
+    this.setState({ emails: newEmails });
+    // Use setFieldValue to update the form value
+    this.props.setFieldValue(this.props.name, newEmails); // Assuming this.props.name is 'exercise_mails_reply_to'
+  };
+
   render() {
     const { name, label, style } = this.props;
     const { emailInput } = this.state;
@@ -31,13 +38,13 @@ class EmailField extends Component {
         options={[]}
         renderTags={(value, getTagProps) => value.map((option, index) => (
           <Chip
+            {...getTagProps({ index })}
             key={index}
             variant="outlined"
             label={option}
-            {...getTagProps({ index })}
+            onDelete={() => this.handleDeleteEmail(option)}
           />
-        ))
-                }
+        ))}
         renderInput={(params) => (
           <TextField
             {...params}
