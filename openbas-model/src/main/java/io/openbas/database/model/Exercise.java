@@ -124,6 +124,19 @@ public class Exercise implements Base {
     @JsonProperty("exercise_lessons_anonymized")
     private boolean lessonsAnonymized = false;
 
+    // -- SCENARIO --
+
+    @Getter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinTable(name = "scenario_exercise",
+        joinColumns = @JoinColumn(name = "exercise_id"),
+        inverseJoinColumns = @JoinColumn(name = "scenario_id"))
+    @JsonSerialize(using = MonoIdDeserializer.class)
+    @JsonProperty("exercise_scenario")
+    private Scenario scenario;
+
+    // -- AUDIT --
+
     @Getter
     @Column(name = "exercise_created_at")
     @JsonProperty("exercise_created_at")
@@ -133,6 +146,8 @@ public class Exercise implements Base {
     @Column(name = "exercise_updated_at")
     @JsonProperty("exercise_updated_at")
     private Instant updatedAt = now();
+
+    // -- RELATION --
 
     @Getter
     @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)

@@ -49,7 +49,17 @@ public class Scenario implements Base {
   @JsonProperty("scenario_subtitle")
   private String subtitle;
 
-  // Message
+  // -- RECURRENCE --
+
+  @Column(name = "scenario_recurrence")
+  @JsonProperty("scenario_recurrence")
+  private String recurrence;
+
+  @Column(name = "scenario_recurrence_start")
+  @JsonProperty("scenario_recurrence_start")
+  private Instant recurrenceStart;
+
+  // -- MESSAGE --
 
   @Column(name = "scenario_message_header")
   @JsonProperty("scenario_message_header")
@@ -71,7 +81,7 @@ public class Scenario implements Base {
   @JsonProperty("scenario_mails_reply_to")
   private List<String> replyTos = new ArrayList<>();
 
-  // Audit
+  // -- AUDIT --
 
   @Column(name = "scenario_created_at")
   @JsonProperty("scenario_created_at")
@@ -81,7 +91,7 @@ public class Scenario implements Base {
   @JsonProperty("scenario_updated_at")
   private Instant updatedAt = now();
 
-  // Relation
+  // -- RELATION --
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.EAGER)
   @JsonIgnore

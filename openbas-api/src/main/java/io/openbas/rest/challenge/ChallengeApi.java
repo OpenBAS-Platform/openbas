@@ -11,7 +11,7 @@ import io.openbas.rest.challenge.response.ChallengeResult;
 import io.openbas.rest.challenge.response.ChallengesReader;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ChallengeService;
-import io.openbas.service.ScenarioService;
+import io.openbas.scenario.ScenarioService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static io.openbas.scenario.ScenarioApi.SCENARIO_URI;
 
 @RestController
 public class ChallengeApi extends RestBehavior {
