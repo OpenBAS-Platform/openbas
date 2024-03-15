@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OpenTelemetryService {
 
+  private static final String PREFIX_PRODUCT;
+
   private final Meter meter;
 
   private LongCounter longCounter;
@@ -20,7 +22,7 @@ public class OpenTelemetryService {
   @PostConstruct
   private void init() {
     this.longCounter = this.meter
-        .counterBuilder("app.login")
+        .counterBuilder(PREFIX_PRODUCT + "app.login")
         .setDescription("Number of login connections")
         .setUnit("connections")
         .build();
