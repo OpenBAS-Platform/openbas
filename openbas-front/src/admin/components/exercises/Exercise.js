@@ -191,6 +191,7 @@ const Exercise = () => {
       'exercise_subtitle',
       'exercise_message_header',
       'exercise_mail_from',
+      'exercise_mails_reply_to',
     ]),
   )(exercise);
   const nextInjectDate = exercise.exercise_next_inject_date

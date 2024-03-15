@@ -579,6 +579,7 @@ export interface Exercise {
   /** @format int64 */
   exercise_logs_number?: number;
   exercise_mail_from?: string;
+  exercise_mails_reply_to?: string[];
   exercise_message_footer?: string;
   exercise_message_header?: string;
   exercise_name: string;

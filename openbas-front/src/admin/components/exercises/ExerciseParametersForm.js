@@ -4,6 +4,7 @@ import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import TextField from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
+import EmailField from '../../../components/EmailField.js';
 
 class ExerciseParametersForm extends Component {
   validate(values) {
@@ -32,7 +33,7 @@ class ExerciseParametersForm extends Component {
           },
         }}
       >
-        {({ handleSubmit, submitting, pristine }) => (
+        {({ handleSubmit, form, submitting, pristine }) => (
           <form id="exerciseParametersForm" onSubmit={handleSubmit}>
             <TextField
               name="exercise_mail_from"
@@ -40,12 +41,19 @@ class ExerciseParametersForm extends Component {
               label={t('Sender email address')}
               disabled={disabled}
             />
+            <EmailField
+              name="exercise_mails_reply_to"
+              label={t('Reply to')}
+              setFieldValue={form.mutators.setValue}
+              style={{ marginTop: 20 }}
+              disabled={disabled}
+            />
             <TextField
               name="exercise_message_header"
               label={t('Messages header')}
               multiline={true}
               fullWidth={true}
-              rows={3}
+              rows={1}
               style={{ marginTop: 20 }}
               disabled={disabled}
             />
