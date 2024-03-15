@@ -1,5 +1,4 @@
 import React from 'react';
-import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
@@ -12,13 +11,6 @@ import DefinitionMenu from '../../components/DefinitionMenu';
 import { ArticleContext } from '../../components/Context';
 import type { ArticleStore, FullArticleStore } from '../../../../actions/channels/Article';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
-
-const useStyles = makeStyles(() => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
-}));
 
 export const articleContextForExercise = (exerciseId: ExerciseStore['exercise_id']) => {
   const dispatch = useAppDispatch();
@@ -37,7 +29,6 @@ export const articleContextForExercise = (exerciseId: ExerciseStore['exercise_id
 
 const ExerciseArticles = () => {
   // Standard hooks
-  const classes = useStyles();
   const dispatch = useAppDispatch();
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
@@ -50,10 +41,8 @@ const ExerciseArticles = () => {
 
   return (
     <ArticleContext.Provider value={context}>
-      <div className={classes.container}>
-        <DefinitionMenu base="/admin/exercises" id={exerciseId} />
-        <Articles articles={articles} />
-      </div>
+      <DefinitionMenu base="/admin/exercises" id={exerciseId} />
+      <Articles articles={articles} />
     </ArticleContext.Provider>
   );
 };

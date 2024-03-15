@@ -58,7 +58,7 @@ const TagsFilter = (props) => {
           if (value !== null) onAddTag(value);
           if (reason === 'clear' && fullWidth) onClearTag();
         }}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
+        isOptionEqualToValue={(option, value) => value === undefined || value === '' || option.id === value.id}
         renderOption={(p, option) => (
           <Box component="li" {...p}>
             <div className={classes.icon} style={{ color: option.color }}>

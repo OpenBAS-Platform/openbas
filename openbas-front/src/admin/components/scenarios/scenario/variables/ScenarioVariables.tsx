@@ -1,5 +1,4 @@
 import React from 'react';
-import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 import Variables from '../../../components/variables/Variables';
 import DefinitionMenu from '../../../components/DefinitionMenu';
@@ -12,16 +11,8 @@ import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import { VariableContext, VariableContextType } from '../../../components/Context';
 import type { Variable, VariableInput } from '../../../../../utils/api-types';
 
-const useStyles = makeStyles(() => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
-}));
-
 const ScenarioVariables = () => {
   // Standard hooks
-  const classes = useStyles();
   const dispatch = useAppDispatch();
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
@@ -38,10 +29,8 @@ const ScenarioVariables = () => {
 
   return (
     <VariableContext.Provider value={context}>
-      <div className={classes.container}>
-        <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
-        <Variables variables={variables} />
-      </div>
+      <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
+      <Variables variables={variables} />
     </VariableContext.Provider>
   );
 };

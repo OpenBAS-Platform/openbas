@@ -1,5 +1,4 @@
 import React from 'react';
-import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 import { useHelper } from '../../../../store';
 import type { Exercise, Variable, VariableInput } from '../../../../utils/api-types';
@@ -11,16 +10,8 @@ import { addVariableForExercise, deleteVariableForExercise, fetchVariablesForExe
 import DefinitionMenu from '../../components/DefinitionMenu';
 import { VariableContext, VariableContextType } from '../../components/Context';
 
-const useStyles = makeStyles(() => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
-}));
-
 const ExerciseVariables = () => {
   // Standard hooks
-  const classes = useStyles();
   const dispatch = useAppDispatch();
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
@@ -37,10 +28,8 @@ const ExerciseVariables = () => {
 
   return (
     <VariableContext.Provider value={context}>
-      <div className={classes.container}>
-        <DefinitionMenu base="/admin/exercises" id={exerciseId} />
-        <Variables variables={variables} />
-      </div>
+      <DefinitionMenu base="/admin/exercises" id={exerciseId} />
+      <Variables variables={variables} />
     </VariableContext.Provider>
   );
 };

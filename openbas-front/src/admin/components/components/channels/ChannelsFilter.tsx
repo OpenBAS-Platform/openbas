@@ -1,12 +1,15 @@
 import React, { useEffect } from 'react';
 import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
-import { Box, Autocomplete, TextField, Chip } from '@mui/material';
-import { useDispatch } from 'react-redux';
+import { Autocomplete, Box, Chip, TextField } from '@mui/material';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import ChannelIcon from './ChannelIcon';
+import { useAppDispatch } from '../../../../utils/hooks';
+import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
+import type { ChannelOption } from './ChannelOption';
+import type { Channel } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   icon: {
@@ -27,16 +30,34 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ChannelsFilter = (props) => {
+interface Props {
+  onAddChannel: (value?: ChannelOption) => void
+  onClearChannel?: () => void
+  onRemoveChannel: (value: string) => void
+  currentChannels: ChannelOption[]
+  fullWidth?: boolean
+}
+
+interface ChannelTransformed {
+  id: string
+  label: string
+  color: string
+  type: string
+}
+
+const ChannelsFilter: React.FC<Props> = (props) => {
   const classes = useStyles();
   const { t } = useFormatter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(fetchChannels());
   }, []);
-  const channels = useHelper((helper) => helper.getChannels());
-  const { onAddChannel, onClearChannel, onRemoveChannel, currentChannels, fullWidth } = props;
-  const channelColor = (type) => {
+  const channels = useHelper((helper: ChannelsHelper) => helper.getChannels());
+  const {
+    onAddChannel, onClearChannel = () => {
+    }, onRemoveChannel, currentChannels, fullWidth,
+  } = props;
+  const channelColor = (type?: string) => {
     switch (type) {
       case 'newspaper':
         return '#3f51b5';
@@ -48,13 +69,13 @@ const ChannelsFilter = (props) => {
         return '#ef41e1';
     }
   };
-  const channelTransform = (n) => ({
+  const channelTransform = (n: Channel) => ({
     id: n.channel_id,
     label: n.channel_name,
     color: channelColor(n.channel_type),
     type: n.channel_type,
   });
-  const channelsOptions = channels.map(channelTransform);
+  const channelsOptions: ChannelTransformed[] = channels.map(channelTransform);
   return (
     <>
       <Autocomplete
@@ -63,7 +84,6 @@ const ChannelsFilter = (props) => {
         openOnFocus={true}
         autoSelect={false}
         autoHighlight={true}
-        hiddenlabel={true}
         size="small"
         options={channelsOptions}
         onChange={(event, value, reason) => {
@@ -72,7 +92,7 @@ const ChannelsFilter = (props) => {
           if (value !== null) onAddChannel(value);
           if (reason === 'clear' && fullWidth) onClearChannel();
         }}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
+        isOptionEqualToValue={(option, value: ChannelTransformed) => value === undefined || option.id === value.id}
         renderOption={(p, option) => (
           <Box component="li" {...p}>
             <div className={classes.icon} style={{ color: option.color }}>
@@ -84,8 +104,6 @@ const ChannelsFilter = (props) => {
         renderInput={(params) => (
           <TextField
             label={t('Channels')}
-            size="small"
-            fullWidth={true}
             variant="outlined"
             {...params}
           />
@@ -94,7 +112,7 @@ const ChannelsFilter = (props) => {
       {!fullWidth && (
         <div className={classes.filters}>
           {R.map(
-            (currentChannel) => (
+            (currentChannel: ChannelOption) => (
               <Chip
                 key={currentChannel.id}
                 classes={{ root: classes.filter }}

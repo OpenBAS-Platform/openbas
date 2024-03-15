@@ -1,4 +1,3 @@
-import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 import React from 'react';
 import { useHelper } from '../../../../../store';
@@ -12,13 +11,6 @@ import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import type { ArticleStore, FullArticleStore } from '../../../../../actions/channels/Article';
 import type { ArticleCreateInput, ArticleUpdateInput } from '../../../../../utils/api-types';
 import { ArticleContext } from '../../../components/Context';
-
-const useStyles = makeStyles(() => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
-}));
 
 export const articleContextForScenario = (scenarioId: ScenarioStore['scenario_id']) => {
   const dispatch = useAppDispatch();
@@ -37,7 +29,6 @@ export const articleContextForScenario = (scenarioId: ScenarioStore['scenario_id
 
 const ScenarioArticles = () => {
   // Standard hooks
-  const classes = useStyles();
   const dispatch = useAppDispatch();
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
@@ -50,10 +41,8 @@ const ScenarioArticles = () => {
 
   return (
     <ArticleContext.Provider value={context}>
-      <div className={classes.container}>
-        <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
-        <Articles articles={articles} />
-      </div>
+      <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
+      <Articles articles={articles} />
     </ArticleContext.Provider>
   );
 };

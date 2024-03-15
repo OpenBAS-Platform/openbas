@@ -1,6 +1,6 @@
 import React from 'react';
 import { Field } from 'react-final-form';
-import { FormGroup, FormControlLabel, Switch as MuiSwitch } from '@mui/material';
+import { FormGroup, FormControlLabel, Switch as MuiSwitch, FormHelperText, FormControl } from '@mui/material';
 
 const renderSwitch = ({
   label,
@@ -9,22 +9,23 @@ const renderSwitch = ({
   style,
   ...others
 }) => (
-  <FormGroup row={true} style={{ ...style, marginLeft: 5 }}>
-    <FormControlLabel
-      control={
-        <MuiSwitch
-          checked={input.value}
-          onChange={(event) => {
-            input.onChange(event.target.checked);
-          }}
-          {...others}
-        />
-      }
-      label={label}
-      error={touched && invalid}
-      helperText={touched && (error || submitError)}
-    />
-  </FormGroup>
+  <FormControl error={touched && invalid}>
+    <FormGroup row={true} style={{ ...style, marginLeft: 5 }}>
+      <FormControlLabel
+        control={
+          <MuiSwitch
+            checked={!!input.value}
+            onChange={(event) => {
+              input.onChange(event.target.checked);
+            }}
+            {...others}
+          />
+        }
+        label={label}
+      />
+    </FormGroup>
+    <FormHelperText>{touched && (error || submitError)}</FormHelperText>
+  </FormControl>
 );
 
 const SwitchField = (props) => (

@@ -1,5 +1,4 @@
 import React from 'react';
-import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
@@ -11,16 +10,8 @@ import DefinitionMenu from '../../../components/DefinitionMenu';
 import Challenges from '../../../components/challenges/Challenges';
 import { ChallengeContext, ChallengeContextType } from '../../../components/Context';
 
-const useStyles = makeStyles(() => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
-}));
-
 const ScenarioChallenges = () => {
   // Standard hooks
-  const classes = useStyles();
   const dispatch = useAppDispatch();
 
   // Fetching data
@@ -36,10 +27,8 @@ const ScenarioChallenges = () => {
 
   return (
     <ChallengeContext.Provider value={context}>
-      <div className={classes.container}>
-        <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
-        <Challenges challenges={challenges} />
-      </div>
+      <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
+      <Challenges challenges={challenges} />
     </ChallengeContext.Provider>
   );
 };

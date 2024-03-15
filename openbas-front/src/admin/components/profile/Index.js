@@ -110,37 +110,38 @@ const Index = () => {
             'The OpenBAS API relies on the REST standard. The token must be passed into the HTTP header',
           )}{' '}
           <strong>Authorization</strong>.
-          <Typography
-            variant="h4"
-            gutterBottom={true}
-            style={{ marginTop: 20 }}
-          >
-            {t('Token key')}
-          </Typography>
-          <pre>{userToken?.token_value}</pre>
-          <Button
-            variant="contained"
-            color="primary"
-            component="a"
-            onClick={() => onRenew(userToken?.token_id)}
-          >
-            {t('RENEW')}
-          </Button>
-          <Typography
-            variant="h4"
-            gutterBottom={true}
-            style={{ marginTop: 20 }}
-          >
-            {t('Example')}
-          </Typography>
-          <pre>
-            GET /api/exercises
-            <br />
-            Content-Type: application/json
-            <br />
-            Authorization: Bearer {userToken?.token_value}
-          </pre>
         </Typography>
+        <Typography
+          variant="h4"
+          gutterBottom={true}
+          style={{ marginTop: 20 }}
+        >
+          {t('Token key')}
+        </Typography>
+        <pre>{userToken?.token_value}</pre>
+        <Button
+          variant="contained"
+          color="primary"
+          component="a"
+          onClick={() => onRenew(userToken?.token_id)}
+        >
+          {t('RENEW')}
+        </Button>
+        <Typography
+          variant="h4"
+          gutterBottom={true}
+          style={{ marginTop: 20 }}
+        >
+          {t('Example')}
+        </Typography>
+        <pre>
+          GET /api/exercises
+          <br />
+          Content-Type: application/json
+          <br />
+          Authorization: Bearer {userToken?.token_value}
+        </pre>
+
         <Button
           variant="contained"
           color="primary"
