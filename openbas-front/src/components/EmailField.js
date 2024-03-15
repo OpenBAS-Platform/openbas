@@ -20,7 +20,7 @@ class EmailField extends Component {
   };
 
   render() {
-    const { name, label, disabled, style } = this.props;
+    const { name, label, style } = this.props;
     const { emailInput } = this.state;
 
     return (
@@ -53,7 +53,6 @@ class EmailField extends Component {
                 this.handleAddEmail();
               }
             }}
-            disabled={disabled}
           />
         )}
       />
