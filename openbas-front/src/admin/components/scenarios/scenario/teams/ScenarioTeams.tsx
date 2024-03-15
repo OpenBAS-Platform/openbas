@@ -1,6 +1,5 @@
 import { useParams } from 'react-router-dom';
 import React, { useContext } from 'react';
-import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../../utils/hooks';
@@ -24,13 +23,6 @@ import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
 import type { UserStore } from '../../../teams/players/Player';
 import AddTeams from '../../../components/teams/AddTeams';
 
-const useStyles = makeStyles(() => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
-}));
-
 interface Props {
   scenarioTeamsUsers: ScenarioStore['scenario_teams_users'],
 }
@@ -38,7 +30,6 @@ interface Props {
 const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
   // Standard hooks
   const dispatch = useAppDispatch();
-  const classes = useStyles();
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
 
   const { teams }: { scenario: ScenarioStore, teams: TeamStore[] } = useHelper((helper: ScenariosHelper) => ({
@@ -87,11 +78,9 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
 
   return (
     <TeamContext.Provider value={context}>
-      <div className={classes.container}>
-        <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
-        <Teams teamIds={teamIds} contextual={true} />
-        {permissions.canWrite && <AddTeams addedTeamIds={teamIds} onAddTeams={onAddTeams} />}
-      </div>
+      <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
+      <Teams teamIds={teamIds} contextual={true} />
+      {permissions.canWrite && <AddTeams addedTeamIds={teamIds} onAddTeams={onAddTeams} />}
     </TeamContext.Provider>
   );
 };
