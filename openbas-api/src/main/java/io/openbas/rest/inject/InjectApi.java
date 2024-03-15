@@ -13,6 +13,7 @@ import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Injector;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
+import io.openbas.scenario.ScenarioService;
 import io.openbas.service.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -35,7 +36,7 @@ import static io.openbas.database.specification.CommunicationSpecification.fromI
 import static io.openbas.helper.DatabaseHelper.resolveOptionalRelation;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static io.openbas.scenario.ScenarioApi.SCENARIO_URI;
 import static java.time.Instant.now;
 
 @RestController

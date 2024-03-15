@@ -36,4 +36,13 @@ public class PlatformTriggers {
                 .withSchedule(repeatMinutelyForever())
                 .build();
     }
+
+    @Bean
+    public Trigger scenarioExecutionTrigger() {
+        return newTrigger()
+            .forJob(this.platformJobs.getScenarioExecution())
+            .withIdentity("ScenarioExecutionTrigger")
+            .withSchedule(repeatMinutelyForever())
+            .build();
+    }
 }

@@ -1,9 +1,9 @@
-package io.openbas.rest;
+package io.openbas.scenario;
 
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.database.repository.ScenarioRepository;
-import io.openbas.rest.scenario.form.ScenarioInformationInput;
-import io.openbas.rest.scenario.form.ScenarioInput;
+import io.openbas.scenario.form.ScenarioInformationInput;
+import io.openbas.scenario.form.ScenarioInput;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import org.junit.jupiter.api.*;
@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static io.openbas.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
