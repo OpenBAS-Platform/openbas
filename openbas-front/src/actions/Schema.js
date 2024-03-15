@@ -387,7 +387,7 @@ export const storeHelper = (state) => ({
     );
   },
   getPlatformSettings: () => {
-    return state.referential.entities.platformParameters.parameters;
+    return state.referential.entities.platformParameters.parameters || {};
   },
   // kill chain phases
   getKillChainPhase: (id) => entity(id, 'killchainphases', state),

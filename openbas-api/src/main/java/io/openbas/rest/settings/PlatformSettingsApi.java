@@ -152,15 +152,18 @@ public class PlatformSettingsApi extends RestBehavior {
     platformSettings.setAuthOpenidEnable(openBASConfig.isAuthOpenidEnable());
     platformSettings.setAuthSaml2Enable(openBASConfig.isAuthSaml2Enable());
     platformSettings.setAuthLocalEnable(openBASConfig.isAuthLocalEnable());
-    platformSettings.setPlatformTheme(dbSettings.get(DEFAULT_THEME.key()).getValue());
-    platformSettings.setPlatformLang(dbSettings.get(DEFAULT_LANG.key()).getValue());
+    platformSettings.setPlatformTheme(
+        ofNullable(dbSettings.get(DEFAULT_THEME.key())).map(Setting::getValue).orElse(null));
+    platformSettings.setPlatformLang(
+        ofNullable(dbSettings.get(DEFAULT_LANG.key())).map(Setting::getValue).orElse(null));
 
     // Build authenticated user settings
     OpenBASPrincipal user = currentUser();
     if (user != null) {
       platformSettings.setMapTileServerLight(openBASConfig.getMapTileServerLight());
       platformSettings.setMapTileServerDark(openBASConfig.getMapTileServerDark());
-      platformSettings.setPlatformName(dbSettings.get(PLATFORM_NAME.key()).getValue());
+      platformSettings.setPlatformName(
+          ofNullable(dbSettings.get(PLATFORM_NAME.key())).map(Setting::getValue).orElse(null));
       platformSettings.setXtmOpenctiEnable(openCTIConfig.getEnable());
       platformSettings.setXtmOpenctiUrl(openCTIConfig.getUrl());
 
@@ -175,7 +178,7 @@ public class PlatformSettingsApi extends RestBehavior {
     // THEME
     ThemeInput themeLight = new ThemeInput();
     themeLight.setBackgroundColor(getValueFromMapOfSettings("light." + Theme.THEME_KEYS.BACKGROUND_COLOR.key()));
-    themeLight.setAccentColor(getValueFromMapOfSettings("light." + Theme.THEME_KEYS.PAPER_COLOR.key()));
+    themeLight.setPaperColor(getValueFromMapOfSettings("light." + Theme.THEME_KEYS.PAPER_COLOR.key()));
     themeLight.setNavigationColor(getValueFromMapOfSettings("light." + Theme.THEME_KEYS.NAVIGATION_COLOR.key()));
     themeLight.setPrimaryColor(getValueFromMapOfSettings("light." + Theme.THEME_KEYS.PRIMARY_COLOR.key()));
     themeLight.setSecondaryColor(getValueFromMapOfSettings("light." + Theme.THEME_KEYS.SECONDARY_COLOR.key()));
@@ -187,7 +190,7 @@ public class PlatformSettingsApi extends RestBehavior {
 
     ThemeInput themeDark = new ThemeInput();
     themeDark.setBackgroundColor(getValueFromMapOfSettings("dark." + Theme.THEME_KEYS.BACKGROUND_COLOR.key()));
-    themeDark.setAccentColor(getValueFromMapOfSettings("dark." + Theme.THEME_KEYS.PAPER_COLOR.key()));
+    themeDark.setPaperColor(getValueFromMapOfSettings("dark." + Theme.THEME_KEYS.PAPER_COLOR.key()));
     themeDark.setNavigationColor(getValueFromMapOfSettings("dark." + Theme.THEME_KEYS.NAVIGATION_COLOR.key()));
     themeDark.setPrimaryColor(getValueFromMapOfSettings("dark." + Theme.THEME_KEYS.PRIMARY_COLOR.key()));
     themeDark.setSecondaryColor(getValueFromMapOfSettings("dark." + Theme.THEME_KEYS.SECONDARY_COLOR.key()));

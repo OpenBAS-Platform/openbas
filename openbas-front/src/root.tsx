@@ -4,7 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { StyledEngineProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { useHelper } from './store';
-import { fetchMe, fetchParameters, fetchPlatformParameters } from './actions/Application';
+import { fetchMe, fetchPlatformParameters } from './actions/Application';
 import NotFound from './components/NotFound';
 import ConnectedThemeProvider from './components/AppThemeProvider';
 import ConnectedIntlProvider from './components/AppIntlProvider';

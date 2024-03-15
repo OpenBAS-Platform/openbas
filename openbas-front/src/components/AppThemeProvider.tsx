@@ -29,8 +29,6 @@ const AppThemeProvider: React.FC<Props> = ({
     document.body.setAttribute('data-theme', theme);
   });
 
-  console.log('dark', dark);
-
   let muiTheme = createTheme(
     themeDark(
       dark?.logo_url,

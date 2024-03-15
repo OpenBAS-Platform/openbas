@@ -144,11 +144,12 @@ const ThemeForm: React.FC<Props> = ({
 
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button
+          variant="contained"
           color="secondary"
           type="submit"
           disabled={!isDirty || isSubmitting}
         >
-          {t('Submit')}
+          {t('Update')}
         </Button>
       </div>
     </form>
