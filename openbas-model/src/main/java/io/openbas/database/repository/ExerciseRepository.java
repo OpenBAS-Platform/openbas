@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Exercise;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -12,7 +13,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ExerciseRepository extends CrudRepository<Exercise, String>, StatisticRepository {
+public interface ExerciseRepository extends CrudRepository<Exercise, String>,
+    StatisticRepository,
+    JpaSpecificationExecutor<Exercise> {
 
     @NotNull
     Optional<Exercise> findById(@NotNull String id);

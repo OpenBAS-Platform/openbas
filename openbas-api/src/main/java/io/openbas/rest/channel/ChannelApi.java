@@ -8,7 +8,7 @@ import io.openbas.rest.channel.form.*;
 import io.openbas.rest.channel.model.VirtualArticle;
 import io.openbas.rest.channel.response.ChannelReader;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.service.ScenarioService;
+import io.openbas.scenario.ScenarioService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -26,7 +26,7 @@ import static io.openbas.database.model.Inject.SPEED_STANDARD;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injects.channel.ChannelContract.CHANNEL_PUBLISH;
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static io.openbas.scenario.ScenarioApi.SCENARIO_URI;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsFirst;
 

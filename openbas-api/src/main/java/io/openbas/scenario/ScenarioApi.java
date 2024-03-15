@@ -1,4 +1,4 @@
-package io.openbas.rest.scenario;
+package io.openbas.scenario;
 
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Scenario;
@@ -8,10 +8,8 @@ import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
-import io.openbas.rest.scenario.form.*;
+import io.openbas.scenario.form.*;
 import io.openbas.service.ImportService;
-import io.openbas.service.ScenarioService;
-import io.openbas.service.ScenarioToExerciseService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -109,7 +107,7 @@ public class ScenarioApi {
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Exercise toExercise(@PathVariable @NotBlank final String scenarioId) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
-    return this.scenarioToExerciseService.toExercise(scenario);
+    return this.scenarioToExerciseService.toExercise(scenario, null);
   }
 
   // -- TAGS --

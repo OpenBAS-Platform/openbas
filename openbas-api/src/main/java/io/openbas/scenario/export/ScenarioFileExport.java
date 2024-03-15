@@ -1,4 +1,4 @@
-package io.openbas.rest.scenario.export;
+package io.openbas.scenario.export;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

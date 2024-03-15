@@ -1,6 +1,7 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Scenario;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ScenarioRepository extends CrudRepository<Scenario, String> {
+public interface ScenarioRepository extends CrudRepository<Scenario, String>, JpaSpecificationExecutor<Scenario> {
 
   @Query("select distinct s from Scenario s " +
       "join s.grants as grant " +

@@ -9,6 +9,7 @@ import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
+import io.openbas.scenario.ScenarioService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static io.openbas.injects.email.EmailContract.EMAIL_DEFAULT;
+import static io.openbas.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.injects.email.EmailContract.TYPE;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;

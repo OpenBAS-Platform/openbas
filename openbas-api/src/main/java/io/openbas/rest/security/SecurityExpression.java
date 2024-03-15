@@ -6,7 +6,7 @@ import io.openbas.database.model.Scenario;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.UserRepository;
-import io.openbas.service.ScenarioService;
+import io.openbas.scenario.ScenarioService;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
