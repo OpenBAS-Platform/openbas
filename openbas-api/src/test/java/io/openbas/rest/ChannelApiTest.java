@@ -9,7 +9,7 @@ import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.rest.channel.form.ArticleCreateInput;
 import io.openbas.rest.channel.form.ArticleUpdateInput;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
-import io.openbas.service.ScenarioService;
+import io.openbas.scenario.ScenarioService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,7 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static io.openbas.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

@@ -1,4 +1,4 @@
-package io.openbas.service;
+package io.openbas.scenario;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,6 +6,8 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.injects.channel.ChannelContract;
 import io.openbas.injects.channel.model.ChannelContent;
+import io.openbas.service.VariableService;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,8 +44,11 @@ public class ScenarioToExerciseService {
   private final VariableService variableService;
 
   @Transactional(rollbackFor = Exception.class)
-  public Exercise toExercise(@NotBlank final Scenario scenario) {
+  public Exercise toExercise(
+      @NotBlank final Scenario scenario,
+      @Nullable final Instant start) {
     Exercise exercise = new Exercise();
+    exercise.setScenario(scenario);
     exercise.setName(scenario.getName());
     exercise.setDescription(scenario.getDescription());
     exercise.setSubtitle(scenario.getSubtitle());
@@ -50,6 +56,7 @@ public class ScenarioToExerciseService {
     exercise.setFooter(scenario.getFooter());
     exercise.setFrom(scenario.getFrom());
     exercise.addReplyTos(scenario.getReplyTos());
+    exercise.setStart(start);
 
     // Tags
     exercise.setTags(copy(scenario.getTags(), Tag.class));

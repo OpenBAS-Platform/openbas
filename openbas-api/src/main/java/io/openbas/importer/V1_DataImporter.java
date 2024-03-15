@@ -12,7 +12,7 @@ import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.service.FileService;
 import io.openbas.service.ImportEntry;
-import io.openbas.service.ScenarioService;
+import io.openbas.scenario.ScenarioService;
 import jakarta.activation.MimetypesFileTypeMap;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;

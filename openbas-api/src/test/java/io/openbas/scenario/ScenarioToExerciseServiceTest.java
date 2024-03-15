@@ -1,7 +1,8 @@
-package io.openbas.service;
+package io.openbas.scenario;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
+import io.openbas.service.LoadService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import static io.openbas.utils.fixtures.DocumentFixture.getDocumentJpeg;
 import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
 import static io.openbas.utils.fixtures.ObjectiveFixture.OBJECTIVE_NAME;
 import static io.openbas.utils.fixtures.ObjectiveFixture.getObjective;
+import static io.openbas.utils.fixtures.ScenarioFixture.getScenario;
 import static io.openbas.utils.fixtures.TagFixture.getTag;
 import static io.openbas.utils.fixtures.TeamFixture.getTeam;
 import static io.openbas.utils.fixtures.UserFixture.getUser;
@@ -91,11 +93,8 @@ public class ScenarioToExerciseServiceTest {
   void scenarioToExerciseTest() {
     // -- PREPARE --
     // Base
-    Scenario scenario = new Scenario();
-    String name = "Crisis exercise";
-    scenario.setName(name);
-    scenario.setDescription("A crisis exercise for my enterprise");
-    scenario.setSubtitle("A crisis exercise");
+    Scenario scenario = getScenario();
+    String name = scenario.getName();
     // User & Teams
     User user = getUser();
     User userSaved = this.userRepository.save(user);
@@ -214,7 +213,7 @@ public class ScenarioToExerciseServiceTest {
     VARIABLE_ID = variableSaved.getId();
 
     // -- EXECUTE --
-    Exercise exercise = this.scenarioToExerciseService.toExercise(scenario);
+    Exercise exercise = this.scenarioToExerciseService.toExercise(scenario, null);
     EXERCISE_ID = exercise.getId();
     Exercise exerciseSaved = this.loadService.exercise(EXERCISE_ID);
 

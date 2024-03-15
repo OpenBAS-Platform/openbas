@@ -1,16 +1,21 @@
-package io.openbas.service;
+package io.openbas.scenario;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
+import io.openbas.database.specification.ScenarioSpecification;
 import io.openbas.rest.exercise.exports.ExerciseExportMixins;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
-import io.openbas.rest.scenario.export.ScenarioExportMixins;
-import io.openbas.rest.scenario.export.ScenarioFileExport;
-import io.openbas.rest.scenario.form.ScenarioSimple;
+import io.openbas.scenario.export.ScenarioExportMixins;
+import io.openbas.scenario.export.ScenarioFileExport;
+import io.openbas.scenario.form.ScenarioSimple;
+import io.openbas.service.ChallengeService;
+import io.openbas.service.FileService;
+import io.openbas.service.GrantService;
+import io.openbas.service.VariableService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
@@ -85,6 +90,10 @@ public class ScenarioService {
       scenarios = this.scenarioRepository.findAllGranted(currentUser().getId());
     }
     return scenarios.stream().map(ScenarioSimple::fromScenario).toList();
+  }
+
+  public List<Scenario> recurringScenarios() {
+    return this.scenarioRepository.findAll(ScenarioSpecification.recurring());
   }
 
   public Scenario scenario(@NotBlank final String scenarioId) {
