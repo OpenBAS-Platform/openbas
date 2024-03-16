@@ -49,7 +49,7 @@ public class ScenarioToExerciseService {
     exercise.setHeader(scenario.getHeader());
     exercise.setFooter(scenario.getFooter());
     exercise.setFrom(scenario.getFrom());
-    exercise.setReplyTos(scenario.getReplyTo());
+    exercise.setReplyTos(scenario.getReplyTos());
 
     // Tags
     exercise.setTags(copy(scenario.getTags(), Tag.class));

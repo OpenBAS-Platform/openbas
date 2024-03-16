@@ -157,7 +157,7 @@ public class ScenarioApiTest {
     // -- PREPARE --
     ScenarioInformationInput scenarioInformationInput = new ScenarioInformationInput();
     String header = "NEW HEADER";
-    scenarioInformationInput.setReplyTo("no-reply@filigran.io");
+    scenarioInformationInput.setFrom("no-reply@filigran.io");
     scenarioInformationInput.setHeader(header);
 
     // -- EXECUTE --
