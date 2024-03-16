@@ -99,7 +99,7 @@ public class Exercise implements Base {
     private String from;
 
     @Getter
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "exercise_mails_reply_to", joinColumns = @JoinColumn(name = "exercise_id"))
     @Column(name = "exercise_reply_to", nullable=false)
     @JsonProperty("exercise_mails_reply_to")
