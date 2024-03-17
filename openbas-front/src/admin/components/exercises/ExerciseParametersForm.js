@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import TextField from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
-import EmailField from '../../../components/EmailField';
+import EmailListField from '../../../components/EmailListField';
 
 class ExerciseParametersForm extends Component {
   validate(values) {
@@ -41,11 +41,11 @@ class ExerciseParametersForm extends Component {
               label={t('Sender email address')}
               disabled={disabled}
             />
-            <EmailField
+            <EmailListField
               name="exercise_mails_reply_to"
+              savedEmails={initialValues.exercise_mails_reply_to}
               label={t('Reply to')}
               setFieldValue={form.mutators.setValue}
-              style={{ marginTop: 20 }}
             />
             <TextField
               name="exercise_message_header"

@@ -5,30 +5,36 @@ class EmailField extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      emails: [],
+      emails: this.props.emails || [],
       emailInput: '',
     };
   }
 
   handleAddEmail = () => {
+    const { name, setFieldValue } = this.props;
     const { emailInput, emails } = this.state;
-    if (emailInput.trim() !== '') {
-      const newEmails = [...emails, emailInput.trim()];
-      this.setState({ emails: newEmails, emailInput: '' });
-      this.props.setFieldValue(this.props.name, newEmails);
+    const newEmail = emailInput.trim();
+    if (newEmail !== '' && !emails.includes(newEmail)) {
+      const newEmails = [...emails, newEmail];
+      this.setState({ emails: newEmails, emailInput: '' }, () => {
+        // Call setFieldValue to update form value after state has been updated
+        setFieldValue(name, newEmails);
+      });
     }
   };
 
   handleDeleteEmail = (emailToDelete) => {
+    const { name, setFieldValue } = this.props;
     const newEmails = this.state.emails.filter((email) => email !== emailToDelete);
-    this.setState({ emails: newEmails });
-    // Use setFieldValue to update the form value
-    this.props.setFieldValue(this.props.name, newEmails); // Assuming this.props.name is 'exercise_mails_reply_to'
+    this.setState({ emails: newEmails }, () => {
+      // Call setFieldValue to update form value after state has been updated
+      setFieldValue(name, newEmails);
+    });
   };
 
   render() {
-    const { name, label, style } = this.props;
-    const { emailInput } = this.state;
+    const { label, style } = this.props;
+    const { emails, emailInput } = this.state;
 
     return (
       <Autocomplete
@@ -36,6 +42,7 @@ class EmailField extends Component {
         id="emails-filled"
         freeSolo
         options={[]}
+        defaultValue={emails}
         renderTags={(value, getTagProps) => value.map((option, index) => (
           <Chip
             {...getTagProps({ index })}
@@ -48,7 +55,6 @@ class EmailField extends Component {
         renderInput={(params) => (
           <TextField
             {...params}
-            name={name}
             variant="standard"
             label={label}
             value={emailInput}

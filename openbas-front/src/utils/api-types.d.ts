@@ -642,6 +642,7 @@ export interface ExerciseTeamUser {
 export interface ExerciseUpdateInput {
   exercise_description?: string;
   exercise_mail_from?: string;
+  exercise_mails_reply_to?: string[];
   exercise_message_footer?: string;
   exercise_message_header?: string;
   exercise_name: string;
