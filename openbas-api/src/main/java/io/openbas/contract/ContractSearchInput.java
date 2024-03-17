@@ -30,6 +30,7 @@ public class ContractSearchInput {
     @Schema(description = "Text to search within contract attributes such as fields, config.label, and label")
     String textSearch;
 
+    @Builder.Default
     @Schema(description = "List of sort fields : a field is composed of a property (for instance \"label\" and an optional direction (\"asc\" is assumed if no direction is specified) : (\"desc\", \"asc\")")
     List<SortField> sorts = new ArrayList<>();
 

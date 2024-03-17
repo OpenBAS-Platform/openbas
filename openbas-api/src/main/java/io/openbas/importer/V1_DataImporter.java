@@ -293,7 +293,7 @@ public class V1_DataImporter implements Importer {
             exercise.setSubtitle(exerciseNode.get("exercise_subtitle").textValue());
             exercise.setHeader(exerciseNode.get("exercise_message_header").textValue());
             exercise.setFooter(exerciseNode.get("exercise_message_footer").textValue());
-            exercise.setReplyTo(exerciseNode.get("exercise_mail_from").textValue());
+            exercise.setFrom(exerciseNode.get("exercise_mail_from").textValue());
             List<String> exerciseTagIds = resolveJsonIds(exerciseNode, "exercise_tags");
             List<Tag> tagsForExercise = exerciseTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
             exercise.setTags(tagsForExercise);
@@ -312,7 +312,7 @@ public class V1_DataImporter implements Importer {
             scenario.setSubtitle(scenarioNode.get("scenario_subtitle").textValue());
             scenario.setHeader(scenarioNode.get("scenario_message_header").textValue());
             scenario.setFooter(scenarioNode.get("scenario_message_footer").textValue());
-            scenario.setReplyTo(scenarioNode.get("scenario_mail_from").textValue());
+            scenario.setFrom(scenarioNode.get("scenario_mail_from").textValue());
             List<String> scenarioTagIds = resolveJsonIds(scenarioNode, "scenario_tags");
             List<Tag> tagsForScenarios = scenarioTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
             scenario.setTags(tagsForScenarios);
