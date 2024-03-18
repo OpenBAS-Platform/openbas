@@ -1,8 +1,8 @@
 import React, { CSSProperties, FunctionComponent, useState } from 'react';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { PaginationField } from './PaginationField';
 import { useFormatter } from '../../i18n';
+import type { PaginationField } from '../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   iconSort: {

@@ -3,7 +3,6 @@ package io.openbas.utils.fixtures;
 import io.openbas.contract.Contract;
 import io.openbas.contract.ContractConfig;
 import io.openbas.helper.SupportedLanguage;
-import io.openbas.utils.pagination.PaginationField;
 
 import java.util.List;
 import java.util.Map;
@@ -20,10 +19,6 @@ import static io.openbas.contract.fields.ContractTextArea.textareaField;
 import static io.openbas.contract.fields.ContractTuple.tupleField;
 
 public class ContractFixture {
-
-  public static PaginationField.PaginationFieldBuilder getDefault() {
-    return PaginationField.builder();
-  }
 
   public static Map<String, Contract> getContracts() {
     return Map.of("1108ad8f8-32f8-4a22-8114-aaa12322bd09",

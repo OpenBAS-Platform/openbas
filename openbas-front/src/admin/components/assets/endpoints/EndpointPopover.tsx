@@ -8,13 +8,13 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import { deleteEndpoint, updateEndpoint } from '../../../../actions/assets/endpoint-actions';
 import Drawer from '../../../../components/common/Drawer';
 import DialogDelete from '../../../../components/common/DialogDelete';
-import type { EndpointStore } from './Endpoint';
 import { updateAssetsOnAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
 import Dialog from '../../../../components/common/Dialog';
+import { EndpointStoreWithType } from './EndpointsList';
 
 interface Props {
   inline?: boolean;
-  endpoint: EndpointStore;
+  endpoint: EndpointStoreWithType;
   assetGroupId?: string;
   assetGroupEndpointIds?: string[];
   onRemoveEndpointFromInject?: (assetId: string) => void;
@@ -116,7 +116,7 @@ const EndpointPopover: React.FC<Props> = ({
         <MenuItem onClick={handleEdit}>
           {t('Update')}
         </MenuItem>
-        {assetGroupId && (
+        {(assetGroupId && endpoint.type !== 'dynamic') && (
           <MenuItem onClick={handleRemove}>
             {t('Remove from the asset group')}
           </MenuItem>

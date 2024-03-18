@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static io.openbas.utils.pagination.PaginationUtils.buildPagination;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationRuntime;
 
 @Getter
 @Service
@@ -76,11 +75,14 @@ public class ContractService {
    * Retrieves a paginated list of contracts.
    *
    * @param paginationField Criteria for searching contracts.
-   * @param pageable        The pagination information
    * @return a {@link Page} containing the contracts for the requested page
    */
-  public Page<Contract> searchContracts(PaginationField paginationField, Pageable pageable) {
-    return buildPagination(new ArrayList<>(getContracts().values()), pageable, paginationField);
+  public Page<Contract> searchContracts(PaginationField paginationField) {
+    List<Contract> contractsExposed = getContracts().values()
+        .stream()
+        .filter(contract -> contract.getConfig().isExpose())
+        .toList();
+    return buildPaginationRuntime(contractsExposed, paginationField);
   }
 
 }

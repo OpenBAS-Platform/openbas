@@ -15,7 +15,7 @@ import {
 import { useFormatter } from '../../../components/i18n';
 import { searchContracts } from '../../../actions/Inject';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
-import { initFilterGroup, initSort } from '../../../components/common/pagination/PaginationField';
+import { initSorting } from '../../../components/common/pagination/PaginationField';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -63,8 +63,7 @@ const Integrations = () => {
     ...type,
   }));
   const [paginationField, _setPaginationField] = useState({
-    filterGroup: initFilterGroup('config.expose', [true]),
-    sorts: initSort('config.type'),
+    sorts: initSorting('config'),
   });
 
   return (

@@ -86,6 +86,8 @@ export interface AssetGroup {
   /** @format date-time */
   asset_group_created_at?: string;
   asset_group_description?: string;
+  asset_group_dynamic_assets?: Asset[];
+  asset_group_dynamic_filter?: FilterGroup;
   asset_group_id: string;
   asset_group_name: string;
   asset_group_tags?: Tag[];
@@ -96,6 +98,7 @@ export interface AssetGroup {
 
 export interface AssetGroupInput {
   asset_group_description?: string;
+  asset_group_dynamic_filter?: FilterGroup;
   asset_group_name: string;
   asset_group_tags?: string[];
 }
@@ -690,6 +693,18 @@ export interface ExpectationUpdateInput {
   expectation_score: number;
 }
 
+export interface Filter {
+  key: string;
+  mode?: "and" | "or";
+  operator?: "eq" | "not_eq" | "contains" | "not_contains" | "starts_with" | "not_starts_with";
+  values?: string[];
+}
+
+export interface FilterGroup {
+  filters?: Filter[];
+  mode: "and" | "or";
+}
+
 export interface FlagInput {
   flag_type: string;
   flag_value: string;
@@ -1181,6 +1196,25 @@ export interface OrganizationUpdateInput {
   organization_tags?: string[];
 }
 
+export interface PageAttackPattern {
+  content?: AttackPattern[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject;
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageContract {
   content?: Contract[];
   empty?: boolean;
@@ -1200,6 +1234,25 @@ export interface PageContract {
   totalPages?: number;
 }
 
+export interface PageKillChainPhase {
+  content?: KillChainPhase[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject;
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageableObject {
   /** @format int64 */
   offset?: number;
@@ -1210,6 +1263,26 @@ export interface PageableObject {
   paged?: boolean;
   sort?: SortObject[];
   unpaged?: boolean;
+}
+
+export interface PaginationField {
+  filterGroup?: FilterGroup;
+  /**
+   * Page number to get
+   * @format int32
+   * @min 0
+   */
+  page?: number;
+  /**
+   * Element number by page
+   * @format int32
+   * @max 100
+   */
+  size?: number;
+  /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
+  sorts?: SortField[];
+  /** Text to search within searchable attributes */
+  textSearch?: string;
 }
 
 export interface Pause {
@@ -1247,6 +1320,12 @@ export interface PlatformStatistic {
   injects_count?: StatisticElement;
   platform_id?: string;
   users_count?: StatisticElement;
+}
+
+export interface PropertySchemaDTO {
+  schema_property_name: string;
+  schema_property_type_array?: boolean;
+  schema_property_values?: string[];
 }
 
 export interface PublicChallenge {

@@ -9,7 +9,7 @@ import TaxonomiesMenu from '../TaxonomiesMenu';
 import { useFormatter } from '../../../../components/i18n';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import { initSort } from '../../../../components/common/pagination/PaginationField';
+import { initSorting } from '../../../../components/common/pagination/PaginationField';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -105,7 +105,7 @@ const inlineStyles = {
 const KillChainPhases = () => {
   // Standard hooks
   const classes = useStyles();
-  const { nsdt } = useFormatter();
+  const { t, nsdt } = useFormatter();
 
   // Headers
   const headers = [
@@ -117,8 +117,21 @@ const KillChainPhases = () => {
 
   const [killChainPhases, setKillChainPhases] = useState([]);
   const [paginationField, setPaginationField] = useState({
-    sorts: initSort('phase_kill_chain_name'),
+    sorts: initSorting('phase_kill_chain_name'),
   });
+
+  // Export
+  const exportProps = {
+    exportType: 'kill_chain_phase',
+    exportKeys: [
+      'phase_kill_chain_name',
+      'phase_name',
+      'phase_order',
+      'phase_created_at',
+    ],
+    exportData: killChainPhases,
+    exportFileName: `${t('KillChainPhases')}.csv`,
+  };
 
   return (
     <div className={classes.container}>
@@ -127,6 +140,7 @@ const KillChainPhases = () => {
         fetch={searchKillChainPhases}
         paginationField={paginationField}
         setContent={setKillChainPhases}
+        exportProps={exportProps}
       />
       <div className="clearfix" />
       <List classes={{ root: classes.list }}>

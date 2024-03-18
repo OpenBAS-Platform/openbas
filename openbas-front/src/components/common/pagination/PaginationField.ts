@@ -1,48 +1,6 @@
-export interface PaginationField {
-  filterGroup?: FilterGroup;
-  textSearch?: string;
-  sorts?: SortField[];
-}
+import type { SortField } from '../../../utils/api-types';
 
-enum FilterOperator {
-  eq = 'eq',
-}
-
-enum FilterMode {
-  and = 'and',
-  or = 'or',
-}
-
-interface FilterGroup {
-  mode: FilterMode;
-  filters?: Filter[];
-}
-
-export interface Filter {
-  key: string;
-  mode: FilterMode;
-  values: string[];
-  operator: FilterOperator;
-}
-
-interface SortField {
-  property?: string;
-  direction?: string;
-}
-
-export const initFilterGroup: (key: string, values: string[]) => FilterGroup = (key: string, values: string[]) => {
-  return {
-    mode: FilterMode.and,
-    filters: [{
-      key,
-      values,
-      mode: FilterMode.and,
-      operator: FilterOperator.eq,
-    }],
-  };
-};
-
-export const initSort: (property: string) => SortField[] = (property: string) => {
+export const initSorting: (property: string) => SortField[] = (property: string) => {
   return [{ property }];
 };
 

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static lombok.AccessLevel.NONE;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.springframework.util.StringUtils.hasText;
 
 @Builder
 @Getter
@@ -34,11 +34,16 @@ public class PropertySchema {
   private final boolean searchable;
 
   private final boolean filterable;
+  private final List<String> availableValues;
+
+  private final boolean sortable;
+
+  private final String propertyRepresentative;
 
   @Singular("propertySchema")
   private final List<PropertySchema> propertiesSchema;
 
-  String getJsonName() {
+  public String getJsonName() {
     return Optional.ofNullable(this.jsonName).orElse(this.name);
   }
 
@@ -51,7 +56,7 @@ public class PropertySchema {
   private static class ValidationBuilder extends PropertySchemaBuilder {
 
     public PropertySchema build() {
-      if (isBlank(super.name)) {
+      if (!hasText(super.name)) {
         throw new RuntimeException("Property name should not be empty");
       }
       if (super.type == null) {

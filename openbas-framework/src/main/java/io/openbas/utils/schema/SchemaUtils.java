@@ -1,8 +1,7 @@
 package io.openbas.utils.schema;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.annotation.Filterable;
-import io.openbas.annotation.Searchable;
+import io.openbas.annotation.Queryable;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -11,8 +10,13 @@ import jakarta.validation.constraints.NotNull;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.springframework.util.StringUtils.hasText;
 
 public class SchemaUtils {
 
@@ -22,7 +26,7 @@ public class SchemaUtils {
       Email.class
   );
 
-  private static final Class<?>[] BASE_CLASSES = {
+  public static final Class<?>[] BASE_CLASSES = {
       byte.class,
       short.class,
       int.class,
@@ -59,6 +63,16 @@ public class SchemaUtils {
             .type(field.getType())
             .multiple(field.getType().isArray() || Collection.class.isAssignableFrom(field.getType()));
 
+        // Enum type -> compute available values
+        if (field.getType().isEnum()) {
+          Object[] enumValues = field.getType().getEnumConstants();
+          List<String> enumNames = new ArrayList<>();
+          for (Object enumValue : enumValues) {
+            enumNames.add(enumValue.toString());
+          }
+          builder.availableValues(enumNames);
+        }
+
         Annotation[] annotations = field.getDeclaredAnnotations();
         for (Annotation annotation : annotations) {
           // Json property name
@@ -73,13 +87,16 @@ public class SchemaUtils {
           if (REQUIRED_ANNOTATIONS.contains(annotation.annotationType())) {
             builder.mandatory(true);
           }
-          // Searchable
-          if (annotation.annotationType().equals(Searchable.class)) {
-            builder.searchable(true);
-          }
-          // Filterable
-          if (annotation.annotationType().equals(Filterable.class)) {
-            builder.filterable(true);
+          // Queryable
+          if (annotation.annotationType().equals(Queryable.class)) {
+            Queryable queryable = field.getAnnotation(Queryable.class);
+            builder.searchable(queryable.searchable());
+            builder.filterable(queryable.filterable());
+            builder.sortable(queryable.sortable());
+            String propertyValue = queryable.property();
+            if (hasText(propertyValue)) {
+              builder.propertyRepresentative(propertyValue);
+            }
           }
         }
 
@@ -101,45 +118,27 @@ public class SchemaUtils {
     return properties;
   }
 
-  @SuppressWarnings("unchecked")
-  public static Map.Entry<Class<Object>, Object> getPropertyInfo(Object obj, String path) {
-    if (obj == null) {
-      return null;
+  public static <T> PropertySchema retrieveProperty(List<PropertySchema> propertySchemas, String jsonFieldPath) {
+    if (jsonFieldPath.contains("\\.")) {
+      throw new IllegalArgumentException("Deep path is not allowed");
     }
-    String[] pathParts = path.split("\\.");
 
-    Object currentObject = obj;
-    for (String pathPart : pathParts) {
-      Field field;
-      try {
-        field = currentObject.getClass().getDeclaredField(pathPart);
-        field.setAccessible(true);
-        currentObject = field.get(currentObject);
-        if (currentObject == null) {
-          return null;
-        }
-      } catch (NoSuchFieldException | IllegalAccessException e) {
-        throw new RuntimeException(e);
-      }
-    }
-    return Map.entry((Class<Object>) currentObject.getClass(), currentObject);
+    return propertySchemas.stream()
+        .filter(p -> jsonFieldPath.equals(p.getJsonName()))
+        .findFirst()
+        .orElseThrow();
   }
 
-  public static <T> String toJavaFieldPath(Class<T> clazz, String jsonFieldPath) {
-    String[] pathParts = jsonFieldPath.split("\\.");
+  public static List<PropertySchema> getSearchableProperties(List<PropertySchema> propertySchemas) {
+    return propertySchemas.stream().filter(PropertySchema::isSearchable).toList();
+  }
 
-    List<String> realPaths = new ArrayList<>();
-    List<PropertySchema> propertySchemas = SchemaUtils.schema(clazz);
+  public static List<PropertySchema> getFilterableProperties(List<PropertySchema> propertySchemas) {
+    return propertySchemas.stream().filter(PropertySchema::isFilterable).toList();
+  }
 
-    for (String pathPart : pathParts) {
-      PropertySchema propertySchema = propertySchemas.stream()
-          .filter(p -> pathPart.equals(p.getJsonName()))
-          .findFirst()
-          .orElseThrow();
-      realPaths.add(propertySchema.getName());
-      propertySchemas = propertySchema.getPropertiesSchema();
-    }
-    return String.join(".", realPaths);
+  public static List<PropertySchema> getSortableProperties(List<PropertySchema> propertySchemas) {
+    return propertySchemas.stream().filter(PropertySchema::isSortable).toList();
   }
 
 }

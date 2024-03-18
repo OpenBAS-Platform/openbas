@@ -1,26 +1,21 @@
 package io.openbas.rest.kill_chain_phase;
 
-import io.openbas.utils.pagination.PaginationField;
 import io.openbas.database.model.KillChainPhase;
 import io.openbas.database.repository.KillChainPhaseRepository;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseCreateInput;
+import io.openbas.utils.pagination.PaginationField;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-import static io.openbas.utils.pagination.PaginationUtils.buildPagination;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RestController
 @Secured(ROLE_USER)
@@ -39,13 +34,12 @@ public class KillChainPhaseApi extends RestBehavior {
   }
 
   @PostMapping("/api/kill_chain_phases/search")
-  public Page<KillChainPhase> killChainPhases(
-      @RequestBody PaginationField paginationField,
-      @RequestParam(defaultValue = "0") @Min(0) int page,
-      @RequestParam(defaultValue = "10") @Max(100) int size) {
-    List<KillChainPhase> killChainPhases = fromIterable(killChainPhaseRepository.findAll());
-    Pageable pageable = PageRequest.of(page, size, paginationField.getSort());
-    return buildPagination(killChainPhases, pageable, paginationField);
+  public Page<KillChainPhase> killChainPhases(@RequestBody @Valid PaginationField paginationField) {
+    return buildPaginationJPA(
+        (Specification<KillChainPhase> specification, Pageable pageable) -> this.killChainPhaseRepository.findAll(specification, pageable),
+        paginationField,
+        KillChainPhase.class
+    );
   }
 
   @GetMapping("/api/kill_chain_phases/{killChainPhaseId}")

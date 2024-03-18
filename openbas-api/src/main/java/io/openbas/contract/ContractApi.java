@@ -7,14 +7,11 @@ import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,11 +67,7 @@ public class ContractApi extends RestBehavior {
             @ApiResponse(responseCode = "200", description = "Page of contracts"),
             @ApiResponse(responseCode = "400", description = "Bad parameters")
     })
-    public Page<Contract> searchExposedContracts(@RequestBody PaginationField paginationField,
-                                                 @RequestParam(defaultValue = "0") @Min(0) int page,
-                                                 @RequestParam(defaultValue = "10") @Max(100) int size) {
-
-        Pageable pageable = PageRequest.of(page, size, paginationField.getSort());
-        return contractService.searchContracts(paginationField, pageable);
+    public Page<Contract> searchExposedContracts(@RequestBody @Valid PaginationField paginationField) {
+        return contractService.searchContracts(paginationField);
     }
 }

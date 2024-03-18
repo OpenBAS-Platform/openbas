@@ -7,22 +7,18 @@ import io.openbas.rest.attack_pattern.form.AttackPatternCreateInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.PaginationField;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.utils.pagination.PaginationUtils.buildPagination;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RestController
 @Secured(ROLE_USER)
@@ -47,13 +43,12 @@ public class AttackPatternApi extends RestBehavior {
   }
 
   @PostMapping("/api/attack_patterns/search")
-  public Page<AttackPattern> attackPatterns(
-      @RequestBody PaginationField paginationField,
-      @RequestParam(defaultValue = "0") @Min(0) int page,
-      @RequestParam(defaultValue = "10") @Max(100) int size) {
-    List<AttackPattern> attackPatterns = fromIterable(this.attackPatternRepository.findAll());
-    Pageable pageable = PageRequest.of(page, size, paginationField.getSort());
-    return buildPagination(attackPatterns, pageable, paginationField);
+  public Page<AttackPattern> attackPatterns(@RequestBody @Valid final PaginationField paginationField) {
+    return buildPaginationJPA(
+        (Specification<AttackPattern> specification, Pageable pageable) -> this.attackPatternRepository.findAll(specification, pageable),
+        paginationField,
+        AttackPattern.class
+    );
   }
 
   @GetMapping("/api/attack_patterns/{attackPatternId}")

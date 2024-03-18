@@ -13,10 +13,9 @@ import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { fetchAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
 import type { AssetGroupsHelper } from '../../../../actions/assetgroups/assetgroup-helper';
-import EndpointsList from '../endpoints/EndpointsList';
+import EndpointsList, { EndpointStoreWithType } from '../endpoints/EndpointsList';
 import EndpointPopover from '../endpoints/EndpointPopover';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import type { EndpointStore } from '../endpoints/Endpoint';
 import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -33,6 +32,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   title: {
     float: 'left',
+    marginRight: 20,
   },
   parameters: {
     float: 'right',
@@ -61,9 +61,6 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
-  // Filter and sort hook
-  const filtering = useSearchAnFilter('asset', 'name', ['name']);
-
   // Fetching data
   const { assetGroup, endpointsMap, userAdmin } = useHelper((helper: AssetGroupsHelper & EndpointsHelper & UsersHelper) => ({
     assetGroup: helper.getAssetGroup(assetGroupId),
@@ -75,8 +72,14 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
     dispatch(fetchEndpoints());
   });
 
-  const endpoints = assetGroup.asset_group_assets?.filter((endpointId: string) => !!endpointsMap[endpointId]).map((endpointId: string) => endpointsMap[endpointId]);
-  const sortedAsset: EndpointStore[] = filtering.filterAndSort(endpoints);
+  // Assets
+
+  const getAssetFromMap = (assets: string[]) => assets?.filter((endpointId: string) => !!endpointsMap[endpointId]).map((endpointId: string) => endpointsMap[endpointId]);
+
+  const filteringAssets = useSearchAnFilter('asset', 'name', ['name']);
+  const assets = getAssetFromMap(assetGroup.asset_group_assets ?? [])?.map((a) => ({ ...a, type: 'static' }))
+    .concat(getAssetFromMap(assetGroup.asset_group_dynamic_assets ?? [])?.map((a) => ({ ...a, type: 'dynamic' })));
+  const sortedAsset: EndpointStoreWithType[] = filteringAssets.filterAndSort(assets);
 
   return (
     <>
@@ -96,17 +99,17 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
         <div className={classes.parameters}>
           <div className={classes.tags}>
             <TagsFilter
-              onAddTag={filtering.handleAddTag}
-              onRemoveTag={filtering.handleRemoveTag}
-              currentTags={filtering.tags}
+              onAddTag={filteringAssets.handleAddTag}
+              onRemoveTag={filteringAssets.handleRemoveTag}
+              currentTags={filteringAssets.tags}
               thin
             />
           </div>
           <div className={classes.search}>
             <SearchFilter
               fullWidth
-              onChange={filtering.handleSearch}
-              keyword={filtering.keyword}
+              onChange={filteringAssets.handleSearch}
+              keyword={filteringAssets.keyword}
             />
           </div>
         </div>

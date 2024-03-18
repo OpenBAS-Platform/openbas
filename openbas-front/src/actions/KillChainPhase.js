@@ -6,9 +6,9 @@ export const fetchKillChainPhases = () => (dispatch) => {
   return getReferential(schema.arrayOfKillChainPhases, uri)(dispatch);
 };
 
-export const searchKillChainPhases = (contractSearchInput, page, size) => {
+export const searchKillChainPhases = (contractSearchInput) => {
   const data = contractSearchInput;
-  const uri = `/api/kill_chain_phases/search?page=${page}&size=${size}`;
+  const uri = '/api/kill_chain_phases/search';
   return simplePostCall(uri, data);
 };
 

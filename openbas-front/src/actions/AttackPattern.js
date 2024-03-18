@@ -6,9 +6,9 @@ export const fetchAttackPatterns = () => (dispatch) => {
   return getReferential(schema.arrayOfAttackPatterns, uri)(dispatch);
 };
 
-export const searchAttackPatterns = (paginationInput, page, size) => {
+export const searchAttackPatterns = (paginationInput) => {
   const data = paginationInput;
-  const uri = `/api/attack_patterns/search?page=${page}&size=${size}`;
+  const uri = '/api/attack_patterns/search';
   return simplePostCall(uri, data);
 };
 

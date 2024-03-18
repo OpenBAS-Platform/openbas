@@ -1,7 +1,7 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.annotation.Searchable;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -32,7 +32,7 @@ public class KillChainPhase implements Base {
   @JsonProperty("phase_stix_id")
   private String stixId;
 
-  @Searchable
+  @Queryable(searchable = true, filterable = true, sortable = true)
   @Column(name = "phase_name")
   @JsonProperty("phase_name")
   private String name;
@@ -41,7 +41,7 @@ public class KillChainPhase implements Base {
   @JsonProperty("phase_shortname")
   private String shortName;
 
-  @Searchable
+  @Queryable(searchable = true, sortable = true)
   @Column(name = "phase_kill_chain_name")
   @JsonProperty("phase_kill_chain_name")
   private String killChainName;
@@ -50,10 +50,12 @@ public class KillChainPhase implements Base {
   @JsonProperty("phase_description")
   private String description;
 
+  @Queryable(sortable = true)
   @Column(name = "phase_order")
   @JsonProperty("phase_order")
   private Long order = 0L;
 
+  @Queryable(sortable = true)
   @Column(name = "phase_created_at")
   @JsonProperty("phase_created_at")
   private Instant createdAt = now();

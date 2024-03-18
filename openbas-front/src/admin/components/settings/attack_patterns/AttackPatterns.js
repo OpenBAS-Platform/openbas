@@ -12,7 +12,8 @@ import TaxonomiesMenu from '../TaxonomiesMenu';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import { initSort } from '../../../../components/common/pagination/PaginationField';
+import { initSorting } from '../../../../components/common/pagination/PaginationField';
+import { useFormatter } from '../../../../components/i18n';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -123,6 +124,7 @@ const AttackPatterns = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
+  const { t } = useFormatter();
 
   const { killChainPhasesMap } = useHelper((helper) => ({
     killChainPhasesMap: helper.getKillChainPhasesMap(),
@@ -142,8 +144,21 @@ const AttackPatterns = () => {
 
   const [attackPatterns, setAttackPatterns] = useState([]);
   const [paginationField, setPaginationField] = useState({
-    sorts: initSort('attack_pattern_name'),
+    sorts: initSorting('attack_pattern_name'),
   });
+
+  // Export
+  const exportProps = {
+    exportType: 'attack_pattern',
+    exportKeys: [
+      'attack_pattern_external_id',
+      'attack_pattern_name',
+      'attack_pattern_created_at',
+      'attack_pattern_updated_at',
+    ],
+    exportData: attackPatterns,
+    exportFileName: `${t('AttackPatterns')}.csv`,
+  };
 
   return (
     <div className={classes.container}>
@@ -152,6 +167,7 @@ const AttackPatterns = () => {
         fetch={searchAttackPatterns}
         paginationField={paginationField}
         setContent={setAttackPatterns}
+        exportProps={exportProps}
       />
       <div className="clearfix" />
       <List classes={{ root: classes.list }}>

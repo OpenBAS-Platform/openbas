@@ -1,7 +1,7 @@
 package io.openbas.contract;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.annotation.Searchable;
+import io.openbas.annotation.Queryable;
 import io.openbas.contract.fields.ContractElement;
 import io.openbas.contract.variables.VariableHelper;
 import io.openbas.helper.SupportedLanguage;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class Contract {
 
     @NotNull
-    @Searchable
+    @Queryable(searchable = true, sortable = true, filterable = true, property = "type")
     private final ContractConfig config;
 
     @NotBlank
@@ -30,6 +30,7 @@ public class Contract {
 
     @NotEmpty
     @Setter
+    @Queryable(searchable = true, filterable = true, sortable = true)
     private Map<SupportedLanguage, String> label;
 
     @NotNull

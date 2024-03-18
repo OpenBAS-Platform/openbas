@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Tag;
 import io.openbas.helper.MultiIdDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
 import jakarta.persistence.EnumType;
@@ -13,6 +15,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
+@Getter
 public class ExerciseSimple {
 
     @JsonProperty("exercise_id")
@@ -42,51 +46,4 @@ public class ExerciseSimple {
         return simple;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Exercise.STATUS getStatus() {
-        return status;
-    }
-
-    public void setStatus(Exercise.STATUS status) {
-        this.status = status;
-    }
-
-    public String getSubtitle() {
-        return subtitle;
-    }
-
-    public void setSubtitle(String subtitle) {
-        this.subtitle = subtitle;
-    }
-
-    public Instant getStart() {
-        return start;
-    }
-
-    public void setStart(Instant start) {
-        this.start = start;
-    }
-
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
 }

@@ -3,7 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
-import io.openbas.annotation.Searchable;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdDeserializer;
@@ -38,18 +38,18 @@ public class AttackPattern implements Base {
   @NotBlank
   private String stixId;
 
-  @Searchable
+  @Queryable(searchable = true, sortable = true)
   @Column(name = "attack_pattern_name")
   @JsonProperty("attack_pattern_name")
   @NotBlank
   private String name;
 
-  @Searchable
+  @Queryable(searchable = true)
   @Column(name = "attack_pattern_description")
   @JsonProperty("attack_pattern_description")
   private String description;
 
-  @Searchable
+  @Queryable(searchable = true, sortable = true)
   @Column(name = "attack_pattern_external_id")
   @JsonProperty("attack_pattern_external_id")
   @NotBlank
@@ -65,10 +65,12 @@ public class AttackPattern implements Base {
   @JsonProperty("attack_pattern_permissions_required")
   private String[] permissionsRequired = new String[0];
 
+  @Queryable(sortable = true)
   @Column(name = "attack_pattern_created_at")
   @JsonProperty("attack_pattern_created_at")
   private Instant createdAt = now();
 
+  @Queryable(sortable = true)
   @Column(name = "attack_pattern_updated_at")
   @JsonProperty("attack_pattern_updated_at")
   private Instant updatedAt = now();
