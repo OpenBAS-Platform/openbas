@@ -8,7 +8,7 @@ import logoDark from '../../../static/images/logo_text_dark.png';
 import logoLight from '../../../static/images/logo_text_light.png';
 import byFiligranDark from '../../../static/images/by_filigran_dark.png';
 import byFiligranLight from '../../../static/images/by_filigran_light.png';
-import { askToken, checkKerberos, fetchParameters } from '../../../actions/Application';
+import { askToken, checkKerberos, fetchPlatformParameters } from '../../../actions/Application';
 import LoginForm from './LoginForm';
 import inject18n from '../../../components/i18n';
 import { storeHelper } from '../../../actions/Schema';
@@ -66,7 +66,7 @@ const Login = (props) => {
     return () => window.removeEventListener('resize', updateWindowDimensions);
   });
   useEffect(() => {
-    props.fetchParameters();
+    props.fetchPlatformParameters();
     props.checkKerberos();
   }, []);
   const onSubmit = (data) => props.askToken(data.username, data.password);
@@ -77,9 +77,12 @@ const Login = (props) => {
     loginHeight = 190;
   }
   const marginTop = dimension.height / 2 - loginHeight / 2 - 100;
+  const loginLogo = theme.palette.mode === 'dark'
+    ? parameters.platform_dark_theme.logo_login_url
+    : parameters.platform_light_theme.logo_login_url;
   return (
     <div data-testid="login-page" className={classes.container} style={{ marginTop }}>
-      <img src={fileUri(theme.palette.mode === 'dark' ? parameters.platform_dark_theme.logo_login_url : parameters.platform_light_theme.logo_login_url)} alt="logo"
+      <img src={loginLogo && loginLogo.length > 0 ? loginLogo : fileUri(theme.palette.mode === 'dark' ? logoDark : logoLight)} alt="logo"
         className={classes.logo}
       />
       <div className={classes.byFiligran} style={{ marginBottom: 20 }}>
@@ -137,7 +140,7 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { askToken, checkKerberos, fetchParameters }),
+  connect(select, { askToken, checkKerberos, fetchPlatformParameters }),
   inject18n,
   withStyles(styles),
 )(Login);

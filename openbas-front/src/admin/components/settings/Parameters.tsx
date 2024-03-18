@@ -3,7 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { Typography, Grid, Paper, List, ListItem, ListItemText, Switch, TextField } from '@mui/material';
 import ParametersForm from './ParametersForm';
 import { useFormatter } from '../../../components/i18n';
-import { updateParameters, updatePlatformLightParameters, updatePlatformDarkParameters, fetchPlatformParameters, fetchParameters } from '../../../actions/Application';
+import { updateParameters, updatePlatformLightParameters, updatePlatformDarkParameters, fetchPlatformParameters } from '../../../actions/Application';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import ItemBoolean from '../../../components/ItemBoolean';
 import ThemeForm from './ThemeForm';

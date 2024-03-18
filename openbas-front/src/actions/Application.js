@@ -9,7 +9,7 @@ export const fetchParameters = () => (dispatch) => {
 
 export const updateParameters = (data) => (dispatch) => {
   return putReferential(
-    schema.arrayOfParameters,
+    schema.platformParameters,
     '/api/settings',
     data,
   )(dispatch);
@@ -21,7 +21,7 @@ export const fetchPlatformParameters = () => (dispatch) => {
 
 export const updatePlatformLightParameters = (data) => (dispatch) => {
   return putReferential(
-    schema.arrayOfParameters,
+    schema.platformParameters,
     '/api/settings/theme/light',
     data,
   )(dispatch);
@@ -29,7 +29,7 @@ export const updatePlatformLightParameters = (data) => (dispatch) => {
 
 export const updatePlatformDarkParameters = (data) => (dispatch) => {
   return putReferential(
-    schema.arrayOfParameters,
+    schema.platformParameters,
     '/api/settings/theme/dark',
     data,
   )(dispatch);

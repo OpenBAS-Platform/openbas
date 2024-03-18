@@ -10,6 +10,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.settings.form.SettingsUpdateInput;
 import io.openbas.rest.settings.response.OAuthProvider;
 import io.openbas.rest.settings.response.PlatformSetting;
+import io.openbas.rest.settings.response.PlatformSettings;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,9 @@ public class SettingsApi extends RestBehavior {
   private OpenCTIConfig openCTIConfig;
 
   @Resource
+  private PlatformSettingsApi platformSettingsApi;
+
+  @Resource
   private OpenBASConfig openBASConfig;
 
   @Autowired
@@ -63,7 +67,9 @@ public class SettingsApi extends RestBehavior {
   }
 
   @Autowired
-  public void setOpenCTIConfig(OpenCTIConfig openCTIConfig) { this.openCTIConfig = openCTIConfig; }
+  public void setOpenCTIConfig(OpenCTIConfig openCTIConfig) {
+    this.openCTIConfig = openCTIConfig;
+  }
 
   private List<OAuthProvider> buildOpenIdProviders() {
     if (!this.openBASConfig.isAuthOpenidEnable()) {
@@ -168,13 +174,13 @@ public class SettingsApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/settings")
-  public List<PlatformSetting> updateSettings(@Valid @RequestBody SettingsUpdateInput input) {
+  public PlatformSettings updateSettings(@Valid @RequestBody SettingsUpdateInput input) {
     Map<String, Setting> dbSettings = mapOfSettings();
     List<Setting> settingsToSave = new ArrayList<>();
     settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_NAME, input.getName()));
     settingsToSave.add(resolveFromMap(dbSettings, DEFAULT_THEME, input.getTheme()));
     settingsToSave.add(resolveFromMap(dbSettings, DEFAULT_LANG, input.getLang()));
     settingRepository.saveAll(settingsToSave);
-    return settings();
+    return platformSettingsApi.settings();
   }
 }
