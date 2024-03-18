@@ -29,6 +29,7 @@ const EmailListField: React.FC<EmailListProps> = ({ label, name, savedEmails, se
         multiple
         id="email-input"
         freeSolo
+        open={false}
         options={emails}
         value={emails}
         onChange={(event, newValue) => {
