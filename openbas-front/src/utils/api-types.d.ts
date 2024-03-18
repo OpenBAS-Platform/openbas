@@ -797,16 +797,22 @@ export interface InjectExpectation {
   inject_expectation_group?: boolean;
   inject_expectation_inject?: Inject;
   inject_expectation_name?: string;
-  inject_expectation_result?: string;
+  inject_expectation_results?: InjectExpectationResult[];
   /** @format int32 */
   inject_expectation_score?: number;
   inject_expectation_team?: Team;
-  inject_expectation_type?: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "TECHNICAL";
+  inject_expectation_type: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: User;
   injectexpectation_id: string;
   updateAttributes?: object;
+}
+
+export interface InjectExpectationResult {
+  result: string;
+  sourceId?: string;
+  sourceName?: string;
 }
 
 export interface InjectInput {

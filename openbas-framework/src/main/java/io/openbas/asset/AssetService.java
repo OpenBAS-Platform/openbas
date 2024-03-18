@@ -1,4 +1,4 @@
-package io.openbas.service;
+package io.openbas.asset;
 
 import io.openbas.database.model.Asset;
 import io.openbas.database.repository.AssetRepository;

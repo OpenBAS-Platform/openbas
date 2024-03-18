@@ -102,18 +102,6 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
     }, new Map());
   };
 
-  const groupedByAsset = (es: InjectExpectationsStore[]) => {
-    return es.reduce((group, expectation) => {
-      const { inject_expectation_asset } = expectation;
-      if (inject_expectation_asset) {
-        const values = group.get(inject_expectation_asset) ?? [];
-        values.push(expectation);
-        group.set(inject_expectation_asset, values);
-      }
-      return group;
-    }, new Map());
-  };
-
   return (
     <div key={id}>
       <ListItem
@@ -151,11 +139,12 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
               <ChallengeExpectation key={expectationType} challenge={challenge} expectation={expectation} />
             );
           }
-          if (expectationType === 'TECHNICAL') {
+          if (expectationType === 'PREVENTION' || expectationType === 'DETECTION') {
             const expectation = es[0];
             if (asset) {
               return (
-                <TechnicalExpectationAsset key={expectationType}
+                <TechnicalExpectationAsset
+                  key={expectationType}
                   expectation={expectation}
                   injectContract={injectContract}
                 />
@@ -165,38 +154,14 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
               const relatedExpectations = expectationsByInject.filter((e) => assetGroup.asset_group_assets?.includes(e.inject_expectation_asset ?? '')) ?? [];
 
               return (
-                <div key={expectationType}>
-                  <TechnicalExpectationAssetGroup
-                    expectation={expectation}
-                    injectContract={injectContract}
-                  />
-                  {Array.from(groupedByAsset(relatedExpectations)).map(([groupedId, groupedExpectations]) => {
-                    const relatedAsset: EndpointStore = assetsMap[groupedId];
-                    return (
-                      <div key={relatedAsset?.asset_id}>
-                        <ListItem
-                          divider
-                          sx={{ pl: 12 }}
-                          classes={{ root: classes.item }}
-                        >
-                          <ListItemIcon>
-                            {!!relatedAsset && <DnsOutlined fontSize="small" />}
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <div className={classes.bodyItem} style={{ width: '20%' }}>
-                                {team?.team_name || relatedAsset?.asset_name || assetGroup?.asset_group_name}
-                              </div>
-                            }
-                          />
-                        </ListItem>
-                        {groupedExpectations.map((e: InjectExpectationsStore) => (
-                          <TechnicalExpectationAsset key={e.injectexpectation_id} expectation={e} injectContract={injectContract} gap={16} />
-                        ))}
-                      </div>
-                    );
-                  })}
-                </div>
+                <TechnicalExpectationAssetGroup
+                  key={expectationType}
+                  expectation={expectation}
+                  injectContract={injectContract}
+                  relatedExpectations={relatedExpectations}
+                  team={team}
+                  assetGroup={assetGroup}
+                />
               );
             }
             return (<div key={expectationType}></div>);

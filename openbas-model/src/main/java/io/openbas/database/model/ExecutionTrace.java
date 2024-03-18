@@ -13,6 +13,8 @@ import java.util.Objects;
 @Getter
 public class ExecutionTrace {
 
+    public static final String COMMAND_LINE_IDENTIFIER = "command_line";
+
     @JsonProperty("trace_identifier")
     private String identifier;
 

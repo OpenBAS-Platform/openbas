@@ -67,6 +67,11 @@
                     <artifactId>openbas-collector-mitre-attack</artifactId>
                     <version>3.5.0-SNAPSHOT</version>
                 </dependency>
+                <dependency>
+                    <groupId>io.openbas</groupId>
+                    <artifactId>openbas-collector-sentinel</artifactId>
+                    <version>3.5.0-SNAPSHOT</version>
+                </dependency>
             </dependencies>
         </profile>
     </profiles>

@@ -2,6 +2,7 @@ import React, { FunctionComponent, useState } from 'react';
 import { List, ListItemButton, ListItemIcon, ListItemText, Chip } from '@mui/material';
 import { AssignmentTurnedIn } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
 import type { Team, Inject } from '../../../../../utils/api-types';
 import { useHelper } from '../../../../../store';
 import type { InjectExpectationsStore } from '../../../components/injects/expectations/Expectation';
@@ -81,9 +82,9 @@ const ManualExpectations: FunctionComponent<Props> = ({
                 ...acc,
                 expected_score: acc.expected_score + (el.inject_expectation_expected_score ?? 0),
                 score: acc.score + (el.inject_expectation_score ?? 0),
-                result: acc.result + (el.inject_expectation_result ?? ''),
+                result: acc.result + (el.inject_expectation_results ?? ''),
               }), { expected_score: 0, score: 0, result: '' });
-            const validated = values.filter((v) => v.inject_expectation_result !== null).length;
+            const validated = values.filter((v) => !R.isEmpty(v.inject_expectation_results)).length;
             let label = t('Pending validation');
             if (validated === values.length) {
               label = `${t('Validated')} (${expectationValues.score})`;

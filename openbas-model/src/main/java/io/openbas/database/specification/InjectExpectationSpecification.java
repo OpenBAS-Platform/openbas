@@ -1,0 +1,31 @@
+package io.openbas.database.specification;
+
+import io.openbas.database.model.InjectExpectation;
+import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import org.springframework.data.jpa.domain.Specification;
+
+import java.time.Instant;
+import java.util.List;
+
+public class InjectExpectationSpecification {
+
+  public static Specification<InjectExpectation> type(@NotBlank final EXPECTATION_TYPE type) {
+    return (root, query, cb) -> cb.equal(root.get("type"), type);
+  }
+
+  public static Specification<InjectExpectation> from(@NotBlank final Instant date) {
+    return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get("createdAt"), date);
+  }
+
+  public static Specification<InjectExpectation> fromAssets(
+      @NotBlank final String injectId,
+      @NotEmpty final List<String> assetIds) {
+    return (root, query, cb) -> cb.and(
+        cb.equal(root.get("inject").get("id"), injectId),
+        root.get("asset").get("id").in(assetIds)
+    );
+  }
+
+}

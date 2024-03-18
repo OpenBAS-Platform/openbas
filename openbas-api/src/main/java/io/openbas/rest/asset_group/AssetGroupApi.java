@@ -4,7 +4,7 @@ import io.openbas.database.model.AssetGroup;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.asset_group.form.AssetGroupInput;
 import io.openbas.rest.asset_group.form.UpdateAssetsOnAssetGroupInput;
-import io.openbas.service.AssetGroupService;
+import io.openbas.asset.AssetGroupService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;

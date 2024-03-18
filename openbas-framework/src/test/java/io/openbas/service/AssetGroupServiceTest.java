@@ -1,5 +1,7 @@
 package io.openbas.service;
 
+import io.openbas.asset.AssetGroupService;
+import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Endpoint;
@@ -24,7 +26,7 @@ public class AssetGroupServiceTest {
   @Autowired
   private AssetGroupService assetGroupService;
   @Autowired
-  private AssetEndpointService assetEndpointService;
+  private EndpointService endpointService;
   @Autowired
   private TagRepository tagRepository;
 
@@ -73,7 +75,7 @@ public class AssetGroupServiceTest {
     endpoint.setIps(new String[]{"127.0.0.1"});
     endpoint.setHostname("hostname");
     endpoint.setPlatform(Linux);
-    Endpoint endpointCreated = this.assetEndpointService.createEndpoint(endpoint);
+    Endpoint endpointCreated = this.endpointService.createEndpoint(endpoint);
 
     AssetGroup assetGroup = this.assetGroupService.assetGroup(ASSET_GROUP_ID);
     String value = "Professional network";
@@ -89,7 +91,7 @@ public class AssetGroupServiceTest {
     // -- CLEAN --
     assetGroupUpdated.setAssets(new ArrayList<>());
     this.assetGroupService.updateAssetGroup(assetGroup);
-    this.assetEndpointService.deleteEndpoint(endpointCreated.getId());
+    this.endpointService.deleteEndpoint(endpointCreated.getId());
   }
 
   @Test
@@ -102,7 +104,7 @@ public class AssetGroupServiceTest {
     endpoint.setIps(new String[]{"127.0.0.1"});
     endpoint.setHostname("hostname");
     endpoint.setPlatform(Linux);
-    Endpoint endpointCreated = this.assetEndpointService.createEndpoint(endpoint);
+    Endpoint endpointCreated = this.endpointService.createEndpoint(endpoint);
     AssetGroup assetGroup = this.assetGroupService.assetGroup(ASSET_GROUP_ID);
 
     // -- EXECUTE --
@@ -114,7 +116,7 @@ public class AssetGroupServiceTest {
     assertEquals(1, assets.size());
 
     // -- CLEAN --
-    this.assetEndpointService.deleteEndpoint(endpointCreated.getId());
+    this.endpointService.deleteEndpoint(endpointCreated.getId());
   }
 
   @DisplayName("Update asset group with tag")

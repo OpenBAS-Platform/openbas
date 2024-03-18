@@ -1,4 +1,4 @@
-package io.openbas.service;
+package io.openbas.execution;
 
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Exercise;
@@ -7,13 +7,12 @@ import io.openbas.database.model.User;
 import io.openbas.database.model.Variable;
 import io.openbas.database.repository.VariableRepository;
 import io.openbas.database.specification.VariableSpecification;
-import io.openbas.execution.ExecutionContext;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 import static io.openbas.contract.variables.VariableHelper.*;

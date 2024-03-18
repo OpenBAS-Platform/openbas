@@ -47,7 +47,7 @@ const DashboardDefinitionStatistics = ({
   )(organizations);
   let cumulation = 0;
   const teamsScores = R.pipe(
-    R.filter((n) => n.inject_expectation_result !== null),
+    R.filter((n) => !R.isEmpty(n.inject_expectation_results)),
     R.groupBy(R.prop('inject_expectation_team')),
     R.toPairs,
     R.map((n) => {
@@ -73,7 +73,7 @@ const DashboardDefinitionStatistics = ({
     })),
   )(injectExpectations);
   const teamsPercentScoresData = R.pipe(
-    R.filter((n) => n.inject_expectation_result !== null),
+    R.filter((n) => !R.isEmpty(n.inject_expectation_results)),
     R.groupBy(R.prop('inject_expectation_team')),
     R.toPairs,
     R.map((n) => {
@@ -109,7 +109,7 @@ const DashboardDefinitionStatistics = ({
     })),
   )(injectExpectations);
   const sortedInjectTypesByTotalScore = R.pipe(
-    R.filter((n) => n.inject_expectation_result !== null),
+    R.filter((n) => !R.isEmpty(n.inject_expectation_results)),
     R.map((n) => R.assoc(
       'inject_expectation_inject',
       injectsMap[n.inject_expectation_inject] || {},
@@ -136,7 +136,7 @@ const DashboardDefinitionStatistics = ({
     },
   ];
   const injectsTypesScores = R.pipe(
-    R.filter((n) => n.inject_expectation_result !== null),
+    R.filter((n) => !R.isEmpty(n.inject_expectation_results)),
     R.map((n) => R.assoc(
       'inject_expectation_inject',
       injectsMap[n.inject_expectation_inject] || {},
@@ -167,7 +167,7 @@ const DashboardDefinitionStatistics = ({
     })),
   )(injectExpectations);
   const injectsTotalScores = R.pipe(
-    R.filter((n) => n.inject_expectation_result !== null),
+    R.filter((n) => !R.isEmpty(n.inject_expectation_results)),
     R.groupBy(R.prop('inject_expectation_inject')),
     R.toPairs,
     R.map((n) => ({
@@ -189,7 +189,7 @@ const DashboardDefinitionStatistics = ({
     },
   ];
   const teamsTotalScores = R.pipe(
-    R.filter((n) => n.inject_expectation_result !== null),
+    R.filter((n) => !R.isEmpty(n.inject_expectation_results)),
     R.groupBy(R.prop('inject_expectation_team')),
     R.toPairs,
     R.map((n) => ({
@@ -215,7 +215,7 @@ const DashboardDefinitionStatistics = ({
   ];
   const organizationsTotalScores = R.pipe(
     R.filter(
-      (n) => n.inject_expectation_result !== null
+      (n) => !R.isEmpty(n.inject_expectation_results)
         && n.inject_expectation_user !== null,
     ),
     R.map((n) => R.assoc(
@@ -248,7 +248,7 @@ const DashboardDefinitionStatistics = ({
   ];
   const usersTotalScores = R.pipe(
     R.filter(
-      (n) => n.inject_expectation_result !== null
+      (n) => !R.isEmpty(n.inject_expectation_results)
         && n.inject_expectation_user !== null,
     ),
     R.groupBy(R.prop('inject_expectation_user')),
