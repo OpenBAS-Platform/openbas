@@ -27,7 +27,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -152,7 +151,8 @@ public class InjectApi extends RestBehavior {
 
   @GetMapping("/api/inject_types")
   public Collection<JsonNode> injectTypes() {
-    List<JsonNode> builtInContracts = contractService.getContracts().values()
+    Collection<Contract> contractCollection = contractService.getContracts().values();
+    List<JsonNode> builtInContracts = contractCollection
             .stream().map(contract -> mapper.convertValue(contract, JsonNode.class)).toList();
     List<JsonNode> contracts = new ArrayList<>(builtInContracts);
     fromIterable(injectorRepository.findAll()).forEach(injector -> {
@@ -223,9 +223,8 @@ public class InjectApi extends RestBehavior {
         this.executionContextService.executionContext(user, inject, "Direct test")
     );
     ExecutableInject injection = new ExecutableInject(false, true, inject, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
-    executor.execute(injection);
     // TODO Must be migrated to Atomic approach (Inject duplication and async tracing)
-    return new InjectStatus();
+    return executor.execute(injection);
   }
 
   @Transactional(rollbackOn = Exception.class)
@@ -314,9 +313,8 @@ public class InjectApi extends RestBehavior {
         .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
     ExecutableInject injection = new ExecutableInject(true, true, inject, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
     file.ifPresent(injection::addDirectAttachment);
-    executor.execute(injection);
     // TODO Must be migrated to Atomic approach (Inject duplication and async tracing)
-    return new InjectStatus();
+    return executor.execute(injection);
   }
 
   @Transactional(rollbackOn = Exception.class)

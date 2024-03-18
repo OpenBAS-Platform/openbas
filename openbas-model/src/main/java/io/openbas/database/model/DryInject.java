@@ -10,9 +10,12 @@ import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.Optional;
 
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 
 @Entity
 @Table(name = "dryinjects")
@@ -62,6 +65,10 @@ public class DryInject implements Base, Injection {
   @JsonProperty("dryinject_exercise")
   public Exercise getExercise() {
     return getInject().getExercise();
+  }
+
+  public Optional<DryInjectStatus> getStatus() {
+    return ofNullable(this.status);
   }
 
   @Override

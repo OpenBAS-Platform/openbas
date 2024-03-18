@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,17 +32,12 @@ public class InjectStatus implements Base {
   @JsonProperty("status_name")
   private String name;
 
-  @Column(name = "status_reporting")
-  @Convert(converter = ExecutionConverter.class)
-  @JsonProperty("status_reporting")
-  private Execution reporting;
-
+  // region dates tracking
   @Column(name = "status_executions")
   @Convert(converter = InjectStatusExecutionConverter.class)
   @JsonProperty("status_traces")
   private List<InjectStatusExecution> traces = new ArrayList<>();
 
-  // region dates tracking
   @Column(name = "tracking_sent_date")
   @JsonProperty("tracking_sent_date")
   private Instant trackingSentDate; // To Queue / processing engine
@@ -83,6 +79,17 @@ public class InjectStatus implements Base {
     return this.getTraces().stream().flatMap(ex -> ex.getIdentifiers().stream()).toList();
   }
   // endregion
+
+  public static InjectStatus fromExecution(Execution execution, Inject executedInject) {
+    InjectStatus injectStatus = executedInject.getStatus().orElseThrow();
+    injectStatus.getTraces().addAll(execution.getTraces());
+    injectStatus.setTrackingTotalError((int)execution.getTraces().stream().filter(ex -> ex.getStatus().equals(ExecutionStatus.ERROR)).count());
+    injectStatus.setTrackingTotalSuccess((int)execution.getTraces().stream().filter(ex -> ex.getStatus().equals(ExecutionStatus.SUCCESS)).count());
+    injectStatus.setTrackingTotalCount(execution.getTraces().size());
+    injectStatus.setTrackingEndDate(Instant.now());
+    injectStatus.setTrackingTotalExecutionTime(Duration.between(injectStatus.getTrackingSentDate(), injectStatus.getTrackingEndDate()).getSeconds());
+    return injectStatus;
+  }
 
   @Override
   public boolean isUserHasAccess(User user) {

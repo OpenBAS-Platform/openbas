@@ -2,13 +2,20 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.converter.ExecutionConverter;
+import io.openbas.database.converter.InjectStatusExecutionConverter;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "dryinjects_statuses")
 public class DryInjectStatus implements Base {
@@ -24,76 +31,62 @@ public class DryInjectStatus implements Base {
     @Enumerated(EnumType.STRING)
     private ExecutionStatus name;
 
-    @Column(name = "status_reporting")
-    @Convert(converter = ExecutionConverter.class)
-    @JsonProperty("status_reporting")
-    private Execution reporting;
+    // region dates tracking
+    @Column(name = "status_executions")
+    @Convert(converter = InjectStatusExecutionConverter.class)
+    @JsonProperty("status_traces")
+    private List<InjectStatusExecution> traces = new ArrayList<>();
 
-    @Column(name = "status_date")
-    @JsonProperty("status_date")
-    private Instant date;
+    @Column(name = "tracking_sent_date")
+    @JsonProperty("tracking_sent_date")
+    private Instant trackingSentDate; // To Queue / processing engine
 
-    @Column(name = "status_execution")
-    @JsonProperty("status_execution")
-    private Integer executionTime;
+    @Column(name = "tracking_ack_date")
+    @JsonProperty("tracking_ack_date")
+    private Instant trackingAckDate; // Ack from remote injector
+
+    @Column(name = "tracking_end_date")
+    @JsonProperty("tracking_end_date")
+    private Instant trackingEndDate; // Done task from injector
+
+    @Column(name = "tracking_total_execution_time")
+    @JsonProperty("tracking_total_execution_time")
+    private Long trackingTotalExecutionTime;
+    // endregion
+
+    // region count
+    @Column(name = "tracking_total_count")
+    @JsonProperty("tracking_total_count")
+    private Integer trackingTotalCount;
+
+    @Column(name = "tracking_total_error")
+    @JsonProperty("tracking_total_error")
+    private Integer trackingTotalError;
+
+    @Column(name = "tracking_total_success")
+    @JsonProperty("tracking_total_success")
+    private Integer trackingTotalSuccess;
+    // endregion
 
     @OneToOne
     @JoinColumn(name = "status_dryinject")
     @JsonIgnore
     private DryInject dryInject;
 
-
-    public String getId() {
-        return id;
-    }
-
     @Override
     public boolean isUserHasAccess(User user) {
         return dryInject.isUserHasAccess(user);
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public ExecutionStatus getName() {
-        return name;
-    }
-
-    public void setName(ExecutionStatus name) {
-        this.name = name;
-    }
-
-    public Execution getReporting() {
-        return reporting;
-    }
-
-    public void setReporting(Execution reporting) {
-        this.reporting = reporting;
-    }
-
-    public Instant getDate() {
-        return date;
-    }
-
-    public void setDate(Instant date) {
-        this.date = date;
-    }
-
-    public Integer getExecutionTime() {
-        return executionTime;
-    }
-
-    public void setExecutionTime(Integer executionTime) {
-        this.executionTime = executionTime;
-    }
-
-    public DryInject getDryInject() {
-        return dryInject;
-    }
-
-    public void setDryInject(DryInject dryInject) {
-        this.dryInject = dryInject;
+    public static DryInjectStatus fromExecution(Execution execution, DryInject executedInject) {
+        DryInjectStatus injectStatus = executedInject.getStatus().orElseThrow();
+        injectStatus.getTraces().addAll(execution.getTraces());
+        injectStatus.setTrackingTotalError((int)execution.getTraces().stream().filter(ex -> ex.getStatus().equals(ExecutionStatus.ERROR)).count());
+        injectStatus.setTrackingTotalSuccess((int)execution.getTraces().stream().filter(ex -> ex.getStatus().equals(ExecutionStatus.SUCCESS)).count());
+        injectStatus.setTrackingTotalCount(execution.getTraces().size());
+        injectStatus.setTrackingEndDate(Instant.now());
+        injectStatus.setTrackingTotalExecutionTime(Duration.between(injectStatus.getTrackingSentDate(), injectStatus.getTrackingEndDate()).getSeconds());
+        return injectStatus;
     }
 
     @Override

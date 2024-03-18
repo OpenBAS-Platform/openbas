@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static io.openbas.database.model.ExecutionTrace.traceError;
+import static io.openbas.database.model.InjectStatusExecution.traceError;
 import static io.openbas.injects.opencti.OpenCTIContract.OPENCTI_CREATE_CASE;
 
 @Component(OpenCTIContract.TYPE)
@@ -31,7 +31,7 @@ public class OpenCTIExecutor extends Injector {
     try {
       openCTIService.createCase(execution, name, description, attachments);
     } catch (Exception e) {
-      execution.addTrace(traceError("email", e.getMessage(), e));
+      execution.addTrace(traceError(e.getMessage()));
     }
   }
 
@@ -39,7 +39,7 @@ public class OpenCTIExecutor extends Injector {
     try {
       openCTIService.createReport(execution, name, description, attachments);
     } catch (Exception e) {
-      execution.addTrace(traceError("email", e.getMessage(), e));
+      execution.addTrace(traceError(e.getMessage()));
     }
   }
 

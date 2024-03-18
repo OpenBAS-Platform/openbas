@@ -44,6 +44,12 @@ public class OpenBASConfig {
   @JsonProperty("default_mailer")
   private String defaultMailer;
 
+  @JsonProperty("rabbitmq_prefix")
+  private String rabbitmqPrefix;
+
+  @JsonProperty("rabbitmq_hostname")
+  private String rabbitmqHostname;
+
   @JsonProperty("default_reply_to")
   private String defaultReplyTo;
 

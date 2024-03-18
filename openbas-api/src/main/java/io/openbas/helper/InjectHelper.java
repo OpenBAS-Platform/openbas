@@ -1,5 +1,6 @@
 package io.openbas.helper;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.DryInjectRepository;
 import io.openbas.database.repository.InjectRepository;
@@ -10,16 +11,14 @@ import io.openbas.execution.ExecutionContext;
 import io.openbas.service.ExecutionContextService;
 import io.openbas.contract.ContractService;
 import io.openbas.execution.ExecutionContextService;
-import jakarta.transaction.Transactional;
+import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,6 +29,9 @@ import static java.util.stream.Stream.concat;
 @Component
 @RequiredArgsConstructor
 public class InjectHelper {
+
+  @Resource
+  protected ObjectMapper mapper;
 
   private final InjectRepository injectRepository;
   private final DryInjectRepository dryInjectRepository;
@@ -56,9 +58,7 @@ public class InjectHelper {
       return teams.stream().flatMap(team ->
           team.getExerciseTeamUsers()
               .stream()
-              .filter(
-                  exerciseTeamUser -> exerciseTeamUser.getExercise().getId().equals(injection.getExercise().getId())
-              )
+              .filter(exerciseTeamUser -> exerciseTeamUser.getExercise().getId().equals(injection.getExercise().getId()))
               .map(exerciseTeamUser -> Tuples.of(exerciseTeamUser.getUser(), team.getName()))
       );
     }
@@ -81,31 +81,19 @@ public class InjectHelper {
 
   // -- EXECUTABLE INJECT --
 
-  @Transactional
   public List<ExecutableInject> getInjectsToRun() {
     // Get injects
     List<Inject> injects = this.injectRepository.findAll(InjectSpecification.executable());
     Stream<ExecutableInject> executableInjects = injects.stream()
         .filter(this::isBeforeOrEqualsNow)
         .sorted(Inject.executionComparator)
-        .map(inject -> {
-          List<Team> teams = getInjectTeams(inject);
-          Hibernate.initialize(inject.getAssets()); // Force lazy load to execute
-          Hibernate.initialize(inject.getAssetGroups()); // Force lazy load to execute
-          return new ExecutableInject(true, false, inject, teams, inject.getAssets(), inject.getAssetGroups(), usersFromInjection(inject));
-        });
+        .map(inject -> new ExecutableInject(true, false, inject, getInjectTeams(inject), inject.getAssets(), inject.getAssetGroups(), usersFromInjection(inject)));
     // Get dry injects
     List<DryInject> dryInjects = this.dryInjectRepository.findAll(DryInjectSpecification.executable());
     Stream<ExecutableInject> executableDryInjects = dryInjects.stream()
         .filter(this::isBeforeOrEqualsNow)
         .sorted(DryInject.executionComparator)
-        .map(dry -> {
-          Inject inject = dry.getInject();
-          List<Team> teams = new ArrayList<>(); // No teams in dry run, only direct users
-          Hibernate.initialize(inject.getAssets()); // Force lazy load to execute
-          Hibernate.initialize(inject.getAssetGroups()); // Force lazy load to execute
-          return new ExecutableInject(false, false, dry, teams, inject.getAssets(), inject.getAssetGroups(), usersFromInjection(dry));
-        });
+        .map(dry -> new ExecutableInject(false, false, dry, List.of(), dry.getInject().getAssets(), dry.getInject().getAssetGroups(), usersFromInjection(dry)));
     // Combine injects and dry
     return concat(executableInjects, executableDryInjects).collect(Collectors.toList());
   }

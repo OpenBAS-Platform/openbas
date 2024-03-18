@@ -13,6 +13,8 @@ import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
+import io.openbas.database.repository.InjectRepository;
+import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ChallengeExpectation;
 import io.openbas.model.expectation.ChannelExpectation;
@@ -31,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static io.openbas.database.model.ExecutionTrace.traceError;
+import static io.openbas.database.model.InjectStatusExecution.traceError;
 
 
 public abstract class Injector {
@@ -40,7 +42,19 @@ public abstract class Injector {
     protected ObjectMapper mapper;
     private FileService fileService;
     private DocumentRepository documentRepository;
+    private InjectStatusRepository injectStatusRepository;
     private InjectExpectationRepository injectExpectationRepository;
+    private InjectRepository injectRepository;
+
+    @Autowired
+    public void setInjectRepository(InjectRepository injectRepository) {
+        this.injectRepository = injectRepository;
+    }
+
+    @Autowired
+    public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
+        this.injectStatusRepository = injectStatusRepository;
+    }
 
     @Autowired
     public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
@@ -117,6 +131,11 @@ public abstract class Injector {
             if (isScheduledInject && !isInInjectableRange(executableInject.getInjection())) {
                 throw new UnsupportedOperationException("Inject is now too old for execution");
             }
+            // Initialize the inject status
+            InjectStatus status = new InjectStatus();
+            status.setTrackingSentDate(Instant.now());
+            status.setInject(executableInject.getInjection().getInject());
+            injectStatusRepository.save(status);
             // Process the execution
             List<Expectation> expectations = process(execution, executableInject);
             // Create the expectations
@@ -138,7 +157,7 @@ public abstract class Injector {
                 }
             }
         } catch (Exception e) {
-            execution.addTrace(traceError(getClass().getSimpleName(), e.getMessage(), e));
+            execution.addTrace(traceError(e.getMessage()));
         } finally {
             execution.stop();
         }
@@ -166,13 +185,13 @@ public abstract class Injector {
     public List<DataAttachment> resolveAttachments(Execution execution, ExecutableInject injection, List<Document> documents) {
         List<DataAttachment> resolved = new ArrayList<>();
         // Add attachments from direct configuration
-        injection.getAttachments().forEach(doc -> {
+        injection.getDirectAttachments().forEach(doc -> {
             try {
                 byte[] content = IOUtils.toByteArray(doc.getInputStream());
                 resolved.add(new DataAttachment(doc.getName(), doc.getOriginalFilename(), content, doc.getContentType()));
             } catch (Exception e) {
                 String message = "Error getting direct attachment " + doc.getName();
-                execution.addTrace(traceError(getClass().getSimpleName(), message, e));
+                execution.addTrace(traceError(message));
             }
         });
         // Add attachments from configuration
@@ -188,7 +207,7 @@ public abstract class Injector {
                 // Can't fetch the attachments, ignore
                 String docInfo = askedDocument.map(Document::getName).orElse(documentId);
                 String message = "Error getting doc attachment " + docInfo;
-                execution.addTrace(traceError(getClass().getSimpleName(), message, e));
+                execution.addTrace(traceError(message));
             }
         });
         return resolved;

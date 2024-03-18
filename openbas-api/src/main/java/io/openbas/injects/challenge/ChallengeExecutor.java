@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.openbas.database.model.ExecutionTrace.traceError;
-import static io.openbas.database.model.ExecutionTrace.traceSuccess;
+import static io.openbas.database.model.InjectStatusExecution.traceError;
+import static io.openbas.database.model.InjectStatusExecution.traceSuccess;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injects.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 
@@ -68,7 +68,7 @@ public class ChallengeExecutor extends Injector {
                 // Challenge publishing is only linked to execution date of this inject.
                 String challengeNames = challenges.stream().map(Challenge::getName).collect(Collectors.joining(","));
                 String publishedMessage = "Challenges (" + challengeNames + ") marked as published";
-                execution.addTrace(traceSuccess("challenge", publishedMessage));
+                execution.addTrace(traceSuccess(publishedMessage));
                 // Send the publication message.
                 Exercise exercise = injection.getInjection().getExercise();
                 String from = exercise.getFrom();
@@ -91,7 +91,7 @@ public class ChallengeExecutor extends Injector {
                         emailService.sendEmail(execution, userInjectContext, from, replyTos, content.getInReplyTo(), encrypted,
                                 content.getSubject(), message, attachments);
                     } catch (Exception e) {
-                        execution.addTrace(traceError("email", e.getMessage(), e));
+                        execution.addTrace(traceError(e.getMessage()));
                     }
                 });
                 // Return expectations
@@ -102,7 +102,7 @@ public class ChallengeExecutor extends Injector {
                 throw new UnsupportedOperationException("Unknown contract " + contract);
             }
         } catch (Exception e) {
-            execution.addTrace(traceError("channel", e.getMessage(), e));
+            execution.addTrace(traceError(e.getMessage()));
         }
         return List.of();
     }

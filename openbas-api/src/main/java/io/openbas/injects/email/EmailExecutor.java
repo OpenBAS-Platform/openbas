@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static io.openbas.database.model.ExecutionTrace.traceError;
+import static io.openbas.database.model.InjectStatusExecution.traceError;
 import static io.openbas.injects.email.EmailContract.EMAIL_GLOBAL;
 
 @Component(EmailContract.TYPE)
@@ -42,7 +42,7 @@ public class EmailExecutor extends Injector {
     try {
       emailService.sendEmail(execution, users, from, replyTos, inReplyTo, subject, message, attachments);
     } catch (Exception e) {
-      execution.addTrace(traceError("email", e.getMessage(), e));
+      execution.addTrace(traceError(e.getMessage()));
     }
   }
 
@@ -52,7 +52,7 @@ public class EmailExecutor extends Injector {
       try {
         emailService.sendEmail(execution, user, from, replyTos, inReplyTo, mustBeEncrypted, subject, message, attachments);
       } catch (Exception e) {
-        execution.addTrace(traceError("email", e.getMessage(), e));
+        execution.addTrace(traceError(e.getMessage()));
       }
     });
   }

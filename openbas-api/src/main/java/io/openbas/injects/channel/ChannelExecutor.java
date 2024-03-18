@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.openbas.database.model.ExecutionTrace.traceError;
-import static io.openbas.database.model.ExecutionTrace.traceSuccess;
+import static io.openbas.database.model.InjectStatusExecution.traceError;
+import static io.openbas.database.model.InjectStatusExecution.traceSuccess;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injects.channel.ChannelContract.CHANNEL_PUBLISH;
 
@@ -75,7 +75,7 @@ public class ChannelExecutor extends Injector {
         // Article publishing is only linked to execution date of this inject.
         String articleNames = articles.stream().map(Article::getName).collect(Collectors.joining(","));
         String publishedMessage = "Articles (" + articleNames + ") marked as published";
-        execution.addTrace(traceSuccess("article", publishedMessage));
+        execution.addTrace(traceSuccess(publishedMessage));
         Exercise exercise = injection.getInjection().getExercise();
         // Send the publication message.
         if (content.isEmailing()) {
@@ -99,11 +99,11 @@ public class ChannelExecutor extends Injector {
               emailService.sendEmail(execution, userInjectContext, from, replyTos, content.getInReplyTo(), encrypted,
                   content.getSubject(), message, attachments);
             } catch (Exception e) {
-              execution.addTrace(traceError("email", e.getMessage(), e));
+              execution.addTrace(traceError(e.getMessage()));
             }
           });
         } else {
-          execution.addTrace(traceSuccess("article", "Email disabled for this inject"));
+          execution.addTrace(traceSuccess("Email disabled for this inject"));
         }
         List<Expectation> expectations = new ArrayList<>();
         if (!content.getExpectations().isEmpty()) {
@@ -126,7 +126,7 @@ public class ChannelExecutor extends Injector {
         throw new UnsupportedOperationException("Unknown contract " + contract);
       }
     } catch (Exception e) {
-      execution.addTrace(traceError("channel", e.getMessage(), e));
+      execution.addTrace(traceError(e.getMessage()));
     }
     return List.of();
   }
