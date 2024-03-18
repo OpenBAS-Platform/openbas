@@ -619,6 +619,12 @@ export interface ExerciseLessonsInput {
   exercise_lessons_anonymized?: boolean;
 }
 
+export interface ExerciseParametersInput {
+  exercise_mail_from?: string;
+  exercise_mails_reply_to?: string[];
+  exercise_message_header?: string;
+}
+
 export interface ExerciseSimple {
   exercise_id?: string;
   exercise_name?: string;

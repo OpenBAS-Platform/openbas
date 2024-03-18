@@ -41,7 +41,6 @@ import { fetchExerciseTeams, updateExercise, updateExerciseStatus } from '../../
 import { useFormatter } from '../../../components/i18n';
 import ExerciseStatus from './ExerciseStatus';
 import { useHelper } from '../../../store';
-import ExerciseParametersForm from './ExerciseParametersForm';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import Empty from '../../../components/Empty';
 import Countdown from '../../../components/Countdown';
@@ -54,6 +53,7 @@ import { deleteDryrun, fetchDryruns } from '../../../actions/Dryrun';
 import DryrunStatus from './controls/DryrunStatus';
 import ComcheckState from './controls/ComcheckState';
 import ExerciseInjectsDistribution from '../injects/ExerciseInjectsDistribution';
+import ExerciseParametersForm from './ExerciseParametersForm';
 
 const useStyles = makeStyles((theme) => ({
   root: {
