@@ -1343,7 +1343,7 @@ export interface Scenario {
 }
 
 export interface ScenarioInformationInput {
-  exercise_mails_reply_to?: string[];
+  scenario_mails_reply_to?: string[];
   scenario_mail_from: string;
   scenario_message_footer?: string;
   scenario_message_header?: string;

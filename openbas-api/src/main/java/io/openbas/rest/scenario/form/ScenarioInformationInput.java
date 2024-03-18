@@ -17,7 +17,7 @@ public class ScenarioInformationInput {
   @NotBlank
   private String from;
 
-  @JsonProperty("exercise_mails_reply_to")
+  @JsonProperty("scenario_mails_reply_to")
   private List<String> replyTos;
 
   @JsonProperty("scenario_message_header")

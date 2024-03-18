@@ -68,7 +68,7 @@ public class Scenario implements Base {
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "scenario_mails_reply_to", joinColumns = @JoinColumn(name = "scenario_id"))
   @Column(name = "scenario_reply_to", nullable=false)
-  @JsonProperty("scenario_mail_reply_to")
+  @JsonProperty("scenario_mails_reply_to")
   private List<String> replyTos = new ArrayList<>();
 
   // Audit

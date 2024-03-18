@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { z } from 'zod';
 import { useFormatter } from '../../../components/i18n';
 import { zodImplement } from '../../../utils/Zod';
-import { ExerciseUpdateInput } from '../../../utils/api-types';
+import type { ExerciseUpdateInput } from '../../../utils/api-types';
 
 interface Props {
   onSubmit: SubmitHandler<ExerciseUpdateInput>;
@@ -40,7 +40,7 @@ const ExerciseParametersForm: React.FC<Props> = ({
           exercise_message_footer: z.string().optional(),
           exercise_name: z.string(),
           exercise_subtitle: z.string().optional(),
-          exercise_mail_from: z.string().email().optional(),
+          exercise_mail_from: z.string().email(t('Should be a valid email address')).optional(),
           exercise_mails_reply_to: z.array(z.string().email()).optional(),
           exercise_message_header: z.string().optional(),
         },
@@ -50,15 +50,13 @@ const ExerciseParametersForm: React.FC<Props> = ({
   });
 
   return (
-    <form id="variableForm" onSubmit={handleSubmit(onSubmit)}>
+    <form id="ExerciseParametersForm" onSubmit={handleSubmit(onSubmit)}>
       <MuiTextField
         variant="standard"
         fullWidth
         label={t('Sender email address')}
         error={!!errors.exercise_mail_from}
-        helperText={
-                    errors.exercise_mail_from && errors.exercise_mail_from?.message
-                }
+        helperText={errors.exercise_mail_from && errors.exercise_mail_from?.message}
         inputProps={register('exercise_mail_from')}
         disabled={disabled}
       />
@@ -69,7 +67,7 @@ const ExerciseParametersForm: React.FC<Props> = ({
           return (
             <Autocomplete
               multiple
-              id="email-input"
+              id="email-reply-to-input"
               freeSolo
               open={false}
               options={[]}
@@ -121,9 +119,7 @@ const ExerciseParametersForm: React.FC<Props> = ({
         label={t('Messages header')}
         style={{ marginTop: 20 }}
         error={!!errors.exercise_message_header}
-        helperText={
-                    errors.exercise_message_header && errors.exercise_message_header?.message
-                }
+        helperText={errors.exercise_message_header && errors.exercise_message_header?.message}
         inputProps={register('exercise_message_header')}
         disabled={disabled}
       />

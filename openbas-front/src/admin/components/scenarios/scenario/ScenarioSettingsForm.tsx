@@ -1,6 +1,6 @@
-import React, { FunctionComponent } from 'react';
-import { Button, TextField as MuiTextField } from '@mui/material';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import React, { FunctionComponent, useState } from 'react';
+import { Autocomplete, Button, Chip, TextField, TextField as MuiTextField } from '@mui/material';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { makeStyles } from '@mui/styles';
@@ -26,6 +26,7 @@ const ScenarioSettingsForm: FunctionComponent<Props> = ({
   onSubmit,
   initialValues = {
     scenario_mail_from: '',
+    scenario_mails_reply_to: [],
     scenario_message_header: '',
   },
   scenarioId,
@@ -34,10 +35,12 @@ const ScenarioSettingsForm: FunctionComponent<Props> = ({
   const classes = useStyles();
   const { t } = useFormatter();
   const permissions = useScenarioPermissions(scenarioId);
+  const [inputValue, setInputValue] = useState('');
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<ScenarioInformationInput>({
     mode: 'onTouched',
@@ -46,6 +49,7 @@ const ScenarioSettingsForm: FunctionComponent<Props> = ({
         scenario_mail_from: z.string().email(t('Should be a valid email address')),
         scenario_message_header: z.string().optional(),
         scenario_message_footer: z.string().optional(),
+        scenario_mails_reply_to: z.array(z.string().email()).optional(),
       }),
     ),
     defaultValues: initialValues,
@@ -61,6 +65,57 @@ const ScenarioSettingsForm: FunctionComponent<Props> = ({
         helperText={errors.scenario_mail_from && errors.scenario_mail_from?.message}
         inputProps={register('scenario_mail_from')}
         disabled={permissions.readOnly}
+      />
+      <Controller
+        control={control}
+        name="scenario_mails_reply_to"
+        render={({ field, fieldState }) => {
+          return (
+            <Autocomplete
+              multiple
+              id="email-reply-to-input"
+              freeSolo
+              open={false}
+              options={[]}
+              value={field.value}
+              onChange={() => {
+                if (undefined !== field.value && inputValue !== '' && !field.value.includes(inputValue)) {
+                  field.onChange([...(field.value || []), inputValue]);
+                }
+              }}
+              onBlur={field.onBlur}
+              inputValue={inputValue}
+              onInputChange={(_event, newInputValue) => {
+                setInputValue(newInputValue);
+              }}
+              disableClearable={true}
+              renderTags={(tags: string[], getTagProps) => tags.map((email: string, index: number) => (
+                <Chip
+                  variant="outlined"
+                  label={email}
+                  {...getTagProps({ index })}
+                  key={email}
+                  onDelete={() => {
+                    const newValue = [...(field.value || [])];
+                    newValue.splice(index, 1);
+                    field.onChange(newValue);
+                  }
+                                }
+                />
+              ))}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="standard"
+                  label={t('Reply to')}
+                  style={{ marginTop: 20 }}
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
+          );
+        }}
       />
       <MuiTextField
         variant="standard"
