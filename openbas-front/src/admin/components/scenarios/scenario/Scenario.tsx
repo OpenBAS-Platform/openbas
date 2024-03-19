@@ -10,13 +10,13 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchScenario, fetchScenarioTeams, toExercise, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
 import { useFormatter } from '../../../../components/i18n';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
-import ScenarioSettingsForm from './ScenarioSettingsForm';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import type { Exercise, ScenarioInformationInput } from '../../../../utils/api-types';
 import useScenarioPermissions from '../../../../utils/Scenario';
 import Transition from '../../../../components/common/Transition';
 import { inlineStyles } from '../../exercises/ExerciseStatus';
 import ScenarioInjectsDistribution from '../../injects/ScenarioInjectsDistribution';
+import SettingsForm, { SettingUpdateInput } from '../../components/SettingsForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -84,17 +84,22 @@ const Scenario = () => {
   const permissions = useScenarioPermissions(scenario.scenario_id);
 
   // Update
-  const initialValues = (({
-    scenario_mail_from,
-    scenario_message_header,
-    scenario_message_footer,
-  }) => ({
-    scenario_mail_from,
-    scenario_message_header,
-    scenario_message_footer,
-  }))(scenario);
+  const initialValues = {
+    setting_mail_from: scenario.scenario_mail_from,
+    setting_mails_reply_to: scenario.scenario_mail_reply_to,
+    setting_message_header: scenario.scenario_message_header,
+    setting_message_footer: scenario.scenario_message_footer,
+  };
 
-  const submitUpdate = (data: ScenarioInformationInput) => dispatch(updateScenarioInformation(scenarioId, data));
+  const submitUpdate = (data: SettingUpdateInput) => {
+    const scenarioInformationInput: ScenarioInformationInput = {
+      scenario_mail_from: data.setting_mail_from || '',
+      scenario_mails_reply_to: data.setting_mails_reply_to,
+      scenario_message_header: data.setting_message_header,
+      scenario_message_footer: scenario.scenario_message_footer,
+    };
+    dispatch(updateScenarioInformation(scenarioId, scenarioInformationInput));
+  };
 
   // Exercise
   const [open, setOpen] = useState(false);
@@ -219,10 +224,10 @@ const Scenario = () => {
         <Grid item xs={6} style={{ paddingBottom: 24 }}>
           <Typography variant="h4">{t('Settings')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <ScenarioSettingsForm
+            <SettingsForm
               initialValues={initialValues}
               onSubmit={submitUpdate}
-              scenarioId={scenarioId}
+              disabled={permissions.readOnly}
             />
           </Paper>
         </Grid>

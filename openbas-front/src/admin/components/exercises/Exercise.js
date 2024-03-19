@@ -53,7 +53,7 @@ import { deleteDryrun, fetchDryruns } from '../../../actions/Dryrun';
 import DryrunStatus from './controls/DryrunStatus';
 import ComcheckState from './controls/ComcheckState';
 import ExerciseInjectsDistribution from '../injects/ExerciseInjectsDistribution';
-import ExerciseParametersForm from './ExerciseParametersForm';
+import SettingsForm from '../components/SettingsForm';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -171,7 +171,15 @@ const Exercise = () => {
     dispatch(fetchComchecks(exerciseId));
     dispatch(fetchDryruns(exerciseId));
   });
-  const submitUpdate = (data) => dispatch(updateExercise(exerciseId, data));
+  const submitUpdate = (data) => {
+    const exerciseUpdateInput = {
+      exercise_mail_from: data.setting_mail_from || '',
+      exercise_mails_reply_to: data.setting_mails_reply_to,
+      exercise_message_header: data.setting_message_header,
+      exercise_message_footer: exercise.exercise_message_footer,
+    };
+    dispatch(updateExercise(exerciseId, exerciseUpdateInput));
+  };
   const submitUpdateStatus = (status) => {
     dispatch(updateExerciseStatus(exerciseId, status));
     setOpenChangeStatus(null);
@@ -193,6 +201,11 @@ const Exercise = () => {
       'exercise_mail_from',
       'exercise_mails_reply_to',
     ]),
+    R.map(R.evolve({
+      exercise_mail_from: (value) => ({ setting_mail_from: value }),
+      exercise_mails_reply_to: (value) => ({ setting_mails_reply_to: value }),
+      exercise_message_header: (value) => ({ setting_message_header: value }),
+    })),
   )(exercise);
   const nextInjectDate = exercise.exercise_next_inject_date
     ? new Date(exercise.exercise_next_inject_date).getTime()
@@ -421,7 +434,7 @@ const Exercise = () => {
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Settings')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <ExerciseParametersForm
+            <SettingsForm
               initialValues={initialValues}
               onSubmit={submitUpdate}
               disabled={permissions.readOnly}

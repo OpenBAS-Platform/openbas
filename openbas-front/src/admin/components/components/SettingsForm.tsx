@@ -3,26 +3,39 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Autocomplete, Button, Chip, TextField, TextField as MuiTextField } from '@mui/material';
 import React, { useState } from 'react';
 import { z } from 'zod';
+import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../components/i18n';
 import { zodImplement } from '../../../utils/Zod';
-import type { ExerciseUpdateInput } from '../../../utils/api-types';
+
+const useStyles = makeStyles(() => ({
+  buttons: {
+    display: 'flex',
+    justifyContent: 'end',
+  },
+}));
+export interface SettingUpdateInput {
+  setting_mail_from?: string;
+  setting_mails_reply_to?: string[];
+  setting_message_header?: string;
+}
 
 interface Props {
-  onSubmit: SubmitHandler<ExerciseUpdateInput>;
-  initialValues?: ExerciseUpdateInput;
+  onSubmit: SubmitHandler<SettingUpdateInput>;
+  initialValues?: SettingUpdateInput;
   disabled?: boolean;
 }
 
-const ExerciseParametersForm: React.FC<Props> = ({
+const SettingsForm: React.FC<Props> = ({
   onSubmit,
   initialValues = {
-    exercise_mail_from: '',
-    exercise_mails_reply_to: [],
-    exercise_message_header: '',
+    setting_mail_from: '',
+    setting_mails_reply_to: [],
+    setting_message_header: '',
   },
   disabled,
 }) => {
   // Standard hooks
+  const classes = useStyles();
   const { t } = useFormatter();
   const [inputValue, setInputValue] = useState('');
 
@@ -31,18 +44,14 @@ const ExerciseParametersForm: React.FC<Props> = ({
     handleSubmit,
     control,
     formState: { errors, isDirty, isSubmitting },
-  } = useForm<ExerciseUpdateInput>({
+  } = useForm<SettingUpdateInput>({
     mode: 'onTouched',
     resolver: zodResolver(
-      zodImplement<ExerciseUpdateInput>().with(
+      zodImplement<SettingUpdateInput>().with(
         {
-          exercise_description: z.string().optional(),
-          exercise_message_footer: z.string().optional(),
-          exercise_name: z.string(),
-          exercise_subtitle: z.string().optional(),
-          exercise_mail_from: z.string().email(t('Should be a valid email address')).optional(),
-          exercise_mails_reply_to: z.array(z.string().email()).optional(),
-          exercise_message_header: z.string().optional(),
+          setting_mail_from: z.string().email(t('Should be a valid email address')).optional(),
+          setting_mails_reply_to: z.array(z.string().email()).optional(),
+          setting_message_header: z.string().optional(),
         },
       ),
     ),
@@ -50,19 +59,19 @@ const ExerciseParametersForm: React.FC<Props> = ({
   });
 
   return (
-    <form id="ExerciseParametersForm" onSubmit={handleSubmit(onSubmit)}>
+    <form id="SettingsForm" onSubmit={handleSubmit(onSubmit)}>
       <MuiTextField
         variant="standard"
         fullWidth
         label={t('Sender email address')}
-        error={!!errors.exercise_mail_from}
-        helperText={errors.exercise_mail_from && errors.exercise_mail_from?.message}
-        inputProps={register('exercise_mail_from')}
+        error={!!errors.setting_mail_from}
+        helperText={errors.setting_mail_from && errors.setting_mail_from?.message}
+        inputProps={register('setting_mail_from')}
         disabled={disabled}
       />
       <Controller
         control={control}
-        name="exercise_mails_reply_to"
+        name="setting_mails_reply_to"
         render={({ field, fieldState }) => {
           return (
             <Autocomplete
@@ -114,16 +123,14 @@ const ExerciseParametersForm: React.FC<Props> = ({
       <MuiTextField
         variant="standard"
         fullWidth
-        multiline
-        rows={1}
         label={t('Messages header')}
         style={{ marginTop: 20 }}
-        error={!!errors.exercise_message_header}
-        helperText={errors.exercise_message_header && errors.exercise_message_header?.message}
-        inputProps={register('exercise_message_header')}
+        error={!!errors.setting_message_header}
+        helperText={errors.setting_message_header && errors.setting_message_header?.message}
+        inputProps={register('setting_message_header')}
         disabled={disabled}
       />
-      <div style={{ float: 'right', marginTop: 20 }}>
+      <div className={classes.buttons} style={{ marginTop: 20 }}>
         <Button
           variant="contained"
           color="primary"
@@ -136,4 +143,4 @@ const ExerciseParametersForm: React.FC<Props> = ({
   );
 };
 
-export default ExerciseParametersForm;
+export default SettingsForm;

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Statement;
 
 @Component
-public class V2_75__Add_reply_to_exercises extends BaseJavaMigration {
+public class V2_77__Add_reply_to_exercises extends BaseJavaMigration {
 
     @Override
     public void migrate(Context context) throws Exception {
