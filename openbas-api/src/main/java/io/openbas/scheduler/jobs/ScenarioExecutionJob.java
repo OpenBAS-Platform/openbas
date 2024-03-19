@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -66,7 +67,7 @@ public class ScenarioExecutionJob implements Job {
     Cron cron = parser.parse(cronExpression);
     ExecutionTime executionTime = ExecutionTime.forCron(cron);
 
-    Duration timeToNextExecution = executionTime.timeToNextExecution(ZonedDateTime.now()).orElse(Duration.ZERO);
+    Duration timeToNextExecution = executionTime.timeToNextExecution(ZonedDateTime.now(ZoneId.of("UTC"))).orElse(Duration.ZERO);
 
     return Instant.now().plus(timeToNextExecution);
   }
