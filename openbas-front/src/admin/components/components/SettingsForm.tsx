@@ -59,7 +59,7 @@ const SettingsForm: React.FC<Props> = ({
   });
 
   return (
-    <form id="SettingsForm" onSubmit={handleSubmit(onSubmit)}>
+    <form id="settingsForm" onSubmit={handleSubmit(onSubmit)}>
       <MuiTextField
         variant="standard"
         fullWidth

@@ -177,6 +177,9 @@ const Exercise = () => {
       exercise_mails_reply_to: data.setting_mails_reply_to,
       exercise_message_header: data.setting_message_header,
       exercise_message_footer: exercise.exercise_message_footer,
+      exercise_name: exercise.exercise_name,
+      exercise_description: exercise.exercise_description,
+      exercise_subtitle: exercise.exercise_subtitle,
     };
     dispatch(updateExercise(exerciseId, exerciseUpdateInput));
   };
