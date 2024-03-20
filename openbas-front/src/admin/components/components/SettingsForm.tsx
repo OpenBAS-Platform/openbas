@@ -50,7 +50,7 @@ const SettingsForm: React.FC<Props> = ({
       zodImplement<SettingUpdateInput>().with(
         {
           setting_mail_from: z.string().email(t('Should be a valid email address')).optional(),
-          setting_mails_reply_to: z.array(z.string().email()).optional(),
+          setting_mails_reply_to: z.array(z.string().email(t('Should be a valid email address'))).optional(),
           setting_message_header: z.string().optional(),
         },
       ),
