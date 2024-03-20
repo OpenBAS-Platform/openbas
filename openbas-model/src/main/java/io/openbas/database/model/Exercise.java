@@ -317,6 +317,10 @@ public class Exercise implements Base {
         return articles.stream().filter(article -> article.getChannel().equals(channel)).toList();
     }
 
+    public void addReplyTos(List<String> replyTos){
+        getReplyTos().addAll(replyTos);
+    }
+
     @Override
     public String toString() {
         return name;
