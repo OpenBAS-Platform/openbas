@@ -204,11 +204,6 @@ const Exercise = () => {
       'exercise_mail_from',
       'exercise_mails_reply_to',
     ]),
-    R.map(R.evolve({
-      exercise_mail_from: (value) => ({ setting_mail_from: value }),
-      exercise_mails_reply_to: (value) => ({ setting_mails_reply_to: value }),
-      exercise_message_header: (value) => ({ setting_message_header: value }),
-    })),
   )(exercise);
   const nextInjectDate = exercise.exercise_next_inject_date
     ? new Date(exercise.exercise_next_inject_date).getTime()
@@ -306,6 +301,15 @@ const Exercise = () => {
         );
     }
   };
+
+  function settingsMapping(settings) {
+    return {
+      setting_mail_from: settings.exercise_mail_from,
+      setting_mails_reply_to: settings.exercise_mails_reply_to,
+      setting_message_header: settings.exercise_message_header,
+    };
+  }
+
   return (
     <div className={classes.root}>
       <Grid container={true} spacing={3} style={{ marginTop: -14 }}>
@@ -438,7 +442,7 @@ const Exercise = () => {
           <Typography variant="h4">{t('Settings')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <SettingsForm
-              initialValues={initialValues}
+              initialValues={settingsMapping(initialValues)}
               onSubmit={submitUpdate}
               disabled={permissions.readOnly}
             />

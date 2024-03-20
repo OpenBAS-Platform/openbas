@@ -102,8 +102,7 @@ const SettingsForm: React.FC<Props> = ({
                     const newValue = [...(field.value || [])];
                     newValue.splice(index, 1);
                     field.onChange(newValue);
-                  }
-                                    }
+                  }}
                 />
               ))}
               renderInput={(params) => (

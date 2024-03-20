@@ -86,7 +86,7 @@ const Scenario = () => {
   // Update
   const initialValues = {
     setting_mail_from: scenario.scenario_mail_from,
-    setting_mails_reply_to: scenario.scenario_mail_reply_to,
+    setting_mails_reply_to: scenario.scenario_mails_reply_to,
     setting_message_header: scenario.scenario_message_header,
     setting_message_footer: scenario.scenario_message_footer,
   };
