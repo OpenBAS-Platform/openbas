@@ -77,6 +77,7 @@ const i18n = {
       'End date': 'Date de fin',
       To: 'A',
       From: 'De',
+      'Reply to': 'Répondre à',
       Tags: 'Tags',
       Reply: 'Répondre',
       newspaper: 'Journal',
