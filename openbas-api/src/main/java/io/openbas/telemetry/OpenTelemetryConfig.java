@@ -7,8 +7,10 @@ import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
 import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.opentelemetry.exporter.logging.LoggingMetricExporter;
+import io.opentelemetry.exporter.otlp.http.metrics.OtlpHttpMetricExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.metrics.SdkMeterProvider;
+import io.opentelemetry.sdk.metrics.SdkMeterProviderBuilder;
 import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.semconv.ResourceAttributes;
@@ -19,6 +21,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import static java.util.Objects.requireNonNull;
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @RequiredArgsConstructor
@@ -34,12 +37,21 @@ public class OpenTelemetryConfig {
         .put(ResourceAttributes.SERVICE_VERSION, requireNonNull(this.env.getProperty("info.app.version")))
         .build();
 
-    SdkMeterProvider sdkMeterProvider = SdkMeterProvider.builder()
-        .registerMetricReader(PeriodicMetricReader.builder(LoggingMetricExporter.create()).build())
+    // Log exporter
+    SdkMeterProviderBuilder sdkMeterProviderBuilder = SdkMeterProvider.builder()
+        .registerMetricReader(PeriodicMetricReader.builder(LoggingMetricExporter.create()).build());
+
+    // OTLP exporter
+    String exporterOtlpEndpoint = this.env.getProperty("telemetry.exporter.otlp.endpoint");
+    if (hasText(exporterOtlpEndpoint)) {
+      sdkMeterProviderBuilder.registerMetricReader(PeriodicMetricReader.builder(
+          OtlpHttpMetricExporter.builder().setEndpoint(exporterOtlpEndpoint).build()
+      ).build());
+    }
+
+    SdkMeterProvider sdkMeterProvider = sdkMeterProviderBuilder
         .setResource(resource)
         .build();
-
-    // TODO: Add file exporter
 
     return OpenTelemetrySdk.builder()
         .setMeterProvider(sdkMeterProvider)
