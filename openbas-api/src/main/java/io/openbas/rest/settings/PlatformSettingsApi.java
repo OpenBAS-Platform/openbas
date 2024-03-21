@@ -7,6 +7,7 @@ import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
 import io.openbas.injects.opencti.config.OpenCTIConfig;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.settings.form.SettingsUpdateInput;
 import io.openbas.rest.settings.form.ThemeInput;
 import io.openbas.rest.settings.response.OAuthProvider;
 import io.openbas.rest.settings.response.PlatformSettings;
@@ -138,7 +139,7 @@ public class PlatformSettingsApi extends RestBehavior {
     return new Setting(themeKey, value);
   }
 
-  @GetMapping("/api/platform/settings")
+  @GetMapping("/api/settings")
   public PlatformSettings settings() {
     // Get setting from database
     Map<String, Setting> dbSettings = mapOfSettings();
@@ -199,6 +200,18 @@ public class PlatformSettingsApi extends RestBehavior {
     platformSettings.setThemeDark(themeDark);
 
     return platformSettings;
+  }
+
+  @Secured(ROLE_ADMIN)
+  @PutMapping("/api/settings")
+  public PlatformSettings updateSettings(@Valid @RequestBody SettingsUpdateInput input) {
+    Map<String, Setting> dbSettings = mapOfSettings();
+    List<Setting> settingsToSave = new ArrayList<>();
+    settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_NAME.key(), input.getName()));
+    settingsToSave.add(resolveFromMap(dbSettings, DEFAULT_THEME.key(), input.getTheme()));
+    settingsToSave.add(resolveFromMap(dbSettings, DEFAULT_LANG.key(), input.getLang()));
+    settingRepository.saveAll(settingsToSave);
+    return settings();
   }
 
   @Secured(ROLE_ADMIN)

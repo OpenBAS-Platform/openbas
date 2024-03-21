@@ -3,6 +3,8 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -10,8 +12,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.util.Objects;
 
 
-@Getter
-@Setter
+@Data
 public class Theme implements Base {
 
   public enum THEME_KEYS {
@@ -46,11 +47,6 @@ public class Theme implements Base {
     // Default constructor
   }
 
-  public Theme(String key, String value) {
-    this.key = key;
-    this.value = value;
-  }
-
   @Id
   @Column(name = "personalized_theme_id")
   @GeneratedValue(generator = "UUID")
@@ -58,54 +54,19 @@ public class Theme implements Base {
   @JsonProperty("theme_id")
   private String id;
 
-  @Getter
+
   @Column(name = "personalized_theme_key")
   @JsonProperty("theme_key")
   private String key;
 
-  @Getter
+
   @Column(name = "personalized_theme_value")
   @JsonProperty("theme_value")
   private String value;
 
   @Override
-  public String getId() {
-    return id;
-  }
-
-  @Override
   public boolean isUserHasAccess(User user) {
     return user.isAdmin();
   }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public void setKey(String key) {
-    this.key = key;
-  }
-
-  public void setValue(String value) {
-    this.value = value;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || !Base.class.isAssignableFrom(o.getClass())) {
-      return false;
-    }
-    Base base = (Base) o;
-    return id.equals(base.getId());
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(id);
-  }
-
 
 }

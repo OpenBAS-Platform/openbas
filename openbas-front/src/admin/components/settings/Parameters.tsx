@@ -1,6 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Typography, Grid, Paper, List, ListItem, ListItemText, Switch, TextField } from '@mui/material';
+import { z } from 'zod';
 import ParametersForm from './ParametersForm';
 import { useFormatter } from '../../../components/i18n';
 import { updateParameters, updatePlatformLightParameters, updatePlatformDarkParameters, fetchPlatformParameters } from '../../../actions/Application';
@@ -36,6 +37,30 @@ const Parameters = () => {
   useDataLoader(() => {
     dispatch(fetchPlatformParameters());
   });
+
+  const initialValuesDark = {
+    accent_color: settings.platform_dark_theme?.accent_color ?? '',
+    background_color: settings.platform_dark_theme?.background_color ?? '',
+    logo_login_url: settings.platform_dark_theme?.logo_login_url ?? '',
+    logo_url: settings.platform_dark_theme?.logo_url ?? '',
+    logo_url_collapsed: settings.platform_dark_theme?.logo_url_collapsed ?? '',
+    navigation_color: settings.platform_dark_theme?.navigation_color ?? '',
+    paper_color: settings.platform_dark_theme?.paper_color ?? '',
+    primary_color: settings.platform_dark_theme?.primary_color ?? '',
+    secondary_color: settings.platform_dark_theme?.secondary_color ?? '',
+  };
+
+  const initialValuesLight = {
+    accent_color: settings.platform_light_theme?.accent_color ?? '',
+    background_color: settings.platform_light_theme?.background_color ?? '',
+    logo_login_url: settings.platform_light_theme?.logo_login_url ?? '',
+    logo_url: settings.platform_light_theme?.logo_url ?? '',
+    logo_url_collapsed: settings.platform_light_theme?.logo_url_collapsed ?? '',
+    navigation_color: settings.platform_light_theme?.navigation_color ?? '',
+    paper_color: settings.platform_light_theme?.paper_color ?? '',
+    primary_color: settings.platform_light_theme?.primary_color ?? '',
+    secondary_color: settings.platform_light_theme?.secondary_color ?? '',
+  };
 
   const onUpdate = (data: SettingsUpdateInput) => dispatch(updateParameters(data));
   const onUpdateLigthParameters = (data: ThemeInput) => dispatch(updatePlatformLightParameters(data));
@@ -83,7 +108,7 @@ const Parameters = () => {
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <ThemeForm
               onSubmit={onUpdateDarkParameters}
-              initialValues={settings.platform_dark_theme}
+              initialValues={initialValuesDark}
             />
           </Paper>
         </Grid>
@@ -92,7 +117,7 @@ const Parameters = () => {
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <ThemeForm
               onSubmit={onUpdateLigthParameters}
-              initialValues={settings.platform_light_theme}
+              initialValues={initialValuesLight}
             />
 
           </Paper>

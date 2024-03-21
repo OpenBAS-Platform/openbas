@@ -12,7 +12,7 @@ export const updateParameters = (data) => (dispatch) => {
 };
 
 export const fetchPlatformParameters = () => (dispatch) => {
-  return getReferential(schema.platformParameters, '/api/platform/settings')(dispatch);
+  return getReferential(schema.platformParameters, '/api/settings')(dispatch);
 };
 
 export const updatePlatformLightParameters = (data) => (dispatch) => {

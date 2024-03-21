@@ -3,6 +3,7 @@ import { Button, TextField as MuiTextField } from '@mui/material';
 import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../components/i18n';
 import type { ThemeInput } from '../../../utils/api-types';
 import { zodImplement } from '../../../utils/Zod';
@@ -13,10 +14,27 @@ interface Props {
   initialValues?: ThemeInput;
 }
 
+const useStyles = makeStyles(() => ({
+  field: {
+    marginBottom: 20,
+  },
+}));
+
 const ThemeForm: React.FC<Props> = ({
   onSubmit,
-  initialValues,
+  initialValues = {
+    accent_color: '',
+    background_color: '',
+    logo_login_url: '',
+    logo_url: '',
+    logo_url_collapsed: '',
+    navigation_color: '',
+    paper_color: '',
+    primary_color: '',
+    secondary_color: '',
+  },
 }) => {
+  const classes = useStyles();
   // Standard hooks
   const { t } = useFormatter();
 
@@ -29,15 +47,15 @@ const ThemeForm: React.FC<Props> = ({
     mode: 'onTouched',
     resolver: zodResolver(
       zodImplement<ThemeInput>().with({
-        accent_color: z.string().optional().nullable(),
-        background_color: z.string().optional().nullable(),
-        logo_login_url: z.string().optional().nullable(),
-        logo_url: z.string().optional().nullable(),
-        logo_url_collapsed: z.string().optional().nullable(),
-        navigation_color: z.string().optional().nullable(),
-        paper_color: z.string().optional().nullable(),
-        primary_color: z.string().optional().nullable(),
-        secondary_color: z.string().optional().nullable(),
+        accent_color: z.string().optional(),
+        background_color: z.string().optional(),
+        logo_login_url: z.string().optional(),
+        logo_url: z.string().optional(),
+        logo_url_collapsed: z.string().optional(),
+        navigation_color: z.string().optional(),
+        paper_color: z.string().optional(),
+        primary_color: z.string().optional(),
+        secondary_color: z.string().optional(),
       }),
     ),
     defaultValues: initialValues,
@@ -47,6 +65,7 @@ const ThemeForm: React.FC<Props> = ({
     <form id="themeForm" onSubmit={handleSubmit(onSubmit)}>
 
       <ColorPickerField
+        className={classes.field}
         variant="standard"
         fullWidth
         label={t('Background color')}
@@ -56,8 +75,8 @@ const ThemeForm: React.FC<Props> = ({
         control={control}
         name="background_color"
       />
-      &nbsp;
       <ColorPickerField
+        className={classes.field}
         variant="standard"
         fullWidth
         label={t('Paper color')}
@@ -67,8 +86,8 @@ const ThemeForm: React.FC<Props> = ({
         control={control}
         name="paper_color"
       />
-      &nbsp;
       <ColorPickerField
+        className={classes.field}
         variant="standard"
         fullWidth
         label={t('Navigation color')}
@@ -78,8 +97,8 @@ const ThemeForm: React.FC<Props> = ({
         control={control}
         name="navigation_color"
       />
-      &nbsp;
       <ColorPickerField
+        className={classes.field}
         variant="standard"
         fullWidth
         label={t('Primary color')}
@@ -89,8 +108,8 @@ const ThemeForm: React.FC<Props> = ({
         control={control}
         name="primary_color"
       />
-      &nbsp;
       <ColorPickerField
+        className={classes.field}
         variant="standard"
         fullWidth
         label={t('Secondary color')}
@@ -100,8 +119,8 @@ const ThemeForm: React.FC<Props> = ({
         control={control}
         name="secondary_color"
       />
-      &nbsp;
       <ColorPickerField
+        className={classes.field}
         variant="standard"
         fullWidth
         label={t('Accent color')}
@@ -111,8 +130,8 @@ const ThemeForm: React.FC<Props> = ({
         control={control}
         name="accent_color"
       />
-      &nbsp;
       <MuiTextField
+        className={classes.field}
         variant="standard"
         fullWidth
         label={t('Logo URL')}
@@ -121,8 +140,8 @@ const ThemeForm: React.FC<Props> = ({
         helperText={errors.logo_url && errors.logo_url?.message}
         inputProps={register('logo_url')}
       />
-      &nbsp;
       <MuiTextField
+        className={classes.field}
         variant="standard"
         fullWidth
         label={t('Logo URL (collapsed)')}
@@ -131,7 +150,6 @@ const ThemeForm: React.FC<Props> = ({
         helperText={errors.logo_url_collapsed && errors.logo_url_collapsed?.message}
         inputProps={register('logo_url_collapsed')}
       />
-      &nbsp;
       <MuiTextField
         variant="standard"
         fullWidth

@@ -112,7 +112,6 @@ public class AppSecurityConfig {
             rq -> rq.requestMatchers("/api/comcheck/**").permitAll()
                 .requestMatchers("/api/player/**").permitAll()
                 .requestMatchers("/api/settings").permitAll()
-                .requestMatchers("/api/platform/settings").permitAll()
                 .requestMatchers("/api/login").permitAll()
                 .requestMatchers("/api/reset/**").permitAll()
                 .requestMatchers("/api/**").authenticated()
