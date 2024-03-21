@@ -12,7 +12,6 @@ import static io.openbas.contract.ContractService.TYPE;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ContractSearchInput {
@@ -23,7 +22,6 @@ public class ContractSearchInput {
     @Schema(description = "Label contract")
     String label;
 
-    @Builder.Default
     @Schema(description = "Indicate if the contract can be exposed")
     boolean exposedContractsOnly = true;
 

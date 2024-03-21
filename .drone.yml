@@ -15,7 +15,7 @@ steps:
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
     commands:
-      - mvn install -DskipTests
+      - mvn clean install -DskipTests
       - cd openbas-api
       - mvn test
       - cd ../openbas-framework
@@ -66,6 +66,7 @@ steps:
         - openbas-injectors/openbas-caldera/target/site/jacoco/jacoco.xml
     depends_on:
       - api-tests
+
   - name: build-circleci
     image: curlimages/curl
     commands:

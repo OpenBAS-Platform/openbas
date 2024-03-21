@@ -53,7 +53,7 @@ class ContratApiTest extends IntegrationTest {
                 mvc.perform(post("/api/contracts")
                                 .params(params)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(ContractFixture.getDefault().build()))).andExpect(status().is2xxSuccessful())
+                                .content(asJsonString(ContractFixture.getDefault()))).andExpect(status().is2xxSuccessful())
                         .andExpect(jsonPath("$.numberOfElements").value(5));
             }
 
@@ -67,7 +67,7 @@ class ContratApiTest extends IntegrationTest {
                 mvc.perform(post("/api/contracts")
                                 .params(params)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(ContractFixture.getDefault().build())))
+                                .content(asJsonString(ContractFixture.getDefault())))
                         .andExpect(status().isBadRequest());
             }
         }
@@ -78,7 +78,8 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Fetching first page of contracts by textsearch")
             @Test
             void given_search_input_with_textsearch_should_return_a_page_of_contrats() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("em").build();
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault();
+                contractSearchInput.setTextSearch("em");
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -90,7 +91,8 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Fetching first page of contracts by textsearch ignoring case")
             @Test
             void given_search_input_with_textsearch_should_return_a_page_of_contrats_ignoring_case() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("Em").build();
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault();
+                contractSearchInput.setTextSearch("Em");
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -102,7 +104,8 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Fetching first page of contracts by textsearch with spaces")
             @Test
             void given_search_input_with_textsearch_with_spaces_should_return_a_page_of_contracts() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("E m").build();
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault();
+                contractSearchInput.setTextSearch("E m");
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -114,7 +117,8 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Fetching first page of contracts by type")
             @Test
             void given_search_input_with_type_should_return_a_page_of_contrats() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().type("HTTP Request").build();
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault();
+                contractSearchInput.setType("HTTP Request");
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -126,7 +130,8 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Fetching first page of contracts by type ignoring case")
             @Test
             void given_search_input_with_type_should_return_a_page_of_contrats_ignoring_case() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().type("http request").build();
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault();
+                contractSearchInput.setType("http request");
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -138,7 +143,8 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Fetching first page of contracts by label")
             @Test
             void given_search_input_with_label_should_return_a_page_of_contrats() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().label("HTTP Request - POST (raw body)").build();
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault();
+                contractSearchInput.setLabel("HTTP Request - POST (raw body)");
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -150,7 +156,8 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Fetching first page of contracts by label email ignoring case")
             @Test
             void given_search_input_with_label_should_return_a_page_of_contrats_ignoring_case() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().label("http request - post (raw body)").build();
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault();
+                contractSearchInput.setLabel("http request - post (raw body)");
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -166,7 +173,8 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Sorting by default")
             @Test
             void given_search_input_without_sort_should_return_a_page_of_contrats_with_default_sort() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("Email").build();
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault();
+                contractSearchInput.setTextSearch("Email");
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -181,10 +189,9 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Sorting by label asc")
             @Test
             void given_sort_input_should_return_a_page_of_contrats_sort_by_label_asc() throws Exception {
-
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email")
-                        .sorts(List.of(SortField.builder().property("label").build())).
-                        build();
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault();
+                contractSearchInput.setTextSearch("email");
+                contractSearchInput.setSorts(List.of(SortField.builder().property("label").build()));
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -198,9 +205,9 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Sorting by label desc")
             @Test
             void given_sort_input_should_return_a_page_of_contrats_sort_by_label_desc() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email")
-                        .sorts(List.of(SortField.builder().property("label").direction("desc").build())).
-                        build();
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault();
+                contractSearchInput.setTextSearch("email");
+                contractSearchInput.setSorts(List.of(SortField.builder().property("label").direction("desc").build()));
 
 
                 mvc.perform(post("/api/contracts")
@@ -215,11 +222,10 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Sorting by type asc and label desc")
             @Test
             void given_sort_input_should_return_a_page_of_contrats_sort_by_type_asc_label_desc() throws Exception {
-                ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email")
-                        .sorts(List.of(SortField.builder().property("type").direction("asc").build(),
-                                SortField.builder().property("label").direction("desc").build())).
-                        build();
-
+                ContractSearchInput contractSearchInput = ContractFixture.getDefault();
+                contractSearchInput.setTextSearch("email");
+                contractSearchInput.setSorts(List.of(SortField.builder().property("type").direction("asc").build(),
+                    SortField.builder().property("label").direction("desc").build()));
 
                 mvc.perform(post("/api/contracts")
                                 .contentType(MediaType.APPLICATION_JSON)
