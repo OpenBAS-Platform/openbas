@@ -100,6 +100,7 @@ const LessonsPlayer = () => {
             question.lessons_question_category,
             question.lessonsquestion_id,
             answerData,
+            finalUserId,
           ),
         );
       }),

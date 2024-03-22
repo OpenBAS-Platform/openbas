@@ -181,7 +181,6 @@ class ContratApiTest extends IntegrationTest {
             @DisplayName("Sorting by label asc")
             @Test
             void given_sort_input_should_return_a_page_of_contrats_sort_by_label_asc() throws Exception {
-
                 ContractSearchInput contractSearchInput = ContractFixture.getDefault().textSearch("email")
                         .sorts(List.of(SortField.builder().property("label").build())).
                         build();

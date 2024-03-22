@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { lazy, Suspense } from 'react';
 import * as PropTypes from 'prop-types';
 import { Route, Routes } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';

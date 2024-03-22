@@ -12,7 +12,6 @@ import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.exercise.form.*;
-import io.openbas.rest.exercise.response.PublicExercise;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.*;
 import jakarta.annotation.Resource;
@@ -748,11 +747,5 @@ public class ExerciseApi extends RestBehavior {
     importService.handleFileImport(file);
   }
 
-  @GetMapping("/api/player/exercises/{exerciseId}")
-  public PublicExercise playerExercise(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
-    impersonateUser(userRepository, userId); // TODO Check Security
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-    return new PublicExercise(exercise);
-  }
   // endregion
 }

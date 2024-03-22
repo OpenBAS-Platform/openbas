@@ -15,7 +15,7 @@ steps:
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
     commands:
-      - mvn install -DskipTests
+      - mvn clean install -DskipTests
       - cd openbas-api
       - mvn test
       - cd ../openbas-framework
@@ -39,6 +39,40 @@ steps:
       - yarn i18n-checker
       - NODE_OPTIONS=--max_old_space_size=8192 yarn test
 
+  - name: app-e2e
+    image: maven:3.9.6-eclipse-temurin-21
+    detach: true
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql-e2e:5432/openbas
+      SPRING_DATASOURCE_USERNAME: openbas
+      SPRING_DATASOURCE_PASSWORD: openbas
+      MINIO_ENDPOINT: minio-e2e
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_ACCESS_SECRET: minioadmin
+      OPENBAS_ADMIN_EMAIL: admin@openbas.io
+      OPENBAS_ADMIN_PASSWORD: admin
+      OPENBAS_ADMIN_TOKEN: 0d17ce9a-f3a8-4c6d-9721-c98dc3dc023f
+    commands:
+      - apt update && apt install -y gnupg
+      - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+      - echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+      - curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+      - apt update
+      - apt install -y yarn
+      - apt install -y nodejs
+      - apt install -y git
+      - git submodule update --init --recursive
+      - cd openbas-front
+      - yarn install
+      - yarn build
+      - cd ..
+      - mvn install -DskipTests=true
+      - java -jar openbas-api/target/openbas-api.jar
+    depends_on:
+      - api-tests
+      - frontend-tests
+
   - name: frontend-e2e-tests
     image: node:20.11.1
     volumes:
@@ -53,7 +87,7 @@ steps:
       - yarn playwright install --with-deps chromium
       - APP_URL=http://app-e2e:8080 yarn test:e2e
     depends_on:
-      - frontend-tests
+      - app-e2e
 
   - name: codecov
     image: robertstettner/drone-codecov
@@ -66,6 +100,7 @@ steps:
         - openbas-injectors/openbas-caldera/target/site/jacoco/jacoco.xml
     depends_on:
       - api-tests
+
   - name: build-circleci
     image: curlimages/curl
     commands:
@@ -136,35 +171,6 @@ services:
       POSTGRES_USER: openbas
       POSTGRES_PASSWORD: openbas
       POSTGRES_DB: openbas
-  - name: app-e2e
-    image: maven:3.9.6-eclipse-temurin-21
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql-e2e:5432/openbas
-      SPRING_DATASOURCE_USERNAME: openbas
-      SPRING_DATASOURCE_PASSWORD: openbas
-      MINIO_ENDPOINT: minio-e2e
-      MINIO_PORT: 9000
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_ACCESS_SECRET: minioadmin
-      OPENBAS_ADMIN_EMAIL: admin@openbas.io
-      OPENBAS_ADMIN_PASSWORD: admin
-      OPENBAS_ADMIN_TOKEN: 0d17ce9a-f3a8-4c6d-9721-c98dc3dc023f
-    commands:
-      - apt update && apt install -y gnupg
-      - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-      - echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-      - curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
-      - apt update
-      - apt install -y yarn
-      - apt install -y nodejs
-      - apt install -y git
-      - git submodule update --init --recursive
-      - cd openbas-front
-      - yarn install
-      - yarn build
-      - cd ..
-      - mvn install -DskipTests=true
-      - java -jar openbas-api/target/openbas-api.jar
 
 volumes:
   - name: cache-node-frontend
