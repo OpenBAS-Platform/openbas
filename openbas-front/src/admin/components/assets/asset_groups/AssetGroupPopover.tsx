@@ -28,12 +28,14 @@ interface Props {
   inline?: boolean;
   assetGroup: AssetGroupStore;
   onRemoveAssetGroupFromInject?: (assetGroupId: string) => void;
+  openEditOnInit?: boolean;
 }
 
 const AssetGroupPopover: FunctionComponent<Props> = ({
   inline,
   assetGroup,
   onRemoveAssetGroupFromInject,
+  openEditOnInit = false,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -55,7 +57,7 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
   }))(assetGroup);
 
   // Edition
-  const [edition, setEdition] = useState(false);
+  const [edition, setEdition] = useState(openEditOnInit);
 
   const handleEdit = () => {
     setEdition(true);

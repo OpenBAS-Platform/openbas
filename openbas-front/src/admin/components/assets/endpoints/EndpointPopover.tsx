@@ -19,6 +19,7 @@ interface Props {
   assetGroupId?: string;
   assetGroupEndpointIds?: string[];
   onRemoveEndpointFromInject?: (assetId: string) => void;
+  openEditOnInit?: boolean;
   onUpdate?: (result: EndpointStore) => void;
   onDelete?: (result: string) => void;
 }
@@ -29,6 +30,7 @@ const EndpointPopover: React.FC<Props> = ({
   assetGroupId,
   assetGroupEndpointIds,
   onRemoveEndpointFromInject,
+  openEditOnInit = false,
   onUpdate,
   onDelete,
 }) => {
@@ -59,7 +61,7 @@ const EndpointPopover: React.FC<Props> = ({
   }))(endpoint);
 
   // Edition
-  const [edition, setEdition] = useState(false);
+  const [edition, setEdition] = useState(openEditOnInit);
 
   const handleEdit = () => {
     setEdition(true);

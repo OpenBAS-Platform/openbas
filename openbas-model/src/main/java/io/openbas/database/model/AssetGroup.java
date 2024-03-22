@@ -3,6 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.model.Filters.FilterGroup;
 import io.openbas.helper.MultiIdDeserializer;
@@ -37,6 +38,7 @@ public class AssetGroup implements Base {
   @NotBlank
   @Column(name = "asset_group_name")
   @JsonProperty("asset_group_name")
+  @Queryable(searchable = true)
   private String name;
 
   @Column(name = "asset_group_description")

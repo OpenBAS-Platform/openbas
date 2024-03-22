@@ -3,6 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { ComputerOutlined } from '@mui/icons-material';
 import { differenceInHours } from 'date-fns';
+import { useSearchParams } from 'react-router-dom';
 import EndpointCreation from './EndpointCreation';
 import EndpointPopover from './EndpointPopover';
 import { useHelper } from '../../../../store';
@@ -114,6 +115,11 @@ const Endpoints = () => {
   const classes = useStyles();
   const { t } = useFormatter();
 
+  // Query param
+  const [searchParams] = useSearchParams();
+  const [search] = searchParams.getAll('search');
+  const [searchId] = searchParams.getAll('id');
+
   // Fetching data
   const { userAdmin } = useHelper((helper: EndpointsHelper & UsersHelper & TagsHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
@@ -134,6 +140,7 @@ const Endpoints = () => {
   const [endpoints, setEndpoints] = useState<EndpointStore[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
     sorts: initSorting('asset_name'),
+    textSearch: search,
   });
 
   // Export
@@ -249,6 +256,7 @@ const Endpoints = () => {
                 endpoint={{ ...endpoint, type: 'static' }}
                 onUpdate={(result) => setEndpoints(endpoints.map((e) => (e.asset_id !== result.asset_id ? e : result)))}
                 onDelete={(result) => setEndpoints(endpoints.filter((e) => (e.asset_id !== result)))}
+                openEditOnInit={endpoint.asset_id === searchId}
               />
             </ListItemSecondaryAction>
           </ListItem>

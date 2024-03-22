@@ -3,6 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.CryptoHelper;
 import io.openbas.helper.MonoIdDeserializer;
@@ -75,6 +76,7 @@ public class User implements Base {
   @Column(name = "user_email")
   @JsonProperty("user_email")
   @NotBlank
+  @Queryable(searchable = true)
   private String email;
 
   @Setter

@@ -128,6 +128,11 @@ export interface AttackPatternCreateInput {
   attack_pattern_parent?: string;
   attack_pattern_permissions_required?: string[];
   attack_pattern_platforms?: string[];
+  attack_pattern_stix_id: string;
+}
+
+export interface AttackPatternUpsertInput {
+  attack_patterns?: AttackPatternCreateInput[];
 }
 
 export interface Challenge {
@@ -265,6 +270,34 @@ export interface ChannelUpdateLogoInput {
   channel_logo_light?: string;
 }
 
+export interface Collector {
+  /** @format date-time */
+  collector_created_at?: string;
+  collector_id: string;
+  /** @format date-time */
+  collector_last_execution?: string;
+  collector_name: string;
+  /** @format int32 */
+  collector_period?: number;
+  collector_type: string;
+  /** @format date-time */
+  collector_updated_at?: string;
+  updateAttributes?: object;
+}
+
+export interface CollectorCreateInput {
+  collector_id: string;
+  collector_name: string;
+  /** @format int32 */
+  collector_period?: number;
+  collector_type: string;
+}
+
+export interface CollectorUpdateInput {
+  /** @format date-time */
+  collector_last_execution?: string;
+}
+
 export interface Comcheck {
   /** @format date-time */
   comcheck_end_date?: string;
@@ -341,7 +374,6 @@ export interface ContractConfig {
   color_dark?: string;
   color_light?: string;
   expose?: boolean;
-  icon?: string;
   label?: Record<string, string>;
   type?: string;
 }
@@ -687,6 +719,18 @@ export interface FlagInput {
   flag_value: string;
 }
 
+export interface FullTextSearchCountResult {
+  clazz: string;
+  /** @format int64 */
+  count: number;
+}
+
+export interface FullTextSearchResult {
+  clazz: string;
+  id: string;
+  name: string;
+}
+
 export interface Grant {
   grant_exercise?: Exercise;
   grant_group?: Group;
@@ -783,6 +827,7 @@ export interface Inject {
 export interface InjectDocument {
   document_attached?: boolean;
   document_id?: Document;
+  document_name?: string;
   inject_id?: Inject;
 }
 
@@ -980,6 +1025,10 @@ export interface KillChainPhaseCreateInput {
   phase_order?: number;
   phase_short_name?: string;
   phase_stix_id?: string;
+}
+
+export interface KillChainPhaseUpsertInput {
+  kill_chain_phases?: KillChainPhaseCreateInput[];
 }
 
 export interface LessonsAnswer {
@@ -1317,6 +1366,25 @@ export interface PageEndpoint {
   totalPages?: number;
 }
 
+export interface PageFullTextSearchResult {
+  content?: FullTextSearchResult[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageKillChainPhase {
   content?: KillChainPhase[];
   empty?: boolean;
@@ -1571,6 +1639,10 @@ export interface SearchPaginationInput {
   sorts?: SortField[];
   /** Text to search within searchable attributes */
   textSearch?: string;
+}
+
+export interface SearchTerm {
+  searchTerm?: string;
 }
 
 export interface SettingsUpdateInput {

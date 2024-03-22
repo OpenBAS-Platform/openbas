@@ -7,6 +7,7 @@ export interface UsersHelper {
 }
 
 export interface OrganizationsHelper {
+  getOrganizations: () => Organization[];
   getOrganizationsMap: () => Record<string, Organization>;
 }
 

@@ -1,9 +1,10 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Tooltip, IconButton } from '@mui/material';
+import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { FileDownloadOutlined, PersonOutlined } from '@mui/icons-material';
 import { CSVLink } from 'react-csv';
+import { useSearchParams } from 'react-router-dom';
 import { fetchPlayers } from '../../../actions/User';
 import { fetchOrganizations } from '../../../actions/Organization';
 import ItemTags from '../../../components/ItemTags';
@@ -139,6 +140,12 @@ const Players = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
+
+  // Query param
+  const [searchParams] = useSearchParams();
+  const [search] = searchParams.getAll('search');
+  const [searchId] = searchParams.getAll('id');
+
   // Filter and sort hook
   const searchColumns = [
     'email',
@@ -147,7 +154,7 @@ const Players = () => {
     'phone',
     'organization',
   ];
-  const filtering = useSearchAnFilter('user', 'email', searchColumns);
+  const filtering = useSearchAnFilter('user', 'email', searchColumns, { defaultKeyword: search });
   // Fetching data
   const { isPlanner, users, organizationsMap, tagsMap } = useHelper((helper) => ({
     isPlanner: helper.getMe().user_is_planner,
@@ -307,7 +314,7 @@ const Players = () => {
               }
             />
             <ListItemSecondaryAction>
-              <PlayerPopover user={user} />
+              <PlayerPopover user={user} openEditOnInit={user.user_id === searchId}/>
             </ListItemSecondaryAction>
           </ListItem>
         ))}

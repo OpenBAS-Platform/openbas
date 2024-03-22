@@ -15,6 +15,7 @@ import NotFound from '../components/NotFound';
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));
+const FullTextSearch = lazy(() => import('./components/search/FullTextSearch'));
 const Exercises = lazy(() => import('./components/exercises/Exercises'));
 const IndexExercise = lazy(() => import('./components/exercises/Index'));
 const Scenarios = lazy(() => import('./components/scenarios/Scenarios'));
@@ -66,6 +67,7 @@ const Index = () => {
             <Routes>
               <Route path="profile/*" element={errorWrapper(IndexProfile)()} />
               <Route path="" element={errorWrapper(Dashboard)()} />
+              <Route path="fulltextsearch" element={errorWrapper(FullTextSearch)()} />
               <Route path="exercises" element={errorWrapper(Exercises)()} />
               <Route path="exercises/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
               <Route path="scenarios" element={errorWrapper(Scenarios)()} />

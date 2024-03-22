@@ -3,6 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.InjectStatisticsHelper;
 import io.openbas.helper.MultiIdDeserializer;
@@ -39,6 +40,7 @@ public class Scenario implements Base {
   @Column(name = "scenario_name")
   @JsonProperty("scenario_name")
   @NotBlank
+  @Queryable(searchable = true)
   private String name;
 
   @Column(name = "scenario_description")

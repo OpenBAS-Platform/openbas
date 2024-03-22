@@ -3,6 +3,7 @@ import React, { CSSProperties, useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { Drawer as MuiDrawer, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import { FileDownloadOutlined, LanOutlined } from '@mui/icons-material';
+import { useSearchParams } from 'react-router-dom';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
@@ -129,11 +130,17 @@ const AssetGroups = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
+
+  // Query param
+  const [searchParams] = useSearchParams();
+  const [search] = searchParams.getAll('search');
+  const [searchId] = searchParams.getAll('id');
+
   // Filter and sort hook
   const searchColumns = [
     'name',
   ];
-  const filtering = useSearchAnFilter('asset_group', 'name', searchColumns);
+  const filtering = useSearchAnFilter('asset_group', 'name', searchColumns, { defaultKeyword: search });
   // Fetching data
   const { assetGroups, userAdmin, tagsMap } = useHelper((helper: AssetGroupsHelper & UsersHelper & TagsHelper) => ({
     assetGroups: helper.getAssetGroups(),
@@ -293,7 +300,10 @@ const AssetGroups = () => {
               }
             />
             <ListItemSecondaryAction>
-              <AssetGroupPopover assetGroup={assetGroup} />
+              <AssetGroupPopover
+                assetGroup={assetGroup}
+                openEditOnInit={assetGroup.asset_group_id === searchId}
+              />
             </ListItemSecondaryAction>
           </ListItem>
         ))}

@@ -3,6 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.InjectStatisticsHelper;
 import io.openbas.helper.MonoIdDeserializer;
@@ -51,6 +52,7 @@ public class Exercise implements Base {
     @Column(name = "exercise_name")
     @JsonProperty("exercise_name")
     @NotBlank
+    @Queryable(searchable = true)
     private String name;
 
     @Getter

@@ -3,6 +3,7 @@ import { Drawer, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryActi
 import { CheckCircleOutlined, FileDownloadOutlined, GroupsOutlined } from '@mui/icons-material';
 import React, { CSSProperties, useContext, useState } from 'react';
 import { makeStyles } from '@mui/styles';
+import { useSearchParams } from 'react-router-dom';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import { exportData } from '../../../../utils/Environment';
@@ -164,11 +165,11 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 interface Props {
   teamIds: Team['team_id'][];
-  contextual?: boolean
+  contextual?: boolean;
 }
 
 interface TeamStoreExtended extends TeamStore {
-  team_users_enabled_number: number
+  team_users_enabled_number: number;
 }
 
 const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
@@ -189,11 +190,21 @@ const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
     dispatch(fetchTeams());
   });
 
+  // Query param
+  const [searchParams] = useSearchParams();
+  const [search] = searchParams.getAll('search');
+  const [searchId] = searchParams.getAll('id');
+
   // Filter and sort hook
-  const filtering = useSearchAnFilter('team', 'name', [
+  const filtering = useSearchAnFilter(
+    'team',
     'name',
-    'description',
-  ]);
+    [
+      'name',
+      'description',
+    ],
+    { defaultKeyword: search },
+  );
 
   const sortedTeams = filtering.filterAndSort(teams.filter((team) => teamIds.includes(team.team_id)).map((team) => {
     if (computeTeamUsersEnabled) {
@@ -319,7 +330,7 @@ const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
             onClick={() => setSelectedTeam(team.team_id)}
           >
             <ListItemIcon>
-              <GroupsOutlined />
+              <GroupsOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={
@@ -374,6 +385,7 @@ const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
                 team={team}
                 managePlayers={() => setSelectedTeam(team.team_id)}
                 disabled={permissions.readOnly}
+                openEditOnInit={team.team_id === searchId}
               />
             </ListItemSecondaryAction>
           </ListItem>
