@@ -164,11 +164,11 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 interface Props {
   teamIds: Team['team_id'][];
-  contextual?: boolean
+  contextual?: boolean;
 }
 
 interface TeamStoreExtended extends TeamStore {
-  team_users_enabled_number: number
+  team_users_enabled_number: number;
 }
 
 const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
@@ -319,7 +319,7 @@ const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
             onClick={() => setSelectedTeam(team.team_id)}
           >
             <ListItemIcon>
-              <GroupsOutlined />
+              <GroupsOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={

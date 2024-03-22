@@ -695,6 +695,12 @@ export interface FlagInput {
   flag_value: string;
 }
 
+export interface GlobalSearchResult {
+  entity: string;
+  id: string;
+  name: string;
+}
+
 export interface Grant {
   grant_exercise?: Exercise;
   grant_group?: Group;
@@ -1324,7 +1330,7 @@ export interface Scenario {
   scenario_injects_statistics?: Record<string, number>;
   scenario_lessons_categories?: LessonsCategory[];
   scenario_mail_from: string;
-  scenario_mail_reply_to?: string[];
+  scenario_mails_reply_to?: string[];
   scenario_message_footer?: string;
   scenario_message_header?: string;
   scenario_name: string;
@@ -1343,8 +1349,8 @@ export interface Scenario {
 }
 
 export interface ScenarioInformationInput {
-  scenario_mails_reply_to?: string[];
   scenario_mail_from: string;
+  scenario_mails_reply_to?: string[];
   scenario_message_footer?: string;
   scenario_message_header?: string;
 }
@@ -1379,6 +1385,10 @@ export interface ScenarioUpdateTagsInput {
 
 export interface ScenarioUpdateTeamsInput {
   scenario_teams?: string[];
+}
+
+export interface SearchTerm {
+  searchTerm?: string;
 }
 
 export interface SettingsUpdateInput {
