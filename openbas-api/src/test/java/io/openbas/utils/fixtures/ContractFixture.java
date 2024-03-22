@@ -21,10 +21,8 @@ import static io.openbas.contract.fields.ContractTuple.tupleField;
 
 public class ContractFixture {
 
-    public static ContractSearchInput getDefault() {
-        ContractSearchInput contractSearchInput = new ContractSearchInput();
-        contractSearchInput.setExposedContractsOnly(true);
-        return contractSearchInput;
+    public static ContractSearchInput.ContractSearchInputBuilder getDefault() {
+        return ContractSearchInput.builder().exposedContractsOnly(true);
     }
 
     public static Map<String, Contract> getContracts() {
