@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button, Grid, MenuItem } from '@mui/material';
 import inject18n from '../../../../components/i18n';
-import DeprecatedColorPickerField from '../../../../components/DeprecatedColorPickerField.js';
+import DeprecatedColorPickerField from '../../../../components/DeprecatedColorPickerField';
 import Select from '../../../../components/Select';
 import TextField from '../../../../components/TextField';
 

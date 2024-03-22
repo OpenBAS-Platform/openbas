@@ -1,7 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Typography, Grid, Paper, List, ListItem, ListItemText, Switch, TextField } from '@mui/material';
-import { z } from 'zod';
 import ParametersForm from './ParametersForm';
 import { useFormatter } from '../../../components/i18n';
 import { updateParameters, updatePlatformLightParameters, updatePlatformDarkParameters, fetchPlatformParameters } from '../../../actions/Application';
