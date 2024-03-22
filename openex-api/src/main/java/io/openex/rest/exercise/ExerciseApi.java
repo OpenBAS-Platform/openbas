@@ -12,7 +12,6 @@ import io.openex.rest.exercise.exports.ExerciseFileExport;
 import io.openex.rest.exercise.exports.VariableMixin;
 import io.openex.rest.exercise.exports.VariableWithValueMixin;
 import io.openex.rest.exercise.form.*;
-import io.openex.rest.exercise.response.PublicExercise;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +33,10 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -637,11 +639,5 @@ public class ExerciseApi extends RestBehavior {
     importService.handleFileImport(file);
   }
 
-  @GetMapping("/api/player/exercises/{exerciseId}")
-  public PublicExercise playerExercise(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
-    impersonateUser(userRepository, userId); // TODO Check Security
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-    return new PublicExercise(exercise);
-  }
   // endregion
 }
