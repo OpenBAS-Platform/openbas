@@ -1,6 +1,6 @@
 {
   "name": "openex-front",
-  "version": "3.5.0",
+  "version": "3.5.1",
   "private": true,
   "main": "src/index.tsx",
   "license": "Apache-2.0",
