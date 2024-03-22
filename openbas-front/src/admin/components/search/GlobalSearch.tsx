@@ -72,7 +72,7 @@ const GlobalSearch = () => {
   const { t } = useFormatter();
 
   const [searchParams] = useSearchParams();
-  const search = searchParams.get('search');
+  const [search] = searchParams.getAll('search');
 
   const [results, setResults] = useState<GlobalSearchResult[]>([]);
 

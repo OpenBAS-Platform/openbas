@@ -209,6 +209,7 @@ const i18n = {
       Scenarios: 'Scenarios',
       Detection: 'Détection',
       Detections: 'Détections',
+      Asset: 'Actif',
       Assets: 'Actifs',
       Active: 'Actif',
       Inactive: 'Inactif',
@@ -743,7 +744,8 @@ const i18n = {
       'Add assets in this inject': 'Ajouter des actifs dans ce stimuli',
       // Asset groups
       'Asset groups': 'Groupe d\'assets',
-      AssetGroups: 'Groupe-d-assets',
+      AssetGroup: 'Groupe-d-assets',
+      AssetGroups: 'Groupes-d-assets',
       'Create a new asset group': 'Créer un nouvel asset group',
       'Update the asset group': 'Modifier l\'asset group',
       'Manage assets': 'Gérer les actifs',
