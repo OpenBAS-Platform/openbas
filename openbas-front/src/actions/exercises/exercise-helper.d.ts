@@ -5,6 +5,7 @@ import type { Exercise, InjectExpectation } from '../../utils/api-types';
 export interface ExercisesHelper {
   getExercise: (exerciseId: string) => ExerciseStore;
   getExercises: () => ExerciseStore[];
+  getExercisesMap: () => Record<string, ExerciseStore>;
   getExerciseTeams: (exerciseId: string) => TeamStore[];
   getExerciseInjectExpectations: (exerciseId: Exercise['exercise_id']) => InjectExpectation[];
 }

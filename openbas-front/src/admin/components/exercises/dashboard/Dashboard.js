@@ -48,6 +48,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+// FIXME: removed this file before merging
+
 const Dashboard = () => {
   const classes = useStyles();
   const dispatch = useDispatch();

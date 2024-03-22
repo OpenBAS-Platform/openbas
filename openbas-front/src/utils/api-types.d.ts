@@ -368,7 +368,7 @@ export interface Comcheck {
   /** @format date-time */
   comcheck_end_date?: string;
   comcheck_exercise?: Exercise;
-  comcheck_id?: string;
+  comcheck_id: string;
   comcheck_message?: string;
   comcheck_name?: string;
   /** @format date-time */
@@ -523,7 +523,7 @@ export interface Dryrun {
   dryrun_end_date?: string;
   dryrun_exercise?: Exercise;
   dryrun_finished?: boolean;
-  dryrun_id?: string;
+  dryrun_id: string;
   dryrun_name?: string;
   /** @format int32 */
   dryrun_speed?: number;
@@ -839,7 +839,7 @@ export interface Inject {
   inject_tags?: Tag[];
   inject_teams?: Team[];
   inject_title?: string;
-  inject_type?: string;
+  inject_type: string;
   /** @format date-time */
   inject_updated_at?: string;
   inject_user?: User;
@@ -1314,7 +1314,7 @@ export interface Organization {
   /** @format date-time */
   organization_created_at?: string;
   organization_description?: string;
-  organization_id?: string;
+  organization_id: string;
   organization_injects?: Inject[];
   /** @format int64 */
   organization_injects_number?: number;

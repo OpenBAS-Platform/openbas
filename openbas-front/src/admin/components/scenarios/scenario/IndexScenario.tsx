@@ -17,6 +17,7 @@ import { useFormatter } from '../../../../components/i18n';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 
 const Scenario = lazy(() => import('./Scenario'));
+const ScenarioSettings = lazy(() => import('./definition/ScenarioSettings'));
 const Teams = lazy(() => import('./teams/ScenarioTeams'));
 const Articles = lazy(() => import('./articles/ScenarioArticles'));
 const Challenges = lazy(() => import('./challenges/ScenarioChallenges'));
@@ -83,7 +84,8 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
           <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="" element={errorWrapper(Scenario)()} />
-              <Route path="definition" element={<Navigate to="teams" replace={true}/>}/>
+              <Route path="definition" element={<Navigate to="settings" replace/>}/>
+              <Route path="definition/settings" element={errorWrapper(ScenarioSettings)()} />
               <Route path="definition/teams" element={errorWrapper(Teams)({ scenarioTeamsUsers: scenario.scenario_teams_users })} />
               <Route path="definition/articles" element={errorWrapper(Articles)()} />
               <Route path="definition/challenges" element={errorWrapper(Challenges)()} />

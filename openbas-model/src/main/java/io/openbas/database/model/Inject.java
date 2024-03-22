@@ -12,6 +12,7 @@ import io.openbas.helper.MultiIdDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -91,6 +92,7 @@ public class Inject implements Base, Injection {
   @Getter
   @Column(name = "inject_type", updatable = false)
   @JsonProperty("inject_type")
+  @NotBlank
   private String type;
 
   @Getter

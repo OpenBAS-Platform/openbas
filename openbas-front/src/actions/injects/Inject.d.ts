@@ -1,4 +1,4 @@
-import type { Inject } from '../../utils/api-types';
+import type { Inject, InjectExpectation } from '../../utils/api-types';
 
 export type InjectInput = {
   inject_contract: { id: string, type: string };
@@ -11,4 +11,9 @@ export type InjectInput = {
 
 export type InjectStore = Omit<Inject, 'inject_tags'> & {
   inject_tags: string[] | undefined;
+};
+
+export type InjectExpectationStore = Omit<InjectExpectation, 'inject_expectation_team', 'inject_expectation_inject'> & {
+  inject_expectation_team: string | undefined;
+  inject_expectation_inject: string | undefined;
 };

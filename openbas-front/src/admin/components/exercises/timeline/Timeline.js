@@ -32,7 +32,7 @@ const useStyles = makeStyles(() => ({
     width: '100%',
     flexGrow: 1,
     marginTop: 10,
-    padding: '0 200px 50px 0',
+    padding: '0 20px 50px 0',
     overflowX: 'hidden',
   },
   container: {

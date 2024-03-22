@@ -5,7 +5,7 @@ import React from 'react';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../../../../components/Theme';
 import { useFormatter } from '../../../../components/i18n';
-import TopMenu, { MenuEntry } from '../../../../components/common/TopMenu';
+import TopMenu, { TopMenuEntry } from '../../../../components/common/TopMenu';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   buttonHome: {
@@ -29,7 +29,7 @@ const TopMenuScenario = () => {
   const { scenarioId } = useParams<'scenarioId'>();
   const { t } = useFormatter();
 
-  const entries: MenuEntry[] = [
+  const entries: TopMenuEntry[] = [
     {
       path: `/admin/scenarios/${scenarioId}`,
       label: 'Overview',

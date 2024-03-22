@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdDeserializer;
+import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
@@ -24,6 +25,7 @@ public class Dryrun implements Base {
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("dryrun_id")
+    @NotBlank
     private String id;
 
     @Column(name = "dryrun_name")

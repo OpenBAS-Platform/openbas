@@ -7,7 +7,7 @@ import Loader from '../../../components/Loader';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../utils/hooks';
-import ExerciseHeader from './ExerciseHeader';
+import ExerciseHeader from './exercise/ExerciseHeader';
 import type { Exercise as ExerciseType } from '../../../utils/api-types';
 import { DocumentContext, DocumentContextType, PermissionsContext, PermissionsContextType } from '../components/Context';
 import { usePermissions } from '../../../utils/Exercise';
@@ -16,13 +16,11 @@ import NotFound from '../../../components/NotFound';
 import { useFormatter } from '../../../components/i18n';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 
-const Exercise = lazy(() => import('./Exercise'));
+const Exercise = lazy(() => import('./exercise/overview/Exercise'));
 const Dryrun = lazy(() => import('./controls/Dryrun'));
 const Comcheck = lazy(() => import('./controls/Comcheck'));
-const Dashboard = lazy(() => import('./dashboard/Dashboard'));
 const Lessons = lazy(() => import('./lessons/Lessons'));
-const Reports = lazy(() => import('./reports/Reports'));
-const Report = lazy(() => import('./reports/Report'));
+const ExerciseSettings = lazy(() => import('./exercise/definition/ExerciseSettings'));
 const ExerciseTeams = lazy(() => import('./teams/ExerciseTeams'));
 const Injects = lazy(() => import('./injects/ExerciseInjects'));
 const Articles = lazy(() => import('./articles/ExerciseArticles'));
@@ -92,7 +90,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
                 component={Link}
                 to={`/admin/exercises/${exercise.exercise_id}/injects`}
                 value={`/admin/exercises/${exercise.exercise_id}/injects`}
-                label={t('Scenario')}
+                label={t('Injects')}
               />
               <Tab
                 component={Link}
@@ -102,9 +100,9 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
               />
               <Tab
                 component={Link}
-                to={`/admin/exercises/${exercise.exercise_id}/results`}
-                value={`/admin/exercises/${exercise.exercise_id}/results`}
-                label={t('Results')}
+                to={`/admin/exercises/${exercise.exercise_id}/lessons`}
+                value={`/admin/exercises/${exercise.exercise_id}/lessons`}
+                label={t('Lessons learned')}
               />
             </Tabs>
           </Box>
@@ -113,7 +111,8 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
               <Route path="" element={errorWrapper(Exercise)()} />
               <Route path="controls/dryruns/:dryrunId" element={errorWrapper(Dryrun)()} />
               <Route path="controls/comchecks/:comcheckId" element={errorWrapper(Comcheck)()} />
-              <Route path="definition" element={<Navigate to="teams" replace={true}/>}/>
+              <Route path="definition" element={<Navigate to="settings" replace/>}/>
+              <Route path="definition/settings" element={errorWrapper(ExerciseSettings)()} />
               <Route path="definition/teams" element={errorWrapper(ExerciseTeams)({ exerciseTeamsUsers: exercise.exercise_teams_users })} />
               <Route path="definition/articles" element={errorWrapper(Articles)()} />
               <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
@@ -126,11 +125,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
               <Route path="animation/logs" element={errorWrapper(Logs)()} />
               <Route path="animation/chat" element={errorWrapper(Chat)()} />
               <Route path="animation/validations" element={errorWrapper(Validations)()} />
-              <Route path="results" element={<Navigate to="dashboard" replace={true}/>}/>
-              <Route path="results/dashboard" element={errorWrapper(Dashboard)()} />
-              <Route path="results/lessons" element={errorWrapper(Lessons)()} />
-              <Route path="results/reports" element={errorWrapper(Reports)()} />
-              <Route path="results/reports/:reportId" element={errorWrapper(Report)()} />
+              <Route path="lessons" element={errorWrapper(Lessons)()} />
               {/* Not found */}
               <Route path="*" element={<NotFound/>}/>
             </Routes>

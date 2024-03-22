@@ -1,21 +1,13 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, IconButton } from '@mui/material';
 import { EditOutlined } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
-import { updateExerciseStartDate } from '../../../actions/Exercise';
-import { useFormatter } from '../../../components/i18n';
-import ExerciseDateForm from './ExerciseDateForm';
-import { isExerciseReadOnly } from '../../../utils/Exercise';
-import type { Exercise } from '../../../utils/api-types';
-import Transition from '../../../components/common/Transition';
-import { useAppDispatch } from '../../../utils/hooks';
-
-const useStyles = makeStyles(() => ({
-  button: {
-    float: 'left',
-    margin: '-15px 0 0 0',
-  },
-}));
+import { updateExerciseStartDate } from '../../../../actions/Exercise';
+import { useFormatter } from '../../../../components/i18n';
+import ExerciseDateForm from '../ExerciseDateForm';
+import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import type { Exercise } from '../../../../utils/api-types';
+import Transition from '../../../../components/common/Transition';
+import { useAppDispatch } from '../../../../utils/hooks';
 
 interface Props {
   exercise: Exercise;
@@ -24,7 +16,6 @@ interface Props {
 const ExerciseDatePopover: React.FC<Props> = ({ exercise }) => {
   const [openEdit, setOpenEdit] = useState(false);
   const { t } = useFormatter();
-  const classes = useStyles();
   const dispatch = useAppDispatch();
 
   const onSubmitEdit = async (data: Pick<Exercise, 'exercise_start_date'>) => {
@@ -37,10 +28,9 @@ const ExerciseDatePopover: React.FC<Props> = ({ exercise }) => {
   return (
     <div>
       <IconButton
-        classes={{ root: classes.button }}
         onClick={() => setOpenEdit(true)}
         aria-haspopup="true"
-        size="large"
+        size="small"
         disabled={isExerciseReadOnly(exercise)}
         color="secondary"
       >
@@ -56,7 +46,7 @@ const ExerciseDatePopover: React.FC<Props> = ({ exercise }) => {
         <DialogContent>
           <ExerciseDateForm
             initialValues={initialValues}
-            editing={true}
+            editing
             onSubmit={onSubmitEdit}
             handleClose={() => setOpenEdit(false)}
           />

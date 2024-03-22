@@ -1,22 +1,19 @@
-import React from 'react';
-import { makeStyles } from '@mui/styles';
-import { useDispatch } from 'react-redux';
-import { List, ListItem, ListItemIcon, ListItemText, Tooltip, IconButton } from '@mui/material';
+import { IconButton, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { FileDownloadOutlined, Kayaking, KeyboardArrowRight } from '@mui/icons-material';
+import React, { CSSProperties, FunctionComponent } from 'react';
 import { CSVLink } from 'react-csv';
-import { useFormatter } from '../../../components/i18n';
-import { fetchExercises } from '../../../actions/Exercise';
+import { makeStyles } from '@mui/styles';
+import ExerciseStatus from './exercise/ExerciseStatus';
 import ItemTags from '../../../components/ItemTags';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
-import CreateExercise from './CreateExercise';
-import ExerciseStatus from './ExerciseStatus';
-import { useHelper } from '../../../store';
-import useDataLoader from '../../../utils/ServerSideEvent';
-import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { exportData } from '../../../utils/Environment';
-import Breadcrumbs from '../../../components/Breadcrumbs';
+import useSearchAnFilter from '../../../utils/SortingFiltering';
+import { useHelper } from '../../../store';
+import type { TagsHelper } from '../../../actions/helper';
+import { useFormatter } from '../../../components/i18n';
+import type { ExerciseStore } from '../../../actions/exercises/Exercise';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -51,7 +48,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const headerStyles = {
+const headerStyles: Record<string, CSSProperties> = {
   iconSort: {
     position: 'absolute',
     margin: '0 0 0 5px',
@@ -90,7 +87,7 @@ const headerStyles = {
   },
 };
 
-const inlineStyles = {
+const inlineStyles: Record<string, CSSProperties> = {
   exercise_name: {
     float: 'left',
     width: '20%',
@@ -133,24 +130,29 @@ const inlineStyles = {
   },
 };
 
-const Exercises = () => {
+interface Props {
+  exercises: ExerciseStore[];
+}
+
+const ExerciseList: FunctionComponent<Props> = ({
+  exercises = [],
+}) => {
+  // Standard hooks
   const classes = useStyles();
-  const dispatch = useDispatch();
   const { t, nsdt } = useFormatter();
-  const { exercises, tagsMap, userAdmin } = useHelper((helper) => ({
-    exercises: helper.getExercises(),
+
+  // Fetching data
+  const { tagsMap } = useHelper((helper: TagsHelper) => ({
     tagsMap: helper.getTagsMap(),
-    userAdmin: helper.getMe()?.user_admin ?? false,
   }));
+
   const searchColumns = ['name', 'subtitle'];
   const filtering = useSearchAnFilter('exercise', 'name', searchColumns);
-  useDataLoader(() => {
-    dispatch(fetchExercises());
-  });
+
   const sortedExercises = filtering.filterAndSort(exercises);
+
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Simulations'), current: true }]} />
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter
@@ -183,18 +185,18 @@ const Exercises = () => {
             >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
-                  <FileDownloadOutlined color="primary"/>
+                  <FileDownloadOutlined color="primary" />
                 </IconButton>
               </Tooltip>
             </CSVLink>
           ) : (
             <IconButton size="large" disabled={true}>
-              <FileDownloadOutlined/>
+              <FileDownloadOutlined />
             </IconButton>
           )}
         </div>
       </div>
-      <div className="clearfix"/>
+      <div className="clearfix" />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -246,20 +248,20 @@ const Exercises = () => {
                   headerStyles,
                 )}
               </div>
-                        }
+            }
           />
         </ListItem>
-        {sortedExercises.map((exercise) => (
+        {sortedExercises.map((exercise: ExerciseStore) => (
           <ListItem
             key={exercise.exercise_id}
             classes={{ root: classes.item }}
-            divider={true}
-            button={true}
+            divider
+            button
             component={Link}
             to={`/admin/exercises/${exercise.exercise_id}`}
           >
             <ListItemIcon>
-              <Kayaking color="primary"/>
+              <Kayaking color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={
@@ -292,17 +294,17 @@ const Exercises = () => {
                   >
                     <ExerciseStatus
                       variant="list"
-                      status={exercise.exercise_status}
+                      exerciseStatus={exercise.exercise_status}
                     />
                   </div>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.exercise_tags}
                   >
-                    <ItemTags variant="list" tags={exercise.exercise_tags}/>
+                    <ItemTags variant="list" tags={exercise.exercise_tags} />
                   </div>
                 </div>
-                            }
+              }
             />
             <ListItemIcon classes={{ root: classes.goIcon }}>
               <KeyboardArrowRight />
@@ -310,9 +312,8 @@ const Exercises = () => {
           </ListItem>
         ))}
       </List>
-      {userAdmin && <CreateExercise/>}
     </>
   );
 };
 
-export default Exercises;
+export default ExerciseList;

@@ -18,10 +18,6 @@ import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import AnimationMenu from '../AnimationMenu';
 
 const useStyles = makeStyles(() => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
   card: {
     width: '100%',
     height: '100%',
@@ -81,7 +77,7 @@ const Logs = () => {
     });
   };
   return (
-    <div className={classes.container}>
+    <div>
       <AnimationMenu exerciseId={exerciseId} />
       <div>
         <Typography variant="h4" style={{ float: 'left' }}>

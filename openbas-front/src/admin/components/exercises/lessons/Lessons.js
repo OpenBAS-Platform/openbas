@@ -36,7 +36,6 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchObjectives } from '../../../../actions/Objective';
 import Transition from '../../../../components/common/Transition';
 import ObjectiveEvaluations from './ObjectiveEvaluations';
-import ResultsMenu from '../ResultsMenu';
 import { fetchInjects } from '../../../../actions/Inject';
 import CreateLessonsCategory from './categories/CreateLessonsCategory';
 import {
@@ -57,10 +56,6 @@ import LessonsObjectives from './LessonsObjectives';
 import LessonsCategories from './LessonsCategories';
 
 const useStyles = makeStyles((theme) => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
   metric: {
     position: 'relative',
     padding: 20,
@@ -177,8 +172,7 @@ const Lessons = () => {
     return Math.round(Math.abs(endDate - startDate) / msInHour);
   };
   return (
-    <div className={classes.container}>
-      <ResultsMenu exerciseId={exerciseId} />
+    <div>
       <Grid container={true} spacing={3} style={{ marginTop: -14 }}>
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>

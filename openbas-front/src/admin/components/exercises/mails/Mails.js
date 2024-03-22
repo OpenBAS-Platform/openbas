@@ -19,10 +19,6 @@ import AnimationMenu from '../AnimationMenu';
 import CreateQuickInject from '../injects/CreateQuickInject';
 
 const useStyles = makeStyles(() => ({
-  container: {
-    margin: '10px 0 50px 0',
-    padding: '0 200px 0 0',
-  },
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -190,7 +186,7 @@ const Mails = () => {
     .filter((i) => i.inject_communications_number > 0);
   // Rendering
   return (
-    <div className={classes.container}>
+    <div>
       <AnimationMenu exerciseId={exerciseId} />
       <div>
         <div style={{ float: 'left', marginRight: 10 }}>

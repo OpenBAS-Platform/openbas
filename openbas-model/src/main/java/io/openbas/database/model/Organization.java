@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MultiIdDeserializer;
+import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
@@ -27,6 +28,7 @@ public class Organization implements Base {
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("organization_id")
+    @NotBlank
     private String id;
 
     @Column(name = "organization_name")

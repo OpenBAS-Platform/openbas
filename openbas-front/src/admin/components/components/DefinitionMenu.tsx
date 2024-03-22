@@ -1,28 +1,8 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Drawer, MenuList, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
-import { AttachMoneyOutlined, GroupsOutlined, EmojiEventsOutlined } from '@mui/icons-material';
-import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
-import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../../components/i18n';
+import { AttachMoneyOutlined, EmojiEventsOutlined, GroupsOutlined } from '@mui/icons-material';
+import { CogOutline, NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import type { Exercise, Scenario } from '../../../utils/api-types';
-import type { Theme } from '../../../components/Theme';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  drawer: {
-    minHeight: '100vh',
-    width: 200,
-    position: 'fixed',
-    overflow: 'auto',
-    padding: 0,
-    backgroundColor: theme.palette.background.nav,
-  },
-  toolbar: theme.mixins.toolbar,
-  item: {
-    paddingTop: 10,
-    paddingBottom: 10,
-  },
-}));
+import RightMenu, { RightMenuEntry } from '../../../components/common/RightMenu';
 
 interface Props {
   base: string;
@@ -30,76 +10,36 @@ interface Props {
 }
 
 const DefinitionMenu: React.FC<Props> = ({ base, id }) => {
-  const location = useLocation();
-  const classes = useStyles();
-  const { t } = useFormatter();
+  const entries: RightMenuEntry[] = [
+    {
+      path: `${base}/${id}/definition/settings`,
+      icon: () => (<CogOutline />),
+      label: 'Settings',
+    },
+    {
+      path: `${base}/${id}/definition/teams`,
+      icon: () => (<GroupsOutlined />),
+      label: 'Teams',
+    },
+    {
+      path: `${base}/${id}/definition/articles`,
+      icon: () => (<NewspaperVariantMultipleOutline />),
+      label: 'Media pressure',
+    },
+    {
+      path: `${base}/${id}/definition/challenges`,
+      icon: () => (<EmojiEventsOutlined />),
+      label: 'Challenges',
+    },
+    {
+      path: `${base}/${id}/definition/variables`,
+      icon: () => (<AttachMoneyOutlined />),
+      label: 'Variables',
+    },
+  ];
 
   return (
-    <Drawer
-      variant="permanent"
-      anchor="right"
-      classes={{ paper: classes.drawer }}
-    >
-      <div className={classes.toolbar} />
-      <MenuList component="nav">
-        <MenuItem
-          component={Link}
-          to={`${base}/${id}/definition/teams`}
-          selected={
-            location.pathname
-            === `${base}/${id}/definition/teams`
-          }
-          classes={{ root: classes.item }}
-        >
-          <ListItemIcon>
-            <GroupsOutlined />
-          </ListItemIcon>
-          <ListItemText primary={t('Teams')} />
-        </MenuItem>
-        <MenuItem
-          component={Link}
-          to={`${base}/${id}/definition/articles`}
-          selected={
-            location.pathname
-            === `${base}/${id}/definition/articles`
-          }
-          classes={{ root: classes.item }}
-        >
-          <ListItemIcon>
-            <NewspaperVariantMultipleOutline />
-          </ListItemIcon>
-          <ListItemText primary={t('Media pressure')} />
-        </MenuItem>
-        <MenuItem
-          component={Link}
-          to={`${base}/${id}/definition/challenges`}
-          selected={
-            location.pathname
-            === `${base}/${id}/definition/challenges`
-          }
-          classes={{ root: classes.item }}
-        >
-          <ListItemIcon>
-            <EmojiEventsOutlined />
-          </ListItemIcon>
-          <ListItemText primary={t('Challenges')} />
-        </MenuItem>
-        <MenuItem
-          component={Link}
-          to={`${base}/${id}/definition/variables`}
-          selected={
-            location.pathname
-            === `${base}/${id}/definition/variables`
-          }
-          classes={{ root: classes.item }}
-        >
-          <ListItemIcon>
-            <AttachMoneyOutlined />
-          </ListItemIcon>
-          <ListItemText primary={t('Variables')} />
-        </MenuItem>
-      </MenuList>
-    </Drawer>
+    <RightMenu entries={entries} />
   );
 };
 
