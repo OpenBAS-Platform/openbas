@@ -12,6 +12,8 @@ import org.springframework.transaction.TransactionSystemException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+
+import java.util.List;
 import java.util.Set;
 
 import static io.openbas.injects.email.EmailContract.EMAIL_DEFAULT;
@@ -33,7 +35,8 @@ public class InjectCrudTest {
     // -- PREPARE --
     Exercise exercise = new Exercise();
     exercise.setName("Exercice name");
-    exercise.setReplyTo("test@test.com");
+    exercise.setFrom("test@test.com");
+    exercise.setReplyTos(List.of("test@test.com"));
     Exercise exerciseCreated = this.exerciseRepository.save(exercise);
     Inject inject = new Inject();
     inject.setExercise(exerciseCreated);
@@ -59,7 +62,8 @@ public class InjectCrudTest {
     // -- PREPARE --
     Exercise exercise = new Exercise();
     exercise.setName("Exercice name");
-    exercise.setReplyTo("test@test.com");
+    exercise.setFrom("test@test.com");
+    exercise.setReplyTos(List.of("test@test.com"));
     Exercise exerciseCreated = this.exerciseRepository.save(exercise);
     Inject inject = new Inject();
     inject.setTitle("test");

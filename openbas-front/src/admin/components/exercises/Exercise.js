@@ -41,7 +41,6 @@ import { fetchExerciseTeams, updateExercise, updateExerciseStatus } from '../../
 import { useFormatter } from '../../../components/i18n';
 import ExerciseStatus from './ExerciseStatus';
 import { useHelper } from '../../../store';
-import ExerciseParametersForm from './ExerciseParametersForm';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import Empty from '../../../components/Empty';
 import Countdown from '../../../components/Countdown';
@@ -54,6 +53,7 @@ import { deleteDryrun, fetchDryruns } from '../../../actions/Dryrun';
 import DryrunStatus from './controls/DryrunStatus';
 import ComcheckState from './controls/ComcheckState';
 import ExerciseInjectsDistribution from '../injects/ExerciseInjectsDistribution';
+import SettingsForm from '../components/SettingsForm';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -171,7 +171,18 @@ const Exercise = () => {
     dispatch(fetchComchecks(exerciseId));
     dispatch(fetchDryruns(exerciseId));
   });
-  const submitUpdate = (data) => dispatch(updateExercise(exerciseId, data));
+  const submitUpdate = (data) => {
+    const exerciseUpdateInput = {
+      exercise_mail_from: data.setting_mail_from || '',
+      exercise_mails_reply_to: data.setting_mails_reply_to,
+      exercise_message_header: data.setting_message_header,
+      exercise_message_footer: exercise.exercise_message_footer,
+      exercise_name: exercise.exercise_name,
+      exercise_description: exercise.exercise_description,
+      exercise_subtitle: exercise.exercise_subtitle,
+    };
+    dispatch(updateExercise(exerciseId, exerciseUpdateInput));
+  };
   const submitUpdateStatus = (status) => {
     dispatch(updateExerciseStatus(exerciseId, status));
     setOpenChangeStatus(null);
@@ -191,6 +202,7 @@ const Exercise = () => {
       'exercise_subtitle',
       'exercise_message_header',
       'exercise_mail_from',
+      'exercise_mails_reply_to',
     ]),
   )(exercise);
   const nextInjectDate = exercise.exercise_next_inject_date
@@ -289,6 +301,15 @@ const Exercise = () => {
         );
     }
   };
+
+  function settingsMapping(settings) {
+    return {
+      setting_mail_from: settings.exercise_mail_from,
+      setting_mails_reply_to: settings.exercise_mails_reply_to,
+      setting_message_header: settings.exercise_message_header,
+    };
+  }
+
   return (
     <div className={classes.root}>
       <Grid container={true} spacing={3} style={{ marginTop: -14 }}>
@@ -420,8 +441,8 @@ const Exercise = () => {
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Settings')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <ExerciseParametersForm
-              initialValues={initialValues}
+            <SettingsForm
+              initialValues={settingsMapping(initialValues)}
               onSubmit={submitUpdate}
               disabled={permissions.readOnly}
             />

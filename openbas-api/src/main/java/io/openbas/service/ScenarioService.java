@@ -65,9 +65,11 @@ public class ScenarioService {
   @Transactional
   public Scenario createScenario(@NotNull final Scenario scenario) {
     if (this.imapEnabled) {
-      scenario.setReplyTo(this.imapUsername);
+      scenario.setFrom(this.imapUsername);
+      scenario.setReplyTos(List.of(this.imapUsername));
     } else {
-      scenario.setReplyTo(this.openBASConfig.getDefaultMailer());
+      scenario.setFrom(this.openBASConfig.getDefaultMailer());
+      scenario.setReplyTos(List.of(this.openBASConfig.getDefaultReplyTo()));
     }
 
     this.grantService.computeGrant(scenario);

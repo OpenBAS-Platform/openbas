@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 import static io.openbas.config.AppConfig.*;
 
 @Setter
@@ -25,7 +27,10 @@ public class ExerciseUpdateInput {
 
     @Email(message = EMAIL_FORMAT)
     @JsonProperty("exercise_mail_from")
-    private String replyTo;
+    private String from;
+
+    @JsonProperty("exercise_mails_reply_to")
+    private List<String> replyTos;
 
     @JsonProperty("exercise_message_header")
     private String header;

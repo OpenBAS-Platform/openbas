@@ -39,7 +39,7 @@ export const updateScenarioInformation = (
   scenarioId: Scenario['scenario_id'],
   data: ScenarioInformationInput,
 ) => (dispatch: Dispatch) => {
-  const uri = `${SCENARIO_URI}/${scenarioId}/informations`;
+  const uri = `${SCENARIO_URI}/${scenarioId}/information`;
   return putReferential(scenario, uri, data)(dispatch);
 };
 

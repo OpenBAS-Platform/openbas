@@ -431,9 +431,11 @@ public class ExerciseApi extends RestBehavior {
     exercise.setUpdateAttributes(input);
     exercise.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
     if (imapEnabled) {
-      exercise.setReplyTo(imapUsername);
+      exercise.setFrom(imapUsername);
+      exercise.setReplyTos(List.of(imapUsername));
     } else {
-      exercise.setReplyTo(openBASConfig.getDefaultMailer());
+      exercise.setFrom(openBASConfig.getDefaultMailer());
+      exercise.setReplyTos(List.of(openBASConfig.getDefaultReplyTo()));
     }
     this.grantService.computeGrant(exercise);
     return exerciseRepository.save(exercise);

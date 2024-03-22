@@ -366,6 +366,20 @@ export interface ContractElement {
     | "asset-group";
 }
 
+export interface ContractSearchInput {
+  /** Indicate if the contract can be exposed */
+  exposedContractsOnly?: boolean;
+  /** Label contract */
+  label?: string;
+  sort?: SortObject;
+  /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
+  sorts?: SortField[];
+  /** Text to search within contract attributes such as fields, config.label, and label */
+  textSearch?: string;
+  /** Label Type from contract config */
+  type?: string;
+}
+
 export interface ContractVariable {
   cardinality: "1" | "n";
   children?: ContractVariable[];
@@ -578,7 +592,8 @@ export interface Exercise {
   exercise_logo_light?: Document;
   /** @format int64 */
   exercise_logs_number?: number;
-  exercise_mail_from?: string;
+  exercise_mail_from: string;
+  exercise_mails_reply_to?: string[];
   exercise_message_footer?: string;
   exercise_message_header?: string;
   exercise_name: string;
@@ -641,6 +656,7 @@ export interface ExerciseTeamUser {
 export interface ExerciseUpdateInput {
   exercise_description?: string;
   exercise_mail_from?: string;
+  exercise_mails_reply_to?: string[];
   exercise_message_footer?: string;
   exercise_message_header?: string;
   exercise_name: string;
@@ -1159,6 +1175,37 @@ export interface OrganizationUpdateInput {
   organization_tags?: string[];
 }
 
+export interface PageContract {
+  content?: Contract[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject;
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageableObject {
+  /** @format int64 */
+  offset?: number;
+  /** @format int32 */
+  pageNumber?: number;
+  /** @format int32 */
+  pageSize?: number;
+  paged?: boolean;
+  sort?: SortObject;
+  unpaged?: boolean;
+}
+
 export interface Pause {
   log_id?: string;
   /** @format date-time */
@@ -1277,6 +1324,7 @@ export interface Scenario {
   scenario_injects_statistics?: Record<string, number>;
   scenario_lessons_categories?: LessonsCategory[];
   scenario_mail_from: string;
+  scenario_mail_reply_to?: string[];
   scenario_message_footer?: string;
   scenario_message_header?: string;
   scenario_name: string;
@@ -1295,6 +1343,7 @@ export interface Scenario {
 }
 
 export interface ScenarioInformationInput {
+  scenario_mails_reply_to?: string[];
   scenario_mail_from: string;
   scenario_message_footer?: string;
   scenario_message_header?: string;
@@ -1336,6 +1385,18 @@ export interface SettingsUpdateInput {
   platform_lang: string;
   platform_name: string;
   platform_theme: string;
+}
+
+/** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
+export interface SortField {
+  direction?: string;
+  property?: string;
+}
+
+export interface SortObject {
+  empty?: boolean;
+  sorted?: boolean;
+  unsorted?: boolean;
 }
 
 export interface StatisticElement {

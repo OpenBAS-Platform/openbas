@@ -36,4 +36,9 @@ public class UserFixture {
         return user;
     }
 
+    public static User getSavedUser() {
+        User user = getUser();
+        user.setId("saved-user-id");
+        return user;
+    }
 }
