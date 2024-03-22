@@ -17,7 +17,6 @@ import { fetchPlayerExercise } from '../../../actions/Exercise';
 import SliderField from '../../../components/SliderField';
 import TextField from '../../../components/TextField';
 import Transition from '../../../components/common/Transition';
-import NotLogged from '../../../components/NotLogged';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -101,6 +100,7 @@ const LessonsPlayer = () => {
             question.lessons_question_category,
             question.lessonsquestion_id,
             answerData,
+            finalUserId,
           ),
         );
       }),
@@ -342,9 +342,6 @@ const LessonsPlayer = () => {
         </Form>
       </div>
     );
-  }
-  if (!me) {
-    return <NotLogged />;
   }
   return <Loader />;
 };
