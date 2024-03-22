@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
 import java.util.Objects;
 
 @Service
@@ -24,6 +25,8 @@ public class OpenTelemetryService {
   private final Meter meter;
 
   private LongCounter longCounter;
+
+  private final SessionCounterListener sessionCounterListener;
 
   @PostConstruct
   private void init() {
@@ -42,10 +45,29 @@ public class OpenTelemetryService {
     this.longCounter.add(1); // Global login count
   }
 
+  // -- DYNAMIC --
+
+  public void registerDynamicMetric() {
+    this.registerActiveSessionsMetric();
+  }
+
+  private void registerActiveSessionsMetric() {
+    LongCounter longCounter = this.meter
+        .counterBuilder(PREFIX_PRODUCT + "app.sessions")
+        .setDescription("Number of active sessions")
+        .setUnit("sessions")
+        .build();
+    longCounter.add(this.sessionCounterListener.getActiveSessions());
+  }
+
   // -- STATIC --
 
-  // Not sure if it's the good way
-  public void registerVersionMetric() {
+  public void registerStaticMetric() {
+    this.registerVersionMetric();
+    this.registerPositionMetric();
+  }
+
+  private void registerVersionMetric() {
     ObservableDoubleMeasurement longGauge = this.meter
         .gaugeBuilder(PREFIX_PRODUCT + "app.version")
         .setDescription("Software version")
@@ -53,6 +75,19 @@ public class OpenTelemetryService {
         .buildObserver();
     String appVersion = Objects.requireNonNull(this.env.getProperty("info.app.version"));
     longGauge.record(1, Attributes.of(AttributeKey.stringKey("app.version"), appVersion));
+  }
+
+  private void registerPositionMetric() {
+    ObservableDoubleMeasurement longGauge = this.meter
+        .gaugeBuilder(PREFIX_PRODUCT + "app.country")
+        .setDescription("Software country")
+        .setUnit("country")
+        .buildObserver();
+
+    Locale locale = Locale.getDefault();
+    String country = locale.getCountry(); // Code pays ISO 3166, 2 lettres
+
+    longGauge.record(1, Attributes.of(AttributeKey.stringKey("app.country"), country));
   }
 
 }

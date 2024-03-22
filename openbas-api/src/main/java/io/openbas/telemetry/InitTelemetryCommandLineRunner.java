@@ -14,6 +14,6 @@ public class InitTelemetryCommandLineRunner implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    this.openTelemetryService.registerVersionMetric();
+    this.openTelemetryService.registerStaticMetric();
   }
 }
