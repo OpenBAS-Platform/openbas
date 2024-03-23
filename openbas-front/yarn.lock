@@ -6130,10 +6130,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:3.0.8":
-  version: 3.0.8
-  resolution: "dompurify@npm:3.0.8"
-  checksum: 10c0/e89e03d3dbd99abd64cd90705ce2cdfbc60ee9726ee53f9860e8a2d91b828ef2c173e7031529f9a3aa169ad0fbb76115c6a6683b545bf1ac5d94cc6176fb2a50
+"dompurify@npm:3.0.11":
+  version: 3.0.11
+  resolution: "dompurify@npm:3.0.11"
+  checksum: 10c0/38740deed057da8076e85026853635312a6720a21430218a85875e5f43e453c78637d93aa08c744460b0e91c652b06c736efb481c408a8f9c81894d8f76e0de1
   languageName: node
   linkType: hard
 
@@ -10763,7 +10763,7 @@ __metadata:
     compression: "npm:1.7.4"
     cross-env: "npm:7.0.3"
     date-fns: "npm:3.6.0"
-    dompurify: "npm:3.0.8"
+    dompurify: "npm:3.0.11"
     esbuild: "npm:0.20.2"
     eslint: "npm:8.57.0"
     eslint-config-airbnb: "npm:19.0.4"
