@@ -2416,20 +2416,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/eslintrc@npm:3.0.1":
-  version: 3.0.1
-  resolution: "@eslint/eslintrc@npm:3.0.1"
+"@eslint/eslintrc@npm:3.0.2":
+  version: 3.0.2
+  resolution: "@eslint/eslintrc@npm:3.0.2"
   dependencies:
     ajv: "npm:^6.12.4"
     debug: "npm:^4.3.2"
     espree: "npm:^10.0.1"
-    globals: "npm:^13.19.0"
+    globals: "npm:^14.0.0"
     ignore: "npm:^5.2.0"
     import-fresh: "npm:^3.2.1"
     js-yaml: "npm:^4.1.0"
     minimatch: "npm:^3.1.2"
     strip-json-comments: "npm:^3.1.1"
-  checksum: 10c0/ee86b6a0246185fa0c3189f7d56c651785d98505d7c2a001c72eb3fa645e472578faf0673111fdc25b865d97c9982624f2addd70ea8af451e08ab0b78b6b56ca
+  checksum: 10c0/d8c92f06bdf8e2be9fcc0eeac4a9351745174adfcc72571ef3d179101cb55e19f15f6385c2a4f4945a3ba9245802d3371208e2e1e4f00f6bcf6b8711656af85a
   languageName: node
   linkType: hard
 
@@ -7634,7 +7634,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:14.0.0":
+"globals@npm:14.0.0, globals@npm:^14.0.0":
   version: 14.0.0
   resolution: "globals@npm:14.0.0"
   checksum: 10c0/b96ff42620c9231ad468d4c58ff42afee7777ee1c963013ff8aabe095a451d0ceeb8dcd8ef4cbd64d2538cef45f787a78ba3a9574f4a634438963e334471302d
@@ -10731,7 +10731,7 @@ __metadata:
     "@ckeditor/ckeditor5-react": "npm:6.2.0"
     "@emotion/react": "npm:11.11.4"
     "@emotion/styled": "npm:11.11.0"
-    "@eslint/eslintrc": "npm:3.0.1"
+    "@eslint/eslintrc": "npm:3.0.2"
     "@eslint/js": "npm:8.57.0"
     "@fontsource/geologica": "npm:5.0.4"
     "@fontsource/ibm-plex-sans": "npm:5.0.19"
