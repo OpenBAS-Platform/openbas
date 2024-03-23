@@ -19,7 +19,7 @@
         <commons-email.version>1.5</commons-email.version>
         <flyway.version>9.0.3</flyway.version>
         <opensaml.version>4.1.1</opensaml.version>
-        <springdoc.version>2.3.0</springdoc.version>
+        <springdoc.version>2.4.0</springdoc.version>
         <springdoc-plugin.version>1.4</springdoc-plugin.version>
     </properties>
 
