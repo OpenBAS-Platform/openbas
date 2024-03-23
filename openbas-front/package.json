@@ -68,7 +68,7 @@
     "@eslint/eslintrc": "3.0.1",
     "@eslint/js": "8.57.0",
     "@playwright/test": "1.41.2",
-    "@stylistic/eslint-plugin": "1.6.1",
+    "@stylistic/eslint-plugin": "1.7.0",
     "@testing-library/react": "14.2.1",
     "@types/node": "20.11.30",
     "@types/react": "18.2.55",
