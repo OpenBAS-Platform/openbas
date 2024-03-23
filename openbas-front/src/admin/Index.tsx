@@ -17,7 +17,7 @@ const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));
 const FullTextSearch = lazy(() => import('./components/search/FullTextSearch'));
 const Exercises = lazy(() => import('./components/exercises/Exercises'));
-const Atomic = lazy(() => import('./components/atomic-testing/AtomicTestings'));
+const Atomic = lazy(() => import('./components/atomictesting/AtomicTestings'));
 const IndexExercise = lazy(() => import('./components/exercises/Index'));
 const Scenarios = lazy(() => import('./components/scenarios/Scenarios'));
 const IndexScenario = lazy(() => import('./components/scenarios/scenario/IndexScenario'));
