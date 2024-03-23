@@ -6768,9 +6768,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-playwright@npm:1.3.1":
-  version: 1.3.1
-  resolution: "eslint-plugin-playwright@npm:1.3.1"
+"eslint-plugin-playwright@npm:1.5.4":
+  version: 1.5.4
+  resolution: "eslint-plugin-playwright@npm:1.5.4"
   dependencies:
     globals: "npm:^13.23.0"
   peerDependencies:
@@ -6779,7 +6779,7 @@ __metadata:
   peerDependenciesMeta:
     eslint-plugin-jest:
       optional: true
-  checksum: 10c0/6a9c792c0f5506751300473db8de397ce31ada93e99f86d01618f68e41c2bd3fdc8ecc68573ece4afdbcdebb6e3b49bf86e15cd3cc1c1f698c082f1d160c6c37
+  checksum: 10c0/574907b95b5fe99f7d32d097b54a965620b197dcdff4aa7a6b282cb5543fa316d309a91756639edc8a3b14c639c81cc9fa3a72ee92e56c6ddf5e0c5d9e137b74
   languageName: node
   linkType: hard
 
@@ -10780,7 +10780,7 @@ __metadata:
     eslint-plugin-custom-rules: "link:packages/eslint-plugin-custom-rules"
     eslint-plugin-import: "npm:2.29.1"
     eslint-plugin-import-newlines: "npm:1.4.0"
-    eslint-plugin-playwright: "npm:1.3.1"
+    eslint-plugin-playwright: "npm:1.5.4"
     eslint-plugin-react: "npm:7.33.2"
     express: "npm:4.19.1"
     final-form: "npm:4.20.10"
