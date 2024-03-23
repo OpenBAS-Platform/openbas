@@ -11090,7 +11090,7 @@ __metadata:
     moment-timezone: "npm:0.5.45"
     normalizr: "npm:3.6.2"
     nyc: "npm:15.1.0"
-    pdfmake: "npm:0.2.9"
+    pdfmake: "npm:0.2.10"
     prop-types: "npm:15.8.1"
     ramda: "npm:0.29.1"
     react: "npm:18.2.0"
@@ -11358,15 +11358,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pdfmake@npm:0.2.9":
-  version: 0.2.9
-  resolution: "pdfmake@npm:0.2.9"
+"pdfmake@npm:0.2.10":
+  version: 0.2.10
+  resolution: "pdfmake@npm:0.2.10"
   dependencies:
     "@foliojs-fork/linebreak": "npm:^1.1.1"
     "@foliojs-fork/pdfkit": "npm:^0.14.0"
     iconv-lite: "npm:^0.6.3"
     xmldoc: "npm:^1.1.2"
-  checksum: 10c0/f604adaa46007d10626bc8719d5e2f8173f1f27921f977ac0bf99877ca65461e911972026171a0f42f0da807160be6d587015e93c60d9d5fa6b2c3370a3d4cf7
+  checksum: 10c0/a1c9e3d6211d25b8f8af943fa0469b79a55de5849cf9c2597420e1e21a098ac9c834aaf7b9c1bfd49a1ba3711d48e2f23dd0d70dfaff290afb4704352768d892
   languageName: node
   linkType: hard
 
