@@ -11060,7 +11060,7 @@ __metadata:
     "@emotion/react": "npm:11.11.4"
     "@emotion/styled": "npm:11.11.0"
     "@eslint/eslintrc": "npm:3.0.1"
-    "@eslint/js": "npm:8.56.0"
+    "@eslint/js": "npm:8.57.0"
     "@fontsource/geologica": "npm:5.0.4"
     "@fontsource/ibm-plex-sans": "npm:5.0.19"
     "@hookform/resolvers": "npm:3.3.4"
