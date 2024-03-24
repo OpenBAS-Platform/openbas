@@ -37,8 +37,13 @@ public class V2_76__Add_tag_unique_index extends BaseJavaMigration {
 
       // Remove duplicate tags in tags table
       statement.executeUpdate("""
-            DELETE FROM tags
-            WHERE tag_id NOT IN (SELECT uniq_id FROM uniq_tags);
+          DELETE FROM tags
+          WHERE tags.tag_name IN (SELECT uniq_tags.tag_name FROM uniq_tags)
+          AND NOT EXISTS (
+             SELECT 1
+             FROM uniq_tags AS ut
+             WHERE tags.tag_id = ut.uniq_id
+         );
           """);
 
       // Recreate primary constraint
@@ -79,6 +84,7 @@ public class V2_76__Add_tag_unique_index extends BaseJavaMigration {
         SET tag_id = uniq_tag.uniq_id
         FROM uniq_tags uniq_tag
         JOIN tags t ON uniq_tag.tag_name = t.tag_name
+        WHERE tableName.tag_id = t.tag_id;
         """);
     // Remove duplicate line by create a new table with distinct
     statement.executeUpdate("""
