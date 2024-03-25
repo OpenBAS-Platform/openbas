@@ -30,7 +30,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 
 interface Props {
   inject: InjectStore;
-  injectTypesMap: Record<string, Contract>;
+  injectTypesMap?: Record<string, Contract>;
   tagsMap: Record<string, Tag>;
   setSelectedInject: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;

@@ -1,7 +1,7 @@
-import React, { CSSProperties } from 'react';
+import React, { CSSProperties, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { CSVLink } from 'react-csv';
-import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import { FileDownloadOutlined, MovieFilterOutlined } from '@mui/icons-material';
 import { useAppDispatch } from '../../../utils/hooks';
 import { useFormatter } from '../../../components/i18n';
@@ -10,13 +10,14 @@ import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import type { InjectHelper } from '../../../actions/injects/inject-helper';
 import type { InjectStore } from '../../../actions/injects/Inject';
-import type { Inject } from '../../../utils/api-types';
 import { fetchAtomicInjects } from '../../../actions/Inject';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
 import { exportData } from '../../../utils/Environment';
 import ItemTags from '../../../components/ItemTags';
+import InjectPopover from '../components/injects/InjectPopover';
+import type { TagsHelper } from '../../../actions/helper';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -133,10 +134,12 @@ const AtomicTestings: React.FC = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
+  const [selectedAtomicTesting, setSelectedAtomicTesting] = useState<string | undefined>(undefined);
   // Filter and sort hook
   const filtering = useSearchAnFilter('injects', 'title', ['title']);
-  const { injects }: { injects: Inject } = useHelper((helper: InjectHelper) => ({
+  const { injects, tagsMap } = useHelper((helper: InjectHelper & TagsHelper) => ({
     injects: helper.getAtomicInjects(),
+    tagsMap: helper.getTagsMap(),
   }));
 
   useDataLoader(() => {
@@ -259,6 +262,7 @@ const AtomicTestings: React.FC = () => {
             key={atomicTesting.inject_id}
             classes={{ root: classes.item }}
             divider
+            onClick={() => setSelectedAtomicTesting(atomicTesting.inject_id)}
           >
             <ListItemIcon>
               <MovieFilterOutlined color="primary"/>
@@ -268,16 +272,26 @@ const AtomicTestings: React.FC = () => {
                 <>
                   {fields.map((field) => (
                     <div
-                      key={field.name}
-                      className={classes.bodyItem}
-                      style={inlineStyles[field.name]}
-                    >
-                      {field.value(atomicTesting)}
-                    </div>
+                        key={field.name}
+                        className={classes.bodyItem}
+                        style={inlineStyles[field.name]}
+                      >
+                        {field.value(atomicTesting)}
+                      </div>
                   ))}
                 </>
                             }
             />
+
+            <ListItemSecondaryAction>
+              <InjectPopover
+                inject={atomicTesting}
+                tagsMap={tagsMap}
+                setSelectedInject={setSelectedAtomicTesting}
+                isDisabled={false}
+              />
+            </ListItemSecondaryAction>
+
           </ListItemButton>
         ))}
       </List>
