@@ -70,6 +70,9 @@ const EnrichedTextFieldBase = ({
   );
 };
 
+/**
+ * @deprecated The component use old form libnary react-final-form
+ */
 const EnrichedTextField = (props) => (
   <Field name={props.name} component={EnrichedTextFieldBase} {...props} />
 );

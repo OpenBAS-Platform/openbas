@@ -23,6 +23,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+/**
+ * @deprecated The component use old form libnary react-final-form
+ */
 const ExerciseField = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
