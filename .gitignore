@@ -32,6 +32,3 @@ logs/**
 
 ### VS Code ###
 .vscode/
-
-### Yarn  ###
-openbas-front/yarn.lock
