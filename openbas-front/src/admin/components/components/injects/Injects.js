@@ -168,8 +168,6 @@ const Injects = ({
   const { permissions } = useContext(PermissionsContext);
   const { onUpdateInject } = useContext(InjectContext);
 
-  console.log(injects);
-
   // Filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
   const filtering = useSearchAnFilter(
@@ -197,7 +195,6 @@ const Injects = ({
     .filter((type) => type.config.expose === false)
     .map((type) => type.config.type);
   // Rendering
-  console.log(injectTypesMap);
 
   if (injects && !R.isEmpty(injectTypesMap)) {
     return (
