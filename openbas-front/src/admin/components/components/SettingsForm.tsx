@@ -13,6 +13,7 @@ const useStyles = makeStyles(() => ({
     justifyContent: 'end',
   },
 }));
+
 export interface SettingUpdateInput {
   setting_mail_from?: string;
   setting_mails_reply_to?: string[];

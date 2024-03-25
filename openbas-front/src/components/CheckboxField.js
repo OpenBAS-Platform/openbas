@@ -30,6 +30,9 @@ const renderCheckbox = ({
   </FormControl>
 );
 
+/**
+ * @deprecated The component use old form libnary react-final-form
+ */
 const CheckboxField = (props) => (
   <Field name={props.name} component={renderCheckbox} {...props} />
 );

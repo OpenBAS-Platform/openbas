@@ -59,6 +59,9 @@ const ColorPickerFieldBase = ({
   );
 };
 
+/**
+ * @deprecated The component use old form libnary react-final-form
+ */
 const DeprecatedColorPickerField = (props) => (
   <Field name={props.name} component={ColorPickerFieldBase} {...props} />
 );

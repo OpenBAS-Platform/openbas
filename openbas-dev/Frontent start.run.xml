@@ -3,7 +3,7 @@
     <package-json value="$PROJECT_DIR$/openbas-front/package.json" />
     <command value="start" />
     <node-interpreter value="project" />
-    <package-manager value="yarn" />
+    <package-manager value="C:\Users\gp\IdeaProjects\obas\openbas\openbas-front\.yarn\releases\yarn-4.1.1.cjs" />
     <envs />
     <method v="2" />
   </configuration>
