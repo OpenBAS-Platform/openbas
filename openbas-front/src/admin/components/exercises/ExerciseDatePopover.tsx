@@ -9,6 +9,7 @@ import { isExerciseReadOnly } from '../../../utils/Exercise';
 import type { Exercise } from '../../../utils/api-types';
 import Transition from '../../../components/common/Transition';
 import { useAppDispatch } from '../../../utils/hooks';
+import TextField from '../../../components/TextField';
 
 const useStyles = makeStyles(() => ({
   button: {

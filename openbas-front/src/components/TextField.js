@@ -23,6 +23,9 @@ const TextFieldBase = ({
   );
 };
 
+/**
+ * @deprecated The component use old form libnary react-final-form
+ */
 const TextField = (props) => (
   <Field name={props.name} component={TextFieldBase} {...props} />
 );

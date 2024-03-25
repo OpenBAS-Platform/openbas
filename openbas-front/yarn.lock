@@ -5614,6 +5614,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cron-time-generator@npm:2.0.3":
+  version: 2.0.3
+  resolution: "cron-time-generator@npm:2.0.3"
+  checksum: 10c0/8368e73a84ebd2f7d74783f1c3e150feb6889a595704d89b7d3a375ebd47127e072ff2b69a70a70e5a635c388274c55761e60544a815ddc106d5f2a5d7c31fd4
+  languageName: node
+  linkType: hard
+
+"cronstrue@npm:2.48.0":
+  version: 2.48.0
+  resolution: "cronstrue@npm:2.48.0"
+  bin:
+    cronstrue: bin/cli.js
+  checksum: 10c0/70bd0bc059ab10bf7af9cd1fa100fa21ab359ad34ae64250bee93d617f7f00cff1e132c7e2b175d2a72d48a702ff6be4f0f72fb199f7bad7d34dc8f1014ecd91
+  languageName: node
+  linkType: hard
+
 "cross-env@npm:7.0.3":
   version: 7.0.3
   resolution: "cross-env@npm:7.0.3"
@@ -10805,6 +10821,8 @@ __metadata:
     ckeditor5-custom-build: "link:packages/ckeditor5-custom-build"
     classnames: "npm:2.5.1"
     compression: "npm:1.7.4"
+    cron-time-generator: "npm:2.0.3"
+    cronstrue: "npm:2.48.0"
     cross-env: "npm:7.0.3"
     date-fns: "npm:3.6.0"
     dompurify: "npm:3.0.11"

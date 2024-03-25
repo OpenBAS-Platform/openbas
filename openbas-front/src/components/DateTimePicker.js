@@ -43,6 +43,9 @@ const DateTimePickerBase = ({
   );
 };
 
+/**
+ * @deprecated The component use old form libnary react-final-form
+ */
 const DateTimePicker = (props) => (
   <Field name={props.name} component={DateTimePickerBase} {...props} />
 );
