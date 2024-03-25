@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class V2_76__Add_tag_unique_index extends BaseJavaMigration {
+public class V2_77__Add_tag_unique_index extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
