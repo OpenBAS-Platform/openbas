@@ -1,25 +1,17 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import { Chip, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import { CSVLink } from 'react-csv';
 import { FileDownloadOutlined } from '@mui/icons-material';
-import { splitDuration } from '../../../../utils/Time';
-import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
-import InjectIcon from './InjectIcon';
-import CreateInject from './CreateInject';
-import InjectPopover from './InjectPopover';
-import InjectType from './InjectType';
-import InjectDefinition from './InjectDefinition';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import ItemBoolean from '../../../../components/ItemBoolean';
 import { exportData } from '../../../../utils/Environment';
 import Loader from '../../../../components/Loader';
-import { InjectContext, PermissionsContext } from '../Context';
+import { PermissionsContext } from '../Context';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -33,27 +25,6 @@ const useStyles = makeStyles(() => ({
   item: {
     paddingLeft: 10,
     height: 50,
-  },
-  bodyItem: {
-    height: '100%',
-    fontSize: 13,
-  },
-  duration: {
-    fontSize: 12,
-    lineHeight: '12px',
-    height: 20,
-    float: 'left',
-    marginRight: 7,
-    borderRadius: 0,
-    width: 180,
-    backgroundColor: 'rgba(0, 177, 255, 0.08)',
-    color: '#00b1ff',
-    border: '1px solid #00b1ff',
-  },
-  drawerPaper: {
-    minHeight: '100vh',
-    width: '50%',
-    padding: 0,
   },
 }));
 
@@ -151,17 +122,15 @@ const inlineStyles = {
   },
 };
 
-const Injects = ({
-  injects
+const AtomicInjects = ({
+  atomicInjects,
 }) => {
   // Standard hooks
   const classes = useStyles();
-  const { t, tPick } = useFormatter();
-  const [selectedInject, setSelectedInject] = useState(null);
+  const { t } = useFormatter();
   const { permissions } = useContext(PermissionsContext);
-  const { onUpdateInject } = useContext(InjectContext);
 
-  console.log(injects);
+  console.log(atomicInjects);
 
   // Filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
@@ -170,20 +139,18 @@ const Injects = ({
     'depends_duration',
     searchColumns,
   );
-  // Fetching data
+    // Fetching data
   const {
     injectTypesMap,
     tagsMap,
   } = useHelper((helper) => {
     return {
       injectTypesMap: helper.getInjectTypesMap(),
-      tagsMap: helper.getTagsMap(),
-      injectTypesWithNoTeams: helper.getInjectTypesWithNoTeams(),
     };
   });
 
   const injectTypes = Object.values(injectTypesMap);
-  const sortedInjects = filtering.filterAndSort(injects);
+  const sortedInjects = filtering.filterAndSort(atomicInjects);
   const types = injectTypes.map((type) => type.config.type);
   const disabledTypes = injectTypes
     .filter((type) => type.config.expose === false)
@@ -232,18 +199,18 @@ const Injects = ({
               >
                 <Tooltip title={t('Export this list')}>
                   <IconButton size="large">
-                    <FileDownloadOutlined color="primary" />
+                    <FileDownloadOutlined color="primary"/>
                   </IconButton>
                 </Tooltip>
               </CSVLink>
             ) : (
               <IconButton size="large" disabled={true}>
-                <FileDownloadOutlined />
+                <FileDownloadOutlined/>
               </IconButton>
             )}
           </div>
         </>
-        <div className="clearfix" />
+        <div className="clearfix"/>
         <List classes={{ root: classes.container }}>
           <ListItem
             classes={{ root: classes.itemHead }}
@@ -301,125 +268,19 @@ const Injects = ({
                     headerStyles,
                   )}
                 </>
-              }
+                            }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-          {sortedInjects.map((inject) => {
-            const injectContract = injectTypesMap[inject.inject_contract];
-            const injectTypeName = tPick(injectContract?.label);
-            const duration = splitDuration(inject.inject_depends_duration || 0);
-            const isDisabled = disabledTypes.includes(inject.inject_type)
-              || !types.includes(inject.inject_type);
-            let injectStatus = inject.inject_enabled
-              ? t('Enabled')
-              : t('Disabled');
-            if (inject.inject_content === null) {
-              injectStatus = t('To fill');
-            }
-            return (
-              <ListItem
-                key={inject.inject_id}
-                classes={{ root: classes.item }}
-                divider={true}
-                button={true}
-                disabled={
-                  !injectContract || isDisabled || !inject.inject_enabled
-                }
-                onClick={() => setSelectedInject(inject.inject_id)}
-              >
-                <ListItemIcon style={{ paddingTop: 5 }}>
-                  <InjectIcon
-                    tooltip={t(inject.inject_type)}
-                    config={injectContract?.config}
-                    type={inject.inject_type}
-                    disabled={
-                      !injectContract || isDisabled || !inject.inject_enabled
-                    }
-                  />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_type}
-                      >
-                        <InjectType
-                          variant="list"
-                          config={injectContract?.config}
-                          label={injectTypeName}
-                        />
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_title}
-                      >
-                        {inject.inject_title}
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_depends_duration}
-                      >
-                        <Chip
-                          classes={{ root: classes.duration }}
-                          label={`${duration.days}
-                            ${t('d')}, ${duration.hours}
-                            ${t('h')}, ${duration.minutes}
-                            ${t('m')}`}
-                        />
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_users_number}
-                      >
-                        {isNoTeam ? t('N/A') : inject.inject_users_number}
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_enabled}
-                      >
-                        <ItemBoolean
-                          status={
-                            inject.inject_content === null
-                              ? false
-                              : inject.inject_enabled
-                          }
-                          label={injectStatus}
-                          variant="inList"
-                        />
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_tags}
-                      >
-                        <ItemTags variant="list" tags={inject.inject_tags} />
-                      </div>
-                    </>
-                  }
-                />
-                <ListItemSecondaryAction>
-                  <InjectPopover
-                    inject={inject}
-                    injectTypesMap={injectTypesMap}
-                    tagsMap={tagsMap}
-                    setSelectedInject={setSelectedInject}
-                    isDisabled={!injectContract || isDisabled}
-                  />
-                </ListItemSecondaryAction>
-              </ListItem>
-            );
-          })}
         </List>
-        </Drawer>
       </div>
     );
   }
   return (
     <div className={classes.container}>
-      <Loader />
+      <Loader/>
     </div>
   );
 };
 
-export default AtomicTestings;
+export default AtomicInjects;
