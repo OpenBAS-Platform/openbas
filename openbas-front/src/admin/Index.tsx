@@ -71,7 +71,7 @@ const Index = () => {
               <Route path="fulltextsearch" element={errorWrapper(FullTextSearch)()} />
               <Route path="exercises" element={errorWrapper(Exercises)()} />
               <Route path="exercises/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
-              <Route path="atomic" element={errorWrapper(Atomic)()} />
+              <Route path="atomictesting" element={errorWrapper(Atomic)()} />
               <Route path="scenarios" element={errorWrapper(Scenarios)()} />
               <Route path="scenarios/:scenarioId/*" element={errorWrapper(IndexScenario)()} />
               <Route path="assets/*" element={errorWrapper(Assets)()} />
