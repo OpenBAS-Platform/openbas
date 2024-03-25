@@ -21,6 +21,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.util.Streamable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.ExecutionTrace.traceSuccess;
@@ -131,6 +133,11 @@ public class InjectApi extends RestBehavior {
   @GetMapping("/api/inject_types")
   public Collection<Contract> injectTypes() {
     return contractService.getContracts().values();
+  }
+
+  @GetMapping("/api/injects")
+  public List<Inject> injects() {
+    return Streamable.of(injectRepository.findAll()).toList(); //todo add pagination, modify repository extends jpaRepository or add specificationQuery
   }
 
   @GetMapping("/api/injects/try/{injectId}")
