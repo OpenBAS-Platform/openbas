@@ -1,7 +1,6 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Inject;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
