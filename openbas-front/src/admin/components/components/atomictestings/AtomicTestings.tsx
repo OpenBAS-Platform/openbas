@@ -152,14 +152,7 @@ const inlineStyles = {
 };
 
 const Injects = ({
-  injects,
-  teams,
-  articles,
-  variables,
-  uriVariable,
-  allUsersNumber,
-  usersNumber,
-  teamsUsers,
+  injects
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -181,7 +174,6 @@ const Injects = ({
   const {
     injectTypesMap,
     tagsMap,
-    injectTypesWithNoTeams,
   } = useHelper((helper) => {
     return {
       injectTypesMap: helper.getInjectTypesMap(),
@@ -196,6 +188,7 @@ const Injects = ({
   const disabledTypes = injectTypes
     .filter((type) => type.config.expose === false)
     .map((type) => type.config.type);
+
   // Rendering
   console.log(injectTypesMap);
 
@@ -318,9 +311,6 @@ const Injects = ({
             const duration = splitDuration(inject.inject_depends_duration || 0);
             const isDisabled = disabledTypes.includes(inject.inject_type)
               || !types.includes(inject.inject_type);
-            const isNoTeam = injectTypesWithNoTeams.includes(
-              inject.inject_type,
-            );
             let injectStatus = inject.inject_enabled
               ? t('Enabled')
               : t('Disabled');
@@ -421,38 +411,7 @@ const Injects = ({
             );
           })}
         </List>
-        <Drawer
-          open={selectedInject !== null}
-          keepMounted={false}
-          anchor="right"
-          sx={{ zIndex: 1202 }}
-          classes={{ paper: classes.drawerPaper }}
-          onClose={() => setSelectedInject(null)}
-          elevation={1}
-          disableEnforceFocus={true}
-        >
-          <InjectDefinition
-            injectId={selectedInject}
-            injectTypes={injectTypes}
-            handleClose={() => setSelectedInject(null)}
-            tagsMap={tagsMap}
-            permissions={permissions}
-            teamsFromExerciseOrScenario={teams}
-            articlesFromExerciseOrScenario={articles}
-            variablesFromExerciseOrScenario={variables}
-            onUpdateInject={onUpdateInject}
-            uriVariable={uriVariable}
-            allUsersNumber={allUsersNumber}
-            usersNumber={usersNumber}
-            teamsUsers={teamsUsers}
-          />
         </Drawer>
-        {permissions.canWrite && (
-          <CreateInject
-            injectTypesMap={injectTypesMap}
-            onCreate={setSelectedInject}
-          />
-        )}
       </div>
     );
   }
@@ -463,4 +422,4 @@ const Injects = ({
   );
 };
 
-export default Injects;
+export default AtomicTestings;
