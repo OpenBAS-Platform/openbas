@@ -1,6 +1,6 @@
 // Fixme: move to common hook
 
-const useEntityLink = (entity: string) => {
+const useEntityLink = (entity: string, id: string) => {
   switch (entity) {
     case 'Asset':
       return '/admin/assets/endpoints';
@@ -12,6 +12,10 @@ const useEntityLink = (entity: string) => {
       return '/admin/teams/teams';
     case 'Organization':
       return '/admin/teams/organizations';
+    case 'Scenario':
+      return `/admin/scenarios/${id}`;
+    case 'Exercise':
+      return `/admin/exercises/${id}`;
     default:
       return ('');
   }

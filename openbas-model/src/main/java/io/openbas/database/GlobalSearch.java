@@ -26,10 +26,9 @@ public class GlobalSearch {
     List<GlobalSearchResult> results = new ArrayList<>();
 
     // Search on assets
-
     results.addAll(
         this.entityManager.createNativeQuery(
-                "SELECT * FROM assets WHERE to_tsvector('simple', asset_name) @@ to_tsquery('simple', concat(:searchTerm, ':*'))"
+                "SELECT * FROM assets WHERE asset_name ILIKE concat('%', concat(:searchTerm, '%'))"
             )
             .setParameter("searchTerm", searchTerm)
             .getResultList()
@@ -48,7 +47,7 @@ public class GlobalSearch {
     // Search on asset groups
     results.addAll(
         this.entityManager.createNativeQuery(
-            "SELECT * FROM asset_groups WHERE to_tsvector('simple', asset_group_name) @@ to_tsquery('simple', concat(:searchTerm, ':*'))"
+                "SELECT * FROM asset_groups WHERE asset_group_name ILIKE concat('%', concat(:searchTerm, '%'))"
         )
         .setParameter("searchTerm", searchTerm)
         .getResultList()
@@ -67,7 +66,7 @@ public class GlobalSearch {
     // Search on users
     results.addAll(
         this.entityManager.createNativeQuery(
-            "SELECT * FROM users WHERE to_tsvector('simple', user_email) @@ to_tsquery('simple', concat(:searchTerm, ':*'))"
+                "SELECT * FROM users WHERE user_email ILIKE concat('%', concat(:searchTerm, '%'))"
         )
         .setParameter("searchTerm", searchTerm)
         .getResultList()
@@ -86,7 +85,7 @@ public class GlobalSearch {
     // Search on teams
     results.addAll(
         this.entityManager.createNativeQuery(
-            "SELECT * FROM teams WHERE to_tsvector('simple', team_name) @@ to_tsquery('simple', concat(:searchTerm, ':*'))"
+                "SELECT * FROM teams WHERE team_name ILIKE concat('%', concat(:searchTerm, '%'))"
         )
         .setParameter("searchTerm", searchTerm)
             .getResultList()
@@ -105,7 +104,7 @@ public class GlobalSearch {
     // Search on organizations
     results.addAll(
         this.entityManager.createNativeQuery(
-            "SELECT * FROM organizations WHERE to_tsvector('simple', organization_name) @@ to_tsquery('simple', concat(:searchTerm, ':*'))"
+                "SELECT * FROM organizations WHERE organization_name ILIKE concat('%', concat(:searchTerm, '%'))"
         )
         .setParameter("searchTerm", searchTerm)
         .getResultList()
@@ -119,6 +118,44 @@ public class GlobalSearch {
           return searchResult;
         })
         .toList()
+    );
+
+    // Search on scenarios
+    results.addAll(
+        this.entityManager.createNativeQuery(
+                "SELECT * FROM scenarios WHERE scenario_name ILIKE concat('%', concat(:searchTerm, '%'))"
+            )
+            .setParameter("searchTerm", searchTerm)
+            .getResultList()
+            .stream()
+            .map((r) -> {
+              GlobalSearchResult searchResult = new GlobalSearchResult();
+              Object[] list = (Object[]) r;
+              searchResult.setId((String) list[0]);
+              searchResult.setEntity(Scenario.class.getSimpleName());
+              searchResult.setName((String) list[1]);
+              return searchResult;
+            })
+            .toList()
+    );
+
+    // Search on simulations
+    results.addAll(
+        this.entityManager.createNativeQuery(
+                "SELECT * FROM exercises WHERE exercise_name ILIKE concat('%', concat(:searchTerm, '%'))"
+            )
+            .setParameter("searchTerm", searchTerm)
+            .getResultList()
+            .stream()
+            .map((r) -> {
+              GlobalSearchResult searchResult = new GlobalSearchResult();
+              Object[] list = (Object[]) r;
+              searchResult.setId((String) list[0]);
+              searchResult.setEntity(Exercise.class.getSimpleName());
+              searchResult.setName((String) list[1]);
+              return searchResult;
+            })
+            .toList()
     );
 
     return results;

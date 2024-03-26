@@ -134,7 +134,7 @@ const GlobalSearch = () => {
             classes={{ root: classes.item }}
             divider
             component={Link}
-            to={useEntityLink(result.entity)}
+            to={useEntityLink(result.entity, result.id)}
           >
             <ListItemIcon>
               {useEntityIcon(result.entity)}
