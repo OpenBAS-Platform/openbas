@@ -38,12 +38,12 @@ public class Endpoint extends Asset {
   @JsonProperty("endpoint_ips")
   private String[] ips;
 
-  @Queryable(filterable = true)
+  @Queryable(filterable = true, sortable = true)
   @Column(name = "endpoint_hostname")
   @JsonProperty("endpoint_hostname")
   private String hostname;
 
-  @Queryable(filterable = true)
+  @Queryable(filterable = true, sortable = true)
   @Column(name = "endpoint_platform")
   @JsonProperty("endpoint_platform")
   @Enumerated(EnumType.STRING)

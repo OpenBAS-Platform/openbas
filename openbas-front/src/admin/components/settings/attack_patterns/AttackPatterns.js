@@ -12,7 +12,7 @@ import TaxonomiesMenu from '../TaxonomiesMenu';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import { initSorting } from '../../../../components/common/pagination/PaginationField';
+import { initSorting } from '../../../../components/common/pagination/Page';
 import { useFormatter } from '../../../../components/i18n';
 
 const useStyles = makeStyles(() => ({
@@ -143,7 +143,7 @@ const AttackPatterns = () => {
   ];
 
   const [attackPatterns, setAttackPatterns] = useState([]);
-  const [paginationField, setPaginationField] = useState({
+  const [searchPaginationInput, setSearchPaginationInput] = useState({
     sorts: initSorting('attack_pattern_name'),
   });
 
@@ -165,7 +165,7 @@ const AttackPatterns = () => {
       <TaxonomiesMenu />
       <PaginationComponent
         fetch={searchAttackPatterns}
-        paginationField={paginationField}
+        searchPaginationInput={searchPaginationInput}
         setContent={setAttackPatterns}
         exportProps={exportProps}
       />
@@ -192,8 +192,8 @@ const AttackPatterns = () => {
               <SortHeadersComponent
                 headers={headers}
                 inlineStylesHeaders={headerStyles}
-                paginationField={paginationField}
-                setPaginationField={setPaginationField}
+                searchPaginationInput={searchPaginationInput}
+                setSearchPaginationInput={setSearchPaginationInput}
               />
             }
           />

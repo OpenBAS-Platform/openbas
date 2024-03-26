@@ -5,7 +5,7 @@ import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.KillChainPhaseRepository;
 import io.openbas.rest.attack_pattern.form.AttackPatternCreateInput;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.utils.pagination.PaginationField;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -43,10 +43,10 @@ public class AttackPatternApi extends RestBehavior {
   }
 
   @PostMapping("/api/attack_patterns/search")
-  public Page<AttackPattern> attackPatterns(@RequestBody @Valid final PaginationField paginationField) {
+  public Page<AttackPattern> attackPatterns(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
         (Specification<AttackPattern> specification, Pageable pageable) -> this.attackPatternRepository.findAll(specification, pageable),
-        paginationField,
+        searchPaginationInput,
         AttackPattern.class
     );
   }

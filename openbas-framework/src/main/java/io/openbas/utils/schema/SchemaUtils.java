@@ -52,70 +52,83 @@ public class SchemaUtils {
   /**
    * Build schema for a specific class
    */
-  public static List<PropertySchema> schema(@NotNull final Class<?> clazz) {
+  public static List<PropertySchema> schema(@NotNull Class<?> clazz) {
     List<PropertySchema> properties = cacheMap.get(clazz);
 
     if (properties == null) {
       Field[] fields = clazz.getDeclaredFields();
-      properties = Arrays.stream(fields).map(field -> {
-        PropertySchema.PropertySchemaBuilder builder = PropertySchema.builder()
-            .name(field.getName())
-            .type(field.getType())
-            .multiple(field.getType().isArray() || Collection.class.isAssignableFrom(field.getType()));
+      properties = new ArrayList<>(computeProperties(clazz, fields));
 
-        // Enum type -> compute available values
-        if (field.getType().isEnum()) {
-          Object[] enumValues = field.getType().getEnumConstants();
-          List<String> enumNames = new ArrayList<>();
-          for (Object enumValue : enumValues) {
-            enumNames.add(enumValue.toString());
-          }
-          builder.availableValues(enumNames);
-        }
+      while (clazz.getSuperclass() != null) {
+        clazz = clazz.getSuperclass();
+        fields = clazz.getDeclaredFields();
+        properties.addAll(computeProperties(clazz, fields));
+      }
 
-        Annotation[] annotations = field.getDeclaredAnnotations();
-        for (Annotation annotation : annotations) {
-          // Json property name
-          if (annotation.annotationType().equals(JsonProperty.class)) {
-            builder.jsonName(((JsonProperty) annotation).value());
-          }
-          // Unicity
-          if (annotation.annotationType().equals(Column.class)) {
-            builder.unicity(((Column) annotation).unique());
-          }
-          // Required
-          if (REQUIRED_ANNOTATIONS.contains(annotation.annotationType())) {
-            builder.mandatory(true);
-          }
-          // Queryable
-          if (annotation.annotationType().equals(Queryable.class)) {
-            Queryable queryable = field.getAnnotation(Queryable.class);
-            builder.searchable(queryable.searchable());
-            builder.filterable(queryable.filterable());
-            builder.sortable(queryable.sortable());
-            String propertyValue = queryable.property();
-            if (hasText(propertyValue)) {
-              builder.propertyRepresentative(propertyValue);
-            }
-          }
-        }
-
-        // Deep object
-        if (Arrays.stream(BASE_CLASSES).noneMatch(c -> c.equals(field.getType()))) {
-          // FIXME: not handling loop property but prevent it for now
-          // Exemple: Object A { private Object A; }
-          if (!field.getType().equals(clazz)) {
-            List<PropertySchema> propertiesSchema = schema(field.getType());
-            builder.propertiesSchema(propertiesSchema);
-          }
-        }
-
-        return builder.build();
-      }).toList();
       cacheMap.put(clazz, properties);
     }
 
     return properties;
+  }
+
+  private static List<PropertySchema> computeProperties(
+      @NotNull final Class<?> clazz,
+      @NotNull final Field[] fields) {
+    return Arrays.stream(fields).map(field -> {
+      PropertySchema.PropertySchemaBuilder builder = PropertySchema.builder()
+          .name(field.getName())
+          .type(field.getType())
+          .multiple(field.getType().isArray() || Collection.class.isAssignableFrom(field.getType()));
+
+      // Enum type -> compute available values
+      if (field.getType().isEnum()) {
+        Object[] enumValues = field.getType().getEnumConstants();
+        List<String> enumNames = new ArrayList<>();
+        for (Object enumValue : enumValues) {
+          enumNames.add(enumValue.toString());
+        }
+        builder.availableValues(enumNames);
+      }
+
+      Annotation[] annotations = field.getDeclaredAnnotations();
+      for (Annotation annotation : annotations) {
+        // Json property name
+        if (annotation.annotationType().equals(JsonProperty.class)) {
+          builder.jsonName(((JsonProperty) annotation).value());
+        }
+        // Unicity
+        if (annotation.annotationType().equals(Column.class)) {
+          builder.unicity(((Column) annotation).unique());
+        }
+        // Required
+        if (REQUIRED_ANNOTATIONS.contains(annotation.annotationType())) {
+          builder.mandatory(true);
+        }
+        // Queryable
+        if (annotation.annotationType().equals(Queryable.class)) {
+          Queryable queryable = field.getAnnotation(Queryable.class);
+          builder.searchable(queryable.searchable());
+          builder.filterable(queryable.filterable());
+          builder.sortable(queryable.sortable());
+          String propertyValue = queryable.property();
+          if (hasText(propertyValue)) {
+            builder.propertyRepresentative(propertyValue);
+          }
+        }
+      }
+
+      // Deep object
+      if (Arrays.stream(BASE_CLASSES).noneMatch(c -> c.equals(field.getType()))) {
+        // FIXME: not handling loop property but prevent it for now
+        // Exemple: Object A { private Object A; }
+        if (!field.getType().equals(clazz)) {
+          List<PropertySchema> propertiesSchema = schema(field.getType());
+          builder.propertiesSchema(propertiesSchema);
+        }
+      }
+
+      return builder.build();
+    }).toList();
   }
 
   public static <T> PropertySchema retrieveProperty(List<PropertySchema> propertySchemas, String jsonFieldPath) {

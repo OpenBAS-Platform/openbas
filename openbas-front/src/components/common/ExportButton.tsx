@@ -4,6 +4,8 @@ import React from 'react';
 import { CSVLink } from 'react-csv';
 import { exportData } from '../../utils/Environment';
 import { useFormatter } from '../i18n';
+import { useHelper } from '../../store';
+import type { TagsHelper } from '../../actions/helper';
 
 export interface ExportProps<T> {
   exportType: string;
@@ -20,6 +22,10 @@ interface Props<T> {
 const ExportButton = <T extends object>({ totalElements, exportProps }: Props<T>) => {
   // Standard hooks
   const { t } = useFormatter();
+  // Fetching data
+  const { tagsMap } = useHelper((helper: TagsHelper) => ({
+    tagsMap: helper.getTagsMap(),
+  }));
 
   return (
     <>
@@ -29,6 +35,7 @@ const ExportButton = <T extends object>({ totalElements, exportProps }: Props<T>
               exportProps.exportType,
               exportProps.exportKeys,
               exportProps.exportData,
+              tagsMap,
             )}
             filename={exportProps.exportFileName}
           >

@@ -15,7 +15,7 @@ import {
 import { useFormatter } from '../../../components/i18n';
 import { searchContracts } from '../../../actions/Inject';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
-import { initSorting } from '../../../components/common/pagination/PaginationField';
+import { initSorting } from '../../../components/common/pagination/Page';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -62,7 +62,7 @@ const Integrations = () => {
     ttype: tPick(type.config.label),
     ...type,
   }));
-  const [paginationField, _setPaginationField] = useState({
+  const [searchPaginationInput, _setSearchPaginationInput] = useState({
     sorts: initSorting('config'),
   });
 
@@ -70,7 +70,7 @@ const Integrations = () => {
     <div className={classes.root}>
       <PaginationComponent
         fetch={searchContracts}
-        paginationField={paginationField}
+        searchPaginationInput={searchPaginationInput}
         setContent={setContracts}
       />
       <div className="clearfix" />

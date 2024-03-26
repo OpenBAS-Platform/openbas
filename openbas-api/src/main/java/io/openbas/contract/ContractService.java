@@ -1,7 +1,7 @@
 package io.openbas.contract;
 
 import io.openbas.database.model.Inject;
-import io.openbas.utils.pagination.PaginationField;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,15 +74,15 @@ public class ContractService {
   /**
    * Retrieves a paginated list of contracts.
    *
-   * @param paginationField Criteria for searching contracts.
+   * @param searchPaginationInput Criteria for searching contracts.
    * @return a {@link Page} containing the contracts for the requested page
    */
-  public Page<Contract> searchContracts(PaginationField paginationField) {
+  public Page<Contract> searchContracts(SearchPaginationInput searchPaginationInput) {
     List<Contract> contractsExposed = getContracts().values()
         .stream()
         .filter(contract -> contract.getConfig().isExpose())
         .toList();
-    return buildPaginationRuntime(contractsExposed, paginationField);
+    return buildPaginationRuntime(contractsExposed, searchPaginationInput);
   }
 
 }

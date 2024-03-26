@@ -2,7 +2,7 @@ import React, { CSSProperties, FunctionComponent, useState } from 'react';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../i18n';
-import type { PaginationField } from '../../../utils/api-types';
+import type { SearchPaginationInput } from '../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   iconSort: {
@@ -22,21 +22,21 @@ export interface Header {
 interface Props {
   headers: Header[];
   inlineStylesHeaders: Record<string, CSSProperties>;
-  paginationField: PaginationField;
-  setPaginationField: (datas: PaginationField) => void;
+  searchPaginationInput: SearchPaginationInput;
+  setSearchPaginationInput: (datas: SearchPaginationInput) => void;
 }
 
 const SortHeadersComponent: FunctionComponent<Props> = ({
   headers,
   inlineStylesHeaders,
-  paginationField,
-  setPaginationField,
+  searchPaginationInput,
+  setSearchPaginationInput,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
 
-  const [sortBy, setSortBy] = useState(paginationField.sorts?.[0].property ?? '');
+  const [sortBy, setSortBy] = useState(searchPaginationInput.sorts?.[0].property ?? '');
   const [sortAsc, setSortAsc] = useState(true);
 
   const reverseBy = (field: string) => {
@@ -48,8 +48,8 @@ const SortHeadersComponent: FunctionComponent<Props> = ({
       direction: (sortAsc ? 'ASC' : 'DESC'),
     }];
 
-    setPaginationField({
-      ...paginationField,
+    setSearchPaginationInput({
+      ...searchPaginationInput,
       sorts,
     });
   };

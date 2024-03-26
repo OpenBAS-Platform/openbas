@@ -2,8 +2,8 @@ import { TablePagination } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import SearchFilter from '../../SearchFilter';
-import type { Page } from './PaginationField';
-import type { PaginationField } from '../../../utils/api-types';
+import type { Page } from './Page';
+import type { SearchPaginationInput } from '../../../utils/api-types';
 import ExportButton, { ExportProps } from '../ExportButton';
 
 const useStyles = makeStyles(() => ({
@@ -19,13 +19,13 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props<T> {
-  fetch: (input: PaginationField) => Promise<{ data: Page<T> }>;
-  paginationField: PaginationField;
+  fetch: (input: SearchPaginationInput) => Promise<{ data: Page<T> }>;
+  searchPaginationInput: SearchPaginationInput;
   setContent: (data: T[]) => void;
   exportProps?: ExportProps<T>;
 }
 
-const PaginationComponent = <T extends object>({ fetch, paginationField, setContent, exportProps }: Props<T>) => {
+const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, setContent, exportProps }: Props<T>) => {
   // Standard hooks
   const classes = useStyles();
 
@@ -56,19 +56,19 @@ const PaginationComponent = <T extends object>({ fetch, paginationField, setCont
   };
 
   useEffect(() => {
-    const finalContractSearchInput = {
-      ...paginationField,
+    const finalSearchPaginationInput = {
+      ...searchPaginationInput,
       textSearch,
       page,
       size: rowsPerPage,
     };
 
-    fetch(finalContractSearchInput).then((result: { data: Page<T> }) => {
+    fetch(finalSearchPaginationInput).then((result: { data: Page<T> }) => {
       const { data } = result;
       setContent(data.content);
       setTotalElements(data.totalElements);
     });
-  }, [paginationField, page, rowsPerPage, textSearch]);
+  }, [searchPaginationInput, page, rowsPerPage, textSearch]);
 
   return (
     <div className={classes.parameters}>

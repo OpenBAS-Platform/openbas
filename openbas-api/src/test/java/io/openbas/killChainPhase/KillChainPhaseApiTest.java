@@ -4,7 +4,7 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.repository.KillChainPhaseRepository;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.pagination.PaginationField;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import io.openbas.utils.pagination.SortField;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,13 +64,13 @@ public class KillChainPhaseApiTest extends IntegrationTest {
     @Test
     @DisplayName("Fetching first page of kill chain phases failed with bad request")
     void given_a_bad_search_input_should_throw_bad_request() throws Exception {
-      PaginationField paginationField = PaginationFixture.getDefault()
+      SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
           .size(110)
           .build();
 
       mvc.perform(post("/api/kill_chain_phases/search")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(paginationField)))
+              .content(asJsonString(searchPaginationInput)))
           .andExpect(status().isBadRequest());
     }
   }
@@ -83,11 +83,11 @@ public class KillChainPhaseApiTest extends IntegrationTest {
     @DisplayName("Fetching first page of kill chain phases by textsearch")
     @Test
     void given_search_input_with_textsearch_should_return_a_page_of_kill_chain_phases() throws Exception {
-      PaginationField paginationField = PaginationFixture.getDefault().textSearch("name2").build();
+      SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("name2").build();
 
       mvc.perform(post("/api/kill_chain_phases/search")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(paginationField)))
+              .content(asJsonString(searchPaginationInput)))
           .andExpect(status().is2xxSuccessful())
           .andExpect(jsonPath("$.numberOfElements").value(1));
     }
@@ -95,11 +95,11 @@ public class KillChainPhaseApiTest extends IntegrationTest {
     @DisplayName("Fetching first page of kill chain phases by textsearch ignoring case")
     @Test
     void given_search_input_with_textsearch_should_return_a_page_of_kill_chain_phases_ignoring_case() throws Exception {
-      PaginationField paginationField = PaginationFixture.getDefault().textSearch("NAME2").build();
+      SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("NAME2").build();
 
       mvc.perform(post("/api/kill_chain_phases/search")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(paginationField)))
+              .content(asJsonString(searchPaginationInput)))
           .andExpect(status().is2xxSuccessful())
           .andExpect(jsonPath("$.numberOfElements").value(1));
     }
@@ -107,11 +107,11 @@ public class KillChainPhaseApiTest extends IntegrationTest {
     @DisplayName("Fetching first page of kill chain phases by textsearch with spaces")
     @Test
     void given_search_input_with_textsearch_with_spaces_should_return_a_page_of_kill_chain_phases() throws Exception {
-      PaginationField paginationField = PaginationFixture.getDefault().textSearch("name 2").build();
+      SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("name 2").build();
 
       mvc.perform(post("/api/kill_chain_phases/search")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(paginationField)))
+              .content(asJsonString(searchPaginationInput)))
           .andExpect(status().is2xxSuccessful())
           .andExpect(jsonPath("$.numberOfElements").value(0));
     }
@@ -126,11 +126,11 @@ public class KillChainPhaseApiTest extends IntegrationTest {
     @DisplayName("Fetching first page of kill chain phases by equals name")
     @Test
     void given_search_input_with_name_and_equals_operator_should_return_a_page_of_kill_chain_phases() throws Exception {
-      PaginationField paginationField = PaginationFixture.simpleFilter("phase_name", "NAME2", eq);
+      SearchPaginationInput searchPaginationInput = PaginationFixture.simpleFilter("phase_name", "NAME2", eq);
 
       mvc.perform(post("/api/kill_chain_phases/search")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(paginationField)))
+              .content(asJsonString(searchPaginationInput)))
           .andExpect(status().is2xxSuccessful())
           .andExpect(jsonPath("$.numberOfElements").value(1));
     }
@@ -138,11 +138,11 @@ public class KillChainPhaseApiTest extends IntegrationTest {
     @DisplayName("Fetching first page of kill chain phases by contains name")
     @Test
     void given_search_input_with_name_and_contains_operator_should_return_a_page_of_kill_chain_phases() throws Exception {
-      PaginationField paginationField = PaginationFixture.simpleFilter("phase_name", "2", contains);
+      SearchPaginationInput searchPaginationInput = PaginationFixture.simpleFilter("phase_name", "2", contains);
 
       mvc.perform(post("/api/kill_chain_phases/search")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(paginationField)))
+              .content(asJsonString(searchPaginationInput)))
           .andExpect(status().is2xxSuccessful())
           .andExpect(jsonPath("$.numberOfElements").value(1));
     }
@@ -157,11 +157,11 @@ public class KillChainPhaseApiTest extends IntegrationTest {
     @DisplayName("Sorting by default")
     @Test
     void given_search_input_without_sort_should_return_a_page_of_kill_chain_phases_with_default_sort() throws Exception {
-      PaginationField paginationField = PaginationFixture.getDefault().textSearch("name").build();
+      SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("name").build();
 
       mvc.perform(post("/api/kill_chain_phases/search")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(paginationField)))
+              .content(asJsonString(searchPaginationInput)))
           .andExpect(status().is2xxSuccessful())
           .andExpect(jsonPath("$.content.[0].phase_name").value("name1"))
           .andExpect(jsonPath("$.content.[1].phase_name").value("name2"))
@@ -171,14 +171,14 @@ public class KillChainPhaseApiTest extends IntegrationTest {
     @DisplayName("Sorting by name desc")
     @Test
     void given_sort_input_should_return_a_page_of_kill_chain_phases_sort_by_name_desc() throws Exception {
-      PaginationField paginationField = PaginationFixture.getDefault()
+      SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
           .textSearch("name")
           .sorts(List.of(SortField.builder().property("phase_name").direction("desc").build()))
           .build();
 
       mvc.perform(post("/api/kill_chain_phases/search")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(paginationField)))
+              .content(asJsonString(searchPaginationInput)))
           .andExpect(status().is2xxSuccessful())
           .andExpect(jsonPath("$.content.[0].phase_name").value("name3"))
           .andExpect(jsonPath("$.content.[1].phase_name").value("name2"))

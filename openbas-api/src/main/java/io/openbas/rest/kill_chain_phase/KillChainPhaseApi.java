@@ -4,7 +4,7 @@ import io.openbas.database.model.KillChainPhase;
 import io.openbas.database.repository.KillChainPhaseRepository;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseCreateInput;
-import io.openbas.utils.pagination.PaginationField;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,10 +34,10 @@ public class KillChainPhaseApi extends RestBehavior {
   }
 
   @PostMapping("/api/kill_chain_phases/search")
-  public Page<KillChainPhase> killChainPhases(@RequestBody @Valid PaginationField paginationField) {
+  public Page<KillChainPhase> killChainPhases(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
         (Specification<KillChainPhase> specification, Pageable pageable) -> this.killChainPhaseRepository.findAll(specification, pageable),
-        paginationField,
+        searchPaginationInput,
         KillChainPhase.class
     );
   }

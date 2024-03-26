@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Data
-public class PaginationField {
+public class SearchPaginationInput {
 
   @Schema(description = "Page number to get")
   @Min(0) int page = 0;

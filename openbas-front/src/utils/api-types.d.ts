@@ -1265,26 +1265,6 @@ export interface PageableObject {
   unpaged?: boolean;
 }
 
-export interface PaginationField {
-  filterGroup?: FilterGroup;
-  /**
-   * Page number to get
-   * @format int32
-   * @min 0
-   */
-  page?: number;
-  /**
-   * Element number by page
-   * @format int32
-   * @max 100
-   */
-  size?: number;
-  /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
-  sorts?: SortField[];
-  /** Text to search within searchable attributes */
-  textSearch?: string;
-}
-
 export interface Pause {
   log_id?: string;
   /** @format date-time */
@@ -1479,6 +1459,26 @@ export interface ScenarioUpdateTagsInput {
 
 export interface ScenarioUpdateTeamsInput {
   scenario_teams?: string[];
+}
+
+export interface SearchPaginationInput {
+  filterGroup?: FilterGroup;
+  /**
+   * Page number to get
+   * @format int32
+   * @min 0
+   */
+  page?: number;
+  /**
+   * Element number by page
+   * @format int32
+   * @max 100
+   */
+  size?: number;
+  /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
+  sorts?: SortField[];
+  /** Text to search within searchable attributes */
+  textSearch?: string;
 }
 
 export interface SettingsUpdateInput {

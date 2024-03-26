@@ -4,7 +4,7 @@ import io.openbas.IntegrationTest;
 import io.openbas.utils.fixtures.ContractFixture;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.pagination.PaginationField;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import io.openbas.utils.pagination.SortField;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
@@ -60,13 +60,13 @@ class ContratApiTest extends IntegrationTest {
       @Test
       @DisplayName("Fetching first page of contracts failed with bad request")
       void given_a_bad_search_input_should_throw_bad_request() throws Exception {
-        PaginationField paginationField = PaginationFixture.getDefault()
+        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
             .size(110)
             .build();
 
         mvc.perform(post("/api/contracts/search")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(paginationField)))
+                .content(asJsonString(searchPaginationInput)))
             .andExpect(status().isBadRequest());
       }
     }
@@ -78,11 +78,11 @@ class ContratApiTest extends IntegrationTest {
       @DisplayName("Fetching first page of contracts by textsearch")
       @Test
       void given_search_input_with_textsearch_should_return_a_page_of_contrats() throws Exception {
-        PaginationField paginationField = PaginationFixture.getDefault().textSearch("em").build();
+        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("em").build();
 
         mvc.perform(post("/api/contracts/search")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(paginationField)))
+                .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(2));
       }
@@ -90,11 +90,11 @@ class ContratApiTest extends IntegrationTest {
       @DisplayName("Fetching first page of contracts by textsearch ignoring case")
       @Test
       void given_search_input_with_textsearch_should_return_a_page_of_contrats_ignoring_case() throws Exception {
-        PaginationField paginationField = PaginationFixture.getDefault().textSearch("http req").build();
+        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("http req").build();
 
         mvc.perform(post("/api/contracts/search")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(paginationField)))
+                .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(1));
       }
@@ -102,11 +102,11 @@ class ContratApiTest extends IntegrationTest {
       @DisplayName("Fetching first page of contracts by textsearch with spaces")
       @Test
       void given_search_input_with_textsearch_with_spaces_should_return_a_page_of_contracts() throws Exception {
-        PaginationField paginationField = PaginationFixture.getDefault().textSearch("E m").build();
+        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("E m").build();
 
         mvc.perform(post("/api/contracts/search")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(paginationField)))
+                .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(0));
       }
@@ -120,11 +120,11 @@ class ContratApiTest extends IntegrationTest {
       @DisplayName("Fetching first page of contracts by type")
       @Test
       void given_search_input_with_type_should_return_a_page_of_contrats() throws Exception {
-        PaginationField paginationField = PaginationFixture.simpleFilter("config", "openbas_http", eq);
+        SearchPaginationInput searchPaginationInput = PaginationFixture.simpleFilter("config", "openbas_http", eq);
 
         mvc.perform(post("/api/contracts/search")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(paginationField)))
+                .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(1));
       }
@@ -132,11 +132,11 @@ class ContratApiTest extends IntegrationTest {
       @DisplayName("Fetching first page of contracts by label type ignoring case and contains operator")
       @Test
       void given_search_input_with_label_type_should_return_a_page_of_contrats_ignoring_case() throws Exception {
-        PaginationField paginationField = PaginationFixture.simpleFilter("label", "http request", contains);
+        SearchPaginationInput searchPaginationInput = PaginationFixture.simpleFilter("label", "http request", contains);
 
         mvc.perform(post("/api/contracts/search")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(paginationField)))
+                .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(1));
       }
@@ -144,11 +144,11 @@ class ContratApiTest extends IntegrationTest {
       @DisplayName("Fetching first page of contracts by label and equals operator")
       @Test
       void given_search_input_with_label_should_return_a_page_of_contrats() throws Exception {
-        PaginationField paginationField = PaginationFixture.simpleFilter("label", "HTTP Request - POST (raw body)", eq);
+        SearchPaginationInput searchPaginationInput = PaginationFixture.simpleFilter("label", "HTTP Request - POST (raw body)", eq);
 
         mvc.perform(post("/api/contracts/search")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(paginationField)))
+                .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(1));
       }
@@ -156,11 +156,11 @@ class ContratApiTest extends IntegrationTest {
       @DisplayName("Fetching first page of contracts by label email ignoring case")
       @Test
       void given_search_input_with_label_should_return_a_page_of_contrats_ignoring_case() throws Exception {
-        PaginationField paginationField = PaginationFixture.simpleFilter("label", "http request - post (raw body)", eq);
+        SearchPaginationInput searchPaginationInput = PaginationFixture.simpleFilter("label", "http request - post (raw body)", eq);
 
         mvc.perform(post("/api/contracts/search")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(paginationField)))
+                .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.numberOfElements").value(1));
       }
@@ -173,11 +173,11 @@ class ContratApiTest extends IntegrationTest {
       @DisplayName("Sorting by default")
       @Test
       void given_search_input_without_sort_should_return_a_page_of_contrats_with_default_sort() throws Exception {
-        PaginationField paginationField = PaginationFixture.getDefault().textSearch("Email").build();
+        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("Email").build();
 
         mvc.perform(post("/api/contracts/search")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(paginationField)))
+                .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.content.[0].config.label.en").value("Email"))
             .andExpect(jsonPath("$.content.[1].config.label.en").value("Email"))
@@ -187,14 +187,14 @@ class ContratApiTest extends IntegrationTest {
       @DisplayName("Sorting by label desc")
       @Test
       void given_sort_input_should_return_a_page_of_contrats_sort_by_label_desc() throws Exception {
-        PaginationField paginationField = PaginationFixture.getDefault()
+        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
             .textSearch("email")
             .sorts(List.of(SortField.builder().property("label").direction("desc").build()))
             .build();
 
         mvc.perform(post("/api/contracts/search")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(paginationField)))
+                .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.content.[0].label.en").value("Send multi-recipients mail"))
             .andExpect(jsonPath("$.content.[1].label.en").value("Send individual mails"));
@@ -203,14 +203,14 @@ class ContratApiTest extends IntegrationTest {
       @DisplayName("Sorting by type asc and label desc")
       @Test
       void given_sort_input_should_return_a_page_of_contrats_sort_by_type_asc_label_desc() throws Exception {
-        PaginationField paginationField = PaginationFixture.getDefault().textSearch("email")
+        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("email")
             .sorts(List.of(SortField.builder().property("config").direction("asc").build(),
                 SortField.builder().property("label").direction("desc").build())).
             build();
 
         mvc.perform(post("/api/contracts/search")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(paginationField)))
+                .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.content.[0].config.label.en").value("Email"))
             .andExpect(jsonPath("$.content.[0].label.en").value("Send multi-recipients mail"))

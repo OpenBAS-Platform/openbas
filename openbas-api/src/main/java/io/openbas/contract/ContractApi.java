@@ -1,7 +1,7 @@
 package io.openbas.contract;
 
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.utils.pagination.PaginationField;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
@@ -67,7 +67,7 @@ public class ContractApi extends RestBehavior {
             @ApiResponse(responseCode = "200", description = "Page of contracts"),
             @ApiResponse(responseCode = "400", description = "Bad parameters")
     })
-    public Page<Contract> searchExposedContracts(@RequestBody @Valid PaginationField paginationField) {
-        return contractService.searchContracts(paginationField);
+    public Page<Contract> searchExposedContracts(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+        return contractService.searchContracts(searchPaginationInput);
     }
 }

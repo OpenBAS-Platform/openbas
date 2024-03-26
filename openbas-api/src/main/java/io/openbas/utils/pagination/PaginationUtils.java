@@ -23,7 +23,7 @@ public class PaginationUtils {
 
   // -- RUNTIME --
 
-  public static <T> Page<T> buildPaginationRuntime(List<T> values, PaginationField input) {
+  public static <T> Page<T> buildPaginationRuntime(List<T> values, SearchPaginationInput input) {
     int currentPage = input.getPage();
     int pageSize = input.getSize();
     int startItem = currentPage * pageSize;
@@ -43,7 +43,7 @@ public class PaginationUtils {
     return new PageImpl<>(paginatedContracts, pageable, totalElements);
   }
 
-  private static <T> List<T> computePagination(List<T> values, PaginationField input) {
+  private static <T> List<T> computePagination(List<T> values, SearchPaginationInput input) {
     return values
         .stream()
         .filter(computeFilterGroupRuntime(input.getFilterGroup()))
@@ -56,7 +56,7 @@ public class PaginationUtils {
 
   public static <T> Page<T> buildPaginationJPA(
       @NotNull final BiFunction<Specification<T>, Pageable, Page<T>> findAll,
-      @NotNull final PaginationField input,
+      @NotNull final SearchPaginationInput input,
       @NotNull final Class<T> clazz) {
     // Specification
     Specification<T> filterSpecifications = computeFilterGroupJpa(input.getFilterGroup());
