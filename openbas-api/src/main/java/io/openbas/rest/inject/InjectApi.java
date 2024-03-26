@@ -200,9 +200,9 @@ public class InjectApi extends RestBehavior {
   }
 
 
-  @GetMapping("/api/injects")
+  @GetMapping("/api/injects/atomic_testings")
   public List<Inject> injects() {
-    return Streamable.of(injectRepository.findAll()).toList(); //todo add pagination, modify repository extends jpaRepository or add specificationQuery
+    return injectRepository.findAllAtomicTestings(); //todo add pagination, modify repository extends jpaRepository or add specificationQuery, move into a service layer
   }
 
   @GetMapping("/api/injects/try/{injectId}")
