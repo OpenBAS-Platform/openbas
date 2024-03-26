@@ -166,10 +166,10 @@ const AtomicTestings = () => {
       value: (atomicTesting: InjectStore) => atomicTesting.inject_type, // check chip
     },
     {
-      name: 'inject_date',
+      name: 'inject_updated_at',
       label: 'Date',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => fldt(atomicTesting.inject_date),
+      value: (atomicTesting: InjectStore) => fldt(atomicTesting.inject_updated_at),
     },
     {
       name: 'inject_players',

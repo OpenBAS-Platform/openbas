@@ -268,27 +268,27 @@ public class Inject implements Base, Injection {
     return standardExecutionDate.plusSeconds(alignedPauseDelay);
   }
 
-  @JsonProperty("inject_date")
-  public Optional<Instant> getDate() {
-    if (this.getExercise() == null && this.getScenario() == null) {
-      log.log(Level.SEVERE, "Exercise OR Scenario should not be null");
-      return Optional.empty();
-    }
+    @JsonProperty("inject_date")
+    public Optional<Instant> getDate() {
+        if (this.getExercise() == null && this.getScenario() == null) {
+            log.log(Level.INFO, "This inject is an atomic testing");
+            return Optional.empty(); //atomic testing date is the update date
+        }
 
-    if (this.getScenario() != null) {
-      return Optional.empty();
-    }
+        if (this.getScenario() != null) {
+          return Optional.empty();
+        }
 
-    if (this.getExercise() != null) {
-      if (this.getExercise().getStatus().equals(Exercise.STATUS.CANCELED)) {
-        return Optional.empty();
-      }
-      return this.getExercise()
-          .getStart()
-          .map(source -> computeInjectDate(source, SPEED_STANDARD));
-    } else {
-      return Optional.ofNullable(LocalDateTime.now().toInstant(ZoneOffset.UTC));
-    }
+        if (this.getExercise() != null) {
+          if (this.getExercise().getStatus().equals(Exercise.STATUS.CANCELED)) {
+            return Optional.empty();
+          }
+          return this.getExercise()
+              .getStart()
+              .map(source -> computeInjectDate(source, SPEED_STANDARD));
+        } else {
+          return Optional.ofNullable(LocalDateTime.now().toInstant(ZoneOffset.UTC));
+        }
   }
 
   @JsonIgnore
