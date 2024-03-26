@@ -4,6 +4,7 @@ import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, List
 import { ComputerOutlined, FileDownloadOutlined } from '@mui/icons-material';
 import { CSVLink } from 'react-csv';
 import { differenceInHours } from 'date-fns';
+import { useSearchParams } from 'react-router-dom';
 import EndpointCreation from './EndpointCreation';
 import EndpointPopover from './EndpointPopover';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -131,8 +132,13 @@ const Endpoints = () => {
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
 
+  // Query param
+  const [searchParams] = useSearchParams();
+  const [search] = searchParams.getAll('search');
+  const [searchId] = searchParams.getAll('id');
+
   // Filter and sort hook
-  const filtering = useSearchAnFilter('asset', 'name', ['name']);
+  const filtering = useSearchAnFilter('asset', 'name', ['name'], { defaultKeyword: search });
 
   // Fetching data
   const { endpoints, userAdmin, tagsMap } = useHelper((helper: EndpointsHelper & UsersHelper & TagsHelper) => ({
@@ -310,7 +316,10 @@ const Endpoints = () => {
               }
             />
             <ListItemSecondaryAction>
-              <EndpointPopover endpoint={endpoint}/>
+              <EndpointPopover
+                endpoint={endpoint}
+                openEditOnInit={endpoint.asset_id === searchId}
+              />
             </ListItemSecondaryAction>
           </ListItem>
         ))}

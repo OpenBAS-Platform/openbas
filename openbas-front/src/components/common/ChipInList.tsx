@@ -1,9 +1,7 @@
 import { Chip } from '@mui/material';
 import React, { CSSProperties, FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from '../../../components/i18n';
-
-// Fixme: move to common
+import { useFormatter } from '../i18n';
 
 const useStyles = makeStyles(() => ({
   chipInList: {

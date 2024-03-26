@@ -20,12 +20,14 @@ interface TeamPopoverProps {
   team: TeamStore;
   managePlayers?: () => void,
   disabled?: boolean,
+  openEditOnInit?: boolean,
 }
 
 const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   team,
   managePlayers,
   disabled,
+  openEditOnInit = false,
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -43,7 +45,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   const { onRemoveTeam } = useContext(TeamContext);
 
   const [openDelete, setOpenDelete] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
+  const [openEdit, setOpenEdit] = useState(openEditOnInit);
   const [openRemove, setOpenRemove] = useState(false);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 

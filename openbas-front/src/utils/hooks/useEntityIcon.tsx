@@ -1,8 +1,6 @@
 import { ComputerOutlined, DomainOutlined, GroupsOutlined, Kayaking, LanOutlined, MovieFilterOutlined, PersonOutlined } from '@mui/icons-material';
 import React from 'react';
 
-// Fixme: move to common hook
-
 const useEntityIcon = (entity: string) => {
   switch (entity) {
     case 'Asset':

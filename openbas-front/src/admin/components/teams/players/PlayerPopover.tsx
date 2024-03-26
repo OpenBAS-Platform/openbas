@@ -17,12 +17,13 @@ import { TeamContext } from '../../components/Context';
 interface PlayerPopoverProps {
   user: UserStore;
   teamId?: string;
-  anchorEl?: string[];
+  openEditOnInit?: boolean,
 }
 
 const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   user,
   teamId,
+  openEditOnInit = false,
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -41,7 +42,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   const { onRemoveUsersTeam } = useContext(TeamContext);
 
   const [openDelete, setOpenDelete] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
+  const [openEdit, setOpenEdit] = useState(openEditOnInit);
   const [openRemove, setOpenRemove] = useState(false);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 

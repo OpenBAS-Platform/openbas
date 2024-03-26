@@ -7,7 +7,7 @@ import globalSearch from '../../../actions/globalSearch-action';
 import type { GlobalSearchResult } from '../../../utils/api-types';
 import { useFormatter } from '../../../components/i18n';
 import Breadcrumbs from '../../../components/Breadcrumbs';
-import useEntityIcon from './useEntityIcon';
+import useEntityIcon from '../../../utils/hooks/useEntityIcon';
 import useEntityLink from './useEntityLink';
 import EntityType from './EntityType';
 
@@ -134,7 +134,7 @@ const GlobalSearch = () => {
             classes={{ root: classes.item }}
             divider
             component={Link}
-            to={useEntityLink(result.entity, result.id)}
+            to={useEntityLink(result.entity, result.id, search)}
           >
             <ListItemIcon>
               {useEntityIcon(result.entity)}

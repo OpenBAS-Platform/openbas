@@ -7,15 +7,14 @@ const useSearchAnFilter = (
   schema,
   defaultSortKey,
   searchColumns,
-  orderAsc = true,
-  tagSuffix = '',
+  options, // {orderAsc, defaultKeyword }
 ) => {
   const { t } = useFormatter();
   const [order, setOrder] = useState({
     sortBy: `${schema ? `${schema}_` : ''}${defaultSortKey}`,
-    orderAsc,
+    orderAsc: options?.orderAsc ?? true,
   });
-  const [keyword, setKeyword] = useState('');
+  const [keyword, setKeyword] = useState(options?.defaultKeyword ?? '');
   const [tags, setTags] = useState([]);
   const handleAddTag = (value) => {
     setTags(R.uniq(R.append(value, tags)));
@@ -68,7 +67,7 @@ const useSearchAnFilter = (
         R.filter(
           (n) => tags.length === 0
               || R.any(
-                (filter) => R.includes(filter, n[`${schema}${tagSuffix}_tags`] || []),
+                (filter) => R.includes(filter, n[`${schema}_tags`] || []),
                 R.pluck('id', tags),
               ),
         ),

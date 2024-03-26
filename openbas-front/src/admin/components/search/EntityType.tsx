@@ -1,8 +1,6 @@
 import React from 'react';
 import { useFormatter } from '../../../components/i18n';
-import ChipInList from './ChipInList';
-
-// Fixme: move to common hook
+import ChipInList from '../../../components/common/ChipInList';
 
 export const inlineStyles = {
   blue: {
