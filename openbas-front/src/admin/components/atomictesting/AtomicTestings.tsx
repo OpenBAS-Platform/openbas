@@ -76,7 +76,7 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
     fontSize: 12,
     fontWeight: '700',
   },
-  inject_date: {
+  inject_updated_at: {
     float: 'left',
     width: '20%',
     fontSize: 12,
@@ -110,7 +110,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   inject_type: {
     width: '25%',
   },
-  inject_date: {
+  inject_updated_at: {
     width: '20%',
   },
   inject_players: {
@@ -129,7 +129,7 @@ const AtomicTestings = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const { t, tPick, fldt } = useFormatter();
+  const { t, fldt } = useFormatter();
   const [selectedAtomicTesting, setSelectedAtomicTesting] = useState<string | undefined>(undefined);
   // Filter and sort hook
   const filtering = useSearchAnFilter('injects', 'title', ['title']);
@@ -184,7 +184,7 @@ const AtomicTestings = () => {
       value: (atomicTesting: InjectStore) => atomicTesting.inject_enabled,
     },
     {
-      name: 'inject_tag',
+      name: 'inject_tags',
       label: 'Tag',
       isSortable: true,
       value: (atomicTesting: InjectStore) => <ItemTags variant="list" tags={atomicTesting.inject_tags} />,
