@@ -2,8 +2,7 @@ import React, { CSSProperties, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { CSVLink } from 'react-csv';
 import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
-import { FileDownloadOutlined, MovieFilterOutlined } from '@mui/icons-material';
-import * as R from 'ramda';
+import { FileDownloadOutlined } from '@mui/icons-material';
 import { useAppDispatch } from '../../../utils/hooks';
 import { useFormatter } from '../../../components/i18n';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
@@ -18,10 +17,8 @@ import TagsFilter from '../../../components/TagsFilter';
 import { exportData } from '../../../utils/Environment';
 import ItemTags from '../../../components/ItemTags';
 import InjectPopover from '../components/injects/InjectPopover';
-import type { TagsHelper } from '../../../actions/helper';
+import type { InjectTypesHelper, TagsHelper } from '../../../actions/helper';
 import InjectIcon from '../components/injects/InjectIcon';
-import InjectType from '../components/injects/InjectType';
-import ItemBoolean from '../../../components/ItemBoolean';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -131,21 +128,24 @@ const AtomicTestings = () => {
   const dispatch = useAppDispatch();
   const { t, fldt } = useFormatter();
   const [selectedAtomicTesting, setSelectedAtomicTesting] = useState<string | undefined>(undefined);
+
   // Filter and sort hook
   const filtering = useSearchAnFilter('injects', 'title', ['title']);
-  const { injects, tagsMap } = useHelper((helper: InjectHelper & TagsHelper) => ({
+  const {
+    injects,
+    tagsMap,
+    injectTypesMap,
+    injectTypesWithNoTeams,
+  } = useHelper((helper: InjectHelper & TagsHelper & InjectTypesHelper) => ({
     injects: helper.getAtomicTestings(),
     tagsMap: helper.getTagsMap(),
+    injectTypesMap: helper.getInjectTypesMap(),
+    injectTypesWithNoTeams: helper.getInjectTypesWithNoTeams(),
   }));
-  const { injectTypesMap, injectTypesWithNoTeams } = useHelper((helper: any) => {
-    return {
-      injectTypesMap: helper.getInjectTypesMap(),
-      injectTypesWithNoTeams: helper.getInjectTypesWithNoTeams(),
-    };
-  });
+
   const injectTypes = Object.values(injectTypesMap);
   const disabledTypes = injectTypes;
-  const types = injectTypes.map((type: any) => type.config.type);
+  const types = injectTypes.map((type) => type.config.type);
 
   useDataLoader(() => {
     dispatch(fetchAtomicTestings());
@@ -187,14 +187,14 @@ const AtomicTestings = () => {
       name: 'inject_tags',
       label: 'Tag',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => <ItemTags variant="list" tags={atomicTesting.inject_tags} />,
+      value: (atomicTesting: InjectStore) => <ItemTags variant="list" tags={atomicTesting.inject_tags}/>,
     },
   ];
   const sortedAtomicTestings: InjectStore[] = filtering.filterAndSort(injects);
   // Fetching data
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]} />
+      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]}/>
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter
@@ -220,13 +220,13 @@ const AtomicTestings = () => {
             >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
-                  <FileDownloadOutlined color="primary" />
+                  <FileDownloadOutlined color="primary"/>
                 </IconButton>
               </Tooltip>
             </CSVLink>
           ) : (
             <IconButton size="large" disabled>
-              <FileDownloadOutlined />
+              <FileDownloadOutlined/>
             </IconButton>
           )}
         </div>
@@ -254,12 +254,12 @@ const AtomicTestings = () => {
                 {fields.map((header) => (
                   <div key={header.name}>
                     {
-                      filtering.buildHeader(
-                        header.name,
-                        header.label,
-                        header.isSortable,
-                        inlineStylesHeaders,
-                      )
+                        filtering.buildHeader(
+                          header.name,
+                          header.label,
+                          header.isSortable,
+                          inlineStylesHeaders,
+                        )
                     }
                   </div>
                 ))
@@ -271,7 +271,7 @@ const AtomicTestings = () => {
         {sortedAtomicTestings.map((atomicTesting) => {
           const injectContract = injectTypesMap[atomicTesting.inject_contract];
           const isDisabled = disabledTypes.includes(atomicTesting.inject_type)
-            || !types.includes(atomicTesting.inject_type);
+                        || !types.includes(atomicTesting.inject_type);
           return (
             <ListItemButton
               key={atomicTesting.inject_id}
@@ -284,9 +284,7 @@ const AtomicTestings = () => {
                   tooltip={t(atomicTesting.inject_type)}
                   config={injectContract?.config}
                   type={atomicTesting.inject_type}
-                  disabled={
-                    !injectContract || isDisabled || !atomicTesting.inject_enabled
-                  }
+                  disabled={!injectContract || isDisabled || !atomicTesting.inject_enabled}
                 />
               </ListItemIcon>
               <ListItemText
@@ -304,13 +302,12 @@ const AtomicTestings = () => {
                   </>
                 }
               />
-
               <ListItemSecondaryAction>
                 <InjectPopover
                   inject={atomicTesting}
                   tagsMap={tagsMap}
                   setSelectedInject={setSelectedAtomicTesting}
-                  isDisabled={false}
+                  isDisabled={false} // isDisabled
                 />
               </ListItemSecondaryAction>
 
