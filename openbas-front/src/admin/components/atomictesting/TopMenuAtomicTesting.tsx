@@ -4,7 +4,7 @@ import TopMenu, { MenuEntry } from '../../../components/common/TopMenu';
 const TopMenuAtomicTesting = () => {
   const entries: MenuEntry[] = [
     {
-      path: '/admin/atomictesting',
+      path: '/admin/atomic_testing',
       label: 'Atomic Testing',
     },
   ];

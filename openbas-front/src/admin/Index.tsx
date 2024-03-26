@@ -75,7 +75,7 @@ const Index = () => {
               <Route path="" element={errorWrapper(Dashboard)()} />
               <Route path="exercises" element={errorWrapper(Exercises)()} />
               <Route path="exercises/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
-              <Route path="atomictesting" element={errorWrapper(Atomic)()} />
+              <Route path="atomic_testing" element={errorWrapper(Atomic)()} />
               <Route path="scenarios" element={errorWrapper(Scenarios)()} />
               <Route path="scenarios/:scenarioId/*" element={errorWrapper(IndexScenario)()} />
               <Route path="assets/*" element={errorWrapper(Assets)()} />
@@ -86,7 +86,7 @@ const Index = () => {
               <Route path="integrations/*" element={errorWrapper(IndexIntegrations)()} />
               <Route path="settings/*" element={errorWrapper(IndexSettings)()} />
               {/* Not found */}
-              <Route path="*" element={<NotFound/>}/>
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </Box>
