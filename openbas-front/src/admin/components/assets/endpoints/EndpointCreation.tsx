@@ -11,6 +11,7 @@ import { addEndpoint } from '../../../../actions/assets/endpoint-actions';
 import Drawer from '../../../../components/common/Drawer';
 import Dialog from '../../../../components/common/Dialog';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
+import type { EndpointStore } from './Endpoint';
 
 const useStyles = makeStyles((theme: Theme) => ({
   text: {
@@ -22,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   inline?: boolean;
-  onCreate?: (result: string) => void;
+  onCreate?: (result: EndpointStore) => void;
 }
 
 const EndpointCreation: FunctionComponent<Props> = ({
@@ -37,10 +38,11 @@ const EndpointCreation: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const onSubmit = (data: EndpointInput) => {
     dispatch(addEndpoint(data)).then(
-      (result: { result: string }) => {
-        if (result.result) {
+      (result: { result: string, entities: { endpoints: Record<string, EndpointStore> } }) => {
+        if (result.entities) {
           if (onCreate) {
-            onCreate(result.result);
+            const endpointCreated = result.entities.endpoints[result.result];
+            onCreate(endpointCreated);
           }
           setOpen(false);
         }

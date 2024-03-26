@@ -245,12 +245,16 @@ const Endpoints = () => {
               }
             />
             <ListItemSecondaryAction>
-              <EndpointPopover endpoint={{ ...endpoint, type: 'static' }} />
+              <EndpointPopover
+                endpoint={{ ...endpoint, type: 'static' }}
+                onUpdate={(result) => setEndpoints(endpoints.map((e) => (e.asset_id !== result.asset_id ? e : result)))}
+                onDelete={(result) => setEndpoints(endpoints.filter((e) => (e.asset_id !== result)))}
+              />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
-      {userAdmin && <EndpointCreation />}
+      {userAdmin && <EndpointCreation onCreate={(result) => setEndpoints([result, ...endpoints])}/>}
     </>
   );
 };

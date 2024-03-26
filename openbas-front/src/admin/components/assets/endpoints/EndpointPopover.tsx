@@ -11,6 +11,7 @@ import DialogDelete from '../../../../components/common/DialogDelete';
 import { updateAssetsOnAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
 import Dialog from '../../../../components/common/Dialog';
 import { EndpointStoreWithType } from './EndpointsList';
+import type { EndpointStore } from './Endpoint';
 
 interface Props {
   inline?: boolean;
@@ -18,6 +19,8 @@ interface Props {
   assetGroupId?: string;
   assetGroupEndpointIds?: string[];
   onRemoveEndpointFromInject?: (assetId: string) => void;
+  onUpdate?: (result: EndpointStore) => void;
+  onDelete?: (result: string) => void;
 }
 
 const EndpointPopover: React.FC<Props> = ({
@@ -26,6 +29,8 @@ const EndpointPopover: React.FC<Props> = ({
   assetGroupId,
   assetGroupEndpointIds,
   onRemoveEndpointFromInject,
+  onUpdate,
+  onDelete,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -61,7 +66,17 @@ const EndpointPopover: React.FC<Props> = ({
     setAnchorEl(null);
   };
   const submitEdit = (data: EndpointInput) => {
-    dispatch(updateEndpoint(endpoint.asset_id, data));
+    dispatch(updateEndpoint(endpoint.asset_id, data)).then(
+      (result: { result: string, entities: { endpoints: Record<string, EndpointStore> } }) => {
+        if (result.entities) {
+          if (onUpdate) {
+            const endpointUpdated = result.entities.endpoints[result.result];
+            onUpdate(endpointUpdated);
+          }
+        }
+        return result;
+      },
+    );
     setEdition(false);
   };
 
@@ -90,7 +105,13 @@ const EndpointPopover: React.FC<Props> = ({
     setAnchorEl(null);
   };
   const submitDelete = () => {
-    dispatch(deleteEndpoint(endpoint.asset_id));
+    dispatch(deleteEndpoint(endpoint.asset_id)).then(
+      () => {
+        if (onDelete) {
+          onDelete(endpoint.asset_id);
+        }
+      },
+    );
     setDeletion(false);
   };
 
