@@ -2,26 +2,18 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.helper.InjectStatisticsHelper;
-import io.openbas.helper.MonoIdDeserializer;
-import io.openbas.helper.MultiIdDeserializer;
-import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-import static io.openbas.database.model.Grant.GRANT_TYPE.OBSERVER;
-import static io.openbas.database.model.Grant.GRANT_TYPE.PLANNER;
-import static io.openbas.helper.UserHelper.getUsersByType;
 import static java.time.Instant.now;
-import static java.util.Optional.ofNullable;
 
 @Setter
 @Entity
@@ -49,17 +41,6 @@ public class Injector implements Base {
     private String type;
 
     @Getter
-    @Column(name = "injector_contracts")
-    @JsonProperty("injector_contracts")
-    @NotBlank
-    private String contracts;
-
-    @Getter
-    @Column(name = "injector_state")
-    @JsonProperty("injector_state")
-    private String state;
-
-    @Getter
     @Column(name = "injector_created_at")
     @JsonProperty("injector_created_at")
     private Instant createdAt = now();
@@ -69,6 +50,10 @@ public class Injector implements Base {
     @JsonProperty("injector_updated_at")
     private Instant updatedAt = now();
 
+    @Getter
+    @OneToMany(mappedBy = "injector", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<InjectorContract> contracts = new ArrayList<>();
 
     @JsonIgnore
     @Override

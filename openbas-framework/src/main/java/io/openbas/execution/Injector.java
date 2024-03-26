@@ -13,7 +13,6 @@ import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
-import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ChallengeExpectation;
@@ -44,12 +43,6 @@ public abstract class Injector {
     private DocumentRepository documentRepository;
     private InjectStatusRepository injectStatusRepository;
     private InjectExpectationRepository injectExpectationRepository;
-    private InjectRepository injectRepository;
-
-    @Autowired
-    public void setInjectRepository(InjectRepository injectRepository) {
-        this.injectRepository = injectRepository;
-    }
 
     @Autowired
     public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {

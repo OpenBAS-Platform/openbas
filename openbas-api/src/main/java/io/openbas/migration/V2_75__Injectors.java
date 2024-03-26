@@ -22,7 +22,6 @@ public class V2_75__Injectors extends BaseJavaMigration {
             injector_updated_at timestamp not null default now(),
             injector_name varchar(255) not null,
             injector_type varchar(255) not null,
-            injector_state text,
             injector_contracts text not null
           );
           CREATE INDEX idx_injectors on injectors (injector_id);

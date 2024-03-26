@@ -3,6 +3,8 @@ package io.openbas.rest.injector.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.List;
+
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 public class InjectorCreateInput {
@@ -19,9 +21,8 @@ public class InjectorCreateInput {
     @JsonProperty("injector_type")
     private String type;
 
-    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("injector_contracts")
-    private String contracts;
+    private List<InjectorContractInput> contracts;
 
     public String getId() {
         return id;
@@ -47,11 +48,11 @@ public class InjectorCreateInput {
         this.name = name;
     }
 
-    public String getContracts() {
+    public List<InjectorContractInput> getContracts() {
         return contracts;
     }
 
-    public void setContracts(String contracts) {
+    public void setContracts(List<InjectorContractInput> contracts) {
         this.contracts = contracts;
     }
 }

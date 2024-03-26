@@ -6,7 +6,7 @@ public abstract class Contractor {
 
     protected abstract boolean isExpose();
 
-    protected abstract String getType();
+    public abstract String getType();
 
     public abstract ContractConfig getConfig();
 

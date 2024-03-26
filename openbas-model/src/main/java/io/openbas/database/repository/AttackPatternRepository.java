@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,6 +16,8 @@ public interface AttackPatternRepository extends CrudRepository<AttackPattern, S
   Optional<AttackPattern> findById(@NotNull String id);
 
   Optional<AttackPattern> findByExternalId(@NotNull String externalId);
+
+  List<AttackPattern> findAllByExternalIdInIgnoreCase(List<String> externalIds);
 
   Optional<AttackPattern> findByStixId(@NotNull String stixId);
 }

@@ -5,8 +5,6 @@ import io.openbas.asset.AssetService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.contract.Contract;
-import io.openbas.contract.ContractService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
@@ -35,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +52,7 @@ public class InjectApi extends RestBehavior {
   private static final int MAX_NEXT_INJECTS = 6;
 
   private Executor executor;
-  private InjectorRepository injectorRepository;
+  private InjectorContractRepository injectorContractRepository;
   private CommunicationRepository communicationRepository;
   private ExerciseRepository exerciseRepository;
   private UserRepository userRepository;
@@ -66,7 +63,6 @@ public class InjectApi extends RestBehavior {
   private AssetGroupService assetGroupService;
   private TagRepository tagRepository;
   private DocumentRepository documentRepository;
-  private ContractService contractService;
   private ExecutionContextService executionContextService;
   private ScenarioService scenarioService;
 
@@ -79,8 +75,8 @@ public class InjectApi extends RestBehavior {
   }
 
   @Autowired
-  public void setInjectorRepository(InjectorRepository injectorRepository) {
-    this.injectorRepository = injectorRepository;
+  public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
+    this.injectorContractRepository = injectorContractRepository;
   }
 
   @Autowired
@@ -140,32 +136,20 @@ public class InjectApi extends RestBehavior {
   }
 
   @Autowired
-  public void setContractService(ContractService contractService) {
-    this.contractService = contractService;
-  }
-
-  @Autowired
   public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
     this.executionContextService = executionContextService;
   }
 
   @GetMapping("/api/inject_types")
   public Collection<JsonNode> injectTypes() {
-    Collection<Contract> contractCollection = contractService.getContracts().values();
-    List<JsonNode> builtInContracts = contractCollection
-            .stream().map(contract -> mapper.convertValue(contract, JsonNode.class)).toList();
-    List<JsonNode> contracts = new ArrayList<>(builtInContracts);
-    fromIterable(injectorRepository.findAll()).forEach(injector -> {
-        try {
-            JsonNode arrNode = mapper.readTree(injector.getContracts());
-            for (final JsonNode objNode : arrNode) {
-              contracts.add(objNode);
-            }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    });
-    return contracts;
+      return fromIterable(injectorContractRepository.findAll()).stream()
+              .map(contract -> {
+                  try {
+                      return mapper.readTree(contract.getContent());
+                  } catch (JsonProcessingException e) {
+                      throw new RuntimeException(e);
+                  }
+              }).toList();
   }
 
   @Secured(ROLE_ADMIN)

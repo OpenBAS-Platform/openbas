@@ -39,44 +39,9 @@ public class ContractService {
         this.baseContracts = baseContracts;
     }
 
-    // Build the contracts every minute
-    @Scheduled(fixedDelay = 60000, initialDelay = 0)
-    public void buildContracts() {
-        this.baseContracts.stream().parallel().forEach(helper -> {
-            try {
-                Map<String, Contract> contractInstances = helper.contracts()
-                        .stream()
-                        .filter(Objects::nonNull)
-                        .distinct()
-                        .collect(Collectors.toMap(Contract::getId, Function.identity()));
-                this.contracts.putAll(contractInstances);
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            }
-        });
-    }
-
     public Contract contract(@NotNull final String contractId) {
         return this.contracts.get(contractId);
     }
-
-    public List<ContractConfig> getContractConfigs() {
-        return this.contracts.values()
-                .stream()
-                .map(Contract::getConfig)
-                .distinct()
-                .toList();
-    }
-
-    public String getContractType(@NotNull final String contractId) {
-        Contract contractInstance = this.contracts.get(contractId);
-        return contractInstance != null ? contractInstance.getConfig().getType() : null;
-    }
-
-    public Contract resolveContract(Inject inject) {
-        return this.contracts.get(inject.getContract());
-    }
-
 
     /**
      * Retrieves a paginated list of contracts.
