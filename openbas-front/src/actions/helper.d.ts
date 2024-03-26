@@ -1,4 +1,4 @@
-import type { Challenge, Exercise, Organization, PlatformSettings, Tag, User } from '../utils/api-types';
+import type { Challenge, Contract, Exercise, Organization, PlatformSettings, Tag, User } from '../utils/api-types';
 import type { ScenarioStore } from './scenarios/Scenario';
 
 export interface UsersHelper {
