@@ -328,7 +328,7 @@ export const storeHelper = (state) => ({
   getTagsMap: () => maps('tags', state),
   // injects
   getInject: (id) => entity(id, 'injects', state),
-  getAtomicInjects: () => entities('injects', state),
+  getAtomicTestings: () => entities('injects', state),
   getInjectsMap: () => maps('injects', state),
   getInjectTypes: () => entities('inject_types', state),
   getInjectTypesMap: () => maps('inject_types', state),

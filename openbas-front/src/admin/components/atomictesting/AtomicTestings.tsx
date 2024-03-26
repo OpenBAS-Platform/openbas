@@ -3,6 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { CSVLink } from 'react-csv';
 import { Chip, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import { FileDownloadOutlined, MovieFilterOutlined } from '@mui/icons-material';
+import R from 'ramda';
 import { useAppDispatch } from '../../../utils/hooks';
 import { useFormatter } from '../../../components/i18n';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
@@ -10,7 +11,7 @@ import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import type { InjectHelper } from '../../../actions/injects/inject-helper';
 import type { InjectStore } from '../../../actions/injects/Inject';
-import { fetchAtomicInjects } from '../../../actions/Inject';
+import { fetchAtomicTestings } from '../../../actions/Inject';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
@@ -128,7 +129,8 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
 };
 
-const AtomicTestings: React.FC = () => {
+// eslint-disable-next-line consistent-return
+const AtomicTestings = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -137,10 +139,10 @@ const AtomicTestings: React.FC = () => {
   // Filter and sort hook
   const filtering = useSearchAnFilter('injects', 'title', ['title']);
   const { injects, tagsMap } = useHelper((helper: InjectHelper & TagsHelper) => ({
-    injects: helper.getAtomicInjects(),
+    injects: helper.getAtomicTestings(),
     tagsMap: helper.getTagsMap(),
   }));
-  const { injectTypesMap, injectTypesWithNoTeams } = useHelper((helper) => {
+  const { injectTypesMap, injectTypesWithNoTeams } = useHelper((helper: any) => {
     return {
       injectTypesMap: helper.getInjectTypesMap(),
       injectTypesWithNoTeams: helper.getInjectTypesWithNoTeams(),
@@ -151,7 +153,7 @@ const AtomicTestings: React.FC = () => {
   const types = injectTypes.map((type: any) => type.config.type);
 
   useDataLoader(() => {
-    dispatch(fetchAtomicInjects());
+    dispatch(fetchAtomicTestings());
   });
 
   // Headers
@@ -189,180 +191,184 @@ const AtomicTestings: React.FC = () => {
   ];
   const sortedAtomicTestings: InjectStore[] = filtering.filterAndSort(injects);
   // Fetching data
-  return (
-    <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]} />
-      <div className={classes.parameters}>
-        <div className={classes.filters}>
-          <SearchFilter
-            small
-            onChange={filtering.handleSearch}
-            keyword={filtering.keyword}
-          />
-          <TagsFilter
-            onAddTag={filtering.handleAddTag}
-            onRemoveTag={filtering.handleRemoveTag}
-            currentTags={filtering.tags}
-          />
+  if (injects && !R.isEmpty(injectTypesMap)) {
+    return (
+      <>
+        <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]} />
+        <div className={classes.parameters}>
+          <div className={classes.filters}>
+            <SearchFilter
+              small
+              onChange={filtering.handleSearch}
+              keyword={filtering.keyword}
+            />
+            <TagsFilter
+              onAddTag={filtering.handleAddTag}
+              onRemoveTag={filtering.handleRemoveTag}
+              currentTags={filtering.tags}
+            />
+          </div>
+          <div className={classes.downloadButton}>
+            {sortedAtomicTestings.length > 0 ? (
+              <CSVLink
+                data={exportData(
+                  'atomic-testing',
+                  fields.map((field) => field.name),
+                  sortedAtomicTestings,
+                )}
+                filename={'AtomicTestings.csv'}
+              >
+                <Tooltip title={t('Export this list')}>
+                  <IconButton size="large">
+                    <FileDownloadOutlined color="primary" />
+                  </IconButton>
+                </Tooltip>
+              </CSVLink>
+            ) : (
+              <IconButton size="large" disabled>
+                <FileDownloadOutlined />
+              </IconButton>
+            )}
+          </div>
         </div>
-        <div className={classes.downloadButton}>
-          {sortedAtomicTestings.length > 0 ? (
-            <CSVLink
-              data={exportData(
-                'atomic-testing',
-                fields.map((field) => field.name),
-                sortedAtomicTestings,
-              )}
-              filename={'AtomicTestings.csv'}
-            >
-              <Tooltip title={t('Export this list')}>
-                <IconButton size="large">
-                  <FileDownloadOutlined color="primary" />
-                </IconButton>
-              </Tooltip>
-            </CSVLink>
-          ) : (
-            <IconButton size="large" disabled>
-              <FileDownloadOutlined />
-            </IconButton>
-          )}
-        </div>
-      </div>
-      <List>
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-        >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
+        <List>
+          <ListItem
+            classes={{ root: classes.itemHead }}
+            divider={false}
+            style={{ paddingTop: 0 }}
+          >
+            <ListItemIcon>
+              <span
+                style={{
+                  padding: '0 8px 0 8px',
+                  fontWeight: 700,
+                  fontSize: 12,
+                }}
+              >
               &nbsp;
-            </span>
-          </ListItemIcon>
-          <ListItemText
-            primary={
-              <>
-                {fields.map((header) => (
-                  <div key={header.name}>
-                    {
-                      filtering.buildHeader(
-                        header.name,
-                        header.label,
-                        header.isSortable,
-                        inlineStylesHeaders,
-                      )
-                    }
-                  </div>
-                ))
-                }
-              </>
-            }
-          />
-        </ListItem>
-        {sortedAtomicTestings.map((atomicTesting) => {
-          const injectContract = injectTypesMap[atomicTesting.inject_contract];
-          const injectTypeName = tPick(injectContract?.label);
-          const isDisabled = disabledTypes.includes(atomicTesting.inject_type)
-            || !types.includes(atomicTesting.inject_type);
-          const isNoTeam = injectTypesWithNoTeams.includes(
-            atomicTesting.inject_type,
-          );
-          let injectStatus = atomicTesting.inject_enabled
-            ? t('Enabled')
-            : t('Disabled');
-          if (atomicTesting.inject_content === null) {
-            injectStatus = t('To fill');
-          }
-          return (
-            <ListItem
-              key={atomicTesting.inject_id}
-              classes={{ root: classes.item }}
-              divider={true}
-              button={true}
-              disabled={
-                !injectContract || isDisabled || !atomicTesting.inject_enabled
+              </span>
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <>
+                  {fields.map((header) => (
+                    <div key={header.name}>
+                      {
+                        filtering.buildHeader(
+                          header.name,
+                          header.label,
+                          header.isSortable,
+                          inlineStylesHeaders,
+                        )
+                      }
+                    </div>
+                  ))
+                  }
+                </>
               }
-              onClick={() => setSelectedAtomicTesting(atomicTesting.inject_id)}
-            >
-              <ListItemIcon style={{ paddingTop: 5 }}>
-                <InjectIcon
-                  tooltip={t(atomicTesting.inject_type)}
-                  config={injectContract?.config}
-                  type={atomicTesting.inject_type}
-                  disabled={
-                    !injectContract || isDisabled || !atomicTesting.inject_enabled
+            />
+          </ListItem>
+          {sortedAtomicTestings.map((atomicTesting) => {
+            // @ts-expect-error will be corrected
+            const injectContract = injectTypesMap[atomicTesting.inject_contract];
+            const injectTypeName = tPick(injectContract?.label);
+            const isDisabled = disabledTypes.includes(atomicTesting.inject_type)
+              || !types.includes(atomicTesting.inject_type);
+            const isNoTeam = injectTypesWithNoTeams.includes(
+              atomicTesting.inject_type,
+            );
+            let injectStatus = atomicTesting.inject_enabled
+              ? t('Enabled')
+              : t('Disabled');
+            if (atomicTesting.inject_content === null) {
+              injectStatus = t('To fill');
+            }
+            return (
+              <ListItem
+                key={atomicTesting.inject_id}
+                classes={{ root: classes.item }}
+                divider={true}
+                button={true}
+                disabled={
+                  !injectContract || isDisabled || !atomicTesting.inject_enabled
+                }
+                onClick={() => setSelectedAtomicTesting(atomicTesting.inject_id)}
+              >
+                <ListItemIcon style={{ paddingTop: 5 }}>
+                  <InjectIcon
+                    tooltip={t(atomicTesting.inject_type)}
+                    // @ts-expect-error will be corrected
+                    config={injectContract?.config}
+                    type={atomicTesting.inject_type}
+                    disabled={
+                      !injectContract || isDisabled || !atomicTesting.inject_enabled
+                    }
+                  />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.inject_type}
+                      >
+                        <InjectType
+                          variant="list"
+                          config={injectContract?.config}
+                          label={injectTypeName}
+                        />
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.inject_title}
+                      >
+                        {atomicTesting.inject_title}
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.inject_users_number}
+                      >
+                        {isNoTeam ? t('N/A') : atomicTesting.inject_users_number}
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.inject_enabled}
+                      >
+                        <ItemBoolean
+                          status={
+                            atomicTesting.inject_content === null
+                              ? false
+                              : atomicTesting.inject_enabled
+                          }
+                          label={injectStatus}
+                          variant="inList"
+                        />
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.inject_tags}
+                      >
+                        <ItemTags variant="list" tags={atomicTesting.inject_tags} />
+                      </div>
+                    </>
                   }
                 />
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_type}
-                    >
-                      <InjectType
-                        variant="list"
-                        config={injectContract?.config}
-                        label={injectTypeName}
-                      />
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_title}
-                    >
-                      {atomicTesting.inject_title}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_users_number}
-                    >
-                      {isNoTeam ? t('N/A') : atomicTesting.inject_users_number}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_enabled}
-                    >
-                      <ItemBoolean
-                        status={
-                          atomicTesting.inject_content === null
-                            ? false
-                            : atomicTesting.inject_enabled
-                        }
-                        label={injectStatus}
-                        variant="inList"
-                      />
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_tags}
-                    >
-                      <ItemTags variant="list" tags={atomicTesting.inject_tags} />
-                    </div>
-                  </>
-                }
-              />
-              <ListItemSecondaryAction>
-                <InjectPopover
-                  inject={atomicTesting}
-                  injectTypesMap={injectTypesMap}
-                  tagsMap={tagsMap}
-                  setSelectedInject={setSelectedAtomicTesting}
-                  isDisabled={!injectContract || isDisabled}
-                />
-              </ListItemSecondaryAction>
-            </ListItem>
-          );
-        })}
-      </List>
-    </>
-  );
+                <ListItemSecondaryAction>
+                  <InjectPopover
+                    inject={atomicTesting}
+                    injectTypesMap={injectTypesMap}
+                    tagsMap={tagsMap}
+                    setSelectedInject={setSelectedAtomicTesting}
+                    isDisabled={!injectContract || isDisabled}
+                  />
+                </ListItemSecondaryAction>
+              </ListItem>
+            );
+          })}
+        </List>
+      </>
+    );
+  }
 };
 
 export default AtomicTestings;
