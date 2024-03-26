@@ -18,6 +18,8 @@ import lombok.extern.java.Log;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -277,12 +279,16 @@ public class Inject implements Base, Injection {
       return Optional.empty();
     }
 
-    if (this.getExercise().getStatus().equals(Exercise.STATUS.CANCELED)) {
-      return Optional.empty();
+    if (this.getExercise() != null) {
+      if (this.getExercise().getStatus().equals(Exercise.STATUS.CANCELED)) {
+        return Optional.empty();
+      }
+      return this.getExercise()
+          .getStart()
+          .map(source -> computeInjectDate(source, SPEED_STANDARD));
+    } else {
+      return Optional.ofNullable(LocalDateTime.now().toInstant(ZoneOffset.UTC));
     }
-    return this.getExercise()
-        .getStart()
-        .map(source -> computeInjectDate(source, SPEED_STANDARD));
   }
 
   @JsonIgnore

@@ -1,8 +1,8 @@
 import React, { CSSProperties, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { CSVLink } from 'react-csv';
-import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
-import { FileDownloadOutlined } from '@mui/icons-material';
+import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { FileDownloadOutlined, MovieFilterOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import { useAppDispatch } from '../../../utils/hooks';
 import { useFormatter } from '../../../components/i18n';
@@ -30,6 +30,15 @@ const useStyles = makeStyles(() => ({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  bodyItem: {
+    height: 20,
+    fontSize: 13,
+    float: 'left',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    paddingRight: 10,
+  },
   filters: {
     display: 'flex',
     gap: '10px',
@@ -45,10 +54,6 @@ const useStyles = makeStyles(() => ({
   },
   downloadButton: {
     marginRight: 15,
-  },
-  bodyItem: {
-    height: '100%',
-    fontSize: 13,
   },
 }));
 
@@ -124,7 +129,7 @@ const AtomicTestings = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const { t, tPick } = useFormatter();
+  const { t, tPick, fldt } = useFormatter();
   const [selectedAtomicTesting, setSelectedAtomicTesting] = useState<string | undefined>(undefined);
   // Filter and sort hook
   const filtering = useSearchAnFilter('injects', 'title', ['title']);
@@ -158,13 +163,13 @@ const AtomicTestings = () => {
       name: 'inject_type',
       label: 'Type',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => atomicTesting.inject_type,
+      value: (atomicTesting: InjectStore) => atomicTesting.inject_type, // check chip
     },
     {
       name: 'inject_date',
       label: 'Date',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => atomicTesting.inject_date,
+      value: (atomicTesting: InjectStore) => fldt(atomicTesting.inject_date),
     },
     {
       name: 'inject_players',
@@ -264,35 +269,19 @@ const AtomicTestings = () => {
           />
         </ListItem>
         {sortedAtomicTestings.map((atomicTesting) => {
-          // @ts-expect-error will be corrected
           const injectContract = injectTypesMap[atomicTesting.inject_contract];
-          const injectTypeName = tPick(injectContract?.label);
           const isDisabled = disabledTypes.includes(atomicTesting.inject_type)
             || !types.includes(atomicTesting.inject_type);
-          const isNoTeam = injectTypesWithNoTeams.includes(
-            atomicTesting.inject_type,
-          );
-          let injectStatus = atomicTesting.inject_enabled
-            ? t('Enabled')
-            : t('Disabled');
-          if (atomicTesting.inject_content === null) {
-            injectStatus = t('To fill');
-          }
           return (
-            <ListItem
+            <ListItemButton
               key={atomicTesting.inject_id}
               classes={{ root: classes.item }}
-              divider={true}
-              button={true}
-              disabled={
-                !injectContract || isDisabled || !atomicTesting.inject_enabled
-              }
+              divider
               onClick={() => setSelectedAtomicTesting(atomicTesting.inject_id)}
             >
-              <ListItemIcon style={{ paddingTop: 5 }}>
+              <ListItemIcon>
                 <InjectIcon
                   tooltip={t(atomicTesting.inject_type)}
-                  // @ts-expect-error will be corrected
                   config={injectContract?.config}
                   type={atomicTesting.inject_type}
                   disabled={
@@ -303,67 +292,29 @@ const AtomicTestings = () => {
               <ListItemText
                 primary={
                   <>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_title}
-                    >
-                      {atomicTesting.inject_title}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_type}
-                    >
-                      <InjectType
-                        variant="list"
-                        config={injectContract?.config}
-                        label={injectTypeName}
-                      />
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_date}
-                    >
-                      {atomicTesting.inject_date}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_players}
-                    >
-                      {isNoTeam ? t('N/A') : atomicTesting.inject_users_number}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_status}
-                    >
-                      <ItemBoolean
-                        status={
-                          atomicTesting.inject_content === null
-                            ? false
-                            : atomicTesting.inject_enabled
-                        }
-                        label={injectStatus}
-                        variant="inList"
-                      />
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_tags}
-                    >
-                      <ItemTags variant="list" tags={atomicTesting.inject_tags} />
-                    </div>
+                    {fields.map((field) => (
+                      <div
+                        key={field.name}
+                        className={classes.bodyItem}
+                        style={inlineStyles[field.name]}
+                      >
+                        {field.value(atomicTesting)}
+                      </div>
+                    ))}
                   </>
                 }
               />
+
               <ListItemSecondaryAction>
                 <InjectPopover
                   inject={atomicTesting}
-                  injectTypesMap={injectTypesMap}
                   tagsMap={tagsMap}
                   setSelectedInject={setSelectedAtomicTesting}
-                  isDisabled={!injectContract || isDisabled}
+                  isDisabled={false}
                 />
               </ListItemSecondaryAction>
-            </ListItem>
+
+            </ListItemButton>
           );
         })}
       </List>
