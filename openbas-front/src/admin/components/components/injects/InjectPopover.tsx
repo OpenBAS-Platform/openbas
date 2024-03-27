@@ -34,6 +34,7 @@ interface Props {
   tagsMap: Record<string, Tag>;
   setSelectedInject: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;
+  isAtomicTesting: boolean;
 }
 
 const InjectPopover: FunctionComponent<Props> = ({
@@ -42,6 +43,7 @@ const InjectPopover: FunctionComponent<Props> = ({
   tagsMap,
   setSelectedInject,
   isDisabled,
+  isAtomicTesting,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -121,6 +123,10 @@ const InjectPopover: FunctionComponent<Props> = ({
     dispatch(tryInject(inject.inject_id)).then((payload: InjectStatus) => {
       setInjectResult(payload);
       setOpenResult(true);
+
+      if (isAtomicTesting) {
+        onUpdateStatusInject(inject.inject_id, { inject_status: true });
+      }
     });
     handleCloseTry();
   };
