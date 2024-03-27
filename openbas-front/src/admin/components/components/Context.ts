@@ -49,7 +49,6 @@ export type InjectContextType = {
   onUpdateInjectActivation: (injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }) => void,
   onInjectDone?: (injectId: Inject['inject_id']) => void,
   onDeleteInject: (injectId: Inject['inject_id']) => void,
-  onUpdateStatusInject: (injectId: Inject['inject_id'], inject_status: .status_name: boolean }) => void>,
 };
 
 export const PermissionsContext = createContext<PermissionsContextType>({
@@ -112,7 +111,5 @@ export const InjectContext = createContext<InjectContextType>({
   onInjectDone(_injectId: Inject['inject_id']): void {
   },
   onDeleteInject(_injectId: Inject['inject_id']): void {
-  },
-  onUpdateStatusInject(_injectId: Inject['inject_id'], _injectStatus: { inject_status.status_name: boolean })): void {
   },
 });

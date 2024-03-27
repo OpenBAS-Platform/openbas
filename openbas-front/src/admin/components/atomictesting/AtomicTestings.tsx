@@ -20,7 +20,6 @@ import InjectPopover from '../components/injects/InjectPopover';
 import type { TagsHelper } from '../../../actions/helper';
 import InjectIcon from '../components/injects/InjectIcon';
 import InjectType from '../components/injects/InjectType';
-import ItemBoolean from '../../../components/ItemBoolean';
 import type { Contract, Inject, Tag } from '../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
@@ -195,24 +194,7 @@ const AtomicTestings = () => {
       name: 'inject_status',
       label: 'Status',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => {
-        let injectStatus = atomicTesting.inject_status?.status_name
-          ? t('Enabled')
-          : t('Disabled');
-        if (atomicTesting.inject_content === null) {
-          injectStatus = t('To fill');
-        }
-        return (
-          <ItemBoolean
-            status={
-              atomicTesting.inject_content === null
-                ? false
-                : atomicTesting.inject_enabled
-            }
-            label={injectStatus}
-            variant="inList"
-          />);
-      },
+      value: (atomicTesting: InjectStore) => atomicTesting.inject_status?.status_name,
     },
     {
       name: 'inject_tags',
