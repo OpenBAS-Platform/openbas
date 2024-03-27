@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
+import React, { FunctionComponent, useContext, useState } from 'react';
 import * as R from 'ramda';
 import {
   Alert,
@@ -23,14 +23,14 @@ import { splitDuration } from '../../../../utils/Time';
 import { tagOptions } from '../../../../utils/Option';
 import Transition from '../../../../components/common/Transition';
 import type { InjectInput, InjectStore } from '../../../../actions/injects/Inject';
-import { InjectContext, PermissionsContext } from '../Context';
+import { AtomicTestingContext, InjectContext, PermissionsContext } from '../Context';
 import type { Contract, ExecutionTrace, Inject, InjectStatus, Tag } from '../../../../utils/api-types';
 import { tryInject } from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
 
 interface Props {
   inject: InjectStore;
-  injectTypesMap?: Record<string, Contract>;
+  injectTypesMap: Record<string, Contract>;
   tagsMap: Record<string, Tag>;
   setSelectedInject: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;
@@ -49,7 +49,14 @@ const InjectPopover: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
-  const { onUpdateInject, onUpdateInjectTrigger, onUpdateInjectActivation, onInjectDone, onDeleteInject } = useContext(InjectContext);
+  const {
+    onUpdateInject,
+    onUpdateInjectTrigger,
+    onUpdateInjectActivation,
+    onInjectDone,
+    onDeleteInject,
+  } = useContext(InjectContext);
+  const { onUpdateStatusInject } = useContext(AtomicTestingContext);
 
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -81,8 +88,8 @@ const InjectPopover: FunctionComponent<Props> = ({
       R.assoc(
         'inject_depends_duration',
         data.inject_depends_duration_days * 3600 * 24
-        + data.inject_depends_duration_hours * 3600
-        + data.inject_depends_duration_minutes * 60,
+                + data.inject_depends_duration_hours * 3600
+                + data.inject_depends_duration_minutes * 60,
       ),
       R.assoc('inject_contract', data.inject_contract.id),
       R.assoc('inject_tags', R.pluck('id', data.inject_tags)),
@@ -122,13 +129,13 @@ const InjectPopover: FunctionComponent<Props> = ({
     dispatch(tryInject(inject.inject_id)).then((payload: InjectStatus) => {
       setInjectResult(payload);
       setOpenResult(true);
+
+      if (isAtomicTesting) {
+        onUpdateStatusInject?.(inject.inject_id);
+      }
     });
     handleCloseTry();
   };
-
-  useEffect(() => {
-    submitTry();
-  }, [inject]);
 
   const handleOpenEnable = () => {
     setOpenEnable(true);
@@ -212,7 +219,7 @@ const InjectPopover: FunctionComponent<Props> = ({
         size="large"
         disabled={permissions.readOnly}
       >
-        <MoreVert />
+        <MoreVert/>
       </IconButton>
       <Menu
         anchorEl={anchorEl}
@@ -232,28 +239,28 @@ const InjectPopover: FunctionComponent<Props> = ({
           {t('Manage content')}
         </MenuItem>
         {!inject.inject_status && onInjectDone && (
-          <MenuItem
-            onClick={handleOpenDone}
-            disabled={isDisabled}
-          >
-            {t('Mark as done')}
-          </MenuItem>
+        <MenuItem
+          onClick={handleOpenDone}
+          disabled={isDisabled}
+        >
+          {t('Mark as done')}
+        </MenuItem>
         )}
         {inject.inject_type !== 'openbas_manual' && onUpdateInjectTrigger && (
-          <MenuItem
-            onClick={handleOpenTrigger}
-            disabled={isDisabled || permissions.isRunning}
-          >
-            {t('Trigger now')}
-          </MenuItem>
+        <MenuItem
+          onClick={handleOpenTrigger}
+          disabled={isDisabled || permissions.isRunning}
+        >
+          {t('Trigger now')}
+        </MenuItem>
         )}
         {inject.inject_type !== 'openbas_manual' && (
-          <MenuItem
-            onClick={handleOpenTry}
-            disabled={isDisabled}
-          >
-            {t('Try the inject')}
-          </MenuItem>
+        <MenuItem
+          onClick={handleOpenTry}
+          disabled={isDisabled}
+        >
+          {t('Try the inject')}
+        </MenuItem>
         )}
         {inject.inject_enabled ? (
           <MenuItem
@@ -430,44 +437,44 @@ const InjectPopover: FunctionComponent<Props> = ({
             {/* TODO: displayRowCheckbox={false} */}
             <TableBody>
               {injectResult?.status_reporting
-                && Object.entries(injectResult.status_reporting).map(
-                  ([key, value]) => {
-                    if (key === 'execution_traces') {
-                      return (
-                        <TableRow key={key}>
-                          <TableCell>{key}</TableCell>
-                          <TableCell>
-                            {/* TODO: selectable={false} */}
-                            <Table size="small" key={key}>
-                              {/* TODO: displayRowCheckbox={false} */}
-                              <TableBody>
-                                <>
-                                  {value?.map((trace: ExecutionTrace) => (
-                                    <TableRow key={trace.trace_identifier}>
-                                      <TableCell>
-                                        {trace.trace_message}
-                                      </TableCell>
-                                      <TableCell>
-                                        {trace.trace_status}
-                                      </TableCell>
-                                      <TableCell>{trace.trace_time}</TableCell>
-                                    </TableRow>
-                                  ))}
-                                </>
-                              </TableBody>
-                            </Table>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    }
-                    return (
-                      <TableRow key={key}>
-                        <TableCell>{key}</TableCell>
-                        <TableCell>{value}</TableCell>
-                      </TableRow>
-                    );
-                  },
-                )}
+                                && Object.entries(injectResult.status_reporting).map(
+                                  ([key, value]) => {
+                                    if (key === 'execution_traces') {
+                                      return (
+                                        <TableRow key={key}>
+                                          <TableCell>{key}</TableCell>
+                                          <TableCell>
+                                            {/* TODO: selectable={false} */}
+                                            <Table size="small" key={key}>
+                                              {/* TODO: displayRowCheckbox={false} */}
+                                              <TableBody>
+                                                <>
+                                                  {value?.map((trace: ExecutionTrace) => (
+                                                    <TableRow key={trace.trace_identifier}>
+                                                      <TableCell>
+                                                        {trace.trace_message}
+                                                      </TableCell>
+                                                      <TableCell>
+                                                        {trace.trace_status}
+                                                      </TableCell>
+                                                      <TableCell>{trace.trace_time}</TableCell>
+                                                    </TableRow>
+                                                  ))}
+                                                </>
+                                              </TableBody>
+                                            </Table>
+                                          </TableCell>
+                                        </TableRow>
+                                      );
+                                    }
+                                    return (
+                                      <TableRow key={key}>
+                                        <TableCell>{key}</TableCell>
+                                        <TableCell>{value}</TableCell>
+                                      </TableRow>
+                                    );
+                                  },
+                                )}
             </TableBody>
           </Table>
         </DialogContent>

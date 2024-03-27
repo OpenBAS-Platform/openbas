@@ -10,7 +10,7 @@ import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import type { InjectHelper } from '../../../actions/injects/inject-helper';
 import type { InjectStore } from '../../../actions/injects/Inject';
-import { fetchAtomicTestings, fetchInjectTypes } from '../../../actions/Inject';
+import { fetchAtomicTesting, fetchAtomicTestings, fetchInject, fetchInjectTypes } from '../../../actions/Inject';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
@@ -21,6 +21,7 @@ import type { TagsHelper } from '../../../actions/helper';
 import InjectIcon from '../components/injects/InjectIcon';
 import InjectType from '../components/injects/InjectType';
 import type { Contract, Inject, Tag } from '../../../utils/api-types';
+import { AtomicTestingContext, AtomicTestingContextType } from '../components/Context';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -132,7 +133,9 @@ const AtomicTestings = () => {
   const [selectedAtomicTesting, setSelectedAtomicTesting] = useState<string | undefined>(undefined);
 
   // Filter and sort hook
-  const filtering = useSearchAnFilter('injects', 'title', ['title']);
+  const filtering = useSearchAnFilter('inject', 'title', ['title']);
+
+  // Fetching data
   const { injects, tagsMap, injectTypesMap, injectTypesWithNoTeams }: {
     injects: Inject[],
     tagsMap: Record<string, Tag>,
@@ -200,14 +203,21 @@ const AtomicTestings = () => {
       name: 'inject_tags',
       label: 'Tag',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => <ItemTags variant="list" tags={atomicTesting.inject_tags} />,
+      value: (atomicTesting: InjectStore) => <ItemTags variant="list" tags={atomicTesting.inject_tags}/>,
     },
   ];
   const sortedAtomicTestings: InjectStore[] = filtering.filterAndSort(injects);
-  // Fetching data
+
+  // Context
+  const context: AtomicTestingContextType = {
+    onUpdateStatusInject(injectId: Inject['inject_id']): void {
+      return dispatch(fetchAtomicTesting(injectId));
+    },
+  };
+
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]} />
+      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]}/>
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter
@@ -233,98 +243,99 @@ const AtomicTestings = () => {
             >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
-                  <FileDownloadOutlined color="primary" />
+                  <FileDownloadOutlined color="primary"/>
                 </IconButton>
               </Tooltip>
             </CSVLink>
           ) : (
             <IconButton size="large" disabled>
-              <FileDownloadOutlined />
+              <FileDownloadOutlined/>
             </IconButton>
           )}
         </div>
       </div>
-      <List>
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-        >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
+      <AtomicTestingContext.Provider value={context}>
+        <List>
+          <ListItem
+            classes={{ root: classes.itemHead }}
+            divider={false}
+            style={{ paddingTop: 0 }}
+          >
+            <ListItemIcon>
+              <span
+                style={{
+                  padding: '0 8px 0 8px',
+                  fontWeight: 700,
+                  fontSize: 12,
+                }}
+              >
               &nbsp;
-            </span>
-          </ListItemIcon>
-          <ListItemText
-            primary={
-              <>
-                {fields.map((header) => (
-                  <div key={header.name}>
-                    {
-                      filtering.buildHeader(
-                        header.name,
-                        header.label,
-                        header.isSortable,
-                        inlineStylesHeaders,
-                      )
-                    }
-                  </div>
-                ))
-                }
-              </>
-            }
-          />
-        </ListItem>
-        {sortedAtomicTestings.map((atomicTesting) => {
-          return (
-            <ListItemButton
-              key={atomicTesting.inject_id}
-              classes={{ root: classes.item }}
-              divider
-              onClick={() => setSelectedAtomicTesting(atomicTesting.inject_id)}
-            >
-              <ListItemIcon>
-                <InjectIcon
-                  tooltip={t(atomicTesting.inject_type)}
-                  type={atomicTesting.inject_type}
+              </span>
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <>
+                  {fields.map((header) => (
+                    <div key={header.name}>
+                      {
+                                                filtering.buildHeader(
+                                                  header.name,
+                                                  header.label,
+                                                  header.isSortable,
+                                                  inlineStylesHeaders,
+                                                )
+                                            }
+                    </div>
+                  ))
+                                    }
+                </>
+                            }
+            />
+          </ListItem>
+          {sortedAtomicTestings.map((atomicTesting) => {
+            return (
+              <ListItemButton
+                key={atomicTesting.inject_id}
+                classes={{ root: classes.item }}
+                divider
+                onClick={() => setSelectedAtomicTesting(atomicTesting.inject_id)}
+              >
+                <ListItemIcon>
+                  <InjectIcon
+                    tooltip={t(atomicTesting.inject_type)}
+                    type={atomicTesting.inject_type}
+                  />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <>
+                      {fields.map((field) => (
+                        <div
+                          key={field.name}
+                          className={classes.bodyItem}
+                          style={inlineStyles[field.name]}
+                        >
+                          {field.value(atomicTesting)}
+                        </div>
+                      ))}
+                    </>
+                                    }
                 />
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <>
-                    {fields.map((field) => (
-                      <div
-                        key={field.name}
-                        className={classes.bodyItem}
-                        style={inlineStyles[field.name]}
-                      >
-                        {field.value(atomicTesting)}
-                      </div>
-                    ))}
-                  </>
-                }
-              />
-
-              <ListItemSecondaryAction>
-                <InjectPopover
-                  inject={atomicTesting}
-                  tagsMap={tagsMap}
-                  setSelectedInject={setSelectedAtomicTesting}
-                  isDisabled={false}
-                  isAtomicTesting={true}
-                />
-              </ListItemSecondaryAction>
-
-            </ListItemButton>
-          );
-        })}
-      </List>
+                <ListItemSecondaryAction>
+                  <InjectPopover
+                    inject={atomicTesting}
+                    tagsMap={tagsMap}
+                    injectTypesMap={injectTypesMap}
+                    setSelectedInject={setSelectedAtomicTesting}
+                    isDisabled={false}
+                    isAtomicTesting={true}
+                  />
+                </ListItemSecondaryAction>
+              </ListItemButton>
+            );
+          })}
+        </List>
+      </AtomicTestingContext.Provider>
     </>
   );
 };

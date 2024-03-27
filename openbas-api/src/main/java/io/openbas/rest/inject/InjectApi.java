@@ -57,6 +57,7 @@ public class InjectApi extends RestBehavior {
   private ContractService contractService;
   private ExecutionContextService executionContextService;
   private ScenarioService scenarioService;
+  private InjectService injectService;
 
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
@@ -120,6 +121,11 @@ public class InjectApi extends RestBehavior {
   }
 
   @Autowired
+  public void setInjectService(InjectService injectService) {
+    this.injectService = injectService;
+  }
+
+  @Autowired
   public void setContext(ApplicationContext context) {
     this.context = context;
   }
@@ -131,11 +137,6 @@ public class InjectApi extends RestBehavior {
   @GetMapping("/api/inject_types")
   public Collection<Contract> injectTypes() {
     return contractService.getContracts().values();
-  }
-
-  @GetMapping("/api/injects/atomic_testings")
-  public List<Inject> injects() {
-    return injectRepository.findAllAtomicTestings(); //todo add pagination, modify repository extends jpaRepository or add specificationQuery, move into a service layer
   }
 
   @GetMapping("/api/injects/try/{injectId}")
@@ -284,20 +285,7 @@ public class InjectApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject setInjectStatus(@PathVariable String exerciseId, @PathVariable String injectId,
       @Valid @RequestBody InjectUpdateStatusInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    // build status
-    InjectStatus injectStatus = new InjectStatus();
-    injectStatus.setInject(inject);
-    injectStatus.setDate(now());
-    injectStatus.setName(input.getStatus());
-    injectStatus.setExecutionTime(0);
-    Execution execution = new Execution(false);
-    execution.addTrace(traceSuccess(currentUser().getId(), input.getMessage()));
-    execution.stop();
-    injectStatus.setReporting(execution);
-    // Save status for inject
-    inject.setStatus(injectStatus);
-    return injectRepository.save(inject);
+    return injectService.updateInjectStatus(injectId, input);
   }
 
   @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/teams")

@@ -1,6 +1,7 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Inject;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +19,10 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
 
     @NotNull
     Optional<Inject> findById(@NotNull String id);
+
+    @EntityGraph(attributePaths = { "status" })
+    @NotNull
+    Optional<Inject> findWithStatusById(@NotNull String id);
 
     @Query(value = "select i from Inject i where i.exercise.id = :exerciseId")
     List<Inject> findAllForExercise(@Param("exerciseId") String exerciseId);
