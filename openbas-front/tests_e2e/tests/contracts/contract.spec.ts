@@ -32,7 +32,7 @@ test.describe('Contracts', () => {
     const leftMenuPage = new LeftMenuPage(page);
     await leftMenuPage.goToContracts();
 
-    await contractPage.goToPage(2);
+    await contractPage.goToNextPage();
 
     const contractTitles = contractFormPage.getContractTitles();
     await expect(contractTitles).toHaveCount(5);

@@ -43,12 +43,12 @@ const AttackPatternPopover = ({ attackPattern, killChainPhasesMap }) => {
   };
   const attackPatternKillChainPhases = killChainPhasesOptions(attackPattern.attack_pattern_kill_chain_phases, killChainPhasesMap);
   const initialValues = R.pipe(
-    R.assoc('attack_pattern_kill_chain_phases', attackPatternKillChainPhases),
     R.pick([
       'attack_pattern_external_id',
       'attack_pattern_name',
       'attack_pattern_description',
     ]),
+    R.assoc('attack_pattern_kill_chain_phases', attackPatternKillChainPhases),
   )(attackPattern);
   return (
     <>

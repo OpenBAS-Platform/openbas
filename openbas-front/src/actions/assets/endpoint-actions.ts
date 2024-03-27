@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux';
-import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
-import type { Endpoint, EndpointInput } from '../../utils/api-types';
+import { delReferential, getReferential, postReferential, putReferential, simplePostCall } from '../../utils/Action';
+import type { Endpoint, EndpointInput, SearchPaginationInput } from '../../utils/api-types';
 import { arrayOfEndpoints, endpoint } from './asset-schema';
 
 const ENDPOINT_URI = '/api/endpoints';
@@ -24,4 +24,10 @@ export const deleteEndpoint = (assetId: Endpoint['asset_id']) => (dispatch: Disp
 
 export const fetchEndpoints = () => (dispatch: Dispatch) => {
   return getReferential(arrayOfEndpoints, ENDPOINT_URI)(dispatch);
+};
+
+export const searchEndpoints = (searchPaginationInput: SearchPaginationInput) => {
+  const data = searchPaginationInput;
+  const uri = '/api/endpoints/search';
+  return simplePostCall(uri, data);
 };

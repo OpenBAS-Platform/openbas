@@ -74,12 +74,11 @@ class KillChainPhaseField extends Component {
       placeholder,
       userAdmin,
     } = this.props;
-    const killChainPhasesOptions = R.map(
+    const killChainPhasesOptions = killChainPhases.map(
       (n) => ({
         id: n.phase_id,
         label: `[${n.phase_kill_chain_name}] ${n.phase_name}`,
       }),
-      killChainPhases,
     );
     return (
       <>

@@ -3,6 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.annotation.Ipv4OrIpv6Constraint;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
@@ -29,6 +30,7 @@ public class Endpoint extends Asset {
     Darwin,
   }
 
+  @Queryable(filterable = true)
   @NotEmpty
   @Ipv4OrIpv6Constraint
   @Type(StringArrayType.class)
@@ -36,10 +38,12 @@ public class Endpoint extends Asset {
   @JsonProperty("endpoint_ips")
   private String[] ips;
 
+  @Queryable(filterable = true, sortable = true)
   @Column(name = "endpoint_hostname")
   @JsonProperty("endpoint_hostname")
   private String hostname;
 
+  @Queryable(filterable = true, sortable = true)
   @Column(name = "endpoint_platform")
   @JsonProperty("endpoint_platform")
   @Enumerated(EnumType.STRING)

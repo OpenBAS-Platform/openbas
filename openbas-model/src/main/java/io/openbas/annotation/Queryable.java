@@ -1,0 +1,15 @@
+package io.openbas.annotation;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface Queryable {
+  boolean searchable() default false;
+  boolean filterable() default false;
+  boolean sortable() default false;
+  String property() default "";
+}

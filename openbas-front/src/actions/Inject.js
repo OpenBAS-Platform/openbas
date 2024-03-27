@@ -72,9 +72,9 @@ export const executeInject = (exerciseId, values, files) => (dispatch) => {
 
 export const fetchInjectTypes = () => (dispatch) => getReferential(schema.arrayOfInjectTypes, '/api/inject_types')(dispatch);
 
-export const fetchPageOfContracts = (contractSearchInput, page, size) => {
-  const data = contractSearchInput;
-  const uri = `/api/contracts?page=${page}&size=${size}`;
+export const searchContracts = (searchPaginationInput) => {
+  const data = searchPaginationInput;
+  const uri = '/api/contracts/search';
   return simplePostCall(uri, data);
 };
 export const injectDone = (exerciseId, injectId) => (dispatch) => {

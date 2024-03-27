@@ -1,12 +1,15 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { Button, TextField } from '@mui/material';
+import { Button, InputLabel, TextField, Tooltip } from '@mui/material';
 import React, { SyntheticEvent } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { InfoOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import type { AssetGroupInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 import TagField from '../../../../components/field/TagField';
+import FilterField from '../../../../components/common/filter/FilterField';
+import { emptyFilterGroup } from '../../../../components/common/filter/FilterUtils';
 
 interface Props {
   onSubmit: SubmitHandler<AssetGroupInput>;
@@ -23,6 +26,7 @@ const AssetGroupForm: React.FC<Props> = ({
     asset_group_name: '',
     asset_group_description: '',
     asset_group_tags: [],
+    asset_group_dynamic_filter: emptyFilterGroup,
   },
 }) => {
   // Standard hooks
@@ -40,6 +44,7 @@ const AssetGroupForm: React.FC<Props> = ({
         asset_group_name: z.string().min(1, { message: t('Should not be empty') }),
         asset_group_description: z.string().optional(),
         asset_group_tags: z.string().array().optional(),
+        asset_group_dynamic_filter: z.any().optional(),
       }),
     ),
     defaultValues: initialValues,
@@ -86,6 +91,32 @@ const AssetGroupForm: React.FC<Props> = ({
             errors={errors}
             style={{ marginTop: 20 }}
           />
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="asset_group_dynamic_filter"
+        render={({ field: { onChange, value } }) => (
+          <div style={{ marginTop: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'end', gap: 10 }}>
+              <InputLabel id="dynamic-asset-filter">{t('Dynamic asset filter')}</InputLabel>
+              <Tooltip title={t('Filter allowing assets to be added dynamically to this group')}>
+                <InfoOutlined
+                  fontSize="small"
+                  color="primary"
+                  style={{ marginTop: 8 }}
+                />
+              </Tooltip>
+            </div>
+            <FilterField
+              labelId="dynamic-asset-filter"
+              clazz="Endpoint"
+              initialValue={value}
+              onChange={onChange}
+              style={{ marginTop: 20 }}
+            />
+          </div>
         )}
       />
 

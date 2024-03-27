@@ -14,6 +14,7 @@ import AssetGroupForm from './AssetGroupForm';
 import AssetGroupManagement from './AssetGroupManagement';
 import Dialog from '../../../../components/common/Dialog';
 import EndpointsDialogAdding from '../endpoints/EndpointsDialogAdding';
+import { emptyFilterGroup } from '../../../../components/common/filter/FilterUtils';
 
 const useStyles = makeStyles(() => ({
   drawerPaper: {
@@ -45,10 +46,12 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
     asset_group_name,
     asset_group_description,
     asset_group_tags,
+    asset_group_dynamic_filter,
   }) => ({
     asset_group_name,
     asset_group_description: asset_group_description ?? '',
     asset_group_tags: asset_group_tags ?? [],
+    asset_group_dynamic_filter: asset_group_dynamic_filter ?? emptyFilterGroup,
   }))(assetGroup);
 
   // Edition

@@ -1,19 +1,17 @@
 package io.openbas.contract;
 
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,7 +51,7 @@ public class ContractApi extends RestBehavior {
         return map;
     }
 
-    @PostMapping
+    @PostMapping("/search")
     @Operation(
             summary = "Retrieves a paginated list of contracts",
             extensions = {
@@ -69,11 +67,7 @@ public class ContractApi extends RestBehavior {
             @ApiResponse(responseCode = "200", description = "Page of contracts"),
             @ApiResponse(responseCode = "400", description = "Bad parameters")
     })
-    public Page<Contract> searchExposedContracts(@RequestBody ContractSearchInput contractSearchInput,
-                                                 @RequestParam(defaultValue = "0") @Min(0) int page,
-                                                 @RequestParam(defaultValue = "10") @Max(20) int size) {
-
-        Pageable pageable = PageRequest.of(page, size, contractSearchInput.getSort());
-        return contractService.searchContracts(contractSearchInput, pageable);
+    public Page<Contract> searchExposedContracts(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+        return contractService.searchContracts(searchPaginationInput);
     }
 }
