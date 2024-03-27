@@ -9,6 +9,7 @@ import io.openbas.execution.Injector;
 import io.openbas.injects.channel.model.ArticleVariable;
 import io.openbas.injects.channel.model.ChannelContent;
 import io.openbas.injects.email.service.EmailService;
+import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ChannelExpectation;
 import io.openbas.model.expectation.ManualExpectation;
@@ -64,9 +65,7 @@ public class ChannelExecutor extends Injector {
   }
 
   @Override
-  public List<Expectation> process(
-      @NotNull final Execution execution,
-      @NotNull final ExecutableInject injection) {
+  public ExecutionProcess process(@NotNull final Execution execution, @NotNull final ExecutableInject injection) {
     try {
       ChannelContent content = contentConvert(injection, ChannelContent.class);
       List<Article> articles = fromIterable(articleRepository.findAllById(content.getArticles()));
@@ -121,13 +120,13 @@ public class ChannelExecutor extends Injector {
                   .toList()
           );
         }
-        return expectations;
+        return new ExecutionProcess(false, expectations);
       } else {
         throw new UnsupportedOperationException("Unknown contract " + contract);
       }
     } catch (Exception e) {
       execution.addTrace(traceError(e.getMessage()));
     }
-    return List.of();
+    return new ExecutionProcess(false, List.of());
   }
 }

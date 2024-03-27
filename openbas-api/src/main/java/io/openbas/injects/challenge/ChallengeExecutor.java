@@ -9,6 +9,7 @@ import io.openbas.execution.Injector;
 import io.openbas.injects.challenge.model.ChallengeContent;
 import io.openbas.injects.challenge.model.ChallengeVariable;
 import io.openbas.injects.email.service.EmailService;
+import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ChallengeExpectation;
 import jakarta.annotation.Resource;
@@ -57,9 +58,7 @@ public class ChallengeExecutor extends Injector {
     }
 
     @Override
-    public List<Expectation> process(
-        @NotNull final Execution execution,
-        @NotNull final ExecutableInject injection) {
+    public ExecutionProcess process(@NotNull final Execution execution, @NotNull final ExecutableInject injection) {
         try {
             ChallengeContent content = contentConvert(injection, ChallengeContent.class);
             List<Challenge> challenges = fromIterable(challengeRepository.findAllById(content.getChallenges()));
@@ -97,13 +96,13 @@ public class ChallengeExecutor extends Injector {
                 // Return expectations
                 List<Expectation> expectations = new ArrayList<>();
                 challenges.forEach(challenge -> expectations.add(new ChallengeExpectation(challenge.getScore(), challenge)));
-                return expectations;
+                return new ExecutionProcess(false, expectations);
             } else {
                 throw new UnsupportedOperationException("Unknown contract " + contract);
             }
         } catch (Exception e) {
             execution.addTrace(traceError(e.getMessage()));
         }
-        return List.of();
+        return new ExecutionProcess(false, List.of());
     }
 }

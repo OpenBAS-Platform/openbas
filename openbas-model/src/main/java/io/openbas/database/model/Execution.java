@@ -22,6 +22,11 @@ public class Execution {
     private boolean runtime;
 
     @Getter
+    @Setter
+    @JsonProperty("execution_async")
+    private boolean async;
+
+    @Getter
     @JsonProperty("execution_start")
     private Instant startTime;
 

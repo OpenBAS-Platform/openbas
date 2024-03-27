@@ -137,6 +137,11 @@ public class InjectsExecutionJob implements Job {
 
     private void executeInternal(ExecutableInject executableInject) {
         Injection source = executableInject.getInjection();
+        // Initialize the inject status
+        InjectStatus status = new InjectStatus();
+        status.setTrackingSentDate(Instant.now());
+        status.setInject(executableInject.getInjection().getInject());
+        // Execute
         io.openbas.execution.Injector executor = context.getBean(source.getInject().getType(), io.openbas.execution.Injector.class);
         Execution execution = executor.executeInjection(executableInject);
         // After execution, expectations are already created

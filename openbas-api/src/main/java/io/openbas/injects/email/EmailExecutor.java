@@ -7,6 +7,7 @@ import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
 import io.openbas.injects.email.model.EmailContent;
 import io.openbas.injects.email.service.EmailService;
+import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ManualExpectation;
 import jakarta.annotation.Resource;
@@ -58,10 +59,7 @@ public class EmailExecutor extends Injector {
   }
 
   @Override
-  public List<Expectation> process(
-      @NotNull final Execution execution,
-      @NotNull final ExecutableInject injection)
-      throws Exception {
+  public ExecutionProcess process(@NotNull final Execution execution, @NotNull final ExecutableInject injection) throws Exception {
     Inject inject = injection.getInjection().getInject();
     EmailContent content = contentConvert(injection, EmailContent.class);
     List<Document> documents = inject.getDocuments().stream().filter(InjectDocument::isAttached)
@@ -84,12 +82,14 @@ public class EmailExecutor extends Injector {
       case EMAIL_GLOBAL -> sendMulti(execution, users, from, replyTos, inReplyTo, subject, message, attachments);
       default -> sendSingle(execution, users, from, replyTos, inReplyTo, mustBeEncrypted, subject, message, attachments);
     }
-    return content.getExpectations()
-        .stream()
-        .flatMap((entry) -> switch (entry.getType()) {
-          case MANUAL -> Stream.of((Expectation) new ManualExpectation(entry.getScore(), entry.getName(), entry.getDescription()));
-          default -> Stream.of();
-        })
-        .toList();
+    List<Expectation> expectations = content.getExpectations()
+            .stream()
+            .flatMap((entry) -> switch (entry.getType()) {
+              case MANUAL ->
+                      Stream.of((Expectation) new ManualExpectation(entry.getScore(), entry.getName(), entry.getDescription()));
+              default -> Stream.of();
+            })
+            .toList();
+    return new ExecutionProcess(false, expectations);
   }
 }

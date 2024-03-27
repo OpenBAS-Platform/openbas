@@ -5,6 +5,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.Injector;
 import io.openbas.injects.opencti.model.CaseContent;
 import io.openbas.injects.opencti.service.OpenCTIService;
+import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ManualExpectation;
 import jakarta.validation.constraints.NotNull;
@@ -44,10 +45,7 @@ public class OpenCTIExecutor extends Injector {
   }
 
   @Override
-  public List<Expectation> process(
-      @NotNull final Execution execution,
-      @NotNull final ExecutableInject injection)
-      throws Exception {
+  public ExecutionProcess process(@NotNull final Execution execution, @NotNull final ExecutableInject injection) throws Exception {
     Inject inject = injection.getInjection().getInject();
     CaseContent content = contentConvert(injection, CaseContent.class);
     List<Document> documents = inject.getDocuments().stream().filter(InjectDocument::isAttached)
@@ -59,12 +57,14 @@ public class OpenCTIExecutor extends Injector {
       case OPENCTI_CREATE_CASE -> createCase(execution, name, description, attachments);
       default -> createReport(execution, name, description, attachments);
     }
-    return content.getExpectations()
-        .stream()
-        .flatMap((entry) -> switch (entry.getType()) {
-          case MANUAL -> Stream.of((Expectation) new ManualExpectation(entry.getScore(), entry.getName(), entry.getDescription()));
-          default -> Stream.of();
-        })
-        .toList();
+    List<Expectation> expectations = content.getExpectations()
+            .stream()
+            .flatMap((entry) -> switch (entry.getType()) {
+              case MANUAL ->
+                      Stream.of((Expectation) new ManualExpectation(entry.getScore(), entry.getName(), entry.getDescription()));
+              default -> Stream.of();
+            })
+            .toList();
+    return new ExecutionProcess(false, expectations);
   }
 }

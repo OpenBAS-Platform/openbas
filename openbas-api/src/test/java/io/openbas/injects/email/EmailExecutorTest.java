@@ -9,6 +9,7 @@ import io.openbas.database.repository.UserRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.injects.email.model.EmailContent;
+import io.openbas.model.ExecutionProcess;
 import io.openbas.model.inject.form.Expectation;
 import io.openbas.contract.ContractService;
 import io.openbas.execution.ExecutionContextService;
@@ -58,11 +59,11 @@ public class EmailExecutorTest {
     Execution execution = new Execution(executableInject.isRuntime());
 
     // -- EXECUTE --
-    List<io.openbas.model.Expectation> expectations = this.emailExecutor.process(execution, executableInject);
+    ExecutionProcess executionProcess = this.emailExecutor.process(execution, executableInject);
 
     // -- ASSERT --
-    assertNotNull(expectations);
-    assertEquals(10, expectations.get(0).getScore());
+    assertNotNull(executionProcess.getExpectations());
+    assertEquals(10, executionProcess.getExpectations().get(0).getScore());
   }
 
 }

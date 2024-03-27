@@ -157,7 +157,7 @@ public class InjectApi extends RestBehavior {
   public Inject InjectExecutionReception(@PathVariable String injectId, @Valid @RequestBody InjectReceptionInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow();
     InjectStatus injectStatus = inject.getStatus().orElseThrow();
-    injectStatus.setName(ExecutionStatus.PENDING.name());
+    injectStatus.setName(ExecutionStatus.PENDING);
     injectStatus.setTrackingAckDate(Instant.now());
     injectStatus.setTrackingTotalCount(input.getTrackingTotalCount());
     injectStatus.setTrackingTotalSuccess(0);
@@ -188,11 +188,11 @@ public class InjectApi extends RestBehavior {
       injectStatus.setTrackingEndDate(trackingEndDate);
       injectStatus.setTrackingTotalExecutionTime(Duration.between(injectStatus.getTrackingSentDate(), trackingEndDate).getSeconds());
       if (injectStatus.getTrackingTotalError().equals(injectStatus.getTrackingTotalCount())) {
-        injectStatus.setName(ExecutionStatus.ERROR.name());
+        injectStatus.setName(ExecutionStatus.ERROR);
       } else if (injectStatus.getTrackingTotalError() > 0) {
-        injectStatus.setName(ExecutionStatus.PARTIAL.name());
+        injectStatus.setName(ExecutionStatus.PARTIAL);
       } else {
-        injectStatus.setName(ExecutionStatus.SUCCESS.name());
+        injectStatus.setName(ExecutionStatus.SUCCESS);
       }
     }
     return injectRepository.save(inject);
@@ -338,7 +338,7 @@ public class InjectApi extends RestBehavior {
     InjectStatus injectStatus = new InjectStatus();
     injectStatus.setInject(inject);
     injectStatus.setTrackingSentDate(now());
-    injectStatus.setName(input.getStatus());
+    injectStatus.setName(ExecutionStatus.valueOf(input.getStatus()));
     injectStatus.setTrackingTotalExecutionTime(0L);
     // Save status for inject
     inject.setStatus(injectStatus);

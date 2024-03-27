@@ -14,6 +14,7 @@ import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.InjectStatusRepository;
+import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ChallengeExpectation;
 import io.openbas.model.expectation.ChannelExpectation;
@@ -64,7 +65,7 @@ public abstract class Injector {
         this.fileService = fileService;
     }
 
-    public abstract List<Expectation> process(Execution execution, ExecutableInject injection) throws Exception;
+    public abstract ExecutionProcess process(Execution execution, ExecutableInject injection) throws Exception;
 
     private InjectExpectation expectationConverter(
         @NotNull final ExecutableInject executableInject,
@@ -124,13 +125,10 @@ public abstract class Injector {
             if (isScheduledInject && !isInInjectableRange(executableInject.getInjection())) {
                 throw new UnsupportedOperationException("Inject is now too old for execution");
             }
-            // Initialize the inject status
-            InjectStatus status = new InjectStatus();
-            status.setTrackingSentDate(Instant.now());
-            status.setInject(executableInject.getInjection().getInject());
-            injectStatusRepository.save(status);
             // Process the execution
-            List<Expectation> expectations = process(execution, executableInject);
+            ExecutionProcess executionProcess = process(execution, executableInject);
+            execution.setAsync(executionProcess.isAsync());
+            List<Expectation> expectations = executionProcess.getExpectations();
             // Create the expectations
             List<Team> teams = executableInject.getTeams();
             List<Asset> assets = executableInject.getAssets();

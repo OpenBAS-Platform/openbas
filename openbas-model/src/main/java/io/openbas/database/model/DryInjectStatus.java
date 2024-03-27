@@ -79,12 +79,19 @@ public class DryInjectStatus implements Base {
     }
 
     public static DryInjectStatus fromExecution(Execution execution, DryInject executedInject) {
-        DryInjectStatus injectStatus = executedInject.getStatus().orElseThrow();
+        DryInjectStatus injectStatus = new DryInjectStatus();
+        injectStatus.setDryInject(executedInject);
         injectStatus.getTraces().addAll(execution.getTraces());
-        injectStatus.setTrackingTotalError((int)execution.getTraces().stream().filter(ex -> ex.getStatus().equals(ExecutionStatus.ERROR)).count());
-        injectStatus.setTrackingTotalSuccess((int)execution.getTraces().stream().filter(ex -> ex.getStatus().equals(ExecutionStatus.SUCCESS)).count());
-        injectStatus.setTrackingTotalCount(execution.getTraces().size());
+        int numberOfElements = execution.getTraces().size();
+        int numberOfError = (int) execution.getTraces().stream().filter(ex -> ex.getStatus().equals(ExecutionStatus.ERROR)).count();
+        int numberOfSuccess = (int) execution.getTraces().stream().filter(ex -> ex.getStatus().equals(ExecutionStatus.SUCCESS)).count();
+        injectStatus.setTrackingTotalError(numberOfError);
+        injectStatus.setTrackingTotalSuccess(numberOfSuccess);
+        injectStatus.setTrackingTotalCount(numberOfElements);
         injectStatus.setTrackingEndDate(Instant.now());
+        ExecutionStatus globalStatus = numberOfSuccess > 0 ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR;
+        ExecutionStatus finalStatus = numberOfError > 0 && numberOfSuccess > 0 ? ExecutionStatus.PARTIAL : globalStatus;
+        injectStatus.setName(finalStatus);
         injectStatus.setTrackingTotalExecutionTime(Duration.between(injectStatus.getTrackingSentDate(), injectStatus.getTrackingEndDate()).getSeconds());
         return injectStatus;
     }
