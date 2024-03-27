@@ -15,8 +15,8 @@ import java.util.concurrent.TimeoutException;
 
 @Service
 public class QueueService {
-    private static final String ROUTING_KEY = "_push_routing_";
-    private static final String EXCHANGE_KEY = "_amqp.connector.exchange";
+    public static final String ROUTING_KEY = "_push_routing_";
+    public static final String EXCHANGE_KEY = "_amqp.connector.exchange";
 
     @Resource
     protected ObjectMapper mapper;
@@ -29,7 +29,6 @@ public class QueueService {
         factory.setHost(openBASConfig.getRabbitmqHostname());
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
-        String jsonInject = mapper.writeValueAsString(publishedJson);
         String routingKey = openBASConfig.getRabbitmqPrefix() + ROUTING_KEY + injectType;
         String exchangeKey = openBASConfig.getRabbitmqPrefix() + EXCHANGE_KEY;
         channel.basicPublish(exchangeKey, routingKey, null, publishedJson.getBytes());

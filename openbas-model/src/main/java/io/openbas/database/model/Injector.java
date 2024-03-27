@@ -41,6 +41,11 @@ public class Injector implements Base {
     private String type;
 
     @Getter
+    @Column(name = "injector_external")
+    @JsonProperty("injector_external")
+    private boolean external = false;
+
+    @Getter
     @Column(name = "injector_created_at")
     @JsonProperty("injector_created_at")
     private Instant createdAt = now();

@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
@@ -22,6 +24,9 @@ public class InjectorContractInput {
 
     @JsonProperty("contract_labels")
     private Map<String, String> labels;
+
+    @JsonProperty("contract_attack_patterns")
+    private List<String> attackPatterns = new ArrayList<>();
 
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("contract_content")

@@ -4,7 +4,7 @@ import java.util.List;
 
 public abstract class Contractor {
 
-    protected abstract boolean isExpose();
+    public abstract boolean isExpose();
 
     public abstract String getType();
 

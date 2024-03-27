@@ -52,12 +52,17 @@ public class InjectorService {
 
     @Transactional
     public void register(String id, String name, Contractor contractor) throws Exception {
+        if(!contractor.isExpose()) {
+            return;
+        }
+        // TODO upload image to MINIO?
         // We need to support upsert for registration
         Injector injector = injectorRepository.findById(id).orElse(null);
         List<Contract> contracts = contractor.contracts();
         if (injector != null) {
             injector.setId(id);
             injector.setName(name);
+            injector.setExternal(false);
             injector.setType(contractor.getType());
             List<String> existing = new ArrayList<>();
             List<String> toDeletes = new ArrayList<>();

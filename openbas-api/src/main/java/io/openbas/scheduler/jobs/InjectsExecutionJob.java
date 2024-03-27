@@ -130,7 +130,6 @@ public class InjectsExecutionJob implements Job {
             injectStatusRepository.save(status);
             queueService.publish(inject.getType(), jsonInject);
         } catch (Exception e) {
-            e.printStackTrace();
             status.getTraces().add(InjectStatusExecution.traceError(e.getMessage()));
             injectStatusRepository.save(status);
         }
@@ -159,8 +158,8 @@ public class InjectsExecutionJob implements Job {
     public void executeInject(ExecutableInject executableInject) {
         // Depending on injector type (internal or external) execution must be done differently
         Inject inject = executableInject.getInjection().getInject();
-        Optional<Injector> externalInjector = injectorRepository.findByType(inject.getType());
-        if (externalInjector.isPresent()) {
+        Injector externalInjector = injectorRepository.findByType(inject.getType()).orElseThrow();
+        if (externalInjector.isExternal()) {
             executeExternal(executableInject);
         } else {
             executeInternal(executableInject);

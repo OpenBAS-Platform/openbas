@@ -39,7 +39,7 @@ public class ChannelContract extends Contractor {
     public static final String TYPE = "openbas_channel";
 
     @Override
-    protected boolean isExpose() {
+    public boolean isExpose() {
         return true;
     }
 
