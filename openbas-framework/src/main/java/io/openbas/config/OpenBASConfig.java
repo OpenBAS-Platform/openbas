@@ -50,6 +50,21 @@ public class OpenBASConfig {
   @JsonProperty("rabbitmq_hostname")
   private String rabbitmqHostname;
 
+  @JsonProperty("rabbitmq_vhost")
+  private String rabbitmqVhost = "/";
+
+  @JsonProperty("rabbitmq_ssl")
+  private boolean rabbitmqSsl = false;
+
+  @JsonProperty("rabbitmq_ssl")
+  private int rabbitmqPort = 5672;
+
+  @JsonProperty("rabbitmq_user")
+  private String rabbitmqUser = "guest";
+
+  @JsonProperty("rabbitmq_pass")
+  private String rabbitmqPass = "guest";
+
   @JsonProperty("default_reply_to")
   private String defaultReplyTo;
 

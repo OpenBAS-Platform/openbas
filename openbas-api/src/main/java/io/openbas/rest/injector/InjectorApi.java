@@ -14,7 +14,8 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.injector.form.InjectorContractInput;
 import io.openbas.rest.injector.form.InjectorCreateInput;
 import io.openbas.rest.injector.form.InjectorUpdateInput;
-import io.openbas.service.InjectorService;
+import io.openbas.rest.injector.response.InjectorConnection;
+import io.openbas.rest.injector.response.InjectorRegistration;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -128,7 +129,7 @@ public class InjectorApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/injectors")
     @Transactional
-    public Injector registerInjector(@Valid @RequestBody InjectorCreateInput input) {
+    public InjectorRegistration registerInjector(@Valid @RequestBody InjectorCreateInput input) {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(openBASConfig.getRabbitmqHostname());
         try {
@@ -140,11 +141,10 @@ public class InjectorApi extends RestBehavior {
             String exchangeKey = openBASConfig.getRabbitmqPrefix() + EXCHANGE_KEY;
             channel.exchangeDeclare(exchangeKey, "direct", true);
             channel.queueBind(queueName, exchangeKey, routingKey);
-
             // We need to support upsert for registration
             Injector injector = injectorRepository.findById(input.getId()).orElse(null);
             if (injector != null) {
-                return updateInjector(injector, input.getName(), input.getContracts());
+                updateInjector(injector, input.getName(), input.getContracts());
             } else {
                 // save the injector
                 Injector newInjector = new Injector();
@@ -157,9 +157,16 @@ public class InjectorApi extends RestBehavior {
                 List<InjectorContract> injectorContracts = input.getContracts().stream()
                         .map(in -> convertInjectorFromInput(in, savedInjector)).toList();
                 injectorContractRepository.saveAll(injectorContracts);
-                return savedInjector;
             }
-
+            InjectorConnection conn = new InjectorConnection(
+                    openBASConfig.getRabbitmqHostname(),
+                    openBASConfig.getRabbitmqVhost(),
+                    openBASConfig.isRabbitmqSsl(),
+                    openBASConfig.getRabbitmqPort(),
+                    openBASConfig.getRabbitmqUser(),
+                    openBASConfig.getRabbitmqPass()
+            );
+            return new InjectorRegistration(conn, queueName);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
