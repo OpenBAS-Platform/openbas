@@ -3,7 +3,7 @@ import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema';
 import { getReferential, postReferential, putReferential, simpleCall } from '../utils/Action';
 
-export const updateParameters = (data) => (dispatch) => {
+export const updatePlatformParameters = (data) => (dispatch) => {
   return putReferential(
     schema.platformParameters,
     '/api/settings',

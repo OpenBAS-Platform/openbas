@@ -3,7 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { Typography, Grid, Paper, List, ListItem, ListItemText, Switch, TextField } from '@mui/material';
 import ParametersForm from './ParametersForm';
 import { useFormatter } from '../../../components/i18n';
-import { updateParameters, updatePlatformLightParameters, updatePlatformDarkParameters, fetchPlatformParameters } from '../../../actions/Application';
+import { updatePlatformParameters, updatePlatformLightParameters, updatePlatformDarkParameters, fetchPlatformParameters } from '../../../actions/Application';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import ItemBoolean from '../../../components/ItemBoolean';
 import ThemeForm from './ThemeForm';
@@ -61,7 +61,7 @@ const Parameters = () => {
     secondary_color: settings.platform_light_theme?.secondary_color ?? '',
   };
 
-  const onUpdate = (data: SettingsUpdateInput) => dispatch(updateParameters(data));
+  const onUpdate = (data: SettingsUpdateInput) => dispatch(updatePlatformParameters(data));
   const onUpdateLigthParameters = (data: ThemeInput) => dispatch(updatePlatformLightParameters(data));
   const onUpdateDarkParameters = (data: ThemeInput) => dispatch(updatePlatformDarkParameters(data));
   return (
