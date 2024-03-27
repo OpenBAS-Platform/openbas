@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext, useState } from 'react';
+import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
 import * as R from 'ramda';
 import {
   Alert,
@@ -123,13 +123,13 @@ const InjectPopover: FunctionComponent<Props> = ({
     dispatch(tryInject(inject.inject_id)).then((payload: InjectStatus) => {
       setInjectResult(payload);
       setOpenResult(true);
-
-      if (isAtomicTesting) {
-        onUpdateStatusInject(inject.inject_id, { inject_status: true });
-      }
     });
     handleCloseTry();
   };
+
+  useEffect(() => {
+    submitTry();
+  }, [inject]);
 
   const handleOpenEnable = () => {
     setOpenEnable(true);
