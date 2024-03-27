@@ -26,13 +26,13 @@ export const injectStatus = new schema.Entity(
 );
 export const arrayOfInjectStatuses = new schema.Array(injectStatus);
 
-export const parameters = new schema.Entity(
-  'parameters',
+export const platformParameters = new schema.Entity(
+  'platformParameters',
   {},
-  { idAttribute: 'setting_key' },
+  {
+    idAttribute: () => 'parameters',
+  },
 );
-
-export const arrayOfParameters = new schema.Array(parameters);
 
 export const token = new schema.Entity(
   'tokens',
@@ -377,6 +377,9 @@ export const storeHelper = (state) => ({
         ([k, v]) => ({ [k]: v.setting_value }),
       ),
     );
+  },
+  getPlatformSettings: () => {
+    return state.referential.entities.platformParameters.parameters || {};
   },
   // kill chain phases
   getKillChainPhase: (id) => entity(id, 'killchainphases', state),

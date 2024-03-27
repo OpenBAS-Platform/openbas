@@ -59,8 +59,8 @@ const ColorPickerFieldBase = ({
   );
 };
 
-const ColorPickerField = (props) => (
+const DeprecatedColorPickerField = (props) => (
   <Field name={props.name} component={ColorPickerFieldBase} {...props} />
 );
 
-export default ColorPickerField;
+export default DeprecatedColorPickerField;

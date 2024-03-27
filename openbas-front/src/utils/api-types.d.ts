@@ -371,7 +371,7 @@ export interface ContractSearchInput {
   exposedContractsOnly?: boolean;
   /** Label contract */
   label?: string;
-  sort?: SortObject;
+  sort?: SortObject[];
   /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
   sorts?: SortField[];
   /** Text to search within contract attributes such as fields, config.label, and label */
@@ -1119,6 +1119,12 @@ export interface LoginUserInput {
   password: string;
 }
 
+export interface OAuthProvider {
+  provider_login?: string;
+  provider_name?: string;
+  provider_uri?: string;
+}
+
 export interface Objective {
   /** @format date-time */
   objective_created_at?: string;
@@ -1187,7 +1193,7 @@ export interface PageContract {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject;
+  sort?: SortObject[];
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -1202,7 +1208,7 @@ export interface PageableObject {
   /** @format int32 */
   pageSize?: number;
   paged?: boolean;
-  sort?: SortObject;
+  sort?: SortObject[];
   unpaged?: boolean;
 }
 
@@ -1216,9 +1222,24 @@ export interface Pause {
   updateAttributes?: object;
 }
 
-export interface PlatformSetting {
-  setting_key?: string;
-  setting_value?: object;
+export interface PlatformSettings {
+  auth_saml2_enable?: boolean;
+  platform_saml2_providers?: OAuthProvider[];
+  auth_local_enable?: boolean;
+  auth_openid_enable?: boolean;
+  java_version?: string;
+  map_tile_server_dark?: string;
+  map_tile_server_light?: string;
+  platform_dark_theme?: ThemeInput;
+  platform_lang?: string;
+  platform_light_theme?: ThemeInput;
+  platform_name?: string;
+  platform_openid_providers?: OAuthProvider[];
+  platform_theme?: string;
+  platform_version?: string;
+  postgre_version?: string;
+  xtm_opencti_enable?: boolean;
+  xtm_opencti_url?: string;
 }
 
 export interface PlatformStatistic {
@@ -1324,7 +1345,7 @@ export interface Scenario {
   scenario_injects_statistics?: Record<string, number>;
   scenario_lessons_categories?: LessonsCategory[];
   scenario_mail_from: string;
-  scenario_mail_reply_to?: string[];
+  scenario_mails_reply_to?: string[];
   scenario_message_footer?: string;
   scenario_message_header?: string;
   scenario_name: string;
@@ -1343,8 +1364,8 @@ export interface Scenario {
 }
 
 export interface ScenarioInformationInput {
-  scenario_mails_reply_to?: string[];
   scenario_mail_from: string;
+  scenario_mails_reply_to?: string[];
   scenario_message_footer?: string;
   scenario_message_header?: string;
 }
@@ -1394,9 +1415,11 @@ export interface SortField {
 }
 
 export interface SortObject {
-  empty?: boolean;
-  sorted?: boolean;
-  unsorted?: boolean;
+  ascending?: boolean;
+  direction?: string;
+  ignoreCase?: boolean;
+  nullHandling?: string;
+  property?: string;
 }
 
 export interface StatisticElement {
@@ -1472,6 +1495,18 @@ export interface TeamUpdateInput {
   team_name: string;
   team_organization?: string;
   team_tags?: string[];
+}
+
+export interface ThemeInput {
+  accent_color?: string;
+  background_color?: string;
+  logo_login_url?: string;
+  logo_url?: string;
+  logo_url_collapsed?: string;
+  navigation_color?: string;
+  paper_color?: string;
+  primary_color?: string;
+  secondary_color?: string;
 }
 
 export interface Token {

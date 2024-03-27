@@ -27,7 +27,7 @@ export const entitiesInitializer = Immutable({
     logs: Immutable({}),
     tags: Immutable({}),
     documents: Immutable({}),
-    parameters: Immutable({}),
+    platformParameters: Immutable({}),
     channels: Immutable({}),
     challenges: Immutable({}),
     articles: Immutable({}),

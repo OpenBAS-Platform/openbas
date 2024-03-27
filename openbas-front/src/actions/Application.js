@@ -3,14 +3,30 @@ import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema';
 import { getReferential, postReferential, putReferential, simpleCall } from '../utils/Action';
 
-export const fetchParameters = () => (dispatch) => {
-  return getReferential(schema.arrayOfParameters, '/api/settings')(dispatch);
+export const updatePlatformParameters = (data) => (dispatch) => {
+  return putReferential(
+    schema.platformParameters,
+    '/api/settings',
+    data,
+  )(dispatch);
 };
 
-export const updateParameters = (data) => (dispatch) => {
+export const fetchPlatformParameters = () => (dispatch) => {
+  return getReferential(schema.platformParameters, '/api/settings')(dispatch);
+};
+
+export const updatePlatformLightParameters = (data) => (dispatch) => {
   return putReferential(
-    schema.arrayOfParameters,
-    '/api/settings',
+    schema.platformParameters,
+    '/api/settings/theme/light',
+    data,
+  )(dispatch);
+};
+
+export const updatePlatformDarkParameters = (data) => (dispatch) => {
+  return putReferential(
+    schema.platformParameters,
+    '/api/settings/theme/dark',
     data,
   )(dispatch);
 };

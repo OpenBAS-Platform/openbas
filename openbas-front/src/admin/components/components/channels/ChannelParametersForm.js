@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button, Grid, MenuItem } from '@mui/material';
 import inject18n from '../../../../components/i18n';
-import ColorPickerField from '../../../../components/ColorPickerField';
+import DeprecatedColorPickerField from '../../../../components/DeprecatedColorPickerField';
 import Select from '../../../../components/Select';
 import TextField from '../../../../components/TextField';
 
@@ -50,7 +50,7 @@ class ChannelParametersForm extends Component {
                   label={t('Name')}
                   style={{ marginTop: 20 }}
                 />
-                <ColorPickerField
+                <DeprecatedColorPickerField
                   variant="standard"
                   name="channel_primary_color_dark"
                   fullWidth={true}
@@ -58,7 +58,7 @@ class ChannelParametersForm extends Component {
                   label={t('Primary color (dark)')}
                   style={{ marginTop: 20 }}
                 />
-                <ColorPickerField
+                <DeprecatedColorPickerField
                   variant="standard"
                   name="channel_secondary_color_dark"
                   fullWidth={true}
@@ -93,7 +93,7 @@ class ChannelParametersForm extends Component {
                     {t('logo-title')}
                   </MenuItem>
                 </Select>
-                <ColorPickerField
+                <DeprecatedColorPickerField
                   variant="standard"
                   name="channel_primary_color_light"
                   fullWidth={true}
@@ -101,7 +101,7 @@ class ChannelParametersForm extends Component {
                   label={t('Primary color (light)')}
                   style={{ marginTop: 20 }}
                 />
-                <ColorPickerField
+                <DeprecatedColorPickerField
                   variant="standard"
                   name="channel_secondary_color_light"
                   fullWidth={true}
