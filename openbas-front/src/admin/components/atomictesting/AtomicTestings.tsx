@@ -17,11 +17,11 @@ import TagsFilter from '../../../components/TagsFilter';
 import { exportData } from '../../../utils/Environment';
 import ItemTags from '../../../components/ItemTags';
 import InjectPopover from '../components/injects/InjectPopover';
-import type { InjectTypesHelper, TagsHelper } from '../../../actions/helper';
+import type { TagsHelper } from '../../../actions/helper';
 import InjectIcon from '../components/injects/InjectIcon';
 import InjectType from '../components/injects/InjectType';
 import ItemBoolean from '../../../components/ItemBoolean';
-import { Contract, Inject, Tag } from '../../../utils/api-types';
+import type { Contract, Inject, Tag } from '../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -196,7 +196,7 @@ const AtomicTestings = () => {
       label: 'Status',
       isSortable: true,
       value: (atomicTesting: InjectStore) => {
-        let injectStatus = atomicTesting.inject_enabled
+        let injectStatus = atomicTesting.inject_status?.status_name
           ? t('Enabled')
           : t('Disabled');
         if (atomicTesting.inject_content === null) {
@@ -335,6 +335,7 @@ const AtomicTestings = () => {
                   tagsMap={tagsMap}
                   setSelectedInject={setSelectedAtomicTesting}
                   isDisabled={false}
+                  isAtomicTesting={true}
                 />
               </ListItemSecondaryAction>
 
