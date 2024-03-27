@@ -5,7 +5,7 @@ class ContractApiMock {
   }
 
   async mockContracts() {
-    await this.page.route('*/**/api/contracts*', async (route) => {
+    await this.page.route('*/**/api/contracts/search*', async (route) => {
       if (route.request().method() === 'POST') {
         const json = {
           content: [

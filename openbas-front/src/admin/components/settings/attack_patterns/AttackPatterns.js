@@ -1,26 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { LockPattern } from 'mdi-material-ui';
-import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
-import SearchFilter from '../../../../components/SearchFilter';
+import { searchAttackPatterns } from '../../../../actions/AttackPattern';
 import CreateAttackPattern from './CreateAttackPattern';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
 import AttackPatternPopover from './AttackPatternPopover';
 import TaxonomiesMenu from '../TaxonomiesMenu';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
+import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
+import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+import { initSorting } from '../../../../components/common/pagination/Page';
+import { useFormatter } from '../../../../components/i18n';
 
 const useStyles = makeStyles(() => ({
   container: {
     margin: 0,
     padding: '0 200px 50px 0',
-  },
-  parameters: {
-    float: 'left',
-    marginTop: -10,
   },
   list: {
     marginTop: 10,
@@ -123,34 +121,54 @@ const inlineStyles = {
 };
 
 const AttackPatterns = () => {
+  // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
-  const searchColumns = [
-    'name',
-    'description',
-    'external_id',
-  ];
-  const filtering = useSearchAnFilter('attack_pattern', 'external_id', searchColumns);
-  const { attackPatterns, killChainPhasesMap } = useHelper((helper) => ({
-    attackPatterns: helper.getAttackPatterns(),
+  const { t } = useFormatter();
+
+  const { killChainPhasesMap } = useHelper((helper) => ({
     killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
   useDataLoader(() => {
-    dispatch(fetchAttackPatterns());
     dispatch(fetchKillChainPhases());
   });
+
+  // Headers
+  const headers = [
+    { field: 'kill_chain_phase', label: 'Kill chain phase', isSortable: false },
+    { field: 'attack_pattern_external_id', label: 'External ID', isSortable: true },
+    { field: 'attack_pattern_name', label: 'Name', isSortable: true },
+    { field: 'attack_pattern_created_at', label: 'Created', isSortable: true },
+    { field: 'attack_pattern_updated_at', label: 'Updated', isSortable: true },
+  ];
+
+  const [attackPatterns, setAttackPatterns] = useState([]);
+  const [searchPaginationInput, setSearchPaginationInput] = useState({
+    sorts: initSorting('attack_pattern_name'),
+  });
+
+  // Export
+  const exportProps = {
+    exportType: 'attack_pattern',
+    exportKeys: [
+      'attack_pattern_external_id',
+      'attack_pattern_name',
+      'attack_pattern_created_at',
+      'attack_pattern_updated_at',
+    ],
+    exportData: attackPatterns,
+    exportFileName: `${t('AttackPatterns')}.csv`,
+  };
+
   return (
     <div className={classes.container}>
       <TaxonomiesMenu />
-      <div className={classes.parameters}>
-        <div style={{ float: 'left', marginRight: 10 }}>
-          <SearchFilter
-            variant="small"
-            onChange={filtering.handleSearch}
-            keyword={filtering.keyword}
-          />
-        </div>
-      </div>
+      <PaginationComponent
+        fetch={searchAttackPatterns}
+        searchPaginationInput={searchPaginationInput}
+        setContent={setAttackPatterns}
+        exportProps={exportProps}
+      />
       <div className="clearfix" />
       <List classes={{ root: classes.list }}>
         <ListItem
@@ -171,45 +189,19 @@ const AttackPatterns = () => {
           </ListItemIcon>
           <ListItemText
             primary={
-              <>
-                {filtering.buildHeader(
-                  'kill_chain_phase',
-                  'Kill chain phase',
-                  false,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'attack_pattern_external_id',
-                  'External ID',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'attack_pattern_name',
-                  'Name',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'attack_pattern_created_at',
-                  'Created',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'attack_pattern_updated_at',
-                  'Updated',
-                  true,
-                  headerStyles,
-                )}
-              </>
+              <SortHeadersComponent
+                headers={headers}
+                inlineStylesHeaders={headerStyles}
+                searchPaginationInput={searchPaginationInput}
+                setSearchPaginationInput={setSearchPaginationInput}
+              />
             }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {filtering.filterAndSort(attackPatterns ?? []).map((attackPattern) => (
+        {attackPatterns.map((attackPattern) => (
           <ListItem
-            key={attackPattern.attackPattern_id}
+            key={attackPattern.attack_pattern_id}
             classes={{ root: classes.item }}
             divider={true}
           >

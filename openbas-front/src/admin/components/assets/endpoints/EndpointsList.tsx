@@ -1,5 +1,5 @@
 import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { ComputerOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import SortHeadersList, { Header } from '../../../../components/common/SortHeadersList';
@@ -25,6 +25,13 @@ const useStyles = makeStyles(() => ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
+  typeChip: {
+    height: 20,
+    borderRadius: '0',
+    textTransform: 'uppercase',
+    width: 100,
+    marginBottom: 5,
+  },
 }));
 
 const inlineStylesHeaders: Record<string, CSSProperties> = {
@@ -36,13 +43,19 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
   },
   asset_name: {
     float: 'left',
-    width: '50%',
+    width: '40%',
     fontSize: 12,
     fontWeight: '700',
   },
   asset_tags: {
     float: 'left',
-    width: '50%',
+    width: '40%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  asset_type: {
+    float: 'left',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -50,15 +63,20 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
 
 const inlineStyles: Record<string, CSSProperties> = {
   asset_name: {
-    width: '50%',
+    width: '40%',
   },
   asset_tags: {
-    width: '50%',
+    width: '40%',
+  },
+  asset_type: {
+    width: '20%',
   },
 };
 
+export type EndpointStoreWithType = EndpointStore & { type: string };
+
 interface Props {
-  endpoints: EndpointStore[];
+  endpoints: EndpointStoreWithType[];
   actions: React.ReactElement;
 }
 
@@ -73,6 +91,7 @@ const EndpointsList: FunctionComponent<Props> = ({
   const headers: Header[] = [
     { field: 'asset_name', label: 'Name', isSortable: true },
     { field: 'asset_tags', label: 'Tags', isSortable: true },
+    { field: 'asset_type', label: 'Type', isSortable: false },
   ];
 
   const component = (endpoint: EndpointStore) => {
@@ -141,6 +160,16 @@ const EndpointsList: FunctionComponent<Props> = ({
                     style={inlineStyles.asset_tags}
                   >
                     <ItemTags variant="list" tags={endpoint.asset_tags} />
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.asset_type}
+                  >
+                    <Chip
+                      variant="outlined"
+                      className={classes.typeChip}
+                      label={endpoint.type}
+                    />
                   </div>
                 </>
               }

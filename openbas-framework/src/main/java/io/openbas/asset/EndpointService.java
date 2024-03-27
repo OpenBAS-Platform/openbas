@@ -5,6 +5,7 @@ import io.openbas.database.repository.EndpointRepository;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,10 @@ public class EndpointService {
 
   public List<Endpoint> endpoints() {
     return fromIterable(this.endpointRepository.findAll());
+  }
+
+  public List<Endpoint> endpoints(@NotNull final Specification<Endpoint> specification) {
+    return fromIterable(this.endpointRepository.findAll(specification));
   }
 
   public Endpoint updateEndpoint(@NotNull final Endpoint endpoint) {

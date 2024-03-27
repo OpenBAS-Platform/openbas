@@ -224,7 +224,9 @@ const i18n = {
       Persons: 'Personnes',
       Taxonomies: 'Taxonomies',
       'Attack patterns': "Motifs d'attaque",
+      AttackPatterns: "Motifs-d'attaque",
       'Kill chain phases': 'Phases de kill chain',
+      KillChainPhases: 'Phases-de-kill-chain',
       'This field is mandatory': 'Ce champ est requis',
       'Remove from the context': 'Retirer de ce contexte',
       'Select a file': 'Sélectionner un fichier',
@@ -753,6 +755,8 @@ const i18n = {
       // Asset groups
       'Asset groups': 'Groupe d\'assets',
       AssetGroups: 'Groupe-d-assets',
+      'Dynamic asset filter': 'Filtre d\'actifs dynamique',
+      'Filter allowing assets to be added dynamically to this group': 'Filtre permettant d\'ajouter dynamiquement des actifs à ce groupe',
       'Create a new asset group': 'Créer un nouvel asset group',
       'Update the asset group': 'Modifier l\'asset group',
       'Manage assets': 'Gérer les actifs',
@@ -781,6 +785,15 @@ const i18n = {
         + 'Il peut contenir des espaces ou des tirets ( – ) ou des parenthèses.\n',
       'Instantiate a simulation': 'Créer une nouvelle simulation',
       'Instantiate a simulation from this scenario': 'Créer une nouvelle simulation depuis ce scenario',
+      // -- FILTERS --
+      'Add filter': 'Ajout d\'un filtre',
+      'Clear filters': 'Supprimer les filtres',
+      AND: 'ET',
+      OR: 'OU',
+      // Endpoint
+      endpoint_hostname: 'Nom d\'hôte',
+      endpoint_ips: 'Addresse Ips',
+      endpoint_platform: 'Platforme',
     },
     en: {
       openbas_email: 'Email',
@@ -824,6 +837,11 @@ const i18n = {
       'Ip Address {index}': 'Ip Address {index}',
       phone_number_tooltip: 'Phone number should start with a plus sign ( + )\n'
         + 'It may contain white spaces or hyphens ( – ) or parenthesis.\n',
+      // -- FILTERS --
+      // Endpoint
+      endpoint_hostname: 'Hostname',
+      endpoint_ips: 'Ips address',
+      endpoint_platform: 'Platform',
     },
   },
 };

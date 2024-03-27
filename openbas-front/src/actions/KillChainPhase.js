@@ -1,9 +1,15 @@
 import * as schema from './Schema';
-import { getReferential, putReferential, postReferential, delReferential } from '../utils/Action';
+import { getReferential, putReferential, postReferential, delReferential, simplePostCall } from '../utils/Action';
 
 export const fetchKillChainPhases = () => (dispatch) => {
   const uri = '/api/kill_chain_phases';
   return getReferential(schema.arrayOfKillChainPhases, uri)(dispatch);
+};
+
+export const searchKillChainPhases = (searchPaginationInput) => {
+  const data = searchPaginationInput;
+  const uri = '/api/kill_chain_phases/search';
+  return simplePostCall(uri, data);
 };
 
 export const updateKillChainPhase = (killChainPhaseId, data) => (dispatch) => {

@@ -10,10 +10,6 @@ class ContractPage {
   async goToNextPage() {
     await this.page.getByLabel('Go to next page').click();
   }
-
-  async goToPage(page: number) {
-    await this.page.getByLabel(`page ${page}`).click();
-  }
 }
 
 export default ContractPage;

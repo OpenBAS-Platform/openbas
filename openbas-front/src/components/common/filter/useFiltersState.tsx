@@ -1,0 +1,79 @@
+import { useEffect, useState } from 'react';
+import { emptyFilterGroup } from './FilterUtils';
+import { FilterHelpers } from './FilterHelpers';
+import {
+  handleAddFilterWithEmptyValueUtil,
+  handleAddMultipleValueFilterUtil,
+  handleAddSingleValueFilterUtil,
+  handleChangeOperatorFiltersUtil,
+  handleRemoveFilterUtil,
+  handleSwitchMode,
+} from './filtersManageStateUtils';
+import type { Filter, FilterGroup } from '../../../utils/api-types';
+
+interface useFiltersStateProps {
+  filters: FilterGroup,
+  latestAddFilterId?: string
+}
+
+const useFiltersState = (initFilters: FilterGroup = emptyFilterGroup, onChange?: (value: FilterGroup) => void): [FilterGroup, FilterHelpers] => {
+  const [filtersState, setFiltersState] = useState<useFiltersStateProps>({
+    filters: initFilters,
+  });
+  const helpers: FilterHelpers = {
+    // Switch filter group operator
+    handleSwitchMode: () => {
+      setFiltersState((prevState) => ({
+        ...prevState,
+        filters: handleSwitchMode(prevState.filters),
+      }));
+    },
+    // Add Filter
+    handleAddFilterWithEmptyValue: (filter: Filter) => {
+      setFiltersState((prevState) => ({
+        ...prevState,
+        filters: handleAddFilterWithEmptyValueUtil(prevState.filters, filter),
+      }));
+    },
+    // Add value to a filter
+    handleAddSingleValueFilter: (key: string, value: string) => {
+      setFiltersState((prevState) => ({
+        ...prevState,
+        filters: handleAddSingleValueFilterUtil(prevState.filters, key, value),
+      }));
+    },
+    // Add multiple value to a filter
+    handleAddMultipleValueFilter: (key: string, values: string[]) => {
+      setFiltersState((prevState) => ({
+        ...prevState,
+        filters: handleAddMultipleValueFilterUtil(prevState.filters, key, values),
+      }));
+    },
+    // Change operator in filter
+    handleChangeOperatorFilters: (key: string, operator: Filter['operator']) => {
+      setFiltersState((prevState) => ({
+        ...prevState,
+        filters: handleChangeOperatorFiltersUtil(prevState.filters, key, operator),
+      }));
+    },
+    // Clear all filters
+    handleClearAllFilters: () => {
+      setFiltersState({ filters: emptyFilterGroup });
+    },
+    // Remove a Filter
+    handleRemoveFilterByKey: (key: string) => {
+      setFiltersState((prevState) => ({
+        ...prevState,
+        filters: handleRemoveFilterUtil(prevState.filters, key),
+      }));
+    },
+  };
+
+  useEffect(() => {
+    onChange?.(filtersState.filters);
+  }, [filtersState]);
+
+  return [filtersState.filters, helpers];
+};
+
+export default useFiltersState;

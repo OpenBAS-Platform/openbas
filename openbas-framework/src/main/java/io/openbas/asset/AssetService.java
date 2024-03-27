@@ -25,6 +25,10 @@ public class AssetService {
     return fromIterable(this.assetRepository.findAllById(assetIds));
   }
 
+  public List<Asset> assets() {
+    return fromIterable(this.assetRepository.findAll());
+  }
+
   public List<Asset> assetsFromTypes(@NotNull final List<String> types) {
     return this.assetRepository.findByType(types);
   }

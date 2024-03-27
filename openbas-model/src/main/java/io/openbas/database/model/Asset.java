@@ -3,6 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLHStoreType;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MultiIdDeserializer;
 import jakarta.persistence.*;
@@ -53,6 +54,7 @@ public class Asset implements Base {
   @Type(PostgreSQLHStoreType.class)
   private Map<String, String> blobs = new HashMap<>();
 
+  @Queryable(searchable = true, sortable = true)
   @NotBlank
   @Column(name = "asset_name")
   @JsonProperty("asset_name")
@@ -68,6 +70,7 @@ public class Asset implements Base {
 
   // -- TAG --
 
+  @Queryable(sortable = true)
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "assets_tags",
       joinColumns = @JoinColumn(name = "asset_id"),

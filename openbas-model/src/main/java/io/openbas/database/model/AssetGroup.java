@@ -2,12 +2,15 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.database.model.Filters.FilterGroup;
 import io.openbas.helper.MultiIdDeserializer;
-import lombok.Data;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+import lombok.Getter;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
@@ -15,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.Instant.now;
+import static lombok.AccessLevel.NONE;
 
 @Data
 @Entity
@@ -39,6 +43,13 @@ public class AssetGroup implements Base {
   @JsonProperty("asset_group_description")
   private String description;
 
+  // -- ASSET --
+
+  @Type(JsonType.class)
+  @Column(name = "asset_group_dynamic_filter")
+  @JsonProperty("asset_group_dynamic_filter")
+  private FilterGroup dynamicFilter;
+
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "asset_groups_assets",
       joinColumns = @JoinColumn(name = "asset_group_id"),
@@ -46,6 +57,17 @@ public class AssetGroup implements Base {
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("asset_group_assets")
   private List<Asset> assets = new ArrayList<>();
+
+  @Getter(NONE)
+  @Transient
+  @JsonProperty("asset_group_dynamic_assets")
+  private List<Asset> dynamicAssets = new ArrayList<>();
+
+  // Getter is Mandatory when we use @Transient annotation
+  @JsonSerialize(using = MultiIdDeserializer.class)
+  public List<Asset> getDynamicAssets() {
+    return this.dynamicAssets;
+  }
 
   // -- TAG --
 

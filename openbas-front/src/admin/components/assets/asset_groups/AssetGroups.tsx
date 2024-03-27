@@ -49,11 +49,6 @@ const useStyles = makeStyles(() => ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  drawerPaper: {
-    minHeight: '100vh',
-    width: '50%',
-    padding: 0,
-  },
   downloadButton: {
     marginRight: 15,
   },
@@ -63,6 +58,8 @@ const headerStyles: {
   iconSort: CSSProperties;
   asset_group_name: CSSProperties;
   asset_group_description: CSSProperties;
+  asset_group_assets: CSSProperties;
+  asset_group_dynamic_assets: CSSProperties;
   asset_group_tags: CSSProperties;
 } = {
   iconSort: {
@@ -79,7 +76,19 @@ const headerStyles: {
   },
   asset_group_description: {
     float: 'left',
-    width: '50%',
+    width: '20%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  asset_group_assets: {
+    float: 'left',
+    width: '15%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  asset_group_dynamic_assets: {
+    float: 'left',
+    width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -94,13 +103,21 @@ const headerStyles: {
 const inlineStyles: {
   asset_group_name: CSSProperties;
   asset_group_description: CSSProperties;
+  asset_group_assets: CSSProperties;
+  asset_group_dynamic_assets: CSSProperties;
   asset_group_tags: CSSProperties;
 } = {
   asset_group_name: {
     width: '25%',
   },
   asset_group_description: {
-    width: '50%',
+    width: '20%',
+  },
+  asset_group_assets: {
+    width: '15%',
+  },
+  asset_group_dynamic_assets: {
+    width: '15%',
   },
   asset_group_tags: {
     width: '25%',
@@ -206,6 +223,18 @@ const AssetGroups = () => {
                   headerStyles,
                 )}
                 {filtering.buildHeader(
+                  'asset_group_assets',
+                  'Assets',
+                  false,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'asset_group_dynamic_assets',
+                  'Dynamic assets',
+                  false,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
                   'asset_group_tags',
                   'Tags',
                   true,
@@ -244,6 +273,18 @@ const AssetGroups = () => {
                   </div>
                   <div
                     className={classes.bodyItem}
+                    style={inlineStyles.asset_group_assets}
+                  >
+                    {assetGroup.asset_group_assets?.length ?? 0}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.asset_group_dynamic_assets}
+                  >
+                    {assetGroup.asset_group_dynamic_assets?.length ?? 0}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
                     style={inlineStyles.asset_group_tags}
                   >
                     <ItemTags variant="list" tags={assetGroup.asset_group_tags} />
@@ -263,15 +304,14 @@ const AssetGroups = () => {
         keepMounted={false}
         anchor="right"
         sx={{ zIndex: 1202 }}
-        classes={{ paper: classes.drawerPaper }}
         onClose={() => setSelected(undefined)}
         elevation={1}
       >
         {selected !== undefined && (
-        <AssetGroupManagement
-          assetGroupId={selected.asset_group_id}
-          handleClose={() => setSelected(undefined)}
-        />
+          <AssetGroupManagement
+            assetGroupId={selected.asset_group_id}
+            handleClose={() => setSelected(undefined)}
+          />
         )}
       </MuiDrawer>
     </>
