@@ -6,13 +6,12 @@ export const emptyFilterGroup: FilterGroup = {
   filters: [],
 };
 
-export const buildEmptyFilter = (key: string) => {
+export const buildEmptyFilter = (key: string, operator: Filter['operator']) => {
   return {
     key,
     mode: 'and' as Filter['mode'],
     values: [],
-    // operator: 'eq' as Filter['operator'],
-    operator: null,
+    operator,
   };
 };
 

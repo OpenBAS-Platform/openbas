@@ -2,10 +2,10 @@ import React, { CSSProperties, FunctionComponent, useEffect, useState } from 're
 import { Autocomplete as MuiAutocomplete, IconButton, TextField, Tooltip } from '@mui/material';
 import { FilterListOffOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { buildEmptyFilter, emptyFilterGroup } from './FilterUtils';
+import { availableOperators, buildEmptyFilter, emptyFilterGroup } from './FilterUtils';
 import { useFormatter } from '../../i18n';
 import useFiltersState from './useFiltersState';
-import type { FilterGroup, PropertySchemaDTO } from '../../../utils/api-types';
+import type { Filter, FilterGroup, PropertySchemaDTO } from '../../../utils/api-types';
 import FilterChips from './FilterChips';
 import useFilterableProperties from '../../../utils/hooks/useFilterableProperties';
 import { Option } from '../../../utils/Option';
@@ -16,6 +16,8 @@ const useStyles = makeStyles(() => ({
     gap: 10,
   },
 }));
+
+type OptionPropertySchema = Option & { operator: Filter['operator'] };
 
 interface Props {
   labelId: string;
@@ -39,7 +41,7 @@ const FilterField: FunctionComponent<Props> = ({
   const [filterGroup, helpers] = useFiltersState(initialValue ?? emptyFilterGroup, onChange);
 
   const [properties, setProperties] = useState<PropertySchemaDTO[]>([]);
-  const [options, setOptions] = useState<Option[]>([]);
+  const [options, setOptions] = useState<OptionPropertySchema[]>([]);
   const [inputValue, setInputValue] = React.useState('');
 
   useEffect(() => {
@@ -47,13 +49,13 @@ const FilterField: FunctionComponent<Props> = ({
       const propertySchemas: PropertySchemaDTO[] = result.data;
       setProperties(propertySchemas);
       setOptions(propertySchemas.map((property) => (
-        { id: property.schema_property_name, label: t(property.schema_property_name) } as Option
+        { id: property.schema_property_name, label: t(property.schema_property_name), operator: availableOperators(property)[0] } as OptionPropertySchema
       )));
     });
   }, []);
 
-  const handleChange = (value: string) => {
-    helpers.handleAddFilterWithEmptyValue(buildEmptyFilter(value));
+  const handleChange = (value: string, operator: Filter['operator']) => {
+    helpers.handleAddFilterWithEmptyValue(buildEmptyFilter(value, operator));
   };
   const handleClearFilters = () => {
     helpers.handleClearAllFilters();
@@ -74,7 +76,7 @@ const FilterField: FunctionComponent<Props> = ({
           value={null}
           onChange={(_, selectOptionValue) => {
             if (selectOptionValue) {
-              handleChange(selectOptionValue.id);
+              handleChange(selectOptionValue.id, selectOptionValue.operator);
             }
           }}
           inputValue={inputValue}
