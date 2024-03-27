@@ -371,7 +371,7 @@ export interface ContractSearchInput {
   exposedContractsOnly?: boolean;
   /** Label contract */
   label?: string;
-  sort?: SortObject;
+  sort?: SortObject[];
   /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
   sorts?: SortField[];
   /** Text to search within contract attributes such as fields, config.label, and label */
@@ -592,7 +592,8 @@ export interface Exercise {
   exercise_logo_light?: Document;
   /** @format int64 */
   exercise_logs_number?: number;
-  exercise_mail_from?: string;
+  exercise_mail_from: string;
+  exercise_mails_reply_to?: string[];
   exercise_message_footer?: string;
   exercise_message_header?: string;
   exercise_name: string;
@@ -655,6 +656,7 @@ export interface ExerciseTeamUser {
 export interface ExerciseUpdateInput {
   exercise_description?: string;
   exercise_mail_from?: string;
+  exercise_mails_reply_to?: string[];
   exercise_message_footer?: string;
   exercise_message_header?: string;
   exercise_name: string;
@@ -811,16 +813,22 @@ export interface InjectExpectation {
   inject_expectation_group?: boolean;
   inject_expectation_inject?: Inject;
   inject_expectation_name?: string;
-  inject_expectation_result?: string;
+  inject_expectation_results?: InjectExpectationResult[];
   /** @format int32 */
   inject_expectation_score?: number;
   inject_expectation_team?: Team;
-  inject_expectation_type?: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "TECHNICAL";
+  inject_expectation_type: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: User;
   injectexpectation_id: string;
   updateAttributes?: object;
+}
+
+export interface InjectExpectationResult {
+  result: string;
+  sourceId?: string;
+  sourceName?: string;
 }
 
 export interface InjectInput {
@@ -1185,7 +1193,7 @@ export interface PageContract {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject;
+  sort?: SortObject[];
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -1200,7 +1208,7 @@ export interface PageableObject {
   /** @format int32 */
   pageSize?: number;
   paged?: boolean;
-  sort?: SortObject;
+  sort?: SortObject[];
   unpaged?: boolean;
 }
 
@@ -1212,11 +1220,6 @@ export interface Pause {
   pause_duration?: number;
   pause_exercise?: Exercise;
   updateAttributes?: object;
-}
-
-export interface PlatformSetting {
-  setting_key?: string;
-  setting_value?: object;
 }
 
 export interface PlatformSettings {
@@ -1342,6 +1345,7 @@ export interface Scenario {
   scenario_injects_statistics?: Record<string, number>;
   scenario_lessons_categories?: LessonsCategory[];
   scenario_mail_from: string;
+  scenario_mails_reply_to?: string[];
   scenario_message_footer?: string;
   scenario_message_header?: string;
   scenario_name: string;
@@ -1361,6 +1365,7 @@ export interface Scenario {
 
 export interface ScenarioInformationInput {
   scenario_mail_from: string;
+  scenario_mails_reply_to?: string[];
   scenario_message_footer?: string;
   scenario_message_header?: string;
 }
@@ -1410,9 +1415,11 @@ export interface SortField {
 }
 
 export interface SortObject {
-  empty?: boolean;
-  sorted?: boolean;
-  unsorted?: boolean;
+  ascending?: boolean;
+  direction?: string;
+  ignoreCase?: boolean;
+  nullHandling?: string;
+  property?: string;
 }
 
 export interface StatisticElement {
