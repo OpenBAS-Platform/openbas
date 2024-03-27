@@ -77,6 +77,9 @@ export const postReferential = (schema, uri, data) => (dispatch) => {
       if (error.status === 409) {
         MESSAGING$.notifyError('The element already exists');
       }
+      if (error.status === 500) {
+        MESSAGING$.notifyError('Internal error');
+      }
       return buildError(error);
     });
 };

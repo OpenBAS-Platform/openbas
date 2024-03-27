@@ -51,6 +51,7 @@ const FilterChips: FunctionComponent<Props> = ({
       sx={{
         padding: '12px 4px',
         display: 'flex',
+        flexWrap: 'wrap',
         gap: 1,
       }}
     >

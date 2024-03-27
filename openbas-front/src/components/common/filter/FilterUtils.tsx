@@ -11,7 +11,8 @@ export const buildEmptyFilter = (key: string) => {
     key,
     mode: 'and' as Filter['mode'],
     values: [],
-    operator: 'eq' as Filter['operator'],
+    // operator: 'eq' as Filter['operator'],
+    operator: null,
   };
 };
 

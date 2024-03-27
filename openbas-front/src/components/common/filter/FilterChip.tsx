@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useRef, useState } from 'react';
 import { Chip, Tooltip } from '@mui/material';
 import { FilterHelpers } from './FilterHelpers';
 import FilterChipPopover from './FilterChipPopover';
@@ -20,13 +20,12 @@ const FilterChip: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
 
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | undefined>();
-  const [open, setOpen] = useState(false);
+  const chipRef = useRef<HTMLAnchorElement>(null);
+  const [open, setOpen] = useState(true);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleChipClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+  const handleChipClick = () => {
     handleOpen();
   };
 
@@ -51,6 +50,8 @@ const FilterChip: FunctionComponent<Props> = ({
           label={title()}
           onClick={handleChipClick}
           onDelete={handleRemoveFilter}
+          component="a"
+          ref={chipRef}
         />
       </Tooltip>
       <FilterChipPopover
@@ -58,7 +59,7 @@ const FilterChip: FunctionComponent<Props> = ({
         helpers={helpers}
         open={open}
         onClose={handleClose}
-        anchorEl={anchorEl}
+        anchorEl={chipRef.current || undefined}
         propertySchema={propertySchema}
       />
     </>
