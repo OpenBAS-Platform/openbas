@@ -1,7 +1,7 @@
 package io.openbas.scheduler;
 
+import lombok.RequiredArgsConstructor;
 import org.quartz.Trigger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -10,19 +10,15 @@ import static org.quartz.SimpleScheduleBuilder.repeatMinutelyForever;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 @Component
+@RequiredArgsConstructor
 public class PlatformTriggers {
 
-    private PlatformJobDefinitions platformJobs;
-
-    @Autowired
-    public void setPlatformJobs(PlatformJobDefinitions platformJobs) {
-        this.platformJobs = platformJobs;
-    }
+    private final PlatformJobDefinitions platformJobs;
 
     @Bean
     public Trigger injectsExecutionTrigger() {
         return newTrigger()
-                .forJob(platformJobs.getInjectsExecution())
+                .forJob(this.platformJobs.getInjectsExecution())
                 .withIdentity("InjectsExecutionTrigger")
                 .withSchedule(cronSchedule("0 0/1 * * * ?")) // Every minute align on clock
                 .build();
@@ -31,9 +27,18 @@ public class PlatformTriggers {
     @Bean
     public Trigger comchecksExecutionTrigger() {
         return newTrigger()
-                .forJob(platformJobs.getComchecksExecution())
+                .forJob(this.platformJobs.getComchecksExecution())
                 .withIdentity("ComchecksExecutionTrigger")
                 .withSchedule(repeatMinutelyForever())
                 .build();
+    }
+
+    @Bean
+    public Trigger telemetryExecutionTrigger() {
+        return newTrigger()
+            .forJob(this.platformJobs.getTelemetryExecutionTrigger())
+            .withIdentity("TelemetryExecutionTrigger")
+            .withSchedule(cronSchedule("0 8/20 * * *")) // Twice a day
+            .build();
     }
 }
