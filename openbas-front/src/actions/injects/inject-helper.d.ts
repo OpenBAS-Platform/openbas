@@ -1,4 +1,4 @@
-import type { Exercise, Inject, Scenario } from '../../utils/api-types';
+import type { Contract, Exercise, Inject, Scenario } from '../../utils/api-types';
 
 export interface InjectHelper {
   getExerciseInjects: (exerciseId: Exercise['exercise_id']) => Inject[];
