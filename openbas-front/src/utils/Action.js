@@ -60,6 +60,9 @@ export const putReferential = (schema, uri, data) => (dispatch) => {
     })
     .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });
+      if (error.status === 409) {
+        MESSAGING$.notifyError('The element already exists');
+      }
       return buildError(error);
     });
 };
