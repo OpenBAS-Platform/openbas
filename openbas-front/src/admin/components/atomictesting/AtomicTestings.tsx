@@ -10,7 +10,7 @@ import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import type { InjectHelper } from '../../../actions/injects/inject-helper';
 import type { InjectStore } from '../../../actions/injects/Inject';
-import { fetchAtomicTestings } from '../../../actions/Inject';
+import { fetchAtomicTestings, fetchInjectTypes } from '../../../actions/Inject';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
@@ -19,6 +19,9 @@ import ItemTags from '../../../components/ItemTags';
 import InjectPopover from '../components/injects/InjectPopover';
 import type { InjectTypesHelper, TagsHelper } from '../../../actions/helper';
 import InjectIcon from '../components/injects/InjectIcon';
+import InjectType from '../components/injects/InjectType';
+import ItemBoolean from '../../../components/ItemBoolean';
+import { Contract, Inject, Tag } from '../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -126,17 +129,17 @@ const AtomicTestings = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const { t, fldt } = useFormatter();
+  const { t, fldt, tPick } = useFormatter();
   const [selectedAtomicTesting, setSelectedAtomicTesting] = useState<string | undefined>(undefined);
 
   // Filter and sort hook
   const filtering = useSearchAnFilter('injects', 'title', ['title']);
-  const {
-    injects,
-    tagsMap,
-    injectTypesMap,
-    injectTypesWithNoTeams,
-  } = useHelper((helper: InjectHelper & TagsHelper & InjectTypesHelper) => ({
+  const { injects, tagsMap, injectTypesMap, injectTypesWithNoTeams }: {
+    injects: Inject[],
+    tagsMap: Record<string, Tag>,
+    injectTypesMap: Record<string, Contract>,
+    injectTypesWithNoTeams: (string | undefined)[]
+  } = useHelper((helper: InjectHelper & TagsHelper) => ({
     injects: helper.getAtomicTestings(),
     tagsMap: helper.getTagsMap(),
     injectTypesMap: helper.getInjectTypesMap(),
@@ -149,6 +152,7 @@ const AtomicTestings = () => {
 
   useDataLoader(() => {
     dispatch(fetchAtomicTestings());
+    dispatch(fetchInjectTypes());
   });
 
   // Headers
@@ -163,7 +167,17 @@ const AtomicTestings = () => {
       name: 'inject_type',
       label: 'Type',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => atomicTesting.inject_type, // check chip
+      value: (atomicTesting: InjectStore) => {
+        const injectContract = injectTypesMap[atomicTesting.inject_contract];
+        const injectTypeName = tPick(injectContract?.label);
+        return (
+          <InjectType
+            variant="list"
+            config={injectContract?.config}
+            label={injectTypeName}
+          />
+        );
+      },
     },
     {
       name: 'inject_updated_at',
@@ -181,20 +195,37 @@ const AtomicTestings = () => {
       name: 'inject_status',
       label: 'Status',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => atomicTesting.inject_enabled,
+      value: (atomicTesting: InjectStore) => {
+        let injectStatus = atomicTesting.inject_enabled
+          ? t('Enabled')
+          : t('Disabled');
+        if (atomicTesting.inject_content === null) {
+          injectStatus = t('To fill');
+        }
+        return (
+          <ItemBoolean
+            status={
+              atomicTesting.inject_content === null
+                ? false
+                : atomicTesting.inject_enabled
+            }
+            label={injectStatus}
+            variant="inList"
+          />);
+      },
     },
     {
       name: 'inject_tags',
       label: 'Tag',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => <ItemTags variant="list" tags={atomicTesting.inject_tags}/>,
+      value: (atomicTesting: InjectStore) => <ItemTags variant="list" tags={atomicTesting.inject_tags} />,
     },
   ];
   const sortedAtomicTestings: InjectStore[] = filtering.filterAndSort(injects);
   // Fetching data
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]}/>
+      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]} />
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter
@@ -220,13 +251,13 @@ const AtomicTestings = () => {
             >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
-                  <FileDownloadOutlined color="primary"/>
+                  <FileDownloadOutlined color="primary" />
                 </IconButton>
               </Tooltip>
             </CSVLink>
           ) : (
             <IconButton size="large" disabled>
-              <FileDownloadOutlined/>
+              <FileDownloadOutlined />
             </IconButton>
           )}
         </div>
@@ -254,12 +285,12 @@ const AtomicTestings = () => {
                 {fields.map((header) => (
                   <div key={header.name}>
                     {
-                        filtering.buildHeader(
-                          header.name,
-                          header.label,
-                          header.isSortable,
-                          inlineStylesHeaders,
-                        )
+                      filtering.buildHeader(
+                        header.name,
+                        header.label,
+                        header.isSortable,
+                        inlineStylesHeaders,
+                      )
                     }
                   </div>
                 ))
@@ -269,9 +300,6 @@ const AtomicTestings = () => {
           />
         </ListItem>
         {sortedAtomicTestings.map((atomicTesting) => {
-          const injectContract = injectTypesMap[atomicTesting.inject_contract];
-          const isDisabled = disabledTypes.includes(atomicTesting.inject_type)
-                        || !types.includes(atomicTesting.inject_type);
           return (
             <ListItemButton
               key={atomicTesting.inject_id}
@@ -282,9 +310,7 @@ const AtomicTestings = () => {
               <ListItemIcon>
                 <InjectIcon
                   tooltip={t(atomicTesting.inject_type)}
-                  config={injectContract?.config}
                   type={atomicTesting.inject_type}
-                  disabled={!injectContract || isDisabled || !atomicTesting.inject_enabled}
                 />
               </ListItemIcon>
               <ListItemText
@@ -302,12 +328,13 @@ const AtomicTestings = () => {
                   </>
                 }
               />
+
               <ListItemSecondaryAction>
                 <InjectPopover
                   inject={atomicTesting}
                   tagsMap={tagsMap}
                   setSelectedInject={setSelectedAtomicTesting}
-                  isDisabled={false} // isDisabled
+                  isDisabled={false}
                 />
               </ListItemSecondaryAction>
 

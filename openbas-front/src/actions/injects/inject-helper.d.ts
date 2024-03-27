@@ -4,4 +4,6 @@ export interface InjectHelper {
   getExerciseInjects: (exerciseId: Exercise['exercise_id']) => Inject[];
   getScenarioInjects: (scenarioId: Scenario['scenario_id']) => Inject[];
   getAtomicTestings: () => Inject[];
+  getInjectTypesMap: () => Record<string, Contract>;
+  getInjectTypesWithNoTeams: () => Contract['config']['type'][];
 }
