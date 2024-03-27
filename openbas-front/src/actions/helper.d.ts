@@ -1,4 +1,4 @@
-import type { Challenge, Exercise, Organization, PlatformSetting, Tag, User } from '../utils/api-types';
+import type { Challenge, Exercise, Organization, PlatformSettings, Tag, User } from '../utils/api-types';
 import type { ScenarioStore } from './scenarios/Scenario';
 
 export interface UsersHelper {
@@ -21,7 +21,8 @@ export interface LoggedHelper {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logged: () => any;
   getMe: () => User;
-  getSettings: () => PlatformSetting;
+  getSettings: () => PlatformSettings;
+  getPlatformSettings: () => PlatformSettings;
 }
 
 export interface ChallengesHelper {

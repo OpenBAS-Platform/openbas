@@ -1,17 +1,18 @@
 import React from 'react';
-import * as PropTypes from 'prop-types';
-import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
-import { connect, useDispatch } from 'react-redux';
+import { makeStyles } from '@mui/styles';
 import { Typography, Grid, Paper, List, ListItem, ListItemText, Switch, TextField } from '@mui/material';
 import ParametersForm from './ParametersForm';
-import inject18n from '../../../components/i18n';
-import { storeHelper } from '../../../actions/Schema';
-import { updateParameters, fetchParameters } from '../../../actions/Application';
+import { useFormatter } from '../../../components/i18n';
+import { updatePlatformParameters, updatePlatformLightParameters, updatePlatformDarkParameters, fetchPlatformParameters } from '../../../actions/Application';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import ItemBoolean from '../../../components/ItemBoolean';
+import ThemeForm from './ThemeForm';
+import { useAppDispatch } from '../../../utils/hooks';
+import { useHelper } from '../../../store';
+import type { LoggedHelper } from '../../../actions/helper';
+import type { PlatformSettings, SettingsUpdateInput, ThemeInput } from '../../../utils/api-types';
 
-const styles = () => ({
+const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
     paddingBottom: 50,
@@ -22,20 +23,47 @@ const styles = () => ({
     overflow: 'hidden',
     height: '100%',
   },
-});
+}));
 
-const Parameters = (props) => {
-  const {
-    updateParameters: connectedUpdateParameters,
-    t,
-    classes,
-    settings,
-  } = props;
-  const dispatch = useDispatch();
+const Parameters = () => {
+  const classes = useStyles();
+  const dispatch = useAppDispatch();
+  const { t } = useFormatter();
+  const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({
+    settings: helper.getPlatformSettings(),
+  }));
+
   useDataLoader(() => {
-    dispatch(fetchParameters());
+    dispatch(fetchPlatformParameters());
   });
-  const onUpdate = (data) => connectedUpdateParameters(data);
+
+  const initialValuesDark = {
+    accent_color: settings.platform_dark_theme?.accent_color ?? '',
+    background_color: settings.platform_dark_theme?.background_color ?? '',
+    logo_login_url: settings.platform_dark_theme?.logo_login_url ?? '',
+    logo_url: settings.platform_dark_theme?.logo_url ?? '',
+    logo_url_collapsed: settings.platform_dark_theme?.logo_url_collapsed ?? '',
+    navigation_color: settings.platform_dark_theme?.navigation_color ?? '',
+    paper_color: settings.platform_dark_theme?.paper_color ?? '',
+    primary_color: settings.platform_dark_theme?.primary_color ?? '',
+    secondary_color: settings.platform_dark_theme?.secondary_color ?? '',
+  };
+
+  const initialValuesLight = {
+    accent_color: settings.platform_light_theme?.accent_color ?? '',
+    background_color: settings.platform_light_theme?.background_color ?? '',
+    logo_login_url: settings.platform_light_theme?.logo_login_url ?? '',
+    logo_url: settings.platform_light_theme?.logo_url ?? '',
+    logo_url_collapsed: settings.platform_light_theme?.logo_url_collapsed ?? '',
+    navigation_color: settings.platform_light_theme?.navigation_color ?? '',
+    paper_color: settings.platform_light_theme?.paper_color ?? '',
+    primary_color: settings.platform_light_theme?.primary_color ?? '',
+    secondary_color: settings.platform_light_theme?.secondary_color ?? '',
+  };
+
+  const onUpdate = (data: SettingsUpdateInput) => dispatch(updatePlatformParameters(data));
+  const onUpdateLigthParameters = (data: ThemeInput) => dispatch(updatePlatformLightParameters(data));
+  const onUpdateDarkParameters = (data: ThemeInput) => dispatch(updatePlatformDarkParameters(data));
   return (
     <div className={classes.root}>
       <Grid container={true} spacing={3}>
@@ -62,7 +90,7 @@ const Parameters = (props) => {
               </ListItem>
               <ListItem divider={true}>
                 <ListItemText primary={t('Edition')} />
-                <ItemBoolean variant="inList" status={null} neutralLabel='Community' />
+                <ItemBoolean variant="inList" status={null} neutralLabel="Community" />
               </ListItem>
               <ListItem divider={true}>
                 <TextField fullWidth={true} label={t('Filigran support key')} variant="standard" disabled={true} />
@@ -77,13 +105,20 @@ const Parameters = (props) => {
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Dark theme')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            &nbsp;
+            <ThemeForm
+              onSubmit={onUpdateDarkParameters}
+              initialValues={initialValuesDark}
+            />
           </Paper>
         </Grid>
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>
           <Typography variant="h4">{t('Light theme')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            &nbsp;
+            <ThemeForm
+              onSubmit={onUpdateLigthParameters}
+              initialValues={initialValuesLight}
+            />
+
           </Paper>
         </Grid>
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>
@@ -106,23 +141,4 @@ const Parameters = (props) => {
   );
 };
 
-Parameters.propTypes = {
-  t: PropTypes.func,
-  nsdt: PropTypes.func,
-  updateParameters: PropTypes.func,
-  userAdmin: PropTypes.bool,
-};
-
-const select = (state) => {
-  const helper = storeHelper(state);
-  return {
-    userAdmin: helper.getMe()?.user_admin,
-    settings: helper.getSettings(),
-  };
-};
-
-export default R.compose(
-  connect(select, { updateParameters }),
-  inject18n,
-  withStyles(styles),
-)(Parameters);
+export default Parameters;

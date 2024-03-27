@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import TextField from '../../../../components/TextField';
-import ColorPickerField from '../../../../components/ColorPickerField';
+import DeprecatedColorPickerField from '../../../../components/DeprecatedColorPickerField';
 import inject18n from '../../../../components/i18n';
 
 class TagForm extends Component {
@@ -35,7 +35,7 @@ class TagForm extends Component {
               fullWidth={true}
               label={t('Value')}
             />
-            <ColorPickerField
+            <DeprecatedColorPickerField
               name="tag_color"
               fullWidth={true}
               label={t('Color')}

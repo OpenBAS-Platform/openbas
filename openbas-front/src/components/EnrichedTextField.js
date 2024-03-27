@@ -27,7 +27,7 @@ const EnrichedTextFieldBase = ({
   const classes = useStyles();
   const lang = useHelper((helper) => {
     const me = helper.getMe();
-    const settings = helper.getSettings();
+    const settings = helper.getPlatformSettings();
     const rawPlatformLang = settings.platform_lang ?? 'auto';
     const rawUserLang = me.user_lang ?? 'auto';
     const platformLang = rawPlatformLang !== 'auto' ? rawPlatformLang : locale;
