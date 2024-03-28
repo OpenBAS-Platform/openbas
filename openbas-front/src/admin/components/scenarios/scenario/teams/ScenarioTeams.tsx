@@ -3,7 +3,15 @@ import React, { useContext } from 'react';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import { addScenarioTeamPlayers, addScenarioTeams, disableScenarioTeamPlayers, enableScenarioTeamPlayers, fetchScenarioTeams, removeScenarioTeamPlayers, removeScenarioTeams, } from '../../../../../actions/scenarios/scenario-actions';
+import {
+  addScenarioTeamPlayers,
+  addScenarioTeams,
+  disableScenarioTeamPlayers,
+  enableScenarioTeamPlayers,
+  fetchScenarioTeams,
+  removeScenarioTeamPlayers,
+  removeScenarioTeams,
+} from '../../../../../actions/scenarios/scenario-actions';
 import DefinitionMenu from '../../../components/DefinitionMenu';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';

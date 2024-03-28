@@ -123,7 +123,7 @@ const TechnicalExpectationAsset: FunctionComponent<Props> = ({
                 && <Button
                   variant="contained"
                   onClick={() => setSelected(null)}
-                >
+                   >
                   {t('Back')}
                 </Button>
               }
