@@ -168,7 +168,7 @@ const InjectAddArticles: FunctionComponent<Props> = ({
                     >
                       <ListItemIcon>
                         <ChannelIcon
-                          type={article.article_fullchannel.channel_type}
+                          type={article.article_fullchannel?.channel_type}
                           variant="inline"
                         />
                       </ListItemIcon>

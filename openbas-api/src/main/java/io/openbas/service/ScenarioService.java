@@ -236,10 +236,12 @@ public class ScenarioService {
   public Iterable<Team> addTeams(@NotBlank final String scenarioId, @NotNull final List<String> teamIds) {
     Scenario scenario = this.scenario(scenarioId);
     List<Team> teams = scenario.getTeams();
-    teams.addAll(fromIterable(this.teamRepository.findAllById(teamIds)));
+    List<Team> teamsToAdd = fromIterable(this.teamRepository.findAllById(teamIds));
+    List<String> existingTeamIds = teams.stream().map(Team::getId).toList();
+    teams.addAll(teamsToAdd.stream().filter(t -> !existingTeamIds.contains(t.getId())).toList());
     scenario.setTeams(teams);
-    this.updateScenario(scenario);
-    return teamRepository.findAllById(teamIds);
+    scenario.setUpdatedAt(now());
+    return teamsToAdd;
   }
 
   public Iterable<Team> removeTeams(@NotBlank final String scenarioId, @NotNull final List<String> teamIds) {
