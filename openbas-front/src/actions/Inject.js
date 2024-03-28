@@ -7,7 +7,7 @@ export const fetchInjects = (exerciseId) => (dispatch) => {
 };
 
 export const fetchAtomicTestings = () => (dispatch) => {
-  const uri = '/api/injects/atomic_testings';
+  const uri = '/api/atomic_testings/injects';
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
 };
 
@@ -22,7 +22,7 @@ export const fetchInject = (exerciseId, injectId) => (dispatch) => {
 };
 
 export const fetchAtomicTesting = (injectId) => (dispatch) => {
-  const uri = `/api/injects/atomic_testings/${injectId}`;
+  const uri = `/api/atomic_testings/injects/${injectId}`;
   return getReferential(schema.inject, uri)(dispatch);
 };
 

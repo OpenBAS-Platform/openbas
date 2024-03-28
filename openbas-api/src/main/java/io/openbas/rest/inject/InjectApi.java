@@ -54,6 +54,8 @@ public class InjectApi extends RestBehavior {
   private ExerciseRepository exerciseRepository;
   private UserRepository userRepository;
   private InjectRepository injectRepository;
+
+  private InjectStatusRepository injectStatusRepository;
   private InjectDocumentRepository injectDocumentRepository;
   private TeamRepository teamRepository;
   private AssetService assetService;
@@ -129,6 +131,11 @@ public class InjectApi extends RestBehavior {
   }
 
   @Autowired
+  public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
+    this.injectStatusRepository = injectStatusRepository;
+  }
+
+  @Autowired
   public void setScenarioService(ScenarioService scenarioService) {
     this.scenarioService = scenarioService;
   }
@@ -142,6 +149,7 @@ public class InjectApi extends RestBehavior {
   public void setContext(ApplicationContext context) {
     this.context = context;
   }
+
   @Autowired
   public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
     this.executionContextService = executionContextService;
