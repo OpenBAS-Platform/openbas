@@ -24,7 +24,7 @@ import { tagOptions } from '../../../../utils/Option';
 import Transition from '../../../../components/common/Transition';
 import type { InjectInput, InjectStore } from '../../../../actions/injects/Inject';
 import { InjectContext, PermissionsContext } from '../Context';
-import type { Contract, ExecutionTrace, Inject, InjectStatus, Tag } from '../../../../utils/api-types';
+import { Contract, Inject, InjectStatus, InjectStatusExecution, Tag } from '../../../../utils/api-types';
 import { tryInject } from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
 
@@ -425,10 +425,10 @@ const InjectPopover: FunctionComponent<Props> = ({
           <Table size="small">
             {/* TODO: displayRowCheckbox={false} */}
             <TableBody>
-              {injectResult?.status_reporting
-                && Object.entries(injectResult.status_reporting).map(
+              {injectResult
+                && Object.entries(injectResult).map(
                   ([key, value]) => {
-                    if (key === 'execution_traces') {
+                    if (key === 'status_traces') {
                       return (
                         <TableRow key={key}>
                           <TableCell>{key}</TableCell>
@@ -438,17 +438,18 @@ const InjectPopover: FunctionComponent<Props> = ({
                               {/* TODO: displayRowCheckbox={false} */}
                               <TableBody>
                                 <>
-                                  {value?.map((trace: ExecutionTrace) => (
-                                    <TableRow key={trace.trace_identifier}>
-                                      <TableCell>
-                                        {trace.trace_message}
-                                      </TableCell>
-                                      <TableCell>
-                                        {trace.trace_status}
-                                      </TableCell>
-                                      <TableCell>{trace.trace_time}</TableCell>
-                                    </TableRow>
-                                  ))}
+                                  {value?.filter((trace: InjectStatusExecution) => !!trace.execution_message)
+                                    .map((trace: InjectStatusExecution) => (
+                                      <TableRow key={trace.execution_category}>
+                                        <TableCell>
+                                          {trace.execution_message}
+                                        </TableCell>
+                                        <TableCell>
+                                          {trace.execution_status}
+                                        </TableCell>
+                                        <TableCell>{trace.execution_time}</TableCell>
+                                      </TableRow>
+                                    ))}
                                 </>
                               </TableBody>
                             </Table>
