@@ -39,6 +39,11 @@ public class InjectDocument {
     @JsonProperty("document_attached")
     private boolean attached = true;
 
+    @JsonProperty("document_name")
+    public String getDocumentName() {
+        return this.document.getName();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
