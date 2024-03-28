@@ -327,7 +327,10 @@ export const storeHelper = (state) => ({
   getTagsMap: () => maps('tags', state),
   // injects
   getInject: (id) => entity(id, 'injects', state),
-  getAtomicTestings: () => entities('injects', state),
+  getAtomicTestings: () => {
+    const atomicTestings = entities('injects', state).filter((t) => (t.inject_exercise === null) && (t.inject_scenario === null));
+    return atomicTestings;
+  },
   getInjectsMap: () => maps('injects', state),
   getInjectTypes: () => entities('inject_types', state),
   getInjectTypesMap: () => maps('inject_types', state),
