@@ -1,15 +1,21 @@
 package io.openbas.service;
 
-import io.openbas.database.model.Execution;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectDocument;
-import io.openbas.database.model.InjectStatus;
+import io.openbas.contract.Contract;
+import io.openbas.contract.ContractService;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
+import io.openbas.database.repository.InjectStatusRepository;
+import io.openbas.database.repository.UserRepository;
+import io.openbas.execution.ExecutableInject;
+import io.openbas.execution.ExecutionContext;
+import io.openbas.execution.ExecutionContextService;
+import io.openbas.execution.Injector;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,17 +29,43 @@ import static java.time.Instant.now;
 @Service
 public class InjectService {
 
-    private InjectDocumentRepository injectDocumentRepository;
+    private ApplicationContext context;
+
+    private ContractService contractService;
+    private ExecutionContextService executionContextService;
+
+    private UserRepository userRepository;
     private InjectRepository injectRepository;
+    private InjectDocumentRepository injectDocumentRepository;
+    private InjectStatusRepository injectStatusRepository;
 
     @Autowired
-    public void setInjectDocumentRepository(InjectDocumentRepository injectDocumentRepository) {
-        this.injectDocumentRepository = injectDocumentRepository;
+    public void setContext(ApplicationContext context) {
+        this.context = context;
     }
 
     @Autowired
-    public void setInjectRepository(InjectRepository injectRepository) {
-        this.injectRepository = injectRepository;
+    public void setContractService(ContractService contractService) {
+        this.contractService = contractService;
+    }
+
+    @Autowired
+    public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
+        this.executionContextService = executionContextService;
+    }
+
+    @Autowired
+    public void setUserRepository(@NotNull final UserRepository userRepository) { this.userRepository = userRepository; }
+
+    @Autowired
+    public void setInjectRepository(InjectRepository injectRepository) { this.injectRepository = injectRepository; }
+
+    @Autowired
+    public void setInjectDocumentRepository(InjectDocumentRepository injectDocumentRepository) { this.injectDocumentRepository = injectDocumentRepository; }
+
+    @Autowired
+    public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
+        this.injectStatusRepository = injectStatusRepository;
     }
 
     public void cleanInjectsDocExercise(String exerciseId, String documentId) {
@@ -86,5 +118,28 @@ public class InjectService {
     @Transactional
     public Optional<Inject> findById(String injectId) {
         return injectRepository.findWithStatusById(injectId);
+    }
+
+    @Transactional
+    public InjectStatus tryAtomicTesting(String injectId) {
+        return injectStatusRepository.save(tryInject(injectId));
+    }
+
+    public InjectStatus tryInject(String injectId) {
+        Inject inject = injectRepository.findById(injectId).orElseThrow();
+        User user = this.userRepository.findById(currentUser().getId()).orElseThrow();
+        List<ExecutionContext> userInjectContexts = List.of(
+                this.executionContextService.executionContext(user, inject, "Direct test")
+        );
+        Contract contract = contractService.resolveContract(inject);
+        if (contract == null) {
+            throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
+        }
+        ExecutableInject injection = new ExecutableInject(false, true, inject, contract, List.of(), inject.getAssets(),
+                inject.getAssetGroups(), userInjectContexts);
+        Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
+        Execution execution = executor.executeInjection(injection);
+
+        return InjectStatus.fromExecution(execution, inject);
     }
 }

@@ -10,7 +10,7 @@ import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import type { InjectHelper } from '../../../actions/injects/inject-helper';
 import type { InjectStore } from '../../../actions/injects/Inject';
-import { fetchAtomicTesting, fetchAtomicTestings, fetchInjectTypes } from '../../../actions/Inject';
+import { fetchInjectTypes } from '../../../actions/Inject';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
@@ -22,6 +22,7 @@ import InjectIcon from '../components/injects/InjectIcon';
 import InjectType from '../components/injects/InjectType';
 import type { Contract, Inject, Tag } from '../../../utils/api-types';
 import { AtomicTestingContext, AtomicTestingContextType } from '../components/Context';
+import { fetchAtomicTesting, fetchAtomicTestings } from '../../../actions/atomictestings/atomic-testing-actions';
 
 const useStyles = makeStyles(() => ({
   parameters: {
