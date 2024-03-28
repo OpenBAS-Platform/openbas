@@ -13,6 +13,9 @@ import java.util.Objects;
 @Setter
 public class InjectStatusExecution {
 
+    public static final String EXECUTION_TYPE_STANDARD = "standard";
+    public static final String EXECUTION_TYPE_COMMAND = "command_line";
+
     @JsonProperty("execution_time")
     private Instant time;
 
@@ -21,6 +24,9 @@ public class InjectStatusExecution {
 
     @JsonProperty("execution_message")
     private String message;
+
+    @JsonProperty("execution_category")
+    private String category = "standard"; // standard / command_line / ??
 
     @JsonProperty("execution_status")
     private ExecutionStatus status;
@@ -32,31 +38,36 @@ public class InjectStatusExecution {
         // Default constructor
     }
 
-    public InjectStatusExecution(ExecutionStatus status, List<String> identifiers, String message) {
+    public InjectStatusExecution(ExecutionStatus status, List<String> identifiers, String message, String category) {
         this.status = status;
         this.identifiers = identifiers;
         this.message = message;
         this.time = Instant.now();
+        this.category = category;
     }
 
     public static InjectStatusExecution traceInfo(String message) {
-        return new InjectStatusExecution(ExecutionStatus.INFO, List.of(), message);
+        return new InjectStatusExecution(ExecutionStatus.INFO, List.of(), message, EXECUTION_TYPE_STANDARD);
+    }
+
+    public static InjectStatusExecution traceInfo(String category, String message) {
+        return new InjectStatusExecution(ExecutionStatus.INFO, List.of(), message, category);
     }
 
     public static InjectStatusExecution traceInfo(String message, List<String> identifiers) {
-        return new InjectStatusExecution(ExecutionStatus.INFO, identifiers, message);
+        return new InjectStatusExecution(ExecutionStatus.INFO, identifiers, message, EXECUTION_TYPE_STANDARD);
     }
 
     public static InjectStatusExecution traceSuccess(String message) {
-        return new InjectStatusExecution(ExecutionStatus.SUCCESS, List.of(), message);
+        return new InjectStatusExecution(ExecutionStatus.SUCCESS, List.of(), message, EXECUTION_TYPE_STANDARD);
     }
 
     public static InjectStatusExecution traceSuccess(String message, List<String> userIds) {
-        return new InjectStatusExecution(ExecutionStatus.SUCCESS, userIds, message);
+        return new InjectStatusExecution(ExecutionStatus.SUCCESS, userIds, message, EXECUTION_TYPE_STANDARD);
     }
 
     public static InjectStatusExecution traceError(String message) {
-        return new InjectStatusExecution(ExecutionStatus.ERROR, List.of(), message);
+        return new InjectStatusExecution(ExecutionStatus.ERROR, List.of(), message, EXECUTION_TYPE_STANDARD);
     }
 
     @Override

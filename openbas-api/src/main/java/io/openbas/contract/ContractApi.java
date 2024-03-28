@@ -8,14 +8,10 @@ import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +30,7 @@ public class ContractApi extends RestBehavior {
 
     @GetMapping("/images")
     public @ResponseBody Map<String, String> contractIcon() {
-        List<ContractConfig> contractTypes = new ArrayList<>(); // this.contractService.getContractConfigs();
+        List<ContractConfig> contractTypes = new ArrayList<>(); // TODO REPLUG
         Map<String, String> map = new HashMap<>();
         contractTypes.forEach(contract -> {
             try {
@@ -51,35 +47,6 @@ public class ContractApi extends RestBehavior {
         });
         return map;
     }
-
-    // @GetMapping(value = CONTRACT_URI + "/images")
-    // public @ResponseBody Map<String, String> contractIcon() {
-    //     Map<String, String> map = new HashMap<>();
-    //     fromIterable(injectorRepository.findAll()).forEach(injector -> {
-    //         try {
-    //             JsonNode arrNode = mapper.readTree(injector.getContracts());
-    //             for (final JsonNode objNode : arrNode) {
-    //                 JsonNode config = objNode.get("config");
-    //                 String icon = config.get("icon").textValue();
-    //                 String type = config.get("type").textValue();
-    //                 try {
-    //                     InputStream in = getClass().getResourceAsStream(icon);
-    //                     if (in != null) {
-    //                         byte[] fileContent;
-    //                         fileContent = IOUtils.toByteArray(in);
-    //                         String encodedString = Base64.getEncoder().encodeToString(fileContent);
-    //                         map.put(type, encodedString);
-    //                     }
-    //                 } catch (IOException e) {
-    //                     log.debug("Logo not found for contract : " + type);
-    //                 }
-    //             }
-    //         } catch (JsonProcessingException e) {
-    //             throw new RuntimeException(e);
-    //         }
-    //     });
-    //     return map;
-    // }
 
     @PostMapping("/search")
     @Operation(

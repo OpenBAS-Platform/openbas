@@ -1,23 +1,19 @@
 package io.openbas.rest.inject;
 
-import io.openbas.asset.AssetGroupService;
-import io.openbas.asset.AssetService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.asset.AssetGroupService;
+import io.openbas.asset.AssetService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
-import io.openbas.execution.Executor;
 import io.openbas.execution.ExecutionContextService;
-import io.openbas.execution.Injector;
+import io.openbas.execution.Executor;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
-import io.openbas.service.AssetGroupService;
-import io.openbas.service.AssetService;
-import io.openbas.service.ExecutionContextService;
 import io.openbas.service.ScenarioService;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;

@@ -64,7 +64,7 @@ public class EmailService {
 
         String emails = usersContext.stream().map(c -> c.getUser().getEmail()).collect(joining(", "));
         List<String> userIds = usersContext.stream().map(c -> c.getUser().getId()).toList();
-        execution.addTrace(traceSuccess("email", "Mail sent to " + emails, userIds));
+        execution.addTrace(traceSuccess("Mail sent to " + emails, userIds));
         // Store message in Imap after sending
         storeMessageImap(execution, mimeMessage);
     }
@@ -86,7 +86,7 @@ public class EmailService {
             emailSender.send(mimeMessage);
         }
         List<String> userIds = List.of(userContext.getUser().getId());
-        execution.addTrace(traceSuccess("email", "Mail sent to " + email, userIds));
+        execution.addTrace(traceSuccess("Mail sent to " + email, userIds));
         // Store message in Imap after sending
         storeMessageImap(execution, mimeMessage);
     }

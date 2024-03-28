@@ -8,8 +8,6 @@ import io.openbas.database.specification.DryInjectSpecification;
 import io.openbas.database.specification.InjectSpecification;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
-import io.openbas.service.ExecutionContextService;
-import io.openbas.contract.ContractService;
 import io.openbas.execution.ExecutionContextService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;

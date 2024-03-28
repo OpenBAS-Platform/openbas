@@ -78,7 +78,7 @@ public class EmailExecutor extends Injector {
     String from = exercise != null ? exercise.getFrom() : this.openBASConfig.getDefaultMailer();
     List<String> replyTos = exercise != null ? exercise.getReplyTos() : List.of(this.openBASConfig.getDefaultReplyTo());
     //noinspection SwitchStatementWithTooFewBranches
-    switch (contract) {
+    switch (inject.getContract()) {
       case EMAIL_GLOBAL -> sendMulti(execution, users, from, replyTos, inReplyTo, subject, message, attachments);
       default -> sendSingle(execution, users, from, replyTos, inReplyTo, mustBeEncrypted, subject, message, attachments);
     }

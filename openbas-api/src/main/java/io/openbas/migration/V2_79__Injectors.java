@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V2_75__Injectors extends BaseJavaMigration {
+public class V2_79__Injectors extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
