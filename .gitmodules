@@ -1,6 +1,6 @@
 [submodule "openbas-injectors"]
 	path = openbas-injectors
-	url = git@github-openbas:OpenBAS-Platform/injectors.git
+	url = https://github.com/OpenBAS-Platform/injectors.git
 [submodule "openbas-collectors"]
 	path = openbas-collectors
-	url = git@github-openbas:OpenBAS-Platform/collectors.git
+	url = https://github.com/OpenBAS-Platform/collectors.git
