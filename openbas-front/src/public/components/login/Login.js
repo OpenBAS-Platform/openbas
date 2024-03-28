@@ -78,8 +78,11 @@ const Login = (props) => {
   }
   const marginTop = dimension.height / 2 - loginHeight / 2 - 100;
   const loginLogo = theme.palette.mode === 'dark'
-    ? parameters.platform_dark_theme.logo_login_url
-    : parameters.platform_light_theme.logo_login_url;
+    ? parameters?.platform_dark_theme?.logo_login_url
+    : parameters?.platform_light_theme?.logo_login_url;
+
+  return null;
+
   return (
     <div data-testid="login-page" className={classes.container} style={{ marginTop }}>
       <img src={loginLogo && loginLogo.length > 0 ? loginLogo : fileUri(theme.palette.mode === 'dark' ? logoDark : logoLight)} alt="logo"
