@@ -526,10 +526,10 @@ const Timeline = () => {
                               marginRight: 15,
                             }}
                           >
-                            {fndt(inject.inject_status?.status_date)} (
+                            {fndt(inject.inject_status?.tracking_sent_date)} (
                             {inject.inject_status
                               && (
-                                inject.inject_status.status_execution / 1000
+                                inject.inject_status.tracking_total_execution_time / 1000
                               ).toFixed(2)}
                             s)
                           </div>

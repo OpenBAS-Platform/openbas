@@ -117,6 +117,7 @@ const InjectPopover: FunctionComponent<Props> = ({
   };
 
   const submitTry = () => {
+    // FIXME: remove try possibility
     dispatch(tryInject(inject.inject_id)).then((payload: InjectStatus) => {
       setInjectResult(payload);
       setOpenResult(true);
@@ -185,6 +186,7 @@ const InjectPopover: FunctionComponent<Props> = ({
     R.assoc('inject_tags', injectTags),
     R.pick([
       'inject_title',
+      'inject_type',
       'inject_contract',
       'inject_description',
       'inject_tags',

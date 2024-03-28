@@ -683,6 +683,7 @@ class InjectDefinition extends Component {
     const values = {
       inject_title: inject.inject_title,
       inject_contract: inject.inject_contract,
+      inject_type: inject.inject_type,
       inject_description: inject.inject_description,
       inject_tags: inject.inject_tags,
       inject_depends_duration: inject.inject_depends_duration,
@@ -1144,7 +1145,7 @@ class InjectDefinition extends Component {
       .map((f) => f.key)
       .includes('assets');
     const assets = assetIds
-      .map((a) => endpointsMap[a])
+      .map((a) => ({ ...endpointsMap[a], type: 'static' }))
       .filter((a) => a !== undefined);
     // -- ASSET GROUPS --
     const hasAssetGroups = injectType.fields

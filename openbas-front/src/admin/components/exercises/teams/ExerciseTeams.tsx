@@ -27,22 +27,10 @@ interface Props {
   exerciseTeamsUsers: ExerciseStore['exercise_teams_users'],
 }
 
-const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
-  // Standard hooks
+export const teamContextForExercise = (exerciseId: ExerciseStore['exercise_id'], exerciseTeamsUsers: ExerciseStore['exercise_teams_users']) => {
   const dispatch = useAppDispatch();
-  const { exerciseId } = useParams() as { exerciseId: ExerciseStore['exercise_id'] };
 
-  const { teams }: { exercise: ExerciseStore, teams: TeamStore[] } = useHelper((helper: ExercisesHelper) => ({
-    teams: helper.getExerciseTeams(exerciseId),
-  }));
-
-  const { permissions } = useContext(PermissionsContext);
-
-  useDataLoader(() => {
-    dispatch(fetchExerciseTeams(exerciseId));
-  });
-
-  const context: TeamContextType = {
+  return {
     async onAddUsersTeam(teamId: Team['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
       await dispatch(addExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: userIds }));
       return dispatch(fetchTeams());
@@ -72,6 +60,22 @@ const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
       }
     },
   };
+};
+
+const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
+  // Standard hooks
+  const dispatch = useAppDispatch();
+  const { exerciseId } = useParams() as { exerciseId: ExerciseStore['exercise_id'] };
+
+  const { teams }: { exercise: ExerciseStore, teams: TeamStore[] } = useHelper((helper: ExercisesHelper) => ({
+    teams: helper.getExerciseTeams(exerciseId),
+  }));
+
+  const { permissions } = useContext(PermissionsContext);
+
+  useDataLoader(() => {
+    dispatch(fetchExerciseTeams(exerciseId));
+  });
 
   const teamIds = teams.map((t) => t.team_id);
 
@@ -80,7 +84,7 @@ const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
   };
 
   return (
-    <TeamContext.Provider value={context}>
+    <TeamContext.Provider value={teamContextForExercise(exerciseId, exerciseTeamsUsers)}>
       <DefinitionMenu base="/admin/exercises" id={exerciseId} />
       <Teams teamIds={teamIds} contextual={true} />
       {permissions.canWrite && <AddTeams addedTeamIds={teamIds} onAddTeams={onAddTeams} />}

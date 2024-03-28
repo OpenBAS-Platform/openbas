@@ -43,26 +43,27 @@ class InjectStatusDetails extends Component {
             <DialogContent>
               <Table selectable={false} size="small">
                 <TableBody displayRowCheckbox={false}>
-                  {Object.entries(status.status_reporting).map(
+                  {Object.entries(status).map(
                     ([key, value]) => {
-                      if (key === 'execution_traces') {
+                      if (key === 'status_traces') {
                         return (
                           <TableRow key={key}>
                             <TableCell>{key}</TableCell>
                             <TableCell>
                               <Table selectable={false} size="small" key={key}>
-                                <TableBody displayRowCheckbox={false}>
-                                  {value.map((trace) => (
-                                    <TableRow key={trace.trace_identifier}>
-                                      <TableCell>
-                                        {trace.trace_message}
-                                      </TableCell>
-                                      <TableCell>
-                                        {trace.trace_status}
-                                      </TableCell>
-                                      <TableCell>{trace.trace_time}</TableCell>
-                                    </TableRow>
-                                  ))}
+                                <TableBody displayRowCheckbox={ false}>
+                                  {value.filter((trace) => !!trace.execution_message)
+                                    .map((trace) => (
+                                      <TableRow key={trace.execution_category}>
+                                        <TableCell>
+                                          {trace.execution_message}
+                                        </TableCell>
+                                        <TableCell>
+                                          {trace.execution_status}
+                                        </TableCell>
+                                        <TableCell>{trace.execution_time}</TableCell>
+                                      </TableRow>
+                                    ))}
                                 </TableBody>
                               </Table>
                             </TableCell>

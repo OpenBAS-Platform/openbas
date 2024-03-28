@@ -28,7 +28,6 @@ const CreateInject: FunctionComponent<Props> = ({
   const handleClose = () => setOpen(false);
 
   const onSubmit = async (data: InjectInput) => {
-      console.log(data);
     const inputValues = R.pipe(
       R.assoc(
         'inject_depends_duration',
