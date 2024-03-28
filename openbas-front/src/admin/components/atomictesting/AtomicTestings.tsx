@@ -10,7 +10,7 @@ import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import type { InjectHelper } from '../../../actions/injects/inject-helper';
 import type { InjectStore } from '../../../actions/injects/Inject';
-import { fetchAtomicTesting, fetchAtomicTestings, fetchInject, fetchInjectTypes } from '../../../actions/Inject';
+import { fetchAtomicTesting, fetchAtomicTestings, fetchInjectTypes } from '../../../actions/Inject';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
@@ -185,7 +185,7 @@ const AtomicTestings = () => {
       name: 'inject_updated_at',
       label: 'Date',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => fldt(atomicTesting.inject_updated_at),
+      value: (atomicTesting: InjectStore) => fldt(atomicTesting.inject_status?.status_date || atomicTesting.inject_updated_at),
     },
     {
       name: 'inject_players',

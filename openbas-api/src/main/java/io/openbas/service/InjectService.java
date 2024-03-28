@@ -65,7 +65,6 @@ public class InjectService {
         return this.injectRepository.findAllAtomicTestings();
     }
 
-    @Modifying
     @Transactional
     public Inject updateInjectStatus(String injectId, InjectUpdateStatusInput status) {
         Inject inject = injectRepository.findById(injectId).orElseThrow();
