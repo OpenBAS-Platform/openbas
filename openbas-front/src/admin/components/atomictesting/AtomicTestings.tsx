@@ -327,7 +327,7 @@ const AtomicTestings = () => {
                     tagsMap={tagsMap}
                     injectTypesMap={injectTypesMap}
                     setSelectedInject={setSelectedAtomicTesting}
-                    isDisabled={true} // How is calculated ?
+                    isDisabled={true} // How is it calculated ?
                     isAtomicTesting={true}
                   />
                 </ListItemSecondaryAction>
