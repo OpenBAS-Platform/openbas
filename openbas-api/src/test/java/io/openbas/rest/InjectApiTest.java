@@ -6,9 +6,9 @@ import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.rest.inject.form.InjectInput;
+import io.openbas.service.ScenarioService;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
-import io.openbas.service.ScenarioService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static io.openbas.injects.email.EmailContract.EMAIL_DEFAULT;
+import static io.openbas.injects.email.EmailContract.TYPE;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,6 +66,7 @@ public class InjectApiTest {
 
     InjectInput input = new InjectInput();
     input.setTitle("Test inject");
+    input.setType(TYPE);
     input.setContract(EMAIL_DEFAULT);
     input.setDependsDuration(0L);
 
@@ -140,6 +142,7 @@ public class InjectApiTest {
     InjectInput input = new InjectInput();
     String injectTitle = "A new title";
     input.setTitle(injectTitle);
+    input.setType(inject.getType());
     input.setContract(inject.getContract());
     input.setDependsDuration(inject.getDependsDuration());
 
