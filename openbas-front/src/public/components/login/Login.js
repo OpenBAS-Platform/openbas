@@ -83,6 +83,7 @@ const Login = (props) => {
 
   return null;
 
+  // eslint-disable-next-line no-unreachable
   return (
     <div data-testid="login-page" className={classes.container} style={{ marginTop }}>
       <img src={loginLogo && loginLogo.length > 0 ? loginLogo : fileUri(theme.palette.mode === 'dark' ? logoDark : logoLight)} alt="logo"
