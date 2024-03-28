@@ -259,7 +259,7 @@ const InjectPopover: FunctionComponent<Props> = ({
         {inject.inject_type !== 'openbas_manual' && (
         <MenuItem
           onClick={handleOpenTry}
-          disabled={isDisabled}
+          disabled={isDisabled && !isAtomicTesting}
         >
           {t('Try the inject')}
         </MenuItem>
@@ -279,7 +279,7 @@ const InjectPopover: FunctionComponent<Props> = ({
             {t('Enable')}
           </MenuItem>
         )}
-        <MenuItem onClick={handleOpenDelete}>
+        <MenuItem onClick={handleOpenDelete} disabled={isAtomicTesting}>
           {t('Delete')}
         </MenuItem>
       </Menu>
