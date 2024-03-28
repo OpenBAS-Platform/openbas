@@ -47,6 +47,8 @@ public class InjectApi extends RestBehavior {
   private ExerciseRepository exerciseRepository;
   private UserRepository userRepository;
   private InjectRepository injectRepository;
+
+  private InjectStatusRepository injectStatusRepository;
   private InjectDocumentRepository injectDocumentRepository;
   private TeamRepository teamRepository;
   private AssetService assetService;
@@ -57,6 +59,7 @@ public class InjectApi extends RestBehavior {
   private ContractService contractService;
   private ExecutionContextService executionContextService;
   private ScenarioService scenarioService;
+  private InjectService injectService;
 
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
@@ -115,14 +118,25 @@ public class InjectApi extends RestBehavior {
   }
 
   @Autowired
+  public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
+    this.injectStatusRepository = injectStatusRepository;
+  }
+
+  @Autowired
   public void setScenarioService(ScenarioService scenarioService) {
     this.scenarioService = scenarioService;
+  }
+
+  @Autowired
+  public void setInjectService(InjectService injectService) {
+    this.injectService = injectService;
   }
 
   @Autowired
   public void setContext(ApplicationContext context) {
     this.context = context;
   }
+
   @Autowired
   public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
     this.executionContextService = executionContextService;
@@ -144,10 +158,11 @@ public class InjectApi extends RestBehavior {
     if (contract == null) {
       throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
     }
-    ExecutableInject injection = new ExecutableInject(false, true, inject, contract, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
+    ExecutableInject injection = new ExecutableInject(false, true, inject, contract, List.of(), inject.getAssets(),
+        inject.getAssetGroups(), userInjectContexts);
     Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
     Execution execution = executor.executeInjection(injection);
-    return InjectStatus.fromExecution(execution, inject);
+    return injectStatusRepository.save(InjectStatus.fromExecution(execution, inject));
   }
 
   @Transactional(rollbackOn = Exception.class)
@@ -240,7 +255,8 @@ public class InjectApi extends RestBehavior {
     Iterable<User> users = userRepository.findAllById(input.getUserIds());
     List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
         .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
-    ExecutableInject injection = new ExecutableInject(true, true, inject, contract, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
+    ExecutableInject injection = new ExecutableInject(true, true, inject, contract, List.of(), inject.getAssets(),
+        inject.getAssetGroups(), userInjectContexts);
     file.ifPresent(injection::addDirectAttachment);
     Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
     Execution execution = executor.executeInjection(injection);
@@ -279,20 +295,7 @@ public class InjectApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject setInjectStatus(@PathVariable String exerciseId, @PathVariable String injectId,
       @Valid @RequestBody InjectUpdateStatusInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    // build status
-    InjectStatus injectStatus = new InjectStatus();
-    injectStatus.setInject(inject);
-    injectStatus.setDate(now());
-    injectStatus.setName(input.getStatus());
-    injectStatus.setExecutionTime(0);
-    Execution execution = new Execution(false);
-    execution.addTrace(traceSuccess(currentUser().getId(), input.getMessage()));
-    execution.stop();
-    injectStatus.setReporting(execution);
-    // Save status for inject
-    inject.setStatus(injectStatus);
-    return injectRepository.save(inject);
+    return injectService.updateInjectStatus(injectId, input);
   }
 
   @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/teams")
@@ -457,7 +460,8 @@ public class InjectApi extends RestBehavior {
     return inject;
   }
 
-  private Inject updateInjectActivation(@NotBlank final String injectId, @NotNull final InjectUpdateActivationInput input) {
+  private Inject updateInjectActivation(@NotBlank final String injectId,
+      @NotNull final InjectUpdateActivationInput input) {
     Inject inject = this.injectRepository.findById(injectId).orElseThrow();
     inject.setEnabled(input.isEnabled());
     inject.setUpdatedAt(now());
