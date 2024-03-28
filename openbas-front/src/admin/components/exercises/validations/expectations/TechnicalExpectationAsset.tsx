@@ -45,6 +45,16 @@ const TechnicalExpectationAsset: FunctionComponent<Props> = ({
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<InjectExpectationResult | null>(null);
 
+  const toJsonFormat = (result: string) => {
+    try {
+      return JSON.parse(result).map((entry: string[], idx: number) => (
+        <p key={idx}>{Object.entries(entry).map(([key, value]) => `${key}: ${value}\n`)}</p>
+      ));
+    } catch (e) {
+      return (<p>{result}</p>);
+    }
+  };
+
   return (
     <>
       <ExpectationLine
@@ -103,9 +113,7 @@ const TechnicalExpectationAsset: FunctionComponent<Props> = ({
             }
             {selected !== null
               && <pre>
-                {JSON.parse(selected.result).map((entry: string[], idx: number) => (
-                  <p key={idx}>{Object.entries(entry).map(([key, value]) => `${key}: ${value}\n`)}</p>
-                ))}
+                {toJsonFormat(selected.result)}
               </pre>
             }
           </Alert>

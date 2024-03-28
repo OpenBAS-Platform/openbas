@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.List;
 
-import static io.openbas.database.model.ExecutionTrace.traceError;
-import static io.openbas.database.model.ExecutionTrace.traceSuccess;
+import static io.openbas.database.model.InjectStatusExecution.traceError;
+import static io.openbas.database.model.InjectStatusExecution.traceSuccess;
 
 @Component
 public class OpenCTIService {
@@ -44,10 +44,10 @@ public class OpenCTIService {
         httpclient.execute(httpPost, classicHttpResponse -> {
             if (classicHttpResponse.getCode() == HttpStatus.SC_OK) {
                 String body = EntityUtils.toString(classicHttpResponse.getEntity());
-                execution.addTrace(traceSuccess("opencti_case", "Case created (" + body + ")"));
+                execution.addTrace(traceSuccess("Case created (" + body + ")"));
                 return true;
             } else {
-                execution.addTrace(traceError("opencti_case", "Fail to POST"));
+                execution.addTrace(traceError("Fail to POST"));
                 return false;
             }
         });
@@ -70,10 +70,10 @@ public class OpenCTIService {
         httpclient.execute(httpPost, classicHttpResponse -> {
             if (classicHttpResponse.getCode() == HttpStatus.SC_OK) {
                 String body = EntityUtils.toString(classicHttpResponse.getEntity());
-                execution.addTrace(traceSuccess("opencti_report", "Report created (" + body + ")"));
+                execution.addTrace(traceSuccess("Report created (" + body + ")"));
                 return true;
             } else {
-                execution.addTrace(traceError("opencti_report", "Fail to POST"));
+                execution.addTrace(traceError("Fail to POST"));
                 return false;
             }
         });

@@ -46,6 +46,11 @@ public class Contract {
     @NotNull
     private final Map<String, String> context = new HashMap<>();
 
+    @NotEmpty
+    @Setter
+    @JsonProperty("contract_attack_patterns")
+    private List<String> attackPatterns = new ArrayList<>();
+
     private Contract(
         @NotNull final ContractConfig config,
         @NotBlank final String id,
@@ -91,5 +96,9 @@ public class Contract {
 
     public void addVariable(ContractVariable variable) {
         variables.add(0, variable);
+    }
+
+    public void addAttackPattern(String id) {
+        attackPatterns.add(id);
     }
 }

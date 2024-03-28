@@ -1,11 +1,8 @@
 package io.openbas.database.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Type;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -14,7 +11,6 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static io.openbas.database.model.ExecutionTrace.traceError;
 import static java.time.Instant.now;
 
 public class Execution {
@@ -26,22 +22,21 @@ public class Execution {
     private boolean runtime;
 
     @Getter
+    @Setter
+    @JsonProperty("execution_async")
+    private boolean async;
+
+    @Getter
     @JsonProperty("execution_start")
     private Instant startTime;
 
     @JsonProperty("execution_stop")
     private Instant stopTime;
 
-    @Setter
-    @Getter
-    @JsonProperty("execution_async_ids")
-    @Type(StringArrayType.class)
-    private String[] asyncIds;
-
     @Getter
     @Setter
     @JsonProperty("execution_traces")
-    private List<ExecutionTrace> traces = new ArrayList<>();
+    private List<InjectStatusExecution> traces = new ArrayList<>();
 
     public Execution() {
         // Default constructor for serialization
@@ -61,24 +56,12 @@ public class Execution {
         this.stopTime = now();
     }
 
-    @JsonIgnore
-    public boolean isSynchronous() {
-        return asyncIds == null;
-    }
-
-    public static Execution executionError(boolean runtime, String identifier, String message) {
-        Execution execution = new Execution(runtime);
-        execution.addTrace(traceError(identifier, message, null));
-        execution.stop();
-        return execution;
-    }
-
-    public void addTrace(ExecutionTrace context) {
+    public void addTrace(InjectStatusExecution context) {
         ExecutionStatus status = context.getStatus();
         if (status.equals(ExecutionStatus.SUCCESS) || status.equals(ExecutionStatus.INFO)) {
             LOGGER.log(Level.INFO, context.getMessage());
         } else {
-            LOGGER.log(Level.SEVERE, context.getMessage(), context.getException());
+            LOGGER.log(Level.SEVERE, context.getMessage());
         }
         this.traces.add(context);
     }

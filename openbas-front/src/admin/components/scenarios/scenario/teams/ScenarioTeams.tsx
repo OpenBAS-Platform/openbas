@@ -17,7 +17,7 @@ import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import type { TeamStore } from '../../../../../actions/teams/Team';
 import Teams from '../../../components/teams/Teams';
-import { PermissionsContext, TeamContext, TeamContextType } from '../../../components/Context';
+import { PermissionsContext, TeamContext } from '../../../components/Context';
 import type { Team, TeamCreateInput } from '../../../../../utils/api-types';
 import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
 import type { UserStore } from '../../../teams/players/Player';
@@ -27,22 +27,10 @@ interface Props {
   scenarioTeamsUsers: ScenarioStore['scenario_teams_users'],
 }
 
-const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
-  // Standard hooks
+export const teamContextForScenario = (scenarioId: ScenarioStore['scenario_id'], scenarioTeamsUsers: ScenarioStore['scenario_teams_users']) => {
   const dispatch = useAppDispatch();
-  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
 
-  const { teams }: { scenario: ScenarioStore, teams: TeamStore[] } = useHelper((helper: ScenariosHelper) => ({
-    teams: helper.getScenarioTeams(scenarioId),
-  }));
-
-  const { permissions } = useContext(PermissionsContext);
-
-  useDataLoader(() => {
-    dispatch(fetchScenarioTeams(scenarioId));
-  });
-
-  const context: TeamContextType = {
+  return {
     async onAddUsersTeam(teamId: Team['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
       await dispatch(addScenarioTeamPlayers(scenarioId, teamId, { scenario_team_players: userIds }));
       return dispatch(fetchTeams());
@@ -71,13 +59,29 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
       }
     },
   };
+};
+
+const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
+  // Standard hooks
+  const dispatch = useAppDispatch();
+  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
+
+  const { teams }: { scenario: ScenarioStore, teams: TeamStore[] } = useHelper((helper: ScenariosHelper) => ({
+    teams: helper.getScenarioTeams(scenarioId),
+  }));
+
+  const { permissions } = useContext(PermissionsContext);
+
+  useDataLoader(() => {
+    dispatch(fetchScenarioTeams(scenarioId));
+  });
 
   const teamIds = teams.map((t) => t.team_id);
 
   const onAddTeams = (ids: Team['team_id'][]) => dispatch(addScenarioTeams(scenarioId, { scenario_teams: ids }));
 
   return (
-    <TeamContext.Provider value={context}>
+    <TeamContext.Provider value={teamContextForScenario(scenarioId, scenarioTeamsUsers)}>
       <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
       <Teams teamIds={teamIds} contextual={true} />
       {permissions.canWrite && <AddTeams addedTeamIds={teamIds} onAddTeams={onAddTeams} />}

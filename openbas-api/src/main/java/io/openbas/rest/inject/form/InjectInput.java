@@ -19,6 +19,9 @@ public class InjectInput {
     @JsonProperty("inject_description")
     private String description;
 
+    @JsonProperty("inject_type")
+    private String type;
+
     @JsonProperty("inject_contract")
     private String contract;
 
@@ -60,6 +63,7 @@ public class InjectInput {
         inject.setTitle(getTitle());
         inject.setDescription(getDescription());
         inject.setContent(getContent());
+        inject.setType(getType());
         inject.setContract(getContract());
         inject.setDependsDuration(getDependsDuration());
         inject.setAllTeams(isAllTeams());

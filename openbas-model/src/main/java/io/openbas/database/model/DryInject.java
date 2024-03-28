@@ -4,17 +4,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
-import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 
 @Entity
 @Table(name = "dryinjects")
@@ -64,6 +65,10 @@ public class DryInject implements Base, Injection {
   @JsonProperty("dryinject_exercise")
   public Exercise getExercise() {
     return getInject().getExercise();
+  }
+
+  public Optional<DryInjectStatus> getStatus() {
+    return ofNullable(this.status);
   }
 
   @Override

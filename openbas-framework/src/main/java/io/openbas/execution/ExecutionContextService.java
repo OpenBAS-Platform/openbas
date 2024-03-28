@@ -32,7 +32,7 @@ public class ExecutionContextService {
   }
 
   public ExecutionContext executionContext(@NotNull final User user, Injection injection, List<String> teams) {
-    ExecutionContext executionContext = new ExecutionContext(user, injection.getExercise(), teams);
+    ExecutionContext executionContext = new ExecutionContext(user, teams);
     if (injection.getExercise() != null) {
       String exerciseId = injection.getExercise().getId();
       String queryParams = "?user=" + user.getId() + "&inject=" + injection.getId();
@@ -47,7 +47,7 @@ public class ExecutionContextService {
   }
 
   public ExecutionContext executionContext(@NotNull final User user, Exercise exercise, String team) {
-    ExecutionContext executionContext = new ExecutionContext(user, exercise, List.of(team));
+    ExecutionContext executionContext = new ExecutionContext(user, List.of(team));
     if (exercise != null) {
       fillDynamicVariable(executionContext, exercise.getId());
     }

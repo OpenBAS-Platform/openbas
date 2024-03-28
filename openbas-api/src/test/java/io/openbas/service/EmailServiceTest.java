@@ -34,7 +34,7 @@ class EmailServiceTest {
         ArgumentCaptor<MimeMessage> argument = ArgumentCaptor.forClass(MimeMessage.class);
 
         Execution execution = new Execution();
-        ExecutionContext userContext = new ExecutionContext(UserFixture.getSavedUser(), null, null);
+        ExecutionContext userContext = new ExecutionContext(UserFixture.getSavedUser(), null);
 
         when(emailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
         emailService.sendEmail(execution, userContext, "user@openbas.io", List.of("user-reply-to@openbas.io"), null, false, "subject", "message", Collections.emptyList());

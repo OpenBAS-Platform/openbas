@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.openbas.database.model.ExecutionTrace.traceError;
-import static io.openbas.database.model.ExecutionTrace.traceSuccess;
+import static io.openbas.database.model.InjectStatusExecution.traceError;
+import static io.openbas.database.model.InjectStatusExecution.traceSuccess;
 import static io.openbas.helper.TemplateHelper.buildContextualContent;
 import static java.util.stream.Collectors.joining;
 
@@ -64,7 +64,7 @@ public class EmailService {
 
         String emails = usersContext.stream().map(c -> c.getUser().getEmail()).collect(joining(", "));
         List<String> userIds = usersContext.stream().map(c -> c.getUser().getId()).toList();
-        execution.addTrace(traceSuccess("email", "Mail sent to " + emails, userIds));
+        execution.addTrace(traceSuccess("Mail sent to " + emails, userIds));
         // Store message in Imap after sending
         storeMessageImap(execution, mimeMessage);
     }
@@ -86,7 +86,7 @@ public class EmailService {
             emailSender.send(mimeMessage);
         }
         List<String> userIds = List.of(userContext.getUser().getId());
-        execution.addTrace(traceSuccess("email", "Mail sent to " + email, userIds));
+        execution.addTrace(traceSuccess("Mail sent to " + email, userIds));
         // Store message in Imap after sending
         storeMessageImap(execution, mimeMessage);
     }
@@ -104,12 +104,12 @@ public class EmailService {
             for (int i = 0; i < 3; i++) {
                 try {
                     imapService.storeSentMessage(mimeMessage);
-                    execution.addTrace(traceSuccess("imap", "Mail successfully stored in IMAP"));
+                    execution.addTrace(traceSuccess("Mail successfully stored in IMAP"));
                     return;
                 } catch (Exception ignored) {
                 }
             }
-            execution.addTrace(traceError("imap", "Fail to store mail in IMAP after 3 attempts"));
+            execution.addTrace(traceError("Fail to store mail in IMAP after 3 attempts"));
         }
     }
 

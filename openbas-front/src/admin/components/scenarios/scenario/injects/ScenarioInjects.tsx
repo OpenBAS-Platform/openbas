@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { useParams } from 'react-router-dom';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
-import { ArticleContext, InjectContext, InjectContextType } from '../../../components/Context';
+import { ArticleContext, InjectContext, InjectContextType, TeamContext } from '../../../components/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
@@ -23,6 +23,7 @@ import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-ac
 import type { Inject } from '../../../../../utils/api-types';
 import Injects from '../../../components/injects/Injects';
 import { articleContextForScenario } from '../articles/ScenarioArticles';
+import { teamContextForScenario } from '../teams/ScenarioTeams';
 
 interface Props {
 
@@ -52,6 +53,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
   });
 
   const articleContext = articleContextForScenario(scenarioId);
+  const teamContext = teamContextForScenario(scenarioId, []);
 
   const context: InjectContextType = {
     onAddInject(inject: Inject): Promise<{ result: string }> {
@@ -71,11 +73,13 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
   return (
     <InjectContext.Provider value={context}>
       <ArticleContext.Provider value={articleContext}>
-        <Injects injects={injects} teams={teams} articles={articles}
-          variables={variables} uriVariable={`/admin/scenarios/${scenarioId}/definition/variables`}
-          allUsersNumber={scenario.scenario_all_users_number} usersNumber={scenario.scenario_users_number}
-          teamsUsers={scenario.scenario_teams_users}
-        />
+        <TeamContext.Provider value={teamContext}>
+          <Injects injects={injects} teams={teams} articles={articles}
+            variables={variables} uriVariable={`/admin/scenarios/${scenarioId}/definition/variables`}
+            allUsersNumber={scenario.scenario_all_users_number} usersNumber={scenario.scenario_users_number}
+            teamsUsers={scenario.scenario_teams_users}
+          />
+        </TeamContext.Provider>
       </ArticleContext.Provider>
     </InjectContext.Provider>
   );

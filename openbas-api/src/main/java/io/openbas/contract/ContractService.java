@@ -6,14 +6,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.logging.Level;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationRuntime;
 
@@ -30,23 +28,6 @@ public class ContractService {
   @Autowired
   public void setBaseContracts(List<Contractor> baseContracts) {
     this.baseContracts = baseContracts;
-  }
-
-  // Build the contracts every minute
-  @Scheduled(fixedDelay = 60000, initialDelay = 0)
-  public void buildContracts() {
-    this.baseContracts.stream().parallel().forEach(helper -> {
-      try {
-        Map<String, Contract> contractInstances = helper.contracts()
-            .stream()
-            .filter(Objects::nonNull)
-            .distinct()
-            .collect(Collectors.toMap(Contract::getId, Function.identity()));
-        this.contracts.putAll(contractInstances);
-      } catch (Exception e) {
-        LOGGER.log(Level.SEVERE, e.getMessage(), e);
-      }
-    });
   }
 
   public Contract contract(@NotNull final String contractId) {

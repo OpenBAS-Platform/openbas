@@ -2,11 +2,12 @@ package io.openbas.execution;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openbas.contract.Contract;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
+import io.openbas.database.repository.InjectStatusRepository;
+import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.*;
 import io.openbas.service.FileService;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static io.openbas.database.model.ExecutionTrace.traceError;
+import static io.openbas.database.model.InjectStatusExecution.traceError;
 
 
 public abstract class Injector {
@@ -31,7 +32,13 @@ public abstract class Injector {
     protected ObjectMapper mapper;
     private FileService fileService;
     private DocumentRepository documentRepository;
+    private InjectStatusRepository injectStatusRepository;
     private InjectExpectationRepository injectExpectationRepository;
+
+    @Autowired
+    public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
+        this.injectStatusRepository = injectStatusRepository;
+    }
 
     @Autowired
     public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
@@ -48,7 +55,7 @@ public abstract class Injector {
         this.fileService = fileService;
     }
 
-    public abstract List<Expectation> process(Execution execution, ExecutableInject injection, Contract contract) throws Exception;
+    public abstract ExecutionProcess process(Execution execution, ExecutableInject injection) throws Exception;
 
     private InjectExpectation expectationConverter(
         @NotNull final ExecutableInject executableInject,
@@ -68,8 +75,8 @@ public abstract class Injector {
         @NotNull InjectExpectation expectationExecution,
         @NotNull final ExecutableInject executableInject,
         @NotNull final Expectation expectation) {
-        expectationExecution.setExercise(executableInject.getInject().getExercise());
-        expectationExecution.setInject(executableInject.getInject());
+        expectationExecution.setExercise(executableInject.getInjection().getExercise());
+        expectationExecution.setInject(executableInject.getInjection().getInject());
         expectationExecution.setExpectedScore(expectation.getScore());
         expectationExecution.setScore(0);
         expectationExecution.setExpectationGroup(expectation.isExpectationGroup());
@@ -99,23 +106,19 @@ public abstract class Injector {
     private Execution execute(ExecutableInject executableInject) {
         Execution execution = new Execution(executableInject.isRuntime());
         try {
-            // Inject contract must exist
-            Contract contract = executableInject.getContract();
             boolean isScheduledInject = !executableInject.isDirect();
-            // Inject contract must be exposed
-            if (!contract.getConfig().isExpose()) {
-                throw new UnsupportedOperationException("Inject is not activated for execution");
-            }
             // If empty content, inject must be rejected
-            if (executableInject.getInject().getContent() == null) {
+            if (executableInject.getInjection().getInject().getContent() == null) {
                 throw new UnsupportedOperationException("Inject is empty");
             }
             // If inject is too old, reject the execution
-            if (isScheduledInject && !isInInjectableRange(executableInject.getSource())) {
+            if (isScheduledInject && !isInInjectableRange(executableInject.getInjection())) {
                 throw new UnsupportedOperationException("Inject is now too old for execution");
             }
             // Process the execution
-            List<Expectation> expectations = process(execution, executableInject, contract);
+            ExecutionProcess executionProcess = process(execution, executableInject);
+            execution.setAsync(executionProcess.isAsync());
+            List<Expectation> expectations = executionProcess.getExpectations();
             // Create the expectations
             List<Team> teams = executableInject.getTeams();
             List<Asset> assets = executableInject.getAssets();
@@ -135,7 +138,7 @@ public abstract class Injector {
                 }
             }
         } catch (Exception e) {
-            execution.addTrace(traceError(getClass().getSimpleName(), e.getMessage(), e));
+            execution.addTrace(traceError(e.getMessage()));
         } finally {
             execution.stop();
         }
@@ -155,7 +158,7 @@ public abstract class Injector {
     }
 
     public <T> T contentConvert(@NotNull final ExecutableInject injection, @NotNull final Class<T> converter) throws Exception {
-        Inject inject = injection.getInject();
+        Inject inject = injection.getInjection().getInject();
         ObjectNode content = inject.getContent();
         return this.mapper.treeToValue(content, converter);
     }
@@ -169,7 +172,7 @@ public abstract class Injector {
                 resolved.add(new DataAttachment(doc.getName(), doc.getOriginalFilename(), content, doc.getContentType()));
             } catch (Exception e) {
                 String message = "Error getting direct attachment " + doc.getName();
-                execution.addTrace(traceError(getClass().getSimpleName(), message, e));
+                execution.addTrace(traceError(message));
             }
         });
         // Add attachments from configuration
@@ -185,7 +188,7 @@ public abstract class Injector {
                 // Can't fetch the attachments, ignore
                 String docInfo = askedDocument.map(Document::getName).orElse(documentId);
                 String message = "Error getting doc attachment " + docInfo;
-                execution.addTrace(traceError(getClass().getSimpleName(), message, e));
+                execution.addTrace(traceError(message));
             }
         });
         return resolved;

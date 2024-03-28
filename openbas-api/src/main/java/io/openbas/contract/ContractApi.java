@@ -16,10 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.InputStream;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 @RequiredArgsConstructor
@@ -33,7 +30,7 @@ public class ContractApi extends RestBehavior {
 
     @GetMapping("/images")
     public @ResponseBody Map<String, String> contractIcon() {
-        List<ContractConfig> contractTypes = this.contractService.getContractConfigs();
+        List<ContractConfig> contractTypes = new ArrayList<>(); // TODO REPLUG
         Map<String, String> map = new HashMap<>();
         contractTypes.forEach(contract -> {
             try {

@@ -1,6 +1,7 @@
 package io.openbas.database.model;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 public interface Injection {
@@ -9,4 +10,6 @@ public interface Injection {
     Exercise getExercise();
 
     Optional<Instant> getDate();
+
+    Inject getInject();
 }

@@ -1,36 +1,40 @@
 package io.openbas.rest.inject;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.asset.AssetGroupService;
 import io.openbas.asset.AssetService;
-import io.openbas.contract.Contract;
-import io.openbas.contract.ContractService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
-import io.openbas.execution.Injector;
+import io.openbas.execution.Executor;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
-import io.openbas.service.*;
+import io.openbas.service.ScenarioService;
+import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.ExecutionTrace.traceSuccess;
+import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.CommunicationSpecification.fromInject;
 import static io.openbas.helper.DatabaseHelper.resolveOptionalRelation;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
@@ -43,6 +47,8 @@ public class InjectApi extends RestBehavior {
 
   private static final int MAX_NEXT_INJECTS = 6;
 
+  private Executor executor;
+  private InjectorContractRepository injectorContractRepository;
   private CommunicationRepository communicationRepository;
   private ExerciseRepository exerciseRepository;
   private UserRepository userRepository;
@@ -53,10 +59,21 @@ public class InjectApi extends RestBehavior {
   private AssetGroupService assetGroupService;
   private TagRepository tagRepository;
   private DocumentRepository documentRepository;
-  private ApplicationContext context;
-  private ContractService contractService;
   private ExecutionContextService executionContextService;
   private ScenarioService scenarioService;
+
+  @Resource
+  protected ObjectMapper mapper;
+
+  @Autowired
+  public void setExecutor(Executor executor) {
+    this.executor = executor;
+  }
+
+  @Autowired
+  public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
+    this.injectorContractRepository = injectorContractRepository;
+  }
 
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
@@ -105,11 +122,6 @@ public class InjectApi extends RestBehavior {
   }
 
   @Autowired
-  public void setContractService(ContractService contractService) {
-    this.contractService = contractService;
-  }
-
-  @Autowired
   public void setInjectRepository(InjectRepository injectRepository) {
     this.injectRepository = injectRepository;
   }
@@ -120,18 +132,68 @@ public class InjectApi extends RestBehavior {
   }
 
   @Autowired
-  public void setContext(ApplicationContext context) {
-    this.context = context;
-  }
-  @Autowired
   public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
     this.executionContextService = executionContextService;
   }
 
   @GetMapping("/api/inject_types")
-  public Collection<Contract> injectTypes() {
-    return contractService.getContracts().values();
+  public Collection<JsonNode> injectTypes() {
+      return fromIterable(injectorContractRepository.findAll()).stream()
+              .map(contract -> {
+                  try {
+                      return mapper.readTree(contract.getContent());
+                  } catch (JsonProcessingException e) {
+                      throw new RuntimeException(e);
+                  }
+              }).toList();
   }
+
+  @Secured(ROLE_ADMIN)
+  @PostMapping("/api/injects/execution/reception/{injectId}")
+  public Inject InjectExecutionReception(@PathVariable String injectId, @Valid @RequestBody InjectReceptionInput input) {
+    Inject inject = injectRepository.findById(injectId).orElseThrow();
+    InjectStatus injectStatus = inject.getStatus().orElseThrow();
+    injectStatus.setName(ExecutionStatus.PENDING);
+    injectStatus.setTrackingAckDate(Instant.now());
+    injectStatus.setTrackingTotalCount(input.getTrackingTotalCount());
+    injectStatus.setTrackingTotalSuccess(0);
+    injectStatus.setTrackingTotalError(0);
+    return injectRepository.save(inject);
+  }
+
+  @Secured(ROLE_ADMIN)
+  @PostMapping("/api/injects/execution/callback/{injectId}")
+  public Inject InjectExecutionCallback(@PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
+    Inject inject = injectRepository.findById(injectId).orElseThrow();
+    InjectStatus injectStatus = inject.getStatus().orElseThrow();
+    ExecutionStatus executionStatus = ExecutionStatus.valueOf(input.getStatus());
+    InjectStatusExecution execution = new InjectStatusExecution();
+    Instant trackingEndDate = now();
+    execution.setTime(trackingEndDate);
+    execution.setStatus(executionStatus);
+    execution.setMessage(input.getMessage());
+    execution.setIdentifiers(input.getIdentifiers());
+    injectStatus.getTraces().add(execution);
+    if (executionStatus.equals(ExecutionStatus.SUCCESS)) {
+      injectStatus.setTrackingTotalSuccess(injectStatus.getTrackingTotalSuccess() + 1);
+    } else {
+      injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalSuccess() + 1);
+    }
+    int currentTotal = injectStatus.getTrackingTotalError() + injectStatus.getTrackingTotalSuccess();
+    if (injectStatus.getTrackingTotalCount() >= currentTotal) {
+      injectStatus.setTrackingEndDate(trackingEndDate);
+      injectStatus.setTrackingTotalExecutionTime(Duration.between(injectStatus.getTrackingSentDate(), trackingEndDate).getSeconds());
+      if (injectStatus.getTrackingTotalError().equals(injectStatus.getTrackingTotalCount())) {
+        injectStatus.setName(ExecutionStatus.ERROR);
+      } else if (injectStatus.getTrackingTotalError() > 0) {
+        injectStatus.setName(ExecutionStatus.PARTIAL);
+      } else {
+        injectStatus.setName(ExecutionStatus.SUCCESS);
+      }
+    }
+    return injectRepository.save(inject);
+  }
+
 
   @GetMapping("/api/injects/try/{injectId}")
   public InjectStatus tryInject(@PathVariable String injectId) {
@@ -140,14 +202,9 @@ public class InjectApi extends RestBehavior {
     List<ExecutionContext> userInjectContexts = List.of(
         this.executionContextService.executionContext(user, inject, "Direct test")
     );
-    Contract contract = contractService.resolveContract(inject);
-    if (contract == null) {
-      throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
-    }
-    ExecutableInject injection = new ExecutableInject(false, true, inject, contract, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
-    Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
-    Execution execution = executor.executeInjection(injection);
-    return InjectStatus.fromExecution(execution, inject);
+    ExecutableInject injection = new ExecutableInject(false, true, inject, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
+    // TODO Must be migrated to Atomic approach (Inject duplication and async tracing)
+    return executor.execute(injection);
   }
 
   @Transactional(rollbackOn = Exception.class)
@@ -205,7 +262,6 @@ public class InjectApi extends RestBehavior {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
     // Get common attributes
     Inject inject = input.toInject();
-    inject.setType(contractService.getContractType(input.getContract()));
     inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setExercise(exercise);
     // Set dependencies
@@ -230,21 +286,15 @@ public class InjectApi extends RestBehavior {
       @Valid @RequestPart("input") DirectInjectInput input,
       @RequestPart("file") Optional<MultipartFile> file) {
     Inject inject = input.toInject();
-    Contract contract = contractService.resolveContract(inject);
-    if (contract == null) {
-      throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
-    }
-    inject.setType(contract.getConfig().getType());
     inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
     Iterable<User> users = userRepository.findAllById(input.getUserIds());
     List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
         .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
-    ExecutableInject injection = new ExecutableInject(true, true, inject, contract, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
+    ExecutableInject injection = new ExecutableInject(true, true, inject, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
     file.ifPresent(injection::addDirectAttachment);
-    Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
-    Execution execution = executor.executeInjection(injection);
-    return InjectStatus.fromExecution(execution, inject);
+    // TODO Must be migrated to Atomic approach (Inject duplication and async tracing)
+    return executor.execute(injection);
   }
 
   @Transactional(rollbackOn = Exception.class)
@@ -283,13 +333,9 @@ public class InjectApi extends RestBehavior {
     // build status
     InjectStatus injectStatus = new InjectStatus();
     injectStatus.setInject(inject);
-    injectStatus.setDate(now());
-    injectStatus.setName(input.getStatus());
-    injectStatus.setExecutionTime(0);
-    Execution execution = new Execution(false);
-    execution.addTrace(traceSuccess(currentUser().getId(), input.getMessage()));
-    execution.stop();
-    injectStatus.setReporting(execution);
+    injectStatus.setTrackingSentDate(now());
+    injectStatus.setName(ExecutionStatus.valueOf(input.getStatus()));
+    injectStatus.setTrackingTotalExecutionTime(0L);
     // Save status for inject
     inject.setStatus(injectStatus);
     return injectRepository.save(inject);
@@ -330,7 +376,6 @@ public class InjectApi extends RestBehavior {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     // Get common attributes
     Inject inject = input.toInject();
-    inject.setType(this.contractService.getContractType(input.getContract()));
     inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setScenario(scenario);
     // Set dependencies

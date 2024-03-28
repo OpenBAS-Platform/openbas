@@ -1,9 +1,8 @@
 package io.openbas.execution;
 
-import io.openbas.contract.Contract;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.openbas.database.model.*;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -12,49 +11,41 @@ import java.util.List;
 @Getter
 public class ExecutableInject {
 
-  private final Inject inject;
-  private final Contract contract;
-  private final Injection source;
-  private final List<ExecutionContext> contextUser;
-  private final List<Team> teams;
-  private final List<Asset> assets;
-  private final List<AssetGroup> assetGroups;
-  private final boolean runtime;
-  private final boolean direct;
-  private final int teamSize;
-  private final int documentSize;
-  @Setter
-  private List<MultipartFile> directAttachments = new ArrayList<>();
+    private final Injection injection;
+    private final int teamSize;
+    private final boolean direct;
+    private final boolean runtime;
+    private final int documentSize;
+    private final List<Team> teams;
+    private final Exercise exercise;
+    private final List<Asset> assets;
+    private final List<AssetGroup> assetGroups;
+    private final List<ExecutionContext> users;
 
-  public ExecutableInject(boolean runtime, boolean direct,
-      Injection source, Inject inject, Contract contract,
-      List<Team> teams, List<Asset> assets, List<AssetGroup> assetGroups, List<ExecutionContext> contextUser) {
-    this.runtime = runtime;
-    this.direct = direct;
-    this.source = source;
-    this.inject = inject;
-    this.contract = contract;
-    this.contextUser = contextUser;
-    this.teams = teams;
-    this.assets = assets;
-    this.assetGroups = assetGroups;
-    this.teamSize = teams.size();
-    this.documentSize = inject.getDocuments().size();
-  }
+    @JsonIgnore
+    private final List<MultipartFile> directAttachments = new ArrayList<>();
 
-  public ExecutableInject(boolean runtime, boolean direct,
-      Inject inject, Contract contract,
-      List<Team> teams, List<Asset> assets, List<AssetGroup> assetGroups, List<ExecutionContext> contextUser) {
-    this(runtime, direct, inject, inject, contract, teams, assets, assetGroups, contextUser);
-  }
 
-  public ExecutableInject(boolean runtime, boolean direct,
-      Inject inject, Contract contract, List<ExecutionContext> contextUser) {
-    this(runtime, direct, inject, inject, contract, List.of(), List.of(), List.of(), contextUser);
-  }
+    public ExecutableInject(boolean runtime, boolean direct, Injection injection,
+                            List<Team> teams, List<Asset> assets, List<AssetGroup> assetGroups, List<ExecutionContext> users) {
+        this.injection = injection;
+        this.exercise = injection.getExercise();
+        this.runtime = runtime;
+        this.direct = direct;
+        this.users = users;
+        this.teams = teams;
+        this.assets = assets;
+        this.assetGroups = assetGroups;
+        this.teamSize = teams.size();
+        this.documentSize = injection.getInject().getDocuments().size();
+    }
 
-  public void addDirectAttachment(MultipartFile file) {
-    this.directAttachments.add(file);
-  }
+    public ExecutableInject(boolean runtime, boolean direct, Injection injection, List<ExecutionContext> users) {
+        this(runtime, direct, injection, List.of(), List.of(), List.of(), users);
+    }
+
+    public void addDirectAttachment(MultipartFile file) {
+        this.directAttachments.add(file);
+    }
 
 }

@@ -16,7 +16,7 @@ public class ManualExecutorTest {
   void process() {
     UnsupportedOperationException error = null;
     try {
-      this.manualExecutor.process(null, null, null);
+      this.manualExecutor.process(null, null);
     } catch (UnsupportedOperationException e) {
       error = e;
     }

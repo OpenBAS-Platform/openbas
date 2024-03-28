@@ -1,31 +1,31 @@
 package io.openbas.injects.channel;
 
 import io.openbas.config.OpenBASConfig;
-import io.openbas.contract.Contract;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ArticleRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
-import io.openbas.injects.email.service.EmailService;
 import io.openbas.injects.channel.model.ArticleVariable;
 import io.openbas.injects.channel.model.ChannelContent;
+import io.openbas.injects.email.service.EmailService;
+import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
-import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.ChannelExpectation;
+import io.openbas.model.expectation.ManualExpectation;
+import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.openbas.database.model.ExecutionTrace.traceError;
-import static io.openbas.database.model.ExecutionTrace.traceSuccess;
+import static io.openbas.database.model.InjectStatusExecution.traceError;
+import static io.openbas.database.model.InjectStatusExecution.traceSuccess;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injects.channel.ChannelContract.CHANNEL_PUBLISH;
 
@@ -65,25 +65,23 @@ public class ChannelExecutor extends Injector {
   }
 
   @Override
-  public List<Expectation> process(
-      @NotNull final Execution execution,
-      @NotNull final ExecutableInject injection,
-      @NotNull final Contract contract) {
+  public ExecutionProcess process(@NotNull final Execution execution, @NotNull final ExecutableInject injection) {
     try {
       ChannelContent content = contentConvert(injection, ChannelContent.class);
       List<Article> articles = fromIterable(articleRepository.findAllById(content.getArticles()));
-      if (contract.getId().equals(CHANNEL_PUBLISH)) {
+      String contract = injection.getInjection().getInject().getContract();
+      if (contract.equals(CHANNEL_PUBLISH)) {
         // Article publishing is only linked to execution date of this inject.
         String articleNames = articles.stream().map(Article::getName).collect(Collectors.joining(","));
         String publishedMessage = "Articles (" + articleNames + ") marked as published";
-        execution.addTrace(traceSuccess("article", publishedMessage));
-        Exercise exercise = injection.getSource().getExercise();
+        execution.addTrace(traceSuccess(publishedMessage));
+        Exercise exercise = injection.getInjection().getExercise();
         // Send the publication message.
         if (content.isEmailing()) {
           String from = exercise.getFrom();
           List<String> replyTos = exercise.getReplyTos();
-          List<ExecutionContext> users = injection.getContextUser();
-          List<Document> documents = injection.getInject().getDocuments().stream()
+          List<ExecutionContext> users = injection.getUsers();
+          List<Document> documents = injection.getInjection().getInject().getDocuments().stream()
               .filter(InjectDocument::isAttached).map(InjectDocument::getDocument).toList();
           List<DataAttachment> attachments = resolveAttachments(execution, injection, documents);
           String message = content.buildMessage(injection, imapEnabled);
@@ -100,11 +98,11 @@ public class ChannelExecutor extends Injector {
               emailService.sendEmail(execution, userInjectContext, from, replyTos, content.getInReplyTo(), encrypted,
                   content.getSubject(), message, attachments);
             } catch (Exception e) {
-              execution.addTrace(traceError("email", e.getMessage(), e));
+              execution.addTrace(traceError(e.getMessage()));
             }
           });
         } else {
-          execution.addTrace(traceSuccess("article", "Email disabled for this inject"));
+          execution.addTrace(traceSuccess("Email disabled for this inject"));
         }
         List<Expectation> expectations = new ArrayList<>();
         if (!content.getExpectations().isEmpty()) {
@@ -122,13 +120,13 @@ public class ChannelExecutor extends Injector {
                   .toList()
           );
         }
-        return expectations;
+        return new ExecutionProcess(false, expectations);
       } else {
-        throw new UnsupportedOperationException("Unknown contract " + contract.getId());
+        throw new UnsupportedOperationException("Unknown contract " + contract);
       }
     } catch (Exception e) {
-      execution.addTrace(traceError("channel", e.getMessage(), e));
+      execution.addTrace(traceError(e.getMessage()));
     }
-    return List.of();
+    return new ExecutionProcess(false, List.of());
   }
 }

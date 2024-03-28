@@ -4,16 +4,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.config.OpenBASConfig;
-import io.openbas.contract.Contract;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ComcheckRepository;
 import io.openbas.database.repository.ComcheckStatusRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
+import io.openbas.execution.ExecutionContextService;
 import io.openbas.injects.email.EmailContract;
 import io.openbas.injects.email.EmailExecutor;
-import io.openbas.contract.ContractService;
-import io.openbas.execution.ExecutionContextService;
+import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -22,9 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -47,16 +45,10 @@ public class ComchecksExecutionJob implements Job {
     private ApplicationContext context;
     private ComcheckRepository comcheckRepository;
     private ComcheckStatusRepository comcheckStatusRepository;
-    private ContractService contractService;
     private ExecutionContextService executionContextService;
 
     @Resource
     private ObjectMapper mapper;
-
-    @Autowired
-    public void setContractService(ContractService contractService) {
-        this.contractService = contractService;
-    }
 
     @Autowired
     public void setComcheckRepository(ComcheckRepository comcheckRepository) {
@@ -125,14 +117,13 @@ public class ComchecksExecutionJob implements Job {
                     return injectContext;
                 }).toList();
                 Inject emailInject = buildComcheckEmail(comCheck);
-                Contract contract = contractService.resolveContract(emailInject);
-                ExecutableInject injection = new ExecutableInject(false, true, emailInject, contract, userInjectContexts);
+                ExecutableInject injection = new ExecutableInject(false, true, emailInject, userInjectContexts);
                 EmailExecutor emailExecutor = context.getBean(EmailExecutor.class);
                 Execution execution = emailExecutor.executeInjection(injection);
                 // Save the status sent date
                 List<String> usersSuccessfullyNotified = execution.getTraces().stream()
                         .filter(executionTrace -> executionTrace.getStatus().equals(ExecutionStatus.SUCCESS))
-                        .flatMap(t -> t.getUserIds().stream()).toList();
+                        .flatMap(t -> t.getIdentifiers().stream()).toList();
                 List<ComcheckStatus> statusToUpdate = comcheckStatuses.stream()
                         .filter(comcheckStatus -> usersSuccessfullyNotified.contains(comcheckStatus.getUser().getId()))
                         .toList();

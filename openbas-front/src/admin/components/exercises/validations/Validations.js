@@ -25,7 +25,6 @@ Transition.displayName = 'TransitionSlide';
 const useStyles = makeStyles(() => ({
   container: {
     margin: '10px 0 50px 0',
-    padding: '0 200px 50px 0',
   },
   item: {
     height: 40,

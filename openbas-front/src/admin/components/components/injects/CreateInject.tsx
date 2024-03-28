@@ -36,6 +36,7 @@ const CreateInject: FunctionComponent<Props> = ({
         + data.inject_depends_duration_minutes * 60
         + data.inject_depends_duration_seconds,
       ),
+      R.assoc('inject_type', data.inject_contract.type),
       R.assoc('inject_contract', data.inject_contract.id),
       R.assoc('inject_tags', R.pluck('id', data.inject_tags)),
       R.dissoc('inject_depends_duration_days'),

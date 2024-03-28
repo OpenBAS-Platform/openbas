@@ -329,6 +329,7 @@ export interface Communication {
 export interface Contract {
   config: ContractConfig;
   context: Record<string, string>;
+  contract_attack_patterns: string[];
   contract_id: string;
   fields: ContractElement[];
   label: Record<string, string>;
@@ -369,20 +370,6 @@ export interface ContractElement {
     | "asset-group";
 }
 
-export interface ContractSearchInput {
-  /** Indicate if the contract can be exposed */
-  exposedContractsOnly?: boolean;
-  /** Label contract */
-  label?: string;
-  sort?: SortObject[];
-  /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
-  sorts?: SortField[];
-  /** Text to search within contract attributes such as fields, config.label, and label */
-  textSearch?: string;
-  /** Label Type from contract config */
-  type?: string;
-}
-
 export interface ContractVariable {
   cardinality: "1" | "n";
   children?: ContractVariable[];
@@ -416,6 +403,7 @@ export interface DirectInjectInput {
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
   inject_title?: string;
+  inject_type?: string;
   inject_users?: string[];
 }
 
@@ -461,13 +449,23 @@ export interface DryInject {
 }
 
 export interface DryInjectStatus {
-  /** @format date-time */
-  status_date?: string;
-  /** @format int32 */
-  status_execution?: number;
   status_id?: string;
-  status_name?: "INFO" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
-  status_reporting?: Execution;
+  status_name?: "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_traces?: InjectStatusExecution[];
+  /** @format date-time */
+  tracking_ack_date?: string;
+  /** @format date-time */
+  tracking_end_date?: string;
+  /** @format date-time */
+  tracking_sent_date?: string;
+  /** @format int32 */
+  tracking_total_count?: number;
+  /** @format int32 */
+  tracking_total_error?: number;
+  /** @format int64 */
+  tracking_total_execution_time?: number;
+  /** @format int32 */
+  tracking_total_success?: number;
   updateAttributes?: object;
 }
 
@@ -548,28 +546,6 @@ export interface Evaluation {
 export interface EvaluationInput {
   /** @format int64 */
   evaluation_score?: number;
-}
-
-export interface Execution {
-  execution_async_ids?: string[];
-  execution_runtime?: boolean;
-  /** @format date-time */
-  execution_start?: string;
-  /** @format date-time */
-  execution_stop?: string;
-  /** @format int32 */
-  execution_time?: number;
-  execution_traces?: ExecutionTrace[];
-  status?: "INFO" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
-}
-
-export interface ExecutionTrace {
-  trace_identifier?: string;
-  trace_message?: string;
-  trace_status?: "INFO" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
-  /** @format date-time */
-  trace_time?: string;
-  trace_users?: string[];
 }
 
 export interface Exercise {
@@ -814,6 +790,14 @@ export interface InjectDocumentInput {
   document_id?: string;
 }
 
+export interface InjectExecutionInput {
+  execution_context_identifiers?: string[];
+  /** @format int32 */
+  execution_duration?: number;
+  execution_message?: string;
+  execution_status: string;
+}
+
 export interface InjectExpectation {
   inject_expectation_article?: Article;
   inject_expectation_asset?: Asset;
@@ -862,18 +846,44 @@ export interface InjectInput {
   inject_tags?: string[];
   inject_teams?: string[];
   inject_title?: string;
+  inject_type?: string;
+}
+
+export interface InjectReceptionInput {
+  /** @format int32 */
+  tracking_total_count?: number;
 }
 
 export interface InjectStatus {
-  status_async_ids?: string[];
-  /** @format date-time */
-  status_date?: string;
-  /** @format int32 */
-  status_execution?: number;
   status_id?: string;
-  status_name?: string;
-  status_reporting?: Execution;
+  status_name?: "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_traces?: InjectStatusExecution[];
+  /** @format date-time */
+  tracking_ack_date?: string;
+  /** @format date-time */
+  tracking_end_date?: string;
+  /** @format date-time */
+  tracking_sent_date?: string;
+  /** @format int32 */
+  tracking_total_count?: number;
+  /** @format int32 */
+  tracking_total_error?: number;
+  /** @format int64 */
+  tracking_total_execution_time?: number;
+  /** @format int32 */
+  tracking_total_success?: number;
   updateAttributes?: object;
+}
+
+export interface InjectStatusExecution {
+  execution_category?: string;
+  execution_context_identifiers?: string[];
+  /** @format int32 */
+  execution_duration?: number;
+  execution_message?: string;
+  execution_status?: "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  /** @format date-time */
+  execution_time?: string;
 }
 
 export interface InjectTeamsInput {
@@ -894,6 +904,55 @@ export interface InjectUpdateTriggerInput {
   inject_depends_duration?: number;
 }
 
+export interface Injector {
+  /** @format date-time */
+  injector_created_at?: string;
+  injector_external?: boolean;
+  injector_id: string;
+  injector_name: string;
+  injector_type: string;
+  /** @format date-time */
+  injector_updated_at?: string;
+  updateAttributes?: object;
+}
+
+export interface InjectorConnection {
+  host?: string;
+  pass?: string;
+  /** @format int32 */
+  port?: number;
+  use_ssl?: boolean;
+  user?: string;
+  vhost?: string;
+}
+
+export interface InjectorContractInput {
+  contract_attack_patterns?: string[];
+  contract_content: string;
+  contract_id: string;
+  contract_labels?: Record<string, string>;
+  contract_manual?: boolean;
+}
+
+export interface InjectorCreateInput {
+  injector_contracts?: InjectorContractInput[];
+  injector_id: string;
+  injector_name: string;
+  injector_type: string;
+}
+
+export interface InjectorRegistration {
+  connection?: InjectorConnection;
+  listen?: string;
+}
+
+export interface InjectorUpdateInput {
+  injector_contracts?: InjectorContractInput[];
+  injector_name: string;
+}
+
+export type JsonNode = object;
+
 export interface KillChainPhase {
   /** @format date-time */
   phase_created_at?: string;
@@ -912,10 +971,14 @@ export interface KillChainPhase {
 }
 
 export interface KillChainPhaseCreateInput {
-  phase_kill_chain_name?: string;
+  phase_description?: string;
+  phase_external_id?: string;
+  phase_kill_chain_name: string;
   phase_name: string;
   /** @format int64 */
   phase_order?: number;
+  phase_short_name?: string;
+  phase_stix_id?: string;
 }
 
 export interface LessonsAnswer {
@@ -1208,7 +1271,7 @@ export interface PageAttackPattern {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject;
+  sort?: SortObject[];
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -1217,6 +1280,25 @@ export interface PageAttackPattern {
 
 export interface PageContract {
   content?: Contract[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageEndpoint {
+  content?: Endpoint[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -1246,7 +1328,7 @@ export interface PageKillChainPhase {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject;
+  sort?: SortObject[];
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */

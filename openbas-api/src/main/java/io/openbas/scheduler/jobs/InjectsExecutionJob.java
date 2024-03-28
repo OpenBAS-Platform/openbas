@@ -1,13 +1,15 @@
 package io.openbas.scheduler.jobs;
 
-import io.openbas.contract.Contract;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.DryInjectRepository;
-import io.openbas.database.repository.ExerciseRepository;
-import io.openbas.database.repository.InjectRepository;
+import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
-import io.openbas.execution.Injector;
 import io.openbas.helper.InjectHelper;
+import io.openbas.service.QueueService;
+import jakarta.annotation.Resource;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -16,12 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static io.openbas.database.model.Execution.executionError;
 import static java.time.Instant.now;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -30,11 +33,47 @@ import static java.util.stream.Collectors.groupingBy;
 public class InjectsExecutionJob implements Job {
 
     private static final Logger LOGGER = Logger.getLogger(InjectsExecutionJob.class.getName());
+
     private ApplicationContext context;
     private InjectHelper injectHelper;
     private DryInjectRepository dryInjectRepository;
     private InjectRepository injectRepository;
+    private InjectorRepository injectorRepository;
+    private InjectStatusRepository injectStatusRepository;
+    private DryInjectStatusRepository dryInjectStatusRepository;
     private ExerciseRepository exerciseRepository;
+    private QueueService queueService;
+
+    @Resource
+    protected ObjectMapper mapper;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Autowired
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    @Autowired
+    public void setQueueService(QueueService queueService) {
+        this.queueService = queueService;
+    }
+
+    @Autowired
+    public void setDryInjectStatusRepository(DryInjectStatusRepository dryInjectStatusRepository) {
+        this.dryInjectStatusRepository = dryInjectStatusRepository;
+    }
+
+    @Autowired
+    public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
+        this.injectStatusRepository = injectStatusRepository;
+    }
+
+    @Autowired
+    public void setInjectorRepository(InjectorRepository injectorRepository) {
+        this.injectorRepository = injectorRepository;
+    }
 
     @Autowired
     public void setInjectRepository(InjectRepository injectRepository) {
@@ -81,27 +120,54 @@ public class InjectsExecutionJob implements Job {
                 }).toList());
     }
 
-    public void executeInject(ExecutableInject executableInject) {
-        Injection source = executableInject.getSource();
-        Contract contract = executableInject.getContract();
-        Execution execution;
-        if (contract == null) {
-            execution = executionError(executableInject.isRuntime(), "injector", "Inject is not available for execution");
-        } else {
-            Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
-            execution = executor.executeInjection(executableInject);
+    private void executeExternal(ExecutableInject executableInject) {
+        Inject inject = executableInject.getInjection().getInject();
+        InjectStatus status = new InjectStatus();
+        status.setTrackingSentDate(Instant.now());
+        status.setInject(inject);
+        try {
+            String jsonInject = mapper.writeValueAsString(executableInject);
+            injectStatusRepository.save(status);
+            queueService.publish(inject.getType(), jsonInject);
+        } catch (Exception e) {
+            status.getTraces().add(InjectStatusExecution.traceError(e.getMessage()));
+            injectStatusRepository.save(status);
         }
+    }
+
+    private void executeInternal(ExecutableInject executableInject) {
+        Injection source = executableInject.getInjection();
+        // Initialize the inject status
+        InjectStatus status = new InjectStatus();
+        status.setTrackingSentDate(Instant.now());
+        status.setInject(executableInject.getInjection().getInject());
+        // Execute
+        io.openbas.execution.Injector executor = context.getBean(source.getInject().getType(), io.openbas.execution.Injector.class);
+        Execution execution = executor.executeInjection(executableInject);
+        // After execution, expectations are already created
+        // Injection status is filled after complete execution
         // Report inject execution
         if (source instanceof Inject) {
             Inject executedInject = injectRepository.findById(source.getId()).orElseThrow();
-            executedInject.setStatus(InjectStatus.fromExecution(execution, executedInject));
-            injectRepository.save(executedInject);
+            InjectStatus completeStatus = InjectStatus.fromExecution(execution, executedInject);
+            injectStatusRepository.save(completeStatus);
         }
         // Report dry inject execution
         if (source instanceof DryInject) {
             DryInject executedDry = dryInjectRepository.findById(source.getId()).orElseThrow();
-            executedDry.setStatus(DryInjectStatus.fromExecution(execution, executedDry));
-            dryInjectRepository.save(executedDry);
+            DryInjectStatus completeStatus = DryInjectStatus.fromExecution(execution, executedDry);
+            dryInjectStatusRepository.save(completeStatus);
+        }
+    }
+
+    public void executeInject(ExecutableInject executableInject) {
+        // Depending on injector type (internal or external) execution must be done differently
+        Inject inject = executableInject.getInjection().getInject();
+        Injector externalInjector = injectorRepository.findByType(inject.getType()).orElseThrow();
+        if (externalInjector.isExternal()) {
+            executeExternal(executableInject);
+        } else {
+            executeInternal(executableInject);
         }
     }
 
@@ -112,13 +178,14 @@ public class InjectsExecutionJob implements Job {
     }
 
     @Override
+    @Transactional
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         try {
             // Handle starting exercises if needed.
             handleAutoStartExercises();
             // Get all injects to execute grouped by exercise.
             List<ExecutableInject> injects = injectHelper.getInjectsToRun();
-            Map<Exercise, List<ExecutableInject>> byExercises = injects.stream().collect(groupingBy(ex -> ex.getInject().getExercise()));
+            Map<Exercise, List<ExecutableInject>> byExercises = injects.stream().collect(groupingBy(ex -> ex.getInjection().getExercise()));
             // Execute injects in parallel for each exercise.
             byExercises.entrySet().stream().parallel().forEach(entry -> {
                 Exercise exercise = entry.getKey();
