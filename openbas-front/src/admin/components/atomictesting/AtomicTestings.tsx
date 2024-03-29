@@ -89,7 +89,7 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
     fontSize: 12,
     fontWeight: '700',
   },
-  inject_status: {
+  inject_result: {
     float: 'left',
     width: '20%',
     fontSize: 12,
@@ -111,7 +111,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   inject_players: {
     width: '20%',
   },
-  inject_status: {
+  inject_result: {
     width: '20%',
   },
 };
@@ -181,7 +181,7 @@ const AtomicTestings = () => {
     },
     {
       name: 'inject_players',
-      label: 'Teams',
+      label: 'Target',
       isSortable: true,
       value: (atomicTesting: InjectStore) => atomicTesting.inject_users_number,
     },
@@ -194,6 +194,8 @@ const AtomicTestings = () => {
           { type: 'PREVENTION', result: 'SUCCESS' },
           { type: 'DETECTION', result: 'ERROR' },
           { type: 'ARTICLE', result: 'PARTIAL' },
+          { type: 'CHALLENGE', result: 'ERROR' },
+          { type: 'MANUAL', result: 'SUCCESS' },
         ];
         return (
           <AtomicTestingResult expectations={mockExpectations} />

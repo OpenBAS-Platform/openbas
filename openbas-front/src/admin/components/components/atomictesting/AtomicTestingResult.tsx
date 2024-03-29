@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, TrackChanges, SensorOccupied, Help } from '@mui/icons-material';
+import { Shield, TrackChanges, SensorOccupied, Help, HorizontalRule } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles(() => ({
@@ -23,7 +23,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
   const classes = useStyles();
   let color = null;
   if (expectations.length === 0) {
-    return <Help style={{ color: '#d9d9d9' }} />;
+    return <HorizontalRule />;
   }
   return (
     <div className={classes.inline}>
