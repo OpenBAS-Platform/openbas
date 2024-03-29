@@ -15,8 +15,6 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
 import { exportData } from '../../../utils/Environment';
-import ItemTags from '../../../components/ItemTags';
-import ItemBoolean from '../../../components/ItemBoolean';
 import InjectPopover from '../components/injects/InjectPopover';
 import type { TagsHelper } from '../../../actions/helper';
 import InjectIcon from '../components/injects/InjectIcon';
@@ -24,6 +22,7 @@ import InjectType from '../components/injects/InjectType';
 import type { Contract, Inject, Tag } from '../../../utils/api-types';
 import { AtomicTestingContext, AtomicTestingContextType } from '../components/Context';
 import { fetchAtomicTesting, fetchAtomicTestings } from '../../../actions/atomictestings/atomic-testing-actions';
+import AtomicTestingResult from '../components/atomictesting/AtomicTestingResult';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -92,13 +91,7 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
   },
   inject_status: {
     float: 'left',
-    width: '10%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  inject_tags: {
-    float: 'left',
-    width: '10%',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -119,10 +112,7 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '20%',
   },
   inject_status: {
-    width: '10%',
-  },
-  inject_tags: {
-    width: '10%',
+    width: '20%',
   },
 };
 
@@ -196,28 +186,19 @@ const AtomicTestings = () => {
       value: (atomicTesting: InjectStore) => atomicTesting.inject_users_number,
     },
     {
-      name: 'inject_status',
-      label: 'Status',
+      name: 'inject_result',
+      label: 'Result',
       isSortable: true,
       value: (atomicTesting: InjectStore) => {
-        const injectStatus = atomicTesting.inject_status?.status_name;
+        const mockExpectations: { type: string, result: string }[] = [
+          { type: 'PREVENTION', result: 'SUCCESS' },
+          { type: 'DETECTION', result: 'ERROR' },
+          { type: 'ARTICLE', result: 'PARTIAL' },
+        ];
         return (
-          <ItemBoolean
-            status={
-              atomicTesting.inject_content === null
-                ? false
-                : atomicTesting.inject_enabled
-            }
-            label={injectStatus}
-            variant="inList"
-          />);
+          <AtomicTestingResult expectations={mockExpectations} />
+        );
       },
-    },
-    {
-      name: 'inject_tags',
-      label: 'Tag',
-      isSortable: true,
-      value: (atomicTesting: InjectStore) => <ItemTags variant="list" tags={atomicTesting.inject_tags} />,
     },
   ];
   const sortedAtomicTestings: InjectStore[] = filtering.filterAndSort(injects);

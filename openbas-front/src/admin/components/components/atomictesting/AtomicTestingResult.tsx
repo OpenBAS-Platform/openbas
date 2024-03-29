@@ -1,22 +1,105 @@
 import React from 'react';
-import { Shield, TrackChanges, SensorOccupied, HelpOutlined } from '@mui/icons-material';
+import { Shield, TrackChanges, SensorOccupied, Help } from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
 
-interface Props {
-  expectationType: string,
-  result: string,
+const useStyles = makeStyles(() => ({
+  inline: {
+    display: 'flex',
+    flexDirection: 'row',
+    padding: 0,
+  },
+}));
+
+interface Expectation {
+  type: string;
+  result: string;
 }
 
-const AtomicTestingResult: React.FC<Props> = ({ result, expectationType }) => {
+interface Props {
+  expectations: Expectation[];
+}
+
+const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
+  const classes = useStyles();
   let color = null;
-  if (result === 'SUCCESS') {
+  if (expectations.length === 0) {
+    return <Help style={{ color: '#d9d9d9' }} />;
+  }
+  return (
+    <div className={classes.inline}>
+      {expectations.map((expectation, index) => {
+        if (expectation.result === 'SUCCESS') {
+          color = '#4caf50';
+        } else if (expectation.result === 'ERROR') {
+          color = '#d51304';
+        } else {
+          color = '#ff9800';
+        }
+        if (expectation.type === 'PREVENTION') {
+          return (
+            <span key={index}>
+              <Shield style={{ color }} />
+            </span>
+          );
+        }
+        if (expectation.type === 'DETECTION') {
+          return (
+            <span key={index}>
+              <TrackChanges style={{ color }} />
+            </span>
+          );
+        }
+        if (expectation.type === 'ARTICLE' || expectation.type === 'CHALLENGE' || expectation.type === 'MANUAL') {
+          return (
+            <span key={index}>
+              <SensorOccupied style={{ color }} />
+            </span>
+          );
+        }
+        return (
+          <span key={index}>
+            <Help style={{ color: '#d9d9d9' }} />
+          </span>
+        );
+      })}
+    </div>
+  );
+
+  /* return (
+    <div>
+      <List className={classes.inline}>
+        <ListItem>
+          if(st){
+
+        }
+          <ListItemText primary="foo1" secondary="bar1" />
+        </ListItem>
+        <ListItem>
+          <ListItemText primary="foo2" secondary="bar2" />
+        </ListItem>
+      </List>
+    </div>
+  ); */
+
+  /* expectations.forEach((expectation) => {
+    if (expectation.result === 'SUCCESS') {
+      color = '#4caf50';
+    } else if (expectation.result === 'ERROR') {
+      color = '#f44336';
+    } else {
+      color = '#ff9800';
+    }
+  }); */
+
+  /* if (result === 'SUCCESS') {
     color = '#4caf50';
   } else if (result === 'ERROR') {
     color = '#f44336';
   } else {
     color = '#ff9800';
-  }
+  } */
 
-  switch (expectationType) {
+  /* switch (stringObjectMap.k) {
     case 'PREVENTION':
       return (
         <Shield style={{ color }} />
@@ -31,7 +114,7 @@ const AtomicTestingResult: React.FC<Props> = ({ result, expectationType }) => {
       );
     default:
       return <HelpOutlined style={{ color }} />;
-  }
+  } */
 };
 
 export default AtomicTestingResult;
