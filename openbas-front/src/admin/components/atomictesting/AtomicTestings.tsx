@@ -16,6 +16,7 @@ import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
 import { exportData } from '../../../utils/Environment';
 import ItemTags from '../../../components/ItemTags';
+import ItemBoolean from '../../../components/ItemBoolean';
 import InjectPopover from '../components/injects/InjectPopover';
 import type { TagsHelper } from '../../../actions/helper';
 import InjectIcon from '../components/injects/InjectIcon';
@@ -198,13 +199,25 @@ const AtomicTestings = () => {
       name: 'inject_status',
       label: 'Status',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => atomicTesting.inject_status?.status_name,
+      value: (atomicTesting: InjectStore) => {
+        const injectStatus = atomicTesting.inject_status?.status_name;
+        return (
+          <ItemBoolean
+            status={
+              atomicTesting.inject_content === null
+                ? false
+                : atomicTesting.inject_enabled
+            }
+            label={injectStatus}
+            variant="inList"
+          />);
+      },
     },
     {
       name: 'inject_tags',
       label: 'Tag',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => <ItemTags variant="list" tags={atomicTesting.inject_tags}/>,
+      value: (atomicTesting: InjectStore) => <ItemTags variant="list" tags={atomicTesting.inject_tags} />,
     },
   ];
   const sortedAtomicTestings: InjectStore[] = filtering.filterAndSort(injects);
@@ -218,7 +231,7 @@ const AtomicTestings = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]}/>
+      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]} />
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter
@@ -244,13 +257,13 @@ const AtomicTestings = () => {
             >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
-                  <FileDownloadOutlined color="primary"/>
+                  <FileDownloadOutlined color="primary" />
                 </IconButton>
               </Tooltip>
             </CSVLink>
           ) : (
             <IconButton size="large" disabled>
-              <FileDownloadOutlined/>
+              <FileDownloadOutlined />
             </IconButton>
           )}
         </div>
@@ -279,18 +292,18 @@ const AtomicTestings = () => {
                   {fields.map((header) => (
                     <div key={header.name}>
                       {
-                                                filtering.buildHeader(
-                                                  header.name,
-                                                  header.label,
-                                                  header.isSortable,
-                                                  inlineStylesHeaders,
-                                                )
-                                            }
+                        filtering.buildHeader(
+                          header.name,
+                          header.label,
+                          header.isSortable,
+                          inlineStylesHeaders,
+                        )
+                      }
                     </div>
                   ))
-                                    }
+                  }
                 </>
-                            }
+              }
             />
           </ListItem>
           {sortedAtomicTestings.map((atomicTesting) => {
@@ -320,7 +333,7 @@ const AtomicTestings = () => {
                         </div>
                       ))}
                     </>
-                                    }
+                  }
                 />
                 <ListItemSecondaryAction>
                   <InjectPopover
