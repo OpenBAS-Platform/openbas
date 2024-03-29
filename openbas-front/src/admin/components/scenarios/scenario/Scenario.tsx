@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import React, { useState } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid, Paper, Theme, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Divider, Grid, Paper, Stack, Theme, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CreateOutlined, GroupsOutlined, NotificationsOutlined } from '@mui/icons-material';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -96,31 +96,6 @@ const Scenario = () => {
   return (
     <>
       <Grid container spacing={3}>
-        <Grid item xs={6} style={{ paddingBottom: 24 }}>
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <Grid container>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Set up a recurring simuation from this scenario')}</Typography>
-                <ScenarioRecurringForm
-                  scenarioId={scenarioId}
-                  initialValues={{ scenario_recurrence: scenario.scenario_recurrence, scenario_recurrence_start: scenario.scenario_recurrence_start }}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Instantiate a simulation from this scenario')}</Typography>
-                <Button
-                  variant="contained"
-                  startIcon={<CreateOutlined />}
-                  color="success"
-                  disabled={permissions.readOnly}
-                  onClick={() => setOpen(true)}
-                >
-                  {t('Instantiate')}
-                </Button>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
         <Grid item xs={3}>
           <Paper variant="outlined" classes={{ root: classes.container_metric }}>
             <div>
@@ -171,10 +146,34 @@ const Scenario = () => {
             </Grid>
           </Paper>
         </Grid>
+        <Grid item xs={6} style={{ paddingBottom: 24 }}>
+          <Typography variant="h4">{t('Execution')}</Typography>
+          <Paper variant="outlined" sx={{ height: '100%' }}>
+            <Box sx={{ p: 2 }}>
+              <Typography variant="h3">{t('Set up a recurring simuation from this scenario')}</Typography>
+              <ScenarioRecurringForm
+                scenarioId={scenarioId}
+                initialValues={{ scenario_recurrence: scenario.scenario_recurrence, scenario_recurrence_start: scenario.scenario_recurrence_start }}
+              />
+            </Box>
+            <Box sx={{ p: 2 }}>
+              <Typography variant="h3">{t('Instantiate a simulation from this scenario')}</Typography>
+              <Button
+                variant="contained"
+                startIcon={<CreateOutlined />}
+                color="success"
+                disabled={permissions.readOnly}
+                onClick={() => setOpen(true)}
+              >
+                {t('Instantiate')}
+              </Button>
+            </Box>
+          </Paper>
+        </Grid>
       </Grid>
       <br />
       <Grid container spacing={3}>
-        <Grid item xs={12} style={{ paddingBottom: 24 }}>
+        <Grid item xs={6} style={{ paddingBottom: 24 }}>
           <Typography variant="h4">{t('Injects distribution')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <ScenarioInjectsDistribution teams={teams} />

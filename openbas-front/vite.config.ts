@@ -65,6 +65,7 @@ export default ({ mode }: { mode: string }) => {
         'ckeditor5-custom-build/build/ckeditor',
         'cronstrue',
         'cron-time-generator',
+        'cron-parser',
       ],
     },
 
