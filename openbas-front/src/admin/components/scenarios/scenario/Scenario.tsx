@@ -101,7 +101,10 @@ const Scenario = () => {
             <Grid container>
               <Grid item xs={6}>
                 <Typography variant="h3">{t('Set up a recurring simuation from this scenario')}</Typography>
-                <ScenarioRecurringForm />
+                <ScenarioRecurringForm
+                  scenarioId={scenarioId}
+                  initialValues={{ scenario_recurrence: scenario.scenario_recurrence, scenario_recurrence_start: scenario.scenario_recurrence_start }}
+                />
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="h3">{t('Instantiate a simulation from this scenario')}</Typography>

@@ -218,4 +218,16 @@ public class ScenarioApi {
     return this.scenarioService.disablePlayers(scenarioId, teamId, input.getPlayersIds());
   }
 
+  // -- RECURRENCE --
+
+  @PutMapping(SCENARIO_URI + "/{scenarioId}/recurrence")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  public Scenario updateScenarioRecurrence(
+      @PathVariable @NotBlank final String scenarioId,
+      @Valid @RequestBody final ScenarioRecurrenceInput input) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    scenario.setUpdateAttributes(input);
+    return this.scenarioService.updateScenario(scenario);
+  }
+
 }
