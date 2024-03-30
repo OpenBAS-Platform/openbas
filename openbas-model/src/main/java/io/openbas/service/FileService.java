@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 public class FileService {
 
     private static final Logger LOGGER = Logger.getLogger(FileService.class.getName());
+    public static final String IMAGES_BASE_PATH = "/injectors/images/";
     private MinioConfig minioConfig;
     private MinioClient minioClient;
 
@@ -116,6 +117,10 @@ public class FileService {
 
     public Optional<InputStream> getFile(Document document) {
         return getFilePath(document.getTarget());
+    }
+
+    public Optional<InputStream> getInjectorImage(String injectType) {
+        return getFilePath(IMAGES_BASE_PATH + injectType + ".png");
     }
 
     public Optional<FileContainer> getFileContainer(String fileTarget) {

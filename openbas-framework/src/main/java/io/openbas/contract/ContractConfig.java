@@ -15,7 +15,6 @@ public class ContractConfig {
   private final Map<SupportedLanguage, String> label;
   private final String color_dark;
   private final String color_light;
-  private final String icon;
 
   public ContractConfig(String type, Map<SupportedLanguage, String> label, String color_dark, String color_light,
       String icon, boolean expose) {
@@ -23,7 +22,6 @@ public class ContractConfig {
     this.expose = expose;
     this.color_dark = color_dark;
     this.color_light = color_light;
-    this.icon = icon;
     this.label = label;
   }
 

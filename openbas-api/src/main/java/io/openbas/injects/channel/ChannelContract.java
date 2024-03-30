@@ -3,6 +3,7 @@ package io.openbas.injects.channel;
 import io.openbas.contract.Contract;
 import io.openbas.contract.ContractConfig;
 import io.openbas.contract.Contractor;
+import io.openbas.contract.ContractorIcon;
 import io.openbas.contract.fields.ContractCheckbox;
 import io.openbas.contract.fields.ContractElement;
 import io.openbas.contract.fields.ContractExpectations;
@@ -101,5 +102,9 @@ public class ChannelContract extends Contractor {
                 variable(VARIABLE_ARTICLE + ".uri", "Http user link to access the article", VariableType.String, One)
         )));
         return List.of(publishArticle);
+    }
+
+    public ContractorIcon getIcon() {
+        return null;
     }
 }

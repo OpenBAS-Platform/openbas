@@ -8,6 +8,8 @@ public abstract class Contractor {
 
     public abstract String getType();
 
+    public abstract ContractorIcon getIcon();
+
     public abstract ContractConfig getConfig();
 
     public abstract List<Contract> contracts() throws Exception;

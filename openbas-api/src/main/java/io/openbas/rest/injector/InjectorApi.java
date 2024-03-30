@@ -1,5 +1,6 @@
 package io.openbas.rest.injector;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -16,12 +17,14 @@ import io.openbas.rest.injector.form.InjectorCreateInput;
 import io.openbas.rest.injector.form.InjectorUpdateInput;
 import io.openbas.rest.injector.response.InjectorConnection;
 import io.openbas.rest.injector.response.InjectorRegistration;
+import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -44,6 +47,16 @@ public class InjectorApi extends RestBehavior {
     private InjectorRepository injectorRepository;
 
     private InjectorContractRepository injectorContractRepository;
+
+    private FileService fileService;
+
+    @Resource
+    protected ObjectMapper mapper;
+
+    @Autowired
+    public void setFileService(FileService fileService) {
+        this.fileService = fileService;
+    }
 
     @Autowired
     public void setAttackPatternRepository(AttackPatternRepository attackPatternRepository) {
@@ -81,6 +94,7 @@ public class InjectorApi extends RestBehavior {
         }
         return injectorContract;
     }
+
     private Injector updateInjector(Injector injector, String name, List<InjectorContractInput> contracts) {
         injector.setUpdatedAt(Instant.now());
         injector.setName(name);
@@ -127,12 +141,19 @@ public class InjectorApi extends RestBehavior {
     }
 
     @Secured(ROLE_ADMIN)
-    @PostMapping("/api/injectors")
-    @Transactional
-    public InjectorRegistration registerInjector(@Valid @RequestBody InjectorCreateInput input) {
+    @PostMapping(value = "/api/injectors",
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public InjectorRegistration registerInjector(@Valid @RequestPart("input") InjectorCreateInput input,
+                                                 @RequestPart("icon") Optional<MultipartFile> file) {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(openBASConfig.getRabbitmqHostname());
         try {
+            // Upload icon
+            if (file.isPresent() && "image/png".equals(file.get().getContentType())) {
+                fileService.uploadFile(FileService.IMAGES_BASE_PATH + input.getType() + ".png", file.get());
+            }
+            // Declare queueing
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
             String queueName = openBASConfig.getRabbitmqPrefix() + "_injector_" + input.getType();

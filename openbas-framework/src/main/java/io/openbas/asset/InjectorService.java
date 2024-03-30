@@ -1,4 +1,4 @@
-package io.openbas.service;
+package io.openbas.asset;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,11 +10,13 @@ import io.openbas.database.model.InjectorContract;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.InjectorRepository;
+import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.service.FileService.IMAGES_BASE_PATH;
 
 @Service
 public class InjectorService {
@@ -29,11 +32,18 @@ public class InjectorService {
     @Resource
     protected ObjectMapper mapper;
 
+    private FileService fileService;
+
     private InjectorRepository injectorRepository;
 
     private InjectorContractRepository injectorContractRepository;
 
     private AttackPatternRepository attackPatternRepository;
+
+    @Resource
+    public void setFileService(FileService fileService) {
+        this.fileService = fileService;
+    }
 
     @Autowired
     public void setAttackPatternRepository(AttackPatternRepository attackPatternRepository) {
@@ -55,7 +65,10 @@ public class InjectorService {
         if(!contractor.isExpose()) {
             return;
         }
-        // TODO upload image to MINIO?
+        if (contractor.getIcon() != null) {
+            InputStream iconData = contractor.getIcon().getData();
+            fileService.uploadStream(IMAGES_BASE_PATH, contractor.getType() + ".png", iconData);
+        }
         // We need to support upsert for registration
         Injector injector = injectorRepository.findById(id).orElse(null);
         List<Contract> contracts = contractor.contracts();

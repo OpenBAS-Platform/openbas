@@ -3,6 +3,7 @@ package io.openbas.injects.challenge;
 import io.openbas.contract.Contract;
 import io.openbas.contract.ContractConfig;
 import io.openbas.contract.Contractor;
+import io.openbas.contract.ContractorIcon;
 import io.openbas.contract.fields.ContractElement;
 import org.springframework.stereotype.Component;
 
@@ -69,5 +70,9 @@ public class ChallengeContract extends Contractor {
         Contract publishChallenge = executableContract(contractConfig,
                 CHALLENGE_PUBLISH, Map.of(en, "Publish challenges", fr, "Publier des challenges"), publishInstance);
         return List.of(publishChallenge);
+    }
+
+    public ContractorIcon getIcon() {
+        return null;
     }
 }

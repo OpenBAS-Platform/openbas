@@ -1,9 +1,6 @@
 package io.openbas.injects.email;
 
-import io.openbas.contract.Contract;
-import io.openbas.contract.ContractConfig;
-import io.openbas.contract.ContractVariable;
-import io.openbas.contract.Contractor;
+import io.openbas.contract.*;
 import io.openbas.contract.fields.ContractElement;
 import io.openbas.contract.fields.ContractExpectations;
 import io.openbas.database.model.Variable.VariableType;
@@ -84,5 +81,10 @@ public class EmailContract extends Contractor {
                 Map.of(en, "Send multi-recipients mail", fr, "Envoyer un mail multi-destinataires"), globalInstance);
         globalEmail.addVariable(documentUriVariable);
         return List.of(standardEmail, globalEmail);
+    }
+
+    @Override
+    public ContractorIcon getIcon() {
+        return null;
     }
 }

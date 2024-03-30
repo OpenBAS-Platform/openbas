@@ -1,9 +1,6 @@
 package io.openbas.injects.opencti;
 
-import io.openbas.contract.Contract;
-import io.openbas.contract.ContractConfig;
-import io.openbas.contract.ContractVariable;
-import io.openbas.contract.Contractor;
+import io.openbas.contract.*;
 import io.openbas.contract.fields.ContractElement;
 import io.openbas.contract.fields.ContractExpectations;
 import io.openbas.database.model.Variable.VariableType;
@@ -86,5 +83,9 @@ public class OpenCTIContract extends Contractor {
         Map.of(en, "Create a new report", fr, "Créer un nouveau rapport"), createReportInstance);
     createReport.addVariable(documentUriVariable);
     return List.of(createCase, createReport);
+  }
+
+  public ContractorIcon getIcon() {
+    return null;
   }
 }

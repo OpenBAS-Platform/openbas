@@ -10,14 +10,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.InputStream;
-import java.util.*;
-import java.util.logging.Level;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
@@ -27,26 +25,6 @@ import java.util.logging.Level;
 public class ContractApi extends RestBehavior {
 
     private final ContractService contractService;
-
-    @GetMapping("/images")
-    public @ResponseBody Map<String, String> contractIcon() {
-        List<ContractConfig> contractTypes = new ArrayList<>(); // TODO REPLUG
-        Map<String, String> map = new HashMap<>();
-        contractTypes.forEach(contract -> {
-            try {
-                String fileName = contract.getIcon();
-                InputStream in = getClass().getResourceAsStream(fileName);
-                assert in != null;
-                byte[] fileContent;
-                fileContent = IOUtils.toByteArray(in);
-                String encodedString = Base64.getEncoder().encodeToString(fileContent);
-                map.put(contract.getType(), encodedString);
-            } catch (Exception e) {
-                log.log(Level.FINE, "Logo not found for contract : " + contract.getType());
-            }
-        });
-        return map;
-    }
 
     @PostMapping("/search")
     @Operation(

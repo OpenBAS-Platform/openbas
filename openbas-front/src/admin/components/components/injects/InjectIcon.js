@@ -1,6 +1,6 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { ApiOutlined, EmailOutlined, EmojiEventsOutlined, HelpOutlined, NotificationsActiveOutlined, SmsOutlined, SpeakerNotesOutlined } from '@mui/icons-material';
+import { EmailOutlined, EmojiEventsOutlined, HelpOutlined, NotificationsActiveOutlined, SmsOutlined, SpeakerNotesOutlined } from '@mui/icons-material';
 import { Mastodon, NewspaperVariantMultipleOutline, Twitter } from 'mdi-material-ui';
 import { useTheme } from '@mui/styles';
 import CustomTooltip from '../../../../components/CustomTooltip';
@@ -8,7 +8,7 @@ import { useHelper } from '../../../../store';
 import octiDark from '../../../../static/images/xtm/octi_dark.png';
 import octiLight from '../../../../static/images/xtm/octi_light.png';
 
-const iconSelector = (type, variant, fontSize, done, disabled, contractImage) => {
+const iconSelector = (type, variant, fontSize, done, disabled) => {
   const theme = useTheme();
   let style;
   switch (variant) {
@@ -64,17 +64,6 @@ const iconSelector = (type, variant, fontSize, done, disabled, contractImage) =>
           sx={{ color: color || '#ad1457' }}
         />
       );
-    case 'openbas_lade':
-      return (
-        <img
-          src={contractImage}
-          alt="Airbus Lade"
-          style={{
-            width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
-            height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
-          }}
-        />
-      );
     case 'openbas_opencti':
       return (
         <img
@@ -102,14 +91,6 @@ const iconSelector = (type, variant, fontSize, done, disabled, contractImage) =>
           sx={{ color: color || '#2196f3' }}
         />
       );
-    case 'openbas_http':
-      return (
-        <ApiOutlined
-          style={style}
-          fontSize={fontSize}
-          sx={{ color: color || '#00bcd4' }}
-        />
-      );
     case 'openbas_channel':
       return (
         <NewspaperVariantMultipleOutline
@@ -126,11 +107,13 @@ const iconSelector = (type, variant, fontSize, done, disabled, contractImage) =>
           sx={{ color: done ? '#4caf50' : '#e91e63' }}
         />
       );
+    case 'openbas_http':
+    case 'openbas_lade':
     case 'openbas_caldera':
       return (
         <img
-          src={contractImage}
-          alt="Caldera"
+          src={`/api/images/${type}`}
+          alt={type}
           style={{
             width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
             height: fontSize === 'small' || variant === 'inline' ? 20 : 24,

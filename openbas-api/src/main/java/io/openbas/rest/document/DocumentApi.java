@@ -13,9 +13,11 @@ import io.openbas.service.FileService;
 import io.openbas.service.InjectService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -232,6 +234,15 @@ public class DocumentApi extends RestBehavior {
     response.setStatus(HttpServletResponse.SC_OK);
     InputStream fileStream = fileService.getFile(document).orElseThrow();
     fileStream.transferTo(response.getOutputStream());
+  }
+
+  @GetMapping(value = "/api/images/{injectType}", produces = MediaType.IMAGE_PNG_VALUE)
+  public @ResponseBody byte[] getImage(@PathVariable String injectType) throws IOException {
+    Optional<InputStream> fileStream = fileService.getInjectorImage(injectType);
+    if (fileStream.isPresent()) {
+      return IOUtils.toByteArray(fileStream.get());
+    }
+    return null;
   }
 
   private List<Document> getExercisePlayerDocuments(Exercise exercise) {
