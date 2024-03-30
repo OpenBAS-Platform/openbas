@@ -16,8 +16,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,6 +31,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
@@ -236,11 +239,24 @@ public class DocumentApi extends RestBehavior {
     fileStream.transferTo(response.getOutputStream());
   }
 
-  @GetMapping(value = "/api/images/{injectType}", produces = MediaType.IMAGE_PNG_VALUE)
-  public @ResponseBody byte[] getImage(@PathVariable String injectType) throws IOException {
+  @GetMapping(value = "/api/images/injectors/{injectType}", produces = MediaType.IMAGE_PNG_VALUE)
+  public @ResponseBody ResponseEntity<byte[]> getInjectorImage(@PathVariable String injectType) throws IOException {
     Optional<InputStream> fileStream = fileService.getInjectorImage(injectType);
     if (fileStream.isPresent()) {
-      return IOUtils.toByteArray(fileStream.get());
+      return ResponseEntity.ok()
+              .cacheControl(CacheControl.maxAge(5, TimeUnit.MINUTES))
+              .body(IOUtils.toByteArray(fileStream.get()));
+    }
+    return null;
+  }
+
+  @GetMapping(value = "/api/images/collectors/{collectorId}", produces = MediaType.IMAGE_PNG_VALUE)
+  public @ResponseBody ResponseEntity<byte[]> getCollectorImage(@PathVariable String collectorId) throws IOException {
+    Optional<InputStream> fileStream = fileService.getCollectorImage(collectorId);
+    if (fileStream.isPresent()) {
+      return ResponseEntity.ok()
+              .cacheControl(CacheControl.maxAge(5, TimeUnit.MINUTES))
+              .body(IOUtils.toByteArray(fileStream.get()));
     }
     return null;
   }

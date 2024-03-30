@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.service.FileService.IMAGES_BASE_PATH;
+import static io.openbas.service.FileService.INJECTORS_IMAGES_BASE_PATH;
 
 @Service
 public class InjectorService {
@@ -67,7 +67,7 @@ public class InjectorService {
         }
         if (contractor.getIcon() != null) {
             InputStream iconData = contractor.getIcon().getData();
-            fileService.uploadStream(IMAGES_BASE_PATH, contractor.getType() + ".png", iconData);
+            fileService.uploadStream(INJECTORS_IMAGES_BASE_PATH, contractor.getType() + ".png", iconData);
         }
         // We need to support upsert for registration
         Injector injector = injectorRepository.findById(id).orElse(null);

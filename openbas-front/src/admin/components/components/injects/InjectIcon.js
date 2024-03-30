@@ -111,7 +111,7 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
     case 'openbas_caldera':
       return (
         <img
-          src={`/api/images/${type}`}
+          src={`/api/images/injectors/${type}`}
           alt={type}
           style={{
             width: fontSize === 'small' || variant === 'inline' ? 20 : 24,

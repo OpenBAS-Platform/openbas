@@ -151,7 +151,7 @@ public class InjectorApi extends RestBehavior {
         try {
             // Upload icon
             if (file.isPresent() && "image/png".equals(file.get().getContentType())) {
-                fileService.uploadFile(FileService.IMAGES_BASE_PATH + input.getType() + ".png", file.get());
+                fileService.uploadFile(FileService.INJECTORS_IMAGES_BASE_PATH + input.getType() + ".png", file.get());
             }
             // Declare queueing
             Connection connection = factory.newConnection();
