@@ -4,7 +4,6 @@ import { EmailOutlined, EmojiEventsOutlined, HelpOutlined, NotificationsActiveOu
 import { Mastodon, NewspaperVariantMultipleOutline, Twitter } from 'mdi-material-ui';
 import { useTheme } from '@mui/styles';
 import CustomTooltip from '../../../../components/CustomTooltip';
-import { useHelper } from '../../../../store';
 import octiDark from '../../../../static/images/xtm/octi_dark.png';
 import octiLight from '../../../../static/images/xtm/octi_light.png';
 
@@ -127,24 +126,15 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
 
 const InjectIcon = (props) => {
   const { type, size, variant, tooltip, done, disabled } = props;
-
-  const {
-    contractImages,
-  } = useHelper((helper) => {
-    return {
-      contractImages: helper.getContractImages(),
-    };
-  });
-  const contractImage = `data:image/png;charset=utf-8;base64, ${contractImages[type]}`;
   const fontSize = size || 'medium';
   if (tooltip) {
     return (
       <CustomTooltip title={tooltip}>
-        {iconSelector(type, variant, fontSize, done, disabled, contractImage)}
+        {iconSelector(type, variant, fontSize, done, disabled)}
       </CustomTooltip>
     );
   }
-  return iconSelector(type, variant, fontSize, done, disabled, contractImage);
+  return iconSelector(type, variant, fontSize, done, disabled);
 };
 
 InjectIcon.propTypes = {

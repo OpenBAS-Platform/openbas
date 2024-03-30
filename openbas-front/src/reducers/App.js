@@ -30,10 +30,6 @@ const app = (state = Immutable({}), action = {}) => {
       return state.set('logged', null);
     }
 
-    case Constants.CONTRACT_IMAGES: {
-      return state.set('contractImages', action.payload.data);
-    }
-
     default: {
       return state;
     }

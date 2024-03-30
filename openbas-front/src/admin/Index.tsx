@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Box } from '@mui/material';
@@ -11,8 +11,6 @@ import { useHelper } from '../store';
 import type { Theme } from '../components/Theme';
 import type { LoggedHelper } from '../actions/helper';
 import Loader from '../components/Loader';
-import contractImages from '../actions/Contract';
-import { useAppDispatch } from '../utils/hooks';
 import NotFound from '../components/NotFound';
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
@@ -51,10 +49,6 @@ const Index = () => {
     overflowX: 'hidden',
   };
   useDataLoader();
-  const dispatch = useAppDispatch();
-  useEffect(() => {
-    dispatch(contractImages());
-  }, []);
   return (
     <>
       <Box

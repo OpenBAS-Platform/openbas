@@ -242,7 +242,6 @@ const maps = (key, state) => state.referential.entities[key].asMutable({ deep: t
 const entities = (key, state) => Object.values(maps(key, state));
 const entity = (id, key, state) => state.referential.entities[key][id]?.asMutable({ deep: true });
 const me = (state) => state.referential.entities.users[R.path(['logged', 'user'], state.app)];
-const contractImages = (state) => state.app.contractImages;
 
 export const storeHelper = (state) => ({
   logged: () => state.app.logged,
@@ -419,8 +418,6 @@ export const storeHelper = (state) => ({
   getAssetGroups: () => entities('asset_groups', state),
   getAssetGroupMaps: () => maps('asset_groups', state),
   getAssetGroup: (id) => entity(id, 'asset_groups', state),
-  // contracts
-  getContractImages: () => contractImages(state),
   // scenarios
   getScenarios: () => entities('scenarios', state),
   getScenariosMap: () => maps('scenarios', state),
