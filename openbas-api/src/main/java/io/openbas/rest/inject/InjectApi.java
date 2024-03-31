@@ -211,15 +211,7 @@ public class InjectApi extends RestBehavior {
 
   @GetMapping("/api/injects/try/{injectId}")
   public InjectStatus tryInject(@PathVariable String injectId) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    User user = this.userRepository.findById(currentUser().getId()).orElseThrow();
-    List<ExecutionContext> userInjectContexts = List.of(
-        this.executionContextService.executionContext(user, inject, "Direct test")
-    );
-    ExecutableInject injection = new ExecutableInject(false, true, inject, List.of(), inject.getAssets(),
-        inject.getAssetGroups(), userInjectContexts);
-    // TODO Must be migrated to Atomic approach (Inject duplication and async tracing)
-    return executor.execute(injection);
+    return injectService.tryInject(injectId);
   }
 
   @Transactional(rollbackOn = Exception.class)
