@@ -65,31 +65,31 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
     padding: 0,
     top: '0px',
   },
-  inject_title: {
+  atomic_title: {
     float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
-  inject_type: {
+  atomic_type: {
     float: 'left',
     width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
-  inject_updated_at: {
+  atomic_updated_at: {
     float: 'left',
     width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
-  inject_players: {
+  atomic_players: {
     float: 'left',
     width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
-  inject_result: {
+  atomic_result: {
     float: 'left',
     width: '20%',
     fontSize: 12,
@@ -99,19 +99,19 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
 };
 
 const inlineStyles: Record<string, CSSProperties> = {
-  inject_title: {
+  atomic_title: {
     width: '15%',
   },
-  inject_type: {
+  atomic_type: {
     width: '25%',
   },
-  inject_updated_at: {
+  atomic_updated_at: {
     width: '20%',
   },
-  inject_players: {
+  atomic_players: {
     width: '20%',
   },
-  inject_result: {
+  atomic_result: {
     width: '20%',
   },
 };
@@ -152,17 +152,17 @@ const AtomicTestings = () => {
   // Headers
   const fields = [
     {
-      name: 'inject_title',
+      name: 'atomic_title',
       label: 'Title',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => atomicTesting.inject_title,
+      value: (atomicTesting: InjectStore) => atomicTesting.atomic_title,
     },
     {
-      name: 'inject_type',
+      name: 'atomic_type',
       label: 'Type',
       isSortable: true,
       value: (atomicTesting: InjectStore) => {
-        const injectContract = injectTypesMap[atomicTesting.inject_contract];
+        const injectContract = injectTypesMap[atomicTesting.atomic_type];
         const injectTypeName = tPick(injectContract?.label);
         return (
           <InjectType
@@ -174,19 +174,19 @@ const AtomicTestings = () => {
       },
     },
     {
-      name: 'inject_updated_at',
+      name: 'atomic_atomic_last_execution_date',
       label: 'Date',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => fldt(atomicTesting.inject_status?.status_date || atomicTesting.inject_updated_at),
+      value: (atomicTesting: InjectStore) => fldt(atomicTesting.atomic_last_execution_date),
     },
     {
-      name: 'inject_players',
+      name: 'atomic_target',
       label: 'Target',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => atomicTesting.inject_users_number,
+      value: (atomicTesting: InjectStore) => atomicTesting.atomic_target,
     },
     {
-      name: 'inject_result',
+      name: 'atomic_result',
       label: 'Result',
       isSortable: true,
       value: (atomicTesting: InjectStore) => {
@@ -207,7 +207,7 @@ const AtomicTestings = () => {
 
   // Context
   const context: AtomicTestingContextType = {
-    onUpdateStatusInject(injectId: Inject['inject_id']): void {
+    onUpdateStatusInject(injectId: Inject['atomic_id']): void {
       return dispatch(fetchAtomicTesting(injectId));
     },
   };
@@ -292,15 +292,15 @@ const AtomicTestings = () => {
           {sortedAtomicTestings.map((atomicTesting) => {
             return (
               <ListItemButton
-                key={atomicTesting.inject_id}
+                key={atomicTesting.atomic_id}
                 classes={{ root: classes.item }}
                 divider
-                onClick={() => setSelectedAtomicTesting(atomicTesting.inject_id)}
+                onClick={() => setSelectedAtomicTesting(atomicTesting.atomic_id)}
               >
                 <ListItemIcon>
                   <InjectIcon
-                    tooltip={t(atomicTesting.inject_type)}
-                    type={atomicTesting.inject_type}
+                    tooltip={t(atomicTesting.atomic_type)}
+                    type={atomicTesting.atomic_type}
                   />
                 </ListItemIcon>
                 <ListItemText

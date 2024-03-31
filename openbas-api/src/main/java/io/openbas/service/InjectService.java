@@ -90,11 +90,6 @@ public class InjectService {
   }
 
   @Transactional
-  public List<Inject> findAllAtomicTestings() {
-    return this.injectRepository.findAllAtomicTestings();
-  }
-
-  @Transactional
   public Inject updateInjectStatus(String injectId, InjectUpdateStatusInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow();
     // build status
@@ -106,6 +101,11 @@ public class InjectService {
     // Save status for inject
     inject.setStatus(injectStatus);
     return injectRepository.save(inject);
+  }
+
+  @Transactional
+  public List<Inject> findAllAtomicTestings() {
+    return this.injectRepository.findAllAtomicTestings();
   }
 
   @Transactional

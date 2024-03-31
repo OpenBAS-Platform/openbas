@@ -64,57 +64,6 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
       })}
     </div>
   );
-
-  /* return (
-    <div>
-      <List className={classes.inline}>
-        <ListItem>
-          if(st){
-
-        }
-          <ListItemText primary="foo1" secondary="bar1" />
-        </ListItem>
-        <ListItem>
-          <ListItemText primary="foo2" secondary="bar2" />
-        </ListItem>
-      </List>
-    </div>
-  ); */
-
-  /* expectations.forEach((expectation) => {
-    if (expectation.result === 'SUCCESS') {
-      color = '#4caf50';
-    } else if (expectation.result === 'ERROR') {
-      color = '#f44336';
-    } else {
-      color = '#ff9800';
-    }
-  }); */
-
-  /* if (result === 'SUCCESS') {
-    color = '#4caf50';
-  } else if (result === 'ERROR') {
-    color = '#f44336';
-  } else {
-    color = '#ff9800';
-  } */
-
-  /* switch (stringObjectMap.k) {
-    case 'PREVENTION':
-      return (
-        <Shield style={{ color }} />
-      );
-    case 'DETECTION':
-      return (
-        <TrackChanges style={{ color }} />
-      );
-    case 'ARTICLE' || 'CHALLENGE' || 'MANUAL':
-      return (
-        <SensorOccupied style={{ color }} />
-      );
-    default:
-      return <HelpOutlined style={{ color }} />;
-  } */
 };
 
 export default AtomicTestingResult;

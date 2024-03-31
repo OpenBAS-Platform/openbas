@@ -103,6 +103,25 @@ export interface AssetGroupInput {
   asset_group_tags?: string[];
 }
 
+export interface AtomicTestingOutput {
+  /** Expectations */
+  atomic_expectations?: BasicExpectation[];
+  /**
+   * Last Execution date
+   * @format date-time
+   */
+  atomic_last_execution_date?: string;
+  /**
+   * Specifies the categories of targets for atomic testing.
+   * @example "assets, asset groups, teams, players"
+   */
+  atomic_targets?: BasicTarget[];
+  /** Title */
+  atomic_title?: string;
+  /** Type */
+  atomic_type?: string;
+}
+
 export interface AttackPattern {
   /** @format date-time */
   attack_pattern_created_at?: string;
@@ -133,6 +152,22 @@ export interface AttackPatternCreateInput {
 
 export interface AttackPatternUpsertInput {
   attack_patterns?: AttackPatternCreateInput[];
+  attack_pattern_stix_id: string;
+}
+
+/** Expectations */
+export interface BasicExpectation {
+  result?: string;
+  type?: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
+}
+
+/**
+ * Specifies the categories of targets for atomic testing.
+ * @example "assets, asset groups, teams, players"
+ */
+export interface BasicTarget {
+  names?: string[];
+  type?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
 export interface Challenge {

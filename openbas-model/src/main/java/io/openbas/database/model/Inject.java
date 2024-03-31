@@ -290,11 +290,11 @@ public class Inject implements Base, Injection {
   }
 
   @JsonIgnore
-  public Inject getInject() {
+    public Inject getInject() {
     return this;
   }
 
-  @JsonIgnore
+    @JsonIgnore
   public boolean isNotExecuted() {
     return this.getStatus().isEmpty();
   }

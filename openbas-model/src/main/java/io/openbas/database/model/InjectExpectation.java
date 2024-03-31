@@ -156,7 +156,6 @@ public class InjectExpectation implements Base {
 
   public void setChallenge(Challenge challenge) {
     this.type = EXPECTATION_TYPE.CHALLENGE;
-    this.type = EXPECTATION_TYPE.CHALLENGE;
     this.challenge = challenge;
   }
 
