@@ -2,7 +2,9 @@ package io.openbas.rest.atomic_testing.form;
 
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
+import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.model.Team;
@@ -58,11 +60,11 @@ public class AtomicTestingMapper {
                 inject.getExpectations()
                     .stream()
                     .filter(e -> e.getType().equals(EXPECTATION_TYPE.PREVENTION))
-                    .map(e ->e.getScore())
+                    .map(InjectExpectation::getScore)
                     .mapToDouble(Integer::doubleValue)
-                    .average() ?),
-            new BasicExpectation(ExpectationType.DETECTION, inject.calculateResult()),
-            new BasicExpectation(ExpectationType.HUMAN_RESPONSE, inject.calculateResult())
+                    .average().getAsDouble() == 1.0 ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR),
+            new BasicExpectation(ExpectationType.DETECTION, ExecutionStatus.ERROR),
+            new BasicExpectation(ExpectationType.HUMAN_RESPONSE, ExecutionStatus.ERROR)
         )
         .toList();
   }
