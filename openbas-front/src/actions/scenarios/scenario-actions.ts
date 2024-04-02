@@ -1,7 +1,7 @@
 import { Dispatch } from 'redux';
 import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
 import { arrayOfScenarios, scenario } from './scenario-schema';
-import {
+import type {
   Scenario,
   ScenarioInformationInput,
   ScenarioInput,

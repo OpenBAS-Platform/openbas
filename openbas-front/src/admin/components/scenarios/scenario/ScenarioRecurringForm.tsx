@@ -1,10 +1,10 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack } from '@mui/material';
+import React, { useEffect, useRef, useState } from 'react';
 import cronstrue from 'cronstrue';
 import { DateTimePicker, TimePicker } from '@mui/x-date-pickers';
 import { Controller, useForm } from 'react-hook-form';
 import crontime from 'cron-time-generator';
-import cronparser, { CronFields } from 'cron-parser';
+import cronparser, { CronExpression } from 'cron-parser';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useFormatter } from '../../../../components/i18n';
@@ -53,10 +53,22 @@ const cronToWeekOfMonth = (cron: number | string) => {
       return 3;
     case 22:
       return 4;
+    default:
+      return 1;
   }
-  return 1;
 };
 
+const getInitialValues = (scenarioRecurrenceStart: string | undefined, cronInterval: CronExpression | null) => ({
+  startDate: scenarioRecurrenceStart
+    || new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
+  time:
+    (cronInterval ? new Date(new Date().setUTCHours(cronInterval.fields.hour[0], cronInterval.fields.minute[0])) : new Date(new Date().getTime() + 4 * 60000))
+      .toISOString(),
+  dayOfWeek:
+    cronInterval ? cronInterval.fields.dayOfWeek[0] as Recurrence['dayOfWeek'] : 1,
+  weekOfMonth:
+    cronInterval ? cronToWeekOfMonth(cronInterval.fields.dayOfMonth[0]) : 1 as Recurrence['weekOfMonth'],
+});
 const ScenarioRecurringForm: React.FC<Props> = ({ scenarioId, initialValues }) => {
   const { t, locale } = useFormatter();
 
@@ -65,26 +77,9 @@ const ScenarioRecurringForm: React.FC<Props> = ({ scenarioId, initialValues }) =
   const [openWeekly, setOpenWeekly] = useState(false);
   const [openMonthly, setOpenMonthly] = useState(false);
   const [selectRecurring, setSelectRecurring] = useState('no');
+  const [cronInterval, setCronInterval] = useState<CronExpression | null>(initialValues.scenario_recurrence ? cronparser.parseExpression(initialValues.scenario_recurrence) : null);
   const [cronExpression, setCronExpression] = useState<string | null>(initialValues.scenario_recurrence || null);
-
-  const interval = initialValues.scenario_recurrence ? cronparser.parseExpression(initialValues.scenario_recurrence) : null;
-
-  console.log('interval', interval);
-  console.log('cronExpression', cronExpression);
-
-  useEffect(() => {
-    if (interval) {
-      if (interval.fields.dayOfWeek.length === 8) {
-        setSelectRecurring('daily');
-      }
-      if (interval.fields.dayOfWeek.length === 1) {
-        setSelectRecurring('weekly');
-      }
-      if (interval.fields.dayOfMonth.length === 7) {
-        setSelectRecurring('monthly');
-      }
-    }
-  }, []);
+  const prevScenarioRecurrencenRef = useRef<string | undefined>(initialValues.scenario_recurrence);
 
   const closeDialog = () => {
     setOpenDaily(false);
@@ -101,7 +96,13 @@ const ScenarioRecurringForm: React.FC<Props> = ({ scenarioId, initialValues }) =
       cron = crontime.everyWeekAt(data.dayOfWeek!, new Date(data.time).getUTCHours(), new Date(data.time).getUTCMinutes());
       setSelectRecurring('weekly');
     } else {
-      cron = crontime.between(weekOfMonthToCron[data.weekOfMonth!].start, weekOfMonthToCron[data.weekOfMonth!].end).days(new Date(data.time).getUTCHours(), new Date(data.time).getUTCMinutes()).slice(0, -1) + data.dayOfWeek!;
+      cron = crontime.between(
+        weekOfMonthToCron[data.weekOfMonth!].start,
+        weekOfMonthToCron[data.weekOfMonth!].end,
+      ).days(
+        new Date(data.time).getUTCHours(),
+        new Date(data.time).getUTCMinutes(),
+      ).slice(0, -1) + data.dayOfWeek!;
       setSelectRecurring('monthly');
     }
     setCronExpression(cron);
@@ -109,13 +110,8 @@ const ScenarioRecurringForm: React.FC<Props> = ({ scenarioId, initialValues }) =
     closeDialog();
   };
 
-  const { handleSubmit, control } = useForm<Recurrence>({
-    defaultValues: {
-      startDate: initialValues.scenario_recurrence_start || new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
-      time: (interval ? new Date(new Date().setUTCHours(interval.fields.hour[0], interval.fields.minute[0])) : new Date(new Date().getTime() + 4 * 60000)).toISOString(),
-      dayOfWeek: interval ? interval.fields.dayOfWeek[0] as Recurrence['dayOfWeek'] : 1,
-      weekOfMonth: interval ? cronToWeekOfMonth(interval.fields.dayOfMonth[0]) : 1,
-    },
+  const { handleSubmit, control, reset } = useForm<Recurrence>({
+    defaultValues: getInitialValues(initialValues.scenario_recurrence_start, cronInterval),
     resolver: zodResolver(
       zodImplement<Recurrence>().with({
         startDate: z.string(),
@@ -136,7 +132,8 @@ const ScenarioRecurringForm: React.FC<Props> = ({ scenarioId, initialValues }) =
         }, { message: t('required') }),
       }).refine(
         (data) => {
-          return new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() !== new Date(data.startDate).getTime() || (new Date().getTime() + 3 * 60000) < new Date(data.time).getTime();
+          return new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() !== new Date(data.startDate).getTime()
+            || (new Date().getTime() + 3 * 60000) < new Date(data.time).getTime();
         },
         {
           message: t('Mismatch between time and start date (time too close from now or in the past)'),
@@ -145,6 +142,29 @@ const ScenarioRecurringForm: React.FC<Props> = ({ scenarioId, initialValues }) =
       ),
     ),
   });
+
+  useEffect(() => {
+    if (prevScenarioRecurrencenRef.current === undefined && initialValues.scenario_recurrence !== undefined) {
+      setCronExpression(initialValues.scenario_recurrence);
+      setCronInterval(cronparser.parseExpression(initialValues.scenario_recurrence));
+      reset(getInitialValues(initialValues.scenario_recurrence_start, cronInterval));
+    }
+    prevScenarioRecurrencenRef.current = initialValues.scenario_recurrence;
+  }, [initialValues.scenario_recurrence]);
+
+  useEffect(() => {
+    if (cronInterval) {
+      if (cronInterval.fields.dayOfWeek.length === 8) {
+        setSelectRecurring('daily');
+      }
+      if (cronInterval.fields.dayOfWeek.length === 1) {
+        setSelectRecurring('weekly');
+      }
+      if (cronInterval.fields.dayOfMonth.length === 7) {
+        setSelectRecurring('monthly');
+      }
+    }
+  }, [cronInterval]);
 
   return (
     <>
@@ -188,7 +208,7 @@ const ScenarioRecurringForm: React.FC<Props> = ({ scenarioId, initialValues }) =
         fullWidth
       >
         <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogTitle>{openDaily && t('Set daily recurrence') || openWeekly && t('Set weekly recurrence') || openMonthly && t('Set monthly recurrence')}</DialogTitle>
+          <DialogTitle>{(openDaily && t('Set daily recurrence')) || (openWeekly && t('Set weekly recurrence')) || (openMonthly && t('Set monthly recurrence'))}</DialogTitle>
           <DialogContent>
             <Stack spacing={{ xs: 2 }}>
               <Controller
@@ -218,7 +238,7 @@ const ScenarioRecurringForm: React.FC<Props> = ({ scenarioId, initialValues }) =
                 && <Controller
                   control={control}
                   name="weekOfMonth"
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <FormControl fullWidth>
                       <InputLabel>{t('Week of month')}</InputLabel>
                       <Select
@@ -240,7 +260,7 @@ const ScenarioRecurringForm: React.FC<Props> = ({ scenarioId, initialValues }) =
                 && <Controller
                   control={control}
                   name="dayOfWeek"
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <FormControl fullWidth>
                       <InputLabel>{t('Day of week')}</InputLabel>
                       <Select

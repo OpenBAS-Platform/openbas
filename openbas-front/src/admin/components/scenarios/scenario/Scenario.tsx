@@ -1,13 +1,13 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import React, { useState } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Divider, Grid, Paper, Stack, Theme, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid, Paper, Theme, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CreateOutlined, GroupsOutlined, NotificationsOutlined } from '@mui/icons-material';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchScenario, fetchScenarioTeams, toExercise, updateScenarioInformation, updateScenario } from '../../../../actions/scenarios/scenario-actions';
+import { fetchScenario, fetchScenarioTeams, toExercise, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
 import { useFormatter } from '../../../../components/i18n';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { TeamStore } from '../../../../actions/teams/Team';
