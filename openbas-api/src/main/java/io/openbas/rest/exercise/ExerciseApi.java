@@ -324,14 +324,17 @@ public class ExerciseApi extends RestBehavior {
   @Transactional(rollbackOn = Exception.class)
   @PutMapping("/api/exercises/{exerciseId}/teams/add")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Iterable<Team> addExerciseTeams(@PathVariable String exerciseId,
+  public Iterable<Team> addExerciseTeams(
+      @PathVariable String exerciseId,
       @Valid @RequestBody ExerciseUpdateTeamsInput input) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
     List<Team> teams = exercise.getTeams();
-    teams.addAll(fromIterable(teamRepository.findAllById(input.getTeamIds())));
+    List<Team> teamsToAdd = fromIterable(teamRepository.findAllById(input.getTeamIds()));
+    List<String> existingTeamIds = teams.stream().map(Team::getId).toList();
+    teams.addAll(teamsToAdd.stream().filter(t -> !existingTeamIds.contains(t.getId())).toList());
     exercise.setTeams(teams);
-    exerciseRepository.save(exercise);
-    return teamRepository.findAllById(input.getTeamIds());
+    exercise.setUpdatedAt(now());
+    return teamsToAdd;
   }
 
   @Transactional(rollbackOn = Exception.class)
