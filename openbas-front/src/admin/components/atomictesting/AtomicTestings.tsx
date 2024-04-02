@@ -122,7 +122,7 @@ const AtomicTestings = () => {
   const [selectedAtomicTesting, setSelectedAtomicTesting] = useState<string | undefined>(undefined);
 
   // Filter and sort hook
-  const filtering = useSearchAnFilter('inject', 'title', ['title']);
+  const filtering = useSearchAnFilter('atomic', 'title', ['title']);
 
   // Fetching data
   const { atomics, injectTypesMap }: {
