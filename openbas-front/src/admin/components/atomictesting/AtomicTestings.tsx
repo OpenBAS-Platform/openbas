@@ -173,7 +173,7 @@ const AtomicTestings = () => {
       label: 'Target',
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
-        return (<TargetChip targets={atomicTesting.atomic_targets}/>);
+        return (<TargetChip targets={atomicTesting.atomic_targets} />);
       },
     },
     {
@@ -182,7 +182,7 @@ const AtomicTestings = () => {
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
         return (
-          <AtomicTestingResult expectations={atomicTesting.atomic_expectations}/>
+          <AtomicTestingResult expectations={atomicTesting.atomic_expectations} />
         );
       },
     },
@@ -191,7 +191,7 @@ const AtomicTestings = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]}/>
+      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]} />
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter
@@ -212,13 +212,13 @@ const AtomicTestings = () => {
             >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
-                  <FileDownloadOutlined color="primary"/>
+                  <FileDownloadOutlined color="primary" />
                 </IconButton>
               </Tooltip>
             </CSVLink>
           ) : (
             <IconButton size="large" disabled>
-              <FileDownloadOutlined/>
+              <FileDownloadOutlined />
             </IconButton>
           )}
         </div>
@@ -246,18 +246,18 @@ const AtomicTestings = () => {
                 {fields.map((header) => (
                   <div key={header.name}>
                     {
-                            filtering.buildHeader(
-                              header.name,
-                              header.label,
-                              header.isSortable,
-                              inlineStylesHeaders,
-                            )
-                          }
+                      filtering.buildHeader(
+                        header.name,
+                        header.label,
+                        header.isSortable,
+                        inlineStylesHeaders,
+                      )
+                    }
                   </div>
                 ))
-                    }
-              </>
                 }
+              </>
+            }
           />
         </ListItem>
         {sortedAtomicTestings.map((atomicTesting) => {
@@ -287,7 +287,7 @@ const AtomicTestings = () => {
                       </div>
                     ))}
                   </>
-                      }
+                }
               />
             </ListItemButton>
           );
