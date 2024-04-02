@@ -61,7 +61,7 @@ public class AtomicTestingMapper {
 
   private static List<BasicExpectation> getExpectations(final Inject inject) {
     OptionalDouble avgPrevention = calculateAverageFromExpectations(List.of(EXPECTATION_TYPE.PREVENTION), inject);
-    OptionalDouble avgDetection = calculateAverageFromExpectations(List.of(EXPECTATION_TYPE.PREVENTION), inject);
+    OptionalDouble avgDetection = calculateAverageFromExpectations(List.of(EXPECTATION_TYPE.DETECTION), inject);
     OptionalDouble avgHumanResponse = calculateAverageFromExpectations(List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL), inject);
 
     return buildBasicExpectations(avgPrevention, avgDetection, avgHumanResponse);
