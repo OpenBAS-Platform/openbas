@@ -819,6 +819,7 @@ const i18n = {
       Sunday: 'Dimanche',
       Hour: 'Heure',
       Save: 'Enregistrer',
+      'Set up a recurring simuation from this scenario': 'Configurer une simulation récurrente à partir de ce scénario',
     },
     en: {
       openbas_email: 'Email',

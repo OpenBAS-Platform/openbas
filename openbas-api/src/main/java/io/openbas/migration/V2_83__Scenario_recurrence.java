@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V2_79__Scenario_recurrence extends BaseJavaMigration {
+public class V2_83__Scenario_recurrence extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
