@@ -19,7 +19,7 @@ public class V2_83__Scenario_recurrence extends BaseJavaMigration {
         ALTER TABLE scenarios ADD COLUMN scenario_recurrence varchar(256);
         ALTER TABLE scenarios ADD COLUMN scenario_recurrence_start timestamp;
         """);
-    // Add association table between scenario and tag
+    // Add association table between scenario and exercise
     select.execute("""
         CREATE TABLE scenario_exercise (
           scenario_id varchar(255) not null constraint scenario_id_fk references scenarios on delete cascade,
