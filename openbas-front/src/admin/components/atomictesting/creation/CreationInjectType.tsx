@@ -3,6 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { Button } from '@mui/material';
 import { useFormatter } from '../../../../components/i18n';
 import SearchInput from '../../../../components/SearchFilter';
+import Autocomplete from '../../../../components/Autocomplete';
 
 const useStyles = makeStyles(() => ({
   inline: {
@@ -27,7 +28,7 @@ const CreationInjectType: FunctionComponent<Props> = () => {
     <div className={classes.inline}>
       <div className={classes.menuContainer}>
         <SearchInput
-          variant="topBar"
+          variant="fullTopBar"
           placeholder={`${t('Search inject')}...`}
           fullWidth={true}
         />

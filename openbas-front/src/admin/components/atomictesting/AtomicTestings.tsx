@@ -21,7 +21,6 @@ import { fetchAtomicTestings } from '../../../actions/atomictestings/atomic-test
 import AtomicTestingResult from '../components/atomictesting/AtomicTestingResult';
 import TargetChip from '../components/atomictesting/TargetChip';
 import AtomicTestingCreation from './AtomicTestingCreation';
-import type { ScenariosHelper } from '../../../actions/scenarios/scenario-helper';
 
 const useStyles = makeStyles(() => ({
   parameters: {

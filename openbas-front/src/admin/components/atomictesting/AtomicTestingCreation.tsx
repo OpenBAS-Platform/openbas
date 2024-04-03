@@ -37,7 +37,7 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
         <Box
           sx={{
             borderBottom: 1,
-            borderColor: 'divider',
+            borderColor: 'transparent',
             marginBottom: 4,
             width: '80%',
             marginTop: 5,
@@ -59,9 +59,6 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
           </Stepper>
           {activeStep === steps.length ? (
             <React.Fragment>
-              <Typography sx={{ mt: 2, mb: 1 }}>
-                All steps completed - you&apos;re finished
-              </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
                 <Box sx={{ flex: '1 1 auto' }} />
                 <Button onClick={handleReset}>Reset</Button>
@@ -77,7 +74,16 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
                   activeStep === 1 && <CreationInjectDetails />
                 }
               </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+              <Box sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                pt: 2,
+                bottom: 0,
+                left: '50%',
+                marginLeft: -100,
+                position: 'absolute',
+              }}
+              >
                 <Button
                   color="inherit"
                   disabled={activeStep === 0}

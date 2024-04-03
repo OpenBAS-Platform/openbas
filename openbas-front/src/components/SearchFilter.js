@@ -20,6 +20,14 @@ const styles = (theme) => ({
     minWidth: 550,
     width: '50%',
   },
+  searchRootFullTopBar: {
+    borderRadius: 4,
+    padding: '1px 10px 0 10px',
+    marginRight: 5,
+    backgroundColor: theme.palette.background.paper,
+    minWidth: 1300,
+    width: '50%',
+  },
   searchRootInDrawer: {
     borderRadius: 5,
     padding: '0 10px 0 10px',
@@ -71,6 +79,8 @@ class SearchInput extends Component {
       classRoot = classes.searchRootNoAnimation;
     } else if (variant === 'topBar') {
       classRoot = classes.searchRootTopBar;
+    } else if (variant === 'fullTopBar') {
+      classRoot = classes.searchRootFullTopBar;
     } else if (variant === 'thin') {
       classRoot = classes.searchRootThin;
     }
