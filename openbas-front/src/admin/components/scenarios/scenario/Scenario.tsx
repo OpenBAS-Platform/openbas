@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import React, { useState } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid, Paper, Theme, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid, Paper, Stack, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CreateOutlined, GroupsOutlined, NotificationsOutlined } from '@mui/icons-material';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -18,27 +18,12 @@ import ScenarioInjectsDistribution from '../../injects/ScenarioInjectsDistributi
 import SettingsForm, { SettingUpdateInput } from '../../components/SettingsForm';
 import ScenarioRecurringForm from './ScenarioRecurringForm';
 
-const useStyles = makeStyles((theme: Theme) => ({
-  paper: {
-    padding: 20,
-    height: '100%',
-  },
+const useStyles = makeStyles(() => ({
   container_metric: {
     display: 'flex',
-    height: 100,
+    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '0 24px',
-  },
-  title: {
-    textTransform: 'uppercase',
-    fontSize: 12,
-    fontWeight: 500,
-    color: theme.palette.text.secondary,
-  },
-  number: {
-    fontSize: 30,
-    fontWeight: 800,
   },
 }));
 
@@ -95,101 +80,107 @@ const Scenario = () => {
 
   return (
     <>
-      <Grid container spacing={3}>
-        <Grid item xs={3}>
-          <Paper variant="outlined" classes={{ root: classes.container_metric }}>
-            <div>
-              <div className={classes.title}>{t('Injects')}</div>
-              <div className={classes.number}>
-                {scenario.scenario_injects_statistics?.total_count ?? '-'}
-              </div>
-            </div>
-            <NotificationsOutlined color="primary" sx={{ fontSize: 50 }} />
-          </Paper>
+      <Stack gap={3}>
+        <Grid container spacing={3}>
+          <Grid container item xs={3}>
+            <Paper variant="outlined" sx={{ flex: 1, p: 2 }} classes={{ root: classes.container_metric }}>
+              <Box>
+                <Typography variant="h4">{t('Injects')}</Typography>
+                <Box sx={{
+                  fontSize: 30,
+                  fontWeight: 800,
+                }}
+                >{scenario.scenario_injects_statistics?.total_count ?? '-'}</Box>
+              </Box>
+              <NotificationsOutlined color="primary" fontSize="large" />
+            </Paper>
+          </Grid>
+          <Grid container item xs={3}>
+            <Paper variant="outlined" sx={{ flex: 1, p: 2 }} classes={{ root: classes.container_metric }}>
+              <Box>
+                <Typography variant="h4">{t('Players')}</Typography>
+                <Box sx={{
+                  fontSize: 30,
+                  fontWeight: 800,
+                }}
+                > {scenario.scenario_users_number ?? '-'}</Box>
+              </Box>
+              <GroupsOutlined color="primary" fontSize="large" />
+            </Paper>
+          </Grid>
         </Grid>
-        <Grid item xs={3}>
-          <Paper variant="outlined" classes={{ root: classes.container_metric }}>
-            <div>
-              <div className={classes.title}>{t('Players')}</div>
-              <div className={classes.number}>
-                {scenario.scenario_users_number ?? '-'}
-              </div>
-            </div>
-            <GroupsOutlined color="primary" sx={{ fontSize: 50 }} />
-          </Paper>
+        <Grid container spacing={3}>
+          <Grid container item xs={6} sx={{ flexDirection: 'column' }}>
+            <Typography variant="h4">{t('Information')}</Typography>
+            <Paper variant="outlined" sx={{ flex: 1, p: 2 }}>
+              <Grid container spacing={3}>
+                <Grid item xs={6}>
+                  <Typography variant="h3">{t('Subtitle')}</Typography>
+                  {scenario.scenario_subtitle || '-'}
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="h3">{t('Description')}</Typography>
+                  {scenario.scenario_description || '-'}
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="h3">{t('Creation date')}</Typography>
+                  {fldt(scenario.scenario_created_at)}
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="h3">
+                    {t('Sender email address')}
+                  </Typography>
+                  {scenario.scenario_mail_from}
+                </Grid>
+              </Grid>
+            </Paper>
+          </Grid>
+          <Grid container item xs={6} sx={{ flexDirection: 'column' }}>
+            <Typography variant="h4">{t('Execution')}</Typography>
+            <Paper variant="outlined" sx={{ flex: 1, p: 2 }}>
+              <Stack gap={2}>
+                <Box>
+                  <Typography variant="h3">{t('Set up a recurring simuation from this scenario')}</Typography>
+                  <ScenarioRecurringForm
+                    scenarioId={scenarioId}
+                    initialValues={{ scenario_recurrence: scenario.scenario_recurrence, scenario_recurrence_start: scenario.scenario_recurrence_start }}
+                  />
+                </Box>
+                <Box>
+                  <Typography variant="h3">{t('Instantiate a simulation from this scenario')}</Typography>
+                  <Button
+                    variant="contained"
+                    startIcon={<CreateOutlined />}
+                    color="success"
+                    disabled={permissions.readOnly}
+                    onClick={() => setOpen(true)}
+                  >
+                    {t('Instantiate')}
+                  </Button>
+                </Box>
+              </Stack>
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
-      <br />
-      <Grid container spacing={3}>
-        <Grid item xs={6} style={{ paddingBottom: 24 }}>
-          <Typography variant="h4">{t('Information')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <Grid container spacing={3}>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Subtitle')}</Typography>
-                {scenario.scenario_subtitle || '-'}
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Description')}</Typography>
-                {scenario.scenario_description || '-'}
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Creation date')}</Typography>
-                {fldt(scenario.scenario_created_at)}
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3">
-                  {t('Sender email address')}
-                </Typography>
-                {scenario.scenario_mail_from}
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-        <Grid item xs={6} style={{ paddingBottom: 24 }}>
-          <Typography variant="h4">{t('Execution')}</Typography>
-          <Paper variant="outlined" sx={{ height: '100%' }}>
-            <Box sx={{ p: 2 }}>
-              <Typography variant="h3">{t('Set up a recurring simuation from this scenario')}</Typography>
-              <ScenarioRecurringForm
-                scenarioId={scenarioId}
-                initialValues={{ scenario_recurrence: scenario.scenario_recurrence, scenario_recurrence_start: scenario.scenario_recurrence_start }}
-              />
-            </Box>
-            <Box sx={{ p: 2 }}>
-              <Typography variant="h3">{t('Instantiate a simulation from this scenario')}</Typography>
-              <Button
-                variant="contained"
-                startIcon={<CreateOutlined />}
-                color="success"
+        <Grid container spacing={3}>
+          <Grid item container xs={6} sx={{ flexDirection: 'column' }}>
+            <Typography variant="h4">{t('Injects distribution')}</Typography>
+            <Paper variant="outlined" sx={{ flex: 1, p: 2 }}>
+              <ScenarioInjectsDistribution teams={teams} />
+            </Paper>
+          </Grid>
+          <Grid item container xs={6} sx={{ flexDirection: 'column' }}>
+            <Typography variant="h4">{t('Settings')}</Typography>
+            <Paper variant="outlined" sx={{ flex: 1, p: 2 }}>
+              <SettingsForm
+                initialValues={initialValues}
+                onSubmit={submitUpdate}
                 disabled={permissions.readOnly}
-                onClick={() => setOpen(true)}
-              >
-                {t('Instantiate')}
-              </Button>
-            </Box>
-          </Paper>
+              />
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
-      <br />
-      <Grid container spacing={3}>
-        <Grid item xs={6} style={{ paddingBottom: 24 }}>
-          <Typography variant="h4">{t('Injects distribution')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <ScenarioInjectsDistribution teams={teams} />
-          </Paper>
-        </Grid>
-        <Grid item xs={6} style={{ paddingBottom: 24 }}>
-          <Typography variant="h4">{t('Settings')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <SettingsForm
-              initialValues={initialValues}
-              onSubmit={submitUpdate}
-              disabled={permissions.readOnly}
-            />
-          </Paper>
-        </Grid>
-      </Grid>
+      </Stack>
       <Dialog
         open={open}
         onClose={() => setOpen(false)}

@@ -5614,7 +5614,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cron-parser@npm:^4.9.0":
+"cron-parser@npm:4.9.0":
   version: 4.9.0
   resolution: "cron-parser@npm:4.9.0"
   dependencies:
@@ -5630,12 +5630,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cronstrue@npm:2.48.0":
-  version: 2.48.0
-  resolution: "cronstrue@npm:2.48.0"
+"cronstrue@npm:2.49.0":
+  version: 2.49.0
+  resolution: "cronstrue@npm:2.49.0"
   bin:
     cronstrue: bin/cli.js
-  checksum: 10c0/70bd0bc059ab10bf7af9cd1fa100fa21ab359ad34ae64250bee93d617f7f00cff1e132c7e2b175d2a72d48a702ff6be4f0f72fb199f7bad7d34dc8f1014ecd91
+  checksum: 10c0/bdbcbe745b12b51b5ff123b561d9b95d624963b1d0d43717a70adf20872f58e87ad74c62d255133f9b0e8adcc682cb7e5ea405c4da36ba7ec5146af1f0d75017
   languageName: node
   linkType: hard
 
@@ -10837,9 +10837,9 @@ __metadata:
     ckeditor5-custom-build: "link:packages/ckeditor5-custom-build"
     classnames: "npm:2.5.1"
     compression: "npm:1.7.4"
-    cron-parser: "npm:^4.9.0"
+    cron-parser: "npm:4.9.0"
     cron-time-generator: "npm:2.0.3"
-    cronstrue: "npm:2.48.0"
+    cronstrue: "npm:2.49.0"
     cross-env: "npm:7.0.3"
     date-fns: "npm:3.6.0"
     dompurify: "npm:3.0.11"

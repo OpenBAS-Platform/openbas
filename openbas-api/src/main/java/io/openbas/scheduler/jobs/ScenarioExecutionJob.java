@@ -19,10 +19,7 @@ import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.List;
 
 import static io.openbas.database.specification.ExerciseSpecification.recurringInstanceNotStarted;
@@ -42,8 +39,15 @@ public class ScenarioExecutionJob implements Job {
     // Find each scenario with cron
     List<Scenario> scenarios = this.scenarioService.recurringScenarios();
     // Filter on valid cron scenario -> Start recurence date is reached
+    Instant nowMidnight = ZonedDateTime.now(ZoneOffset.UTC).toLocalDate().atStartOfDay(ZoneOffset.UTC).toInstant();
     List<Scenario> validScenarios = scenarios.stream()
-        .filter(scenario -> scenario.getRecurrenceStart() == null || scenario.getRecurrenceStart().isAfter(now()))
+        .filter(scenario -> {
+          if (scenario.getRecurrenceStart() == null) {
+            return true;
+          }
+          return scenario.getRecurrenceStart().equals(nowMidnight) || scenario.getRecurrenceStart()
+              .isAfter(nowMidnight);
+        })
         .toList();
     // Check if a simulation link to this scenario already exists
     // Retrieve simulations not started, link to a scenario
@@ -67,7 +71,8 @@ public class ScenarioExecutionJob implements Job {
     Cron cron = parser.parse(cronExpression);
     ExecutionTime executionTime = ExecutionTime.forCron(cron);
 
-    Duration timeToNextExecution = executionTime.timeToNextExecution(ZonedDateTime.now(ZoneId.of("UTC"))).orElse(Duration.ZERO);
+    Duration timeToNextExecution = executionTime.timeToNextExecution(ZonedDateTime.now(ZoneId.of("UTC")))
+        .orElse(Duration.ZERO);
 
     return Instant.now().plus(timeToNextExecution);
   }
