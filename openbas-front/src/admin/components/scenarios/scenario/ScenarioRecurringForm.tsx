@@ -144,7 +144,7 @@ const ScenarioRecurringForm: React.FC<Props> = ({ scenarioId, initialValues }) =
   });
 
   useEffect(() => {
-    if (prevScenarioRecurrencenRef.current === undefined && initialValues.scenario_recurrence !== undefined) {
+    if (prevScenarioRecurrencenRef.current === undefined && initialValues.scenario_recurrence !== undefined && initialValues.scenario_recurrence !== null) {
       setCronExpression(initialValues.scenario_recurrence);
       setCronInterval(cronparser.parseExpression(initialValues.scenario_recurrence));
       reset(getInitialValues(initialValues.scenario_recurrence_start, cronInterval));
