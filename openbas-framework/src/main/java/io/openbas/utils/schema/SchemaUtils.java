@@ -3,6 +3,7 @@ package io.openbas.utils.schema;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
 import jakarta.persistence.Column;
+import jakarta.persistence.JoinTable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -114,6 +115,13 @@ public class SchemaUtils {
           if (hasText(propertyValue)) {
             builder.propertyRepresentative(propertyValue);
           }
+        }
+        // Join table
+        if (annotation.annotationType().equals(JoinTable.class)) {
+          PropertySchema.JoinTable joinTableProperty = PropertySchema.JoinTable.builder()
+              .joinOn(field.getName())
+              .build();
+          builder.joinTable(joinTableProperty);
         }
       }
 

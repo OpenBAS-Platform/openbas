@@ -11,6 +11,7 @@ const useStyles = makeStyles(() => ({
     marginTop: -10,
     display: 'flex',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   container: {
     display: 'flex',

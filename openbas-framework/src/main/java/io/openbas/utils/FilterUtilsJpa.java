@@ -73,8 +73,9 @@ public class FilterUtilsJpa {
         List<PropertySchema> propertySchemas = SchemaUtils.schema(root.getJavaType());
         List<PropertySchema> filterableProperties = getFilterableProperties(propertySchemas);
         PropertySchema filterableProperty = retrieveProperty(filterableProperties, filterKey);
-        Expression<String> paths = toPath(filterableProperty, root);
-        return toPredicate(paths, filter, cb, filterableProperty.getType());
+        Expression<String> paths = toPath(filterableProperty, root, cb);
+        // In case of join table, we will use ID so type is String
+        return toPredicate(paths, filter, cb, filterableProperty.getJoinTable() != null ? String.class : filterableProperty.getType());
       };
     }
     return (Specification<T>) EMPTY_SPECIFICATION;
@@ -97,7 +98,7 @@ public class FilterUtilsJpa {
       @NotNull final Class<?> type) {
     if (operator == null) {
       // Default case
-      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.equalsTexts(paths, cb, texts);
+      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.equalsTexts(paths, cb, texts, type);
     }
     if (operator.equals(FilterOperator.not_contains)) {
       return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.notContainsTexts(paths, cb, texts, type);
@@ -108,9 +109,9 @@ public class FilterUtilsJpa {
     } else if (operator.equals(FilterOperator.starts_with)) {
       return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.startWithTexts(paths, cb, texts);
     } else if (operator.equals(FilterOperator.not_eq)) {
-      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.notEqualsTexts(paths, cb, texts);
+      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.notEqualsTexts(paths, cb, texts, type);
     } else { // Default case
-      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.equalsTexts(paths, cb, texts);
+      return (Expression<String> paths, List<String> texts) -> OperationUtilsJpa.equalsTexts(paths, cb, texts, type);
     }
   }
 

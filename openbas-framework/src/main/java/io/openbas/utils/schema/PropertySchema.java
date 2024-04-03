@@ -26,25 +26,28 @@ public class PropertySchema {
   private final Class<?> type;
 
   private final boolean unicity;
-
   private final boolean mandatory;
-
   private final boolean multiple;
 
   private final boolean searchable;
-
   private final boolean filterable;
   private final List<String> availableValues;
-
   private final boolean sortable;
-
   private final String propertyRepresentative;
+
+  private final JoinTable joinTable;
 
   @Singular("propertySchema")
   private final List<PropertySchema> propertiesSchema;
 
   public String getJsonName() {
     return Optional.ofNullable(this.jsonName).orElse(this.name);
+  }
+
+  @Builder
+  @Getter
+  public static class JoinTable {
+    private final String joinOn;
   }
 
   // -- VALIDATION --

@@ -78,7 +78,7 @@ public class AttackPatternApi extends RestBehavior {
       String attackPatternExternalId = attackPatternInput.getExternalId();
       Optional<AttackPattern> optionalAttackPattern = attackPatternRepository.findByExternalId(attackPatternExternalId);
       List<KillChainPhase> killChainPhases = !attackPatternInput.getKillChainPhasesIds().isEmpty() ?
-              fromIterable(killChainPhaseRepository.findAllById(attackPatternInput.getKillChainPhasesIds())): List.of();
+              fromIterable(killChainPhaseRepository.findAllByShortName(attackPatternInput.getKillChainPhasesIds())): List.of();
       AttackPattern attackPatternParent = attackPatternInput.getParentId() != null ?
               attackPatternRepository.findByStixId(attackPatternInput.getParentId()).orElseThrow() : null;
       if (optionalAttackPattern.isEmpty()) {

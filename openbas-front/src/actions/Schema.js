@@ -388,6 +388,7 @@ export const storeHelper = (state) => ({
   // attack patterns
   getAttackPattern: (id) => entity(id, 'attackpatterns', state),
   getAttackPatterns: () => entities('attackpatterns', state),
+  getAttackPatternsMap: () => maps('attackpatterns', state),
   // channels
   getChannels: () => entities('channels', state),
   getChannel: (id) => entity(id, 'channels', state),

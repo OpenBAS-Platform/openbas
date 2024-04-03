@@ -1,4 +1,5 @@
 import type { Filter, FilterGroup } from '../../../utils/api-types';
+import { isExistFilter } from './FilterUtils';
 
 const updateFilters = (filters: FilterGroup, updateFn: (filter: Filter) => Filter): FilterGroup => {
   return {
@@ -14,13 +15,16 @@ export const handleSwitchMode = (filters: FilterGroup) => {
   } as FilterGroup;
 };
 
-export const handleAddFilterWithEmptyValueUtil = (filters: FilterGroup, filter: Filter) => {
-  return {
-    ...filters,
-    filters: [
-      ...filters.filters ?? [],
+export const handleAddFilterWithEmptyValueUtil = (filterGroup: FilterGroup, filter: Filter) => {
+  const filters = isExistFilter(filterGroup, filter.key)
+    ? filterGroup.filters ?? []
+    : [
+      ...filterGroup.filters ?? [],
       filter,
-    ],
+    ];
+  return {
+    ...filterGroup,
+    filters,
   };
 };
 

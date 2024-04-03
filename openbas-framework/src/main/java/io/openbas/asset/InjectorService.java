@@ -78,8 +78,12 @@ public class InjectorService {
             injector.setExternal(false);
             injector.setType(contractor.getType());
             List<String> existing = new ArrayList<>();
+            List<InjectorContract> toUpdates = new ArrayList<>();
             List<String> toDeletes = new ArrayList<>();
-            injector.getContracts().forEach(contract -> {
+            injector.getContracts()
+                .stream()
+                .parallel()
+                .forEach(contract -> {
                 Optional<Contract> current = contracts.stream().filter(c -> c.getId().equals(contract.getId())).findFirst();
                 if (current.isPresent()) {
                     existing.add(contract.getId());
@@ -98,6 +102,7 @@ public class InjectorService {
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
                     }
+                    toUpdates.add(contract);
                 } else {
                     toDeletes.add(contract.getId());
                 }
@@ -125,6 +130,7 @@ public class InjectorService {
             }).toList();
             injectorContractRepository.deleteAllById(toDeletes);
             injectorContractRepository.saveAll(toCreates);
+            injectorContractRepository.saveAll(toUpdates);
             injectorRepository.save(injector);
         } else {
             // save the injector
