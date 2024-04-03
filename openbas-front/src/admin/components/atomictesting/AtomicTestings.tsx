@@ -13,13 +13,15 @@ import { fetchInjectTypes } from '../../../actions/Inject';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import SearchFilter from '../../../components/SearchFilter';
 import { exportData } from '../../../utils/Environment';
-import type { TagsHelper } from '../../../actions/helper';
+import type { TagsHelper, UsersHelper } from '../../../actions/helper';
 import InjectIcon from '../components/injects/InjectIcon';
 import InjectType from '../components/injects/InjectType';
 import type { AtomicTestingOutput, Contract } from '../../../utils/api-types';
 import { fetchAtomicTestings } from '../../../actions/atomictestings/atomic-testing-actions';
 import AtomicTestingResult from '../components/atomictesting/AtomicTestingResult';
 import TargetChip from '../components/atomictesting/TargetChip';
+import AtomicTestingCreation from './AtomicTestingCreation';
+import type { ScenariosHelper } from '../../../actions/scenarios/scenario-helper';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -133,6 +135,10 @@ const AtomicTestings = () => {
     injectTypesMap: helper.getInjectTypesMap(),
   }));
 
+  const { userAdmin } = useHelper((helper: UsersHelper) => ({
+    userAdmin: helper.getMe()?.user_admin ?? false,
+  }));
+
   useDataLoader(() => {
     dispatch(fetchAtomicTestings());
     dispatch(fetchInjectTypes());
@@ -178,7 +184,7 @@ const AtomicTestings = () => {
     },
     {
       name: 'atomic_expectations',
-      label: 'Result',
+      label: 'Global score',
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
         return (
@@ -293,6 +299,7 @@ const AtomicTestings = () => {
           );
         })}
       </List>
+      {userAdmin && <AtomicTestingCreation />}
     </>
   );
 };
