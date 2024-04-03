@@ -106,8 +106,8 @@ export interface AssetGroupInput {
 export interface AtomicTestingOutput {
   /** Contract */
   atomic_contract: string;
-  /** Expectations */
-  atomic_expectations?: BasicExpectation[];
+  /** Result of expectations */
+  atomic_expectation_results?: BasicExpectationResult[];
   /** Id */
   atomic_id: string;
   /**
@@ -159,10 +159,11 @@ export interface AttackPatternUpsertInput {
   attack_pattern_stix_id: string;
 }
 
-/** Expectations */
-export interface BasicExpectation {
-  result: "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
-  type: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
+/** Result of expectations */
+export interface BasicExpectationResult {
+  distribution: ResultDetail[];
+  result?: "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  type?: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
 }
 
 /**
@@ -170,8 +171,8 @@ export interface BasicExpectation {
  * @example "assets, asset groups, teams, players"
  */
 export interface BasicTarget {
-  names: string[];
-  type: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
+  targets?: TargetResult[];
+  type?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
 export interface Challenge {
@@ -1583,6 +1584,12 @@ export interface ResetUserInput {
   login: string;
 }
 
+export interface ResultDetail {
+  label: string;
+  /** @format int32 */
+  value: number;
+}
+
 export interface Scenario {
   /** @format int64 */
   scenario_all_users_number?: number;
@@ -1732,6 +1739,12 @@ export interface TagCreateInput {
 export interface TagUpdateInput {
   tag_color: string;
   tag_name: string;
+}
+
+export interface TargetResult {
+  expectationResults?: BasicExpectationResult[];
+  id?: string;
+  name?: string;
 }
 
 export interface Team {

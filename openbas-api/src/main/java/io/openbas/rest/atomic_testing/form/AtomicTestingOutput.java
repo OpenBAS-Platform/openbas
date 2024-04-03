@@ -1,6 +1,8 @@
 package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.rest.atomic_testing.form.AtomicTestingMapper.BasicExpectationResult;
+import io.openbas.rest.atomic_testing.form.AtomicTestingMapper.BasicTarget;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -47,7 +49,7 @@ public class AtomicTestingOutput {
   private List<BasicTarget> targets;
 
   @Default
-  @Schema(description = "Expectations")
-  @JsonProperty("atomic_expectations")
-  private List<BasicExpectation> expectations = new ArrayList<>();
+  @Schema(description = "Result of expectations")
+  @JsonProperty("atomic_expectation_results")
+  private List<BasicExpectationResult> expectationResults = new ArrayList<>();
 }

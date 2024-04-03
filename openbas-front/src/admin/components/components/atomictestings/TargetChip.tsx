@@ -50,13 +50,13 @@ const TargetChip: FunctionComponent<Props> = ({
       {targets.map((target, index) => {
         return (
           <span key={index}>
-            <Tooltip title={target.names}>
+            <Tooltip title={target.targets?.map((t) => t.name)}>
               <Chip
                 key={target.type}
                 classes={{ root: classes.target }}
                 icon={getIcon(target.type)}
                 color={getColor(target.type)}
-                label={target.names.length}
+                label={target.targets?.length}
               />
             </Tooltip>
           </span>

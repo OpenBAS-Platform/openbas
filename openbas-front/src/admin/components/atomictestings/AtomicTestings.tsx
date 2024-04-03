@@ -1,7 +1,8 @@
-import React, { CSSProperties, useState } from 'react';
+import React, { CSSProperties } from 'react';
 import { makeStyles } from '@mui/styles';
 import { CSVLink } from 'react-csv';
 import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { Link } from 'react-router-dom';
 import { FileDownloadOutlined } from '@mui/icons-material';
 import { useAppDispatch } from '../../../utils/hooks';
 import { useFormatter } from '../../../components/i18n';
@@ -13,14 +14,15 @@ import { fetchInjectTypes } from '../../../actions/Inject';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import SearchFilter from '../../../components/SearchFilter';
 import { exportData } from '../../../utils/Environment';
-import type { TagsHelper, UsersHelper } from '../../../actions/helper';
+import type { UsersHelper } from '../../../actions/helper';
 import InjectIcon from '../components/injects/InjectIcon';
 import InjectType from '../components/injects/InjectType';
 import type { AtomicTestingOutput, Contract } from '../../../utils/api-types';
 import { fetchAtomicTestings } from '../../../actions/atomictestings/atomic-testing-actions';
-import AtomicTestingResult from '../components/atomictesting/AtomicTestingResult';
-import TargetChip from '../components/atomictesting/TargetChip';
 import AtomicTestingCreation from './AtomicTestingCreation';
+import AtomicTestingResult from '../components/atomictestings/AtomicTestingResult';
+import TargetChip from '../components/atomictestings/TargetChip';
+import type { AtomicTestingHelper } from '../../../actions/atomictestings/atomic-testing-helper';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -120,7 +122,6 @@ const AtomicTestings = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const { t, fldt, tPick } = useFormatter();
-  const [selectedAtomicTesting, setSelectedAtomicTesting] = useState<string | undefined>(undefined);
 
   // Filter and sort hook
   const filtering = useSearchAnFilter('atomic', 'title', ['title']);
@@ -129,7 +130,7 @@ const AtomicTestings = () => {
   const { atomics, injectTypesMap }: {
     atomics: AtomicTestingOutput[],
     injectTypesMap: Record<string, Contract>,
-  } = useHelper((helper: InjectHelper & TagsHelper) => ({
+  } = useHelper((helper: InjectHelper & AtomicTestingHelper) => ({
     atomics: helper.getAtomicTestings(),
     injectTypesMap: helper.getInjectTypesMap(),
   }));
@@ -187,7 +188,7 @@ const AtomicTestings = () => {
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
         return (
-          <AtomicTestingResult expectations={atomicTesting.atomic_expectations} />
+          <AtomicTestingResult expectations={atomicTesting.atomic_expectation_results} />
         );
       },
     },
@@ -271,7 +272,8 @@ const AtomicTestings = () => {
               key={atomicTesting.atomic_id}
               classes={{ root: classes.item }}
               divider
-              onClick={() => setSelectedAtomicTesting(atomicTesting.atomic_id)}
+              component={Link}
+              to={`/admin/atomic_testings/${atomicTesting.atomic_id}`}
             >
               <ListItemIcon>
                 <InjectIcon
