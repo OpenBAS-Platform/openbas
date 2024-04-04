@@ -6,7 +6,7 @@ import io.openbas.database.model.Variable;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.variable.form.VariableInput;
-import io.openbas.service.ScenarioService;
+import io.openbas.scenario.ScenarioService;
 import io.openbas.service.VariableService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static io.openbas.scenario.ScenarioApi.SCENARIO_URI;
 
 @RequiredArgsConstructor
 @RestController

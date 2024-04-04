@@ -21,6 +21,7 @@
         <opensaml.version>4.3.1</opensaml.version>
         <springdoc.version>2.4.0</springdoc.version>
         <springdoc-plugin.version>1.4</springdoc-plugin.version>
+        <cron-utils.version>9.2.1</cron-utils.version>
     </properties>
 
     <profiles>
@@ -197,6 +198,11 @@
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
             <version>${httpclient5.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cronutils</groupId>
+            <artifactId>cron-utils</artifactId>
+            <version>${cron-utils.version}</version>
         </dependency>
         <!-- TEST -->
         <dependency>

@@ -65,6 +65,9 @@ const renderAutocomplete = ({
   );
 };
 
+/**
+ * @deprecated The component use old form libnary react-final-form
+ */
 const Autocomplete = (props) => (
   <Field name={props.name} component={renderAutocomplete} {...props} />
 );

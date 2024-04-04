@@ -63,6 +63,9 @@ export default ({ mode }: { mode: string }) => {
         'remark-parse',
         'zod',
         'ckeditor5-custom-build/build/ckeditor',
+        'cronstrue',
+        'cron-time-generator',
+        'cron-parser',
       ],
     },
 

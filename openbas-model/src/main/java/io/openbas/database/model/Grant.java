@@ -49,7 +49,7 @@ public class Grant implements Base {
     @JoinColumn(name = "grant_scenario")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("grant_scenario")
-    private Scenario scenario; // TODO: verify is used
+    private Scenario scenario;
 
     @Override
     public boolean isUserHasAccess(User user) {

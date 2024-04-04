@@ -14,7 +14,8 @@ import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
-import io.openbas.service.ScenarioService;
+import io.openbas.scenario.ScenarioService;
+import io.openbas.service.*;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -39,7 +40,7 @@ import static io.openbas.database.specification.CommunicationSpecification.fromI
 import static io.openbas.helper.DatabaseHelper.resolveOptionalRelation;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static io.openbas.scenario.ScenarioApi.SCENARIO_URI;
 import static java.time.Instant.now;
 
 @RestController
@@ -138,19 +139,20 @@ public class InjectApi extends RestBehavior {
 
   @GetMapping("/api/inject_types")
   public Collection<JsonNode> injectTypes() {
-      return fromIterable(injectorContractRepository.findAll()).stream()
-              .map(contract -> {
-                  try {
-                      return mapper.readTree(contract.getContent());
-                  } catch (JsonProcessingException e) {
-                      throw new RuntimeException(e);
-                  }
-              }).toList();
+    return fromIterable(injectorContractRepository.findAll()).stream()
+        .map(contract -> {
+          try {
+            return mapper.readTree(contract.getContent());
+          } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+          }
+        }).toList();
   }
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/injects/execution/reception/{injectId}")
-  public Inject InjectExecutionReception(@PathVariable String injectId, @Valid @RequestBody InjectReceptionInput input) {
+  public Inject InjectExecutionReception(@PathVariable String injectId,
+      @Valid @RequestBody InjectReceptionInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow();
     InjectStatus injectStatus = inject.getStatus().orElseThrow();
     injectStatus.setName(ExecutionStatus.PENDING);
@@ -182,7 +184,8 @@ public class InjectApi extends RestBehavior {
     int currentTotal = injectStatus.getTrackingTotalError() + injectStatus.getTrackingTotalSuccess();
     if (injectStatus.getTrackingTotalCount() >= currentTotal) {
       injectStatus.setTrackingEndDate(trackingEndDate);
-      injectStatus.setTrackingTotalExecutionTime(Duration.between(injectStatus.getTrackingSentDate(), trackingEndDate).getSeconds());
+      injectStatus.setTrackingTotalExecutionTime(
+          Duration.between(injectStatus.getTrackingSentDate(), trackingEndDate).getSeconds());
       if (injectStatus.getTrackingTotalError().equals(injectStatus.getTrackingTotalCount())) {
         injectStatus.setName(ExecutionStatus.ERROR);
       } else if (injectStatus.getTrackingTotalError() > 0) {
@@ -202,7 +205,8 @@ public class InjectApi extends RestBehavior {
     List<ExecutionContext> userInjectContexts = List.of(
         this.executionContextService.executionContext(user, inject, "Direct test")
     );
-    ExecutableInject injection = new ExecutableInject(false, true, inject, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
+    ExecutableInject injection = new ExecutableInject(false, true, inject, List.of(), inject.getAssets(),
+        inject.getAssetGroups(), userInjectContexts);
     // TODO Must be migrated to Atomic approach (Inject duplication and async tracing)
     return executor.execute(injection);
   }
@@ -291,7 +295,8 @@ public class InjectApi extends RestBehavior {
     Iterable<User> users = userRepository.findAllById(input.getUserIds());
     List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
         .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
-    ExecutableInject injection = new ExecutableInject(true, true, inject, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
+    ExecutableInject injection = new ExecutableInject(true, true, inject, List.of(), inject.getAssets(),
+        inject.getAssetGroups(), userInjectContexts);
     file.ifPresent(injection::addDirectAttachment);
     // TODO Must be migrated to Atomic approach (Inject duplication and async tracing)
     return executor.execute(injection);
@@ -502,7 +507,8 @@ public class InjectApi extends RestBehavior {
     return inject;
   }
 
-  private Inject updateInjectActivation(@NotBlank final String injectId, @NotNull final InjectUpdateActivationInput input) {
+  private Inject updateInjectActivation(@NotBlank final String injectId,
+      @NotNull final InjectUpdateActivationInput input) {
     Inject inject = this.injectRepository.findById(injectId).orElseThrow();
     inject.setEnabled(input.isEnabled());
     inject.setUpdatedAt(now());

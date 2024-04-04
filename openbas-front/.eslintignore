@@ -6,3 +6,7 @@
 /builder/prod/build
 /src/static/ext/*
 __generated__
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

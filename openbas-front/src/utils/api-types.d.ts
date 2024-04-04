@@ -582,6 +582,7 @@ export interface Exercise {
   exercise_observers?: User[];
   exercise_pauses?: Pause[];
   exercise_planners?: User[];
+  exercise_scenario?: Scenario;
   /** @format double */
   exercise_score?: number;
   /** @format date-time */
@@ -1492,6 +1493,9 @@ export interface Scenario {
   scenario_name: string;
   scenario_observers?: User[];
   scenario_planners?: User[];
+  scenario_recurrence?: string;
+  /** @format date-time */
+  scenario_recurrence_start?: string;
   scenario_subtitle?: string;
   scenario_tags?: Tag[];
   scenario_teams?: Team[];
@@ -1516,6 +1520,12 @@ export interface ScenarioInput {
   scenario_name: string;
   scenario_subtitle?: string;
   scenario_tags?: string[];
+}
+
+export interface ScenarioRecurrenceInput {
+  scenario_recurrence?: string;
+  /** @format date-time */
+  scenario_recurrence_start?: string;
 }
 
 export interface ScenarioSimple {

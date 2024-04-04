@@ -1,4 +1,4 @@
-package io.openbas.rest.scenario.form;
+package io.openbas.scenario.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

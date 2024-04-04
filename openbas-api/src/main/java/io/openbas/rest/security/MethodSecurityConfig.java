@@ -2,7 +2,7 @@ package io.openbas.rest.security;
 
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.UserRepository;
-import io.openbas.service.ScenarioService;
+import io.openbas.scenario.ScenarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

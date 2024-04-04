@@ -5,6 +5,7 @@ import type {
   Scenario,
   ScenarioInformationInput,
   ScenarioInput,
+  ScenarioRecurrenceInput,
   ScenarioTeamPlayersEnableInput,
   ScenarioUpdateTagsInput,
   ScenarioUpdateTeamsInput,
@@ -113,3 +114,13 @@ export const removeScenarioTeamPlayers = (scenarioId: Scenario['scenario_id'], t
   `/api/scenarios/${scenarioId}/teams/${teamId}/players/remove`,
   data,
 )(dispatch);
+
+// -- RECURRENCE --
+
+export const updateScenarioRecurrence = (
+  scenarioId: Scenario['scenario_id'],
+  data: ScenarioRecurrenceInput,
+) => (dispatch: Dispatch) => {
+  const uri = `${SCENARIO_URI}/${scenarioId}/recurrence`;
+  return putReferential(scenario, uri, data)(dispatch);
+};

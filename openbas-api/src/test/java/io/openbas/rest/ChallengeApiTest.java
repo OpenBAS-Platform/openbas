@@ -10,7 +10,7 @@ import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.injects.challenge.model.ChallengeContent;
 import io.openbas.utils.mockUser.WithMockObserverUser;
-import io.openbas.service.ScenarioService;
+import io.openbas.scenario.ScenarioService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import java.util.List;
 
 import static io.openbas.injects.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 import static io.openbas.injects.challenge.ChallengeContract.TYPE;
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static io.openbas.scenario.ScenarioApi.SCENARIO_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
