@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import React from 'react';
 import { Grid, List, ListItem, ListItemText, Paper } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import * as PropTypes from 'prop-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
@@ -21,11 +22,10 @@ const useStyles = makeStyles(() => ({
     height: '100%',
   },
   container: {
-    marginBottom: '20px',
+    marginBottom: '30px',
   },
   filters: {
     display: 'flex',
-    gap: '10px',
   },
   bodyTarget: {
     float: 'left',
@@ -76,11 +76,14 @@ const AtomicTesting = () => {
       <Grid container spacing={2} classes={{ root: classes.container }}>
         <Grid item xs={4} style={{ paddingBottom: 24 }}>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <div className={classes.filters}>
+            <div>
               <SearchFilter
                 small
+                fullWidth
                 onChange={filtering.handleSearch}
                 keyword={filtering.keyword}
+                placeholder={'Search by target name'}
+                classes={classes.filters}
               />
             </div>
             {sortedTargets.length > 0 ? (
