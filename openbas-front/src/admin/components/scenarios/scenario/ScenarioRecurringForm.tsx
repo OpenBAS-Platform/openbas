@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import cronstrue from 'cronstrue';
 import { DateTimePicker, TimePicker } from '@mui/x-date-pickers';
 import { Controller, useForm } from 'react-hook-form';
-import crontime from 'cron-time-generator';
+import { CronTime } from 'cron-time-generator';
 import cronparser, { CronExpression } from 'cron-parser';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -90,13 +90,13 @@ const ScenarioRecurringForm: React.FC<Props> = ({ scenarioId, initialValues }) =
   const onSubmit = (data: Recurrence) => {
     let cron;
     if (openDaily) {
-      cron = crontime.everyDayAt(new Date(data.time).getUTCHours(), new Date(data.time).getUTCMinutes());
+      cron = CronTime.everyDayAt(new Date(data.time).getUTCHours(), new Date(data.time).getUTCMinutes());
       setSelectRecurring('daily');
     } else if (openWeekly) {
-      cron = crontime.everyWeekAt(data.dayOfWeek!, new Date(data.time).getUTCHours(), new Date(data.time).getUTCMinutes());
+      cron = CronTime.everyWeekAt(data.dayOfWeek!, new Date(data.time).getUTCHours(), new Date(data.time).getUTCMinutes());
       setSelectRecurring('weekly');
     } else {
-      cron = crontime.between(
+      cron = CronTime.between(
         weekOfMonthToCron[data.weekOfMonth!].start,
         weekOfMonthToCron[data.weekOfMonth!].end,
       ).days(
