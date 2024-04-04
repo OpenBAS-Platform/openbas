@@ -129,7 +129,7 @@ const ScenarioRecurringForm: React.FC<Props> = ({ scenarioId, initialValues }) =
             return value !== null;
           }
           return true;
-        }, { message: t('required') }),
+        }, { message: t('Required') }),
       }).refine(
         (data) => {
           return new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() !== new Date(data.startDate).getTime()
