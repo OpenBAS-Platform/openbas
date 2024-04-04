@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLHStoreType;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdDeserializer;
@@ -35,6 +36,7 @@ public class InjectorContract implements Base {
     @Column(name = "injector_contract_labels")
     @JsonProperty("injector_contract_labels")
     @Type(PostgreSQLHStoreType.class)
+    @Queryable(searchable = true, filterable = true, sortable = true)
     private Map<String, String> labels = new HashMap<>();
 
     @Getter
@@ -73,6 +75,7 @@ public class InjectorContract implements Base {
             inverseJoinColumns = @JoinColumn(name = "attack_pattern_id"))
     @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("injectors_contracts_attack_patterns")
+    @Queryable(filterable = true)
     private List<AttackPattern> attackPatterns = new ArrayList<>();
 
     @JsonIgnore
