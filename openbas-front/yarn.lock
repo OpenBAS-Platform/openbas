@@ -8119,21 +8119,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-react-parser@npm:5.1.9":
-  version: 5.1.9
-  resolution: "html-react-parser@npm:5.1.9"
+"html-react-parser@npm:5.1.10":
+  version: 5.1.10
+  resolution: "html-react-parser@npm:5.1.10"
   dependencies:
     domhandler: "npm:5.0.3"
     html-dom-parser: "npm:5.0.8"
     react-property: "npm:2.0.2"
-    style-to-js: "npm:1.1.11"
+    style-to-js: "npm:1.1.12"
   peerDependencies:
     "@types/react": 17 || 18
     react: 0.14 || 15 || 16 || 17 || 18
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10c0/d0fb755d8fbf064326a3e78cb1d367763ece4de6abb00c7634862c9a165009020a5543457bf9a5e7a40d1026e500cda40c032982f90589e1ef62e02cb83eeff1
+  checksum: 10c0/8fde26f5f9b53dc03629899bb5af35bde0c8b934c28a917e8bed8bd21a1c404f4ba9f1d349607d1fda6ee93bf8bb48066f22c9c3f22cbad6ceee10fa81c13a74
   languageName: node
   linkType: hard
 
@@ -8365,6 +8365,13 @@ __metadata:
   version: 0.2.2
   resolution: "inline-style-parser@npm:0.2.2"
   checksum: 10c0/82099645fd99451301ff243706f70917c066e3033d32bdb1074a54eb1909e08d1cafb48c426a643facbe8248cff362082e90ca14760b3d44e09a858fe668b3fe
+  languageName: node
+  linkType: hard
+
+"inline-style-parser@npm:0.2.3":
+  version: 0.2.3
+  resolution: "inline-style-parser@npm:0.2.3"
+  checksum: 10c0/21b46d39a39c8aeaa738346650469388e8a412dd276ab75aa3d85b1883311e89c86a1fdbb8c2f1958f4c979bae74067f6ba0385455b125faf4fa77e1dbb94799
   languageName: node
   linkType: hard
 
@@ -10860,7 +10867,7 @@ __metadata:
     fs-extra: "npm:11.2.0"
     globals: "npm:14.0.0"
     history: "npm:5.3.0"
-    html-react-parser: "npm:5.1.9"
+    html-react-parser: "npm:5.1.10"
     html-to-image: "npm:1.11.11"
     http-proxy-middleware: "npm:2.0.6"
     js-file-download: "npm:0.4.12"
@@ -13430,16 +13437,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"style-to-js@npm:1.1.11":
-  version: 1.1.11
-  resolution: "style-to-js@npm:1.1.11"
+"style-to-js@npm:1.1.12":
+  version: 1.1.12
+  resolution: "style-to-js@npm:1.1.12"
   dependencies:
-    style-to-object: "npm:1.0.5"
-  checksum: 10c0/8e67135b3eefc0ff28633ab00f7e50ac71ea4edd2a53ab0140a5dc60036f948cd9c2746d47776a23ed71af658f196f7bdeb15ff1ef08ad7459e185b8fe541c16
+    style-to-object: "npm:1.0.6"
+  checksum: 10c0/4b03ac3cec5d0e4c2578513dfbae9861eb9fb56825bccfd64bddcdf067e66805d6f160b93d2985aad4198893940fa162c4c85c3969e13ba2662a5824231c009c
   languageName: node
   linkType: hard
 
-"style-to-object@npm:1.0.5, style-to-object@npm:^1.0.0":
+"style-to-object@npm:1.0.6":
+  version: 1.0.6
+  resolution: "style-to-object@npm:1.0.6"
+  dependencies:
+    inline-style-parser: "npm:0.2.3"
+  checksum: 10c0/be5e8e3f0e35c0338de4112b9d861db576a52ebbd97f2501f1fb2c900d05c8fc42c5114407fa3a7f8b39301146cd8ca03a661bf52212394125a9629d5b771aba
+  languageName: node
+  linkType: hard
+
+"style-to-object@npm:^1.0.0":
   version: 1.0.5
   resolution: "style-to-object@npm:1.0.5"
   dependencies:
