@@ -73,7 +73,7 @@
     "@playwright/test": "1.42.1",
     "@stylistic/eslint-plugin": "1.7.0",
     "@testing-library/react": "14.2.2",
-    "@types/node": "20.11.30",
+    "@types/node": "20.12.4",
     "@types/react": "18.2.74",
     "@types/react-csv": "1.1.10",
     "@types/react-dom": "18.2.24",
