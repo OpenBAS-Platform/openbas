@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux';
 import { arrayOfAtomicTestings, atomicTesting } from './atomic-testing-schema';
-import { delReferential, getReferential } from '../../utils/Action';
+import { delReferential, getReferential, putReferential } from '../../utils/Action';
 
 const ATOMIC_TESTING_URI = '/api/atomic_testings';
 
@@ -16,4 +16,9 @@ export const fetchAtomicTesting = (injectId: string) => (dispatch: Dispatch) => 
 export const deleteAtomicTesting = (injectId: string) => (dispatch: Dispatch) => {
   const uri = `${ATOMIC_TESTING_URI}/${injectId}`;
   return delReferential(uri, atomicTesting.key, injectId)(dispatch);
+};
+
+export const updateAtomicTesting = (injectId: string, data: string) => (dispatch: Dispatch) => {
+  const uri = `${ATOMIC_TESTING_URI}/${injectId}`;
+  return putReferential(atomicTesting.key, uri, data)(dispatch);
 };

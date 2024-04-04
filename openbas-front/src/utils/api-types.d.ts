@@ -107,23 +107,28 @@ export interface AtomicTestingOutput {
   /** Contract */
   atomic_contract: string;
   /** Result of expectations */
-  atomic_expectation_results?: BasicExpectationResult[];
+  atomic_expectation_results: BasicExpectationResult[];
   /** Id */
   atomic_id: string;
   /**
    * Last Execution date
    * @format date-time
    */
-  atomic_last_execution_date?: string;
+  atomic_last_execution_date: string;
   /**
    * Specifies the categories of targets for atomic testing.
    * @example "assets, asset groups, teams, players"
    */
-  atomic_targets?: BasicTarget[];
+  atomic_targets: BasicTarget[];
   /** Title */
-  atomic_title?: string;
+  atomic_title: string;
   /** Type */
   atomic_type: string;
+}
+
+export interface AtomicTestingSimpleInput {
+  /** Title */
+  atomic_title: string;
 }
 
 export interface AttackPattern {
@@ -161,7 +166,7 @@ export interface AttackPatternUpsertInput {
 
 /** Result of expectations */
 export interface BasicExpectationResult {
-  distribution: ResultDetail[];
+  distribution?: ResultDetail[];
   result?: "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   type?: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
 }
@@ -397,57 +402,6 @@ export interface Communication {
   communication_to?: string;
   communication_users?: User[];
   updateAttributes?: object;
-}
-
-export interface Contract {
-  config: ContractConfig;
-  context: Record<string, string>;
-  contract_attack_patterns: string[];
-  contract_id: string;
-  fields: ContractElement[];
-  label: Record<string, string>;
-  manual: boolean;
-  variables: ContractVariable[];
-}
-
-export interface ContractConfig {
-  color_dark?: string;
-  color_light?: string;
-  expose?: boolean;
-  label?: Record<string, string>;
-  type?: string;
-}
-
-export interface ContractElement {
-  key?: string;
-  label?: string;
-  linkedFields?: LinkedFieldModel[];
-  linkedValues?: string[];
-  mandatory?: boolean;
-  mandatoryGroups?: string[];
-  type?:
-    | "text"
-    | "number"
-    | "tuple"
-    | "checkbox"
-    | "textarea"
-    | "select"
-    | "article"
-    | "challenge"
-    | "dependency-select"
-    | "attachment"
-    | "team"
-    | "expectation"
-    | "asset"
-    | "asset-group";
-}
-
-export interface ContractVariable {
-  cardinality: "1" | "n";
-  children?: ContractVariable[];
-  key: string;
-  label: string;
-  type: "String" | "Object";
 }
 
 export interface CreatePlayerInput {
@@ -1014,6 +968,20 @@ export interface InjectorConnection {
   vhost?: string;
 }
 
+export interface InjectorContract {
+  injector_contract_content: string;
+  /** @format date-time */
+  injector_contract_created_at?: string;
+  injector_contract_id: string;
+  injector_contract_injector?: Injector;
+  injector_contract_labels?: Record<string, string>;
+  injector_contract_manual?: boolean;
+  /** @format date-time */
+  injector_contract_updated_at?: string;
+  injectors_contracts_attack_patterns?: AttackPattern[];
+  updateAttributes?: object;
+}
+
 export interface InjectorContractInput {
   contract_attack_patterns?: string[];
   contract_content: string;
@@ -1245,25 +1213,6 @@ export interface LessonsTemplateUpdateInput {
   lessons_template_name: string;
 }
 
-export interface LinkedFieldModel {
-  key?: string;
-  type?:
-    | "text"
-    | "number"
-    | "tuple"
-    | "checkbox"
-    | "textarea"
-    | "select"
-    | "article"
-    | "challenge"
-    | "dependency-select"
-    | "attachment"
-    | "team"
-    | "expectation"
-    | "asset"
-    | "asset-group";
-}
-
 export interface Log {
   log_content?: string;
   /** @format date-time */
@@ -1370,8 +1319,8 @@ export interface PageAttackPattern {
   totalPages?: number;
 }
 
-export interface PageContract {
-  content?: Contract[];
+export interface PageEndpoint {
+  content?: Endpoint[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -1389,8 +1338,8 @@ export interface PageContract {
   totalPages?: number;
 }
 
-export interface PageEndpoint {
-  content?: Endpoint[];
+export interface PageInjectorContract {
+  content?: InjectorContract[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -1585,9 +1534,9 @@ export interface ResetUserInput {
 }
 
 export interface ResultDetail {
-  label: string;
+  label?: string;
   /** @format int32 */
-  value: number;
+  value?: number;
 }
 
 export interface Scenario {

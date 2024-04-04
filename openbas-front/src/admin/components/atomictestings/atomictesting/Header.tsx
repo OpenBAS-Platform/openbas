@@ -8,7 +8,7 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import type { AtomicTestingOutput } from '../../../../utils/api-types';
 import { fetchAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
 import type { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
-import { useFormatter } from '../../../../components/i18n';
+import AtomicPopover from './Popover';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -21,7 +21,8 @@ const useStyles = makeStyles(() => ({
   },
   title: {
     textTransform: 'uppercase',
-    marginBottom: 0,
+    marginTop: 5,
+    marginBottom: 5,
   },
 }));
 
@@ -29,7 +30,6 @@ const AtomicTestingHeader = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
   const classes = useStyles();
-  const { fldt } = useFormatter();
   const { atomicId } = useParams() as { atomicId: AtomicTestingOutput['atomic_id'] };
 
   // Fetching data
@@ -50,6 +50,7 @@ const AtomicTestingHeader = () => {
         >
           {atomic.atomic_title}
         </Typography>
+        <AtomicPopover atomic={atomic}/>
       </div>
     </div>
   );

@@ -25,6 +25,7 @@ public class AtomicTestingOutput {
 
   @Schema(description = "Title")
   @JsonProperty("atomic_title")
+  @NotNull
   private String title;
 
   @Schema(description = "Type")
@@ -39,6 +40,7 @@ public class AtomicTestingOutput {
 
   @Schema(description = "Last Execution date")
   @JsonProperty("atomic_last_execution_date")
+  @NotNull
   private Instant lastExecutionDate;
 
   @Schema(
@@ -46,10 +48,12 @@ public class AtomicTestingOutput {
       example = "assets, asset groups, teams, players"
   )
   @JsonProperty("atomic_targets")
+  @NotNull
   private List<BasicTarget> targets;
 
   @Default
   @Schema(description = "Result of expectations")
   @JsonProperty("atomic_expectation_results")
+  @NotNull
   private List<BasicExpectationResult> expectationResults = new ArrayList<>();
 }
