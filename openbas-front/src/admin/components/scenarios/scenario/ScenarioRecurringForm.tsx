@@ -122,7 +122,7 @@ const ScenarioRecurringForm: React.FC<Props> = ({ scenarioId, initialValues }) =
             return value !== null;
           }
           return true;
-        }, { message: t('required') }),
+        }, { message: t('Required') }),
         // @ts-expect-error zodImplement cannot handle refine
         weekOfMonth: z.number().optional().refine((value) => {
           if (openMonthly) {
