@@ -1,16 +1,16 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import React from 'react';
-import { Grid, Paper, Theme } from '@mui/material';
+import { Grid, Paper } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import type { AtomicTestingOutput } from '../../../../utils/api-types';
-import { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
+import type { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
 import { fetchAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
 import ResponsePie from '../../components/atomictestings/ResponsePie';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   paper: {
     padding: 50,
     height: '100%',
@@ -24,7 +24,6 @@ const AtomicTesting = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
 
   const { atomicId } = useParams() as { atomicId: AtomicTestingOutput['atomic_id'] };
 
@@ -41,7 +40,7 @@ const AtomicTesting = () => {
 
   return (
     <>
-      <Grid container justify="center" spacing={2} classes={{ root: classes.container }}>
+      <Grid container spacing={2} classes={{ root: classes.container }}>
         <Grid item xs={12}>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <ResponsePie expectations={atomic.atomic_expectation_results}/>
