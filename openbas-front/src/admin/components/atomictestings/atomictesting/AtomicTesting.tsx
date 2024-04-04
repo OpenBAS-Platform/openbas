@@ -1,8 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Grid, List, ListItem, ListItemText, Paper } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import * as PropTypes from 'prop-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
@@ -13,6 +12,7 @@ import ResponsePie from '../../components/atomictestings/ResponsePie';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import AtomicTestingResult from '../../components/atomictestings/AtomicTestingResult';
+import TargetResponsesDetail from '../../components/atomictestings/TargetResponsesDetail';
 import SearchFilter from '../../../../components/SearchFilter';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 
@@ -22,10 +22,7 @@ const useStyles = makeStyles(() => ({
     height: '100%',
   },
   container: {
-    marginBottom: '30px',
-  },
-  filters: {
-    display: 'flex',
+    padding: '20px',
   },
   bodyTarget: {
     float: 'left',
@@ -44,6 +41,7 @@ const AtomicTesting = () => {
   const classes = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const [selectedTarget, setSelectedTarget] = useState(undefined);
 
   const { atomicId } = useParams() as { atomicId: AtomicTestingOutput['atomic_id'] };
 
@@ -61,6 +59,11 @@ const AtomicTesting = () => {
     dispatch(fetchAtomicTesting(atomicId));
   });
 
+  useEffect(() => {
+    // console.log(atomic.atomic_targets?.flatMap((target) => target.targets)[0]?.id);
+    // dispatch(fetchAtomicTesting(atomic.atomic_targets?.flatMap((target) => target.targets)[0]?.id));
+  }, [atomic]);
+
   const allTargets = atomic.atomic_targets?.flatMap((target) => target.targets);
   const sortedTargets: TargetResult[] = allTargets; // todo
 
@@ -68,55 +71,51 @@ const AtomicTesting = () => {
     <>
       <Grid container spacing={2} classes={{ root: classes.container }}>
         <Grid item xs={12}>
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <ResponsePie expectations={atomic.atomic_expectation_results}/>
-          </Paper>
+          <ResponsePie expectations={atomic.atomic_expectation_results}/>
         </Grid>
       </Grid>
       <Grid container spacing={2} classes={{ root: classes.container }}>
         <Grid item xs={4} style={{ paddingBottom: 24 }}>
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <div>
-              <SearchFilter
-                small
-                fullWidth
-                onChange={filtering.handleSearch}
-                keyword={filtering.keyword}
-                placeholder={'Search by target name'}
-                classes={classes.filters}
-              />
-            </div>
-            {sortedTargets.length > 0 ? (
-              <List style={{ paddingTop: 0 }}>
-                {sortedTargets.map((target) => (
-                  <ListItem
-                    key={target?.id}
-                    dense={true}
-                    divider={true}
-                    component={Link}
-                  >
-                    <ListItemText
-                      primary={
-                        <div>
-                          <div className={classes.bodyTarget} style={{ width: '30%' }}>
-                            {target?.name}
-                          </div>
-                          <div style={{ float: 'right' }}>
-                            <AtomicTestingResult expectations={target?.expectationResults}/>
-                          </div>
+          <div style={{ padding: 10 }}>
+            <SearchFilter
+              small
+              fullWidth
+              onChange={filtering.handleSearch}
+              keyword={filtering.keyword}
+              placeholder={'Search by target name'}
+            />
+          </div>
+          {sortedTargets.length > 0 ? (
+            <List style={{ paddingTop: 10 }}>
+              {sortedTargets.map((target) => (
+                <ListItem
+                  key={target?.id}
+                  dense={true}
+                  divider={true}
+                  component={Link}
+                >
+                  <ListItemText
+                    primary={
+                      <div>
+                        <div className={classes.bodyTarget} style={{ width: '30%' }}>
+                          {target?.name}
                         </div>
+                        <div style={{ float: 'right' }}>
+                          <AtomicTestingResult expectations={target?.expectationResults}/>
+                        </div>
+                      </div>
                             }
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            ) : (
-              <Empty message={t('No targets in this atomic testing.')}/>
-            )}
-          </Paper>
+                  />
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <Empty message={t('No targets in this atomic testing.')}/>
+          )}
         </Grid>
         <Grid item xs={8} style={{ paddingBottom: 24 }}>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
+            <TargetResponsesDetail/>
           </Paper>
         </Grid>
       </Grid>

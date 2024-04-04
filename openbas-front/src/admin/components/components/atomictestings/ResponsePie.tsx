@@ -1,7 +1,7 @@
 import Chart from 'react-apexcharts';
 import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
-import { BasicExpectationResult } from '../../../../utils/api-types';
+import type { BasicExpectationResult } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   inline: {
@@ -11,6 +11,7 @@ const useStyles = makeStyles(() => ({
   },
   chartContainer: {
     position: 'relative',
+    float: 'right',
   },
   chartTitle: {
     fontWeight: 'bold',
