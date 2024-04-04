@@ -795,7 +795,6 @@ const i18n = {
       endpoint_ips: 'Addresse Ips',
       endpoint_platform: 'Platforme',
       Instantiate: 'Instancier',
-      required: 'requis',
       Recurrence: 'Récurrence',
       'Does not repeat': 'Ne se répète pas',
       Daily: 'Quotidien',
