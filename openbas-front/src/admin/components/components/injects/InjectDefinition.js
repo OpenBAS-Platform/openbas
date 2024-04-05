@@ -2074,7 +2074,7 @@ InjectDefinition.propTypes = {
 const select = (state, ownProps) => {
   const helper = storeHelper(state);
   const { injectId } = ownProps;
-  const inject = helper.getInject(injectId);
+  const inject = injectId ? helper.getInject(injectId) : ownProps.inject;
   const documentsMap = helper.getDocumentsMap();
   const teamsMap = helper.getTeamsMap();
   const endpointsMap = helper.getEndpointsMap();

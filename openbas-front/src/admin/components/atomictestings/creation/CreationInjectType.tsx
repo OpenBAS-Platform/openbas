@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import { Button, Chip, List, ListItem, ListItemText, Typography } from '@mui/material';
+import { Button, Chip, List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';
 import { useFormatter } from '../../../../components/i18n';
 import { searchInjectorContracts } from '../../../../actions/Inject';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
@@ -60,6 +60,8 @@ const CreationInjectType: FunctionComponent<Props> = () => {
     filterGroup: f,
   }));
 
+  const [selectedInject, setSelectedInject] = useState<string | undefined>(undefined);
+
   return (
     <div className={classes.menuContainer}>
       <PaginationComponent
@@ -70,12 +72,12 @@ const CreationInjectType: FunctionComponent<Props> = () => {
       <div className={classes.container} style={{ marginTop: 10 }}>
         <div>
           {!isEmptyFilter(filterGroup, MITRE_FILTER_KEY)
-                && <Chip
-                  label={`Attack pattern = ${filterGroup.filters?.[0]?.values?.map((id) => attackPatternsMap[id].attack_pattern_name)}`}
-                  onDelete={() => helpers.handleClearAllFilters()}
-                  component="a"
-                   />
-            }
+            && <Chip
+              label={`Attack pattern = ${filterGroup.filters?.[0]?.values?.map((id) => attackPatternsMap[id].attack_pattern_name)}`}
+              onDelete={() => helpers.handleClearAllFilters()}
+              component="a"
+               />
+          }
         </div>
         <Button
           variant="outlined"
@@ -89,14 +91,16 @@ const CreationInjectType: FunctionComponent<Props> = () => {
       <List>
         {contracts.map((contract) => (
           <ListItem key={contract.injector_contract_id} divider>
-            <ListItemText
-              primary={<div className={classes.container}>
-                {tPick(contract.injector_contract_labels)}
-                <Typography variant="h3"
-                  sx={{ m: 0 }}
-                >{computeAttackPattern(contract, attackPatternsMap)}</Typography>
-              </div>}
-            />
+            <ListItemButton
+              onClick={() => setSelectedInject(contract.injector_id)}
+            >
+              <ListItemText
+                primary={<div className={classes.container}>
+                  {tPick(contract.injector_contract_labels)}
+                  <Typography variant="h3" sx={{ m: 0 }}>{computeAttackPattern(contract, attackPatternsMap)}</Typography>
+                </div>}
+              />
+            </ListItemButton>
           </ListItem>
         ))}
       </List>
@@ -106,7 +110,7 @@ const CreationInjectType: FunctionComponent<Props> = () => {
         title={t('ATT&CK Matrix')}
         maxWidth={'xl'}
       >
-        <MitreFilter helpers={helpers} onClick={() => setOpenMitreFilter(false)}/>
+        <MitreFilter helpers={helpers} onClick={() => setOpenMitreFilter(false)} />
       </Dialog>
     </div>
   );
