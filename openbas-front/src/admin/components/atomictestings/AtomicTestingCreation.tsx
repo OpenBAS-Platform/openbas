@@ -133,7 +133,7 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
                             label={`Attack pattern = ${filterGroup.filters?.[0]?.values?.map((id) => attackPatternsMap[id].attack_pattern_name)}`}
                             onDelete={() => helpers.handleClearAllFilters()}
                             component="a"
-                             />
+                          />
                         }
                       </div>
                       <Button
@@ -148,6 +148,7 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
                     <List>
                       {contracts.map((contract) => {
                         const parsedContent = JSON.parse(contract.injector_contract_content);
+                        const [attackPattern] = computeAttackPattern(contract, attackPatternsMap);
                         return (
                           <ListItem key={contract.injector_contract_id} divider>
                             <ListItemButton
@@ -159,8 +160,12 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
                             >
                               <ListItemText
                                 primary={<div className={classes.container}>
-                                  {tPick(contract.injector_contract_labels)}
-                                  <Typography variant="h3" sx={{ m: 0 }}>{computeAttackPattern(contract, attackPatternsMap)}</Typography>
+                                  <span>
+                                    [{attackPattern.attack_pattern_external_id}]
+                                    {' - '}
+                                    {tPick(contract.injector_contract_labels)}
+                                  </span>
+                                  <Typography variant="h3" sx={{ m: 0 }}>{attackPattern.attack_pattern_name}</Typography>
                                 </div>}
                               />
                             </ListItemButton>

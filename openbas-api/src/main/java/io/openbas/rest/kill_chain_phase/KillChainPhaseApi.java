@@ -41,7 +41,8 @@ public class KillChainPhaseApi extends RestBehavior {
   @PostMapping("/api/kill_chain_phases/search")
   public Page<KillChainPhase> killChainPhases(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-        (Specification<KillChainPhase> specification, Pageable pageable) -> this.killChainPhaseRepository.findAll(specification, pageable),
+        (Specification<KillChainPhase> specification, Pageable pageable) -> this.killChainPhaseRepository.findAll(
+            specification, pageable),
         searchPaginationInput,
         KillChainPhase.class
     );
@@ -65,30 +66,34 @@ public class KillChainPhaseApi extends RestBehavior {
   public Iterable<KillChainPhase> upsertKillChainPhases(@Valid @RequestBody KillChainPhaseUpsertInput input) {
     List<KillChainPhase> upserted = new ArrayList<>();
     List<KillChainPhaseCreateInput> inputKillChainPhases = input.getKillChainPhases();
-    inputKillChainPhases.forEach(killChainPhaseCreateInput -> {
-      String killChainName = killChainPhaseCreateInput.getKillChainName();
-      String shortName = killChainPhaseCreateInput.getShortName();
-      Optional<KillChainPhase> optionalKillChainPhase = killChainPhaseRepository.findByKillChainNameAndShortName(killChainName, shortName);
-      if (optionalKillChainPhase.isEmpty()) {
-        KillChainPhase newKillChainPhase = new KillChainPhase();
-        newKillChainPhase.setKillChainName(killChainName);
-        newKillChainPhase.setStixId(killChainPhaseCreateInput.getStixId());
-        newKillChainPhase.setExternalId(killChainPhaseCreateInput.getExternalId());
-        newKillChainPhase.setShortName(shortName);
-        newKillChainPhase.setName(killChainPhaseCreateInput.getName());
-        newKillChainPhase.setDescription(killChainPhaseCreateInput.getDescription());
-        upserted.add(killChainPhaseRepository.save(newKillChainPhase));
-      } else {
-        KillChainPhase killChainPhase = optionalKillChainPhase.get();
-        killChainPhase.setStixId(killChainPhaseCreateInput.getStixId());
-        killChainPhase.setShortName(killChainPhaseCreateInput.getShortName());
-        killChainPhase.setName(killChainPhaseCreateInput.getName());
-        killChainPhase.setExternalId(killChainPhaseCreateInput.getExternalId());
-        killChainPhase.setDescription(killChainPhaseCreateInput.getDescription());
-        upserted.add(killChainPhaseRepository.save(killChainPhase));
-      }
-    });
-    return upserted;
+    inputKillChainPhases.stream()
+        .parallel()
+        .forEach(killChainPhaseCreateInput -> {
+          String killChainName = killChainPhaseCreateInput.getKillChainName();
+          String shortName = killChainPhaseCreateInput.getShortName();
+          Optional<KillChainPhase> optionalKillChainPhase = killChainPhaseRepository.findByKillChainNameAndShortName(
+              killChainName, shortName);
+          if (optionalKillChainPhase.isEmpty()) {
+            KillChainPhase newKillChainPhase = new KillChainPhase();
+            newKillChainPhase.setKillChainName(killChainName);
+            newKillChainPhase.setStixId(killChainPhaseCreateInput.getStixId());
+            newKillChainPhase.setExternalId(killChainPhaseCreateInput.getExternalId());
+            newKillChainPhase.setShortName(shortName);
+            newKillChainPhase.setName(killChainPhaseCreateInput.getName());
+            newKillChainPhase.setDescription(killChainPhaseCreateInput.getDescription());
+            newKillChainPhase.setOrder(KillChainPhaseUtils.orderFromMitreAttack().get(shortName));
+            upserted.add(newKillChainPhase);
+          } else {
+            KillChainPhase killChainPhase = optionalKillChainPhase.get();
+            killChainPhase.setStixId(killChainPhaseCreateInput.getStixId());
+            killChainPhase.setShortName(killChainPhaseCreateInput.getShortName());
+            killChainPhase.setName(killChainPhaseCreateInput.getName());
+            killChainPhase.setExternalId(killChainPhaseCreateInput.getExternalId());
+            killChainPhase.setDescription(killChainPhaseCreateInput.getDescription());
+            upserted.add(killChainPhase);
+          }
+        });
+    return this.killChainPhaseRepository.saveAll(upserted);
   }
 
   @Secured(ROLE_ADMIN)
