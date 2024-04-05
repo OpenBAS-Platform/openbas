@@ -65,10 +65,11 @@ const getInitialValues = (scenarioRecurrenceStart: string | undefined, cronInter
     (cronInterval ? new Date(new Date().setUTCHours(cronInterval.fields.hour[0], cronInterval.fields.minute[0])) : new Date(new Date().getTime() + 4 * 60000))
       .toISOString(),
   dayOfWeek:
-    cronInterval ? cronInterval.fields.dayOfWeek[0] as Recurrence['dayOfWeek'] : 1,
+    cronInterval && (cronInterval.fields.dayOfWeek.length === 1 || cronInterval.fields.dayOfMonth.length === 7) ? cronInterval.fields.dayOfWeek[0] as Recurrence['dayOfWeek'] : 1,
   weekOfMonth:
-    cronInterval ? cronToWeekOfMonth(cronInterval.fields.dayOfMonth[0]) : 1 as Recurrence['weekOfMonth'],
+    cronInterval && cronInterval.fields.dayOfMonth.length === 7 ? cronToWeekOfMonth(cronInterval.fields.dayOfMonth[0]) : 1 as Recurrence['weekOfMonth'],
 });
+
 const ScenarioRecurringForm: React.FC<Props> = ({ scenarioId, initialValues }) => {
   const { t, locale } = useFormatter();
 
@@ -146,8 +147,9 @@ const ScenarioRecurringForm: React.FC<Props> = ({ scenarioId, initialValues }) =
   useEffect(() => {
     if (prevScenarioRecurrencenRef.current === undefined && initialValues.scenario_recurrence !== undefined && initialValues.scenario_recurrence !== null) {
       setCronExpression(initialValues.scenario_recurrence);
-      setCronInterval(cronparser.parseExpression(initialValues.scenario_recurrence));
-      reset(getInitialValues(initialValues.scenario_recurrence_start, cronInterval));
+      const cronIntervalToSet = cronparser.parseExpression(initialValues.scenario_recurrence);
+      setCronInterval(cronIntervalToSet);
+      reset(getInitialValues(initialValues.scenario_recurrence_start, cronIntervalToSet));
     }
     prevScenarioRecurrencenRef.current = initialValues.scenario_recurrence;
   }, [initialValues.scenario_recurrence]);
