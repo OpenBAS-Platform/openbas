@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
-import { Box, Button, Typography, Stepper, Step, StepLabel, Chip, List, ListItem, ListItemButton, ListItemText, IconButton } from '@mui/material';
+import { Box, Button, Typography, Stepper, Step, StepLabel, Chip, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import ButtonCreate from '../../../components/common/ButtonCreate';
 import { useFormatter } from '../../../components/i18n';
@@ -7,7 +7,7 @@ import FullPageDrawer from '../../../components/common/FullPageDrawer';
 import CreationInjectDetails from './creation/CreationInjectDetails';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import { searchInjectorContracts } from '../../../actions/Inject';
-import MitreFilter, { MITRE_FILTER_KEY } from '../components/atomictesting/MitreFilter';
+import MitreFilter, { MITRE_FILTER_KEY } from '../components/atomictestings/MitreFilter';
 import computeAttackPattern from '../../../utils/injectorcontract/InjectorContractUtils';
 import type { InjectorContractStore } from '../../../actions/injectorcontract/InjectorContract';
 import type { FilterGroup, SearchPaginationInput, InjectorContract } from '../../../utils/api-types';
@@ -133,7 +133,7 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
                             label={`Attack pattern = ${filterGroup.filters?.[0]?.values?.map((id) => attackPatternsMap[id].attack_pattern_name)}`}
                             onDelete={() => helpers.handleClearAllFilters()}
                             component="a"
-                          />
+                             />
                         }
                       </div>
                       <Button

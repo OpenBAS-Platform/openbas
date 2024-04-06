@@ -30,6 +30,23 @@ public class AtomicTestingMapper {
     return injects.stream().map(AtomicTestingMapper::toDto).toList();
   }
 
+  public static SimpleExpectationResultOutput toTargetResultDto(InjectExpectation injectExpectation) {
+    return SimpleExpectationResultOutput
+        .builder()
+        .id(injectExpectation.getId())
+        .type(ExpectationType.valueOf(injectExpectation.getType().name()))
+        .startedAt(injectExpectation.getCreatedAt())
+        .endedAt(injectExpectation.getUpdatedAt())
+        .logs(injectExpectation.getResults().toString())
+        .response(injectExpectation.getScore() == 0 ? ExpectationStatus.FAILED : ExpectationStatus.VALIDATED)
+        .build();
+  }
+
+  public static List<SimpleExpectationResultOutput> toTargetResultDto(List<InjectExpectation> injectExpectations) {
+    return injectExpectations.stream().map(AtomicTestingMapper::toTargetResultDto).toList();
+
+  }
+
   private static Instant getLastExecutionDate(final Inject inject) {
     return inject.getStatus().map(InjectStatus::getTrackingEndDate).orElseGet(inject::getUpdatedAt);
   }
@@ -153,12 +170,6 @@ public class AtomicTestingMapper {
     return scores.stream()
         .mapToInt(Integer::intValue)
         .average();
-  }
-
-  enum TargetType {
-    ASSETS,
-    ASSETS_GROUPS,
-    TEAMS
   }
 
   public record ExpectationResultsByType(@NotNull ExpectationType type, @NotNull ExpectationStatus avgResult, @NotNull List<ResultDistribution> distribution) {

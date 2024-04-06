@@ -1,5 +1,10 @@
 package io.openbas.injectExpectation;
 
+import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.DETECTION;
+import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVENTION;
+import static io.openbas.injectExpectation.InjectExpectationUtils.computeResult;
+import static java.time.Instant.now;
+
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Inject;
@@ -8,17 +13,12 @@ import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.specification.InjectExpectationSpecification;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.List;
-
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.DETECTION;
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVENTION;
-import static io.openbas.injectExpectation.InjectExpectationUtils.computeResult;
-import static java.time.Instant.now;
 
 @RequiredArgsConstructor
 @Service
@@ -128,6 +128,21 @@ public class InjectExpectationService {
         Specification.where(InjectExpectationSpecification.type(DETECTION))
             .and(InjectExpectationSpecification.fromAssets(inject.getId(), assetIds))
     );
+  }
+
+  // -- BY TARGET TYPE
+
+  public List<InjectExpectation> findExpectationsByInjectAndTarget(@NotBlank final String injectId, @NotBlank final String targetId, @NotBlank final String targetType) {
+    switch (targetType) {
+      case "TEAMS":
+        return injectExpectationRepository.findAllByInjectAndTeam(injectId, targetId);
+      case "ASSETS":
+        return injectExpectationRepository.findAllByInjectAndAsset(injectId, targetId);
+      case "ASSETS_GROUPS":
+        return injectExpectationRepository.findAllByInjectAndAssetGroup(injectId, targetId);
+      default:
+        return Collections.emptyList();
+    }
   }
 
 }

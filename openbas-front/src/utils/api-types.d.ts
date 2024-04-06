@@ -107,7 +107,7 @@ export interface AtomicTestingOutput {
   /** Contract */
   atomic_contract: string;
   /** Result of expectations */
-  atomic_expectation_results: BasicExpectationResult[];
+  atomic_expectation_results: ExpectationResultsByType[];
   /** Id */
   atomic_id: string;
   /**
@@ -116,10 +116,10 @@ export interface AtomicTestingOutput {
    */
   atomic_last_execution_date: string;
   /**
-   * Specifies the categories of targets for atomic testing.
+   * Specifies the categories of targetResults for atomic testing.
    * @example "assets, asset groups, teams, players"
    */
-  atomic_targets: BasicTarget[];
+  atomic_targets: InjectTargetsByType[];
   /** Title */
   atomic_title: string;
   /** Type */
@@ -162,22 +162,6 @@ export interface AttackPatternCreateInput {
 export interface AttackPatternUpsertInput {
   attack_patterns?: AttackPatternCreateInput[];
   attack_pattern_stix_id: string;
-}
-
-/** Result of expectations */
-export interface BasicExpectationResult {
-  distribution?: ResultDetail[];
-  result?: "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
-  type?: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
-}
-
-/**
- * Specifies the categories of targets for atomic testing.
- * @example "assets, asset groups, teams, players"
- */
-export interface BasicTarget {
-  targets?: TargetResult[];
-  type?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
 export interface Challenge {
@@ -402,57 +386,6 @@ export interface Communication {
   communication_to?: string;
   communication_users?: User[];
   updateAttributes?: object;
-}
-
-export interface Contract {
-  config: ContractConfig;
-  context: Record<string, string>;
-  contract_attack_patterns: string[];
-  contract_id: string;
-  fields: ContractElement[];
-  label: Record<string, string>;
-  manual: boolean;
-  variables: ContractVariable[];
-}
-
-export interface ContractConfig {
-  color_dark?: string;
-  color_light?: string;
-  expose?: boolean;
-  label?: Record<string, string>;
-  type?: string;
-}
-
-export interface ContractElement {
-  key?: string;
-  label?: string;
-  linkedFields?: LinkedFieldModel[];
-  linkedValues?: string[];
-  mandatory?: boolean;
-  mandatoryGroups?: string[];
-  type?:
-      | "text"
-      | "number"
-      | "tuple"
-      | "checkbox"
-      | "textarea"
-      | "select"
-      | "article"
-      | "challenge"
-      | "dependency-select"
-      | "attachment"
-      | "team"
-      | "expectation"
-      | "asset"
-      | "asset-group";
-}
-
-export interface ContractVariable {
-  cardinality: "1" | "n";
-  children?: ContractVariable[];
-  key: string;
-  label: string;
-  type: "String" | "Object";
 }
 
 export interface CreatePlayerInput {
@@ -742,6 +675,13 @@ export interface ExerciseUpdateTeamsInput {
   exercise_teams?: string[];
 }
 
+/** Result of expectations */
+export interface ExpectationResultsByType {
+  avgResult?: "FAILED" | "PARTIAL" | "VALIDATED";
+  distribution?: ResultDistribution[];
+  type?: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
+}
+
 export interface ExpectationUpdateInput {
   /** @format int32 */
   expectation_score: number;
@@ -977,6 +917,15 @@ export interface InjectStatusExecution {
   execution_status?: "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   /** @format date-time */
   execution_time?: string;
+}
+
+/**
+ * Specifies the categories of targetResults for atomic testing.
+ * @example "assets, asset groups, teams, players"
+ */
+export interface InjectTargetsByType {
+  targetResults?: TargetResult[];
+  type?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
 export interface InjectTeamsInput {
@@ -1584,7 +1533,7 @@ export interface ResetUserInput {
   login: string;
 }
 
-export interface ResultDetail {
+export interface ResultDistribution {
   label?: string;
   /** @format int32 */
   value?: number;
@@ -1703,6 +1652,27 @@ export interface SettingsUpdateInput {
   platform_theme: string;
 }
 
+export interface SimpleExpectationResultOutput {
+  /**
+   * End date of inject
+   * @format date-time
+   */
+  target_result_ended_at?: string;
+  /** Id */
+  target_result_id: string;
+  /** Logs */
+  target_result_logs?: string;
+  /** Response status */
+  target_result_response_status?: "FAILED" | "PARTIAL" | "VALIDATED";
+  /**
+   * Started date of inject
+   * @format date-time
+   */
+  target_result_started_at: string;
+  /** Type */
+  target_result_type: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
+}
+
 /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
 export interface SortField {
   direction?: string;
@@ -1742,7 +1712,7 @@ export interface TagUpdateInput {
 }
 
 export interface TargetResult {
-  expectationResults?: BasicExpectationResult[];
+  expectationResultsByTypes?: ExpectationResultsByType[];
   id?: string;
   name?: string;
 }

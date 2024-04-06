@@ -1,7 +1,7 @@
 import React from 'react';
 import { HorizontalRule, SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import type { BasicExpectation } from '../../../../utils/api-types';
+import type { ExpectationResultsByType } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   inline: {
@@ -12,17 +12,17 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  expectations: BasicExpectation[] | undefined;
+  expectations: ExpectationResultsByType[] | undefined;
 }
 
 const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
   const classes = useStyles();
 
-  const getColor = (result: string): string => {
+  const getColor = (result: 'FAILED' | 'PARTIAL' | 'VALIDATED' | undefined): string => {
     switch (result) {
-      case 'SUCCESS':
+      case 'VALIDATED':
         return '#7ed321';
-      case 'ERROR':
+      case 'FAILED':
         return '#d0021b';
       default:
         return '#f5a623';
@@ -36,7 +36,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
   return (
     <div className={classes.inline}>
       {expectations.map((expectation, index) => {
-        const color = getColor(expectation.result);
+        const color = getColor(expectation.avgResult);
         let IconComponent;
         switch (expectation.type) {
           case 'PREVENTION':

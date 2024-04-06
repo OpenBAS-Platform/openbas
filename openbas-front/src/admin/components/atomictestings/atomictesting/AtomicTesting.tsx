@@ -62,10 +62,8 @@ const AtomicTesting = () => {
   // Effects
   useEffect(() => {
     if (atomic && atomic.atomic_targets) {
-      const allTargets = atomic.atomic_targets.flatMap((target) => target.targets);
-      const sortedTargets = allTargets.concat(allTargets); // filtering.filterAndSort(allTargets);
-      setAllTargets(allTargets);
-      setSortedTargets(sortedTargets);
+      setAllTargets(atomic.atomic_targets.flatMap((target) => target.targetResults) || []);
+      setSortedTargets(allTargets.concat(allTargets));
       setSelectedTarget(sortedTargets[0]?.id);
     }
   }, [atomic]);
@@ -100,13 +98,15 @@ const AtomicTesting = () => {
                   <ListItemText
                     primary={
                       <div>
-                        <div className={classes.bodyTarget} style={{ width: '30%' }}>
-                          {target?.name}
+                          <div className={classes.bodyTarget} style={{ width: '30%' }}>
+                            {target?.name}
+                          </div>
+                          <div style={{ float: 'right' }}>
+                            <AtomicTestingResult
+                              expectations={target?.expectationResultsByTypes}
+                            />
+                          </div>
                         </div>
-                        <div style={{ float: 'right' }}>
-                          <AtomicTestingResult expectations={target?.expectationResults}/>
-                        </div>
-                      </div>
                             }
                   />
                 </ListItemButton>
