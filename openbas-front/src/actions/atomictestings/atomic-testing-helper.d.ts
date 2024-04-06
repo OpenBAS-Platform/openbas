@@ -1,7 +1,7 @@
-import type { AtomicTestingOutput, TargetResult } from '../../utils/api-types';
+import type { AtomicTestingOutput, SimpleExpectationResultOutput } from '../../utils/api-types';
 
 export interface AtomicTestingHelper {
   getAtomicTestings: () => AtomicTestingOutput[];
   getAtomicTesting: (atomicId: string) => AtomicTestingOutput;
-  getTargetResults: (targetId: string) => TargetResult;
+  getTargetResults: (targetId: string) => SimpleExpectationResultOutput[];
 }

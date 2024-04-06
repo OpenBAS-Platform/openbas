@@ -3,7 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { Chip, Tooltip } from '@mui/material';
 import { DnsOutlined, Groups3Outlined, HorizontalRule } from '@mui/icons-material';
 import { SelectGroup } from 'mdi-material-ui';
-import type { BasicTarget } from '../../../../utils/api-types';
+import type { InjectTargetsWithResult } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   inline: {
@@ -20,7 +20,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  targets: BasicTarget[] | undefined;
+  targets: InjectTargetsWithResult[] | undefined;
 }
 
 const TargetChip: FunctionComponent<Props> = ({
@@ -33,35 +33,50 @@ const TargetChip: FunctionComponent<Props> = ({
     return <HorizontalRule/>;
   }
 
+  const targetsByType: Record<string, InjectTargetsWithResult[]> = targets.reduce((targetsByType, target) => {
+    const type = target.targetType || '';
+    if (!targetsByType[type]) {
+      targetsByType[type] = [];
+    }
+    targetsByType[type].push(target);
+    return targetsByType;
+  }, {});
+
   const getIcon = (type: string) => {
-    if (type === 'ASSETS') { return <DnsOutlined fontSize="small"/>; }
-    if (type === 'ASSETS_GROUPS') { return <SelectGroup fontSize="small"/>; }
+    if (type === 'ASSETS') {
+      return <DnsOutlined fontSize="small"/>;
+    }
+    if (type === 'ASSETS_GROUPS') {
+      return <SelectGroup fontSize="small"/>;
+    }
     return <Groups3Outlined fontSize="small"/>; // Teams
   };
 
   const getColor = (type: string) => {
-    if (type === 'ASSETS') { return 'primary'; }
-    if (type === 'ASSETS_GROUPS') { return 'info'; }
+    if (type === 'ASSETS') {
+      return 'primary';
+    }
+    if (type === 'ASSETS_GROUPS') {
+      return 'info';
+    }
     return 'success'; // Teams
   };
 
   return (
     <div className={classes.inline}>
-      {targets.map((target, index) => {
-        return (
-          <span key={index}>
-            <Tooltip title={target.targets?.map((t) => t.name)}>
-              <Chip
-                key={target.type}
-                classes={{ root: classes.target }}
-                icon={getIcon(target.type)}
-                color={getColor(target.type)}
-                label={target.targets?.length}
-              />
-            </Tooltip>
-          </span>
-        );
-      })}
+      {Object.keys(targetsByType).map((targetType, index) => (
+        <span key={index}>
+          <Tooltip title={targetsByType[targetType].map((t) => t.name).join(', ')}>
+            <Chip
+              key={targetType}
+              classes={{ root: classes.target }}
+              icon={getIcon(targetType)}
+              color={getColor(targetType)}
+              label={targetsByType[targetType].length}
+            />
+          </Tooltip>
+        </span>
+      ))}
     </div>
   );
 };

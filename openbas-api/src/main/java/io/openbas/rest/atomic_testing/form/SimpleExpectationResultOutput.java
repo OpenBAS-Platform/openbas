@@ -13,10 +13,15 @@ import lombok.Setter;
 @Builder
 public class SimpleExpectationResultOutput {
 
-  @Schema(description = "Id")
+  @Schema(description = "Expectation Id")
   @JsonProperty("target_result_id")
   @NotNull
   String id;
+
+  @Schema(description = "Target id")
+  @JsonProperty("target_id")
+  @NotNull
+  String targetId;
 
   @Schema(description = "Type")
   @JsonProperty("target_result_type")

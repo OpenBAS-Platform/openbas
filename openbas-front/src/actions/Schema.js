@@ -329,6 +329,7 @@ export const storeHelper = (state) => ({
   getInject: (id) => entity(id, 'injects', state),
   getAtomicTesting: (id) => entity(id, 'atomics', state),
   getAtomicTestings: () => entities('atomics', state),
+  getTargetResults: (id) => entities('targetresults', state).filter((r) => r.target_id === id),
   getInjectsMap: () => maps('injects', state),
   getInjectTypes: () => entities('inject_types', state),
   getInjectTypesMap: () => maps('inject_types', state),

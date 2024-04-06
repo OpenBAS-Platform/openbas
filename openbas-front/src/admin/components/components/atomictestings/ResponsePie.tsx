@@ -2,6 +2,7 @@ import Chart from 'react-apexcharts';
 import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import type { BasicExpectationResult } from '../../../../utils/api-types';
+import { useFormatter } from '../../../../components/i18n';
 
 const useStyles = makeStyles(() => ({
   inline: {
@@ -28,6 +29,7 @@ const ResponsePie: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const classes = useStyles();
+  const { t } = useFormatter();
 
   const chartOptions: ApexCharts.ApexOptions = {
     chart: {
@@ -62,7 +64,7 @@ const ResponsePie: FunctionComponent<Props> = ({
             width="100%"
             height="100%"
           />
-          <div className={classes.chartTitle}>{expectation.type}</div>
+          <div className={classes.chartTitle}>{t(`TYPE_${expectation.type}`)}</div>
         </div>
       ))}
     </div>

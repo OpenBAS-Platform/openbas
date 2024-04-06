@@ -119,7 +119,7 @@ export interface AtomicTestingOutput {
    * Specifies the categories of targetResults for atomic testing.
    * @example "assets, asset groups, teams, players"
    */
-  atomic_targets: InjectTargetsByType[];
+  atomic_targets: InjectTargetWithResult[];
   /** Title */
   atomic_title: string;
   /** Type */
@@ -923,9 +923,11 @@ export interface InjectStatusExecution {
  * Specifies the categories of targetResults for atomic testing.
  * @example "assets, asset groups, teams, players"
  */
-export interface InjectTargetsByType {
-  targetResults?: TargetResult[];
-  type?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
+export interface InjectTargetWithResult {
+  expectationResultsByTypes?: ExpectationResultsByType[];
+  id?: string;
+  name?: string;
+  targetType?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
 export interface InjectTeamsInput {
@@ -1653,12 +1655,14 @@ export interface SettingsUpdateInput {
 }
 
 export interface SimpleExpectationResultOutput {
+  /** Target id */
+  target_id: string;
   /**
    * End date of inject
    * @format date-time
    */
   target_result_ended_at?: string;
-  /** Id */
+  /** Expectation Id */
   target_result_id: string;
   /** Logs */
   target_result_logs?: string;
@@ -1709,12 +1713,6 @@ export interface TagCreateInput {
 export interface TagUpdateInput {
   tag_color: string;
   tag_name: string;
-}
-
-export interface TargetResult {
-  expectationResultsByTypes?: ExpectationResultsByType[];
-  id?: string;
-  name?: string;
 }
 
 export interface Team {

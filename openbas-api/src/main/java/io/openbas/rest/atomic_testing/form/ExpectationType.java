@@ -12,4 +12,16 @@ public enum ExpectationType {
     this.successLabel = successLabel;
     this.failureLabel = failureLabel;
   }
+
+  public static ExpectationType of(String value) {
+    switch (value.toLowerCase()) {
+      case "manual":
+      case "article":
+      case "challenge":
+        return ExpectationType.HUMAN_RESPONSE;
+      default:
+        return valueOf(value);
+    }
+  }
+
 }

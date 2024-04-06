@@ -1,13 +1,14 @@
-import React, { FunctionComponent } from 'react';
-import { Paper, Step, StepLabel, Stepper, Typography } from '@mui/material';
+import React, { FunctionComponent, useState } from 'react';
+import { Box, Paper, Step, StepLabel, Stepper, Tab, Tabs, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import type { AtomicTestingOutput, TargetResult } from '../../../../utils/api-types';
+import { SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
+import type { InjectTargetWithResult, SimpleExpectationResultOutput } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchAtomicTesting, fetchTargetResult } from '../../../../actions/atomictestings/atomic-testing-actions';
-import { useFormatter } from '../../../../components/i18n';
+import { fetchTargetResult } from '../../../../actions/atomictestings/atomic-testing-actions';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { useFormatter } from '../../../../components/i18n';
 
 const useStyles = makeStyles(() => ({
   circle: {
@@ -31,87 +32,135 @@ const useStyles = makeStyles(() => ({
     background: 'blue', // Adjust the background color of the line
     zIndex: 0, // Ensure the line is behind the circles
   },
+  icon: {
+    position: 'absolute',
+    bottom: 'calc(80%)',
+    right: 'calc(47%)',
+  },
+  tabs: {
+    flexDirection: 'row-reverse',
+    marginLeft: 'auto', // Push tabs to the rightmost edge
+  },
 }));
 
 interface Props {
-  targetId: string | '';
+  injectId: string,
+  target: InjectTargetWithResult,
 }
 
-const TargetResultsDetail: FunctionComponent<Props> = ({ targetId }) => {
+const TargetResultsDetail: FunctionComponent<Props> = ({
+  injectId,
+  target,
+}) => {
   const classes = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
 
-  const exampleData = [
-    {
-      name: 'asset 1',
-      responses: [
-        { id: '1',
-          type: 'PREVENTION',
-          timeline: [
-            { label: 'start', inState: true },
-            { label: 'End', inState: false },
-            { label: 'Status', inState: false },
-          ],
-          logs: 'logs',
-        },
-        { id: '2',
-          type: 'PREVENTION',
-          timeline: [
-            { label: 'start', inState: true },
-            { label: 'End', inState: false },
-            { label: 'Status', inState: false },
-          ],
-          logs: 'logs',
-        },
-        { id: '3',
-          type: 'DETECTION',
-          timeline: [
-            { label: 'start', inState: true },
-            { label: 'End', inState: false },
-            { label: 'Status', inState: false },
-          ],
-          logs: 'logs',
-        },
-
-      ],
-    }];
-
   // Fetching data
-  const { targetResults }: {
-    targetResults: TargetResult,
+  const { targetresults }: {
+    targetresults: SimpleExpectationResultOutput[],
   } = useHelper((helper: AtomicTestingHelper) => ({
-    targetResults: helper.getTargetResults(targetId),
+    targetresults: helper.getTargetResults(target.id),
   }));
+
   useDataLoader(() => {
-    dispatch(fetchTargetResult(targetId));
+    dispatch(fetchTargetResult(injectId, target.id, target.targetType));
   });
 
-  const activeStepIndex = stepsData.findIndex((stepData) => stepData.inState);
+  const [activeTab, setActiveTab] = useState(0);
 
-  return (
-    <div>
-      <div>
-        <label>{targetId}</label>
-      </div>
-      <Stepper activeStep={activeStepIndex} alternativeLabel connector={<hr className={classes.connector} />}>
-        {stepsData.map((stepData, index) => (
-          <Step key={index} completed={index < activeStepIndex}>
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+  };
+
+  const renderStepper = (targetResult: SimpleExpectationResultOutput) => {
+    const getStatusLabel = () => {
+      const { target_result_type, target_result_response_status } = targetResult;
+      switch (target_result_type) {
+        case 'PREVENTION':
+          return target_result_response_status === 'VALIDATED' ? 'Blocked' : 'Unblocked';
+        case 'DETECTION':
+          return target_result_response_status === 'VALIDATED' ? 'Detected' : 'Undetected';
+        case 'HUMAN_RESPONSE':
+          return target_result_response_status === 'VALIDATED' ? 'Successful' : 'Failed';
+        default:
+          return '';
+      }
+    };
+
+    const getCircleColor = () => {
+      const { target_result_response_status } = targetResult;
+      return {
+        color: target_result_response_status === 'VALIDATED' ? 'green' : 'red',
+        background:
+            target_result_response_status === 'VALIDATED' ? 'rgba(176, 211, 146, 0.21)' : 'rgba(192, 113, 113, 0.29)',
+      };
+    };
+
+    const getStepIcon = (index) => {
+      if (index === 2) {
+        const { target_result_type, target_result_response_status } = targetResult;
+        const IconComponent = target_result_type === 'PREVENTION'
+          ? Shield
+          : target_result_type === 'DETECTION'
+            ? TrackChanges
+            : SensorOccupied;
+        return <IconComponent style={{ color: getCircleColor().color }} className={classes.icon}/>;
+      }
+      return null;
+    };
+
+    const steps = ['Attack started', 'Attack finished', `Attack ${getStatusLabel()}`];
+
+    return (
+      <Stepper activeStep={0} alternativeLabel connector={<hr className={classes.connector}/>}>
+        {steps.map((label, index) => (
+          <Step key={index} completed={index < activeTab}>
             <StepLabel
               StepIconComponent={({ active, completed }) => (
-                <div className={classes.circle}>
-                  <Typography className={classes.circleLabel}>{stepData.label}</Typography>
+                <div className={classes.circle} style={index === 2 ? getCircleColor() : {}}>
+                  {getStepIcon(index)}
+                  <Typography className={classes.circleLabel}>{label}</Typography>
                 </div>
               )}
             />
           </Step>
         ))}
       </Stepper>
-      <div style={{ marginTop: '40px' }}>
-        <Paper elevation={3} style={{ padding: '20px' }}>
-          <div>stepData</div>
-        </Paper>
-      </div>
+    );
+  };
+
+  const renderLogs = (targetResult: SimpleExpectationResultOutput) => {
+    return (
+      <Paper elevation={3} style={{ padding: 20, marginTop: 25, minHeight: 200 }}>
+        <Typography variant="button" display="block" gutterBottom>Info</Typography>
+        {targetResult.target_result_id}
+      </Paper>
+    );
+  };
+
+  return (
+    <div>
+      <Typography variant="h1" className="pageTitle">{target.name}</Typography>
+      <Tabs
+        value={activeTab}
+        onChange={handleTabChange}
+        indicatorColor="primary"
+        textColor="primary"
+        className={classes.tabs}
+      >
+        {targetresults.map((targetResult, index) => (
+          <Tab key={index} label={t(`TYPE_${targetResult.target_result_type}`)}/>
+        ))}
+      </Tabs>
+      <Box marginTop={4}> {}
+        {targetresults.map((targetResult, index) => (
+          <div key={index} hidden={activeTab !== index}>
+            {renderStepper(targetResult)}
+            {renderLogs(targetResult)}
+          </div>
+        ))}
+      </Box>
     </div>
   );
 };

@@ -3,10 +3,13 @@ package io.openbas.rest.atomic_testing.form;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
+import io.openbas.database.model.InjectExpectationResult;
 import io.openbas.database.model.InjectStatus;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
@@ -34,24 +37,31 @@ public class AtomicTestingMapper {
     return SimpleExpectationResultOutput
         .builder()
         .id(injectExpectation.getId())
-        .type(ExpectationType.valueOf(injectExpectation.getType().name()))
+        .type(ExpectationType.of(injectExpectation.getType().name()))
         .startedAt(injectExpectation.getCreatedAt())
         .endedAt(injectExpectation.getUpdatedAt())
-        .logs(injectExpectation.getResults().toString())
+        .logs(Optional.ofNullable(
+            injectExpectation.getResults())
+            .map(results -> results.stream().map(InjectExpectationResult::getResult)
+                .collect(Collectors.joining(", ")))
+            .orElse(null))
         .response(injectExpectation.getScore() == 0 ? ExpectationStatus.FAILED : ExpectationStatus.VALIDATED)
         .build();
   }
 
-  public static List<SimpleExpectationResultOutput> toTargetResultDto(List<InjectExpectation> injectExpectations) {
-    return injectExpectations.stream().map(AtomicTestingMapper::toTargetResultDto).toList();
-
+  public static List<SimpleExpectationResultOutput> toTargetResultDto(List<InjectExpectation> injectExpectations, String targetId) {
+    return injectExpectations
+        .stream()
+        .map(AtomicTestingMapper::toTargetResultDto)
+        .peek(dto -> dto.setTargetId(targetId))
+        .toList();
   }
 
   private static Instant getLastExecutionDate(final Inject inject) {
     return inject.getStatus().map(InjectStatus::getTrackingEndDate).orElseGet(inject::getUpdatedAt);
   }
 
-  private static List<InjectTargetsByType> getTargets(final List<InjectExpectation> expectations) {
+  private static List<InjectTargetWithResult> getTargets(final List<InjectExpectation> expectations) {
     List<InjectExpectation> teamExpectations = new ArrayList<>();
     List<InjectExpectation> assetExpectations = new ArrayList<>();
     List<InjectExpectation> assetGroupExpectations = new ArrayList<>();
@@ -68,38 +78,42 @@ public class AtomicTestingMapper {
       }
     });
 
-    List<InjectTargetsByType> targets = new ArrayList<>();
+    List<InjectTargetWithResult> targets = new ArrayList<>();
 
     if (!teamExpectations.isEmpty()) {
-      targets.add(new InjectTargetsByType(TargetType.TEAMS, teamExpectations
-          .stream()
-          .collect(
-              Collectors.groupingBy(InjectExpectation::getTeam,
-                  Collectors.collectingAndThen(
-                      Collectors.toList(), AtomicTestingMapper::getExpectations)
+      targets.addAll(
+          teamExpectations
+              .stream()
+              .collect(
+                  Collectors.groupingBy(InjectExpectation::getTeam,
+                      Collectors.collectingAndThen(
+                          Collectors.toList(), AtomicTestingMapper::getExpectations)
+                  )
               )
-          )
-          .entrySet().stream()
-          .map(entry -> new TargetResult(entry.getKey().getId(), entry.getKey().getName(), entry.getValue()))
-          .toList()));
+              .entrySet().stream()
+              .map(entry -> new InjectTargetWithResult(TargetType.TEAMS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue()))
+              .toList()
+      );
     }
 
     if (!assetExpectations.isEmpty()) {
-      targets.add(new InjectTargetsByType(TargetType.ASSETS, assetExpectations
-          .stream()
-          .collect(
-              Collectors.groupingBy(InjectExpectation::getAsset,
-                  Collectors.collectingAndThen(
-                      Collectors.toList(), AtomicTestingMapper::getExpectations)
+      targets.addAll(
+          assetExpectations
+              .stream()
+              .collect(
+                  Collectors.groupingBy(InjectExpectation::getAsset,
+                      Collectors.collectingAndThen(
+                          Collectors.toList(), AtomicTestingMapper::getExpectations)
+                  )
               )
-          )
-          .entrySet().stream()
-          .map(entry -> new TargetResult(entry.getKey().getId(), entry.getKey().getName(), entry.getValue()))
-          .toList()));
+              .entrySet().stream()
+              .map(entry -> new InjectTargetWithResult(TargetType.ASSETS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue()))
+              .toList()
+      );
     }
 
     if (!assetGroupExpectations.isEmpty()) {
-      targets.add(new InjectTargetsByType(TargetType.ASSETS_GROUPS, assetGroupExpectations
+      targets.addAll(assetGroupExpectations
           .stream()
           .collect(
               Collectors.groupingBy(InjectExpectation::getAssetGroup,
@@ -108,11 +122,11 @@ public class AtomicTestingMapper {
               )
           )
           .entrySet().stream()
-          .map(entry -> new TargetResult(entry.getKey().getId(), entry.getKey().getName(), entry.getValue()))
-          .toList()));
+          .map(entry -> new InjectTargetWithResult(TargetType.ASSETS_GROUPS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue()))
+          .toList());
     }
 
-    return targets;
+    return targets.stream().sorted(Comparator.comparing(InjectTargetWithResult::name)).toList();
   }
 
   @NotNull
@@ -180,12 +194,7 @@ public class AtomicTestingMapper {
 
   }
 
-
-  public record InjectTargetsByType(@NotNull TargetType type, @NotNull List<TargetResult> targetResults) {
-
-  }
-
-  public record TargetResult(@NotNull String id, @NotNull String name, @NotNull List<ExpectationResultsByType> expectationResultsByTypes) {
+  public record InjectTargetWithResult(@NotNull TargetType targetType, @NotNull String id, @NotNull String name, @NotNull List<ExpectationResultsByType> expectationResultsByTypes) {
 
   }
 

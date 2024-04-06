@@ -5,7 +5,7 @@ import { makeStyles } from '@mui/styles';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import type { AtomicTestingOutput, TargetResult } from '../../../../utils/api-types';
+import type { AtomicTestingOutput, InjectTargetWithResult } from '../../../../utils/api-types';
 import type { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
 import { fetchAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
 import ResponsePie from '../../components/atomictestings/ResponsePie';
@@ -17,8 +17,8 @@ import SearchFilter from '../../../../components/SearchFilter';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 
 const useStyles = makeStyles(() => ({
-  paper: {
-    padding: 50,
+  resultDetail: {
+    padding: 30,
     height: '100%',
   },
   container: {
@@ -43,9 +43,8 @@ const AtomicTesting = () => {
   const dispatch = useAppDispatch();
   const { atomicId } = useParams() as { atomicId: AtomicTestingOutput['atomic_id'] };
 
-  const [allTargets, setAllTargets] = useState<TargetResult[]>([]);
-  const [sortedTargets, setSortedTargets] = useState<TargetResult[]>([]);
-  const [selectedTarget, setSelectedTarget] = useState<string>('');
+  const [sortedTargets, setSortedTargets] = useState<InjectTargetWithResult[]>([]);
+  const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
 
   const filtering = useSearchAnFilter('target', 'name');
 
@@ -62,9 +61,8 @@ const AtomicTesting = () => {
   // Effects
   useEffect(() => {
     if (atomic && atomic.atomic_targets) {
-      setAllTargets(atomic.atomic_targets.flatMap((target) => target.targetResults) || []);
-      setSortedTargets(allTargets.concat(allTargets));
-      setSelectedTarget(sortedTargets[0]?.id);
+      setSelectedTarget(atomic.atomic_targets[0]);
+      setSortedTargets(atomic.atomic_targets);
     }
   }, [atomic]);
 
@@ -76,7 +74,7 @@ const AtomicTesting = () => {
         </Grid>
       </Grid>
       <Grid container spacing={2} classes={{ root: classes.container }}>
-        <Grid item xs={4} style={{ paddingBottom: 24 }}>
+        <Grid item xs={5} style={{ paddingBottom: 24 }}>
           <div style={{ padding: 10 }}>
             <SearchFilter
               small
@@ -93,20 +91,20 @@ const AtomicTesting = () => {
                   key={target?.id}
                   dense={true}
                   divider={true}
-                  onClick={() => setSelectedTarget(target.id || '')}
+                  onClick={() => setSelectedTarget(target)}
                 >
                   <ListItemText
                     primary={
                       <div>
-                          <div className={classes.bodyTarget} style={{ width: '30%' }}>
-                            {target?.name}
-                          </div>
-                          <div style={{ float: 'right' }}>
-                            <AtomicTestingResult
-                              expectations={target?.expectationResultsByTypes}
-                            />
-                          </div>
+                        <div className={classes.bodyTarget} style={{ width: '30%' }}>
+                          {target?.name}
                         </div>
+                        <div style={{ float: 'right' }}>
+                          <AtomicTestingResult
+                            expectations={target?.expectationResultsByTypes}
+                          />
+                        </div>
+                      </div>
                             }
                   />
                 </ListItemButton>
@@ -116,9 +114,9 @@ const AtomicTesting = () => {
             <Empty message={t('No targets in this atomic testing.')}/>
           )}
         </Grid>
-        <Grid item xs={8} style={{ paddingBottom: 24 }}>
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <TargetResultsDetail targetId={selectedTarget}/>
+        <Grid item xs={7} style={{ paddingBottom: 24 }}>
+          <Paper variant="outlined" classes={{ root: classes.resultDetail }}>
+            {selectedTarget && <TargetResultsDetail target={selectedTarget} injectId={atomicId}/>}
           </Paper>
         </Grid>
       </Grid>
