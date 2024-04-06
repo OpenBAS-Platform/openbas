@@ -1,6 +1,5 @@
 package io.openbas.rest.atomic_testing.form;
 
-import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
@@ -23,7 +22,7 @@ public class AtomicTestingMapper {
         .contract(inject.getContract())
         .lastExecutionDate(getLastExecutionDate(inject))
         .targets(getTargets(inject.getExpectations()))
-        .expectationResults(getExpectations(inject.getExpectations()))
+        .expectationResultByTypes(getExpectations(inject.getExpectations()))
         .build();
   }
 
@@ -35,7 +34,7 @@ public class AtomicTestingMapper {
     return inject.getStatus().map(InjectStatus::getTrackingEndDate).orElseGet(inject::getUpdatedAt);
   }
 
-  private static List<BasicTarget> getTargets(final List<InjectExpectation> expectations) {
+  private static List<InjectTargetsByType> getTargets(final List<InjectExpectation> expectations) {
     List<InjectExpectation> teamExpectations = new ArrayList<>();
     List<InjectExpectation> assetExpectations = new ArrayList<>();
     List<InjectExpectation> assetGroupExpectations = new ArrayList<>();
@@ -52,10 +51,10 @@ public class AtomicTestingMapper {
       }
     });
 
-    List<BasicTarget> targets = new ArrayList<>();
+    List<InjectTargetsByType> targets = new ArrayList<>();
 
     if (!teamExpectations.isEmpty()) {
-      targets.add(new BasicTarget(TargetType.TEAMS, teamExpectations
+      targets.add(new InjectTargetsByType(TargetType.TEAMS, teamExpectations
           .stream()
           .collect(
               Collectors.groupingBy(InjectExpectation::getTeam,
@@ -69,10 +68,10 @@ public class AtomicTestingMapper {
     }
 
     if (!assetExpectations.isEmpty()) {
-      targets.add(new BasicTarget(TargetType.ASSETS, assetExpectations
+      targets.add(new InjectTargetsByType(TargetType.ASSETS, assetExpectations
           .stream()
           .collect(
-              Collectors.groupingBy(InjectExpectation::getTeam,
+              Collectors.groupingBy(InjectExpectation::getAsset,
                   Collectors.collectingAndThen(
                       Collectors.toList(), AtomicTestingMapper::getExpectations)
               )
@@ -80,14 +79,13 @@ public class AtomicTestingMapper {
           .entrySet().stream()
           .map(entry -> new TargetResult(entry.getKey().getId(), entry.getKey().getName(), entry.getValue()))
           .toList()));
-
     }
 
     if (!assetGroupExpectations.isEmpty()) {
-      targets.add(new BasicTarget(TargetType.ASSETS_GROUPS, assetGroupExpectations
+      targets.add(new InjectTargetsByType(TargetType.ASSETS_GROUPS, assetGroupExpectations
           .stream()
           .collect(
-              Collectors.groupingBy(InjectExpectation::getTeam,
+              Collectors.groupingBy(InjectExpectation::getAssetGroup,
                   Collectors.collectingAndThen(
                       Collectors.toList(), AtomicTestingMapper::getExpectations)
               )
@@ -101,37 +99,37 @@ public class AtomicTestingMapper {
   }
 
   @NotNull
-  private static List<BasicExpectationResult> getExpectations(List<InjectExpectation> expectations) {
+  private static List<ExpectationResultsByType> getExpectations(List<InjectExpectation> expectations) {
     List<Integer> preventionScores = getScores(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
     List<Integer> detectionScores = getScores(List.of(EXPECTATION_TYPE.DETECTION), expectations);
     List<Integer> humanScores = getScores(List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL), expectations);
 
-    List<BasicExpectationResult> resultAvgOfExpectations = new ArrayList<>();
+    List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
 
     OptionalDouble avgPrevention = calculateAverageFromExpectations(preventionScores);
     if (avgPrevention.isPresent()) {
-      resultAvgOfExpectations.add(new BasicExpectationResult(ExpectationType.PREVENTION, getResult(avgPrevention), getResultDetail(ExpectationType.PREVENTION, preventionScores)));
+      resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.PREVENTION, getResult(avgPrevention), getResultDetail(ExpectationType.PREVENTION, preventionScores)));
     }
 
     OptionalDouble avgDetection = calculateAverageFromExpectations(detectionScores);
     if (avgDetection.isPresent()) {
-      resultAvgOfExpectations.add(new BasicExpectationResult(ExpectationType.DETECTION, getResult(avgDetection), getResultDetail(ExpectationType.DETECTION, detectionScores)));
+      resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.DETECTION, getResult(avgDetection), getResultDetail(ExpectationType.DETECTION, detectionScores)));
     }
 
     OptionalDouble avgHumanResponse = calculateAverageFromExpectations(humanScores);
     if (avgHumanResponse.isPresent()) {
-      resultAvgOfExpectations.add(new BasicExpectationResult(ExpectationType.HUMAN_RESPONSE, getResult(avgHumanResponse), getResultDetail(ExpectationType.HUMAN_RESPONSE, humanScores)));
+      resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.HUMAN_RESPONSE, getResult(avgHumanResponse), getResultDetail(ExpectationType.HUMAN_RESPONSE, humanScores)));
     }
     return resultAvgOfExpectations;
   }
 
-  private static List<ResultDetail> getResultDetail(ExpectationType type, List<Integer> normalizedScores) {
+  private static List<ResultDistribution> getResultDetail(ExpectationType type, List<Integer> normalizedScores) {
     long successCount = normalizedScores.stream().filter(score -> score.equals(1)).count();
     long failureCount = normalizedScores.size() - successCount;
 
     return List.of(
-        new ResultDetail(type.successLabel, (int) successCount),
-        new ResultDetail(type.failureLabel, (int) failureCount)
+        new ResultDistribution(type.successLabel, (int) successCount),
+        new ResultDistribution(type.failureLabel, (int) failureCount)
     );
   }
 
@@ -144,11 +142,11 @@ public class AtomicTestingMapper {
         .toList();
   }
 
-  private static ExecutionStatus getResult(OptionalDouble avg) {
+  private static ExpectationStatus getResult(OptionalDouble avg) {
     Double avgAsDouble = avg.getAsDouble();
-    return avgAsDouble == 0.0 ? ExecutionStatus.ERROR :
-        (avgAsDouble == 1.0 ? ExecutionStatus.SUCCESS :
-            ExecutionStatus.PARTIAL);
+    return avgAsDouble == 0.0 ? ExpectationStatus.FAILED :
+        (avgAsDouble == 1.0 ? ExpectationStatus.VALIDATED :
+            ExpectationStatus.PARTIAL);
   }
 
   private static OptionalDouble calculateAverageFromExpectations(List<Integer> scores) {
@@ -163,33 +161,20 @@ public class AtomicTestingMapper {
     TEAMS
   }
 
-  enum ExpectationType {
-    PREVENTION("Blocked", "Unblocked"),
-    DETECTION("Detected", "Undetected"),
-    HUMAN_RESPONSE("Successful", "Failed");
-
-    public final String successLabel;
-    public final String failureLabel;
-
-    ExpectationType(String successLabel, String failureLabel) {
-      this.successLabel = successLabel;
-      this.failureLabel = failureLabel;
-    }
-  }
-
-  record BasicExpectationResult(@NotNull ExpectationType type, @NotNull ExecutionStatus result, @NotNull List<ResultDetail> distribution) {
+  public record ExpectationResultsByType(@NotNull ExpectationType type, @NotNull ExpectationStatus avgResult, @NotNull List<ResultDistribution> distribution) {
 
   }
 
-  record ResultDetail(@NotNull String label, @NotNull Integer value) {
+  public record ResultDistribution(@NotNull String label, @NotNull Integer value) {
 
   }
 
-  record BasicTarget(@NotNull TargetType type, @NotNull List<TargetResult> targets) {
+
+  public record InjectTargetsByType(@NotNull TargetType type, @NotNull List<TargetResult> targetResults) {
 
   }
 
-  record TargetResult(@NotNull String id, @NotNull String name, @NotNull List<BasicExpectationResult> expectationResults) {
+  public record TargetResult(@NotNull String id, @NotNull String name, @NotNull List<ExpectationResultsByType> expectationResultsByTypes) {
 
   }
 

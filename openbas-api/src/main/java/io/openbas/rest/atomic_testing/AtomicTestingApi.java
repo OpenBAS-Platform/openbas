@@ -2,8 +2,10 @@ package io.openbas.rest.atomic_testing;
 
 import io.openbas.database.model.InjectStatus;
 import io.openbas.rest.atomic_testing.form.AtomicTestingMapper;
+import io.openbas.rest.atomic_testing.form.AtomicTestingMapper.TargetResult;
 import io.openbas.rest.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingSimpleInput;
+import io.openbas.rest.atomic_testing.form.SimpleExpectationResult;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.InjectService;
 import jakarta.validation.Valid;
@@ -38,16 +40,21 @@ public class AtomicTestingApi extends RestBehavior {
     return injectService.findById(injectId).map(AtomicTestingMapper::toDto).orElseThrow();
   }
 
+  @PutMapping("/{injectId}")
+  public AtomicTestingOutput updateScenario(
+      @PathVariable @NotBlank final String injectId,
+      @Valid @RequestBody final AtomicTestingSimpleInput input) {
+    return null; //todo
+  }
+
   @GetMapping("/try/{injectId}")
   public InjectStatus tryAtomicTesting(@PathVariable String injectId) {
     return injectService.tryAtomicTesting(injectId);
   }
 
-  @PutMapping("/{injectId}")
-  public AtomicTestingOutput updateScenario(
-      @PathVariable @NotBlank final String injectId,
-      @Valid @RequestBody final AtomicTestingSimpleInput input) {
-    return null;
+  @GetMapping("/target/{targetId}")
+  public List<SimpleExpectationResult> findTargetResult(@PathVariable String targetId) {
+    return null; //todo
   }
 
 }

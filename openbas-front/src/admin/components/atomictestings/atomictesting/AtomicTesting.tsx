@@ -1,6 +1,6 @@
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import { Grid, List, ListItem, ListItemText, Paper } from '@mui/material';
+import { Grid, List, ListItemButton, ListItemText, Paper } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
@@ -12,7 +12,7 @@ import ResponsePie from '../../components/atomictestings/ResponsePie';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import AtomicTestingResult from '../../components/atomictestings/AtomicTestingResult';
-import TargetResponsesDetail from '../../components/atomictestings/TargetResponsesDetail';
+import TargetResultsDetail from '../../components/atomictestings/TargetResultsDetail';
 import SearchFilter from '../../../../components/SearchFilter';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 
@@ -41,11 +41,12 @@ const AtomicTesting = () => {
   const classes = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-  const [selectedTarget, setSelectedTarget] = useState(undefined);
-
   const { atomicId } = useParams() as { atomicId: AtomicTestingOutput['atomic_id'] };
 
-  // Filter and sort hook
+  const [allTargets, setAllTargets] = useState<TargetResult[]>([]);
+  const [sortedTargets, setSortedTargets] = useState<TargetResult[]>([]);
+  const [selectedTarget, setSelectedTarget] = useState<string>('');
+
   const filtering = useSearchAnFilter('target', 'name');
 
   // Fetching data
@@ -54,18 +55,20 @@ const AtomicTesting = () => {
   } = useHelper((helper: AtomicTestingHelper) => ({
     atomic: helper.getAtomicTesting(atomicId),
   }));
-
   useDataLoader(() => {
     dispatch(fetchAtomicTesting(atomicId));
   });
 
+  // Effects
   useEffect(() => {
-    // console.log(atomic.atomic_targets?.flatMap((target) => target.targets)[0]?.id);
-    // dispatch(fetchAtomicTesting(atomic.atomic_targets?.flatMap((target) => target.targets)[0]?.id));
+    if (atomic && atomic.atomic_targets) {
+      const allTargets = atomic.atomic_targets.flatMap((target) => target.targets);
+      const sortedTargets = allTargets.concat(allTargets); // filtering.filterAndSort(allTargets);
+      setAllTargets(allTargets);
+      setSortedTargets(sortedTargets);
+      setSelectedTarget(sortedTargets[0]?.id);
+    }
   }, [atomic]);
-
-  const allTargets = atomic.atomic_targets?.flatMap((target) => target.targets);
-  const sortedTargets: TargetResult[] = allTargets; // todo
 
   return (
     <>
@@ -88,11 +91,11 @@ const AtomicTesting = () => {
           {sortedTargets.length > 0 ? (
             <List style={{ paddingTop: 10 }}>
               {sortedTargets.map((target) => (
-                <ListItem
+                <ListItemButton
                   key={target?.id}
                   dense={true}
                   divider={true}
-                  component={Link}
+                  onClick={() => setSelectedTarget(target.id || '')}
                 >
                   <ListItemText
                     primary={
@@ -106,7 +109,7 @@ const AtomicTesting = () => {
                       </div>
                             }
                   />
-                </ListItem>
+                </ListItemButton>
               ))}
             </List>
           ) : (
@@ -115,7 +118,7 @@ const AtomicTesting = () => {
         </Grid>
         <Grid item xs={8} style={{ paddingBottom: 24 }}>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <TargetResponsesDetail/>
+            <TargetResultsDetail targetId={selectedTarget}/>
           </Paper>
         </Grid>
       </Grid>
