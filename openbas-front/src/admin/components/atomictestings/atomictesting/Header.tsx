@@ -79,7 +79,7 @@ const AtomicTestingHeader = () => {
             <DialogContentText>
               <span>{t('Do you want to try this inject?')}</span>
             </DialogContentText>
-            <Alert severity="info">
+            <Alert severity="info" style={{ marginTop: 20 }}>
               {t('The inject will only be sent to you.')}
             </Alert>
           </DialogContent>

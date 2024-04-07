@@ -128,4 +128,9 @@ public class InjectService {
     // TODO Must be migrated to Atomic approach (Inject duplication and async tracing)
     return executor.execute(injection);
   }
+
+  public void deleteAtomicTesting(String injectId) {
+    //TODO
+    injectRepository.deleteById(injectId);
+  }
 }

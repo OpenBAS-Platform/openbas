@@ -110,7 +110,7 @@ const ResponsePie: FunctionComponent<Props> = ({
                 key={index}
                 options={{
                   ...chartOptions,
-                  labels: expectation.distribution.map((e) => `${e.label} (${((e.value / getTotal(expectation.distribution)) * 100)}%)`),
+                  labels: expectation.distribution.map((e) => `${e.label} (${((e.value / getTotal(expectation.distribution)) * 100).toFixed(1)}%)`),
                   colors: expectation.distribution.map((e) => getColor(e.label)),
                 }}
                 series={expectation.distribution.map((e) => e.value)}
