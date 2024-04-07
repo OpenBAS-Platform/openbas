@@ -18,15 +18,13 @@ interface Props {
 const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
   const classes = useStyles();
 
-  const getColor = (result: 'FAILED' | 'PARTIAL' | 'VALIDATED' | undefined): string => {
-    switch (result) {
-      case 'VALIDATED':
-        return '#7ed321';
-      case 'FAILED':
-        return '#d0021b';
-      default:
-        return '#f5a623';
-    }
+  const getColor = (result: string | undefined): string => {
+    const colorMap: Record<string, string> = {
+      VALIDATED: 'rgb(107, 235, 112)',
+      FAILED: 'rgb(220, 81, 72)',
+    };
+
+    return colorMap[result ?? ''] ?? 'rgb(245, 166, 35)';
   };
 
   if (!expectations || expectations.length === 0) {
@@ -50,7 +48,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
         }
         return (
           <span key={index}>
-            <IconComponent style={{ color }}/>
+            <IconComponent style={{ color, marginRight: 10 }}/>
           </span>
         );
       })}

@@ -6,6 +6,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { deleteAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
+import Drawer from '../../../../components/common/Drawer';
 
 interface Props {
   atomic: AtomicTestingOutput;
@@ -47,6 +48,12 @@ const AtomicPopover: FunctionComponent<Props> = ({
   return (
     <>
       <ButtonPopover entries={entries}/>
+      <Drawer
+        open={edition}
+        handleClose={() => setEdition(false)}
+        title={t('Update the atomic testing')}
+      >
+      </Drawer>
       <DialogDelete
         open={deletion}
         handleClose={() => setDeletion(false)}

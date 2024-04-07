@@ -57,14 +57,6 @@ const AtomicTestingHeader = () => {
           {atomic.atomic_title}
         </Typography>
         <AtomicPopover atomic={atomic}/>
-        <Button
-          variant="contained"
-          startIcon={<PlayArrowOutlined/>}
-          color="success"
-          onClick={() => setOpen(true)}
-        >
-          {t('Launch')}
-        </Button>
         <Dialog
           open={open}
           onClose={() => setOpen(false)}
@@ -92,6 +84,16 @@ const AtomicTestingHeader = () => {
           </DialogActions>
         </Dialog>
       </div>
+      <Button
+        variant="contained"
+        startIcon={<PlayArrowOutlined/>}
+        color="secondary"
+        onClick={() => setOpen(true)}
+        sx={{ width: 120, height: 40 }}
+        disabled={!atomic.atomic_targets || !(atomic.atomic_targets.length > 0)}
+      >
+        {t('Launch')}
+      </Button>
     </div>
   );
 };

@@ -66,6 +66,11 @@ const AtomicTesting = () => {
     }
   }, [atomic]);
 
+  // handles
+  const handleTargetClick = (target) => {
+    setSelectedTarget(target);
+  };
+
   return (
     <>
       <Grid container spacing={2} classes={{ root: classes.container }}>
@@ -91,7 +96,7 @@ const AtomicTesting = () => {
                   key={target?.id}
                   dense={true}
                   divider={true}
-                  onClick={() => setSelectedTarget(target)}
+                  onClick={() => handleTargetClick(target)}
                 >
                   <ListItemText
                     primary={
@@ -111,12 +116,19 @@ const AtomicTesting = () => {
               ))}
             </List>
           ) : (
-            <Empty message={t('No targets in this atomic testing.')}/>
+            <Empty message={t('No targets available')}/>
           )}
         </Grid>
         <Grid item xs={7} style={{ paddingBottom: 24 }}>
           <Paper variant="outlined" classes={{ root: classes.resultDetail }}>
             {selectedTarget && <TargetResultsDetail target={selectedTarget} injectId={atomicId}/>}
+            {!selectedTarget && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: 300, height: 350 }}>
+              {!selectedTarget && (
+              <Empty message={t('No target data available')}/>
+              )}
+            </div>
+            )}
           </Paper>
         </Grid>
       </Grid>

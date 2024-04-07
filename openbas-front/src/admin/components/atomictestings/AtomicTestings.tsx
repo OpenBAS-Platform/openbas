@@ -23,6 +23,7 @@ import AtomicTestingCreation from './AtomicTestingCreation';
 import AtomicTestingResult from '../components/atomictestings/AtomicTestingResult';
 import TargetChip from '../components/atomictestings/TargetChip';
 import type { AtomicTestingHelper } from '../../../actions/atomictestings/atomic-testing-helper';
+import Empty from '../../../components/Empty';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -32,7 +33,7 @@ const useStyles = makeStyles(() => ({
     alignItems: 'center',
   },
   bodyItem: {
-    height: 20,
+    height: 30,
     fontSize: 13,
     float: 'left',
     whiteSpace: 'nowrap',
@@ -46,6 +47,7 @@ const useStyles = makeStyles(() => ({
   },
   itemHead: {
     paddingLeft: 10,
+    marginBottom: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
@@ -299,6 +301,9 @@ const AtomicTestings = () => {
             </ListItemButton>
           );
         })}
+        {!sortedAtomicTestings ? (
+          <Empty message={t('No data available')}/>
+        ) : null}
       </List>
       {userAdmin && <AtomicTestingCreation />}
     </>

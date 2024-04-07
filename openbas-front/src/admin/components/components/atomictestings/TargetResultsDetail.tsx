@@ -1,11 +1,10 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { Box, Paper, Step, StepLabel, Stepper, Tab, Tabs, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
 import type { InjectTargetWithResult, SimpleExpectationResultOutput } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
-import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchTargetResult } from '../../../../actions/atomictestings/atomic-testing-actions';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
@@ -32,14 +31,20 @@ const useStyles = makeStyles(() => ({
     background: 'blue', // Adjust the background color of the line
     zIndex: 0, // Ensure the line is behind the circles
   },
+  connectorLabel: {
+    color: 'rgb(255,255,255)',
+    fontSize: '0.7rem',
+    position: 'absolute',
+    bottom: 'calc(60%)',
+    left: 'calc(-20%)',
+  },
   icon: {
     position: 'absolute',
     bottom: 'calc(80%)',
     right: 'calc(47%)',
   },
   tabs: {
-    flexDirection: 'row-reverse',
-    marginLeft: 'auto', // Push tabs to the rightmost edge
+    marginLeft: 'auto',
   },
 }));
 
@@ -53,7 +58,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   target,
 }) => {
   const classes = useStyles();
-  const { t } = useFormatter();
+  const { nsdt, t } = useFormatter();
   const dispatch = useAppDispatch();
 
   // Fetching data
@@ -63,14 +68,29 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     targetresults: helper.getTargetResults(target.id),
   }));
 
-  useDataLoader(() => {
-    dispatch(fetchTargetResult(injectId, target.id, target.targetType));
-  });
+  useEffect(() => {
+    if (target) {
+      dispatch(fetchTargetResult(injectId, target.id, target.targetType));
+      setActiveTab(0);
+    }
+  }, [target]);
 
   const [activeTab, setActiveTab] = useState(0);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
+  };
+
+  const CustomConnector = ({ index, label }) => {
+    const classes = useStyles();
+    return (
+      <>
+        <hr className={classes.connector}/>
+        <Typography variant="body2" className={classes.connectorLabel}>
+          {nsdt(label)}
+        </Typography>
+      </>
+    );
   };
 
   const renderStepper = (targetResult: SimpleExpectationResultOutput) => {
@@ -91,7 +111,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     const getCircleColor = () => {
       const { target_result_response_status } = targetResult;
       return {
-        color: target_result_response_status === 'VALIDATED' ? 'green' : 'red',
+        color: target_result_response_status === 'VALIDATED' ? 'rgb(107,235,112)' : 'rgb(220,81,72)',
         background:
             target_result_response_status === 'VALIDATED' ? 'rgba(176, 211, 146, 0.21)' : 'rgba(192, 113, 113, 0.29)',
       };
@@ -113,7 +133,9 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     const steps = ['Attack started', 'Attack finished', `Attack ${getStatusLabel()}`];
 
     return (
-      <Stepper activeStep={0} alternativeLabel connector={<hr className={classes.connector}/>}>
+      <Stepper activeStep={0} alternativeLabel
+        connector={<CustomConnector label={targetResult.target_result_started_at}/>}
+      >
         {steps.map((label, index) => (
           <Step key={index} completed={index < activeTab}>
             <StepLabel
