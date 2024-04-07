@@ -60,6 +60,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   const classes = useStyles();
   const { nsdt, t } = useFormatter();
   const dispatch = useAppDispatch();
+  const [activeTab, setActiveTab] = useState(0);
 
   // Fetching data
   const { targetresults }: {
@@ -75,14 +76,11 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     }
   }, [target]);
 
-  const [activeTab, setActiveTab] = useState(0);
-
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
 
-  const CustomConnector = ({ index, label }) => {
-    const classes = useStyles();
+  const CustomConnector = ({ label }) => {
     return (
       <>
         <hr className={classes.connector}/>
@@ -119,12 +117,19 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
 
     const getStepIcon = (index) => {
       if (index === 2) {
-        const { target_result_type, target_result_response_status } = targetResult;
-        const IconComponent = target_result_type === 'PREVENTION'
-          ? Shield
-          : target_result_type === 'DETECTION'
-            ? TrackChanges
-            : SensorOccupied;
+        const { target_result_type } = targetResult;
+        let IconComponent;
+        switch (target_result_type) {
+          case 'PREVENTION':
+            IconComponent = Shield;
+            break;
+          case 'DETECTION':
+            IconComponent = TrackChanges;
+            break;
+          default:
+            IconComponent = SensorOccupied;
+            break;
+        }
         return <IconComponent style={{ color: getCircleColor().color }} className={classes.icon}/>;
       }
       return null;
@@ -139,7 +144,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         {steps.map((label, index) => (
           <Step key={index} completed={index < activeTab}>
             <StepLabel
-              StepIconComponent={({ active, completed }) => (
+              StepIconComponent={() => (
                 <div className={classes.circle} style={index === 2 ? getCircleColor() : {}}>
                   {getStepIcon(index)}
                   <Typography className={classes.circleLabel}>{label}</Typography>

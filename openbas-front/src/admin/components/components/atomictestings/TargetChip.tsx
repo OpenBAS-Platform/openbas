@@ -3,7 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { Chip, Tooltip } from '@mui/material';
 import { DnsOutlined, Groups3Outlined, HorizontalRule } from '@mui/icons-material';
 import { SelectGroup } from 'mdi-material-ui';
-import type { InjectTargetsWithResult } from '../../../../utils/api-types';
+import type { InjectTargetWithResult } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   inline: {
@@ -20,7 +20,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  targets: InjectTargetsWithResult[] | undefined;
+  targets: InjectTargetWithResult[] | undefined;
 }
 
 const TargetChip: FunctionComponent<Props> = ({
@@ -33,14 +33,15 @@ const TargetChip: FunctionComponent<Props> = ({
     return <HorizontalRule/>;
   }
 
-  const targetsByType: Record<string, InjectTargetsWithResult[]> = targets.reduce((targetsByType, target) => {
+  const targetsByTypes: Record<string, InjectTargetWithResult[]> = targets.reduce((accumulator, target) => {
     const type = target.targetType || '';
-    if (!targetsByType[type]) {
-      targetsByType[type] = [];
+    const updatedAccumulator = { ...accumulator };
+    if (!updatedAccumulator[type]) {
+      updatedAccumulator[type] = [];
     }
-    targetsByType[type].push(target);
-    return targetsByType;
-  }, {});
+    updatedAccumulator[type].push(target);
+    return updatedAccumulator;
+  }, {} as Record<string, InjectTargetWithResult[]>);
 
   const getIcon = (type: string) => {
     if (type === 'ASSETS') {
@@ -64,15 +65,15 @@ const TargetChip: FunctionComponent<Props> = ({
 
   return (
     <div className={classes.inline}>
-      {Object.keys(targetsByType).map((targetType, index) => (
+      {Object.keys(targetsByTypes).map((targetType, index) => (
         <span key={index}>
-          <Tooltip title={targetsByType[targetType].map((t) => t.name).join(', ')}>
+          <Tooltip title={targetsByTypes[targetType].map((t) => t.name).join(', ')}>
             <Chip
               key={targetType}
               classes={{ root: classes.target }}
               icon={getIcon(targetType)}
               color={getColor(targetType)}
-              label={targetsByType[targetType].length}
+              label={targetsByTypes[targetType].length}
             />
           </Tooltip>
         </span>

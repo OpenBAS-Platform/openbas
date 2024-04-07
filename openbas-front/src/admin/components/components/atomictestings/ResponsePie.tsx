@@ -97,36 +97,38 @@ const ResponsePie: FunctionComponent<Props> = ({
   };
 
   return (
-    <Box margin={1}> {
-      <div className={classes.inline}>
-        {expectations?.map((expectation, index) => (
-          <div key={index} className={classes.chartContainer}>
-            <Typography variant="h1"
-              className={classes.chartTitle}
-            >{t(`TYPE_${expectation.type}`)}</Typography>
-            {getChartIcon(expectation.type, expectation.avgResult)}
-            <Chart
-              key={index}
-              options={{
-                ...chartOptions,
-                labels: expectation.distribution.map((e) => `${e.label} (${((e.value / getTotal(expectation.distribution)) * 100).toFixed(2)}%)`),
-                colors: expectation.distribution.map((e) => getColor(e.label)),
-              }}
-              series={expectation.distribution.map((e) => e.value)}
-              type="donut"
-              width="100%"
-              height="100%"
-            />
-          </div>
-        ))}
-        {!expectations || expectations.length === 0 ? (
-          <div className={classes.chartContainer}>
-            <Empty message={t('No data available')}/>
-          </div>
-        ) : null}
-      </div>
+    <>
+      <Box margin={1}> {
+        <div className={classes.inline}>
+          {expectations?.map((expectation, index) => (
+            <div key={index} className={classes.chartContainer}>
+              <Typography variant="h1"
+                className={classes.chartTitle}
+              >{t(`TYPE_${expectation.type}`)}</Typography>
+              {getChartIcon(expectation.type, expectation.avgResult)}
+              <Chart
+                key={index}
+                options={{
+                  ...chartOptions,
+                  labels: expectation.distribution.map((e) => `${e.label} (${((e.value / getTotal(expectation.distribution)) * 100)}%)`),
+                  colors: expectation.distribution.map((e) => getColor(e.label)),
+                }}
+                series={expectation.distribution.map((e) => e.value)}
+                type="donut"
+                width="100%"
+                height="100%"
+              />
+            </div>
+          ))}
+          {!expectations || expectations.length === 0 ? (
+            <div className={classes.chartContainer}>
+              <Empty message={t('No data available')}/>
+            </div>
+          ) : null}
+        </div>
       }
-    </Box>
+      </Box>
+    </>
   );
 };
 
