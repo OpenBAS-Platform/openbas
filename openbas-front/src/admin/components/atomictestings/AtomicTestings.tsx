@@ -3,7 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { CSVLink } from 'react-csv';
 import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { FileDownloadOutlined } from '@mui/icons-material';
+import { FileDownloadOutlined, KeyboardArrowRight } from '@mui/icons-material';
 import { useAppDispatch } from '../../../utils/hooks';
 import { useFormatter } from '../../../components/i18n';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
@@ -24,6 +24,7 @@ import AtomicTestingResult from '../components/atomictestings/AtomicTestingResul
 import TargetChip from '../components/atomictestings/TargetChip';
 import type { AtomicTestingHelper } from '../../../actions/atomictestings/atomic-testing-helper';
 import Empty from '../../../components/Empty';
+import StatusChip from '../components/atomictestings/StatusChip';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -58,6 +59,10 @@ const useStyles = makeStyles(() => ({
   downloadButton: {
     marginRight: 15,
   },
+  goIcon: {
+    position: 'absolute',
+    right: -10,
+  },
 }));
 
 const inlineStylesHeaders: Record<string, CSSProperties> = {
@@ -69,19 +74,19 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
   },
   atomic_title: {
     float: 'left',
-    width: '15%',
+    width: '16%',
     fontSize: 12,
     fontWeight: '700',
   },
   atomic_type: {
     float: 'left',
-    width: '25%',
+    width: '16%',
     fontSize: 12,
     fontWeight: '700',
   },
   atomic_last_execution_date: {
     float: 'left',
-    width: '20%',
+    width: '16%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -91,9 +96,15 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
     fontSize: 12,
     fontWeight: '700',
   },
+  atomic_status: {
+    float: 'left',
+    width: '16%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
   atomic_expectations: {
     float: 'left',
-    width: '20%',
+    width: '16%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -102,19 +113,22 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
 
 const inlineStyles: Record<string, CSSProperties> = {
   atomic_title: {
-    width: '15%',
+    width: '16%',
   },
   atomic_type: {
-    width: '25%',
+    width: '16%',
   },
   atomic_last_execution_date: {
-    width: '20%',
+    width: '16%',
   },
   atomic_targets: {
     width: '20%',
   },
+  atomic_status: {
+    width: '16%',
+  },
   atomic_expectations: {
-    width: '20%',
+    width: '16%',
   },
 };
 
@@ -126,7 +140,7 @@ const AtomicTestings = () => {
   const { t, fldt, tPick } = useFormatter();
 
   // Filter and sort hook
-  const filtering = useSearchAnFilter('atomic', 'title', ['title']);
+  const filtering = useSearchAnFilter('atomic', 'title', ['title, targets']);
 
   // Fetching data
   const { atomics, injectTypesMap }: {
@@ -181,7 +195,15 @@ const AtomicTestings = () => {
       label: 'Target',
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
-        return (<TargetChip targets={atomicTesting.atomic_targets} />);
+        return (<TargetChip targets={atomicTesting.atomic_targets}/>);
+      },
+    },
+    {
+      name: 'atomic_status',
+      label: 'Status',
+      isSortable: true,
+      value: (atomicTesting: AtomicTestingOutput) => {
+        return (<StatusChip status={atomicTesting.atomic_status}/>);
       },
     },
     {
@@ -190,7 +212,7 @@ const AtomicTestings = () => {
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
         return (
-          <AtomicTestingResult expectations={atomicTesting.atomic_expectation_results} />
+          <AtomicTestingResult expectations={atomicTesting.atomic_expectation_results}/>
         );
       },
     },
@@ -199,7 +221,7 @@ const AtomicTestings = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]} />
+      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]}/>
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter
@@ -220,13 +242,13 @@ const AtomicTestings = () => {
             >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
-                  <FileDownloadOutlined color="primary" />
+                  <FileDownloadOutlined color="primary"/>
                 </IconButton>
               </Tooltip>
             </CSVLink>
           ) : (
             <IconButton size="large" disabled>
-              <FileDownloadOutlined />
+              <FileDownloadOutlined/>
             </IconButton>
           )}
         </div>
@@ -254,18 +276,18 @@ const AtomicTestings = () => {
                 {fields.map((header) => (
                   <div key={header.name}>
                     {
-                      filtering.buildHeader(
-                        header.name,
-                        header.label,
-                        header.isSortable,
-                        inlineStylesHeaders,
-                      )
-                    }
+                            filtering.buildHeader(
+                              header.name,
+                              header.label,
+                              header.isSortable,
+                              inlineStylesHeaders,
+                            )
+                          }
                   </div>
                 ))
-                }
+                    }
               </>
-            }
+                }
           />
         </ListItem>
         {sortedAtomicTestings.map((atomicTesting) => {
@@ -296,8 +318,11 @@ const AtomicTestings = () => {
                       </div>
                     ))}
                   </>
-                }
+                      }
               />
+              <ListItemIcon classes={{ root: classes.goIcon }}>
+                <KeyboardArrowRight/>
+              </ListItemIcon>
             </ListItemButton>
           );
         })}
@@ -305,7 +330,7 @@ const AtomicTestings = () => {
           <Empty message={t('No data available')}/>
         ) : null}
       </List>
-      {userAdmin && <AtomicTestingCreation />}
+      {userAdmin && <AtomicTestingCreation/>}
     </>
   );
 };

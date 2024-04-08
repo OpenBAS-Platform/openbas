@@ -66,7 +66,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   const { targetresults }: {
     targetresults: SimpleExpectationResultOutput[],
   } = useHelper((helper: AtomicTestingHelper) => ({
-    targetresults: helper.getTargetResults(target.id),
+    targetresults: helper.getTargetResults(target.id, injectId),
   }));
 
   useEffect(() => {

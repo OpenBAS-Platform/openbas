@@ -3,5 +3,5 @@ import type { AtomicTestingOutput, SimpleExpectationResultOutput } from '../../u
 export interface AtomicTestingHelper {
   getAtomicTestings: () => AtomicTestingOutput[];
   getAtomicTesting: (atomicId: string) => AtomicTestingOutput;
-  getTargetResults: (targetId: string) => SimpleExpectationResultOutput[];
+  getTargetResults: (targetId: string, injectId: string) => SimpleExpectationResultOutput[];
 }

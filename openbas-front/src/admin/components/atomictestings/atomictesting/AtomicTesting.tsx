@@ -102,7 +102,8 @@ const AtomicTesting = () => {
                     primary={
                       <div>
                         <div className={classes.bodyTarget} style={{ width: '30%' }}>
-                          {target?.name}
+                          {`${target?.name} `}
+                          <span style={{ color: 'gray' }}>[{t(target?.targetType)}]</span>
                         </div>
                         <div style={{ float: 'right' }}>
                           <AtomicTestingResult

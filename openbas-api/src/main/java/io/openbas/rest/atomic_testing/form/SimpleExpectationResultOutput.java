@@ -23,6 +23,11 @@ public class SimpleExpectationResultOutput {
   @NotNull
   String targetId;
 
+  @Schema(description = "Inject id")
+  @JsonProperty("target_inject_id")
+  @NotNull
+  String injectId;
+
   @Schema(description = "Type")
   @JsonProperty("target_result_type")
   @NotNull

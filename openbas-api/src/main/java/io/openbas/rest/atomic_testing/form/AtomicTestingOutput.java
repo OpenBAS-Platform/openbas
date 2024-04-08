@@ -1,6 +1,7 @@
 package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.database.model.ExecutionStatus;
 import io.openbas.rest.atomic_testing.form.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.rest.atomic_testing.form.AtomicTestingMapper.InjectTargetWithResult;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -50,6 +51,11 @@ public class AtomicTestingOutput {
   @JsonProperty("atomic_targets")
   @NotNull
   private List<InjectTargetWithResult> targets;
+
+  @Schema(description = "Status of execution")
+  @JsonProperty("atomic_status")
+  @NotNull
+  private ExecutionStatus status;
 
   @Default
   @Schema(description = "Result of expectations")

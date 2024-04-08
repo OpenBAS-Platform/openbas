@@ -1,5 +1,6 @@
 package io.openbas.rest.atomic_testing.form;
 
+import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
@@ -25,6 +26,7 @@ public class AtomicTestingMapper {
         .contract(inject.getContract())
         .lastExecutionDate(getLastExecutionDate(inject))
         .targets(getTargets(inject.getExpectations()))
+        .status(inject.getStatus().map(InjectStatus::getName).orElse(ExecutionStatus.DRAFT))
         .expectationResultByTypes(getExpectations(inject.getExpectations()))
         .build();
   }
@@ -37,6 +39,7 @@ public class AtomicTestingMapper {
     return SimpleExpectationResultOutput
         .builder()
         .id(injectExpectation.getId())
+        .injectId(injectExpectation.getInject().getId())
         .type(ExpectationType.of(injectExpectation.getType().name()))
         .startedAt(injectExpectation.getCreatedAt())
         .endedAt(injectExpectation.getUpdatedAt())

@@ -15,8 +15,8 @@ const useStyles = makeStyles(() => ({
   },
   chartContainer: {
     position: 'relative',
-    width: '300px',
-    height: '200px',
+    width: '350px',
+    height: '350px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -28,9 +28,9 @@ const useStyles = makeStyles(() => ({
   },
   iconOverlay: {
     position: 'absolute',
-    top: '33%',
-    left: '44%',
-    fontSize: '40px',
+    top: '36%',
+    left: '43%',
+    fontSize: '50px',
   },
 }));
 
@@ -60,14 +60,14 @@ const ResponsePie: FunctionComponent<Props> = ({
 
     return colorMap[result ?? ''] ?? 'rgb(245, 166, 35)';
   };
-  const getChartIcon = (type, result) => {
+  const getChartIcon = (type) => {
     switch (type) {
       case 'PREVENTION':
-        return <Shield className={classes.iconOverlay} style={{ color: getColor(result) }}/>;
+        return <Shield className={classes.iconOverlay}/>;
       case 'DETECTION':
-        return <TrackChanges className={classes.iconOverlay} style={{ color: getColor(result) }}/>;
+        return <TrackChanges className={classes.iconOverlay}/>;
       default:
-        return <SensorOccupied className={classes.iconOverlay} style={{ color: getColor(result) }}/>;
+        return <SensorOccupied className={classes.iconOverlay}/>;
     }
   };
   const getTotal = (distribution) => {
@@ -97,38 +97,36 @@ const ResponsePie: FunctionComponent<Props> = ({
   };
 
   return (
-    <>
-      <Box margin={1}> {
-        <div className={classes.inline}>
-          {expectations?.map((expectation, index) => (
-            <div key={index} className={classes.chartContainer}>
-              <Typography variant="h1"
-                className={classes.chartTitle}
-              >{t(`TYPE_${expectation.type}`)}</Typography>
-              {getChartIcon(expectation.type, expectation.avgResult)}
-              <Chart
-                key={index}
-                options={{
-                  ...chartOptions,
-                  labels: expectation.distribution.map((e) => `${e.label} (${((e.value / getTotal(expectation.distribution)) * 100).toFixed(1)}%)`),
-                  colors: expectation.distribution.map((e) => getColor(e.label)),
-                }}
-                series={expectation.distribution.map((e) => e.value)}
-                type="donut"
-                width="100%"
-                height="100%"
-              />
-            </div>
-          ))}
-          {!expectations || expectations.length === 0 ? (
-            <div className={classes.chartContainer}>
-              <Empty message={t('No data available')}/>
-            </div>
-          ) : null}
-        </div>
+    <Box margin={1}> {
+      <div className={classes.inline}>
+        {expectations?.map((expectation, index) => (
+          <div key={index} className={classes.chartContainer}>
+            <Typography variant="h1"
+              className={classes.chartTitle}
+            >{t(`TYPE_${expectation.type}`)}</Typography>
+            {getChartIcon(expectation.type)}
+            <Chart
+              key={index}
+              options={{
+                ...chartOptions,
+                labels: expectation.distribution.map((e) => `${e.label} (${((e.value / getTotal(expectation.distribution)) * 100).toFixed(1)}%)`),
+                colors: expectation.distribution.map((e) => getColor(e.label)),
+              }}
+              series={expectation.distribution.map((e) => e.value)}
+              type="donut"
+              width="100%"
+              height="100%"
+            />
+          </div>
+        ))}
+        {!expectations || expectations.length === 0 ? (
+          <div className={classes.chartContainer}>
+            <Empty message={t('No data available')}/>
+          </div>
+        ) : null}
+      </div>
       }
-      </Box>
-    </>
+    </Box>
   );
 };
 

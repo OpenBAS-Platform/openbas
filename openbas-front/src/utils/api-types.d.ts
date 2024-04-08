@@ -115,6 +115,8 @@ export interface AtomicTestingOutput {
    * @format date-time
    */
   atomic_last_execution_date: string;
+  /** Status of execution */
+  atomic_status: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   /**
    * Specifies the categories of targetResults for atomic testing.
    * @example "assets, asset groups, teams, players"
@@ -460,7 +462,7 @@ export interface DryInject {
 
 export interface DryInjectStatus {
   status_id?: string;
-  status_name?: "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_name?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -889,7 +891,7 @@ export interface InjectReceptionInput {
 
 export interface InjectStatus {
   status_id?: string;
-  status_name?: "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_name?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -914,7 +916,7 @@ export interface InjectStatusExecution {
   /** @format int32 */
   execution_duration?: number;
   execution_message?: string;
-  execution_status?: "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  execution_status?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   /** @format date-time */
   execution_time?: string;
 }
@@ -1657,6 +1659,8 @@ export interface SettingsUpdateInput {
 export interface SimpleExpectationResultOutput {
   /** Target id */
   target_id: string;
+  /** Inject id */
+  target_inject_id: string;
   /**
    * End date of inject
    * @format date-time
