@@ -109,6 +109,11 @@ const styles = (theme) => ({
   errorColor: {
     color: theme.palette.error.main,
   },
+  inline: {
+    display: 'flex',
+    flexDirection: 'row',
+    padding: 0,
+  },
 });
 
 const inlineStylesHeaders = {
@@ -1098,6 +1103,7 @@ class InjectDefinition extends Component {
       challengesMap,
       teamsFromExerciseOrScenario,
       articlesFromExerciseOrScenario,
+      creation,
     } = this.props;
     if (!inject) {
       return <Loader variant="inElement" />;
@@ -2021,16 +2027,40 @@ class InjectDefinition extends Component {
                     />
                   </List>
                 </div>
-                <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    disabled={submitting || this.props.permissions.readOnly}
-                  >
-                    {t('Update')}
-                  </Button>
-                </div>
+                {
+                  creation === true
+                    ? <div className={classes.inline} style={{ float: 'right', margin: '20px 0 20px 0' }}>
+                      <div>
+                        <Button
+                          variant="contained"
+                          color="inherit"
+                          type="submit"
+                        >
+                          {t('Back')}
+                        </Button>
+                      </div>
+                      <div>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          type="submit"
+                          disabled={submitting || this.props.permissions.readOnly}
+                        >
+                          {t('Create')}
+                        </Button>
+                      </div>
+                    </div> : <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        type="submit"
+                        disabled={submitting || this.props.permissions.readOnly}
+                      >
+                        {t('Update')}
+                      </Button>
+                    </div>
+                }
+
               </form>
             )}
           </Form>
@@ -2069,6 +2099,8 @@ InjectDefinition.propTypes = {
   allUsersNumber: PropTypes.number,
   usersNumber: PropTypes.number,
   teamsUsers: PropTypes.object,
+  createAtomicTest: PropTypes.func,
+  creation: PropTypes.bool,
 };
 
 const select = (state, ownProps) => {

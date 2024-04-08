@@ -1,4 +1,5 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
+import { TextField, Typography } from '@mui/material';
 import InjectDefinition from '../../components/injects/InjectDefinition';
 import { InjectContext, PermissionsContext } from '../../components/Context';
 import type { Tag } from '../../../../utils/api-types';
@@ -26,6 +27,13 @@ const CreationInjectType: FunctionComponent<Props> = ({ contractId, injectType }
   const injectTypes = Object.values(injectTypesMap);
   return (
     <form id="scenarioForm">
+      <Typography variant="h2" style={{ float: 'left' }}>
+        Title
+      </Typography>
+      <TextField
+        variant="standard"
+        fullWidth
+      />
       <InjectDefinition
         inject={{
           inject_contract: contractId,
@@ -47,6 +55,7 @@ const CreationInjectType: FunctionComponent<Props> = ({ contractId, injectType }
         allUsersNumber={0}
         usersNumber={0}
         teamsUsers={0}
+        creation={true}
       />
     </form>
   );
