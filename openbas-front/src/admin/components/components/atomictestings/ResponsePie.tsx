@@ -51,15 +51,11 @@ const ResponsePie: FunctionComponent<Props> = ({
       Blocked: 'rgb(107, 235, 112)',
       Detected: 'rgb(107, 235, 112)',
       Successful: 'rgb(107, 235, 112)',
-      VALIDATED: 'rgb(107, 235, 112)',
-      Failed: 'rgb(220, 81, 72)',
-      Unblocked: 'rgb(220, 81, 72)',
-      Undetected: 'rgb(220, 81, 72)',
-      FAILED: 'rgb(220, 81, 72)',
     };
 
-    return colorMap[result ?? ''] ?? 'rgb(245, 166, 35)';
+    return colorMap[result ?? ''] ?? 'rgb(220, 81, 72)';
   };
+
   const getChartIcon = (type) => {
     switch (type) {
       case 'PREVENTION':
@@ -70,9 +66,11 @@ const ResponsePie: FunctionComponent<Props> = ({
         return <SensorOccupied className={classes.iconOverlay}/>;
     }
   };
+
   const getTotal = (distribution) => {
     return distribution.reduce((sum, item) => sum + item.value, 0);
   };
+
   const chartOptions: ApexCharts.ApexOptions = {
     chart: {
       type: 'donut',
@@ -105,18 +103,33 @@ const ResponsePie: FunctionComponent<Props> = ({
               className={classes.chartTitle}
             >{t(`TYPE_${expectation.type}`)}</Typography>
             {getChartIcon(expectation.type)}
-            <Chart
-              key={index}
-              options={{
-                ...chartOptions,
-                labels: expectation.distribution.map((e) => `${e.label} (${((e.value / getTotal(expectation.distribution)) * 100).toFixed(1)}%)`),
-                colors: expectation.distribution.map((e) => getColor(e.label)),
-              }}
-              series={expectation.distribution.map((e) => e.value)}
-              type="donut"
-              width="100%"
-              height="100%"
-            />
+            {expectation.distribution && expectation.distribution.length > 0 ? (
+              <Chart
+                key={index}
+                options={{
+                  ...chartOptions,
+                  labels: expectation.distribution.map((e) => `${t(e.label)} (${((e.value / getTotal(expectation.distribution)) * 100).toFixed(1)}%)`),
+                  colors: expectation.distribution.map((e) => getColor(e.label)),
+                }}
+                series={expectation.distribution.map((e) => e.value)}
+                type="donut"
+                width="100%"
+                height="100%"
+              />
+            ) : (
+              <Chart
+                options={{
+                  ...chartOptions,
+                  colors: ['rgb(202,203,206)'],
+                  labels: [t('Unknown Data')],
+                }}
+                series={[1]}
+                type="donut"
+                width="100%"
+                height="100%"
+              />
+
+            )}
           </div>
         ))}
         {!expectations || expectations.length === 0 ? (

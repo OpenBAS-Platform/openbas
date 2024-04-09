@@ -8,11 +8,14 @@ import io.openbas.database.model.InjectExpectationResult;
 import io.openbas.database.model.InjectStatus;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
+import kotlin.collections.EmptyList;
 import org.jetbrains.annotations.NotNull;
 
 public class AtomicTestingMapper {
@@ -48,7 +51,7 @@ public class AtomicTestingMapper {
             .map(results -> results.stream().map(InjectExpectationResult::getResult)
                 .collect(Collectors.joining(", ")))
             .orElse(null))
-        .response(injectExpectation.getScore() == 0 ? ExpectationStatus.FAILED : ExpectationStatus.VALIDATED)
+        .response(injectExpectation.getScore() == null? ExpectationStatus.UNKNOWN : (injectExpectation.getScore() == 0 ? ExpectationStatus.FAILED : ExpectationStatus.VALIDATED))
         .build();
   }
 
@@ -140,19 +143,31 @@ public class AtomicTestingMapper {
 
     List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
 
-    OptionalDouble avgPrevention = calculateAverageFromExpectations(preventionScores);
-    if (avgPrevention.isPresent()) {
-      resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.PREVENTION, getResult(avgPrevention), getResultDetail(ExpectationType.PREVENTION, preventionScores)));
+    if (preventionScores.stream().anyMatch(Objects::isNull)){
+      resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.PREVENTION, ExpectationStatus.UNKNOWN, Collections.emptyList()));
+    } else{
+      OptionalDouble avgPrevention = calculateAverageFromExpectations(preventionScores);
+      if (avgPrevention.isPresent()) {
+        resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.PREVENTION, getResult(avgPrevention), getResultDetail(ExpectationType.PREVENTION, preventionScores)));
+      }
     }
 
-    OptionalDouble avgDetection = calculateAverageFromExpectations(detectionScores);
-    if (avgDetection.isPresent()) {
-      resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.DETECTION, getResult(avgDetection), getResultDetail(ExpectationType.DETECTION, detectionScores)));
+    if (detectionScores.stream().anyMatch(Objects::isNull)){
+      resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.DETECTION, ExpectationStatus.UNKNOWN, Collections.emptyList()));
+    } else {
+      OptionalDouble avgDetection = calculateAverageFromExpectations(detectionScores);
+      if (avgDetection.isPresent()) {
+        resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.DETECTION, getResult(avgDetection), getResultDetail(ExpectationType.DETECTION, detectionScores)));
+      }
     }
 
-    OptionalDouble avgHumanResponse = calculateAverageFromExpectations(humanScores);
-    if (avgHumanResponse.isPresent()) {
-      resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.HUMAN_RESPONSE, getResult(avgHumanResponse), getResultDetail(ExpectationType.HUMAN_RESPONSE, humanScores)));
+    if (humanScores.stream().anyMatch(Objects::isNull)){
+      resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.HUMAN_RESPONSE, ExpectationStatus.UNKNOWN, Collections.emptyList()));
+    } else {
+      OptionalDouble avgHumanResponse = calculateAverageFromExpectations(humanScores);
+      if (avgHumanResponse.isPresent()) {
+        resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.HUMAN_RESPONSE, getResult(avgHumanResponse), getResultDetail(ExpectationType.HUMAN_RESPONSE, humanScores)));
+      }
     }
     return resultAvgOfExpectations;
   }
@@ -172,7 +187,7 @@ public class AtomicTestingMapper {
         .stream()
         .filter(e -> types.contains(e.getType()))
         .map(InjectExpectation::getScore)
-        .map(score -> score == 0 ? 0 : 1)
+        .map(score -> score == null ? null : (score == 0 ? 0 : 1))
         .toList();
   }
 
@@ -185,6 +200,7 @@ public class AtomicTestingMapper {
 
   private static OptionalDouble calculateAverageFromExpectations(List<Integer> scores) {
     return scores.stream()
+        .filter(Objects::nonNull)
         .mapToInt(Integer::intValue)
         .average();
   }

@@ -94,13 +94,18 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   const renderStepper = (targetResult: SimpleExpectationResultOutput) => {
     const getStatusLabel = () => {
       const { target_result_type, target_result_response_status } = targetResult;
+
+      if (target_result_response_status === 'UNKNOWN') {
+        return 'Unknown Data';
+      }
+
       switch (target_result_type) {
         case 'PREVENTION':
-          return target_result_response_status === 'VALIDATED' ? 'Blocked' : 'Unblocked';
+          return target_result_response_status === 'VALIDATED' ? 'Attack Blocked' : 'Attack Unblocked';
         case 'DETECTION':
-          return target_result_response_status === 'VALIDATED' ? 'Detected' : 'Undetected';
+          return target_result_response_status === 'VALIDATED' ? 'Attack Detected' : 'Attack Undetected';
         case 'HUMAN_RESPONSE':
-          return target_result_response_status === 'VALIDATED' ? 'Successful' : 'Failed';
+          return target_result_response_status === 'VALIDATED' ? 'Attack Successful' : 'Attack Failed';
         default:
           return '';
       }
@@ -108,11 +113,25 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
 
     const getCircleColor = () => {
       const { target_result_response_status } = targetResult;
-      return {
-        color: target_result_response_status === 'VALIDATED' ? 'rgb(107,235,112)' : 'rgb(220,81,72)',
-        background:
-            target_result_response_status === 'VALIDATED' ? 'rgba(176, 211, 146, 0.21)' : 'rgba(192, 113, 113, 0.29)',
-      };
+      let color;
+      let background;
+
+      switch (target_result_response_status) {
+        case 'VALIDATED':
+          color = 'rgb(107, 235, 112)';
+          background = 'rgba(176, 211, 146, 0.21)';
+          break;
+        case 'FAILED':
+          color = 'rgb(220, 81, 72)';
+          background = 'rgba(192, 113, 113, 0.29)';
+          break;
+        default: // Unknown status because we dont have spectation score
+          color = 'rgb(202,203,206)';
+          background = 'rgba(202,203,206, 0.5)';
+          break;
+      }
+
+      return { color, background };
     };
 
     const getStepIcon = (index) => {
@@ -135,7 +154,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
       return null;
     };
 
-    const steps = ['Attack started', 'Attack finished', `Attack ${getStatusLabel()}`];
+    const steps = ['Attack started', 'Attack finished', `${getStatusLabel()}`];
 
     return (
       <Stepper activeStep={0} alternativeLabel

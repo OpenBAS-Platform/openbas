@@ -140,7 +140,7 @@ const AtomicTestings = () => {
   const { t, fldt, tPick } = useFormatter();
 
   // Filter and sort hook
-  const filtering = useSearchAnFilter('atomic', 'title', ['title, targets']);
+  const filtering = useSearchAnFilter('atomic', 'title', ['title', 'targets']);
 
   // Fetching data
   const { atomics, injectTypesMap }: {

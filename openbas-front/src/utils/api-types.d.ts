@@ -103,6 +103,20 @@ export interface AssetGroupInput {
   asset_group_tags?: string[];
 }
 
+export interface AtomicTestingInput {
+  inject_all_teams?: boolean;
+  inject_asset_groups?: string[];
+  inject_assets?: string[];
+  inject_content?: object;
+  inject_contract?: string;
+  inject_description?: string;
+  inject_documents?: InjectDocumentInput[];
+  inject_tags?: string[];
+  inject_teams?: string[];
+  inject_title?: string;
+  inject_type?: string;
+}
+
 export interface AtomicTestingOutput {
   /** Contract */
   atomic_contract: string;
@@ -679,7 +693,7 @@ export interface ExerciseUpdateTeamsInput {
 
 /** Result of expectations */
 export interface ExpectationResultsByType {
-  avgResult?: "FAILED" | "PARTIAL" | "VALIDATED";
+  avgResult?: "FAILED" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
   distribution?: ResultDistribution[];
   type?: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
 }
@@ -1671,7 +1685,7 @@ export interface SimpleExpectationResultOutput {
   /** Logs */
   target_result_logs?: string;
   /** Response status */
-  target_result_response_status?: "FAILED" | "PARTIAL" | "VALIDATED";
+  target_result_response_status?: "FAILED" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
   /**
    * Started date of inject
    * @format date-time

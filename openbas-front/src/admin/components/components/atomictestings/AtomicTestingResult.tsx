@@ -22,6 +22,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
     const colorMap: Record<string, string> = {
       VALIDATED: 'rgb(107, 235, 112)',
       FAILED: 'rgb(220, 81, 72)',
+      UNKNOWN: 'rgb(202,203,206)',
     };
 
     return colorMap[result ?? ''] ?? 'rgb(245, 166, 35)';
