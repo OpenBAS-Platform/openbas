@@ -1,4 +1,4 @@
-package io.openbas.rest.atomic_testing.form;
+package io.openbas.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;

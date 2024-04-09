@@ -1,4 +1,4 @@
-package io.openbas.rest.atomic_testing.form;
+package io.openbas.atomic_testing.form;
 
 public enum TargetType {
   ASSETS,

@@ -1,4 +1,4 @@
-package io.openbas.service;
+package io.openbas.atomic_testing;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -9,7 +9,6 @@ import io.openbas.database.model.InjectStatus;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
@@ -17,7 +16,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
-import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
+import io.openbas.atomic_testing.form.AtomicTestingInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -31,7 +30,6 @@ public class AtomicTestingService {
   private Executor executor;
   private ExecutionContextService executionContextService;
   private InjectRepository injectRepository;
-  private InjectStatusRepository injectStatusRepository;
   private UserRepository userRepository;
   private TeamRepository teamRepository;
   private TagRepository tagRepository;
@@ -50,11 +48,6 @@ public class AtomicTestingService {
   @Autowired
   public void setInjectRepository(InjectRepository injectRepository) {
     this.injectRepository = injectRepository;
-  }
-
-  @Autowired
-  public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
-    this.injectStatusRepository = injectStatusRepository;
   }
 
   @Autowired

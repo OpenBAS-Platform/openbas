@@ -1,4 +1,4 @@
-package io.openbas.rest.atomic_testing.form;
+package io.openbas.atomic_testing.form;
 
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.Inject;
@@ -203,6 +203,13 @@ public class AtomicTestingMapper {
         .filter(Objects::nonNull)
         .mapToInt(Integer::intValue)
         .average();
+  }
+
+  public static AtomicTestingDetailOutput toDetailDto(Inject inject) {
+    return AtomicTestingDetailOutput
+        .builder()
+        .title(inject.getTitle())
+        .build();
   }
 
 

@@ -15,6 +15,7 @@ import type { AtomicTestingOutput } from '../../../../utils/api-types';
 import type { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
 
 const AtomicTesting = lazy(() => import('./AtomicTesting'));
+const AtomicTestingDetail = lazy(() => import('./detail/Detail'));
 
 const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutput }> = ({
   atomic,
@@ -26,9 +27,7 @@ const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutp
     tabValue = `/admin/atomic_testings/${atomic.atomic_id}/detail`;
   }
   return (
-    <div
-      style={{ paddingRight: ['/detail'].some((el) => location.pathname.includes(el)) ? 200 : 0 }}
-    >
+    <div>
       <Breadcrumbs variant="object" elements={[
         { label: t('Atomic Testings') },
         { label: atomic.atomic_title, current: true },
@@ -60,6 +59,7 @@ const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutp
       <Suspense fallback={<Loader/>}>
         <Routes>
           <Route path="" element={errorWrapper(AtomicTesting)()}/>
+          <Route path="/detail" element={errorWrapper(AtomicTestingDetail)()}/>
           {/* Not found */}
           <Route path="*" element={<NotFound/>}/>
         </Routes>

@@ -1,14 +1,13 @@
-package io.openbas.rest.atomic_testing;
+package io.openbas.atomic_testing;
 
+import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
+import io.openbas.atomic_testing.form.AtomicTestingInput;
+import io.openbas.atomic_testing.form.AtomicTestingMapper;
+import io.openbas.atomic_testing.form.AtomicTestingOutput;
+import io.openbas.atomic_testing.form.SimpleExpectationResultOutput;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.injectExpectation.InjectExpectationService;
-import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
-import io.openbas.rest.atomic_testing.form.AtomicTestingMapper;
-import io.openbas.rest.atomic_testing.form.AtomicTestingOutput;
-import io.openbas.rest.atomic_testing.form.AtomicTestingSimpleInput;
-import io.openbas.rest.atomic_testing.form.SimpleExpectationResultOutput;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.service.AtomicTestingService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
@@ -50,6 +49,11 @@ public class AtomicTestingApi extends RestBehavior {
     return atomicTestingService.findById(injectId).map(AtomicTestingMapper::toDto).orElseThrow();
   }
 
+  @GetMapping("/{injectId}/detail")
+  public AtomicTestingDetailOutput findAtomicTestingWithDetail(@PathVariable String injectId) {
+    return atomicTestingService.findById(injectId).map(AtomicTestingMapper::toDetailDto).orElseThrow();
+  }
+
   @PostMapping()
   public AtomicTestingOutput createAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {
     return AtomicTestingMapper.toDto(atomicTestingService.createOrUpdate(input));
@@ -58,7 +62,7 @@ public class AtomicTestingApi extends RestBehavior {
   @PutMapping("/{injectId}")
   public AtomicTestingOutput updateAtomicTesting(
       @PathVariable @NotBlank final String injectId,
-      @Valid @RequestBody final AtomicTestingSimpleInput input) {
+      @Valid @RequestBody final AtomicTestingInput input) {
     return null; //todo
   }
 
