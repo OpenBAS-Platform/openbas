@@ -70,7 +70,7 @@ public class AtomicTestingApi extends RestBehavior {
 
   @GetMapping("/try/{injectId}")
   public InjectStatus tryAtomicTesting(@PathVariable String injectId) {
-    return atomicTestingService.tryAtomicTesting(injectId);
+    return atomicTestingService.tryInject(injectId);
   }
 
   @GetMapping("/target_results/{targetId}")

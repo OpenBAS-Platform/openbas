@@ -107,11 +107,6 @@ public class AtomicTestingService {
     return injectRepository.save(inject);
   }
 
-  @Transactional
-  public InjectStatus tryAtomicTesting(String injectId) {
-    return injectStatusRepository.save(tryInject(injectId));
-  }
-
   public InjectStatus tryInject(String injectId) {
     Inject inject = injectRepository.findById(injectId).orElseThrow();
     User user = this.userRepository.findById(currentUser().getId()).orElseThrow();

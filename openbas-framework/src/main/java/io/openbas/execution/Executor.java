@@ -58,7 +58,7 @@ public class Executor {
     }
 
     private InjectStatus executeExternal(ExecutableInject executableInject, Inject inject) {
-        InjectStatus status = new InjectStatus();
+        InjectStatus status = injectStatusRepository.findByInject(inject).orElse(new InjectStatus());
         status.setTrackingSentDate(Instant.now());
         status.setInject(inject);
         try {
