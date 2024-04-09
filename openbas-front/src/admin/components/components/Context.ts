@@ -51,6 +51,10 @@ export type InjectContextType = {
   onDeleteInject: (injectId: Inject['inject_id']) => void,
 };
 
+export type AtomicTestingContextType = {
+  onAddAtomicTesting: (inject: Inject) => Promise<{ result: string }>,
+};
+
 export const PermissionsContext = createContext<PermissionsContextType>({
   permissions: { canWrite: false, readOnly: false, isRunning: false },
 });
@@ -111,5 +115,11 @@ export const InjectContext = createContext<InjectContextType>({
   onInjectDone(_injectId: Inject['inject_id']): void {
   },
   onDeleteInject(_injectId: Inject['inject_id']): void {
+  },
+});
+
+export const AtomicTestingContext = createContext<AtomicTestingContextType>({
+  onAddAtomicTesting(_inject: Inject): Promise<{ result: string }> {
+    return Promise.resolve({ result: '' });
   },
 });

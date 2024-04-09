@@ -20,6 +20,7 @@ import type { AttackPatternHelper } from '../../../actions/attackpattern/attackp
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { fetchAttackPatterns } from '../../../actions/AttackPattern';
 import DialogWithCross from '../../../components/common/DialogWithCross';
+import { createAtomicTesting } from '../../../actions/atomictestings/atomic-testing-actions';
 
 const useStyles = makeStyles(() => ({
   menuContainer: {
@@ -62,6 +63,10 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
     dispatch(fetchAttackPatterns());
   });
 
+  const handleCreation = () => {
+    dispatch(createAtomicTesting());
+  };
+
   // Filter
   const [openMitreFilter, setOpenMitreFilter] = React.useState(false);
 
@@ -91,12 +96,12 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
             borderBottom: 1,
             borderColor: 'transparent',
             marginBottom: 4,
-            width: '80%',
-            marginTop: 5,
+            width: '90%',
+            marginTop: 2,
             marginLeft: 10,
           }}
         >
-          <Stepper activeStep={activeStep}>
+          <Stepper sx={{ marginBottom: 6 }} activeStep={activeStep}>
             {steps.map((label) => {
               const stepProps: { completed?: boolean } = {};
               const labelProps: {

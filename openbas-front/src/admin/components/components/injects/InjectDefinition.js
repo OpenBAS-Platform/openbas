@@ -1307,21 +1307,25 @@ class InjectDefinition extends Component {
       });
     return (
       <div>
-        <div className={classes.header}>
-          <IconButton
-            aria-label="Close"
-            className={classes.closeButton}
-            onClick={handleClose.bind(this)}
-            size="large"
-            color="primary"
-          >
-            <CloseRounded fontSize="small" color="primary" />
-          </IconButton>
-          <Typography variant="h6" classes={{ root: classes.title }}>
-            {inject.inject_title}
-          </Typography>
-          <div className="clearfix" />
-        </div>
+        {
+          creation !== true
+          && <div className={classes.header}>
+            <IconButton
+              aria-label="Close"
+              className={classes.closeButton}
+              onClick={handleClose.bind(this)}
+              size="large"
+              color="primary"
+            >
+              <CloseRounded fontSize="small" color="primary" />
+            </IconButton>
+            <Typography variant="h6" classes={{ root: classes.title }}>
+              {inject.inject_title}
+            </Typography>
+            <div className="clearfix" />
+          </div>
+        }
+
         <div className={classes.container}>
           <Form
             keepDirtyOnReinitialize={true}
@@ -2028,37 +2032,17 @@ class InjectDefinition extends Component {
                   </List>
                 </div>
                 {
-                  creation === true
-                    ? <div className={classes.inline} style={{ float: 'right', margin: '20px 0 20px 0' }}>
-                      <div>
-                        <Button
-                          variant="contained"
-                          color="inherit"
-                          type="submit"
-                        >
-                          {t('Back')}
-                        </Button>
-                      </div>
-                      <div>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          type="submit"
-                          disabled={submitting || this.props.permissions.readOnly}
-                        >
-                          {t('Create')}
-                        </Button>
-                      </div>
-                    </div> : <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        type="submit"
-                        disabled={submitting || this.props.permissions.readOnly}
-                      >
-                        {t('Update')}
-                      </Button>
-                    </div>
+                  creation !== true
+                  && <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      disabled={submitting || this.props.permissions.readOnly}
+                    >
+                      {t('Update')}
+                    </Button>
+                  </div>
                 }
 
               </form>

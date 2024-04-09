@@ -1,7 +1,8 @@
 import { Dispatch } from 'redux';
 import { arrayOfAtomicTestings, atomicTesting } from './atomic-testing-schema';
-import { delReferential, getReferential, putReferential } from '../../utils/Action';
+import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
 import { arrayOftargetResults } from './target-result-schema';
+import { AtomicTestingInput } from '../../utils/api-types';
 
 const ATOMIC_TESTING_URI = '/api/atomic_testings';
 
@@ -33,4 +34,15 @@ export const fetchTargetResult = (injectId: string, targetId: string, targetType
   const queryParams = `?injectId=${injectId}&targetType=${targetType}`;
   const uri = `${ATOMIC_TESTING_URI}/target_results/${targetId}${queryParams}`;
   return getReferential(arrayOftargetResults, uri)(dispatch);
+};
+
+export const createAtomicTesting = () => (dispatch: Dispatch) => {
+  const body: AtomicTestingInput = {
+    inject_title: 'Test inject from back',
+    inject_description: 'Test with add from back',
+    inject_type: 'openbas_email',
+    inject_contract: '138ad8f8-32f8-4a22-8114-aaa12322bd09',
+    inject_content: { expectations: [], subject: 'resfsdfdsfs', body: '<p>fcfd</p>', encrypted: false },
+  };
+  return postReferential(null, ATOMIC_TESTING_URI, body)(dispatch);
 };
