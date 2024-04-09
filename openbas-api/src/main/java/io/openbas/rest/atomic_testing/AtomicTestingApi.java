@@ -50,6 +50,11 @@ public class AtomicTestingApi extends RestBehavior {
     return atomicTestingService.findById(injectId).map(AtomicTestingMapper::toDto).orElseThrow();
   }
 
+  @PostMapping()
+  public AtomicTestingOutput createAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {
+    return AtomicTestingMapper.toDto(atomicTestingService.createOrUpdate(input));
+  }
+
   @PutMapping("/{injectId}")
   public AtomicTestingOutput updateAtomicTesting(
       @PathVariable @NotBlank final String injectId,
@@ -73,11 +78,6 @@ public class AtomicTestingApi extends RestBehavior {
       @RequestParam String injectId, @RequestParam String targetType) {
     return AtomicTestingMapper.toTargetResultDto(
         injectExpectationService.findExpectationsByInjectAndTarget(injectId, targetId, targetType), targetId);
-  }
-
-  @PostMapping()
-  public AtomicTestingOutput createOrUpdate(@Valid @RequestBody AtomicTestingInput input) {
-    return AtomicTestingMapper.toDto(atomicTestingService.createOrUpdate(input));
   }
 
 }

@@ -156,7 +156,10 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         {targetResult.map((result, index) => (
           <div key={result.target_result_id}>
             <Typography variant="body1" gutterBottom>
-              {result.target_result_subtype}
+              {t(`TYPE_${result.target_result_subtype}`)}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              {t(result.target_result_response_status)}
             </Typography>
             {result.target_result_logs !== null && (
             <Typography variant="body1">
