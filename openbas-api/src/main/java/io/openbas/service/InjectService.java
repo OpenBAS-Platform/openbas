@@ -1,55 +1,25 @@
 package io.openbas.service;
 
-import static io.openbas.config.SessionHelper.currentUser;
 import static java.time.Instant.now;
 
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectDocument;
 import io.openbas.database.model.InjectStatus;
-import io.openbas.database.model.User;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.InjectStatusRepository;
-import io.openbas.database.repository.UserRepository;
-import io.openbas.execution.ExecutableInject;
-import io.openbas.execution.ExecutionContext;
-import io.openbas.execution.ExecutionContextService;
-import io.openbas.execution.Executor;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
-
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class InjectService {
 
-  private Executor executor;
-  private ExecutionContextService executionContextService;
-  private UserRepository userRepository;
   private InjectRepository injectRepository;
   private InjectDocumentRepository injectDocumentRepository;
-
-  @Autowired
-  public void setExecutor(Executor executor) {
-    this.executor = executor;
-  }
-
-  @Autowired
-  public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
-    this.executionContextService = executionContextService;
-  }
-
-  @Autowired
-  public void setUserRepository(@NotNull final UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
 
   @Autowired
   public void setInjectRepository(InjectRepository injectRepository) {
@@ -99,24 +69,5 @@ public class InjectService {
     inject.setStatus(injectStatus);
     return injectRepository.save(inject);
   }
-
-  @Transactional
-  public Optional<Inject> findById(String injectId) {
-    return injectRepository.findWithStatusById(injectId);
-  }
-
-
-  public InjectStatus tryInject(String injectId) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    User user = this.userRepository.findById(currentUser().getId()).orElseThrow();
-    List<ExecutionContext> userInjectContexts = List.of(
-        this.executionContextService.executionContext(user, inject, "Direct test")
-    );
-    ExecutableInject injection = new ExecutableInject(false, true, inject, List.of(), inject.getAssets(),
-        inject.getAssetGroups(), userInjectContexts);
-    // TODO Must be migrated to Atomic approach (Inject duplication and async tracing)
-    return executor.execute(injection);
-  }
-
 
 }

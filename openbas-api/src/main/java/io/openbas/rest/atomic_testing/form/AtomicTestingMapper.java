@@ -205,6 +205,7 @@ public class AtomicTestingMapper {
         .average();
   }
 
+
   public record ExpectationResultsByType(@NotNull ExpectationType type, @NotNull ExpectationStatus avgResult, @NotNull List<ResultDistribution> distribution) {
 
   }

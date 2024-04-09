@@ -63,6 +63,8 @@ public class InjectApi extends RestBehavior {
   private ExecutionContextService executionContextService;
   private ScenarioService scenarioService;
   private InjectService injectService;
+  private AtomicTestingService atomicTestingService;
+
 
   @Resource
   protected ObjectMapper mapper;
@@ -138,6 +140,11 @@ public class InjectApi extends RestBehavior {
   }
 
   @Autowired
+  public void setAtomicTestingService(AtomicTestingService atomicTestingService) {
+    this.atomicTestingService = atomicTestingService;
+  }
+
+  @Autowired
   public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
     this.executionContextService = executionContextService;
   }
@@ -205,7 +212,7 @@ public class InjectApi extends RestBehavior {
 
   @GetMapping("/api/injects/try/{injectId}")
   public InjectStatus tryInject(@PathVariable String injectId) {
-    return injectService.tryInject(injectId);
+    return atomicTestingService.tryInject(injectId);
   }
 
   @Transactional(rollbackOn = Exception.class)

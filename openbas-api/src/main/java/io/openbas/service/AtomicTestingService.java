@@ -1,23 +1,29 @@
 package io.openbas.service;
 
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.helper.StreamHelper.fromIterable;
+
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.InjectDocument;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.model.User;
+import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
+import io.openbas.database.repository.TagRepository;
+import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
+import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-
-import static io.openbas.config.SessionHelper.currentUser;
 
 @Service
 public class AtomicTestingService {
@@ -27,6 +33,9 @@ public class AtomicTestingService {
   private InjectRepository injectRepository;
   private InjectStatusRepository injectStatusRepository;
   private UserRepository userRepository;
+  private TeamRepository teamRepository;
+  private TagRepository tagRepository;
+  private DocumentRepository documentRepository;
 
   @Autowired
   public void setExecutor(Executor executor) {
@@ -53,10 +62,49 @@ public class AtomicTestingService {
     this.userRepository = userRepository;
   }
 
+  @Autowired
+  public void setTeamRepository(@NotNull final TeamRepository teamRepository) {
+    this.teamRepository = teamRepository;
+  }
 
-  @Transactional
+  @Autowired
+  public void setTagRepository(@NotNull final TagRepository tagRepository) {
+    this.tagRepository = tagRepository;
+  }
+
+  @Autowired
+  public void setDocumentRepository(@NotNull final DocumentRepository documentRepository) {
+    this.documentRepository = documentRepository;
+  }
+
   public List<Inject> findAllAtomicTestings() {
     return this.injectRepository.findAllAtomicTestings();
+  }
+
+  public Optional<Inject> findById(String injectId) {
+    return injectRepository.findWithStatusById(injectId);
+  }
+
+  @Transactional
+  public Inject createOrUpdate(AtomicTestingInput input) {
+    Inject inject = input.toInject();
+
+    inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
+    inject.setExercise(null);
+    // Set dependencies
+    inject.setDependsOn(null);
+    inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
+    inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+    List<InjectDocument> injectDocuments = input.getDocuments().stream()
+        .map(i -> {
+          InjectDocument injectDocument = new InjectDocument();
+          injectDocument.setInject(inject);
+          injectDocument.setDocument(documentRepository.findById(i.getDocumentId()).orElseThrow());
+          injectDocument.setAttached(i.isAttached());
+          return injectDocument;
+        }).toList();
+    inject.setDocuments(injectDocuments);
+    return injectRepository.save(inject);
   }
 
   @Transactional
@@ -76,9 +124,9 @@ public class AtomicTestingService {
     return executor.execute(injection);
   }
 
+  @Transactional
   public void deleteAtomicTesting(String injectId) {
     //TODO
     injectRepository.deleteById(injectId);
   }
-
 }
