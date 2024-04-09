@@ -113,7 +113,6 @@ public class AtomicTestingApi extends RestBehavior {
         injectExpectationService.findExpectationsByInjectAndTarget(injectId, targetId, targetType), targetId);
   }
 
-
   @PostMapping()
   public Inject addAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {
     // Get common attributes

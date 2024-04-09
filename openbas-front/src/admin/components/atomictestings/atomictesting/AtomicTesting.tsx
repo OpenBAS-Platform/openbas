@@ -92,28 +92,30 @@ const AtomicTesting = () => {
           {sortedTargets.length > 0 ? (
             <List style={{ paddingTop: 10 }}>
               {sortedTargets.map((target) => (
-                <ListItemButton
-                  key={target?.id}
-                  dense={true}
-                  divider={true}
-                  onClick={() => handleTargetClick(target)}
-                >
-                  <ListItemText
-                    primary={
-                      <div>
-                        <div className={classes.bodyTarget} style={{ width: '30%' }}>
-                          {`${target?.name} `}
-                          <span style={{ color: 'gray' }}>[{t(target?.targetType)}]</span>
+                <Paper elevation={3} style={{ marginBottom: 10 }} key={target?.id}>
+                  <ListItemButton
+                    key={target?.id}
+                    onClick={() => handleTargetClick(target)}
+                  >
+                    <ListItemText
+                      primary={
+                        <div>
+                          <div className={classes.bodyTarget} style={{ width: '30%' }}>
+                            {`${target?.name}`}
+                            <span style={{ color: 'gray', marginLeft: 10 }}>
+                              [{t(target?.targetType.toLowerCase())}]
+                            </span>
+                          </div>
+                          <div style={{ float: 'right' }}>
+                            <AtomicTestingResult
+                              expectations={target?.expectationResultsByTypes}
+                            />
+                          </div>
                         </div>
-                        <div style={{ float: 'right' }}>
-                          <AtomicTestingResult
-                            expectations={target?.expectationResultsByTypes}
-                          />
-                        </div>
-                      </div>
                             }
-                  />
-                </ListItemButton>
+                    />
+                  </ListItemButton>
+                </Paper>
               ))}
             </List>
           ) : (

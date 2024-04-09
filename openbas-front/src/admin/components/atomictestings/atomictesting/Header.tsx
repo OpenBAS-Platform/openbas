@@ -161,7 +161,7 @@ const AtomicTestingHeader = () => {
       <Button
         variant="contained"
         startIcon={<PlayArrowOutlined/>}
-        color="secondary"
+        color="info"
         onClick={() => setOpen(true)}
         sx={{ width: 120, height: 40 }}
         disabled={!atomic.atomic_targets || !(atomic.atomic_targets.length > 0)}

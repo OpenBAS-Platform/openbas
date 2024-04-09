@@ -36,7 +36,7 @@ const useStyles = makeStyles(() => ({
     fontSize: '0.7rem',
     position: 'absolute',
     bottom: 'calc(60%)',
-    left: 'calc(-20%)',
+    left: 'calc(-25%)',
   },
   icon: {
     position: 'absolute',
@@ -61,7 +61,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   const { nsdt, t } = useFormatter();
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState(0);
-
+  const [steps, setSteps] = useState([]);
   // Fetching data
   const { targetresults }: {
     targetresults: SimpleExpectationResultOutput[],
@@ -76,104 +76,77 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     }
   }, [target]);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
-
-  const CustomConnector = ({ label }) => {
+  const CustomConnector = ({ date, index }) => {
+    if (!index || index === 0) {
+      return null;
+    }
     return (
       <>
         <hr className={classes.connector}/>
         <Typography variant="body2" className={classes.connectorLabel}>
-          {nsdt(label)}
+          {nsdt(date)}
         </Typography>
       </>
     );
   };
 
-  const renderStepper = (targetResult: SimpleExpectationResultOutput) => {
-    const getStatusLabel = () => {
-      const { target_result_type, target_result_response_status } = targetResult;
+  const getStatusLabel = (type, status) => {
+    if (status === 'UNKNOWN') {
+      return 'Unknown Data';
+    }
 
-      if (target_result_response_status === 'UNKNOWN') {
-        return 'Unknown Data';
-      }
+    switch (type) {
+      case 'PREVENTION':
+        return status === 'VALIDATED' ? 'Attack Blocked' : 'Attack Unblocked';
+      case 'DETECTION':
+        return status === 'VALIDATED' ? 'Attack Detected' : 'Attack Undetected';
+      case 'HUMAN_RESPONSE':
+        return status === 'VALIDATED' ? 'Attack Successful' : 'Attack Failed';
+      default:
+        return '';
+    }
+  };
 
-      switch (target_result_type) {
+  const getCircleColor = (status) => {
+    let color;
+    let background;
+    switch (status) {
+      case 'VALIDATED':
+        color = 'rgb(107, 235, 112)';
+        background = 'rgba(176, 211, 146, 0.21)';
+        break;
+      case 'FAILED':
+        color = 'rgb(220, 81, 72)';
+        background = 'rgba(192, 113, 113, 0.29)';
+        break;
+      default: // Unknown status because we dont have spectation score
+        color = 'rgb(202,203,206)';
+        background = 'rgba(202,203,206, 0.5)';
+        break;
+    }
+    return { color, background };
+  };
+
+  const getStepIcon = (index, type, status) => {
+    const classes = useStyles();
+    if (index >= 2) {
+      let IconComponent;
+      switch (type) {
         case 'PREVENTION':
-          return target_result_response_status === 'VALIDATED' ? 'Attack Blocked' : 'Attack Unblocked';
+          IconComponent = Shield;
+          break;
         case 'DETECTION':
-          return target_result_response_status === 'VALIDATED' ? 'Attack Detected' : 'Attack Undetected';
-        case 'HUMAN_RESPONSE':
-          return target_result_response_status === 'VALIDATED' ? 'Attack Successful' : 'Attack Failed';
+          IconComponent = TrackChanges;
+          break;
         default:
-          return '';
-      }
-    };
-
-    const getCircleColor = () => {
-      const { target_result_response_status } = targetResult;
-      let color;
-      let background;
-
-      switch (target_result_response_status) {
-        case 'VALIDATED':
-          color = 'rgb(107, 235, 112)';
-          background = 'rgba(176, 211, 146, 0.21)';
-          break;
-        case 'FAILED':
-          color = 'rgb(220, 81, 72)';
-          background = 'rgba(192, 113, 113, 0.29)';
-          break;
-        default: // Unknown status because we dont have spectation score
-          color = 'rgb(202,203,206)';
-          background = 'rgba(202,203,206, 0.5)';
+          IconComponent = SensorOccupied;
           break;
       }
-
-      return { color, background };
-    };
-
-    const getStepIcon = (index) => {
-      if (index === 2) {
-        const { target_result_type } = targetResult;
-        let IconComponent;
-        switch (target_result_type) {
-          case 'PREVENTION':
-            IconComponent = Shield;
-            break;
-          case 'DETECTION':
-            IconComponent = TrackChanges;
-            break;
-          default:
-            IconComponent = SensorOccupied;
-            break;
-        }
-        return <IconComponent style={{ color: getCircleColor().color }} className={classes.icon}/>;
-      }
-      return null;
-    };
-
-    const steps = ['Attack started', 'Attack finished', `${getStatusLabel()}`];
-
-    return (
-      <Stepper activeStep={0} alternativeLabel
-        connector={<CustomConnector label={targetResult.target_result_started_at}/>}
-      >
-        {steps.map((label, index) => (
-          <Step key={index} completed={index < activeTab}>
-            <StepLabel
-              StepIconComponent={() => (
-                <div className={classes.circle} style={index === 2 ? getCircleColor() : {}}>
-                  {getStepIcon(index)}
-                  <Typography className={classes.circleLabel}>{label}</Typography>
-                </div>
-              )}
-            />
-          </Step>
-        ))}
-      </Stepper>
-    );
+      return <IconComponent style={{ color: getCircleColor(status).color }}
+        className={classes.icon}
+             />;
+    }
+    return null;
   };
 
   const renderLogs = (targetResult: SimpleExpectationResultOutput) => {
@@ -185,24 +158,56 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     );
   };
 
+  // Define steps
+  const initialSteps = [{ label: 'Attack started' }, { label: 'Attack finished' }];
+  useEffect(() => {
+    if (targetresults && targetresults.length > 0) {
+      const newSteps = targetresults.map((result) => ({
+        label: getStatusLabel(result.target_result_type, result.target_result_response_status),
+        type: result.target_result_type,
+        status: result.target_result_response_status,
+      }));
+      const mergedSteps = [...initialSteps, ...newSteps];
+      setSteps(mergedSteps);
+    }
+  }, [targetresults]);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+  };
+
   return (
     <div>
       <Typography variant="h1" className="pageTitle">{target.name}</Typography>
-      <Tabs
-        value={activeTab}
-        onChange={handleTabChange}
-        indicatorColor="primary"
-        textColor="primary"
-        className={classes.tabs}
-      >
-        {targetresults.map((targetResult, index) => (
-          <Tab key={index} label={t(`TYPE_${targetResult.target_result_type}`)}/>
-        ))}
-      </Tabs>
-      <Box marginTop={4}> {}
+      <Box marginTop={5}>
+        <Stepper alternativeLabel connector={<></>}>
+          {steps.map((step, index) => (
+            <Step key={index}>
+              <StepLabel
+                StepIconComponent={() => (
+                  <div className={classes.circle}
+                    style={index >= 2 ? getCircleColor(step.status) : {}}
+                  >
+                    {getStepIcon(index, step.type, step.status)}
+                    <Typography className={classes.circleLabel}>{step.label}</Typography>
+                  </div>
+                )}
+              />
+              <CustomConnector date={'04-04-2024'} index={index}/>
+            </Step>
+          ))}
+        </Stepper>
+      </Box>
+      <Box marginTop={3}>
+        <Tabs value={activeTab} onChange={handleTabChange} indicatorColor="primary"
+          textColor="primary" className={classes.tabs}
+        >
+          {targetresults.map((targetResult, index) => (
+            <Tab key={index} label={t(`TYPE_${targetResult.target_result_type}`)}/>
+          ))}
+        </Tabs>
         {targetresults.map((targetResult, index) => (
           <div key={index} hidden={activeTab !== index}>
-            {renderStepper(targetResult)}
             {renderLogs(targetResult)}
           </div>
         ))}
