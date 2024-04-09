@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
-import kotlin.collections.EmptyList;
 import org.jetbrains.annotations.NotNull;
 
 public class AtomicTestingMapper {
@@ -44,14 +43,15 @@ public class AtomicTestingMapper {
         .id(injectExpectation.getId())
         .injectId(injectExpectation.getInject().getId())
         .type(ExpectationType.of(injectExpectation.getType().name()))
+        .subtype(injectExpectation.getType().name())
         .startedAt(injectExpectation.getCreatedAt())
         .endedAt(injectExpectation.getUpdatedAt())
         .logs(Optional.ofNullable(
-            injectExpectation.getResults())
+                injectExpectation.getResults())
             .map(results -> results.stream().map(InjectExpectationResult::getResult)
                 .collect(Collectors.joining(", ")))
             .orElse(null))
-        .response(injectExpectation.getScore() == null? ExpectationStatus.UNKNOWN : (injectExpectation.getScore() == 0 ? ExpectationStatus.FAILED : ExpectationStatus.VALIDATED))
+        .response(injectExpectation.getScore() == null ? ExpectationStatus.UNKNOWN : (injectExpectation.getScore() == 0 ? ExpectationStatus.FAILED : ExpectationStatus.VALIDATED))
         .build();
   }
 
@@ -143,16 +143,16 @@ public class AtomicTestingMapper {
 
     List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
 
-    if (preventionScores.stream().anyMatch(Objects::isNull)){
+    if (preventionScores.stream().anyMatch(Objects::isNull)) {
       resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.PREVENTION, ExpectationStatus.UNKNOWN, Collections.emptyList()));
-    } else{
+    } else {
       OptionalDouble avgPrevention = calculateAverageFromExpectations(preventionScores);
       if (avgPrevention.isPresent()) {
         resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.PREVENTION, getResult(avgPrevention), getResultDetail(ExpectationType.PREVENTION, preventionScores)));
       }
     }
 
-    if (detectionScores.stream().anyMatch(Objects::isNull)){
+    if (detectionScores.stream().anyMatch(Objects::isNull)) {
       resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.DETECTION, ExpectationStatus.UNKNOWN, Collections.emptyList()));
     } else {
       OptionalDouble avgDetection = calculateAverageFromExpectations(detectionScores);
@@ -161,7 +161,7 @@ public class AtomicTestingMapper {
       }
     }
 
-    if (humanScores.stream().anyMatch(Objects::isNull)){
+    if (humanScores.stream().anyMatch(Objects::isNull)) {
       resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.HUMAN_RESPONSE, ExpectationStatus.UNKNOWN, Collections.emptyList()));
     } else {
       OptionalDouble avgHumanResponse = calculateAverageFromExpectations(humanScores);

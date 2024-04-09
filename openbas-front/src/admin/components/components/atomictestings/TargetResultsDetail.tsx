@@ -149,11 +149,23 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     return null;
   };
 
-  const renderLogs = (targetResult: SimpleExpectationResultOutput) => {
+  const renderLogs = (targetResult) => {
     return (
       <Paper elevation={3} style={{ padding: 20, marginTop: 25, minHeight: 200 }}>
-        <Typography variant="button" display="block" gutterBottom>Info</Typography>
-        {targetResult.target_result_id}
+        {/* Render logs for each target result */}
+        {targetResult.map((result, index) => (
+          <div key={result.target_result_id}>
+            <Typography variant="body1" gutterBottom>
+              {result.target_result_subtype}
+            </Typography>
+            {result.target_result_logs !== null && (
+            <Typography variant="body1">
+              {result.target_result_logs}
+            </Typography>
+            )}
+            <br/>
+          </div>
+        ))}
       </Paper>
     );
   };
@@ -171,6 +183,16 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
       setSteps(mergedSteps);
     }
   }, [targetresults]);
+
+  // Define Tabs
+  const groupedResults = {};
+  targetresults.forEach((result) => {
+    const type = result.target_result_type;
+    if (!groupedResults[type]) {
+      groupedResults[type] = [];
+    }
+    groupedResults[type].push(result);
+  });
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
@@ -202,13 +224,13 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         <Tabs value={activeTab} onChange={handleTabChange} indicatorColor="primary"
           textColor="primary" className={classes.tabs}
         >
-          {targetresults.map((targetResult, index) => (
-            <Tab key={index} label={t(`TYPE_${targetResult.target_result_type}`)}/>
+          {Object.keys(groupedResults).map((type, index) => (
+            <Tab key={index} label={t(`TYPE_${type}`)}/>
           ))}
         </Tabs>
-        {targetresults.map((targetResult, index) => (
+        {Object.keys(groupedResults).map((targetResult, index) => (
           <div key={index} hidden={activeTab !== index}>
-            {renderLogs(targetResult)}
+            {renderLogs(groupedResults[targetResult])}
           </div>
         ))}
       </Box>

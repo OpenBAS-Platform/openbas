@@ -33,6 +33,11 @@ public class SimpleExpectationResultOutput {
   @NotNull
   ExpectationType type;
 
+  @Schema(description = "Subtype")
+  @JsonProperty("target_result_subtype")
+  @NotNull
+  String subtype;
+
   @Schema(description = "Started date of inject")
   @JsonProperty("target_result_started_at")
   @NotNull

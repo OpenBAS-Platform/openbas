@@ -1691,6 +1691,8 @@ export interface SimpleExpectationResultOutput {
    * @format date-time
    */
   target_result_started_at: string;
+  /** Subtype */
+  target_result_subtype: string;
   /** Type */
   target_result_type: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
 }
