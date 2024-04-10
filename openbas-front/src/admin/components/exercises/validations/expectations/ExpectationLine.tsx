@@ -46,7 +46,7 @@ const ExpectationLine: FunctionComponent<Props> = ({
   return (
     <>
       <ListItem
-        key={expectation.injectexpectation_id}
+        key={expectation.inject_expectation_id}
         divider
         sx={{ pl: gap ?? 8 }}
         classes={{ root: classes.item }}

@@ -23,7 +23,7 @@ import { splitDuration } from '../../../../utils/Time';
 import { tagOptions } from '../../../../utils/Option';
 import Transition from '../../../../components/common/Transition';
 import type { InjectInput, InjectStore } from '../../../../actions/injects/Inject';
-import { AtomicTestingContext, InjectContext, PermissionsContext } from '../Context';
+import { InjectContext, PermissionsContext } from '../Context';
 import type { Contract, Inject, InjectStatus, InjectStatusExecution, Tag } from '../../../../utils/api-types';
 import { tryInject } from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -34,7 +34,6 @@ interface Props {
   tagsMap: Record<string, Tag>;
   setSelectedInject: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;
-  isAtomicTesting: boolean;
 }
 
 const InjectPopover: FunctionComponent<Props> = ({
@@ -43,7 +42,6 @@ const InjectPopover: FunctionComponent<Props> = ({
   tagsMap,
   setSelectedInject,
   isDisabled,
-  isAtomicTesting,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -56,7 +54,6 @@ const InjectPopover: FunctionComponent<Props> = ({
     onInjectDone,
     onDeleteInject,
   } = useContext(InjectContext);
-  const { onUpdateStatusInject } = useContext(AtomicTestingContext);
 
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -130,10 +127,6 @@ const InjectPopover: FunctionComponent<Props> = ({
     dispatch(tryInject(inject.inject_id)).then((payload: InjectStatus) => {
       setInjectResult(payload);
       setOpenResult(true);
-
-      if (isAtomicTesting) {
-        onUpdateStatusInject?.(inject.inject_id);
-      }
     });
     handleCloseTry();
   };
@@ -259,7 +252,7 @@ const InjectPopover: FunctionComponent<Props> = ({
         {inject.inject_type !== 'openbas_manual' && (
         <MenuItem
           onClick={handleOpenTry}
-          disabled={isDisabled && !isAtomicTesting}
+          disabled={isDisabled}
         >
           {t('Try the inject')}
         </MenuItem>
@@ -279,7 +272,7 @@ const InjectPopover: FunctionComponent<Props> = ({
             {t('Enable')}
           </MenuItem>
         )}
-        <MenuItem onClick={handleOpenDelete} disabled={isAtomicTesting}>
+        <MenuItem onClick={handleOpenDelete}>
           {t('Delete')}
         </MenuItem>
       </Menu>
@@ -452,17 +445,17 @@ const InjectPopover: FunctionComponent<Props> = ({
                                               <TableBody>
                                                 <>
                                                   {value?.filter((trace: InjectStatusExecution) => !!trace.execution_message)
-                                    .map((trace: InjectStatusExecution) => (
-                                                    <TableRow key={trace.execution_category}>
-                                                      <TableCell>
-                                                        {trace.execution_message}
-                                                      </TableCell>
-                                                      <TableCell>
-                                                        {trace.execution_status}
-                                                      </TableCell>
-                                                      <TableCell>{trace.execution_time}</TableCell>
-                                                    </TableRow>
-                                                  ))}
+                                                    .map((trace: InjectStatusExecution) => (
+                                                      <TableRow key={trace.execution_category}>
+                                                        <TableCell>
+                                                          {trace.execution_message}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                          {trace.execution_status}
+                                                        </TableCell>
+                                                        <TableCell>{trace.execution_time}</TableCell>
+                                                      </TableRow>
+                                                    ))}
                                                 </>
                                               </TableBody>
                                             </Table>

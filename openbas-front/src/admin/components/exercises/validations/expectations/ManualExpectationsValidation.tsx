@@ -63,7 +63,7 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({
 
   const onSubmit = (data: { expectation_score: number }) => {
     dispatch(
-      updateInjectExpectation(exerciseId, expectation.injectexpectation_id, data),
+      updateInjectExpectation(exerciseId, expectation.inject_expectation_id, data),
     ).then((e: InjectExpectationsStore) => {
       setValidated(isValid(e));
       setLabel(isValid(e) ? t('Validated') : t('Pending validation'));
@@ -159,7 +159,7 @@ const ManualExpectationsValidation: FunctionComponent<Props> = ({
     >
       <>
         {expectations
-          && expectations.map((e) => <ManualExpectationsValidationForm key={e.injectexpectation_id} exerciseId={exerciseId} expectation={e} />)
+          && expectations.map((e) => <ManualExpectationsValidationForm key={e.inject_expectation_id} exerciseId={exerciseId} expectation={e} />)
         }
         <div className={classes.buttons}>
           <Button

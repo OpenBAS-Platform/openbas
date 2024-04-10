@@ -80,7 +80,7 @@ const TechnicalExpectationAssetGroup: FunctionComponent<Props> = ({
               />
             </ListItem>
             {groupedExpectations.map((e: InjectExpectationsStore) => (
-              <TechnicalExpectationAsset key={e.injectexpectation_id} expectation={e} injectContract={injectContract} gap={16} />
+              <TechnicalExpectationAsset key={e.inject_expectation_id} expectation={e} injectContract={injectContract} gap={16} />
             ))}
           </div>
         );

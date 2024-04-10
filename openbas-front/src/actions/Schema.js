@@ -157,7 +157,7 @@ export const challengesReader = new schema.Entity(
 export const injectexpectation = new schema.Entity(
   'injectexpectations',
   {},
-  { idAttribute: 'injectexpectation_id' },
+  { idAttribute: 'inject_expectation_id' },
 );
 export const arrayOfInjectexpectations = new schema.Array(injectexpectation);
 
@@ -327,10 +327,7 @@ export const storeHelper = (state) => ({
   getTagsMap: () => maps('tags', state),
   // injects
   getInject: (id) => entity(id, 'injects', state),
-  getAtomicTestings: () => {
-    const atomicTestings = entities('injects', state).filter((t) => (t.inject_exercise === null) && (t.inject_scenario === null));
-    return atomicTestings;
-  },
+  getAtomicTestings: () => entities('atomics', state),
   getInjectsMap: () => maps('injects', state),
   getInjectTypes: () => entities('inject_types', state),
   getInjectTypesMap: () => maps('inject_types', state),

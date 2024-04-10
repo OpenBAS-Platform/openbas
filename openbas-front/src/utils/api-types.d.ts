@@ -104,8 +104,12 @@ export interface AssetGroupInput {
 }
 
 export interface AtomicTestingOutput {
+  /** Contract */
+  atomic_contract: string;
   /** Expectations */
   atomic_expectations?: BasicExpectation[];
+  /** Id */
+  atomic_id: string;
   /**
    * Last Execution date
    * @format date-time
@@ -119,7 +123,7 @@ export interface AtomicTestingOutput {
   /** Title */
   atomic_title?: string;
   /** Type */
-  atomic_type?: string;
+  atomic_type: string;
 }
 
 export interface AttackPattern {
@@ -157,8 +161,8 @@ export interface AttackPatternUpsertInput {
 
 /** Expectations */
 export interface BasicExpectation {
-  result?: string;
-  type?: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
+  result: "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  type: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
 }
 
 /**
@@ -166,8 +170,8 @@ export interface BasicExpectation {
  * @example "assets, asset groups, teams, players"
  */
 export interface BasicTarget {
-  names?: string[];
-  type?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
+  names: string[];
+  type: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
 export interface Challenge {
@@ -893,6 +897,7 @@ export interface InjectExpectation {
   /** @format int32 */
   inject_expectation_expected_score?: number;
   inject_expectation_group?: boolean;
+  inject_expectation_id: string;
   inject_expectation_inject?: Inject;
   inject_expectation_name?: string;
   inject_expectation_results?: InjectExpectationResult[];
@@ -903,7 +908,6 @@ export interface InjectExpectation {
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: User;
-  injectexpectation_id: string;
   updateAttributes?: object;
 }
 

@@ -1,7 +1,7 @@
 import React, { CSSProperties, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { CSVLink } from 'react-csv';
-import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { FileDownloadOutlined } from '@mui/icons-material';
 import { useAppDispatch } from '../../../utils/hooks';
 import { useFormatter } from '../../../components/i18n';
@@ -9,20 +9,17 @@ import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import type { InjectHelper } from '../../../actions/injects/inject-helper';
-import type { InjectStore } from '../../../actions/injects/Inject';
 import { fetchInjectTypes } from '../../../actions/Inject';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import SearchFilter from '../../../components/SearchFilter';
-import TagsFilter from '../../../components/TagsFilter';
 import { exportData } from '../../../utils/Environment';
-import InjectPopover from '../components/injects/InjectPopover';
 import type { TagsHelper } from '../../../actions/helper';
 import InjectIcon from '../components/injects/InjectIcon';
 import InjectType from '../components/injects/InjectType';
-import type { Contract, Inject, Tag } from '../../../utils/api-types';
-import { AtomicTestingContext, AtomicTestingContextType } from '../components/Context';
-import { fetchAtomicTesting, fetchAtomicTestings } from '../../../actions/atomictestings/atomic-testing-actions';
+import type { AtomicTestingOutput, Contract } from '../../../utils/api-types';
+import { fetchAtomicTestings } from '../../../actions/atomictestings/atomic-testing-actions';
 import AtomicTestingResult from '../components/atomictesting/AtomicTestingResult';
+import TargetChip from '../components/atomictesting/TargetChip';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -77,19 +74,19 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
     fontSize: 12,
     fontWeight: '700',
   },
-  atomic_updated_at: {
+  atomic_last_execution_date: {
     float: 'left',
     width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
-  atomic_players: {
+  atomic_targets: {
     float: 'left',
     width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
-  atomic_result: {
+  atomic_expectations: {
     float: 'left',
     width: '20%',
     fontSize: 12,
@@ -105,13 +102,13 @@ const inlineStyles: Record<string, CSSProperties> = {
   atomic_type: {
     width: '25%',
   },
-  atomic_updated_at: {
+  atomic_last_execution_date: {
     width: '20%',
   },
-  atomic_players: {
+  atomic_targets: {
     width: '20%',
   },
-  atomic_result: {
+  atomic_expectations: {
     width: '20%',
   },
 };
@@ -128,21 +125,13 @@ const AtomicTestings = () => {
   const filtering = useSearchAnFilter('inject', 'title', ['title']);
 
   // Fetching data
-  const { injects, tagsMap, injectTypesMap, injectTypesWithNoTeams }: {
-    injects: Inject[],
-    tagsMap: Record<string, Tag>,
+  const { atomics, injectTypesMap }: {
+    atomics: AtomicTestingOutput[],
     injectTypesMap: Record<string, Contract>,
-    injectTypesWithNoTeams: (string | undefined)[]
   } = useHelper((helper: InjectHelper & TagsHelper) => ({
-    injects: helper.getAtomicTestings(),
-    tagsMap: helper.getTagsMap(),
+    atomics: helper.getAtomicTestings(),
     injectTypesMap: helper.getInjectTypesMap(),
-    injectTypesWithNoTeams: helper.getInjectTypesWithNoTeams(),
   }));
-
-  const injectTypes = Object.values(injectTypesMap);
-  const disabledTypes = injectTypes;
-  const types = injectTypes.map((type) => type.config.type);
 
   useDataLoader(() => {
     dispatch(fetchAtomicTestings());
@@ -155,14 +144,14 @@ const AtomicTestings = () => {
       name: 'atomic_title',
       label: 'Title',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => atomicTesting.atomic_title,
+      value: (atomicTesting: AtomicTestingOutput) => atomicTesting.atomic_title,
     },
     {
       name: 'atomic_type',
       label: 'Type',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => {
-        const injectContract = injectTypesMap[atomicTesting.atomic_type];
+      value: (atomicTesting: AtomicTestingOutput) => {
+        const injectContract = injectTypesMap[atomicTesting.atomic_contract];
         const injectTypeName = tPick(injectContract?.label);
         return (
           <InjectType
@@ -174,58 +163,41 @@ const AtomicTestings = () => {
       },
     },
     {
-      name: 'atomic_atomic_last_execution_date',
+      name: 'atomic_last_execution_date',
       label: 'Date',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => fldt(atomicTesting.atomic_last_execution_date),
+      value: (atomicTesting: AtomicTestingOutput) => fldt(atomicTesting.atomic_last_execution_date),
     },
     {
-      name: 'atomic_target',
+      name: 'atomic_targets',
       label: 'Target',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => atomicTesting.atomic_target,
+      value: (atomicTesting: AtomicTestingOutput) => {
+        return (<TargetChip targets={atomicTesting.atomic_targets}/>);
+      },
     },
     {
-      name: 'atomic_result',
+      name: 'atomic_expectations',
       label: 'Result',
       isSortable: true,
-      value: (atomicTesting: InjectStore) => {
-        const mockExpectations: { type: string, result: string }[] = [
-          { type: 'PREVENTION', result: 'SUCCESS' },
-          { type: 'DETECTION', result: 'ERROR' },
-          { type: 'ARTICLE', result: 'PARTIAL' },
-          { type: 'CHALLENGE', result: 'ERROR' },
-          { type: 'MANUAL', result: 'SUCCESS' },
-        ];
+      value: (atomicTesting: AtomicTestingOutput) => {
         return (
-          <AtomicTestingResult expectations={mockExpectations} />
+          <AtomicTestingResult expectations={atomicTesting.atomic_expectations}/>
         );
       },
     },
   ];
-  const sortedAtomicTestings: InjectStore[] = filtering.filterAndSort(injects);
-
-  // Context
-  const context: AtomicTestingContextType = {
-    onUpdateStatusInject(injectId: Inject['atomic_id']): void {
-      return dispatch(fetchAtomicTesting(injectId));
-    },
-  };
+  const sortedAtomicTestings: AtomicTestingOutput[] = filtering.filterAndSort(atomics);
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]} />
+      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]}/>
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter
             small
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
-          />
-          <TagsFilter
-            onAddTag={filtering.handleAddTag}
-            onRemoveTag={filtering.handleRemoveTag}
-            currentTags={filtering.tags}
           />
         </div>
         <div className={classes.downloadButton}>
@@ -240,99 +212,87 @@ const AtomicTestings = () => {
             >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
-                  <FileDownloadOutlined color="primary" />
+                  <FileDownloadOutlined color="primary"/>
                 </IconButton>
               </Tooltip>
             </CSVLink>
           ) : (
             <IconButton size="large" disabled>
-              <FileDownloadOutlined />
+              <FileDownloadOutlined/>
             </IconButton>
           )}
         </div>
       </div>
-      <AtomicTestingContext.Provider value={context}>
-        <List>
-          <ListItem
-            classes={{ root: classes.itemHead }}
-            divider={false}
-            style={{ paddingTop: 0 }}
-          >
-            <ListItemIcon>
-              <span
-                style={{
-                  padding: '0 8px 0 8px',
-                  fontWeight: 700,
-                  fontSize: 12,
-                }}
-              >
+      <List>
+        <ListItem
+          classes={{ root: classes.itemHead }}
+          divider={false}
+          style={{ paddingTop: 0 }}
+        >
+          <ListItemIcon>
+            <span
+              style={{
+                padding: '0 8px 0 8px',
+                fontWeight: 700,
+                fontSize: 12,
+              }}
+            >
               &nbsp;
-              </span>
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <>
-                  {fields.map((header) => (
-                    <div key={header.name}>
-                      {
-                        filtering.buildHeader(
-                          header.name,
-                          header.label,
-                          header.isSortable,
-                          inlineStylesHeaders,
-                        )
-                      }
-                    </div>
-                  ))
-                  }
-                </>
-              }
-            />
-          </ListItem>
-          {sortedAtomicTestings.map((atomicTesting) => {
-            return (
-              <ListItemButton
-                key={atomicTesting.atomic_id}
-                classes={{ root: classes.item }}
-                divider
-                onClick={() => setSelectedAtomicTesting(atomicTesting.atomic_id)}
-              >
-                <ListItemIcon>
-                  <InjectIcon
-                    tooltip={t(atomicTesting.atomic_type)}
-                    type={atomicTesting.atomic_type}
-                  />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <>
-                      {fields.map((field) => (
-                        <div
-                          key={field.name}
-                          className={classes.bodyItem}
-                          style={inlineStyles[field.name]}
-                        >
-                          {field.value(atomicTesting)}
-                        </div>
-                      ))}
-                    </>
-                  }
+            </span>
+          </ListItemIcon>
+          <ListItemText
+            primary={
+              <>
+                {fields.map((header) => (
+                  <div key={header.name}>
+                    {
+                            filtering.buildHeader(
+                              header.name,
+                              header.label,
+                              header.isSortable,
+                              inlineStylesHeaders,
+                            )
+                          }
+                  </div>
+                ))
+                    }
+              </>
+                }
+          />
+        </ListItem>
+        {sortedAtomicTestings.map((atomicTesting) => {
+          return (
+            <ListItemButton
+              key={atomicTesting.atomic_id}
+              classes={{ root: classes.item }}
+              divider
+              onClick={() => setSelectedAtomicTesting(atomicTesting.atomic_id)}
+            >
+              <ListItemIcon>
+                <InjectIcon
+                  tooltip={t(atomicTesting.atomic_type)}
+                  type={atomicTesting.atomic_type}
                 />
-                <ListItemSecondaryAction>
-                  <InjectPopover
-                    inject={atomicTesting}
-                    tagsMap={tagsMap}
-                    injectTypesMap={injectTypesMap}
-                    setSelectedInject={setSelectedAtomicTesting}
-                    isDisabled={true} // How is it calculated ?
-                    isAtomicTesting={true}
-                  />
-                </ListItemSecondaryAction>
-              </ListItemButton>
-            );
-          })}
-        </List>
-      </AtomicTestingContext.Provider>
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <>
+                    {fields.map((field) => (
+                      <div
+                        key={field.name}
+                        className={classes.bodyItem}
+                        style={inlineStyles[field.name]}
+                      >
+                        {field.value(atomicTesting)}
+                      </div>
+                    ))}
+                  </>
+                      }
+              />
+            </ListItemButton>
+          );
+        })}
+      </List>
     </>
   );
 };

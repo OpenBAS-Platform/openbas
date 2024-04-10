@@ -2,6 +2,7 @@ package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +16,28 @@ import lombok.Setter;
 @Builder
 public class AtomicTestingOutput {
 
+  @Schema(description = "Id")
+  @JsonProperty("atomic_id")
+  @NotNull
+  private String id;
+
   @Schema(description = "Title")
   @JsonProperty("atomic_title")
   private String title;
 
   @Schema(description = "Type")
   @JsonProperty("atomic_type")
+  @NotNull
   private String type;
+
+  @Schema(description = "Contract")
+  @JsonProperty("atomic_contract")
+  @NotNull
+  private String contract;
+
+  @Schema(description = "Last Execution date")
+  @JsonProperty("atomic_last_execution_date")
+  private Instant lastExecutionDate;
 
   @Schema(
       description = "Specifies the categories of targets for atomic testing.",
@@ -29,10 +45,6 @@ public class AtomicTestingOutput {
   )
   @JsonProperty("atomic_targets")
   private List<BasicTarget> targets;
-
-  @Schema(description = "Last Execution date")
-  @JsonProperty("atomic_last_execution_date")
-  private Instant lastExecutionDate;
 
   @Default
   @Schema(description = "Expectations")

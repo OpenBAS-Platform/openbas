@@ -1,6 +1,7 @@
 import React from 'react';
-import { Shield, TrackChanges, SensorOccupied, Help, HorizontalRule } from '@mui/icons-material';
+import { HorizontalRule, SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
+import type { BasicExpectation } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   inline: {
@@ -10,55 +11,46 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-interface Expectation {
-  type: string;
-  result: string;
-}
-
 interface Props {
-  expectations: Expectation[];
+  expectations: BasicExpectation[] | undefined;
 }
 
 const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
   const classes = useStyles();
-  let color = null;
-  if (expectations.length === 0) {
-    return <HorizontalRule />;
+
+  const getColor = (result: string): string => {
+    switch (result) {
+      case 'SUCCESS':
+        return '#7ed321';
+      case 'ERROR':
+        return '#d0021b';
+      default:
+        return '#f5a623';
+    }
+  };
+
+  if (!expectations || expectations.length === 0) {
+    return <HorizontalRule/>;
   }
+
   return (
     <div className={classes.inline}>
       {expectations.map((expectation, index) => {
-        if (expectation.result === 'SUCCESS') {
-          color = '#4caf50';
-        } else if (expectation.result === 'ERROR') {
-          color = '#d51304';
-        } else {
-          color = '#ff9800';
-        }
-        if (expectation.type === 'PREVENTION') {
-          return (
-            <span key={index}>
-              <Shield style={{ color }} />
-            </span>
-          );
-        }
-        if (expectation.type === 'DETECTION') {
-          return (
-            <span key={index}>
-              <TrackChanges style={{ color }} />
-            </span>
-          );
-        }
-        if (expectation.type === 'ARTICLE' || expectation.type === 'CHALLENGE' || expectation.type === 'MANUAL') {
-          return (
-            <span key={index}>
-              <SensorOccupied style={{ color }} />
-            </span>
-          );
+        const color = getColor(expectation.result);
+        let IconComponent;
+        switch (expectation.type) {
+          case 'PREVENTION':
+            IconComponent = Shield;
+            break;
+          case 'DETECTION':
+            IconComponent = TrackChanges;
+            break;
+          default:
+            IconComponent = SensorOccupied;
         }
         return (
           <span key={index}>
-            <Help style={{ color: '#d9d9d9' }} />
+            <IconComponent style={{ color }}/>
           </span>
         );
       })}

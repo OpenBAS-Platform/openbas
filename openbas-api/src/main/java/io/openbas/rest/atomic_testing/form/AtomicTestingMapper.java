@@ -9,17 +9,22 @@ import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.model.Team;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalDouble;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
 
 public class AtomicTestingMapper {
 
   public static AtomicTestingOutput toDto(Inject inject) {
     return AtomicTestingOutput
         .builder()
+        .id(inject.getId())
         .title(inject.getTitle())
         .type(inject.getType())
+        .contract(inject.getContract())
         .lastExecutionDate(getLastExecutionDate(inject))
         .targets(getTargets(inject))
         .expectations(getExpectations(inject))
@@ -37,17 +42,17 @@ public class AtomicTestingMapper {
   private static List<BasicTarget> getTargets(final Inject inject) {
     return Stream.of(
             new BasicTarget(TargetType.ASSETS,
-                mapNames(inject.getAssets(), entity -> ((Asset) entity).getName())),
+                getNames(inject.getAssets(), entity -> ((Asset) entity).getName())),
             new BasicTarget(TargetType.ASSETS_GROUPS,
-                mapNames(inject.getAssetGroups(), entity -> ((AssetGroup) entity).getName())),
+                getNames(inject.getAssetGroups(), entity -> ((AssetGroup) entity).getName())),
             new BasicTarget(TargetType.TEAMS,
-                mapNames(inject.getTeams(), entity -> ((Team) entity).getName()))
+                getNames(inject.getTeams(), entity -> ((Team) entity).getName()))
         )
         .filter(target -> !target.names().isEmpty())
         .toList();
   }
 
-  private static List<String> mapNames(List<? extends Object> entities,
+  private static List<String> getNames(List<? extends Object> entities,
       Function<Object, String> nameExtractor) {
     return entities.stream()
         .map(nameExtractor)
@@ -55,18 +60,42 @@ public class AtomicTestingMapper {
   }
 
   private static List<BasicExpectation> getExpectations(final Inject inject) {
-    return Stream.of(
-            new BasicExpectation(ExpectationType.PREVENTION,
-                inject.getExpectations()
-                    .stream()
-                    .filter(e -> e.getType().equals(EXPECTATION_TYPE.PREVENTION))
-                    .map(InjectExpectation::getScore)
-                    .mapToDouble(Integer::doubleValue)
-                    .average().getAsDouble() == 1.0 ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR),
-            new BasicExpectation(ExpectationType.DETECTION, ExecutionStatus.ERROR),
-            new BasicExpectation(ExpectationType.HUMAN_RESPONSE, ExecutionStatus.ERROR)
-        )
-        .toList();
+    OptionalDouble avgPrevention = calculateAverageFromExpectations(List.of(EXPECTATION_TYPE.PREVENTION), inject);
+    OptionalDouble avgDetection = calculateAverageFromExpectations(List.of(EXPECTATION_TYPE.PREVENTION), inject);
+    OptionalDouble avgHumanResponse = calculateAverageFromExpectations(List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL), inject);
+
+    return buildBasicExpectations(avgPrevention, avgDetection, avgHumanResponse);
+  }
+
+  @NotNull
+  private static List<BasicExpectation> buildBasicExpectations(OptionalDouble avgPrevention, OptionalDouble avgDetection, OptionalDouble avgHumanResponse) {
+    List<BasicExpectation> resultAvgOfExpectations = new ArrayList<>();
+    if (avgPrevention.isPresent()) {
+      resultAvgOfExpectations.add(new BasicExpectation(ExpectationType.PREVENTION, getResult(avgPrevention)));
+    }
+    if (avgDetection.isPresent()) {
+      resultAvgOfExpectations.add(new BasicExpectation(ExpectationType.DETECTION, getResult(avgDetection)));
+    }
+    if (avgHumanResponse.isPresent()) {
+      resultAvgOfExpectations.add(new BasicExpectation(ExpectationType.HUMAN_RESPONSE, getResult(avgHumanResponse)));
+    }
+    return resultAvgOfExpectations;
+  }
+
+  private static ExecutionStatus getResult(OptionalDouble avg) {
+    Double avgAsDouble = avg.getAsDouble();
+    return avgAsDouble == 0.0 ? ExecutionStatus.ERROR :
+        (avgAsDouble == 1.0 ? ExecutionStatus.SUCCESS :
+            ExecutionStatus.PARTIAL);
+  }
+
+  private static OptionalDouble calculateAverageFromExpectations(List<EXPECTATION_TYPE> types, Inject inject) {
+    return inject.getExpectations()
+        .stream()
+        .filter(e -> types.contains(e.getType()))
+        .mapToInt(InjectExpectation::getScore)
+        .map(score -> score == 0 ? 0 : 1)
+        .average();
   }
 
   enum TargetType {
