@@ -59,7 +59,7 @@ const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutp
       <Suspense fallback={<Loader/>}>
         <Routes>
           <Route path="" element={errorWrapper(AtomicTesting)()}/>
-          <Route path="/detail" element={errorWrapper(AtomicTestingDetail)()}/>
+          <Route path="detail" element={errorWrapper(AtomicTestingDetail)()}/>
           {/* Not found */}
           <Route path="*" element={<NotFound/>}/>
         </Routes>

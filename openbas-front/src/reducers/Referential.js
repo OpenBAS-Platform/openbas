@@ -22,6 +22,7 @@ export const entitiesInitializer = Immutable({
     teams: Immutable({}),
     injects: Immutable({}),
     atomics: Immutable({}),
+    atomicdetails: Immutable({}),
     targetresults: Immutable({}),
     inject_types: Immutable({}),
     inject_statuses: Immutable({}),

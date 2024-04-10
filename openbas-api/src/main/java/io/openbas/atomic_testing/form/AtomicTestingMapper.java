@@ -207,10 +207,21 @@ public class AtomicTestingMapper {
   }
 
   public static AtomicTestingDetailOutput toDetailDto(Inject inject) {
-    return AtomicTestingDetailOutput
-        .builder()
-        .title(inject.getTitle())
-        .build();
+    return inject.getStatus().map(status ->
+        AtomicTestingDetailOutput
+            .builder()
+            .atomicId(inject.getId())
+            .status(status.getName())
+            .traces(status.getTraces().stream().map(trace -> trace.getStatus() + " " + trace.getMessage()).collect(Collectors.toList()))
+            .trackingAckDate(status.getTrackingAckDate())
+            .trackingSentDate(status.getTrackingSentDate())
+            .trackingEndDate(status.getTrackingEndDate())
+            .trackingTotalCount(status.getTrackingTotalCount())
+            .trackingTotalError(status.getTrackingTotalError())
+            .trackingTotalSuccess(status.getTrackingTotalSuccess())
+            .build()
+    ).orElse(AtomicTestingDetailOutput.builder().status(ExecutionStatus.DRAFT).build());
+
   }
 
 

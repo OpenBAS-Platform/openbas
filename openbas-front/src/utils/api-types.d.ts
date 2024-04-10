@@ -104,10 +104,23 @@ export interface AssetGroupInput {
 }
 
 export interface AtomicTestingDetailOutput {
-  /** Status */
-  atomic_status: string;
-  /** Title */
-  atomic_title: string;
+  atomic_id?: string;
+  status_label?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_traces?: InjectStatusExecution[];
+  /** @format date-time */
+  tracking_ack_date?: string;
+  /** @format date-time */
+  tracking_end_date?: string;
+  /** @format date-time */
+  tracking_sent_date?: string;
+  /** @format int32 */
+  tracking_total_count?: number;
+  /** @format int32 */
+  tracking_total_error?: number;
+  /** @format int64 */
+  tracking_total_execution_time?: number;
+  /** @format int32 */
+  tracking_total_success?: number;
 }
 
 export interface AtomicTestingInput {
@@ -135,12 +148,12 @@ export interface AtomicTestingOutput {
    * Last Execution End date
    * @format date-time
    */
-  atomic_last_execution_end_date: string;
+  atomic_last_execution_end_date?: string;
   /**
    * Last Execution Start date
    * @format date-time
    */
-  atomic_last_execution_start_date: string;
+  atomic_last_execution_start_date?: string;
   /** Status of execution */
   atomic_status: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   /**

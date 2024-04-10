@@ -57,12 +57,12 @@ const TargetChip: FunctionComponent<Props> = ({
 
   const getIcon = (type: string) => {
     if (type === 'ASSETS') {
-      return <DevicesOtherOutlined fontSize="1rem" style={{ color: 'rgb(177,250,67)' }}/>;
+      return <DevicesOtherOutlined fontSize="1rem"/>;
     }
     if (type === 'ASSETS_GROUPS') {
-      return <SelectGroup fontSize="1rem" style={{ color: 'rgb(42, 232, 192)' }}/>;
+      return <SelectGroup fontSize="1rem"/>;
     }
-    return <Groups3Outlined fontSize="1rem" style={{ color: 'rgb(234,241,71)' }}/>; // Teams
+    return <Groups3Outlined fontSize="1rem"/>; // Teams
   };
 
   return (
