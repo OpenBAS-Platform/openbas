@@ -38,24 +38,26 @@ const Detail: FunctionComponent<Props> = () => {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <Paper elevation={3} className={classes.paper}>
-          {atomicdetail ? (
-            <>
-              <Typography variant="h5" gutterBottom>
-                {atomicdetail.status_label}
+        {atomicdetail ? (
+          <>
+            <Paper elevation={3} className={classes.paper}>
+              <Typography variant="title" gutterBottom>
+                Status : {atomicdetail.status_label}
               </Typography>
               {atomicdetail.status_traces && (
-              <>
-                <Typography variant="subtitle1">Status Traces:</Typography>
-                <ul>
-                  {atomicdetail.status_traces.map((trace, index) => (
-                    <li key={index} className={classes.listItem}>
-                          {trace}
-                        </li>
-                  ))}
-                </ul>
-              </>
+                <>
+                  <Typography variant="body1" sx={{ marginTop: 2 }}>Traces:</Typography>
+                  <ul>
+                    {atomicdetail.status_traces.map((trace, index) => (
+                      <li key={index} className={classes.listItem}>
+                        {trace}
+                      </li>
+                    ))}
+                  </ul>
+                </>
               )}
+            </Paper>
+            <Paper elevation={3} className={classes.paper}>
               <Typography variant="body1" gutterBottom>
                 Tracking Sent Date: {atomicdetail.tracking_sent_date || 'N/A'}
               </Typography>
@@ -65,6 +67,8 @@ const Detail: FunctionComponent<Props> = () => {
               <Typography variant="body1" gutterBottom>
                 Tracking End Date: {atomicdetail.tracking_end_date || 'N/A'}
               </Typography>
+            </Paper>
+            <Paper elevation={3} className={classes.paper}>
               <Typography variant="body1" gutterBottom>
                 Tracking Total Execution
                 Time: {atomicdetail.tracking_total_execution_time || 'N/A'} ms
@@ -78,11 +82,13 @@ const Detail: FunctionComponent<Props> = () => {
               <Typography variant="body1" gutterBottom>
                 Tracking Total Success: {atomicdetail.tracking_total_success || 'N/A'}
               </Typography>
-            </>
-          ) : (
+            </Paper>
+          </>
+        ) : (
+          <Paper elevation={3} className={classes.paper}>
             <Typography variant="body1">No data available</Typography>
-          )}
-        </Paper>
+          </Paper>
+        )}
       </Grid>
     </Grid>
   );

@@ -85,6 +85,9 @@ const ResponsePie: FunctionComponent<Props> = ({
     legend: {
       position: 'bottom',
       show: true,
+      labels: {
+        colors: ['rgb(202,203,206)', 'rgb(202,203,206)'],
+      },
     },
     stroke: {
       show: false,
