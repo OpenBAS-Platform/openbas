@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -92,8 +93,12 @@ public class ScenarioService {
     return scenarios.stream().map(ScenarioSimple::fromScenario).toList();
   }
 
-  public List<Scenario> recurringScenarios() {
-    return this.scenarioRepository.findAll(ScenarioSpecification.recurring());
+  public List<Scenario> recurringScenarios(@NotNull final Instant instant) {
+    return this.scenarioRepository.findAll(
+        ScenarioSpecification.recurring()
+            .and(ScenarioSpecification.recurringStartDate(instant))
+            .and(ScenarioSpecification.recurringStopDate(instant))
+    );
   }
 
   public Scenario scenario(@NotBlank final String scenarioId) {

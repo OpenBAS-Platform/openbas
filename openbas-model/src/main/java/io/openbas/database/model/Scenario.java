@@ -59,6 +59,10 @@ public class Scenario implements Base {
   @JsonProperty("scenario_recurrence_start")
   private Instant recurrenceStart;
 
+  @Column(name = "scenario_recurrence_end")
+  @JsonProperty("scenario_recurrence_end")
+  private Instant recurrenceEnd;
+
   // -- MESSAGE --
 
   @Column(name = "scenario_message_header")
