@@ -39,10 +39,13 @@ public class AtomicTestingOutput {
   @NotNull
   private String contract;
 
-  @Schema(description = "Last Execution date")
-  @JsonProperty("atomic_last_execution_date")
-  @NotNull
-  private Instant lastExecutionDate;
+  @Schema(description = "Last Execution Start date")
+  @JsonProperty("atomic_last_execution_start_date")
+  private Instant lastExecutionStartDate;
+
+  @Schema(description = "Last Execution End date")
+  @JsonProperty("atomic_last_execution_end_date")
+  private Instant lastExecutionEndDate;
 
   @Schema(
       description = "Specifies the categories of targetResults for atomic testing.",

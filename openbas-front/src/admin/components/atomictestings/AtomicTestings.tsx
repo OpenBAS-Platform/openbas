@@ -84,7 +84,7 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
     fontSize: 12,
     fontWeight: '700',
   },
-  atomic_last_execution_date: {
+  atomic_last_start_execution_date: {
     float: 'left',
     width: '16%',
     fontSize: 12,
@@ -108,7 +108,6 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
     fontSize: 12,
     fontWeight: '700',
   },
-
 };
 
 const inlineStyles: Record<string, CSSProperties> = {
@@ -118,7 +117,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   atomic_type: {
     width: '16%',
   },
-  atomic_last_execution_date: {
+  atomic_last_start_execution_date: {
     width: '16%',
   },
   atomic_targets: {
@@ -185,10 +184,10 @@ const AtomicTestings = () => {
       },
     },
     {
-      name: 'atomic_last_execution_date',
+      name: 'atomic_last_start_execution_date',
       label: 'Date',
       isSortable: true,
-      value: (atomicTesting: AtomicTestingOutput) => fldt(atomicTesting.atomic_last_execution_date),
+      value: (atomicTesting: AtomicTestingOutput) => fldt(atomicTesting.atomic_last_execution_start_date),
     },
     {
       name: 'atomic_targets',

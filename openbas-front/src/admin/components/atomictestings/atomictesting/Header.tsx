@@ -48,9 +48,11 @@ const AtomicTestingHeader = () => {
 
   // Launch atomic testing
   const [open, setOpen] = useState(false);
+  const [availableLaunch, setAvailableLaunch] = useState(true);
 
   const submitTry = () => {
     setOpen(false);
+    setAvailableLaunch(false);
     dispatch(tryAtomicTesting(atomic.atomic_id)).then((payload: InjectStatus) => {
       setInjectResult(payload);
       setOpenResult(true);
@@ -60,6 +62,7 @@ const AtomicTestingHeader = () => {
   const handleCloseResult = () => {
     setOpenResult(false);
     setInjectResult(null);
+    setAvailableLaunch(true);
   };
 
   return (
@@ -164,7 +167,7 @@ const AtomicTestingHeader = () => {
         color="info"
         onClick={() => setOpen(true)}
         sx={{ width: 120, height: 40 }}
-        disabled={!atomic.atomic_targets || !(atomic.atomic_targets.length > 0)}
+        disabled={!atomic.atomic_targets || !(atomic.atomic_targets.length > 0) || !availableLaunch}
       >
         {t('Launch')}
       </Button>

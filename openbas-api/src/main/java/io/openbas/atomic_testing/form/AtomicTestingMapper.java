@@ -26,7 +26,8 @@ public class AtomicTestingMapper {
         .title(inject.getTitle())
         .type(inject.getType())
         .contract(inject.getContract())
-        .lastExecutionDate(getLastExecutionDate(inject))
+        .lastExecutionStartDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))
+        .lastExecutionEndDate(getLastExecutionEndDate(inject))
         .targets(getTargets(inject.getExpectations()))
         .status(inject.getStatus().map(InjectStatus::getName).orElse(ExecutionStatus.DRAFT))
         .expectationResultByTypes(getExpectations(inject.getExpectations()))
@@ -63,8 +64,8 @@ public class AtomicTestingMapper {
         .toList();
   }
 
-  private static Instant getLastExecutionDate(final Inject inject) {
-    return inject.getStatus().map(InjectStatus::getTrackingEndDate).orElseGet(inject::getUpdatedAt);
+  private static Instant getLastExecutionEndDate(final Inject inject) {
+    return inject.getStatus().map(InjectStatus::getTrackingEndDate).orElse(null);
   }
 
   private static List<InjectTargetWithResult> getTargets(final List<InjectExpectation> expectations) {

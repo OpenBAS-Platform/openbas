@@ -36,7 +36,6 @@ const useStyles = makeStyles(() => ({
     fontSize: '0.7rem',
     position: 'absolute',
     bottom: 'calc(60%)',
-    left: 'calc(-25%)',
   },
   icon: {
     position: 'absolute',
@@ -50,11 +49,15 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   injectId: string,
+  lastExecutionStartDate: string,
+  lastExecutionEndDate: string,
   target: InjectTargetWithResult,
 }
 
 const TargetResultsDetail: FunctionComponent<Props> = ({
   injectId,
+  lastExecutionStartDate,
+  lastExecutionEndDate,
   target,
 }) => {
   const classes = useStyles();
@@ -76,15 +79,22 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     }
   }, [target]);
 
-  const CustomConnector = ({ date, index }) => {
+  const CustomConnector = ({ index }) => {
     if (!index || index === 0) {
       return null;
     }
+    const dateToDisplay = index === 1 ? lastExecutionStartDate : lastExecutionEndDate;
+    const leftPosition = steps.length === 4
+      ? 'calc(-25%)'
+      : steps.length > 4
+        ? 'calc(-30%)'
+        : 'calc(-20%)';
+
     return (
       <>
         <hr className={classes.connector}/>
-        <Typography variant="body2" className={classes.connectorLabel}>
-          {nsdt(date)}
+        <Typography variant="body2" className={classes.connectorLabel} style={{ left: leftPosition }}>
+          {dateToDisplay && nsdt(dateToDisplay)}
         </Typography>
       </>
     );
@@ -218,7 +228,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
                   </div>
                 )}
               />
-              <CustomConnector date={'04-04-2024'} index={index}/>
+              <CustomConnector index={index}/>
             </Step>
           ))}
         </Stepper>

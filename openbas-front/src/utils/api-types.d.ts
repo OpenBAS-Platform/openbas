@@ -103,6 +103,13 @@ export interface AssetGroupInput {
   asset_group_tags?: string[];
 }
 
+export interface AtomicTestingDetailOutput {
+  /** Status */
+  atomic_status: string;
+  /** Title */
+  atomic_title: string;
+}
+
 export interface AtomicTestingInput {
   inject_all_teams?: boolean;
   inject_asset_groups?: string[];
@@ -125,10 +132,15 @@ export interface AtomicTestingOutput {
   /** Id */
   atomic_id: string;
   /**
-   * Last Execution date
+   * Last Execution End date
    * @format date-time
    */
-  atomic_last_execution_date: string;
+  atomic_last_execution_end_date: string;
+  /**
+   * Last Execution Start date
+   * @format date-time
+   */
+  atomic_last_execution_start_date: string;
   /** Status of execution */
   atomic_status: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   /**
@@ -140,11 +152,6 @@ export interface AtomicTestingOutput {
   atomic_title: string;
   /** Type */
   atomic_type: string;
-}
-
-export interface AtomicTestingSimpleInput {
-  /** Title */
-  atomic_title: string;
 }
 
 export interface AttackPattern {
