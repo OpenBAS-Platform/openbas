@@ -309,12 +309,12 @@ const AtomicTestings = () => {
                   <>
                     {fields.map((field) => (
                       <div
-                        key={field.name}
-                        className={classes.bodyItem}
-                        style={inlineStyles[field.name]}
-                      >
-                        {field.value(atomicTesting)}
-                      </div>
+                          key={field.name}
+                          className={classes.bodyItem}
+                          style={inlineStyles[field.name]}
+                        >
+                          {field.value(atomicTesting)}
+                        </div>
                     ))}
                   </>
                       }

@@ -63,6 +63,7 @@ public class Executor {
         status.setInject(inject);
         try {
             String jsonInject = mapper.writeValueAsString(executableInject);
+            status.setName(ExecutionStatus.PENDING);
             InjectStatus savedStatus = injectStatusRepository.save(status);
             queueService.publish(inject.getType(), jsonInject);
             return savedStatus;

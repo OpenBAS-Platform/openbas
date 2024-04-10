@@ -43,10 +43,9 @@ const AtomicTesting = () => {
   const dispatch = useAppDispatch();
   const { atomicId } = useParams() as { atomicId: AtomicTestingOutput['atomic_id'] };
 
-  const [sortedTargets, setSortedTargets] = useState<InjectTargetWithResult[]>([]);
   const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
 
-  const filtering = useSearchAnFilter('target', 'name');
+  const filtering = useSearchAnFilter('', 'name', ['name']);
 
   // Fetching data
   const { atomic }: {
@@ -62,9 +61,10 @@ const AtomicTesting = () => {
   useEffect(() => {
     if (atomic && atomic.atomic_targets) {
       setSelectedTarget(atomic.atomic_targets[0]);
-      setSortedTargets(atomic.atomic_targets);
     }
   }, [atomic]);
+
+  const sortedTargets: AtomicTestingOutput[] = filtering.filterAndSort(atomic.atomic_targets);
 
   // handles
   const handleTargetClick = (target) => {
@@ -82,8 +82,8 @@ const AtomicTesting = () => {
         <Grid item xs={5} style={{ paddingBottom: 24 }}>
           <div style={{ padding: 10 }}>
             <SearchFilter
-              small
               fullWidth
+              small
               onChange={filtering.handleSearch}
               keyword={filtering.keyword}
               placeholder={'Search by target name'}
@@ -99,19 +99,19 @@ const AtomicTesting = () => {
                   >
                     <ListItemText
                       primary={
-                        <div>
-                          <div className={classes.bodyTarget} style={{ width: '30%' }}>
-                            {`${target?.name}`}
-                            <span style={{ color: 'gray', marginLeft: 10 }}>
-                              [{t(target?.targetType.toLowerCase())}]
-                            </span>
+                          <div>
+                            <div className={classes.bodyTarget} style={{ width: '30%' }}>
+                              {`${target?.name}`}
+                              <span style={{ color: 'gray', marginLeft: 10 }}>
+                                [{t(target?.targetType.toLowerCase())}]
+                              </span>
+                            </div>
+                            <div style={{ float: 'right' }}>
+                              <AtomicTestingResult
+                                expectations={target?.expectationResultsByTypes}
+                              />
+                            </div>
                           </div>
-                          <div style={{ float: 'right' }}>
-                            <AtomicTestingResult
-                              expectations={target?.expectationResultsByTypes}
-                            />
-                          </div>
-                        </div>
                               }
                     />
                   </ListItemButton>
