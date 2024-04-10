@@ -4,8 +4,8 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import InjectDefinition from '../../components/injects/InjectDefinition';
-import { InjectContext, PermissionsContext } from '../../components/Context';
-import type { AtomicTestingInput, ScenarioInput, Tag } from '../../../../utils/api-types';
+import { AtomicTestingContext, InjectContext, PermissionsContext } from '../../components/Context';
+import type { AtomicTestingInput, Tag } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import { Contract } from '../../../../utils/api-types';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
@@ -39,7 +39,7 @@ const CreationInjectType: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const { permissions } = useContext(PermissionsContext);
   const { onUpdateInject } = useContext(InjectContext);
-  const { onCreateAtomicTest } = useContext(InjectContext);
+  const { onAddAtomicTesting } = useContext(AtomicTestingContext);
   const [setSelectedInject] = useState(null);
   const { injectTypesMap, tagsMap }: {
     injectTypesMap: Record<string, Contract>,
@@ -110,7 +110,7 @@ const CreationInjectType: FunctionComponent<Props> = ({
         usersNumber={0}
         teamsUsers={0}
         creation={true}
-        createAtomicTest={onCreateAtomicTest}
+        createAtomicTest={onAddAtomicTesting}
       />
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button
