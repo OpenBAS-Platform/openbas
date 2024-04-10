@@ -2,8 +2,8 @@ package io.openbas.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ExecutionStatus;
-import io.openbas.atomic_testing.form.AtomicTestingMapper.ExpectationResultsByType;
-import io.openbas.atomic_testing.form.AtomicTestingMapper.InjectTargetWithResult;
+import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
+import io.openbas.atomic_testing.AtomicTestingMapper.InjectTargetWithResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;

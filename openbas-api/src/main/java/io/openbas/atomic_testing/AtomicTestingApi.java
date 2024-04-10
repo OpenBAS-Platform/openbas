@@ -2,7 +2,6 @@ package io.openbas.atomic_testing;
 
 import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
 import io.openbas.atomic_testing.form.AtomicTestingInput;
-import io.openbas.atomic_testing.form.AtomicTestingMapper;
 import io.openbas.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.atomic_testing.form.SimpleExpectationResultOutput;
 import io.openbas.database.model.InjectStatus;
@@ -38,6 +37,7 @@ public class AtomicTestingApi extends RestBehavior {
   public void setInjectExpectationService(InjectExpectationService injectExpectationService) {
     this.injectExpectationService = injectExpectationService;
   }
+
 
   @GetMapping()
   public List<AtomicTestingOutput> findAllAtomicTestings() {

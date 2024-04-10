@@ -1,5 +1,8 @@
-package io.openbas.atomic_testing.form;
+package io.openbas.atomic_testing;
 
+import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
+import io.openbas.atomic_testing.form.AtomicTestingOutput;
+import io.openbas.atomic_testing.form.SimpleExpectationResultOutput;
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
@@ -62,6 +65,24 @@ public class AtomicTestingMapper {
         .map(AtomicTestingMapper::toTargetResultDto)
         .peek(dto -> dto.setTargetId(targetId))
         .toList();
+  }
+
+  public static AtomicTestingDetailOutput toDetailDto(Inject inject) {
+    return inject.getStatus().map(status ->
+        AtomicTestingDetailOutput
+            .builder()
+            .atomicId(inject.getId())
+            .status(status.getName())
+            .traces(status.getTraces().stream().map(trace -> trace.getStatus() + " " + trace.getMessage()).collect(Collectors.toList()))
+            .trackingAckDate(status.getTrackingAckDate())
+            .trackingSentDate(status.getTrackingSentDate())
+            .trackingEndDate(status.getTrackingEndDate())
+            .trackingTotalCount(status.getTrackingTotalCount())
+            .trackingTotalError(status.getTrackingTotalError())
+            .trackingTotalSuccess(status.getTrackingTotalSuccess())
+            .build()
+    ).orElse(AtomicTestingDetailOutput.builder().status(ExecutionStatus.DRAFT).build());
+
   }
 
   private static Instant getLastExecutionEndDate(final Inject inject) {
@@ -144,33 +165,23 @@ public class AtomicTestingMapper {
 
     List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
 
-    if (preventionScores.stream().anyMatch(Objects::isNull)) {
-      resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.PREVENTION, ExpectationStatus.UNKNOWN, Collections.emptyList()));
-    } else {
-      OptionalDouble avgPrevention = calculateAverageFromExpectations(preventionScores);
-      if (avgPrevention.isPresent()) {
-        resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.PREVENTION, getResult(avgPrevention), getResultDetail(ExpectationType.PREVENTION, preventionScores)));
-      }
-    }
+    getExpectationByType(ExpectationType.PREVENTION, preventionScores).map(resultAvgOfExpectations::add);
+    getExpectationByType(ExpectationType.DETECTION, detectionScores).map(resultAvgOfExpectations::add);
+    getExpectationByType(ExpectationType.HUMAN_RESPONSE, humanScores).map(resultAvgOfExpectations::add);
 
-    if (detectionScores.stream().anyMatch(Objects::isNull)) {
-      resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.DETECTION, ExpectationStatus.UNKNOWN, Collections.emptyList()));
-    } else {
-      OptionalDouble avgDetection = calculateAverageFromExpectations(detectionScores);
-      if (avgDetection.isPresent()) {
-        resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.DETECTION, getResult(avgDetection), getResultDetail(ExpectationType.DETECTION, detectionScores)));
-      }
-    }
-
-    if (humanScores.stream().anyMatch(Objects::isNull)) {
-      resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.HUMAN_RESPONSE, ExpectationStatus.UNKNOWN, Collections.emptyList()));
-    } else {
-      OptionalDouble avgHumanResponse = calculateAverageFromExpectations(humanScores);
-      if (avgHumanResponse.isPresent()) {
-        resultAvgOfExpectations.add(new ExpectationResultsByType(ExpectationType.HUMAN_RESPONSE, getResult(avgHumanResponse), getResultDetail(ExpectationType.HUMAN_RESPONSE, humanScores)));
-      }
-    }
     return resultAvgOfExpectations;
+  }
+
+  private static Optional<ExpectationResultsByType> getExpectationByType(ExpectationType type, List<Integer> scores) {
+    if (scores.stream().anyMatch(Objects::isNull)) {
+      return Optional.of(new ExpectationResultsByType(type, ExpectationStatus.UNKNOWN, Collections.emptyList()));
+    } else {
+      OptionalDouble avgResponse = calculateAverageFromExpectations(scores);
+      if (avgResponse.isPresent()) {
+        return Optional.of(new ExpectationResultsByType(type, getResult(avgResponse), getResultDetail(type, scores)));
+      }
+    }
+    return Optional.empty();
   }
 
   private static List<ResultDistribution> getResultDetail(ExpectationType type, List<Integer> normalizedScores) {
@@ -204,24 +215,6 @@ public class AtomicTestingMapper {
         .filter(Objects::nonNull)
         .mapToInt(Integer::intValue)
         .average();
-  }
-
-  public static AtomicTestingDetailOutput toDetailDto(Inject inject) {
-    return inject.getStatus().map(status ->
-        AtomicTestingDetailOutput
-            .builder()
-            .atomicId(inject.getId())
-            .status(status.getName())
-            .traces(status.getTraces().stream().map(trace -> trace.getStatus() + " " + trace.getMessage()).collect(Collectors.toList()))
-            .trackingAckDate(status.getTrackingAckDate())
-            .trackingSentDate(status.getTrackingSentDate())
-            .trackingEndDate(status.getTrackingEndDate())
-            .trackingTotalCount(status.getTrackingTotalCount())
-            .trackingTotalError(status.getTrackingTotalError())
-            .trackingTotalSuccess(status.getTrackingTotalSuccess())
-            .build()
-    ).orElse(AtomicTestingDetailOutput.builder().status(ExecutionStatus.DRAFT).build());
-
   }
 
 
