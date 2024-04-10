@@ -5,14 +5,17 @@ import { Grid, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
 import type { AtomicTestingDetailOutput } from '../../../../../utils/api-types';
 import type { AtomicTestingHelper } from '../../../../../actions/atomictestings/atomic-testing-helper';
 import { fetchAtomicTestingDetail } from '../../../../../actions/atomictestings/atomic-testing-actions';
 
 const useStyles = makeStyles(() => ({
-  container: {
-    padding: '20px',
+  paper: {
+    padding: 20,
+    marginBottom: 20,
+  },
+  listItem: {
+    marginBottom: 8,
   },
 }));
 
@@ -33,41 +36,46 @@ const Detail: FunctionComponent<Props> = () => {
   }, [dispatch, atomicId]);
 
   return (
-    <Grid container spacing={2} classes={{ root: classes.container }}>
+    <Grid container spacing={2}>
       <Grid item xs={12}>
-        <Paper elevation={3} style={{ padding: '20px', marginBottom: '20px' }}>
+        <Paper elevation={3} className={classes.paper}>
           {atomicdetail ? (
             <>
-              <Typography variant="h5">{atomicdetail.status_label}</Typography>
+              <Typography variant="h5" gutterBottom>
+                {atomicdetail.status_label}
+              </Typography>
               {atomicdetail.status_traces && (
-              <div>
+              <>
                 <Typography variant="subtitle1">Status Traces:</Typography>
                 <ul>
                   {atomicdetail.status_traces.map((trace, index) => (
-                    <li key={index}>{trace}</li>
+                    <li key={index} className={classes.listItem}>
+                          {trace}
+                        </li>
                   ))}
                 </ul>
-              </div>
+              </>
               )}
-              <Typography variant="body1">
+              <Typography variant="body1" gutterBottom>
                 Tracking Sent Date: {atomicdetail.tracking_sent_date || 'N/A'}
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body1" gutterBottom>
                 Tracking Ack Date: {atomicdetail.tracking_ack_date || 'N/A'}
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body1" gutterBottom>
                 Tracking End Date: {atomicdetail.tracking_end_date || 'N/A'}
               </Typography>
-              <Typography variant="body1">
-                Tracking Total Execution Time: {atomicdetail.tracking_total_execution_time || 'N/A'} ms
+              <Typography variant="body1" gutterBottom>
+                Tracking Total Execution
+                Time: {atomicdetail.tracking_total_execution_time || 'N/A'} ms
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body1" gutterBottom>
                 Tracking Total Count: {atomicdetail.tracking_total_count || 'N/A'}
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body1" gutterBottom>
                 Tracking Total Error: {atomicdetail.tracking_total_error || 'N/A'}
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body1" gutterBottom>
                 Tracking Total Success: {atomicdetail.tracking_total_success || 'N/A'}
               </Typography>
             </>
