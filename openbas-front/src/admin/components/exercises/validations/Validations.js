@@ -3,7 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
-import { FormControlLabel, List, ListItem, ListItemIcon, ListItemText, Slide, Switch } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemText, Slide } from '@mui/material';
 import AnimationMenu from '../AnimationMenu';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
@@ -43,7 +43,6 @@ const Validations = () => {
   const [tags, setTags] = useState([]);
   const { t, fndt } = useFormatter();
   const [keyword, setKeyword] = useState('');
-  const [onlyManual, setOnlyManual] = useState(true);
   const handleSearch = (value) => setKeyword(value);
   const handleAddTag = (value) => {
     if (value) {
@@ -80,14 +79,13 @@ const Validations = () => {
   const sort = R.sortWith([R.descend(R.prop('inject_expectation_created_at'))]);
   const sortedInjectExpectations = R.pipe(
     R.uniqBy(R.prop('injectexpectation_id')),
+    R.filter(((n) => R.isEmpty(n.inject_expectation_results))),
     R.map((n) => R.assoc(
       'inject_expectation_inject',
       injectsMap[n.inject_expectation_inject] || {},
       n,
     )),
-    R.filter((n) => (onlyManual
-      ? n.inject_expectation_type === 'MANUAL'
-      : n.injectexpectation_id !== null)),
+    R.filter((n) => n.inject_expectation_type === 'MANUAL'),
     R.filter(
       (n) => tags.length === 0
         || R.any(
@@ -152,17 +150,6 @@ const Validations = () => {
             onAddTag={handleAddTag}
             onRemoveTag={handleRemoveTag}
             currentTags={tags}
-          />
-        </div>
-        <div style={{ float: 'right' }}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={onlyManual}
-                onChange={() => setOnlyManual(!onlyManual)}
-              />
-            }
-            label={t('Only injects with manual validation')}
           />
         </div>
         <div className="clearfix" />
