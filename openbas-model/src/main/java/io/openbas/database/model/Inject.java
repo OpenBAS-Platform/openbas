@@ -228,13 +228,17 @@ public class Inject implements Base, Injection {
 
   @JsonProperty("inject_users_number")
   public long getNumberOfTargetUsers() {
-    if (this.allTeams) {
-      return getExercise().usersNumber();
+    Exercise exercise = getExercise();
+        if (exercise == null) {
+            return 0L;
+        }
+        if (this.allTeams) {
+            return getExercise().usersNumber();
+        }
+        return getTeams().stream()
+                .map(team -> team.getUsersNumberInExercise(getExercise()))
+                .reduce(Long::sum).orElse(0L);
     }
-    return getTeams().stream()
-        .map(team -> team.getUsersNumberInExercise(getExercise()))
-        .reduce(Long::sum).orElse(0L);
-  }
 
   @JsonIgnore
   public Instant computeInjectDate(Instant source, int speed) {

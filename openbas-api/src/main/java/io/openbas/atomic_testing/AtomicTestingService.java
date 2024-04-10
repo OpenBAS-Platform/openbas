@@ -8,6 +8,7 @@ import io.openbas.database.model.InjectDocument;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.DocumentRepository;
+import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.TeamRepository;
@@ -30,6 +31,7 @@ public class AtomicTestingService {
   private Executor executor;
   private ExecutionContextService executionContextService;
   private InjectRepository injectRepository;
+  private InjectDocumentRepository injectDocumentRepository;
   private UserRepository userRepository;
   private TeamRepository teamRepository;
   private TagRepository tagRepository;
@@ -48,6 +50,11 @@ public class AtomicTestingService {
   @Autowired
   public void setInjectRepository(InjectRepository injectRepository) {
     this.injectRepository = injectRepository;
+  }
+
+  @Autowired
+  public void setInjectDocumentRepository(InjectDocumentRepository injectDocumentRepository) {
+    this.injectDocumentRepository = injectDocumentRepository;
   }
 
   @Autowired
@@ -114,7 +121,7 @@ public class AtomicTestingService {
 
   @Transactional
   public void deleteAtomicTesting(String injectId) {
-    //TODO
+    injectDocumentRepository.deleteDocumentsFromInject(injectId);
     injectRepository.deleteById(injectId);
   }
 }

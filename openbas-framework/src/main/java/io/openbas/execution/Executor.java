@@ -67,6 +67,7 @@ public class Executor {
             queueService.publish(inject.getType(), jsonInject);
             return savedStatus;
         } catch (Exception e) {
+            status.setName(ExecutionStatus.ERROR);
             status.getTraces().add(InjectStatusExecution.traceError(e.getMessage()));
             return injectStatusRepository.save(status);
         }
