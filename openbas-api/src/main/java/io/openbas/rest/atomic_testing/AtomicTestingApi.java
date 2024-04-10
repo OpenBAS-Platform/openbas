@@ -1,8 +1,8 @@
-package io.openbas.rest.atomictesting;
+package io.openbas.rest.atomic_testing;
 
 import io.openbas.database.model.InjectStatus;
-import io.openbas.rest.atomictesting.form.AtomicTestingMapper;
-import io.openbas.rest.atomictesting.form.AtomicTestingOutput;
+import io.openbas.rest.atomic_testing.form.AtomicTestingMapper;
+import io.openbas.rest.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.InjectService;
 import java.util.List;

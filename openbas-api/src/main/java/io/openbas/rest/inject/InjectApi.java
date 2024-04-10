@@ -117,7 +117,6 @@ public class InjectApi extends RestBehavior {
     this.assetService = assetService;
   }
 
-
   @Autowired
   public void setAssetGroupService(@NotNull final AssetGroupService assetGroupService) {
     this.assetGroupService = assetGroupService;
@@ -136,11 +135,6 @@ public class InjectApi extends RestBehavior {
   @Autowired
   public void setInjectService(InjectService injectService) {
     this.injectService = injectService;
-  }
-
-  @Autowired
-  public void setContext(ApplicationContext context) {
-    this.context = context;
   }
 
   @Autowired

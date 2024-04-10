@@ -1,4 +1,4 @@
-package io.openbas.rest.atomictesting.form;
+package io.openbas.rest.atomic_testing.form;
 
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 
