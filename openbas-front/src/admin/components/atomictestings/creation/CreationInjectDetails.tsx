@@ -7,7 +7,7 @@ import InjectDefinition from '../../components/injects/InjectDefinition';
 import { AtomicTestingContext, InjectContext, PermissionsContext } from '../../components/Context';
 import type { AtomicTestingInput, Tag } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
-import { Contract } from '../../../../utils/api-types';
+import { InjectorContract } from '../../../../utils/api-types';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import type { TagsHelper } from '../../../../actions/helper';
 import { zodImplement } from '../../../../utils/Zod';
@@ -42,7 +42,7 @@ const CreationInjectType: FunctionComponent<Props> = ({
   const { onAddAtomicTesting } = useContext(AtomicTestingContext);
   const [setSelectedInject] = useState(null);
   const { injectTypesMap, tagsMap }: {
-    injectTypesMap: Record<string, Contract>,
+    injectTypesMap: Record<string, InjectorContract>,
     tagsMap: Record<string, Tag>,
   } = useHelper((helper: InjectHelper & TagsHelper) => ({
     injectTypesMap: helper.getInjectTypesMap(),

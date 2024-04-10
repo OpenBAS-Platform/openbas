@@ -165,12 +165,19 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
                             >
                               <ListItemText
                                 primary={<div className={classes.container}>
-                                  <span>
-                                    [{attackPattern.attack_pattern_external_id}]
-                                    {' - '}
-                                    {tPick(contract.injector_contract_labels)}
-                                  </span>
-                                  <Typography variant="h3" sx={{ m: 0 }}>{attackPattern.attack_pattern_name}</Typography>
+                                  <div>
+                                    {attackPattern
+                                      && <span>
+                                        [{attackPattern.attack_pattern_external_id}]
+                                        {' - '}
+                                      </span>
+                                    }
+                                    <span>
+                                      {tPick(contract.injector_contract_labels)}
+                                    </span>
+                                  </div>
+
+                                  <Typography variant="h3" sx={{ m: 0 }}>{attackPattern?.attack_pattern_name}</Typography>
                                 </div>}
                               />
                             </ListItemButton>
