@@ -191,7 +191,7 @@ const FullTextSearch = () => {
           {entries(results).map(([entity, result]) => (
             <Tab
               key={entity}
-              label={`${result.clazz} (${result.count})`}
+              label={`${t(result.clazz)} (${result.count})`}
               className={classes.tab}
             />
           ))}

@@ -6,20 +6,26 @@ import io.openbas.database.specification.SpecificationUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+import static io.openbas.utils.pagination.SortUtilsRuntime.toSortRuntime;
 import static org.springframework.util.StringUtils.hasText;
 
 @Component
@@ -52,9 +58,10 @@ public class FullTextSearchService<T extends Base> {
 
   public Page<FullTextSearchResult> fullTextSearch(
       @NotBlank final String clazz,
-      @Nullable final SearchPaginationInput searchPaginationInput) throws ClassNotFoundException {
-    if (searchPaginationInput == null) {
-      return Page.empty();
+      @NotNull final SearchPaginationInput searchPaginationInput) throws ClassNotFoundException {
+    if (!hasText(searchPaginationInput.getTextSearch())) {
+      Pageable pageable = PageRequest.of(searchPaginationInput.getPage(), searchPaginationInput.getSize(), toSortRuntime(searchPaginationInput.getSorts()));
+      return new PageImpl<>(Collections.emptyList(), pageable, 0);
     }
 
     Class<?> clazzUnknown = Class.forName(clazz);

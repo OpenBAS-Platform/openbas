@@ -215,6 +215,7 @@ const i18n = {
       File: 'Fichier',
       Simulations: 'Simulations',
       Simulation: 'Simulation',
+      Exercise: 'Simulation',
       Scenarios: 'Scenarios',
       Detection: 'Détection',
       Detections: 'Détections',
@@ -864,6 +865,7 @@ const i18n = {
       'Ip Address {index}': 'Ip Address {index}',
       phone_number_tooltip: 'Phone number should start with a plus sign ( + )\n'
         + 'It may contain white spaces or hyphens ( – ) or parenthesis.\n',
+      Exercise: 'Simulation',
       // -- FILTERS --
       // Endpoint
       endpoint_hostname: 'Hostname',
