@@ -81,7 +81,7 @@ public class InjectStatus implements Base {
   // endregion
 
   public static InjectStatus fromExecution(Execution execution, Inject executedInject) {
-    InjectStatus injectStatus = new InjectStatus();
+    InjectStatus injectStatus = executedInject.getStatus().orElse(new InjectStatus());
     injectStatus.setTrackingSentDate(Instant.now());
     injectStatus.setInject(executedInject);
     injectStatus.getTraces().addAll(execution.getTraces());

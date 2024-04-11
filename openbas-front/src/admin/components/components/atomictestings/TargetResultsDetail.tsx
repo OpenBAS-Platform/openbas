@@ -8,13 +8,14 @@ import type { AtomicTestingHelper } from '../../../../actions/atomictestings/ato
 import { fetchTargetResult } from '../../../../actions/atomictestings/atomic-testing-actions';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
+import type { Theme } from '../../../../components/Theme';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles<Theme>((theme) => ({
   circle: {
     width: '80px', // Adjust the width of the circle
     height: '80px', // Adjust the height of the circle
     borderRadius: '50%',
-    background: '#1e2330',
+    background: theme.palette.grey?.A700,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -32,7 +33,7 @@ const useStyles = makeStyles(() => ({
     zIndex: 0, // Ensure the line is behind the circles
   },
   connectorLabel: {
-    color: 'rgb(255,255,255)',
+    color: theme.palette.common,
     fontSize: '0.7rem',
     position: 'absolute',
     bottom: 'calc(60%)',
@@ -84,7 +85,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
       return null;
     }
     const dateToDisplay = index === 1 ? lastExecutionStartDate : lastExecutionEndDate;
-    const leftPosition = steps.length === 4
+    const leftPos = steps.length === 4
       ? 'calc(-25%)'
       : steps.length > 4
         ? 'calc(-30%)'
@@ -93,7 +94,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     return (
       <>
         <hr className={classes.connector}/>
-        <Typography variant="body2" className={classes.connectorLabel} style={{ left: leftPosition }}>
+        <Typography variant="body2" className={classes.connectorLabel} style={{ left: leftPos }}>
           {dateToDisplay && nsdt(dateToDisplay)}
         </Typography>
       </>

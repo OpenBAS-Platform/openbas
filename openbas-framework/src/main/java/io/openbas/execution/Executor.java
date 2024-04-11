@@ -64,11 +64,13 @@ public class Executor {
         try {
             String jsonInject = mapper.writeValueAsString(executableInject);
             status.setName(ExecutionStatus.PENDING);
+            //add trace pending with message
             InjectStatus savedStatus = injectStatusRepository.save(status);
             queueService.publish(inject.getType(), jsonInject);
             return savedStatus;
         } catch (Exception e) {
             status.setName(ExecutionStatus.ERROR);
+            //add trace error with message
             status.getTraces().add(InjectStatusExecution.traceError(e.getMessage()));
             return injectStatusRepository.save(status);
         }
@@ -96,11 +98,11 @@ public class Executor {
         }
         // Depending on injector type (internal or external) execution must be done differently
         Optional<Injector> externalInjector = injectorRepository.findByType(inject.getType());
-        if (externalInjector.isPresent()) {
-            return executeExternal(executableInject, inject);
-        } else {
-            return executeInternal(executableInject);
-        }
+
+        return externalInjector
+            .map(Injector::isExternal)
+            .map(isExternal -> isExternal ? executeExternal(executableInject, inject) : executeInternal(executableInject))
+            .orElseThrow(() -> new IllegalStateException("External injector not found for type: " + inject.getType()));
     }
 
     // region utils

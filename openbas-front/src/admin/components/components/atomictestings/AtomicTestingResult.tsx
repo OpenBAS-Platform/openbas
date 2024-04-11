@@ -1,7 +1,8 @@
 import React from 'react';
 import { HorizontalRule, SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import type { ExpectationResultsByType } from '../../../../utils/api-types';
+import type { Theme } from '../../../../components/Theme';
 
 const useStyles = makeStyles(() => ({
   inline: {
@@ -17,6 +18,7 @@ interface Props {
 
 const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
   const classes = useStyles();
+  const theme = useTheme<Theme>();
 
   const getColor = (result: string | undefined): string => {
     const colorMap: Record<string, string> = {
