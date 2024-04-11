@@ -236,7 +236,7 @@ public class Inject implements Base, Injection {
             return getExercise().usersNumber();
         }
         return getTeams().stream()
-                .map(team -> team.getUsersNumberInExercise(getExercise()))
+                .map(team -> team.getUsersNumberInExercise(getExercise().getId()))
                 .reduce(Long::sum).orElse(0L);
     }
 

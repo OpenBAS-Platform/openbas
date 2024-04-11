@@ -56,12 +56,11 @@ public class ChannelExecutor extends Injector {
     this.emailService = emailService;
   }
 
-  private String buildArticleUri(ExecutionContext context, Article article) {
+  private String buildArticleUri(ExecutionContext context, Article article, String idForUrl) {
     String userId = context.getUser().getId();
     String channelId = article.getChannel().getId();
-    String exerciseId = article.getExercise().getId();
     String queryOptions = "article=" + article.getId() + "&user=" + userId;
-    return openBASConfig.getBaseUrl() + "/channels/" + exerciseId + "/" + channelId + "?" + queryOptions;
+    return openBASConfig.getBaseUrl() + "/channels/" + idForUrl + "/" + channelId + "?" + queryOptions;
   }
 
   @Override
@@ -78,8 +77,9 @@ public class ChannelExecutor extends Injector {
         Exercise exercise = injection.getInjection().getExercise();
         // Send the publication message.
         if (content.isEmailing()) {
-          String from = exercise.getFrom();
-          List<String> replyTos = exercise.getReplyTos();
+          String from = exercise != null ? exercise.getFrom() : this.openBASConfig.getDefaultMailer();
+          List<String> replyTos = exercise != null ? exercise.getReplyTos() : List.of(this.openBASConfig.getDefaultReplyTo());
+          String idToChannelUrl = exercise != null ? exercise.getId() : injection.getInjection().getInject().getId();
           List<ExecutionContext> users = injection.getUsers();
           List<Document> documents = injection.getInjection().getInject().getDocuments().stream()
               .filter(InjectDocument::isAttached).map(InjectDocument::getDocument).toList();
@@ -91,7 +91,7 @@ public class ChannelExecutor extends Injector {
               // Put the challenges variables in the injection context
               List<ArticleVariable> articleVariables = articles.stream()
                   .map(article -> new ArticleVariable(article.getId(), article.getName(),
-                      buildArticleUri(userInjectContext, article)))
+                      buildArticleUri(userInjectContext, article, idToChannelUrl)))
                   .toList();
               userInjectContext.put(VARIABLE_ARTICLES, articleVariables);
               // Send the email.

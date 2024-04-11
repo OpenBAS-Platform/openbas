@@ -9,10 +9,15 @@ const getStatusStyles = (status: string) => {
         backgroundColor: 'rgba(244, 67, 54, 0.08)',
         color: '#f44336',
       };
-    case 'PENDING':
+    case 'PARTIAL':
       return {
         backgroundColor: 'rgba(245,174,92,0.18)',
         color: '#f5a353',
+      };
+    case 'PENDING':
+      return {
+        backgroundColor: 'rgba(178,176,176,0.38)',
+        color: '#b0b0b0',
       };
     case 'SUCCESS':
       return {

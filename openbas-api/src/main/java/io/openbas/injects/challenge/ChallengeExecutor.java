@@ -50,11 +50,10 @@ public class ChallengeExecutor extends Injector {
         this.emailService = emailService;
     }
 
-    private String buildChallengeUri(ExecutionContext context, Exercise exercise, Challenge challenge) {
+    private String buildChallengeUri(ExecutionContext context, String idForUrl, Challenge challenge) {
         String userId = context.getUser().getId();
         String challengeId = challenge.getId();
-        String exerciseId = exercise.getId();
-        return openBASConfig.getBaseUrl() + "/challenges/" + exerciseId + "?user=" + userId + "&challenge=" + challengeId;
+        return openBASConfig.getBaseUrl() + "/challenges/" + idForUrl + "?user=" + userId + "&challenge=" + challengeId;
     }
 
     @Override
@@ -70,8 +69,9 @@ public class ChallengeExecutor extends Injector {
                 execution.addTrace(traceSuccess(publishedMessage));
                 // Send the publication message.
                 Exercise exercise = injection.getInjection().getExercise();
-                String from = exercise.getFrom();
-                List<String> replyTos = exercise.getReplyTos();
+                String from = exercise != null ? exercise.getFrom() : this.openBASConfig.getDefaultMailer();
+                List<String> replyTos = exercise != null ? exercise.getReplyTos() : List.of(this.openBASConfig.getDefaultReplyTo());
+                String idToChallengeUrl = exercise != null ? exercise.getId() : injection.getInjection().getInject().getId();
                 List<ExecutionContext> users = injection.getUsers();
                 List<Document> documents = injection.getInjection().getInject().getDocuments().stream()
                         .filter(InjectDocument::isAttached).map(InjectDocument::getDocument).toList();
@@ -83,7 +83,7 @@ public class ChallengeExecutor extends Injector {
                         // Put the challenges variables in the injection context
                         List<ChallengeVariable> challengeVariables = challenges.stream()
                                 .map(challenge -> new ChallengeVariable(challenge.getId(), challenge.getName(),
-                                        buildChallengeUri(userInjectContext, exercise, challenge)))
+                                        buildChallengeUri(userInjectContext, idToChallengeUrl, challenge)))
                                 .toList();
                         userInjectContext.put("challenges", challengeVariables);
                         // Send the email.

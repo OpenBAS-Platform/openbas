@@ -1,5 +1,8 @@
 package io.openbas.execution;
 
+import static io.openbas.database.model.InjectStatusExecution.traceError;
+import static io.openbas.database.model.InjectStatusExecution.traceInfo;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Injector;
 import io.openbas.database.model.*;
@@ -63,14 +66,13 @@ public class Executor {
         status.setInject(inject);
         try {
             String jsonInject = mapper.writeValueAsString(executableInject);
-            status.setName(ExecutionStatus.PENDING);
-            //add trace pending with message
+            status.setName(ExecutionStatus.PENDING);//Fixme We need this status?
+            status.getTraces().add(traceInfo("The inject has been published and is now waiting to be consumed."));
             InjectStatus savedStatus = injectStatusRepository.save(status);
             queueService.publish(inject.getType(), jsonInject);
             return savedStatus;
         } catch (Exception e) {
-            status.setName(ExecutionStatus.ERROR);
-            //add trace error with message
+            status.setName(ExecutionStatus.ERROR); //Fixme
             status.getTraces().add(InjectStatusExecution.traceError(e.getMessage()));
             return injectStatusRepository.save(status);
         }
