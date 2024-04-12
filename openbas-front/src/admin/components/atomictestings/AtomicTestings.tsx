@@ -234,7 +234,12 @@ const AtomicTestings = () => {
             <CSVLink
               data={exportData(
                 'atomic-testing',
-                fields.map((field) => field.name),
+                [
+                  'atomic_title',
+                  'atomic_type',
+                  'atomic_last_start_execution_date',
+                  'atomic_status',
+                ],
                 sortedAtomicTestings,
               )}
               filename={'AtomicTestings.csv'}
@@ -309,12 +314,12 @@ const AtomicTestings = () => {
                   <>
                     {fields.map((field) => (
                       <div
-                          key={field.name}
-                          className={classes.bodyItem}
-                          style={inlineStyles[field.name]}
-                        >
-                          {field.value(atomicTesting)}
-                        </div>
+                        key={field.name}
+                        className={classes.bodyItem}
+                        style={inlineStyles[field.name]}
+                      >
+                        {field.value(atomicTesting)}
+                      </div>
                     ))}
                   </>
                       }
