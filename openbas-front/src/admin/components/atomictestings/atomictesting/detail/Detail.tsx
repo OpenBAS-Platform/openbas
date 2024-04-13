@@ -28,11 +28,11 @@ const Detail: FunctionComponent<Props> = () => {
   const { atomicdetail }: {
     atomicdetail: AtomicTestingDetailOutput,
   } = useHelper((helper: AtomicTestingHelper) => ({
-    atomicdetail: helper.getAtomicTestingDetail(atomicId),
+    atomicdetail: helper.getAtomicTestingDetail(atomicId!),
   }));
 
   useEffect(() => {
-    dispatch(fetchAtomicTestingDetail(atomicId));
+    dispatch(fetchAtomicTestingDetail(atomicId!));
   }, [dispatch, atomicId]);
 
   return (
@@ -41,7 +41,7 @@ const Detail: FunctionComponent<Props> = () => {
         {atomicdetail ? (
           <>
             <Paper elevation={3} className={classes.paper}>
-              <Typography variant="title" gutterBottom>
+              <Typography variant="h2" gutterBottom>
                 Status : {atomicdetail.status_label}
               </Typography>
               {atomicdetail.status_traces && (

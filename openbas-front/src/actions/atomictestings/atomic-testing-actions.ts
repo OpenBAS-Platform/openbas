@@ -3,7 +3,7 @@ import * as schema from '../Schema';
 import { arrayOfAtomicTestings, atomicTesting, atomicTestingDetail } from './atomic-testing-schema';
 import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
 import { arrayOftargetResults } from './target-result-schema';
-import { AtomicTestingInput } from '../../utils/api-types';
+import type { AtomicTestingInput } from '../../utils/api-types';
 
 const ATOMIC_TESTING_URI = '/api/atomic_testings';
 
@@ -43,18 +43,5 @@ export const fetchTargetResult = (injectId: string, targetId: string, targetType
 };
 
 export const createAtomicTesting = (data: AtomicTestingInput) => (dispatch: Dispatch) => {
-  /* const body: AtomicTestingInput = {
-    inject_title: 'Test inject from back',
-    inject_description: 'Test with add from back',
-    inject_type: 'openbas_email',
-    inject_contract: '138ad8f8-32f8-4a22-8114-aaa12322bd09',
-    inject_content: {
-      expectations: [],
-      subject: 'resfsdfdsfs',
-      body: '<p>fcfd</p>',
-      encrypted: false,
-    },
-  };
-  return postReferential(schema.inject, ATOMIC_TESTING_URI, body)(dispatch); */
-  return postReferential(atomicTesting, ATOMIC_TESTING_URI, data)(dispatch);
+return postReferential(atomicTesting, ATOMIC_TESTING_URI, data)(dispatch);
 };

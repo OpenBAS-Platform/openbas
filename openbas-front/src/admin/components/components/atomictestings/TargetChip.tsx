@@ -19,10 +19,10 @@ const useStyles = makeStyles(() => ({
     borderColor: 'rgb(134,134,134)',
     border: '1px  solid',
     background: 'rgba(255,255,255,0.16)',
-    maxWidth: '100%', // Allow chips to take up full width
-    whiteSpace: 'nowrap', // Prevent chip text from wrapping
-    overflow: 'hidden', // Hide overflow text
-    textOverflow: 'ellipsis', // Display ellipsis (...) for truncated text
+    maxWidth: '100%',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
 }));
 
@@ -37,11 +37,11 @@ const TargetChip: FunctionComponent<Props> = ({
   const classes = useStyles();
 
   // Extract the first two targets as visible chips
-  const visibleTargets = targets.slice(0, 2);
+  const visibleTargets = targets?.slice(0, 2);
 
   // Calculate the number of remaining targets
   const remainingTargets = targets?.slice(2, targets?.length).map((target) => target.name).join(', ');
-  const remainingTargetsCount = targets.length - visibleTargets.length;
+  const remainingTargetsCount = (targets && visibleTargets && targets.length - visibleTargets.length);
 
   if (!targets || targets.length === 0) {
     return <HorizontalRule/>;
@@ -57,29 +57,29 @@ const TargetChip: FunctionComponent<Props> = ({
 
   const getIcon = (type: string) => {
     if (type === 'ASSETS') {
-      return <DevicesOtherOutlined fontSize="1rem"/>;
+      return <DevicesOtherOutlined style={{ fontSize: '1rem' }}/>;
     }
     if (type === 'ASSETS_GROUPS') {
-      return <SelectGroup fontSize="1rem"/>;
+      return <SelectGroup style={{ fontSize: '1rem' }}/>;
     }
-    return <Groups3Outlined fontSize="1rem"/>; // Teams
+    return <Groups3Outlined style={{ fontSize: '1rem' }}/>; // Teams
   };
 
   return (
     <div className={classes.inline}>
-      {visibleTargets.map((target, index) => (
+      {visibleTargets && visibleTargets.map((target, index) => (
         <span key={index}>
           <Tooltip title={target.name}>
             <Chip
               key={target.id}
               className={classes.target}
-              icon={getIcon(target.targetType)}
-              label={truncateText(target.name, 5)}
+              icon={getIcon(target.targetType!)}
+              label={truncateText(target.name!, 5)}
             />
           </Tooltip>
         </span>
       ))}
-      {remainingTargetsCount > 0 && (
+      {remainingTargetsCount && remainingTargetsCount > 0 && (
         <Tooltip title={remainingTargets}>
           <Chip
             className={classes.target}

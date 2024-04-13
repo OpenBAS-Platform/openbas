@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import { Chip } from '@mui/material';
 import { useFormatter } from '../../../../components/i18n';
 
@@ -32,11 +32,11 @@ const getStatusStyles = (status: string) => {
   }
 };
 
-const StatusChip = ({ status }) => {
+const StatusChip = ({ status }: { status: string }) => {
   const { t } = useFormatter();
   const statusStyles = getStatusStyles(status);
 
-  const chipStyles = {
+  const chipStyles: CSSProperties = {
     fontSize: 12,
     lineHeight: '12px',
     height: 25,

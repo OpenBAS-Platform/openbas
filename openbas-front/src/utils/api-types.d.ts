@@ -106,7 +106,7 @@ export interface AssetGroupInput {
 export interface AtomicTestingDetailOutput {
   atomic_id?: string;
   status_label?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
-  status_traces?: InjectStatusExecution[];
+  status_traces?: string[];
   /** @format date-time */
   tracking_ack_date?: string;
   /** @format date-time */

@@ -1,11 +1,12 @@
 import Chart from 'react-apexcharts';
 import React, { FunctionComponent } from 'react';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import { Box, Typography } from '@mui/material';
 import { SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
-import type { ExpectationResultsByType } from '../../../../utils/api-types';
+import type { ExpectationResultsByType, ResultDistribution } from '../../../../utils/api-types';
 import Empty from '../../../../components/Empty';
+import type { Theme } from '../../../../components/Theme';
 
 const useStyles = makeStyles(() => ({
   inline: {
@@ -44,6 +45,7 @@ const ResponsePie: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
+  const theme = useTheme<Theme>();
 
   // Sytle
   const getColor = (result: string | undefined): string => {
@@ -56,7 +58,7 @@ const ResponsePie: FunctionComponent<Props> = ({
     return colorMap[result ?? ''] ?? 'rgb(220, 81, 72)';
   };
 
-  const getChartIcon = (type) => {
+  const getChartIcon = (type: 'PREVENTION' | 'DETECTION' | 'HUMAN_RESPONSE' | undefined) => {
     switch (type) {
       case 'PREVENTION':
         return <Shield className={classes.iconOverlay}/>;
@@ -67,8 +69,8 @@ const ResponsePie: FunctionComponent<Props> = ({
     }
   };
 
-  const getTotal = (distribution) => {
-    return distribution.reduce((sum, item) => sum + item.value, 0);
+  const getTotal = (distribution: ResultDistribution[]) => {
+    return distribution.reduce((sum, item) => sum + (item.value!), 0)!;
   };
 
   const chartOptions: ApexCharts.ApexOptions = {
@@ -86,7 +88,7 @@ const ResponsePie: FunctionComponent<Props> = ({
       position: 'bottom',
       show: true,
       labels: {
-        colors: ['rgb(202,203,206)', 'rgb(202,203,206)'],
+        colors: theme.palette.mode === 'dark' ? ['rgb(202,203,206)', 'rgb(202,203,206)'] : [],
       },
     },
     stroke: {
@@ -111,10 +113,10 @@ const ResponsePie: FunctionComponent<Props> = ({
                 key={index}
                 options={{
                   ...chartOptions,
-                  labels: expectation.distribution.map((e) => `${t(e.label)} (${((e.value / getTotal(expectation.distribution)) * 100).toFixed(1)}%)`),
+                  labels: expectation.distribution.map((e) => `${t(e.label)} (${(((e.value!) / getTotal(expectation.distribution!)) * 100).toFixed(1)}%)`),
                   colors: expectation.distribution.map((e) => getColor(e.label)),
                 }}
-                series={expectation.distribution.map((e) => e.value)}
+                series={expectation.distribution.map((e) => (e.value!))}
                 type="donut"
                 width="100%"
                 height="100%"

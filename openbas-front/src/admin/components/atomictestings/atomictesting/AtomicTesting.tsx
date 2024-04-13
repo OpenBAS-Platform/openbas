@@ -64,10 +64,10 @@ const AtomicTesting = () => {
     }
   }, [atomic]);
 
-  const sortedTargets: AtomicTestingOutput[] = filtering.filterAndSort(atomic.atomic_targets);
+  const sortedTargets: InjectTargetWithResult[] = filtering.filterAndSort(atomic.atomic_targets);
 
   // handles
-  const handleTargetClick = (target) => {
+  const handleTargetClick = (target: InjectTargetWithResult) => {
     setSelectedTarget(target);
   };
 
@@ -91,32 +91,30 @@ const AtomicTesting = () => {
           </div>
           {sortedTargets.length > 0 ? (
             <List style={{ paddingTop: 10 }}>
-              {sortedTargets.map((target) => (
-                <Paper elevation={3} style={{ marginBottom: 10 }} key={target?.id}>
-                  <ListItemButton
-                    key={target?.id}
-                    onClick={() => handleTargetClick(target)}
-                  >
-                    <ListItemText
-                      primary={
-                          <div>
-                            <div className={classes.bodyTarget} style={{ width: '30%' }}>
-                              {`${target?.name}`}
-                              <span style={{ color: 'gray', marginLeft: 10 }}>
-                                [{t(target?.targetType.toLowerCase())}]
-                              </span>
-                            </div>
-                            <div style={{ float: 'right' }}>
-                              <AtomicTestingResult
-                                expectations={target?.expectationResultsByTypes}
-                              />
-                            </div>
-                          </div>
-                              }
-                    />
-                  </ListItemButton>
-                </Paper>
-              ))}
+              {sortedTargets.map((target) => <Paper elevation={3} style={{ marginBottom: 10 }} key={target?.id}>
+                <ListItemButton
+                  key={target?.id}
+                  onClick={() => handleTargetClick(target)}
+                >
+                  <ListItemText
+                    primary={
+                      <div>
+                        <div className={classes.bodyTarget} style={{ width: '30%' }}>
+                          {`${target?.name}`}
+                          <span style={{ color: 'gray', marginLeft: 10 }}>
+                            [{t(target?.targetType?.toLowerCase())}]
+                          </span>
+                        </div>
+                        <div style={{ float: 'right' }}>
+                          <AtomicTestingResult
+                            expectations={target?.expectationResultsByTypes}
+                          />
+                        </div>
+                      </div>
+                            }
+                  />
+                </ListItemButton>
+              </Paper>)}
             </List>
           ) : (
             <Empty message={t('No targets available')}/>
@@ -125,8 +123,8 @@ const AtomicTesting = () => {
         <Grid item xs={7} style={{ paddingBottom: 24 }}>
           <Paper variant="outlined" classes={{ root: classes.resultDetail }}>
             {selectedTarget && <TargetResultsDetail target={selectedTarget} injectId={atomicId}
-              lastExecutionStartDate={atomic.atomic_last_execution_start_date}
-              lastExecutionEndDate={atomic.atomic_last_execution_end_date}
+              lastExecutionStartDate={atomic.atomic_last_execution_start_date || ''}
+              lastExecutionEndDate={atomic.atomic_last_execution_end_date || ''}
                                />}
             {!selectedTarget && (
               <div style={{

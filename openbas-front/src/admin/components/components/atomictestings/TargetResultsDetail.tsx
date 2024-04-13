@@ -10,12 +10,18 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 
+interface Steptarget {
+  label: string;
+  type?: string;
+  status?: string;
+}
+
 const useStyles = makeStyles<Theme>((theme) => ({
   circle: {
-    width: '80px', // Adjust the width of the circle
-    height: '80px', // Adjust the height of the circle
+    width: '80px',
+    height: '80px',
     borderRadius: '50%',
-    background: theme.palette.grey?.A700,
+    background: theme.palette.mode === 'dark' ? 'rgb(202,203,206)' : 'rgba(202,203,206,0.33)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -25,12 +31,12 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   connector: {
     position: 'absolute',
-    top: '40%', // Position the line vertically in the middle of the circle
+    top: '40%',
     right: 'calc(50% + 40px)',
-    height: '1px', // Adjust the height of the line
-    width: 'calc(100% - 80px)', // Adjust the width of the line
-    background: 'blue', // Adjust the background color of the line
-    zIndex: 0, // Ensure the line is behind the circles
+    height: '1px',
+    width: 'calc(100% - 80px)',
+    background: 'blue',
+    zIndex: 0,
   },
   connectorLabel: {
     color: theme.palette.common,
@@ -65,26 +71,31 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   const { nsdt, t } = useFormatter();
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState(0);
-  const [steps, setSteps] = useState([]);
+  const [steps, setSteps] = useState<Steptarget[]>([]);
   // Fetching data
   const { targetresults }: {
     targetresults: SimpleExpectationResultOutput[],
   } = useHelper((helper: AtomicTestingHelper) => ({
-    targetresults: helper.getTargetResults(target.id, injectId),
+    targetresults: helper.getTargetResults(target.id!, injectId),
   }));
 
   useEffect(() => {
     if (target) {
-      dispatch(fetchTargetResult(injectId, target.id, target.targetType));
+      dispatch(fetchTargetResult(injectId, target.id!, target.targetType!));
       setActiveTab(0);
     }
   }, [target]);
 
-  const CustomConnector = ({ index }) => {
+  interface CustomConnectorProps {
+    index: number;
+  }
+
+  const CustomConnector: React.FC<CustomConnectorProps> = ({ index }: CustomConnectorProps) => {
     if (!index || index === 0) {
       return null;
     }
     const dateToDisplay = index === 1 ? lastExecutionStartDate : lastExecutionEndDate;
+    // eslint-disable-next-line no-nested-ternary
     const leftPos = steps.length === 4
       ? 'calc(-25%)'
       : steps.length > 4
@@ -101,11 +112,10 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     );
   };
 
-  const getStatusLabel = (type, status) => {
+  const getStatusLabel = (type: string, status: string) => {
     if (status === 'UNKNOWN') {
       return 'Unknown Data';
     }
-
     switch (type) {
       case 'PREVENTION':
         return status === 'VALIDATED' ? 'Attack Blocked' : 'Attack Unblocked';
@@ -118,7 +128,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     }
   };
 
-  const getCircleColor = (status) => {
+  const getCircleColor = (status: string) => {
     let color;
     let background;
     switch (status) {
@@ -130,7 +140,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         color = 'rgb(220, 81, 72)';
         background = 'rgba(192, 113, 113, 0.29)';
         break;
-      default: // Unknown status because we dont have spectation score
+      default: // Unknown status fow unknown spectation score
         color = 'rgb(202,203,206)';
         background = 'rgba(202,203,206, 0.5)';
         break;
@@ -138,8 +148,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     return { color, background };
   };
 
-  const getStepIcon = (index, type, status) => {
-    const classes = useStyles();
+  const getStepIcon = (index: number, type: string, status: string) => {
     if (index >= 2) {
       let IconComponent;
       switch (type) {
@@ -160,11 +169,11 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     return null;
   };
 
-  const renderLogs = (targetResult) => {
+  const renderLogs = (targetResult: SimpleExpectationResultOutput[]) => {
     return (
       <Paper elevation={3} style={{ padding: 20, marginTop: 25, minHeight: 200 }}>
         {/* Render logs for each target result */}
-        {targetResult.map((result, index) => (
+        {targetResult.map((result) => (
           <div key={result.target_result_id}>
             <Typography variant="body1" gutterBottom>
               {t(`TYPE_${result.target_result_subtype}`)}
@@ -189,17 +198,17 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   useEffect(() => {
     if (targetresults && targetresults.length > 0) {
       const newSteps = targetresults.map((result) => ({
-        label: getStatusLabel(result.target_result_type, result.target_result_response_status),
+        label: getStatusLabel(result.target_result_type, result.target_result_response_status!),
         type: result.target_result_type,
         status: result.target_result_response_status,
       }));
-      const mergedSteps = [...initialSteps, ...newSteps];
+      const mergedSteps: Steptarget[] = [...initialSteps, ...newSteps];
       setSteps(mergedSteps);
     }
   }, [targetresults]);
 
   // Define Tabs
-  const groupedResults = {};
+  const groupedResults: Record<string, SimpleExpectationResultOutput[]> = {};
   targetresults.forEach((result) => {
     const type = result.target_result_type;
     if (!groupedResults[type]) {
@@ -222,9 +231,9 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
               <StepLabel
                 StepIconComponent={() => (
                   <div className={classes.circle}
-                    style={index >= 2 ? getCircleColor(step.status) : {}}
+                    style={index >= 2 ? getCircleColor(step.status!) : {}}
                   >
-                    {getStepIcon(index, step.type, step.status)}
+                    {getStepIcon(index, step.type!, step.status!)}
                     <Typography className={classes.circleLabel}>{step.label}</Typography>
                   </div>
                 )}
