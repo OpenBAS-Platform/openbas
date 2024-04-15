@@ -13,3 +13,10 @@ export const atomicTestingDetail = new schema.Entity(
   { idAttribute: 'atomic_id' },
 );
 export const arrayOfAtomicTestingDetails = new schema.Array(atomicTestingDetail);
+
+export const targetResult = new schema.Entity(
+  'targetresults',
+  {},
+  { idAttribute: 'target_result_id' },
+);
+export const arrayOftargetResults = new schema.Array(targetResult);

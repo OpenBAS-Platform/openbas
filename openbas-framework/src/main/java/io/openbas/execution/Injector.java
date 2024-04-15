@@ -109,7 +109,7 @@ public abstract class Injector {
             boolean isScheduledInject = !executableInject.isDirect();
             boolean isAtomicTesting = executableInject.getInjection().getInject().isAtomicTesting();
             // If empty content, inject must be rejected
-            if (executableInject.getInjection().getInject().getContent() == null) { //Fixme duplicated code on Executor.java
+            if (executableInject.getInjection().getInject().getContent() == null) {
                 throw new UnsupportedOperationException("Inject is empty");
             }
             // If inject is too old, reject the execution

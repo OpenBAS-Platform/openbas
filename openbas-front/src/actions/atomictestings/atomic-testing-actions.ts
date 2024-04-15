@@ -1,7 +1,6 @@
 import { Dispatch } from 'redux';
-import { arrayOfAtomicTestings, atomicTesting, atomicTestingDetail } from './atomic-testing-schema';
+import { arrayOfAtomicTestings, arrayOftargetResults, atomicTesting, atomicTestingDetail } from './atomic-testing-schema';
 import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
-import { arrayOftargetResults } from './target-result-schema';
 import type { AtomicTestingInput } from '../../utils/api-types';
 
 const ATOMIC_TESTING_URI = '/api/atomic_testings';
