@@ -138,7 +138,7 @@ public class InjectsExecutionJob implements Job {
     private void executeInternal(ExecutableInject executableInject) {
         Injection source = executableInject.getInjection();
         // Initialize the inject status
-        InjectStatus status = new InjectStatus(); //Fixme Could be create error about unicity of injectStatus
+        InjectStatus status = new InjectStatus();
         status.setTrackingSentDate(Instant.now());
         status.setInject(executableInject.getInjection().getInject());
         // Execute

@@ -33,7 +33,7 @@ public class ExecutionContextService {
 
   public ExecutionContext executionContext(@NotNull final User user, Injection injection, List<String> teams) {
     ExecutionContext executionContext = new ExecutionContext(user, teams);
-    if (injection.getExercise() != null) { //TODO
+    if (injection.getExercise() != null) {
       String exerciseId = injection.getExercise().getId();
       String queryParams = "?user=" + user.getId() + "&inject=" + injection.getId();
       String baseUrl = this.openBASCOnfig.getBaseUrl();

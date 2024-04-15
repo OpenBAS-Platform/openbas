@@ -39,7 +39,7 @@ public class AtomicTestingService {
   private DocumentRepository documentRepository;
 
   @Autowired
-  public void setExecutor(Executor executor) {
+  public void setExecutor(@NotNull final Executor executor) {
     this.executor = executor;
   }
 
@@ -49,22 +49,22 @@ public class AtomicTestingService {
   }
 
   @Autowired
-  public void setInjectRepository(InjectRepository injectRepository) {
+  public void setInjectRepository(@NotNull final InjectRepository injectRepository) {
     this.injectRepository = injectRepository;
   }
 
   @Autowired
-  public void setAssetRepository(AssetRepository assetRepository) {
+  public void setAssetRepository(@NotNull final AssetRepository assetRepository) {
     this.assetRepository = assetRepository;
   }
 
   @Autowired
-  public void setAssetGroupRepository(AssetGroupRepository assetGroupRepository) {
+  public void setAssetGroupRepository(@NotNull final AssetGroupRepository assetGroupRepository) {
     this.assetGroupRepository = assetGroupRepository;
   }
 
   @Autowired
-  public void setInjectDocumentRepository(InjectDocumentRepository injectDocumentRepository) {
+  public void setInjectDocumentRepository(@NotNull final InjectDocumentRepository injectDocumentRepository) {
     this.injectDocumentRepository = injectDocumentRepository;
   }
 

@@ -81,7 +81,7 @@ public class AtomicTestingApi extends RestBehavior {
       @PathVariable String injectId, @PathVariable String targetType) {
     return injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(injectId, targetId, targetType)
         .stream()
-        .map(ie -> AtomicTestingMapper.toTargetResultDto(ie, targetId))
+        .map(expectation -> AtomicTestingMapper.toTargetResultDto(expectation, targetId))
         .toList();
   }
 

@@ -159,13 +159,13 @@ public class Team implements Base {
     }
 
     public long getUsersNumberInExercise(String exerciseId) {
-        return exerciseId != null ?
+        return exerciseId == null ?
+            0:
             getExerciseTeamUsers()
                 .stream()
                 .filter(exerciseTeamUser -> exerciseTeamUser.getExercise().getId().equals(exerciseId))
                 .toList()
-                .size()
-            : 0;
+                .size();
     }
 
     @Override

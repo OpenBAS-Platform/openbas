@@ -56,7 +56,7 @@ public class InjectService {
     injectDocumentRepository.deleteAll(updatedInjects);
   }
 
-  @Transactional
+  @Transactional(rollbackOn = Exception.class)
   public Inject updateInjectStatus(String injectId, InjectUpdateStatusInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow();
     // build status
