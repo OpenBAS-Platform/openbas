@@ -8,20 +8,17 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectDocument;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.model.User;
-import io.openbas.database.repository.DocumentRepository;
-import io.openbas.database.repository.InjectDocumentRepository;
-import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.TagRepository;
-import io.openbas.database.repository.TeamRepository;
-import io.openbas.database.repository.UserRepository;
+import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +27,10 @@ public class AtomicTestingService {
 
   private Executor executor;
   private ExecutionContextService executionContextService;
+
+  private AssetGroupRepository assetGroupRepository;
+
+  private AssetRepository assetRepository;
   private InjectRepository injectRepository;
   private InjectDocumentRepository injectDocumentRepository;
   private UserRepository userRepository;
@@ -50,6 +51,16 @@ public class AtomicTestingService {
   @Autowired
   public void setInjectRepository(InjectRepository injectRepository) {
     this.injectRepository = injectRepository;
+  }
+
+  @Autowired
+  public void setAssetRepository(AssetRepository assetRepository) {
+    this.assetRepository = assetRepository;
+  }
+
+  @Autowired
+  public void setAssetGroupRepository(AssetGroupRepository assetGroupRepository) {
+    this.assetGroupRepository = assetGroupRepository;
   }
 
   @Autowired
@@ -104,6 +115,8 @@ public class AtomicTestingService {
           return injectDocument;
         }).toList();
     inject.setDocuments(injectDocuments);
+    inject.setAssets(fromIterable(this.assetRepository.findAllById(input.getAssets())));
+    inject.setAssetGroups(fromIterable(this.assetGroupRepository.findAllById(input.getAssetGroups())));
     return injectRepository.save(inject);
   }
 
