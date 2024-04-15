@@ -727,8 +727,10 @@ export interface FullTextSearchCountResult {
 
 export interface FullTextSearchResult {
   clazz: string;
+  description?: string;
   id: string;
   name: string;
+  tags?: Tag[];
 }
 
 export interface Grant {

@@ -13,6 +13,7 @@ import useEntityLink from './useEntityLink';
 import useEntityIcon from '../../../utils/hooks/useEntityIcon';
 import type { Theme } from '../../../components/Theme';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
+import ItemTags from '../../../components/ItemTags';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -48,7 +49,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const inlineStyles: Record<string, CSSProperties> = {
   result_name: {
-    width: '100%',
+    width: '40%',
+  },
+  result_description: {
+    width: '40%',
+  },
+  result_tags: {
+    width: '20%',
   },
 };
 
@@ -62,6 +69,8 @@ const TabPanel = (props: TabPanelProps & { index: number, entity: string, search
   // Headers
   const fields: Header[] = [
     { field: 'result_name', label: 'Name', isSortable: false, value: (result: FullTextSearchResult) => <span>{result.name}</span> },
+    { field: 'result_description', label: 'Description', isSortable: false, value: (result: FullTextSearchResult) => <span>{result.description}</span> },
+    { field: 'result_tags', label: 'Tags', isSortable: false, value: (result: FullTextSearchResult) => <span><ItemTags variant="list" tags={result.tags} /></span> },
   ];
 
   const [elements, setElements] = useState<FullTextSearchResult[]>([]);
@@ -102,6 +111,7 @@ const TabPanel = (props: TabPanelProps & { index: number, entity: string, search
                   </div>
                 }
               />
+              <ListItemIcon />
             </ListItem>
             {elements.map((result) => (
               <ListItemButton

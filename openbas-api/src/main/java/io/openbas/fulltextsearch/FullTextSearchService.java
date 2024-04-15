@@ -18,10 +18,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
@@ -85,6 +82,8 @@ public class FullTextSearchService<T extends Base> {
         FullTextSearchResult result = new FullTextSearchResult();
         result.setId(asset.getId());
         result.setName(asset.getName());
+        result.setDescription(asset.getDescription());
+        result.setTags(asset.getTags());
         result.setClazz(Asset.class.getSimpleName());
         return result;
       }
@@ -92,6 +91,8 @@ public class FullTextSearchService<T extends Base> {
         FullTextSearchResult result = new FullTextSearchResult();
         result.setId(assetGroup.getId());
         result.setName(assetGroup.getName());
+        result.setDescription(assetGroup.getDescription());
+        result.setTags(assetGroup.getTags());
         result.setClazz(AssetGroup.class.getSimpleName());
         return result;
       }
@@ -99,6 +100,7 @@ public class FullTextSearchService<T extends Base> {
         FullTextSearchResult result = new FullTextSearchResult();
         result.setId(user.getId());
         result.setName(user.getEmail());
+        result.setTags(user.getTags());
         result.setClazz(User.class.getSimpleName());
         return result;
       }
@@ -106,6 +108,8 @@ public class FullTextSearchService<T extends Base> {
         FullTextSearchResult result = new FullTextSearchResult();
         result.setId(team.getId());
         result.setName(team.getName());
+        result.setDescription(team.getDescription());
+        result.setTags(team.getTags());
         result.setClazz(Team.class.getSimpleName());
         return result;
       }
@@ -113,6 +117,8 @@ public class FullTextSearchService<T extends Base> {
         FullTextSearchResult result = new FullTextSearchResult();
         result.setId(organization.getId());
         result.setName(organization.getName());
+        result.setDescription(organization.getDescription());
+        result.setTags(organization.getTags());
         result.setClazz(Organization.class.getSimpleName());
         return result;
       }
@@ -120,6 +126,8 @@ public class FullTextSearchService<T extends Base> {
         FullTextSearchResult result = new FullTextSearchResult();
         result.setId(scenario.getId());
         result.setName(scenario.getName());
+        result.setDescription(scenario.getDescription());
+        result.setTags(scenario.getTags());
         result.setClazz(Scenario.class.getSimpleName());
         return result;
       }
@@ -127,6 +135,8 @@ public class FullTextSearchService<T extends Base> {
         FullTextSearchResult result = new FullTextSearchResult();
         result.setId(exercise.getId());
         result.setName(exercise.getName());
+        result.setDescription(exercise.getDescription());
+        result.setTags(exercise.getTags());
         result.setClazz(Exercise.class.getSimpleName());
         return result;
       }
@@ -208,6 +218,8 @@ public class FullTextSearchService<T extends Base> {
     private String id;
     @NotBlank
     private String name;
+    private String description;
+    private List<Tag> tags;
     @NotBlank
     private String clazz;
 
