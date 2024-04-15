@@ -37,11 +37,10 @@ export const tryAtomicTesting = (injectId: string) => (dispatch: Dispatch) => {
 };
 
 export const fetchTargetResult = (injectId: string, targetId: string, targetType: string) => (dispatch: Dispatch) => {
-  const queryParams = `?injectId=${injectId}&targetType=${targetType}`;
-  const uri = `${ATOMIC_TESTING_URI}/target_results/${targetId}${queryParams}`;
+  const uri = `${ATOMIC_TESTING_URI}/${injectId}/target_results/${targetId}/types/${targetType}`;
   return getReferential(arrayOftargetResults, uri)(dispatch);
 };
 
 export const createAtomicTesting = (data: AtomicTestingInput) => (dispatch: Dispatch) => {
-return postReferential(atomicTesting, ATOMIC_TESTING_URI, data)(dispatch);
+  return postReferential(atomicTesting, ATOMIC_TESTING_URI, data)(dispatch);
 };

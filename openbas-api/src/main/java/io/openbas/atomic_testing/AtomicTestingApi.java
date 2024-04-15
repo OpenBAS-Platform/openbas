@@ -77,9 +77,9 @@ public class AtomicTestingApi extends RestBehavior {
     return atomicTestingService.tryInject(injectId);
   }
 
-  @GetMapping("/target_results/{targetId}")
+  @GetMapping("/{injectId}/target_results/{targetId}/types/{targetType}")
   public List<SimpleExpectationResultOutput> findTargetResult(@PathVariable String targetId,
-      @RequestParam String injectId, @RequestParam String targetType) {
+      @PathVariable String injectId, @PathVariable String targetType) {
     return AtomicTestingMapper.toTargetResultDto(
         injectExpectationService.findExpectationsByInjectAndTarget(injectId, targetId, targetType), targetId);
   }
