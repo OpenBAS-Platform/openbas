@@ -56,7 +56,7 @@ public class ScenarioExecutionJobTest {
     int hourToStart = zonedDateTime.getHour() == 23 ? 0 : zonedDateTime.getHour() + 1;
 
     Scenario scenario = getScenario();
-    scenario.setRecurrence("0 " + hourToStart + " * * *"); // Every day at 23 hours
+    scenario.setRecurrence("0 0 " + hourToStart + " * * *"); // Every day at 23 hours
     Scenario scenarioSaved = this.scenarioService.createScenario(scenario);
     SCENARIO_ID_1 = scenarioSaved.getId();
 
@@ -82,7 +82,8 @@ public class ScenarioExecutionJobTest {
     ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("UTC"));
 
     Scenario scenario = getScenario();
-    scenario.setRecurrence(zonedDateTime.getMinute() + 1 + " " + zonedDateTime.getHour() + " * * *"); // Every day now + 1 minute
+    scenario.setRecurrence(
+        "0 " + (zonedDateTime.getMinute() + 1) + " " + zonedDateTime.getHour() + " * * *"); // Every day now + 1 minute
     Scenario scenarioSaved = this.scenarioService.createScenario(scenario);
     SCENARIO_ID_2 = scenarioSaved.getId();
 
@@ -120,16 +121,17 @@ public class ScenarioExecutionJobTest {
     assertEquals(1, createdExercises.size());
   }
 
-  @DisplayName("Not create simulation based on end date after now")
+  @DisplayName("Not create simulation based on end date before now")
   @Test
   @Order(4)
-  public void given_end_date_after_now_should_not_create_second_simulation() throws JobExecutionException {
+  public void given_end_date_before_now_should_not_create_second_simulation() throws JobExecutionException {
     // -- PREPARE --
     Instant instant = Instant.now();
     ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("UTC"));
 
     Scenario scenario = getScenario();
-    scenario.setRecurrence(zonedDateTime.getMinute() + 1 + " " + zonedDateTime.getHour() + " * * *"); // Every day now + 1 minute
+    scenario.setRecurrence(
+        "0 " + (zonedDateTime.getMinute() + 1) + " " + zonedDateTime.getHour() + " * * *"); // Every day now + 1 minute
     scenario.setRecurrenceEnd(Instant.now().minus(0, ChronoUnit.DAYS));
     Scenario scenarioSaved = this.scenarioService.createScenario(scenario);
     SCENARIO_ID_3 = scenarioSaved.getId();
@@ -144,6 +146,6 @@ public class ScenarioExecutionJobTest {
         .filter(exercise -> exercise.getScenario() != null)
         .filter(exercise -> SCENARIO_ID_3.equals(exercise.getScenario().getId()))
         .toList();
-    assertEquals(1, createdExercises.size());
+    assertEquals(0, createdExercises.size());
   }
 }
