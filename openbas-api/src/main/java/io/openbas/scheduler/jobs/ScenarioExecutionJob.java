@@ -64,7 +64,7 @@ public class ScenarioExecutionJob implements Job {
   }
 
   private Instant cronToDate(@NotBlank final String cronExpression) {
-    CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(CronType.UNIX);
+    CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(CronType.SPRING53);
     CronParser parser = new CronParser(cronDefinition);
     Cron cron = parser.parse(cronExpression);
     ExecutionTime executionTime = ExecutionTime.forCron(cron);
