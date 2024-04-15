@@ -63,10 +63,6 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
     dispatch(fetchAttackPatterns());
   });
 
-  /* const handleCreation = () => {
-    dispatch(createAtomicTesting());
-  }; */
-
   // Filter
   const [openMitreFilter, setOpenMitreFilter] = React.useState(false);
 
@@ -82,12 +78,17 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
 
   const [selectedContractParsedContent, setSelectedContractParsedContent] = useState<any | null>(null);
 
+  const handleCloseDrawer = () => {
+    setOpen(false);
+    handleReset();
+  };
+
   return (
     <>
       <ButtonCreate onClick={() => setOpen(true)} />
       <FullPageDrawer
         open={open}
-        handleClose={() => setOpen(false)}
+        handleClose={handleCloseDrawer}
         title={t('Create a new atomic test')}
       >
 
@@ -198,33 +199,11 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
                 }
                 {
                   activeStep === 1 && selectedContract && selectedContractParsedContent
-                  && <CreationInjectDetails contractId={selectedContract.injector_contract_id} injectType={selectedContractParsedContent.config.type} />
+                  && <CreationInjectDetails contractId={selectedContract.injector_contract_id} injectType={selectedContractParsedContent.config.type}
+                    handleClose={() => setOpen(false)} handleBack={handleBack} handleReset={handleReset}
+                     />
                 }
               </Typography>
-              <Box sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                pt: 2,
-              }}
-              >
-                <Button
-                  color="inherit"
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                  sx={{ mr: 1 }}
-                >
-                  Back
-                </Button>
-                <Box sx={{ flex: '1 1 auto' }} />
-                <Button
-                  color="secondary"
-                  disabled={activeStep === 0}
-                  onClick={handleNext}
-                  sx={{ mr: 1 }}
-                >
-                  Create
-                </Button>
-              </Box>
             </React.Fragment>
           )}
         </Box>

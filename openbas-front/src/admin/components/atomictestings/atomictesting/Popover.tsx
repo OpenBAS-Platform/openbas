@@ -1,12 +1,19 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { AtomicTestingOutput } from '../../../../utils/api-types';
+import type { AtomicTestingOutput, InjectorContract, Tag } from '../../../../utils/api-types';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { deleteAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
 import Drawer from '../../../../components/common/Drawer';
+import InjectDefinition from '../../components/injects/InjectDefinition';
+import type { TeamStore } from '../../../../actions/teams/Team';
+import { useHelper } from '../../../../store';
+import type { InjectHelper } from '../../../../actions/injects/inject-helper';
+import type { TagsHelper } from '../../../../actions/helper';
+import type { TeamsHelper } from '../../../../actions/teams/team-helper';
+import { PermissionsContext } from '../../components/Context';
 
 interface Props {
   atomic: AtomicTestingOutput;
@@ -39,6 +46,18 @@ const AtomicPopover: FunctionComponent<Props> = ({
     navigate('/admin/atomic_testings');
   };
 
+  const { permissions } = useContext(PermissionsContext);
+  const { injectTypesMap, tagsMap, teams }: {
+    injectTypesMap: Record<string, InjectorContract>,
+    tagsMap: Record<string, Tag>,
+    teams: TeamStore[],
+  } = useHelper((helper: InjectHelper & TagsHelper & TeamsHelper) => ({
+    injectTypesMap: helper.getInjectTypesMap(),
+    tagsMap: helper.getTagsMap(),
+    teams: helper.getTeams(),
+  }));
+  const injectTypes = Object.values(injectTypesMap);
+
   // Button Popover
   const entries: ButtonPopoverEntry[] = [
     { label: 'Update', action: handleEdit },
@@ -47,12 +66,63 @@ const AtomicPopover: FunctionComponent<Props> = ({
 
   return (
     <>
-      <ButtonPopover entries={entries}/>
+      <ButtonPopover entries={entries} />
       <Drawer
         open={edition}
         handleClose={() => setEdition(false)}
         title={t('Update the atomic testing')}
       >
+        {/* <InjectDefinition
+          injectId={atomic.atomic_id}
+          inject={{
+            inject_contract: atomic.atomic_contract,
+            inject_type: atomic.atomic_type,
+            inject_teams: [],
+            inject_assets: [],
+            inject_asset_groups: [],
+            inject_documents: [],
+          }}
+          injectTypes={injectTypes}
+          handleClose={() => setEdition(false)}
+          tagsMap={tagsMap}
+          permissions={permissions}
+          teamsFromExerciseOrScenario={teams}
+          articlesFromExerciseOrScenario={articles}
+          variablesFromExerciseOrScenario={variables}
+          onUpdateInject={onUpdateInject}
+          uriVariable={uriVariable}
+          allUsersNumber={allUsersNumber}
+          usersNumber={usersNumber}
+          teamsUsers={teamsUsers}
+        />
+
+        <InjectDefinition
+          ref={injectDefinitionRef}
+          inject={{
+            inject_contract: contractId,
+            inject_type: injectType,
+            inject_teams: [],
+            inject_assets: [],
+            inject_asset_groups: [],
+            inject_documents: [],
+          }}
+          injectTypes={injectTypes}
+          handleClose={handleClose}
+          tagsMap={tagsMap}
+          permissions={permissions}
+          teamsFromExerciseOrScenario={teams}
+          articlesFromExerciseOrScenario={[]}
+          variablesFromExerciseOrScenario={[]}
+          onUpdateInject={onUpdateInject}
+          uriVariable={''}
+          allUsersNumber={0}
+          usersNumber={0}
+          teamsUsers={[]}
+          atomicTestingCreation={true}
+          onAddAtomicTesting={onAddAtomicTesting}
+          handleBack={handleBack}
+          handleReset={handleReset}
+        /> */}
       </Drawer>
       <DialogDelete
         open={deletion}

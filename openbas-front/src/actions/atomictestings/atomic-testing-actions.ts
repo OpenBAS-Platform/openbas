@@ -1,5 +1,4 @@
 import { Dispatch } from 'redux';
-import * as schema from '../Schema';
 import { arrayOfAtomicTestings, atomicTesting, atomicTestingDetail } from './atomic-testing-schema';
 import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
 import { arrayOftargetResults } from './target-result-schema';

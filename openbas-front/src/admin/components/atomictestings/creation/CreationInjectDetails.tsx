@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useContext, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { Button } from '@mui/material';
 import InjectDefinition from '../../components/injects/InjectDefinition';
 import { InjectContext, PermissionsContext } from '../../components/Context';
 import type { AtomicTestingInput, Tag, InjectorContract } from '../../../../utils/api-types';
@@ -17,19 +18,18 @@ import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 interface Props {
   contractId: string;
   injectType: string;
-  onSubmit: SubmitHandler<AtomicTestingInput>;
-  initialValues?: AtomicTestingInput;
+  handleClose: () => void;
+  handleBack: () => void;
+  handleReset: () => void;
 }
 
 const CreationInjectType: FunctionComponent<Props> = ({
-  contractId, injectType,
+  contractId, injectType, handleClose, handleBack, handleReset,
 }) => {
-  const { t } = useFormatter();
   const { permissions } = useContext(PermissionsContext);
   const dispatch = useAppDispatch();
   const injectDefinitionRef = useRef();
   const { onUpdateInject } = useContext(InjectContext);
-  const [setSelectedInject] = useState(null);
   const { injectTypesMap, tagsMap, teams }: {
     injectTypesMap: Record<string, InjectorContract>,
     tagsMap: Record<string, Tag>,
@@ -61,7 +61,7 @@ const CreationInjectType: FunctionComponent<Props> = ({
         inject_documents: [],
       }}
       injectTypes={injectTypes}
-      handleClose={() => setSelectedInject(null)}
+      handleClose={handleClose}
       tagsMap={tagsMap}
       permissions={permissions}
       teamsFromExerciseOrScenario={teams}
@@ -72,9 +72,12 @@ const CreationInjectType: FunctionComponent<Props> = ({
       allUsersNumber={0}
       usersNumber={0}
       teamsUsers={[]}
-      creation={true}
+      atomicTestingCreation={true}
       onAddAtomicTesting={onAddAtomicTesting}
+      handleBack={handleBack}
+      handleReset={handleReset}
     />
+
   );
 };
 

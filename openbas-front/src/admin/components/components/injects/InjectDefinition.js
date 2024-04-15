@@ -711,9 +711,11 @@ class InjectDefinition extends Component {
       inject_title: data.atomic_testing_title,
       inject_type: inject.inject_type,
     };
-    if (this.props.creation) {
+    if (this.props.atomicTestingCreation) {
       return this.props
-        .onAddAtomicTesting(atomicTestingValues);
+        .onAddAtomicTesting(atomicTestingValues)
+        .then(() => this.props.handleReset())
+        .then(() => this.props.handleClose());
     }
     return this.props
       .onUpdateInject(this.props.inject.inject_id, values)
@@ -1118,7 +1120,8 @@ class InjectDefinition extends Component {
       challengesMap,
       teamsFromExerciseOrScenario,
       articlesFromExerciseOrScenario,
-      creation,
+      atomicTestingCreation,
+      handleBack,
     } = this.props;
     if (!inject) {
       return <Loader variant="inElement" />;
@@ -1323,7 +1326,7 @@ class InjectDefinition extends Component {
     return (
       <div>
         {
-          !creation
+          !atomicTestingCreation
           && <div className={classes.header}>
             <IconButton
               aria-label="Close"
@@ -1357,7 +1360,7 @@ class InjectDefinition extends Component {
             {({ form, handleSubmit, submitting, values }) => (
               <form id="injectContentForm" onSubmit={handleSubmit}>
                 {
-                  creation
+                  atomicTestingCreation
                   && <div>
                     <Typography variant="h2" style={{ float: 'left' }}>
                       {t('Title')}
@@ -2060,17 +2063,31 @@ class InjectDefinition extends Component {
                   </List>
                 </div>
                 {
-                  creation
-                    ? <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
-                      <Button
-                        variant="contained"
-                        color="secondary"
-                        type="submit"
-                        disabled={submitting || this.props.permissions.readOnly}
-                      >
-                        {t('Create')}
-                      </Button>
+                  atomicTestingCreation
+                    ? <div>
+
+                      <div style={{ float: 'left', margin: '20px 0 20px 0' }}>
+                        <Button
+                          color="inherit"
+                          sx={{ mr: 1 }}
+                          onClick={handleBack}
+                        >
+                          Back
+                        </Button>
+                      </div>
+
+                      <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          type="submit"
+                          disabled={submitting || this.props.permissions.readOnly}
+                        >
+                          {t('Create')}
+                        </Button>
+                      </div>
                     </div>
+
                     : <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
                       <Button
                         variant="contained"
@@ -2122,7 +2139,9 @@ InjectDefinition.propTypes = {
   usersNumber: PropTypes.number,
   teamsUsers: PropTypes.object,
   onAddAtomicTesting: PropTypes.func,
-  creation: PropTypes.bool,
+  atomicTestingCreation: PropTypes.bool,
+  handleBack: PropTypes.func,
+  handleReset: PropTypes.func,
 };
 
 const select = (state, ownProps) => {
