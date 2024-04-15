@@ -56,5 +56,5 @@ export const createAtomicTesting = (data: AtomicTestingInput) => (dispatch: Disp
     },
   };
   return postReferential(schema.inject, ATOMIC_TESTING_URI, body)(dispatch); */
-  return postReferential(schema.inject, ATOMIC_TESTING_URI, data)(dispatch);
+  return postReferential(atomicTesting, ATOMIC_TESTING_URI, data)(dispatch);
 };

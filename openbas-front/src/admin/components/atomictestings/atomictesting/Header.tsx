@@ -71,7 +71,7 @@ const AtomicTestingHeader = () => {
         <Typography variant="h1" gutterBottom classes={{ root: classes.title }}>
           {atomic.atomic_title}
         </Typography>
-        <AtomicPopover atomic={atomic}/>
+        <AtomicPopover atomic={atomic} />
         <Dialog
           open={open}
           onClose={() => setOpen(false)}
@@ -112,45 +112,45 @@ const AtomicTestingHeader = () => {
               {/* TODO: displayRowCheckbox={false} */}
               <TableBody>
                 {injectResult
-                      && Object.entries(injectResult).map(
-                        ([key, value]) => {
-                          if (key === 'status_traces') {
-                            return (
-                              <TableRow key={key}>
-                                <TableCell>{key}</TableCell>
-                                <TableCell>
-                                  {/* TODO: selectable={false} */}
-                                  <Table size="small" key={key}>
-                                    {/* TODO: displayRowCheckbox={false} */}
-                                    <TableBody>
-                                      <>
-                                        {value?.filter((trace: InjectStatusExecution) => !!trace.execution_message)
-                                          .map((trace: InjectStatusExecution) => (
-                                            <TableRow key={trace.execution_category}>
-                                              <TableCell>
-                                                { trace.execution_message }
-                                              </TableCell>
-                                              <TableCell>
-                                                { trace.execution_status }
-                                              </TableCell>
-                                              <TableCell>{trace.execution_time}</TableCell>
-                                            </TableRow>
-                                          ))}
-                                      </>
-                                    </TableBody>
-                                  </Table>
-                                </TableCell>
-                              </TableRow>
-                            );
-                          }
-                          return (
-                            <TableRow key={key}>
-                              <TableCell>{key}</TableCell>
-                              <TableCell>{value}</TableCell>
-                            </TableRow>
-                          );
-                        },
-                      )}
+                  && Object.entries(injectResult).map(
+                    ([key, value]) => {
+                      if (key === 'status_traces') {
+                        return (
+                          <TableRow key={key}>
+                            <TableCell>{key}</TableCell>
+                            <TableCell>
+                              {/* TODO: selectable={false} */}
+                              <Table size="small" key={key}>
+                                {/* TODO: displayRowCheckbox={false} */}
+                                <TableBody>
+                                  <>
+                                    {value?.filter((trace: InjectStatusExecution) => !!trace.execution_message)
+                                      .map((trace: InjectStatusExecution) => (
+                                        <TableRow key={trace.execution_category}>
+                                          <TableCell>
+                                            {trace.execution_message}
+                                          </TableCell>
+                                          <TableCell>
+                                            {trace.execution_status}
+                                          </TableCell>
+                                          <TableCell>{trace.execution_time}</TableCell>
+                                        </TableRow>
+                                      ))}
+                                  </>
+                                </TableBody>
+                              </Table>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      }
+                      return (
+                        <TableRow key={key}>
+                          <TableCell>{key}</TableCell>
+                          <TableCell>{value}</TableCell>
+                        </TableRow>
+                      );
+                    },
+                  )}
               </TableBody>
             </Table>
           </DialogContent>
@@ -163,11 +163,11 @@ const AtomicTestingHeader = () => {
       </div>
       <Button
         variant="contained"
-        startIcon={<PlayArrowOutlined/>}
+        startIcon={<PlayArrowOutlined />}
         color="info"
         onClick={() => setOpen(true)}
         sx={{ width: 120, height: 40 }}
-        disabled={!atomic.atomic_targets || !(atomic.atomic_targets.length > 0) || !availableLaunch}
+        disabled={!availableLaunch}
       >
         {t('Launch')}
       </Button>
