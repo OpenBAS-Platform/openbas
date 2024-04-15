@@ -829,6 +829,7 @@ const i18n = {
       Scheduling: 'Planification',
       'End date need to be stricly after start date': '',
       'The time and start date do not match, as the time provided is either too close to the current moment or in the past': 'Il y a un décalage entre l\'heure et la date de début (l\'heure est soit trop proche de maintenant, soit dans le passé)',
+      'Only weekday': 'Seulement la semaine',
     },
     en: {
       openbas_email: 'Email',
