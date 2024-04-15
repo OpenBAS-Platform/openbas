@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -41,7 +40,7 @@ public class AtomicTestingApi extends RestBehavior {
 
   @GetMapping()
   public List<AtomicTestingOutput> findAllAtomicTestings() {
-    return AtomicTestingMapper.toDto(atomicTestingService.findAllAtomicTestings());
+    return atomicTestingService.findAllAtomicTestings().stream().map(AtomicTestingMapper::toDto).toList();
   }
 
   @GetMapping("/{injectId}")
@@ -80,8 +79,10 @@ public class AtomicTestingApi extends RestBehavior {
   @GetMapping("/{injectId}/target_results/{targetId}/types/{targetType}")
   public List<SimpleExpectationResultOutput> findTargetResult(@PathVariable String targetId,
       @PathVariable String injectId, @PathVariable String targetType) {
-    return AtomicTestingMapper.toTargetResultDto(
-        injectExpectationService.findExpectationsByInjectAndTarget(injectId, targetId, targetType), targetId);
+    return injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(injectId, targetId, targetType)
+        .stream()
+        .map(ie -> AtomicTestingMapper.toTargetResultDto(ie, targetId))
+        .toList();
   }
 
 }

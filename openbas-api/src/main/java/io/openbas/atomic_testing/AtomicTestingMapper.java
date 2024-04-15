@@ -41,16 +41,13 @@ public class AtomicTestingMapper {
         .expectationResultByTypes(AtomicTestingUtils.getExpectations(inject.getExpectations()));
   }
 
-  public static List<AtomicTestingOutput> toDto(List<Inject> injects) {
-    return injects.stream().map(AtomicTestingMapper::toDto).toList();
-  }
-
-  public static SimpleExpectationResultOutput toTargetResultDto(InjectExpectation injectExpectation) {
+  public static SimpleExpectationResultOutput toTargetResultDto(InjectExpectation injectExpectation, final String targetId) {
     return SimpleExpectationResultOutput
         .builder()
         .id(injectExpectation.getId())
         .injectId(injectExpectation.getInject().getId())
         .type(ExpectationType.of(injectExpectation.getType().name()))
+        .targetId(targetId)
         .subtype(injectExpectation.getType().name())
         .startedAt(injectExpectation.getCreatedAt())
         .endedAt(injectExpectation.getUpdatedAt())
@@ -61,14 +58,6 @@ public class AtomicTestingMapper {
             .orElse(null))
         .response(injectExpectation.getScore() == null ? ExpectationStatus.UNKNOWN : (injectExpectation.getScore() == 0 ? ExpectationStatus.FAILED : ExpectationStatus.VALIDATED))
         .build();
-  }
-
-  public static List<SimpleExpectationResultOutput> toTargetResultDto(List<InjectExpectation> injectExpectations, String targetId) {
-    return injectExpectations
-        .stream()
-        .map(AtomicTestingMapper::toTargetResultDto)
-        .peek(dto -> dto.setTargetId(targetId))
-        .toList();
   }
 
   public static AtomicTestingDetailOutput toDetailDto(Inject inject) {

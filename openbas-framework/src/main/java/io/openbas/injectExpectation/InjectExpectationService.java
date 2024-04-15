@@ -132,7 +132,7 @@ public class InjectExpectationService {
 
   // -- BY TARGET TYPE
 
-  public List<InjectExpectation> findExpectationsByInjectAndTarget(@NotBlank final String injectId, @NotBlank final String targetId, @NotBlank final String targetType) {
+  public List<InjectExpectation> findExpectationsByInjectAndTargetAndTargetType(@NotBlank final String injectId, @NotBlank final String targetId, @NotBlank final String targetType) {
     switch (targetType) {
       case "TEAMS":
         return injectExpectationRepository.findAllByInjectAndTeam(injectId, targetId);
