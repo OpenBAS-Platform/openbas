@@ -167,7 +167,7 @@ const AtomicTestingHeader = () => {
         color="info"
         onClick={() => setOpen(true)}
         sx={{ width: 120, height: 40 }}
-        disabled={!availableLaunch}
+        disabled={!atomic.atomic_targets || !(atomic.atomic_targets.length > 0) || !availableLaunch}
       >
         {t('Launch')}
       </Button>
