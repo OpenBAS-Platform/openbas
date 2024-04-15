@@ -1012,6 +1012,7 @@ export interface InjectorContract {
   injector_contract_created_at?: string;
   injector_contract_id: string;
   injector_contract_injector?: Injector;
+  injector_contract_is_used_for_atomic_testing?: boolean;
   injector_contract_labels?: Record<string, string>;
   injector_contract_manual?: boolean;
   /** @format date-time */

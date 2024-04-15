@@ -1,6 +1,10 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Inject;
+import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -9,12 +13,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import jakarta.validation.constraints.NotNull;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-
 @Repository
 public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpecificationExecutor<Inject>,
     StatisticRepository {
@@ -22,7 +20,6 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
   @NotNull
   Optional<Inject> findById(@NotNull String id);
 
-  @EntityGraph(attributePaths = {"status"})
   @NotNull
   Optional<Inject> findWithStatusById(@NotNull String id);
 
@@ -86,15 +83,4 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
 
   @Query(value = "select i from Inject i where i.scenario is null and i.exercise is null")
   List<Inject> findAllAtomicTestings();
-
-
-
-    /*
-     @Query(value = "select i from Inject i " +
-        "join i.documents as doc_rel " +
-        "join doc_rel.document as doc " +
-        "where doc.id = :documentId and i.scenario.id = :scenarioId")
-    List<Inject> findAllForScenarioAndDoc(@Param("scenarioId") String scenarioId, @Param("documentId") String documentId);
-
-     */
 }

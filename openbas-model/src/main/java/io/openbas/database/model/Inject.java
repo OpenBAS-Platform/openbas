@@ -1,5 +1,9 @@
 package io.openbas.database.model;
 
+import static java.time.Duration.between;
+import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -12,18 +16,17 @@ import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.logging.Level;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
 import org.hibernate.annotations.UuidGenerator;
-
-import java.time.Instant;
-import java.util.*;
-import java.util.logging.Level;
-
-import static java.time.Duration.between;
-import static java.time.Instant.now;
-import static java.util.Optional.ofNullable;
 
 @Setter
 @Entity
@@ -229,16 +232,16 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_users_number")
   public long getNumberOfTargetUsers() {
     Exercise exercise = getExercise();
-        if (exercise == null) {
-            return 0L;
-        }
-        if (this.allTeams) {
-            return getExercise().usersNumber();
-        }
-        return getTeams().stream()
-                .map(team -> team.getUsersNumberInExercise(getExercise().getId()))
-                .reduce(Long::sum).orElse(0L);
+    if (exercise == null) {
+      return 0L;
     }
+    if (this.allTeams) {
+      return getExercise().usersNumber();
+    }
+    return getTeams().stream()
+        .map(team -> team.getUsersNumberInExercise(getExercise().getId()))
+        .reduce(Long::sum).orElse(0L);
+  }
 
   @JsonIgnore
   public Instant computeInjectDate(Instant source, int speed) {
@@ -270,35 +273,34 @@ public class Inject implements Base, Injection {
     return standardExecutionDate.plusSeconds(alignedPauseDelay);
   }
 
-    @JsonProperty("inject_date")
-    public Optional<Instant> getDate() {
-        if (this.getExercise() == null && this.getScenario() == null) {
-            log.log(Level.INFO, "This inject is an atomic testing");
-            return Optional.empty(); //atomic testing date is the update date
-        }
+  @JsonProperty("inject_date")
+  public Optional<Instant> getDate() {
+    if (this.getExercise() == null && this.getScenario() == null) {
+      log.log(Level.INFO, "This inject is an atomic testing");
+      return Optional.empty(); //atomic testing date is the update date
+    }
 
-        if (this.getScenario() != null) {
-          return Optional.empty();
-        }
+    if (this.getScenario() != null) {
+      return Optional.empty();
+    }
 
-        if (this.getExercise() != null) {
-          if (this.getExercise().getStatus().equals(Exercise.STATUS.CANCELED)) {
-            return Optional.empty();
-          }
-          return this.getExercise()
-              .getStart()
-              .map(source -> computeInjectDate(source, SPEED_STANDARD));
-        } else {
+    if (this.getExercise() != null) {if (this.getExercise().getStatus().equals(Exercise.STATUS.CANCELED)) {
+      return Optional.empty();
+    }
+    return this.getExercise()
+        .getStart()
+        .map(source -> computeInjectDate(source, SPEED_STANDARD));
+  }else {
           return Optional.ofNullable(LocalDateTime.now().toInstant(ZoneOffset.UTC));
         }
   }
 
   @JsonIgnore
-    public Inject getInject() {
+  public Inject getInject() {
     return this;
   }
 
-    @JsonIgnore
+  @JsonIgnore
   public boolean isNotExecuted() {
     return this.getStatus().isEmpty();
   }
@@ -354,11 +356,11 @@ public class Inject implements Base, Injection {
   }
 
   @JsonIgnore
-    public boolean isAtomicTesting(){
-        return this.exercise == null && this.scenario == null;
-    }
+  public boolean isAtomicTesting() {
+    return this.exercise == null && this.scenario == null;
+  }
 
-    @Override
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;

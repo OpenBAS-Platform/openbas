@@ -44,7 +44,7 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
     InjectExpectation findPreventionExpectationForAsset(@Param("injectId") String injectId, @Param("assetId") String assetId);
 
     @Query(value = "select i from InjectExpectation i where i.type = 'PREVENTION' and i.inject.id = :injectId and i.assetGroup.id IN :assetGroupId")
-    InjectExpectation findPreventionExpectationForAssetGroup(@Param("injectId") String injectId, @Param("assetGroupId") String assetGroupId); //TO FIX: It s not a list
+    InjectExpectation findPreventionExpectationForAssetGroup(@Param("injectId") String injectId, @Param("assetGroupId") String assetGroupId);
 
     // -- BY TARGET TYPE
 
