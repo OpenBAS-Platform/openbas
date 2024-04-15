@@ -88,6 +88,7 @@ public class InjectorService {
                 if (current.isPresent()) {
                     existing.add(contract.getId());
                     contract.setManual(current.get().isManual());
+                    contract.setUsedForAtomicTesting(isUsedForAtomicTesting(current.get()));
                     Map<String, String> labels = current.get().getLabel().entrySet().stream()
                             .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
                     contract.setLabels(labels);
@@ -111,10 +112,12 @@ public class InjectorService {
                 InjectorContract injectorContract = new InjectorContract();
                 injectorContract.setId(in.getId());
                 injectorContract.setManual(in.isManual());
+                injectorContract.setUsedForAtomicTesting(isUsedForAtomicTesting(in));
                 Map<String, String> labels = in.getLabel().entrySet().stream()
                         .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
                 injectorContract.setLabels(labels);
                 injectorContract.setInjector(injector);
+
                 if (!in.getAttackPatterns().isEmpty()) {
                     List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(in.getAttackPatterns()));
                     injectorContract.setAttackPatterns(attackPatterns);
@@ -144,6 +147,7 @@ public class InjectorService {
                 InjectorContract injectorContract = new InjectorContract();
                 injectorContract.setId(in.getId());
                 injectorContract.setManual(in.isManual());
+                injectorContract.setUsedForAtomicTesting(isUsedForAtomicTesting(in));
                 Map<String, String> labels = in.getLabel().entrySet().stream()
                         .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
                 injectorContract.setLabels(labels);
@@ -161,4 +165,11 @@ public class InjectorService {
             injectorContractRepository.saveAll(injectorContracts);
         }
     }
+
+    public boolean isUsedForAtomicTesting(final Contract contract){
+        return !(contract.getConfig().getType().equals("openbas_manual") ||
+            contract.getConfig().getType().equals("openbas_channel") ||
+            contract.getConfig().getType().equals("openbas_challenge"));
+    }
+
 }

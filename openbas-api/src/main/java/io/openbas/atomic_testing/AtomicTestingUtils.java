@@ -68,46 +68,46 @@ public class AtomicTestingUtils {
 
     /* Match Target with expectations
      * */
-    inject.getTeams().forEach(t -> {
+    inject.getTeams().forEach(team -> {
       // Check if there are no expectations matching the current team (t)
       boolean noMatchingExpectations = teamExpectations.stream()
-          .noneMatch(exp -> exp.getTeam().equals(t));
+          .noneMatch(exp -> exp.getTeam().getId().equals(team.getId()));
       if (noMatchingExpectations) {
         InjectTargetWithResult target = new InjectTargetWithResult(
             TargetType.TEAMS,
-            t.getId(),
-            t.getName(),
+            team.getId(),
+            team.getName(),
             resultsByTypes
         );
         targets.add(target);
       }
     });
-    inject.getAssets().forEach(t -> {
+    inject.getAssets().forEach(asset -> {
       // Check if there are no expectations matching the current asset (t)
       boolean noMatchingExpectations = assetExpectations.stream()
-          .noneMatch(exp -> exp.getAsset().equals(t));
+          .noneMatch(exp -> exp.getAsset().getId().equals(asset.getId()));
 
       if (noMatchingExpectations) {
         InjectTargetWithResult target = new InjectTargetWithResult(
             TargetType.ASSETS,
-            t.getId(),
-            t.getName(),
+            asset.getId(),
+            asset.getName(),
             resultsByTypes
         );
 
         targets.add(target);
       }
     });
-    inject.getAssetGroups().forEach(t -> {
+    inject.getAssetGroups().forEach(assetGroup -> {
       // Check if there are no expectations matching the current assetgroup (t)
       boolean noMatchingExpectations = assetGroupExpectations.stream()
-          .noneMatch(exp -> exp.getAssetGroup().equals(t));
+          .noneMatch(exp -> exp.getAssetGroup().getId().equals(assetGroup.getId()));
 
       if (noMatchingExpectations) {
         InjectTargetWithResult target = new InjectTargetWithResult(
             TargetType.ASSETS_GROUPS,
-            t.getId(),
-            t.getName(),
+            assetGroup.getId(),
+            assetGroup.getName(),
             resultsByTypes
         );
 
