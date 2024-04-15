@@ -1,22 +1,21 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import React, { useState } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid, Paper, Stack, Typography } from '@mui/material';
+import { useParams } from 'react-router-dom';
+import React from 'react';
+import { Box, Grid, Paper, Stack, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { CreateOutlined, GroupsOutlined, NotificationsOutlined } from '@mui/icons-material';
+import { GroupsOutlined, NotificationsOutlined } from '@mui/icons-material';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchScenario, fetchScenarioTeams, toExercise, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
+import { fetchScenario, fetchScenarioTeams, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
 import { useFormatter } from '../../../../components/i18n';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { TeamStore } from '../../../../actions/teams/Team';
-import type { Exercise, ScenarioInformationInput } from '../../../../utils/api-types';
+import type { ScenarioInformationInput } from '../../../../utils/api-types';
 import useScenarioPermissions from '../../../../utils/Scenario';
-import Transition from '../../../../components/common/Transition';
 import ScenarioInjectsDistribution from '../../injects/ScenarioInjectsDistribution';
 import SettingsForm, { SettingUpdateInput } from '../../components/SettingsForm';
-import ScenarioRecurringForm from './ScenarioRecurringForm';
+import ScenarioRecurring from './ScenarioRecurring';
 
 const useStyles = makeStyles(() => ({
   container_metric: {
@@ -32,7 +31,6 @@ const Scenario = () => {
   const classes = useStyles();
   const { t, fldt } = useFormatter();
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
 
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
 
@@ -65,17 +63,6 @@ const Scenario = () => {
       scenario_message_footer: scenario.scenario_message_footer,
     };
     dispatch(updateScenarioInformation(scenarioId, scenarioInformationInput));
-  };
-
-  // Exercise
-  const [open, setOpen] = useState(false);
-  const submitCreateExercise = () => {
-    dispatch(toExercise(scenario.scenario_id)).then((result: Exercise) => {
-      setOpen(false);
-      if (result) {
-        navigate(`/admin/exercises/${result.exercise_id}`);
-      }
-    });
   };
 
   return (
@@ -136,29 +123,17 @@ const Scenario = () => {
             </Paper>
           </Grid>
           <Grid container item xs={6} sx={{ flexDirection: 'column' }}>
-            <Typography variant="h4">{t('Execution')}</Typography>
-            <Paper variant="outlined" sx={{ flex: 1, p: 2 }}>
-              <Stack gap={2}>
-                <Box>
-                  <Typography variant="h3">{t('Set up a recurring simuation from this scenario')}</Typography>
-                  <ScenarioRecurringForm
-                    scenarioId={scenarioId}
-                    initialValues={{ scenario_recurrence: scenario.scenario_recurrence, scenario_recurrence_start: scenario.scenario_recurrence_start }}
-                  />
-                </Box>
-                <Box>
-                  <Typography variant="h3">{t('Instantiate a simulation from this scenario')}</Typography>
-                  <Button
-                    variant="contained"
-                    startIcon={<CreateOutlined />}
-                    color="success"
-                    disabled={permissions.readOnly}
-                    onClick={() => setOpen(true)}
-                  >
-                    {t('Instantiate')}
-                  </Button>
-                </Box>
-              </Stack>
+            <Typography variant="h4">{t('Launch')}</Typography>
+            <Paper variant="outlined" sx={{ display: 'flex', flexDirection: 'column', flex: 1, p: 2 }}>
+              <Typography variant="h3">{t('Launch a simulation or start a recurring simuation from this scenario')}</Typography>
+              <ScenarioRecurring
+                scenarioId={scenarioId}
+                initialValues={{
+                  scenario_recurrence: scenario.scenario_recurrence,
+                  scenario_recurrence_start: scenario.scenario_recurrence_start,
+                  scenario_recurrence_end: scenario.scenario_recurrence_end,
+                }}
+              />
             </Paper>
           </Grid>
         </Grid>
@@ -181,29 +156,6 @@ const Scenario = () => {
           </Grid>
         </Grid>
       </Stack>
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        TransitionComponent={Transition}
-        PaperProps={{ elevation: 1 }}
-      >
-        <DialogContent>
-          <DialogContentText>
-            {t('Instantiate a simulation from this scenario')}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>
-            {t('Cancel')}
-          </Button>
-          <Button
-            color="secondary"
-            onClick={submitCreateExercise}
-          >
-            {t('Confirm')}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   );
 };

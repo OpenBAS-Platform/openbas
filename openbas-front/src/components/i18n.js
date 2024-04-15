@@ -156,6 +156,7 @@ const inject18n = (WrappedComponent) => {
       );
     }
   }
+
   return injectIntl(InjectIntl);
 };
 
@@ -242,6 +243,9 @@ export const useFormatter = () => {
       year: 'numeric',
     });
   };
+  const time = (date) => {
+    return intl.formatTime(date);
+  };
   const standardDate = (date) => {
     if (isNone(date)) {
       return translate('None');
@@ -285,6 +289,7 @@ export const useFormatter = () => {
     nsd: shortNumericDate,
     nsdt: shortNumericDateTime,
     fndt: fullNumericDateTime,
+    ft: time,
     fd: standardDate,
     md: monthDate,
     mtd: monthTextDate,

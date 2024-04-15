@@ -5655,22 +5655,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cron-parser@npm:4.9.0":
-  version: 4.9.0
-  resolution: "cron-parser@npm:4.9.0"
-  dependencies:
-    luxon: "npm:^3.2.1"
-  checksum: 10c0/348622bdcd1a15695b61fc33af8a60133e5913a85cf99f6344367579e7002896514ba3b0a9d6bb569b02667d6b06836722bf2295fcd101b3de378f71d37bed0b
-  languageName: node
-  linkType: hard
-
-"cron-time-generator@npm:2.0.3":
-  version: 2.0.3
-  resolution: "cron-time-generator@npm:2.0.3"
-  checksum: 10c0/8368e73a84ebd2f7d74783f1c3e150feb6889a595704d89b7d3a375ebd47127e072ff2b69a70a70e5a635c388274c55761e60544a815ddc106d5f2a5d7c31fd4
-  languageName: node
-  linkType: hard
-
 "cronstrue@npm:2.49.0":
   version: 2.49.0
   resolution: "cronstrue@npm:2.49.0"
@@ -9517,13 +9501,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"luxon@npm:^3.2.1":
-  version: 3.4.4
-  resolution: "luxon@npm:3.4.4"
-  checksum: 10c0/02e26a0b039c11fd5b75e1d734c8f0332c95510f6a514a9a0991023e43fb233884da02d7f966823ffb230632a733fc86d4a4b1e63c3fbe00058b8ee0f8c728af
-  languageName: node
-  linkType: hard
-
 "lz-string@npm:^1.5.0":
   version: 1.5.0
   resolution: "lz-string@npm:1.5.0"
@@ -10892,8 +10869,6 @@ __metadata:
     ckeditor5-custom-build: "link:packages/ckeditor5-custom-build"
     classnames: "npm:2.5.1"
     compression: "npm:1.7.4"
-    cron-parser: "npm:4.9.0"
-    cron-time-generator: "npm:2.0.3"
     cronstrue: "npm:2.49.0"
     cross-env: "npm:7.0.3"
     date-fns: "npm:3.6.0"

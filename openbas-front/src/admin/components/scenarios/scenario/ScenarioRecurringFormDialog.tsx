@@ -1,0 +1,312 @@
+import React, { useEffect } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Stack, Switch } from '@mui/material';
+import { DateTimePicker, TimePicker } from '@mui/x-date-pickers';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useFormatter } from '../../../../components/i18n';
+import type { ScenarioRecurrenceInput } from '../../../../utils/api-types';
+import { zodImplement } from '../../../../utils/Zod';
+import { generateDailyCron, generateMonthlyCron, generateWeeklyCron, parseCron } from '../../../../utils/Cron';
+import Transition from '../../../../components/common/Transition';
+
+interface Props {
+  onSubmit: (cron: string, start: string, end?: string) => void,
+  onSelectRecurring: (selectRecurring: string) => void,
+  selectRecurring: string,
+  initialValues: ScenarioRecurrenceInput
+  open: boolean
+  setOpen: (open: boolean) => void,
+}
+
+interface Recurrence {
+  startDate: string,
+  endDate?: string,
+  time: string,
+  onlyWeekday: boolean,
+  dayOfWeek?: 1 | 2 | 3 | 4 | 5 | 6 | 7,
+  weekOfMonth?: 1 | 2 | 3 | 4 | 5,
+}
+
+// eslint-disable-next-line no-underscore-dangle
+const _MS_DELAY_TOO_CLOSE = 1000 * 60 * 2;
+
+const defaultFormValues = {
+  startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
+  endDate: '',
+  time: '',
+  onlyWeekday: false,
+  dayOfWeek: 1 as Recurrence['dayOfWeek'],
+  weekOfMonth: 1 as Recurrence['weekOfMonth'],
+};
+
+const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurring, onSelectRecurring, initialValues, open, setOpen }) => {
+  const { t } = useFormatter();
+
+  const submit = (data: Recurrence) => {
+    // case day
+    let cron: string = generateDailyCron(new Date(data.time).getUTCHours(), new Date(data.time).getUTCMinutes(), data.onlyWeekday);
+    const start = data.startDate;
+    let end = data.endDate;
+    switch (selectRecurring) {
+      case 'noRepeat':
+        end = new Date(new Date(data.startDate).setUTCHours(24, 0, 0, 0)).toISOString();
+        break;
+      case 'weekly':
+        cron = generateWeeklyCron(data.dayOfWeek!, new Date(data.time).getUTCHours(), new Date(data.time).getUTCMinutes());
+        break;
+      case 'monthly':
+        cron = generateMonthlyCron(data.weekOfMonth!, data.dayOfWeek!, new Date(data.time).getUTCHours(), new Date(data.time).getUTCMinutes());
+        break;
+      default:
+        break;
+    }
+
+    onSubmit(cron, start, end);
+  };
+
+  const { handleSubmit, control, reset, getValues, clearErrors } = useForm<Recurrence>({
+    defaultValues: defaultFormValues,
+    resolver: zodResolver(
+      zodImplement<Recurrence>().with({
+        startDate: z.string().min(1, t('Required')),
+        endDate: z.string().optional(),
+        onlyWeekday: z.boolean(),
+        time: z.string().min(1, t('Required')),
+        // @ts-expect-error zodImplement cannot handle refine
+        dayOfWeek: z.number().optional().refine((value) => {
+          if (['weekly', 'monthly'].includes(selectRecurring)) {
+            return value !== null;
+          }
+          return true;
+        }, { message: t('Required') }),
+        // @ts-expect-error zodImplement cannot handle refine
+        weekOfMonth: z.number().optional().refine((value) => {
+          if (['monthly'].includes(selectRecurring)) {
+            return value !== null;
+          }
+          return true;
+        }, { message: t('Required') }),
+      }).refine(
+        (data) => {
+          if (['noRepeat'].includes(selectRecurring)) {
+            return new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() !== new Date(data.startDate).getTime()
+              || (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
+          }
+          return true;
+        },
+        {
+          message: t('The time and start date do not match, as the time provided is either too close to the current moment or in the past'),
+          path: ['time'],
+        },
+      ).refine(
+        (data) => {
+          if (data.endDate) {
+            return new Date(data.endDate).getTime() > new Date(data.startDate).getTime();
+          }
+          return true;
+        },
+        {
+          message: t('End date need to be stricly after start date'),
+          path: ['endDate'],
+        },
+      ),
+    ),
+  });
+
+  useEffect(() => {
+    if (initialValues.scenario_recurrence != null) {
+      if (!initialValues.scenario_recurrence || !initialValues.scenario_recurrence_start) {
+        reset(defaultFormValues);
+      }
+      const { w, d, h, m, owd } = parseCron(initialValues.scenario_recurrence);
+
+      reset({
+        startDate: initialValues.scenario_recurrence_start,
+        endDate: initialValues.scenario_recurrence_end || '',
+        onlyWeekday: owd || false,
+        time: new Date(new Date().setUTCHours(h, m)).toISOString() || '',
+        dayOfWeek: (d || 1) as Recurrence['dayOfWeek'],
+        weekOfMonth: (w || 1) as Recurrence['weekOfMonth'],
+      });
+    }
+  }, [initialValues.scenario_recurrence]);
+
+  return (
+    <form onSubmit={handleSubmit(submit)}>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        TransitionComponent={Transition}
+        PaperProps={{ elevation: 1 }}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>{t('Scheduling')}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={{ xs: 2 }}>
+            <Select
+              value={selectRecurring}
+              label={t('Recurrence')}
+              onChange={(event) => onSelectRecurring(event.target.value)}
+            >
+              <MenuItem value="noRepeat">{t('Does not repeat')}</MenuItem>
+              <MenuItem value="daily">{t('Daily')}</MenuItem>
+              <MenuItem value="weekly">{t('Weekly')}</MenuItem>
+              <MenuItem value="monthly">{t('Monthly')}</MenuItem>
+            </Select>
+            <Controller
+              control={control}
+              name="startDate"
+              render={({ field, fieldState }) => (
+                <DateTimePicker
+                  views={['year', 'month', 'day']}
+                  value={field.value}
+                  minDate={new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()}
+                  onChange={(startDate) => {
+                    return (startDate ? field.onChange(new Date(startDate).toISOString()) : field.onChange(''));
+                  }}
+                  onAccept={() => {
+                    clearErrors('time');
+                  }}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      error: !!fieldState.error,
+                      helperText: fieldState.error && fieldState.error?.message,
+                    },
+                  }}
+                  label={t('Start date')}
+                />
+              )}
+            />
+            {
+              ['daily'].includes(selectRecurring)
+              && <Controller
+                control={control}
+                name="onlyWeekday"
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={
+                      <Switch checked={field.value}
+                        onChange={field.onChange}
+                      />
+                    }
+                    label={t('Only weekday')}
+                  />)}
+                 />
+            }
+            {
+              ['monthly'].includes(selectRecurring)
+              && <Controller
+                control={control}
+                name="weekOfMonth"
+                render={({ field }) => (
+                  <FormControl fullWidth>
+                    <InputLabel>{t('Week of month')}</InputLabel>
+                    <Select
+                      value={field.value}
+                      label={t('Week of month')}
+                      onChange={field.onChange}
+                    >
+                      <MenuItem value={1}>{t('First')}</MenuItem>
+                      <MenuItem value={2}>{t('Second')}</MenuItem>
+                      <MenuItem value={3}>{t('Third')}</MenuItem>
+                      <MenuItem value={4}>{t('Fourth')}</MenuItem>
+                      <MenuItem value={5}>{t('recurrence_Last')}</MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
+                 />
+            }
+            {
+              ['weekly', 'monthly'].includes(selectRecurring)
+              && <Controller
+                control={control}
+                name="dayOfWeek"
+                render={({ field }) => (
+                  <FormControl fullWidth>
+                    <InputLabel>{t('Day of week')}</InputLabel>
+                    <Select
+                      value={field.value}
+                      label={t('Day of week')}
+                      onChange={field.onChange}
+                    >
+                      <MenuItem value={1}>{t('Monday')}</MenuItem>
+                      <MenuItem value={2}>{t('Tuesday')}</MenuItem>
+                      <MenuItem value={3}>{t('Wednesday')}</MenuItem>
+                      <MenuItem value={4}>{t('Thursday')}</MenuItem>
+                      <MenuItem value={5}>{t('Friday')}</MenuItem>
+                      <MenuItem value={6}>{t('Saturday')}</MenuItem>
+                      <MenuItem value={7}>{t('Sunday')}</MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
+                 />
+            }
+            <Controller
+              control={control}
+              name="time"
+              render={({ field, fieldState }) => (
+                <TimePicker
+                  label={t('Hour')}
+                  openTo="hours"
+                  closeOnSelect={false}
+                  value={field.value}
+                  minTime={['noRepeat'].includes(selectRecurring) && new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() === new Date(getValues('startDate')).getTime() ? new Date().toISOString() : null}
+                  onChange={(time) => (time ? field.onChange(new Date(time).toISOString()) : field.onChange(''))}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      error: !!fieldState.error,
+                      helperText: fieldState.error && fieldState.error?.message,
+                    },
+                  }}
+                />
+              )}
+            />
+            {
+              ['daily', 'weekly', 'monthly'].includes(selectRecurring)
+              && <Controller
+                control={control}
+                name="endDate"
+                render={({ field, fieldState }) => (
+                  <DateTimePicker
+                    views={['year', 'month', 'day']}
+                    value={field.value}
+                    minDate={new Date(new Date().setUTCHours(24, 0, 0, 0)).toISOString()}
+                    onChange={(endDate) => {
+                      return (endDate ? field.onChange(new Date(new Date(endDate).setUTCHours(0, 0, 0, 0)).toISOString()) : field.onChange(''));
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!fieldState.error,
+                        helperText: fieldState.error && fieldState.error?.message,
+                      },
+                    }}
+                    label={t('End date')}
+                  />
+                )}
+                 />
+            }
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>
+            {t('Cancel')}
+          </Button>
+          <Button
+            color="primary"
+            type="submit"
+            variant="contained"
+          >
+            {t('Start')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </form>
+  );
+};
+
+export default ScenarioRecurringFormDialog;

@@ -17,10 +17,10 @@ import i18n from '../utils/Localization';
 import { useHelper } from '../store';
 
 const localeMap = {
-  'en-us': enLocale,
-  'fr-fr': frLocale,
-  'es-es': esLocale,
-  'zg-cn': cnLocale,
+  en: enLocale,
+  fr: frLocale,
+  es: esLocale,
+  zh: cnLocale,
 };
 
 const AppIntlProvider = (props) => {
@@ -44,6 +44,7 @@ const AppIntlProvider = (props) => {
   useEffect(() => {
     document.title = platformName;
   }, [platformName]);
+
   return (
     <IntlProvider
       locale={lang}
