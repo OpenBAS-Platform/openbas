@@ -46,7 +46,7 @@ public class AtomicTestingApi extends RestBehavior {
 
   @GetMapping("/{injectId}")
   public AtomicTestingOutput findAtomicTesting(@PathVariable String injectId) {
-    return atomicTestingService.findById(injectId).map(AtomicTestingMapper::toDto).orElseThrow();
+    return atomicTestingService.findById(injectId).map(AtomicTestingMapper::toDtoWithTargetResults).orElseThrow();
   }
 
   @GetMapping("/{injectId}/detail")

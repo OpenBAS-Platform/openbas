@@ -353,7 +353,12 @@ public class Inject implements Base, Injection {
     return null;
   }
 
-  @Override
+  @JsonIgnore
+    public boolean isAtomicTesting(){
+        return this.exercise == null && this.scenario == null;
+    }
+
+    @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;

@@ -21,7 +21,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     width: '80px',
     height: '80px',
     borderRadius: '50%',
-    background: theme.palette.mode === 'dark' ? 'rgb(202,203,206)' : 'rgba(202,203,206,0.33)',
+    background: theme.palette.mode === 'dark' ? 'rgba(202,203,206,0.51)' : 'rgba(202,203,206,0.33)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

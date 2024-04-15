@@ -1,6 +1,5 @@
 package io.openbas.execution;
 
-import static io.openbas.database.model.InjectStatusExecution.traceError;
 import static io.openbas.database.model.InjectStatusExecution.traceInfo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -72,14 +71,13 @@ public class Executor {
             queueService.publish(inject.getType(), jsonInject);
             return savedStatus;
         } catch (Exception e) {
-            status.setName(ExecutionStatus.ERROR); //Fixme
+            status.setName(ExecutionStatus.ERROR); //Fixme We need this status?
             status.getTraces().add(InjectStatusExecution.traceError(e.getMessage()));
             return injectStatusRepository.save(status);
         }
     }
 
-    private InjectStatus executeInternal(ExecutableInject executableInject) {
-        Inject inject = executableInject.getInjection().getInject();
+    private InjectStatus executeInternal(ExecutableInject executableInject, Inject inject) {
         io.openbas.execution.Injector executor = this.context.getBean(inject.getType(), io.openbas.execution.Injector.class);
         Execution execution = executor.executeInjection(executableInject);
         Inject executedInject = injectRepository.findById(inject.getId()).orElseThrow();
@@ -103,7 +101,7 @@ public class Executor {
 
         return externalInjector
             .map(Injector::isExternal)
-            .map(isExternal -> isExternal ? executeExternal(executableInject, inject) : executeInternal(executableInject))
+            .map(isExternal -> isExternal ? executeExternal(executableInject, inject) : executeInternal(executableInject, inject))
             .orElseThrow(() -> new IllegalStateException("External injector not found for type: " + inject.getType()));
     }
 

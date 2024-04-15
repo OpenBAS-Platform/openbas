@@ -56,8 +56,6 @@ public class AtomicTestingInput {
     inject.setContract(getContract());
     inject.setDependsDuration(0L);
     inject.setAllTeams(isAllTeams());
-    inject.setCountry(null);
-    inject.setCity(null);
     return inject;
   }
 

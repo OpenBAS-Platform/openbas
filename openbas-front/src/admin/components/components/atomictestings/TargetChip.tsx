@@ -41,7 +41,7 @@ const TargetChip: FunctionComponent<Props> = ({
 
   // Calculate the number of remaining targets
   const remainingTargets = targets?.slice(2, targets?.length).map((target) => target.name).join(', ');
-  const remainingTargetsCount = (targets && visibleTargets && targets.length - visibleTargets.length);
+  const remainingTargetsCount = (targets && visibleTargets && targets.length - visibleTargets.length) || null;
 
   if (!targets || targets.length === 0) {
     return <HorizontalRule/>;

@@ -39,7 +39,7 @@ public class InjectHelper {
 
   private List<Team> getInjectTeams(@NotNull final Inject inject) {
     Exercise exercise = inject.getExercise();
-    return inject.isAllTeams() ? exercise.getTeams() : inject.getTeams();
+    return inject.isAllTeams() ? exercise.getTeams() : inject.getTeams(); //TODO
   }
 
   // -- INJECTION --
