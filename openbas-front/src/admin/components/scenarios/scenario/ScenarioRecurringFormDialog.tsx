@@ -292,19 +292,19 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
             }
           </Stack>
         </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>
+            {t('Cancel')}
+          </Button>
+          <Button
+            color="primary"
+            type="submit"
+            variant="contained"
+          >
+            {t('Start')}
+          </Button>
+        </DialogActions>
       </form>
-      <DialogActions>
-        <Button onClick={() => setOpen(false)}>
-          {t('Cancel')}
-        </Button>
-        <Button
-          color="primary"
-          type="submit"
-          variant="contained"
-        >
-          {t('Start')}
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };
