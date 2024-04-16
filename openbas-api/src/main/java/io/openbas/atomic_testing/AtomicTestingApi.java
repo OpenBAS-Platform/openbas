@@ -7,12 +7,14 @@ import io.openbas.atomic_testing.form.SimpleExpectationResultOutput;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.injectExpectation.InjectExpectationService;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,10 +44,11 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
 
-  @GetMapping()
-  public List<AtomicTestingOutput> findAllAtomicTestings() {
-    return atomicTestingService.findAllAtomicTestings().stream().map(AtomicTestingMapper::toDto).toList();
+  @PostMapping("/search")
+  public Page<AtomicTestingOutput> findAllAtomicTestings(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    return atomicTestingService.findAllAtomicTestings(searchPaginationInput).map(AtomicTestingMapper::toDto);
   }
+
 
   @GetMapping("/{injectId}")
   public AtomicTestingOutput findAtomicTesting(@PathVariable String injectId) {

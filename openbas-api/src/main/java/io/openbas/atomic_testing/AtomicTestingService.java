@@ -2,24 +2,34 @@ package io.openbas.atomic_testing;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.atomic_testing.form.AtomicTestingInput;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectDocument;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.model.User;
-import io.openbas.database.repository.*;
+import io.openbas.database.repository.AssetGroupRepository;
+import io.openbas.database.repository.AssetRepository;
+import io.openbas.database.repository.DocumentRepository;
+import io.openbas.database.repository.InjectDocumentRepository;
+import io.openbas.database.repository.InjectRepository;
+import io.openbas.database.repository.TagRepository;
+import io.openbas.database.repository.TeamRepository;
+import io.openbas.database.repository.UserRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -88,8 +98,12 @@ public class AtomicTestingService {
     this.documentRepository = documentRepository;
   }
 
-  public List<Inject> findAllAtomicTestings() {
-    return this.injectRepository.findAllAtomicTestings();
+  public Page<Inject> findAllAtomicTestings(SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+        (Specification<Inject> specification, Pageable pageable) -> injectRepository.findAllAtomicTestings(specification, pageable),
+        searchPaginationInput,
+        Inject.class
+    );
   }
 
   public Optional<Inject> findById(String injectId) {

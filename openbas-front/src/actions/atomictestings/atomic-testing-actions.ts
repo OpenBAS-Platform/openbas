@@ -1,12 +1,14 @@
 import { Dispatch } from 'redux';
-import { arrayOfAtomicTestings, arrayOftargetResults, atomicTesting, atomicTestingDetail } from './atomic-testing-schema';
-import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
-import type { AtomicTestingInput } from '../../utils/api-types';
+import { arrayOftargetResults, atomicTesting, atomicTestingDetail } from './atomic-testing-schema';
+import { delReferential, getReferential, postReferential, putReferential, simplePostCall } from '../../utils/Action';
+import type { AtomicTestingInput, SearchPaginationInput } from '../../utils/api-types';
 
 const ATOMIC_TESTING_URI = '/api/atomic_testings';
 
-export const fetchAtomicTestings = () => (dispatch: Dispatch) => {
-  return getReferential(arrayOfAtomicTestings, ATOMIC_TESTING_URI)(dispatch);
+export const searchAtomicTestings = (searchPaginationInput: SearchPaginationInput) => {
+  const data = searchPaginationInput;
+  const uri = `${ATOMIC_TESTING_URI}/search`;
+  return simplePostCall(uri, data);
 };
 
 export const fetchAtomicTesting = (injectId: string) => (dispatch: Dispatch) => {

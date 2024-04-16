@@ -5,7 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -82,5 +84,5 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
   long globalCount(@Param("creationDate") Instant creationDate);
 
   @Query(value = "select i from Inject i where i.scenario is null and i.exercise is null")
-  List<Inject> findAllAtomicTestings();
+  Page<Inject> findAllAtomicTestings(Specification<Inject> spec, Pageable pageable);
 }

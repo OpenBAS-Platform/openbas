@@ -1,38 +1,31 @@
-import React, { CSSProperties } from 'react';
+import React, { CSSProperties, useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import { CSVLink } from 'react-csv';
-import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { FileDownloadOutlined, KeyboardArrowRight } from '@mui/icons-material';
+import { KeyboardArrowRight } from '@mui/icons-material';
 import { useAppDispatch } from '../../../utils/hooks';
 import { useFormatter } from '../../../components/i18n';
-import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import type { InjectHelper } from '../../../actions/injects/inject-helper';
 import { fetchInjectTypes } from '../../../actions/Inject';
 import Breadcrumbs from '../../../components/Breadcrumbs';
-import SearchFilter from '../../../components/SearchFilter';
-import { exportData } from '../../../utils/Environment';
 import type { UsersHelper } from '../../../actions/helper';
 import InjectIcon from '../components/injects/InjectIcon';
 import InjectType from '../components/injects/InjectType';
-import type { AtomicTestingOutput, Contract } from '../../../utils/api-types';
-import { fetchAtomicTestings } from '../../../actions/atomictestings/atomic-testing-actions';
+import type { AtomicTestingOutput, Contract, SearchPaginationInput } from '../../../utils/api-types';
+import { searchAtomicTestings } from '../../../actions/atomictestings/atomic-testing-actions';
 import AtomicTestingCreation from './AtomicTestingCreation';
 import AtomicTestingResult from '../components/atomictestings/AtomicTestingResult';
 import TargetChip from '../components/atomictestings/TargetChip';
-import type { AtomicTestingHelper } from '../../../actions/atomictestings/atomic-testing-helper';
 import Empty from '../../../components/Empty';
 import StatusChip from '../components/atomictestings/StatusChip';
+import { initSorting } from '../../../components/common/pagination/Page';
+import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
+import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
+import { AtomicStore } from './AtomicTesting';
 
 const useStyles = makeStyles(() => ({
-  parameters: {
-    marginTop: -10,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   bodyItem: {
     height: 30,
     fontSize: 13,
@@ -41,10 +34,6 @@ const useStyles = makeStyles(() => ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     paddingRight: 10,
-  },
-  filters: {
-    display: 'flex',
-    gap: '10px',
   },
   itemHead: {
     paddingLeft: 10,
@@ -55,9 +44,6 @@ const useStyles = makeStyles(() => ({
   item: {
     paddingLeft: 10,
     height: 50,
-  },
-  downloadButton: {
-    marginRight: 15,
   },
   goIcon: {
     position: 'absolute',
@@ -139,14 +125,15 @@ const AtomicTestings = () => {
   const { t, fldt, tPick } = useFormatter();
 
   // Filter and sort hook
-  const filtering = useSearchAnFilter('atomic', 'title', ['title', 'targets']);
+  const [atomics, setAtomics] = useState<AtomicStore[]>([]);
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+    sorts: initSorting('inject_title'),
+  });
 
   // Fetching data
-  const { atomics, injectTypesMap }: {
-    atomics: AtomicTestingOutput[],
+  const { injectTypesMap }: {
     injectTypesMap: Record<string, Contract>,
-  } = useHelper((helper: InjectHelper & AtomicTestingHelper) => ({
-    atomics: helper.getAtomicTestings(),
+  } = useHelper((helper: InjectHelper) => ({
     injectTypesMap: helper.getInjectTypesMap(),
   }));
 
@@ -155,20 +142,19 @@ const AtomicTestings = () => {
   }));
 
   useDataLoader(() => {
-    dispatch(fetchAtomicTestings());
     dispatch(fetchInjectTypes());
   });
 
   // Headers
-  const fields = [
+  const headers = [
     {
-      name: 'atomic_title',
+      field: 'atomic_title',
       label: 'Title',
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => atomicTesting.atomic_title,
     },
     {
-      name: 'atomic_type',
+      field: 'atomic_type',
       label: 'Type',
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
@@ -184,13 +170,13 @@ const AtomicTestings = () => {
       },
     },
     {
-      name: 'atomic_last_start_execution_date',
+      field: 'atomic_last_start_execution_date',
       label: 'Date',
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => fldt(atomicTesting.atomic_last_execution_start_date),
     },
     {
-      name: 'atomic_targets',
+      field: 'atomic_targets',
       label: 'Target',
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
@@ -198,7 +184,7 @@ const AtomicTestings = () => {
       },
     },
     {
-      name: 'atomic_status',
+      field: 'atomic_status',
       label: 'Status',
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
@@ -206,7 +192,7 @@ const AtomicTestings = () => {
       },
     },
     {
-      name: 'atomic_expectations',
+      field: 'atomic_expectations',
       label: 'Global score',
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
@@ -216,47 +202,15 @@ const AtomicTestings = () => {
       },
     },
   ];
-  const sortedAtomicTestings: AtomicTestingOutput[] = filtering.filterAndSort(atomics);
 
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]}/>
-      <div className={classes.parameters}>
-        <div className={classes.filters}>
-          <SearchFilter
-            small
-            onChange={filtering.handleSearch}
-            keyword={filtering.keyword}
-          />
-        </div>
-        <div className={classes.downloadButton}>
-          {sortedAtomicTestings.length > 0 ? (
-            <CSVLink
-              data={exportData(
-                'atomic-testing',
-                [
-                  'atomic_title',
-                  'atomic_type',
-                  'atomic_last_start_execution_date',
-                  'atomic_status',
-                ],
-                sortedAtomicTestings,
-              )}
-              filename={'AtomicTestings.csv'}
-            >
-              <Tooltip title={t('Export this list')}>
-                <IconButton size="large">
-                  <FileDownloadOutlined color="primary"/>
-                </IconButton>
-              </Tooltip>
-            </CSVLink>
-          ) : (
-            <IconButton size="large" disabled>
-              <FileDownloadOutlined/>
-            </IconButton>
-          )}
-        </div>
-      </div>
+      <PaginationComponent
+        fetch={searchAtomicTestings}
+        searchPaginationInput={searchPaginationInput}
+        setContent={setAtomics}
+      />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -276,25 +230,16 @@ const AtomicTestings = () => {
           </ListItemIcon>
           <ListItemText
             primary={
-              <>
-                {fields.map((header) => (
-                  <div key={header.name}>
-                    {
-                            filtering.buildHeader(
-                              header.name,
-                              header.label,
-                              header.isSortable,
-                              inlineStylesHeaders,
-                            )
-                          }
-                  </div>
-                ))
-                    }
-              </>
+              <SortHeadersComponent
+                headers={headers}
+                inlineStylesHeaders={inlineStylesHeaders}
+                searchPaginationInput={searchPaginationInput}
+                setSearchPaginationInput={setSearchPaginationInput}
+              />
                 }
           />
         </ListItem>
-        {sortedAtomicTestings.map((atomicTesting) => {
+        {atomics.map((atomicTesting) => {
           return (
             <ListItemButton
               key={atomicTesting.atomic_id}
@@ -312,13 +257,13 @@ const AtomicTestings = () => {
               <ListItemText
                 primary={
                   <>
-                    {fields.map((field) => (
+                    {headers.map((header) => (
                       <div
-                        key={field.name}
+                        key={header.field}
                         className={classes.bodyItem}
-                        style={inlineStyles[field.name]}
+                        style={inlineStyles[header.field]}
                       >
-                        {field.value(atomicTesting)}
+                        {header.value(atomicTesting)}
                       </div>
                     ))}
                   </>
@@ -330,7 +275,7 @@ const AtomicTestings = () => {
             </ListItemButton>
           );
         })}
-        {!sortedAtomicTestings ? (
+        {!atomics ? (
           <Empty message={t('No data available')}/>
         ) : null}
       </List>

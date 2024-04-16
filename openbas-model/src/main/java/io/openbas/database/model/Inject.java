@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.converter.ContentConverter;
 import io.openbas.helper.MonoIdDeserializer;
@@ -53,6 +54,7 @@ public class Inject implements Base, Injection {
   private String id;
 
   @Getter
+  @Queryable(searchable = true, filterable = true, sortable = true)
   @Column(name = "inject_title")
   @JsonProperty("inject_title")
   private String title;

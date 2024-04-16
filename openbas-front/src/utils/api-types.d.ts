@@ -1007,12 +1007,12 @@ export interface InjectorConnection {
 }
 
 export interface InjectorContract {
+  injector_contract_atomic_testing?: boolean;
   injector_contract_content: string;
   /** @format date-time */
   injector_contract_created_at?: string;
   injector_contract_id: string;
   injector_contract_injector?: Injector;
-  injector_contract_is_used_for_atomic_testing?: boolean;
   injector_contract_labels?: Record<string, string>;
   injector_contract_manual?: boolean;
   /** @format date-time */
@@ -1337,6 +1337,25 @@ export interface OrganizationUpdateInput {
   organization_description?: string;
   organization_name: string;
   organization_tags?: string[];
+}
+
+export interface PageAtomicTestingOutput {
+  content?: AtomicTestingOutput[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
 }
 
 export interface PageAttackPattern {

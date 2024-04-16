@@ -125,16 +125,6 @@ public class SchemaUtils {
         }
       }
 
-      // Deep object
-      if (Arrays.stream(BASE_CLASSES).noneMatch(c -> c.equals(field.getType()))) {
-        // FIXME: not handling loop property but prevent it for now
-        // Exemple: Object A { private Object A; }
-        if (!field.getType().equals(clazz)) {
-          List<PropertySchema> propertiesSchema = schema(field.getType());
-          builder.propertiesSchema(propertiesSchema);
-        }
-      }
-
       return builder.build();
     }).toList();
   }
