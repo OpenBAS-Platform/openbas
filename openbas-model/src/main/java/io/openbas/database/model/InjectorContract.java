@@ -79,9 +79,10 @@ public class InjectorContract implements Base {
     private List<AttackPattern> attackPatterns = new ArrayList<>();
 
     @Getter
-    @Column(name = "injector_contract_is_used_for_atomic_testing")
-    @JsonProperty("injector_contract_is_used_for_atomic_testing")
-    private boolean isUsedForAtomicTesting;
+    @Column(name = "injector_contract_atomic_testing")
+    @JsonProperty("injector_contract_atomic_testing")
+    @Queryable(filterable = true)
+    private boolean isAtomicTesting;
 
     @JsonIgnore
     @Override

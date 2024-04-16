@@ -1,5 +1,6 @@
 package io.openbas.contract;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.contract.fields.ContractElement;
 import io.openbas.contract.variables.VariableHelper;
@@ -97,5 +98,12 @@ public class Contract {
 
     public void addAttackPattern(String id) {
         attackPatterns.add(id);
+    }
+
+    @JsonIgnore
+    public boolean isUsedForAtomicTesting(){
+        return !(this.config.getType().equals("openbas_manual") ||
+            this.config.getType().equals("openbas_channel") ||
+            this.config.getType().equals("openbas_challenge"));
     }
 }

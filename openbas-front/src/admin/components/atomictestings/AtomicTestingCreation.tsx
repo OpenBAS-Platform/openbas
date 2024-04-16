@@ -70,9 +70,28 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
   const [contracts, setContracts] = useState<InjectorContractStore[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
     sorts: initSorting('injector_contract_labels'),
+    filterGroup: {
+      mode: 'and',
+      filters: [
+        {
+          key: 'injector_contract_atomic_testing',
+          operator: 'eq',
+          values: ['true'],
+        }],
+    },
   });
 
-  const [filterGroup, helpers] = useFiltersState(emptyFilterGroup, (f: FilterGroup) => setSearchPaginationInput({ ...searchPaginationInput, filterGroup: f }));
+  const iniFilter: FilterGroup = {
+    mode: 'and',
+    filters: [
+      {
+        key: 'injector_contract_atomic_testing',
+        operator: 'eq',
+        values: ['true'],
+      }],
+  };
+
+  const [filterGroup, helpers] = useFiltersState(iniFilter, (f: FilterGroup) => setSearchPaginationInput({ ...searchPaginationInput, filterGroup: f }));
 
   const [selectedContract, setSelectedContract] = useState<InjectorContract | null>(null);
 
@@ -136,7 +155,7 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
                       <div>
                         {!isEmptyFilter(filterGroup, MITRE_FILTER_KEY)
                           && <Chip
-                            label={`Attack pattern = ${filterGroup.filters?.[0]?.values?.map((id) => attackPatternsMap[id].attack_pattern_name)}`}
+                            label={`Attack pattern = ${filterGroup.filters?.filter((f) => f.key === MITRE_FILTER_KEY)?.[0]?.values?.map((id) => attackPatternsMap[id].attack_pattern_name)}`}
                             onDelete={() => helpers.handleClearAllFilters()}
                             component="a"
                              />
