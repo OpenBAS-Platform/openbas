@@ -97,27 +97,34 @@ public class AtomicTestingService {
   }
 
   @Transactional
-  public Inject createOrUpdate(AtomicTestingInput input) {
-    Inject inject = input.toInject();
+  public Inject createOrUpdate(AtomicTestingInput input, String injectId) {
+    Inject injectToSave = new Inject();
+    if (injectId != null) {
+      injectToSave = injectRepository.findById(injectId).orElseThrow();
+    }
 
-    inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
-    inject.setExercise(null);
+    injectToSave.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
+    injectToSave.setExercise(null);
     // Set dependencies
-    inject.setDependsOn(null);
-    inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
-    inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+    injectToSave.setDependsOn(null);
+    injectToSave.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
+    injectToSave.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+    Inject finalInjectToSave = injectToSave;
     List<InjectDocument> injectDocuments = input.getDocuments().stream()
         .map(i -> {
           InjectDocument injectDocument = new InjectDocument();
-          injectDocument.setInject(inject);
+          injectDocument.setInject(finalInjectToSave);
           injectDocument.setDocument(documentRepository.findById(i.getDocumentId()).orElseThrow());
           injectDocument.setAttached(i.isAttached());
           return injectDocument;
         }).toList();
-    inject.setDocuments(injectDocuments);
-    inject.setAssets(fromIterable(this.assetRepository.findAllById(input.getAssets())));
-    inject.setAssetGroups(fromIterable(this.assetGroupRepository.findAllById(input.getAssetGroups())));
-    return injectRepository.save(inject);
+    injectToSave.setDocuments(injectDocuments);
+    injectToSave.setAssets(fromIterable(this.assetRepository.findAllById(input.getAssets())));
+    injectToSave.setAssetGroups(fromIterable(this.assetGroupRepository.findAllById(input.getAssetGroups())));
+    injectToSave.setDescription(input.getDescription());
+    injectToSave.setTitle(input.getTitle());
+    injectToSave.setContent(input.getContent());
+    return injectRepository.save(injectToSave);
   }
 
   @Transactional

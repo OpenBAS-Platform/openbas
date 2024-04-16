@@ -63,6 +63,7 @@ import InjectAddEndpoints from '../../exercises/injects/endpoints/InjectAddEndpo
 import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
 import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
 import InjectAddAssetGroups from '../../exercises/injects/assetgroups/InjectAddAssetGroups';
+import TagField from '../../../../components/TagField.js';
 
 const styles = (theme) => ({
   header: {
@@ -709,6 +710,8 @@ class InjectDefinition extends Component {
       inject_documents: documents,
       inject_teams: teamsIds,
       inject_title: data.atomic_testing_title,
+      inject_description: data.inject_description,
+      inject_tags: data.inject_tags,
       inject_type: inject.inject_type,
     };
     if (this.props.atomicTestingCreation) {
@@ -908,16 +911,16 @@ class InjectDefinition extends Component {
                                       </MenuItem>
                                     ))}
                                   </Select>
-                                  ) : (
-                                    <TextField
-                                      variant="standard"
-                                      name={`${name}.value`}
-                                      fullWidth={true}
-                                      label={t('Value')}
-                                      style={{ marginRight: 20 }}
-                                      disabled={this.props.permissions.readOnly}
-                                    />
-                                  )}
+                                ) : (
+                                  <TextField
+                                    variant="standard"
+                                    name={`${name}.value`}
+                                    fullWidth={true}
+                                    label={t('Value')}
+                                    style={{ marginRight: 20 }}
+                                    disabled={this.props.permissions.readOnly}
+                                  />
+                                )}
                                 {field.cardinality === 'n' && (
                                   <IconButton
                                     onClick={() => fields.remove(index)}
@@ -1366,10 +1369,30 @@ class InjectDefinition extends Component {
                       {t('Title')}
                     </Typography>
                     <TextField style={{ marginBottom: 33 }}
-                      variant="outlined"
-                      name="atomic_testing_title"
-                      fullWidth required
+                               variant="standard"
+                               name="atomic_testing_title"
+                               fullWidth required
                     />
+                    <Typography variant="h2" style={{ float: 'left' }}>
+                      {t('Description')}
+                    </Typography>
+                    <TextField
+                      variant="standard"
+                      name="atomic_testing_description"
+                      fullWidth={true}
+                      multiline={true}
+                      rows={2}
+                      style={{ marginTop: 20 }}
+                    />
+                    <Typography variant="h2" style={{ float: 'left' }}>
+                      {t('Tags')}
+                    </Typography>
+                    {/*<TagField
+                      name="atomic_testing_tags"
+                      values={values}
+                      setFieldValue={form.mutators.setValue}
+                      style={{ marginTop: 20 }}
+                    />*/}
                   </div>
                 }
                 {hasTeams && (
@@ -1914,7 +1937,7 @@ class InjectDefinition extends Component {
                         predefinedExpectationDatas={predefinedExpectations}
                         expectationDatas={expectations}
                         handleExpectations={this.handleExpectations.bind(this)}
-                         />
+                      />
                     }
                   </>
                 }

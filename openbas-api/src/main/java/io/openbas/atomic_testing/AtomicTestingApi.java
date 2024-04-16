@@ -9,7 +9,9 @@ import io.openbas.injectExpectation.InjectExpectationService;
 import io.openbas.rest.helper.RestBehavior;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -57,14 +59,14 @@ public class AtomicTestingApi extends RestBehavior {
 
   @PostMapping()
   public AtomicTestingOutput createAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {
-    return AtomicTestingMapper.toDto(atomicTestingService.createOrUpdate(input));
+    return AtomicTestingMapper.toDto(atomicTestingService.createOrUpdate(input, null));
   }
 
   @PutMapping("/{injectId}")
   public AtomicTestingOutput updateAtomicTesting(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingInput input) {
-    return null; //todo
+    return AtomicTestingMapper.toDto(atomicTestingService.createOrUpdate(input, injectId));
   }
 
   @DeleteMapping("/{injectId}")

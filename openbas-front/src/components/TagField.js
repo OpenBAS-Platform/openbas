@@ -44,6 +44,7 @@ class TagField extends Component {
   }
 
   onSubmit(data) {
+    console.log('In Tagfield: ');
     const { name, setFieldValue, values } = this.props;
     this.props.addTag(data).then((result) => {
       if (result.result) {

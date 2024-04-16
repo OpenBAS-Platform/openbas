@@ -5,8 +5,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
-import { deleteAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
-import Drawer from '../../../../components/common/Drawer';
+import { deleteAtomicTesting, UpdateAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
 import InjectDefinition from '../../components/injects/InjectDefinition';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import { useHelper } from '../../../../store';
@@ -14,6 +13,7 @@ import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import type { TagsHelper } from '../../../../actions/helper';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import { PermissionsContext } from '../../components/Context';
+import FullPageDrawer from '../../../../components/common/FullPageDrawer';
 
 interface Props {
   atomic: AtomicTestingOutput;
@@ -67,33 +67,26 @@ const AtomicPopover: FunctionComponent<Props> = ({
   return (
     <>
       <ButtonPopover entries={entries} />
-      <Drawer
+      <FullPageDrawer
         open={edition}
         handleClose={() => setEdition(false)}
         title={t('Update the atomic testing')}
       >
         {/* <InjectDefinition
           injectId={atomic.atomic_id}
-          inject={{
-            inject_contract: atomic.atomic_contract,
-            inject_type: atomic.atomic_type,
-            inject_teams: [],
-            inject_assets: [],
-            inject_asset_groups: [],
-            inject_documents: [],
-          }}
+          inject={{ atomic }}
           injectTypes={injectTypes}
           handleClose={() => setEdition(false)}
           tagsMap={tagsMap}
           permissions={permissions}
           teamsFromExerciseOrScenario={teams}
-          articlesFromExerciseOrScenario={articles}
-          variablesFromExerciseOrScenario={variables}
-          onUpdateInject={onUpdateInject}
-          uriVariable={uriVariable}
-          allUsersNumber={allUsersNumber}
-          usersNumber={usersNumber}
-          teamsUsers={teamsUsers}
+          articlesFromExerciseOrScenario={[]}
+          variablesFromExerciseOrScenario={[]}
+          onUpdateInject={UpdateAtomicTesting}
+          uriVariable={''}
+          allUsersNumber={0}
+          usersNumber={0}
+          teamsUsers={[]}
         />
 
         <InjectDefinition
@@ -123,7 +116,7 @@ const AtomicPopover: FunctionComponent<Props> = ({
           handleBack={handleBack}
           handleReset={handleReset}
         /> */}
-      </Drawer>
+      </FullPageDrawer>
       <DialogDelete
         open={deletion}
         handleClose={() => setDeletion(false)}
