@@ -215,9 +215,11 @@ const i18n = {
       File: 'Fichier',
       Simulations: 'Simulations',
       Simulation: 'Simulation',
+      Exercise: 'Simulation',
       Scenarios: 'Scenarios',
       Detection: 'Détection',
       Detections: 'Détections',
+      Asset: 'Actif',
       Assets: 'Actifs',
       Active: 'Actif',
       Inactive: 'Inactif',
@@ -754,7 +756,8 @@ const i18n = {
       'Add assets in this inject': 'Ajouter des actifs dans ce stimuli',
       // Asset groups
       'Asset groups': 'Groupe d\'assets',
-      AssetGroups: 'Groupe-d-assets',
+      AssetGroup: 'Groupe-d-assets',
+      AssetGroups: 'Groupes-d-assets',
       'Dynamic asset filter': 'Filtre d\'actifs dynamique',
       'Filter allowing assets to be added dynamically to this group': 'Filtre permettant d\'ajouter dynamiquement des actifs à ce groupe',
       'Create a new asset group': 'Créer un nouvel asset group',
@@ -871,6 +874,7 @@ const i18n = {
       'Ip Address {index}': 'Ip Address {index}',
       phone_number_tooltip: 'Phone number should start with a plus sign ( + )\n'
         + 'It may contain white spaces or hyphens ( – ) or parenthesis.\n',
+      Exercise: 'Simulation',
       // -- FILTERS --
       // Endpoint
       endpoint_hostname: 'Hostname',

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AppBar, Badge, Box, Grid, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AccountCircleOutlined, AppsOutlined, NotificationsOutlined } from '@mui/icons-material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { logout } from '../../../actions/Application';
@@ -91,11 +91,14 @@ const useStyles = makeStyles<Theme>((theme) => ({
 }));
 
 const TopBar: React.FC = () => {
+  // Standard hooks
   const theme = useTheme<Theme>();
   const location = useLocation();
+  const navigate = useNavigate();
   const classes = useStyles();
   const { t } = useFormatter();
   const { settings } = useAuth();
+
   const [xtmOpen, setXtmOpen] = useState<{
     open: boolean;
     anchorEl: HTMLButtonElement | null;
@@ -139,6 +142,11 @@ const TopBar: React.FC = () => {
     handleCloseMenu();
   };
 
+  // Full Text search
+  const onFullTextSearch = (search: string) => {
+    navigate(`/admin/fulltextsearch?search=${search}`);
+  };
+
   return (
     <AppBar
       position="fixed"
@@ -161,6 +169,7 @@ const TopBar: React.FC = () => {
             variant="topBar"
             placeholder={`${t('Search the platform')}...`}
             fullWidth={true}
+            onSubmit={onFullTextSearch}
           />
         </div>
         <div className={classes.barRight}>
@@ -251,7 +260,7 @@ const TopBar: React.FC = () => {
               </Box>
             </Popover>
             <IconButton
-              aria-label='account-menu'
+              aria-label="account-menu"
               onClick={handleOpenMenu}
               size="medium"
               color={

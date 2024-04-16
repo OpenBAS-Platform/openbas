@@ -19,7 +19,7 @@ class OrganizationPopover extends Component {
     super(props);
     this.state = {
       openDelete: false,
-      openEdit: false,
+      openEdit: props.openEditOnInit,
       openPopover: false,
     };
   }
@@ -150,6 +150,7 @@ OrganizationPopover.propTypes = {
   tagsMap: PropTypes.object,
   updateOrganization: PropTypes.func,
   deleteOrganization: PropTypes.func,
+  openEditOnInit: PropTypes.bool,
 };
 
 export default R.compose(

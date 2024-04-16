@@ -23,9 +23,10 @@ interface Props<T> {
   searchPaginationInput: SearchPaginationInput;
   setContent: (data: T[]) => void;
   exportProps?: ExportProps<T>;
+  searchEnable?: boolean;
 }
 
-const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, setContent, exportProps }: Props<T>) => {
+const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, setContent, exportProps, searchEnable = true }: Props<T>) => {
   // Standard hooks
   const classes = useStyles();
 
@@ -49,7 +50,7 @@ const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, s
   };
 
   // Text Search
-  const [textSearch, setTextSearch] = React.useState('');
+  const [textSearch, setTextSearch] = React.useState(searchPaginationInput.textSearch ?? '');
   const handleTextSearch = (value: string) => {
     setPage(0);
     setTextSearch(value);
@@ -72,11 +73,15 @@ const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, s
 
   return (
     <div className={classes.parameters}>
-      <SearchFilter
-        variant="small"
-        onChange={handleTextSearch}
-        keyword={textSearch}
-      />
+      <div>
+        {searchEnable
+          && <SearchFilter
+            variant="small"
+            onChange={handleTextSearch}
+            keyword={textSearch}
+             />
+        }
+      </div>
       <div className={classes.container}>
         <TablePagination
           component="div"

@@ -3,6 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MultiIdDeserializer;
 import org.hibernate.annotations.UuidGenerator;
@@ -30,6 +31,7 @@ public class Organization implements Base {
 
     @Column(name = "organization_name")
     @JsonProperty("organization_name")
+    @Queryable(searchable = true)
     private String name;
 
     @Column(name = "organization_description")

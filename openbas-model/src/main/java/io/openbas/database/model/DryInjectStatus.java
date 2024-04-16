@@ -92,7 +92,9 @@ public class DryInjectStatus implements Base {
         ExecutionStatus globalStatus = numberOfSuccess > 0 ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR;
         ExecutionStatus finalStatus = numberOfError > 0 && numberOfSuccess > 0 ? ExecutionStatus.PARTIAL : globalStatus;
         injectStatus.setName(finalStatus);
-        injectStatus.setTrackingTotalExecutionTime(Duration.between(injectStatus.getTrackingSentDate(), injectStatus.getTrackingEndDate()).getSeconds());
+        if (injectStatus.getTrackingSentDate() != null && injectStatus.getTrackingEndDate() != null) {
+            injectStatus.setTrackingTotalExecutionTime(Duration.between(injectStatus.getTrackingSentDate(), injectStatus.getTrackingEndDate()).getSeconds());
+        }
         return injectStatus;
     }
 

@@ -14,14 +14,12 @@ import java.util.Optional;
 @Repository
 public interface TeamRepository extends CrudRepository<Team, String>, JpaSpecificationExecutor<Team> {
 
-    @NotNull
-    Optional<Team> findById(@NotNull String id);
+  @NotNull
+  Optional<Team> findById(@NotNull String id);
 
-    List<Team> findByNameIgnoreCase(String name);
+  List<Team> findByNameIgnoreCase(String name);
 
-    @Query("select team from Team team where team.organization is null or team.organization.id in :organizationIds")
-    List<Team> teamsAccessibleFromOrganizations(@Param("organizationIds") List<String> organizationIds);
+  @Query("select team from Team team where team.organization is null or team.organization.id in :organizationIds")
+  List<Team> teamsAccessibleFromOrganizations(@Param("organizationIds") List<String> organizationIds);
 
-    @Query("select team from Team team where team.contextual is true")
-    List<Team> teamsNotContextual();
 }
