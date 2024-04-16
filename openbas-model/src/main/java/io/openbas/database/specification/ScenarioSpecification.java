@@ -8,18 +8,18 @@ import java.time.Instant;
 
 public class ScenarioSpecification {
 
-  public static Specification<Scenario> recurring() {
+  public static Specification<Scenario> isRecurring() {
     return (root, query, cb) -> cb.isNotNull(root.get("recurrence"));
   }
 
-  public static Specification<Scenario> recurringStartDate(@NotNull final Instant startDate) {
+  public static Specification<Scenario> recurrenceStartDateAfter(@NotNull final Instant startDate) {
     return (root, query, cb) -> cb.or(
         cb.isNull(root.get("recurrenceStart")),
         cb.lessThanOrEqualTo(root.get("recurrenceStart"), startDate)
     );
   }
 
-  public static Specification<Scenario> recurringStopDate(@NotNull final Instant stopDate) {
+  public static Specification<Scenario> recurrenceStopDateBefore(@NotNull final Instant stopDate) {
     return (root, query, cb) -> cb.or(
         cb.isNull(root.get("recurrenceEnd")),
         cb.greaterThanOrEqualTo(root.get("recurrenceEnd"), stopDate)

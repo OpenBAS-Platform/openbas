@@ -133,15 +133,15 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
   }, [initialValues.scenario_recurrence]);
 
   return (
-    <form onSubmit={handleSubmit(submit)}>
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        TransitionComponent={Transition}
-        PaperProps={{ elevation: 1 }}
-        maxWidth="xs"
-        fullWidth
-      >
+    <Dialog
+      open={open}
+      onClose={() => setOpen(false)}
+      TransitionComponent={Transition}
+      PaperProps={{ elevation: 1 }}
+      maxWidth="xs"
+      fullWidth
+    >
+      <form onSubmit={handleSubmit(submit)}>
         <DialogTitle>{t('Scheduling')}</DialogTitle>
         <DialogContent>
           <Stack spacing={{ xs: 2 }}>
@@ -189,12 +189,12 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                   <FormControlLabel
                     control={
                       <Switch checked={field.value}
-                        onChange={field.onChange}
+                              onChange={field.onChange}
                       />
                     }
                     label={t('Only weekday')}
                   />)}
-                 />
+              />
             }
             {
               ['monthly'].includes(selectRecurring)
@@ -217,7 +217,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                     </Select>
                   </FormControl>
                 )}
-                 />
+              />
             }
             {
               ['weekly', 'monthly'].includes(selectRecurring)
@@ -242,7 +242,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                     </Select>
                   </FormControl>
                 )}
-                 />
+              />
             }
             <Controller
               control={control}
@@ -288,24 +288,24 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                     label={t('End date')}
                   />
                 )}
-                 />
+              />
             }
           </Stack>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>
-            {t('Cancel')}
-          </Button>
-          <Button
-            color="primary"
-            type="submit"
-            variant="contained"
-          >
-            {t('Start')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </form>
+      </form>
+      <DialogActions>
+        <Button onClick={() => setOpen(false)}>
+          {t('Cancel')}
+        </Button>
+        <Button
+          color="primary"
+          type="submit"
+          variant="contained"
+        >
+          {t('Start')}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 
