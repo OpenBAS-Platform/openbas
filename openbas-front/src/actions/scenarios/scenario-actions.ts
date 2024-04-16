@@ -58,13 +58,6 @@ export const importScenario = (formData: FormData) => (dispatch: Dispatch) => {
   return postReferential(null, uri, formData)(dispatch);
 };
 
-// -- EXERCISES --
-
-export const toExercise = (scenarioId: Scenario['scenario_id']) => (dispatch: Dispatch) => {
-  const uri = `${SCENARIO_URI}/${scenarioId}/exercises`;
-  return postReferential(null, uri, null)(dispatch);
-};
-
 // -- TAGS --
 
 export const updateScenarioTags = (scenarioId: Scenario['scenario_id'], data: ScenarioUpdateTagsInput) => {

@@ -1,6 +1,5 @@
 package io.openbas.scenario;
 
-import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Team;
 import io.openbas.database.model.User;
@@ -99,15 +98,6 @@ public class ScenarioApi {
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public void deleteScenario(@PathVariable @NotBlank final String scenarioId) {
     this.scenarioService.deleteScenario(scenarioId);
-  }
-
-  // -- EXERCISES --
-
-  @PostMapping(SCENARIO_URI + "/{scenarioId}/exercises")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Exercise toExercise(@PathVariable @NotBlank final String scenarioId) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    return this.scenarioToExerciseService.toExercise(scenario, null);
   }
 
   // -- TAGS --

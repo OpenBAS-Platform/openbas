@@ -20,10 +20,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static io.openbas.database.specification.ExerciseSpecification.recurringInstanceNotStarted;
-import static java.time.Instant.now;
 
 @Component
 @RequiredArgsConstructor
@@ -36,17 +36,17 @@ public class ScenarioExecutionJob implements Job {
   @Override
   @Transactional(rollbackFor = Exception.class)
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-    // Find each scenario with cron
-    List<Scenario> scenarios = this.scenarioService.recurringScenarios();
-    // Filter on valid cron scenario -> Start recurence date is reached
-    Instant nowMidnight = ZonedDateTime.now(ZoneOffset.UTC).toLocalDate().atStartOfDay(ZoneOffset.UTC).toInstant();
+    // Find each scenario with cron where now is between start and end date
+    List<Scenario> scenarios = this.scenarioService.recurringScenarios(Instant.now());
+    // Filter on valid cron scenario -> Start date on cron is in 1 minute
     List<Scenario> validScenarios = scenarios.stream()
         .filter(scenario -> {
-          if (scenario.getRecurrenceStart() == null) {
-            return true;
-          }
-          return scenario.getRecurrenceStart().equals(nowMidnight) || scenario.getRecurrenceStart()
-              .isAfter(nowMidnight);
+          Instant startDate = cronToDate(scenario.getRecurrence()).minus(1, ChronoUnit.MINUTES);
+          Instant now = Instant.now();
+
+          ZonedDateTime startDateMinute = startDate.atZone(ZoneId.of("UTC")).truncatedTo(ChronoUnit.MINUTES);
+          ZonedDateTime nowMinute = now.atZone(ZoneId.of("UTC")).truncatedTo(ChronoUnit.MINUTES);
+          return startDateMinute.equals(nowMinute);
         })
         .toList();
     // Check if a simulation link to this scenario already exists
@@ -60,13 +60,11 @@ public class ScenarioExecutionJob implements Job {
     validScenarios.stream()
         .filter(scenario -> !alreadyExistIds.contains(scenario.getId()))
         // Create simulation with start date provided by cron
-        .forEach(scenario -> {
-          this.scenarioToExerciseService.toExercise(scenario, cronToDate(scenario.getRecurrence()));
-        });
+        .forEach(scenario -> this.scenarioToExerciseService.toExercise(scenario, cronToDate(scenario.getRecurrence())));
   }
 
   private Instant cronToDate(@NotBlank final String cronExpression) {
-    CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(CronType.UNIX);
+    CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(CronType.SPRING53);
     CronParser parser = new CronParser(cronDefinition);
     Cron cron = parser.parse(cronExpression);
     ExecutionTime executionTime = ExecutionTime.forCron(cron);
