@@ -784,7 +784,6 @@ const i18n = {
       phone_number_tooltip: 'Le numéro de téléphone devrait commencer par un signe plus ( + )\n'
         + 'Il peut contenir des espaces ou des tirets ( – ) ou des parenthèses.\n',
       'Instantiate a simulation': 'Créer une nouvelle simulation',
-      'Instantiate a simulation from this scenario': 'Créer une nouvelle simulation depuis ce scenario',
       // -- FILTERS --
       'Add filter': 'Ajout d\'un filtre',
       'Clear filters': 'Supprimer les filtres',
@@ -794,7 +793,6 @@ const i18n = {
       endpoint_hostname: 'Nom d\'hôte',
       endpoint_ips: 'Addresse Ips',
       endpoint_platform: 'Platforme',
-      Instantiate: 'Instancier',
       Recurrence: 'Récurrence',
       'Does not repeat': 'Ne se répète pas',
       Daily: 'Quotidien',

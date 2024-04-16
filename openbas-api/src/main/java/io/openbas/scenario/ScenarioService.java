@@ -95,9 +95,9 @@ public class ScenarioService {
 
   public List<Scenario> recurringScenarios(@NotNull final Instant instant) {
     return this.scenarioRepository.findAll(
-        ScenarioSpecification.recurring()
-            .and(ScenarioSpecification.recurringStartDate(instant))
-            .and(ScenarioSpecification.recurringStopDate(instant))
+        ScenarioSpecification.isRecurring()
+            .and(ScenarioSpecification.recurrenceStartDateAfter(instant))
+            .and(ScenarioSpecification.recurrenceStopDateBefore(instant))
     );
   }
 
