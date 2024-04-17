@@ -5,7 +5,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
-import { deleteAtomicTesting, UpdateAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
+import { deleteAtomicTesting, updateAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
 import InjectDefinition from '../../components/injects/InjectDefinition';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import { useHelper } from '../../../../store';
@@ -74,7 +74,15 @@ const AtomicPopover: FunctionComponent<Props> = ({
       >
         {/* <InjectDefinition
           injectId={atomic.atomic_id}
-          inject={{ atomic }}
+          inject={{
+            inject_contract: atomic.atomic_contract,
+            inject_type: atomic.atomic_type,
+            inject_teams: [],
+            inject_assets: [],
+            inject_asset_groups: [],
+            inject_documents: [],
+            inject_tags: [],
+          }}
           injectTypes={injectTypes}
           handleClose={() => setEdition(false)}
           tagsMap={tagsMap}
@@ -82,39 +90,13 @@ const AtomicPopover: FunctionComponent<Props> = ({
           teamsFromExerciseOrScenario={teams}
           articlesFromExerciseOrScenario={[]}
           variablesFromExerciseOrScenario={[]}
-          onUpdateInject={UpdateAtomicTesting}
+          onUpdateInject={updateAtomicTesting}
           uriVariable={''}
           allUsersNumber={0}
           usersNumber={0}
-          teamsUsers={[]}
-        />
-
-        <InjectDefinition
-          ref={injectDefinitionRef}
-          inject={{
-            inject_contract: contractId,
-            inject_type: injectType,
-            inject_teams: [],
-            inject_assets: [],
-            inject_asset_groups: [],
-            inject_documents: [],
-          }}
-          injectTypes={injectTypes}
-          handleClose={handleClose}
-          tagsMap={tagsMap}
-          permissions={permissions}
-          teamsFromExerciseOrScenario={teams}
-          articlesFromExerciseOrScenario={[]}
-          variablesFromExerciseOrScenario={[]}
-          onUpdateInject={onUpdateInject}
-          uriVariable={''}
-          allUsersNumber={0}
-          usersNumber={0}
-          teamsUsers={[]}
-          atomicTestingCreation={true}
-          onAddAtomicTesting={onAddAtomicTesting}
-          handleBack={handleBack}
-          handleReset={handleReset}
+          teamsUsers={{}}
+          atomicTestingCreation={false}
+          atomicTestingUpdate={true}
         /> */}
       </FullPageDrawer>
       <DialogDelete

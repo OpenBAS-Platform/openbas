@@ -1124,6 +1124,7 @@ class InjectDefinition extends Component {
       teamsFromExerciseOrScenario,
       articlesFromExerciseOrScenario,
       atomicTestingCreation,
+      atomicTestingUpdate,
       handleBack,
     } = this.props;
     if (!inject) {
@@ -1363,7 +1364,7 @@ class InjectDefinition extends Component {
             {({ form, handleSubmit, submitting, values }) => (
               <form id="injectContentForm" onSubmit={handleSubmit}>
                 {
-                  atomicTestingCreation
+                  (atomicTestingCreation || atomicTestingUpdate)
                   && (
                     <>
                       <Typography variant="h2" style={{ float: 'left' }}>
@@ -1385,15 +1386,14 @@ class InjectDefinition extends Component {
                         rows={2}
                         style={{ marginTop: 20 }}
                       />
-                      <Typography variant="h2" style={{ float: 'left' }}>
+                      <Typography variant="h2" style={{ float: 'left', marginTop: 20 }}>
                         {t('Tags')}
                       </Typography>
                       <TagField
                         name="inject_tags"
-                        label={t('Tags')}
                         values={values}
                         setFieldValue={form.mutators.setValue}
-                        style={{ marginTop: 20 }}
+                        style={{ marginBottom: 20 }}
                       />
                     </>
                   )
@@ -2166,6 +2166,7 @@ InjectDefinition.propTypes = {
   teamsUsers: PropTypes.object,
   onAddAtomicTesting: PropTypes.func,
   atomicTestingCreation: PropTypes.bool,
+  atomicTestingUpdate: PropTypes.bool,
   handleBack: PropTypes.func,
   handleReset: PropTypes.func,
 };

@@ -23,7 +23,7 @@ interface Props {
   handleReset: () => void;
 }
 
-const CreationInjectType: FunctionComponent<Props> = ({
+const CreationInjectDetails: FunctionComponent<Props> = ({
   contractId, injectType, handleClose, handleBack, handleReset,
 }) => {
   const { permissions } = useContext(PermissionsContext);
@@ -82,4 +82,4 @@ const CreationInjectType: FunctionComponent<Props> = ({
   );
 };
 
-export default CreationInjectType;
+export default CreationInjectDetails;
