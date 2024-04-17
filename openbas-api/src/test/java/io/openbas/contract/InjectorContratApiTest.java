@@ -151,8 +151,8 @@ class InjectorContratApiTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
-            .andExpect(jsonPath("$.content.[0].injector_contract_labels.en").value("Send multi-recipients mail"))
-            .andExpect(jsonPath("$.content.[1].injector_contract_labels.en").value("Send individual mails"));
+            .andExpect(jsonPath("$.content.[0].injector_contract_labels.en").value("Send individual mails"))
+            .andExpect(jsonPath("$.content.[1].injector_contract_labels.en").value("Send multi-recipients mail"));
       }
 
       @DisplayName("Sorting by label desc")
