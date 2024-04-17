@@ -1,4 +1,5 @@
 import { schema } from 'normalizr';
+import type { SimpleExpectationResultOutput } from '../../utils/api-types';
 
 export const atomicTesting = new schema.Entity(
   'atomics',
@@ -14,9 +15,11 @@ export const atomicTestingDetail = new schema.Entity(
 );
 export const arrayOfAtomicTestingDetails = new schema.Array(atomicTestingDetail);
 
+const targetIdAttribute = (value: SimpleExpectationResultOutput) => `${value.target_id}_${value.target_inject_id}_${value.target_result_type}`;
+
 export const targetResult = new schema.Entity(
   'targetresults',
   {},
-  { idAttribute: 'target_result_id' },
+  { idAttribute: targetIdAttribute },
 );
 export const arrayOftargetResults = new schema.Array(targetResult);
