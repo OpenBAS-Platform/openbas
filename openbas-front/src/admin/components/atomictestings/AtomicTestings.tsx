@@ -121,7 +121,6 @@ const inlineStyles: Record<string, CSSProperties> = {
 const AtomicTestings = () => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   const { t, fldt, tPick } = useFormatter();
 
   // Filter and sort hook
@@ -130,20 +129,9 @@ const AtomicTestings = () => {
     sorts: initSorting('inject_title'),
   });
 
-  // Fetching data
-  const { injectTypesMap }: {
-    injectTypesMap: Record<string, any>,
-  } = useHelper((helper: InjectHelper) => ({
-    injectTypesMap: helper.getInjectTypesMap(),
-  }));
-
   const { userAdmin } = useHelper((helper: UsersHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
-
-  useDataLoader(() => {
-    dispatch(fetchInjectTypes());
-  });
 
   // Headers
   const headers = [
@@ -157,16 +145,8 @@ const AtomicTestings = () => {
       field: 'atomic_type',
       label: 'Type',
       isSortable: true,
-      value: (atomicTesting: AtomicTestingOutput) => {
-        const injectContract = injectTypesMap[atomicTesting.atomic_contract];
-        const injectTypeName = tPick(injectContract?.label);
-        return (
-          <InjectType
-            variant="list"
-            label={injectTypeName}
-          />
-        );
-      },
+      // TODO add atomic_inject_label in /api/atomic_testings/search backend with label map
+      value: (atomicTesting: AtomicTestingOutput) => tPick(atomicTesting.atomic_inject_label),
     },
     {
       field: 'atomic_last_start_execution_date',

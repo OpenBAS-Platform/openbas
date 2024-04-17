@@ -68,7 +68,7 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
   // Contracts
   const [contracts, setContracts] = useState<InjectorContractStore[]>([]);
   // as we don't know the type of the content of a contract we need to put any here
-  // eslint-ignore-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [parsedContentContracts, setParsedContentContracts] = useState<any[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
     sorts: initSorting('injector_contract_labels'),
@@ -216,7 +216,7 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
             activeStep === 1 && selectedContract !== null
             && <CreationInjectDetails
               contractId={contracts[selectedContract].injector_contract_id}
-              injectType={parsedContentContracts[selectedContract].config.type}
+              contractContent={parsedContentContracts[selectedContract]}
               handleClose={() => setOpen(false)}
               handleBack={handleBack}
               handleReset={handleReset}
