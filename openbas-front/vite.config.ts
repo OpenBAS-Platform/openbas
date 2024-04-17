@@ -26,6 +26,7 @@ export default ({ mode }: { mode: string }) => {
   return defineConfig({
     build: {
       target: ['chrome58'],
+      sourcemap: true,
     },
 
     resolve: {
