@@ -1,13 +1,10 @@
-import React, { FunctionComponent, useContext, useRef, useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { Button } from '@mui/material';
+import React, { FunctionComponent, useContext } from 'react';
 import InjectDefinition from '../../components/injects/InjectDefinition';
 import { InjectContext, PermissionsContext } from '../../components/Context';
-import type { AtomicTestingInput, Tag, InjectorContract } from '../../../../utils/api-types';
+import type { Tag, InjectorContract } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import type { TagsHelper } from '../../../../actions/helper';
-import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { fetchTeams } from '../../../../actions/teams/team-actions';
 import { createAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
@@ -28,7 +25,6 @@ const CreationInjectDetails: FunctionComponent<Props> = ({
 }) => {
   const { permissions } = useContext(PermissionsContext);
   const dispatch = useAppDispatch();
-  const injectDefinitionRef = useRef();
   const { onUpdateInject } = useContext(InjectContext);
   const { injectTypesMap, tagsMap, teams }: {
     injectTypesMap: Record<string, InjectorContract>,
@@ -51,7 +47,6 @@ const CreationInjectDetails: FunctionComponent<Props> = ({
 
   return (
     <InjectDefinition
-      ref={injectDefinitionRef}
       inject={{
         inject_contract: contractId,
         inject_type: injectType,
@@ -78,7 +73,6 @@ const CreationInjectDetails: FunctionComponent<Props> = ({
       handleBack={handleBack}
       handleReset={handleReset}
     />
-
   );
 };
 

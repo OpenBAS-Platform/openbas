@@ -68,14 +68,14 @@ const SortHeadersList: FunctionComponent<Props> = ({
   const sortHeader = (header: Header, style: CSSProperties) => {
     if (header.isSortable) {
       return (
-        <div style={style} onClick={() => reverseBy(header.field)}>
+        <div key={header.label} style={style} onClick={() => reverseBy(header.field)}>
           <span>{t(header.label)}</span>
           {sortBy === header.field ? sortComponent(sortAsc) : ''}
         </div>
       );
     }
     return (
-      <div style={style}>
+      <div key={header.label} style={style}>
         <span>{t(header.label)}</span>
       </div>
     );

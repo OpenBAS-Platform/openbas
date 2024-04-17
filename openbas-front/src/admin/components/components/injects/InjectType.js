@@ -27,7 +27,7 @@ const styles = () => ({
 
 class InjectType extends Component {
   render() {
-    const { config, classes, label, variant, theme } = this.props;
+    const { classes, label, variant, theme } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     return (
       <Tooltip title={label}>
@@ -48,7 +48,6 @@ class InjectType extends Component {
 InjectType.propTypes = {
   classes: PropTypes.object.isRequired,
   variant: PropTypes.string,
-  config: PropTypes.object,
   label: PropTypes.string,
 };
 

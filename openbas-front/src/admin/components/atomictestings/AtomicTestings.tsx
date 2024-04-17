@@ -13,7 +13,7 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 import type { UsersHelper } from '../../../actions/helper';
 import InjectIcon from '../components/injects/InjectIcon';
 import InjectType from '../components/injects/InjectType';
-import type { AtomicTestingOutput, Contract, SearchPaginationInput } from '../../../utils/api-types';
+import type { AtomicTestingOutput, SearchPaginationInput } from '../../../utils/api-types';
 import { searchAtomicTestings } from '../../../actions/atomictestings/atomic-testing-actions';
 import AtomicTestingCreation from './AtomicTestingCreation';
 import AtomicTestingResult from '../components/atomictestings/AtomicTestingResult';
@@ -132,7 +132,7 @@ const AtomicTestings = () => {
 
   // Fetching data
   const { injectTypesMap }: {
-    injectTypesMap: Record<string, Contract>,
+    injectTypesMap: Record<string, any>,
   } = useHelper((helper: InjectHelper) => ({
     injectTypesMap: helper.getInjectTypesMap(),
   }));
@@ -163,7 +163,6 @@ const AtomicTestings = () => {
         return (
           <InjectType
             variant="list"
-            config={injectContract?.config}
             label={injectTypeName}
           />
         );
@@ -180,7 +179,7 @@ const AtomicTestings = () => {
       label: 'Target',
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
-        return (<TargetChip targets={atomicTesting.atomic_targets}/>);
+        return (<TargetChip targets={atomicTesting.atomic_targets} />);
       },
     },
     {
@@ -188,7 +187,7 @@ const AtomicTestings = () => {
       label: 'Status',
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
-        return (<StatusChip status={atomicTesting.atomic_status}/>);
+        return (<StatusChip status={atomicTesting.atomic_status} />);
       },
     },
     {
@@ -197,7 +196,7 @@ const AtomicTestings = () => {
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
         return (
-          <AtomicTestingResult expectations={atomicTesting.atomic_expectation_results}/>
+          <AtomicTestingResult expectations={atomicTesting.atomic_expectation_results} />
         );
       },
     },
@@ -205,7 +204,7 @@ const AtomicTestings = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]}/>
+      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]} />
       <PaginationComponent
         fetch={searchAtomicTestings}
         searchPaginationInput={searchPaginationInput}
@@ -236,7 +235,7 @@ const AtomicTestings = () => {
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-                }
+            }
           />
         </ListItem>
         {atomics.map((atomicTesting) => {
@@ -267,19 +266,19 @@ const AtomicTestings = () => {
                       </div>
                     ))}
                   </>
-                      }
+                }
               />
               <ListItemIcon classes={{ root: classes.goIcon }}>
-                <KeyboardArrowRight/>
+                <KeyboardArrowRight />
               </ListItemIcon>
             </ListItemButton>
           );
         })}
         {!atomics ? (
-          <Empty message={t('No data available')}/>
+          <Empty message={t('No data available')} />
         ) : null}
       </List>
-      {userAdmin && <AtomicTestingCreation/>}
+      {userAdmin && <AtomicTestingCreation />}
     </>
   );
 };

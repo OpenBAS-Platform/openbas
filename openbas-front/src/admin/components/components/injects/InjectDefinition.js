@@ -63,7 +63,7 @@ import InjectAddEndpoints from '../../exercises/injects/endpoints/InjectAddEndpo
 import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
 import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
 import InjectAddAssetGroups from '../../exercises/injects/assetgroups/InjectAddAssetGroups';
-import TagField from '../../../../components/TagField.js';
+import TagField from '../../../../components/TagField';
 
 const styles = (theme) => ({
   header: {
@@ -2163,7 +2163,7 @@ InjectDefinition.propTypes = {
   uriVariable: PropTypes.string,
   allUsersNumber: PropTypes.number,
   usersNumber: PropTypes.number,
-  teamsUsers: PropTypes.object,
+  teamsUsers: PropTypes.array,
   onAddAtomicTesting: PropTypes.func,
   atomicTestingCreation: PropTypes.bool,
   atomicTestingUpdate: PropTypes.bool,
