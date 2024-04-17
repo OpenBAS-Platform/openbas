@@ -2,7 +2,6 @@ package io.openbas.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openbas.database.model.Inject;
 import io.openbas.rest.inject.form.InjectDocumentInput;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,17 +45,5 @@ public class AtomicTestingInput {
 
   @JsonProperty("inject_tags")
   private List<String> tagIds = new ArrayList<>();
-
-  public Inject toInject() {
-    Inject inject = new Inject();
-    inject.setTitle(getTitle());
-    inject.setDescription(getDescription());
-    inject.setContent(getContent());
-    inject.setType(getType());
-    inject.setContract(getContract());
-    inject.setDependsDuration(0L);
-    inject.setAllTeams(isAllTeams());
-    return inject;
-  }
 
 }

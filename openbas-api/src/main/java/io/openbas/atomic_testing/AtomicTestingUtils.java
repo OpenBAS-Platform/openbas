@@ -7,8 +7,6 @@ import io.openbas.atomic_testing.AtomicTestingMapper.ResultDistribution;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
-import io.openbas.database.model.InjectStatus;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,10 +18,6 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
 public class AtomicTestingUtils {
-
-  public static Instant getLastExecutionEndDate(final Inject inject) {
-    return inject.getStatus().map(InjectStatus::getTrackingEndDate).orElse(null);
-  }
 
   public static List<InjectTargetWithResult> getTargets(final Inject inject) {
     List<InjectTargetWithResult> targets = new ArrayList<>();

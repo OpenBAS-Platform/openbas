@@ -116,7 +116,13 @@ public class AtomicTestingService {
     if (injectId != null) {
       injectToSave = injectRepository.findById(injectId).orElseThrow();
     }
-
+    injectToSave.setTitle(input.getTitle());
+    injectToSave.setContent(input.getContent());
+    injectToSave.setType(input.getType());
+    injectToSave.setContract(input.getContract());
+    injectToSave.setAllTeams(input.isAllTeams());
+    injectToSave.setDescription(input.getDescription());
+    injectToSave.setDependsDuration(0L);
     injectToSave.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
     injectToSave.setExercise(null);
     // Set dependencies
@@ -135,9 +141,7 @@ public class AtomicTestingService {
     injectToSave.setDocuments(injectDocuments);
     injectToSave.setAssets(fromIterable(this.assetRepository.findAllById(input.getAssets())));
     injectToSave.setAssetGroups(fromIterable(this.assetGroupRepository.findAllById(input.getAssetGroups())));
-    injectToSave.setDescription(input.getDescription());
-    injectToSave.setTitle(input.getTitle());
-    injectToSave.setContent(input.getContent());
+
     return injectRepository.save(injectToSave);
   }
 
@@ -145,6 +149,10 @@ public class AtomicTestingService {
   public InjectStatus tryInject(String injectId) {
     Inject inject = injectRepository.findById(injectId).orElseThrow();
     User user = this.userRepository.findById(currentUser().getId()).orElseThrow();
+
+    // Reset injects outcome, communications and expectations
+    inject.clean();
+
     List<ExecutionContext> userInjectContexts = List.of(
         this.executionContextService.executionContext(user, inject, "Direct test")
     );
