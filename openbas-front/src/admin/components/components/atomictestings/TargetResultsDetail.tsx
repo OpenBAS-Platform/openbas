@@ -94,7 +94,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     if (!index || index === 0) {
       return null;
     }
-    const dateToDisplay = index === 1 ? lastExecutionStartDate : lastExecutionEndDate;
+    const dateToDisplay = index === 0 ? lastExecutionStartDate : lastExecutionEndDate;
     // eslint-disable-next-line no-nested-ternary
     const leftPos = steps.length === 4
       ? 'calc(-25%)'

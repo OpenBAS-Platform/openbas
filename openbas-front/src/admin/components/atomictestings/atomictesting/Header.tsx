@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { PlayArrowOutlined } from '@mui/icons-material';
@@ -12,6 +12,7 @@ import type { AtomicTestingHelper } from '../../../../actions/atomictestings/ato
 import AtomicPopover from './Popover';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
+import { AtomicTestingResultContext } from '../../components/Context';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -37,6 +38,7 @@ const AtomicTestingHeader = () => {
   const { atomicId } = useParams() as { atomicId: AtomicTestingOutput['atomic_id'] };
   const [injectResult, setInjectResult] = useState<InjectStatus | null>(null);
   const [openResult, setOpenResult] = useState(false);
+  const { onLaunchAtomicTesting } = useContext(AtomicTestingResultContext);
 
   // Fetching data
   const { atomic }: { atomic: AtomicTestingOutput } = useHelper((helper: AtomicTestingHelper) => ({
@@ -63,6 +65,7 @@ const AtomicTestingHeader = () => {
     setOpenResult(false);
     setInjectResult(null);
     setAvailableLaunch(true);
+    onLaunchAtomicTesting();
   };
 
   return (

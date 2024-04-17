@@ -13,6 +13,7 @@ import AtomicTestingHeader from './Header';
 import { fetchAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
 import type { AtomicTestingOutput } from '../../../../utils/api-types';
 import type { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
+import { AtomicTestingResultContext, AtomicTestingResultContextType } from '../../components/Context';
 
 const AtomicTesting = lazy(() => import('./AtomicTesting'));
 const AtomicTestingDetail = lazy(() => import('./detail/Detail'));
@@ -28,6 +29,7 @@ const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutp
   }
   return (
     <div>
+
       <Breadcrumbs variant="object" elements={[
         { label: t('Atomic Testings') },
         { label: atomic.atomic_title, current: true },
@@ -71,14 +73,27 @@ const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutp
 const IndexAtomicTesting = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
+
   // Fetching data
   const { atomicId } = useParams() as { atomicId: AtomicTestingOutput['atomic_id'] };
   const atomic = useHelper((helper: AtomicTestingHelper) => helper.getAtomicTesting(atomicId));
   useDataLoader(() => {
     dispatch(fetchAtomicTesting(atomicId));
   });
+
+  // Context
+  const context: AtomicTestingResultContextType = {
+    onLaunchAtomicTesting(): void {
+      dispatch(fetchAtomicTesting(atomicId));
+    },
+  };
+
   if (atomic) {
-    return <IndexAtomicTestingComponent atomic={atomic}/>;
+    return (
+      <AtomicTestingResultContext.Provider value={context}>
+        <IndexAtomicTestingComponent atomic={atomic}/>
+      </AtomicTestingResultContext.Provider>
+    );
   }
   return <Loader/>;
 };
