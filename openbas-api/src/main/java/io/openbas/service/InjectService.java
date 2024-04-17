@@ -19,9 +19,11 @@ import io.openbas.execution.Executor;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +35,6 @@ public class InjectService {
   private UserRepository userRepository;
   private InjectRepository injectRepository;
   private InjectDocumentRepository injectDocumentRepository;
-  private InjectStatusRepository injectStatusRepository;
 
   @Autowired
   public void setExecutor(Executor executor) {
@@ -60,10 +61,6 @@ public class InjectService {
     this.injectDocumentRepository = injectDocumentRepository;
   }
 
-  @Autowired
-  public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
-    this.injectStatusRepository = injectStatusRepository;
-  }
 
   public void cleanInjectsDocExercise(String exerciseId, String documentId) {
     // Delete document from all exercise injects
@@ -104,19 +101,10 @@ public class InjectService {
   }
 
   @Transactional
-  public List<Inject> findAllAtomicTestings() {
-    return this.injectRepository.findAllAtomicTestings();
-  }
-
-  @Transactional
   public Optional<Inject> findById(String injectId) {
     return injectRepository.findWithStatusById(injectId);
   }
 
-  @Transactional
-  public InjectStatus tryAtomicTesting(String injectId) {
-    return injectStatusRepository.save(tryInject(injectId));
-  }
 
   public InjectStatus tryInject(String injectId) {
     Inject inject = injectRepository.findById(injectId).orElseThrow();
@@ -124,13 +112,11 @@ public class InjectService {
     List<ExecutionContext> userInjectContexts = List.of(
         this.executionContextService.executionContext(user, inject, "Direct test")
     );
-    ExecutableInject injection = new ExecutableInject(false, true, inject, List.of(), inject.getAssets(), inject.getAssetGroups(), userInjectContexts);
+    ExecutableInject injection = new ExecutableInject(false, true, inject, List.of(), inject.getAssets(),
+        inject.getAssetGroups(), userInjectContexts);
     // TODO Must be migrated to Atomic approach (Inject duplication and async tracing)
     return executor.execute(injection);
   }
 
-  public void deleteAtomicTesting(String injectId) {
-    //TODO
-    injectRepository.deleteById(injectId);
-  }
+
 }
