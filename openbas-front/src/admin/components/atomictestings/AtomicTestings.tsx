@@ -3,16 +3,11 @@ import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { KeyboardArrowRight } from '@mui/icons-material';
-import { useAppDispatch } from '../../../utils/hooks';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import useDataLoader from '../../../utils/ServerSideEvent';
-import type { InjectHelper } from '../../../actions/injects/inject-helper';
-import { fetchInjectTypes } from '../../../actions/Inject';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import type { UsersHelper } from '../../../actions/helper';
 import InjectIcon from '../components/injects/InjectIcon';
-import InjectType from '../components/injects/InjectType';
 import type { AtomicTestingOutput, SearchPaginationInput } from '../../../utils/api-types';
 import { searchAtomicTestings } from '../../../actions/atomictestings/atomic-testing-actions';
 import AtomicTestingCreation from './AtomicTestingCreation';
@@ -23,7 +18,6 @@ import StatusChip from '../components/atomictestings/StatusChip';
 import { initSorting } from '../../../components/common/pagination/Page';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
-import { AtomicStore } from './AtomicTesting';
 
 const useStyles = makeStyles(() => ({
   bodyItem: {
@@ -124,7 +118,7 @@ const AtomicTestings = () => {
   const { t, fldt, tPick } = useFormatter();
 
   // Filter and sort hook
-  const [atomics, setAtomics] = useState<AtomicStore[]>([]);
+  const [atomics, setAtomics] = useState<AtomicTestingOutput[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
     sorts: initSorting('inject_title'),
   });
@@ -146,7 +140,7 @@ const AtomicTestings = () => {
       label: 'Type',
       isSortable: true,
       // TODO add atomic_inject_label in /api/atomic_testings/search backend with label map
-      value: (atomicTesting: AtomicTestingOutput) => tPick(atomicTesting.atomic_inject_label),
+      value: (atomicTesting: AtomicTestingOutput) => tPick(atomicTesting.atomic_injector_contract.injector_contract_labels),
     },
     {
       field: 'atomic_last_start_execution_date',
@@ -184,7 +178,7 @@ const AtomicTestings = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Atomic Testings'), current: true }]} />
+      <Breadcrumbs variant="list" elements={[{ label: t('Atomic testings'), current: true }]} />
       <PaginationComponent
         fetch={searchAtomicTestings}
         searchPaginationInput={searchPaginationInput}

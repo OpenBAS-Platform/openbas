@@ -3,7 +3,7 @@ import * as R from 'ramda';
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import InjectForm from './InjectForm';
 import { useFormatter } from '../../../../components/i18n';
-import type { Contract } from '../../../../utils/api-types';
+import type { Contract } from '../../../../actions/contract/contract';
 import Transition from '../../../../components/common/Transition';
 import { InjectContext } from '../Context';
 import type { InjectInput } from '../../../../actions/injects/Inject';

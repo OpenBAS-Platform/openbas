@@ -101,6 +101,7 @@ public class ChannelContract extends Contractor {
                 variable(VARIABLE_ARTICLE + ".name", "Name of the article", VariableType.String, One),
                 variable(VARIABLE_ARTICLE + ".uri", "Http user link to access the article", VariableType.String, One)
         )));
+        publishArticle.setAtomicTesting(false);
         return List.of(publishArticle);
     }
 

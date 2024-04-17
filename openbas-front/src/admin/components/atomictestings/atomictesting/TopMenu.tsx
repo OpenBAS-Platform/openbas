@@ -50,7 +50,7 @@ const TopMenuAtomicTesting = () => {
         classes={{ root: classes.buttonHome }}
       >
         <MovieFilterOutlined className={classes.icon} fontSize="small" />
-        {t('AtomicTestings')}
+        {t('Atomic testings')}
       </Button>
       <ArrowForwardIosOutlined
         color="primary"

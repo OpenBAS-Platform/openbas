@@ -2,6 +2,7 @@ import { Dispatch } from 'redux';
 import { arrayOftargetResults, atomicTesting, atomicTestingDetail } from './atomic-testing-schema';
 import { delReferential, getReferential, postReferential, putReferential, simplePostCall } from '../../utils/Action';
 import type { AtomicTestingInput, SearchPaginationInput } from '../../utils/api-types';
+import { inject } from '../Schema';
 
 const ATOMIC_TESTING_URI = '/api/atomic_testings';
 
@@ -19,6 +20,12 @@ export const fetchAtomicTesting = (injectId: string) => (dispatch: Dispatch) => 
 export const fetchAtomicTestingDetail = (injectId: string) => (dispatch: Dispatch) => {
   const uri = `${ATOMIC_TESTING_URI}/${injectId}/detail`;
   return getReferential(atomicTestingDetail, uri)(dispatch);
+};
+
+// FIXME: find a better way to retrieve inject for update
+export const fetchAtomicTestingForUpdate = (injectId: string) => (dispatch: Dispatch) => {
+  const uri = `${ATOMIC_TESTING_URI}/${injectId}/update`;
+  return getReferential(inject, uri)(dispatch);
 };
 
 export const deleteAtomicTesting = (injectId: string) => (dispatch: Dispatch) => {

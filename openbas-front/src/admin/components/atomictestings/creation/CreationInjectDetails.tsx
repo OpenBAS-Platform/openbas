@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useContext } from 'react';
 import InjectDefinition from '../../components/injects/InjectDefinition';
 import { InjectContext, PermissionsContext } from '../../components/Context';
-import type { Tag } from '../../../../utils/api-types';
+import type { AtomicTestingInput, Tag } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import type { TagsHelper } from '../../../../actions/helper';
@@ -36,7 +36,7 @@ const CreationInjectDetails: FunctionComponent<Props> = ({
     teams: helper.getTeams(),
   }));
 
-  const onAddAtomicTesting = async (data) => {
+  const onAddAtomicTesting = async (data: AtomicTestingInput) => {
     await dispatch(createAtomicTesting(data));
   };
 

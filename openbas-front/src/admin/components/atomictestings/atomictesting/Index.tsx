@@ -31,7 +31,7 @@ const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutp
     <div>
 
       <Breadcrumbs variant="object" elements={[
-        { label: t('Atomic Testings') },
+        { label: t('Atomic testings') },
         { label: atomic.atomic_title, current: true },
       ]}
       />

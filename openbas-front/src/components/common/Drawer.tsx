@@ -4,10 +4,14 @@ import { Close } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../Theme';
 
-const useStyles = makeStyles((theme: Theme) => ({
-  drawerPaper: {
+const useStyles = makeStyles<Theme>((theme: Theme) => ({
+  drawerPaperHalf: {
     minHeight: '100vh',
     width: '50%',
+  },
+  drawerPaperFull: {
+    minHeight: '100vh',
+    width: '100%',
   },
   header: {
     backgroundColor: theme.palette.background.nav,
@@ -30,6 +34,7 @@ interface DrawerProps {
   (() => React.ReactElement)
   | React.ReactElement
   | null;
+  variant?: 'full' | 'half';
 }
 
 const Drawer: FunctionComponent<DrawerProps> = ({
@@ -37,8 +42,9 @@ const Drawer: FunctionComponent<DrawerProps> = ({
   handleClose,
   title,
   children,
+  variant = 'half',
 }) => {
-  const classes = useStyles();
+  const classes = useStyles({ variant });
 
   let component;
   if (children) {
@@ -55,7 +61,7 @@ const Drawer: FunctionComponent<DrawerProps> = ({
       anchor="right"
       elevation={1}
       sx={{ zIndex: 1202 }}
-      classes={{ paper: classes.drawerPaper }}
+      classes={{ paper: variant === 'full' ? classes.drawerPaperFull : classes.drawerPaperHalf }}
       onClose={handleClose}
     >
       <div className={classes.header}>

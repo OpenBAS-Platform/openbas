@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ExecutionStatus;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import java.time.Instant;
-import java.util.List;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,6 +19,7 @@ public class AtomicTestingDetailOutput {
 
   @JsonProperty("atomic_id")
   @Enumerated(EnumType.STRING)
+  @NotBlank
   private String atomicId;
 
   @JsonProperty("status_label")

@@ -4,26 +4,20 @@ import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
 import io.openbas.atomic_testing.form.AtomicTestingInput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.atomic_testing.form.SimpleExpectationResultOutput;
+import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectStatus;
-import io.openbas.injectExpectation.InjectExpectationService;
+import io.openbas.database.repository.InjectorContractRepository;
+import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/atomic_testings")
@@ -31,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AtomicTestingApi extends RestBehavior {
 
   private AtomicTestingService atomicTestingService;
+  private InjectorContractRepository injectorContractRepository;
   private InjectExpectationService injectExpectationService;
 
   @Autowired
@@ -39,25 +34,47 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
   @Autowired
+  public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
+    this.injectorContractRepository = injectorContractRepository;
+  }
+
+  @Autowired
   public void setInjectExpectationService(InjectExpectationService injectExpectationService) {
     this.injectExpectationService = injectExpectationService;
   }
 
-
   @PostMapping("/search")
   public Page<AtomicTestingOutput> findAllAtomicTestings(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return atomicTestingService.findAllAtomicTestings(searchPaginationInput).map(AtomicTestingMapper::toDto);
+    return atomicTestingService.findAllAtomicTestings(searchPaginationInput)
+        // Fixme: find a better way to have Contract inside Atomic object
+        .map((inject) -> this.injectorContractRepository.findById(inject.getContract()).map((c) -> {
+          inject.setInjectorContract(c);
+          return inject;
+        }).orElse(inject))
+        .map(AtomicTestingMapper::toDto);
   }
 
 
   @GetMapping("/{injectId}")
   public AtomicTestingOutput findAtomicTesting(@PathVariable String injectId) {
-    return atomicTestingService.findById(injectId).map(AtomicTestingMapper::toDtoWithTargetResults).orElseThrow();
+    return atomicTestingService.findById(injectId)
+        // Fixme: find a better way to have Contract inside Atomic object
+        .map((inject) -> this.injectorContractRepository.findById(inject.getContract()).map((c) -> {
+          inject.setInjectorContract(c);
+          return inject;
+        }).orElse(inject))
+        .map(AtomicTestingMapper::toDtoWithTargetResults)
+        .orElseThrow();
   }
 
   @GetMapping("/{injectId}/detail")
   public AtomicTestingDetailOutput findAtomicTestingWithDetail(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId).map(AtomicTestingMapper::toDetailDto).orElseThrow();
+  }
+
+  @GetMapping("/{injectId}/update")
+  public Inject findAtomicTestingForUpdate(@PathVariable String injectId) {
+    return atomicTestingService.findById(injectId).orElseThrow();
   }
 
   @PostMapping()

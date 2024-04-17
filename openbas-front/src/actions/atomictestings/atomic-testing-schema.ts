@@ -1,6 +1,8 @@
 import { schema } from 'normalizr';
 import type { SimpleExpectationResultOutput } from '../../utils/api-types';
 
+// FIXME: do we really need this ?
+
 export const atomicTesting = new schema.Entity(
   'atomics',
   {},

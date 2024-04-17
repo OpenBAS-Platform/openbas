@@ -19,55 +19,48 @@ import java.util.*;
 
 import static java.time.Instant.now;
 
+@Getter
 @Setter
 @Entity
 @Table(name = "injectors_contracts")
 @EntityListeners(ModelBaseListener.class)
 public class InjectorContract implements Base {
 
-    @Getter
     @Id
     @Column(name = "injector_contract_id")
     @JsonProperty("injector_contract_id")
     @NotBlank
     private String id;
 
-    @Getter
     @Column(name = "injector_contract_labels")
     @JsonProperty("injector_contract_labels")
     @Type(PostgreSQLHStoreType.class)
     @Queryable(searchable = true, filterable = true, sortable = true)
     private Map<String, String> labels = new HashMap<>();
 
-    @Getter
     @Column(name = "injector_contract_manual")
     @JsonProperty("injector_contract_manual")
     private Boolean manual;
 
-    @Getter
     @Column(name = "injector_contract_content")
     @JsonProperty("injector_contract_content")
     @NotBlank
     private String content;
 
-    @Getter
     @Column(name = "injector_contract_created_at")
     @JsonProperty("injector_contract_created_at")
     private Instant createdAt = now();
 
-    @Getter
     @Column(name = "injector_contract_updated_at")
     @JsonProperty("injector_contract_updated_at")
     private Instant updatedAt = now();
 
-    @Getter
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "injector_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("injector_contract_injector")
     private Injector injector;
 
-    @Getter
     @Setter
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "injectors_contracts_attack_patterns",
@@ -78,7 +71,6 @@ public class InjectorContract implements Base {
     @Queryable(filterable = true)
     private List<AttackPattern> attackPatterns = new ArrayList<>();
 
-    @Getter
     @Column(name = "injector_contract_atomic_testing")
     @JsonProperty("injector_contract_atomic_testing")
     @Queryable(filterable = true)

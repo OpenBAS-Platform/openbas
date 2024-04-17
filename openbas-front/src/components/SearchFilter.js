@@ -80,6 +80,7 @@ class SearchInput extends Component {
     } else if (variant === 'topBar') {
       classRoot = classes.searchRootTopBar;
     } else if (variant === 'fullTopBar') {
+      // FIXME: why ?
       classRoot = classes.searchRootFullTopBar;
     } else if (variant === 'thin') {
       classRoot = classes.searchRootThin;

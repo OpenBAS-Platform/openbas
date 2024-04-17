@@ -65,7 +65,7 @@ public class Executor {
         status.setInject(inject);
         try {
             String jsonInject = mapper.writeValueAsString(executableInject);
-            status.setName(ExecutionStatus.PENDING);
+            status.setName(ExecutionStatus.PENDING); // FIXME: need to be test with HTTP Collector
             status.getTraces().add(traceInfo("The inject has been published and is now waiting to be consumed."));
             InjectStatus savedStatus = injectStatusRepository.save(status);
             queueService.publish(inject.getType(), jsonInject);

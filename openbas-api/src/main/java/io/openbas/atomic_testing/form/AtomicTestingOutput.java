@@ -1,18 +1,20 @@
 package io.openbas.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.model.ExecutionStatus;
 import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.atomic_testing.AtomicTestingMapper.InjectTargetWithResult;
+import io.openbas.database.model.ExecutionStatus;
+import io.openbas.database.model.InjectorContract;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
@@ -33,6 +35,11 @@ public class AtomicTestingOutput {
   @JsonProperty("atomic_type")
   @NotNull
   private String type;
+
+  @Schema(description = "Full contract")
+  @JsonProperty("atomic_injector_contract")
+  @NotNull
+  private InjectorContract injectorContract;
 
   @Schema(description = "Contract")
   @JsonProperty("atomic_contract")

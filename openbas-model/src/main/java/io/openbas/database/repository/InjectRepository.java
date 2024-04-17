@@ -25,9 +25,6 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
   @NotNull
   Optional<Inject> findWithStatusById(@NotNull String id);
 
-  @Query(value = "select i from Inject i where i.exercise.id = :exerciseId")
-  List<Inject> findAllForExercise(@Param("exerciseId") String exerciseId);
-
   @Query(value = "select i.* from injects i where i.inject_type = 'openbas_challenge'" +
       " and i.inject_content like :challengeId", nativeQuery = true)
   List<Inject> findAllForChallengeId(@Param("challengeId") String challengeId);

@@ -3,7 +3,6 @@ import { Box, Button, Typography, Stepper, Step, StepLabel, Chip, List, ListItem
 import { makeStyles } from '@mui/styles';
 import ButtonCreate from '../../../components/common/ButtonCreate';
 import { useFormatter } from '../../../components/i18n';
-import FullPageDrawer from '../../../components/common/FullPageDrawer';
 import CreationInjectDetails from './creation/CreationInjectDetails';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import { searchInjectorContracts } from '../../../actions/Inject';
@@ -20,6 +19,7 @@ import type { AttackPatternHelper } from '../../../actions/attackpattern/attackp
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { fetchAttackPatterns } from '../../../actions/AttackPattern';
 import DialogWithCross from '../../../components/common/DialogWithCross';
+import Drawer from '../../../components/common/Drawer';
 
 const useStyles = makeStyles(() => ({
   menuContainer: {
@@ -111,10 +111,11 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
   return (
     <>
       <ButtonCreate onClick={() => setOpen(true)} />
-      <FullPageDrawer
+      <Drawer
         open={open}
         handleClose={handleCloseDrawer}
         title={t('Create a new atomic test')}
+        variant={'full'}
       >
 
         <Box
@@ -223,7 +224,7 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
                />
           }
         </Box>
-      </FullPageDrawer>
+      </Drawer>
     </>
   );
 };

@@ -104,7 +104,7 @@ export interface AssetGroupInput {
 }
 
 export interface AtomicTestingDetailOutput {
-  atomic_id?: string;
+  atomic_id: string;
   status_label?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_traces?: string[];
   /** @format date-time */
@@ -144,6 +144,8 @@ export interface AtomicTestingOutput {
   atomic_expectation_results: ExpectationResultsByType[];
   /** Id */
   atomic_id: string;
+  /** Full contract */
+  atomic_injector_contract: InjectorContract;
   /**
    * Last Execution End date
    * @format date-time
@@ -197,7 +199,6 @@ export interface AttackPatternCreateInput {
 
 export interface AttackPatternUpsertInput {
   attack_patterns?: AttackPatternCreateInput[];
-  attack_pattern_stix_id: string;
 }
 
 export interface Challenge {
@@ -1006,6 +1007,7 @@ export interface InjectorConnection {
   vhost?: string;
 }
 
+/** Full contract */
 export interface InjectorContract {
   injector_contract_atomic_testing?: boolean;
   injector_contract_content: string;
@@ -1052,7 +1054,7 @@ export interface KillChainPhase {
   /** @format date-time */
   phase_created_at?: string;
   phase_description?: string;
-  phase_external_id?: string;
+  phase_external_id: string;
   phase_id?: string;
   phase_kill_chain_name?: string;
   phase_name?: string;
@@ -1396,8 +1398,8 @@ export interface PageEndpoint {
   totalPages?: number;
 }
 
-export interface PageInjectorContract {
-  content?: InjectorContract[];
+export interface PageFullTextSearchResult {
+  content?: FullTextSearchResult[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -1415,8 +1417,8 @@ export interface PageInjectorContract {
   totalPages?: number;
 }
 
-export interface PageFullTextSearchResult {
-  content?: FullTextSearchResult[];
+export interface PageInjectorContract {
+  content?: InjectorContract[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;

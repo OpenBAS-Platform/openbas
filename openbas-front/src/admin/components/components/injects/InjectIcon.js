@@ -30,11 +30,11 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
   } else {
     color = '#000000';
   }
-  /* if (done) {
+  if (done) {
     color = '#4caf50';
   } else if (disabled) {
     color = '#7a7a7a';
-  } */
+  }
   switch (type) {
     case 'openbas_email':
       return (

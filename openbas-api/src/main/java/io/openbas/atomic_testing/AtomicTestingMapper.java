@@ -4,15 +4,12 @@ import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput.AtomicTestingOutputBuilder;
 import io.openbas.atomic_testing.form.SimpleExpectationResultOutput;
-import io.openbas.database.model.ExecutionStatus;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectExpectation;
-import io.openbas.database.model.InjectExpectationResult;
-import io.openbas.database.model.InjectStatus;
+import io.openbas.database.model.*;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.jetbrains.annotations.NotNull;
 
 public class AtomicTestingMapper {
 
@@ -34,6 +31,7 @@ public class AtomicTestingMapper {
         .id(inject.getId())
         .title(inject.getTitle())
         .type(inject.getType())
+        .injectorContract(inject.getInjectorContract())
         .contract(inject.getContract())
         .lastExecutionStartDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))
         .lastExecutionEndDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))

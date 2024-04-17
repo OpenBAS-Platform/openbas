@@ -1,4 +1,4 @@
-package io.openbas.injectExpectation;
+package io.openbas.inject_expectation;
 
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectationResult;

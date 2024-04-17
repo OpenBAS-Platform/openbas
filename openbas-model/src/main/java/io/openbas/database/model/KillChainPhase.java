@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -26,6 +27,7 @@ public class KillChainPhase implements Base {
 
   @Column(name = "phase_external_id")
   @JsonProperty("phase_external_id")
+  @NotBlank
   private String externalId;
 
   @Column(name = "phase_stix_id")

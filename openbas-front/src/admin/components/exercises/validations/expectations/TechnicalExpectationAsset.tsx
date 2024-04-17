@@ -10,7 +10,8 @@ import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import { typeIcon } from '../../../components/injects/expectations/ExpectationUtils';
 import { truncate } from '../../../../../utils/String';
-import type { Contract, InjectExpectationResult } from '../../../../../utils/api-types';
+import type { InjectExpectationResult } from '../../../../../utils/api-types';
+import type { Contract } from '../../../../../actions/contract/contract';
 
 const useStyles = makeStyles((theme: Theme) => ({
   buttons: {

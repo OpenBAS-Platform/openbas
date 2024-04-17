@@ -1,9 +1,5 @@
 package io.openbas.database.model;
 
-import static java.time.Duration.between;
-import static java.time.Instant.now;
-import static java.util.Optional.ofNullable;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -17,19 +13,20 @@ import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.logging.Level;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
 import org.hibernate.annotations.UuidGenerator;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.*;
+import java.util.logging.Level;
+
+import static java.time.Duration.between;
+import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
 
 @Setter
 @Entity
@@ -70,6 +67,11 @@ public class Inject implements Base, Injection {
   @Column(name = "inject_contract")
   @JsonProperty("inject_contract")
   private String contract;
+
+  @Getter
+  @JsonIgnore
+  @Transient
+  private InjectorContract injectorContract;
 
   @Getter
   @Column(name = "inject_country")
@@ -288,15 +290,15 @@ public class Inject implements Base, Injection {
       return Optional.empty();
     }
 
-    if (this.getExercise() != null) {if (this.getExercise().getStatus().equals(Exercise.STATUS.CANCELED)) {
-      return Optional.empty();
+    if (this.getExercise() != null) {
+      if (this.getExercise().getStatus().equals(Exercise.STATUS.CANCELED)) {
+        return Optional.empty();
+      }
+      return this.getExercise()
+          .getStart()
+          .map(source -> computeInjectDate(source, SPEED_STANDARD));
     }
-    return this.getExercise()
-        .getStart()
-        .map(source -> computeInjectDate(source, SPEED_STANDARD));
-  }else {
-          return Optional.ofNullable(LocalDateTime.now().toInstant(ZoneOffset.UTC));
-        }
+    return Optional.ofNullable(LocalDateTime.now().toInstant(ZoneOffset.UTC));
   }
 
   @JsonIgnore

@@ -32,7 +32,7 @@ const Detail: FunctionComponent<Props> = () => {
   }));
 
   useEffect(() => {
-    dispatch(fetchAtomicTestingDetail(atomicId!));
+    dispatch(fetchAtomicTestingDetail(atomicId));
   }, [dispatch, atomicId]);
 
   return (
