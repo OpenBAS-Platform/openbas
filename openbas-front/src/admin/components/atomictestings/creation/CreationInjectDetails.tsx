@@ -41,8 +41,8 @@ const CreationInjectType: FunctionComponent<Props> = ({
   }));
   const injectTypes = Object.values(injectTypesMap);
 
-  const onAddAtomicTesting = (data) => {
-    dispatch(createAtomicTesting(data));
+  const onAddAtomicTesting = async (data) => {
+    await dispatch(createAtomicTesting(data));
   };
 
   useDataLoader(() => {
@@ -59,7 +59,7 @@ const CreationInjectType: FunctionComponent<Props> = ({
         inject_assets: [],
         inject_asset_groups: [],
         inject_documents: [],
-        atomic_testing_tags: [],
+        inject_tags: [],
       }}
       injectTypes={injectTypes}
       handleClose={handleClose}

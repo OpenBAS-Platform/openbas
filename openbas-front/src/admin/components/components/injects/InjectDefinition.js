@@ -709,7 +709,7 @@ class InjectDefinition extends Component {
       inject_contract: inject.inject_contract,
       inject_documents: documents,
       inject_teams: teamsIds,
-      inject_title: data.atomic_testing_title,
+      inject_title: data.inject_title,
       inject_description: data.inject_description,
       inject_tags: data.inject_tags,
       inject_type: inject.inject_type,
@@ -911,16 +911,16 @@ class InjectDefinition extends Component {
                                       </MenuItem>
                                     ))}
                                   </Select>
-                                ) : (
-                                  <TextField
-                                    variant="standard"
-                                    name={`${name}.value`}
-                                    fullWidth={true}
-                                    label={t('Value')}
-                                    style={{ marginRight: 20 }}
-                                    disabled={this.props.permissions.readOnly}
-                                  />
-                                )}
+                                  ) : (
+                                    <TextField
+                                      variant="standard"
+                                      name={`${name}.value`}
+                                      fullWidth={true}
+                                      label={t('Value')}
+                                      style={{ marginRight: 20 }}
+                                      disabled={this.props.permissions.readOnly}
+                                    />
+                                  )}
                                 {field.cardinality === 'n' && (
                                   <IconButton
                                     onClick={() => fields.remove(index)}
@@ -1242,7 +1242,7 @@ class InjectDefinition extends Component {
       (f) => f.expectation === true,
     );
 
-    const initialValues = { ...inject.inject_content };
+    const initialValues = { ...inject.inject_content, inject_title: inject.inject_title, inject_description: inject.inject_description, inject_tags: inject.inject_tags };
     // Enrich initialValues with default contract value
     const builtInFields = [
       'teams',
@@ -1364,36 +1364,39 @@ class InjectDefinition extends Component {
               <form id="injectContentForm" onSubmit={handleSubmit}>
                 {
                   atomicTestingCreation
-                  && <div>
-                    <Typography variant="h2" style={{ float: 'left' }}>
-                      {t('Title')}
-                    </Typography>
-                    <TextField style={{ marginBottom: 33 }}
-                               variant="standard"
-                               name="atomic_testing_title"
-                               fullWidth required
-                    />
-                    <Typography variant="h2" style={{ float: 'left' }}>
-                      {t('Description')}
-                    </Typography>
-                    <TextField
-                      variant="standard"
-                      name="atomic_testing_description"
-                      fullWidth={true}
-                      multiline={true}
-                      rows={2}
-                      style={{ marginTop: 20 }}
-                    />
-                    <Typography variant="h2" style={{ float: 'left' }}>
-                      {t('Tags')}
-                    </Typography>
-                    {/*<TagField
-                      name="atomic_testing_tags"
-                      values={values}
-                      setFieldValue={form.mutators.setValue}
-                      style={{ marginTop: 20 }}
-                    />*/}
-                  </div>
+                  && (
+                    <>
+                      <Typography variant="h2" style={{ float: 'left' }}>
+                        {t('Title')}
+                      </Typography>
+                      <TextField style={{ marginBottom: 33 }}
+                        variant="standard"
+                        name="inject_title"
+                        fullWidth required
+                      />
+                      <Typography variant="h2" style={{ float: 'left' }}>
+                        {t('Description')}
+                      </Typography>
+                      <TextField
+                        variant="standard"
+                        name="inject_description"
+                        fullWidth={true}
+                        multiline={true}
+                        rows={2}
+                        style={{ marginTop: 20 }}
+                      />
+                      <Typography variant="h2" style={{ float: 'left' }}>
+                        {t('Tags')}
+                      </Typography>
+                      <TagField
+                        name="inject_tags"
+                        label={t('Tags')}
+                        values={values}
+                        setFieldValue={form.mutators.setValue}
+                        style={{ marginTop: 20 }}
+                      />
+                    </>
+                  )
                 }
                 {hasTeams && (
                   <div>
@@ -1937,7 +1940,7 @@ class InjectDefinition extends Component {
                         predefinedExpectationDatas={predefinedExpectations}
                         expectationDatas={expectations}
                         handleExpectations={this.handleExpectations.bind(this)}
-                      />
+                         />
                     }
                   </>
                 }
