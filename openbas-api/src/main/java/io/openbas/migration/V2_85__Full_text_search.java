@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V2_84__Full_text_search extends BaseJavaMigration {
+public class V2_85__Full_text_search extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {

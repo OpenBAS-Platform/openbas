@@ -270,6 +270,7 @@ public class Inject implements Base, Injection {
   public Optional<Instant> getDate() {
     if (this.getExercise() == null && this.getScenario() == null) {
       log.log(Level.SEVERE, "Exercise OR Scenario should not be null");
+      return Optional.empty();
     }
 
     if (this.getScenario() != null) {
