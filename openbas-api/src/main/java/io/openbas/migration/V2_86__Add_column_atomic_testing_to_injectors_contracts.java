@@ -7,7 +7,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V2_85__Add_column_atomic_testing_to_injectors_contracts extends BaseJavaMigration {
+public class V2_86__Add_column_atomic_testing_to_injectors_contracts extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
