@@ -700,6 +700,21 @@ class InjectDefinition extends Component {
       inject_asset_groups: assetGroupIds,
       inject_documents: documents,
     };
+    const atomicTestingValues = {
+      inject_all_teams: allTeams,
+      inject_asset_groups: assetGroupIds,
+      inject_assets: assetIds,
+      inject_content: finalData,
+      inject_contract: inject.inject_contract,
+      inject_documents: documents,
+      inject_teams: teamsIds,
+      inject_title: data.atomic_testing_title,
+      inject_type: inject.inject_type,
+    };
+    if (this.props.creation) {
+      return this.props
+        .onAddAtomicTesting(atomicTestingValues);
+    }
     return this.props
       .onUpdateInject(this.props.inject.inject_id, values)
       .then(() => this.props.handleClose());
@@ -1308,7 +1323,7 @@ class InjectDefinition extends Component {
     return (
       <div>
         {
-          creation !== true
+          !creation
           && <div className={classes.header}>
             <IconButton
               aria-label="Close"
@@ -1341,6 +1356,19 @@ class InjectDefinition extends Component {
           >
             {({ form, handleSubmit, submitting, values }) => (
               <form id="injectContentForm" onSubmit={handleSubmit}>
+                {
+                  creation
+                  && <div>
+                    <Typography variant="h2" style={{ float: 'left' }}>
+                      {t('Title')}
+                    </Typography>
+                    <TextField style={{ marginBottom: 33 }}
+                      variant="outlined"
+                      name="atomic_testing_title"
+                      fullWidth required
+                    />
+                  </div>
+                }
                 {hasTeams && (
                   <div>
                     <Typography variant="h2" style={{ float: 'left' }}>
@@ -2032,17 +2060,27 @@ class InjectDefinition extends Component {
                   </List>
                 </div>
                 {
-                  creation !== true
-                  && <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      type="submit"
-                      disabled={submitting || this.props.permissions.readOnly}
-                    >
-                      {t('Update')}
-                    </Button>
-                  </div>
+                  creation
+                    ? <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        type="submit"
+                        disabled={submitting || this.props.permissions.readOnly}
+                      >
+                        {t('Create')}
+                      </Button>
+                    </div>
+                    : <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        type="submit"
+                        disabled={submitting || this.props.permissions.readOnly}
+                      >
+                        {t('Update')}
+                      </Button>
+                    </div>
                 }
 
               </form>
@@ -2083,7 +2121,7 @@ InjectDefinition.propTypes = {
   allUsersNumber: PropTypes.number,
   usersNumber: PropTypes.number,
   teamsUsers: PropTypes.object,
-  createAtomicTest: PropTypes.func,
+  onAddAtomicTesting: PropTypes.func,
   creation: PropTypes.bool,
 };
 

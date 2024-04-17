@@ -117,9 +117,3 @@ export const InjectContext = createContext<InjectContextType>({
   onDeleteInject(_injectId: Inject['inject_id']): void {
   },
 });
-
-export const AtomicTestingContext = createContext<AtomicTestingContextType>({
-  onAddAtomicTesting(_inject: Inject): Promise<{ result: string }> {
-    return Promise.resolve({ result: '' });
-  },
-});

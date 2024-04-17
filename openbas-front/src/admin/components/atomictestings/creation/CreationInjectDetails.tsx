@@ -1,17 +1,18 @@
-import React, { FunctionComponent, useContext, useState } from 'react';
-import { Button, TextField, Typography } from '@mui/material';
+import React, { FunctionComponent, useContext, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import InjectDefinition from '../../components/injects/InjectDefinition';
-import { AtomicTestingContext, InjectContext, PermissionsContext } from '../../components/Context';
-import type { AtomicTestingInput, Tag } from '../../../../utils/api-types';
+import { InjectContext, PermissionsContext } from '../../components/Context';
+import type { AtomicTestingInput, Tag, InjectorContract } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
-import { InjectorContract } from '../../../../utils/api-types';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import type { TagsHelper } from '../../../../actions/helper';
-import { zodImplement } from '../../../../utils/Zod';
 import { useFormatter } from '../../../../components/i18n';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { fetchTeams } from '../../../../actions/teams/team-actions';
+import { createAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import type { TeamStore } from '../../../../actions/teams/Team';
+import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 
 interface Props {
   contractId: string;
@@ -21,107 +22,59 @@ interface Props {
 }
 
 const CreationInjectType: FunctionComponent<Props> = ({
-  contractId, injectType, onSubmit,
-  initialValues = {
-    inject_title: '',
-    inject_description: '',
-    inject_type: '',
-    inject_all_teams: '',
-    inject_teams: '',
-    inject_asset_groups: '',
-    inject_assets: '',
-    inject_content: '',
-    inject_contract: '',
-    inject_documents: '',
-    inject_tags: '',
-  },
+  contractId, injectType,
 }) => {
   const { t } = useFormatter();
   const { permissions } = useContext(PermissionsContext);
+  const dispatch = useAppDispatch();
+  const injectDefinitionRef = useRef();
   const { onUpdateInject } = useContext(InjectContext);
-  const { onAddAtomicTesting } = useContext(AtomicTestingContext);
   const [setSelectedInject] = useState(null);
-  const { injectTypesMap, tagsMap }: {
+  const { injectTypesMap, tagsMap, teams }: {
     injectTypesMap: Record<string, InjectorContract>,
     tagsMap: Record<string, Tag>,
-  } = useHelper((helper: InjectHelper & TagsHelper) => ({
+    teams: TeamStore[],
+  } = useHelper((helper: InjectHelper & TagsHelper & TeamsHelper) => ({
     injectTypesMap: helper.getInjectTypesMap(),
     tagsMap: helper.getTagsMap(),
+    teams: helper.getTeams(),
   }));
   const injectTypes = Object.values(injectTypesMap);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty, isSubmitting },
-  } = useForm<AtomicTestingInput>({
-    mode: 'onTouched',
-    resolver: zodResolver(
-      zodImplement<AtomicTestingInput>().with({
-        inject_title: z.string().min(1, { message: t('Should not be empty') }),
-        inject_description: z.string().optional(),
-        inject_type: z.string().optional(),
-        inject_all_teams: z.boolean().optional(),
-        inject_teams: z.string().array().optional(),
-        inject_asset_groups: z.string().array().optional(),
-        inject_assets: z.string().array().optional(),
-        inject_content: z.object().optional(),
-        inject_contract: z.string().optional(),
-        inject_documents: z.string().array().optional(),
-        inject_tags: z.string().array().optional(),
-      }),
-    ),
-    defaultValues: initialValues,
+
+  const onAddAtomicTesting = (data) => {
+    dispatch(createAtomicTesting(data));
+  };
+
+  useDataLoader(() => {
+    dispatch(fetchTeams());
   });
+
   return (
-    <form id="atomicdetails" onSubmit={handleSubmit(onSubmit)}>
-      <Typography variant="h2" style={{ float: 'left', marginLeft: 12 }}>
-        Title
-      </Typography>
-      <TextField
-        variant="outlined"
-        fullWidth
-        sx={{ m: 1 }}
-        name="inject_title"
-        error={!!errors.inject_title}
-        helperText={errors.inject_title?.message}
-        inputProps={register('inject_title')}
-        InputLabelProps={{ required: true }}
-      />
-      <InjectDefinition
-        inject={{
-          // inject_title:inject_title,
-          inject_contract: contractId,
-          inject_type: injectType,
-          inject_teams: [],
-          inject_assets: [],
-          inject_asset_groups: [],
-          inject_documents: [],
-        }}
-        injectTypes={injectTypes}
-        handleClose={() => setSelectedInject(null)}
-        tagsMap={tagsMap}
-        permissions={permissions}
-        teamsFromExerciseOrScenario={[]}
-        articlesFromExerciseOrScenario={[]}
-        variablesFromExerciseOrScenario={[]}
-        onUpdateInject={onUpdateInject}
-        uriVariable={''}
-        allUsersNumber={0}
-        usersNumber={0}
-        teamsUsers={0}
-        creation={true}
-        createAtomicTest={onAddAtomicTesting}
-      />
-      <div style={{ float: 'right', marginTop: 20 }}>
-        <Button
-          color="secondary"
-          type="submit"
-          disabled={!isDirty || isSubmitting}
-        >
-          {t('Create')}
-        </Button>
-      </div>
-    </form>
+    <InjectDefinition
+      ref={injectDefinitionRef}
+      inject={{
+        inject_contract: contractId,
+        inject_type: injectType,
+        inject_teams: [],
+        inject_assets: [],
+        inject_asset_groups: [],
+        inject_documents: [],
+      }}
+      injectTypes={injectTypes}
+      handleClose={() => setSelectedInject(null)}
+      tagsMap={tagsMap}
+      permissions={permissions}
+      teamsFromExerciseOrScenario={teams}
+      articlesFromExerciseOrScenario={[]}
+      variablesFromExerciseOrScenario={[]}
+      onUpdateInject={onUpdateInject}
+      uriVariable={''}
+      allUsersNumber={0}
+      usersNumber={0}
+      teamsUsers={[]}
+      creation={true}
+      onAddAtomicTesting={onAddAtomicTesting}
+    />
   );
 };
 

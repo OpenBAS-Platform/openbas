@@ -63,9 +63,9 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
     dispatch(fetchAttackPatterns());
   });
 
-  const handleCreation = () => {
+  /* const handleCreation = () => {
     dispatch(createAtomicTesting());
-  };
+  }; */
 
   // Filter
   const [openMitreFilter, setOpenMitreFilter] = React.useState(false);

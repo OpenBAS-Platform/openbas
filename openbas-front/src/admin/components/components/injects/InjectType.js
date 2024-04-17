@@ -34,9 +34,9 @@ class InjectType extends Component {
         <Chip
           classes={{ root: style }}
           style={{
-            backgroundColor: `${theme.palette.mode === 'dark' ? config?.color_dark : config?.color_light}20`,
-            color: theme.palette.mode === 'dark' ? config?.color_dark : config?.color_light,
-            border: `1px solid ${theme.palette.mode === 'dark' ? config?.color_dark : config?.color_light}`,
+            backgroundColor: `${theme.palette.mode === 'dark' ? '#f8f8f8' : '#070d19'}20`,
+            color: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
+            border: `1px solid ${theme.palette.mode === 'dark' ? '#f8f8f8' : '#070d19'}`,
           }}
           label={label}
         />
