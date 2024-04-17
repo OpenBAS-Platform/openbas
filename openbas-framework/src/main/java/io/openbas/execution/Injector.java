@@ -78,7 +78,6 @@ public abstract class Injector {
         expectationExecution.setExercise(executableInject.getInjection().getExercise());
         expectationExecution.setInject(executableInject.getInjection().getInject());
         expectationExecution.setExpectedScore(expectation.getScore());
-        expectationExecution.setScore(0);
         expectationExecution.setExpectationGroup(expectation.isExpectationGroup());
         switch (expectation.type()) {
             case ARTICLE -> expectationExecution.setArticle(((ChannelExpectation) expectation).getArticle());
