@@ -5,10 +5,11 @@ import { useFormatter } from '../../../../components/i18n';
 
 const useStyles = makeStyles(() => ({
   chip: {
-    fontSize: 20,
+    fontSize: 15,
     fontWeight: 800,
     textTransform: 'uppercase',
     borderRadius: '0',
+    width: 150,
   },
   chipInList: {
     fontSize: 12,
@@ -44,7 +45,7 @@ const inlineStyles = {
   },
 };
 
-const StatusChip = ({ status, variant }: { status: string, variant: string }) => {
+const StatusChip = ({ status, variant }: { status: string, variant?: string }) => {
   const { t } = useFormatter();
   const classes = useStyles();
   const style = variant === 'list' ? classes.chipInList : classes.chip;

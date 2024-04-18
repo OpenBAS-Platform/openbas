@@ -13,6 +13,7 @@ import AtomicPopover from './Popover';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import { AtomicTestingResultContext } from '../../components/Context';
+import StatusChip from '../../components/atomictestings/StatusChip';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -75,6 +76,7 @@ const AtomicTestingHeader = () => {
           {atomic.atomic_title}
         </Typography>
         <AtomicPopover atomic={atomic} />
+        <StatusChip status={atomic.atomic_status}/>
         <Dialog
           open={open}
           onClose={() => setOpen(false)}
