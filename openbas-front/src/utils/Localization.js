@@ -73,7 +73,7 @@ const i18n = {
       Stop: 'Arrêter',
       Name: 'Nom',
       Subtitle: 'Sous-titre',
-      'Please be aware that if you change the "Reply-To" address, the IMAP functionality will be disabled.': 'Veuillez noter que si vous modifiez l\'adresse « Répondre à », la fonctionnalité IMAP sera désactivée.',
+      'Please note that if you change the “Reply to” address, the email interaction functionality in the platform will be disabled.': 'Veuillez noter que si vous modifiez l'adresse « Répondre à », la fonctionnalité d'interaction par mail dans la plateforme sera désactivée.',
       'Start date': 'Date de début',
       'End date': 'Date de fin',
       To: 'A',
