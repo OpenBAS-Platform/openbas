@@ -49,25 +49,25 @@ const useStyles = makeStyles(() => ({
 const inlineStylesHeaders: Record<string, CSSProperties> = {
   iconSort: {
     position: 'absolute',
-    margin: '0 0 0 5px',
+    margin: '0 0 0 15px',
     padding: 0,
     top: '0px',
   },
   atomic_title: {
     float: 'left',
-    width: '16%',
+    width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
   atomic_type: {
     float: 'left',
-    width: '16%',
+    width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
   atomic_last_start_execution_date: {
     float: 'left',
-    width: '16%',
+    width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -79,13 +79,13 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
   },
   atomic_status: {
     float: 'left',
-    width: '16%',
+    width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
   atomic_expectations: {
     float: 'left',
-    width: '16%',
+    width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -93,22 +93,22 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
 
 const inlineStyles: Record<string, CSSProperties> = {
   atomic_title: {
-    width: '16%',
+    width: '10%',
   },
   atomic_type: {
-    width: '16%',
+    width: '25%',
   },
   atomic_last_start_execution_date: {
-    width: '16%',
+    width: '15%',
   },
   atomic_targets: {
     width: '20%',
   },
   atomic_status: {
-    width: '16%',
+    width: '15%',
   },
   atomic_expectations: {
-    width: '16%',
+    width: '15%',
   },
 };
 
@@ -161,10 +161,10 @@ const AtomicTestings = () => {
     },
     {
       field: 'atomic_status',
-      label: 'Status',
+      label: 'Inject Execution Status',
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
-        return (<StatusChip status={atomicTesting.atomic_status} />);
+        return (<StatusChip status={atomicTesting.atomic_status} variant={'list'}/>);
       },
     },
     {

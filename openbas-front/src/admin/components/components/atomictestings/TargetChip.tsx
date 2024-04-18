@@ -74,7 +74,7 @@ const TargetChip: FunctionComponent<Props> = ({
               key={target.id}
               className={classes.target}
               icon={getIcon(target.targetType!)}
-              label={truncateText(target.name!, 5)}
+              label={truncateText(target.name!, 10)}
             />
           </Tooltip>
         </span>
