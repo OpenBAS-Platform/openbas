@@ -203,14 +203,14 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
                   );
                 })}
               </List>
-              <DialogWithCross
+              <Drawer
                 open={openMitreFilter}
                 handleClose={() => setOpenMitreFilter(false)}
                 title={t('ATT&CK Matrix')}
-                maxWidth={'xl'}
+                variant={'full'}
               >
                 <MitreFilter helpers={helpers} onClick={() => setOpenMitreFilter(false)} />
-              </DialogWithCross>
+              </Drawer>
             </div>
           }
           {
