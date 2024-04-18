@@ -63,7 +63,7 @@ const SettingsForm: React.FC<Props> = ({
     <form id="settingsForm" onSubmit={handleSubmit(onSubmit)}>
       <Alert severity="info">
         {t(
-          'Please be aware that if you change the "Reply-To" address, the IMAP functionality will be disabled.',
+          'Please note that if you change the “Reply to” address, the email interaction functionality in the platform will be disabled.',
         )}
       </Alert>
       <MuiTextField
