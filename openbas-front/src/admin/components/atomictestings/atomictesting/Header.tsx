@@ -88,7 +88,7 @@ const AtomicTestingHeader = () => {
               <span>{t('Do you want to try this inject?')}</span>
             </DialogContentText>
             <Alert severity="info" style={{ marginTop: 20 }}>
-              {t('The inject will only be sent to you.')}
+              {t('The previous results will be deleted.')}
             </Alert>
           </DialogContent>
           <DialogActions>
@@ -100,68 +100,6 @@ const AtomicTestingHeader = () => {
               onClick={submitTry}
             >
               {t('Confirm')}
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog
-          open={openResult}
-          TransitionComponent={Transition}
-          onClose={handleCloseResult}
-          fullWidth
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
-        >
-          <DialogContent>
-            {/* TODO: selectable={false} */}
-            <Table size="small">
-              {/* TODO: displayRowCheckbox={false} */}
-              <TableBody>
-                {injectResult
-                  && Object.entries(injectResult).map(
-                    ([key, value]) => {
-                      if (key === 'status_traces') {
-                        return (
-                          <TableRow key={key}>
-                            <TableCell>{key}</TableCell>
-                            <TableCell>
-                              {/* TODO: selectable={false} */}
-                              <Table size="small" key={key}>
-                                {/* TODO: displayRowCheckbox={false} */}
-                                <TableBody>
-                                  <>
-                                    {value?.filter((trace: InjectStatusExecution) => !!trace.execution_message)
-                                      .map((trace: InjectStatusExecution) => (
-                                        <TableRow key={trace.execution_category}>
-                                          <TableCell>
-                                            {trace.execution_message}
-                                          </TableCell>
-                                          <TableCell>
-                                            {trace.execution_status}
-                                          </TableCell>
-                                          <TableCell>{trace.execution_time}</TableCell>
-                                        </TableRow>
-                                      ))}
-                                  </>
-                                </TableBody>
-                              </Table>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      }
-                      return (
-                        <TableRow key={key}>
-                          <TableCell>{key}</TableCell>
-                          <TableCell>{value}</TableCell>
-                        </TableRow>
-                      );
-                    },
-                  )}
-              </TableBody>
-            </Table>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseResult}>
-              {t('Close')}
             </Button>
           </DialogActions>
         </Dialog>
