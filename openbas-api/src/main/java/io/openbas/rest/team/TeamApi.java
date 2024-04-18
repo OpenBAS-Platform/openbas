@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_USER;
@@ -107,6 +108,31 @@ public class TeamApi extends RestBehavior {
     team.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
     team.setScenarios(fromIterable(scenarioRepository.findAllById(input.getScenarioIds())));
     return teamRepository.save(team);
+  }
+
+  @PostMapping("/api/teams/upsert")
+  @PreAuthorize("isPlanner()")
+  public Team upsertTeam(@Valid @RequestBody TeamCreateInput input) {
+    if (input.getContextual() && input.getExerciseIds().toArray().length > 1) {
+      throw new UnsupportedOperationException("Contextual team can only be associated to one exercise");
+    }
+    Optional<Team> team = teamRepository.findByName(input.getName());
+    if( team.isPresent() ) {
+      Team existingTeam = team.get();
+      existingTeam.setUpdateAttributes(input);
+      existingTeam.setUpdatedAt(now());
+      existingTeam.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+      existingTeam.setOrganization(updateRelation(input.getOrganizationId(), existingTeam.getOrganization(), organizationRepository));
+      return teamRepository.save(existingTeam);
+    } else {
+      Team newTeam = new Team();
+      newTeam.setUpdateAttributes(input);
+      newTeam.setOrganization(updateRelation(input.getOrganizationId(), newTeam.getOrganization(), organizationRepository));
+      newTeam.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+      newTeam.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
+      newTeam.setScenarios(fromIterable(scenarioRepository.findAllById(input.getScenarioIds())));
+      return teamRepository.save(newTeam);
+    }
   }
 
   @DeleteMapping("/api/teams/{teamId}")

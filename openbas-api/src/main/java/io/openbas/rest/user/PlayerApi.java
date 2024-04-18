@@ -2,10 +2,7 @@ package io.openbas.rest.user;
 
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.SessionManager;
-import io.openbas.database.model.Communication;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.Organization;
-import io.openbas.database.model.User;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.user.form.player.CreatePlayerInput;
@@ -13,16 +10,20 @@ import io.openbas.rest.user.form.player.UpdatePlayerInput;
 import io.openbas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static java.time.Instant.now;
 
 @RestController
 public class PlayerApi extends RestBehavior {
@@ -36,6 +37,11 @@ public class PlayerApi extends RestBehavior {
   private UserRepository userRepository;
   private TagRepository tagRepository;
   private UserService userService;
+  private final TeamRepository teamRepository;
+
+  public PlayerApi(TeamRepository teamRepository) {
+    this.teamRepository = teamRepository;
+  }
 
   @Autowired
   public void setCommunicationRepository(CommunicationRepository communicationRepository) {
@@ -107,6 +113,36 @@ public class PlayerApi extends RestBehavior {
     User savedUser = userRepository.save(user);
     userService.createUserToken(savedUser);
     return savedUser;
+  }
+
+  @Transactional(rollbackOn = Exception.class)
+  @PostMapping("/api/players/upsert")
+  @PreAuthorize("isPlanner()")
+  public User upsertPlayer(@Valid @RequestBody CreatePlayerInput input) {
+    checkOrganizationAccess(userRepository, input.getOrganizationId());
+    Optional<User> user = userRepository.findByEmailIgnoreCase(input.getEmail());
+    if( user.isPresent() ) {
+      User existingUser = user.get();
+      existingUser.setUpdateAttributes(input);
+      existingUser.setUpdatedAt(now());
+      Iterable<String> tags = Stream.concat(existingUser.getTags().stream().map(Tag::getId).toList().stream(), input.getTagIds().stream()).distinct().toList();
+      existingUser.setTags(fromIterable(tagRepository.findAllById(tags)));
+      Iterable<String> teams = Stream.concat(existingUser.getTeams().stream().map(Team::getId).toList().stream(), input.getTeamIds().stream()).distinct().toList();
+      existingUser.setTeams(fromIterable(teamRepository.findAllById(teams)));
+      if( StringUtils.hasText(input.getOrganizationId()) ) {
+        existingUser.setOrganization(updateRelation(input.getOrganizationId(), existingUser.getOrganization(), organizationRepository));
+      }
+      return userRepository.save(existingUser);
+    } else {
+      User newUser = new User();
+      newUser.setUpdateAttributes(input);
+      newUser.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+      newUser.setOrganization(updateRelation(input.getOrganizationId(), newUser.getOrganization(), organizationRepository));
+      newUser.setTeams(fromIterable(teamRepository.findAllById(input.getTeamIds())));
+      User savedUser = userRepository.save(newUser);
+      userService.createUserToken(savedUser);
+      return savedUser;
+    }
   }
 
   @PutMapping("/api/players/{userId}")

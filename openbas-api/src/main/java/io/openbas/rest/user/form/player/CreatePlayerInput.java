@@ -35,4 +35,6 @@ public class CreatePlayerInput {
   @JsonProperty("user_tags")
   private List<String> tagIds = new ArrayList<>();
 
+  @JsonProperty("user_teams")
+  private List<String> teamIds = new ArrayList<>();
 }

@@ -17,6 +17,8 @@ public interface TeamRepository extends CrudRepository<Team, String>, JpaSpecifi
   @NotNull
   Optional<Team> findById(@NotNull String id);
 
+  Optional<Team> findByName(String name);
+
   List<Team> findByNameIgnoreCase(String name);
 
   @Query("select team from Team team where team.organization is null or team.organization.id in :organizationIds")
