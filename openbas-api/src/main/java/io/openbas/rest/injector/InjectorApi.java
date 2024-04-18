@@ -27,9 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -159,7 +157,9 @@ public class InjectorApi extends RestBehavior {
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
             String queueName = openBASConfig.getRabbitmqPrefix() + "_injector_" + input.getType();
-            channel.queueDeclare(queueName, true, false, false, null);
+            Map<String, Object> queueOptions = new HashMap<>();
+            queueOptions.put("x-queue-type", openBASConfig.getRabbitmqQueueType());
+            channel.queueDeclare(queueName, true, false, false, queueOptions);
             String routingKey = openBASConfig.getRabbitmqPrefix() + ROUTING_KEY + input.getType();
             String exchangeKey = openBASConfig.getRabbitmqPrefix() + EXCHANGE_KEY;
             channel.exchangeDeclare(exchangeKey, "direct", true);

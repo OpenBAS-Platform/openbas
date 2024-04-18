@@ -65,6 +65,9 @@ public class OpenBASConfig {
   @JsonProperty("rabbitmq_pass")
   private String rabbitmqPass = "guest";
 
+  @JsonProperty("rabbitmq_queue_type")
+  private String rabbitmqQueueType = "classic";
+
   @JsonProperty("default_reply_to")
   private String defaultReplyTo;
 
