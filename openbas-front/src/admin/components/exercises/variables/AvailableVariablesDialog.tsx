@@ -6,10 +6,11 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { CopyAllOutlined } from '@mui/icons-material';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import type { Contract, Variable } from '../../../../utils/api-types';
+import type { Variable } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { UsersHelper } from '../../../../actions/helper';
 import { copyToClipboard } from '../../../../utils/CopyToClipboard';
+import type { Contract } from '../../../../actions/contract/contract';
 
 interface VariableChildItemProps {
   hasChildren?: boolean;

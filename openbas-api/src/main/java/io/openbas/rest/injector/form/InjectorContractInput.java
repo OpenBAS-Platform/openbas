@@ -31,4 +31,7 @@ public class InjectorContractInput {
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("contract_content")
     private String content;
+
+    @JsonProperty("is_atomic_testing")
+    private boolean isAtomicTesting = true;
 }

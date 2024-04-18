@@ -3,7 +3,8 @@ import { ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { DnsOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import type { InjectExpectationsStore } from '../../../components/injects/expectations/Expectation';
-import type { Contract, Team } from '../../../../../utils/api-types';
+import type { Team } from '../../../../../utils/api-types';
+import type { Contract } from '../../../../../actions/contract/contract';
 import ExpectationLine from './ExpectationLine';
 import { typeIcon } from '../../../components/injects/expectations/ExpectationUtils';
 import type { EndpointStore } from '../../../assets/endpoints/Endpoint';
@@ -80,7 +81,7 @@ const TechnicalExpectationAssetGroup: FunctionComponent<Props> = ({
               />
             </ListItem>
             {groupedExpectations.map((e: InjectExpectationsStore) => (
-              <TechnicalExpectationAsset key={e.injectexpectation_id} expectation={e} injectContract={injectContract} gap={16} />
+              <TechnicalExpectationAsset key={e.inject_expectation_id} expectation={e} injectContract={injectContract} gap={16} />
             ))}
           </div>
         );

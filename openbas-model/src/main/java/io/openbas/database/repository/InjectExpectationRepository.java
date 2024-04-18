@@ -43,6 +43,26 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
     @Query(value = "select i from InjectExpectation i where i.type = 'PREVENTION' and i.inject.id = :injectId and i.asset.id = :assetId")
     InjectExpectation findPreventionExpectationForAsset(@Param("injectId") String injectId, @Param("assetId") String assetId);
 
-    @Query(value = "select i from InjectExpectation i where i.type = 'PREVENTION' and i.inject.id = :injectId and i.assetGroup.id IN :assetGroupId")
+    @Query(value = "select i from InjectExpectation i where i.type = 'PREVENTION' and i.inject.id = :injectId and i.assetGroup.id = :assetGroupId")
     InjectExpectation findPreventionExpectationForAssetGroup(@Param("injectId") String injectId, @Param("assetGroupId") String assetGroupId);
+
+    // -- BY TARGET TYPE
+
+    @Query(value = "select i from InjectExpectation i where i.inject.id = :injectId and i.team.id = :teamId")
+    List<InjectExpectation> findAllByInjectAndTeam(
+        @Param("injectId") @NotBlank final String injectId,
+        @Param("teamId") @NotBlank final String teamId
+    );
+
+    @Query(value = "select i from InjectExpectation i where i.inject.id = :injectId and i.asset.id = :assetId")
+    List<InjectExpectation> findAllByInjectAndAsset(
+        @Param("injectId") @NotBlank final String injectId,
+        @Param("assetId") @NotBlank final String assetId
+    );
+
+    @Query(value = "select i from InjectExpectation i where i.inject.id = :injectId and i.assetGroup.id = :assetGroupId")
+    List<InjectExpectation> findAllByInjectAndAssetGroup(
+        @Param("injectId") @NotBlank final String injectId,
+        @Param("assetGroupId") @NotBlank final String assetGroupId
+    );
 }

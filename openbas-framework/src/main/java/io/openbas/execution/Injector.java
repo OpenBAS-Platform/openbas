@@ -78,7 +78,6 @@ public abstract class Injector {
         expectationExecution.setExercise(executableInject.getInjection().getExercise());
         expectationExecution.setInject(executableInject.getInjection().getInject());
         expectationExecution.setExpectedScore(expectation.getScore());
-        expectationExecution.setScore(0);
         expectationExecution.setExpectationGroup(expectation.isExpectationGroup());
         switch (expectation.type()) {
             case ARTICLE -> expectationExecution.setArticle(((ChannelExpectation) expectation).getArticle());
@@ -107,6 +106,7 @@ public abstract class Injector {
         Execution execution = new Execution(executableInject.isRuntime());
         try {
             boolean isScheduledInject = !executableInject.isDirect();
+            boolean isAtomicTesting = executableInject.getInjection().getInject().isAtomicTesting();
             // If empty content, inject must be rejected
             if (executableInject.getInjection().getInject().getContent() == null) {
                 throw new UnsupportedOperationException("Inject is empty");
@@ -123,7 +123,7 @@ public abstract class Injector {
             List<Team> teams = executableInject.getTeams();
             List<Asset> assets = executableInject.getAssets();
             List<AssetGroup> assetGroups = executableInject.getAssetGroups();
-            if (isScheduledInject && !expectations.isEmpty()) {
+            if ((isScheduledInject || isAtomicTesting) && !expectations.isEmpty()) {
                 if (!teams.isEmpty()) {
                     List<InjectExpectation> injectExpectations = teams.stream()
                         .flatMap(team -> expectations.stream()

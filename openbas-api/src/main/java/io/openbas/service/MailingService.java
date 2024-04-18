@@ -1,8 +1,6 @@
 package io.openbas.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.contract.Contract;
-import io.openbas.contract.ContractService;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.User;

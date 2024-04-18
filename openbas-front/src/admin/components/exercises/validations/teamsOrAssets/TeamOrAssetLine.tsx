@@ -9,7 +9,7 @@ import TechnicalExpectationAssetGroup from '../expectations/TechnicalExpectation
 import ManualExpectations from '../expectations/ManualExpectations';
 import type { EndpointStore } from '../../../assets/endpoints/Endpoint';
 import type { AssetGroupStore } from '../../../assets/asset_groups/AssetGroup';
-import type { Contract, Inject, Team } from '../../../../../utils/api-types';
+import type { Inject, Team } from '../../../../../utils/api-types';
 import type { InjectExpectationsStore } from '../../../components/injects/expectations/Expectation';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
@@ -26,6 +26,7 @@ import type { ArticlesHelper } from '../../../../../actions/channels/article-hel
 import type { ChannelsHelper } from '../../../../../actions/channels/channel-helper';
 import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 import { fetchExerciseArticles } from '../../../../../actions/channels/article-action';
+import type { Contract } from '../../../../../actions/contract/contract';
 
 const useStyles = makeStyles(() => ({
   item: {

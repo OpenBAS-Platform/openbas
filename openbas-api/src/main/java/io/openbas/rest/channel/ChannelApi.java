@@ -201,7 +201,6 @@ public class ChannelApi extends RestBehavior {
       injects = scenario.getInjects();
     }
 
-
     final User user = impersonateUser(userRepository, userId);
     if (user.getId().equals(ANONYMOUS)) {
       throw new UnsupportedOperationException("User must be logged or dynamic player is required");

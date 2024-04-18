@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.converter.ContentConverter;
 import io.openbas.helper.MonoIdDeserializer;
@@ -18,6 +19,8 @@ import lombok.extern.java.Log;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -50,6 +53,7 @@ public class Inject implements Base, Injection {
   private String id;
 
   @Getter
+  @Queryable(searchable = true, filterable = true, sortable = true)
   @Column(name = "inject_title")
   @JsonProperty("inject_title")
   private String title;
@@ -63,6 +67,11 @@ public class Inject implements Base, Injection {
   @Column(name = "inject_contract")
   @JsonProperty("inject_contract")
   private String contract;
+
+  @Getter
+  @JsonIgnore
+  @Transient
+  private InjectorContract injectorContract;
 
   @Getter
   @Column(name = "inject_country")
@@ -228,11 +237,15 @@ public class Inject implements Base, Injection {
 
   @JsonProperty("inject_users_number")
   public long getNumberOfTargetUsers() {
+    Exercise exercise = getExercise();
+    if (exercise == null) {
+      return 0L;
+    }
     if (this.allTeams) {
       return getExercise().usersNumber();
     }
     return getTeams().stream()
-        .map(team -> team.getUsersNumberInExercise(getExercise()))
+        .map(team -> team.getUsersNumberInExercise(getExercise().getId()))
         .reduce(Long::sum).orElse(0L);
   }
 
@@ -269,20 +282,23 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_date")
   public Optional<Instant> getDate() {
     if (this.getExercise() == null && this.getScenario() == null) {
-      log.log(Level.SEVERE, "Exercise OR Scenario should not be null");
-      return Optional.empty();
+      log.log(Level.INFO, "This inject is an atomic testing");
+      return Optional.empty(); //atomic testing date is the update date
     }
 
     if (this.getScenario() != null) {
       return Optional.empty();
     }
 
-    if (this.getExercise().getStatus().equals(Exercise.STATUS.CANCELED)) {
-      return Optional.empty();
+    if (this.getExercise() != null) {
+      if (this.getExercise().getStatus().equals(Exercise.STATUS.CANCELED)) {
+        return Optional.empty();
+      }
+      return this.getExercise()
+          .getStart()
+          .map(source -> computeInjectDate(source, SPEED_STANDARD));
     }
-    return this.getExercise()
-        .getStart()
-        .map(source -> computeInjectDate(source, SPEED_STANDARD));
+    return Optional.ofNullable(LocalDateTime.now().toInstant(ZoneOffset.UTC));
   }
 
   @JsonIgnore
@@ -343,6 +359,11 @@ public class Inject implements Base, Injection {
       return this.getStatus().orElseThrow().getTrackingSentDate();
     }
     return null;
+  }
+
+  @JsonIgnore
+  public boolean isAtomicTesting() {
+    return this.exercise == null && this.scenario == null;
   }
 
   @Override

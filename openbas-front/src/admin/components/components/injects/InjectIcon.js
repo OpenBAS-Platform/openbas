@@ -25,6 +25,11 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
       };
   }
   let color = null;
+  if (theme.palette.mode === 'dark') {
+    color = '#ffffff';
+  } else {
+    color = '#000000';
+  }
   if (done) {
     color = '#4caf50';
   } else if (disabled) {
@@ -36,7 +41,7 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
         <EmailOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: color || '#cddc39' }}
+          sx={{ color }}
         />
       );
     case 'openbas_ovh_sms':
@@ -44,7 +49,7 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
         <SmsOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: color || '#9c27b0' }}
+          sx={{ color }}
         />
       );
     case 'openbas_manual':
@@ -52,7 +57,7 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
         <NotificationsActiveOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: color || '#009688' }}
+          sx={{ color }}
         />
       );
     case 'openbas_mastodon':
@@ -60,7 +65,7 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
         <Mastodon
           style={style}
           fontSize={fontSize}
-          sx={{ color: color || '#ad1457' }}
+          sx={{ color }}
         />
       );
     case 'openbas_opencti':
@@ -79,7 +84,7 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
         <SpeakerNotesOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: color || '#f44336' }}
+          sx={{ color }}
         />
       );
     case 'openbas_twitter':
@@ -87,7 +92,7 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
         <Twitter
           style={style}
           fontSize={fontSize}
-          sx={{ color: color || '#2196f3' }}
+          sx={{ color }}
         />
       );
     case 'openbas_channel':
@@ -95,7 +100,7 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
         <NewspaperVariantMultipleOutline
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#4caf50' : '#ff9800' }}
+          sx={{ color }}
         />
       );
     case 'openbas_challenge':
@@ -103,7 +108,7 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
         <EmojiEventsOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#4caf50' : '#e91e63' }}
+          sx={{ color }}
         />
       );
     case 'openbas_http':

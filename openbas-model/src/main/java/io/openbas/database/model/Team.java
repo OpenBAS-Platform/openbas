@@ -158,8 +158,14 @@ public class Team implements Base {
                 .toList();
     }
 
-    public long getUsersNumberInExercise(Exercise exercise) {
-        return getExerciseTeamUsers().stream().filter(exerciseTeamUser -> exerciseTeamUser.getExercise().getId().equals(exercise.getId())).toList().size();
+    public long getUsersNumberInExercise(String exerciseId) {
+        return exerciseId == null ?
+            0:
+            getExerciseTeamUsers()
+                .stream()
+                .filter(exerciseTeamUser -> exerciseTeamUser.getExercise().getId().equals(exerciseId))
+                .toList()
+                .size();
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.asset.AssetGroupService;
 import io.openbas.asset.AssetService;
+import io.openbas.atomic_testing.AtomicTestingService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
@@ -62,6 +63,9 @@ public class InjectApi extends RestBehavior {
   private DocumentRepository documentRepository;
   private ExecutionContextService executionContextService;
   private ScenarioService scenarioService;
+  private InjectService injectService;
+  private AtomicTestingService atomicTestingService;
+
 
   @Resource
   protected ObjectMapper mapper;
@@ -116,7 +120,6 @@ public class InjectApi extends RestBehavior {
     this.assetService = assetService;
   }
 
-
   @Autowired
   public void setAssetGroupService(@NotNull final AssetGroupService assetGroupService) {
     this.assetGroupService = assetGroupService;
@@ -130,6 +133,16 @@ public class InjectApi extends RestBehavior {
   @Autowired
   public void setScenarioService(ScenarioService scenarioService) {
     this.scenarioService = scenarioService;
+  }
+
+  @Autowired
+  public void setInjectService(InjectService injectService) {
+    this.injectService = injectService;
+  }
+
+  @Autowired
+  public void setAtomicTestingService(AtomicTestingService atomicTestingService) {
+    this.atomicTestingService = atomicTestingService;
   }
 
   @Autowired
@@ -200,15 +213,7 @@ public class InjectApi extends RestBehavior {
 
   @GetMapping("/api/injects/try/{injectId}")
   public InjectStatus tryInject(@PathVariable String injectId) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    User user = this.userRepository.findById(currentUser().getId()).orElseThrow();
-    List<ExecutionContext> userInjectContexts = List.of(
-        this.executionContextService.executionContext(user, inject, "Direct test")
-    );
-    ExecutableInject injection = new ExecutableInject(false, true, inject, List.of(), inject.getAssets(),
-        inject.getAssetGroups(), userInjectContexts);
-    // TODO Must be migrated to Atomic approach (Inject duplication and async tracing)
-    return executor.execute(injection);
+    return atomicTestingService.tryInject(injectId);
   }
 
   @Transactional(rollbackOn = Exception.class)
@@ -334,16 +339,7 @@ public class InjectApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject setInjectStatus(@PathVariable String exerciseId, @PathVariable String injectId,
       @Valid @RequestBody InjectUpdateStatusInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    // build status
-    InjectStatus injectStatus = new InjectStatus();
-    injectStatus.setInject(inject);
-    injectStatus.setTrackingSentDate(now());
-    injectStatus.setName(ExecutionStatus.valueOf(input.getStatus()));
-    injectStatus.setTrackingTotalExecutionTime(0L);
-    // Save status for inject
-    inject.setStatus(injectStatus);
-    return injectRepository.save(inject);
+    return injectService.updateInjectStatus(injectId, input);
   }
 
   @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/teams")

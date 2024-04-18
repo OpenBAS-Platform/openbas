@@ -1,5 +1,6 @@
-package io.openbas.injectExpectation;
+package io.openbas.inject_expectation;
 
+import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Inject;
@@ -13,11 +14,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.DETECTION;
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVENTION;
-import static io.openbas.injectExpectation.InjectExpectationUtils.computeResult;
+import static io.openbas.inject_expectation.InjectExpectationUtils.computeResult;
 import static java.time.Instant.now;
 
 @RequiredArgsConstructor
@@ -128,6 +130,25 @@ public class InjectExpectationService {
         Specification.where(InjectExpectationSpecification.type(DETECTION))
             .and(InjectExpectationSpecification.fromAssets(inject.getId(), assetIds))
     );
+  }
+
+  // -- BY TARGET TYPE
+
+  public List<InjectExpectation> findExpectationsByInjectAndTargetAndTargetType(
+      @NotBlank final String injectId,
+      @NotBlank final String targetId,
+      @NotBlank final String targetType) {
+    try {
+      TargetType targetTypeEnum = TargetType.valueOf(targetType);
+      return switch (targetTypeEnum) {
+        case TEAMS -> injectExpectationRepository.findAllByInjectAndTeam(injectId, targetId);
+        case ASSETS -> injectExpectationRepository.findAllByInjectAndAsset(injectId, targetId);
+        case ASSETS_GROUPS -> injectExpectationRepository.findAllByInjectAndAssetGroup(injectId, targetId);
+      };
+    } catch (IllegalArgumentException e) {
+      return Collections.emptyList();
+    }
+
   }
 
 }

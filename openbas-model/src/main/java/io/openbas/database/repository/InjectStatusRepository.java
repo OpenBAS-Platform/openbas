@@ -1,5 +1,6 @@
 package io.openbas.database.repository;
 
+import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectStatus;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -19,4 +20,6 @@ public interface InjectStatusRepository extends CrudRepository<InjectStatus, Str
 
     @Query(value = "select c from InjectStatus c where c.name = 'PENDING' and c.inject.type = :injectType")
     List<InjectStatus> pendingForInjectType(@Param("injectType") String injectType);
+
+    Optional<InjectStatus> findByInject(@NotNull Inject inject);
 }

@@ -24,9 +24,10 @@ import { tagOptions } from '../../../../utils/Option';
 import Transition from '../../../../components/common/Transition';
 import type { InjectInput, InjectStore } from '../../../../actions/injects/Inject';
 import { InjectContext, PermissionsContext } from '../Context';
-import type { Contract, Inject, InjectStatus, InjectStatusExecution, Tag } from '../../../../utils/api-types';
+import type { Inject, InjectStatus, InjectStatusExecution, Tag } from '../../../../utils/api-types';
 import { tryInject } from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
+import type { Contract } from '../../../../actions/contract/contract';
 
 interface Props {
   inject: InjectStore;
@@ -47,7 +48,13 @@ const InjectPopover: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
-  const { onUpdateInject, onUpdateInjectTrigger, onUpdateInjectActivation, onInjectDone, onDeleteInject } = useContext(InjectContext);
+  const {
+    onUpdateInject,
+    onUpdateInjectTrigger,
+    onUpdateInjectActivation,
+    onInjectDone,
+    onDeleteInject,
+  } = useContext(InjectContext);
 
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -79,8 +86,8 @@ const InjectPopover: FunctionComponent<Props> = ({
       R.assoc(
         'inject_depends_duration',
         data.inject_depends_duration_days * 3600 * 24
-        + data.inject_depends_duration_hours * 3600
-        + data.inject_depends_duration_minutes * 60,
+                + data.inject_depends_duration_hours * 3600
+                + data.inject_depends_duration_minutes * 60,
       ),
       R.assoc('inject_contract', data.inject_contract.id),
       R.assoc('inject_tags', R.pluck('id', data.inject_tags)),
@@ -208,7 +215,7 @@ const InjectPopover: FunctionComponent<Props> = ({
         size="large"
         disabled={permissions.readOnly}
       >
-        <MoreVert />
+        <MoreVert/>
       </IconButton>
       <Menu
         anchorEl={anchorEl}
@@ -228,28 +235,28 @@ const InjectPopover: FunctionComponent<Props> = ({
           {t('Manage content')}
         </MenuItem>
         {!inject.inject_status && onInjectDone && (
-          <MenuItem
-            onClick={handleOpenDone}
-            disabled={isDisabled}
-          >
-            {t('Mark as done')}
-          </MenuItem>
+        <MenuItem
+          onClick={handleOpenDone}
+          disabled={isDisabled}
+        >
+          {t('Mark as done')}
+        </MenuItem>
         )}
         {inject.inject_type !== 'openbas_manual' && onUpdateInjectTrigger && (
-          <MenuItem
-            onClick={handleOpenTrigger}
-            disabled={isDisabled || permissions.isRunning}
-          >
-            {t('Trigger now')}
-          </MenuItem>
+        <MenuItem
+          onClick={handleOpenTrigger}
+          disabled={isDisabled || permissions.isRunning}
+        >
+          {t('Trigger now')}
+        </MenuItem>
         )}
         {inject.inject_type !== 'openbas_manual' && (
-          <MenuItem
-            onClick={handleOpenTry}
-            disabled={isDisabled}
-          >
-            {t('Try the inject')}
-          </MenuItem>
+        <MenuItem
+          onClick={handleOpenTry}
+          disabled={isDisabled}
+        >
+          {t('Try the inject')}
+        </MenuItem>
         )}
         {inject.inject_enabled ? (
           <MenuItem
@@ -426,45 +433,45 @@ const InjectPopover: FunctionComponent<Props> = ({
             {/* TODO: displayRowCheckbox={false} */}
             <TableBody>
               {injectResult
-                && Object.entries(injectResult).map(
-                  ([key, value]) => {
-                    if (key === 'status_traces') {
-                      return (
-                        <TableRow key={key}>
-                          <TableCell>{key}</TableCell>
-                          <TableCell>
-                            {/* TODO: selectable={false} */}
-                            <Table size="small" key={key}>
-                              {/* TODO: displayRowCheckbox={false} */}
-                              <TableBody>
-                                <>
-                                  {value?.filter((trace: InjectStatusExecution) => !!trace.execution_message)
-                                    .map((trace: InjectStatusExecution) => (
-                                      <TableRow key={trace.execution_category}>
-                                        <TableCell>
-                                          {trace.execution_message}
-                                        </TableCell>
-                                        <TableCell>
-                                          {trace.execution_status}
-                                        </TableCell>
-                                        <TableCell>{trace.execution_time}</TableCell>
+                                && Object.entries(injectResult).map(
+                                  ([key, value]) => {
+                                    if (key === 'status_traces') {
+                                      return (
+                                        <TableRow key={key}>
+                                          <TableCell>{key}</TableCell>
+                                          <TableCell>
+                                            {/* TODO: selectable={false} */}
+                                            <Table size="small" key={key}>
+                                              {/* TODO: displayRowCheckbox={false} */}
+                                              <TableBody>
+                                                <>
+                                                  {value?.filter((trace: InjectStatusExecution) => !!trace.execution_message)
+                                                    .map((trace: InjectStatusExecution) => (
+                                                      <TableRow key={trace.execution_category}>
+                                                        <TableCell>
+                                                          {trace.execution_message}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                          {trace.execution_status}
+                                                        </TableCell>
+                                                        <TableCell>{trace.execution_time}</TableCell>
+                                                      </TableRow>
+                                                    ))}
+                                                </>
+                                              </TableBody>
+                                            </Table>
+                                          </TableCell>
+                                        </TableRow>
+                                      );
+                                    }
+                                    return (
+                                      <TableRow key={key}>
+                                        <TableCell>{key}</TableCell>
+                                        <TableCell>{value}</TableCell>
                                       </TableRow>
-                                    ))}
-                                </>
-                              </TableBody>
-                            </Table>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    }
-                    return (
-                      <TableRow key={key}>
-                        <TableCell>{key}</TableCell>
-                        <TableCell>{value}</TableCell>
-                      </TableRow>
-                    );
-                  },
-                )}
+                                    );
+                                  },
+                                )}
             </TableBody>
           </Table>
         </DialogContent>

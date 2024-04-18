@@ -1,5 +1,7 @@
 package io.openbas.execution;
 
+import static io.openbas.database.model.InjectStatusExecution.traceInfo;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Injector;
 import io.openbas.database.model.*;
@@ -58,22 +60,24 @@ public class Executor {
     }
 
     private InjectStatus executeExternal(ExecutableInject executableInject, Inject inject) {
-        InjectStatus status = new InjectStatus();
+        InjectStatus status = injectStatusRepository.findByInject(inject).orElse(new InjectStatus());
         status.setTrackingSentDate(Instant.now());
         status.setInject(inject);
         try {
             String jsonInject = mapper.writeValueAsString(executableInject);
+            status.setName(ExecutionStatus.PENDING); // FIXME: need to be test with HTTP Collector
+            status.getTraces().add(traceInfo("The inject has been published and is now waiting to be consumed."));
             InjectStatus savedStatus = injectStatusRepository.save(status);
             queueService.publish(inject.getType(), jsonInject);
             return savedStatus;
         } catch (Exception e) {
+            status.setName(ExecutionStatus.ERROR);
             status.getTraces().add(InjectStatusExecution.traceError(e.getMessage()));
             return injectStatusRepository.save(status);
         }
     }
 
-    private InjectStatus executeInternal(ExecutableInject executableInject) {
-        Inject inject = executableInject.getInjection().getInject();
+    private InjectStatus executeInternal(ExecutableInject executableInject, Inject inject) {
         io.openbas.execution.Injector executor = this.context.getBean(inject.getType(), io.openbas.execution.Injector.class);
         Execution execution = executor.executeInjection(executableInject);
         Inject executedInject = injectRepository.findById(inject.getId()).orElseThrow();
@@ -94,11 +98,11 @@ public class Executor {
         }
         // Depending on injector type (internal or external) execution must be done differently
         Optional<Injector> externalInjector = injectorRepository.findByType(inject.getType());
-        if (externalInjector.isPresent()) {
-            return executeExternal(executableInject, inject);
-        } else {
-            return executeInternal(executableInject);
-        }
+
+        return externalInjector
+            .map(Injector::isExternal)
+            .map(isExternal -> isExternal ? executeExternal(executableInject, inject) : executeInternal(executableInject, inject))
+            .orElseThrow(() -> new IllegalStateException("External injector not found for type: " + inject.getType()));
     }
 
     // region utils

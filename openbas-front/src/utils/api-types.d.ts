@@ -103,6 +103,72 @@ export interface AssetGroupInput {
   asset_group_tags?: string[];
 }
 
+export interface AtomicTestingDetailOutput {
+  atomic_id: string;
+  status_label?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_traces?: string[];
+  /** @format date-time */
+  tracking_ack_date?: string;
+  /** @format date-time */
+  tracking_end_date?: string;
+  /** @format date-time */
+  tracking_sent_date?: string;
+  /** @format int32 */
+  tracking_total_count?: number;
+  /** @format int32 */
+  tracking_total_error?: number;
+  /** @format int64 */
+  tracking_total_execution_time?: number;
+  /** @format int32 */
+  tracking_total_success?: number;
+}
+
+export interface AtomicTestingInput {
+  inject_all_teams?: boolean;
+  inject_asset_groups?: string[];
+  inject_assets?: string[];
+  inject_content?: object;
+  inject_contract?: string;
+  inject_description?: string;
+  inject_documents?: InjectDocumentInput[];
+  inject_tags?: string[];
+  inject_teams?: string[];
+  inject_title?: string;
+  inject_type?: string;
+}
+
+export interface AtomicTestingOutput {
+  /** Contract */
+  atomic_contract: string;
+  /** Result of expectations */
+  atomic_expectation_results: ExpectationResultsByType[];
+  /** Id */
+  atomic_id: string;
+  /** Full contract */
+  atomic_injector_contract: InjectorContract;
+  /**
+   * Last Execution End date
+   * @format date-time
+   */
+  atomic_last_execution_end_date?: string;
+  /**
+   * Last Execution Start date
+   * @format date-time
+   */
+  atomic_last_execution_start_date?: string;
+  /** Status of execution */
+  atomic_status: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  /**
+   * Specifies the categories of targetResults for atomic testing.
+   * @example "assets, asset groups, teams, players"
+   */
+  atomic_targets: InjectTargetWithResult[];
+  /** Title */
+  atomic_title: string;
+  /** Type */
+  atomic_type: string;
+}
+
 export interface AttackPattern {
   /** @format date-time */
   attack_pattern_created_at?: string;
@@ -359,57 +425,6 @@ export interface Communication {
   updateAttributes?: object;
 }
 
-export interface Contract {
-  config: ContractConfig;
-  context: Record<string, string>;
-  contract_attack_patterns: string[];
-  contract_id: string;
-  fields: ContractElement[];
-  label: Record<string, string>;
-  manual: boolean;
-  variables: ContractVariable[];
-}
-
-export interface ContractConfig {
-  color_dark?: string;
-  color_light?: string;
-  expose?: boolean;
-  label?: Record<string, string>;
-  type?: string;
-}
-
-export interface ContractElement {
-  key?: string;
-  label?: string;
-  linkedFields?: LinkedFieldModel[];
-  linkedValues?: string[];
-  mandatory?: boolean;
-  mandatoryGroups?: string[];
-  type?:
-    | "text"
-    | "number"
-    | "tuple"
-    | "checkbox"
-    | "textarea"
-    | "select"
-    | "article"
-    | "challenge"
-    | "dependency-select"
-    | "attachment"
-    | "team"
-    | "expectation"
-    | "asset"
-    | "asset-group";
-}
-
-export interface ContractVariable {
-  cardinality: "1" | "n";
-  children?: ContractVariable[];
-  key: string;
-  label: string;
-  type: "String" | "Object";
-}
-
 export interface CreatePlayerInput {
   user_country?: string;
   user_email: string;
@@ -482,7 +497,7 @@ export interface DryInject {
 
 export interface DryInjectStatus {
   status_id?: string;
-  status_name?: "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_name?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -697,6 +712,13 @@ export interface ExerciseUpdateTeamsInput {
   exercise_teams?: string[];
 }
 
+/** Result of expectations */
+export interface ExpectationResultsByType {
+  avgResult?: "FAILED" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
+  distribution?: ResultDistribution[];
+  type?: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
+}
+
 export interface ExpectationUpdateInput {
   /** @format int32 */
   expectation_score: number;
@@ -858,6 +880,7 @@ export interface InjectExpectation {
   /** @format int32 */
   inject_expectation_expected_score?: number;
   inject_expectation_group?: boolean;
+  inject_expectation_id: string;
   inject_expectation_inject?: Inject;
   inject_expectation_name?: string;
   inject_expectation_results?: InjectExpectationResult[];
@@ -868,7 +891,6 @@ export interface InjectExpectation {
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: User;
-  injectexpectation_id: string;
   updateAttributes?: object;
 }
 
@@ -904,7 +926,7 @@ export interface InjectReceptionInput {
 
 export interface InjectStatus {
   status_id?: string;
-  status_name?: "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_name?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -929,9 +951,20 @@ export interface InjectStatusExecution {
   /** @format int32 */
   execution_duration?: number;
   execution_message?: string;
-  execution_status?: "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  execution_status?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   /** @format date-time */
   execution_time?: string;
+}
+
+/**
+ * Specifies the categories of targetResults for atomic testing.
+ * @example "assets, asset groups, teams, players"
+ */
+export interface InjectTargetWithResult {
+  expectationResultsByTypes?: ExpectationResultsByType[];
+  id?: string;
+  name?: string;
+  targetType?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
 export interface InjectTeamsInput {
@@ -974,6 +1007,22 @@ export interface InjectorConnection {
   vhost?: string;
 }
 
+/** Full contract */
+export interface InjectorContract {
+  injector_contract_atomic_testing?: boolean;
+  injector_contract_content: string;
+  /** @format date-time */
+  injector_contract_created_at?: string;
+  injector_contract_id: string;
+  injector_contract_injector?: Injector;
+  injector_contract_labels?: Record<string, string>;
+  injector_contract_manual?: boolean;
+  /** @format date-time */
+  injector_contract_updated_at?: string;
+  injectors_contracts_attack_patterns?: AttackPattern[];
+  updateAttributes?: object;
+}
+
 export interface InjectorContractInput {
   contract_attack_patterns?: string[];
   contract_content: string;
@@ -1005,7 +1054,7 @@ export interface KillChainPhase {
   /** @format date-time */
   phase_created_at?: string;
   phase_description?: string;
-  phase_external_id?: string;
+  phase_external_id: string;
   phase_id?: string;
   phase_kill_chain_name?: string;
   phase_name?: string;
@@ -1205,25 +1254,6 @@ export interface LessonsTemplateUpdateInput {
   lessons_template_name: string;
 }
 
-export interface LinkedFieldModel {
-  key?: string;
-  type?:
-    | "text"
-    | "number"
-    | "tuple"
-    | "checkbox"
-    | "textarea"
-    | "select"
-    | "article"
-    | "challenge"
-    | "dependency-select"
-    | "attachment"
-    | "team"
-    | "expectation"
-    | "asset"
-    | "asset-group";
-}
-
 export interface Log {
   log_content?: string;
   /** @format date-time */
@@ -1311,8 +1341,8 @@ export interface OrganizationUpdateInput {
   organization_tags?: string[];
 }
 
-export interface PageAttackPattern {
-  content?: AttackPattern[];
+export interface PageAtomicTestingOutput {
+  content?: AtomicTestingOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -1330,8 +1360,8 @@ export interface PageAttackPattern {
   totalPages?: number;
 }
 
-export interface PageContract {
-  content?: Contract[];
+export interface PageAttackPattern {
+  content?: AttackPattern[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -1370,6 +1400,25 @@ export interface PageEndpoint {
 
 export interface PageFullTextSearchResult {
   content?: FullTextSearchResult[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageInjectorContract {
+  content?: InjectorContract[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -1544,6 +1593,12 @@ export interface ResetUserInput {
   login: string;
 }
 
+export interface ResultDistribution {
+  label?: string;
+  /** @format int32 */
+  value?: number;
+}
+
 export interface Scenario {
   /** @format int64 */
   scenario_all_users_number?: number;
@@ -1655,6 +1710,33 @@ export interface SettingsUpdateInput {
   platform_lang: string;
   platform_name: string;
   platform_theme: string;
+}
+
+export interface SimpleExpectationResultOutput {
+  /** Target id */
+  target_id: string;
+  /** Inject id */
+  target_inject_id: string;
+  /**
+   * End date of inject
+   * @format date-time
+   */
+  target_result_ended_at?: string;
+  /** Expectation Id */
+  target_result_id: string;
+  /** Logs */
+  target_result_logs?: string;
+  /** Response status */
+  target_result_response_status?: "FAILED" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
+  /**
+   * Started date of inject
+   * @format date-time
+   */
+  target_result_started_at: string;
+  /** Subtype */
+  target_result_subtype: string;
+  /** Type */
+  target_result_type: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
 }
 
 /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */

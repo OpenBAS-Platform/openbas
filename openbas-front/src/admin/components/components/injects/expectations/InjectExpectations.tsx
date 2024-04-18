@@ -98,14 +98,14 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
   const sortHeader = (header: { field: string, label: string, isSortable: boolean }) => {
     if (header.isSortable) {
       return (
-        <div className={classes.header} onClick={() => reverseBy(header.field)}>
+        <div key={header.label} className={classes.header} onClick={() => reverseBy(header.field)}>
           <span>{t(header.label)}</span>
           {sortBy === header.field ? sortComponent(sortAsc) : ''}
         </div>
       );
     }
     return (
-      <div className={classes.header}>
+      <div key={header.label} className={classes.header}>
         <span>{t(header.label)}</span>
       </div>
     );
@@ -165,7 +165,7 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
         </ListItem>
         {sortedExpectations.map((expectation, idx) => (
           <ListItem
-            key={idx}
+            key={expectation.expectation_name}
             classes={{ root: classes.item }}
             divider={true}
           >

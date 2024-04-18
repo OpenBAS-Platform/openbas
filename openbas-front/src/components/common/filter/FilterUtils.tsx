@@ -1,4 +1,5 @@
 import React from 'react';
+import * as R from 'ramda';
 import type { Filter, FilterGroup, PropertySchemaDTO } from '../../../utils/api-types';
 
 export const emptyFilterGroup: FilterGroup = {
@@ -13,6 +14,17 @@ export const buildEmptyFilter = (key: string, operator: Filter['operator']) => {
     values: [],
     operator,
   };
+};
+
+export const isExistFilter = (filterGroup: FilterGroup, key: string) => {
+  return filterGroup.filters?.some((f) => f.key === key);
+};
+
+export const isEmptyFilter = (filterGroup: FilterGroup, key: string) => {
+  if (R.isEmpty(filterGroup.filters)) {
+    return true;
+  }
+  return R.isEmpty(filterGroup.filters?.find((f) => f.key === key)?.values);
 };
 
 // -- OPERATOR --

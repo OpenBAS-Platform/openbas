@@ -7,6 +7,7 @@ import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdDeserializer;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.annotations.Type;
 
@@ -204,7 +205,7 @@ public class Communication implements Base {
 
     @JsonProperty("communication_exercise")
     public String getExercise() {
-        return this.inject.getExercise().getId();
+        return this.inject.getExercise() != null ? this.inject.getExercise().getId() : StringUtils.EMPTY;
     }
 
     @JsonIgnore

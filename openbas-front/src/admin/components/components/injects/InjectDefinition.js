@@ -63,6 +63,7 @@ import InjectAddEndpoints from '../../exercises/injects/endpoints/InjectAddEndpo
 import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
 import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
 import InjectAddAssetGroups from '../../exercises/injects/assetgroups/InjectAddAssetGroups';
+import TagField from '../../../../components/TagField';
 
 const styles = (theme) => ({
   header: {
@@ -108,6 +109,11 @@ const styles = (theme) => ({
   },
   errorColor: {
     color: theme.palette.error.main,
+  },
+  inline: {
+    display: 'flex',
+    flexDirection: 'row',
+    padding: 0,
   },
 });
 
@@ -695,6 +701,25 @@ class InjectDefinition extends Component {
       inject_asset_groups: assetGroupIds,
       inject_documents: documents,
     };
+    const atomicTestingValues = {
+      inject_all_teams: allTeams,
+      inject_asset_groups: assetGroupIds,
+      inject_assets: assetIds,
+      inject_content: finalData,
+      inject_contract: inject.inject_contract,
+      inject_documents: documents,
+      inject_teams: teamsIds,
+      inject_title: data.inject_title,
+      inject_description: data.inject_description,
+      inject_tags: data.inject_tags,
+      inject_type: inject.inject_type,
+    };
+    if (this.props.atomicTestingCreation) {
+      return this.props
+        .onAddAtomicTesting(atomicTestingValues)
+        .then(() => this.props.handleReset())
+        .then(() => this.props.handleClose());
+    }
     return this.props
       .onUpdateInject(this.props.inject.inject_id, values)
       .then(() => this.props.handleClose());
@@ -1098,6 +1123,9 @@ class InjectDefinition extends Component {
       challengesMap,
       teamsFromExerciseOrScenario,
       articlesFromExerciseOrScenario,
+      atomicTestingCreation,
+      atomicTestingUpdate,
+      handleBack,
     } = this.props;
     if (!inject) {
       return <Loader variant="inElement" />;
@@ -1215,7 +1243,7 @@ class InjectDefinition extends Component {
       (f) => f.expectation === true,
     );
 
-    const initialValues = { ...inject.inject_content };
+    const initialValues = { ...inject.inject_content, inject_title: inject.inject_title, inject_description: inject.inject_description, inject_tags: inject.inject_tags };
     // Enrich initialValues with default contract value
     const builtInFields = [
       'teams',
@@ -1301,21 +1329,25 @@ class InjectDefinition extends Component {
       });
     return (
       <div>
-        <div className={classes.header}>
-          <IconButton
-            aria-label="Close"
-            className={classes.closeButton}
-            onClick={handleClose.bind(this)}
-            size="large"
-            color="primary"
-          >
-            <CloseRounded fontSize="small" color="primary" />
-          </IconButton>
-          <Typography variant="h6" classes={{ root: classes.title }}>
-            {inject.inject_title}
-          </Typography>
-          <div className="clearfix" />
-        </div>
+        {
+          !atomicTestingCreation
+          && <div className={classes.header}>
+            <IconButton
+              aria-label="Close"
+              className={classes.closeButton}
+              onClick={handleClose.bind(this)}
+              size="large"
+              color="primary"
+            >
+              <CloseRounded fontSize="small" color="primary" />
+            </IconButton>
+            <Typography variant="h6" classes={{ root: classes.title }}>
+              {inject.inject_title}
+            </Typography>
+            <div className="clearfix" />
+          </div>
+        }
+
         <div className={classes.container}>
           <Form
             keepDirtyOnReinitialize={true}
@@ -1331,6 +1363,41 @@ class InjectDefinition extends Component {
           >
             {({ form, handleSubmit, submitting, values }) => (
               <form id="injectContentForm" onSubmit={handleSubmit}>
+                {
+                  (atomicTestingCreation || atomicTestingUpdate)
+                  && (
+                    <>
+                      <Typography variant="h2" style={{ float: 'left' }}>
+                        {t('Title')}
+                      </Typography>
+                      <TextField style={{ marginBottom: 33 }}
+                        variant="standard"
+                        name="inject_title"
+                        fullWidth required
+                      />
+                      <Typography variant="h2" style={{ float: 'left' }}>
+                        {t('Description')}
+                      </Typography>
+                      <TextField
+                        variant="standard"
+                        name="inject_description"
+                        fullWidth={true}
+                        multiline={true}
+                        rows={2}
+                        style={{ marginTop: 20 }}
+                      />
+                      <Typography variant="h2" style={{ float: 'left', marginTop: 20 }}>
+                        {t('Tags')}
+                      </Typography>
+                      <TagField
+                        name="inject_tags"
+                        values={values}
+                        setFieldValue={form.mutators.setValue}
+                        style={{ marginBottom: 20 }}
+                      />
+                    </>
+                  )
+                }
                 {hasTeams && (
                   <div>
                     <Typography variant="h2" style={{ float: 'left' }}>
@@ -2021,16 +2088,44 @@ class InjectDefinition extends Component {
                     />
                   </List>
                 </div>
-                <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    disabled={submitting || this.props.permissions.readOnly}
-                  >
-                    {t('Update')}
-                  </Button>
-                </div>
+                {
+                  atomicTestingCreation
+                    ? <div>
+
+                      <div style={{ float: 'left', margin: '20px 0 20px 0' }}>
+                        <Button
+                          color="inherit"
+                          sx={{ mr: 1 }}
+                          onClick={handleBack}
+                        >
+                          Back
+                        </Button>
+                      </div>
+
+                      <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          type="submit"
+                          disabled={submitting || this.props.permissions.readOnly}
+                        >
+                          {t('Create')}
+                        </Button>
+                      </div>
+                    </div>
+
+                    : <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        type="submit"
+                        disabled={submitting || this.props.permissions.readOnly}
+                      >
+                        {t('Update')}
+                      </Button>
+                    </div>
+                }
+
               </form>
             )}
           </Form>
@@ -2068,13 +2163,18 @@ InjectDefinition.propTypes = {
   uriVariable: PropTypes.string,
   allUsersNumber: PropTypes.number,
   usersNumber: PropTypes.number,
-  teamsUsers: PropTypes.object,
+  teamsUsers: PropTypes.array,
+  onAddAtomicTesting: PropTypes.func,
+  atomicTestingCreation: PropTypes.bool,
+  atomicTestingUpdate: PropTypes.bool,
+  handleBack: PropTypes.func,
+  handleReset: PropTypes.func,
 };
 
 const select = (state, ownProps) => {
   const helper = storeHelper(state);
   const { injectId } = ownProps;
-  const inject = helper.getInject(injectId);
+  const inject = injectId ? helper.getInject(injectId) : ownProps.inject;
   const documentsMap = helper.getDocumentsMap();
   const teamsMap = helper.getTeamsMap();
   const endpointsMap = helper.getEndpointsMap();

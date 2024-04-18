@@ -1,7 +1,6 @@
 package io.openbas.contract;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.annotation.Queryable;
 import io.openbas.contract.fields.ContractElement;
 import io.openbas.contract.variables.VariableHelper;
 import io.openbas.helper.SupportedLanguage;
@@ -20,7 +19,6 @@ import java.util.Map;
 public class Contract {
 
     @NotNull
-    @Queryable(searchable = true, sortable = true, filterable = true, property = "type")
     private final ContractConfig config;
 
     @NotBlank
@@ -30,7 +28,6 @@ public class Contract {
 
     @NotEmpty
     @Setter
-    @Queryable(searchable = true, filterable = true, sortable = true)
     private Map<SupportedLanguage, String> label;
 
     @NotNull
@@ -50,6 +47,10 @@ public class Contract {
     @Setter
     @JsonProperty("contract_attack_patterns")
     private List<String> attackPatterns = new ArrayList<>();
+
+    @Setter
+    @JsonProperty("is_atomic_testing")
+    private boolean isAtomicTesting = true;
 
     private Contract(
         @NotNull final ContractConfig config,
@@ -79,7 +80,9 @@ public class Contract {
         @NotBlank final String id,
         @NotEmpty final Map<SupportedLanguage, String> label,
         @NotEmpty final List<ContractElement> fields) {
-        return new Contract(config, id, label, true, fields);
+        Contract contract = new Contract(config, id, label, true, fields);
+        contract.setAtomicTesting(false);
+        return contract;
     }
 
     public static Contract executableContract(

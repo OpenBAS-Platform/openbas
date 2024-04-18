@@ -50,7 +50,7 @@ public class InjectExpectation implements Base {
   @GeneratedValue(generator = "UUID")
   @UuidGenerator
   @Column(name = "inject_expectation_id")
-  @JsonProperty("injectexpectation_id")
+  @JsonProperty("inject_expectation_id")
   private String id;
 
   @Setter

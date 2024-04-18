@@ -18,6 +18,8 @@ const IndexProfile = lazy(() => import('./components/profile/Index'));
 const FullTextSearch = lazy(() => import('./components/search/FullTextSearch'));
 const Exercises = lazy(() => import('./components/exercises/Exercises'));
 const IndexExercise = lazy(() => import('./components/exercises/Index'));
+const Atomics = lazy(() => import('./components/atomictestings/AtomicTestings'));
+const IndexAtomic = lazy(() => import('./components/atomictestings/atomictesting/Index'));
 const Scenarios = lazy(() => import('./components/scenarios/Scenarios'));
 const IndexScenario = lazy(() => import('./components/scenarios/scenario/IndexScenario'));
 const Assets = lazy(() => import('./components/assets/Index'));
@@ -70,6 +72,8 @@ const Index = () => {
               <Route path="fulltextsearch" element={errorWrapper(FullTextSearch)()} />
               <Route path="exercises" element={errorWrapper(Exercises)()} />
               <Route path="exercises/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
+              <Route path="atomic_testings" element={errorWrapper(Atomics)()} />
+              <Route path="atomic_testings/:atomicId/*" element={errorWrapper(IndexAtomic)()} />
               <Route path="scenarios" element={errorWrapper(Scenarios)()} />
               <Route path="scenarios/:scenarioId/*" element={errorWrapper(IndexScenario)()} />
               <Route path="assets/*" element={errorWrapper(Assets)()} />
@@ -80,7 +84,7 @@ const Index = () => {
               <Route path="integrations/*" element={errorWrapper(IndexIntegrations)()} />
               <Route path="settings/*" element={errorWrapper(IndexSettings)()} />
               {/* Not found */}
-              <Route path="*" element={<NotFound/>}/>
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </Box>

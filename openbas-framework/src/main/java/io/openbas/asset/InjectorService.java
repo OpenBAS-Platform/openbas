@@ -78,12 +78,17 @@ public class InjectorService {
             injector.setExternal(false);
             injector.setType(contractor.getType());
             List<String> existing = new ArrayList<>();
+            List<InjectorContract> toUpdates = new ArrayList<>();
             List<String> toDeletes = new ArrayList<>();
-            injector.getContracts().forEach(contract -> {
+            injector.getContracts()
+                .stream()
+                .parallel()
+                .forEach(contract -> {
                 Optional<Contract> current = contracts.stream().filter(c -> c.getId().equals(contract.getId())).findFirst();
                 if (current.isPresent()) {
                     existing.add(contract.getId());
                     contract.setManual(current.get().isManual());
+                    contract.setAtomicTesting(current.get().isAtomicTesting());
                     Map<String, String> labels = current.get().getLabel().entrySet().stream()
                             .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
                     contract.setLabels(labels);
@@ -98,6 +103,7 @@ public class InjectorService {
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
                     }
+                    toUpdates.add(contract);
                 } else {
                     toDeletes.add(contract.getId());
                 }
@@ -106,10 +112,12 @@ public class InjectorService {
                 InjectorContract injectorContract = new InjectorContract();
                 injectorContract.setId(in.getId());
                 injectorContract.setManual(in.isManual());
+                injectorContract.setAtomicTesting(in.isAtomicTesting());
                 Map<String, String> labels = in.getLabel().entrySet().stream()
                         .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
                 injectorContract.setLabels(labels);
                 injectorContract.setInjector(injector);
+
                 if (!in.getAttackPatterns().isEmpty()) {
                     List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(in.getAttackPatterns()));
                     injectorContract.setAttackPatterns(attackPatterns);
@@ -125,6 +133,7 @@ public class InjectorService {
             }).toList();
             injectorContractRepository.deleteAllById(toDeletes);
             injectorContractRepository.saveAll(toCreates);
+            injectorContractRepository.saveAll(toUpdates);
             injectorRepository.save(injector);
         } else {
             // save the injector
@@ -138,6 +147,7 @@ public class InjectorService {
                 InjectorContract injectorContract = new InjectorContract();
                 injectorContract.setId(in.getId());
                 injectorContract.setManual(in.isManual());
+                injectorContract.setAtomicTesting(in.isAtomicTesting());
                 Map<String, String> labels = in.getLabel().entrySet().stream()
                         .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
                 injectorContract.setLabels(labels);
@@ -155,4 +165,5 @@ public class InjectorService {
             injectorContractRepository.saveAll(injectorContracts);
         }
     }
+
 }

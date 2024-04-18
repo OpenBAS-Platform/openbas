@@ -157,7 +157,7 @@ export const challengesReader = new schema.Entity(
 export const injectexpectation = new schema.Entity(
   'injectexpectations',
   {},
-  { idAttribute: 'injectexpectation_id' },
+  { idAttribute: 'inject_expectation_id' },
 );
 export const arrayOfInjectexpectations = new schema.Array(injectexpectation);
 
@@ -327,6 +327,10 @@ export const storeHelper = (state) => ({
   getTagsMap: () => maps('tags', state),
   // injects
   getInject: (id) => entity(id, 'injects', state),
+  getAtomicTesting: (id) => entity(id, 'atomics', state),
+  getAtomicTestingDetail: (id) => entity(id, 'atomicdetails', state),
+  getAtomicTestings: () => entities('atomics', state),
+  getTargetResults: (id, injectId) => entities('targetresults', state).filter((r) => (r.target_id === id) && (r.target_inject_id === injectId)),
   getInjectsMap: () => maps('injects', state),
   getInjectTypes: () => entities('inject_types', state),
   getInjectTypesMap: () => maps('inject_types', state),
@@ -387,6 +391,7 @@ export const storeHelper = (state) => ({
   // attack patterns
   getAttackPattern: (id) => entity(id, 'attackpatterns', state),
   getAttackPatterns: () => entities('attackpatterns', state),
+  getAttackPatternsMap: () => maps('attackpatterns', state),
   // channels
   getChannels: () => entities('channels', state),
   getChannel: (id) => entity(id, 'channels', state),

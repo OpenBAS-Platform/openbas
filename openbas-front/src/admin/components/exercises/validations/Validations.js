@@ -78,7 +78,7 @@ const Validations = () => {
       .indexOf(keyword.toLowerCase()) !== -1;
   const sort = R.sortWith([R.descend(R.prop('inject_expectation_created_at'))]);
   const sortedInjectExpectations = R.pipe(
-    R.uniqBy(R.prop('injectexpectation_id')),
+    R.uniqBy(R.prop('inject_expectation_id')),
     R.filter(((n) => R.isEmpty(n.inject_expectation_results))),
     R.map((n) => R.assoc(
       'inject_expectation_inject',

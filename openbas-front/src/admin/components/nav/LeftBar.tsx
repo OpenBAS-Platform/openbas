@@ -225,14 +225,16 @@ const LeftBar = () => {
         onClose={handleSelectedMenuClose}
         disableRestoreFocus={true}
         disableScrollLock={true}
-        slotProps={{ paper: {
-          elevation: 1,
-          onMouseEnter: () => handleSelectedMenuOpen(menu),
-          onMouseLeave: handleSelectedMenuClose,
-          sx: {
-            pointerEvents: 'auto',
+        slotProps={{
+          paper: {
+            elevation: 1,
+            onMouseEnter: () => handleSelectedMenuOpen(menu),
+            onMouseLeave: handleSelectedMenuClose,
+            sx: {
+              pointerEvents: 'auto',
+            },
           },
-        } }}
+        }}
       >
         <MenuList component="nav">
           {entries.filter((entry) => entry.granted !== false).map((entry) => {
@@ -318,11 +320,11 @@ const LeftBar = () => {
               )}
             </MenuItem>
           </StyledTooltip>
-          <StyledTooltip title={!navOpen && t('Atomic testing')} placement="right">
+          <StyledTooltip title={!navOpen && t('Atomic testings')} placement="right">
             <MenuItem
               component={Link}
-              to="/admin/atomic"
-              selected={location.pathname.includes('/admin/atomic')}
+              to="/admin/atomic_testings"
+              selected={location.pathname.includes('/admin/atomic_testings')}
               dense={true}
               classes={{ root: classes.menuItem }}
             >
@@ -332,7 +334,7 @@ const LeftBar = () => {
               {navOpen && (
                 <ListItemText
                   classes={{ primary: classes.menuItemText }}
-                  primary={t('Atomic testing')}
+                  primary={t('Atomic testings')}
                 />
               )}
             </MenuItem>
@@ -362,7 +364,7 @@ const LeftBar = () => {
           <MenuItem
             aria-label="Assets"
             ref={anchors.assets}
-            href='assets'
+            href="assets"
             selected={!navOpen && location.pathname.includes('/admin/assets')}
             dense={true}
             classes={{ root: classes.menuItem }}
@@ -390,7 +392,7 @@ const LeftBar = () => {
           )}
           <MenuItem
             ref={anchors.teams}
-            href='teams'
+            href="teams"
             selected={!navOpen && location.pathname.includes('/admin/teams')}
             dense={true}
             classes={{ root: classes.menuItem }}
@@ -419,7 +421,7 @@ const LeftBar = () => {
           )}
           <MenuItem
             ref={anchors.components}
-            href='components'
+            href="components"
             selected={!navOpen && location.pathname.includes('/admin/components')}
             dense={true}
             classes={{ root: classes.menuItem }}
@@ -531,27 +533,27 @@ const LeftBar = () => {
         <Divider />
         <MenuList component="nav">
           {userAdmin && (
-          <MenuItem
-            ref={anchors.settings}
-            href='settings'
-            selected={!navOpen && location.pathname.includes('/admin/settings')}
-            dense={true}
-            classes={{ root: classes.menuItem }}
-            onClick={() => (isMobile || navOpen ? handleSelectedMenuToggle('settings') : handleGoToPage('/admin/settings'))}
-            onMouseEnter={() => !navOpen && handleSelectedMenuOpen('settings')}
-            onMouseLeave={() => !navOpen && handleSelectedMenuClose()}
-          >
-            <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
-              <SettingsOutlined />
-            </ListItemIcon>
-            {navOpen && (
-            <ListItemText
-              classes={{ primary: classes.menuItemText }}
-              primary={t('Settings')}
-            />
-            )}
-            {navOpen && (selectedMenu === 'settings' ? <ExpandLessOutlined /> : <ExpandMoreOutlined />)}
-          </MenuItem>
+            <MenuItem
+              ref={anchors.settings}
+              href="settings"
+              selected={!navOpen && location.pathname.includes('/admin/settings')}
+              dense={true}
+              classes={{ root: classes.menuItem }}
+              onClick={() => (isMobile || navOpen ? handleSelectedMenuToggle('settings') : handleGoToPage('/admin/settings'))}
+              onMouseEnter={() => !navOpen && handleSelectedMenuOpen('settings')}
+              onMouseLeave={() => !navOpen && handleSelectedMenuClose()}
+            >
+              <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
+                <SettingsOutlined />
+              </ListItemIcon>
+              {navOpen && (
+                <ListItemText
+                  classes={{ primary: classes.menuItemText }}
+                  primary={t('Settings')}
+                />
+              )}
+              {navOpen && (selectedMenu === 'settings' ? <ExpandLessOutlined /> : <ExpandMoreOutlined />)}
+            </MenuItem>
           )}
           {userAdmin && generateSubMenu(
             'settings',

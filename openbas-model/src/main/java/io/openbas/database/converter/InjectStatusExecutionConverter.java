@@ -8,6 +8,7 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Converter(autoApply = true)
@@ -29,13 +30,13 @@ public class InjectStatusExecutionConverter implements AttributeConverter<List<I
     @Override
     public List<InjectStatusExecution> convertToEntityAttribute(String dbData) {
         if (dbData == null) {
-            return null;
+            return new ArrayList<>();
         }
         try {
             return mapper.readValue(dbData, mapper.getTypeFactory().constructCollectionType(List.class, InjectStatusExecution.class));
         } catch (IOException ex) {
             // logger.error("Unexpected IOEx decoding json from database: " + dbData);
-            return null;
+            return new ArrayList<>();
         }
     }
 
