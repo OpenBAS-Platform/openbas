@@ -3,7 +3,7 @@ import * as R from 'ramda';
 import { useNavigate } from 'react-router-dom';
 import InjectDefinition from '../../components/injects/InjectDefinition';
 import { InjectContext, PermissionsContext } from '../../components/Context';
-import type { AtomicTestingOutput, Inject, Tag } from '../../../../utils/api-types';
+import type { Inject, Tag } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import type { TagsHelper } from '../../../../actions/helper';

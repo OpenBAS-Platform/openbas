@@ -18,7 +18,6 @@ import { useHelper } from '../../../store';
 import type { AttackPatternHelper } from '../../../actions/attackpattern/attackpattern-helper';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { fetchAttackPatterns } from '../../../actions/AttackPattern';
-import DialogWithCross from '../../../components/common/DialogWithCross';
 import Drawer from '../../../components/common/Drawer';
 
 const useStyles = makeStyles(() => ({

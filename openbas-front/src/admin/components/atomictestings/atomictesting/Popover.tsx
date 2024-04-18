@@ -25,10 +25,6 @@ const AtomicPopover: FunctionComponent<Props> = ({
     dispatch(fetchAtomicTestingForUpdate(atomic.atomic_id));
   });
 
-  // Edition
-  const [edition, setEdition] = useState(false);
-  const handleEdit = () => setEdition(true);
-
   // Deletion
   const [deletion, setDeletion] = useState(false);
 
@@ -41,7 +37,6 @@ const AtomicPopover: FunctionComponent<Props> = ({
 
   // Button Popover
   const entries: ButtonPopoverEntry[] = [
-    { label: 'Update', action: handleEdit },
     { label: 'Delete', action: handleDelete },
   ];
 
