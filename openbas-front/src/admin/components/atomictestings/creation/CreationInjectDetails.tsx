@@ -1,7 +1,9 @@
 import React, { FunctionComponent, useContext } from 'react';
+import * as R from 'ramda';
+import { useNavigate } from 'react-router-dom';
 import InjectDefinition from '../../components/injects/InjectDefinition';
 import { InjectContext, PermissionsContext } from '../../components/Context';
-import type { AtomicTestingInput, Tag } from '../../../../utils/api-types';
+import type { AtomicTestingOutput, Inject, Tag } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import type { TagsHelper } from '../../../../actions/helper';
@@ -25,6 +27,7 @@ interface Props {
 const CreationInjectDetails: FunctionComponent<Props> = ({
   contractId, contractContent, handleClose, handleBack, handleReset,
 }) => {
+  const navigate = useNavigate();
   const { permissions } = useContext(PermissionsContext);
   const dispatch = useAppDispatch();
   const { onUpdateInject } = useContext(InjectContext);
@@ -36,8 +39,22 @@ const CreationInjectDetails: FunctionComponent<Props> = ({
     teams: helper.getTeams(),
   }));
 
-  const onAddAtomicTesting = async (data: AtomicTestingInput) => {
-    await dispatch(createAtomicTesting(data));
+  const onAddAtomicTesting = async (data: Inject) => {
+    const toCreate = R.pipe(
+      R.assoc('inject_tags', R.pluck('id', data.inject_tags)),
+      R.assoc('inject_title', data.inject_title),
+      R.assoc('inject_all_teams', data.inject_all_teams),
+      R.assoc('inject_asset_groups', data.inject_asset_groups),
+      R.assoc('inject_assets', data.inject_assets),
+      R.assoc('inject_content', data.inject_content),
+      R.assoc('inject_contract', data.inject_contract),
+      R.assoc('inject_description', data.inject_description),
+      R.assoc('inject_documents', data.inject_documents),
+      R.assoc('inject_teams', data.inject_teams),
+      R.assoc('inject_type', data.inject_type),
+    )(data);
+    const result = await dispatch(createAtomicTesting(toCreate));
+    navigate(`/admin/atomic_testings/${result.result}`);
   };
 
   useDataLoader(() => {

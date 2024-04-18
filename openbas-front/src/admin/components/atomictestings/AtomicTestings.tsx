@@ -18,6 +18,7 @@ import StatusChip from '../components/atomictestings/StatusChip';
 import { initSorting } from '../../../components/common/pagination/Page';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
+import InjectType from '../components/injects/InjectType';
 
 const useStyles = makeStyles(() => ({
   bodyItem: {
@@ -140,7 +141,9 @@ const AtomicTestings = () => {
       label: 'Type',
       isSortable: true,
       // TODO add atomic_inject_label in /api/atomic_testings/search backend with label map
-      value: (atomicTesting: AtomicTestingOutput) => tPick(atomicTesting.atomic_injector_contract.injector_contract_labels),
+      value: (atomicTesting: AtomicTestingOutput) => {
+        return (<InjectType variant="list" label={tPick(atomicTesting.atomic_injector_contract.injector_contract_labels)} />);
+      },
     },
     {
       field: 'atomic_last_start_execution_date',

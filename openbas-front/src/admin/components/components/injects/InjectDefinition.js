@@ -1370,7 +1370,7 @@ class InjectDefinition extends Component {
                       <Typography variant="h2" style={{ float: 'left' }}>
                         {t('Title')}
                       </Typography>
-                      <TextField style={{ marginBottom: 33 }}
+                      <TextField style={{ marginBottom: 20 }}
                         variant="standard"
                         name="inject_title"
                         fullWidth required
@@ -1384,7 +1384,6 @@ class InjectDefinition extends Component {
                         fullWidth={true}
                         multiline={true}
                         rows={2}
-                        style={{ marginTop: 20 }}
                       />
                       <Typography variant="h2" style={{ float: 'left', marginTop: 20 }}>
                         {t('Tags')}
