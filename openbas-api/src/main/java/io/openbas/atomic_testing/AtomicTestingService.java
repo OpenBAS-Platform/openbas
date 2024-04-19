@@ -5,6 +5,7 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.atomic_testing.form.AtomicTestingInput;
+import io.openbas.database.model.Document;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectDocument;
 import io.openbas.database.model.InjectStatus;
@@ -26,10 +27,9 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -144,19 +144,28 @@ public class AtomicTestingService {
     injectToSave.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
     injectToSave.setAssets(fromIterable(this.assetRepository.findAllById(input.getAssets())));
     injectToSave.setAssetGroups(fromIterable(this.assetGroupRepository.findAllById(input.getAssetGroups())));
+
+    List<String> previousDocumentIds = injectToSave
+        .getDocuments()
+        .stream()
+        .map(InjectDocument::getDocument)
+        .map(Document::getId)
+        .toList();
+
     Inject finalInjectToSave = injectToSave;
     List<InjectDocument> injectDocuments = input.getDocuments().stream()
         .map(i -> {
-          InjectDocument injectDocument = new InjectDocument();
-          injectDocument.setInject(finalInjectToSave);
-          injectDocument.setDocument(documentRepository.findById(i.getDocumentId()).orElseThrow());
-          injectDocument.setAttached(i.isAttached());
-          return injectDocument;
-        }).collect(Collectors.toList());
-    injectToSave.getDocuments().clear();
+          if(!previousDocumentIds.contains(i.getDocumentId())) {
+            InjectDocument injectDocument = new InjectDocument();
+            injectDocument.setInject(finalInjectToSave);
+            injectDocument.setDocument(documentRepository.findById(i.getDocumentId()).orElseThrow());
+            injectDocument.setAttached(i.isAttached());
+            return injectDocument;
+          }
+          return null;
+        }).filter(Objects::nonNull).toList();
     injectToSave.getDocuments().addAll(injectDocuments);
-    Inject injectsaved = injectRepository.save(injectToSave);
-    return injectsaved;
+    return injectRepository.save(injectToSave);
   }
 
   @Transactional
