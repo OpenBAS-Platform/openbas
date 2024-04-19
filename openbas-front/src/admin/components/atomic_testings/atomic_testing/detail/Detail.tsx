@@ -66,9 +66,9 @@ const Detail: FunctionComponent<Props> = () => {
                 })
               }
               {/* {
-                atomicdetail.atomic_content?.map((document, index) => (
+                atomicdetail.atomic_content?.map((content, index) => (
                   <Typography key={index} variant="body1">
-                    {document}
+                    {content}
                   </Typography>
                 ))
               } */}
