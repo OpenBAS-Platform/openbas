@@ -58,27 +58,15 @@ const AtomicPopover: FunctionComponent<Props> = ({
     teams: helper.getTeams(),
   }));
   // inject.inject_tags = tagOptions(inject.inject_tags, tagsMap);
+  // const injectTags = tagOptions(inject.inject_tags, tagsMap);
+  /* if (inject.inject_tags.length !== 0) {
+    inject.inject_tags = tagOptions(inject.inject_tags, tagsMap);
+  } */
 
   // Button Popover
   const entries: ButtonPopoverEntry[] = [
     { label: 'Delete', action: handleDelete },
   ];
-
-  /*
-   R.pipe(
-      R.assoc('inject_tags', R.pluck('id', data.inject_tags)),
-      R.assoc('inject_title', data.inject_title),
-      R.assoc('inject_all_teams', data.inject_all_teams),
-      R.assoc('inject_asset_groups', data.inject_asset_groups),
-      R.assoc('inject_assets', data.inject_assets),
-      R.assoc('inject_content', data.inject_content),
-      R.assoc('inject_contract', data.inject_contract),
-      R.assoc('inject_description', data.inject_description),
-      R.assoc('inject_documents', data.inject_documents),
-      R.assoc('inject_teams', data.inject_teams),
-      R.assoc('inject_type', data.inject_type),
-    )(data);
-   */
 
   const onUpdateAtomicTesting = async (id: string, data: Inject) => {
     const toUpdate = R.pipe(
@@ -93,6 +81,7 @@ const AtomicPopover: FunctionComponent<Props> = ({
         'inject_description',
         'inject_content',
         'inject_all_teams',
+        'inject_documents',
       ]),
     )(data);
 

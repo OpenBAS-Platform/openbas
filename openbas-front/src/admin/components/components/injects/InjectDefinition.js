@@ -1335,7 +1335,7 @@ class InjectDefinition extends Component {
     return (
       <div>
         {
-          !atomicTestingCreation || !atomicTestingUpdate
+          !atomicTestingCreation && !atomicTestingUpdate
           && <div className={classes.header}>
             <IconButton
               aria-label="Close"

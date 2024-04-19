@@ -153,9 +153,10 @@ public class AtomicTestingService {
           injectDocument.setAttached(i.isAttached());
           return injectDocument;
         }).collect(Collectors.toList());
-    //finalInjectToSave.setDocuments(injectDocuments);
-
-    return injectRepository.save(finalInjectToSave);
+    injectToSave.getDocuments().clear();
+    injectToSave.getDocuments().addAll(injectDocuments);
+    Inject injectsaved = injectRepository.save(injectToSave);
+    return injectsaved;
   }
 
   @Transactional
