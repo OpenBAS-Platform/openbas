@@ -620,6 +620,8 @@ const i18n = {
       TYPE_HUMAN_RESPONSE: 'Réponse humaine',
       FAILED: 'Echoué',
       VALIDATED: 'Validé',
+      Done: 'Fait',
+      Draft: 'Brouillon ',
       Failed: 'Echoué',
       'Pending result': 'Résultat en attente',
       'Validation mode': 'Type de validation',
@@ -889,7 +891,6 @@ const i18n = {
       ARTICLE: 'Automatic - Triggered when team reads articles',
       DETECTION: 'Automatic - Detection: Triggered when inject is processed',
       PREVENTION: 'Automatic - Prevention: Triggered when inject is processed',
-      // FIXME: Why ?
       TYPE_ARTICLE: 'Article',
       TYPE_CHALLENGE: 'Challenge',
       TYPE_DETECTION: 'Detection',
