@@ -42,6 +42,39 @@ const Detail: FunctionComponent<Props> = () => {
           <>
             <Paper elevation={3} className={classes.paper}>
               <Typography variant="h2" gutterBottom>
+                Atomic testing details
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                Description: {atomicdetail?.atomic_description || 'N/A'}
+              </Typography>
+              {
+                atomicdetail.atomic_tags?.map((tag, index) => {
+                  return (
+                    <Typography key={index} component="li" variant="body1">
+                      {tag.tag_name}
+                    </Typography>
+                  );
+                })
+              }
+              {
+                atomicdetail.atomic_documents?.map((document, index) => {
+                  return (
+                    <Typography key={index} variant="body1">
+                      {document.document_name}
+                    </Typography>
+                  );
+                })
+              }
+              {/* {
+                atomicdetail.atomic_content?.map((document, index) => (
+                  <Typography key={index} variant="body1">
+                    {document}
+                  </Typography>
+                ))
+              } */}
+            </Paper>
+            <Paper elevation={3} className={classes.paper}>
+              <Typography variant="h2" gutterBottom>
                 Status : {atomicdetail.status_label}
               </Typography>
               {atomicdetail.status_traces && (

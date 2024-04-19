@@ -39,7 +39,8 @@ public class AtomicTestingMapper {
         .expectationResultByTypes(AtomicTestingUtils.getExpectations(inject.getExpectations()));
   }
 
-  public static SimpleExpectationResultOutput toTargetResultDto(InjectExpectation injectExpectation, final String targetId) {
+  public static SimpleExpectationResultOutput toTargetResultDto(InjectExpectation injectExpectation,
+      final String targetId) {
     return SimpleExpectationResultOutput
         .builder()
         .id(injectExpectation.getId())
@@ -54,7 +55,8 @@ public class AtomicTestingMapper {
             .map(results -> results.stream().map(InjectExpectationResult::getResult)
                 .collect(Collectors.joining(", ")))
             .orElse(null))
-        .response(injectExpectation.getScore() == null ? ExpectationStatus.UNKNOWN : (injectExpectation.getScore() == 0 ? ExpectationStatus.FAILED : ExpectationStatus.VALIDATED))
+        .response(injectExpectation.getScore() == null ? ExpectationStatus.UNKNOWN
+            : (injectExpectation.getScore() == 0 ? ExpectationStatus.FAILED : ExpectationStatus.VALIDATED))
         .build();
   }
 
@@ -63,8 +65,13 @@ public class AtomicTestingMapper {
         AtomicTestingDetailOutput
             .builder()
             .atomicId(inject.getId())
+            .description(inject.getDescription())
+            .content(inject.getContent())
+            .tags(inject.getTags())
+            .documents(inject.getDocuments())
             .status(status.getName())
-            .traces(status.getTraces().stream().map(trace -> trace.getStatus() + " " + trace.getMessage()).collect(Collectors.toList()))
+            .traces(status.getTraces().stream().map(trace -> trace.getStatus() + " " + trace.getMessage())
+                .collect(Collectors.toList()))
             .trackingAckDate(status.getTrackingAckDate())
             .trackingSentDate(status.getTrackingSentDate())
             .trackingEndDate(status.getTrackingEndDate())
@@ -77,7 +84,8 @@ public class AtomicTestingMapper {
   }
 
 
-  public record ExpectationResultsByType(@NotNull ExpectationType type, @NotNull ExpectationStatus avgResult, @NotNull List<ResultDistribution> distribution) {
+  public record ExpectationResultsByType(@NotNull ExpectationType type, @NotNull ExpectationStatus avgResult,
+                                         @NotNull List<ResultDistribution> distribution) {
 
   }
 
@@ -85,7 +93,8 @@ public class AtomicTestingMapper {
 
   }
 
-  public record InjectTargetWithResult(@NotNull TargetType targetType, @NotNull String id, @NotNull String name, @NotNull List<ExpectationResultsByType> expectationResultsByTypes) {
+  public record InjectTargetWithResult(@NotNull TargetType targetType, @NotNull String id, @NotNull String name,
+                                       @NotNull List<ExpectationResultsByType> expectationResultsByTypes) {
 
   }
 

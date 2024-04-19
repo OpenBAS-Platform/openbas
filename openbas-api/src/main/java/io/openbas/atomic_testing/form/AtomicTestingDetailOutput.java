@@ -1,7 +1,14 @@
 package io.openbas.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.database.converter.ContentConverter;
 import io.openbas.database.model.ExecutionStatus;
+import io.openbas.database.model.InjectDocument;
+import io.openbas.database.model.Tag;
+import io.openbas.helper.MultiModelDeserializer;
+import jakarta.persistence.Convert;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
@@ -10,6 +17,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -21,6 +29,18 @@ public class AtomicTestingDetailOutput {
   @Enumerated(EnumType.STRING)
   @NotBlank
   private String atomicId;
+
+  @JsonProperty("atomic_description")
+  private String description;
+
+  @JsonProperty("atomic_content")
+  private ObjectNode content;
+
+  @JsonProperty("atomic_tags")
+  private List<Tag> tags = new ArrayList<>();
+
+  @JsonProperty("atomic_documents")
+  private List<InjectDocument> documents = new ArrayList<>();
 
   @JsonProperty("status_label")
   @Enumerated(EnumType.STRING)
