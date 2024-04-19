@@ -16,7 +16,6 @@ import { PermissionsContext } from '../../components/Context';
 import Drawer from '../../../../components/common/Drawer';
 import InjectDefinition from '../../components/injects/InjectDefinition';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { tagOptions } from '../../../../utils/Option';
 import type { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
 
 interface Props {
@@ -38,6 +37,10 @@ const AtomicPopover: FunctionComponent<Props> = ({
   useDataLoader(() => {
     dispatch(fetchAtomicTestingForUpdate(atomic.atomic_id));
   });
+
+  // Edition
+  const [edition, setEdition] = useState(false);
+  const handleEdit = () => setEdition(true);
 
   // Deletion
   const [deletion, setDeletion] = useState(false);
@@ -65,6 +68,7 @@ const AtomicPopover: FunctionComponent<Props> = ({
 
   // Button Popover
   const entries: ButtonPopoverEntry[] = [
+    { label: 'Update', action: handleEdit },
     { label: 'Delete', action: handleDelete },
   ];
 
