@@ -1,9 +1,12 @@
 package io.openbas.rest.kill_chain_phase;
 
+import io.openbas.database.model.Channel;
 import io.openbas.database.model.KillChainPhase;
 import io.openbas.database.repository.KillChainPhaseRepository;
+import io.openbas.rest.channel.form.ChannelUpdateInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseCreateInput;
+import io.openbas.rest.kill_chain_phase.form.KillChainPhaseUpdateInput;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseUpsertInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
@@ -14,6 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,6 +55,15 @@ public class KillChainPhaseApi extends RestBehavior {
     @GetMapping("/api/kill_chain_phases/{killChainPhaseId}")
     public KillChainPhase killChainPhase(@PathVariable String killChainPhaseId) {
         return killChainPhaseRepository.findById(killChainPhaseId).orElseThrow();
+    }
+
+    @Secured(ROLE_ADMIN)
+    @PutMapping("/api/kill_chain_phases/{killChainPhaseId}")
+    public KillChainPhase updateKillChainPhase(@PathVariable String killChainPhaseId, @Valid @RequestBody KillChainPhaseUpdateInput input) {
+        KillChainPhase killchainPhase = killChainPhaseRepository.findById(killChainPhaseId).orElseThrow();
+        killchainPhase.setUpdateAttributes(input);
+        killchainPhase.setUpdatedAt(Instant.now());
+        return killChainPhaseRepository.save(killchainPhase);
     }
 
     @Secured(ROLE_ADMIN)

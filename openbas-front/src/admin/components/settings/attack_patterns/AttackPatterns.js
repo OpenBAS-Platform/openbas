@@ -124,8 +124,7 @@ const AttackPatterns = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { t } = useFormatter();
-
+  const { t, nsdt } = useFormatter();
   const { killChainPhasesMap } = useHelper((helper) => ({
     killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
@@ -144,7 +143,7 @@ const AttackPatterns = () => {
 
   const [attackPatterns, setAttackPatterns] = useState([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState({
-    sorts: initSorting('attack_pattern_name'),
+    sorts: initSorting('attack_pattern_external_id'),
   });
 
   // Export
@@ -237,13 +236,13 @@ const AttackPatterns = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.attack_pattern_created_at}
                   >
-                    {attackPattern.attack_pattern_created_at}
+                    {nsdt(attackPattern.attack_pattern_created_at)}
                   </div>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.attack_pattern_updated_at}
                   >
-                    {attackPattern.attack_pattern_updated_at}
+                    {nsdt(attackPattern.attack_pattern_updated_at)}
                   </div>
                 </div>
               }

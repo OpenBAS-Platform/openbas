@@ -1,30 +1,20 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
+import React, { useState } from 'react';
+import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
-import { connect } from 'react-redux';
-import { interval } from 'rxjs';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined, LabelOutlined } from '@mui/icons-material';
-import inject18n from '../../../../components/i18n';
-import { fetchTags } from '../../../../actions/Tag';
-import { FIVE_SECONDS } from '../../../../utils/Time';
-import SearchFilter from '../../../../components/SearchFilter';
+import { LabelOutlined } from '@mui/icons-material';
+import { useFormatter } from '../../../../components/i18n';
+import { searchTags } from '../../../../actions/Tag';
 import CreateTag from './CreateTag';
 import TagPopover from './TagPopover';
-import { storeHelper } from '../../../../actions/Schema';
 import TaxonomiesMenu from '../TaxonomiesMenu';
+import { initSorting } from '../../../../components/common/pagination/Page';
+import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
+import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 
-const interval$ = interval(FIVE_SECONDS);
-
-const styles = (theme) => ({
+const useStyles = makeStyles(() => ({
   container: {
     margin: 0,
     padding: '0 200px 50px 0',
-  },
-  parameters: {
-    float: 'left',
-    marginTop: -10,
   },
   list: {
     marginTop: 10,
@@ -42,26 +32,9 @@ const styles = (theme) => ({
     height: '100%',
     fontSize: 13,
   },
-  itemIcon: {
-    color: theme.palette.primary.main,
-  },
-  goIcon: {
-    position: 'absolute',
-    right: -10,
-  },
-  inputLabel: {
-    float: 'left',
-  },
-  sortIcon: {
-    float: 'left',
-    margin: '-5px 0 0 15px',
-  },
-  icon: {
-    color: theme.palette.primary.main,
-  },
-});
+}));
 
-const inlineStylesHeaders = {
+const headerStyles = {
   iconSort: {
     position: 'absolute',
     margin: '0 0 0 5px',
@@ -76,6 +49,13 @@ const inlineStylesHeaders = {
   },
   tag_color: {
     float: 'left',
+    width: '20%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  tag_created_at: {
+    float: 'left',
+    width: '30%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -92,6 +72,15 @@ const inlineStyles = {
   },
   tag_color: {
     float: 'left',
+    width: '20%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  tag_created_at: {
+    float: 'left',
+    width: '30%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -99,174 +88,114 @@ const inlineStyles = {
   },
 };
 
-class Tags extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      sortBy: 'tag_name',
-      orderAsc: true,
-      keyword: '',
-      tags: [],
-    };
-  }
+const Tags = () => {
+  // Standard hooks
+  const classes = useStyles();
+  const { t, nsdt } = useFormatter();
 
-  componentDidMount() {
-    this.props.fetchTags();
-    this.subscription = interval$.subscribe(() => {
-      this.props.fetchTags();
-    });
-  }
+  // Headers
+  const headers = [
+    { field: 'tag_name', label: 'Name', isSortable: true },
+    { field: 'tag_color', label: 'Color', isSortable: true },
+  ];
 
-  componentWillUnmount() {
-    this.subscription.unsubscribe();
-  }
+  const [tags, setTags] = useState([]);
+  const [searchPaginationInput, setSearchPaginationInput] = useState({
+    sorts: initSorting('tag_name'),
+  });
 
-  handleSearch(value) {
-    this.setState({ keyword: value });
-  }
+  // Export
+  const exportProps = {
+    exportType: 'tags',
+    exportKeys: [
+      'tag_name',
+      'tag_color',
+    ],
+    exportData: tags,
+    exportFileName: `${t('Tags')}.csv`,
+  };
 
-  handleAddTag(value) {
-    this.setState({ tags: R.uniq(R.append(value, this.state.tags)) });
-  }
-
-  handleRemoveTag(value) {
-    this.setState({ tags: R.filter((n) => n !== value, this.state.tags) });
-  }
-
-  reverseBy(field) {
-    this.setState({ sortBy: field, orderAsc: !this.state.orderAsc });
-  }
-
-  sortHeader(field, label, isSortable) {
-    const { t } = this.props;
-    const { orderAsc, sortBy } = this.state;
-    const sortComponent = orderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
-    if (isSortable) {
-      return (
-        <div
-          style={inlineStylesHeaders[field]}
-          onClick={this.reverseBy.bind(this, field)}
+  return (
+    <div className={classes.container}>
+      <TaxonomiesMenu />
+      <PaginationComponent
+        fetch={searchTags}
+        searchPaginationInput={searchPaginationInput}
+        setContent={setTags}
+        exportProps={exportProps}
+      />
+      <div className="clearfix" />
+      <List classes={{ root: classes.list }}>
+        <ListItem
+          classes={{ root: classes.itemHead }}
+          divider={false}
+          style={{ paddingTop: 0 }}
         >
-          <span>{t(label)}</span>
-          {sortBy === field ? sortComponent : ''}
-        </div>
-      );
-    }
-    return (
-      <div style={inlineStylesHeaders[field]}>
-        <span>{t(label)}</span>
-      </div>
-    );
-  }
-
-  render() {
-    const { classes, tags } = this.props;
-    const { keyword, sortBy, orderAsc } = this.state;
-    const filterByKeyword = (n) => keyword === ''
-      || (n.tag_name || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-      || (n.tag_color || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
-    const sort = R.sortWith(
-      orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
-    );
-    const sortedTags = R.pipe(R.filter(filterByKeyword), sort)(tags);
-    return (
-      <div className={classes.container}>
-        <TaxonomiesMenu />
-        <div className={classes.parameters}>
-          <div style={{ float: 'left', marginRight: 10 }}>
-            <SearchFilter
-              variant="small"
-              onChange={this.handleSearch.bind(this)}
-              keyword={keyword}
-            />
-          </div>
-        </div>
-        <div className="clearfix" />
-        <List classes={{ root: classes.list }}>
+          <ListItemIcon>
+            <span
+              style={{
+                padding: '0 8px 0 8px',
+                fontWeight: 700,
+                fontSize: 12,
+              }}
+            >
+              &nbsp;
+            </span>
+          </ListItemIcon>
+          <ListItemText
+            primary={
+              <SortHeadersComponent
+                headers={headers}
+                inlineStylesHeaders={headerStyles}
+                searchPaginationInput={searchPaginationInput}
+                setSearchPaginationInput={setSearchPaginationInput}
+              />
+                }
+          />
+          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
+        </ListItem>
+        {tags.map((tag) => (
           <ListItem
-            classes={{ root: classes.itemHead }}
-            divider={false}
-            style={{ paddingTop: 0 }}
+            key={tag.tag_id}
+            classes={{ root: classes.item }}
+            divider={true}
           >
-            <ListItemIcon>
-              <span
-                style={{
-                  padding: '0 8px 0 8px',
-                  fontWeight: 700,
-                  fontSize: 12,
-                }}
-              >
-                &nbsp;
-              </span>
+            <ListItemIcon style={{ color: tag.tag_color }}>
+              <LabelOutlined />
             </ListItemIcon>
             <ListItemText
               primary={
-                <div>
-                  {this.sortHeader('tag_name', 'Name', true)}
-                  {this.sortHeader('tag_color', 'Color', true)}
-                </div>
-              }
-            />
-            <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
-          </ListItem>
-          {sortedTags.map((tag) => (
-            <ListItem
-              key={tag.tag_id}
-              classes={{ root: classes.item }}
-              divider={true}
-            >
-              <ListItemIcon>
-                <ListItemIcon style={{ color: tag.tag_color }}>
-                  <LabelOutlined />
-                </ListItemIcon>
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.tag_name}
-                    >
-                      {tag.tag_name}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.tag_color}
-                    >
-                      {tag.tag_color}
-                    </div>
+                <>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.tag_name}
+                  >
+                    {tag.tag_name}
                   </div>
-                }
-              />
-              <ListItemSecondaryAction>
-                <TagPopover tag={tag} />
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-        </List>
-        <CreateTag />
-      </div>
-    );
-  }
-}
-
-Tags.propTypes = {
-  t: PropTypes.func,
-  tags: PropTypes.array,
-  fetchTags: PropTypes.func,
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.tag_color}
+                  >
+                    {tag.tag_color}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.tag_created_at}
+                  >
+                    {nsdt(tag.tag_created_at)}
+                  </div>
+                </>
+                    }
+            />
+            <ListItemSecondaryAction>
+              <TagPopover tag={tag} />
+            </ListItemSecondaryAction>
+          </ListItem>
+        ))}
+      </List>
+      <CreateTag />
+    </div>
+  );
 };
 
-const select = (state) => {
-  const helper = storeHelper(state);
-  return { tags: helper.getTags() };
-};
-
-export default R.compose(
-  connect(select, { fetchTags }),
-  inject18n,
-  withStyles(styles),
-)(Tags);
+export default Tags;

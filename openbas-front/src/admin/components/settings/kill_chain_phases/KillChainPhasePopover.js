@@ -59,7 +59,7 @@ class KillChainPhasePopover extends Component {
 
   render() {
     const { t } = this.props;
-    const initialValues = R.pipe(R.pick(['killChainPhase_name', 'killChainPhase_color']))(
+    const initialValues = R.pipe(R.pick(['phase_name', 'phase_kill_chain_name', 'phase_order']))(
       this.props.killChainPhase,
     );
     return (

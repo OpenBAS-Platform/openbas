@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, Chip, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { RouteOutlined } from '@mui/icons-material';
 import { searchKillChainPhases } from '../../../../actions/KillChainPhase';
@@ -32,6 +32,13 @@ const useStyles = makeStyles(() => ({
     height: '100%',
     fontSize: 13,
   },
+  chipInList: {
+    fontSize: 12,
+    height: 20,
+    float: 'left',
+    textTransform: 'uppercase',
+    borderRadius: 4,
+  },
 }));
 
 const headerStyles = {
@@ -43,13 +50,13 @@ const headerStyles = {
   },
   phase_kill_chain_name: {
     float: 'left',
-    width: '25%',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
   phase_name: {
     float: 'left',
-    width: '30%',
+    width: '35%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -70,7 +77,7 @@ const headerStyles = {
 const inlineStyles = {
   phase_kill_chain_name: {
     float: 'left',
-    width: '25%',
+    width: '20%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -78,7 +85,7 @@ const inlineStyles = {
   },
   phase_name: {
     float: 'left',
-    width: '30%',
+    width: '35%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -117,7 +124,7 @@ const KillChainPhases = () => {
 
   const [killChainPhases, setKillChainPhases] = useState([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState({
-    sorts: initSorting('phase_kill_chain_name'),
+    sorts: initSorting('phase_order'),
   });
 
   // Export
@@ -183,12 +190,18 @@ const KillChainPhases = () => {
             </ListItemIcon>
             <ListItemText
               primary={
-                <div>
+                <>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.phase_kill_chain_name}
                   >
-                    {killChainPhase.phase_kill_chain_name}
+                    <Chip
+                      variant="outlined"
+                      classes={{ root: classes.chipInList }}
+                      style={{ width: 120 }}
+                      color="primary"
+                      label={killChainPhase.phase_kill_chain_name}
+                    />
                   </div>
                   <div
                     className={classes.bodyItem}
@@ -208,7 +221,7 @@ const KillChainPhases = () => {
                   >
                     {nsdt(killChainPhase.phase_created_at)}
                   </div>
-                </div>
+                </>
               }
             />
             <ListItemSecondaryAction>

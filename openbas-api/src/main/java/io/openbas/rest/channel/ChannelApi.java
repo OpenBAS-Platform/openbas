@@ -94,6 +94,7 @@ public class ChannelApi extends RestBehavior {
   public Channel updateChannel(@PathVariable String channelId, @Valid @RequestBody ChannelUpdateInput input) {
     Channel channel = channelRepository.findById(channelId).orElseThrow();
     channel.setUpdateAttributes(input);
+    channel.setUpdatedAt(Instant.now());
     return channelRepository.save(channel);
   }
 

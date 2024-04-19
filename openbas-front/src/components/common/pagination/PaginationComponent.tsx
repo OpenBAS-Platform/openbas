@@ -33,7 +33,7 @@ const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, s
 
   // Pagination
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(100);
   const [totalElements, setTotalElements] = useState(0);
 
   const handleChangePage = (
@@ -74,7 +74,7 @@ const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, s
 
   return (
     <div className={classes.parameters}>
-      <div>
+      <>
         {searchEnable
           && <SearchFilter
             variant="small"
@@ -82,10 +82,11 @@ const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, s
             keyword={textSearch}
              />
         }
-      </div>
+      </>
       <div className={classes.container}>
         <TablePagination
           component="div"
+          rowsPerPageOptions={[100, 200, 500, 1000]}
           count={totalElements}
           page={page}
           onPageChange={handleChangePage}

@@ -1,7 +1,13 @@
 import * as schema from './Schema';
-import { getReferential, postReferential, delReferential, putReferential } from '../utils/Action';
+import { getReferential, postReferential, delReferential, putReferential, simplePostCall } from '../utils/Action';
 
 export const fetchTags = () => (dispatch) => getReferential(schema.arrayOfTags, '/api/tags')(dispatch);
+
+export const searchTags = (searchPaginationInput) => {
+  const data = searchPaginationInput;
+  const uri = '/api/tags/search';
+  return simplePostCall(uri, data);
+};
 
 export const fetchTag = (tagId) => (dispatch) => getReferential(schema.tag, `/api/tags/${tagId}`)(dispatch);
 

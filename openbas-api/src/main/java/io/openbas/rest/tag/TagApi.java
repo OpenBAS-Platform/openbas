@@ -1,16 +1,22 @@
 package io.openbas.rest.tag;
 
+import io.openbas.database.model.KillChainPhase;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.tag.form.TagCreateInput;
 import io.openbas.rest.tag.form.TagUpdateInput;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RestController
 public class TagApi extends RestBehavior {
@@ -25,6 +31,16 @@ public class TagApi extends RestBehavior {
     @GetMapping("/api/tags")
     public Iterable<Tag> tags() {
         return tagRepository.findAll();
+    }
+
+    @PostMapping("/api/tags/search")
+    public Page<Tag> tags(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+        return buildPaginationJPA(
+                (Specification<Tag> specification, Pageable pageable) -> this.tagRepository.findAll(
+                        specification, pageable),
+                searchPaginationInput,
+                Tag.class
+        );
     }
 
     @Secured(ROLE_ADMIN)
