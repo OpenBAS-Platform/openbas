@@ -1,12 +1,12 @@
 import { useParams } from 'react-router-dom';
 import React, { useContext, useState } from 'react';
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { PlayArrowOutlined } from '@mui/icons-material';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import type { AtomicTestingOutput, InjectStatus, InjectStatusExecution } from '../../../../utils/api-types';
+import type { AtomicTestingOutput } from '../../../../utils/api-types';
 import { fetchAtomicTesting, tryAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
 import type { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
 import AtomicPopover from './Popover';
@@ -37,8 +37,6 @@ const AtomicTestingHeader = () => {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const { atomicId } = useParams() as { atomicId: AtomicTestingOutput['atomic_id'] };
-  const [injectResult, setInjectResult] = useState<InjectStatus | null>(null);
-  const [openResult, setOpenResult] = useState(false);
   const { onLaunchAtomicTesting } = useContext(AtomicTestingResultContext);
 
   // Fetching data
@@ -56,17 +54,10 @@ const AtomicTestingHeader = () => {
   const submitTry = () => {
     setOpen(false);
     setAvailableLaunch(false);
-    dispatch(tryAtomicTesting(atomic.atomic_id)).then((payload: InjectStatus) => {
-      setInjectResult(payload);
-      setOpenResult(true);
+    dispatch(tryAtomicTesting(atomic.atomic_id)).then(() => {
+      setAvailableLaunch(true);
+      onLaunchAtomicTesting();
     });
-  };
-
-  const handleCloseResult = () => {
-    setOpenResult(false);
-    setInjectResult(null);
-    setAvailableLaunch(true);
-    onLaunchAtomicTesting();
   };
 
   return (
@@ -75,7 +66,7 @@ const AtomicTestingHeader = () => {
         <Typography variant="h1" gutterBottom classes={{ root: classes.title }}>
           {atomic.atomic_title}
         </Typography>
-        <AtomicPopover atomic={atomic} />
+        <AtomicPopover atomic={atomic}/>
         <StatusChip status={atomic.atomic_status}/>
         <Dialog
           open={open}
@@ -106,7 +97,7 @@ const AtomicTestingHeader = () => {
       </div>
       <Button
         variant="contained"
-        startIcon={<PlayArrowOutlined />}
+        startIcon={<PlayArrowOutlined/>}
         color="info"
         onClick={() => setOpen(true)}
         sx={{ width: 120, height: 40 }}

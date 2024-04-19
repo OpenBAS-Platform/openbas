@@ -5,7 +5,6 @@ import { Box, Typography } from '@mui/material';
 import { SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import type { ExpectationResultsByType, ResultDistribution } from '../../../../utils/api-types';
-import Empty from '../../../../components/Empty';
 import type { Theme } from '../../../../components/Theme';
 
 const useStyles = makeStyles(() => ({
