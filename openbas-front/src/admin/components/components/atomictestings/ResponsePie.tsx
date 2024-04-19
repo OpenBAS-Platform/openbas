@@ -5,7 +5,6 @@ import { Box, Typography } from '@mui/material';
 import { SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import type { ExpectationResultsByType, ResultDistribution } from '../../../../utils/api-types';
-import Empty from '../../../../components/Empty';
 import type { Theme } from '../../../../components/Theme';
 
 const useStyles = makeStyles(() => ({
@@ -133,13 +132,22 @@ const ResponsePie: FunctionComponent<Props> = ({
                 width="100%"
                 height="100%"
               />
-
             )}
           </div>
         ))}
         {!expectations || expectations.length === 0 ? (
           <div className={classes.chartContainer}>
-            <Empty message={t('No data available')}/>
+            <Chart
+              options={{
+                ...chartOptions,
+                colors: ['rgb(202,203,206)'],
+                labels: [t('No data available')],
+              }}
+              series={[1]}
+              type="donut"
+              width="100%"
+              height="100%"
+            />
           </div>
         ) : null}
       </div>

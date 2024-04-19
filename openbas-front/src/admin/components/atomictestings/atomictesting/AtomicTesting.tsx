@@ -2,6 +2,8 @@ import { useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { Grid, List, ListItemButton, ListItemText, Paper } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { DevicesOtherOutlined, Groups3Outlined } from '@mui/icons-material';
+import { SelectGroup } from 'mdi-material-ui';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
@@ -66,9 +68,20 @@ const AtomicTesting = () => {
 
   const sortedTargets: InjectTargetWithResult[] = filtering.filterAndSort(atomic.atomic_targets);
 
-  // handles
+  // Handles
   const handleTargetClick = (target: InjectTargetWithResult) => {
     setSelectedTarget(target);
+  };
+
+  // Icon
+  const getIcon = (type: string | undefined) => {
+    if (type === 'ASSETS') {
+      return <DevicesOtherOutlined/>;
+    }
+    if (type === 'ASSETS_GROUPS') {
+      return <SelectGroup/>;
+    }
+    return <Groups3Outlined/>; // Teams
   };
 
   return (
@@ -99,11 +112,9 @@ const AtomicTesting = () => {
                   <ListItemText
                     primary={
                       <div>
+                        <div style={{ color: 'gray', display: 'inline-block', float: 'left', paddingRight: 10 }}>{getIcon(target?.targetType)}</div>
                         <div className={classes.bodyTarget} style={{ width: '30%' }}>
                           {`${target?.name}`}
-                          <span style={{ color: 'gray', marginLeft: 10 }}>
-                            [{t(target?.targetType?.toLowerCase())}]
-                          </span>
                         </div>
                         <div style={{ float: 'right' }}>
                           <AtomicTestingResult
@@ -111,7 +122,7 @@ const AtomicTesting = () => {
                           />
                         </div>
                       </div>
-                            }
+                    }
                   />
                 </ListItemButton>
               </Paper>)}

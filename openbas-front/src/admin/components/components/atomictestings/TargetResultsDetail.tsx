@@ -18,8 +18,8 @@ interface Steptarget {
 
 const useStyles = makeStyles<Theme>((theme) => ({
   circle: {
-    width: '80px',
-    height: '80px',
+    width: '100px',
+    height: '100px',
     borderRadius: '50%',
     background: theme.palette.mode === 'dark' ? 'rgba(202,203,206,0.51)' : 'rgba(202,203,206,0.33)',
     display: 'flex',
@@ -27,14 +27,18 @@ const useStyles = makeStyles<Theme>((theme) => ({
     justifyContent: 'center',
   },
   circleLabel: {
+    fontSize: '1rem',
+    padding: '10px',
     textAlign: 'center',
+    whiteSpace: 'pre-wrap',
+    wordWrap: 'break-word',
   },
   connector: {
     position: 'absolute',
     top: '40%',
-    right: 'calc(50% + 40px)',
+    right: 'calc(50% + 50px)',
     height: '1px',
-    width: 'calc(100% - 80px)',
+    width: 'calc(100% - 100px)',
     background: 'blue',
     zIndex: 0,
   },
@@ -46,8 +50,8 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   icon: {
     position: 'absolute',
-    bottom: 'calc(80%)',
-    right: 'calc(47%)',
+    bottom: 'calc(82%)',
+    right: 'calc(46%)',
   },
   tabs: {
     marginLeft: 'auto',
@@ -194,7 +198,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   };
 
   // Define steps
-  const initialSteps = [{ label: 'Attack started' }, { label: 'Attack finished' }];
+  const initialSteps = [{ label: 'Attack started' }, { label: 'Attack ended' }];
   useEffect(() => {
     if (targetresults && targetresults.length > 0) {
       const newSteps = targetresults.map((result) => ({

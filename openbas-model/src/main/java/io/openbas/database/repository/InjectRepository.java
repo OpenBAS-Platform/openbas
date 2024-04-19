@@ -79,7 +79,4 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
   @Override
   @Query("select count(distinct i) from Inject i where i.createdAt < :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
-
-  @Query(value = "select i from Inject i where i.scenario is null and i.exercise is null")
-  Page<Inject> findAllAtomicTestings(Specification<Inject> spec, Pageable pageable);
 }
