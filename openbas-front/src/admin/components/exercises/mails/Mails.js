@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Chip, Tooltip, IconButton } from '@mui/material';
+import { Chip, Grid, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { CSVLink } from 'react-csv';
@@ -17,6 +17,11 @@ import { useHelper } from '../../../../store';
 import { exportData } from '../../../../utils/Environment';
 import AnimationMenu from '../AnimationMenu';
 import CreateQuickInject from '../injects/CreateQuickInject';
+import MailDistributionOverTimeChart from './MailDistributionOverTimeChart';
+import MailDistributionOverTimeLine from './MailDistributionOverTimeLine';
+import MailDistributionByTeam from './MailDistributionByTeam';
+import MailDistributionByPlayer from './MailDistributionByPlayer';
+import MailDistributionByInject from './MailDistributionByInject';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -188,7 +193,49 @@ const Mails = () => {
   return (
     <div>
       <AnimationMenu exerciseId={exerciseId} />
-      <div>
+      <Grid container spacing={3}>
+        <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="h4">
+            {t('Sent mails over time')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            <MailDistributionOverTimeChart exerciseId={exerciseId} />
+          </Paper>
+        </Grid>
+        <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="h4">
+            {t('Sent mails over time')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            <MailDistributionOverTimeLine exerciseId={exerciseId} />
+          </Paper>
+        </Grid>
+        <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="h4">
+            {t('Distribution of mails by team')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            <MailDistributionByTeam exerciseId={exerciseId} />
+          </Paper>
+        </Grid>
+        <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="h4">
+            {t('Distribution of mails by player')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            <MailDistributionByPlayer exerciseId={exerciseId} />
+          </Paper>
+        </Grid>
+        <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="h4">
+            {t('Distribution of mails by inject')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            <MailDistributionByInject exerciseId={exerciseId} />
+          </Paper>
+        </Grid>
+      </Grid>
+      <div style={{ marginTop: 24 }}>
         <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
             variant="small"

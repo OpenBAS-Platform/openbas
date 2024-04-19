@@ -9,8 +9,9 @@ export type InjectInput = {
   inject_depends_duration_seconds: number;
 };
 
-export type InjectStore = Omit<Inject, 'inject_tags'> & {
+export type InjectStore = Omit<Inject, 'inject_tags' | 'inject_content'> & {
   inject_tags: string[] | undefined;
+  inject_content: { expectationScore: number, challenges: string[] | undefined }
 };
 
 export type InjectExpectationStore = Omit<InjectExpectation, 'inject_expectation_team', 'inject_expectation_inject'> & {

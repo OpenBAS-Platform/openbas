@@ -102,7 +102,8 @@ public class ScenarioService {
   }
 
   public Scenario scenario(@NotBlank final String scenarioId) {
-    return this.scenarioRepository.findById(scenarioId).orElseThrow();
+    return this.scenarioRepository.findById(scenarioId)
+        .orElseThrow(() -> new IllegalStateException("Scenario not found"));
   }
 
   public Scenario updateScenario(@NotNull final Scenario scenario) {

@@ -1,6 +1,7 @@
 package io.openbas.rest.exercise;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Exercise.STATUS;
@@ -86,7 +87,6 @@ public class ExerciseApi extends RestBehavior {
   private DryInjectRepository dryInjectRepository;
   private ComcheckRepository comcheckRepository;
   private ImportService importService;
-  private InjectRepository injectRepository;
   private LessonsCategoryRepository lessonsCategoryRepository;
   private LessonsQuestionRepository lessonsQuestionRepository;
   private LessonsAnswerRepository lessonsAnswerRepository;
@@ -146,11 +146,6 @@ public class ExerciseApi extends RestBehavior {
   @Autowired
   public void setDryrunService(DryrunService dryrunService) {
     this.dryrunService = dryrunService;
-  }
-
-  @Autowired
-  public void setInjectRepository(InjectRepository injectRepository) {
-    this.injectRepository = injectRepository;
   }
 
   @Autowired
@@ -504,6 +499,22 @@ public class ExerciseApi extends RestBehavior {
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Exercise exercise(@PathVariable String exerciseId) {
     return exerciseRepository.findById(exerciseId).orElseThrow();
+  }
+
+  @GetMapping("/api/exercises/{exerciseId}/results")
+  @PreAuthorize("isExerciseObserver(#exerciseId)")
+  public List<ExpectationResultsByType> globalResults(@NotBlank final @PathVariable String exerciseId) {
+    return exerciseRepository.findById(exerciseId)
+        .map((ExerciseUtils::computeGlobalExpectationResults))
+        .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + exerciseId));
+  }
+
+  @GetMapping("/api/exercises/{exerciseId}/injects/results")
+  @PreAuthorize("isExerciseObserver(#exerciseId)")
+  public List<ExerciseInjectExpectationResultsByType> injectResults(@NotBlank final @PathVariable String exerciseId) {
+    return exerciseRepository.findById(exerciseId)
+        .map((ExerciseUtils::computeInjectExpectationResults))
+        .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + exerciseId));
   }
 
   @Transactional(rollbackOn = Exception.class)

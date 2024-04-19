@@ -1,23 +1,12 @@
 package io.openbas.atomic_testing;
 
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
-
 import io.openbas.atomic_testing.form.AtomicTestingInput;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectDocument;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.model.User;
-import io.openbas.database.repository.AssetGroupRepository;
-import io.openbas.database.repository.AssetRepository;
-import io.openbas.database.repository.DocumentRepository;
-import io.openbas.database.repository.InjectDocumentRepository;
-import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.TagRepository;
-import io.openbas.database.repository.TeamRepository;
-import io.openbas.database.repository.UserRepository;
+import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
@@ -37,6 +26,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+
 @Service
 public class AtomicTestingService {
 
@@ -47,6 +43,7 @@ public class AtomicTestingService {
 
   private AssetRepository assetRepository;
   private InjectRepository injectRepository;
+  private InjectorContractRepository injectorContractRepository;
   private InjectDocumentRepository injectDocumentRepository;
   private UserRepository userRepository;
   private TeamRepository teamRepository;
@@ -103,6 +100,11 @@ public class AtomicTestingService {
     this.documentRepository = documentRepository;
   }
 
+  @Autowired
+  public void setInjectorContractRepository(@NotNull final InjectorContractRepository injectorContractRepository) {
+    this.injectorContractRepository = injectorContractRepository;
+  }
+
   public Page<Inject> findAllAtomicTestings(SearchPaginationInput searchPaginationInput) {
     Specification<Inject> customSpec = Specification.where((root, query, cb) -> {
       Predicate predicate = cb.conjunction();
@@ -132,7 +134,7 @@ public class AtomicTestingService {
     injectToSave.setTitle(input.getTitle());
     injectToSave.setContent(input.getContent());
     injectToSave.setType(input.getType());
-    injectToSave.setContract(input.getContract());
+    injectToSave.setInjectorContract(this.injectorContractRepository.findById(input.getContract()).orElseThrow());
     injectToSave.setAllTeams(input.isAllTeams());
     injectToSave.setDescription(input.getDescription());
     injectToSave.setDependsDuration(0L);

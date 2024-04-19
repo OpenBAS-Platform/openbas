@@ -7,15 +7,10 @@ import io.openbas.atomic_testing.AtomicTestingMapper.ResultDistribution;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class AtomicTestingUtils {
 
@@ -196,23 +191,24 @@ public class AtomicTestingUtils {
   }
 
   public static Optional<ExpectationResultsByType> getExpectationByType(final ExpectationType type, final List<Integer> scores) {
-    if (scores.stream().anyMatch(Objects::isNull)) {
-      return Optional.of(new ExpectationResultsByType(type, ExpectationStatus.UNKNOWN, Collections.emptyList()));
-    } else {
-      OptionalDouble avgResponse = calculateAverageFromExpectations(scores);
-      if (avgResponse.isPresent()) {
-        return Optional.of(new ExpectationResultsByType(type, getResult(avgResponse), getResultDetail(type, scores)));
-      }
+    if (scores.isEmpty()) {
+      return Optional.empty();
     }
-    return Optional.empty();
+    OptionalDouble avgResponse = calculateAverageFromExpectations(scores);
+    if (avgResponse.isPresent()) {
+      return Optional.of(new ExpectationResultsByType(type, getResult(avgResponse), getResultDetail(type, scores)));
+    }
+    return Optional.of(new ExpectationResultsByType(type, getResult(OptionalDouble.of(0.0)), getResultDetail(type, scores)));
   }
 
   public static List<ResultDistribution> getResultDetail(final ExpectationType type, final List<Integer> normalizedScores) {
-    long successCount = normalizedScores.stream().filter(score -> score.equals(1)).count();
-    long failureCount = normalizedScores.size() - successCount;
+    long successCount = normalizedScores.stream().filter(s -> s != null && s.equals(1)).count();
+    long pendingCount = normalizedScores.stream().filter(Objects::isNull).count();
+    long failureCount = normalizedScores.stream().filter(s -> s != null && s.equals(0)).count();
 
     return List.of(
         new ResultDistribution(type.successLabel, (int) successCount),
+        new ResultDistribution(type.pendingLabel, (int) pendingCount),
         new ResultDistribution(type.failureLabel, (int) failureCount)
     );
   }

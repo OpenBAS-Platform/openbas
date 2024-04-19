@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { Grid, Paper, Typography } from '@mui/material';
 import React from 'react';
+import { Groups3Outlined, MailOutlined, NotificationsOutlined, PersonOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../../../components/i18n';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
@@ -13,6 +14,7 @@ import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-
 import { fetchScenario, updateScenarioInformation } from '../../../../../actions/scenarios/scenario-actions';
 import type { ScenarioInformationInput } from '../../../../../utils/api-types';
 import ScenarioInformation from './ScenarioInformation';
+import PaperMetric from '../../../components/PaperMetric';
 
 const ScenarioSettings = () => {
   // Standard hooks
@@ -48,6 +50,20 @@ const ScenarioSettings = () => {
   return (
     <>
       <DefinitionMenu base="/admin/scenarios" id={scenario.scenario_id} />
+      <Grid container spacing={3} style={{ marginBottom: 24 }}>
+        <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <PaperMetric title={t('Players')} icon={<PersonOutlined />} number={scenario.scenario_users_number ?? '-'}/>
+        </Grid>
+        <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <PaperMetric title={t('Injects')} icon={<NotificationsOutlined />} number={scenario.scenario_injects_statistics?.total_count ?? '-'}/>
+        </Grid>
+        <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <PaperMetric title={t('Teams')} icon={<Groups3Outlined />} number={scenario.scenario_teams.length ?? '-'}/>
+        </Grid>
+        <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <PaperMetric title={t('Messages')} icon={<MailOutlined />} number={scenario.scenario_communications_number ?? '-'}/>
+        </Grid>
+      </Grid>
       <Grid container spacing={3}>
         <Grid container item xs={6} sx={{ flexDirection: 'column' }}>
           <Typography variant="h4">{t('Information')}</Typography>

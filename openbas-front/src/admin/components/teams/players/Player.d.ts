@@ -9,7 +9,8 @@ UpdatePlayerInput,
   user_country: Option | undefined;
   user_tags: Option[];
 };
-export type UserStore = Omit<User, 'user_organization' | 'user_tags'> & {
+export type UserStore = Omit<User, 'user_organization' | 'user_tags', |'user_teams'> & {
   user_organization: string | undefined;
   user_tags: string[] | undefined;
+  user_teams: string[] | undefined;
 };

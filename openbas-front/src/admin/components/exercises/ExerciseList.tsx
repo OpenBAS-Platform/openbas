@@ -1,4 +1,4 @@
-import { IconButton, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { FileDownloadOutlined, Kayaking, KeyboardArrowRight } from '@mui/icons-material';
 import React, { CSSProperties, FunctionComponent } from 'react';
@@ -14,8 +14,10 @@ import { useHelper } from '../../../store';
 import type { TagsHelper } from '../../../actions/helper';
 import { useFormatter } from '../../../components/i18n';
 import type { ExerciseStore } from '../../../actions/exercises/Exercise';
+import type { Theme } from '../../../components/Theme';
+import AtomicTestingResult from '../components/atomictestings/AtomicTestingResult';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: Theme) => ({
   parameters: {
     marginTop: -10,
     display: 'flex',
@@ -26,18 +28,18 @@ const useStyles = makeStyles(() => ({
     display: 'flex',
     gap: '10px',
   },
-  itemHead: {
-    paddingLeft: 10,
+  itemHeader: {
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
-    paddingLeft: 10,
     height: 50,
   },
   bodyItem: {
-    height: '100%',
-    fontSize: 13,
+    fontSize: theme.typography.h3.fontSize,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
   goIcon: {
     position: 'absolute',
@@ -61,12 +63,6 @@ const headerStyles: Record<string, CSSProperties> = {
     fontSize: 12,
     fontWeight: '700',
   },
-  exercise_subtitle: {
-    float: 'left',
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
   exercise_start_date: {
     float: 'left',
     width: '15%',
@@ -81,7 +77,13 @@ const headerStyles: Record<string, CSSProperties> = {
   },
   exercise_tags: {
     float: 'left',
-    width: '30%',
+    width: '25%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  exercise_global_score: {
+    float: 'left',
+    width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -96,14 +98,6 @@ const inlineStyles: Record<string, CSSProperties> = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  exercise_subtitle: {
-    float: 'left',
-    width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
   exercise_start_date: {
     float: 'left',
     width: '15%',
@@ -122,7 +116,15 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   exercise_tags: {
     float: 'left',
-    width: '30%',
+    width: '25%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  exercise_global_score: {
+    float: 'left',
+    width: '25%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -146,7 +148,7 @@ const ExerciseList: FunctionComponent<Props> = ({
     tagsMap: helper.getTagsMap(),
   }));
 
-  const searchColumns = ['name', 'subtitle'];
+  const searchColumns = ['name'];
   const filtering = useSearchAnFilter('exercise', 'name', searchColumns);
 
   const sortedExercises = filtering.filterAndSort(exercises);
@@ -199,33 +201,17 @@ const ExerciseList: FunctionComponent<Props> = ({
       <div className="clearfix" />
       <List>
         <ListItem
-          classes={{ root: classes.itemHead }}
+          classes={{ root: classes.itemHeader }}
           divider={false}
           style={{ paddingTop: 0 }}
         >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-              &nbsp;
-            </span>
-          </ListItemIcon>
+          <ListItemIcon />
           <ListItemText
             primary={
               <div>
                 {filtering.buildHeader(
                   'exercise_name',
                   'Name',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'exercise_subtitle',
-                  'Subtitle',
                   true,
                   headerStyles,
                 )}
@@ -247,16 +233,21 @@ const ExerciseList: FunctionComponent<Props> = ({
                   true,
                   headerStyles,
                 )}
+                {filtering.buildHeader(
+                  'exercise_global_score',
+                  'Global score',
+                  false,
+                  headerStyles,
+                )}
               </div>
             }
           />
         </ListItem>
         {sortedExercises.map((exercise: ExerciseStore) => (
-          <ListItem
+          <ListItemButton
             key={exercise.exercise_id}
             classes={{ root: classes.item }}
             divider
-            button
             component={Link}
             to={`/admin/exercises/${exercise.exercise_id}`}
           >
@@ -271,12 +262,6 @@ const ExerciseList: FunctionComponent<Props> = ({
                     style={inlineStyles.exercise_name}
                   >
                     {exercise.exercise_name}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.exercise_subtitle}
-                  >
-                    {exercise.exercise_subtitle}
                   </div>
                   <div
                     className={classes.bodyItem}
@@ -303,13 +288,19 @@ const ExerciseList: FunctionComponent<Props> = ({
                   >
                     <ItemTags variant="list" tags={exercise.exercise_tags} />
                   </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.exercise_global_score}
+                  >
+                    <AtomicTestingResult expectations={exercise.exercise_global_score} />
+                  </div>
                 </div>
               }
             />
             <ListItemIcon classes={{ root: classes.goIcon }}>
               <KeyboardArrowRight />
             </ListItemIcon>
-          </ListItem>
+          </ListItemButton>
         ))}
       </List>
     </>

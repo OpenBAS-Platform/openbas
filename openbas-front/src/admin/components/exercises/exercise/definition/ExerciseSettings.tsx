@@ -2,6 +2,7 @@ import { Alert, Grid, Paper, Typography } from '@mui/material';
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
+import { Groups3Outlined, MailOutlined, NotificationsOutlined, PersonOutlined } from '@mui/icons-material';
 import ExerciseInformation from './ExerciseInformation';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import { useFormatter } from '../../../../../components/i18n';
@@ -16,6 +17,7 @@ import useDataLoader from '../../../../../utils/ServerSideEvent';
 import CreateControl from '../../controls/CreateControl';
 import ExerciseControlDryRuns from './ExerciseControlDryRuns';
 import ExerciseControlComChecks from './ExerciseControlComChecks';
+import PaperMetric from '../../../components/PaperMetric';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -60,6 +62,20 @@ const ExerciseSettings = () => {
   return (
     <>
       <DefinitionMenu base="/admin/exercises" id={exercise.exercise_id} />
+      <Grid container spacing={3} style={{ marginBottom: 24 }}>
+        <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <PaperMetric title={t('Players')} icon={<PersonOutlined />} number={exercise.exercise_users_number ?? '-'}/>
+        </Grid>
+        <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <PaperMetric title={t('Injects')} icon={<NotificationsOutlined />} number={exercise.exercise_injects_statistics?.total_count ?? '-'}/>
+        </Grid>
+        <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <PaperMetric title={t('Teams')} icon={<Groups3Outlined />} number={exercise.exercise_teams.length ?? '-'}/>
+        </Grid>
+        <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <PaperMetric title={t('Messages')} icon={<MailOutlined />} number={exercise.exercise_communications_number ?? '-'}/>
+        </Grid>
+      </Grid>
       <Grid container spacing={3} style={{ marginBottom: 24 }}>
         <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="h4">{t('Information')}</Typography>

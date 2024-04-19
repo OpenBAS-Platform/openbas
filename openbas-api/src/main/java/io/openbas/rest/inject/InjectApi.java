@@ -270,7 +270,7 @@ public class InjectApi extends RestBehavior {
   public Inject createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
     // Get common attributes
-    Inject inject = input.toInject();
+    Inject inject = input.toInject(this.injectorContractRepository.findById(input.getContract()).orElseThrow());
     inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setExercise(exercise);
     // Set dependencies
@@ -294,7 +294,7 @@ public class InjectApi extends RestBehavior {
   public InjectStatus executeInject(@PathVariable String exerciseId,
       @Valid @RequestPart("input") DirectInjectInput input,
       @RequestPart("file") Optional<MultipartFile> file) {
-    Inject inject = input.toInject();
+    Inject inject = input.toInject(this.injectorContractRepository.findById(input.getContract()).orElseThrow());
     inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
     Iterable<User> users = userRepository.findAllById(input.getUserIds());
@@ -376,7 +376,7 @@ public class InjectApi extends RestBehavior {
       @Valid @RequestBody InjectInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     // Get common attributes
-    Inject inject = input.toInject();
+    Inject inject = input.toInject(this.injectorContractRepository.findById(input.getContract()).orElseThrow());
     inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setScenario(scenario);
     // Set dependencies

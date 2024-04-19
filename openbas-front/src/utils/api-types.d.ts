@@ -144,7 +144,6 @@ export interface AtomicTestingOutput {
   atomic_expectation_results: ExpectationResultsByType[];
   /** Id */
   atomic_id: string;
-  /** Full contract */
   atomic_injector_contract: InjectorContract;
   /**
    * Last Execution End date
@@ -432,6 +431,7 @@ export interface CreatePlayerInput {
   user_lastname?: string;
   user_organization?: string;
   user_tags?: string[];
+  user_teams?: string[];
 }
 
 export interface CreateUserInput {
@@ -656,11 +656,17 @@ export interface ExerciseCreateInput {
   exercise_tags?: string[];
 }
 
+export interface ExerciseInjectExpectationResultsByType {
+  exercise_inject_results_attack_pattern?: AttackPattern;
+  exercise_inject_results_results?: InjectExpectationResultsByType[];
+}
+
 export interface ExerciseLessonsInput {
   exercise_lessons_anonymized?: boolean;
 }
 
 export interface ExerciseSimple {
+  exercise_global_score?: ExpectationResultsByType[];
   exercise_id?: string;
   exercise_name?: string;
   /** @format date-time */
@@ -802,6 +808,7 @@ export interface GroupUpdateUsersInput {
 }
 
 export interface Inject {
+  contract?: string;
   footer?: string;
   header?: string;
   inject_all_teams?: boolean;
@@ -814,7 +821,7 @@ export interface Inject {
   /** @format int64 */
   inject_communications_number?: number;
   inject_content?: object;
-  inject_contract?: string;
+  inject_contract?: InjectorContract;
   inject_country?: string;
   /** @format date-time */
   inject_created_at?: string;
@@ -898,6 +905,11 @@ export interface InjectExpectationResult {
   result: string;
   sourceId?: string;
   sourceName?: string;
+}
+
+export interface InjectExpectationResultsByType {
+  inject?: Inject;
+  results?: ExpectationResultsByType[];
 }
 
 export interface InjectInput {
@@ -1007,7 +1019,6 @@ export interface InjectorConnection {
   vhost?: string;
 }
 
-/** Full contract */
 export interface InjectorContract {
   injector_contract_atomic_testing?: boolean;
   injector_contract_content: string;
@@ -1029,6 +1040,7 @@ export interface InjectorContractInput {
   contract_id: string;
   contract_labels?: Record<string, string>;
   contract_manual?: boolean;
+  is_atomic_testing?: boolean;
 }
 
 export interface InjectorCreateInput {
@@ -1076,6 +1088,13 @@ export interface KillChainPhaseCreateInput {
   phase_order?: number;
   phase_short_name?: string;
   phase_stix_id?: string;
+}
+
+export interface KillChainPhaseUpdateInput {
+  phase_kill_chain_name: string;
+  phase_name: string;
+  /** @format int64 */
+  phase_order?: number;
 }
 
 export interface KillChainPhaseUpsertInput {
@@ -1455,6 +1474,25 @@ export interface PageKillChainPhase {
   totalPages?: number;
 }
 
+export interface PageTag {
+  content?: Tag[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageableObject {
   /** @format int64 */
   offset?: number;
@@ -1603,10 +1641,13 @@ export interface Scenario {
   /** @format int64 */
   scenario_all_users_number?: number;
   scenario_articles?: Article[];
+  /** @format int64 */
+  scenario_communications_number?: number;
   /** @format date-time */
   scenario_created_at?: string;
   scenario_description?: string;
   scenario_documents?: Document[];
+  scenario_exercises?: Exercise[];
   scenario_id: string;
   scenario_injects?: Inject[];
   scenario_injects_statistics?: Record<string, number>;
@@ -1793,9 +1834,9 @@ export interface Team {
   /** @format int64 */
   team_injects_expectations_number?: number;
   /** @format int64 */
-  team_injects_expectations_total_expected_score?: number;
+  team_injects_expectations_total_expected_score: number;
   /** @format int64 */
-  team_injects_expectations_total_score?: number;
+  team_injects_expectations_total_score: number;
   team_name: string;
   team_organization?: Organization;
   team_scenario_injects?: Inject[];
@@ -1870,6 +1911,7 @@ export interface UpdatePlayerInput {
   /** @pattern ^\+[\d\s\-.()]+$ */
   user_phone?: string;
   user_tags?: string[];
+  user_teams?: string[];
 }
 
 export interface UpdateProfileInput {

@@ -6,7 +6,6 @@ import io.openbas.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.atomic_testing.form.SimpleExpectationResultOutput;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectStatus;
-import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -25,17 +24,11 @@ import java.util.List;
 public class AtomicTestingApi extends RestBehavior {
 
   private AtomicTestingService atomicTestingService;
-  private InjectorContractRepository injectorContractRepository;
   private InjectExpectationService injectExpectationService;
 
   @Autowired
   public void setAtomicTestingService(AtomicTestingService atomicTestingService) {
     this.atomicTestingService = atomicTestingService;
-  }
-
-  @Autowired
-  public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
-    this.injectorContractRepository = injectorContractRepository;
   }
 
   @Autowired
@@ -46,11 +39,6 @@ public class AtomicTestingApi extends RestBehavior {
   @PostMapping("/search")
   public Page<AtomicTestingOutput> findAllAtomicTestings(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return atomicTestingService.findAllAtomicTestings(searchPaginationInput)
-        // Fixme: find a better way to have Contract inside Atomic object
-        .map((inject) -> this.injectorContractRepository.findById(inject.getContract()).map((c) -> {
-          inject.setInjectorContract(c);
-          return inject;
-        }).orElse(inject))
         .map(AtomicTestingMapper::toDto);
   }
 
@@ -58,11 +46,6 @@ public class AtomicTestingApi extends RestBehavior {
   @GetMapping("/{injectId}")
   public AtomicTestingOutput findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId)
-        // Fixme: find a better way to have Contract inside Atomic object
-        .map((inject) -> this.injectorContractRepository.findById(inject.getContract()).map((c) -> {
-          inject.setInjectorContract(c);
-          return inject;
-        }).orElse(inject))
         .map(AtomicTestingMapper::toDtoWithTargetResults)
         .orElseThrow();
   }

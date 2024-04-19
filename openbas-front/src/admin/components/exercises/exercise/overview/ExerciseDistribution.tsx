@@ -10,6 +10,8 @@ import ExerciseDistributionScoreOverTimeByInjectType from './ExerciseDistributio
 import ExerciseDistributionByInjectType from './ExerciseDistributionByInjectType';
 import ExerciseDistributionScoreOverTimeByTeam from './ExerciseDistributionScoreOverTimeByTeam';
 import ExerciseDistributionScoreByTeam from './ExerciseDistributionScoreByTeam';
+import ExerciseDistributionScoreByTeamInPercentage from './ExerciseDistributionScoreByTeamInPercentage';
+import ExerciseDistributionScoreOverTimeByTeamInPercentage from './ExerciseDistributionScoreOverTimeByTeamInPercentage';
 
 const useStyles = makeStyles(() => ({
   paperChart: {
@@ -32,9 +34,25 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
   const classes = useStyles();
 
   return (
-    <>
+    <Grid container spacing={3}>
       <Typography variant="h1" style={{ paddingLeft: 24, paddingTop: 24 }}>{t('Distribution')}</Typography>
       <Grid container item spacing={3}>
+        <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="h4">
+            {t('Distribution of score by team (in % of expectations)')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId} />
+          </Paper>
+        </Grid>
+        <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="h4">
+            {t('Teams scores over time (in % of expectations)')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            <ExerciseDistributionScoreOverTimeByTeamInPercentage exerciseId={exerciseId} />
+          </Paper>
+        </Grid>
         <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="h4">
             {t('Distribution of total score by team')}
@@ -90,7 +108,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
           </Paper>
         </Grid>
       </Grid>
-    </>
+    </Grid>
   );
 };
 export default ExerciseDistribution;

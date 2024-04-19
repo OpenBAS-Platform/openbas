@@ -1,8 +1,9 @@
 import Chart from 'react-apexcharts';
 import React, { FunctionComponent } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { Box, Typography } from '@mui/material';
-import { SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
+import { Box, Button, Typography } from '@mui/material';
+import { InfoOutlined, SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
 import { useFormatter } from '../../../../components/i18n';
 import type { ExpectationResultsByType, ResultDistribution } from '../../../../utils/api-types';
 import type { Theme } from '../../../../components/Theme';
@@ -13,6 +14,10 @@ const useStyles = makeStyles(() => ({
     flexDirection: 'row',
     justifyContent: 'center',
   },
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
   chartContainer: {
     position: 'relative',
     width: '350px',
@@ -21,6 +26,12 @@ const useStyles = makeStyles(() => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  btnContainer: {
+    display: 'flex',
+    gap: '8',
+    placeContent: 'center',
+    placeItems: 'center',
   },
   chartTitle: {
     fontSize: '1.2rem',
@@ -35,11 +46,13 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  expectations?: ExpectationResultsByType[]
+  expectations: ExpectationResultsByType[];
+  humanValidationLink?: string;
 }
 
 const ResponsePie: FunctionComponent<Props> = ({
   expectations,
+  humanValidationLink,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -52,6 +65,7 @@ const ResponsePie: FunctionComponent<Props> = ({
       Blocked: 'rgb(107, 235, 112)',
       Detected: 'rgb(107, 235, 112)',
       Successful: 'rgb(107, 235, 112)',
+      Pending: 'rgb(192,111,0)',
     };
 
     return colorMap[result ?? ''] ?? 'rgb(220, 81, 72)';
@@ -60,11 +74,11 @@ const ResponsePie: FunctionComponent<Props> = ({
   const getChartIcon = (type: 'PREVENTION' | 'DETECTION' | 'HUMAN_RESPONSE' | undefined) => {
     switch (type) {
       case 'PREVENTION':
-        return <Shield className={classes.iconOverlay}/>;
+        return <Shield className={classes.iconOverlay} />;
       case 'DETECTION':
-        return <TrackChanges className={classes.iconOverlay}/>;
+        return <TrackChanges className={classes.iconOverlay} />;
       default:
-        return <SensorOccupied className={classes.iconOverlay}/>;
+        return <SensorOccupied className={classes.iconOverlay} />;
     }
   };
 
@@ -87,7 +101,7 @@ const ResponsePie: FunctionComponent<Props> = ({
       position: 'bottom',
       show: true,
       labels: {
-        colors: theme.palette.mode === 'dark' ? ['rgb(202,203,206)', 'rgb(202,203,206)'] : [],
+        colors: theme.palette.mode === 'dark' ? ['rgb(202,203,206)', 'rgb(202,203,206)', 'rgb(202,203,206)'] : [],
       },
     },
     stroke: {
@@ -101,40 +115,58 @@ const ResponsePie: FunctionComponent<Props> = ({
   return (
     <Box margin={1}> {
       <div className={classes.inline}>
-        {expectations?.map((expectation, index) => (
-          <div key={index} className={classes.chartContainer}>
-            <Typography variant="h1"
-              className={classes.chartTitle}
-            >{t(`TYPE_${expectation.type}`)}</Typography>
-            {getChartIcon(expectation.type)}
-            {expectation.distribution && expectation.distribution.length > 0 ? (
-              <Chart
-                key={index}
-                options={{
-                  ...chartOptions,
-                  labels: expectation.distribution.map((e) => `${t(e.label)} (${(((e.value!) / getTotal(expectation.distribution!)) * 100).toFixed(1)}%)`),
-                  colors: expectation.distribution.map((e) => getColor(e.label)),
-                }}
-                series={expectation.distribution.map((e) => (e.value!))}
-                type="donut"
-                width="100%"
-                height="100%"
-              />
-            ) : (
-              <Chart
-                options={{
-                  ...chartOptions,
-                  colors: ['rgb(202,203,206)'],
-                  labels: [t('Unknown Data')],
-                }}
-                series={[1]}
-                type="donut"
-                width="100%"
-                height="100%"
-              />
-            )}
-          </div>
-        ))}
+        {expectations?.map((expectation, index) => {
+          const pending = expectation.distribution?.filter((res) => res.label === 'Pending' && (res.value ?? 0) > 0) ?? [];
+          const displayHumanValidationBtn = humanValidationLink && expectation.type === 'HUMAN_RESPONSE' && (pending.length > 0);
+          return (
+            <div key={index} className={classes.container}>
+              <div className={classes.chartContainer}>
+                <Typography variant="h1"
+                  className={classes.chartTitle}
+                >{t(`TYPE_${expectation.type}`)}</Typography>
+                {getChartIcon(expectation.type)}
+                {expectation.distribution && expectation.distribution.length > 0 ? (
+                  <Chart
+                    key={index}
+                    options={{
+                      ...chartOptions,
+                      labels: expectation.distribution.map((e) => `${t(e.label)} (${(((e.value!) / getTotal(expectation.distribution!)) * 100).toFixed(1)}%)`),
+                      colors: expectation.distribution.map((e) => getColor(e.label)),
+                    }}
+                    series={expectation.distribution.map((e) => (e.value!))}
+                    type="donut"
+                    width="100%"
+                    height="100%"
+                  />
+                ) : (
+                  <Chart
+                    options={{
+                      ...chartOptions,
+                      colors: ['rgb(202,203,206)'],
+                      labels: [t('Unknown Data')],
+                    }}
+                    series={[1]}
+                    type="donut"
+                    width="100%"
+                    height="100%"
+                  />
+                )}
+              </div>
+              {displayHumanValidationBtn
+                && <div className={classes.btnContainer}>
+                  <InfoOutlined color="primary" />
+                  <Button
+                    color="primary"
+                    component={Link}
+                    to={humanValidationLink}
+                  >
+                    {`${pending.length} ${t('validations needed')}`}
+                  </Button>
+                </div>
+              }
+            </div>
+          );
+        })}
         {!expectations || expectations.length === 0 ? (
           <div className={classes.chartContainer}>
             <Chart
@@ -151,7 +183,7 @@ const ResponsePie: FunctionComponent<Props> = ({
           </div>
         ) : null}
       </div>
-      }
+    }
     </Box>
   );
 };

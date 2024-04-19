@@ -36,7 +36,6 @@ public class ScenarioApi {
   public static final String SCENARIO_URI = "/api/scenarios";
 
   private final ScenarioService scenarioService;
-  private final ScenarioToExerciseService scenarioToExerciseService;
   private final TagRepository tagRepository;
   private final ImportService importService;
 

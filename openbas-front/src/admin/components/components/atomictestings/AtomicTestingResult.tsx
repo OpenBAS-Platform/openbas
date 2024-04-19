@@ -31,7 +31,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
   };
 
   if (!expectations || expectations.length === 0) {
-    return <HorizontalRule/>;
+    return <HorizontalRule />;
   }
 
   return (
@@ -50,9 +50,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
             IconComponent = SensorOccupied;
         }
         return (
-          <span key={index}>
-            <IconComponent style={{ color, marginRight: 10 }}/>
-          </span>
+          <IconComponent key={index} style={{ color, marginRight: 10 }} />
         );
       })}
     </div>
