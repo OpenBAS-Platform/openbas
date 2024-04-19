@@ -22,6 +22,7 @@ import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -99,8 +100,15 @@ public class AtomicTestingService {
   }
 
   public Page<Inject> findAllAtomicTestings(SearchPaginationInput searchPaginationInput) {
+    Specification<Inject> customSpec = Specification.where((root, query, cb) -> {
+      Predicate predicate = cb.conjunction();
+      predicate = cb.and(predicate, cb.isNull(root.get("scenario")));
+      predicate = cb.and(predicate, cb.isNull(root.get("exercise")));
+      return predicate;
+    });
+
     return buildPaginationJPA(
-        (Specification<Inject> specification, Pageable pageable) -> injectRepository.findAllAtomicTestings(specification, pageable),
+        (Specification<Inject> specification, Pageable pageable) -> injectRepository.findAll(specification.and(customSpec), pageable),
         searchPaginationInput,
         Inject.class
     );
