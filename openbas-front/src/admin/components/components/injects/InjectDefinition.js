@@ -720,6 +720,11 @@ class InjectDefinition extends Component {
         .then(() => this.props.handleReset())
         .then(() => this.props.handleClose());
     }
+    if (this.props.atomicTestingUpdate) {
+      return this.props
+        .onUpdateInject(this.props.inject.inject_id, atomicTestingValues)
+        .then(() => this.props.handleClose());
+    }
     return this.props
       .onUpdateInject(this.props.inject.inject_id, values)
       .then(() => this.props.handleClose());
@@ -1330,7 +1335,7 @@ class InjectDefinition extends Component {
     return (
       <div>
         {
-          !atomicTestingCreation
+          !atomicTestingCreation || !atomicTestingUpdate
           && <div className={classes.header}>
             <IconButton
               aria-label="Close"

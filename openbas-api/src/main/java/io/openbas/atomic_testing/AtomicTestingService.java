@@ -25,8 +25,12 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -108,7 +112,8 @@ public class AtomicTestingService {
     });
 
     return buildPaginationJPA(
-        (Specification<Inject> specification, Pageable pageable) -> injectRepository.findAll(specification.and(customSpec), pageable),
+        (Specification<Inject> specification, Pageable pageable) -> injectRepository.findAll(
+            specification.and(customSpec), pageable),
         searchPaginationInput,
         Inject.class
     );
@@ -137,6 +142,8 @@ public class AtomicTestingService {
     injectToSave.setDependsOn(null);
     injectToSave.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     injectToSave.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+    injectToSave.setAssets(fromIterable(this.assetRepository.findAllById(input.getAssets())));
+    injectToSave.setAssetGroups(fromIterable(this.assetGroupRepository.findAllById(input.getAssetGroups())));
     Inject finalInjectToSave = injectToSave;
     List<InjectDocument> injectDocuments = input.getDocuments().stream()
         .map(i -> {
@@ -145,12 +152,10 @@ public class AtomicTestingService {
           injectDocument.setDocument(documentRepository.findById(i.getDocumentId()).orElseThrow());
           injectDocument.setAttached(i.isAttached());
           return injectDocument;
-        }).toList();
-    injectToSave.setDocuments(injectDocuments);
-    injectToSave.setAssets(fromIterable(this.assetRepository.findAllById(input.getAssets())));
-    injectToSave.setAssetGroups(fromIterable(this.assetGroupRepository.findAllById(input.getAssetGroups())));
+        }).collect(Collectors.toList());
+    //finalInjectToSave.setDocuments(injectDocuments);
 
-    return injectRepository.save(injectToSave);
+    return injectRepository.save(finalInjectToSave);
   }
 
   @Transactional
