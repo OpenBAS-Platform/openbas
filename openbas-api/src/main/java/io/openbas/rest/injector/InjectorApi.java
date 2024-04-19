@@ -148,6 +148,10 @@ public class InjectorApi extends RestBehavior {
                                                  @RequestPart("icon") Optional<MultipartFile> file) {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(openBASConfig.getRabbitmqHostname());
+        factory.setPort(openBASConfig.getRabbitmqPort());
+        factory.setUsername(openBASConfig.getRabbitmqUser());
+        factory.setPassword(openBASConfig.getRabbitmqPass());
+        factory.setVirtualHost(openBASConfig.getRabbitmqVhost());
         try {
             // Upload icon
             if (file.isPresent() && "image/png".equals(file.get().getContentType())) {
