@@ -12,7 +12,7 @@ import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import type { TagsHelper } from '../../../../actions/helper';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
-import { PermissionsContext } from '../../components/Context';
+import { AtomicTestingResultContext, PermissionsContext } from '../../components/Context';
 import Drawer from '../../../../components/common/Drawer';
 import InjectDefinition from '../../components/injects/InjectDefinition';
 import useDataLoader from '../../../../utils/ServerSideEvent';
@@ -29,7 +29,7 @@ const AtomicPopover: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
+  const { permissions } = useContext(PermissionsContext);
   // Fetching data
   const { inject } = useHelper((helper: AtomicTestingHelper) => ({
     inject: helper.getInject(atomic.atomic_id),
@@ -37,41 +37,11 @@ const AtomicPopover: FunctionComponent<Props> = ({
   useDataLoader(() => {
     dispatch(fetchAtomicTestingForUpdate(atomic.atomic_id));
   });
-
+  // Context
+  const { onLaunchAtomicTesting } = useContext(AtomicTestingResultContext);
   // Edition
   const [edition, setEdition] = useState(false);
   const handleEdit = () => setEdition(true);
-
-  // Deletion
-  const [deletion, setDeletion] = useState(false);
-
-  const handleDelete = () => setDeletion(true);
-  const submitDelete = () => {
-    dispatch(deleteAtomicTesting(atomic.atomic_id));
-    setDeletion(false);
-    navigate('/admin/atomic_testings');
-  };
-
-  const { permissions } = useContext(PermissionsContext);
-  const { tagsMap, teams }: {
-    tagsMap: Record<string, Tag>,
-    teams: TeamStore[],
-  } = useHelper((helper: InjectHelper & TagsHelper & TeamsHelper) => ({
-    tagsMap: helper.getTagsMap(),
-    teams: helper.getTeams(),
-  }));
-  // inject.inject_tags = tagOptions(inject.inject_tags, tagsMap);
-  // const injectTags = tagOptions(inject.inject_tags, tagsMap);
-  /* if (inject.inject_tags.length !== 0) {
-    inject.inject_tags = tagOptions(inject.inject_tags, tagsMap);
-  } */
-
-  // Button Popover
-  const entries: ButtonPopoverEntry[] = [
-    { label: 'Update', action: handleEdit },
-    { label: 'Delete', action: handleDelete },
-  ];
-
   const onUpdateAtomicTesting = async (id: string, data: Inject) => {
     const toUpdate = R.pipe(
       R.assoc('inject_tags', !R.isEmpty(data.inject_tags) ? R.pluck('id', data.inject_tags) : []),
@@ -89,8 +59,31 @@ const AtomicPopover: FunctionComponent<Props> = ({
       ]),
     )(data);
 
-    await dispatch(updateAtomicTesting(id, toUpdate));
+    await dispatch(updateAtomicTesting(id, toUpdate)).then(() => {
+      onLaunchAtomicTesting();
+    });
   };
+
+  // Deletion
+  const [deletion, setDeletion] = useState(false);
+  const handleDelete = () => setDeletion(true);
+  const submitDelete = () => {
+    dispatch(deleteAtomicTesting(atomic.atomic_id));
+    setDeletion(false);
+    navigate('/admin/atomic_testings');
+  };
+  // Button Popover
+  const entries: ButtonPopoverEntry[] = [
+    { label: 'Update', action: handleEdit },
+    { label: 'Delete', action: handleDelete },
+  ];
+  const { tagsMap, teams }: {
+    tagsMap: Record<string, Tag>,
+    teams: TeamStore[],
+  } = useHelper((helper: InjectHelper & TagsHelper & TeamsHelper) => ({
+    tagsMap: helper.getTagsMap(),
+    teams: helper.getTeams(),
+  }));
 
   return (
     <>
