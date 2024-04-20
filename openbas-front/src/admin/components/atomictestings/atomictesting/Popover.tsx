@@ -45,10 +45,8 @@ const AtomicPopover: FunctionComponent<Props> = ({
   const onUpdateAtomicTesting = async (id: string, data: Inject) => {
     const toUpdate = R.pipe(
       R.assoc('inject_tags', !R.isEmpty(data.inject_tags) ? R.pluck('id', data.inject_tags) : []),
-      R.assoc('inject_teams', !R.isEmpty(data.inject_teams) ? R.pluck('id', data.inject_teams) : []),
-      R.assoc('inject_assets', !R.isEmpty(data.inject_assets) ? R.pluck('id', data.inject_assets) : []),
-      R.assoc('inject_asset_groups', !R.isEmpty(data.inject_asset_groups) ? R.pluck('id', data.inject_asset_groups) : []),
       R.pick([
+        'inject_tags',
         'inject_title',
         'inject_type',
         'inject_contract',
@@ -56,9 +54,11 @@ const AtomicPopover: FunctionComponent<Props> = ({
         'inject_content',
         'inject_all_teams',
         'inject_documents',
+        'inject_assets',
+        'inject_asset_groups',
+        'inject_teams',
       ]),
     )(data);
-
     await dispatch(updateAtomicTesting(id, toUpdate)).then(() => {
       onLaunchAtomicTesting();
     });
