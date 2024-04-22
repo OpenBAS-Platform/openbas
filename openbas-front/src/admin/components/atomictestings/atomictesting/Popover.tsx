@@ -17,6 +17,7 @@ import Drawer from '../../../../components/common/Drawer';
 import InjectDefinition from '../../components/injects/InjectDefinition';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import type { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
+import { tagOptions } from '../../../../utils/Option';
 
 interface Props {
   atomic: AtomicTestingOutput;
@@ -95,7 +96,10 @@ const AtomicPopover: FunctionComponent<Props> = ({
         variant={'full'}
       >
         <InjectDefinition
-          inject={inject}
+          inject={{
+            ...inject, inject_tags: tagOptions(inject?.inject_tags, tagsMap),
+          }
+          }
           injectTypes={[JSON.parse(atomic.atomic_injector_contract.injector_contract_content)]}
           handleClose={() => setEdition(false)}
           tagsMap={tagsMap}
