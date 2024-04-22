@@ -7,9 +7,15 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import type { AtomicTestingOutput } from '../../../../utils/api-types';
+<<<<<<<< HEAD:openbas-front/src/admin/components/atomic_testings/atomic_testing/Header.tsx
 import { fetchAtomicTesting, tryAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import AtomicPopover from './Popover';
+========
+import { fetchAtomicTesting, tryAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
+import type { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
+import AtomicTestingPopover from './AtomicTestingPopover';
+>>>>>>>> 5a1aabd3 (renaming):openbas-front/src/admin/components/atomic_testings/atomic_testing/AtomicTestingHeader.tsx
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import { AtomicTestingResultContext } from '../../components/Context';
@@ -66,7 +72,7 @@ const AtomicTestingHeader = () => {
         <Typography variant="h1" gutterBottom classes={{ root: classes.title }}>
           {atomic.atomic_title}
         </Typography>
-        <AtomicPopover atomic={atomic}/>
+        <AtomicTestingPopover atomic={atomic} />
         <StatusChip status={atomic.atomic_status}/>
         <Dialog
           open={open}
