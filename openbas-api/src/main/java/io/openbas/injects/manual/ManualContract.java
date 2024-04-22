@@ -8,6 +8,7 @@ import io.openbas.contract.fields.ContractElement;
 import io.openbas.helper.SupportedLanguage;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +49,9 @@ public class ManualContract extends Contractor {
                 Map.of(en, "Manual", fr, "Manuel"), instance));
     }
 
+    @Override
     public ContractorIcon getIcon() {
-        return null;
+        InputStream iconStream = getClass().getResourceAsStream("/img/icon-manual.png");
+        return new ContractorIcon(iconStream);
     }
 }

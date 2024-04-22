@@ -6,6 +6,7 @@ import io.openbas.contract.fields.ContractExpectations;
 import io.openbas.database.model.Variable.VariableType;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -85,6 +86,7 @@ public class EmailContract extends Contractor {
 
     @Override
     public ContractorIcon getIcon() {
-        return null;
+        InputStream iconStream = getClass().getResourceAsStream("/img/icon-email.png");
+        return new ContractorIcon(iconStream);
     }
 }

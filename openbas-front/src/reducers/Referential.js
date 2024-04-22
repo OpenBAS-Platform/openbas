@@ -48,6 +48,8 @@ export const entitiesInitializer = Immutable({
     endpoints: Immutable({}),
     asset_groups: Immutable({}),
     scenarios: Immutable({}),
+    injectors: Immutable({}),
+    collectors: Immutable({}),
   }),
 });
 

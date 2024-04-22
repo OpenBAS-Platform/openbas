@@ -1,15 +1,29 @@
 import React, { CSSProperties, FunctionComponent, useState } from 'react';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
+import { Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../i18n';
 import type { SearchPaginationInput } from '../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
-  iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 5px',
-    padding: 0,
-    top: '0px',
+  sortableHeaderItem: {
+    display: 'flex',
+    fontSize: 12,
+    fontWeight: '700',
+    cursor: 'pointer',
+    paddingRight: 10,
+    alignItems: 'center',
+  },
+  headerItem: {
+    display: 'flex',
+    fontSize: 12,
+    fontWeight: 700,
+    alignItems: 'center',
+  },
+  headerItemText: {
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
 }));
 
@@ -55,32 +69,30 @@ const SortHeadersComponent: FunctionComponent<Props> = ({
   };
 
   const sortComponent = (asc: boolean) => {
-    return asc ? (
-      <ArrowDropDownOutlined className={classes.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined className={classes.iconSort} />
-    );
+    return asc ? (<ArrowDropDownOutlined />) : (<ArrowDropUpOutlined />);
   };
 
   const sortHeader = (header: Header, style: CSSProperties) => {
     if (header.isSortable) {
       return (
-        <div key={header.field} style={style} onClick={() => reverseBy(header.field)}>
-          <span>{t(header.label)}</span>
+        <div key={header.field} className={classes.sortableHeaderItem} style={style} onClick={() => reverseBy(header.field)}>
+          <div className={classes.headerItemText}>{t(header.label)}</div>
           {sortBy === header.field ? sortComponent(sortAsc) : ''}
         </div>
       );
     }
     return (
-      <div key={header.field} style={style}>
-        <span>{t(header.label)}</span>
+      <div key={header.field} className={classes.headerItem} style={style}>
+        <div className={classes.headerItemText}>{t(header.label)}</div>
       </div>
     );
   };
 
   return (
     <>
-      {headers.map((header: Header) => (sortHeader(header, inlineStylesHeaders[header.field])))}
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        {headers.map((header: Header) => (sortHeader(header, inlineStylesHeaders[header.field])))}
+      </Box>
     </>
   );
 };

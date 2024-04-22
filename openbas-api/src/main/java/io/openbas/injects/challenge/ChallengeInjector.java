@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ChallengeInjector {
 
-    private static final String CHALLENGE_INJECTOR_NAME = "Challenge injector";
-    private static final String CHALLENGE_INJECTOR_ID = "b031c355-7599-4cb8-99d5-f99e0e1936a7";
+    private static final String CHALLENGE_INJECTOR_NAME = "Challenges";
+    private static final String CHALLENGE_INJECTOR_ID = "49229430-b5b5-431f-ba5b-f36f599b0233";
 
     @Autowired
     public ChallengeInjector(InjectorService injectorService, ChallengeContract contract) {

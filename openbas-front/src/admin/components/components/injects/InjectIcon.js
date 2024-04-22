@@ -1,132 +1,19 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { EmailOutlined, EmojiEventsOutlined, HelpOutlined, NotificationsActiveOutlined, SmsOutlined, SpeakerNotesOutlined } from '@mui/icons-material';
-import { Mastodon, NewspaperVariantMultipleOutline, Twitter } from 'mdi-material-ui';
-import { useTheme } from '@mui/styles';
 import CustomTooltip from '../../../../components/CustomTooltip';
-import octiDark from '../../../../static/images/xtm/octi_dark.png';
-import octiLight from '../../../../static/images/xtm/octi_light.png';
 
 const iconSelector = (type, variant, fontSize, done, disabled) => {
-  const theme = useTheme();
-  let style;
-  switch (variant) {
-    case 'inline':
-      style = {
-        width: 20,
-        height: 20,
-        margin: '0 7px 0 0',
-        float: 'left',
-      };
-      break;
-    default:
-      style = {
-        margin: 0,
-      };
-  }
-  let color = null;
-  if (theme.palette.mode === 'dark') {
-    color = '#ffffff';
-  } else {
-    color = '#000000';
-  }
-  if (done) {
-    color = '#4caf50';
-  } else if (disabled) {
-    color = '#7a7a7a';
-  }
-  switch (type) {
-    case 'openbas_email':
-      return (
-        <EmailOutlined
-          style={style}
-          fontSize={fontSize}
-          sx={{ color }}
-        />
-      );
-    case 'openbas_ovh_sms':
-      return (
-        <SmsOutlined
-          style={style}
-          fontSize={fontSize}
-          sx={{ color }}
-        />
-      );
-    case 'openbas_manual':
-      return (
-        <NotificationsActiveOutlined
-          style={style}
-          fontSize={fontSize}
-          sx={{ color }}
-        />
-      );
-    case 'openbas_mastodon':
-      return (
-        <Mastodon
-          style={style}
-          fontSize={fontSize}
-          sx={{ color }}
-        />
-      );
-    case 'openbas_opencti':
-      return (
-        <img
-          src={theme.palette.mode === 'dark' ? octiDark : octiLight}
-          alt="OpenCTI"
-          style={{
-            width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
-            height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
-          }}
-        />
-      );
-    case 'openbas_gnu_social':
-      return (
-        <SpeakerNotesOutlined
-          style={style}
-          fontSize={fontSize}
-          sx={{ color }}
-        />
-      );
-    case 'openbas_twitter':
-      return (
-        <Twitter
-          style={style}
-          fontSize={fontSize}
-          sx={{ color }}
-        />
-      );
-    case 'openbas_channel':
-      return (
-        <NewspaperVariantMultipleOutline
-          style={style}
-          fontSize={fontSize}
-          sx={{ color }}
-        />
-      );
-    case 'openbas_challenge':
-      return (
-        <EmojiEventsOutlined
-          style={style}
-          fontSize={fontSize}
-          sx={{ color }}
-        />
-      );
-    case 'openbas_http':
-    case 'openbas_lade':
-    case 'openbas_caldera':
-      return (
-        <img
-          src={`/api/images/injectors/${type}`}
-          alt={type}
-          style={{
-            width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
-            height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
-          }}
-        />
-      );
-    default:
-      return <HelpOutlined style={style} fontSize={fontSize} />;
-  }
+  return (
+    <img
+      src={`/api/images/injectors/${type}`}
+      alt={type}
+      style={{
+        width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
+        height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
+        filter: `brightness(${disabled ? '30%' : '100%'})`,
+      }}
+    />
+  );
 };
 
 const InjectIcon = (props) => {

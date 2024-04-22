@@ -11,6 +11,7 @@ import io.openbas.database.model.Variable.VariableType;
 import io.openbas.model.inject.form.Expectation;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -106,6 +107,7 @@ public class ChannelContract extends Contractor {
     }
 
     public ContractorIcon getIcon() {
-        return null;
+        InputStream iconStream = getClass().getResourceAsStream("/img/icon-media-pressure.png");
+        return new ContractorIcon(iconStream);
     }
 }

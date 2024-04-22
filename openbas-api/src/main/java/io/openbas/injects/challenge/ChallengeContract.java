@@ -7,6 +7,7 @@ import io.openbas.contract.ContractorIcon;
 import io.openbas.contract.fields.ContractElement;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -74,6 +75,7 @@ public class ChallengeContract extends Contractor {
     }
 
     public ContractorIcon getIcon() {
-        return null;
+        InputStream iconStream = getClass().getResourceAsStream("/img/icon-challenge.png");
+        return new ContractorIcon(iconStream);
     }
 }

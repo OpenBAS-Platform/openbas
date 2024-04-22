@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   chipInList: {
     height: 20,
-    borderRadius: '0',
+    borderRadius: 4,
     textTransform: 'uppercase',
     width: 200,
     float: 'right',

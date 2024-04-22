@@ -8,6 +8,7 @@ import io.openbas.injects.opencti.config.OpenCTIConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -86,6 +87,7 @@ public class OpenCTIContract extends Contractor {
   }
 
   public ContractorIcon getIcon() {
-    return null;
+    InputStream iconStream = getClass().getResourceAsStream("/img/icon-opencti.png");
+    return new ContractorIcon(iconStream);
   }
 }

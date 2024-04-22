@@ -5,9 +5,9 @@ import { progression } from '../../../../utils/Time';
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 10,
-  borderRadius: 5,
+  borderRadius: 4,
   [`& .${linearProgressClasses.bar}`]: {
-    borderRadius: 5,
+    borderRadius: 4,
     backgroundColor: theme.palette.primary.main,
   },
 }));

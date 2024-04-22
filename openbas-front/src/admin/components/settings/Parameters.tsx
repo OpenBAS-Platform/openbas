@@ -86,11 +86,11 @@ const Parameters = () => {
             <List style={{ paddingTop: 0 }}>
               <ListItem divider={true}>
                 <ListItemText primary={t('Version')} />
-                <ItemBoolean variant="inList" status={null} neutralLabel={settings?.platform_version?.replace('-SNAPSHOT', '')} />
+                <ItemBoolean variant="large" status={null} neutralLabel={settings?.platform_version?.replace('-SNAPSHOT', '')} />
               </ListItem>
               <ListItem divider={true}>
                 <ListItemText primary={t('Edition')} />
-                <ItemBoolean variant="inList" status={null} neutralLabel="Community" />
+                <ItemBoolean variant="large" status={null} neutralLabel="Community" />
               </ListItem>
               <ListItem divider={true}>
                 <TextField fullWidth={true} label={t('Filigran support key')} variant="standard" disabled={true} />
@@ -118,7 +118,6 @@ const Parameters = () => {
               onSubmit={onUpdateLigthParameters}
               initialValues={initialValuesLight}
             />
-
           </Paper>
         </Grid>
         <Grid item={true} xs={4} style={{ marginTop: 30 }}>
@@ -127,11 +126,15 @@ const Parameters = () => {
             <List style={{ paddingTop: 0 }}>
               <ListItem divider={true}>
                 <ListItemText primary={t('JAVA Virtual Machine')} />
-                <ItemBoolean status={null} neutralLabel={settings?.java_version} />
+                <ItemBoolean status={null} variant="large" neutralLabel={settings?.java_version} />
               </ListItem>
               <ListItem divider={true}>
                 <ListItemText primary={t('PostgreSQL')} />
-                <ItemBoolean status={null} neutralLabel={settings?.postgre_version} />
+                <ItemBoolean status={null} variant="large" neutralLabel={settings?.postgre_version} />
+              </ListItem>
+              <ListItem divider={true}>
+                <ListItemText primary={t('RabbitMQ')} />
+                <ItemBoolean status={null} variant="large" neutralLabel={settings?.postgre_version} />
               </ListItem>
             </List>
           </Paper>

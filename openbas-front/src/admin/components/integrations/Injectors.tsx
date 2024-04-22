@@ -1,0 +1,143 @@
+import React from 'react';
+import { makeStyles } from '@mui/styles';
+import { Chip, Grid, Paper, Typography } from '@mui/material';
+import { useFormatter } from '../../../components/i18n';
+import { useHelper } from '../../../store';
+import useDataLoader from '../../../utils/ServerSideEvent';
+import { useAppDispatch } from '../../../utils/hooks';
+import type { Injector } from '../../../utils/api-types';
+import type { InjectorHelper } from '../../../actions/injector/injector-helper';
+import { fetchInjectors } from '../../../actions/Injectors';
+import useSearchAnFilter from '../../../utils/SortingFiltering';
+import SearchFilter from '../../../components/SearchFilter';
+import type { Theme } from '../../../components/Theme';
+import Breadcrumbs from '../../../components/Breadcrumbs';
+
+const useStyles = makeStyles((theme: Theme) => ({
+  parameters: {
+    marginTop: -3,
+  },
+  paper: {
+    position: 'relative',
+    padding: 20,
+    overflow: 'hidden',
+    height: 180,
+  },
+  icon: {
+    padding: 0,
+  },
+  chipInList: {
+    marginTop: 10,
+    fontSize: 12,
+    height: 20,
+    textTransform: 'uppercase',
+    borderRadius: 4,
+  },
+  dotGreen: {
+    height: 15,
+    width: 15,
+    backgroundColor: theme.palette.success.main,
+    borderRadius: '50%',
+  },
+  dotRed: {
+    height: 15,
+    width: 15,
+    backgroundColor: theme.palette.error.main,
+    borderRadius: '50%',
+  },
+}));
+
+const Injectors = () => {
+  // Standard hooks
+  const { t, nsdt } = useFormatter();
+  const classes = useStyles();
+  const dispatch = useAppDispatch();
+
+  // Filter and sort hook
+  const searchColumns = ['name', 'description'];
+  const filtering = useSearchAnFilter(
+    'injector',
+    'name',
+    searchColumns,
+  );
+
+  // Fetching data
+  const { injectors } = useHelper((helper: InjectorHelper) => ({
+    injectors: helper.getInjectors(),
+  }));
+  useDataLoader(() => {
+    dispatch(fetchInjectors());
+  });
+  const sortedInjectors = filtering.filterAndSort(injectors);
+  return (
+    <>
+      <Breadcrumbs variant="list" elements={[{ label: t('Integrations') }, { label: t('Injectors'), current: true }]} />
+      <div className={classes.parameters}>
+        <div style={{ float: 'left', marginRight: 10 }}>
+          <SearchFilter
+            variant="small"
+            onChange={filtering.handleSearch}
+            keyword={filtering.keyword}
+          />
+        </div>
+      </div>
+      <div className="clearfix" />
+      <Grid container={true} spacing={3}>
+        {sortedInjectors.map((injector: Injector) => {
+          return (
+            <Grid key={injector.injector_id} item={true} xs={3}>
+              <Paper variant="outlined" classes={{ root: classes.paper }}>
+                <div style={{ display: 'flex' }}>
+                  <div className={classes.icon}>
+                    <img
+                      src={`/api/images/injectors/${injector.injector_type}`}
+                      alt={injector.injector_type}
+                      style={{ width: 50, height: 50, borderRadius: 4 }}
+                    />
+                  </div>
+                  <Typography
+                    variant="h1"
+                    style={{
+                      margin: '14px 0 0 10px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {injector.injector_name}
+                  </Typography>
+                </div>
+                <Chip
+                  variant="outlined"
+                  classes={{ root: classes.chipInList }}
+                  style={{ width: 120 }}
+                  color={injector.injector_external ? 'primary' : 'secondary'}
+                  label={t(injector.injector_external ? 'External' : 'Built-in')}
+                />
+                <div style={{ display: 'flex', marginTop: 30 }}>
+                  {
+                    (injector.injector_external && injector.injector_updated_at) || !injector.injector_external
+                      ? <div className={classes.dotGreen} /> : <div className={classes.dotRed} />
+                  }
+                  <Typography
+                    variant="h4"
+                    style={{
+                      margin: '1px 0 0 10px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {t('Updated at')} {nsdt(injector.injector_updated_at)}
+                  </Typography>
+                </div>
+              </Paper>
+            </Grid>
+          );
+        })}
+      </Grid>
+    </>
+  );
+};
+
+export default Injectors;

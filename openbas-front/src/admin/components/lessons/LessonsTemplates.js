@@ -98,7 +98,7 @@ const LessonsTemplates = () => {
   });
   const sortedLessonsTemplates = filtering.filterAndSort(lessonsTemplates);
   return (
-    <div>
+    <>
       <div className={classes.parameters}>
         <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
@@ -181,7 +181,7 @@ const LessonsTemplates = () => {
         })}
       </List>
       {userAdmin && <CreateLessonsTemplate />}
-    </div>
+    </>
   );
 };
 

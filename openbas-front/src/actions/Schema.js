@@ -235,6 +235,20 @@ export const attackPattern = new schema.Entity(
 );
 export const arrayOfAttackPatterns = new schema.Array(attackPattern);
 
+export const injector = new schema.Entity(
+  'injectors',
+  {},
+  { idAttribute: 'injector_id' },
+);
+export const arrayOfInjectors = new schema.Array(injector);
+
+export const collector = new schema.Entity(
+  'collectors',
+  {},
+  { idAttribute: 'collector_id' },
+);
+export const arrayOfCollectors = new schema.Array(collector);
+
 token.define({ token_user: user });
 user.define({ user_organization: organization });
 
@@ -392,6 +406,14 @@ export const storeHelper = (state) => ({
   getAttackPattern: (id) => entity(id, 'attackpatterns', state),
   getAttackPatterns: () => entities('attackpatterns', state),
   getAttackPatternsMap: () => maps('attackpatterns', state),
+  // injectors
+  getInjector: (id) => entity(id, 'injectors', state),
+  getInjectors: () => entities('injectors', state),
+  getInjectorsMap: () => maps('injectors', state),
+  // collectors
+  getCollector: (id) => entity(id, 'collectors', state),
+  getCollectors: () => entities('collectors', state),
+  getCollectorsMap: () => maps('collectors', state),
   // channels
   getChannels: () => entities('channels', state),
   getChannel: (id) => entity(id, 'channels', state),

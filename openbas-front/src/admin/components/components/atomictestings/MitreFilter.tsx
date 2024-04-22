@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     whiteSpace: 'nowrap',
     width: '100%',
     textTransform: 'capitalize',
-    borderRadius: 0,
+    borderRadius: 4,
     color: theme.palette.chip.main,
   },
 }));

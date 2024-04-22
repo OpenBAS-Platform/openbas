@@ -10,6 +10,7 @@ import TaxonomiesMenu from '../TaxonomiesMenu';
 import { initSorting } from '../../../../components/common/pagination/Page';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -35,29 +36,14 @@ const useStyles = makeStyles(() => ({
 }));
 
 const headerStyles = {
-  iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 5px',
-    padding: 0,
-    top: '0px',
-  },
   tag_name: {
-    float: 'left',
     width: '40%',
-    fontSize: 12,
-    fontWeight: '700',
   },
   tag_color: {
-    float: 'left',
     width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
   },
   tag_created_at: {
-    float: 'left',
     width: '30%',
-    fontSize: 12,
-    fontWeight: '700',
   },
 };
 
@@ -117,6 +103,7 @@ const Tags = () => {
 
   return (
     <div className={classes.container}>
+      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, { label: t('Tags'), current: true }]} />
       <TaxonomiesMenu />
       <PaginationComponent
         fetch={searchTags}

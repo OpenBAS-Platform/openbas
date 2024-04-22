@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class ManualInjector {
 
     private static final String MANUAL_INJECTOR_NAME = "Manual injector";
-    private static final String MANUAL_INJECTOR_ID = "b031c355-7599-4cb8-99d5-f99e0e1936a5";
+    private static final String MANUAL_INJECTOR_ID = "6981a39d-e219-4016-a235-cf7747994abc";
 
     @Autowired
     public ManualInjector(InjectorService injectorService, ManualContract contract) {

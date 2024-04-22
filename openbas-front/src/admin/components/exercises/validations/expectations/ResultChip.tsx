@@ -9,7 +9,7 @@ import type { InjectExpectationsStore } from '../../../components/injects/expect
 const useStyles = makeStyles(() => ({
   chipInList: {
     height: 20,
-    borderRadius: '0',
+    borderRadius: 4,
     textTransform: 'uppercase',
     width: 200,
   },

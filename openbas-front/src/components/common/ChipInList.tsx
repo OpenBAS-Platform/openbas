@@ -10,7 +10,7 @@ const useStyles = makeStyles(() => ({
     height: 20,
     float: 'left',
     textTransform: 'uppercase',
-    borderRadius: '0',
+    borderRadius: 4,
     width: 120,
   },
 }));

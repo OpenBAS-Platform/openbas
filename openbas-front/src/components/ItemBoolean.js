@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import * as PropTypes from 'prop-types';
-import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
-import { Chip } from '@mui/material';
+import { withStyles, useTheme } from '@mui/styles';
+import { Chip, CircularProgress, Tooltip } from '@mui/material';
+import { compose } from 'ramda';
 import inject18n from './i18n';
 
 const styles = () => ({
@@ -12,8 +12,17 @@ const styles = () => ({
     height: 25,
     marginRight: 7,
     textTransform: 'uppercase',
-    borderRadius: '0',
+    borderRadius: 4,
     width: 120,
+  },
+  chipLarge: {
+    fontSize: 12,
+    lineHeight: '12px',
+    height: 25,
+    marginRight: 7,
+    textTransform: 'uppercase',
+    borderRadius: 4,
+    width: 150,
   },
   chipInList: {
     fontSize: 12,
@@ -21,12 +30,12 @@ const styles = () => ({
     height: 20,
     float: 'left',
     textTransform: 'uppercase',
-    borderRadius: '0',
+    borderRadius: 4,
     width: 100,
   },
 });
 
-const inlineStyles = {
+const computeInlineStyles = (theme) => ({
   green: {
     backgroundColor: 'rgba(76, 175, 80, 0.08)',
     color: '#4caf50',
@@ -35,76 +44,89 @@ const inlineStyles = {
     backgroundColor: 'rgba(244, 67, 54, 0.08)',
     color: '#f44336',
   },
-  greenClickable: {
-    backgroundColor: 'rgba(76, 175, 80, 0.08)',
-    color: '#4caf50',
-    border: '1px solid #4caf50',
-  },
-  redClickable: {
-    backgroundColor: 'rgba(244, 67, 54, 0.08)',
-    color: '#f44336',
-    border: '1px solid #f44336',
-  },
-  grey: {
-    backgroundColor: 'rgba(176, 176, 176, 0.08)',
-    color: '#b0b0b0',
-  },
   blue: {
     backgroundColor: 'rgba(92, 123, 245, 0.08)',
     color: '#5c7bf5',
   },
-};
+  ee: {
+    backgroundColor: theme.palette.ee.lightBackground,
+    color: theme.palette.ee.main,
+  },
+});
 
-class ItemBoolean extends Component {
-  render() {
-    const { classes, label, neutralLabel, status, variant, t, reverse, onClick, disabled } = this.props;
-    const style = variant === 'inList' ? classes.chipInList : classes.chip;
-    const inlineStyleRed = onClick
-      ? inlineStyles.redClickable
-      : inlineStyles.red;
-    const inlineStyleGreen = onClick
-      ? inlineStyles.greenClickable
-      : inlineStyles.green;
-    if (status === true) {
-      return (
-        <Chip
-          classes={{ root: style }}
-          style={reverse ? inlineStyleRed : inlineStyleGreen}
-          label={label}
-          onClick={!disabled && onClick ? onClick.bind(this) : null}
-        />
-      );
-    }
-    if (status === null) {
-      return (
-        <Chip
-          classes={{ root: style }}
-          style={inlineStyles.blue}
-          label={neutralLabel || t('Not applicable')}
-          onClick={!disabled && onClick ? onClick.bind(this) : null}
-        />
-      );
-    }
+const renderChip = (props) => {
+  const { classes, label, neutralLabel, status, variant, t, reverse } = props;
+  const theme = useTheme();
+  let style = classes.chip;
+  if (variant === 'inList') {
+    style = classes.chipInList;
+  } else if (variant === 'large') {
+    style = classes.chipLarge;
+  }
+  const inlineStyles = computeInlineStyles(theme);
+  if (status === true) {
     return (
       <Chip
         classes={{ root: style }}
-        style={reverse ? inlineStyleGreen : inlineStyleRed}
+        style={reverse ? inlineStyles.red : inlineStyles.green}
         label={label}
-        onClick={!disabled && onClick ? onClick.bind(this) : null}
       />
     );
   }
-}
+  if (status === null) {
+    return (
+      <Chip
+        classes={{ root: style }}
+        style={inlineStyles.blue}
+        label={neutralLabel || t('Not applicable')}
+      />
+    );
+  }
+  if (status === 'ee') {
+    return (
+      <Chip
+        classes={{ root: style }}
+        style={inlineStyles.ee}
+        label={neutralLabel || t('EE')}
+      />
+    );
+  }
+  if (status === undefined) {
+    return (
+      <Chip
+        classes={{ root: style }}
+        style={inlineStyles.blue}
+        label={<CircularProgress size={10} color="primary" />}
+      />
+    );
+  }
+  return (
+    <Chip
+      classes={{ root: style }}
+      style={reverse ? inlineStyles.green : inlineStyles.red}
+      label={label}
+    />
+  );
+};
+const ItemBoolean = (props) => {
+  const { tooltip } = props;
+  if (tooltip) {
+    return (
+      <Tooltip title={tooltip}>
+        {renderChip(props)}
+      </Tooltip>
+    );
+  }
+  return renderChip(props);
+};
 
 ItemBoolean.propTypes = {
   classes: PropTypes.object.isRequired,
-  status: PropTypes.bool,
+  status: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
   label: PropTypes.string,
   neutralLabel: PropTypes.string,
   variant: PropTypes.string,
   reverse: PropTypes.bool,
-  onClick: PropTypes.func,
-  disabled: PropTypes.bool,
 };
 
-export default R.compose(inject18n, withStyles(styles))(ItemBoolean);
+export default compose(inject18n, withStyles(styles))(ItemBoolean);

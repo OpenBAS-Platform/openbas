@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ChannelInjector {
 
-    private static final String CHANNEL_INJECTOR_NAME = "Channel injector";
-    private static final String CHANNEL_INJECTOR_ID = "b031c355-7599-4cb8-99d5-f99e0e1936a6";
+    private static final String CHANNEL_INJECTOR_NAME = "Media pressure";
+    private static final String CHANNEL_INJECTOR_ID = "8d932e36-353c-48fa-ba6f-86cb7b02ed19";
 
     @Autowired
     public ChannelInjector(InjectorService injectorService, ChannelContract contract) {

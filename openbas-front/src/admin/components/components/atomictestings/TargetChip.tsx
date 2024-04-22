@@ -15,7 +15,7 @@ const useStyles = makeStyles(() => ({
     height: 20,
     float: 'left',
     margin: '0 7px 7px 0',
-    borderRadius: 5,
+    borderRadius: 4,
     borderColor: 'rgb(134,134,134)',
     border: '1px  solid',
     background: 'rgba(255,255,255,0.16)',

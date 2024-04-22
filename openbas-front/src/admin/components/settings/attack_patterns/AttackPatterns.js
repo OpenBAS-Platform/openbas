@@ -14,6 +14,7 @@ import PaginationComponent from '../../../../components/common/pagination/Pagina
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/pagination/Page';
 import { useFormatter } from '../../../../components/i18n';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -39,41 +40,20 @@ const useStyles = makeStyles(() => ({
 }));
 
 const headerStyles = {
-  iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 5px',
-    padding: 0,
-    top: '0px',
-  },
   kill_chain_phase: {
-    float: 'left',
     width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
   },
   attack_pattern_external_id: {
-    float: 'left',
     width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
   },
   attack_pattern_name: {
-    float: 'left',
     width: '35%',
-    fontSize: 12,
-    fontWeight: '700',
   },
   attack_pattern_created_at: {
-    float: 'left',
     width: '12%',
-    fontSize: 12,
-    fontWeight: '700',
   },
   attack_pattern_updated_at: {
-    float: 'left',
     width: '12%',
-    fontSize: 12,
-    fontWeight: '700',
   },
 };
 
@@ -161,6 +141,7 @@ const AttackPatterns = () => {
 
   return (
     <div className={classes.container}>
+      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, { label: t('Attack patterns'), current: true }]} />
       <TaxonomiesMenu />
       <PaginationComponent
         fetch={searchAttackPatterns}

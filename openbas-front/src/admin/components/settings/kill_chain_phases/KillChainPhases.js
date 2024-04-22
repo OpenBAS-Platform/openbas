@@ -10,6 +10,7 @@ import { useFormatter } from '../../../../components/i18n';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/pagination/Page';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -42,35 +43,17 @@ const useStyles = makeStyles(() => ({
 }));
 
 const headerStyles = {
-  iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 5px',
-    padding: 0,
-    top: '0px',
-  },
   phase_kill_chain_name: {
-    float: 'left',
     width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
   },
   phase_name: {
-    float: 'left',
     width: '35%',
-    fontSize: 12,
-    fontWeight: '700',
   },
   phase_order: {
-    float: 'left',
     width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
   },
   phase_created_at: {
-    float: 'left',
     width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
   },
 };
 
@@ -142,6 +125,7 @@ const KillChainPhases = () => {
 
   return (
     <div className={classes.container}>
+      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, { label: t('Kill chain phases'), current: true }]} />
       <TaxonomiesMenu />
       <PaginationComponent
         fetch={searchKillChainPhases}

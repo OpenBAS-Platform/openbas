@@ -11,7 +11,7 @@ const styles = () => ({
     lineHeight: '18px',
     height: 30,
     margin: '0 7px 7px 0',
-    borderRadius: 5,
+    borderRadius: 4,
     width: 160,
   },
   chipInList: {
@@ -20,7 +20,7 @@ const styles = () => ({
     height: 20,
     float: 'left',
     marginRight: 7,
-    borderRadius: 5,
+    borderRadius: 4,
     width: 140,
   },
 });

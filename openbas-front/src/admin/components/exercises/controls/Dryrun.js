@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
     height: 20,
     float: 'left',
     marginRight: 7,
-    borderRadius: 0,
+    borderRadius: 4,
     width: 180,
     backgroundColor: 'rgba(0, 177, 255, 0.08)',
     color: '#00b1ff',
