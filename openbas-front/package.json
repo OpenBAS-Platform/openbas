@@ -99,7 +99,7 @@
     "jsdom": "24.0.0",
     "nyc": "15.1.0",
     "swagger-typescript-api": "13.0.3",
-    "typescript": "5.4.3",
+    "typescript": "5.4.5",
     "vite": "5.2.8",
     "vite-plugin-istanbul": "6.0.0",
     "vitest": "1.4.0"
