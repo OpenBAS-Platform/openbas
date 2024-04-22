@@ -11,6 +11,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,7 +56,13 @@ public class AtomicTestingApi extends RestBehavior {
   @Transactional
   @GetMapping("/{injectId}/detail")
   public AtomicTestingDetailOutput findAtomicTestingWithDetail(@PathVariable String injectId) {
-    return atomicTestingService.findByIdWithDetails(injectId).orElseThrow();
+    return atomicTestingService.findById(injectId)
+        .map(inject -> {
+          Hibernate.initialize(inject.getTags());
+          Hibernate.initialize(inject.getDocuments());
+          return AtomicTestingMapper.toDetailDto(inject);
+        })
+        .orElseThrow();
   }
 
   @GetMapping("/{injectId}/update")

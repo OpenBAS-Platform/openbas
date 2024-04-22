@@ -12,13 +12,6 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static io.openbas.config.SessionHelper.currentUser;
@@ -122,33 +116,6 @@ public class AtomicTestingService {
 
   public Optional<Inject> findById(String injectId) {
     return injectRepository.findWithStatusById(injectId);
-  }
-
-  public Optional<AtomicTestingDetailOutput> findByIdWithDetails(String injectId) {
-    return injectRepository.findWithStatusById(injectId).map(inject -> {
-      // FIXME tags and documents initialization
-      Hibernate.initialize(inject.getTags());
-      Hibernate.initialize(inject.getDocuments());
-      return inject.getStatus().map(status ->
-          AtomicTestingDetailOutput
-              .builder()
-              .atomicId(inject.getId())
-              .description(inject.getDescription())
-              .content(inject.getContent())
-              .tags(inject.getTags())
-              .documents(inject.getDocuments())
-              .status(status.getName())
-              .traces(status.getTraces().stream().map(trace -> trace.getStatus() + " " + trace.getMessage())
-                  .collect(Collectors.toList()))
-              .trackingAckDate(status.getTrackingAckDate())
-              .trackingSentDate(status.getTrackingSentDate())
-              .trackingEndDate(status.getTrackingEndDate())
-              .trackingTotalCount(status.getTrackingTotalCount())
-              .trackingTotalError(status.getTrackingTotalError())
-              .trackingTotalSuccess(status.getTrackingTotalSuccess())
-              .build()
-      ).orElse(AtomicTestingDetailOutput.builder().status(ExecutionStatus.DRAFT).build());
-    });
   }
 
   @Transactional
