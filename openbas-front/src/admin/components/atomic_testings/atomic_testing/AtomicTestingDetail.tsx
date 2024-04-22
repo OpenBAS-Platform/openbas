@@ -3,11 +3,11 @@ import { Props } from 'html-react-parser/lib/attributes-to-props';
 import { useParams } from 'react-router-dom';
 import { Grid, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import { useHelper } from '../../../../../store';
-import type { AtomicTestingDetailOutput } from '../../../../../utils/api-types';
-import type { AtomicTestingHelper } from '../../../../../actions/atomic_testings/atomic-testing-helper';
-import { fetchAtomicTestingDetail } from '../../../../../actions/atomic_testings/atomic-testing-actions';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { useHelper } from '../../../../store';
+import type { AtomicTestingDetailOutput } from '../../../../utils/api-types';
+import type { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
+import { fetchAtomicTestingDetail } from '../../../../actions/atomictestings/atomic-testing-actions';
 
 const useStyles = makeStyles(() => ({
   paper: {

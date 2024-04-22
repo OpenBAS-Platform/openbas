@@ -1,18 +1,18 @@
 import React, { FunctionComponent, useContext } from 'react';
 import * as R from 'ramda';
 import { useNavigate } from 'react-router-dom';
-import InjectDefinition from '../../components/injects/InjectDefinition';
-import { InjectContext, PermissionsContext } from '../../components/Context';
-import type { Inject, Tag } from '../../../../utils/api-types';
-import { useHelper } from '../../../../store';
-import type { InjectHelper } from '../../../../actions/injects/inject-helper';
-import type { TagsHelper } from '../../../../actions/helper';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { fetchTeams } from '../../../../actions/teams/team-actions';
-import { createAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import type { TeamStore } from '../../../../actions/teams/Team';
-import type { TeamsHelper } from '../../../../actions/teams/team-helper';
+import InjectDefinition from '../components/injects/InjectDefinition';
+import { InjectContext, PermissionsContext } from '../components/Context';
+import type { Inject, Tag } from '../../../utils/api-types';
+import { useHelper } from '../../../store';
+import type { InjectHelper } from '../../../actions/injects/inject-helper';
+import type { TagsHelper } from '../../../actions/helper';
+import { useAppDispatch } from '../../../utils/hooks';
+import { fetchTeams } from '../../../actions/teams/team-actions';
+import { createAtomicTesting } from '../../../actions/atomictestings/atomic-testing-actions';
+import useDataLoader from '../../../utils/ServerSideEvent';
+import type { TeamStore } from '../../../actions/teams/Team';
+import type { TeamsHelper } from '../../../actions/teams/team-helper';
 
 interface Props {
   contractId: string;
@@ -24,7 +24,7 @@ interface Props {
   handleReset: () => void;
 }
 
-const CreationInjectDetails: FunctionComponent<Props> = ({
+const AtomicTestingCreationDetails: FunctionComponent<Props> = ({
   contractId, contractContent, handleClose, handleBack, handleReset,
 }) => {
   const navigate = useNavigate();
@@ -92,4 +92,4 @@ const CreationInjectDetails: FunctionComponent<Props> = ({
   );
 };
 
-export default CreationInjectDetails;
+export default AtomicTestingCreationDetails;
