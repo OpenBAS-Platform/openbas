@@ -1,6 +1,6 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Autocomplete, Button, Chip, TextField, TextField as MuiTextField } from '@mui/material';
+import { Alert, Autocomplete, Button, Chip, TextField, TextField as MuiTextField } from '@mui/material';
 import React, { useState } from 'react';
 import { z } from 'zod';
 import { makeStyles } from '@mui/styles';
@@ -61,6 +61,11 @@ const SettingsForm: React.FC<Props> = ({
 
   return (
     <form id="settingsForm" onSubmit={handleSubmit(onSubmit)}>
+      <Alert severity="info">
+        {t(
+          'Please note that if you change the “Reply to” address, the email interaction functionality in the platform will be disabled.',
+        )}
+      </Alert>
       <MuiTextField
         variant="standard"
         fullWidth
