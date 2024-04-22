@@ -33,7 +33,7 @@ export const deleteAtomicTesting = (injectId: string) => (dispatch: Dispatch) =>
   return delReferential(uri, atomicTesting.key, injectId)(dispatch);
 };
 
-export const updateAtomicTesting = (injectId: string, data: string) => (dispatch: Dispatch) => {
+export const updateAtomicTesting = (injectId: string, data: AtomicTestingInput) => (dispatch: Dispatch) => {
   const uri = `${ATOMIC_TESTING_URI}/${injectId}`;
   return putReferential(atomicTesting.key, uri, data)(dispatch);
 };

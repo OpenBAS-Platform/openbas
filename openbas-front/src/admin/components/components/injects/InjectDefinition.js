@@ -720,6 +720,11 @@ class InjectDefinition extends Component {
         .then(() => this.props.handleReset())
         .then(() => this.props.handleClose());
     }
+    if (this.props.atomicTestingUpdate) {
+      return this.props
+        .onUpdateInject(this.props.inject.inject_id, atomicTestingValues)
+        .then(() => this.props.handleClose());
+    }
     return this.props
       .onUpdateInject(this.props.inject.inject_id, values)
       .then(() => this.props.handleClose());
@@ -1330,7 +1335,7 @@ class InjectDefinition extends Component {
     return (
       <div>
         {
-          !atomicTestingCreation
+          !atomicTestingCreation && !atomicTestingUpdate
           && <div className={classes.header}>
             <IconButton
               aria-label="Close"
@@ -2170,10 +2175,8 @@ InjectDefinition.propTypes = {
   handleReset: PropTypes.func,
 };
 
-const select = (state, ownProps) => {
+const select = (state) => {
   const helper = storeHelper(state);
-  const { injectId } = ownProps;
-  const inject = injectId ? helper.getInject(injectId) : ownProps.inject;
   const documentsMap = helper.getDocumentsMap();
   const teamsMap = helper.getTeamsMap();
   const endpointsMap = helper.getEndpointsMap();
@@ -2182,7 +2185,6 @@ const select = (state, ownProps) => {
   const articlesMap = helper.getArticlesMap();
   const challengesMap = helper.getChallengesMap();
   return {
-    inject,
     documentsMap,
     teamsMap,
     endpointsMap,
