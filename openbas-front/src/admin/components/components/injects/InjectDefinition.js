@@ -2175,7 +2175,7 @@ InjectDefinition.propTypes = {
   handleReset: PropTypes.func,
 };
 
-const select = (state, ownProps) => {
+const select = (state) => {
   const helper = storeHelper(state);
   const documentsMap = helper.getDocumentsMap();
   const teamsMap = helper.getTeamsMap();
