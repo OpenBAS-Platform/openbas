@@ -14,6 +14,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,7 +38,8 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
   @PostMapping("/search")
-  public Page<AtomicTestingOutput> findAllAtomicTestings(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+  public Page<AtomicTestingOutput> findAllAtomicTestings(
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return atomicTestingService.findAllAtomicTestings(searchPaginationInput)
         .map(AtomicTestingMapper::toDto);
   }
@@ -50,9 +52,10 @@ public class AtomicTestingApi extends RestBehavior {
         .orElseThrow();
   }
 
+  @Transactional
   @GetMapping("/{injectId}/detail")
   public AtomicTestingDetailOutput findAtomicTestingWithDetail(@PathVariable String injectId) {
-    return atomicTestingService.findById(injectId).map(AtomicTestingMapper::toDetailDto).orElseThrow();
+    return atomicTestingService.findByIdWithDetails(injectId).orElseThrow();
   }
 
   @GetMapping("/{injectId}/update")

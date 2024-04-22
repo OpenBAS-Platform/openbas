@@ -65,13 +65,13 @@ const Detail: FunctionComponent<Props> = () => {
                   );
                 })
               }
-              {/* {
-                atomicdetail.atomic_content?.map((content, index) => (
+              {
+                atomicdetail.atomic_content.expectations?.map((content, index) => (
                   <Typography key={index} variant="body1">
-                    {content}
+                    {content.expectation_name}
                   </Typography>
                 ))
-              } */}
+              }
             </Paper>
             <Paper elevation={3} className={classes.paper}>
               <Typography variant="h2" gutterBottom>

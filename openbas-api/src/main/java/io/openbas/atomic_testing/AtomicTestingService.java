@@ -1,5 +1,6 @@
 package io.openbas.atomic_testing;
 
+import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
 import io.openbas.atomic_testing.form.AtomicTestingInput;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Inject;
@@ -123,6 +124,33 @@ public class AtomicTestingService {
 
   public Optional<Inject> findById(String injectId) {
     return injectRepository.findWithStatusById(injectId);
+  }
+
+  public Optional<AtomicTestingDetailOutput> findByIdWithDetails(String injectId) {
+    return injectRepository.findWithStatusById(injectId).map(inject -> {
+      // FIXME tags and documents initialization
+      Hibernate.initialize(inject.getTags());
+      Hibernate.initialize(inject.getDocuments());
+      return inject.getStatus().map(status ->
+          AtomicTestingDetailOutput
+              .builder()
+              .atomicId(inject.getId())
+              .description(inject.getDescription())
+              .content(inject.getContent())
+              .tags(inject.getTags())
+              .documents(inject.getDocuments())
+              .status(status.getName())
+              .traces(status.getTraces().stream().map(trace -> trace.getStatus() + " " + trace.getMessage())
+                  .collect(Collectors.toList()))
+              .trackingAckDate(status.getTrackingAckDate())
+              .trackingSentDate(status.getTrackingSentDate())
+              .trackingEndDate(status.getTrackingEndDate())
+              .trackingTotalCount(status.getTrackingTotalCount())
+              .trackingTotalError(status.getTrackingTotalError())
+              .trackingTotalSuccess(status.getTrackingTotalSuccess())
+              .build()
+      ).orElse(AtomicTestingDetailOutput.builder().status(ExecutionStatus.DRAFT).build());
+    });
   }
 
   @Transactional
