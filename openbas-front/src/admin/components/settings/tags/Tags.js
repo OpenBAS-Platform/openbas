@@ -175,12 +175,18 @@ const Tags = () => {
                     }
             />
             <ListItemSecondaryAction>
-              <TagPopover tag={tag} />
+              <TagPopover
+                tag={tag}
+                onUpdate={(result) => setTags(tags.map((existingTag) => (existingTag.tag_id !== result.tag_id ? existingTag : result)))}
+                onDelete={(result) => setTags(tags.filter((existingTag) => (existingTag.tag_id !== result)))}
+              />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
-      <CreateTag />
+      <CreateTag
+        onCreate={(result) => setTags([result, ...tags])}
+      />
     </div>
   );
 };

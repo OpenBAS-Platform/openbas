@@ -9,7 +9,7 @@ class KillChainPhaseForm extends Component {
   validate(values) {
     const { t } = this.props;
     const errors = {};
-    const requiredFields = ['phase_name', 'phase_kill_chain_name', 'phase_order'];
+    const requiredFields = ['phase_name', 'phase_shortname', 'phase_kill_chain_name', 'phase_external_id', 'phase_order'];
     requiredFields.forEach((field) => {
       if (!values[field]) {
         errors[field] = t('This field is required.');
@@ -36,9 +36,23 @@ class KillChainPhaseForm extends Component {
             />
             <TextField
               variant="standard"
+              name="phase_shortname"
+              fullWidth={true}
+              label={t('Phase short name')}
+              style={{ marginTop: 20 }}
+            />
+            <TextField
+              variant="standard"
               name="phase_kill_chain_name"
               fullWidth={true}
               label={t('Kill chain name')}
+              style={{ marginTop: 20 }}
+            />
+            <TextField
+              variant="standard"
+              name="phase_external_id"
+              fullWidth={true}
+              label={t('External Id')}
               style={{ marginTop: 20 }}
             />
             <TextField

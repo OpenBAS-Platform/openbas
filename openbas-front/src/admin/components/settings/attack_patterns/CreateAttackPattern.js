@@ -38,7 +38,13 @@ class CreateAttackPattern extends Component {
     )(data);
     return this.props
       .addAttackPattern(inputValues)
-      .then((result) => (result.result ? this.handleClose() : result));
+      .then((result) => {
+        if (this.props.onCreate) {
+          const attackPatternCreated = result.entities.attackpatterns[result.result];
+          this.props.onCreate(attackPatternCreated);
+        }
+        return (result.result ? this.handleClose() : result);
+      });
   }
 
   render() {
@@ -80,6 +86,7 @@ CreateAttackPattern.propTypes = {
   t: PropTypes.func,
   organizations: PropTypes.array,
   addAttackPattern: PropTypes.func,
+  onCreate: PropTypes.func,
 };
 
 export default R.compose(

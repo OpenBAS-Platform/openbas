@@ -8,6 +8,7 @@ import { updateKillChainPhase, deleteKillChainPhase } from '../../../../actions/
 import KillChainPhaseForm from './KillChainPhaseForm';
 import inject18n from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
+import { deleteAttackPattern } from "../../../../actions/AttackPattern.js";
 
 class KillChainPhasePopover extends Component {
   constructor(props) {
@@ -40,7 +41,13 @@ class KillChainPhasePopover extends Component {
   onSubmitEdit(data) {
     return this.props
       .updateKillChainPhase(this.props.killChainPhase.phase_id, data)
-      .then(() => this.handleCloseEdit());
+      .then((result) => {
+        if (this.props.onUpdate) {
+          const killChainPhaseUpdated = result.entities.killchainphases[result.result];
+          this.props.onUpdate(killChainPhaseUpdated);
+        }
+        this.handleCloseEdit();
+      });
   }
 
   handleOpenDelete() {
@@ -53,13 +60,19 @@ class KillChainPhasePopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteKillChainPhase(this.props.killChainPhase.phase_id);
+    this.props.deleteKillChainPhase(this.props.killChainPhase.phase_id).then(
+      () => {
+        if (this.props.onDelete) {
+          this.props.onDelete(this.props.killChainPhase.phase_id);
+        }
+      },
+    );
     this.handleCloseDelete();
   }
 
   render() {
     const { t } = this.props;
-    const initialValues = R.pipe(R.pick(['phase_name', 'phase_kill_chain_name', 'phase_order']))(
+    const initialValues = R.pipe(R.pick(['phase_name', 'phase_shortname', 'phase_kill_chain_name', 'phase_order', 'phase_external_id']))(
       this.props.killChainPhase,
     );
     return (
@@ -131,7 +144,9 @@ KillChainPhasePopover.propTypes = {
   t: PropTypes.func,
   killChainPhase: PropTypes.object,
   updateKillChainPhase: PropTypes.func,
+  onUpdate: PropTypes.func,
   deleteKillChainPhase: PropTypes.func,
+  onDelete: PropTypes.func,
 };
 
 export default R.compose(

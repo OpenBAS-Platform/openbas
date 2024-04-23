@@ -35,7 +35,13 @@ class CreateTag extends Component {
   onSubmit(data) {
     this.props
       .addTag(data)
-      .then((result) => (result.result ? this.handleClose() : result));
+      .then((result) => {
+        if (this.props.onCreate) {
+          const tagCreated = result.entities.tags[result.result];
+          this.props.onCreate(tagCreated);
+        }
+        return (result.result ? this.handleClose() : result);
+      });
   }
 
   render() {
@@ -75,6 +81,7 @@ CreateTag.propTypes = {
   t: PropTypes.func,
   classes: PropTypes.object,
   addTag: PropTypes.func,
+  onCreate: PropTypes.func,
 };
 
 export default R.compose(

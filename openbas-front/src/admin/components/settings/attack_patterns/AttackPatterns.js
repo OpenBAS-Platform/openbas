@@ -232,12 +232,16 @@ const AttackPatterns = () => {
               <AttackPatternPopover
                 killChainPhasesMap={killChainPhasesMap}
                 attackPattern={attackPattern}
+                onUpdate={(result) => setAttackPatterns(attackPatterns.map((a) => (a.attack_pattern_id !== result.attack_pattern_id ? a : result)))}
+                onDelete={(result) => setAttackPatterns(attackPatterns.filter((a) => (a.attack_pattern_id !== result)))}
               />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
-      <CreateAttackPattern />
+      <CreateAttackPattern
+        onCreate={(result) => setAttackPatterns([result, ...attackPatterns])}
+      />
     </div>
   );
 };

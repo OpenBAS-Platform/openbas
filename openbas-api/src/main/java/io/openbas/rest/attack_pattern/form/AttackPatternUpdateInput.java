@@ -7,16 +7,12 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 @Getter
 @Setter
-public class AttackPatternCreateInput {
-
-    @JsonProperty("attack_pattern_stix_id")
-    private String stixId = "attack-pattern--" + UUID.randomUUID();;
+public class AttackPatternUpdateInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("attack_pattern_name")
@@ -29,17 +25,9 @@ public class AttackPatternCreateInput {
     @JsonProperty("attack_pattern_external_id")
     private String externalId;
 
-    @JsonProperty("attack_pattern_platforms")
-    private String[] platforms = new String[0];
-
-    @JsonProperty("attack_pattern_permissions_required")
-    private String[] permissionsRequired = new String[0];
-
     @JsonProperty("attack_pattern_kill_chain_phases")
     private List<String> killChainPhasesIds = new ArrayList<>();
 
-    @JsonProperty("attack_pattern_parent")
-    private String parentId;
 }
 
 

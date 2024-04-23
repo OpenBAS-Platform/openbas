@@ -209,12 +209,18 @@ const KillChainPhases = () => {
               }
             />
             <ListItemSecondaryAction>
-              <KillChainPhasePopover killChainPhase={killChainPhase} />
+              <KillChainPhasePopover
+                killChainPhase={killChainPhase}
+                onUpdate={(result) => setKillChainPhases(killChainPhases.map((k) => (k.phase_id !== result.phase_id ? k : result)))}
+                onDelete={(result) => setKillChainPhases(killChainPhases.filter((k) => (k.phase_id !== result)))}
+              />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
-      <CreateKillChainPhase />
+      <CreateKillChainPhase
+        onCreate={(result) => setKillChainPhases([result, ...killChainPhases])}
+      />
     </div>
   );
 };

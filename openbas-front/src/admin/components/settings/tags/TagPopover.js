@@ -44,7 +44,13 @@ class TagPopover extends Component {
   onSubmitEdit(data) {
     return this.props
       .updateTag(this.props.tag.tag_id, data)
-      .then(() => this.handleCloseEdit());
+      .then((result) => {
+        if (this.props.onUpdate) {
+          const tagUpdated = result.entities.tags[result.result];
+          this.props.onUpdate(tagUpdated);
+        }
+        this.handleCloseEdit();
+      });
   }
 
   handleOpenDelete() {
@@ -57,7 +63,11 @@ class TagPopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteTag(this.props.tag.tag_id);
+    this.props.deleteTag(this.props.tag.tag_id).then(() => {
+      if (this.props.onDelete) {
+        this.props.onDelete(this.props.tag.tag_id);
+      }
+    });
     this.handleCloseDelete();
   }
 
@@ -135,7 +145,9 @@ TagPopover.propTypes = {
   t: PropTypes.func,
   tag: PropTypes.object,
   updateTag: PropTypes.func,
+  onUpdate: PropTypes.func,
   deleteTag: PropTypes.func,
+  onDelete: PropTypes.func,
 };
 
 export default R.compose(
