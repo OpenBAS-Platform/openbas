@@ -8,7 +8,6 @@ import { updateKillChainPhase, deleteKillChainPhase } from '../../../../actions/
 import KillChainPhaseForm from './KillChainPhaseForm';
 import inject18n from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
-import { deleteAttackPattern } from "../../../../actions/AttackPattern.js";
 
 class KillChainPhasePopover extends Component {
   constructor(props) {
