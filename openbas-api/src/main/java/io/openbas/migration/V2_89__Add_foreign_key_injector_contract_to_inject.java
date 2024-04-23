@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Statement;
 
 @Component
-public class V2_88__Add_foreign_key_injector_contract_to_inject extends BaseJavaMigration {
+public class V2_89__Add_foreign_key_injector_contract_to_inject extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
