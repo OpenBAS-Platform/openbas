@@ -1,6 +1,7 @@
 package io.openbas.rest.exercise;
 
 import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
+import io.openbas.atomic_testing.AtomicTestingMapper.InjectTargetWithResult;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
@@ -14,8 +15,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.openbas.atomic_testing.AtomicTestingUtils.getExpectations;
+import static io.openbas.atomic_testing.AtomicTestingUtils.getTargetsWithResults;
 
 public class ExerciseUtils {
+
+  // -- GLOBAL SCORE --
 
   public static List<ExpectationResultsByType> computeGlobalExpectationResults(@NotNull final Exercise exercise) {
     List<InjectExpectation> expectations = exercise.getInjects()
@@ -60,6 +64,15 @@ public class ExerciseUtils {
     results.setResults(injectResults);
     results.setAttackPattern(attackPattern);
     return results;
+  }
+
+  // -- TARGET --
+
+  public static List<InjectTargetWithResult> computeTargetResults(@NotNull final Exercise exercise) {
+    return exercise.getInjects()
+        .stream()
+        .flatMap((inject) -> getTargetsWithResults(inject).stream())
+        .toList();
   }
 
 }
