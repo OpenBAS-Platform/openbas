@@ -5,7 +5,7 @@ import ButtonCreate from '../../../components/common/ButtonCreate';
 import { useFormatter } from '../../../components/i18n';
 import CreationInjectDetails from './creation/CreationInjectDetails';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
-import { searchInjectorContracts } from '../../../actions/Inject';
+import { searchInjectorContracts } from '../../../actions/InjectorContracts';
 import MitreFilter, { MITRE_FILTER_KEY } from '../components/atomictestings/MitreFilter';
 import computeAttackPattern from '../../../utils/injectorcontract/InjectorContractUtils';
 import type { InjectorContractStore } from '../../../actions/injectorcontract/InjectorContract';

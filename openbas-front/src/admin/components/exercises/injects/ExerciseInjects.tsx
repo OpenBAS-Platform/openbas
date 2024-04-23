@@ -10,7 +10,6 @@ import {
   addInjectForExercise,
   deleteInjectForExercise,
   fetchExerciseInjects,
-  fetchInjectTypes,
   injectDone,
   updateInjectActivationForExercise,
   updateInjectForExercise,
@@ -29,6 +28,7 @@ import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import { fetchExerciseArticles } from '../../../../actions/channels/article-action';
 import { articleContextForExercise } from '../articles/ExerciseArticles';
 import { teamContextForExercise } from '../teams/ExerciseTeams';
+import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 import InjectDistributionByType from '../../components/injects/InjectDistributionByType';
 import InjectDistributionByTeam from '../../components/injects/InjectDistributionByTeam';
 import ExerciseDistributionScoreByTeamInPercentage from '../exercise/overview/ExerciseDistributionScoreByTeamInPercentage';
@@ -72,7 +72,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
     dispatch(fetchExerciseInjects(exerciseId));
     dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchExerciseArticles(exerciseId));
-    dispatch(fetchInjectTypes());
+    dispatch(fetchInjectorContracts());
     dispatch(fetchVariablesForExercise(exerciseId));
   });
 

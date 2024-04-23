@@ -1,7 +1,7 @@
 export interface Contract {
   config: ContractConfig;
   context: Record<string, string>;
-  contract_attack_patterns: string[];
+  contract_attack_patterns_external_ids: string[];
   contract_id: string;
   fields: ContractElement[];
   label: Record<string, string>;

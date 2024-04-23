@@ -92,8 +92,8 @@ public class InjectorService {
                     Map<String, String> labels = current.get().getLabel().entrySet().stream()
                             .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
                     contract.setLabels(labels);
-                    if (!current.get().getAttackPatterns().isEmpty()) {
-                        List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(current.get().getAttackPatterns()));
+                    if (!current.get().getAttackPatternsExternalIds().isEmpty()) {
+                        List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(current.get().getAttackPatternsExternalIds()));
                         contract.setAttackPatterns(attackPatterns);
                     } else {
                         contract.setAttackPatterns(new ArrayList<>());
@@ -118,8 +118,8 @@ public class InjectorService {
                 injectorContract.setLabels(labels);
                 injectorContract.setInjector(injector);
 
-                if (!in.getAttackPatterns().isEmpty()) {
-                    List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(in.getAttackPatterns()));
+                if (!in.getAttackPatternsExternalIds().isEmpty()) {
+                    List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(in.getAttackPatternsExternalIds()));
                     injectorContract.setAttackPatterns(attackPatterns);
                 } else {
                     injectorContract.setAttackPatterns(new ArrayList<>());
@@ -152,8 +152,8 @@ public class InjectorService {
                         .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
                 injectorContract.setLabels(labels);
                 injectorContract.setInjector(savedInjector);
-                if (!in.getAttackPatterns().isEmpty()) {
-                    injectorContract.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(in.getAttackPatterns())));
+                if (!in.getAttackPatternsExternalIds().isEmpty()) {
+                    injectorContract.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(in.getAttackPatternsExternalIds())));
                 }
                 try {
                     injectorContract.setContent(mapper.writeValueAsString(in));

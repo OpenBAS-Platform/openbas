@@ -9,7 +9,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchExerciseTeams } from '../../../../actions/Exercise';
-import { fetchInjects, fetchInjectTypes, updateInjectForExercise } from '../../../../actions/Inject';
+import { fetchInjects, updateInjectForExercise } from '../../../../actions/Inject';
 import Empty from '../../../../components/Empty';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
@@ -28,6 +28,7 @@ import { fetchExerciseArticles } from '../../../../actions/channels/article-acti
 import { fetchVariablesForExercise } from '../../../../actions/variables/variable-actions';
 import InjectOverTimeArea from './InjectOverTimeArea';
 import InjectOverTimeLine from './InjectOverTimeLine';
+import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -170,8 +171,8 @@ const Timeline = () => {
       teamsInjectsMap: injectsPerTeam,
       technicalInjectsMap:
         helper.getExerciseTechnicalInjectsPerType(exerciseId),
-      injectTypesMap: helper.getInjectTypesMap(),
-      injectTypesWithNoTeams: helper.getInjectTypesWithNoTeams(),
+      injectTypesMap: helper.getInjectorContractsMap(),
+      injectTypesWithNoTeams: helper.getInjectorContractsWithNoTeams(),
       articles: helper.getExerciseArticles(exerciseId),
       variables: helper.getExerciseVariables(exerciseId),
     };
@@ -189,7 +190,7 @@ const Timeline = () => {
   const injectsMap = { ...teamsInjectsMap, ...technicalInjectsMap };
   const [selectedInject, setSelectedInject] = useState(null);
   useDataLoader(() => {
-    dispatch(fetchInjectTypes());
+    dispatch(fetchInjectorContracts());
     dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchInjects(exerciseId));
     dispatch(fetchExerciseArticles(exerciseId));

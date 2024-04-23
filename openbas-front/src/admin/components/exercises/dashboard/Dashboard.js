@@ -1,14 +1,14 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Grid, Paper, Typography } from '@mui/material';
-import { GroupsOutlined, NotificationsOutlined, ContactMailOutlined, CastForEducationOutlined } from '@mui/icons-material';
+import { CastForEducationOutlined, ContactMailOutlined, GroupsOutlined, NotificationsOutlined } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import ResultsMenu from '../ResultsMenu';
-import { fetchInjects, fetchInjectTypes } from '../../../../actions/Inject';
+import { fetchInjects } from '../../../../actions/Inject';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../actions/Exercise';
 import { fetchPlayers } from '../../../../actions/User';
@@ -18,6 +18,7 @@ import DashboardDefinitionStatistics from './DashboardDefinitionStatistics';
 import DashboardDefinitionScoreStatistics from './DashboardDefinitionScoreStatistics';
 import DashboardDataStatistics from './DashboardDataStatistics';
 import DashboardResultsStatistics from './DashboardResultsStatistics';
+import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -81,13 +82,13 @@ const Dashboard = () => {
       organizationsMap: helper.getOrganizationsMap(),
       injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
       challengesMap: helper.getChallengesMap(),
-      injectTypesMap: helper.getInjectTypesMapByType(),
+      injectTypesMap: helper.getInjectorContractsMapByType(),
       communications: helper.getExerciseCommunications(exerciseId),
     };
   });
   useDataLoader(() => {
     dispatch(fetchExerciseTeams(exerciseId));
-    dispatch(fetchInjectTypes());
+    dispatch(fetchInjectorContracts());
     dispatch(fetchInjects(exerciseId));
     dispatch(fetchExerciseChallenges(exerciseId));
     dispatch(fetchExerciseInjectExpectations(exerciseId));

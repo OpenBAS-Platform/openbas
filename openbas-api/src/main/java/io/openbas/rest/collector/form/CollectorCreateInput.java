@@ -1,12 +1,9 @@
 package io.openbas.rest.collector.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.rest.injector.form.InjectorContractInput;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 

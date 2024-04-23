@@ -1035,7 +1035,7 @@ export interface InjectorContract {
 }
 
 export interface InjectorContractInput {
-  contract_attack_patterns?: string[];
+  contract_attack_patterns_external_ids?: string[];
   contract_content: string;
   contract_id: string;
   contract_labels?: Record<string, string>;

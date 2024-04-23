@@ -2,15 +2,15 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { Fab, Drawer } from '@mui/material';
+import { Drawer, Fab } from '@mui/material';
 import { withStyles, withTheme } from '@mui/styles';
 import { Add } from '@mui/icons-material';
-import { fetchInjectTypes } from '../../../../actions/Inject';
 import inject18n from '../../../../components/i18n';
 import QuickInject from './QuickInject';
 import { storeHelper } from '../../../../actions/Schema';
 import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchTags } from '../../../../actions/Tag';
+import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 
 const styles = (theme) => ({
   createButton: {
@@ -89,7 +89,7 @@ const select = (state) => {
   const helper = storeHelper(state);
   return {
     exercisesMap: helper.getExercisesMap(),
-    injectTypes: helper.getInjectTypes(),
+    injectTypes: helper.getInjectorContracts(),
     tagsMap: helper.getTagsMap(),
   };
 };
@@ -98,7 +98,7 @@ export default R.compose(
   connect(select, {
     fetchExercises,
     fetchTags,
-    fetchInjectTypes,
+    fetchInjectorContracts,
   }),
   inject18n,
   withTheme,

@@ -1,6 +1,7 @@
 package io.openbas.rest.injector.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.rest.injector_contract.form.InjectorContractInput;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;

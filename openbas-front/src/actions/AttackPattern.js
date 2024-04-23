@@ -24,5 +24,5 @@ export const addAttackPattern = (data) => (dispatch) => {
 
 export const deleteAttackPattern = (attackPatternId) => (dispatch) => {
   const uri = `/api/attack_patterns/${attackPatternId}`;
-  return delReferential(uri, 'attackPatterns', attackPatternId)(dispatch);
+  return delReferential(uri, 'attackpatterns', attackPatternId)(dispatch);
 };

@@ -14,11 +14,11 @@ import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.InjectorRepository;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.rest.injector.form.InjectorContractInput;
 import io.openbas.rest.injector.form.InjectorCreateInput;
 import io.openbas.rest.injector.form.InjectorUpdateInput;
 import io.openbas.rest.injector.response.InjectorConnection;
 import io.openbas.rest.injector.response.InjectorRegistration;
+import io.openbas.rest.injector_contract.form.InjectorContractInput;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -78,7 +78,7 @@ public class InjectorApi extends RestBehavior {
         return injectorRepository.findAll();
     }
 
-    @GetMapping("/api/injectors/{injectorId}/inject_types")
+    @GetMapping("/api/injectors/{injectorId}/injector_contracts")
     public Collection<JsonNode> injectorInjectTypes(@PathVariable String injectorId) {
         Injector injector = injectorRepository.findById(injectorId).orElseThrow();
         return fromIterable(injectorContractRepository.findInjectorContractsByInjector(injector)).stream()
@@ -100,8 +100,8 @@ public class InjectorApi extends RestBehavior {
         injectorContract.setInjector(injector);
         injectorContract.setContent(in.getContent());
         injectorContract.setAtomicTesting(in.isAtomicTesting());
-        if (!in.getAttackPatterns().isEmpty()) {
-            List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(in.getAttackPatterns()));
+        if (!in.getAttackPatternsExternalIds().isEmpty()) {
+            List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(in.getAttackPatternsExternalIds()));
             injectorContract.setAttackPatterns(attackPatterns);
         } else {
             injectorContract.setAttackPatterns(new ArrayList<>());
@@ -124,8 +124,8 @@ public class InjectorApi extends RestBehavior {
                 contract.setLabels(current.get().getLabels());
                 contract.setContent(current.get().getContent());
                 contract.setAtomicTesting(current.get().isAtomicTesting());
-                if (!current.get().getAttackPatterns().isEmpty()) {
-                    List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(current.get().getAttackPatterns()));
+                if (!current.get().getAttackPatternsExternalIds().isEmpty()) {
+                    List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(current.get().getAttackPatternsExternalIds()));
                     contract.setAttackPatterns(attackPatterns);
                 } else {
                     contract.setAttackPatterns(new ArrayList<>());

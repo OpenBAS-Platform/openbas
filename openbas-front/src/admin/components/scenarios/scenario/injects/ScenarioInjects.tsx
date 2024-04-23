@@ -10,20 +10,14 @@ import type { ChallengesHelper } from '../../../../../actions/helper';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
-import {
-  addInjectForScenario,
-  deleteInjectScenario,
-  fetchInjectTypes,
-  fetchScenarioInjects,
-  updateInjectActivationForScenario,
-  updateInjectForScenario,
-} from '../../../../../actions/Inject';
+import { addInjectForScenario, deleteInjectScenario, fetchScenarioInjects, updateInjectActivationForScenario, updateInjectForScenario } from '../../../../../actions/Inject';
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
 import type { Inject } from '../../../../../utils/api-types';
 import Injects from '../../../components/injects/Injects';
 import { articleContextForScenario } from '../articles/ScenarioArticles';
 import { teamContextForScenario } from '../teams/ScenarioTeams';
+import { fetchInjectorContracts } from '../../../../../actions/InjectorContracts';
 
 interface Props {
 
@@ -48,7 +42,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
   useDataLoader(() => {
     dispatch(fetchScenarioInjects(scenarioId));
     dispatch(fetchScenarioTeams(scenarioId));
-    dispatch(fetchInjectTypes());
+    dispatch(fetchInjectorContracts());
     dispatch(fetchVariablesForScenario(scenarioId));
   });
 

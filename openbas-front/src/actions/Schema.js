@@ -12,12 +12,12 @@ export const arrayOfDocuments = new schema.Array(document);
 export const tag = new schema.Entity('tags', {}, { idAttribute: 'tag_id' });
 export const arrayOfTags = new schema.Array(tag);
 
-export const injectType = new schema.Entity(
-  'inject_types',
+export const injectorContract = new schema.Entity(
+  'injector_contracts',
   {},
   { idAttribute: 'contract_id' },
 );
-export const arrayOfInjectTypes = new schema.Array(injectType);
+export const arrayOfInjectTypes = new schema.Array(injectorContract);
 
 export const injectStatus = new schema.Entity(
   'inject_statuses',
@@ -279,7 +279,7 @@ export const storeHelper = (state) => ({
   ),
   getExerciseTechnicalInjectsPerType: (id) => {
     const typesWithNoTeams = R.uniq(
-      entities('inject_types', state)
+      entities('injector_contracts', state)
         .map((t) => ({
           type: t.config.type,
           hasTeams:
@@ -346,11 +346,11 @@ export const storeHelper = (state) => ({
   getAtomicTestings: () => entities('atomics', state),
   getTargetResults: (id, injectId) => entities('targetresults', state).filter((r) => (r.target_id === id) && (r.target_inject_id === injectId)),
   getInjectsMap: () => maps('injects', state),
-  getInjectTypes: () => entities('inject_types', state),
-  getInjectTypesMap: () => maps('inject_types', state),
-  getInjectTypesMapByType: () => R.indexBy(R.path(['config', 'type']), entities('inject_types', state)),
+  getInjectTypes: () => entities('injector_contracts', state),
+  getInjectTypesMap: () => maps('injector_contracts', state),
+  getInjectTypesMapByType: () => R.indexBy(R.path(['config', 'type']), entities('injector_contracts', state)),
   getInjectTypesWithNoTeams: () => R.uniq(
-    entities('inject_types', state)
+    entities('injector_contracts', state)
       .map((t) => ({
         hasTeams:
           t.fields.filter((f) => f.key === 'teams').length > 0,
@@ -410,6 +410,21 @@ export const storeHelper = (state) => ({
   getInjector: (id) => entity(id, 'injectors', state),
   getInjectors: () => entities('injectors', state),
   getInjectorsMap: () => maps('injectors', state),
+  // injector contracts
+  getInjectorContract: (id) => entity(id, 'injector_contracts', state),
+  getInjectorContracts: () => entities('injector_contracts', state),
+  getInjectorContractsMap: () => maps('injector_contracts', state),
+  getInjectorContractsMapByType: () => R.indexBy(R.path(['config', 'type']), entities('injector_contracts', state)),
+  getInjectorContractsWithNoTeams: () => R.uniq(
+    entities('injector_contracts', state)
+      .map((t) => ({
+        hasTeams:
+                t.fields.filter((f) => f.key === 'teams').length > 0,
+        ...t,
+      }))
+      .filter((t) => !t.hasTeams)
+      .map((t) => t.config.type),
+  ),
   // collectors
   getCollector: (id) => entity(id, 'collectors', state),
   getCollectors: () => entities('collectors', state),

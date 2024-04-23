@@ -182,9 +182,9 @@ const Injects = ({
     injectTypesWithNoTeams,
   } = useHelper((helper) => {
     return {
-      injectTypesMap: helper.getInjectTypesMap(),
+      injectTypesMap: helper.getInjectorContractsMap(),
       tagsMap: helper.getTagsMap(),
-      injectTypesWithNoTeams: helper.getInjectTypesWithNoTeams(),
+      injectTypesWithNoTeams: helper.getInjectorContractsWithNoTeams(),
     };
   });
 

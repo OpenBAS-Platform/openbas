@@ -1,8 +1,8 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemText, Grid, Paper, Typography, Chip, ListItemSecondaryAction } from '@mui/material';
+import { Chip, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { PersonOutlined, CastOutlined, CheckCircleOutlineOutlined } from '@mui/icons-material';
+import { CastOutlined, CheckCircleOutlineOutlined, PersonOutlined } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import SearchFilter from '../../../../components/SearchFilter';
 import { fetchTags } from '../../../../actions/Tag';
@@ -20,7 +20,7 @@ import InjectStatus from '../../components/injects/InjectStatus';
 import InjectStatusDetails from '../../components/injects/InjectStatusDetails';
 import { resolveUserName } from '../../../../utils/String';
 import DryrunProgress from './DryrunProgress';
-import { fetchInjectTypes } from '../../../../actions/Inject';
+import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -182,7 +182,7 @@ const Dryrun = () => {
       dryrun: helper.getDryrun(dryrunId),
       dryinjects: helper.getDryrunInjects(dryrunId),
       users: helper.getDryrunUsers(dryrunId),
-      injectTypesMap: helper.getInjectTypesMap(),
+      injectTypesMap: helper.getInjectorContractsMap(),
     };
   });
   useDataLoader(() => {
@@ -190,7 +190,7 @@ const Dryrun = () => {
     dispatch(fetchPlayers());
     dispatch(fetchDryrun(exerciseId, dryrunId));
     dispatch(fetchDryinjects(exerciseId, dryrunId));
-    dispatch(fetchInjectTypes());
+    dispatch(fetchInjectorContracts());
   });
   return (
     <div className={classes.root}>

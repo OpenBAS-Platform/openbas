@@ -8,7 +8,7 @@ import { FileDownloadOutlined, KeyboardArrowRight } from '@mui/icons-material';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
-import { fetchExerciseInjects, fetchInjectTypes } from '../../../../actions/Inject';
+import { fetchExerciseInjects } from '../../../../actions/Inject';
 import InjectIcon from '../../components/injects/InjectIcon';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { useFormatter } from '../../../../components/i18n';
@@ -17,6 +17,7 @@ import { useHelper } from '../../../../store';
 import { exportData } from '../../../../utils/Environment';
 import AnimationMenu from '../AnimationMenu';
 import CreateQuickInject from '../injects/CreateQuickInject';
+import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 import MailDistributionOverTimeChart from './MailDistributionOverTimeChart';
 import MailDistributionOverTimeLine from './MailDistributionOverTimeLine';
 import MailDistributionByTeam from './MailDistributionByTeam';
@@ -178,12 +179,12 @@ const Mails = () => {
     return {
       exercise: helper.getExercise(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
-      injectTypesMap: helper.getInjectTypesMap(),
+      injectTypesMap: helper.getInjectorContractsMap(),
       tagsMap: helper.getTagsMap(),
     };
   });
   useDataLoader(() => {
-    dispatch(fetchInjectTypes());
+    dispatch(fetchInjectorContracts());
     dispatch(fetchExerciseInjects(exerciseId));
   });
   const sortedInjects = filtering

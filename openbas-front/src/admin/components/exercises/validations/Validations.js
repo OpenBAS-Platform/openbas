@@ -7,7 +7,7 @@ import { List, ListItem, ListItemIcon, ListItemText, Slide } from '@mui/material
 import AnimationMenu from '../AnimationMenu';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchExerciseInjects, fetchInjectTypes } from '../../../../actions/Inject';
+import { fetchExerciseInjects } from '../../../../actions/Inject';
 import { fetchExerciseInjectExpectations } from '../../../../actions/Exercise';
 import SearchFilter from '../../../../components/SearchFilter';
 import Loader from '../../../../components/Loader';
@@ -16,6 +16,7 @@ import TagsFilter from '../../../../components/TagsFilter';
 import InjectIcon from '../../components/injects/InjectIcon';
 import ItemTags from '../../../../components/ItemTags';
 import TeamOrAssetLine from './teamsOrAssets/TeamOrAssetLine';
+import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -58,11 +59,11 @@ const Validations = () => {
       exercise: helper.getExercise(exerciseId),
       injectsMap: helper.getInjectsMap(),
       injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
-      injectTypesMap: helper.getInjectTypesMap(),
+      injectTypesMap: helper.getInjectorContractsMap(),
     };
   });
   useDataLoader(() => {
-    dispatch(fetchInjectTypes());
+    dispatch(fetchInjectorContracts());
     dispatch(fetchExerciseInjectExpectations(exerciseId));
     dispatch(fetchExerciseInjects(exerciseId));
   });

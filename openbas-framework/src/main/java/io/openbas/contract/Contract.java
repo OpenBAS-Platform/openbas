@@ -45,8 +45,8 @@ public class Contract {
 
     @NotEmpty
     @Setter
-    @JsonProperty("contract_attack_patterns")
-    private List<String> attackPatterns = new ArrayList<>();
+    @JsonProperty("contract_attack_patterns_external_ids")
+    private List<String> attackPatternsExternalIds = new ArrayList<>();
 
     @Setter
     @JsonProperty("is_atomic_testing")
@@ -102,6 +102,6 @@ public class Contract {
     }
 
     public void addAttackPattern(String id) {
-        attackPatterns.add(id);
+        attackPatternsExternalIds.add(id);
     }
 }
