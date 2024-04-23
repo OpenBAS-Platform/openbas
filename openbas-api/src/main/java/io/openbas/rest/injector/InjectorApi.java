@@ -1,5 +1,7 @@
 package io.openbas.rest.injector;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -74,6 +76,19 @@ public class InjectorApi extends RestBehavior {
     @GetMapping("/api/injectors")
     public Iterable<Injector> injectors() {
         return injectorRepository.findAll();
+    }
+
+    @GetMapping("/api/injectors/{injectorId}/inject_types")
+    public Collection<JsonNode> injectorInjectTypes(@PathVariable String injectorId) {
+        Injector injector = injectorRepository.findById(injectorId).orElseThrow();
+        return fromIterable(injectorContractRepository.findInjectorContractsByInjector(injector)).stream()
+                .map(contract -> {
+                    try {
+                        return mapper.readTree(contract.getContent());
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList();
     }
 
     // TODO JRI => REFACTOR TO RELY ON INJECTOR SERVICE

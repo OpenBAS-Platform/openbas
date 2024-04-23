@@ -10,6 +10,7 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
       style={{
         width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
         height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
+        borderRadius: 4,
         filter: `brightness(${disabled ? '30%' : '100%'})`,
       }}
     />

@@ -1,6 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import { Chip, Grid, Paper, Typography } from '@mui/material';
+import { Link } from 'react-router-dom';
+import { Card, CardActionArea, CardContent, Chip, Grid, Typography } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
@@ -17,11 +18,17 @@ const useStyles = makeStyles((theme: Theme) => ({
   parameters: {
     marginTop: -3,
   },
-  paper: {
+  card: {
     position: 'relative',
-    padding: 20,
     overflow: 'hidden',
     height: 180,
+  },
+  area: {
+    width: '100%',
+    height: '100%',
+  },
+  content: {
+    padding: 20,
   },
   icon: {
     padding: 0,
@@ -86,52 +93,60 @@ const Injectors = () => {
         {sortedInjectors.map((injector: Injector) => {
           return (
             <Grid key={injector.injector_id} item={true} xs={3}>
-              <Paper variant="outlined" classes={{ root: classes.paper }}>
-                <div style={{ display: 'flex' }}>
-                  <div className={classes.icon}>
-                    <img
-                      src={`/api/images/injectors/${injector.injector_type}`}
-                      alt={injector.injector_type}
-                      style={{ width: 50, height: 50, borderRadius: 4 }}
+              <Card classes={{ root: classes.card }} variant="outlined">
+                <CardActionArea
+                  classes={{ root: classes.area }}
+                  component={Link}
+                  to={`/admin/integrations/injectors/${injector.injector_id}`}
+                >
+                  <CardContent className={classes.content}>
+                    <div style={{ display: 'flex' }}>
+                      <div className={classes.icon}>
+                        <img
+                          src={`/api/images/injectors/${injector.injector_type}`}
+                          alt={injector.injector_type}
+                          style={{ width: 50, height: 50, borderRadius: 4 }}
+                        />
+                      </div>
+                      <Typography
+                        variant="h1"
+                        style={{
+                          margin: '14px 0 0 10px',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {injector.injector_name}
+                      </Typography>
+                    </div>
+                    <Chip
+                      variant="outlined"
+                      classes={{ root: classes.chipInList }}
+                      style={{ width: 120 }}
+                      color={injector.injector_external ? 'primary' : 'secondary'}
+                      label={t(injector.injector_external ? 'External' : 'Built-in')}
                     />
-                  </div>
-                  <Typography
-                    variant="h1"
-                    style={{
-                      margin: '14px 0 0 10px',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {injector.injector_name}
-                  </Typography>
-                </div>
-                <Chip
-                  variant="outlined"
-                  classes={{ root: classes.chipInList }}
-                  style={{ width: 120 }}
-                  color={injector.injector_external ? 'primary' : 'secondary'}
-                  label={t(injector.injector_external ? 'External' : 'Built-in')}
-                />
-                <div style={{ display: 'flex', marginTop: 30 }}>
-                  {
+                    <div style={{ display: 'flex', marginTop: 30 }}>
+                      {
                     (injector.injector_external && injector.injector_updated_at) || !injector.injector_external
                       ? <div className={classes.dotGreen} /> : <div className={classes.dotRed} />
                   }
-                  <Typography
-                    variant="h4"
-                    style={{
-                      margin: '1px 0 0 10px',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {t('Updated at')} {nsdt(injector.injector_updated_at)}
-                  </Typography>
-                </div>
-              </Paper>
+                      <Typography
+                        variant="h4"
+                        style={{
+                          margin: '1px 0 0 10px',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {t('Updated at')} {nsdt(injector.injector_updated_at)}
+                      </Typography>
+                    </div>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
             </Grid>
           );
         })}
