@@ -10,7 +10,7 @@ import NotFound from '../../../../components/NotFound';
 import { useFormatter } from '../../../../components/i18n';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import AtomicTestingHeader from './AtomicTestingHeader';
-import { fetchAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
+import { fetchAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import type { AtomicTestingOutput } from '../../../../utils/api-types';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import { AtomicTestingResultContext, AtomicTestingResultContextType } from '../../components/Context';

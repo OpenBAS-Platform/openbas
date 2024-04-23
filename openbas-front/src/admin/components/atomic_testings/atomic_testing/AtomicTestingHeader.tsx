@@ -1,25 +1,19 @@
 import { useParams } from 'react-router-dom';
 import React, { useContext, useState } from 'react';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { PlayArrowOutlined } from '@mui/icons-material';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import type { AtomicTestingOutput } from '../../../../utils/api-types';
-<<<<<<<< HEAD:openbas-front/src/admin/components/atomic_testings/atomic_testing/Header.tsx
+import { makeStyles } from '@mui/styles';
 import { fetchAtomicTesting, tryAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
-import AtomicPopover from './Popover';
-========
-import { fetchAtomicTesting, tryAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
-import type { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
 import AtomicTestingPopover from './AtomicTestingPopover';
->>>>>>>> 5a1aabd3 (renaming):openbas-front/src/admin/components/atomic_testings/atomic_testing/AtomicTestingHeader.tsx
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import { AtomicTestingResultContext } from '../../components/Context';
 import StatusChip from '../../components/atomic_testings/StatusChip';
+import type { AtomicTestingOutput } from '../../../../utils/api-types';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import { useHelper } from '../../../../store';
+import { useAppDispatch } from '../../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -73,7 +67,7 @@ const AtomicTestingHeader = () => {
           {atomic.atomic_title}
         </Typography>
         <AtomicTestingPopover atomic={atomic} />
-        <StatusChip status={atomic.atomic_status}/>
+        <StatusChip status={atomic.atomic_status} />
         <Dialog
           open={open}
           onClose={() => setOpen(false)}
@@ -103,7 +97,7 @@ const AtomicTestingHeader = () => {
       </div>
       <Button
         variant="contained"
-        startIcon={<PlayArrowOutlined/>}
+        startIcon={<PlayArrowOutlined />}
         color="info"
         onClick={() => setOpen(true)}
         sx={{ width: 120, height: 40 }}

@@ -6,8 +6,8 @@ import { makeStyles } from '@mui/styles';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { AtomicTestingDetailOutput } from '../../../../utils/api-types';
-import type { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
-import { fetchAtomicTestingDetail } from '../../../../actions/atomictestings/atomic-testing-actions';
+import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
+import { fetchAtomicTestingDetail } from '../../../../actions/atomic_testings/atomic-testing-actions';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -77,13 +77,13 @@ const Detail: FunctionComponent<Props> = () => {
               <Typography variant="subtitle1" gutterBottom>
                 Expectations
               </Typography>
-              {
-                atomicDetail.atomic_content.expectations?.map((content, index) => (
-                  <Typography key={index} component="li" variant="body1">
-                    {content.expectation_name}
-                  </Typography>
-                ))
-              }
+              {/* { */}
+              {/*  atomicDetail.atomic_content.expectations?.map((content, index) => ( */}
+              {/*    <Typography key={index} component="li" variant="body1"> */}
+              {/*      {content.expectation_name} */}
+              {/*    </Typography> */}
+              {/*  )) */}
+              {/* } */}
             </Paper>
             <Paper elevation={3} className={classes.paper}>
               <Typography variant="h2" gutterBottom>

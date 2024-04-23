@@ -9,7 +9,7 @@ import type { InjectHelper } from '../../../actions/injects/inject-helper';
 import type { TagsHelper } from '../../../actions/helper';
 import { useAppDispatch } from '../../../utils/hooks';
 import { fetchTeams } from '../../../actions/teams/team-actions';
-import { createAtomicTesting } from '../../../actions/atomictestings/atomic-testing-actions';
+import { createAtomicTesting } from '../../../actions/atomic_testings/atomic-testing-actions';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import type { TeamStore } from '../../../actions/teams/Team';
 import type { TeamsHelper } from '../../../actions/teams/team-helper';
