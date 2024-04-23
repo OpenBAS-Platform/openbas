@@ -3,6 +3,7 @@ import { Props } from 'html-react-parser/lib/attributes-to-props';
 import { useParams } from 'react-router-dom';
 import { Grid, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { AtomicTestingDetailOutput } from '../../../../utils/api-types';
@@ -21,6 +22,7 @@ const useStyles = makeStyles(() => ({
 
 const Detail: FunctionComponent<Props> = () => {
   const classes = useStyles();
+  const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { atomicId } = useParams() as { atomicId: AtomicTestingDetailOutput['atomic_id'] };
 
@@ -42,16 +44,16 @@ const Detail: FunctionComponent<Props> = () => {
           <>
             <Paper elevation={3} className={classes.paper}>
               <Typography variant="h2" gutterBottom>
-                Atomic testing details
+                {t('Atomic testing details')}
               </Typography>
               <Typography variant="subtitle1" gutterBottom>
-                Description
+                {t('Description')}
               </Typography>
               <Typography variant="body1" gutterBottom>
                 {atomicDetail?.atomic_description || 'N/A'}
               </Typography>
               <Typography variant="subtitle1" gutterBottom>
-                Tags
+                {t('Tags')}
               </Typography>
               {
                 atomicDetail.atomic_tags?.map((tag, index) => {
@@ -63,7 +65,7 @@ const Detail: FunctionComponent<Props> = () => {
                 })
               }
               <Typography variant="subtitle1" gutterBottom>
-                Documents
+                {t('Documents')}
               </Typography>
               {
                 atomicDetail.atomic_documents?.map((document, index) => {
@@ -75,7 +77,7 @@ const Detail: FunctionComponent<Props> = () => {
                 })
               }
               <Typography variant="subtitle1" gutterBottom>
-                Expectations
+                {t('Expectations')}
               </Typography>
               {/* { */}
               {/*  atomicDetail.atomic_content.expectations?.map((content, index) => ( */}
@@ -87,7 +89,7 @@ const Detail: FunctionComponent<Props> = () => {
             </Paper>
             <Paper elevation={3} className={classes.paper}>
               <Typography variant="h2" gutterBottom>
-                Status : {atomicDetail.status_label}
+                {t('Status')} : {atomicDetail.status_label}
               </Typography>
               {atomicDetail.status_traces && (
                 <>
@@ -104,34 +106,34 @@ const Detail: FunctionComponent<Props> = () => {
             </Paper>
             <Paper elevation={3} className={classes.paper}>
               <Typography variant="body1" gutterBottom>
-                Tracking Sent Date: {atomicDetail.tracking_sent_date || 'N/A'}
+                {t('Tracking Sent Date')}: {atomicDetail.tracking_sent_date || 'N/A'}
               </Typography>
               <Typography variant="body1" gutterBottom>
-                Tracking Ack Date: {atomicDetail.tracking_ack_date || 'N/A'}
+                {t('Tracking Ack Date')}: {atomicDetail.tracking_ack_date || 'N/A'}
               </Typography>
               <Typography variant="body1" gutterBottom>
-                Tracking End Date: {atomicDetail.tracking_end_date || 'N/A'}
+                {t('Tracking End Date')}: {atomicDetail.tracking_end_date || 'N/A'}
               </Typography>
             </Paper>
             <Paper elevation={3} className={classes.paper}>
               <Typography variant="body1" gutterBottom>
-                Tracking Total Execution
-                Time: {atomicDetail.tracking_total_execution_time || 'N/A'} ms
+                {t('Tracking Total Execution')}
+                {t('Time')}: {atomicDetail.tracking_total_execution_time || 'N/A'} ms
               </Typography>
               <Typography variant="body1" gutterBottom>
-                Tracking Total Count: {atomicDetail.tracking_total_count || 'N/A'}
+                {t('Tracking Total Count')}: {atomicDetail.tracking_total_count || 'N/A'}
               </Typography>
               <Typography variant="body1" gutterBottom>
-                Tracking Total Error: {atomicDetail.tracking_total_error || 'N/A'}
+                {t('Tracking Total Error')}: {atomicDetail.tracking_total_error || 'N/A'}
               </Typography>
               <Typography variant="body1" gutterBottom>
-                Tracking Total Success: {atomicDetail.tracking_total_success || 'N/A'}
+                {t('Tracking Total Success')}: {atomicDetail.tracking_total_success || 'N/A'}
               </Typography>
             </Paper>
           </>
         ) : (
           <Paper elevation={3} className={classes.paper}>
-            <Typography variant="body1">No data available</Typography>
+            <Typography variant="body1">{t('No data available')}</Typography>
           </Paper>
         )}
       </Grid>

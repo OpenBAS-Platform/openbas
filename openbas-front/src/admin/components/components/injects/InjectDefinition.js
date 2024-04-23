@@ -2102,7 +2102,7 @@ class InjectDefinition extends Component {
                           sx={{ mr: 1 }}
                           onClick={handleBack}
                         >
-                          Back
+                          {t('Back')}
                         </Button>
                       </div>
 
