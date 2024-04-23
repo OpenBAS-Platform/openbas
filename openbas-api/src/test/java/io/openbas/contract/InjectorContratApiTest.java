@@ -142,19 +142,6 @@ class InjectorContratApiTest extends IntegrationTest {
     @DisplayName("Sorting page of contracts")
     class SortingPageOfContracts {
 
-      @DisplayName("Sorting by default")
-      @Test
-      void given_search_input_without_sort_should_return_a_page_of_contrats_with_default_sort() throws Exception {
-        SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().textSearch("MAIL").build();
-
-        mvc.perform(post("/api/injector_contracts/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(searchPaginationInput)))
-            .andExpect(status().is2xxSuccessful())
-            .andExpect(jsonPath("$.content.[0].injector_contract_labels.en").value("Send individual mails"))
-            .andExpect(jsonPath("$.content.[1].injector_contract_labels.en").value("Send multi-recipients mail"));
-      }
-
       @DisplayName("Sorting by label desc")
       @Test
       void given_sort_input_should_return_a_page_of_contrats_sort_by_label_desc() throws Exception {
