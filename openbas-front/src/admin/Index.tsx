@@ -18,8 +18,8 @@ const IndexProfile = lazy(() => import('./components/profile/Index'));
 const FullTextSearch = lazy(() => import('./components/search/FullTextSearch'));
 const Exercises = lazy(() => import('./components/exercises/Exercises'));
 const IndexExercise = lazy(() => import('./components/exercises/Index'));
-const Atomics = lazy(() => import('./components/atomic_testings/AtomicTestings'));
-const IndexAtomic = lazy(() => import('./components/atomic_testings/atomic_testing/Index'));
+const AtomicTestings = lazy(() => import('./components/atomic_testings/AtomicTestings'));
+const IndexAtomicTesting = lazy(() => import('./components/atomic_testings/atomic_testing/IndexAtomicTesting'));
 const Scenarios = lazy(() => import('./components/scenarios/Scenarios'));
 const IndexScenario = lazy(() => import('./components/scenarios/scenario/IndexScenario'));
 const Assets = lazy(() => import('./components/assets/Index'));
@@ -72,8 +72,8 @@ const Index = () => {
               <Route path="fulltextsearch" element={errorWrapper(FullTextSearch)()} />
               <Route path="exercises" element={errorWrapper(Exercises)()} />
               <Route path="exercises/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
-              <Route path="atomic_testings" element={errorWrapper(Atomics)()} />
-              <Route path="atomic_testings/:atomicId/*" element={errorWrapper(IndexAtomic)()} />
+              <Route path="atomic_testings" element={errorWrapper(AtomicTestings)()} />
+              <Route path="atomic_testings/:atomicId/*" element={errorWrapper(IndexAtomicTesting)()} />
               <Route path="scenarios" element={errorWrapper(Scenarios)()} />
               <Route path="scenarios/:scenarioId/*" element={errorWrapper(IndexScenario)()} />
               <Route path="assets/*" element={errorWrapper(Assets)()} />

@@ -104,7 +104,11 @@ export interface AssetGroupInput {
 }
 
 export interface AtomicTestingDetailOutput {
+  atomic_content?: object;
+  atomic_description?: string;
+  atomic_documents?: InjectDocument[];
   atomic_id: string;
+  atomic_tags?: Tag[];
   status_label?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_traces?: string[];
   /** @format date-time */

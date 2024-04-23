@@ -3,7 +3,7 @@ import { Box, Button, Typography, Stepper, Step, StepLabel, Chip, List, ListItem
 import { makeStyles } from '@mui/styles';
 import ButtonCreate from '../../../components/common/ButtonCreate';
 import { useFormatter } from '../../../components/i18n';
-import CreationInjectDetails from './creation/CreationInjectDetails';
+import AtomicTestingCreationDetails from './AtomicTestingCreationDetails';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import { searchInjectorContracts } from '../../../actions/InjectorContracts';
 import MitreFilter, { MITRE_FILTER_KEY } from '../components/atomic_testings/MitreFilter';
@@ -214,7 +214,7 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
           }
           {
             activeStep === 1 && selectedContract !== null
-            && <CreationInjectDetails
+            && <AtomicTestingCreationDetails
               contractId={contracts[selectedContract].injector_contract_id}
               contractContent={parsedContentContracts[selectedContract]}
               handleClose={() => setOpen(false)}

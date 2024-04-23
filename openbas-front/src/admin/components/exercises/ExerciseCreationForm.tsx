@@ -3,7 +3,7 @@ import { Button, TextField } from '@mui/material';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers/DateTimePicker/DateTimePicker';
+import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
 import { useFormatter } from '../../../components/i18n';
 import TagField from '../../../components/field/TagField';
 import type { ExerciseCreateInput } from '../../../utils/api-types';

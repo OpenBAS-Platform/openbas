@@ -9,14 +9,14 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import NotFound from '../../../../components/NotFound';
 import { useFormatter } from '../../../../components/i18n';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
-import AtomicTestingHeader from './Header';
+import AtomicTestingHeader from './AtomicTestingHeader';
 import { fetchAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import type { AtomicTestingOutput } from '../../../../utils/api-types';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import { AtomicTestingResultContext, AtomicTestingResultContextType } from '../../components/Context';
 
 const AtomicTesting = lazy(() => import('./AtomicTesting'));
-const AtomicTestingDetail = lazy(() => import('./detail/Detail'));
+const AtomicTestingDetail = lazy(() => import('./AtomicTestingDetail'));
 
 const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutput }> = ({
   atomic,
@@ -35,7 +35,7 @@ const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutp
         { label: atomic.atomic_title, current: true },
       ]}
       />
-      <AtomicTestingHeader/>
+      <AtomicTestingHeader />
       <Box
         sx={{
           borderBottom: 1,
@@ -58,12 +58,12 @@ const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutp
           />
         </Tabs>
       </Box>
-      <Suspense fallback={<Loader/>}>
+      <Suspense fallback={<Loader />}>
         <Routes>
-          <Route path="" element={errorWrapper(AtomicTesting)()}/>
-          <Route path="detail" element={errorWrapper(AtomicTestingDetail)()}/>
+          <Route path="" element={errorWrapper(AtomicTesting)()} />
+          <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
           {/* Not found */}
-          <Route path="*" element={<NotFound/>}/>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </div>
@@ -91,11 +91,11 @@ const IndexAtomicTesting = () => {
   if (atomic) {
     return (
       <AtomicTestingResultContext.Provider value={context}>
-        <IndexAtomicTestingComponent atomic={atomic}/>
+        <IndexAtomicTestingComponent atomic={atomic} />
       </AtomicTestingResultContext.Provider>
     );
   }
-  return <Loader/>;
+  return <Loader />;
 };
 
 export default IndexAtomicTesting;

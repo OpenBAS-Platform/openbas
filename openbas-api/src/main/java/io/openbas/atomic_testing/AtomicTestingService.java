@@ -1,11 +1,8 @@
 package io.openbas.atomic_testing;
 
+import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
 import io.openbas.atomic_testing.form.AtomicTestingInput;
-import io.openbas.database.model.Document;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectDocument;
-import io.openbas.database.model.InjectStatus;
-import io.openbas.database.model.User;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
@@ -15,11 +12,6 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static io.openbas.config.SessionHelper.currentUser;
@@ -157,7 +150,7 @@ public class AtomicTestingService {
     Inject finalInjectToSave = injectToSave;
     List<InjectDocument> injectDocuments = input.getDocuments().stream()
         .map(i -> {
-          if(!previousDocumentIds.contains(i.getDocumentId())) {
+          if (!previousDocumentIds.contains(i.getDocumentId())) {
             InjectDocument injectDocument = new InjectDocument();
             injectDocument.setInject(finalInjectToSave);
             injectDocument.setDocument(documentRepository.findById(i.getDocumentId()).orElseThrow());
