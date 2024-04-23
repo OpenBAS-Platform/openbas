@@ -40,7 +40,7 @@ class CreateQuickInject extends Component {
   }
 
   render() {
-    const { classes, exercise, injectTypes, exercisesMap, tagsMap } = this.props;
+    const { classes, exercise, injectorContracts, exercisesMap, tagsMap } = this.props;
     const { open } = this.state;
     return (
       <>
@@ -66,7 +66,7 @@ class CreateQuickInject extends Component {
           <QuickInject
             exerciseId={exercise.exercise_id}
             exercise={exercise}
-            injectTypes={injectTypes}
+            injectorContracts={injectorContracts}
             handleClose={this.handleClose.bind(this)}
             exercisesMap={exercisesMap}
             tagsMap={tagsMap}
@@ -81,7 +81,7 @@ CreateQuickInject.propTypes = {
   t: PropTypes.func,
   exercise: PropTypes.object,
   exercisesMap: PropTypes.object,
-  injectTypes: PropTypes.array,
+  injectorContracts: PropTypes.array,
   tagsMap: PropTypes.object,
 };
 
@@ -89,7 +89,7 @@ const select = (state) => {
   const helper = storeHelper(state);
   return {
     exercisesMap: helper.getExercisesMap(),
-    injectTypes: helper.getInjectorContracts(),
+    injectorContracts: helper.getInjectorContracts(),
     tagsMap: helper.getTagsMap(),
   };
 };

@@ -17,7 +17,7 @@ export const injectorContract = new schema.Entity(
   {},
   { idAttribute: 'contract_id' },
 );
-export const arrayOfInjectTypes = new schema.Array(injectorContract);
+export const arrayOfInjectorContracts = new schema.Array(injectorContract);
 
 export const injectStatus = new schema.Entity(
   'inject_statuses',
@@ -346,19 +346,6 @@ export const storeHelper = (state) => ({
   getAtomicTestings: () => entities('atomics', state),
   getTargetResults: (id, injectId) => entities('targetresults', state).filter((r) => (r.target_id === id) && (r.target_inject_id === injectId)),
   getInjectsMap: () => maps('injects', state),
-  getInjectTypes: () => entities('injector_contracts', state),
-  getInjectTypesMap: () => maps('injector_contracts', state),
-  getInjectTypesMapByType: () => R.indexBy(R.path(['config', 'type']), entities('injector_contracts', state)),
-  getInjectTypesWithNoTeams: () => R.uniq(
-    entities('injector_contracts', state)
-      .map((t) => ({
-        hasTeams:
-          t.fields.filter((f) => f.key === 'teams').length > 0,
-        ...t,
-      }))
-      .filter((t) => !t.hasTeams)
-      .map((t) => t.config.type),
-  ),
   getNextInjects: () => {
     const sortFn = (a, b) => new Date(a.inject_date).getTime() - new Date(b.inject_date).getTime();
     const injects = entities('injects', state).filter(

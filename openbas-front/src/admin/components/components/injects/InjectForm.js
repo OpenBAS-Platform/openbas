@@ -66,12 +66,12 @@ class InjectForm extends Component {
       handleClose,
       initialValues,
       editing,
-      injectTypesMap,
+      injectorContractsMap,
       classes,
     } = this.props;
     const sortedTypes = R.sortWith(
       [R.ascend(R.prop('ttype')), R.ascend(R.prop('tname'))],
-      R.values(injectTypesMap)
+      R.values(injectorContractsMap)
         .filter((type) => type.config.expose === true)
         .map((type) => ({
           tname: tPick(type.label),
@@ -89,7 +89,7 @@ class InjectForm extends Component {
         'inject_contract',
         {
           id: initialValues.inject_contract,
-          label: tPick(injectTypesMap[initialValues.inject_contract]?.label),
+          label: tPick(injectorContractsMap[initialValues.inject_contract]?.label),
         },
         initialValues,
       )
@@ -204,7 +204,7 @@ InjectForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
-  injectTypesMap: PropTypes.object,
+  injectorContractsMap: PropTypes.object,
 };
 
 export default R.compose(inject18n, withStyles(styles))(InjectForm);

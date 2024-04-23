@@ -15,7 +15,7 @@ import { useFormatter } from '../../../../components/i18n';
 import DryrunStatus from './DryrunStatus';
 import { fetchDryinjects } from '../../../../actions/Dryinject';
 import InjectIcon from '../../components/injects/InjectIcon';
-import InjectType from '../../components/injects/InjectType';
+import InjectorContract from '../../components/injects/InjectorContract';
 import InjectStatus from '../../components/injects/InjectStatus';
 import InjectStatusDetails from '../../components/injects/InjectStatusDetails';
 import { resolveUserName } from '../../../../utils/String';
@@ -177,12 +177,12 @@ const Dryrun = () => {
   const searchColumns = ['type', 'title', 'date'];
   const filtering = useSearchAnFilter('dryinject', 'date', searchColumns);
   // Fetching data
-  const { dryrun, dryinjects, users, injectTypesMap } = useHelper((helper) => {
+  const { dryrun, dryinjects, users, injectorContractsMap } = useHelper((helper) => {
     return {
       dryrun: helper.getDryrun(dryrunId),
       dryinjects: helper.getDryrunInjects(dryrunId),
       users: helper.getDryrunUsers(dryrunId),
-      injectTypesMap: helper.getInjectorContractsMap(),
+      injectorContractsMap: helper.getInjectorContractsMap(),
     };
   });
   useDataLoader(() => {
@@ -329,8 +329,8 @@ const Dryrun = () => {
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
           {filtering.filterAndSort(dryinjects).map((dryinject) => {
-            const injectContract = injectTypesMap[dryinject.dryinject_inject.inject_contract];
-            const injectTypeName = tPick(injectContract?.label);
+            const injectContract = injectorContractsMap[dryinject.dryinject_inject.inject_contract];
+            const injectorContractName = tPick(injectContract?.label);
             return (
               <ListItem
                 key={dryinject.dryinject_id}
@@ -351,10 +351,10 @@ const Dryrun = () => {
                         className={classes.bodyItem}
                         style={inlineStyles.dryinject_type}
                       >
-                        <InjectType
+                        <InjectorContract
                           variant="list"
                           config={injectContract?.config}
-                          label={injectTypeName}
+                          label={injectorContractName}
                         />
                       </div>
                       <div

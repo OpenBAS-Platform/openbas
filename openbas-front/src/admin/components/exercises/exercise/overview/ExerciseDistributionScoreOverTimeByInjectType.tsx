@@ -11,16 +11,17 @@ import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
-import { fetchInjectTypes } from '../../../../../actions/Inject';
+import { fetchInjectorContracts } from '../../../../../actions/Inject';
 import { fetchExerciseInjectExpectations } from '../../../../../actions/Exercise';
 import type { InjectExpectation } from '../../../../../utils/api-types';
 import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
+import { InjectorContractHelper } from '../../../../../actions/injectorcontract/injector-contract-helper';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
 }
 
-const ExerciseDistributionScoreOverTimeByInjectType: FunctionComponent<Props> = ({
+const ExerciseDistributionScoreOverTimeByInjectorContract: FunctionComponent<Props> = ({
   exerciseId,
 }) => {
   // Standard hooks
@@ -29,14 +30,14 @@ const ExerciseDistributionScoreOverTimeByInjectType: FunctionComponent<Props> = 
   const theme: Theme = useTheme();
 
   // Fetching data
-  const { injectsMap, injectTypesMap, injectExpectations } = useHelper((helper: InjectHelper) => ({
+  const { injectsMap, injectorContractsMap, injectExpectations } = useHelper((helper: InjectHelper & InjectorContractHelper) => ({
     injectsMap: helper.getInjectsMap(),
     injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
-    injectTypesMap: helper.getInjectTypesMapByType(),
+    injectorContractsMap: helper.getInjectorContractsMapByType(),
   }));
   useDataLoader(() => {
     dispatch(fetchExerciseInjectExpectations(exerciseId));
-    dispatch(fetchInjectTypes());
+    dispatch(fetchInjectorContracts());
   });
 
   let cumulation = 0;
@@ -63,8 +64,8 @@ const ExerciseDistributionScoreOverTimeByInjectType: FunctionComponent<Props> = 
       ];
     }),
     R.map((n: [string, Array<InjectExpectationStore & { inject_expectation_cumulated_score: number }>]) => ({
-      name: tPick(injectTypesMap && injectTypesMap[n[0]]?.label),
-      color: injectTypesMap && injectTypesMap[n[0]]?.config?.color,
+      name: tPick(injectorContractsMap && injectorContractsMap[n[0]]?.label),
+      color: injectorContractsMap && injectorContractsMap[n[0]]?.config?.color,
       data: n[1].map((i: InjectExpectation & { inject_expectation_cumulated_score: number }) => ({
         x: i.inject_expectation_updated_at,
         y: i.inject_expectation_cumulated_score,
@@ -103,4 +104,4 @@ const ExerciseDistributionScoreOverTimeByInjectType: FunctionComponent<Props> = 
   );
 };
 
-export default ExerciseDistributionScoreOverTimeByInjectType;
+export default ExerciseDistributionScoreOverTimeByInjectorContract;

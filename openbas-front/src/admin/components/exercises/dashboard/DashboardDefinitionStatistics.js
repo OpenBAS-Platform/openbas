@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
 const DashboardDefinitionStatistics = ({
   teams,
   injects,
-  injectTypesMap,
+  injectorContractsMap,
 }) => {
   const classes = useStyles();
   const { t, tPick } = useFormatter();
@@ -56,14 +56,14 @@ const DashboardDefinitionStatistics = ({
     })),
     R.sortWith([R.descend(R.prop('number'))]),
   )(injects);
-  const injectsByInjectTypeData = [
+  const injectsByInjectorContractData = [
     {
       name: t('Number of injects'),
       data: injectsByType.map((a) => ({
-        x: tPick(injectTypesMap && injectTypesMap[a.inject_type]?.label),
+        x: tPick(injectorContractsMap && injectorContractsMap[a.inject_type]?.label),
         y: a.number,
         fillColor:
-          injectTypesMap && injectTypesMap[a.inject_type]?.config?.color,
+          injectorContractsMap && injectorContractsMap[a.inject_type]?.config?.color,
       })),
     },
   ];
@@ -77,7 +77,7 @@ const DashboardDefinitionStatistics = ({
           {injectsByType.length > 0 ? (
             <Chart
               options={horizontalBarsChartOptions(theme)}
-              series={injectsByInjectTypeData}
+              series={injectsByInjectorContractData}
               type="bar"
               width="100%"
               height={50 + injectsByType.length * 50}

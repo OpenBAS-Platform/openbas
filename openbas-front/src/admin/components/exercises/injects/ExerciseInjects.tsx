@@ -32,7 +32,7 @@ import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 import InjectDistributionByType from '../../components/injects/InjectDistributionByType';
 import InjectDistributionByTeam from '../../components/injects/InjectDistributionByTeam';
 import ExerciseDistributionScoreByTeamInPercentage from '../exercise/overview/ExerciseDistributionScoreByTeamInPercentage';
-import ExerciseDistributionScoreOverTimeByInjectType from '../exercise/overview/ExerciseDistributionScoreOverTimeByInjectType';
+import ExerciseDistributionScoreOverTimeByInjectorContract from '../exercise/overview/ExerciseDistributionScoreOverTimeByInjectorContract';
 import ExerciseDistributionScoreOverTimeByTeam from '../exercise/overview/ExerciseDistributionScoreOverTimeByTeam';
 import ExerciseDistributionScoreOverTimeByTeamInPercentage from '../exercise/overview/ExerciseDistributionScoreOverTimeByTeamInPercentage';
 import { useFormatter } from '../../../../components/i18n';
@@ -186,7 +186,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                 {t('Distribution of expected total score by inject type')}
               </Typography>
               <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                <ExerciseDistributionScoreOverTimeByInjectType exerciseId={exerciseId} />
+                <ExerciseDistributionScoreOverTimeByInjectorContract exerciseId={exerciseId} />
               </Paper>
             </Grid>
             <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>

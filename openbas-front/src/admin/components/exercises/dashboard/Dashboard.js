@@ -62,7 +62,7 @@ const Dashboard = () => {
     teams,
     injects,
     challengesMap,
-    injectTypesMap,
+    injectorContractsMap,
     teamsMap,
     injectExpectations,
     injectsMap,
@@ -82,7 +82,7 @@ const Dashboard = () => {
       organizationsMap: helper.getOrganizationsMap(),
       injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
       challengesMap: helper.getChallengesMap(),
-      injectTypesMap: helper.getInjectorContractsMapByType(),
+      injectorContractsMap: helper.getInjectorContractsMapByType(),
       communications: helper.getExerciseCommunications(exerciseId),
     };
   });
@@ -150,12 +150,12 @@ const Dashboard = () => {
       <DashboardDefinitionStatistics
         teams={teams}
         injects={injects}
-        injectTypesMap={injectTypesMap}
+        injectorContractsMap={injectorContractsMap}
       />
       <DashboardDefinitionScoreStatistics
         teams={teams}
         injects={injects}
-        injectTypesMap={injectTypesMap}
+        injectorContractsMap={injectorContractsMap}
         challengesMap={challengesMap}
       />
       <Typography variant="h1" style={{ marginTop: 60 }}>
@@ -175,7 +175,7 @@ const Dashboard = () => {
         usersMap={usersMap}
         injectsMap={injectsMap}
         teams={teams}
-        injectTypesMap={injectTypesMap}
+        injectorContractsMap={injectorContractsMap}
         teamsMap={teamsMap}
         injectExpectations={injectExpectations}
         organizations={organizations}

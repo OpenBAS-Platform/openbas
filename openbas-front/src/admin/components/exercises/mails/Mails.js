@@ -175,11 +175,11 @@ const Mails = () => {
   const filtering = useSearchAnFilter('inject', 'sent_at', searchColumns);
   // Fetching data
   const { exerciseId } = useParams();
-  const { exercise, injects, injectTypesMap, tagsMap } = useHelper((helper) => {
+  const { exercise, injects, injectorContractsMap, tagsMap } = useHelper((helper) => {
     return {
       exercise: helper.getExercise(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
-      injectTypesMap: helper.getInjectorContractsMap(),
+      injectorContractsMap: helper.getInjectorContractsMap(),
       tagsMap: helper.getTagsMap(),
     };
   });
@@ -347,7 +347,7 @@ const Mails = () => {
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {sortedInjects.map((inject) => {
-          const injectContract = injectTypesMap[inject.inject_contract];
+          const injectContract = injectorContractsMap[inject.inject_contract];
           return (
             <ListItem
               key={inject.inject_id}

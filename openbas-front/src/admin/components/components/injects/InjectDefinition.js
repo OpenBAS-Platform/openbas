@@ -612,30 +612,30 @@ class InjectDefinition extends Component {
   }
 
   onSubmit(data) {
-    const { inject, injectTypes } = this.props;
-    const injectType = R.head(
-      injectTypes.filter((i) => i.contract_id === inject.inject_contract),
+    const { inject, injectorContracts } = this.props;
+    const injectorContract = R.head(
+      injectorContracts.filter((i) => i.contract_id === inject.inject_contract),
     );
     const finalData = {};
-    const hasArticles = injectType.fields
+    const hasArticles = injectorContract.fields
       .map((f) => f.key)
       .includes('articles');
     if (hasArticles) {
       finalData.articles = this.state.articlesIds;
     }
-    const hasChallenges = injectType.fields
+    const hasChallenges = injectorContract.fields
       .map((f) => f.key)
       .includes('challenges');
     if (hasChallenges) {
       finalData.challenges = this.state.challengesIds;
     }
-    const hasExpectations = injectType.fields
+    const hasExpectations = injectorContract.fields
       .map((f) => f.key)
       .includes('expectations');
     if (hasExpectations) {
       finalData.expectations = this.state.expectations;
     }
-    injectType.fields
+    injectorContract.fields
       .filter(
         (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
           f.key,
@@ -731,13 +731,13 @@ class InjectDefinition extends Component {
   }
 
   validate(values) {
-    const { t, injectTypes, inject } = this.props;
+    const { t, injectorContracts, inject } = this.props;
     const errors = {};
-    const injectType = R.head(
-      injectTypes.filter((i) => i.contract_id === inject.inject_contract),
+    const injectorContract = R.head(
+      injectorContracts.filter((i) => i.contract_id === inject.inject_contract),
     );
-    if (injectType && Array.isArray(injectType.fields)) {
-      injectType.fields
+    if (injectorContract && Array.isArray(injectorContract.fields)) {
+      injectorContract.fields
         .filter(
           (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
             f.key,
@@ -756,7 +756,7 @@ class InjectDefinition extends Component {
             });
             // If condition are not filled
             if (!conditionOk) {
-              const labels = mandatoryGroups.map((key) => injectType.fields.find((f) => f.key === key).label).join(', ');
+              const labels = mandatoryGroups.map((key) => injectorContract.fields.find((f) => f.key === key).label).join(', ');
               errors[field.key] = t(`One of this field is required : ${labels}.`);
             }
           }
@@ -1061,11 +1061,11 @@ class InjectDefinition extends Component {
   }
 
   resetDefaultvalues(setFieldValue, builtInFields) {
-    const { inject, injectTypes } = this.props;
-    const injectType = R.head(
-      injectTypes.filter((i) => i.contract_id === inject.inject_contract),
+    const { inject, injectorContracts } = this.props;
+    const injectorContract = R.head(
+      injectorContracts.filter((i) => i.contract_id === inject.inject_contract),
     );
-    injectType.fields
+    injectorContract.fields
       .filter((f) => !builtInFields.includes(f.key) && !f.expectation)
       .forEach((field) => {
         if (field.cardinality && field.cardinality === '1') {
@@ -1118,7 +1118,7 @@ class InjectDefinition extends Component {
       classes,
       handleClose,
       inject,
-      injectTypes,
+      injectorContracts,
       teamsMap,
       endpointsMap,
       assetGroupsMap,
@@ -1154,8 +1154,8 @@ class InjectDefinition extends Component {
       challengesIds,
       openVariables,
     } = this.state;
-    const injectType = R.head(
-      injectTypes.filter((i) => i.contract_id === inject.inject_contract),
+    const injectorContract = R.head(
+      injectorContracts.filter((i) => i.contract_id === inject.inject_contract),
     );
     // -- TEAMS --
     const teams = teamsIds
@@ -1170,18 +1170,18 @@ class InjectDefinition extends Component {
       team_users_enabled_number: this.props.teamsUsers.filter((o) => o.team_id === n.team_id).length,
       ...n,
     })));
-    const hasTeams = injectType.fields
+    const hasTeams = injectorContract.fields
       .map((f) => f.key)
       .includes('teams');
     // -- ASSETS --
-    const hasAssets = injectType.fields
+    const hasAssets = injectorContract.fields
       .map((f) => f.key)
       .includes('assets');
     const assets = assetIds
       .map((a) => ({ ...endpointsMap[a], type: 'static' }))
       .filter((a) => a !== undefined);
     // -- ASSET GROUPS --
-    const hasAssetGroups = injectType.fields
+    const hasAssetGroups = injectorContract.fields
       .map((f) => f.key)
       .includes('assetgroups');
     const assetGroups = assetGroupIds
@@ -1202,7 +1202,7 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(articlesSortBy))],
     );
     const sortedArticles = sortArticles(articles);
-    const hasArticles = injectType.fields
+    const hasArticles = injectorContract.fields
       .map((f) => f.key)
       .includes('articles');
     // -- CHALLENGES --
@@ -1215,7 +1215,7 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(challengesSortBy))],
     );
     const sortedChallenges = sortChallenges(challenges);
-    const hasChallenges = injectType.fields
+    const hasChallenges = injectorContract.fields
       .map((f) => f.key)
       .includes('challenges');
     // -- DOCUMENTS --
@@ -1234,17 +1234,17 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(documentsSortBy))],
     );
     const sortedDocuments = sortDocuments(docs);
-    const hasAttachments = injectType.fields
+    const hasAttachments = injectorContract.fields
       .map((f) => f.key)
       .includes('attachments');
     // -- EXPECTATIONS --
-    const hasExpectations = injectType.fields
+    const hasExpectations = injectorContract.fields
       .map((f) => f.key)
       .includes('expectations');
-    const predefinedExpectations = injectType.fields.filter(
+    const predefinedExpectations = injectorContract.fields.filter(
       (f) => f.key === 'expectations',
     ).flatMap((f) => f.predefinedExpectations);
-    const expectationsNotManual = injectType.fields.filter(
+    const expectationsNotManual = injectorContract.fields.filter(
       (f) => f.expectation === true,
     );
 
@@ -1260,7 +1260,7 @@ class InjectDefinition extends Component {
       'expectations',
     ];
     if (inject.inject_content === null) {
-      injectType.fields
+      injectorContract.fields
         .filter((f) => !builtInFields.includes(f.key))
         .forEach((field) => {
           if (!initialValues[field.key]) {
@@ -1273,7 +1273,7 @@ class InjectDefinition extends Component {
         });
     }
     // Specific processing for some field
-    injectType.fields
+    injectorContract.fields
       .filter((f) => !builtInFields.includes(f.key))
       .forEach((field) => {
         if (
@@ -1598,7 +1598,7 @@ class InjectDefinition extends Component {
                     <InjectAddEndpoints
                       endpointIds={assetIds}
                       onSubmit={this.handleAddAssets.bind(this)}
-                      filter={(e) => Object.keys(e.asset_sources).length > 0 && injectType.context['collector-ids']?.includes(Object.keys(e.asset_sources))}
+                      filter={(e) => Object.keys(e.asset_sources).length > 0 && injectorContract.context['collector-ids']?.includes(Object.keys(e.asset_sources))}
                     />
                   </>
                 )}
@@ -1857,7 +1857,7 @@ class InjectDefinition extends Component {
                 </div>
                 <div style={{ marginTop: -15 }}>
                   {this.renderFields(
-                    injectType.fields
+                    injectorContract.fields
                       .filter(
                         (f) => !builtInFields.includes(f.key) && !f.expectation,
                       )
@@ -2139,7 +2139,7 @@ class InjectDefinition extends Component {
           variables={this.props.variablesFromExerciseOrScenario}
           open={openVariables}
           handleClose={this.handleCloseVariables.bind(this)}
-          injectType={injectType}
+          injectorContract={injectorContract}
         />
       </div>
     );
@@ -2156,7 +2156,7 @@ InjectDefinition.propTypes = {
   fetchChallenges: PropTypes.func,
   updateInject: PropTypes.func,
   handleClose: PropTypes.func,
-  injectTypes: PropTypes.array,
+  injectorContracts: PropTypes.array,
   fetchDocuments: PropTypes.func,
   tagsMap: PropTypes.object,
   teamsFromExerciseOrScenario: PropTypes.array,

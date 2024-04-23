@@ -74,13 +74,13 @@ interface AvailableVariablesDialogProps {
   open: boolean;
   handleClose: () => void;
   variables: Variable[];
-  injectType: Contract;
+  injectorContract: Contract;
   uriVariable: string;
 }
 
 const AvailableVariablesDialog: FunctionComponent<
 AvailableVariablesDialogProps
-> = ({ open, handleClose, variables, injectType, uriVariable }) => {
+> = ({ open, handleClose, variables, injectorContract, uriVariable }) => {
   const classes = useStyles();
   const { t } = useFormatter();
   const [tab, setTab] = useState('1');
@@ -123,7 +123,7 @@ AvailableVariablesDialogProps
             style={{ maxHeight: '100%', overflow: 'auto', padding: 0 }}
           >
             <List>
-              {injectType.variables.map((variable) => {
+              {injectorContract.variables.map((variable) => {
                 return (
                   <div key={variable.key}>
                     <VariableChildItem

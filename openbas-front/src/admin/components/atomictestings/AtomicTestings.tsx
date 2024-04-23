@@ -18,7 +18,7 @@ import StatusChip from '../components/atomictestings/StatusChip';
 import { initSorting } from '../../../components/common/pagination/Page';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
-import InjectType from '../components/injects/InjectType';
+import InjectorContract from '../components/injects/InjectorContract';
 
 const useStyles = makeStyles(() => ({
   bodyItem: {
@@ -142,7 +142,7 @@ const AtomicTestings = () => {
       isSortable: true,
       // TODO add atomic_inject_label in /api/atomic_testings/search backend with label map
       value: (atomicTesting: AtomicTestingOutput) => {
-        return (<InjectType variant="list" label={tPick(atomicTesting.atomic_injector_contract.injector_contract_labels)} />);
+        return (<InjectorContract variant="list" label={tPick(atomicTesting.atomic_injector_contract.injector_contract_labels)} />);
       },
     },
     {

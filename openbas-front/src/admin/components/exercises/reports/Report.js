@@ -82,7 +82,7 @@ const Dashboard = () => {
     teams,
     injects,
     challengesMap,
-    injectTypesMap,
+    injectorContractsMap,
     teamsMap,
     injectExpectations,
     injectsMap,
@@ -107,7 +107,7 @@ const Dashboard = () => {
       organizationsMap: helper.getOrganizationsMap(),
       injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
       challengesMap: helper.getChallengesMap(),
-      injectTypesMap: helper.getInjectorContractsMapByType(),
+      injectorContractsMap: helper.getInjectorContractsMapByType(),
       communications: helper.getExerciseCommunications(exerciseId),
       objectives: helper.getExerciseObjectives(exerciseId),
       lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
@@ -214,14 +214,14 @@ const Dashboard = () => {
             <DashboardDefinitionStatistics
               teams={teams}
               injects={injects}
-              injectTypesMap={injectTypesMap}
+              injectorContractsMap={injectorContractsMap}
             />
           )}
           {report.report_stats_definition_score && (
             <DashboardDefinitionScoreStatistics
               teams={teams}
               injects={injects}
-              injectTypesMap={injectTypesMap}
+              injectorContractsMap={injectorContractsMap}
               challengesMap={challengesMap}
             />
           )}
@@ -249,7 +249,7 @@ const Dashboard = () => {
               usersMap={usersMap}
               injectsMap={injectsMap}
               teams={teams}
-              injectTypesMap={injectTypesMap}
+              injectorContractsMap={injectorContractsMap}
               teamsMap={teamsMap}
               injectExpectations={injectExpectations}
               organizations={organizations}

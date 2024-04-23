@@ -10,12 +10,12 @@ import type { InjectInput } from '../../../../actions/injects/Inject';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 
 interface Props {
-  injectTypesMap: Record<string, Contract>;
+  injectorContractsMap: Record<string, Contract>;
   onCreate: (injectId: string) => void;
 }
 
 const CreateInject: FunctionComponent<Props> = ({
-  injectTypesMap,
+  injectorContractsMap,
   onCreate,
 }) => {
   // Standard hooks
@@ -79,7 +79,7 @@ const CreateInject: FunctionComponent<Props> = ({
               inject_depends_duration_seconds: 0,
             }}
             handleClose={handleClose}
-            injectTypesMap={injectTypesMap}
+            injectorContractsMap={injectorContractsMap}
           />
         </DialogContent>
       </Dialog>

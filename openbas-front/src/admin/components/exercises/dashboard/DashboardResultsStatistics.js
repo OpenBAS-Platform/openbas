@@ -23,7 +23,7 @@ const DashboardDefinitionStatistics = ({
   teamsMap,
   injectExpectations,
   injectsMap,
-  injectTypesMap,
+  injectorContractsMap,
   usersMap,
   organizationsMap,
 }) => {
@@ -108,7 +108,7 @@ const DashboardDefinitionStatistics = ({
       })),
     })),
   )(injectExpectations);
-  const sortedInjectTypesByTotalScore = R.pipe(
+  const sortedInjectorContractsByTotalScore = R.pipe(
     R.filter((n) => !R.isEmpty(n.inject_expectation_results)),
     R.map((n) => R.assoc(
       'inject_expectation_inject',
@@ -124,14 +124,14 @@ const DashboardDefinitionStatistics = ({
     R.sortWith([R.descend(R.prop('inject_total_score'))]),
     R.take(10),
   )(injectExpectations);
-  const totalScoreByInjectTypeData = [
+  const totalScoreByInjectorContractData = [
     {
       name: t('Total score'),
-      data: sortedInjectTypesByTotalScore.map((i) => ({
-        x: tPick(injectTypesMap && injectTypesMap[i.inject_type]?.label),
+      data: sortedInjectorContractsByTotalScore.map((i) => ({
+        x: tPick(injectorContractsMap && injectorContractsMap[i.inject_type]?.label),
         y: i.inject_total_score,
         fillColor:
-          injectTypesMap && injectTypesMap[i.inject_type]?.config?.color,
+          injectorContractsMap && injectorContractsMap[i.inject_type]?.config?.color,
       })),
     },
   ];
@@ -158,8 +158,8 @@ const DashboardDefinitionStatistics = ({
       ];
     }),
     R.map((n) => ({
-      name: tPick(injectTypesMap && injectTypesMap[n[0]]?.label),
-      color: injectTypesMap && injectTypesMap[n[0]]?.config?.color,
+      name: tPick(injectorContractsMap && injectorContractsMap[n[0]]?.label),
+      color: injectorContractsMap && injectorContractsMap[n[0]]?.config?.color,
       data: n[1].map((i) => ({
         x: i.inject_expectation_updated_at,
         y: i.inject_expectation_cumulated_score,
@@ -405,7 +405,7 @@ const DashboardDefinitionStatistics = ({
           {t('Distribution of total score by inject type')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {sortedInjectTypesByTotalScore.length > 0 ? (
+          {sortedInjectorContractsByTotalScore.length > 0 ? (
             <Chart
               options={horizontalBarsChartOptions(
                 theme,
@@ -414,10 +414,10 @@ const DashboardDefinitionStatistics = ({
                 null,
                 true,
               )}
-              series={totalScoreByInjectTypeData}
+              series={totalScoreByInjectorContractData}
               type="bar"
               width="100%"
-              height={50 + sortedInjectTypesByTotalScore.length * 50}
+              height={50 + sortedInjectorContractsByTotalScore.length * 50}
             />
           ) : (
             <Empty

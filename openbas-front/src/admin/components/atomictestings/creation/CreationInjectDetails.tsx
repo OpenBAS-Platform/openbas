@@ -72,7 +72,7 @@ const CreationInjectDetails: FunctionComponent<Props> = ({
         inject_documents: [],
         inject_tags: [],
       }}
-      injectTypes={[contractContent]}
+      injectorContracts={[contractContent]}
       handleClose={handleClose}
       tagsMap={tagsMap}
       permissions={permissions}

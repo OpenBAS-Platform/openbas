@@ -6,8 +6,8 @@ import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import ExerciseDistributionScoreByInject from './ExerciseDistributionScoreByInject';
 import ExerciseDistributionScoreByPlayer from './ExerciseDistributionScoreByPlayer';
 import ExerciseDistributionScoreByOrganization from './ExerciseDistributionScoreByOrganization';
-import ExerciseDistributionScoreOverTimeByInjectType from './ExerciseDistributionScoreOverTimeByInjectType';
-import ExerciseDistributionByInjectType from './ExerciseDistributionByInjectType';
+import ExerciseDistributionScoreOverTimeByInjectorContract from './ExerciseDistributionScoreOverTimeByInjectorContract';
+import ExerciseDistributionByInjectorContract from './ExerciseDistributionByInjectorContract';
 import ExerciseDistributionScoreOverTimeByTeam from './ExerciseDistributionScoreOverTimeByTeam';
 import ExerciseDistributionScoreByTeam from './ExerciseDistributionScoreByTeam';
 import ExerciseDistributionScoreByTeamInPercentage from './ExerciseDistributionScoreByTeamInPercentage';
@@ -72,7 +72,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
             {t('Distribution of total score by inject type')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <ExerciseDistributionByInjectType exerciseId={exerciseId} />
+            <ExerciseDistributionByInjectorContract exerciseId={exerciseId} />
           </Paper>
         </Grid>
         <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -80,7 +80,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
             {t('Inject types scores over time')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <ExerciseDistributionScoreOverTimeByInjectType exerciseId={exerciseId} />
+            <ExerciseDistributionScoreOverTimeByInjectorContract exerciseId={exerciseId} />
           </Paper>
         </Grid>
         <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>

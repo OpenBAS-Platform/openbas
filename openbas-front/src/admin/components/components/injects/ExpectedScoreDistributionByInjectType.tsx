@@ -29,17 +29,17 @@ const MailDistributionScoreOverTime: FunctionComponent<Props> = ({
   const theme: Theme = useTheme();
 
   // Fetching data
-  const { injects, challengesMap, injectTypesMap } = useHelper((helper: InjectHelper & ChallengesHelper) => ({
+  const { injects, challengesMap, injectorContractsMap } = useHelper((helper: InjectHelper & ChallengesHelper) => ({
     injects: helper.getExerciseInjects(exerciseId),
     challengesMap: helper.getChallengesMap(),
-    injectTypesMap: helper.getInjectTypesMapByType(),
+    injectorContractsMap: helper.getInjectorContractsMapByType(),
   }));
   useDataLoader(() => {
     dispatch(fetchExerciseInjects(exerciseId));
     dispatch(fetchExerciseChallenges(exerciseId));
   });
 
-  const injectTypesWithScore = R.pipe(
+  const injectorContractsWithScore = R.pipe(
     R.filter(
       (n: InjectStore) => n.inject_type === 'openbas_challenge'
         || n.inject_content?.expectationScore,
@@ -66,32 +66,32 @@ const MailDistributionScoreOverTime: FunctionComponent<Props> = ({
       number: R.sum(n[1].map((i: InjectStore) => i.inject_expectations?.length)),
     })),
   )(injects);
-  const sortedInjectTypesWithScoreByScore = R.pipe(
+  const sortedInjectorContractsWithScoreByScore = R.pipe(
     R.sortWith([R.descend(R.prop('score'))]),
     R.take(10),
-  )(injectTypesWithScore);
-  const expectedScoreByInjectTypeData = [
+  )(injectorContractsWithScore);
+  const expectedScoreByInjectorContractData = [
     {
       name: t('Total expected score'),
-      data: sortedInjectTypesWithScoreByScore.map((a: InjectStore & { score: number }) => ({
-        x: tPick(injectTypesMap && injectTypesMap[a.inject_type]?.label),
+      data: sortedInjectorContractsWithScoreByScore.map((a: InjectStore & { score: number }) => ({
+        x: tPick(injectorContractsMap && injectorContractsMap[a.inject_type]?.label),
         y: a.score,
         fillColor:
-          injectTypesMap && injectTypesMap[a.inject_type]?.config?.color,
+          injectorContractsMap && injectorContractsMap[a.inject_type]?.config?.color,
       })),
     },
   ];
 
   return (
     <>
-      {injectTypesWithScore.length > 0 ? (
+      {injectorContractsWithScore.length > 0 ? (
         <Chart
           // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(theme)}
-          series={expectedScoreByInjectTypeData}
+          series={expectedScoreByInjectorContractData}
           type="bar"
           width="100%"
-          height={50 + injectTypesWithScore.length * 50}
+          height={50 + injectorContractsWithScore.length * 50}
         />
       ) : (
         <Empty

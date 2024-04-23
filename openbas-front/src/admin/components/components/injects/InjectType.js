@@ -25,7 +25,7 @@ const styles = () => ({
   },
 });
 
-class InjectType extends Component {
+class InjectorContract extends Component {
   render() {
     const { classes, label, variant, theme } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
@@ -45,10 +45,10 @@ class InjectType extends Component {
   }
 }
 
-InjectType.propTypes = {
+InjectorContract.propTypes = {
   classes: PropTypes.object.isRequired,
   variant: PropTypes.string,
   label: PropTypes.string,
 };
 
-export default R.compose(inject18n, withTheme, withStyles(styles))(InjectType);
+export default R.compose(inject18n, withTheme, withStyles(styles))(InjectorContract);

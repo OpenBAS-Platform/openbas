@@ -27,9 +27,9 @@ const InjectDistributionByType: FunctionComponent<Props> = ({
   const theme: Theme = useTheme();
 
   // Fetching data
-  const { injects, injectTypesMap } = useHelper((helper: InjectHelper) => ({
+  const { injects, injectorContractsMap } = useHelper((helper: InjectHelper) => ({
     injects: helper.getScenarioInjects(exerciseId),
-    injectTypesMap: helper.getInjectTypesMapByType(),
+    injectorContractsMap: helper.getInjectorContractsMapByType(),
   }));
   useDataLoader(() => {
     dispatch(fetchInjects(exerciseId));
@@ -45,14 +45,14 @@ const InjectDistributionByType: FunctionComponent<Props> = ({
     })),
     R.sortWith([R.descend(R.prop('number'))]),
   )(injects);
-  const injectsByInjectTypeData = [
+  const injectsByInjectorContractData = [
     {
       name: t('Number of injects'),
       data: injectsByType.map((a: InjectStore & { number: number }) => ({
-        x: tPick(injectTypesMap && injectTypesMap[a.inject_type]?.label),
+        x: tPick(injectorContractsMap && injectorContractsMap[a.inject_type]?.label),
         y: a.number,
         fillColor:
-          injectTypesMap && injectTypesMap[a.inject_type]?.config?.color,
+          injectorContractsMap && injectorContractsMap[a.inject_type]?.config?.color,
       })),
     },
   ];
@@ -63,7 +63,7 @@ const InjectDistributionByType: FunctionComponent<Props> = ({
         <Chart
           // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(theme)}
-          series={injectsByInjectTypeData}
+          series={injectsByInjectorContractData}
           type="bar"
           width="100%"
           height={50 + injectsByType.length * 50}

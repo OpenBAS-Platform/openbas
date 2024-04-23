@@ -377,18 +377,18 @@ class QuickInject extends Component {
   }
 
   onSubmit(data) {
-    const { injectTypes } = this.props;
-    const injectType = R.head(
-      injectTypes.filter((i) => i.contract_id === EMAIL_CONTRACT),
+    const { injectorContracts } = this.props;
+    const injectorContract = R.head(
+      injectorContracts.filter((i) => i.contract_id === EMAIL_CONTRACT),
     );
     const finalData = {};
-    const hasExpectations = injectType.fields
+    const hasExpectations = injectorContract.fields
       .map((f) => f.key)
       .includes('expectations');
     if (hasExpectations) {
       finalData.expectations = this.state.expectations;
     }
-    injectType.fields
+    injectorContract.fields
       .filter(
         (f) => !['teams', 'attachments', 'expectations'].includes(
           f.key,
@@ -450,13 +450,13 @@ class QuickInject extends Component {
   }
 
   validate(values) {
-    const { t, injectTypes } = this.props;
+    const { t, injectorContracts } = this.props;
     const errors = {};
-    const injectType = R.head(
-      injectTypes.filter((i) => i.contract_id === EMAIL_CONTRACT),
+    const injectorContract = R.head(
+      injectorContracts.filter((i) => i.contract_id === EMAIL_CONTRACT),
     );
-    if (injectType && Array.isArray(injectType.fields)) {
-      injectType.fields
+    if (injectorContract && Array.isArray(injectorContract.fields)) {
+      injectorContract.fields
         .filter(
           (f) => !['teams', 'attachments', 'expectations'].includes(
             f.key,
@@ -762,11 +762,11 @@ class QuickInject extends Component {
   }
 
   resetDefaultvalues(setFieldValue, builtInFields) {
-    const { injectTypes } = this.props;
-    const injectType = R.head(
-      injectTypes.filter((i) => i.contract_id === EMAIL_CONTRACT),
+    const { injectorContracts } = this.props;
+    const injectorContract = R.head(
+      injectorContracts.filter((i) => i.contract_id === EMAIL_CONTRACT),
     );
-    injectType.fields
+    injectorContract.fields
       .filter((f) => !builtInFields.includes(f.key) && !f.expectation)
       .forEach((field) => {
         if (field.cardinality && field.cardinality === '1') {
@@ -804,7 +804,7 @@ class QuickInject extends Component {
       handleClose,
       exerciseId,
       exercise,
-      injectTypes,
+      injectorContracts,
       teamsMap,
       documentsMap,
     } = this.props;
@@ -819,8 +819,8 @@ class QuickInject extends Component {
       documentsOrderAsc,
       openVariables,
     } = this.state;
-    const injectType = R.head(
-      injectTypes.filter((i) => i.contract_id === EMAIL_CONTRACT),
+    const injectorContract = R.head(
+      injectorContracts.filter((i) => i.contract_id === EMAIL_CONTRACT),
     );
     // -- TEAMS --
     const teams = teamsIds
@@ -832,7 +832,7 @@ class QuickInject extends Component {
         : [R.descend(R.prop(teamsSortBy))],
     );
     const sortedTeams = sortTeams(teams);
-    const hasTeams = injectType.fields
+    const hasTeams = injectorContract.fields
       .map((f) => f.key)
       .includes('teams');
     // -- DOCUMENTS --
@@ -851,17 +851,17 @@ class QuickInject extends Component {
         : [R.descend(R.prop(documentsSortBy))],
     );
     const sortedDocuments = sortDocuments(docs);
-    const hasAttachments = injectType.fields
+    const hasAttachments = injectorContract.fields
       .map((f) => f.key)
       .includes('attachments');
     // -- EXPECTATIONS --
-    const hasExpectations = injectType.fields
+    const hasExpectations = injectorContract.fields
       .map((f) => f.key)
       .includes('expectations');
-    const predefinedExpectations = injectType.fields.filter(
+    const predefinedExpectations = injectorContract.fields.filter(
       (f) => f.key === 'expectations',
     ).flatMap((f) => f.predefinedExpectations);
-    const expectationsNotManual = injectType.fields.filter(
+    const expectationsNotManual = injectorContract.fields.filter(
       (f) => f.expectation === true,
     );
     const initialValues = {};
@@ -871,7 +871,7 @@ class QuickInject extends Component {
       'attachments',
       'expectations',
     ];
-    injectType.fields
+    injectorContract.fields
       .filter((f) => !builtInFields.includes(f.key))
       .forEach((field) => {
         if (!initialValues[field.key]) {
@@ -883,7 +883,7 @@ class QuickInject extends Component {
         }
       });
     // Specific processing for some field
-    injectType.fields
+    injectorContract.fields
       .filter((f) => !builtInFields.includes(f.key))
       .forEach((field) => {
         if (
@@ -1177,7 +1177,7 @@ class QuickInject extends Component {
                 </div>
                 <div style={{ marginTop: -15 }}>
                   {this.renderFields(
-                    injectType.fields
+                    injectorContract.fields
                       .filter(
                         (f) => !builtInFields.includes(f.key) && !f.expectation,
                       )
@@ -1433,7 +1433,7 @@ class QuickInject extends Component {
           variables={this.props.exerciseVariables}
           open={openVariables}
           handleClose={this.handleCloseVariables.bind(this)}
-          injectType={injectType}
+          injectorContract={injectorContract}
         />
       </div>
     );
@@ -1448,7 +1448,7 @@ QuickInject.propTypes = {
   fetchInjectTeams: PropTypes.func,
   addInject: PropTypes.func,
   handleClose: PropTypes.func,
-  injectTypes: PropTypes.array,
+  injectorContracts: PropTypes.array,
   fetchDocuments: PropTypes.func,
   exercisesMap: PropTypes.object,
   tagsMap: PropTypes.object,

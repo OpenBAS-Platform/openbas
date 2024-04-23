@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
 const DashboardDefinitionScoreStatistics = ({
   teams,
   injects,
-  injectTypesMap,
+  injectorContractsMap,
   challengesMap,
 }) => {
   const classes = useStyles();
@@ -33,7 +33,7 @@ const DashboardDefinitionScoreStatistics = ({
     ]),
     R.fromPairs,
   )(teams);
-  const injectTypesWithScore = R.pipe(
+  const injectorContractsWithScore = R.pipe(
     R.filter(
       (n) => n.inject_type === 'openbas_challenge'
         || n.inject_content?.expectationScore,
@@ -60,33 +60,33 @@ const DashboardDefinitionScoreStatistics = ({
       number: R.sum(n[1].map((i) => i.inject_expectations.length)),
     })),
   )(injects);
-  const sortedInjectTypesWithScoreByNumber = R.pipe(
+  const sortedInjectorContractsWithScoreByNumber = R.pipe(
     R.sortWith([R.descend(R.prop('number'))]),
     R.take(10),
-  )(injectTypesWithScore);
-  const expectationsByInjectTypeData = [
+  )(injectorContractsWithScore);
+  const expectationsByInjectorContractData = [
     {
       name: t('Number of expectations'),
-      data: sortedInjectTypesWithScoreByNumber.map((a) => ({
-        x: tPick(injectTypesMap && injectTypesMap[a.inject_type]?.label),
+      data: sortedInjectorContractsWithScoreByNumber.map((a) => ({
+        x: tPick(injectorContractsMap && injectorContractsMap[a.inject_type]?.label),
         y: a.number,
         fillColor:
-          injectTypesMap && injectTypesMap[a.inject_type]?.config?.color,
+          injectorContractsMap && injectorContractsMap[a.inject_type]?.config?.color,
       })),
     },
   ];
-  const sortedInjectTypesWithScoreByScore = R.pipe(
+  const sortedInjectorContractsWithScoreByScore = R.pipe(
     R.sortWith([R.descend(R.prop('score'))]),
     R.take(10),
-  )(injectTypesWithScore);
-  const expectedScoreByInjectTypeData = [
+  )(injectorContractsWithScore);
+  const expectedScoreByInjectorContractData = [
     {
       name: t('Total expected score'),
-      data: sortedInjectTypesWithScoreByScore.map((a) => ({
-        x: tPick(injectTypesMap && injectTypesMap[a.inject_type]?.label),
+      data: sortedInjectorContractsWithScoreByScore.map((a) => ({
+        x: tPick(injectorContractsMap && injectorContractsMap[a.inject_type]?.label),
         y: a.score,
         fillColor:
-          injectTypesMap && injectTypesMap[a.inject_type]?.config?.color,
+          injectorContractsMap && injectorContractsMap[a.inject_type]?.config?.color,
       })),
     },
   ];
@@ -127,13 +127,13 @@ const DashboardDefinitionScoreStatistics = ({
           {t('Distribution of expectations by inject type')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {injectTypesWithScore.length > 0 ? (
+          {injectorContractsWithScore.length > 0 ? (
             <Chart
               options={horizontalBarsChartOptions(theme)}
-              series={expectationsByInjectTypeData}
+              series={expectationsByInjectorContractData}
               type="bar"
               width="100%"
-              height={50 + injectTypesWithScore.length * 50}
+              height={50 + injectorContractsWithScore.length * 50}
             />
           ) : (
             <Empty
@@ -149,13 +149,13 @@ const DashboardDefinitionScoreStatistics = ({
           {t('Distribution of expected total score by inject type')}
         </Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-          {injectTypesWithScore.length > 0 ? (
+          {injectorContractsWithScore.length > 0 ? (
             <Chart
               options={horizontalBarsChartOptions(theme)}
-              series={expectedScoreByInjectTypeData}
+              series={expectedScoreByInjectorContractData}
               type="bar"
               width="100%"
-              height={50 + injectTypesWithScore.length * 50}
+              height={50 + injectorContractsWithScore.length * 50}
             />
           ) : (
             <Empty

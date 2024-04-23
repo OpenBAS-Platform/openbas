@@ -11,7 +11,7 @@ import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
-import { fetchInjects, fetchInjectTypes } from '../../../../../actions/Inject';
+import { fetchInjects, fetchInjectorContracts } from '../../../../../actions/Inject';
 import { fetchExerciseInjectExpectations } from '../../../../../actions/Exercise';
 import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 import type { Inject } from '../../../../../utils/api-types';
@@ -20,7 +20,7 @@ interface Props {
   exerciseId: ExerciseStore['exercise_id'];
 }
 
-const ExerciseDistributionByInjectType: FunctionComponent<Props> = ({
+const ExerciseDistributionByInjectorContract: FunctionComponent<Props> = ({
   exerciseId,
 }) => {
   // Standard hooks
@@ -29,18 +29,18 @@ const ExerciseDistributionByInjectType: FunctionComponent<Props> = ({
   const theme: Theme = useTheme();
 
   // Fetching data
-  const { injectsMap, injectTypesMap, injectExpectations } = useHelper((helper: InjectHelper) => ({
+  const { injectsMap, injectorContractsMap, injectExpectations } = useHelper((helper: InjectHelper) => ({
     injectsMap: helper.getInjectsMap(),
-    injectTypesMap: helper.getInjectTypesMapByType(),
+    injectorContractsMap: helper.getInjectorContractsMapByType(),
     injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
   }));
   useDataLoader(() => {
     dispatch(fetchInjects(exerciseId));
-    dispatch(fetchInjectTypes());
+    dispatch(fetchInjectorContracts());
     dispatch(fetchExerciseInjectExpectations(exerciseId));
   });
 
-  const sortedInjectTypesByTotalScore = R.pipe(
+  const sortedInjectorContractsByTotalScore = R.pipe(
     R.filter((n: InjectExpectationStore) => !R.isEmpty(n.inject_expectation_results)),
     R.map((n: InjectExpectationStore) => R.assoc(
       'inject_expectation_inject',
@@ -57,21 +57,21 @@ const ExerciseDistributionByInjectType: FunctionComponent<Props> = ({
     R.take(10),
   )(injectExpectations);
 
-  const totalScoreByInjectTypeData = [
+  const totalScoreByInjectorContractData = [
     {
       name: t('Total score'),
-      data: sortedInjectTypesByTotalScore.map((i: Inject & { inject_total_score: number }) => ({
-        x: tPick(injectTypesMap && injectTypesMap[i.inject_type]?.label),
+      data: sortedInjectorContractsByTotalScore.map((i: Inject & { inject_total_score: number }) => ({
+        x: tPick(injectorContractsMap && injectorContractsMap[i.inject_type]?.label),
         y: i.inject_total_score,
         fillColor:
-          injectTypesMap && injectTypesMap[i.inject_type]?.config?.color,
+          injectorContractsMap && injectorContractsMap[i.inject_type]?.config?.color,
       })),
     },
   ];
 
   return (
     <>
-      {sortedInjectTypesByTotalScore.length > 0 ? (
+      {sortedInjectorContractsByTotalScore.length > 0 ? (
         <Chart
           // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(
@@ -81,10 +81,10 @@ const ExerciseDistributionByInjectType: FunctionComponent<Props> = ({
             null,
             true,
           )}
-          series={totalScoreByInjectTypeData}
+          series={totalScoreByInjectorContractData}
           type="bar"
           width="100%"
-          height={50 + sortedInjectTypesByTotalScore.length * 50}
+          height={50 + sortedInjectorContractsByTotalScore.length * 50}
         />
       ) : (
         <Empty
@@ -97,4 +97,4 @@ const ExerciseDistributionByInjectType: FunctionComponent<Props> = ({
   );
 };
 
-export default ExerciseDistributionByInjectType;
+export default ExerciseDistributionByInjectorContract;

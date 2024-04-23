@@ -11,7 +11,7 @@ import TagsFilter from '../../../../components/TagsFilter';
 import InjectIcon from './InjectIcon';
 import CreateInject from './CreateInject';
 import InjectPopover from './InjectPopover';
-import InjectType from './InjectType';
+import InjectorContract from './InjectorContract';
 import InjectDefinition from './InjectDefinition';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { useFormatter } from '../../../../components/i18n';
@@ -177,25 +177,25 @@ const Injects = ({
   );
   // Fetching data
   const {
-    injectTypesMap,
+    injectorContractsMap,
     tagsMap,
-    injectTypesWithNoTeams,
+    injectorContractsWithNoTeams,
   } = useHelper((helper) => {
     return {
-      injectTypesMap: helper.getInjectorContractsMap(),
+      injectorContractsMap: helper.getInjectorContractsMap(),
       tagsMap: helper.getTagsMap(),
-      injectTypesWithNoTeams: helper.getInjectorContractsWithNoTeams(),
+      injectorContractsWithNoTeams: helper.getInjectorContractsWithNoTeams(),
     };
   });
 
-  const injectTypes = Object.values(injectTypesMap);
+  const injectorContracts = Object.values(injectorContractsMap);
   const sortedInjects = filtering.filterAndSort(injects);
-  const types = injectTypes.map((type) => type.config.type);
-  const disabledTypes = injectTypes
+  const types = injectorContracts.map((type) => type.config.type);
+  const disabledTypes = injectorContracts
     .filter((type) => type.config.expose === false)
     .map((type) => type.config.type);
   // Rendering
-  if (injects && !R.isEmpty(injectTypesMap)) {
+  if (injects && !R.isEmpty(injectorContractsMap)) {
     return (
       <div className={classes.container}>
         <>
@@ -309,12 +309,12 @@ const Injects = ({
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
           {sortedInjects.map((inject) => {
-            const injectContract = injectTypesMap[inject.inject_contract];
-            const injectTypeName = tPick(injectContract?.label);
+            const injectContract = injectorContractsMap[inject.inject_contract];
+            const injectorContractName = tPick(injectContract?.label);
             const duration = splitDuration(inject.inject_depends_duration || 0);
             const isDisabled = disabledTypes.includes(inject.inject_type)
               || !types.includes(inject.inject_type);
-            const isNoTeam = injectTypesWithNoTeams.includes(
+            const isNoTeam = injectorContractsWithNoTeams.includes(
               inject.inject_type,
             );
             let injectStatus = inject.inject_enabled
@@ -351,10 +351,10 @@ const Injects = ({
                         className={classes.bodyItem}
                         style={inlineStyles.inject_type}
                       >
-                        <InjectType
+                        <InjectorContract
                           variant="list"
                           config={injectContract?.config}
-                          label={injectTypeName}
+                          label={injectorContractName}
                         />
                       </div>
                       <div
@@ -407,7 +407,7 @@ const Injects = ({
                 <ListItemSecondaryAction>
                   <InjectPopover
                     inject={inject}
-                    injectTypesMap={injectTypesMap}
+                    injectorContractsMap={injectorContractsMap}
                     tagsMap={tagsMap}
                     setSelectedInject={setSelectedInject}
                     isDisabled={!injectContract || isDisabled}
@@ -429,7 +429,7 @@ const Injects = ({
         >
           <InjectDefinition
             injectId={selectedInject}
-            injectTypes={injectTypes}
+            injectorContracts={injectorContracts}
             handleClose={() => setSelectedInject(null)}
             tagsMap={tagsMap}
             permissions={permissions}
@@ -445,7 +445,7 @@ const Injects = ({
         </Drawer>
         {permissions.canWrite && (
           <CreateInject
-            injectTypesMap={injectTypesMap}
+            injectorContractsMap={injectorContractsMap}
             onCreate={setSelectedInject}
           />
         )}

@@ -100,7 +100,7 @@ const AtomicPopover: FunctionComponent<Props> = ({
             ...inject, inject_tags: tagOptions(inject?.inject_tags, tagsMap),
           }
           }
-          injectTypes={[JSON.parse(atomic.atomic_injector_contract.injector_contract_content)]}
+          injectorContracts={[JSON.parse(atomic.atomic_injector_contract.injector_contract_content)]}
           handleClose={() => setEdition(false)}
           tagsMap={tagsMap}
           permissions={permissions}

@@ -148,8 +148,8 @@ const Timeline = () => {
     exercise,
     teams,
     injects,
-    injectTypesMap,
-    injectTypesWithNoTeams,
+    injectorContractsMap,
+    injectorContractsWithNoTeams,
     tagsMap,
     teamsInjectsMap,
     technicalInjectsMap,
@@ -171,15 +171,15 @@ const Timeline = () => {
       teamsInjectsMap: injectsPerTeam,
       technicalInjectsMap:
         helper.getExerciseTechnicalInjectsPerType(exerciseId),
-      injectTypesMap: helper.getInjectorContractsMap(),
-      injectTypesWithNoTeams: helper.getInjectorContractsWithNoTeams(),
+      injectorContractsMap: helper.getInjectorContractsMap(),
+      injectorContractsWithNoTeams: helper.getInjectorContractsWithNoTeams(),
       articles: helper.getExerciseArticles(exerciseId),
       variables: helper.getExerciseVariables(exerciseId),
     };
   });
-  const technicalTeams = injectTypesWithNoTeams
+  const technicalTeams = injectorContractsWithNoTeams
     .filter(
-      (injectType) => injects.filter((i) => i.inject_type === injectType).length > 0,
+      (injectorContract) => injects.filter((i) => i.inject_type === injectorContract).length > 0,
     )
     .map((type) => ({ team_id: type, team_name: type }));
   const sortedNativeTeams = R.sortWith(
@@ -229,11 +229,11 @@ const Timeline = () => {
     [R.descend(R.prop('inject_depends_duration'))],
     injects.filter((i) => i.inject_status !== null),
   );
-  const injectTypes = R.values(injectTypesMap);
-  const disabledTypes = injectTypes
+  const injectorContracts = R.values(injectorContractsMap);
+  const disabledTypes = injectorContracts
     .filter((type) => type.config.expose === false)
     .map((type) => type.config.type);
-  const types = injectTypes.map((type) => type.config.type);
+  const types = injectorContracts.map((type) => type.config.type);
   const grid0 = theme.palette.mode === 'light' ? 'rgba(0,0,0,0)' : 'rgba(255,255,255,0)';
   const grid5 = theme.palette.mode === 'light'
     ? 'rgba(0,0,0,0.05)'
@@ -474,7 +474,7 @@ const Timeline = () => {
                             exerciseId={exerciseId}
                             exercise={exercise}
                             tagsMap={tagsMap}
-                            injectTypesMap={injectTypesMap}
+                            injectorContractsMap={injectorContractsMap}
                             setSelectedInject={setSelectedInject}
                             isDisabled={isDisabled}
                           />
@@ -586,7 +586,7 @@ const Timeline = () => {
       >
         <InjectDefinition
           injectId={selectedInject}
-          injectTypes={injectTypes}
+          injectorContracts={injectorContracts}
           handleClose={() => setSelectedInject(null)}
           tagsMap={tagsMap}
           permissions={permissions}

@@ -51,7 +51,7 @@ const Validations = () => {
   // Fetching data
   const {
     exercise,
-    injectTypesMap,
+    injectorContractsMap,
     injectExpectations,
     injectsMap,
   } = useHelper((helper) => {
@@ -59,7 +59,7 @@ const Validations = () => {
       exercise: helper.getExercise(exerciseId),
       injectsMap: helper.getInjectsMap(),
       injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
-      injectTypesMap: helper.getInjectorContractsMap(),
+      injectorContractsMap: helper.getInjectorContractsMap(),
     };
   });
   useDataLoader(() => {
@@ -132,7 +132,7 @@ const Validations = () => {
   };
 
   // Rendering
-  if (exercise && injectExpectations && !R.isEmpty(injectTypesMap)) {
+  if (exercise && injectExpectations && !R.isEmpty(injectorContractsMap)) {
     return (
       <div>
         <AnimationMenu exerciseId={exerciseId} />
@@ -154,7 +154,7 @@ const Validations = () => {
         <List>
           {Object.entries(groupedByInject).map(([injectId, expectationsByInject]) => {
             const inject = injectsMap[injectId] || {};
-            const injectContract = injectTypesMap[inject.inject_contract] || {};
+            const injectContract = injectorContractsMap[inject.inject_contract] || {};
             return (
               <div key={inject.inject_id}>
                 <ListItem divider={true} classes={{ root: classes.item }}>
