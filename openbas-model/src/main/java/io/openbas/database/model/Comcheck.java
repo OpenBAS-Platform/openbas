@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdDeserializer;
+import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
@@ -29,6 +30,7 @@ public class Comcheck implements Base {
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
     @JsonProperty("comcheck_id")
+    @NotBlank
     private String id;
 
     @Column(name = "comcheck_name")

@@ -76,6 +76,8 @@ const inlineStyles = {
   },
 };
 
+// FIXME: removed this file before merging
+
 const Reports = () => {
   // Standard hooks
   const classes = useStyles();

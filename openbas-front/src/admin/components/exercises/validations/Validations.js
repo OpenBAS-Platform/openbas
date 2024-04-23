@@ -23,9 +23,6 @@ const Transition = React.forwardRef((props, ref) => (
 Transition.displayName = 'TransitionSlide';
 
 const useStyles = makeStyles(() => ({
-  container: {
-    margin: '10px 0 50px 0',
-  },
   item: {
     height: 40,
   },
@@ -136,7 +133,7 @@ const Validations = () => {
   // Rendering
   if (exercise && injectExpectations && !R.isEmpty(injectTypesMap)) {
     return (
-      <div className={classes.container}>
+      <div>
         <AnimationMenu exerciseId={exerciseId} />
         <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter

@@ -9,6 +9,7 @@ import io.openbas.helper.MultiIdDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -141,11 +142,15 @@ public class Team implements Base {
     }
 
     @JsonProperty("team_injects_expectations_total_score")
+    @NotNull
     public long getInjectExceptationsTotalScore() {
-        return getInjectExpectations().stream().mapToLong(InjectExpectation::getScore).sum();
+        return getInjectExpectations().stream()
+            .filter((inject) -> inject.getScore() != null)
+            .mapToLong(InjectExpectation::getScore).sum();
     }
 
     @JsonProperty("team_injects_expectations_total_expected_score")
+    @NotNull
     public long getInjectExceptationsTotalExpectedScore() {
         return getInjectExpectations().stream().mapToLong(InjectExpectation::getExpectedScore).sum();
     }

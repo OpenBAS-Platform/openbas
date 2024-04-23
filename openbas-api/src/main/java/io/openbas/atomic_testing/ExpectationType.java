@@ -1,15 +1,17 @@
 package io.openbas.atomic_testing;
 
 public enum ExpectationType {
-  PREVENTION("Blocked", "Unblocked"),
-  DETECTION("Detected", "Undetected"),
-  HUMAN_RESPONSE("Successful", "Failed");
+  PREVENTION("Blocked", "Pending", "Unblocked"),
+  DETECTION("Detected", "Pending", "Undetected"),
+  HUMAN_RESPONSE("Successful", "Pending", "Failed");
 
   public final String successLabel;
+  public final String pendingLabel;
   public final String failureLabel;
 
-  ExpectationType(String successLabel, String failureLabel) {
+  ExpectationType(String successLabel, String pendingLabel, String failureLabel) {
     this.successLabel = successLabel;
+    this.pendingLabel = pendingLabel;
     this.failureLabel = failureLabel;
   }
 

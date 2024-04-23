@@ -151,6 +151,14 @@ public class Scenario implements Base {
   @JsonProperty("scenario_lessons_categories")
   private List<LessonsCategory> lessonsCategories = new ArrayList<>();
 
+  @OneToMany(fetch = FetchType.LAZY)
+  @JoinTable(name = "scenario_exercise",
+      joinColumns = @JoinColumn(name = "scenario_id"),
+      inverseJoinColumns = @JoinColumn(name = "exercise_id"))
+  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonProperty("scenario_exercises")
+  private List<Exercise> exercises;
+
   // -- SECURITY --
 
   @JsonProperty("scenario_planners")
@@ -189,6 +197,11 @@ public class Scenario implements Base {
         .map(ScenarioTeamUser::getUser)
         .distinct()
         .toList();
+  }
+
+  @JsonProperty("scenario_communications_number")
+  public long getCommunicationsNumber() {
+    return getInjects().stream().mapToLong(Inject::getCommunicationsNumber).sum();
   }
 
   // -- CHANNELS --

@@ -1,36 +1,30 @@
 package io.openbas.service;
 
-import static java.time.Instant.now;
-
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectDocument;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
+import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import jakarta.transaction.Transactional;
-import java.util.List;
-import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Stream;
+
+import static java.time.Instant.now;
+
+@RequiredArgsConstructor
 @Service
 public class InjectService {
 
-  private InjectRepository injectRepository;
-  private InjectDocumentRepository injectDocumentRepository;
-
-  @Autowired
-  public void setInjectRepository(InjectRepository injectRepository) {
-    this.injectRepository = injectRepository;
-  }
-
-  @Autowired
-  public void setInjectDocumentRepository(InjectDocumentRepository injectDocumentRepository) {
-    this.injectDocumentRepository = injectDocumentRepository;
-  }
-
+  private final InjectRepository injectRepository;
+  private final InjectorContractRepository injectorContractRepository;
+  private final InjectDocumentRepository injectDocumentRepository;
 
   public void cleanInjectsDocExercise(String exerciseId, String documentId) {
     // Delete document from all exercise injects

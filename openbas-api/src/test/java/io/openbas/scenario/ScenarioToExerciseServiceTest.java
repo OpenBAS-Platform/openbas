@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.openbas.injects.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.utils.fixtures.ArticleFixture.ARTICLE_NAME;
 import static io.openbas.utils.fixtures.ArticleFixture.getArticle;
 import static io.openbas.utils.fixtures.DocumentFixture.getDocumentJpeg;
@@ -56,6 +57,8 @@ public class ScenarioToExerciseServiceTest {
   private InjectRepository injectRepository;
   @Autowired
   private VariableRepository variableRepository;
+  @Autowired
+  private InjectorContractRepository injectorContractRepository;
 
   private static String SCENARIO_ID;
   private static String EXERCISE_ID;
@@ -192,7 +195,7 @@ public class ScenarioToExerciseServiceTest {
     }});
 
     // Inject
-    Inject inject = getInjectForEmailContract();
+    Inject inject = getInjectForEmailContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
     inject.setTeams(new ArrayList<>() {{
       add(teamSaved);
       add(contextualTeamSaved);
@@ -221,9 +224,9 @@ public class ScenarioToExerciseServiceTest {
     assertNotNull(exerciseSaved);
     assertEquals(name, exerciseSaved.getName());
     // Grants
-    assertEquals(2, exerciseSaved.getGrants().stream().map(Grant::getId).count());
+    assertEquals(2, (long) exerciseSaved.getGrants().size());
     // User & Teams
-    assertEquals(2, exerciseSaved.getTeams().stream().map(Team::getId).count());
+    assertEquals(2, (long) exerciseSaved.getTeams().size());
     assertTrue(exerciseSaved.getTeams().stream().anyMatch(t -> teamSaved.getId().equals(t.getId())));
     assertTrue(exerciseSaved.getTeams().stream().anyMatch(t -> Boolean.TRUE.equals(t.getContextual())));
     // Team Users

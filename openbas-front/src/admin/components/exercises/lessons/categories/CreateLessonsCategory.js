@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Fab, Dialog, DialogTitle, DialogContent, Slide, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { Add, ControlPointOutlined } from '@mui/icons-material';
+import { Dialog, DialogContent, DialogTitle, ListItem, ListItemIcon, ListItemText, Slide } from '@mui/material';
+import { ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../../components/i18n';
 import LessonsCategoryForm from './LessonsCategoryForm';
 import { addLessonsCategory } from '../../../../../actions/Lessons';
+import ButtonCreate from '../../../../../components/common/ButtonCreate';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -13,11 +14,6 @@ const Transition = React.forwardRef((props, ref) => (
 Transition.displayName = 'TransitionSlide';
 
 const useStyles = makeStyles((theme) => ({
-  createButton: {
-    position: 'fixed',
-    bottom: 30,
-    right: 230,
-  },
   text: {
     fontSize: 15,
     color: theme.palette.primary.main,
@@ -62,14 +58,7 @@ const CreateLessonsCategory = (props) => {
           />
         </ListItem>
       ) : (
-        <Fab
-          onClick={handleOpen}
-          color="primary"
-          aria-label="Add"
-          className={classes.createButton}
-        >
-          <Add />
-        </Fab>
+        <ButtonCreate onClick={handleOpen} />
       )}
       <Dialog
         open={open}

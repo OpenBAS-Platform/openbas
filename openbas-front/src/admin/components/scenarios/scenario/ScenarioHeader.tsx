@@ -1,144 +1,36 @@
 import { useParams } from 'react-router-dom';
-import React, { useState } from 'react';
-import { Button, Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import * as R from 'ramda';
-import { AddOutlined } from '@mui/icons-material';
-import { Form } from 'react-final-form';
+import cronstrue from 'cronstrue';
+import { EditOutlined } from '@mui/icons-material';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchScenario, updateScenarioTags } from '../../../../actions/scenarios/scenario-actions';
+import { fetchScenario, updateScenarioRecurrence, updateScenarioTags } from '../../../../actions/scenarios/scenario-actions';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import ScenarioPopover from './ScenarioPopover';
-import Transition from '../../../../components/common/Transition';
-import TagField from '../../../../components/TagField';
-import TagChip from '../../components/tags/TagChip';
 import useScenarioPermissions from '../../../../utils/Scenario';
+import ScenarioStatus from './ScenarioStatus';
+import HeaderTags from './HeaderTags';
 import { useFormatter } from '../../../../components/i18n';
-import { Option } from '../../../../utils/Option';
+import { parseCron, ParsedCron } from '../../../../utils/Cron';
+import ScenarioRecurringFormDialog from './ScenarioRecurringFormDialog';
 
 const useStyles = makeStyles(() => ({
-  container: {
-    display: 'flex',
-    justifyContent: 'space-between',
-  },
-  containerTitle: {
-    display: 'inline-flex',
-    alignItems: 'center',
-  },
   title: {
     textTransform: 'uppercase',
     marginBottom: 0,
   },
 }));
 
-const Tags = ({ scenario }: { scenario: ScenarioStore }) => {
-  // Standard hooks
-  const dispatch = useAppDispatch();
-  const { t } = useFormatter();
-
-  const { scenario_tags: tags } = scenario;
-
-  const [openTagAdd, setOpenTagAdd] = useState(false);
-  const handleToggleAddTag = () => setOpenTagAdd(!openTagAdd);
-  const permissions = useScenarioPermissions(scenario.scenario_id);
-
-  const deleteTag = (tagId: string) => {
-    const tagIds = scenario.scenario_tags?.filter((id: string) => id !== tagId);
-    dispatch(
-      updateScenarioTags(scenario.scenario_id, {
-        scenario_tags: tagIds,
-      }),
-    );
-  };
-  const submitTags = (values: { scenario_tags: Option[] }) => {
-    handleToggleAddTag();
-    dispatch(
-      updateScenarioTags(scenario.scenario_id, {
-        scenario_tags: R.uniq([
-          ...values.scenario_tags.map((tag) => tag.id),
-          ...(scenario.scenario_tags ?? []),
-        ]),
-      }),
-    );
-  };
-
-  return (
-    <div>
-      <IconButton
-        color="primary"
-        aria-label="Tag"
-        onClick={handleToggleAddTag}
-        disabled={permissions.readOnly}
-      >
-        <AddOutlined />
-      </IconButton>
-      <Dialog
-        TransitionComponent={Transition}
-        open={openTagAdd}
-        onClose={handleToggleAddTag}
-        fullWidth
-        maxWidth="xs"
-        PaperProps={{ elevation: 1 }}
-      >
-        <DialogTitle>{t('Add tags to this scenario')}</DialogTitle>
-        <DialogContent>
-          <Form
-            keepDirtyOnReinitialize
-            initialValues={{ scenario_tags: [] }}
-            onSubmit={submitTags}
-            mutators={{
-              setValue: ([field, value], state, { changeValue }) => {
-                changeValue(state, field, () => value);
-              },
-            }}
-          >
-            {({ handleSubmit, form, values, submitting, pristine }) => (
-              <form id="tagsForm" onSubmit={handleSubmit}>
-                <TagField
-                  name="scenario_tags"
-                  label={null}
-                  values={values}
-                  setFieldValue={form.mutators.setValue}
-                  placeholder={t('Tags')}
-                />
-                <div style={{ float: 'right', marginTop: 20 }}>
-                  <Button
-                    onClick={handleToggleAddTag}
-                    style={{ marginRight: 10 }}
-                    disabled={submitting}
-                  >
-                    {t('Cancel')}
-                  </Button>
-                  <Button
-                    color="secondary"
-                    type="submit"
-                    disabled={pristine || submitting}
-                  >
-                    {t('Add')}
-                  </Button>
-                </div>
-              </form>
-            )}
-          </Form>
-        </DialogContent>
-      </Dialog>
-      {R.take(5, tags ?? []).map((tag: string) => (
-        <TagChip
-          key={tag}
-          tagId={tag}
-          isReadOnly={permissions.readOnly}
-          deleteTag={deleteTag}
-        />
-      ))}
-    </div>
-  );
-};
+// eslint-disable-next-line no-underscore-dangle
+const _MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 const ScenarioHeader = () => {
   // Standard hooks
+  const { t, nsd, ft, locale } = useFormatter();
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
@@ -150,19 +42,143 @@ const ScenarioHeader = () => {
   useDataLoader(() => {
     dispatch(fetchScenario(scenarioId));
   });
+
+  const [selectRecurring, setSelectRecurring] = useState('noRepeat');
+
+  const [openScenarioRecurringFormDialog, setOpenScenarioRecurringFormDialog] = useState<boolean>(false);
+  const [cronExpression, setCronExpression] = useState<string | null>(scenario.scenario_recurrence || null);
+  const [parsedCronExpression, setParsedCronExpression] = useState<ParsedCron | null>(scenario.scenario_recurrence ? parseCron(scenario.scenario_recurrence) : null);
+
+  const noRepeat = scenario.scenario_recurrence_end && scenario.scenario_recurrence_start
+    && new Date(scenario.scenario_recurrence_end).getTime() - new Date(scenario.scenario_recurrence_start).getTime() <= _MS_PER_DAY
+    && ['noRepeat', 'daily'].includes(selectRecurring);
+
+  const ended = scenario.scenario_recurrence_end && new Date(scenario.scenario_recurrence_end).getTime() < new Date().getTime();
+
+  const onSubmit = (cron: string, start: string, end?: string) => {
+    setCronExpression(cron);
+    setParsedCronExpression(parseCron(cron));
+    dispatch(updateScenarioRecurrence(scenarioId, { scenario_recurrence: cron, scenario_recurrence_start: start, scenario_recurrence_end: end }));
+    setOpenScenarioRecurringFormDialog(false);
+  };
+
+  useEffect(() => {
+    if (scenario.scenario_recurrence != null) {
+      setCronExpression(scenario.scenario_recurrence);
+      setParsedCronExpression(parseCron(scenario.scenario_recurrence));
+      const { w, d } = parseCron(scenario.scenario_recurrence);
+      if (w) {
+        setSelectRecurring('monthly');
+      } else if (d) {
+        setSelectRecurring('weekly');
+      } else if (!noRepeat) {
+        setSelectRecurring('daily');
+      }
+    }
+  }, [scenario.scenario_recurrence]);
+  const stop = () => {
+    setCronExpression(null);
+    setParsedCronExpression(null);
+    dispatch(updateScenarioRecurrence(scenarioId, { scenario_recurrence: undefined, scenario_recurrence_start: undefined, scenario_recurrence_end: undefined }));
+  };
+
+  const getHumanReadableScheduling = () => {
+    if (!cronExpression || !parsedCronExpression) {
+      return null;
+    }
+    let sentence = '';
+
+    if (noRepeat) {
+      sentence = `${t('recurrence_The')} ${nsd(scenario.scenario_recurrence_start)} ${t('recurrence_at')} ${ft(new Date().setUTCHours(parsedCronExpression.h, parsedCronExpression.m))}`;
+    } else {
+      sentence = cronstrue.toString(cronExpression, {
+        verbose: true,
+        tzOffset: -new Date().getTimezoneOffset() / 60,
+        locale,
+      });
+
+      if (scenario.scenario_recurrence_end) {
+        sentence += ` ${t('recurrence_from')} ${nsd(scenario.scenario_recurrence_start)}`;
+        sentence += ` ${t('recurrence_to')} ${nsd(scenario.scenario_recurrence_end)}`;
+      } else {
+        sentence += ` ${t('recurrence_starting_from')} ${nsd(scenario.scenario_recurrence_start)}`;
+      }
+    }
+
+    return sentence;
+  };
+
   return (
-    <div className={classes.container}>
-      <div className={classes.containerTitle}>
-        <Typography
-          variant="h1"
-          gutterBottom
-          classes={{ root: classes.title }}
-        >
-          {scenario.scenario_name}
-        </Typography>
-        <ScenarioPopover scenario={scenario} />
+    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Typography
+              variant="h1"
+              gutterBottom
+              classes={{ root: classes.title }}
+            >
+              {scenario.scenario_name}
+            </Typography>
+            <ScenarioStatus scenario={scenario} />
+          </div>
+          <ScenarioPopover scenario={scenario} />
+        </div>
+        <Stack flex={1} gap={2} justifyContent="space-between">
+          <Box>
+            <Stack direction="row" gap={1} alignItems="center" style={{ minHeight: 40 }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{cronExpression ? t('Scheduled') : t('No scheduling')}</Typography>
+              <Typography variant="body1">
+                {
+                  getHumanReadableScheduling()
+                }
+              </Typography>
+              {
+                scenario.scenario_recurrence && <IconButton onClick={() => setOpenScenarioRecurringFormDialog(true)} color="secondary"><EditOutlined fontSize="small" /></IconButton>
+              }
+            </Stack>
+          </Box>
+        </Stack>
+        <ScenarioRecurringFormDialog
+          selectRecurring={selectRecurring}
+          onSelectRecurring={setSelectRecurring}
+          open={openScenarioRecurringFormDialog}
+          setOpen={setOpenScenarioRecurringFormDialog}
+          onSubmit={onSubmit}
+          initialValues={scenario}
+        />
       </div>
-      <Tags scenario={scenario} />
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+        <HeaderTags
+          tags={scenario.scenario_tags}
+          disabled={useScenarioPermissions(scenario.scenario_id).readOnly}
+          updateTags={(tagIds: string[]) => updateScenarioTags(scenario.scenario_id, { scenario_tags: tagIds })}
+        />
+        <Box display="flex">
+          <Stack direction="row" gap={2}>
+            {
+              scenario.scenario_recurrence
+                ? <Button
+                    fullWidth={false}
+                    variant="contained"
+                    color={ended ? 'primary' : 'error'}
+                    onClick={stop}
+                  >
+                  {ended ? t('Reset') : t('Stop')}
+                </Button>
+                : <Button
+                    fullWidth={false}
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setOpenScenarioRecurringFormDialog(true)}
+                  >
+                  {t('Schedule')}
+                </Button>
+            }
+
+          </Stack>
+        </Box>
+      </div>
     </div>
   );
 };

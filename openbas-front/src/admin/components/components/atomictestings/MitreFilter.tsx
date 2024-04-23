@@ -14,7 +14,6 @@ import type { Theme } from '../../../../components/Theme';
 import { buildEmptyFilter } from '../../../../components/common/filter/FilterUtils';
 import { FilterHelpers } from '../../../../components/common/filter/FilterHelpers';
 import type { AttackPatternStore } from '../../../../actions/attackpattern/AttackPattern';
-import extractKillChainPhaseExternalId from '../../../../utils/KillChainPhaseUtils';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -137,7 +136,7 @@ const MitreFilter: FunctionComponent<MitreFilterProps> = ({
 
   // Kill Chain Phase
   const sortKillChainPhase = (k1: KillChainPhase, k2: KillChainPhase) => {
-    return extractKillChainPhaseExternalId(k2) - extractKillChainPhaseExternalId(k1);
+    return (k1.phase_order ?? 0) - (k2.phase_order ?? 0);
   };
 
   // Attack Pattern

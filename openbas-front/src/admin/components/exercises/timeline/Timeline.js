@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { Grid, Paper, Typography, List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Drawer } from '@mui/material';
+import { Drawer, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { CastOutlined, CastForEducationOutlined } from '@mui/icons-material';
+import { CastForEducationOutlined, CastOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -26,13 +26,15 @@ import AnimationMenu from '../AnimationMenu';
 import { usePermissions } from '../../../../utils/Exercise';
 import { fetchExerciseArticles } from '../../../../actions/channels/article-action';
 import { fetchVariablesForExercise } from '../../../../actions/variables/variable-actions';
+import InjectOverTimeArea from './InjectOverTimeArea';
+import InjectOverTimeLine from './InjectOverTimeLine';
 
 const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
     flexGrow: 1,
     marginTop: 10,
-    padding: '0 200px 50px 0',
+    padding: '0 20px 50px 0',
     overflowX: 'hidden',
   },
   container: {
@@ -404,50 +406,118 @@ const Timeline = () => {
         </div>
       )}
       <div className="clearfix" />
-      <Grid container={true} spacing={3} style={{ marginTop: 50 }}>
-        <Grid item={true} xs={6}>
-          <Typography variant="h4">{t('Pending injects')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            {pendingInjects.length > 0 ? (
-              <List style={{ paddingTop: 0 }}>
-                {pendingInjects.map((inject) => {
-                  const isDisabled = disabledTypes.includes(inject.inject_type)
-                    || !types.includes(inject.inject_type);
-                  return (
+      <Grid container spacing={3} style={{ marginTop: 50, paddingBottom: 24 }}>
+        <Grid container item spacing={3}>
+          <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography variant="h4">{t('Pending injects')}</Typography>
+            <Paper variant="outlined" classes={{ root: classes.paper }}>
+              {pendingInjects.length > 0 ? (
+                <List style={{ paddingTop: 0 }}>
+                  {pendingInjects.map((inject) => {
+                    const isDisabled = disabledTypes.includes(inject.inject_type)
+                      || !types.includes(inject.inject_type);
+                    return (
+                      <ListItem
+                        key={inject.inject_id}
+                        dense={true}
+                        classes={{ root: classes.item }}
+                        divider={true}
+                        button={true}
+                        disabled={isDisabled || !inject.inject_enabled}
+                        onClick={() => setSelectedInject(inject.inject_id)}
+                      >
+                        <ListItemIcon>
+                          <InjectIcon
+                            type={inject.inject_type}
+                            variant="inline"
+                          />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <div>
+                              <div
+                                className={classes.bodyItem}
+                                style={{ width: '50%' }}
+                              >
+                                {inject.inject_title}
+                              </div>
+                              <div
+                                className={classes.bodyItem}
+                                style={{ width: '20%', paddingTop: 8 }}
+                              >
+                                <ProgressBarCountdown
+                                  date={inject.inject_date}
+                                  paused={
+                                    exercise?.exercise_status === 'PAUSED'
+                                    || exercise?.exercise_status === 'CANCELED'
+                                  }
+                                />
+                              </div>
+                              <div
+                                className={classes.bodyItem}
+                                style={{
+                                  fontFamily: 'Consolas, monaco, monospace',
+                                  fontSize: 12,
+                                  paddingTop: 3,
+                                  marginRight: 15,
+                                }}
+                              >
+                                {fndt(inject.inject_date)}
+                              </div>
+                            </div>
+                          }
+                        />
+                        <ListItemSecondaryAction>
+                          <InjectPopover
+                            inject={inject}
+                            exerciseId={exerciseId}
+                            exercise={exercise}
+                            tagsMap={tagsMap}
+                            injectTypesMap={injectTypesMap}
+                            setSelectedInject={setSelectedInject}
+                            isDisabled={isDisabled}
+                          />
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    );
+                  })}
+                </List>
+              ) : (
+                <Empty message={t('No pending injects in this simulation.')} />
+              )}
+            </Paper>
+          </Grid>
+          <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography variant="h4">{t('Processed injects')}</Typography>
+            <Paper variant="outlined" classes={{ root: classes.paper }}>
+              {processedInjects.length > 0 ? (
+                <List style={{ paddingTop: 0 }}>
+                  {processedInjects.map((inject) => (
                     <ListItem
                       key={inject.inject_id}
                       dense={true}
                       classes={{ root: classes.item }}
                       divider={true}
-                      button={true}
-                      disabled={isDisabled || !inject.inject_enabled}
-                      onClick={() => setSelectedInject(inject.inject_id)}
                     >
                       <ListItemIcon>
-                        <InjectIcon
-                          type={inject.inject_type}
-                          variant="inline"
-                        />
+                        <InjectIcon type={inject.inject_type} variant="inline" />
                       </ListItemIcon>
                       <ListItemText
                         primary={
                           <div>
                             <div
                               className={classes.bodyItem}
-                              style={{ width: '50%' }}
+                              style={{ width: '40%' }}
                             >
                               {inject.inject_title}
                             </div>
                             <div
                               className={classes.bodyItem}
-                              style={{ width: '20%', paddingTop: 8 }}
+                              style={{ width: '20%' }}
                             >
-                              <ProgressBarCountdown
-                                date={inject.inject_date}
-                                paused={
-                                  exercise?.exercise_status === 'PAUSED'
-                                  || exercise?.exercise_status === 'CANCELED'
-                                }
+                              <InjectStatus
+                                variant="list"
+                                status={inject.inject_status?.status_name}
                               />
                             </div>
                             <div
@@ -459,93 +529,48 @@ const Timeline = () => {
                                 marginRight: 15,
                               }}
                             >
-                              {fndt(inject.inject_date)}
+                              {fndt(inject.inject_status?.tracking_sent_date)} (
+                              {inject.inject_status
+                                && (
+                                  inject.inject_status.tracking_total_execution_time / 1000
+                                ).toFixed(2)}
+                              s)
                             </div>
                           </div>
                         }
                       />
                       <ListItemSecondaryAction>
-                        <InjectPopover
-                          inject={inject}
-                          exerciseId={exerciseId}
-                          exercise={exercise}
-                          tagsMap={tagsMap}
-                          injectTypesMap={injectTypesMap}
-                          setSelectedInject={setSelectedInject}
-                          isDisabled={isDisabled}
-                        />
+                        <InjectStatusDetails status={inject.inject_status} />
                       </ListItemSecondaryAction>
                     </ListItem>
-                  );
-                })}
-              </List>
-            ) : (
-              <Empty message={t('No pending injects in this simulation.')} />
-            )}
-          </Paper>
+                  ))}
+                </List>
+              ) : (
+                <Empty message={t('No processed injects in this simulation.')} />
+              )}
+            </Paper>
+          </Grid>
         </Grid>
-        <Grid item={true} xs={6}>
-          <Typography variant="h4">{t('Processed injects')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            {processedInjects.length > 0 ? (
-              <List style={{ paddingTop: 0 }}>
-                {processedInjects.map((inject) => (
-                  <ListItem
-                    key={inject.inject_id}
-                    dense={true}
-                    classes={{ root: classes.item }}
-                    divider={true}
-                  >
-                    <ListItemIcon>
-                      <InjectIcon type={inject.inject_type} variant="inline" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <div>
-                          <div
-                            className={classes.bodyItem}
-                            style={{ width: '40%' }}
-                          >
-                            {inject.inject_title}
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={{ width: '20%' }}
-                          >
-                            <InjectStatus
-                              variant="list"
-                              status={inject.inject_status?.status_name}
-                            />
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={{
-                              fontFamily: 'Consolas, monaco, monospace',
-                              fontSize: 12,
-                              paddingTop: 3,
-                              marginRight: 15,
-                            }}
-                          >
-                            {fndt(inject.inject_status?.tracking_sent_date)} (
-                            {inject.inject_status
-                              && (
-                                inject.inject_status.tracking_total_execution_time / 1000
-                              ).toFixed(2)}
-                            s)
-                          </div>
-                        </div>
-                      }
-                    />
-                    <ListItemSecondaryAction>
-                      <InjectStatusDetails status={inject.inject_status} />
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-              </List>
-            ) : (
-              <Empty message={t('No processed injects in this simulation.')} />
-            )}
-          </Paper>
+      </Grid>
+      <Grid container spacing={3}>
+        <Typography variant="h1" style={{ paddingLeft: 24, paddingTop: 24 }}>{t('Simulation data')}</Typography>
+        <Grid container item spacing={3}>
+          <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography variant="h4">
+              {t('Sent injects over time')}
+            </Typography>
+            <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+              <InjectOverTimeArea exerciseId={exerciseId} />
+            </Paper>
+          </Grid>
+          <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography variant="h4">
+              {t('Sent injects over time')}
+            </Typography>
+            <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+              <InjectOverTimeLine exerciseId={exerciseId} />
+            </Paper>
+          </Grid>
         </Grid>
       </Grid>
       <Drawer

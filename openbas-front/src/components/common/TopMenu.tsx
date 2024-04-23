@@ -18,23 +18,24 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }));
 
-export interface MenuEntry {
+export interface TopMenuEntry {
   path: string;
   match?: string;
   label: string;
 }
 
-const TopMenu: FunctionComponent<{ entries: MenuEntry[], contextual?: boolean }> = ({
+const TopMenu: FunctionComponent<{ entries: TopMenuEntry[], contextual?: boolean }> = ({
   entries,
   contextual,
 }) => {
+  // Standard hooks
   const location = useLocation();
   const classes = useStyles();
   const { t } = useFormatter();
 
   const buttons = () => (
     entries.map((entry, idx) => {
-      let isCurrentTab = false;
+      let isCurrentTab: boolean;
       if (entry.match) {
         isCurrentTab = location.pathname.includes(entry.match);
       } else {

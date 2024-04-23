@@ -7,6 +7,7 @@ import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ComcheckRepository;
 import io.openbas.database.repository.ComcheckStatusRepository;
+import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
@@ -46,6 +47,7 @@ public class ComchecksExecutionJob implements Job {
     private ComcheckRepository comcheckRepository;
     private ComcheckStatusRepository comcheckStatusRepository;
     private ExecutionContextService executionContextService;
+    private InjectorContractRepository injectorContractRepository;
 
     @Resource
     private ObjectMapper mapper;
@@ -75,9 +77,14 @@ public class ComchecksExecutionJob implements Job {
         this.executionContextService = executionContextService;
     }
 
+    @Autowired
+    public void setInjectorContractRepository(@NotNull final InjectorContractRepository injectorContractRepository) {
+        this.injectorContractRepository = injectorContractRepository;
+    }
+
     private Inject buildComcheckEmail(Comcheck comCheck) {
         Inject emailInject = new Inject();
-        emailInject.setContract(EmailContract.EMAIL_DEFAULT);
+        emailInject.setInjectorContract(this.injectorContractRepository.findById(EmailContract.EMAIL_DEFAULT).orElseThrow());
         emailInject.setExercise(comCheck.getExercise());
         ObjectNode content = mapper.createObjectNode();
         content.set("subject", mapper.convertValue(comCheck.getSubject(), JsonNode.class));

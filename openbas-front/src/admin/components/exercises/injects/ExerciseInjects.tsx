@@ -1,5 +1,8 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { ReorderOutlined, SignalCellularAltOutlined } from '@mui/icons-material';
+import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import type { Exercise, Inject } from '../../../../utils/api-types';
 import { ArticleContext, InjectContext, InjectContextType, TeamContext } from '../../components/Context';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -26,6 +29,22 @@ import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import { fetchExerciseArticles } from '../../../../actions/channels/article-action';
 import { articleContextForExercise } from '../articles/ExerciseArticles';
 import { teamContextForExercise } from '../teams/ExerciseTeams';
+import InjectDistributionByType from '../../components/injects/InjectDistributionByType';
+import InjectDistributionByTeam from '../../components/injects/InjectDistributionByTeam';
+import ExerciseDistributionScoreByTeamInPercentage from '../exercise/overview/ExerciseDistributionScoreByTeamInPercentage';
+import ExerciseDistributionScoreOverTimeByInjectType from '../exercise/overview/ExerciseDistributionScoreOverTimeByInjectType';
+import ExerciseDistributionScoreOverTimeByTeam from '../exercise/overview/ExerciseDistributionScoreOverTimeByTeam';
+import ExerciseDistributionScoreOverTimeByTeamInPercentage from '../exercise/overview/ExerciseDistributionScoreOverTimeByTeamInPercentage';
+import { useFormatter } from '../../../../components/i18n';
+
+const useStyles = makeStyles(() => ({
+  paperChart: {
+    position: 'relative',
+    padding: '0 20px 0 0',
+    overflow: 'hidden',
+    height: '100%',
+  },
+}));
 
 interface Props {
 
@@ -33,6 +52,8 @@ interface Props {
 
 const ExerciseInjects: FunctionComponent<Props> = () => {
   // Standard hooks
+  const { t } = useFormatter();
+  const classes = useStyles();
   const dispatch = useAppDispatch();
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
 
@@ -82,18 +103,112 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
     },
   };
 
+  const [viewMode, setViewMode] = useState('list');
+
   return (
-    <InjectContext.Provider value={context}>
-      <ArticleContext.Provider value={articleContext}>
-        <TeamContext.Provider value={teamContext}>
-          <Injects injects={injects} teams={teams} articles={articles} variables={variables}
-            uriVariable={`/admin/exercises/${exerciseId}/definition/variables`}
-            allUsersNumber={exercise.exercise_all_users_number} usersNumber={exercise.exercise_users_number}
-            teamsUsers={exercise.exercise_teams_users}
-          />
-        </TeamContext.Provider>
-      </ArticleContext.Provider>
-    </InjectContext.Provider>
+    <>
+      <ToggleButtonGroup
+        size="small"
+        exclusive
+        style={{ float: 'right' }}
+        aria-label="Change view mode"
+      >
+        <Tooltip title={t('List view')}>
+          <ToggleButton
+            value='list'
+            onClick={() => setViewMode('list')}
+            selected={viewMode === 'list'}
+            aria-label="List view mode"
+          >
+            <ReorderOutlined
+              fontSize="small"
+              color={viewMode === 'list' ? 'primary' : 'inherit'}
+            />
+          </ToggleButton>
+        </Tooltip>
+        <Tooltip title={t('Distribution view')}>
+          <ToggleButton
+            value='distribution'
+            onClick={() => setViewMode('distribution')}
+            selected={viewMode === 'distribution'}
+            aria-label="Distribution view mode"
+          >
+            <SignalCellularAltOutlined
+              fontSize="small"
+              color={viewMode === 'distribution' ? 'primary' : 'inherit'}
+            />
+          </ToggleButton>
+        </Tooltip>
+      </ToggleButtonGroup>
+      {viewMode === 'list'
+        && <InjectContext.Provider value={context}>
+          <ArticleContext.Provider value={articleContext}>
+            <TeamContext.Provider value={teamContext}>
+              <Injects injects={injects} teams={teams} articles={articles} variables={variables}
+                uriVariable={`/admin/exercises/${exerciseId}/definition/variables`}
+                allUsersNumber={exercise.exercise_all_users_number}
+                usersNumber={exercise.exercise_users_number}
+                teamsUsers={exercise.exercise_teams_users}
+              />
+            </TeamContext.Provider>
+          </ArticleContext.Provider>
+        </InjectContext.Provider>
+      }
+      {viewMode === 'distribution'
+        && <Grid container spacing={3}>
+          <Grid container item spacing={3}>
+            <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="h4">
+                {t('Distribution of injects by type')}
+              </Typography>
+              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                <InjectDistributionByType exerciseId={exerciseId} />
+              </Paper>
+            </Grid>
+            <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="h4">
+                {t('Distribution of injects by team')}
+              </Typography>
+              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                <InjectDistributionByTeam exerciseId={exerciseId} />
+              </Paper>
+            </Grid>
+            <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="h4">
+                {t('Distribution of expectations by inject type')}
+              </Typography>
+              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId} />
+              </Paper>
+            </Grid>
+            <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="h4">
+                {t('Distribution of expected total score by inject type')}
+              </Typography>
+              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                <ExerciseDistributionScoreOverTimeByInjectType exerciseId={exerciseId} />
+              </Paper>
+            </Grid>
+            <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="h4">
+                {t('Distribution of expectations by team')}
+              </Typography>
+              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                <ExerciseDistributionScoreOverTimeByTeam exerciseId={exerciseId} />
+              </Paper>
+            </Grid>
+            <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="h4">
+                {t('Distribution of expected total score by team')}
+              </Typography>
+              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                <ExerciseDistributionScoreOverTimeByTeamInPercentage exerciseId={exerciseId} />
+              </Paper>
+            </Grid>
+          </Grid>
+        </Grid>
+      }
+    </>
   );
 };
 

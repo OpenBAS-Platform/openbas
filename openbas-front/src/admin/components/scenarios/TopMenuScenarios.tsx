@@ -1,8 +1,8 @@
 import React from 'react';
-import TopMenu, { MenuEntry } from '../../../components/common/TopMenu';
+import TopMenu, { TopMenuEntry } from '../../../components/common/TopMenu';
 
 const TopMenuScenarios = () => {
-  const entries: MenuEntry[] = [
+  const entries: TopMenuEntry[] = [
     {
       path: '/admin/scenarios',
       label: 'Scenarios',

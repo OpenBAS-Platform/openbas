@@ -5,6 +5,7 @@ import io.openbas.database.model.Execution;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.User;
+import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.injects.email.EmailContract.EMAIL_DEFAULT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -32,6 +34,8 @@ public class EmailExecutorTest {
   private UserRepository userRepository;
   @Autowired
   private ExecutionContextService executionContextService;
+  @Autowired
+  private InjectorContractRepository injectorContractRepository;
   @Resource
   protected ObjectMapper mapper;
 
@@ -48,7 +52,7 @@ public class EmailExecutorTest {
     content.setExpectations(List.of(expectation));
     Inject inject = new Inject();
     inject.setType(EmailContract.TYPE);
-    inject.setContract(EmailContract.EMAIL_DEFAULT);
+    inject.setInjectorContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
     inject.setContent(this.mapper.valueToTree(content));
     Iterable<User> users = this.userRepository.findAll();
     List<ExecutionContext> userInjectContexts = fromIterable(users).stream()

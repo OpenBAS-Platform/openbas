@@ -15,14 +15,15 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import { useFormatter } from '../../../components/i18n';
-import ExerciseForm from './ExerciseForm';
-import { deleteExercise, updateExercise } from '../../../actions/Exercise';
-import { usePermissions } from '../../../utils/Exercise';
-import Transition from '../../../components/common/Transition';
-import type { Exercise, ExerciseUpdateInput } from '../../../utils/api-types';
-import { useAppDispatch } from '../../../utils/hooks';
-import ButtonPopover, { ButtonPopoverEntry } from '../../../components/common/ButtonPopover';
+import { useFormatter } from '../../../../components/i18n';
+import { deleteExercise, updateExercise } from '../../../../actions/Exercise';
+import { usePermissions } from '../../../../utils/Exercise';
+import Transition from '../../../../components/common/Transition';
+import type { Exercise, ExerciseUpdateInput } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
+import ExerciseUpdateForm from '../ExerciseUpdateForm';
+import Drawer from '../../../../components/common/Drawer';
 
 interface ExercisePopoverProps {
   exercise: Exercise;
@@ -49,7 +50,15 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleCloseEdit = () => setOpenEdit(false);
 
   const onSubmitEdit = (data: ExerciseUpdateInput) => {
-    return dispatch(updateExercise(exercise.exercise_id, data)).then(() => handleCloseEdit());
+    const input = {
+      exercise_name: data.exercise_name,
+      exercise_subtitle: data.exercise_subtitle,
+      exercise_description: data.exercise_description,
+      exercise_mail_from: exercise.exercise_mail_from,
+      exercise_message_header: exercise.exercise_message_header,
+      exercise_message_footer: exercise.exercise_message_footer,
+    };
+    return dispatch(updateExercise(exercise.exercise_id, input)).then(() => handleCloseEdit());
   };
 
   // Deletion
@@ -87,9 +96,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     exercise_name: exercise.exercise_name,
     exercise_subtitle: exercise.exercise_subtitle,
     exercise_description: exercise.exercise_description,
-    exercise_mail_from: exercise.exercise_mail_from,
-    exercise_message_header: exercise.exercise_message_header,
-    exercise_message_footer: exercise.exercise_message_footer,
   };
 
   const permissions = usePermissions(exercise.exercise_id);
@@ -122,24 +128,17 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog
-        TransitionComponent={Transition}
+      <Drawer
         open={openEdit}
-        onClose={handleCloseEdit}
-        fullWidth={true}
-        maxWidth="md"
-        PaperProps={{ elevation: 1 }}
+        handleClose={handleCloseEdit}
+        title={t('Update the simulation')}
       >
-        <DialogTitle>{t('Update the simulation')}</DialogTitle>
-        <DialogContent>
-          <ExerciseForm
-            initialValues={initialValues}
-            editing={true}
-            onSubmit={onSubmitEdit}
-            handleClose={handleCloseEdit}
-          />
-        </DialogContent>
-      </Dialog>
+        <ExerciseUpdateForm
+          initialValues={initialValues}
+          onSubmit={onSubmitEdit}
+          handleClose={handleCloseEdit}
+        />
+      </Drawer>
       <Dialog
         open={openExport}
         TransitionComponent={Transition}
