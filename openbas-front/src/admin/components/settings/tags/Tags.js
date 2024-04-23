@@ -137,7 +137,7 @@ const Tags = () => {
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-                }
+            }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>

@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import countriesJson from '../static/geo/countries.json';
-import type { Exercise, KillChainPhase, Organization, Scenario, Tag } from './api-types';
+import type { AttackPattern, Exercise, KillChainPhase, Organization, Scenario, Tag } from './api-types';
 
 interface Countries {
   features: [{
@@ -32,6 +32,24 @@ export const tagOptions = (
       label: tagItem.tag_name,
       color: tagItem.tag_color,
     }) as Option,
+  );
+
+export const attackPatternsOptions = (
+  attack_pattern_ids: string[] | undefined,
+  attackPatternsMap: Record<string, AttackPattern>,
+  killChainPhasesMap: Record<string, KillChainPhase>,
+) => (attack_pattern_ids ?? [])
+  .map((attackPatternId) => attackPatternsMap[attackPatternId])
+  .filter((attackPatternItem) => attackPatternItem !== undefined)
+  .map(
+    (attackPatternItem) => {
+      const killChainPhase = R.head(attackPatternItem.attack_pattern_kill_chain_phases);
+      const killChainName = killChainPhase ? killChainPhasesMap[killChainPhase]?.phase_kill_chain_name ?? null : null;
+      return {
+        id: attackPatternItem.attack_pattern_id,
+        label: killChainName ? `[${killChainName}] [${attackPatternItem.attack_pattern_external_id}] ${attackPatternItem.attack_pattern_name}` : `[${attackPatternItem.attack_pattern_external_id}] ${attackPatternItem.attack_pattern_name}`,
+      } as Option;
+    },
   );
 
 export const killChainPhasesOptions = (

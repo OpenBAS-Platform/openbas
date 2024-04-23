@@ -3,7 +3,7 @@ import type { AttackPatternStore } from '../../actions/attack_patterns/AttackPat
 import type { InjectorContractStore } from '../../actions/injector_contracts/InjectorContract';
 
 const computeAttackPattern = (contract: InjectorContractStore, attackPatternsMap: Record<string, AttackPatternStore>) => {
-  const attackPatternParents = (contract.injectors_contracts_attack_patterns ?? []).flatMap((attackPattern) => {
+  const attackPatternParents = (contract.injector_contract_attack_patterns ?? []).flatMap((attackPattern) => {
     const attackPatternParentId = attackPatternsMap[attackPattern]?.attack_pattern_parent;
     if (attackPatternParentId) {
       return [attackPatternsMap[attackPatternParentId]];
@@ -15,7 +15,7 @@ const computeAttackPattern = (contract: InjectorContractStore, attackPatternsMap
     return attackPatternParents;
   }
 
-  return (contract.injectors_contracts_attack_patterns ?? []).map((attackPattern) => {
+  return (contract.injector_contract_attack_patterns ?? []).map((attackPattern) => {
     return attackPatternsMap[attackPattern];
   });
 };

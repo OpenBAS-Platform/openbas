@@ -6,6 +6,11 @@ export const fetchInjectors = () => (dispatch) => {
   return getReferential(schema.arrayOfInjectors, uri)(dispatch);
 };
 
+export const fetchInjector = (injectorId) => (dispatch) => {
+  const uri = `/api/injectors/${injectorId}`;
+  return getReferential(schema.injector, uri)(dispatch);
+};
+
 export const searchInjectors = (paginationInput) => {
   const data = paginationInput;
   const uri = '/api/injectors/search';

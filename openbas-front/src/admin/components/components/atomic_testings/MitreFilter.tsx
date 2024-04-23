@@ -36,7 +36,7 @@ interface KillChainPhaseComponentProps {
   onClick: () => void;
 }
 
-export const MITRE_FILTER_KEY = 'injectors_contracts_attack_patterns';
+export const MITRE_FILTER_KEY = 'injector_contract_attack_patterns';
 
 const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
   killChainPhase,

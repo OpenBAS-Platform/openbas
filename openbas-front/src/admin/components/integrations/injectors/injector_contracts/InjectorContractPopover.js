@@ -3,13 +3,13 @@ import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { updateAttackPattern, deleteAttackPattern } from '../../../../actions/AttackPattern';
 import InjectorContractForm from './InjectorContractForm';
-import { useFormatter } from '../../../../components/i18n';
-import { killChainPhasesOptions } from '../../../../utils/Option';
-import Transition from '../../../../components/common/Transition';
+import { useFormatter } from '../../../../../components/i18n';
+import { attackPatternsOptions } from '../../../../../utils/Option';
+import Transition from '../../../../../components/common/Transition';
+import { updateInjectorContract, deleteInjectorContract } from '../../../../../actions/InjectorContracts';
 
-const InjectorContractPopover = ({ attackPattern, killChainPhasesMap }) => {
+const InjectorContractPopover = ({ injector, injectorContract, killChainPhasesMap, attackPatternsMap }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -29,7 +29,7 @@ const InjectorContractPopover = ({ attackPattern, killChainPhasesMap }) => {
     const inputValues = R.pipe(
       R.assoc('attack_pattern_kill_chain_phases', R.pluck('id', data.attack_pattern_kill_chain_phases)),
     )(data);
-    return dispatch(updateAttackPattern(attackPattern.attack_pattern_id, inputValues)).then(() => handleCloseEdit());
+    return dispatch(updateInjectorContract(injectorContract.injector_contract_id, inputValues)).then(() => handleCloseEdit());
   };
 
   const handleOpenDelete = () => {
@@ -38,18 +38,21 @@ const InjectorContractPopover = ({ attackPattern, killChainPhasesMap }) => {
   };
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
-    dispatch(deleteAttackPattern(attackPattern.attack_pattern_id));
+    dispatch(deleteInjectorContract(injectorContract.injector_contract_id));
     handleCloseDelete();
   };
-  const attackPatternKillChainPhases = killChainPhasesOptions(attackPattern.attack_pattern_kill_chain_phases, killChainPhasesMap);
-  const initialValues = R.pipe(
-    R.pick([
-      'attack_pattern_external_id',
-      'attack_pattern_name',
-      'attack_pattern_description',
-    ]),
-    R.assoc('attack_pattern_kill_chain_phases', attackPatternKillChainPhases),
-  )(attackPattern);
+  const injectorContractAttackPatterns = attackPatternsOptions(injectorContract.injector_contract_attack_patterns, attackPatternsMap, killChainPhasesMap);
+  let initialValues = null;
+  if (injector.injector_custom_contracts) {
+    initialValues = R.pipe(
+      R.pick([
+        'injector_contract_name',
+      ]),
+      R.assoc('injector_contract_attack_patterns', injectorContractAttackPatterns),
+    )(injectorContract);
+  } else {
+    initialValues = { injector_contract_attack_patterns: injectorContractAttackPatterns };
+  }
   return (
     <>
       <IconButton color="primary" onClick={handlePopoverOpen} aria-haspopup="true" size="large">
@@ -61,7 +64,7 @@ const InjectorContractPopover = ({ attackPattern, killChainPhasesMap }) => {
         onClose={handlePopoverClose}
       >
         <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
-        <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
+        <MenuItem onClick={handleOpenDelete} disabled={!injector.injector_custom_contracts}>{t('Delete')}</MenuItem>
       </Menu>
       <Dialog
         open={openDelete}
@@ -71,7 +74,7 @@ const InjectorContractPopover = ({ attackPattern, killChainPhasesMap }) => {
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to delete this attack pattern?')}
+            {t('Do you want to delete this inject contract?')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -89,7 +92,7 @@ const InjectorContractPopover = ({ attackPattern, killChainPhasesMap }) => {
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
-        <DialogTitle>{t('Update the attack pattern')}</DialogTitle>
+        <DialogTitle>{t('Update the inject contract')}</DialogTitle>
         <DialogContent>
           <InjectorContractForm
             initialValues={initialValues}

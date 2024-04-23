@@ -20,9 +20,13 @@ import io.openbas.rest.injector.response.InjectorConnection;
 import io.openbas.rest.injector.response.InjectorRegistration;
 import io.openbas.rest.injector_contract.form.InjectorContractInput;
 import io.openbas.service.FileService;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +39,7 @@ import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.service.QueueService.EXCHANGE_KEY;
 import static io.openbas.service.QueueService.ROUTING_KEY;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RestController
 public class InjectorApi extends RestBehavior {
@@ -109,10 +114,12 @@ public class InjectorApi extends RestBehavior {
         return injectorContract;
     }
 
-    private Injector updateInjector(Injector injector, String name, List<InjectorContractInput> contracts) {
+    private Injector updateInjector(Injector injector, String name, List<InjectorContractInput> contracts, Boolean customContracts, String contractTemplate) {
         injector.setUpdatedAt(Instant.now());
         injector.setName(name);
         injector.setExternal(true);
+        injector.setCustomContracts(customContracts);
+        injector.setContractTemplate(contractTemplate);
         List<String> existing = new ArrayList<>();
         List<String> toDeletes = new ArrayList<>();
         injector.getContracts().forEach(contract -> {
@@ -146,7 +153,7 @@ public class InjectorApi extends RestBehavior {
     @PutMapping("/api/injectors/{injectorId}")
     public Injector updateInjector(@PathVariable String injectorId, @Valid @RequestBody InjectorUpdateInput input) {
         Injector injector = injectorRepository.findById(injectorId).orElseThrow();
-        return updateInjector(injector, input.getName(), input.getContracts());
+        return updateInjector(injector, input.getName(), input.getContracts(), input.getCustomContracts(), input.getContractTemplate());
     }
 
     @Secured(ROLE_ADMIN)
@@ -186,7 +193,7 @@ public class InjectorApi extends RestBehavior {
             // We need to support upsert for registration
             Injector injector = injectorRepository.findById(input.getId()).orElse(null);
             if (injector != null) {
-                updateInjector(injector, input.getName(), input.getContracts());
+                updateInjector(injector, input.getName(), input.getContracts(), input.getCustomContracts(), input.getContractTemplate());
             } else {
                 // save the injector
                 Injector newInjector = new Injector();
@@ -194,6 +201,8 @@ public class InjectorApi extends RestBehavior {
                 newInjector.setExternal(true);
                 newInjector.setName(input.getName());
                 newInjector.setType(input.getType());
+                newInjector.setCustomContracts(input.getCustomContracts());
+                newInjector.setContractTemplate(input.getContractTemplate());
                 Injector savedInjector = injectorRepository.save(newInjector);
                 // Save the contracts
                 List<InjectorContract> injectorContracts = input.getContracts().stream()

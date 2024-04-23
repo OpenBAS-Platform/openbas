@@ -59,6 +59,7 @@ public class InjectorContract implements Base {
     @JoinColumn(name = "injector_id")
     @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("injector_contract_injector")
+    @Queryable(filterable = true, property = "id")
     private Injector injector;
 
     @Setter
@@ -67,7 +68,7 @@ public class InjectorContract implements Base {
             joinColumns = @JoinColumn(name = "injector_contract_id"),
             inverseJoinColumns = @JoinColumn(name = "attack_pattern_id"))
     @JsonSerialize(using = MultiIdDeserializer.class)
-    @JsonProperty("injectors_contracts_attack_patterns")
+    @JsonProperty("injector_contract_attack_patterns")
     @Queryable(filterable = true)
     private List<AttackPattern> attackPatterns = new ArrayList<>();
 

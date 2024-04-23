@@ -6,6 +6,11 @@ export const fetchInjectorContracts = () => (dispatch) => {
   return getReferential(schema.arrayOfInjectorContracts, uri)(dispatch);
 };
 
+export const fetchInjectorContract = (injectorContractId) => (dispatch) => {
+  const uri = `/api/injector_contracts/${injectorContractId}`;
+  return getReferential(schema.injectorContract, uri)(dispatch);
+};
+
 export const searchInjectorContracts = (paginationInput) => {
   const data = paginationInput;
   const uri = '/api/injector_contracts/search';

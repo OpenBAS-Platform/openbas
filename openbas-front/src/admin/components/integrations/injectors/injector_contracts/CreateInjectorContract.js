@@ -5,10 +5,10 @@ import * as R from 'ramda';
 import { Fab, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { Add } from '@mui/icons-material';
-import { addAttackPattern } from '../../../../actions/AttackPattern';
+import { addAttackPattern } from '../../../../../actions/AttackPattern';
 import InjectorContractForm from './InjectorContractForm';
-import inject18n from '../../../../components/i18n';
-import Transition from '../../../../components/common/Transition';
+import inject18n from '../../../../../components/i18n';
+import Transition from '../../../../../components/common/Transition';
 
 const styles = () => ({
   createButton: {

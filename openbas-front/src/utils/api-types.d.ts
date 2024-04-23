@@ -1002,8 +1002,10 @@ export interface InjectUpdateTriggerInput {
 }
 
 export interface Injector {
+  injector_contract_template?: string;
   /** @format date-time */
   injector_created_at?: string;
+  injector_custom_contracts?: boolean;
   injector_external?: boolean;
   injector_id: string;
   injector_name: string;
@@ -1034,11 +1036,23 @@ export interface InjectorContract {
   injector_contract_manual?: boolean;
   /** @format date-time */
   injector_contract_updated_at?: string;
-  injectors_contracts_attack_patterns?: AttackPattern[];
+  injector_contract_attack_patterns?: AttackPattern[];
   updateAttributes?: object;
 }
 
+export interface InjectorContractAddInput {
+  atomicTesting?: boolean;
+  contract_attack_patterns_external_ids?: string[];
+  contract_content: string;
+  contract_id: string;
+  contract_labels?: Record<string, string>;
+  contract_manual?: boolean;
+  injector_id: string;
+  is_atomic_testing?: boolean;
+}
+
 export interface InjectorContractInput {
+  atomicTesting?: boolean;
   contract_attack_patterns_external_ids?: string[];
   contract_content: string;
   contract_id: string;
@@ -1047,8 +1061,19 @@ export interface InjectorContractInput {
   is_atomic_testing?: boolean;
 }
 
+export interface InjectorContractUpdateInput {
+  atomicTesting?: boolean;
+  contract_attack_patterns_external_ids?: string[];
+  contract_content: string;
+  contract_labels?: Record<string, string>;
+  contract_manual?: boolean;
+  is_atomic_testing?: boolean;
+}
+
 export interface InjectorCreateInput {
+  injector_contract_template?: string;
   injector_contracts?: InjectorContractInput[];
+  injector_custom_contracts?: boolean;
   injector_id: string;
   injector_name: string;
   injector_type: string;
@@ -1060,7 +1085,9 @@ export interface InjectorRegistration {
 }
 
 export interface InjectorUpdateInput {
+  injector_contract_template?: string;
   injector_contracts?: InjectorContractInput[];
+  injector_custom_contracts?: boolean;
   injector_name: string;
 }
 

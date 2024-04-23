@@ -20,4 +20,10 @@ public class InjectorUpdateInput {
 
     @JsonProperty("injector_contracts")
     private List<InjectorContractInput> contracts;
+
+    @JsonProperty("injector_custom_contracts")
+    private Boolean customContracts = false;
+
+    @JsonProperty("injector_contract_template")
+    private String contractTemplate;
 }

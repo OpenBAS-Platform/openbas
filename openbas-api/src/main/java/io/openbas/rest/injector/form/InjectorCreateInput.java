@@ -25,6 +25,12 @@ public class InjectorCreateInput {
     @JsonProperty("injector_contracts")
     private List<InjectorContractInput> contracts;
 
+    @JsonProperty("injector_custom_contracts")
+    private Boolean customContracts = false;
+
+    @JsonProperty("injector_contract_template")
+    private String contractTemplate;
+
     public String getId() {
         return id;
     }
@@ -55,5 +61,21 @@ public class InjectorCreateInput {
 
     public void setContracts(List<InjectorContractInput> contracts) {
         this.contracts = contracts;
+    }
+
+    public Boolean getCustomContracts() {
+        return customContracts;
+    }
+
+    public void setCustomContracts(Boolean customContracts) {
+        this.customContracts = customContracts;
+    }
+
+    public String getContractTemplate() {
+        return contractTemplate;
+    }
+
+    public void setContractTemplate(String contractTemplate) {
+        this.contractTemplate = contractTemplate;
     }
 }

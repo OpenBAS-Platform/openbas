@@ -46,6 +46,16 @@ public class Injector implements Base {
     private boolean external = false;
 
     @Getter
+    @Column(name = "injector_custom_contracts")
+    @JsonProperty("injector_custom_contracts")
+    private boolean customContracts = false;
+
+    @Getter
+    @Column(name = "injector_contract_template")
+    @JsonProperty("injector_contract_template")
+    private String contractTemplate = null;
+
+    @Getter
     @Column(name = "injector_created_at")
     @JsonProperty("injector_created_at")
     private Instant createdAt = now();
