@@ -5,10 +5,12 @@ import io.openbas.database.model.KillChainPhase;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.KillChainPhaseRepository;
 import io.openbas.rest.attack_pattern.form.AttackPatternCreateInput;
+import io.openbas.rest.attack_pattern.form.AttackPatternUpdateInput;
 import io.openbas.rest.attack_pattern.form.AttackPatternUpsertInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -70,6 +73,18 @@ public class AttackPatternApi extends RestBehavior {
     attackPattern.setUpdateAttributes(input);
     attackPattern.setKillChainPhases(fromIterable(killChainPhaseRepository.findAllById(input.getKillChainPhasesIds())));
     attackPattern.setParent(updateRelation(input.getParentId(), attackPattern.getParent(), attackPatternRepository));
+    return attackPatternRepository.save(attackPattern);
+  }
+
+  @Secured(ROLE_ADMIN)
+  @PutMapping("/api/attack_patterns/{attackPatternId}")
+  public AttackPattern updateAttackPattern(
+      @NotBlank @PathVariable final String attackPatternId,
+      @Valid @RequestBody AttackPatternUpdateInput input) {
+    AttackPattern attackPattern = this.attackPatternRepository.findById(attackPatternId).orElseThrow();
+    attackPattern.setUpdateAttributes(input);
+    attackPattern.setKillChainPhases(fromIterable(this.killChainPhaseRepository.findAllById(input.getKillChainPhasesIds())));
+    attackPattern.setUpdatedAt(Instant.now());
     return attackPatternRepository.save(attackPattern);
   }
 

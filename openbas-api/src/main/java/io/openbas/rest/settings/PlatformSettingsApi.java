@@ -152,9 +152,11 @@ public class PlatformSettingsApi extends RestBehavior {
     platformSettings.setAuthSaml2Enable(openBASConfig.isAuthSaml2Enable());
     platformSettings.setAuthLocalEnable(openBASConfig.isAuthLocalEnable());
     platformSettings.setPlatformTheme(
-        ofNullable(dbSettings.get(DEFAULT_THEME.key())).map(Setting::getValue).orElse(null));
+        ofNullable(dbSettings.get(DEFAULT_THEME.key())).map(Setting::getValue).orElse(DEFAULT_THEME.defaultValue())
+    );
     platformSettings.setPlatformLang(
-        ofNullable(dbSettings.get(DEFAULT_LANG.key())).map(Setting::getValue).orElse(null));
+        ofNullable(dbSettings.get(DEFAULT_LANG.key())).map(Setting::getValue).orElse(DEFAULT_LANG.defaultValue())
+    );
 
     // Build authenticated user settings
     OpenBASPrincipal user = currentUser();
@@ -162,7 +164,8 @@ public class PlatformSettingsApi extends RestBehavior {
       platformSettings.setMapTileServerLight(openBASConfig.getMapTileServerLight());
       platformSettings.setMapTileServerDark(openBASConfig.getMapTileServerDark());
       platformSettings.setPlatformName(
-          ofNullable(dbSettings.get(PLATFORM_NAME.key())).map(Setting::getValue).orElse(null));
+          ofNullable(dbSettings.get(PLATFORM_NAME.key())).map(Setting::getValue).orElse(PLATFORM_NAME.defaultValue())
+      );
       platformSettings.setXtmOpenctiEnable(openCTIConfig.getEnable());
       platformSettings.setXtmOpenctiUrl(openCTIConfig.getUrl());
 

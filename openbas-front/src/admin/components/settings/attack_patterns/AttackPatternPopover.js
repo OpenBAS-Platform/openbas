@@ -9,7 +9,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { killChainPhasesOptions } from '../../../../utils/Option';
 import Transition from '../../../../components/common/Transition';
 
-const AttackPatternPopover = ({ attackPattern, killChainPhasesMap }) => {
+const AttackPatternPopover = ({ attackPattern, killChainPhasesMap, onUpdate, onDelete }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -29,7 +29,13 @@ const AttackPatternPopover = ({ attackPattern, killChainPhasesMap }) => {
     const inputValues = R.pipe(
       R.assoc('attack_pattern_kill_chain_phases', R.pluck('id', data.attack_pattern_kill_chain_phases)),
     )(data);
-    return dispatch(updateAttackPattern(attackPattern.attack_pattern_id, inputValues)).then(() => handleCloseEdit());
+    return dispatch(updateAttackPattern(attackPattern.attack_pattern_id, inputValues)).then((result) => {
+      if (onUpdate) {
+        const attackPatternUpdated = result.entities.attackpatterns[result.result];
+        onUpdate(attackPatternUpdated);
+      }
+      handleCloseEdit();
+    });
   };
 
   const handleOpenDelete = () => {
@@ -38,7 +44,13 @@ const AttackPatternPopover = ({ attackPattern, killChainPhasesMap }) => {
   };
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
-    dispatch(deleteAttackPattern(attackPattern.attack_pattern_id));
+    dispatch(deleteAttackPattern(attackPattern.attack_pattern_id)).then(
+      () => {
+        if (onDelete) {
+          onDelete(attackPattern.attack_pattern_id);
+        }
+      },
+    );
     handleCloseDelete();
   };
   const attackPatternKillChainPhases = killChainPhasesOptions(attackPattern.attack_pattern_kill_chain_phases, killChainPhasesMap);

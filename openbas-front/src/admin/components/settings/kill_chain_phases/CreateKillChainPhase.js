@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { Fab, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Fab } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { Add } from '@mui/icons-material';
 import { addKillChainPhase } from '../../../../actions/KillChainPhase';
@@ -35,7 +35,13 @@ class CreateKillChainPhase extends Component {
   onSubmit(data) {
     return this.props
       .addKillChainPhase(data)
-      .then((result) => (result.result ? this.handleClose() : result));
+      .then((result) => {
+        if (this.props.onCreate) {
+          const killChainPhaseCreated = result.entities.killchainphases[result.result];
+          this.props.onCreate(killChainPhaseCreated);
+        }
+        return (result.result ? this.handleClose() : result);
+      });
   }
 
   render() {
@@ -75,6 +81,7 @@ class CreateKillChainPhase extends Component {
 CreateKillChainPhase.propTypes = {
   t: PropTypes.func,
   addKillChainPhase: PropTypes.func,
+  onCreate: PropTypes.func,
 };
 
 const select = (state) => ({
