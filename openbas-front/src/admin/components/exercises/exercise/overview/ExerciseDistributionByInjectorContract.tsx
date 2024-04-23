@@ -11,10 +11,12 @@ import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
-import { fetchInjects, fetchInjectorContracts } from '../../../../../actions/Inject';
+import { fetchInjects } from '../../../../../actions/Inject';
 import { fetchExerciseInjectExpectations } from '../../../../../actions/Exercise';
 import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 import type { Inject } from '../../../../../utils/api-types';
+import { fetchInjectorContracts } from '../../../../../actions/InjectorContracts';
+import type { InjectorContractHelper } from '../../../../../actions/injectorcontract/injector-contract-helper';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
@@ -29,7 +31,7 @@ const ExerciseDistributionByInjectorContract: FunctionComponent<Props> = ({
   const theme: Theme = useTheme();
 
   // Fetching data
-  const { injectsMap, injectorContractsMap, injectExpectations } = useHelper((helper: InjectHelper) => ({
+  const { injectsMap, injectorContractsMap, injectExpectations } = useHelper((helper: InjectHelper & InjectorContractHelper) => ({
     injectsMap: helper.getInjectsMap(),
     injectorContractsMap: helper.getInjectorContractsMapByType(),
     injectExpectations: helper.getExerciseInjectExpectations(exerciseId),

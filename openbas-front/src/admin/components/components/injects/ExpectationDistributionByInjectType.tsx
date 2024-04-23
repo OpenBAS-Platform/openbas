@@ -15,6 +15,7 @@ import { fetchExerciseInjects } from '../../../../actions/Inject';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import type { ChallengesHelper } from '../../../../actions/helper';
 import type { InjectExpectationStore, InjectStore } from '../../../../actions/injects/Inject';
+import type { InjectorContractHelper } from '../../../../actions/injectorcontract/injector-contract-helper';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
@@ -29,7 +30,7 @@ const ExpectationDistributionByInjectorContract: FunctionComponent<Props> = ({
   const theme: Theme = useTheme();
 
   // Fetching data
-  const { injects, challengesMap, injectorContractsMap } = useHelper((helper: InjectHelper & ChallengesHelper) => ({
+  const { injects, challengesMap, injectorContractsMap } = useHelper((helper: InjectHelper & InjectorContractHelper & ChallengesHelper) => ({
     injects: helper.getExerciseInjects(exerciseId),
     challengesMap: helper.getChallengesMap(),
     injectorContractsMap: helper.getInjectorContractsMapByType(),

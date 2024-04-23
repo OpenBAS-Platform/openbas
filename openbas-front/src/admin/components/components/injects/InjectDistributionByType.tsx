@@ -13,6 +13,7 @@ import type { Theme } from '../../../../components/Theme';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import { fetchInjects } from '../../../../actions/Inject';
 import type { InjectExpectationStore, InjectStore } from '../../../../actions/injects/Inject';
+import type { InjectorContractHelper } from '../../../../actions/injectorcontract/injector-contract-helper';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
@@ -27,7 +28,7 @@ const InjectDistributionByType: FunctionComponent<Props> = ({
   const theme: Theme = useTheme();
 
   // Fetching data
-  const { injects, injectorContractsMap } = useHelper((helper: InjectHelper) => ({
+  const { injects, injectorContractsMap } = useHelper((helper: InjectHelper & InjectorContractHelper) => ({
     injects: helper.getScenarioInjects(exerciseId),
     injectorContractsMap: helper.getInjectorContractsMapByType(),
   }));

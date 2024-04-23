@@ -11,11 +11,11 @@ import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
-import { fetchInjectorContracts } from '../../../../../actions/Inject';
 import { fetchExerciseInjectExpectations } from '../../../../../actions/Exercise';
 import type { InjectExpectation } from '../../../../../utils/api-types';
 import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
-import { InjectorContractHelper } from '../../../../../actions/injectorcontract/injector-contract-helper';
+import type { InjectorContractHelper } from '../../../../../actions/injectorcontract/injector-contract-helper';
+import { fetchInjectorContracts } from '../../../../../actions/InjectorContracts';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
