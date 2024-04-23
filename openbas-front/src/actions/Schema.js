@@ -15,7 +15,7 @@ export const arrayOfTags = new schema.Array(tag);
 export const injectorContract = new schema.Entity(
   'injector_contracts',
   {},
-  { idAttribute: 'contract_id' },
+  { idAttribute: 'injector_contract_id' },
 );
 export const arrayOfInjectorContracts = new schema.Array(injectorContract);
 
@@ -405,8 +405,7 @@ export const storeHelper = (state) => ({
   getInjectorContractsWithNoTeams: () => R.uniq(
     entities('injector_contracts', state)
       .map((t) => ({
-        hasTeams:
-                t.fields.filter((f) => f.key === 'teams').length > 0,
+        hasTeams: t.fields.filter((f) => f.key === 'teams').length > 0,
         ...t,
       }))
       .filter((t) => !t.hasTeams)
