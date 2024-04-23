@@ -13,9 +13,10 @@ import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { useHelper } from '../../../store';
 import type { TagsHelper } from '../../../actions/helper';
 import { useFormatter } from '../../../components/i18n';
-import type { ExerciseStore } from '../../../actions/exercises/Exercise';
+import type { ExerciseSimpleStore, ExerciseStore } from '../../../actions/exercises/Exercise';
 import type { Theme } from '../../../components/Theme';
 import AtomicTestingResult from '../components/atomic_testings/AtomicTestingResult';
+import TargetChip from '../components/atomic_testings/TargetChip';
 
 const useStyles = makeStyles((theme: Theme) => ({
   parameters: {
@@ -77,13 +78,19 @@ const headerStyles: Record<string, CSSProperties> = {
   },
   exercise_tags: {
     float: 'left',
-    width: '25%',
+    width: '10%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  exercise_targets: {
+    float: 'left',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
   exercise_global_score: {
     float: 'left',
-    width: '25%',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -116,7 +123,15 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   exercise_tags: {
     float: 'left',
-    width: '25%',
+    width: '10%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  exercise_targets: {
+    float: 'left',
+    width: '20%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -124,7 +139,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   exercise_global_score: {
     float: 'left',
-    width: '25%',
+    width: '20%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -133,7 +148,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  exercises: ExerciseStore[];
+  exercises: ExerciseSimpleStore[];
 }
 
 const ExerciseList: FunctionComponent<Props> = ({
@@ -234,6 +249,12 @@ const ExerciseList: FunctionComponent<Props> = ({
                   headerStyles,
                 )}
                 {filtering.buildHeader(
+                  'exercise_targets',
+                  'Target',
+                  false,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
                   'exercise_global_score',
                   'Global score',
                   false,
@@ -287,6 +308,12 @@ const ExerciseList: FunctionComponent<Props> = ({
                     style={inlineStyles.exercise_tags}
                   >
                     <ItemTags variant="list" tags={exercise.exercise_tags} />
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.exercise_targets}
+                  >
+                    <TargetChip targets={exercise.exercise_targets} />
                   </div>
                   <div
                     className={classes.bodyItem}

@@ -678,6 +678,7 @@ export interface ExerciseSimple {
   exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   exercise_subtitle?: string;
   exercise_tags?: Tag[];
+  exercise_targets: InjectTargetWithResult[];
 }
 
 export interface ExerciseTeamPlayersEnableInput {
