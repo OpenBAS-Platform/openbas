@@ -15,7 +15,7 @@ import type { TagsHelper } from '../../../actions/helper';
 import { useFormatter } from '../../../components/i18n';
 import type { ExerciseStore } from '../../../actions/exercises/Exercise';
 import type { Theme } from '../../../components/Theme';
-import AtomicTestingResult from '../components/atomictestings/AtomicTestingResult';
+import AtomicTestingResult from '../components/atomic_testings/AtomicTestingResult';
 
 const useStyles = makeStyles((theme: Theme) => ({
   parameters: {

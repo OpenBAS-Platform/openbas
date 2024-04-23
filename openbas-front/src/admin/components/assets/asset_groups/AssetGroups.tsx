@@ -10,7 +10,7 @@ import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { useHelper } from '../../../../store';
 import type { TagsHelper, UsersHelper } from '../../../../actions/helper';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import type { AssetGroupsHelper } from '../../../../actions/assetgroups/assetgroup-helper';
+import type { AssetGroupsHelper } from '../../../../actions/asset_groups/assetgroup-helper';
 import type { AssetGroupStore } from './AssetGroup';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
@@ -18,7 +18,7 @@ import { exportData } from '../../../../utils/Environment';
 import ItemTags from '../../../../components/ItemTags';
 import AssetGroupPopover from './AssetGroupPopover';
 import AssetGroupCreation from './AssetGroupCreation';
-import { fetchAssetGroups } from '../../../../actions/assetgroups/assetgroup-action';
+import { fetchAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
 import AssetGroupManagement from './AssetGroupManagement';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 

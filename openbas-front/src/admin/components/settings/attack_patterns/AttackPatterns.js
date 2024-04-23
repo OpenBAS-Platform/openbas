@@ -128,7 +128,7 @@ const AttackPatterns = () => {
 
   // Export
   const exportProps = {
-    exportType: 'attack_pattern',
+    exportType: 'attack_patterns',
     exportKeys: [
       'attack_pattern_external_id',
       'attack_pattern_name',

@@ -6,14 +6,14 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
-import type { KillChainPhaseHelper } from '../../../../actions/killchainphase/killchainphase-helper';
+import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
-import type { AttackPatternHelper } from '../../../../actions/attackpattern/attackpattern-helper';
+import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import { buildEmptyFilter } from '../../../../components/common/filter/FilterUtils';
 import { FilterHelpers } from '../../../../components/common/filter/FilterHelpers';
-import type { AttackPatternStore } from '../../../../actions/attackpattern/AttackPattern';
+import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {

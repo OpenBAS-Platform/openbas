@@ -7,7 +7,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { AssetGroupInput } from '../../../../utils/api-types';
 import Drawer from '../../../../components/common/Drawer';
-import { addAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
+import { addAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import AssetGroupForm from './AssetGroupForm';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Dialog from '../../../../components/common/Dialog';

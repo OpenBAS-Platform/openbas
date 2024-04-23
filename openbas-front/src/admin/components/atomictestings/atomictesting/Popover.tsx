@@ -6,7 +6,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
-import { deleteAtomicTesting, fetchAtomicTestingForUpdate, updateAtomicTesting } from '../../../../actions/atomictestings/atomic-testing-actions';
+import { deleteAtomicTesting, fetchAtomicTestingForUpdate, updateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
@@ -16,7 +16,7 @@ import { AtomicTestingResultContext, PermissionsContext } from '../../components
 import Drawer from '../../../../components/common/Drawer';
 import InjectDefinition from '../../components/injects/InjectDefinition';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import type { AtomicTestingHelper } from '../../../../actions/atomictestings/atomic-testing-helper';
+import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import { tagOptions } from '../../../../utils/Option';
 
 interface Props {

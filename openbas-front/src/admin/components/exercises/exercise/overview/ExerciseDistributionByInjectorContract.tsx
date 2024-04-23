@@ -16,7 +16,7 @@ import { fetchExerciseInjectExpectations } from '../../../../../actions/Exercise
 import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 import type { Inject } from '../../../../../utils/api-types';
 import { fetchInjectorContracts } from '../../../../../actions/InjectorContracts';
-import type { InjectorContractHelper } from '../../../../../actions/injectorcontract/injector-contract-helper';
+import type { InjectorContractHelper } from '../../../../../actions/injector_contracts/injector-contract-helper';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];

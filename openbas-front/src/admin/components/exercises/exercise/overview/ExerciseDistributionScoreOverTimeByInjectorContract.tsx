@@ -14,7 +14,7 @@ import useDataLoader from '../../../../../utils/ServerSideEvent';
 import { fetchExerciseInjectExpectations } from '../../../../../actions/Exercise';
 import type { InjectExpectation } from '../../../../../utils/api-types';
 import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
-import type { InjectorContractHelper } from '../../../../../actions/injectorcontract/injector-contract-helper';
+import type { InjectorContractHelper } from '../../../../../actions/injector_contracts/injector-contract-helper';
 import { fetchInjectorContracts } from '../../../../../actions/InjectorContracts';
 
 interface Props {

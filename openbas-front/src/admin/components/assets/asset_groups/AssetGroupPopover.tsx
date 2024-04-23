@@ -9,7 +9,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import Drawer from '../../../../components/common/Drawer';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import type { AssetGroupStore } from './AssetGroup';
-import { deleteAssetGroup, updateAssetGroup, updateAssetsOnAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
+import { deleteAssetGroup, updateAssetGroup, updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import AssetGroupForm from './AssetGroupForm';
 import AssetGroupManagement from './AssetGroupManagement';
 import Dialog from '../../../../components/common/Dialog';

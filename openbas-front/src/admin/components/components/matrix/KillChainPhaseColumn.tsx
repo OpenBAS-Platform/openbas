@@ -4,7 +4,7 @@ import { makeStyles } from '@mui/styles';
 import type { ExerciseInjectExpectationResultsByTypeStore } from '../../../../actions/exercises/Exercise';
 import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
 import AttackPatternBox from './AttackPatternBox';
-import type { AttackPatternStore } from '../../../../actions/attackpattern/AttackPattern';
+import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 
 const useStyles = makeStyles(() => ({
   column: {

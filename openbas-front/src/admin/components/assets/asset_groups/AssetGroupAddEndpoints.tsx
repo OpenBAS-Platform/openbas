@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { updateAssetsOnAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
+import { updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import EndpointsDialogAdding from '../endpoints/EndpointsDialogAdding';
 import { useFormatter } from '../../../../components/i18n';

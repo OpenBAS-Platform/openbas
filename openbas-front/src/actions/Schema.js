@@ -397,7 +397,7 @@ export const storeHelper = (state) => ({
   getInjector: (id) => entity(id, 'injectors', state),
   getInjectors: () => entities('injectors', state),
   getInjectorsMap: () => maps('injectors', state),
-  // injector contracts
+  // injectors contracts
   getInjectorContract: (id) => entity(id, 'injector_contracts', state),
   getInjectorContracts: () => entities('injector_contracts', state),
   getInjectorContractsMap: () => maps('injector_contracts', state),

@@ -7,7 +7,7 @@ import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../utils/hooks';
 import type { Injector } from '../../../utils/api-types';
-import type { InjectorHelper } from '../../../actions/injector/injector-helper';
+import type { InjectorHelper } from '../../../actions/injectors/injector-helper';
 import { fetchInjectors } from '../../../actions/Injectors';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import SearchFilter from '../../../components/SearchFilter';

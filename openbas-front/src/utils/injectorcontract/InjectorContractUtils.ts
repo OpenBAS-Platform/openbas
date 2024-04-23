@@ -1,6 +1,6 @@
 import * as R from 'ramda';
-import type { AttackPatternStore } from '../../actions/attackpattern/AttackPattern';
-import type { InjectorContractStore } from '../../actions/injectorcontract/InjectorContract';
+import type { AttackPatternStore } from '../../actions/attack_patterns/AttackPattern';
+import type { InjectorContractStore } from '../../actions/injector_contracts/InjectorContract';
 
 const computeAttackPattern = (contract: InjectorContractStore, attackPatternsMap: Record<string, AttackPatternStore>) => {
   const attackPatternParents = (contract.injectors_contracts_attack_patterns ?? []).flatMap((attackPattern) => {

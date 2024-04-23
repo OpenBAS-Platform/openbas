@@ -8,7 +8,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import { deleteEndpoint, updateEndpoint } from '../../../../actions/assets/endpoint-actions';
 import Drawer from '../../../../components/common/Drawer';
 import DialogDelete from '../../../../components/common/DialogDelete';
-import { updateAssetsOnAssetGroup } from '../../../../actions/assetgroups/assetgroup-action';
+import { updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import Dialog from '../../../../components/common/Dialog';
 import { EndpointStoreWithType } from './EndpointsList';
 import type { EndpointStore } from './Endpoint';

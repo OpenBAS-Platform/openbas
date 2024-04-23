@@ -2,13 +2,13 @@ import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import type { AttackPatternHelper } from '../../../../actions/attackpattern/attackpattern-helper';
-import type { KillChainPhaseHelper } from '../../../../actions/killchainphase/killchainphase-helper';
+import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
+import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { KillChainPhase } from '../../../../utils/api-types';
-import type { AttackPatternStore } from '../../../../actions/attackpattern/AttackPattern';
+import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import type { ExerciseInjectExpectationResultsByTypeStore } from '../../../../actions/exercises/Exercise';
 import KillChainPhaseColumn from './KillChainPhaseColumn';
 

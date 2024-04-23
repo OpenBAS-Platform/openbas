@@ -637,7 +637,7 @@ class InjectDefinition extends Component {
     }
     injectorContract.fields
       .filter(
-        (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+        (f) => !['teams', 'assets', 'asset_groups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
           f.key,
         ),
       )
@@ -739,7 +739,7 @@ class InjectDefinition extends Component {
     if (injectorContract && Array.isArray(injectorContract.fields)) {
       injectorContract.fields
         .filter(
-          (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+          (f) => !['teams', 'assets', 'asset_groups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
             f.key,
           ),
         )
@@ -1183,7 +1183,7 @@ class InjectDefinition extends Component {
     // -- ASSET GROUPS --
     const hasAssetGroups = injectorContract.fields
       .map((f) => f.key)
-      .includes('assetgroups');
+      .includes('asset_groups');
     const assetGroups = assetGroupIds
       .map((a) => assetGroupsMap[a])
       .filter((a) => a !== undefined);
@@ -1253,7 +1253,7 @@ class InjectDefinition extends Component {
     const builtInFields = [
       'teams',
       'assets',
-      'assetgroups',
+      'asset_groups',
       'articles',
       'challenges',
       'attachments',

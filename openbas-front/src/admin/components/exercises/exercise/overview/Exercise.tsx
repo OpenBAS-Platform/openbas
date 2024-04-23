@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { ExerciseInjectExpectationResultsByTypeStore, ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import ExerciseDistribution from './ExerciseDistribution';
-import ResponsePie from '../../../components/atomictestings/ResponsePie';
+import ResponsePie from '../../../components/atomic_testings/ResponsePie';
 import { fetchExerciseExpectationResult, fetchExerciseInjectExpectationResults } from '../../../../../actions/exercises/exercise-action';
 import type { ExpectationResultsByType } from '../../../../../utils/api-types';
 import MitreMatrix from '../../../components/matrix/MitreMatrix';
