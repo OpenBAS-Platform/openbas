@@ -56,7 +56,7 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
 
   const results: InjectExpectationResultsByTypeStore[] = injectResult?.exercise_inject_results_results ?? [];
 
-  if (results.length !== 1) {
+  if (results.length === 1) {
     return (
       <Button
         key={attackPattern.attack_pattern_id}
