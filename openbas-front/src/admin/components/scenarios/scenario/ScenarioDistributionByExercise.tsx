@@ -101,7 +101,6 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
     <>
       {exerciseSeries.length > 0 ? (
         <Chart
-          // @ts-expect-error: Need to migrate Chart.js file
           options={options}
           series={series}
           type="bar"
