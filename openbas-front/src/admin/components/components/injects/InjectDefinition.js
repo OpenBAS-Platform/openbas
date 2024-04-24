@@ -779,7 +779,7 @@ class InjectDefinition extends Component {
                   label={t(field.label)}
                   fullWidth={true}
                   style={{ marginTop: 20, height: 250 }}
-                  disabled={this.props.permissions.readOnly}
+                  disabled={this.props.permissions.readOnly || field.readOnly}
                 />
               ) : (
                 <TextField
@@ -791,7 +791,7 @@ class InjectDefinition extends Component {
                   rows={10}
                   label={t(field.label)}
                   style={{ marginTop: 20 }}
-                  disabled={this.props.permissions.readOnly}
+                  disabled={this.props.permissions.readOnly || field.readOnly}
                 />
               );
             case 'number':
@@ -804,7 +804,7 @@ class InjectDefinition extends Component {
                   type="number"
                   label={t(field.label)}
                   style={{ marginTop: 20 }}
-                  disabled={this.props.permissions.readOnly}
+                  disabled={this.props.permissions.readOnly || field.readOnly}
                 />
               );
             case 'checkbox':
@@ -814,7 +814,7 @@ class InjectDefinition extends Component {
                   name={field.key}
                   label={t(field.label)}
                   style={{ marginTop: 20 }}
-                  disabled={this.props.permissions.readOnly}
+                  disabled={this.props.permissions.readOnly || field.readOnly}
                 />
               );
             case 'tuple':
@@ -841,7 +841,7 @@ class InjectDefinition extends Component {
                                 aria-haspopup="true"
                                 size="medium"
                                 style={{ marginTop: -2 }}
-                                disabled={this.props.permissions.readOnly}
+                                disabled={this.props.permissions.readOnly || field.readOnly}
                                 color="primary"
                               >
                                 <ControlPointOutlined />
@@ -868,7 +868,7 @@ class InjectDefinition extends Component {
                                   fullWidth={true}
                                   label={t('Type')}
                                   style={{ marginRight: 20 }}
-                                  disabled={this.props.permissions.readOnly}
+                                  disabled={this.props.permissions.readOnly || field.readOnly}
                                 >
                                   <MenuItem key="text" value="text">
                                     <ListItemText>{t('Text')}</ListItemText>
@@ -890,7 +890,7 @@ class InjectDefinition extends Component {
                                   fullWidth={true}
                                   label={t('Key')}
                                   style={{ marginRight: 20 }}
-                                  disabled={this.props.permissions.readOnly}
+                                  disabled={this.props.permissions.readOnly || field.readOnly}
                                 />
                                 {values
                                 && values[field.key]
@@ -903,7 +903,7 @@ class InjectDefinition extends Component {
                                     fullWidth={true}
                                     label={t('Value')}
                                     style={{ marginRight: 20 }}
-                                    disabled={this.props.permissions.readOnly}
+                                    disabled={this.props.permissions.readOnly || field.readOnly}
                                   >
                                     {attachedDocs.map((doc) => (
                                       <MenuItem
@@ -923,7 +923,7 @@ class InjectDefinition extends Component {
                                       fullWidth={true}
                                       label={t('Value')}
                                       style={{ marginRight: 20 }}
-                                      disabled={this.props.permissions.readOnly}
+                                      disabled={this.props.permissions.readOnly || field.readOnly}
                                     />
                                   )}
                                 {field.cardinality === 'n' && (
@@ -931,7 +931,7 @@ class InjectDefinition extends Component {
                                     onClick={() => fields.remove(index)}
                                     aria-haspopup="true"
                                     size="small"
-                                    disabled={this.props.permissions.readOnly}
+                                    disabled={this.props.permissions.readOnly || field.readOnly}
                                     color="primary"
                                   >
                                     <DeleteOutlined />
@@ -957,7 +957,7 @@ class InjectDefinition extends Component {
                   name={field.key}
                   fullWidth={true}
                   style={{ marginTop: 20 }}
-                  disabled={this.props.permissions.readOnly}
+                  disabled={this.props.permissions.readOnly || field.readOnly}
                 >
                   {Object.entries(field.choices)
                     .sort((a, b) => a[1].localeCompare(b[1]))
@@ -1009,7 +1009,7 @@ class InjectDefinition extends Component {
                   name={field.key}
                   fullWidth={true}
                   style={{ marginTop: 20 }}
-                  disabled={this.props.permissions.readOnly}
+                  disabled={this.props.permissions.readOnly || field.readOnly}
                 >
                   {Object.entries(choices)
                     .sort((a, b) => a[1].localeCompare(b[1]))
@@ -1026,7 +1026,7 @@ class InjectDefinition extends Component {
                   key={field.key}
                   renderValue={(v) => (field.expectation ? t(choices[v] || 'Unknown') : choices[v])
                   }
-                  disabled={this.props.permissions.readOnly}
+                  disabled={this.props.permissions.readOnly || field.readOnly}
                   name={field.key}
                   fullWidth={true}
                   style={{ marginTop: 20 }}
@@ -1051,7 +1051,7 @@ class InjectDefinition extends Component {
                   fullWidth={true}
                   label={t(field.label)}
                   style={{ marginTop: 20 }}
-                  disabled={this.props.permissions.readOnly}
+                  disabled={this.props.permissions.readOnly || field.readOnly}
                 />
               );
           }
@@ -1170,10 +1170,12 @@ class InjectDefinition extends Component {
       team_users_enabled_number: this.props.teamsUsers.filter((o) => o.team_id === n.team_id).length,
       ...n,
     })));
+    const fieldTeams = injectorContract.fields.filter((n) => n.key === 'teams').at(0);
     const hasTeams = injectorContract.fields
       .map((f) => f.key)
       .includes('teams');
     // -- ASSETS --
+    const fieldAssets = injectorContract.fields.filter((n) => n.key === 'assets').at(0);
     const hasAssets = injectorContract.fields
       .map((f) => f.key)
       .includes('assets');
@@ -1202,6 +1204,7 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(articlesSortBy))],
     );
     const sortedArticles = sortArticles(articles);
+    const fieldArticles = injectorContract.fields.filter((n) => n.key === 'articles').at(0);
     const hasArticles = injectorContract.fields
       .map((f) => f.key)
       .includes('articles');
@@ -1215,6 +1218,7 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(challengesSortBy))],
     );
     const sortedChallenges = sortChallenges(challenges);
+    const fieldChallenges = injectorContract.fields.filter((n) => n.key === 'challenges').at(0);
     const hasChallenges = injectorContract.fields
       .map((f) => f.key)
       .includes('challenges');
@@ -1234,6 +1238,7 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(documentsSortBy))],
     );
     const sortedDocuments = sortDocuments(docs);
+    const fieldAttachements = injectorContract.fields.filter((n) => n.key === 'attachments').at(0);
     const hasAttachments = injectorContract.fields
       .map((f) => f.key)
       .includes('attachments');
@@ -1417,7 +1422,7 @@ class InjectDefinition extends Component {
                             checked={allTeams}
                             onChange={this.toggleAll.bind(this)}
                             color="primary"
-                            disabled={this.props.permissions.readOnly}
+                            disabled={this.props.permissions.readOnly || fieldTeams.readOnly}
                           />
                         }
                         label={<strong>{t('All teams')}</strong>}
@@ -1567,7 +1572,7 @@ class InjectDefinition extends Component {
                                   onRemoveTeam={this.handleRemoveTeam.bind(
                                     this,
                                   )}
-                                  disabled={this.props.permissions.readOnly}
+                                  disabled={this.props.permissions.readOnly || fieldTeams.readOnly}
                                 />
                               </ListItemSecondaryAction>
                             </ListItem>
@@ -1719,7 +1724,7 @@ class InjectDefinition extends Component {
                               onRemoveArticle={this.handleRemoveArticle.bind(
                                 this,
                               )}
-                              disabled={this.props.permissions.readOnly}
+                              disabled={this.props.permissions.readOnly || fieldArticles.readOnly}
                             />
                           </ListItemSecondaryAction>
                         </ListItem>
@@ -1825,7 +1830,7 @@ class InjectDefinition extends Component {
                               onRemoveChallenge={this.handleRemoveChallenge.bind(
                                 this,
                               )}
-                              disabled={this.props.permissions.readOnly}
+                              disabled={this.props.permissions.readOnly || fieldChallenges.readOnly}
                             />
                           </ListItemSecondaryAction>
                         </ListItem>
@@ -2058,6 +2063,7 @@ class InjectDefinition extends Component {
                                   }}
                                   disabled={
                                     this.props.permissions.readOnly
+                                      || fieldAttachements.readOnly
                                     || !hasAttachments
                                   }
                                 />
@@ -2078,7 +2084,7 @@ class InjectDefinition extends Component {
                                 : null
                             }
                             attached={document.document_attached}
-                            disabled={this.props.permissions.readOnly}
+                            disabled={this.props.permissions.readOnly || fieldAttachements.readOnly}
                           />
                         </ListItemSecondaryAction>
                       </ListItem>

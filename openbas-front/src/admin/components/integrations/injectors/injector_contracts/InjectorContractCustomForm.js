@@ -37,7 +37,7 @@ const InjectorContractForm = (props) => {
               width: '100%',
               language: 'en-us',
             }}
-            data={!R.isNil(fields[field.key]?.value) ? fields[field.key].value : field.defaultValue}
+            data={!R.isNil(fields[field.key]?.defaultValue) ? fields[field.key].defaultValue : field.defaultValue}
             onChange={(_, editor) => {
               setFields({ ...fields, [field.key]: { defaultValue: editor.getData() } });
             }}
@@ -49,7 +49,7 @@ const InjectorContractForm = (props) => {
             multiline={true}
             rows={10}
             style={{ marginTop: 5 }}
-            value={!R.isNil(fields[field.key]?.value) ? fields[field.key].value : field.defaultValue}
+            value={!R.isNil(fields[field.key]?.defaultValue) ? fields[field.key].defaultValue : field.defaultValue}
             onChange={(event) => setFields({ ...fields, [field.key]: { defaultValue: event.target.value } })}
           />
         );
@@ -60,7 +60,7 @@ const InjectorContractForm = (props) => {
             fullWidth={true}
             type="number"
             style={{ marginTop: 5 }}
-            value={!R.isNil(fields[field.key]?.value) ? fields[field.key].value : field.defaultValue}
+            value={!R.isNil(fields[field.key]?.defaultValue) ? fields[field.key].defaultValue : field.defaultValue}
             onChange={(event) => setFields({ ...fields, [field.key]: { defaultValue: event.target.value } })}
           />
         );
@@ -70,7 +70,7 @@ const InjectorContractForm = (props) => {
             variant="standard"
             fullWidth={true}
             style={{ marginTop: 5 }}
-            value={!R.isNil(fields[field.key]?.value) ? fields[field.key].value : field.defaultValue}
+            value={!R.isNil(fields[field.key]?.defaultValue) ? fields[field.key].defaultValue : field.defaultValue}
             onChange={(event) => setFields({ ...fields, [field.key]: { defaultValue: event.target.value } })}
           />
         );

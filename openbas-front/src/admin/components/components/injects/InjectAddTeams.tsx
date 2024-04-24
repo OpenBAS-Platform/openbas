@@ -42,12 +42,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
+  disabled: boolean
   handleAddTeams: (teamIds: string[]) => void;
   injectTeamsIds: string[]
   teams: TeamStore[]
 }
 
 const InjectAddTeams: FunctionComponent<Props> = ({
+  disabled,
   handleAddTeams,
   injectTeamsIds,
   teams,
@@ -133,7 +135,7 @@ const InjectAddTeams: FunctionComponent<Props> = ({
         divider
         onClick={handleOpen}
         color="primary"
-        disabled={permissions.readOnly}
+        disabled={permissions.readOnly || disabled}
       >
         <ListItemIcon color="primary">
           <ControlPointOutlined color="primary" />
@@ -179,12 +181,12 @@ const InjectAddTeams: FunctionComponent<Props> = ({
               </Grid>
               <List>
                 {filteredTeams.map((team: TeamStore) => {
-                  const disabled = teamsIds.includes(team.team_id)
+                  const teamDisabled = teamsIds.includes(team.team_id)
                     || injectTeamsIds.includes(team.team_id);
                   return (
                     <ListItem
                       key={team.team_id}
-                      disabled={disabled}
+                      disabled={teamDisabled}
                       button
                       divider
                       dense

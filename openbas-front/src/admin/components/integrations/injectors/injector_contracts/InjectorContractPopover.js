@@ -45,7 +45,7 @@ const InjectorContractPopover = ({ injectorContract, killChainPhasesMap, attackP
           newField.readOnly = fields[field.key]?.readOnly;
         }
         if (!R.isNil(fields[field.key]?.defaultValue)) {
-          newField.defaultValue = fields[field.key]?.defaultValue;
+          newField.defaultValue = field.cardinality === '1' ? fields[field.key]?.defaultValue : [fields[field.key]?.defaultValue];
         }
         return newField;
       }),
