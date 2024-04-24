@@ -42,7 +42,6 @@ export const teamContextForExercise = (exerciseId: ExerciseStore['exercise_id'],
     onCreateTeam(team: TeamCreateInput): Promise<{ result: string }> {
       return dispatch(addTeam({ ...team, team_exercises: [exerciseId] }));
     },
-
     checkUserEnabled(teamId: Team['team_id'], userId: UserStore['user_id']): boolean {
       return exerciseTeamsUsers.filter((o: ExerciseStore['exercise_teams_users']) => o.exercise_id === exerciseId && o.team_id === teamId && userId === o.user_id).length > 0;
     },

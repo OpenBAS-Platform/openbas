@@ -32,7 +32,6 @@ class ExerciseDateForm extends Component {
               {handleClose && (
                 <Button
                   onClick={handleClose.bind(this)}
-                  disabled={pristine || submitting}
                   style={{ marginRight: 10 }}
                 >
                   {t('Cancel')}

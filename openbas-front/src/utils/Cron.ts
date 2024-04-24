@@ -1,6 +1,6 @@
 const generateDailyCron = (h: number, m: number, owd: boolean) => {
   if (owd) {
-    return `0 ${m} ${h} * * 0-4`;
+    return `0 ${m} ${h} * * 1-5`;
   }
   return `0 ${m} ${h} * * *`;
 };

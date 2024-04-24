@@ -164,7 +164,8 @@ const Injects = ({
   // Standard hooks
   const classes = useStyles();
   const { t, tPick } = useFormatter();
-  const [selectedInject, setSelectedInject] = useState(null);
+
+  const [selectedInjectId, setSelectedInjectId] = useState(null);
   const { permissions } = useContext(PermissionsContext);
   const { onUpdateInject } = useContext(InjectContext);
 
@@ -180,11 +181,13 @@ const Injects = ({
     injectorContractsMap,
     tagsMap,
     injectorContractsWithNoTeams,
+    selectedInject,
   } = useHelper((helper) => {
     return {
       injectorContractsMap: helper.getInjectorContractsMap(),
       tagsMap: helper.getTagsMap(),
       injectorContractsWithNoTeams: helper.getInjectorContractsWithNoTeams(),
+      selectedInject: helper.getInject(selectedInjectId),
     };
   });
 
@@ -332,7 +335,7 @@ const Injects = ({
                 disabled={
                   !injectContract || isDisabled || !inject.inject_enabled
                 }
-                onClick={() => setSelectedInject(inject.inject_id)}
+                onClick={() => setSelectedInjectId(inject.inject_id)}
               >
                 <ListItemIcon style={{ paddingTop: 5 }}>
                   <InjectIcon
@@ -409,7 +412,7 @@ const Injects = ({
                     inject={inject}
                     injectorContractsMap={injectorContractsMap}
                     tagsMap={tagsMap}
-                    setSelectedInject={setSelectedInject}
+                    setSelectedInject={setSelectedInjectId}
                     isDisabled={!injectContract || isDisabled}
                   />
                 </ListItemSecondaryAction>
@@ -418,19 +421,19 @@ const Injects = ({
           })}
         </List>
         <Drawer
-          open={selectedInject !== null}
+          open={selectedInjectId !== null}
           keepMounted={false}
           anchor="right"
           sx={{ zIndex: 1202 }}
           classes={{ paper: classes.drawerPaper }}
-          onClose={() => setSelectedInject(null)}
+          onClose={() => setSelectedInjectId(null)}
           elevation={1}
           disableEnforceFocus={true}
         >
           <InjectDefinition
-            injectId={selectedInject}
+            inject={selectedInject}
             injectorContracts={injectorContracts}
-            handleClose={() => setSelectedInject(null)}
+            handleClose={() => setSelectedInjectId(null)}
             tagsMap={tagsMap}
             permissions={permissions}
             teamsFromExerciseOrScenario={teams}
@@ -446,7 +449,7 @@ const Injects = ({
         {permissions.canWrite && (
           <CreateInject
             injectorContractsMap={injectorContractsMap}
-            onCreate={setSelectedInject}
+            onCreate={setSelectedInjectId}
           />
         )}
       </div>

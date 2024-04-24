@@ -44,9 +44,11 @@ const ChannelNewspaper = ({ channelReader }) => {
   const isDark = theme.palette.mode === 'dark';
   const {
     channel_exercise: exercise,
+    channel_scenario: scenario,
     channel_articles: articles,
     channel_information: channel,
   } = channelReader;
+  const baseUri = `/api/player/${exercise?.exercise_id ?? scenario?.scenario_id}`;
   const { documentsMap } = useHelper((helper) => ({
     documentsMap: helper.getDocumentsMap(),
   }));
@@ -74,7 +76,7 @@ const ChannelNewspaper = ({ channelReader }) => {
           style={{ margin: '0 auto', textAlign: 'center', marginBottom: 15 }}
         >
           <img
-            src={`/api/player/${exercise.exercise_id}/documents/${logo}/file${queryParams}`}
+            src={`${baseUri}/documents/${logo}/file${queryParams}`}
             className={classes.logo}
           />
         </div>
@@ -133,7 +135,7 @@ const ChannelNewspaper = ({ channelReader }) => {
                     <CardMedia
                       component="img"
                       height="200"
-                      src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
+                      src={`${baseUri}/documents/${doc.document_id}/file${queryParams}`}
                     />
                   </Grid>
                 ))}
@@ -228,7 +230,7 @@ const ChannelNewspaper = ({ channelReader }) => {
                         <CardMedia
                           component="img"
                           height="100"
-                          src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
+                          src={`${baseUri}/documents/${doc.document_id}/file${queryParams}`}
                         />
                       </Grid>
                     ))}
@@ -320,7 +322,7 @@ const ChannelNewspaper = ({ channelReader }) => {
                       <CardMedia
                         component="img"
                         height="150"
-                        src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
+                        src={`${baseUri}/documents/${doc.document_id}/file${queryParams}`}
                       />
                     </Grid>
                   ))}
