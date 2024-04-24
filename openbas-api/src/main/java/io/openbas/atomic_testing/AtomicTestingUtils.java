@@ -198,7 +198,7 @@ public class AtomicTestingUtils {
     if (avgResponse.isPresent()) {
       return Optional.of(new ExpectationResultsByType(type, getResult(avgResponse), getResultDetail(type, scores)));
     }
-    return Optional.of(new ExpectationResultsByType(type, getResult(OptionalDouble.of(0.0)), getResultDetail(type, scores)));
+    return Optional.of(new ExpectationResultsByType(type, ExpectationStatus.PENDING, getResultDetail(type, scores)));
   }
 
   public static List<ResultDistribution> getResultDetail(final ExpectationType type, final List<Integer> normalizedScores) {

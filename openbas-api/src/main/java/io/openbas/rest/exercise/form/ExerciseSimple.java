@@ -8,6 +8,7 @@ import io.openbas.database.model.Tag;
 import io.openbas.helper.MultiIdDeserializer;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,9 +26,11 @@ import static io.openbas.rest.exercise.ExerciseUtils.computeTargetResults;
 public class ExerciseSimple {
 
     @JsonProperty("exercise_id")
+    @NotBlank
     private String id;
 
     @JsonProperty("exercise_name")
+    @NotBlank
     private String name;
 
     @JsonProperty("exercise_status")
