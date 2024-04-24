@@ -44,7 +44,7 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
       .string()
       .regex(
         /^\+[\d\s\-.()]+$/,
-        t('Phone number invalid'),
+        t('The country code and mobile phone number provided is invalid. Please provide a valid number'),
       )
       .optional()
       .nullable(),
@@ -52,7 +52,7 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
       .string()
       .regex(
         /^\+[\d\s\-.()]+$/,
-        t('Phone number invalid'),
+        t('The country code and mobile phone number provided is invalid. Please provide a valid number'),
       )
       .optional()
       .nullable(),

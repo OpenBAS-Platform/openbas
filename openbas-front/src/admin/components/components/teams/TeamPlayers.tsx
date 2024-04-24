@@ -115,6 +115,7 @@ const inlineStyles: Record<string, CSSProperties> = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    cursor: 'pointer',
   },
   user_email: {
     float: 'left',
@@ -326,11 +327,14 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
               primary={
                 <>
                   {onToggleUser && (
-                    <div className={classes.bodyItem} style={inlineStyles.user_enabled}>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.user_enabled}
+                      onClick={() => onToggleUser(teamId, user.user_id, user.user_enabled)}
+                    >
                       <ItemBoolean
                         status={user.user_enabled}
                         label={user.user_enabled ? t('Enabled') : t('Disabled')}
-                        onClick={() => onToggleUser(teamId, user.user_id, user.user_enabled)}
                         variant="inList"
                       />
                     </div>

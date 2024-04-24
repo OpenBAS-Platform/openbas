@@ -794,7 +794,7 @@ const i18n = {
       'Get OpenCTI now': 'Obtenir OpenCTI maintenant',
       'Current platform': 'Plateforme courante',
       Personas: 'Personas',
-      'Phone number invalid': 'Numéro de téléphone invalide',
+      'The country code and mobile phone number provided is invalid. Please provide a valid number': 'L\'indicatif du pays et le numéro de téléphone mobile fournis ne sont pas valides. Veuillez fournir un numéro valide',
       phone_number_tooltip: 'Le numéro de téléphone devrait commencer par un signe plus ( + )\n'
         + 'Il peut contenir des espaces ou des tirets ( – ) ou des parenthèses.\n',
       'Instantiate a simulation': 'Créer une nouvelle simulation',

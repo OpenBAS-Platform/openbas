@@ -1,6 +1,6 @@
 import React, { CSSProperties } from 'react';
 import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { ChevronRightOutlined } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import SearchFilter from '../../../components/SearchFilter';
@@ -15,13 +15,18 @@ import type { ChannelsHelper } from '../../../actions/channels/channel-helper';
 import type { UsersHelper } from '../../../actions/helper';
 import { useAppDispatch } from '../../../utils/hooks';
 import type { Channel } from '../../../utils/api-types';
+import Breadcrumbs from '../../../components/Breadcrumbs';
 
 const useStyles = makeStyles(() => ({
   parameters: {
     marginTop: -10,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  container: {
-    marginTop: 10,
+  filters: {
+    display: 'flex',
+    gap: '10px',
   },
   itemHead: {
     paddingLeft: 10,
@@ -108,9 +113,10 @@ const Channels = () => {
   });
   const sortedChannels: Channel[] = filtering.filterAndSort(channels);
   return (
-    <div>
+    <>
+      <Breadcrumbs variant="list" elements={[{ label: t('Components') }, { label: t('Channels'), current: true }]} />
       <div className={classes.parameters}>
-        <div style={{ float: 'left', marginRight: 10 }}>
+        <div className={classes.filters}>
           <SearchFilter
             variant="small"
             onChange={filtering.handleSearch}
@@ -119,7 +125,7 @@ const Channels = () => {
         </div>
       </div>
       <div className="clearfix" />
-      <List classes={{ root: classes.container }}>
+      <List>
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
@@ -204,7 +210,7 @@ const Channels = () => {
         ))}
       </List>
       {userAdmin && <CreateChannel />}
-    </div>
+    </>
   );
 };
 

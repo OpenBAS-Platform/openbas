@@ -17,13 +17,19 @@ import TagsFilter from '../../../components/TagsFilter';
 import ItemTags from '../../../components/ItemTags';
 import { fetchDocuments } from '../../../actions/Document';
 import { fetchExercises } from '../../../actions/Exercise';
+import Breadcrumbs from '../../../components/Breadcrumbs';
+import { useFormatter } from '../../../components/i18n';
 
 const useStyles = makeStyles(() => ({
   parameters: {
     marginTop: -10,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  container: {
-    marginTop: 10,
+  filters: {
+    display: 'flex',
+    gap: '10px',
   },
   itemHead: {
     paddingLeft: 10,
@@ -131,6 +137,8 @@ const Challenges = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
+  const { t } = useFormatter();
+
   // Filter and sort hook
   const searchColumns = ['name', 'content', 'category'];
   const filtering = useSearchAnFilter('challenge', 'name', searchColumns);
@@ -149,15 +157,14 @@ const Challenges = () => {
   const sortedChallenges = filtering.filterAndSort(challenges);
   return (
     <>
+      <Breadcrumbs variant="list" elements={[{ label: t('Components') }, { label: t('Challenges'), current: true }]} />
       <div className={classes.parameters}>
-        <div style={{ float: 'left', marginRight: 10 }}>
+        <div className={classes.filters}>
           <SearchFilter
             variant="small"
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
           />
-        </div>
-        <div style={{ float: 'left', marginRight: 10 }}>
           <TagsFilter
             onAddTag={filtering.handleAddTag}
             onRemoveTag={filtering.handleRemoveTag}
@@ -166,7 +173,7 @@ const Challenges = () => {
         </div>
       </div>
       <div className="clearfix" />
-      <List classes={{ root: classes.container }}>
+      <List>
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}

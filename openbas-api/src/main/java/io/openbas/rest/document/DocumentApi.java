@@ -297,10 +297,26 @@ public class DocumentApi extends RestBehavior {
         .toList();
   }
 
-  @GetMapping("/api/player/{exerciseId}/documents")
-  public List<Document> playerDocuments(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
-    Optional<Exercise> exerciseOpt = this.exerciseRepository.findById(exerciseId);
-    Optional<Scenario> scenarioOpt = this.scenarioRepository.findById(exerciseId);
+  @Transactional(rollbackOn = Exception.class)
+  @DeleteMapping("/api/documents/{documentId}")
+  public void deleteDocument(@PathVariable String documentId) {
+    injectDocumentRepository.deleteDocumentFromAllReferences(documentId);
+    List<Document> documents = documentRepository.removeById(documentId);
+    documents.forEach(document -> {
+      try {
+        fileService.deleteFile(document.getTarget());
+      } catch (Exception e) {
+        // Fail no longer available in the storage.
+      }
+    });
+  }
+
+  // -- EXERCISE & SENARIO--
+
+  @GetMapping("/api/player/{exerciseOrScenarioId}/documents")
+  public List<Document> playerDocuments(@PathVariable String exerciseOrScenarioId, @RequestParam Optional<String> userId) {
+    Optional<Exercise> exerciseOpt = this.exerciseRepository.findById(exerciseOrScenarioId);
+    Optional<Scenario> scenarioOpt = this.scenarioRepository.findById(exerciseOrScenarioId);
 
     final User user = impersonateUser(userRepository, userId);
     if (user.getId().equals(ANONYMOUS)) {
@@ -322,39 +338,47 @@ public class DocumentApi extends RestBehavior {
     }
   }
 
-  @GetMapping("/api/player/{exerciseId}/documents/{documentId}/file")
+  @GetMapping("/api/player/{exerciseOrScenarioId}/documents/{documentId}/file")
   public void downloadPlayerDocument(
-      @PathVariable String exerciseId,
+      @PathVariable String exerciseOrScenarioId,
       @PathVariable String documentId,
       @RequestParam Optional<String> userId, HttpServletResponse response) throws IOException {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Optional<Exercise> exerciseOpt = this.exerciseRepository.findById(exerciseOrScenarioId);
+    Optional<Scenario> scenarioOpt = this.scenarioRepository.findById(exerciseOrScenarioId);
+
     final User user = impersonateUser(userRepository, userId);
     if (user.getId().equals(ANONYMOUS)) {
       throw new UnsupportedOperationException("User must be logged or dynamic player is required");
     }
-    if (!exercise.isUserHasAccess(user) && !exercise.getUsers().contains(user)) {
-      throw new UnsupportedOperationException("The given player is not in this exercise");
+
+    Document document = null;
+    if (exerciseOpt.isPresent()) {
+      if (!exerciseOpt.get().isUserHasAccess(user) && !exerciseOpt.get().getUsers().contains(user)) {
+        throw new UnsupportedOperationException("The given player is not in this exercise");
+      }
+      document = getExercisePlayerDocuments(exerciseOpt.get())
+          .stream()
+          .filter(doc -> doc.getId().equals(documentId))
+          .findFirst()
+          .orElseThrow();
+    } else if (scenarioOpt.isPresent()) {
+      if (!scenarioOpt.get().isUserHasAccess(user) && !scenarioOpt.get().getUsers().contains(user)) {
+        throw new UnsupportedOperationException("The given player is not in this exercise");
+      }
+      document = getScenarioPlayerDocuments(scenarioOpt.get())
+          .stream()
+          .filter(doc -> doc.getId().equals(documentId))
+          .findFirst()
+          .orElseThrow();
     }
-    Document document = getExercisePlayerDocuments(exercise).stream().filter(doc -> doc.getId().equals(documentId))
-        .findFirst().orElseThrow();
-    response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
-    response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
-    response.setStatus(HttpServletResponse.SC_OK);
-    InputStream fileStream = fileService.getFile(document).orElseThrow();
-    fileStream.transferTo(response.getOutputStream());
+
+    if (document != null) {
+      response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
+      response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
+      response.setStatus(HttpServletResponse.SC_OK);
+      InputStream fileStream = fileService.getFile(document).orElseThrow();
+      fileStream.transferTo(response.getOutputStream());
+    }
   }
 
-  @Transactional(rollbackOn = Exception.class)
-  @DeleteMapping("/api/documents/{documentId}")
-  public void deleteDocument(@PathVariable String documentId) {
-    injectDocumentRepository.deleteDocumentFromAllReferences(documentId);
-    List<Document> documents = documentRepository.removeById(documentId);
-    documents.forEach(document -> {
-      try {
-        fileService.deleteFile(document.getTarget());
-      } catch (Exception e) {
-        // Fail no longer available in the storage.
-      }
-    });
-  }
 }

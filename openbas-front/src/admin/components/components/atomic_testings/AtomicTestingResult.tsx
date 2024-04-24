@@ -23,6 +23,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
   const getColor = (result: string | undefined): string => {
     const colorMap: Record<string, string> = {
       VALIDATED: 'rgb(107, 235, 112)',
+      PENDING: 'rgb(192,111,0)',
       FAILED: 'rgb(220, 81, 72)',
       UNKNOWN: theme.palette.mode === 'dark' ? 'rgb(202,203,206)' : 'rgba(53,52,49,0.62)',
     };

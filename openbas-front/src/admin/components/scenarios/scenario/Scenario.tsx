@@ -10,6 +10,7 @@ import type { ExercisesHelper } from '../../../../actions/exercises/exercise-hel
 import { fetchExercises } from '../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import ExerciseList from '../../exercises/ExerciseList';
+import ScenarioDistributionByExercise from './ScenarioDistributionByExercise';
 
 const Scenario = () => {
   // Standard hooks
@@ -33,6 +34,7 @@ const Scenario = () => {
 
   return (
     <div style={{ marginTop: 24 }}>
+      <ScenarioDistributionByExercise exercises={scenarioExercises}/>
       <ExerciseList exercises={scenarioExercises} />
     </div>
   );
