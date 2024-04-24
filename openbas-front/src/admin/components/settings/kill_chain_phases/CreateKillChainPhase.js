@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { Dialog, DialogContent, DialogTitle, Fab } from '@mui/material';
+import { Fab } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { Add } from '@mui/icons-material';
 import { addKillChainPhase } from '../../../../actions/KillChainPhase';
 import KillChainPhaseForm from './KillChainPhaseForm';
 import inject18n from '../../../../components/i18n';
-import Transition from '../../../../components/common/Transition';
+import Drawer from '../../../../components/common/Drawer';
 
 const styles = () => ({
   createButton: {
@@ -47,7 +47,7 @@ class CreateKillChainPhase extends Component {
   render() {
     const { classes, t } = this.props;
     return (
-      <div>
+      <>
         <Fab
           onClick={this.handleOpen.bind(this)}
           color="primary"
@@ -56,24 +56,18 @@ class CreateKillChainPhase extends Component {
         >
           <Add />
         </Fab>
-        <Dialog
+        <Drawer
           open={this.state.open}
-          TransitionComponent={Transition}
-          onClose={this.handleClose.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
+          handleClose={this.handleClose.bind(this)}
+          title={t('Create a new kill chain phase')}
         >
-          <DialogTitle>{t('Create a new kill chain phase')}</DialogTitle>
-          <DialogContent>
-            <KillChainPhaseForm
-              editing={false}
-              onSubmit={this.onSubmit.bind(this)}
-              handleClose={this.handleClose.bind(this)}
-            />
-          </DialogContent>
-        </Dialog>
-      </div>
+          <KillChainPhaseForm
+            editing={false}
+            onSubmit={this.onSubmit.bind(this)}
+            handleClose={this.handleClose.bind(this)}
+          />
+        </Drawer>
+      </>
     );
   }
 }

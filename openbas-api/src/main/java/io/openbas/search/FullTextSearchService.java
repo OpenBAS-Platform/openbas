@@ -1,4 +1,4 @@
-package io.openbas.fulltextsearch;
+package io.openbas.search;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;

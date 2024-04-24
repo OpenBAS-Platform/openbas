@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Slide, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Slide } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { updateTag, deleteTag } from '../../../../actions/Tag';
+import { deleteTag, updateTag } from '../../../../actions/Tag';
 import TagForm from './TagForm';
 import inject18n from '../../../../components/i18n';
+import Drawer from '../../../../components/common/Drawer';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -118,24 +119,18 @@ class TagPopover extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-        <Dialog
-          TransitionComponent={Transition}
+        <Drawer
           open={this.state.openEdit}
-          onClose={this.handleCloseEdit.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
+          handleClose={this.handleCloseEdit.bind(this)}
+          title={t('Update the tag')}
         >
-          <DialogTitle>{t('Update the tag')}</DialogTitle>
-          <DialogContent>
-            <TagForm
-              initialValues={initialValues}
-              editing={true}
-              onSubmit={this.onSubmitEdit.bind(this)}
-              handleClose={this.handleCloseEdit.bind(this)}
-            />
-          </DialogContent>
-        </Dialog>
+          <TagForm
+            initialValues={initialValues}
+            editing={true}
+            onSubmit={this.onSubmitEdit.bind(this)}
+            handleClose={this.handleCloseEdit.bind(this)}
+          />
+        </Drawer>
       </>
     );
   }

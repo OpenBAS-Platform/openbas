@@ -37,6 +37,7 @@ const AttackPatternForm = (props) => {
             name="attack_pattern_external_id"
             fullWidth={true}
             label={t('External ID')}
+            style={{ marginTop: 10 }}
           />
           <KillChainPhaseField
             name="attack_pattern_kill_chain_phases"
@@ -61,6 +62,7 @@ const AttackPatternForm = (props) => {
           />
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button
+              variant="contained"
               onClick={handleClose}
               style={{ marginRight: 10 }}
               disabled={submitting}
@@ -68,6 +70,7 @@ const AttackPatternForm = (props) => {
               {t('Cancel')}
             </Button>
             <Button
+              variant="contained"
               color="secondary"
               type="submit"
               disabled={pristine || submitting}

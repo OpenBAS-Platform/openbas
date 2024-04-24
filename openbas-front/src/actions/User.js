@@ -1,5 +1,5 @@
 import * as schema from './Schema';
-import { delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
+import { delReferential, getReferential, postReferential, putReferential, simplePostCall } from '../utils/Action';
 import * as Constants from '../constants/ActionTypes';
 
 // region players
@@ -14,6 +14,12 @@ export const deletePlayer = (userId) => (dispatch) => delReferential(`/api/playe
 
 // region users
 export const fetchUsers = () => (dispatch) => getReferential(schema.arrayOfUsers, '/api/users')(dispatch);
+
+export const searchUsers = (paginationInput) => {
+  const data = paginationInput;
+  const uri = '/api/users/search';
+  return simplePostCall(uri, data);
+};
 
 export const addUser = (data) => (dispatch) => postReferential(schema.user, '/api/users', data)(dispatch);
 

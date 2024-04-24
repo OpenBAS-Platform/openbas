@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { Fab, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Fab } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { Add } from '@mui/icons-material';
 import { addAttackPattern } from '../../../../actions/AttackPattern';
 import AttackPatternForm from './AttackPatternForm';
 import inject18n from '../../../../components/i18n';
-import Transition from '../../../../components/common/Transition';
+import Drawer from '../../../../components/common/Drawer';
 
 const styles = () => ({
   createButton: {
@@ -50,7 +50,7 @@ class CreateAttackPattern extends Component {
   render() {
     const { classes, t } = this.props;
     return (
-      <div>
+      <>
         <Fab
           onClick={this.handleOpen.bind(this)}
           color="primary"
@@ -59,25 +59,19 @@ class CreateAttackPattern extends Component {
         >
           <Add />
         </Fab>
-        <Dialog
+        <Drawer
           open={this.state.open}
-          TransitionComponent={Transition}
-          onClose={this.handleClose.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
+          handleClose={this.handleClose.bind(this)}
+          title={t('Create a new attack pattern')}
         >
-          <DialogTitle>{t('Create a new attack pattern')}</DialogTitle>
-          <DialogContent>
-            <AttackPatternForm
-              editing={false}
-              onSubmit={this.onSubmit.bind(this)}
-              initialValues={{ attack_pattern_kill_chain_phases: [] }}
-              handleClose={this.handleClose.bind(this)}
-            />
-          </DialogContent>
-        </Dialog>
-      </div>
+          <AttackPatternForm
+            editing={false}
+            onSubmit={this.onSubmit.bind(this)}
+            initialValues={{ attack_pattern_kill_chain_phases: [] }}
+            handleClose={this.handleClose.bind(this)}
+          />
+        </Drawer>
+      </>
     );
   }
 }

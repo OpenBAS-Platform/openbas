@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Slide, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Slide } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { updateUser, deleteUser, updateUserPassword } from '../../../../actions/User';
+import { deleteUser, updateUser, updateUserPassword } from '../../../../actions/User';
 import UserForm from './UserForm';
 import { useFormatter } from '../../../../components/i18n';
 import UserPasswordForm from './UserPasswordForm';
 import { tagOptions } from '../../../../utils/Option';
+import Drawer from '../../../../components/common/Drawer';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -128,40 +129,28 @@ const UserPopover = ({ user, organizationsMap, tagsMap }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog
-        TransitionComponent={Transition}
+      <Drawer
         open={openEdit}
-        onClose={handleCloseEdit}
-        fullWidth={true}
-        maxWidth="md"
-        PaperProps={{ elevation: 1 }}
+        handleClose={handleCloseEdit}
+        title={t('Update the user')}
       >
-        <DialogTitle>{t('Update the user')}</DialogTitle>
-        <DialogContent>
-          <UserForm
-            initialValues={initialValues}
-            editing={true}
-            onSubmit={onSubmitEdit}
-            handleClose={handleCloseEdit}
-          />
-        </DialogContent>
-      </Dialog>
-      <Dialog
-        TransitionComponent={Transition}
+        <UserForm
+          initialValues={initialValues}
+          editing={true}
+          onSubmit={onSubmitEdit}
+          handleClose={handleCloseEdit}
+        />
+      </Drawer>
+      <Drawer
         open={openEditPassword}
-        onClose={handleCloseEditPassword}
-        fullWidth={true}
-        maxWidth="md"
-        PaperProps={{ elevation: 1 }}
+        handleClose={handleCloseEditPassword}
+        title={t('Update the user password')}
       >
-        <DialogTitle>{t('Update the user password')}</DialogTitle>
-        <DialogContent>
-          <UserPasswordForm
-            onSubmit={onSubmitEditPassword}
-            handleClose={handleCloseEditPassword}
-          />
-        </DialogContent>
-      </Dialog>
+        <UserPasswordForm
+          onSubmit={onSubmitEditPassword}
+          handleClose={handleCloseEditPassword}
+        />
+      </Drawer>
     </>
   );
 };

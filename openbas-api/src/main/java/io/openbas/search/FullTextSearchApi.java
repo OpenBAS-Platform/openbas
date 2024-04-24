@@ -1,4 +1,4 @@
-package io.openbas.fulltextsearch;
+package io.openbas.search;
 
 import io.openbas.database.model.Base;
 import io.openbas.rest.helper.RestBehavior;

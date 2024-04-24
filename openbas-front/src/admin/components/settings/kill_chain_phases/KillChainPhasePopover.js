@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { updateKillChainPhase, deleteKillChainPhase } from '../../../../actions/KillChainPhase';
+import { deleteKillChainPhase, updateKillChainPhase } from '../../../../actions/KillChainPhase';
 import KillChainPhaseForm from './KillChainPhaseForm';
 import inject18n from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
+import Drawer from '../../../../components/common/Drawer';
 
 class KillChainPhasePopover extends Component {
   constructor(props) {
@@ -116,24 +117,18 @@ class KillChainPhasePopover extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-        <Dialog
-          TransitionComponent={Transition}
+        <Drawer
           open={this.state.openEdit}
-          onClose={this.handleCloseEdit.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
+          handleClose={this.handleCloseEdit.bind(this)}
+          title={t('Update the kill chain phase')}
         >
-          <DialogTitle>{t('Update the kill chain phase')}</DialogTitle>
-          <DialogContent>
-            <KillChainPhaseForm
-              initialValues={initialValues}
-              editing={true}
-              onSubmit={this.onSubmitEdit.bind(this)}
-              handleClose={this.handleCloseEdit.bind(this)}
-            />
-          </DialogContent>
-        </Dialog>
+          <KillChainPhaseForm
+            initialValues={initialValues}
+            editing={true}
+            onSubmit={this.onSubmitEdit.bind(this)}
+            handleClose={this.handleCloseEdit.bind(this)}
+          />
+        </Drawer>
       </>
     );
   }

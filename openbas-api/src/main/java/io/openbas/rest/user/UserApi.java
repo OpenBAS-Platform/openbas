@@ -14,12 +14,16 @@ import io.openbas.rest.user.form.user.CreateUserInput;
 import io.openbas.rest.user.form.user.UpdateUserInput;
 import io.openbas.service.MailingService;
 import io.openbas.service.UserService;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +34,7 @@ import java.util.Optional;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RestController
 public class UserApi extends RestBehavior {
@@ -133,6 +138,16 @@ public class UserApi extends RestBehavior {
     @GetMapping("/api/users")
     public Iterable<User> users() {
         return userRepository.findAll();
+    }
+
+    @PostMapping("/api/users/search")
+    public Page<User> users(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+        return buildPaginationJPA(
+                (Specification<User> specification, Pageable pageable) -> this.userRepository.findAll(
+                        specification, pageable),
+                searchPaginationInput,
+                User.class
+        );
     }
 
     @Secured(ROLE_ADMIN)

@@ -39,10 +39,10 @@ const DefinitionMenu: React.FC = () => {
           to='/admin/settings/security/groups'
           selected={location.pathname === '/admin/settings/security/groups'}
           classes={{ root: classes.item }}
-          dense={true}
+          dense={false}
         >
           <ListItemIcon>
-            <GroupsOutlined />
+            <GroupsOutlined fontSize="medium" />
           </ListItemIcon>
           <ListItemText primary={t('Groups')} />
         </MenuItem>
@@ -51,10 +51,10 @@ const DefinitionMenu: React.FC = () => {
           to='/admin/settings/security/users'
           selected={location.pathname === '/admin/settings/security/users'}
           classes={{ root: classes.item }}
-          dense={true}
+          dense={false}
         >
           <ListItemIcon>
-            <PermIdentityOutlined />
+            <PermIdentityOutlined fontSize="medium" />
           </ListItemIcon>
           <ListItemText primary={t('Users')} />
         </MenuItem>

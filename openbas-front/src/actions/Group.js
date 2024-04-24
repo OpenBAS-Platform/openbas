@@ -1,9 +1,15 @@
 import * as schema from './Schema';
-import { getReferential, postReferential, putReferential, delReferential } from '../utils/Action';
+import { getReferential, postReferential, putReferential, delReferential, simplePostCall } from '../utils/Action';
 
 export const fetchGroups = () => (dispatch) => getReferential(schema.arrayOfGroups, '/api/groups')(dispatch);
 
 export const fetchGroup = (groupId) => (dispatch) => getReferential(schema.group, `/api/groups/${groupId}`)(dispatch);
+
+export const searchGroups = (paginationInput) => {
+  const data = paginationInput;
+  const uri = '/api/groups/search';
+  return simplePostCall(uri, data);
+};
 
 export const addGroup = (data) => (dispatch) => postReferential(schema.group, '/api/groups', data)(dispatch);
 

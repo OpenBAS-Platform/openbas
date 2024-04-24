@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { Dialog, DialogTitle, DialogContent, Fab } from '@mui/material';
+import { Fab } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import { withStyles } from '@mui/styles';
 import { addTag } from '../../../../actions/Tag';
 import TagForm from './TagForm';
 import inject18n from '../../../../components/i18n';
-import Transition from '../../../../components/common/Transition';
+import Drawer from '../../../../components/common/Drawer';
 
 const styles = () => ({
   createButton: {
@@ -47,7 +47,7 @@ class CreateTag extends Component {
   render() {
     const { classes, t } = this.props;
     return (
-      <div>
+      <>
         <Fab
           onClick={this.handleOpen.bind(this)}
           color="primary"
@@ -56,23 +56,17 @@ class CreateTag extends Component {
         >
           <Add />
         </Fab>
-        <Dialog
+        <Drawer
           open={this.state.open}
-          TransitionComponent={Transition}
-          onClose={this.handleClose.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
+          handleClose={this.handleClose.bind(this)}
+          title={t('Create a new tag')}
         >
-          <DialogTitle>{t('Create a new tag')}</DialogTitle>
-          <DialogContent>
-            <TagForm
-              onSubmit={this.onSubmit.bind(this)}
-              handleClose={this.handleClose.bind(this)}
-            />
-          </DialogContent>
-        </Dialog>
-      </div>
+          <TagForm
+            onSubmit={this.onSubmit.bind(this)}
+            handleClose={this.handleClose.bind(this)}
+          />
+        </Drawer>
+      </>
     );
   }
 }

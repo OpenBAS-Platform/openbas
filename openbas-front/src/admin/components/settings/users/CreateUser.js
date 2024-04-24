@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { Fab, Dialog, DialogTitle, DialogContent, Slide } from '@mui/material';
+import { Fab, Slide } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { Add } from '@mui/icons-material';
 import { addUser } from '../../../../actions/User';
 import UserForm from './UserForm';
 import inject18n from '../../../../components/i18n';
+import Drawer from '../../../../components/common/Drawer';
 
 const styles = () => ({
   createButton: {
@@ -54,7 +55,7 @@ class CreateUser extends Component {
   render() {
     const { classes, t } = this.props;
     return (
-      <div>
+      <>
         <Fab
           onClick={this.handleOpen.bind(this)}
           color="primary"
@@ -63,25 +64,19 @@ class CreateUser extends Component {
         >
           <Add />
         </Fab>
-        <Dialog
+        <Drawer
           open={this.state.open}
-          TransitionComponent={Transition}
-          onClose={this.handleClose.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
+          handleClose={this.handleClose.bind(this)}
+          title={t('Create a new user')}
         >
-          <DialogTitle>{t('Create a new user')}</DialogTitle>
-          <DialogContent>
-            <UserForm
-              editing={false}
-              onSubmit={this.onSubmit.bind(this)}
-              initialValues={{ user_tags: [] }}
-              handleClose={this.handleClose.bind(this)}
-            />
-          </DialogContent>
-        </Dialog>
-      </div>
+          <UserForm
+            editing={false}
+            onSubmit={this.onSubmit.bind(this)}
+            initialValues={{ user_tags: [] }}
+            handleClose={this.handleClose.bind(this)}
+          />
+        </Drawer>
+      </>
     );
   }
 }

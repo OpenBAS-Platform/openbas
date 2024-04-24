@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { Fab, Dialog, DialogTitle, DialogContent, Slide } from '@mui/material';
+import { Fab } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { Add } from '@mui/icons-material';
 import { addGroup } from '../../../../actions/Group';
 import GroupForm from './GroupForm';
 import inject18n from '../../../../components/i18n';
+import Drawer from '../../../../components/common/Drawer';
 
 const styles = () => ({
   createButton: {
@@ -16,11 +17,6 @@ const styles = () => ({
     right: 230,
   },
 });
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
 
 class CreateGroup extends Component {
   constructor(props) {
@@ -45,7 +41,7 @@ class CreateGroup extends Component {
   render() {
     const { classes, t } = this.props;
     return (
-      <div>
+      <>
         <Fab
           onClick={this.handleOpen.bind(this)}
           color="primary"
@@ -54,24 +50,18 @@ class CreateGroup extends Component {
         >
           <Add />
         </Fab>
-        <Dialog
+        <Drawer
           open={this.state.open}
-          TransitionComponent={Transition}
-          onClose={this.handleClose.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
+          handleClose={this.handleClose.bind(this)}
+          title={t('Create a new group')}
         >
-          <DialogTitle>{t('Create a new group')}</DialogTitle>
-          <DialogContent>
-            <GroupForm
-              editing={false}
-              onSubmit={this.onSubmit.bind(this)}
-              handleClose={this.handleClose.bind(this)}
-            />
-          </DialogContent>
-        </Dialog>
-      </div>
+          <GroupForm
+            editing={false}
+            onSubmit={this.onSubmit.bind(this)}
+            handleClose={this.handleClose.bind(this)}
+          />
+        </Drawer>
+      </>
     );
   }
 }

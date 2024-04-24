@@ -1,32 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CheckCircleOutlined, PersonOutlined } from '@mui/icons-material';
-import { fetchUsers } from '../../../../actions/User';
+import { searchUsers } from '../../../../actions/User';
 import { fetchOrganizations } from '../../../../actions/Organization';
 import ItemTags from '../../../../components/ItemTags';
-import SearchFilter from '../../../../components/SearchFilter';
 import CreateUser from './CreateUser';
 import { fetchTags } from '../../../../actions/Tag';
-import TagsFilter from '../../../../components/TagsFilter';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
 import UserPopover from './UserPopover';
 import SecurityMenu from '../SecurityMenu';
+import { useFormatter } from '../../../../components/i18n';
+import { initSorting } from '../../../../components/common/pagination/Page';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
+import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
+import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 
 const useStyles = makeStyles(() => ({
   container: {
     margin: 0,
     padding: '0 200px 50px 0',
-  },
-  parameters: {
-    float: 'left',
-    marginTop: -10,
-  },
-  list: {
-    marginTop: 10,
   },
   itemHead: {
     paddingLeft: 10,
@@ -44,46 +39,23 @@ const useStyles = makeStyles(() => ({
 }));
 
 const headerStyles = {
-  iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 5px',
-    padding: 0,
-    top: '0px',
-  },
   user_email: {
-    float: 'left',
     width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
   },
   user_firstname: {
-    float: 'left',
     width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
   },
   user_lastname: {
-    float: 'left',
     width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
   },
   user_organization: {
-    float: 'left',
     width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
   },
   user_admin: {
-    float: 'left',
     width: '10%',
-    fontSize: 12,
-    fontWeight: '700',
   },
   user_tags: {
-    float: 'left',
-    fontSize: 12,
-    fontWeight: '700',
+    width: '12%',
   },
 };
 
@@ -130,6 +102,7 @@ const inlineStyles = {
   },
   user_tags: {
     float: 'left',
+    width: '12%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -138,47 +111,57 @@ const inlineStyles = {
 };
 
 const Users = () => {
+  // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
-  const searchColumns = [
-    'email',
-    'firstname',
-    'lastname',
-    'phone',
-    'organization',
-  ];
-  const filtering = useSearchAnFilter('user', 'email', searchColumns);
-  const { users, tagsMap, organizationsMap } = useHelper((helper) => ({
-    users: helper.getUsers(),
+  const { t } = useFormatter();
+  const { tagsMap, organizationsMap } = useHelper((helper) => ({
     organizationsMap: helper.getOrganizationsMap(),
     tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchTags());
     dispatch(fetchOrganizations());
-    dispatch(fetchUsers());
   });
+
+  // Headers
+  const headers = [
+    { field: 'user_email', label: 'Email address', isSortable: true },
+    { field: 'user_firstname', label: 'Firstname', isSortable: true },
+    { field: 'user_lastname', label: 'Lastname', isSortable: true },
+    { field: 'user_organization', label: 'Organization', isSortable: true },
+    { field: 'user_admin', label: 'Administrator', isSortable: true },
+  ];
+
+  const [users, setUsers] = useState([]);
+  const [searchPaginationInput, setSearchPaginationInput] = useState({
+    sorts: initSorting('user_email'),
+  });
+
+  // Export
+  const exportProps = {
+    exportType: 'tags',
+    exportKeys: [
+      'user_email',
+      'user_firstname',
+      'user_lastname',
+    ],
+    exportData: users,
+    exportFileName: `${t('Users')}.csv`,
+  };
+
   return (
     <div className={classes.container}>
+      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Security') }, { label: t('Users'), current: true }]} />
       <SecurityMenu />
-      <div className={classes.parameters}>
-        <div style={{ float: 'left', marginRight: 10 }}>
-          <SearchFilter
-            variant="small"
-            onChange={filtering.handleSearch}
-            keyword={filtering.keyword}
-          />
-        </div>
-        <div style={{ float: 'left', marginRight: 10 }}>
-          <TagsFilter
-            onAddTag={filtering.handleAddTag}
-            onRemoveTag={filtering.handleRemoveTag}
-            currentTags={filtering.tags}
-          />
-        </div>
-      </div>
+      <PaginationComponent
+        fetch={searchUsers}
+        searchPaginationInput={searchPaginationInput}
+        setContent={setUsers}
+        exportProps={exportProps}
+      />
       <div className="clearfix" />
-      <List classes={{ root: classes.list }}>
+      <List>
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
@@ -197,44 +180,17 @@ const Users = () => {
           </ListItemIcon>
           <ListItemText
             primary={
-              <>
-                {filtering.buildHeader(
-                  'user_email',
-                  'Email address',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'user_firstname',
-                  'Firstname',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'user_lastname',
-                  'Lastname',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'user_organization',
-                  'Organization',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'user_admin',
-                  'Administrator',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader('user_tags', 'Tags', true, headerStyles)}
-              </>
-            }
+              <SortHeadersComponent
+                headers={headers}
+                inlineStylesHeaders={headerStyles}
+                searchPaginationInput={searchPaginationInput}
+                setSearchPaginationInput={setSearchPaginationInput}
+              />
+              }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {filtering.filterAndSort(users ?? []).map((user) => (
+        {users.map((user) => (
           <ListItem
             key={user.user_id}
             classes={{ root: classes.item }}

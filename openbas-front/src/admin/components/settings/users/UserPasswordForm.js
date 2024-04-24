@@ -31,6 +31,7 @@ class UserPasswordForm extends Component {
               fullWidth={true}
               type="password"
               label={t('Password')}
+              style={{ marginTop: 10 }}
             />
             <TextField
               variant="standard"

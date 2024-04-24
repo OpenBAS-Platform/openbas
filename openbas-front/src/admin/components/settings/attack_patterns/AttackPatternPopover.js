@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { updateAttackPattern, deleteAttackPattern } from '../../../../actions/AttackPattern';
+import { deleteAttackPattern, updateAttackPattern } from '../../../../actions/AttackPattern';
 import AttackPatternForm from './AttackPatternForm';
 import { useFormatter } from '../../../../components/i18n';
 import { killChainPhasesOptions } from '../../../../utils/Option';
 import Transition from '../../../../components/common/Transition';
+import Drawer from '../../../../components/common/Drawer';
 
 const AttackPatternPopover = ({ attackPattern, killChainPhasesMap, onUpdate, onDelete }) => {
   const [openDelete, setOpenDelete] = useState(false);
@@ -93,24 +94,18 @@ const AttackPatternPopover = ({ attackPattern, killChainPhasesMap, onUpdate, onD
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog
-        TransitionComponent={Transition}
+      <Drawer
         open={openEdit}
-        onClose={handleCloseEdit}
-        fullWidth={true}
-        maxWidth="md"
-        PaperProps={{ elevation: 1 }}
+        handleClose={handleCloseEdit}
+        title={t('Update the attack pattern')}
       >
-        <DialogTitle>{t('Update the attack pattern')}</DialogTitle>
-        <DialogContent>
-          <AttackPatternForm
-            initialValues={initialValues}
-            editing={true}
-            onSubmit={onSubmitEdit}
-            handleClose={handleCloseEdit}
-          />
-        </DialogContent>
-      </Dialog>
+        <AttackPatternForm
+          initialValues={initialValues}
+          editing={true}
+          onSubmit={onSubmitEdit}
+          handleClose={handleCloseEdit}
+        />
+      </Drawer>
     </>
   );
 };

@@ -3,37 +3,36 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import {
-  Table,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-  Button,
-  Chip,
   Avatar,
+  Box,
+  Button,
   Checkbox,
-  Tabs,
-  Tab,
-  List,
-  ListItem,
-  ListItemText,
+  Chip,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
+  Grid,
   IconButton,
-  Box,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   Menu,
   MenuItem,
-  ListItemIcon,
-  Grid,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tabs,
   Typography,
 } from '@mui/material';
 import { MoreVert, PersonOutlined } from '@mui/icons-material';
 import { withStyles } from '@mui/styles';
-import { fetchGroup, deleteGroup, updateGroupUsers, updateGroupInformation } from '../../../../actions/Group';
-import { addGrant, deleteGrant, addGroupOrganization, deleteGroupOrganization } from '../../../../actions/Grant';
+import { deleteGroup, fetchGroup, updateGroupInformation, updateGroupUsers } from '../../../../actions/Group';
+import { addGrant, addGroupOrganization, deleteGrant, deleteGroupOrganization } from '../../../../actions/Grant';
 import GroupForm from './GroupForm';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
@@ -42,6 +41,7 @@ import Transition from '../../../../components/common/Transition';
 import ItemTags from '../../../../components/ItemTags';
 import TagsFilter from '../../../../components/TagsFilter';
 import { resolveUserName, truncate } from '../../../../utils/String';
+import Drawer from '../../../../components/common/Drawer';
 
 const styles = () => ({
   box: {
@@ -333,40 +333,24 @@ class GroupPopover extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-        <Dialog
-          TransitionComponent={Transition}
+        <Drawer
           open={this.state.openEdit}
-          onClose={this.handleCloseEdit.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
+          handleClose={this.handleCloseEdit.bind(this)}
+          title={t('Update the group')}
         >
-          <DialogTitle>{t('Update the group')}</DialogTitle>
-          <DialogContent>
-            <GroupForm
-              initialValues={initialValues}
-              editing={true}
-              onSubmit={this.onSubmitEdit.bind(this)}
-              handleClose={this.handleCloseEdit.bind(this)}
-            />
-          </DialogContent>
-        </Dialog>
-        <Dialog
+          <GroupForm
+            initialValues={initialValues}
+            editing={true}
+            onSubmit={this.onSubmitEdit.bind(this)}
+            handleClose={this.handleCloseEdit.bind(this)}
+          />
+        </Drawer>
+        <Drawer
           open={this.state.openUsers}
-          TransitionComponent={Transition}
-          onClose={this.handleCloseUsers.bind(this)}
-          fullWidth={true}
-          maxWidth="lg"
-          PaperProps={{
-            elevation: 1,
-            sx: {
-              minHeight: 580,
-              maxHeight: 580,
-            },
-          }}
+          handleClose={this.handleCloseUsers.bind(this)}
+          title={t('Manage the users of this group')}
         >
-          <DialogTitle>{t('Manage the users of this group')}</DialogTitle>
-          <DialogContent>
+          <>
             <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
               <Grid item={true} xs={8}>
                 <Grid container={true} spacing={3}>
@@ -428,26 +412,22 @@ class GroupPopover extends Component {
                 </Box>
               </Grid>
             </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleCloseUsers.bind(this)}>
-              {t('Cancel')}
-            </Button>
-            <Button color="secondary" onClick={this.submitAddUsers.bind(this)}>
-              {t('Update')}
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog
+            <div style={{ float: 'right', marginTop: 20 }}>
+              <Button variant="contained" style={{ marginRight: 10 }} onClick={this.handleCloseUsers.bind(this)}>
+                {t('Cancel')}
+              </Button>
+              <Button variant="contained" color="secondary" onClick={this.submitAddUsers.bind(this)}>
+                {t('Update')}
+              </Button>
+            </div>
+          </>
+        </Drawer>
+        <Drawer
           open={this.state.openGrants}
-          TransitionComponent={Transition}
-          onClose={this.handleCloseGrants.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
+          handleClose={this.handleCloseGrants.bind(this)}
+          title={t('Manage grants')}
         >
-          <DialogTitle>{t('Manage grants')}</DialogTitle>
-          <DialogContent style={{ minHeight: 480, maxHeight: 480 }}>
+          <>
             <Tabs
               value={this.state.tabSelect}
               onChange={this.handleTabChange.bind(this)}
@@ -628,13 +608,13 @@ class GroupPopover extends Component {
                 </TableBody>
               </Table>
             </TabPanel>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleCloseGrants.bind(this)}>
-              {t('Close')}
-            </Button>
-          </DialogActions>
-        </Dialog>
+            <div style={{ float: 'right', marginTop: 20 }}>
+              <Button variant="contained" onClick={this.handleCloseGrants.bind(this)}>
+                {t('Close')}
+              </Button>
+            </div>
+          </>
+        </Drawer>
       </>
     );
   }

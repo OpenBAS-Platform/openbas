@@ -21,12 +21,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
+  disabled: boolean;
   endpointIds: string[];
   onSubmit: (endpointIds: string[]) => void;
   filter: (endpoint: EndpointStore) => boolean;
 }
 
 const InjectAddEndpoints: FunctionComponent<Props> = ({
+  disabled,
   endpointIds,
   onSubmit,
   filter,
@@ -48,7 +50,7 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
         divider={true}
         onClick={handleOpen}
         color="primary"
-        disabled={permissions.readOnly}
+        disabled={permissions.readOnly || disabled}
       >
         <ListItemIcon color="primary">
           <ControlPointOutlined color="primary" />

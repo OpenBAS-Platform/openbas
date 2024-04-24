@@ -17,9 +17,6 @@ const useStyles = makeStyles(() => ({
     margin: 0,
     padding: '0 200px 50px 0',
   },
-  list: {
-    marginTop: 10,
-  },
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -134,7 +131,7 @@ const KillChainPhases = () => {
         exportProps={exportProps}
       />
       <div className="clearfix" />
-      <List classes={{ root: classes.list }}>
+      <List>
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}

@@ -42,6 +42,7 @@ const UserForm = (props) => {
             fullWidth={true}
             label={t('Email address')}
             disabled={initialValues.user_email === 'admin@openbas.io'}
+            style={{ marginTop: 10 }}
           />
           <TextField
             name="user_firstname"
@@ -112,8 +113,9 @@ const UserForm = (props) => {
             style={{ marginTop: 20 }}
             disabled={initialValues.user_email === 'admin@openbas.io'}
           />
-          <div style={{ float: 'right', marginTop: 20 }}>
+          <div style={{ float: 'right', marginTop: 40 }}>
             <Button
+              variant="contained"
               onClick={handleClose}
               style={{ marginRight: 10 }}
               disabled={submitting}
@@ -121,6 +123,7 @@ const UserForm = (props) => {
               {t('Cancel')}
             </Button>
             <Button
+              variant="contained"
               color="secondary"
               type="submit"
               disabled={pristine || submitting}

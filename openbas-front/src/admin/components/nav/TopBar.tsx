@@ -45,8 +45,8 @@ const useStyles = makeStyles<Theme>((theme) => ({
     marginRight: 4,
   },
   menuContainer: {
+    width: '50%',
     float: 'left',
-    marginLeft: 30,
   },
   barRight: {
     position: 'absolute',
@@ -164,7 +164,7 @@ const TopBar: React.FC = () => {
             />
           </Link>
         </div>
-        <div className={classes.menuContainer}>
+        <div className={classes.menuContainer} style={{ marginLeft: navOpen ? 20 : 30 }}>
           <SearchInput
             variant="topBar"
             placeholder={`${t('Search the platform')}...`}

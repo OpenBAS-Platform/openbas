@@ -34,6 +34,7 @@ class TagForm extends Component {
               name="tag_name"
               fullWidth={true}
               label={t('Value')}
+              style={{ marginTop: 10 }}
             />
             <DeprecatedColorPickerField
               name="tag_color"
@@ -43,6 +44,7 @@ class TagForm extends Component {
             />
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button
+                variant="contained"
                 onClick={handleClose.bind(this)}
                 style={{ marginRight: 10 }}
                 disabled={submitting}
@@ -50,6 +52,7 @@ class TagForm extends Component {
                 {t('Cancel')}
               </Button>
               <Button
+                variant="contained"
                 color="secondary"
                 type="submit"
                 disabled={pristine || submitting}
