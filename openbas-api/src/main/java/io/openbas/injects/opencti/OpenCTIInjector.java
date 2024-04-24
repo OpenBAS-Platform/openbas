@@ -13,7 +13,7 @@ public class OpenCTIInjector {
     @Autowired
     public OpenCTIInjector(InjectorService injectorService, OpenCTIContract contract) {
         try {
-            injectorService.register(OPENCTI_INJECTOR_ID, OPENCTI_INJECTOR_NAME, contract);
+            injectorService.register(OPENCTI_INJECTOR_ID, OPENCTI_INJECTOR_NAME, contract, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

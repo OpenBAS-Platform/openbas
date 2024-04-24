@@ -38,6 +38,7 @@ const InjectorContractPopover = ({ injectorContract, killChainPhasesMap, attackP
     const injectorContractContent = JSON.parse(injectorContract.injector_contract_content);
     const newInjectorContractContent = {
       ...injectorContractContent,
+      label: { en: data.injector_contract_name },
       fields: injectorContractContent.fields.map((field) => {
         const newField = field;
         if (!R.isNil(fields[field.key]?.readOnly)) {
