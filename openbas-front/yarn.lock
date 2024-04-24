@@ -3765,6 +3765,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/uuid@npm:^9":
+  version: 9.0.8
+  resolution: "@types/uuid@npm:9.0.8"
+  checksum: 10c0/b411b93054cb1d4361919579ef3508a1f12bf15b5fdd97337d3d351bece6c921b52b6daeef89b62340fd73fd60da407878432a1af777f40648cbe53a01723489
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/eslint-plugin@npm:7.5.0":
   version: 7.5.0
   resolution: "@typescript-eslint/eslint-plugin@npm:7.5.0"
@@ -10859,6 +10866,7 @@ __metadata:
     "@types/react-csv": "npm:1.1.10"
     "@types/react-dom": "npm:18.2.24"
     "@types/seamless-immutable": "npm:7.1.19"
+    "@types/uuid": "npm:^9"
     "@typescript-eslint/eslint-plugin": "npm:7.5.0"
     "@typescript-eslint/parser": "npm:7.5.0"
     "@uiw/react-md-editor": "npm:4.0.4"
@@ -10926,6 +10934,7 @@ __metadata:
     seamless-immutable: "npm:7.1.4"
     swagger-typescript-api: "npm:13.0.3"
     typescript: "npm:5.4.5"
+    uuid: "npm:9.0.1"
     vite: "npm:5.2.8"
     vite-plugin-istanbul: "npm:6.0.0"
     vitest: "npm:1.4.0"
@@ -14418,6 +14427,15 @@ __metadata:
   version: 1.0.1
   resolution: "utils-merge@npm:1.0.1"
   checksum: 10c0/02ba649de1b7ca8854bfe20a82f1dfbdda3fb57a22ab4a8972a63a34553cf7aa51bc9081cf7e001b035b88186d23689d69e71b510e610a09a4c66f68aa95b672
+  languageName: node
+  linkType: hard
+
+"uuid@npm:9.0.1":
+  version: 9.0.1
+  resolution: "uuid@npm:9.0.1"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 10c0/1607dd32ac7fc22f2d8f77051e6a64845c9bce5cd3dd8aa0070c074ec73e666a1f63c7b4e0f4bf2bc8b9d59dc85a15e17807446d9d2b17c8485fbc2147b27f9b
   languageName: node
   linkType: hard
 

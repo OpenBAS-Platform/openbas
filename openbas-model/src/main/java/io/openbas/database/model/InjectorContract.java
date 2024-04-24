@@ -47,6 +47,10 @@ public class InjectorContract implements Base {
     @NotBlank
     private String content;
 
+    @Column(name = "injector_contract_custom")
+    @JsonProperty("injector_contract_custom")
+    private Boolean custom = false;
+
     @Column(name = "injector_contract_created_at")
     @JsonProperty("injector_contract_created_at")
     private Instant createdAt = now();

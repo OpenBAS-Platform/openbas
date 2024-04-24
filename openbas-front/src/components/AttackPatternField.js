@@ -44,14 +44,16 @@ class AttackPatternField extends Component {
   }
 
   onSubmit(data) {
-    const { name, setFieldValue, values } = this.props;
+    const { name, setFieldValue, values, killChainPhasesMap, useExternalId } = this.props;
     this.props.addAttackPattern(data).then((result) => {
       if (result.result) {
-        const newAttackPattern = result.entities.attackPatterns[result.result];
+        const newAttackPattern = result.entities.attackpatterns[result.result];
+        const killChainPhase = R.head(newAttackPattern.attack_pattern_kill_chain_phases);
+        const killChainName = killChainPhase ? killChainPhasesMap[killChainPhase]?.phase_kill_chain_name ?? null : null;
         const attackPatterns = R.append(
           {
-            id: newAttackPattern.phase_id,
-            label: `[${newAttackPattern.phase_kill_chain_name}] ${newAttackPattern.phase_name}`,
+            id: useExternalId ? newAttackPattern.attack_pattern_external_id : newAttackPattern.attack_pattern_id,
+            label: killChainName ? `[${killChainName}] [${newAttackPattern.attack_pattern_external_id}] ${newAttackPattern.attack_pattern_name}` : `[${newAttackPattern.attack_pattern_external_id}] ${newAttackPattern.attack_pattern_name}`,
           },
           values[name],
         );
@@ -74,13 +76,14 @@ class AttackPatternField extends Component {
       label,
       placeholder,
       userAdmin,
+      useExternalId,
     } = this.props;
     const attackPatternsOptions = attackPatterns.map(
       (n) => {
         const killChainPhase = R.head(n.attack_pattern_kill_chain_phases);
         const killChainName = killChainPhase ? killChainPhasesMap[killChainPhase]?.phase_kill_chain_name ?? null : null;
         return {
-          id: n.attack_pattern_id,
+          id: useExternalId ? n.attack_pattern_external_id : n.attack_pattern_id,
           label: killChainName ? `[${killChainName}] [${n.attack_pattern_external_id}] ${n.attack_pattern_name}` : `[${n.attack_pattern_external_id}] ${n.attack_pattern_name}`,
         };
       },

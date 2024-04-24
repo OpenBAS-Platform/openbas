@@ -17,6 +17,9 @@ public abstract class ContractElement {
     private String label;
 
     private boolean mandatory = true;
+
+    private boolean readOnly = false;
+
     private List<String> mandatoryGroups;
 
     private List<LinkedFieldModel> linkedFields = new ArrayList<>();

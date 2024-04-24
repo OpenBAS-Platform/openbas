@@ -31,4 +31,6 @@ public enum ContractType {
     Asset,
     @JsonProperty("asset-group")
     AssetGroup,
+    @JsonProperty("payload")
+    Payload,
 }

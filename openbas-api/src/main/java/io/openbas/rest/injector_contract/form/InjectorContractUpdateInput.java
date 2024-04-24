@@ -1,4 +1,4 @@
-package io.openbas.rest.injector.form;
+package io.openbas.rest.injector_contract.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
@@ -23,8 +23,8 @@ public class InjectorContractUpdateInput {
     private Map<String, String> labels;
 
     @Getter
-    @JsonProperty("contract_attack_patterns_external_ids")
-    private List<String> attackPatternsExternalIds = new ArrayList<>();
+    @JsonProperty("contract_attack_patterns_ids")
+    private List<String> attackPatternsIds = new ArrayList<>();
 
     @Getter
     @NotBlank(message = MANDATORY_MESSAGE)
@@ -42,8 +42,8 @@ public class InjectorContractUpdateInput {
         this.labels = labels;
     }
 
-    public void setAttackPatternsExternalIds(List<String> attackPatternsExternalIds) {
-        this.attackPatternsExternalIds = attackPatternsExternalIds;
+    public void setAttackPatternsIds(List<String> attackPatternsIds) {
+        this.attackPatternsIds = attackPatternsIds;
     }
 
     public void setContent(String content) {

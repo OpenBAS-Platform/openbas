@@ -13,7 +13,7 @@ public class EmailInjector {
     @Autowired
     public EmailInjector(InjectorService injectorService, EmailContract contract) {
         try {
-            injectorService.register(EMAIL_INJECTOR_ID, EMAIL_INJECTOR_NAME, contract);
+            injectorService.register(EMAIL_INJECTOR_ID, EMAIL_INJECTOR_NAME, contract, false);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

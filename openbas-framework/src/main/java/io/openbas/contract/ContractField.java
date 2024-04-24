@@ -8,13 +8,16 @@ public class ContractField {
 
     private boolean mandatory;
 
+    private boolean readOnly;
+
     private ContractCardinality cardinality;
 
-    ContractField(String name, ContractType type, ContractCardinality cardinality, Boolean mandatory) {
+    ContractField(String name, ContractType type, ContractCardinality cardinality, Boolean mandatory, Boolean readOnly) {
         this.name = name;
         this.type = type;
         this.cardinality = cardinality;
         this.mandatory = mandatory;
+        this.readOnly = readOnly;
     }
 
     public String getName() {
@@ -47,5 +50,13 @@ public class ContractField {
 
     public void setMandatory(boolean mandatory) {
         this.mandatory = mandatory;
+    }
+
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
     }
 }

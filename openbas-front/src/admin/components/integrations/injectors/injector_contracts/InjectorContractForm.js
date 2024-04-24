@@ -22,7 +22,7 @@ const InjectorContractForm = (props) => {
       {({ handleSubmit, form, values, submitting, pristine }) => (
         <form id="injectorContractForm" onSubmit={handleSubmit}>
           <AttackPatternField
-            name="attack_pattern_kill_chain_phases"
+            name="injector_contract_attack_patterns"
             label={t('Attack patterns')}
             values={values}
             setFieldValue={form.mutators.setValue}

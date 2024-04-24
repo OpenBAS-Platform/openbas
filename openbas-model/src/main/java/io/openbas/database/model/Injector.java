@@ -51,11 +51,6 @@ public class Injector implements Base {
     private boolean customContracts = false;
 
     @Getter
-    @Column(name = "injector_contract_template")
-    @JsonProperty("injector_contract_template")
-    private String contractTemplate = null;
-
-    @Getter
     @Column(name = "injector_created_at")
     @JsonProperty("injector_created_at")
     private Instant createdAt = now();

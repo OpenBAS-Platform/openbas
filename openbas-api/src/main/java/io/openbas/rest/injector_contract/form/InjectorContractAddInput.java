@@ -32,6 +32,10 @@ public class InjectorContractAddInput {
     private Map<String, String> labels;
 
     @Getter
+    @JsonProperty("contract_attack_patterns_ids")
+    private List<String> attackPatternsIds = new ArrayList<>();
+
+    @Getter
     @JsonProperty("contract_attack_patterns_external_ids")
     private List<String> attackPatternsExternalIds = new ArrayList<>();
 
@@ -73,6 +77,14 @@ public class InjectorContractAddInput {
 
     public void setLabels(Map<String, String> labels) {
         this.labels = labels;
+    }
+
+    public List<String> getAttackPatternsIds() {
+        return attackPatternsIds;
+    }
+
+    public void setAttackPatternsIds(List<String> attackPatternsIds) {
+        this.attackPatternsIds = attackPatternsIds;
     }
 
     public List<String> getAttackPatternsExternalIds() {

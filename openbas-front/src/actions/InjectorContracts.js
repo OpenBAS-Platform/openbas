@@ -42,6 +42,11 @@ export const updateInjectorContract = (injectorContractId, data) => (dispatch) =
   return putReferential(schema.injectorContract, uri, data)(dispatch);
 };
 
+export const updateInjectorContractMapping = (injectorContractId, data) => (dispatch) => {
+  const uri = `/api/injector_contracts/${injectorContractId}/mapping`;
+  return putReferential(schema.injectorContract, uri, data)(dispatch);
+};
+
 export const addInjectorContract = (data) => (dispatch) => {
   const uri = '/api/injector_contracts';
   return postReferential(schema.injectorContract, uri, data)(dispatch);

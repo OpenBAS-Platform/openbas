@@ -13,7 +13,7 @@ public class ChannelInjector {
     @Autowired
     public ChannelInjector(InjectorService injectorService, ChannelContract contract) {
         try {
-            injectorService.register(CHANNEL_INJECTOR_ID, CHANNEL_INJECTOR_NAME, contract);
+            injectorService.register(CHANNEL_INJECTOR_ID, CHANNEL_INJECTOR_NAME, contract, false);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

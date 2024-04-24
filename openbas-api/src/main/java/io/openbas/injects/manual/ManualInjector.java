@@ -13,7 +13,7 @@ public class ManualInjector {
     @Autowired
     public ManualInjector(InjectorService injectorService, ManualContract contract) {
         try {
-            injectorService.register(MANUAL_INJECTOR_ID, MANUAL_INJECTOR_NAME, contract);
+            injectorService.register(MANUAL_INJECTOR_ID, MANUAL_INJECTOR_NAME, contract, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

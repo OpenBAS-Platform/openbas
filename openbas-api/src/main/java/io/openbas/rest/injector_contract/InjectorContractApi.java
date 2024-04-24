@@ -2,14 +2,14 @@ package io.openbas.rest.injector_contract;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.config.OpenBASConfig;
-import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.InjectorRepository;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.rest.injector.form.InjectorContractUpdateInput;
 import io.openbas.rest.injector_contract.form.InjectorContractAddInput;
+import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
+import io.openbas.rest.injector_contract.form.InjectorContractUpdateMappingInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -82,8 +82,13 @@ public class InjectorContractApi extends RestBehavior {
     @PostMapping("/api/injector_contracts")
     public InjectorContract createInjectorContract(@Valid @RequestBody InjectorContractAddInput input) {
         InjectorContract injectorContract = new InjectorContract();
+        injectorContract.setCustom(true);
         injectorContract.setUpdateAttributes(input);
-        injectorContract.setAttackPatterns(fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(input.getAttackPatternsExternalIds())));
+        if (!input.getAttackPatternsExternalIds().isEmpty()) {
+            injectorContract.setAttackPatterns(fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(input.getAttackPatternsExternalIds())));
+        } else if (!input.getAttackPatternsIds().isEmpty()) {
+            injectorContract.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
+        }
         injectorContract.setInjector(updateRelation(input.getInjectorId(), injectorContract.getInjector(), injectorRepository));
         return injectorContractRepository.save(injectorContract);
     }
@@ -93,6 +98,16 @@ public class InjectorContractApi extends RestBehavior {
     public InjectorContract updateInjectorContract(@PathVariable String injectorContractId, @Valid @RequestBody InjectorContractUpdateInput input) {
         InjectorContract injectorContract = injectorContractRepository.findById(injectorContractId).orElseThrow();
         injectorContract.setUpdateAttributes(input);
+        injectorContract.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
+        injectorContract.setUpdatedAt(Instant.now());
+        return injectorContractRepository.save(injectorContract);
+    }
+
+    @Secured(ROLE_ADMIN)
+    @PutMapping("/api/injector_contracts/{injectorContractId}/mapping")
+    public InjectorContract updateInjectorContractMapping(@PathVariable String injectorContractId, @Valid @RequestBody InjectorContractUpdateMappingInput input) {
+        InjectorContract injectorContract = injectorContractRepository.findById(injectorContractId).orElseThrow();
+        injectorContract.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         injectorContract.setUpdatedAt(Instant.now());
         return injectorContractRepository.save(injectorContract);
     }

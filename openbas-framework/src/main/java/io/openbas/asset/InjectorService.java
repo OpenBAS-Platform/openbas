@@ -61,7 +61,7 @@ public class InjectorService {
     }
 
     @Transactional
-    public void register(String id, String name, Contractor contractor) throws Exception {
+    public void register(String id, String name, Contractor contractor, Boolean isCustomizable) throws Exception {
         if(!contractor.isExpose()) {
             return;
         }
@@ -76,6 +76,7 @@ public class InjectorService {
             injector.setId(id);
             injector.setName(name);
             injector.setExternal(false);
+            injector.setCustomContracts(isCustomizable);
             injector.setType(contractor.getType());
             List<String> existing = new ArrayList<>();
             List<InjectorContract> toUpdates = new ArrayList<>();

@@ -5,7 +5,7 @@ import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemTe
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 import { SmartButtonOutlined } from '@mui/icons-material';
-import CreateAttackPattern from './injector_contracts/CreateInjectorContract';
+import CreateInjectorContract from './injector_contracts/CreateInjectorContract';
 import InjectorContractPopover from './injector_contracts/InjectorContractPopover';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
@@ -241,7 +241,6 @@ const InjectorContracts = () => {
             />
             <ListItemSecondaryAction>
               <InjectorContractPopover
-                injector={injector}
                 injectorContract={injectorContract}
                 killChainPhasesMap={killChainPhasesMap}
                 attackPatternsMap={attackPatternsMap}
@@ -250,7 +249,14 @@ const InjectorContracts = () => {
           </ListItem>
         ))}
       </List>
-      <CreateAttackPattern />
+      {injector.injector_custom_contracts && (
+        <CreateInjectorContract
+          injector={injector}
+          injectorContracts={injectorContracts}
+          killChainPhasesMap={killChainPhasesMap}
+          attackPatternsMap={attackPatternsMap}
+        />
+      )}
     </div>
   );
 };

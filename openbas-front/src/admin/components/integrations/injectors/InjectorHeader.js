@@ -8,9 +8,6 @@ const useStyles = makeStyles(() => ({
   container: {
     width: '100%',
   },
-  title: {
-    textTransform: 'uppercase',
-  },
 }));
 
 const InjectorHeader = () => {
@@ -24,7 +21,6 @@ const InjectorHeader = () => {
       <Typography
         variant="h1"
         gutterBottom={true}
-        classes={{ root: classes.title }}
       >
         {injector.injector_name}
       </Typography>

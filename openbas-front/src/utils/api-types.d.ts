@@ -197,7 +197,14 @@ export interface AttackPatternCreateInput {
   attack_pattern_parent?: string;
   attack_pattern_permissions_required?: string[];
   attack_pattern_platforms?: string[];
-  attack_pattern_stix_id: string;
+  attack_pattern_stix_id?: string;
+}
+
+export interface AttackPatternUpdateInput {
+  attack_pattern_description?: string;
+  attack_pattern_external_id: string;
+  attack_pattern_kill_chain_phases?: string[];
+  attack_pattern_name: string;
 }
 
 export interface AttackPatternUpsertInput {
@@ -1003,7 +1010,6 @@ export interface InjectUpdateTriggerInput {
 }
 
 export interface Injector {
-  injector_contract_template?: string;
   /** @format date-time */
   injector_created_at?: string;
   injector_custom_contracts?: boolean;
@@ -1028,6 +1034,7 @@ export interface InjectorConnection {
 
 export interface InjectorContract {
   injector_contract_atomic_testing?: boolean;
+  injector_contract_attack_patterns?: AttackPattern[];
   injector_contract_content: string;
   /** @format date-time */
   injector_contract_created_at?: string;
@@ -1037,13 +1044,13 @@ export interface InjectorContract {
   injector_contract_manual?: boolean;
   /** @format date-time */
   injector_contract_updated_at?: string;
-  injector_contract_attack_patterns?: AttackPattern[];
   updateAttributes?: object;
 }
 
 export interface InjectorContractAddInput {
   atomicTesting?: boolean;
   contract_attack_patterns_external_ids?: string[];
+  contract_attack_patterns_ids?: string[];
   contract_content: string;
   contract_id: string;
   contract_labels?: Record<string, string>;
@@ -1064,15 +1071,18 @@ export interface InjectorContractInput {
 
 export interface InjectorContractUpdateInput {
   atomicTesting?: boolean;
-  contract_attack_patterns_external_ids?: string[];
+  contract_attack_patterns_ids?: string[];
   contract_content: string;
   contract_labels?: Record<string, string>;
   contract_manual?: boolean;
   is_atomic_testing?: boolean;
 }
 
+export interface InjectorContractUpdateMappingInput {
+  contract_attack_patterns_ids?: string[];
+}
+
 export interface InjectorCreateInput {
-  injector_contract_template?: string;
   injector_contracts?: InjectorContractInput[];
   injector_custom_contracts?: boolean;
   injector_id: string;
@@ -1086,7 +1096,6 @@ export interface InjectorRegistration {
 }
 
 export interface InjectorUpdateInput {
-  injector_contract_template?: string;
   injector_contracts?: InjectorContractInput[];
   injector_custom_contracts?: boolean;
   injector_name: string;
@@ -1118,7 +1127,7 @@ export interface KillChainPhaseCreateInput {
   phase_name: string;
   /** @format int64 */
   phase_order?: number;
-  phase_short_name?: string;
+  phase_shortname: string;
   phase_stix_id?: string;
 }
 
