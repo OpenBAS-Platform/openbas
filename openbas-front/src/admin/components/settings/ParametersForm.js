@@ -2,7 +2,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { MenuItem, Button } from '@mui/material';
-import Select from '../../../components/Select';
+import SelectField from '../../../components/SelectField';
 import inject18n from '../../../components/i18n';
 import TextField from '../../../components/TextField';
 
@@ -22,7 +22,7 @@ const ParametersForm = (props) => {
             fullWidth={true}
             label={t('Platform name')}
           />
-          <Select
+          <SelectField
             variant="standard"
             label={t('Default theme')}
             name="platform_theme"
@@ -35,8 +35,8 @@ const ParametersForm = (props) => {
             <MenuItem key="light" value="light">
               {t('Light')}
             </MenuItem>
-          </Select>
-          <Select
+          </SelectField>
+          <SelectField
             variant="standard"
             label={t('Default language')}
             name="platform_lang"
@@ -52,7 +52,7 @@ const ParametersForm = (props) => {
             <MenuItem key="fr" value="fr">
               Français
             </MenuItem>
-          </Select>
+          </SelectField>
           <div style={{ marginTop: 20 }}>
             <Button
               variant="contained"

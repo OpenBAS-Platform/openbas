@@ -2,7 +2,7 @@ import React from 'react';
 import { Form } from 'react-final-form';
 import { MenuItem, Button } from '@mui/material';
 import { z } from 'zod';
-import Select from '../../../components/Select';
+import SelectField from '../../../components/SelectField';
 import TextField from '../../../components/TextField';
 import { useFormatter } from '../../../components/i18n';
 import OrganizationField from '../../../components/OrganizationField';
@@ -63,7 +63,7 @@ const UserForm = ({ onSubmit, initialValues }) => {
             values={values}
             setFieldValue={form.mutators.setValue}
           />
-          <Select
+          <SelectField
             variant="standard"
             label={t('Theme')}
             name="user_theme"
@@ -79,8 +79,8 @@ const UserForm = ({ onSubmit, initialValues }) => {
             <MenuItem key="light" value="light">
               {t('Light')}
             </MenuItem>
-          </Select>
-          <Select
+          </SelectField>
+          <SelectField
             variant="standard"
             label={t('Language')}
             name="user_lang"
@@ -96,7 +96,7 @@ const UserForm = ({ onSubmit, initialValues }) => {
             <MenuItem key="fr" value="fr">
               Français
             </MenuItem>
-          </Select>
+          </SelectField>
           <div style={{ marginTop: 20 }}>
             <Button
               variant="contained"

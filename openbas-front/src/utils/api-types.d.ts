@@ -852,6 +852,7 @@ export interface Inject {
   inject_exercise?: Exercise;
   inject_expectations?: InjectExpectation[];
   inject_id?: string;
+  inject_payloads?: Asset[];
   inject_scenario?: Scenario;
   /** @format date-time */
   inject_sent_at?: string;
@@ -1536,6 +1537,25 @@ export interface PageKillChainPhase {
   totalPages?: number;
 }
 
+export interface PagePayload {
+  content?: Payload[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageTag {
   content?: Tag[];
   empty?: boolean;
@@ -1594,6 +1614,34 @@ export interface Pause {
   pause_duration?: number;
   pause_exercise?: Exercise;
   updateAttributes?: object;
+}
+
+export interface Payload {
+  payload_content?: string;
+  /** @format date-time */
+  payload_created_at?: string;
+  payload_description?: string;
+  payload_id: string;
+  payload_name: string;
+  payload_tags?: Tag[];
+  payload_type?: string;
+  /** @format date-time */
+  payload_updated_at?: string;
+  updateAttributes?: object;
+}
+
+export interface PayloadCreateInput {
+  payload_description?: string;
+  payload_name: string;
+  payload_tags?: string[];
+  payload_type: string;
+}
+
+export interface PayloadUpdateInput {
+  payload_description?: string;
+  payload_name: string;
+  payload_tags?: string[];
+  payload_type: string;
 }
 
 export interface PlatformSettings {

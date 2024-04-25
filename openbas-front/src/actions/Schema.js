@@ -249,6 +249,13 @@ export const collector = new schema.Entity(
 );
 export const arrayOfCollectors = new schema.Array(collector);
 
+export const payload = new schema.Entity(
+  'payloads',
+  {},
+  { idAttribute: 'payload_id' },
+);
+export const arrayOfPayloads = new schema.Array(payload);
+
 token.define({ token_user: user });
 user.define({ user_organization: organization });
 
@@ -419,6 +426,10 @@ export const storeHelper = (state) => ({
   getChannels: () => entities('channels', state),
   getChannel: (id) => entity(id, 'channels', state),
   getChannelsMap: () => maps('channels', state),
+  // payloads
+  getPayloads: () => entities('payloads', state),
+  getPayload: (id) => entity(id, 'payloads', state),
+  getPayloadsMap: () => maps('payloads', state),
   // articles
   getArticles: () => entities('articles', state),
   getArticle: (id) => entity(id, 'articles', state),

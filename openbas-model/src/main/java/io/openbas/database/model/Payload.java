@@ -26,8 +26,6 @@ import static lombok.AccessLevel.NONE;
 @Data
 @Entity
 @Table(name = "payloads")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "payload_type", discriminatorType = STRING)
 @EntityListeners(ModelBaseListener.class)
 public class Payload implements Base {
 
@@ -39,9 +37,9 @@ public class Payload implements Base {
   @NotBlank
   private String id;
 
-  @Column(name = "payload_type", insertable = false, updatable = false)
+  @Queryable(searchable = true, filterable = true, sortable = true)
+  @Column(name = "payload_type")
   @JsonProperty("payload_type")
-  @Setter(NONE)
   private String type;
 
   @Queryable(searchable = true, sortable = true)

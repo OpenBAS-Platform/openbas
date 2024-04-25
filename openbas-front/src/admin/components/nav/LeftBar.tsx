@@ -24,6 +24,7 @@ import {
   DevicesOtherOutlined,
   SmartButtonOutlined,
   OnlinePredictionOutlined,
+  SubscriptionsOutlined,
 } from '@mui/icons-material';
 import { DramaMasks, NewspaperVariantMultipleOutline, PostOutline, SelectGroup, Target } from 'mdi-material-ui';
 import { createStyles, makeStyles, styled, useTheme } from '@mui/styles';
@@ -447,6 +448,7 @@ const LeftBar = () => {
             [
               { type: 'Document', link: '/admin/components/documents', label: 'Documents', icon: <DescriptionOutlined fontSize="small" /> },
               { type: 'Variable', link: '/admin/components/variables', label: 'Custom variables', icon: <AttachMoneyOutlined fontSize="small" /> },
+              { type: 'Payload', link: '/admin/components/payloads', label: 'Payloads', icon: <SubscriptionsOutlined fontSize="small" /> },
               { type: 'Persona', link: '/admin/components/personas', label: 'Personas', icon: <DramaMasks fontSize="small" /> },
               { type: 'Channel', link: '/admin/components/channels', label: 'Channels', icon: <PostOutline fontSize="small" /> },
               { type: 'Challenge', link: '/admin/components/challenges', label: 'Challenges', icon: <RowingOutlined fontSize="small" /> },
@@ -515,7 +517,7 @@ const LeftBar = () => {
           <StyledTooltip title={!navOpen && t('Integrations')} placement="right">
             <MenuItem
               ref={anchors.components}
-              href="components"
+              href="integrations"
               selected={!navOpen && location.pathname.includes('/admin/integrations')}
               dense={true}
               classes={{ root: classes.menuItem }}

@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Button, MenuItem } from '@mui/material';
 import TextField from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';
-import Select from '../../../../components/Select';
+import SelectField from '../../../../components/SelectField';
 
 class ChannelForm extends Component {
   validate(values) {
@@ -35,7 +35,7 @@ class ChannelForm extends Component {
       >
         {({ handleSubmit, submitting, pristine }) => (
           <form id="channelForm" onSubmit={handleSubmit}>
-            <Select
+            <SelectField
               variant="standard"
               label={t('Type')}
               name="channel_type"
@@ -50,7 +50,7 @@ class ChannelForm extends Component {
               <MenuItem key="tv" value="tv">
                 {t('tv')}
               </MenuItem>
-            </Select>
+            </SelectField>
             <TextField
               variant="standard"
               name="channel_name"

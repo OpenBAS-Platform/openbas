@@ -51,6 +51,7 @@ public class CollectorApi extends RestBehavior {
 
     private Collector updateCollector(Collector collector, String type, String name, int period, Instant lastExecution) {
         collector.setUpdatedAt(Instant.now());
+        collector.setExternal(true);
         collector.setType(type);
         collector.setName(name);
         collector.setPeriod(period);

@@ -57,6 +57,7 @@ const DocumentForm = (props) => {
             multiline
             rows={2}
             label={t('Description')}
+            style={{ marginTop: 10 }}
           />
           <ExerciseField
             name="document_exercises"

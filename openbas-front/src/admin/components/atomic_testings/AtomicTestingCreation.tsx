@@ -7,7 +7,7 @@ import AtomicTestingCreationDetails from './AtomicTestingCreationDetails';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import { searchInjectorContracts } from '../../../actions/InjectorContracts';
 import MitreFilter, { MITRE_FILTER_KEY } from '../components/atomic_testings/MitreFilter';
-import computeAttackPattern from '../../../utils/injectorcontract/InjectorContractUtils';
+import computeAttackPattern from '../../../utils/injector_contract/InjectorContractUtils';
 import type { InjectorContractStore } from '../../../actions/injector_contracts/InjectorContract';
 import type { FilterGroup, SearchPaginationInput } from '../../../utils/api-types';
 import { initSorting } from '../../../components/common/pagination/Page';

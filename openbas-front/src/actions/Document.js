@@ -1,9 +1,15 @@
 import * as schema from './Schema';
-import { getReferential, postReferential, delReferential, putReferential } from '../utils/Action';
+import { getReferential, postReferential, delReferential, putReferential, simplePostCall } from '../utils/Action';
 
 export const fetchDocuments = () => (dispatch) => getReferential(schema.arrayOfDocuments, '/api/documents')(dispatch);
 
 export const fetchDocument = (documentId) => (dispatch) => getReferential(schema.document, `/api/documents/${documentId}`)(dispatch);
+
+export const searchDocuments = (paginationInput) => {
+  const data = paginationInput;
+  const uri = '/api/documents/search';
+  return simplePostCall(uri, data);
+};
 
 export const addDocument = (data) => (dispatch) => {
   const uri = '/api/documents';

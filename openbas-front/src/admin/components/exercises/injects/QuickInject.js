@@ -47,7 +47,7 @@ import EnrichedTextField from '../../../../components/EnrichedTextField';
 import InjectAddDocuments from '../../components/injects/InjectAddDocuments';
 import DocumentType from '../../components/documents/DocumentType';
 import DocumentPopover from '../../components/documents/DocumentPopover';
-import Select from '../../../../components/Select';
+import SelectField from '../../../../components/SelectField';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
 import InjectExpectations from '../../components/injects/expectations/InjectExpectations';
 import { fetchExerciseTeams } from '../../../../actions/Exercise';
@@ -564,7 +564,7 @@ class QuickInject extends Component {
                                 classes={{ root: classes.tuple }}
                                 divider={false}
                               >
-                                <Select
+                                <SelectField
                                   variant="standard"
                                   name={`${name}.type`}
                                   fullWidth={true}
@@ -585,7 +585,7 @@ class QuickInject extends Component {
                                       </ListItemText>
                                     </MenuItem>
                                   )}
-                                </Select>
+                                </SelectField>
                                 <TextField
                                   variant="standard"
                                   name={`${name}.key`}
@@ -599,7 +599,7 @@ class QuickInject extends Component {
                                 && values[field.key][index]
                                 && values[field.key][index].type
                                 === 'attachment' ? (
-                                  <Select
+                                  <SelectField
                                     variant="standard"
                                     name={`${name}.value`}
                                     fullWidth={true}
@@ -617,7 +617,7 @@ class QuickInject extends Component {
                                         </ListItemText>
                                       </MenuItem>
                                     ))}
-                                  </Select>
+                                  </SelectField>
                                   ) : (
                                     <TextField
                                       variant="standard"
@@ -650,7 +650,7 @@ class QuickInject extends Component {
               );
             case 'select':
               return field.cardinality === 'n' ? (
-                <Select
+                <SelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -670,9 +670,9 @@ class QuickInject extends Component {
                         </ListItemText>
                       </MenuItem>
                     ))}
-                </Select>
+                </SelectField>
               ) : (
-                <Select
+                <SelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -694,7 +694,7 @@ class QuickInject extends Component {
                         </ListItemText>
                       </MenuItem>
                     ))}
-                </Select>
+                </SelectField>
               );
             case 'dependency-select':
               // eslint-disable-next-line no-case-declarations
@@ -702,7 +702,7 @@ class QuickInject extends Component {
               // eslint-disable-next-line no-case-declarations
               const choices = field.choices[depValue] ?? {};
               return field.cardinality === 'n' ? (
-                <Select
+                <SelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -720,9 +720,9 @@ class QuickInject extends Component {
                         <ListItemText>{v}</ListItemText>
                       </MenuItem>
                     ))}
-                </Select>
+                </SelectField>
               ) : (
-                <Select
+                <SelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -741,7 +741,7 @@ class QuickInject extends Component {
                         </ListItemText>
                       </MenuItem>
                     ))}
-                </Select>
+                </SelectField>
               );
             default:
               return (

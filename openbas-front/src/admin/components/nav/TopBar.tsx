@@ -174,17 +174,20 @@ const TopBar: React.FC = () => {
         </div>
         <div className={classes.barRight}>
           <div className={classes.barRightContainer}>
-            <Tooltip title={t('Notifications')}>
-              <IconButton
-                size="medium"
-                classes={{ root: classes.button }}
-                aria-haspopup="true"
-                component={Link}
-                to="/dashboard/profile/notifications"
-                color={location.pathname === '/dashboard/profile/notifications' ? 'primary' : 'inherit'}
-              >
-                <NotificationsOutlined fontSize="medium" />
-              </IconButton>
+            <Tooltip title={t('Notifications - Coming soon')}>
+              <span>
+                <IconButton
+                  size="medium"
+                  classes={{ root: classes.button }}
+                  aria-haspopup="true"
+                  component={Link}
+                  to="/dashboard/profile/notifications"
+                  color={location.pathname === '/dashboard/profile/notifications' ? 'primary' : 'inherit'}
+                  disabled={true}
+                >
+                  <NotificationsOutlined fontSize="medium" />
+                </IconButton>
+              </span>
             </Tooltip>
             <IconButton
               color="inherit"

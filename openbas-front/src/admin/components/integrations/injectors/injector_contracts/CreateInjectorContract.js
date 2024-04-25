@@ -116,7 +116,7 @@ class CreateInjectorContract extends Component {
           <>
             <Stepper activeStep={this.state.activeStep} style={{ marginBottom: 20 }}>
               <Step>
-                <StepLabel >{t('Select the template')}</StepLabel>
+                <StepLabel >{t('SelectField the template')}</StepLabel>
               </Step>
               <Step>
                 <StepLabel >{t('Create the injector contract')}</StepLabel>

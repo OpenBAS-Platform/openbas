@@ -32,6 +32,7 @@ export const entitiesInitializer = Immutable({
     documents: Immutable({}),
     platformParameters: Immutable({}),
     channels: Immutable({}),
+    payloads: Immutable({}),
     challenges: Immutable({}),
     articles: Immutable({}),
     injectexpectations: Immutable({}),

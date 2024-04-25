@@ -8,7 +8,7 @@ import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
 import TextField from '../../../../components/TextField';
 import { useFormatter } from '../../../../components/i18n';
-import Select from '../../../../components/Select';
+import SelectField from '../../../../components/SelectField';
 import MarkDownField from '../../../../components/MarkDownField';
 import DocumentType from '../documents/DocumentType';
 import ItemTags from '../../../../components/ItemTags';
@@ -326,7 +326,7 @@ const ChallengeForm = (props) => {
                       classes={{ root: classes.tuple }}
                       divider={false}
                     >
-                      <Select
+                      <SelectField
                         name={`${name}.flag_type`}
                         label={t('Flag type')}
                         fullWidth={true}
@@ -341,7 +341,7 @@ const ChallengeForm = (props) => {
                         <MenuItem key="REGEXP" value="REGEXP">
                           {t('Regular expression')}
                         </MenuItem>
-                      </Select>
+                      </SelectField>
                       <TextField
                         name={`${name}.flag_value`}
                         validate={required}

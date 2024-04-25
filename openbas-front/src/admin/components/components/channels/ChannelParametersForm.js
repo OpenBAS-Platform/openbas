@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Button, Grid, MenuItem } from '@mui/material';
 import inject18n from '../../../../components/i18n';
 import DeprecatedColorPickerField from '../../../../components/DeprecatedColorPickerField';
-import Select from '../../../../components/Select';
+import SelectField from '../../../../components/SelectField';
 import TextField from '../../../../components/TextField';
 
 class ChannelParametersForm extends Component {
@@ -25,7 +25,7 @@ class ChannelParametersForm extends Component {
           <form id="channelParametersForm" onSubmit={handleSubmit}>
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
-                <Select
+                <SelectField
                   variant="standard"
                   label={t('Type')}
                   name="channel_type"
@@ -41,7 +41,7 @@ class ChannelParametersForm extends Component {
                   <MenuItem key="tv" value="tv">
                     {t('tv')}
                   </MenuItem>
-                </Select>
+                </SelectField>
                 <TextField
                   variant="standard"
                   name="channel_name"
@@ -75,7 +75,7 @@ class ChannelParametersForm extends Component {
                   disabled={disabled}
                   label={t('Subtitle')}
                 />
-                <Select
+                <SelectField
                   variant="standard"
                   label={t('Header mode')}
                   name="channel_mode"
@@ -92,7 +92,7 @@ class ChannelParametersForm extends Component {
                   <MenuItem key="logo-title" value="logo-title">
                     {t('logo-title')}
                   </MenuItem>
-                </Select>
+                </SelectField>
                 <DeprecatedColorPickerField
                   variant="standard"
                   name="channel_primary_color_light"

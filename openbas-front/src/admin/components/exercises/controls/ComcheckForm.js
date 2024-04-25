@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { Form } from 'react-final-form';
 import { Button, MenuItem } from '@mui/material';
 import TextField from '../../../../components/TextField';
-import Select from '../../../../components/Select';
+import SelectField from '../../../../components/SelectField';
 import inject18n from '../../../../components/i18n';
 import DateTimePicker from '../../../../components/DateTimePicker';
 import EnrichedTextField from '../../../../components/EnrichedTextField';
@@ -51,7 +51,7 @@ class ComcheckForm extends Component {
               fullWidth={true}
               label={t('Name')}
             />
-            <Select
+            <SelectField
               variant="standard"
               name="comcheck_teams"
               fullWidth={true}
@@ -77,7 +77,7 @@ class ComcheckForm extends Component {
                   {team.team_name}
                 </MenuItem>
               ))}
-            </Select>
+            </SelectField>
             <DateTimePicker
               name="comcheck_end_date"
               label={t('End date')}

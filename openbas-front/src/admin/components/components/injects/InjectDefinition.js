@@ -49,7 +49,7 @@ import InjectAddDocuments from './InjectAddDocuments';
 import Loader from '../../../../components/Loader';
 import DocumentType from '../documents/DocumentType';
 import DocumentPopover from '../documents/DocumentPopover';
-import Select from '../../../../components/Select';
+import SelectField from '../../../../components/SelectField';
 import ArticlePopover from '../articles/ArticlePopover';
 import InjectAddArticles from './InjectAddArticles';
 import ChannelIcon from '../channels/ChannelIcon';
@@ -862,7 +862,7 @@ class InjectDefinition extends Component {
                                 classes={{ root: classes.tuple }}
                                 divider={false}
                               >
-                                <Select
+                                <SelectField
                                   variant="standard"
                                   name={`${name}.type`}
                                   fullWidth={true}
@@ -883,7 +883,7 @@ class InjectDefinition extends Component {
                                       </ListItemText>
                                     </MenuItem>
                                   )}
-                                </Select>
+                                </SelectField>
                                 <TextField
                                   variant="standard"
                                   name={`${name}.key`}
@@ -897,7 +897,7 @@ class InjectDefinition extends Component {
                                 && values[field.key][index]
                                 && values[field.key][index].type
                                 === 'attachment' ? (
-                                  <Select
+                                  <SelectField
                                     variant="standard"
                                     name={`${name}.value`}
                                     fullWidth={true}
@@ -915,7 +915,7 @@ class InjectDefinition extends Component {
                                         </ListItemText>
                                       </MenuItem>
                                     ))}
-                                  </Select>
+                                  </SelectField>
                                   ) : (
                                     <TextField
                                       variant="standard"
@@ -948,7 +948,7 @@ class InjectDefinition extends Component {
               );
             case 'select':
               return field.cardinality === 'n' ? (
-                <Select
+                <SelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -968,9 +968,9 @@ class InjectDefinition extends Component {
                         </ListItemText>
                       </MenuItem>
                     ))}
-                </Select>
+                </SelectField>
               ) : (
-                <Select
+                <SelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -992,7 +992,7 @@ class InjectDefinition extends Component {
                         </ListItemText>
                       </MenuItem>
                     ))}
-                </Select>
+                </SelectField>
               );
             case 'dependency-select':
               // eslint-disable-next-line no-case-declarations
@@ -1000,7 +1000,7 @@ class InjectDefinition extends Component {
               // eslint-disable-next-line no-case-declarations
               const choices = field.choices[depValue] ?? {};
               return field.cardinality === 'n' ? (
-                <Select
+                <SelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -1018,9 +1018,9 @@ class InjectDefinition extends Component {
                         <ListItemText>{v}</ListItemText>
                       </MenuItem>
                     ))}
-                </Select>
+                </SelectField>
               ) : (
-                <Select
+                <SelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -1040,7 +1040,7 @@ class InjectDefinition extends Component {
                         </ListItemText>
                       </MenuItem>
                     ))}
-                </Select>
+                </SelectField>
               );
             default:
               return (
