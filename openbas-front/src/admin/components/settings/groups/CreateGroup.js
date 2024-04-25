@@ -35,7 +35,13 @@ class CreateGroup extends Component {
   onSubmit(data) {
     return this.props
       .addGroup(data)
-      .then((result) => (result.result ? this.handleClose() : result));
+      .then((result) => {
+        if (this.props.onCreate) {
+          const groupCreated = result.entities.groups[result.result];
+          this.props.onCreate(groupCreated);
+        }
+        return result.result ? this.handleClose() : result;
+      });
   }
 
   render() {

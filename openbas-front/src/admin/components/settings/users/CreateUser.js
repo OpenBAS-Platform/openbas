@@ -49,7 +49,13 @@ class CreateUser extends Component {
     )(data);
     return this.props
       .addUser(inputValues)
-      .then((result) => (result.result ? this.handleClose() : result));
+      .then((result) => {
+        if (this.props.onCreate) {
+          const userCreated = result.entities.users[result.result];
+          this.props.onCreate(userCreated);
+        }
+        return result.result ? this.handleClose() : result;
+      });
   }
 
   render() {
