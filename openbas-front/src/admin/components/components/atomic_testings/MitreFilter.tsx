@@ -91,7 +91,7 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
     <div>
       <div style={{ marginBottom: 10, textAlign: 'center' }}>
         <div>{killChainPhase.phase_name}</div>
-        <div>({techniques.length} {t('techniques')})</div>
+        <div style={{ textWrap: 'nowrap' }}>({techniques.length} {t('techniques')})</div>
       </div>
       <div>
         {techniques.sort(sortAttackPattern)
@@ -101,6 +101,7 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
               variant="outlined"
               className={classes.button}
               onClick={() => handleOnClick(attackPattern)}
+              style={{ justifyContent: 'start' }}
             >
               <Typography variant="caption">
                 {attackPattern.attack_pattern_name}
