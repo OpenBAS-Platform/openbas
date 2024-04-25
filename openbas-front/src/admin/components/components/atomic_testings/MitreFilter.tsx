@@ -36,6 +36,13 @@ interface KillChainPhaseComponentProps {
   onClick: () => void;
 }
 
+const computeTechnique = (attackPatterns: AttackPattern[]) => {
+  return attackPatterns.filter((attackPattern) => attackPattern.attack_pattern_external_id.indexOf('.') < 0);
+};
+const computeSubTechnique = (attackPatterns: AttackPattern[]) => {
+  return attackPatterns.filter((attackPattern) => attackPattern.attack_pattern_external_id.indexOf('.') > -1);
+};
+
 export const MITRE_FILTER_KEY = 'injector_contract_attack_patterns';
 
 const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
@@ -60,11 +67,11 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
   };
 
   // Techniques
-  const techniques = attackPatterns.filter((attackPattern) => attackPattern.attack_pattern_parent === null);
+  const techniques = computeTechnique(attackPatterns);
 
   // Sub techniques
   const subTechniquesComponent = (attackPattern: AttackPattern) => {
-    const subTechniques = attackPatterns.filter((a) => a.attack_pattern_parent !== null)
+    const subTechniques = computeSubTechnique(attackPatterns)
       .filter((a) => a.attack_pattern_external_id.includes(attackPattern.attack_pattern_external_id));
     if (subTechniques.length > 0) {
       return (<span>&nbsp;({subTechniques.length})</span>);
@@ -75,7 +82,7 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
   const handleOnClick = (attackPattern: AttackPattern) => {
     helpers.handleAddSingleValueFilter(
       MITRE_FILTER_KEY,
-      attackPattern.attack_pattern_id,
+      attackPattern.attack_pattern_external_id,
     );
     onClick();
   };
@@ -131,7 +138,7 @@ const MitreFilter: FunctionComponent<MitreFilterProps> = ({
 
   // Filters
   useEffect(() => {
-    helpers.handleAddFilterWithEmptyValue(buildEmptyFilter(MITRE_FILTER_KEY, 'eq'));
+    helpers.handleAddFilterWithEmptyValue(buildEmptyFilter(MITRE_FILTER_KEY, 'contains'));
   }, []);
 
   // Kill Chain Phase

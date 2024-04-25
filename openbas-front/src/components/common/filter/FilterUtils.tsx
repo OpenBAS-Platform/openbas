@@ -24,7 +24,7 @@ export const isEmptyFilter = (filterGroup: FilterGroup, key: string) => {
   if (R.isEmpty(filterGroup.filters)) {
     return true;
   }
-  return R.isEmpty(filterGroup.filters?.find((f) => f.key === key)?.values);
+  return !filterGroup.filters?.find((f) => f.key === key) || R.isEmpty(filterGroup.filters?.find((f) => f.key === key)?.values);
 };
 
 // -- OPERATOR --

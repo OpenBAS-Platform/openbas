@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import { Box, Button, Typography, Stepper, Step, StepLabel, Chip, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
+import { Box, Button, Chip, List, ListItem, ListItemButton, ListItemText, Step, StepLabel, Stepper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import ButtonCreate from '../../../components/common/ButtonCreate';
 import { useFormatter } from '../../../components/i18n';
@@ -19,6 +19,7 @@ import type { AttackPatternHelper } from '../../../actions/attack_patterns/attac
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { fetchAttackPatterns } from '../../../actions/AttackPattern';
 import Drawer from '../../../components/common/Drawer';
+import { AttackPatternStore } from '../../../actions/attack_patterns/AttackPattern';
 
 const useStyles = makeStyles(() => ({
   menuContainer: {
@@ -54,7 +55,8 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
   };
 
   // Fetching data
-  const { attackPatternsMap } = useHelper((helper: AttackPatternHelper) => ({
+  const { attackPatterns, attackPatternsMap } = useHelper((helper: AttackPatternHelper) => ({
+    attackPatterns: helper.getAttackPatterns(),
     attackPatternsMap: helper.getAttackPatternsMap(),
   }));
   useDataLoader(() => {
@@ -107,6 +109,11 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
     }
   }, [contracts]);
 
+  // Utils
+  const computeAttackPatternNameForFilter = () => {
+    return filterGroup.filters?.filter((f) => f.key === MITRE_FILTER_KEY)?.[0]?.values?.map((externalId) => attackPatterns.find((a: AttackPatternStore) => a.attack_pattern_external_id === externalId)?.attack_pattern_name);
+  };
+
   return (
     <>
       <ButtonCreate onClick={() => setOpen(true)} />
@@ -153,10 +160,10 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
                 <div>
                   {!isEmptyFilter(filterGroup, MITRE_FILTER_KEY)
                     && <Chip
-                      label={`Attack pattern = ${filterGroup.filters?.filter((f) => f.key === MITRE_FILTER_KEY)?.[0]?.values?.map((id) => attackPatternsMap[id].attack_pattern_name)}`}
+                      label={`Attack pattern = ${computeAttackPatternNameForFilter()}`}
                       onDelete={() => helpers.handleClearAllFilters()}
                       component="a"
-                       />
+                    />
                   }
                 </div>
                 <Button
@@ -220,7 +227,7 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
               handleClose={() => setOpen(false)}
               handleBack={handleBack}
               handleReset={handleReset}
-               />
+            />
           }
         </Box>
       </Drawer>
