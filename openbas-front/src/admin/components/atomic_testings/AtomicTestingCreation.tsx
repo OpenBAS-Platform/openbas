@@ -165,7 +165,7 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
                       label={`Attack pattern = ${computeAttackPatternNameForFilter()}`}
                       onDelete={() => helpers.handleClearAllFilters()}
                       component="a"
-                       />
+                    />
                   }
                 </div>
                 <Button
@@ -229,7 +229,7 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
               handleClose={() => setOpen(false)}
               handleBack={handleBack}
               handleReset={handleReset}
-               />
+            />
           }
         </Box>
       </Drawer>
