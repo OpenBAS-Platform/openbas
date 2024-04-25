@@ -19,7 +19,7 @@ import type { AttackPatternHelper } from '../../../actions/attack_patterns/attac
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { fetchAttackPatterns } from '../../../actions/AttackPattern';
 import Drawer from '../../../components/common/Drawer';
-import { AttackPatternStore } from '../../../actions/attack_patterns/AttackPattern';
+import type { AttackPatternStore } from '../../../actions/attack_patterns/AttackPattern';
 
 const useStyles = makeStyles(() => ({
   menuContainer: {
@@ -111,7 +111,9 @@ const AtomicTestingCreation: FunctionComponent<Props> = () => {
 
   // Utils
   const computeAttackPatternNameForFilter = () => {
-    return filterGroup.filters?.filter((f) => f.key === MITRE_FILTER_KEY)?.[0]?.values?.map((externalId) => attackPatterns.find((a: AttackPatternStore) => a.attack_pattern_external_id === externalId)?.attack_pattern_name);
+    return filterGroup
+      .filters?.filter((f) => f.key === MITRE_FILTER_KEY)?.[0]?.values?.map((externalId) => attackPatterns
+        .find((a: AttackPatternStore) => a.attack_pattern_external_id === externalId)?.attack_pattern_name);
   };
 
   return (
