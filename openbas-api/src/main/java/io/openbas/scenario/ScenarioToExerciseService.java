@@ -190,6 +190,7 @@ public class ScenarioToExerciseService {
       Inject exerciseInject = new Inject();
       exerciseInject.setTitle(scenarioInject.getTitle());
       exerciseInject.setDescription(scenarioInject.getDescription());
+      exerciseInject.setContract(scenarioInject.getContract());
       exerciseInject.setCountry(scenarioInject.getCountry());
       exerciseInject.setCity(scenarioInject.getCity());
       exerciseInject.setEnabled(scenarioInject.isEnabled());
