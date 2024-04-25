@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -78,37 +80,44 @@ public class InjectorService {
             injector.setExternal(false);
             injector.setCustomContracts(isCustomizable);
             injector.setType(contractor.getType());
-            List<String> existing = new ArrayList<>();
-            List<InjectorContract> toUpdates = new ArrayList<>();
-            List<String> toDeletes = new ArrayList<>();
+            ConcurrentLinkedQueue<String> existing = new ConcurrentLinkedQueue<>();
+            ConcurrentLinkedQueue<InjectorContract> toUpdates = new ConcurrentLinkedQueue<>();
+            ConcurrentLinkedQueue<String> toDeletes = new ConcurrentLinkedQueue<>();
             injector.getContracts()
-                .stream()
-                .parallel()
+                .parallelStream()
                 .forEach(contract -> {
-                Optional<Contract> current = contracts.stream().filter(c -> c.getId().equals(contract.getId())).findFirst();
-                if (current.isPresent()) {
-                    existing.add(contract.getId());
-                    contract.setManual(current.get().isManual());
-                    contract.setAtomicTesting(current.get().isAtomicTesting());
-                    Map<String, String> labels = current.get().getLabel().entrySet().stream()
-                            .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
-                    contract.setLabels(labels);
-                    if (!current.get().getAttackPatternsExternalIds().isEmpty()) {
-                        List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(current.get().getAttackPatternsExternalIds()));
-                        contract.setAttackPatterns(attackPatterns);
+                    Optional<Contract> current = contracts.stream()
+                        .filter(c -> c.getId().equals(contract.getId()))
+                        .findFirst();
+                    if (current.isPresent()) {
+                        existing.add(contract.getId());
+
+                        synchronized (contract) {
+                            contract.setManual(current.get().isManual());
+                            contract.setAtomicTesting(current.get().isAtomicTesting());
+
+                            Map<String, String> labels = new ConcurrentHashMap<>();
+                            current.get().getLabel().forEach((key, value) -> labels.putIfAbsent(key.toString(), value));
+                            contract.setLabels(labels);
+
+                            if (!current.get().getAttackPatternsExternalIds().isEmpty()) {
+                                List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(current.get().getAttackPatternsExternalIds()));
+                                contract.setAttackPatterns(attackPatterns);
+                            } else {
+                                contract.setAttackPatterns(new ArrayList<>());
+                            }
+
+                            try {
+                                contract.setContent(mapper.writeValueAsString(current.get()));
+                            } catch (JsonProcessingException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                        toUpdates.add(contract);
                     } else {
-                        contract.setAttackPatterns(new ArrayList<>());
+                        toDeletes.add(contract.getId());
                     }
-                    try {
-                        contract.setContent(mapper.writeValueAsString(current.get()));
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                    toUpdates.add(contract);
-                } else {
-                    toDeletes.add(contract.getId());
-                }
-            });
+                });
             List<InjectorContract> toCreates = contracts.stream().filter(c -> !existing.contains(c.getId())).map(in -> {
                 InjectorContract injectorContract = new InjectorContract();
                 injectorContract.setId(in.getId());
