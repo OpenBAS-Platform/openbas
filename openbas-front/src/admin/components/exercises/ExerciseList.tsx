@@ -59,37 +59,31 @@ const headerStyles: Record<string, CSSProperties> = {
     top: '0px',
   },
   exercise_name: {
-    float: 'left',
     width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
   exercise_start_date: {
-    float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
   exercise_status: {
-    float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
   exercise_tags: {
-    float: 'left',
     width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
   exercise_targets: {
-    float: 'left',
     width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
   exercise_global_score: {
-    float: 'left',
     width: '20%',
     fontSize: 12,
     fontWeight: '700',
@@ -98,49 +92,37 @@ const headerStyles: Record<string, CSSProperties> = {
 
 const inlineStyles: Record<string, CSSProperties> = {
   exercise_name: {
-    float: 'left',
     width: '20%',
-    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
   exercise_start_date: {
-    float: 'left',
     width: '15%',
-    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
   exercise_status: {
-    float: 'left',
     width: '15%',
-    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
   exercise_tags: {
-    float: 'left',
     width: '10%',
-    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
   exercise_targets: {
-    float: 'left',
     width: '20%',
-    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
   exercise_global_score: {
-    float: 'left',
     width: '20%',
-    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -223,7 +205,7 @@ const ExerciseList: FunctionComponent<Props> = ({
           <ListItemIcon />
           <ListItemText
             primary={
-              <div>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
                 {filtering.buildHeader(
                   'exercise_name',
                   'Name',
@@ -277,7 +259,7 @@ const ExerciseList: FunctionComponent<Props> = ({
             </ListItemIcon>
             <ListItemText
               primary={
-                <div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.exercise_name}

@@ -22,9 +22,7 @@ import InjectorContract from '../components/injects/InjectorContract';
 
 const useStyles = makeStyles(() => ({
   bodyItem: {
-    height: 30,
     fontSize: 13,
-    float: 'left',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -54,37 +52,31 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
     top: '0px',
   },
   atomic_title: {
-    float: 'left',
     width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
   atomic_type: {
-    float: 'left',
     width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
   atomic_last_start_execution_date: {
-    float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
   atomic_targets: {
-    float: 'left',
     width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
   atomic_status: {
-    float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
   atomic_expectations: {
-    float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
@@ -164,7 +156,7 @@ const AtomicTestings = () => {
       label: 'Inject Execution Status',
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
-        return (<StatusChip status={atomicTesting.atomic_status} variant={'list'}/>);
+        return (<StatusChip status={atomicTesting.atomic_status} variant={'list'} />);
       },
     },
     {
@@ -232,7 +224,7 @@ const AtomicTestings = () => {
               </ListItemIcon>
               <ListItemText
                 primary={
-                  <>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
                     {headers.map((header) => (
                       <div
                         key={header.field}
@@ -242,7 +234,7 @@ const AtomicTestings = () => {
                         {header.value(atomicTesting)}
                       </div>
                     ))}
-                  </>
+                  </div>
                 }
               />
               <ListItemIcon classes={{ root: classes.goIcon }}>
