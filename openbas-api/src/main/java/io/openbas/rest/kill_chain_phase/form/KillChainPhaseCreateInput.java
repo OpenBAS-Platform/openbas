@@ -33,6 +33,6 @@ public class KillChainPhaseCreateInput {
     private String description;
 
     @JsonProperty("phase_order")
-    private Long order;
+    private Long order = 0L;
 
 }

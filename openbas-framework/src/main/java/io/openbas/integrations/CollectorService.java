@@ -36,7 +36,7 @@ public class CollectorService {
     @Transactional
     public void register(String id, String type, String name, InputStream iconData) throws Exception {
         if (iconData != null) {
-            fileService.uploadStream(COLLECTORS_IMAGES_BASE_PATH, id + ".png", iconData);
+            fileService.uploadStream(COLLECTORS_IMAGES_BASE_PATH, type + ".png", iconData);
         }
         Collector collector = collectorRepository.findById(id).orElse(null);
         if (collector != null) {

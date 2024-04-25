@@ -49,8 +49,9 @@ public class CollectorApi extends RestBehavior {
         return collectorRepository.findAll();
     }
 
-    private Collector updateCollector(Collector collector, String name, int period, Instant lastExecution) {
+    private Collector updateCollector(Collector collector, String type, String name, int period, Instant lastExecution) {
         collector.setUpdatedAt(Instant.now());
+        collector.setType(type);
         collector.setName(name);
         collector.setPeriod(period);
         collector.setLastExecution(lastExecution);
@@ -61,7 +62,7 @@ public class CollectorApi extends RestBehavior {
     @PutMapping("/api/collectors/{collectorId}")
     public Collector updateCollector(@PathVariable String collectorId, @Valid @RequestBody CollectorUpdateInput input) {
         Collector collector = collectorRepository.findById(collectorId).orElseThrow();
-        return updateCollector(collector, collector.getName(), collector.getPeriod(), input.getLastExecution());
+        return updateCollector(collector, collector.getType(), collector.getName(), collector.getPeriod(), input.getLastExecution());
     }
 
     @Secured(ROLE_ADMIN)
@@ -73,16 +74,17 @@ public class CollectorApi extends RestBehavior {
         try {
             // Upload icon
             if (file.isPresent() && "image/png".equals(file.get().getContentType())) {
-                fileService.uploadFile(FileService.COLLECTORS_IMAGES_BASE_PATH + input.getId() + ".png", file.get());
+                fileService.uploadFile(FileService.COLLECTORS_IMAGES_BASE_PATH + input.getType() + ".png", file.get());
             }
             // We need to support upsert for registration
             Collector collector = collectorRepository.findById(input.getId()).orElse(null);
             if (collector != null) {
-                return updateCollector(collector, input.getName(), input.getPeriod(), collector.getLastExecution());
+                return updateCollector(collector, input.getType(), input.getName(), input.getPeriod(), collector.getLastExecution());
             } else {
                 // save the injector
                 Collector newCollector = new Collector();
                 newCollector.setId(input.getId());
+                newCollector.setExternal(true);
                 newCollector.setName(input.getName());
                 newCollector.setType(input.getType());
                 newCollector.setPeriod(input.getPeriod());
