@@ -15,7 +15,7 @@ const Transition = React.forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-const UserPopover = ({ user, organizationsMap, tagsMap }) => {
+const UserPopover = ({ user, organizationsMap, tagsMap, onUpdate, onDelete }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openEditPassword, setOpenEditPassword] = useState(false);
@@ -47,7 +47,13 @@ const UserPopover = ({ user, organizationsMap, tagsMap }) => {
       ),
       R.assoc('user_tags', R.pluck('id', data.user_tags)),
     )(data);
-    return dispatch(updateUser(user.user_id, inputValues)).then(() => handleCloseEdit());
+    return dispatch(updateUser(user.user_id, inputValues)).then((result) => {
+      if (onUpdate) {
+        const userUpdated = result.entities.users[result.result];
+        onUpdate(userUpdated);
+      }
+      handleCloseEdit();
+    });
   };
 
   const handleOpenEditPassword = () => {
@@ -69,7 +75,13 @@ const UserPopover = ({ user, organizationsMap, tagsMap }) => {
   const handleCloseDelete = () => setOpenDelete(false);
 
   const submitDelete = () => {
-    dispatch(deleteUser(user.user_id));
+    dispatch(deleteUser(user.user_id)).then(
+      () => {
+        if (onDelete) {
+          onDelete(user.user_id);
+        }
+      },
+    );
     handleCloseDelete();
   };
 

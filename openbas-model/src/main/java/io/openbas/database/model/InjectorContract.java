@@ -73,7 +73,7 @@ public class InjectorContract implements Base {
             inverseJoinColumns = @JoinColumn(name = "attack_pattern_id"))
     @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("injector_contract_attack_patterns")
-    @Queryable(filterable = true)
+    @Queryable(searchable = true, filterable = true, property = "externalId")
     private List<AttackPattern> attackPatterns = new ArrayList<>();
 
     @Column(name = "injector_contract_atomic_testing")

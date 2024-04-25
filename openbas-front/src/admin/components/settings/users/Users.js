@@ -253,12 +253,16 @@ const Users = () => {
                 user={user}
                 tagsMap={tagsMap}
                 organizationsMap={organizationsMap}
+                onUpdate={(result) => setUsers(users.map((u) => (u.user_id !== result.user_id ? u : result)))}
+                onDelete={(result) => setUsers(users.filter((u) => (u.user_id !== result)))}
               />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
-      <CreateUser />
+      <CreateUser
+        onCreate={(result) => setUsers([result, ...users])}
+      />
     </div>
   );
 };

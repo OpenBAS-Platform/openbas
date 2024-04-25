@@ -312,12 +312,19 @@ const Groups = () => {
                 }
             />
             <ListItemSecondaryAction>
-              <GroupPopover group={group} groupUsersIds={group.group_users} />
+              <GroupPopover
+                group={group}
+                groupUsersIds={group.group_users}
+                onUpdate={(result) => setGroups(groups.map((g) => (g.group_id !== result.group_id ? g : result)))}
+                onDelete={(result) => setGroups(groups.filter((g) => (g.group_id !== result)))}
+              />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
-      <CreateGroup />
+      <CreateGroup
+        onCreate={(result) => setGroups([result, ...groups])}
+      />
     </div>
   );
 };

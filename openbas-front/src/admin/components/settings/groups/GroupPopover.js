@@ -110,7 +110,11 @@ class GroupPopover extends Component {
   async onSubmitEdit(data) {
     return this.props
       .updateGroupInformation(this.props.group.group_id, data)
-      .then(() => {
+      .then((result) => {
+        if (this.props.onUpdate) {
+          const groupUpdated = result.entities.groups[result.result];
+          this.props.onUpdate(groupUpdated);
+        }
         this.setState({ openEdit: false });
       });
   }
@@ -232,7 +236,13 @@ class GroupPopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteGroup(this.props.group.group_id);
+    this.props.deleteGroup(this.props.group.group_id).then(
+      () => {
+        if (this.props.onDelete) {
+          this.props.onDelete(this.props.group.group_id);
+        }
+      },
+    );
     this.handleCloseDelete();
   }
 
