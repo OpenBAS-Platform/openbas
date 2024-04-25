@@ -6,6 +6,8 @@ import io.openbas.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.atomic_testing.form.SimpleExpectationResultOutput;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectStatus;
+import io.openbas.database.model.InjectorContract;
+import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -20,6 +22,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static io.openbas.atomic_testing.AtomicTestingMapper.toDto;
+import static io.openbas.atomic_testing.AtomicTestingMapper.toDtoWithTargetResults;
+
 @RestController
 @RequestMapping("/api/atomic_testings")
 @PreAuthorize("isAdmin()")
@@ -27,6 +32,7 @@ public class AtomicTestingApi extends RestBehavior {
 
   private AtomicTestingService atomicTestingService;
   private InjectExpectationService injectExpectationService;
+  private InjectorContractRepository injectorContractRepository;
 
   @Autowired
   public void setAtomicTestingService(AtomicTestingService atomicTestingService) {
@@ -38,18 +44,31 @@ public class AtomicTestingApi extends RestBehavior {
     this.injectExpectationService = injectExpectationService;
   }
 
+  @Autowired
+  public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
+    this.injectorContractRepository = injectorContractRepository;
+  }
+
   @PostMapping("/search")
   public Page<AtomicTestingOutput> findAllAtomicTestings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return atomicTestingService.findAllAtomicTestings(searchPaginationInput)
-        .map(AtomicTestingMapper::toDto);
+    return this.atomicTestingService.findAllAtomicTestings(searchPaginationInput)
+        .map((inject) -> {
+          InjectorContract injectorContract = this.injectorContractRepository
+              .findById(inject.getContract()).orElseThrow();
+          return toDto(inject, injectorContract);
+        });
   }
 
 
   @GetMapping("/{injectId}")
   public AtomicTestingOutput findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId)
-        .map(AtomicTestingMapper::toDtoWithTargetResults)
+        .map(inject -> {
+          InjectorContract injectorContract = this.injectorContractRepository
+              .findById(inject.getContract()).orElseThrow();
+          return toDtoWithTargetResults(inject, injectorContract);
+        })
         .orElseThrow();
   }
 
@@ -72,14 +91,20 @@ public class AtomicTestingApi extends RestBehavior {
 
   @PostMapping()
   public AtomicTestingOutput createAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {
-    return AtomicTestingMapper.toDto(atomicTestingService.createOrUpdate(input, null));
+    Inject inject = this.atomicTestingService.createOrUpdate(input, null);
+    InjectorContract injectorContract = this.injectorContractRepository
+        .findById(inject.getContract()).orElseThrow();
+    return toDto(inject, injectorContract);
   }
 
   @PutMapping("/{injectId}")
   public AtomicTestingOutput updateAtomicTesting(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingInput input) {
-    return AtomicTestingMapper.toDto(atomicTestingService.createOrUpdate(input, injectId));
+    Inject inject = this.atomicTestingService.createOrUpdate(input, injectId);
+    InjectorContract injectorContract = this.injectorContractRepository
+        .findById(inject.getContract()).orElseThrow();
+    return toDto(inject, injectorContract);
   }
 
   @DeleteMapping("/{injectId}")

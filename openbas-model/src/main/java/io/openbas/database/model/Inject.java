@@ -65,15 +65,9 @@ public class Inject implements Base, Injection {
   private String description;
 
   @Getter
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "inject_contract")
-  @JsonSerialize(using = MonoIdDeserializer.class)
+  @Column(name = "inject_contract")
   @JsonProperty("inject_contract")
-  private InjectorContract injectorContract;
-
-  public String getContract() {
-    return this.injectorContract.getId();
-  }
+  private String contract;
 
   @Getter
   @Column(name = "inject_country")

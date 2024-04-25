@@ -195,7 +195,7 @@ public class ScenarioToExerciseServiceTest {
     }});
 
     // Inject
-    Inject inject = getInjectForEmailContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+    Inject inject = getInjectForEmailContract();
     inject.setTeams(new ArrayList<>() {{
       add(teamSaved);
       add(contextualTeamSaved);

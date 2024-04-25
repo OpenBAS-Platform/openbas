@@ -18,8 +18,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.openbas.rest.exercise.ExerciseUtils.computeGlobalExpectationResults;
-import static io.openbas.rest.exercise.ExerciseUtils.computeTargetResults;
+import static io.openbas.rest.exercise.ExerciseService.computeGlobalExpectationResults;
+import static io.openbas.rest.exercise.ExerciseService.computeTargetResults;
 
 @Setter
 @Getter

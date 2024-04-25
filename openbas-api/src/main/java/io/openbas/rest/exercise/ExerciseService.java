@@ -2,22 +2,27 @@ package io.openbas.rest.exercise;
 
 import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.atomic_testing.AtomicTestingMapper.InjectTargetWithResult;
-import io.openbas.database.model.AttackPattern;
-import io.openbas.database.model.Exercise;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectExpectation;
+import io.openbas.database.model.*;
+import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.rest.exercise.form.ExerciseInjectExpectationResultsByType;
 import io.openbas.rest.exercise.form.ExerciseInjectExpectationResultsByType.InjectExpectationResultsByType;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.openbas.atomic_testing.AtomicTestingUtils.getExpectations;
 import static io.openbas.atomic_testing.AtomicTestingUtils.getTargetsWithResults;
 
-public class ExerciseUtils {
+@Service
+@RequiredArgsConstructor
+public class ExerciseService {
+
+  private final InjectorContractRepository injectorContractRepository;
 
   // -- GLOBAL SCORE --
 
@@ -29,15 +34,18 @@ public class ExerciseUtils {
     return getExpectations(expectations);
   }
 
-  public static List<ExerciseInjectExpectationResultsByType> computeInjectExpectationResults(
+  public List<ExerciseInjectExpectationResultsByType> computeInjectExpectationResults(
       @NotNull final Exercise exercise) {
     Map<AttackPattern, List<Inject>> groupedByAttackPattern = exercise.getInjects()
         .stream()
-        .flatMap(
-            inject -> inject.getInjectorContract()
-                .getAttackPatterns()
-                .stream()
-                .map(attackPattern -> java.util.Map.entry(attackPattern, inject))
+        .flatMap((inject) -> {
+              Optional<InjectorContract> injectorContract = this.injectorContractRepository
+                  .findById(inject.getContract());
+              return injectorContract
+                  .stream()
+                  .flatMap(i -> i.getAttackPatterns().stream())
+                  .map(attackPattern -> java.util.Map.entry(attackPattern, inject));
+            }
         )
         .collect(Collectors.groupingBy(
             java.util.Map.Entry::getKey,

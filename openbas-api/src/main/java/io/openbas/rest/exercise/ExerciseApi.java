@@ -99,6 +99,7 @@ public class ExerciseApi extends RestBehavior {
   private InjectService injectService;
   private ChallengeService challengeService;
   private VariableService variableService;
+  private ExerciseService exerciseService;
   // endregion
 
   // region setters
@@ -216,6 +217,11 @@ public class ExerciseApi extends RestBehavior {
   @Autowired
   public void setVariableService(@NotNull final VariableService variableService) {
     this.variableService = variableService;
+  }
+
+  @Autowired
+  public void setExerciseService(@NotNull final ExerciseService exerciseService) {
+    this.exerciseService = exerciseService;
   }
   // endregion
 
@@ -505,7 +511,7 @@ public class ExerciseApi extends RestBehavior {
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public List<ExpectationResultsByType> globalResults(@NotBlank final @PathVariable String exerciseId) {
     return exerciseRepository.findById(exerciseId)
-        .map((ExerciseUtils::computeGlobalExpectationResults))
+        .map((ExerciseService::computeGlobalExpectationResults))
         .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + exerciseId));
   }
 
@@ -513,7 +519,7 @@ public class ExerciseApi extends RestBehavior {
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public List<ExerciseInjectExpectationResultsByType> injectResults(@NotBlank final @PathVariable String exerciseId) {
     return exerciseRepository.findById(exerciseId)
-        .map((ExerciseUtils::computeInjectExpectationResults))
+        .map((e) -> this.exerciseService.computeInjectExpectationResults(e))
         .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + exerciseId));
   }
 

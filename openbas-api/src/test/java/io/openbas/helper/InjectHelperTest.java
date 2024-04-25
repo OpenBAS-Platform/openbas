@@ -41,9 +41,6 @@ public class InjectHelperTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private InjectorContractRepository injectorContractRepository;
-
     @Disabled
     @DisplayName("Retrieve simple inject to run")
     @Test
@@ -78,7 +75,7 @@ public class InjectHelperTest {
         Inject inject = new Inject();
         inject.setTitle("Test inject");
         inject.setType(TYPE);
-        inject.setInjectorContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+        inject.setContract(EMAIL_DEFAULT);
         inject.setEnabled(true);
         inject.setExercise(exerciseSaved);
         inject.setTeams(List.of(team));
