@@ -104,6 +104,7 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
               style={{ justifyContent: 'start' }}
             >
               <Typography variant="caption">
+                {`[${attackPattern.attack_pattern_external_id}] `}
                 {attackPattern.attack_pattern_name}
                 {subTechniquesComponent(attackPattern)}
               </Typography>
