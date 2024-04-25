@@ -1,33 +1,42 @@
 version: '3'
 services:
-  openbas-dev-postgre:
-    container_name: openbas-dev-postgre
-    image: postgres:latest
-    restart: unless-stopped
+  openbas-dev-pgsql:
+    container_name: openbas-dev-pgsql
+    image: postgres:16-alpine
     environment:
-      - POSTGRES_PASSWORD=admin
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: openbas
     ports:
       - "5432:5432"
+    restart: unless-stopped
   openbas-dev-minio:
     container_name: openbas-dev-minio
-    image: minio/minio:latest
+    image: minio/minio:RELEASE.2024-01-16T16-07-38Z
     ports:
       - "10000:9000"
       - "10001:9001"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server /data --console-address ":9001"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
     restart: unless-stopped
   openbas-dev-rabbitmq:
     container_name: openbas-dev-rabbitmq
     image: rabbitmq:3.13-management
     restart: unless-stopped
     ports:
-      - 5672:5672
-      - 15672:15672
+      - "5672:5672"
+      - "15672:15672"
+  openbas-dev-caldera:
+    container_name: openbas-dev-caldera
+    image: openbas/caldera-server:5.0.0
+    restart: unless-stopped
+    ports:
+      - "8888:8888"
+    environment:
+      CALDERA_URL: http://localhost:8888
+    volumes:
+      - type: bind
+        source: caldera.yml
+        target: /usr/src/app/conf/local.yml
