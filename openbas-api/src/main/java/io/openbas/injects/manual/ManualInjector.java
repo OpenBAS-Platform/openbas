@@ -1,6 +1,6 @@
 package io.openbas.injects.manual;
 
-import io.openbas.asset.InjectorService;
+import io.openbas.integrations.InjectorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

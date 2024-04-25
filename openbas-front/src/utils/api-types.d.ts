@@ -349,6 +349,7 @@ export interface ChannelUpdateLogoInput {
 export interface Collector {
   /** @format date-time */
   collector_created_at?: string;
+  collector_external?: boolean;
   collector_id: string;
   /** @format date-time */
   collector_last_execution?: string;
@@ -678,8 +679,8 @@ export interface ExerciseLessonsInput {
 
 export interface ExerciseSimple {
   exercise_global_score?: ExpectationResultsByType[];
-  exercise_id?: string;
-  exercise_name?: string;
+  exercise_id: string;
+  exercise_name: string;
   /** @format date-time */
   exercise_start_date?: string;
   exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
@@ -732,7 +733,7 @@ export interface ExerciseUpdateTeamsInput {
 
 /** Result of expectations */
 export interface ExpectationResultsByType {
-  avgResult?: "FAILED" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
+  avgResult?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
   distribution?: ResultDistribution[];
   type?: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
 }
@@ -1038,6 +1039,7 @@ export interface InjectorContract {
   injector_contract_content: string;
   /** @format date-time */
   injector_contract_created_at?: string;
+  injector_contract_custom?: boolean;
   injector_contract_id: string;
   injector_contract_injector?: Injector;
   injector_contract_labels?: Record<string, string>;
@@ -1477,6 +1479,25 @@ export interface PageFullTextSearchResult {
   totalPages?: number;
 }
 
+export interface PageGroup {
+  content?: Group[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageInjectorContract {
   content?: InjectorContract[];
   empty?: boolean;
@@ -1517,6 +1538,25 @@ export interface PageKillChainPhase {
 
 export interface PageTag {
   content?: Tag[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageUser {
+  content?: User[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -1809,7 +1849,7 @@ export interface SimpleExpectationResultOutput {
   /** Logs */
   target_result_logs?: string;
   /** Response status */
-  target_result_response_status?: "FAILED" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
+  target_result_response_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
   /**
    * Started date of inject
    * @format date-time

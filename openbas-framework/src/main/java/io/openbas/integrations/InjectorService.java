@@ -1,4 +1,4 @@
-package io.openbas.asset;
+package io.openbas.integrations;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -105,7 +105,7 @@ public class InjectorService {
                         throw new RuntimeException(e);
                     }
                     toUpdates.add(contract);
-                } else {
+                } else if( !contract.getCustom() ) {
                     toDeletes.add(contract.getId());
                 }
             });

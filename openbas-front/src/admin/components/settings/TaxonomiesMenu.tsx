@@ -40,10 +40,10 @@ const DefinitionMenu: React.FC = () => {
           to='/admin/settings/taxonomies/tags'
           selected={location.pathname === '/admin/settings/taxonomies/tags'}
           classes={{ root: classes.item }}
-          dense={true}
+          dense={false}
         >
           <ListItemIcon>
-            <StyleOutlined />
+            <StyleOutlined fontSize="medium" />
           </ListItemIcon>
           <ListItemText primary={t('Tags')} />
         </MenuItem>
@@ -52,10 +52,10 @@ const DefinitionMenu: React.FC = () => {
           to='/admin/settings/taxonomies/attack_patterns'
           selected={location.pathname === '/admin/settings/taxonomies/attack_patterns'}
           classes={{ root: classes.item }}
-          dense={true}
+          dense={false}
         >
           <ListItemIcon>
-            <LockPattern />
+            <LockPattern fontSize="medium" />
           </ListItemIcon>
           <ListItemText primary={t('Attack patterns')} />
         </MenuItem>
@@ -64,10 +64,10 @@ const DefinitionMenu: React.FC = () => {
           to='/admin/settings/taxonomies/kill_chain_phases'
           selected={location.pathname === '/admin/settings/taxonomies/kill_chain_phases'}
           classes={{ root: classes.item }}
-          dense={true}
+          dense={false}
         >
           <ListItemIcon>
-            <RouteOutlined />
+            <RouteOutlined fontSize="medium" />
           </ListItemIcon>
           <ListItemText primary={t('Kill chain phases')} />
         </MenuItem>

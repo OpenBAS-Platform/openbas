@@ -7,12 +7,11 @@ import org.springframework.stereotype.Component;
 import java.sql.Statement;
 
 @Component
-public class V2_90__Custom_injectors extends BaseJavaMigration {
+public class V2_92__Collectors_external extends BaseJavaMigration {
 
     @Override
     public void migrate(Context context) throws Exception {
         Statement select = context.getConnection().createStatement();
-        select.execute("ALTER TABLE injectors ADD injector_custom_contracts bool default false;");
-        select.execute("ALTER TABLE injectors ADD injector_contract_template text;");
+        select.execute("ALTER TABLE collectors ADD collector_external bool default false not null;");
     }
 }

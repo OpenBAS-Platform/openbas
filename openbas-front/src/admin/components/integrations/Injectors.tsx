@@ -1,7 +1,8 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Link } from 'react-router-dom';
-import { Card, CardActionArea, CardContent, Chip, Grid, Typography } from '@mui/material';
+import { Card, CardActionArea, CardContent, Chip, Grid, Tooltip, Typography } from '@mui/material';
+import { AutoModeOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
@@ -51,6 +52,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: 15,
     backgroundColor: theme.palette.error.main,
     borderRadius: '50%',
+  },
+  customizable: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
   },
 }));
 
@@ -144,6 +150,11 @@ const Injectors = () => {
                         {t('Updated at')} {nsdt(injector.injector_updated_at)}
                       </Typography>
                     </div>
+                    {injector.injector_custom_contracts && <div className={classes.customizable}>
+                      <Tooltip title={t('Supporting adding new contracts')}>
+                        <AutoModeOutlined />
+                      </Tooltip>
+                    </div>}
                   </CardContent>
                 </CardActionArea>
               </Card>

@@ -46,6 +46,11 @@ public class Collector implements Base {
     private int period;
 
     @Getter
+    @Column(name = "collector_external")
+    @JsonProperty("collector_external")
+    private boolean external = false;
+    
+    @Getter
     @Column(name = "collector_created_at")
     @JsonProperty("collector_created_at")
     private Instant createdAt = now();
