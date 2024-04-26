@@ -650,7 +650,7 @@ class InjectDefinition extends Component {
     }
     injectorContract.fields
       .filter(
-        (f) => !['teams', 'assets', 'asset_groups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+        (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
           f.key,
         ),
       )
@@ -727,6 +727,21 @@ class InjectDefinition extends Component {
       await onUpdateInject(values);
     }
     this.props.handleClose();
+
+    // if (this.props.atomicTestingCreation) {
+    //   return this.props
+    //     .onAddAtomicTesting(atomicTestingValues)
+    //     .then(() => this.props.handleReset())
+    //     .then(() => this.props.handleClose());
+    // }
+    // if (this.props.atomicTestingUpdate) {
+    //   return this.props
+    //     .onUpdateInject(this.props.inject.inject_id, atomicTestingValues)
+    //     .then(() => this.props.handleClose());
+    // }
+    // return this.props
+    //   .onUpdateInject(this.props.inject.inject_id, values)
+    //   .then(() => this.props.handleClose());
   }
 
   validate(values) {
@@ -738,7 +753,7 @@ class InjectDefinition extends Component {
     if (injectorContract && Array.isArray(injectorContract.fields)) {
       injectorContract.fields
         .filter(
-          (f) => !['teams', 'assets', 'asset_groups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+          (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
             f.key,
           ),
         )
@@ -1197,7 +1212,7 @@ class InjectDefinition extends Component {
     // -- ASSET GROUPS --
     const hasAssetGroups = injectorContract.fields
       .map((f) => f.key)
-      .includes('asset_groups');
+      .includes('assetgroups');
     const assetGroups = assetGroupIds
       .map((a) => assetGroupsMap[a])
       .filter((a) => a !== undefined);
@@ -1279,7 +1294,7 @@ class InjectDefinition extends Component {
     const builtInFields = [
       'teams',
       'assets',
-      'asset_groups',
+      'assetgroups',
       'articles',
       'challenges',
       'attachments',

@@ -576,7 +576,7 @@ const Timeline = () => {
           open={selectedInjectId !== null}
           handleClose={() => setSelectedInjectId(null)}
           onUpdateInject={onUpdateInject}
-          injectorContract={injectorContractsMap[selectedInject.inject_injector_contract]}
+          injectorContract={injectorContractsMap[selectedInject.inject_contract]}
           inject={selectedInject}
           teamsFromExerciseOrScenario={teams}
           articlesFromExerciseOrScenario={articles}

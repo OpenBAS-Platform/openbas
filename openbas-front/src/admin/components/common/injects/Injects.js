@@ -17,12 +17,12 @@ import { useHelper } from '../../../../store';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import { exportData } from '../../../../utils/Environment';
 import Loader from '../../../../components/Loader';
-import { InjectContext, PermissionsContext } from '../../components/Context';
-import CreateInject from './CreateInject';
-import UpdateInject from './UpdateInject';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { InjectContext, PermissionsContext } from '../Context';
+import CreateInject from './CreateInject';
+import UpdateInject from './UpdateInject';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -437,7 +437,7 @@ const Injects = ({
                 open={selectedInjectId !== null}
                 handleClose={() => setSelectedInjectId(null)}
                 onUpdateInject={onUpdateInject}
-                injectorContract={injectorContractsMap[selectedInject.inject_injector_contract]}
+                injectorContract={injectorContractsMap[selectedInject.inject_contract]}
                 inject={selectedInject}
                 teamsFromExerciseOrScenario={teams}
                 articlesFromExerciseOrScenario={articles}
