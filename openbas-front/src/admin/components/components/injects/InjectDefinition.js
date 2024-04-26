@@ -727,21 +727,6 @@ class InjectDefinition extends Component {
       await onUpdateInject(values);
     }
     this.props.handleClose();
-
-    // if (this.props.atomicTestingCreation) {
-    //   return this.props
-    //     .onAddAtomicTesting(atomicTestingValues)
-    //     .then(() => this.props.handleReset())
-    //     .then(() => this.props.handleClose());
-    // }
-    // if (this.props.atomicTestingUpdate) {
-    //   return this.props
-    //     .onUpdateInject(this.props.inject.inject_id, atomicTestingValues)
-    //     .then(() => this.props.handleClose());
-    // }
-    // return this.props
-    //   .onUpdateInject(this.props.inject.inject_id, values)
-    //   .then(() => this.props.handleClose());
   }
 
   validate(values) {
