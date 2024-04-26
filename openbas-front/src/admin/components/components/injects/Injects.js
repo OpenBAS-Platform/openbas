@@ -20,6 +20,9 @@ import Loader from '../../../../components/Loader';
 import { InjectContext, PermissionsContext } from '../Context';
 import CreateInject from './CreateInject';
 import UpdateInject from './UpdateInject';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
+import { useAppDispatch } from '../../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -158,6 +161,7 @@ const Injects = ({
 }) => {
   // Standard hooks
   const classes = useStyles();
+  const dispatch = useAppDispatch();
   const { t, tPick } = useFormatter();
 
   const [selectedInjectId, setSelectedInjectId] = useState(null);
@@ -172,6 +176,9 @@ const Injects = ({
     searchColumns,
   );
   // Fetching data
+  useDataLoader(() => {
+    dispatch(fetchInjectorContracts());
+  });
   const {
     injectorContractsMap,
     tagsMap,
