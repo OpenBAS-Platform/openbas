@@ -1,7 +1,8 @@
 import { FORM_ERROR } from 'final-form';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
 import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema';
-import { getReferential, postReferential, putReferential, simpleCall } from '../utils/Action';
+import { buildUri, getReferential, postReferential, putReferential, simpleCall } from '../utils/Action';
 
 export const updatePlatformParameters = (data) => (dispatch) => {
   return putReferential(
@@ -97,4 +98,42 @@ export const logout = () => (dispatch) => {
 
 export const fetchStatistics = () => (dispatch) => {
   return getReferential(schema.statistics, '/api/statistics')(dispatch);
+};
+
+/**
+ * Ask execution of a specific prompt type
+ * Usage example
+ *   const [textAi, setTextAi] = useState('');
+ *   const ask = async () => askAI('EMAIL', 'Question?', (data) => setTextAi(data));
+ * @param type the type of the prompt
+ * @param question the question
+ * @param eventCallback the callback function accumulating the IA result text
+ * @returns {Promise<void>}
+ */
+export const askAI = async (type, question, eventCallback) => {
+  let aiContent = '';
+  return new Promise((resolve, reject) => {
+    fetchEventSource(buildUri('/api/ai'), {
+      method: 'POST',
+      body: JSON.stringify({
+        prompt_type: type,
+        prompt_question: question,
+      }),
+      headers: {
+        Accept: 'text/event-stream',
+        'Content-Type': 'application/json',
+      },
+      onmessage(event) {
+        const data = JSON.parse(event.data);
+        aiContent += data.chunk_content;
+        eventCallback(aiContent);
+      },
+      onclose() {
+        resolve();
+      },
+      onerror(err) {
+        reject(err);
+      },
+    });
+  });
 };

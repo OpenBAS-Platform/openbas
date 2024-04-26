@@ -12,6 +12,7 @@
     "@fontsource/geologica": "5.0.4",
     "@fontsource/ibm-plex-sans": "5.0.19",
     "@hookform/resolvers": "3.3.4",
+    "@microsoft/fetch-event-source": "2.0.1",
     "@mui/icons-material": "5.15.15",
     "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "5.15.15",
