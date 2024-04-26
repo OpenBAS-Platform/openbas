@@ -49,8 +49,9 @@ public class CollectorApi extends RestBehavior {
         return collectorRepository.findAll();
     }
 
-    private Collector updateCollector(Collector collector, String type, String name, int period, Instant lastExecution) {
+    private Collector updateCollector(Collector collector, String id, String type, String name, int period, Instant lastExecution) {
         collector.setUpdatedAt(Instant.now());
+        collector.setId(id);
         collector.setExternal(true);
         collector.setType(type);
         collector.setName(name);
@@ -63,7 +64,7 @@ public class CollectorApi extends RestBehavior {
     @PutMapping("/api/collectors/{collectorId}")
     public Collector updateCollector(@PathVariable String collectorId, @Valid @RequestBody CollectorUpdateInput input) {
         Collector collector = collectorRepository.findById(collectorId).orElseThrow();
-        return updateCollector(collector, collector.getType(), collector.getName(), collector.getPeriod(), input.getLastExecution());
+        return updateCollector(collector, collectorId, collector.getType(), collector.getName(), collector.getPeriod(), input.getLastExecution());
     }
 
     @Secured(ROLE_ADMIN)
@@ -78,9 +79,9 @@ public class CollectorApi extends RestBehavior {
                 fileService.uploadFile(FileService.COLLECTORS_IMAGES_BASE_PATH + input.getType() + ".png", file.get());
             }
             // We need to support upsert for registration
-            Collector collector = collectorRepository.findById(input.getId()).orElse(null);
+            Collector collector = collectorRepository.findById(input.getId()).orElse(collectorRepository.findByType(input.getType()).orElse(null));
             if (collector != null) {
-                return updateCollector(collector, input.getType(), input.getName(), input.getPeriod(), collector.getLastExecution());
+                return updateCollector(collector, input.getId(), input.getType(), input.getName(), input.getPeriod(), collector.getLastExecution());
             } else {
                 // save the injector
                 Collector newCollector = new Collector();

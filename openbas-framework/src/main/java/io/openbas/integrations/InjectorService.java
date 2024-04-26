@@ -70,7 +70,7 @@ public class InjectorService {
             fileService.uploadStream(INJECTORS_IMAGES_BASE_PATH, contractor.getType() + ".png", iconData);
         }
         // We need to support upsert for registration
-        Injector injector = injectorRepository.findById(id).orElse(null);
+        Injector injector = injectorRepository.findById(id).orElse(injectorRepository.findByType(contractor.getType()).orElse(null));
         List<Contract> contracts = contractor.contracts();
         if (injector != null) {
             injector.setId(id);

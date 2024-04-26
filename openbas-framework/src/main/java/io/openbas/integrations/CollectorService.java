@@ -38,7 +38,7 @@ public class CollectorService {
         if (iconData != null) {
             fileService.uploadStream(COLLECTORS_IMAGES_BASE_PATH, type + ".png", iconData);
         }
-        Collector collector = collectorRepository.findById(id).orElse(null);
+        Collector collector = collectorRepository.findById(id).orElse(collectorRepository.findByType(type).orElse(null));
         if (collector != null) {
             collector.setId(id);
             collector.setName(name);

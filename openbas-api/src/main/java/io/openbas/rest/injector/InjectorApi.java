@@ -109,8 +109,9 @@ public class InjectorApi extends RestBehavior {
         return injectorContract;
     }
 
-    private Injector updateInjector(Injector injector, String type, String name, List<InjectorContractInput> contracts, Boolean customContracts) {
+    private Injector updateInjector(Injector injector, String id, String type, String name, List<InjectorContractInput> contracts, Boolean customContracts) {
         injector.setUpdatedAt(Instant.now());
+        injector.setId(id);
         injector.setType(type);
         injector.setName(name);
         injector.setExternal(true);
@@ -148,7 +149,7 @@ public class InjectorApi extends RestBehavior {
     @PutMapping("/api/injectors/{injectorId}")
     public Injector updateInjector(@PathVariable String injectorId, @Valid @RequestBody InjectorUpdateInput input) {
         Injector injector = injectorRepository.findById(injectorId).orElseThrow();
-        return updateInjector(injector, injector.getType(), input.getName(), input.getContracts(), input.getCustomContracts());
+        return updateInjector(injector, injectorId, injector.getType(), input.getName(), input.getContracts(), input.getCustomContracts());
     }
 
     @Secured(ROLE_ADMIN)
@@ -186,9 +187,9 @@ public class InjectorApi extends RestBehavior {
             channel.exchangeDeclare(exchangeKey, "direct", true);
             channel.queueBind(queueName, exchangeKey, routingKey);
             // We need to support upsert for registration
-            Injector injector = injectorRepository.findById(input.getId()).orElse(null);
+            Injector injector = injectorRepository.findById(input.getId()).orElse(injectorRepository.findByType(input.getType()).orElse(null));
             if (injector != null) {
-                updateInjector(injector, input.getType(), input.getName(), input.getContracts(), input.getCustomContracts());
+                updateInjector(injector, input.getId(), input.getType(), input.getName(), input.getContracts(), input.getCustomContracts());
             } else {
                 // save the injector
                 Injector newInjector = new Injector();
