@@ -765,6 +765,8 @@ const i18n = {
       'Targeted asets': 'Actifs ciblés',
       'Add assets': 'Ajouter des actifs',
       'Add assets in this inject': 'Ajouter des actifs dans ce stimuli',
+      'Show all assets': 'Afficher tous les actifs',
+      'By default, only assets compliant with the injector are displayed': 'Par défaut, seuls les actifs conformes à l\'injecteur sont affichés',
       // Asset groups
       'Asset groups': 'Groupe d\'assets',
       AssetGroup: 'Groupe-d-assets',

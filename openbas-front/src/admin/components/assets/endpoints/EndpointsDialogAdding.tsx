@@ -1,5 +1,21 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import {
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControlLabel,
+  Grid,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Switch,
+  Tooltip,
+} from '@mui/material';
 import { ComputerOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
@@ -62,7 +78,9 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
     dispatch(fetchEndpoints());
   });
 
-  const sortedEndpoints: EndpointStore[] = filtering.filterAndSort(R.values(endpointsMap).filter(filter));
+  const [disableFilter, setDisableFilter] = useState(false);
+
+  const sortedEndpoints: EndpointStore[] = filtering.filterAndSort(R.values(endpointsMap).filter(!disableFilter ? filter : () => true));
 
   const [endpointIds, setEndpointIds] = useState<string[]>(initialState);
   useEffect(() => {
@@ -107,20 +125,28 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
         <Grid container spacing={3} style={{ marginTop: -15 }}>
           <Grid item xs={8}>
             <Grid container spacing={3}>
-              <Grid item xs={6}>
+              <Grid item xs={4}>
                 <SearchFilter
                   fullWidth
                   onChange={filtering.handleSearch}
                   keyword={filtering.keyword}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={4}>
                 <TagsFilter
                   fullWidth
                   onAddTag={filtering.handleAddTag}
                   onRemoveTag={filtering.handleRemoveTag}
                   currentTags={filtering.tags}
                 />
+              </Grid>
+              <Grid item xs={4}>
+                <Tooltip title={t('By default, only assets compliant with the injector are displayed')}>
+                  <FormControlLabel
+                    control={<Switch checked={disableFilter} onChange={(_e, checked) => setDisableFilter(checked)} />}
+                    label={t('Show all assets')}
+                  />
+                </Tooltip>
               </Grid>
             </Grid>
             <List>
