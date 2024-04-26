@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { Drawer, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
+import { Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { CastForEducationOutlined, CastOutlined } from '@mui/icons-material';
@@ -19,7 +19,6 @@ import { splitDuration } from '../../../../utils/Time';
 import InjectPopover from '../../components/injects/InjectPopover';
 import InjectStatus from '../../components/injects/InjectStatus';
 import { truncate } from '../../../../utils/String';
-import InjectDefinition from '../../components/injects/InjectDefinition';
 import InjectStatusDetails from '../../components/injects/InjectStatusDetails';
 import ProgressBarCountdown from '../../../../components/ProgressBarCountdown';
 import AnimationMenu from '../AnimationMenu';
@@ -29,6 +28,7 @@ import { fetchVariablesForExercise } from '../../../../actions/variables/variabl
 import InjectOverTimeArea from './InjectOverTimeArea';
 import InjectOverTimeLine from './InjectOverTimeLine';
 import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
+import UpdateInject from '../../components/injects/UpdateInject';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -130,11 +130,6 @@ const useStyles = makeStyles(() => ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  drawerPaper: {
-    minHeight: '100vh',
-    width: '50%',
-    padding: 0,
-  },
 }));
 
 const Timeline = () => {
@@ -144,6 +139,7 @@ const Timeline = () => {
   const { exerciseId } = useParams();
   const permissions = usePermissions(exerciseId);
   const { t, fndt } = useFormatter();
+  const [selectedInjectId, setSelectedInjectId] = useState(null);
   const {
     exercise,
     teams,
@@ -155,6 +151,7 @@ const Timeline = () => {
     technicalInjectsMap,
     articles,
     variables,
+    selectedInject,
   } = useHelper((helper) => {
     const exerciseTeams = helper.getExerciseTeams(exerciseId);
     const injectsPerTeam = R.mergeAll(
@@ -175,6 +172,7 @@ const Timeline = () => {
       injectorContractsWithNoTeams: helper.getInjectorContractsWithNoTeams(),
       articles: helper.getExerciseArticles(exerciseId),
       variables: helper.getExerciseVariables(exerciseId),
+      selectedInject: helper.getInject(selectedInjectId),
     };
   });
   const technicalTeams = injectorContractsWithNoTeams
@@ -188,7 +186,6 @@ const Timeline = () => {
   );
   const sortedTeams = [...technicalTeams, ...sortedNativeTeams];
   const injectsMap = { ...teamsInjectsMap, ...technicalInjectsMap };
-  const [selectedInject, setSelectedInject] = useState(null);
   useDataLoader(() => {
     dispatch(fetchInjectorContracts());
     dispatch(fetchExerciseTeams(exerciseId));
@@ -425,7 +422,7 @@ const Timeline = () => {
                         divider={true}
                         button={true}
                         disabled={isDisabled || !inject.inject_enabled}
-                        onClick={() => setSelectedInject(inject.inject_id)}
+                        onClick={() => setSelectedInjectId(inject.inject_id)}
                       >
                         <ListItemIcon>
                           <InjectIcon
@@ -475,7 +472,7 @@ const Timeline = () => {
                             exercise={exercise}
                             tagsMap={tagsMap}
                             injectorContractsMap={injectorContractsMap}
-                            setSelectedInject={setSelectedInject}
+                            setSelectedInjectId={setSelectedInjectId}
                             isDisabled={isDisabled}
                           />
                         </ListItemSecondaryAction>
@@ -574,32 +571,23 @@ const Timeline = () => {
           </Grid>
         </Grid>
       </Grid>
-      <Drawer
-        open={selectedInject !== null}
-        keepMounted={false}
-        anchor="right"
-        sx={{ zIndex: 1202 }}
-        classes={{ paper: classes.drawerPaper }}
-        onClose={() => setSelectedInject(null)}
-        elevation={1}
-        disableEnforceFocus
-      >
-        <InjectDefinition
-          injectId={selectedInject}
-          injectorContracts={injectorContracts}
-          handleClose={() => setSelectedInject(null)}
-          tagsMap={tagsMap}
-          permissions={permissions}
+      {selectedInject
+        && <UpdateInject
+          open={selectedInjectId !== null}
+          handleClose={() => setSelectedInjectId(null)}
+          onUpdateInject={onUpdateInject}
+          injectorContract={injectorContractsMap[selectedInject.inject_contract]}
+          inject={selectedInject}
           teamsFromExerciseOrScenario={teams}
           articlesFromExerciseOrScenario={articles}
           variablesFromExerciseOrScenario={variables}
-          onUpdateInject={onUpdateInject}
           uriVariable={`/admin/exercises/${exerciseId}/definition/variables`}
           allUsersNumber={exercise.exercise_all_users_number}
           usersNumber={exercise.exercise_users_number}
           teamsUsers={exercise.exercise_teams_users}
-        />
-      </Drawer>
+          permissions={permissions}
+           />
+      }
     </div>
   );
 };

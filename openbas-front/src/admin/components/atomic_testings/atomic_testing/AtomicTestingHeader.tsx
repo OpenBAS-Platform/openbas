@@ -51,13 +51,12 @@ const AtomicTestingHeader = () => {
   const [open, setOpen] = useState(false);
   const [availableLaunch, setAvailableLaunch] = useState(true);
 
-  const submitTry = () => {
+  const submitTry = async () => {
     setOpen(false);
     setAvailableLaunch(false);
-    dispatch(tryAtomicTesting(atomic.atomic_id)).then(() => {
-      setAvailableLaunch(true);
-      onLaunchAtomicTesting();
-    });
+    await dispatch(tryAtomicTesting(atomic.atomic_id));
+    setAvailableLaunch(true);
+    onLaunchAtomicTesting();
   };
 
   return (

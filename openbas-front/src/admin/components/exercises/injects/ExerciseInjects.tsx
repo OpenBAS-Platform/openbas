@@ -175,7 +175,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
             </Grid>
             <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography variant="h4">
-                {t('Distribution of expectations by inject type')}
+                {t('Distribution of expectations by inject type')} (%)
               </Typography>
               <Paper variant="outlined" classes={{ root: classes.paperChart }}>
                 <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId} />

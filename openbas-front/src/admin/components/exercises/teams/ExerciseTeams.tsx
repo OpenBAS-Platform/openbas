@@ -39,6 +39,9 @@ export const teamContextForExercise = (exerciseId: ExerciseStore['exercise_id'],
       await dispatch(removeExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: userIds }));
       return dispatch(fetchTeams());
     },
+    onAddTeam(teamId: Team['team_id']): Promise<void> {
+      return dispatch(addExerciseTeams(exerciseId, { exercise_teams: [teamId] }));
+    },
     onCreateTeam(team: TeamCreateInput): Promise<{ result: string }> {
       return dispatch(addTeam({ ...team, team_exercises: [exerciseId] }));
     },

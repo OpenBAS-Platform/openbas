@@ -17,7 +17,6 @@ import type { Inject } from '../../../../../utils/api-types';
 import Injects from '../../../components/injects/Injects';
 import { articleContextForScenario } from '../articles/ScenarioArticles';
 import { teamContextForScenario } from '../teams/ScenarioTeams';
-import { fetchInjectorContracts } from '../../../../../actions/InjectorContracts';
 
 interface Props {
 
@@ -42,7 +41,6 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
   useDataLoader(() => {
     dispatch(fetchScenarioInjects(scenarioId));
     dispatch(fetchScenarioTeams(scenarioId));
-    dispatch(fetchInjectorContracts());
     dispatch(fetchVariablesForScenario(scenarioId));
   });
 

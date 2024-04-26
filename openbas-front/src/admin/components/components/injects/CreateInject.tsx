@@ -1,90 +1,243 @@
-import React, { FunctionComponent, useContext, useState } from 'react';
-import * as R from 'ramda';
-import { Dialog, DialogContent, DialogTitle } from '@mui/material';
-import InjectForm from './InjectForm';
-import { useFormatter } from '../../../../components/i18n';
-import type { Contract } from '../../../../actions/contract/contract';
-import Transition from '../../../../components/common/Transition';
-import { InjectContext } from '../Context';
-import type { InjectInput } from '../../../../actions/injects/Inject';
+import React, { FunctionComponent, useEffect, useState } from 'react';
+import { Box, Button, Typography, Stepper, Step, StepLabel, Chip, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
+import { useFormatter } from '../../../../components/i18n';
+import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
+import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
+import MitreFilter, { MITRE_FILTER_KEY } from './MitreFilter';
+import computeAttackPattern from '../../../../utils/injector_contract/InjectorContractUtils';
+import type { InjectorContractStore } from '../../../../actions/injector_contracts/InjectorContract';
+import type { FilterGroup, Inject, SearchPaginationInput } from '../../../../utils/api-types';
+import { initSorting } from '../../../../components/common/pagination/Page';
+import useFiltersState from '../../../../components/common/filter/useFiltersState';
+import { emptyFilterGroup, isEmptyFilter } from '../../../../components/common/filter/FilterUtils';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { useHelper } from '../../../../store';
+import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
+import Drawer from '../../../../components/common/Drawer';
+import CreateinjectDetails from './CreateinjectDetails';
+import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
+
+const useStyles = makeStyles(() => ({
+  menuContainer: {
+    marginLeft: 30,
+  },
+  container: {
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+}));
 
 interface Props {
-  injectorContractsMap: Record<string, Contract>;
-  onCreate: (injectId: string) => void;
+  title: string
+  onCreateInject: (data: Inject) => Promise<void>
+  isAtomic?: boolean
 }
 
-const CreateInject: FunctionComponent<Props> = ({
-  injectorContractsMap,
-  onCreate,
-}) => {
+const atomicFilter: FilterGroup = {
+  mode: 'and',
+  filters: [
+    {
+      key: 'injector_contract_atomic_testing',
+      operator: 'eq',
+      values: ['true'],
+    }],
+};
+
+const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomic = false, ...props }) => {
   // Standard hooks
-  const { t } = useFormatter();
-
   const [open, setOpen] = useState(false);
-  const { onAddInject } = useContext(InjectContext);
+  const classes = useStyles();
+  const dispatch = useAppDispatch();
+  const { t, tPick } = useFormatter();
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const steps = ['Inject type', 'Inject details'];
+  const [activeStep, setActiveStep] = React.useState(0);
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+  const handleReset = () => {
+    setActiveStep(0);
+  };
 
-  const onSubmit = async (data: InjectInput) => {
-    const inputValues = R.pipe(
-      R.assoc(
-        'inject_depends_duration',
-        data.inject_depends_duration_days * 3600 * 24
-        + data.inject_depends_duration_hours * 3600
-        + data.inject_depends_duration_minutes * 60
-        + data.inject_depends_duration_seconds,
-      ),
-      R.assoc('inject_type', data.inject_contract.type),
-      R.assoc('inject_contract', data.inject_contract.id),
-      R.assoc('inject_tags', R.pluck('id', data.inject_tags)),
-      R.dissoc('inject_depends_duration_days'),
-      R.dissoc('inject_depends_duration_hours'),
-      R.dissoc('inject_depends_duration_minutes'),
-      R.dissoc('inject_depends_duration_seconds'),
-    )(data);
-    const result = await onAddInject(inputValues);
-    if (result.result) {
-      if (onCreate) {
-        handleClose();
-        return onCreate(result.result);
-      }
-      return handleClose();
+  const submitCreation = async (data: Inject) => {
+    handleReset();
+    await onCreateInject(data);
+  };
+
+  // Fetching data
+  const { attackPatterns, attackPatternsMap } = useHelper((helper: AttackPatternHelper) => ({
+    attackPatterns: helper.getAttackPatterns(),
+    attackPatternsMap: helper.getAttackPatternsMap(),
+  }));
+  useDataLoader(() => {
+    dispatch(fetchAttackPatterns());
+  });
+
+  // Filter
+  const [openMitreFilter, setOpenMitreFilter] = React.useState(false);
+
+  // Contracts
+  const [contracts, setContracts] = useState<InjectorContractStore[]>([]);
+  // as we don't know the type of the content of a contract we need to put any here
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [parsedContentContracts, setParsedContentContracts] = useState<any[]>([]);
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+    sorts: initSorting('injector_contract_labels'),
+    filterGroup: isAtomic ? atomicFilter : emptyFilterGroup,
+  });
+
+  const [filterGroup, helpers] = useFiltersState(isAtomic ? atomicFilter : emptyFilterGroup, (f: FilterGroup) => setSearchPaginationInput({
+    ...searchPaginationInput,
+    filterGroup: f,
+  }));
+
+  const [selectedContract, setSelectedContract] = useState<number | null>(null);
+
+  const handleCloseDrawer = () => {
+    setOpen(false);
+    handleReset();
+  };
+
+  useEffect(() => {
+    if (contracts && contracts.length > 0) {
+      setParsedContentContracts(contracts.map((c) => JSON.parse(c.injector_contract_content)));
     }
-    return result;
+  }, [contracts]);
+
+  // Utils
+  const computeAttackPatternNameForFilter = () => {
+    return filterGroup
+      .filters?.filter((f) => f.key === MITRE_FILTER_KEY)?.[0]?.values?.map((externalId) => attackPatterns
+        .find((a: AttackPatternStore) => a.attack_pattern_external_id === externalId)?.attack_pattern_name);
   };
 
   return (
-    <div>
-      <ButtonCreate onClick={handleOpen} />
-      <Dialog
+    <>
+      <ButtonCreate onClick={() => setOpen(true)} />
+      <Drawer
         open={open}
-        TransitionComponent={Transition}
-        onClose={handleClose}
-        fullWidth
-        maxWidth="md"
-        PaperProps={{ elevation: 1 }}
+        handleClose={handleCloseDrawer}
+        title={title}
+        variant={'full'}
       >
-        <DialogTitle>{t('Create a new inject')}</DialogTitle>
-        <DialogContent>
-          <InjectForm
-            editing={false}
-            onSubmit={onSubmit}
-            initialValues={{
-              inject_tags: [],
-              inject_depends_duration_days: 0,
-              inject_depends_duration_hours: 0,
-              inject_depends_duration_minutes: 0,
-              inject_depends_duration_seconds: 0,
-            }}
-            handleClose={handleClose}
-            injectorContractsMap={injectorContractsMap}
-          />
-        </DialogContent>
-      </Dialog>
-    </div>
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: 'transparent',
+            marginBottom: 4,
+            width: '90%',
+            marginTop: 2,
+            marginLeft: 10,
+          }}
+        >
+          <Stepper sx={{ marginBottom: 6 }} activeStep={activeStep}>
+            {steps.map((label) => {
+              const stepProps: { completed?: boolean } = {};
+              const labelProps: {
+                optional?: React.ReactNode;
+              } = {};
+              return (
+                <Step key={label} {...stepProps}>
+                  <StepLabel {...labelProps}>{label}</StepLabel>
+                </Step>
+              );
+            })}
+          </Stepper>
+          {
+            activeStep === 0
+            && <div className={classes.menuContainer}>
+              <PaginationComponent
+                fetch={searchInjectorContracts}
+                searchPaginationInput={searchPaginationInput}
+                setContent={setContracts}
+              />
+              <div className={classes.container} style={{ marginTop: 10 }}>
+                <div>
+                  {!isEmptyFilter(filterGroup, MITRE_FILTER_KEY)
+                    && <Chip
+                      label={`Attack pattern = ${computeAttackPatternNameForFilter()}`}
+                      onDelete={() => helpers.handleClearAllFilters()}
+                      component="a"
+                       />
+                  }
+                </div>
+                <Button
+                  variant="outlined"
+                  color="inherit"
+                  type="submit"
+                  onClick={() => setOpenMitreFilter(true)}
+                >
+                  {t('Mitre Filter')}
+                </Button>
+              </div>
+              <List>
+                {contracts.map((contract, index) => {
+                  const [attackPattern] = computeAttackPattern(contract, attackPatternsMap);
+                  return (
+                    <ListItem key={contract.injector_contract_id} divider>
+                      <ListItemButton
+                        onClick={() => {
+                          setSelectedContract(index);
+                          handleNext();
+                        }}
+                      >
+                        <ListItemText
+                          primary={<div className={classes.container}>
+                            <div>
+                              {attackPattern
+                                && <span>
+                                  [{attackPattern.attack_pattern_external_id}]
+                                  {' - '}
+                                </span>
+                              }
+                              <span>
+                                {tPick(contract.injector_contract_labels)}
+                              </span>
+                            </div>
+
+                            <Typography variant="h3" sx={{ m: 0 }}>{attackPattern?.attack_pattern_name}</Typography>
+                          </div>}
+                        />
+                      </ListItemButton>
+
+                    </ListItem>
+                  );
+                })}
+              </List>
+              <Drawer
+                open={openMitreFilter}
+                handleClose={() => setOpenMitreFilter(false)}
+                title={t('ATT&CK Matrix')}
+                variant={'full'}
+              >
+                <MitreFilter helpers={helpers} onClick={() => setOpenMitreFilter(false)} />
+              </Drawer>
+            </div>
+          }
+          {
+            activeStep === 1 && selectedContract !== null
+            && <CreateinjectDetails
+              contractId={contracts[selectedContract].injector_contract_id}
+              contractContent={parsedContentContracts[selectedContract]}
+              handleClose={() => setOpen(false)}
+              handleBack={handleBack}
+              handleReset={handleReset}
+              onCreateInject={submitCreation}
+              isAtomic={isAtomic}
+              {...props}
+               />
+          }
+        </Box>
+      </Drawer>
+    </>
   );
 };
 
-export default CreateInject;
+export default Createinject;

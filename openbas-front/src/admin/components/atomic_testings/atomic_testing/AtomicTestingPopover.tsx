@@ -1,23 +1,17 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
 import * as R from 'ramda';
 import { useNavigate } from 'react-router-dom';
-import type { AtomicTestingOutput, Inject, Tag } from '../../../../utils/api-types';
+import type { AtomicTestingOutput, Inject } from '../../../../utils/api-types';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { deleteAtomicTesting, fetchAtomicTestingForUpdate, updateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
-import type { TeamStore } from '../../../../actions/teams/Team';
 import { useHelper } from '../../../../store';
-import type { InjectHelper } from '../../../../actions/injects/inject-helper';
-import type { TagsHelper } from '../../../../actions/helper';
-import type { TeamsHelper } from '../../../../actions/teams/team-helper';
-import { AtomicTestingResultContext, PermissionsContext } from '../../components/Context';
-import Drawer from '../../../../components/common/Drawer';
-import InjectDefinition from '../../components/injects/InjectDefinition';
+import { AtomicTestingResultContext } from '../../components/Context';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
-import { tagOptions } from '../../../../utils/Option';
+import UpdateInject from '../../components/injects/UpdateInject';
 
 interface Props {
   atomic: AtomicTestingOutput;
@@ -30,7 +24,7 @@ const AtomicPopover: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { permissions } = useContext(PermissionsContext);
+
   // Fetching data
   const { inject } = useHelper((helper: AtomicTestingHelper) => ({
     inject: helper.getInject(atomic.atomic_id),
@@ -38,14 +32,15 @@ const AtomicPopover: FunctionComponent<Props> = ({
   useDataLoader(() => {
     dispatch(fetchAtomicTestingForUpdate(atomic.atomic_id));
   });
+
   // Context
   const { onLaunchAtomicTesting } = useContext(AtomicTestingResultContext);
+
   // Edition
   const [edition, setEdition] = useState(false);
   const handleEdit = () => setEdition(true);
-  const onUpdateAtomicTesting = async (id: string, data: Inject) => {
+  const onUpdateAtomicTesting = async (data: Inject) => {
     const toUpdate = R.pipe(
-      R.assoc('inject_tags', !R.isEmpty(data.inject_tags) ? R.pluck('id', data.inject_tags) : []),
       R.pick([
         'inject_tags',
         'inject_title',
@@ -58,11 +53,11 @@ const AtomicPopover: FunctionComponent<Props> = ({
         'inject_assets',
         'inject_asset_groups',
         'inject_teams',
+        'inject_tags',
       ]),
     )(data);
-    await dispatch(updateAtomicTesting(id, toUpdate)).then(() => {
-      onLaunchAtomicTesting();
-    });
+    await dispatch(updateAtomicTesting(inject.inject_id, toUpdate));
+    onLaunchAtomicTesting();
   };
 
   // Deletion
@@ -78,43 +73,18 @@ const AtomicPopover: FunctionComponent<Props> = ({
     { label: 'Update', action: handleEdit },
     { label: 'Delete', action: handleDelete },
   ];
-  const { tagsMap, teams }: {
-    tagsMap: Record<string, Tag>,
-    teams: TeamStore[],
-  } = useHelper((helper: InjectHelper & TagsHelper & TeamsHelper) => ({
-    tagsMap: helper.getTagsMap(),
-    teams: helper.getTeams(),
-  }));
 
   return (
     <>
       <ButtonPopover entries={entries} />
-      <Drawer
+      <UpdateInject
+        injectorContract={JSON.parse(atomic.atomic_injector_contract.injector_contract_content)}
         open={edition}
         handleClose={() => setEdition(false)}
-        title={t('Update the atomic testing')}
-        variant={'full'}
-      >
-        <InjectDefinition
-          inject={{
-            ...inject, inject_tags: tagOptions(inject?.inject_tags, tagsMap),
-          }
-          }
-          injectorContracts={[JSON.parse(atomic.atomic_injector_contract.injector_contract_content)]}
-          handleClose={() => setEdition(false)}
-          tagsMap={tagsMap}
-          permissions={permissions}
-          teamsFromExerciseOrScenario={teams}
-          articlesFromExerciseOrScenario={[]}
-          variablesFromExerciseOrScenario={[]}
-          onUpdateInject={onUpdateAtomicTesting}
-          uriVariable={''}
-          allUsersNumber={0}
-          usersNumber={0}
-          teamsUsers={[]}
-          atomicTestingUpdate={true}
-        />
-      </Drawer>
+        onUpdateInject={onUpdateAtomicTesting}
+        inject={inject}
+        isAtomic
+      />
       <DialogDelete
         open={deletion}
         handleClose={() => setDeletion(false)}

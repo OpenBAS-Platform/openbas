@@ -39,6 +39,9 @@ export const teamContextForScenario = (scenarioId: ScenarioStore['scenario_id'],
       await dispatch(removeScenarioTeamPlayers(scenarioId, teamId, { scenario_team_players: userIds }));
       return dispatch(fetchTeams());
     },
+    onAddTeam(teamId: Team['team_id']): Promise<void> {
+      return dispatch(addScenarioTeams(scenarioId, { scenario_teams: [teamId] }));
+    },
     onCreateTeam(team: TeamCreateInput): Promise<{ result: string }> {
       return dispatch(addTeam({ ...team, team_scenarios: [scenarioId] }));
     },

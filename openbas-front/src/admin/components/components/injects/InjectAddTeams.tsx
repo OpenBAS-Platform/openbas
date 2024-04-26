@@ -15,7 +15,7 @@ import type { Theme } from '../../../../components/Theme';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { Option } from '../../../../utils/Option';
-import { PermissionsContext } from '../Context';
+import { PermissionsContext, TeamContext } from '../Context';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import { useHelper } from '../../../../store';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
@@ -59,6 +59,7 @@ const InjectAddTeams: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
+  const { onAddTeam } = useContext(TeamContext);
 
   const teamsMap = useHelper((helper: TeamsHelper) => helper.getTeamsMap());
 
@@ -106,8 +107,9 @@ const InjectAddTeams: FunctionComponent<Props> = ({
     handleClose();
   };
 
-  const onCreate = (result: string) => {
+  const onCreate = async (result: string) => {
     addTeam(result);
+    await onAddTeam?.(result);
   };
 
   const filterByKeyword = (n: TeamStore) => keyword === ''

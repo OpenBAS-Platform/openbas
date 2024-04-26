@@ -23,7 +23,6 @@ import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
   AttachmentOutlined,
-  CloseRounded,
   ControlPointOutlined,
   DeleteOutlined,
   EmojiEventsOutlined,
@@ -33,7 +32,7 @@ import {
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
-import { fetchInjectTeams, updateInjectForExercise } from '../../../../actions/Inject';
+import { fetchInjectTeams } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchChallenges } from '../../../../actions/Challenge';
@@ -114,6 +113,20 @@ const styles = (theme) => ({
     display: 'flex',
     flexDirection: 'row',
     padding: 0,
+  },
+  duration: {
+    marginTop: 20,
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'space-between',
+    border: `1px solid ${theme.palette.primary.main}`,
+    padding: 15,
+  },
+  trigger: {
+    fontFamily: ' Consolas, monaco, monospace',
+    fontSize: 12,
+    paddingTop: 15,
+    color: theme.palette.primary.main,
   },
 });
 
@@ -611,8 +624,8 @@ class InjectDefinition extends Component {
     );
   }
 
-  onSubmit(data) {
-    const { inject, injectorContracts } = this.props;
+  async onSubmit(data) {
+    const { inject, injectorContracts, onCreateInject, onUpdateInject } = this.props;
     const injectorContract = R.head(
       injectorContracts.filter((i) => i.contract_id === inject.inject_contract),
     );
@@ -637,7 +650,7 @@ class InjectDefinition extends Component {
     }
     injectorContract.fields
       .filter(
-        (f) => !['teams', 'assets', 'asset_groups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+        (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
           f.key,
         ),
       )
@@ -686,13 +699,18 @@ class InjectDefinition extends Component {
         }
       });
     const { allTeams, teamsIds, assetIds, assetGroupIds, documents } = this.state;
+
+    const inject_depends_duration = data.inject_depends_duration_days * 3600 * 24
+      + data.inject_depends_duration_hours * 3600
+      + data.inject_depends_duration_minutes * 60;
+    const inject_tags = !R.isEmpty(data.inject_tags) ? R.pluck('id', data.inject_tags) : [];
+
     const values = {
-      inject_title: inject.inject_title,
+      inject_title: data.inject_title,
       inject_contract: inject.inject_contract,
       inject_type: inject.inject_type,
-      inject_description: inject.inject_description,
-      inject_tags: inject.inject_tags,
-      inject_depends_duration: inject.inject_depends_duration,
+      inject_description: data.inject_description,
+      inject_tags,
       inject_depends_from_another: inject.inject_depends_from_another,
       inject_content: finalData,
       inject_all_teams: allTeams,
@@ -700,34 +718,15 @@ class InjectDefinition extends Component {
       inject_assets: assetIds,
       inject_asset_groups: assetGroupIds,
       inject_documents: documents,
+      inject_depends_duration,
     };
-    const atomicTestingValues = {
-      inject_all_teams: allTeams,
-      inject_asset_groups: assetGroupIds,
-      inject_assets: assetIds,
-      inject_content: finalData,
-      inject_contract: inject.inject_contract,
-      inject_documents: documents,
-      inject_teams: teamsIds,
-      inject_title: data.inject_title,
-      inject_description: data.inject_description,
-      inject_tags: data.inject_tags,
-      inject_type: inject.inject_type,
-    };
-    if (this.props.atomicTestingCreation) {
-      return this.props
-        .onAddAtomicTesting(atomicTestingValues)
-        .then(() => this.props.handleReset())
-        .then(() => this.props.handleClose());
+
+    if (onCreateInject) {
+      await onCreateInject(values);
+    } else {
+      await onUpdateInject(values);
     }
-    if (this.props.atomicTestingUpdate) {
-      return this.props
-        .onUpdateInject(this.props.inject.inject_id, atomicTestingValues)
-        .then(() => this.props.handleClose());
-    }
-    return this.props
-      .onUpdateInject(this.props.inject.inject_id, values)
-      .then(() => this.props.handleClose());
+    this.props.handleClose();
   }
 
   validate(values) {
@@ -739,7 +738,7 @@ class InjectDefinition extends Component {
     if (injectorContract && Array.isArray(injectorContract.fields)) {
       injectorContract.fields
         .filter(
-          (f) => !['teams', 'assets', 'asset_groups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+          (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
             f.key,
           ),
         )
@@ -762,13 +761,24 @@ class InjectDefinition extends Component {
           }
         });
     }
+    const requiredFields = [
+      'inject_title',
+      'inject_depends_duration_days',
+      'inject_depends_duration_hours',
+      'inject_depends_duration_minutes',
+    ];
+    requiredFields.forEach((field) => {
+      if (R.isNil(values[field])) {
+        errors[field] = t('This field is required.');
+      }
+    });
     return errors;
   }
 
   renderFields(renderedFields, values, attachedDocs) {
     const { classes, t } = this.props;
     return (
-      <div>
+      <>
         {renderedFields.map((field) => {
           switch (field.type) {
             case 'textarea':
@@ -1056,7 +1066,7 @@ class InjectDefinition extends Component {
               );
           }
         })}
-      </div>
+      </>
     );
   }
 
@@ -1116,7 +1126,6 @@ class InjectDefinition extends Component {
     const {
       t,
       classes,
-      handleClose,
       inject,
       injectorContracts,
       teamsMap,
@@ -1128,9 +1137,7 @@ class InjectDefinition extends Component {
       challengesMap,
       teamsFromExerciseOrScenario,
       articlesFromExerciseOrScenario,
-      atomicTestingCreation,
-      atomicTestingUpdate,
-      handleBack,
+      isAtomic,
     } = this.props;
     if (!inject) {
       return <Loader variant="inElement" />;
@@ -1185,7 +1192,7 @@ class InjectDefinition extends Component {
     // -- ASSET GROUPS --
     const hasAssetGroups = injectorContract.fields
       .map((f) => f.key)
-      .includes('asset_groups');
+      .includes('assetgroups');
     const assetGroups = assetGroupIds
       .map((a) => assetGroupsMap[a])
       .filter((a) => a !== undefined);
@@ -1253,12 +1260,21 @@ class InjectDefinition extends Component {
       (f) => f.expectation === true,
     );
 
-    const initialValues = { ...inject.inject_content, inject_title: inject.inject_title, inject_description: inject.inject_description, inject_tags: inject.inject_tags };
+    const initialValues = {
+      ...inject.inject_content,
+      inject_title: inject.inject_title,
+      inject_description: inject.inject_description,
+      inject_tags: inject.inject_tags,
+      inject_depends_duration_days: inject.inject_depends_duration_days,
+      inject_depends_duration_hours: inject.inject_depends_duration_hours,
+      inject_depends_duration_minutes: inject.inject_depends_duration_minutes,
+      inject_depends_duration_seconds: inject.inject_depends_duration_seconds,
+    };
     // Enrich initialValues with default contract value
     const builtInFields = [
       'teams',
       'assets',
-      'asset_groups',
+      'assetgroups',
       'articles',
       'challenges',
       'attachments',
@@ -1338,26 +1354,7 @@ class InjectDefinition extends Component {
         }
       });
     return (
-      <div>
-        {
-          !atomicTestingCreation && !atomicTestingUpdate
-          && <div className={classes.header}>
-            <IconButton
-              aria-label="Close"
-              className={classes.closeButton}
-              onClick={handleClose.bind(this)}
-              size="large"
-              color="primary"
-            >
-              <CloseRounded fontSize="small" color="primary" />
-            </IconButton>
-            <Typography variant="h6" classes={{ root: classes.title }}>
-              {inject.inject_title}
-            </Typography>
-            <div className="clearfix" />
-          </div>
-        }
-
+      <>
         <div className={classes.container}>
           <Form
             keepDirtyOnReinitialize={true}
@@ -1373,40 +1370,33 @@ class InjectDefinition extends Component {
           >
             {({ form, handleSubmit, submitting, values }) => (
               <form id="injectContentForm" onSubmit={handleSubmit}>
-                {
-                  (atomicTestingCreation || atomicTestingUpdate)
-                  && (
-                    <>
-                      <Typography variant="h2" style={{ float: 'left' }}>
-                        {t('Title')}
-                      </Typography>
-                      <TextField style={{ marginBottom: 20 }}
-                        variant="standard"
-                        name="inject_title"
-                        fullWidth required
-                      />
-                      <Typography variant="h2" style={{ float: 'left' }}>
-                        {t('Description')}
-                      </Typography>
-                      <TextField
-                        variant="standard"
-                        name="inject_description"
-                        fullWidth={true}
-                        multiline={true}
-                        rows={2}
-                      />
-                      <Typography variant="h2" style={{ float: 'left', marginTop: 20 }}>
-                        {t('Tags')}
-                      </Typography>
-                      <TagField
-                        name="inject_tags"
-                        values={values}
-                        setFieldValue={form.mutators.setValue}
-                        style={{ marginBottom: 20 }}
-                      />
-                    </>
-                  )
-                }
+                <Typography variant="h2" style={{ float: 'left' }}>
+                  {t('Title')}
+                </Typography>
+                <TextField style={{ marginBottom: 20 }}
+                  variant="standard"
+                  name="inject_title"
+                  fullWidth
+                />
+                <Typography variant="h2" style={{ float: 'left' }}>
+                  {t('Description')}
+                </Typography>
+                <TextField
+                  variant="standard"
+                  name="inject_description"
+                  fullWidth={true}
+                  multiline={true}
+                  rows={2}
+                />
+                <Typography variant="h2" style={{ float: 'left', marginTop: 20 }}>
+                  {t('Tags')}
+                </Typography>
+                <TagField
+                  name="inject_tags"
+                  values={values}
+                  setFieldValue={form.mutators.setValue}
+                  style={{ marginBottom: 20 }}
+                />
                 {hasTeams && (
                   <div>
                     <Typography variant="h2" style={{ float: 'left' }}>
@@ -1954,189 +1944,180 @@ class InjectDefinition extends Component {
                     }
                   </>
                 }
-                <div>
-                  <Typography variant="h2" style={{ marginTop: 30 }}>
-                    {t('Inject documents')}
-                  </Typography>
-                  <List>
-                    <ListItem
-                      classes={{ root: classes.itemHead }}
-                      divider={false}
-                      style={{ paddingTop: 0 }}
-                    >
-                      <ListItemIcon>
-                        <span
-                          style={{
-                            padding: '0 8px 0 8px',
-                            fontWeight: 700,
-                            fontSize: 12,
-                          }}
-                        >
-                          &nbsp;
-                        </span>
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <div>
-                            {this.documentsSortHeader(
-                              'document_name',
-                              'Name',
-                              true,
-                            )}
-                            {this.documentsSortHeader(
-                              'document_type',
-                              'Type',
-                              true,
-                            )}
-                            {this.documentsSortHeader(
-                              'document_tags',
-                              'Tags',
-                              true,
-                            )}
-                            {this.documentsSortHeader(
-                              'document_attached',
-                              'Attachment',
-                              true,
-                            )}
-                          </div>
-                        }
-                      />
-                      <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
-                    </ListItem>
-                    {sortedDocuments.map((document) => (
+                {!isAtomic
+                  && <>
+                    <Typography variant="h2" style={{ marginTop: 30 }}>
+                      {t('Inject documents')}
+                    </Typography>
+                    <List>
                       <ListItem
-                        key={document.document_id}
-                        classes={{ root: classes.item }}
-                        divider={true}
-                        button={true}
-                        component="a"
-                        href={`/api/documents/${document.document_id}/file`}
+                        classes={{ root: classes.itemHead }}
+                        divider={false}
+                        style={{ paddingTop: 0 }}
                       >
                         <ListItemIcon>
-                          <AttachmentOutlined />
+                          <span
+                            style={{
+                              padding: '0 8px 0 8px',
+                              fontWeight: 700,
+                              fontSize: 12,
+                            }}
+                          >
+                          &nbsp;
+                          </span>
                         </ListItemIcon>
                         <ListItemText
                           primary={
                             <div>
-                              <div
-                                className={classes.bodyItem}
-                                style={inlineStyles.document_name}
-                              >
-                                {document.document_name}
-                              </div>
-                              <div
-                                className={classes.bodyItem}
-                                style={inlineStyles.document_type}
-                              >
-                                <DocumentType
-                                  type={document.document_type}
-                                  variant="list"
-                                />
-                              </div>
-                              <div
-                                className={classes.bodyItem}
-                                style={inlineStyles.document_tags}
-                              >
-                                <ItemTags
-                                  variant="list"
-                                  tags={document.document_tags}
-                                />
-                              </div>
-                              <div
-                                className={classes.bodyItem}
-                                style={inlineStyles.document_attached}
-                              >
-                                <ItemBoolean
-                                  status={
-                                    hasAttachments
-                                      ? document.document_attached
-                                      : null
-                                  }
-                                  label={
-                                    document.document_attached
-                                      ? t('Yes')
-                                      : t('No')
-                                  }
-                                  variant="inList"
-                                  onClick={(event) => {
-                                    event.preventDefault();
-                                    this.toggleAttachment(document.document_id);
-                                  }}
-                                  disabled={
-                                    this.props.permissions.readOnly
-                                      || fieldAttachements.readOnly
-                                    || !hasAttachments
-                                  }
-                                />
-                              </div>
+                              {this.documentsSortHeader(
+                                'document_name',
+                                'Name',
+                                true,
+                              )}
+                              {this.documentsSortHeader(
+                                'document_type',
+                                'Type',
+                                true,
+                              )}
+                              {this.documentsSortHeader(
+                                'document_tags',
+                                'Tags',
+                                true,
+                              )}
+                              {this.documentsSortHeader(
+                                'document_attached',
+                                'Attachment',
+                                true,
+                              )}
                             </div>
                           }
                         />
-                        <ListItemSecondaryAction>
-                          <DocumentPopover
-                            inline
-                            document={document}
-                            onRemoveDocument={this.handleRemoveDocument.bind(
-                              this,
-                            )}
-                            onToggleAttach={
-                              hasAttachments
-                                ? this.toggleAttachment.bind(this)
-                                : null
-                            }
-                            attached={document.document_attached}
-                            disabled={this.props.permissions.readOnly || fieldAttachements.readOnly}
-                          />
-                        </ListItemSecondaryAction>
+                        <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
                       </ListItem>
-                    ))}
-                    <InjectAddDocuments
-                      injectDocumentsIds={documents
-                        .filter((a) => !a.inject_document_attached)
-                        .map((d) => d.document_id)}
-                      handleAddDocuments={this.handleAddDocuments.bind(this)}
-                      hasAttachments={hasAttachments}
-                    />
-                  </List>
-                </div>
-                {
-                  atomicTestingCreation
-                    ? <div>
-
-                      <div style={{ float: 'left', margin: '20px 0 20px 0' }}>
-                        <Button
-                          color="inherit"
-                          sx={{ mr: 1 }}
-                          onClick={handleBack}
+                      {sortedDocuments.map((document) => (
+                        <ListItem
+                          key={document.document_id}
+                          classes={{ root: classes.item }}
+                          divider={true}
+                          button={true}
+                          component="a"
+                          href={`/api/documents/${document.document_id}/file`}
                         >
-                          {t('Back')}
-                        </Button>
-                      </div>
-
-                      <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
-                        <Button
-                          variant="contained"
-                          color="secondary"
-                          type="submit"
-                          disabled={submitting || this.props.permissions.readOnly}
-                        >
-                          {t('Create')}
-                        </Button>
-                      </div>
+                          <ListItemIcon>
+                            <AttachmentOutlined />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={inlineStyles.document_name}
+                                >
+                                  {document.document_name}
+                                </div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={inlineStyles.document_type}
+                                >
+                                  <DocumentType
+                                    type={document.document_type}
+                                    variant="list"
+                                  />
+                                </div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={inlineStyles.document_tags}
+                                >
+                                  <ItemTags
+                                    variant="list"
+                                    tags={document.document_tags}
+                                  />
+                                </div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={inlineStyles.document_attached}
+                                >
+                                  <ItemBoolean
+                                    status={
+                                      hasAttachments
+                                        ? document.document_attached
+                                        : null
+                                    }
+                                    label={
+                                      document.document_attached
+                                        ? t('Yes')
+                                        : t('No')
+                                    }
+                                    variant="inList"
+                                    onClick={(event) => {
+                                      event.preventDefault();
+                                      this.toggleAttachment(document.document_id);
+                                    }}
+                                    disabled={
+                                      this.props.permissions.readOnly
+                                      || fieldAttachements.readOnly
+                                      || !hasAttachments
+                                    }
+                                  />
+                                </div>
+                              </div>
+                            }
+                          />
+                          <ListItemSecondaryAction>
+                            <DocumentPopover
+                              inline
+                              document={document}
+                              onRemoveDocument={this.handleRemoveDocument.bind(
+                                this,
+                              )}
+                              onToggleAttach={
+                                hasAttachments
+                                  ? this.toggleAttachment.bind(this)
+                                  : null
+                              }
+                              attached={document.document_attached}
+                              disabled={this.props.permissions.readOnly || fieldAttachements.readOnly}
+                            />
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                      ))}
+                      <InjectAddDocuments
+                        injectDocumentsIds={documents
+                          .filter((a) => !a.inject_document_attached)
+                          .map((d) => d.document_id)}
+                        handleAddDocuments={this.handleAddDocuments.bind(this)}
+                        hasAttachments={hasAttachments}
+                      />
+                    </List>
+                    <div className={classes.duration}>
+                      <div className={classes.trigger}>{t('Trigger after')}</div>
+                      <TextField
+                        variant="standard"
+                        name="inject_depends_duration_days"
+                        type="number"
+                        label={t('Days')}
+                        style={{ width: '20%' }}
+                      />
+                      <TextField
+                        variant="standard"
+                        name="inject_depends_duration_hours"
+                        type="number"
+                        label={t('Hours')}
+                        style={{ width: '20%' }}
+                      />
+                      <TextField
+                        variant="standard"
+                        name="inject_depends_duration_minutes"
+                        type="number"
+                        label={t('Minutes')}
+                        style={{ width: '20%' }}
+                      />
                     </div>
-
-                    : <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        type="submit"
-                        disabled={submitting || this.props.permissions.readOnly}
-                      >
-                        {t('Update')}
-                      </Button>
-                    </div>
+                  </>
                 }
-
+                {
+                  this.props.getFooter(submitting)
+                }
               </form>
             )}
           </Form>
@@ -2148,7 +2129,7 @@ class InjectDefinition extends Component {
           handleClose={this.handleCloseVariables.bind(this)}
           injectorContract={injectorContract}
         />
-      </div>
+      </>
     );
   }
 }
@@ -2161,7 +2142,6 @@ InjectDefinition.propTypes = {
   fetchInjectTeams: PropTypes.func,
   fetchChannels: PropTypes.func,
   fetchChallenges: PropTypes.func,
-  updateInject: PropTypes.func,
   handleClose: PropTypes.func,
   injectorContracts: PropTypes.array,
   fetchDocuments: PropTypes.func,
@@ -2171,15 +2151,13 @@ InjectDefinition.propTypes = {
   variablesFromExerciseOrScenario: PropTypes.array,
   permissions: PropTypes.object,
   onUpdateInject: PropTypes.func,
+  onCreateInject: PropTypes.func,
   uriVariable: PropTypes.string,
   allUsersNumber: PropTypes.number,
   usersNumber: PropTypes.number,
   teamsUsers: PropTypes.array,
-  onAddAtomicTesting: PropTypes.func,
-  atomicTestingCreation: PropTypes.bool,
-  atomicTestingUpdate: PropTypes.bool,
-  handleBack: PropTypes.func,
-  handleReset: PropTypes.func,
+  getFooter: PropTypes.func,
+  isAtomic: PropTypes.bool,
 };
 
 const select = (state) => {
@@ -2205,7 +2183,6 @@ const select = (state) => {
 export default R.compose(
   connect(select, {
     fetchInjectTeams,
-    updateInject: updateInjectForExercise,
     fetchDocuments,
     fetchChannels,
     fetchChallenges,
