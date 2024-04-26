@@ -19,6 +19,7 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import Drawer from '../../../../components/common/Drawer';
 import CreateinjectDetails from './CreateinjectDetails';
+import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 
 const useStyles = makeStyles(() => ({
   menuContainer: {
@@ -66,7 +67,8 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
   };
 
   // Fetching data
-  const { attackPatternsMap } = useHelper((helper: AttackPatternHelper) => ({
+  const { attackPatterns, attackPatternsMap } = useHelper((helper: AttackPatternHelper) => ({
+    attackPatterns: helper.getAttackPatterns(),
     attackPatternsMap: helper.getAttackPatternsMap(),
   }));
   useDataLoader(() => {
@@ -104,6 +106,13 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
     }
   }, [contracts]);
 
+  // Utils
+  const computeAttackPatternNameForFilter = () => {
+    return filterGroup
+      .filters?.filter((f) => f.key === MITRE_FILTER_KEY)?.[0]?.values?.map((externalId) => attackPatterns
+        .find((a: AttackPatternStore) => a.attack_pattern_external_id === externalId)?.attack_pattern_name);
+  };
+
   return (
     <>
       <ButtonCreate onClick={() => setOpen(true)} />
@@ -113,7 +122,6 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
         title={title}
         variant={'full'}
       >
-
         <Box
           sx={{
             borderBottom: 1,
@@ -137,7 +145,6 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
               );
             })}
           </Stepper>
-
           {
             activeStep === 0
             && <div className={classes.menuContainer}>
@@ -150,7 +157,7 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
                 <div>
                   {!isEmptyFilter(filterGroup, MITRE_FILTER_KEY)
                     && <Chip
-                      label={`${t('Attack pattern')} = ${filterGroup.filters?.filter((f) => f.key === MITRE_FILTER_KEY)?.[0]?.values?.map((id) => attackPatternsMap[id].attack_pattern_name)}`}
+                      label={`Attack pattern = ${computeAttackPatternNameForFilter()}`}
                       onDelete={() => helpers.handleClearAllFilters()}
                       component="a"
                        />
