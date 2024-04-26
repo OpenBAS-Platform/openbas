@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import { Chip, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { Chip, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import { CSVLink } from 'react-csv';
 import { FileDownloadOutlined } from '@mui/icons-material';
 import { splitDuration } from '../../../../utils/Time';
@@ -9,10 +9,8 @@ import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import InjectIcon from './InjectIcon';
-import CreateInject from './CreateInject';
 import InjectPopover from './InjectPopover';
 import InjectorContract from './InjectorContract';
-import InjectDefinition from './InjectDefinition';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -20,6 +18,8 @@ import ItemBoolean from '../../../../components/ItemBoolean';
 import { exportData } from '../../../../utils/Environment';
 import Loader from '../../../../components/Loader';
 import { InjectContext, PermissionsContext } from '../Context';
+import CreateInject from './CreateInject';
+import UpdateInject from './UpdateInject';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -49,11 +49,6 @@ const useStyles = makeStyles(() => ({
     backgroundColor: 'rgba(0, 177, 255, 0.08)',
     color: '#00b1ff',
     border: '1px solid #00b1ff',
-  },
-  drawerPaper: {
-    minHeight: '100vh',
-    width: '50%',
-    padding: 0,
   },
 }));
 
@@ -167,7 +162,7 @@ const Injects = ({
 
   const [selectedInjectId, setSelectedInjectId] = useState(null);
   const { permissions } = useContext(PermissionsContext);
-  const { onUpdateInject } = useContext(InjectContext);
+  const injectContext = useContext(InjectContext);
 
   // Filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
@@ -192,6 +187,14 @@ const Injects = ({
   });
 
   const injectorContracts = Object.values(injectorContractsMap);
+
+  const onCreateInject = async (data) => {
+    await injectContext.onAddInject(data);
+  };
+  const onUpdateInject = async (data) => {
+    await injectContext.onUpdateInject(selectedInjectId, data);
+  };
+
   const sortedInjects = filtering.filterAndSort(injects);
   const types = injectorContracts.map((type) => type.config.type);
   const disabledTypes = injectorContracts
@@ -412,7 +415,7 @@ const Injects = ({
                     inject={inject}
                     injectorContractsMap={injectorContractsMap}
                     tagsMap={tagsMap}
-                    setSelectedInject={setSelectedInjectId}
+                    setSelectedInjectId={setSelectedInjectId}
                     isDisabled={!injectContract || isDisabled}
                   />
                 </ListItemSecondaryAction>
@@ -420,37 +423,36 @@ const Injects = ({
             );
           })}
         </List>
-        <Drawer
-          open={selectedInjectId !== null}
-          keepMounted={false}
-          anchor="right"
-          sx={{ zIndex: 1202 }}
-          classes={{ paper: classes.drawerPaper }}
-          onClose={() => setSelectedInjectId(null)}
-          elevation={1}
-          disableEnforceFocus={true}
-        >
-          <InjectDefinition
-            inject={selectedInject}
-            injectorContracts={injectorContracts}
-            handleClose={() => setSelectedInjectId(null)}
-            tagsMap={tagsMap}
-            permissions={permissions}
-            teamsFromExerciseOrScenario={teams}
-            articlesFromExerciseOrScenario={articles}
-            variablesFromExerciseOrScenario={variables}
-            onUpdateInject={onUpdateInject}
-            uriVariable={uriVariable}
-            allUsersNumber={allUsersNumber}
-            usersNumber={usersNumber}
-            teamsUsers={teamsUsers}
-          />
-        </Drawer>
         {permissions.canWrite && (
-          <CreateInject
-            injectorContractsMap={injectorContractsMap}
-            onCreate={setSelectedInjectId}
-          />
+          <>
+            {selectedInject
+              && <UpdateInject
+                open={selectedInjectId !== null}
+                handleClose={() => setSelectedInjectId(null)}
+                onUpdateInject={onUpdateInject}
+                injectorContract={injectorContractsMap[selectedInject.inject_contract]}
+                inject={selectedInject}
+                teamsFromExerciseOrScenario={teams}
+                articlesFromExerciseOrScenario={articles}
+                variablesFromExerciseOrScenario={variables}
+                uriVariable={uriVariable}
+                allUsersNumber={allUsersNumber}
+                usersNumber={usersNumber}
+                teamsUsers={teamsUsers}
+                 />
+            }
+            <CreateInject
+              title={t('Create a new inject')}
+              onCreateInject={onCreateInject}
+              teamsFromExerciseOrScenario={teams}
+              articlesFromExerciseOrScenario={articles}
+              variablesFromExerciseOrScenario={variables}
+              uriVariable={uriVariable}
+              allUsersNumber={allUsersNumber}
+              usersNumber={usersNumber}
+              teamsUsers={teamsUsers}
+            />
+          </>
         )}
       </div>
     );

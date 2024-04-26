@@ -76,19 +76,19 @@ const AtomicTesting = () => {
   // Icon
   const getIcon = (type: string | undefined) => {
     if (type === 'ASSETS') {
-      return <DevicesOtherOutlined/>;
+      return <DevicesOtherOutlined />;
     }
     if (type === 'ASSETS_GROUPS') {
-      return <SelectGroup/>;
+      return <SelectGroup />;
     }
-    return <Groups3Outlined/>; // Teams
+    return <Groups3Outlined />; // Teams
   };
 
   return (
     <>
       <Grid container spacing={2} classes={{ root: classes.container }}>
         <Grid item xs={12}>
-          <ResponsePie expectations={atomic.atomic_expectation_results}/>
+          <ResponsePie expectations={atomic.atomic_expectation_results} />
         </Grid>
       </Grid>
       <Grid container spacing={2} classes={{ root: classes.container }}>
@@ -128,7 +128,7 @@ const AtomicTesting = () => {
               </Paper>)}
             </List>
           ) : (
-            <Empty message={t('No targets available')}/>
+            <Empty message={t('No targets available')} />
           )}
         </Grid>
         <Grid item xs={7} style={{ paddingBottom: 24 }}>
@@ -147,7 +147,7 @@ const AtomicTesting = () => {
               }}
               >
                 {!selectedTarget && (
-                <Empty message={t('No target data available')}/>
+                  <Empty message={t('No target data available')} />
                 )}
               </div>
             )}
