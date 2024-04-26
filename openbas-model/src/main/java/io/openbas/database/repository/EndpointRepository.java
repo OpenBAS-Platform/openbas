@@ -8,15 +8,15 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface EndpointRepository extends CrudRepository<Endpoint, String>, JpaSpecificationExecutor<Endpoint> {
 
-  @Query(value = "select e.* from assets e where e.asset_sources[:sourceKey] = :sourceValue", nativeQuery = true)
-  Optional<Endpoint> findBySource(
+  @Query(value = "select e.* from assets e where e.asset_sources[:sourceKey] IS NOT NULL AND e.endpoint_hostname = :hostname", nativeQuery = true)
+  List<Endpoint> findBySourceAndHostname(
       @NotBlank final @Param("sourceKey") String sourceKey,
-      @NotBlank final @Param("sourceValue") String sourceValue
+      @NotBlank final @Param("hostname") String hostname
   );
 
 }

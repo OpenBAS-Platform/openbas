@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
@@ -34,10 +33,10 @@ public class EndpointService {
   }
 
   @Transactional(readOnly = true)
-  public Optional<Endpoint> findBySource(
+  public List<Endpoint> findBySourceAndHostname(
       @NotBlank final String sourceKey,
-      @NotBlank final String sourceValue) {
-    return this.endpointRepository.findBySource(sourceKey, sourceValue);
+      @NotBlank final String hostname) {
+    return this.endpointRepository.findBySourceAndHostname(sourceKey, hostname);
   }
 
   public List<Endpoint> endpoints() {
