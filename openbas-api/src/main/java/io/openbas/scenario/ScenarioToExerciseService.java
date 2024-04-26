@@ -42,7 +42,6 @@ public class ScenarioToExerciseService {
   private final InjectRepository injectRepository;
   private final InjectDocumentRepository injectDocumentRepository;
   private final VariableService variableService;
-  private final InjectorContractRepository injectorContractRepository;
 
   @Transactional(rollbackFor = Exception.class)
   public Exercise toExercise(
@@ -191,7 +190,7 @@ public class ScenarioToExerciseService {
       Inject exerciseInject = new Inject();
       exerciseInject.setTitle(scenarioInject.getTitle());
       exerciseInject.setDescription(scenarioInject.getDescription());
-      exerciseInject.setInjectorContract(this.injectorContractRepository.findById(scenarioInject.getContract()).orElseThrow());
+      exerciseInject.setContract(scenarioInject.getContract());
       exerciseInject.setCountry(scenarioInject.getCountry());
       exerciseInject.setCity(scenarioInject.getCity());
       exerciseInject.setEnabled(scenarioInject.isEnabled());

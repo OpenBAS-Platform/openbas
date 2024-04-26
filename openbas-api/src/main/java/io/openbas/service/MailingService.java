@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.User;
-import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
@@ -35,7 +34,6 @@ public class MailingService {
   private UserRepository userRepository;
 
   private ExecutionContextService executionContextService;
-  private InjectorContractRepository injectorContractRepository;
 
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
@@ -52,18 +50,13 @@ public class MailingService {
     this.executionContextService = executionContextService;
   }
 
-  @Autowired
-  public void setInjectorContractRepository(@NotNull final InjectorContractRepository injectorContractRepository) {
-    this.injectorContractRepository = injectorContractRepository;
-  }
-
   public void sendEmail(String subject, String body, List<User> users, Optional<Exercise> exercise) {
     EmailContent emailContent = new EmailContent();
     emailContent.setSubject(subject);
     emailContent.setBody(body);
     Inject inject = new Inject();
     inject.setContent(this.mapper.valueToTree(emailContent));
-    inject.setInjectorContract(this.injectorContractRepository.findById(EmailContract.EMAIL_DEFAULT).orElseThrow());
+    inject.setContract(EmailContract.EMAIL_DEFAULT);
     inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setType(EmailContract.TYPE);
     exercise.ifPresent(inject::setExercise);

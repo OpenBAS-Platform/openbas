@@ -13,25 +13,25 @@ import java.util.stream.Collectors;
 
 public class AtomicTestingMapper {
 
-  public static AtomicTestingOutput toDtoWithTargetResults(Inject inject) {
-    return getAtomicTestingOutputBuilder(inject)
+  public static AtomicTestingOutput toDtoWithTargetResults(Inject inject, InjectorContract injectorContract) {
+    return getAtomicTestingOutputBuilder(inject, injectorContract)
         .targets(AtomicTestingUtils.getTargetsWithResults(inject))
         .build();
   }
 
-  public static AtomicTestingOutput toDto(Inject inject) {
-    return getAtomicTestingOutputBuilder(inject)
+  public static AtomicTestingOutput toDto(Inject inject, InjectorContract injectorContract) {
+    return getAtomicTestingOutputBuilder(inject, injectorContract)
         .targets(AtomicTestingUtils.getTargets(inject))
         .build();
   }
 
-  private static AtomicTestingOutputBuilder getAtomicTestingOutputBuilder(Inject inject) {
+  private static AtomicTestingOutputBuilder getAtomicTestingOutputBuilder(Inject inject, InjectorContract injectorContract) {
     return AtomicTestingOutput
         .builder()
         .id(inject.getId())
         .title(inject.getTitle())
         .type(inject.getType())
-        .injectorContract(inject.getInjectorContract())
+        .injectorContract(injectorContract)
         .contract(inject.getContract())
         .lastExecutionStartDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))
         .lastExecutionEndDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))

@@ -1,6 +1,5 @@
 package io.openbas.atomic_testing;
 
-import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
 import io.openbas.atomic_testing.form.AtomicTestingInput;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
@@ -127,7 +126,7 @@ public class AtomicTestingService {
     injectToSave.setTitle(input.getTitle());
     injectToSave.setContent(input.getContent());
     injectToSave.setType(input.getType());
-    injectToSave.setInjectorContract(this.injectorContractRepository.findById(input.getContract()).orElseThrow());
+    injectToSave.setContract(input.getContract());
     injectToSave.setAllTeams(input.isAllTeams());
     injectToSave.setDescription(input.getDescription());
     injectToSave.setDependsDuration(0L);
