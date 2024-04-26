@@ -109,7 +109,7 @@ const InjectAddTeams: FunctionComponent<Props> = ({
 
   const onCreate = async (result: string) => {
     addTeam(result);
-    await onAddTeam(result);
+    await onAddTeam?.(result);
   };
 
   const filterByKeyword = (n: TeamStore) => keyword === ''
