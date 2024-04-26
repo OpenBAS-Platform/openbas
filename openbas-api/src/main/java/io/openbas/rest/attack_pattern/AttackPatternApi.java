@@ -1,9 +1,13 @@
 package io.openbas.rest.attack_pattern;
 
 import io.openbas.database.model.AttackPattern;
+import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.KillChainPhase;
 import io.openbas.database.repository.AttackPatternRepository;
+import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.KillChainPhaseRepository;
+import io.openbas.database.specification.InjectorContractSpecification;
+import io.openbas.database.specification.LessonsQuestionSpecification;
 import io.openbas.rest.attack_pattern.form.AttackPatternCreateInput;
 import io.openbas.rest.attack_pattern.form.AttackPatternUpdateInput;
 import io.openbas.rest.attack_pattern.form.AttackPatternUpsertInput;
@@ -34,6 +38,8 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 public class AttackPatternApi extends RestBehavior {
 
   private AttackPatternRepository attackPatternRepository;
+
+  private InjectorContractRepository injectorContractRepository;
   private KillChainPhaseRepository killChainPhaseRepository;
 
   @Autowired
@@ -44,6 +50,11 @@ public class AttackPatternApi extends RestBehavior {
   @Autowired
   public void setKillChainPhaseRepository(KillChainPhaseRepository killChainPhaseRepository) {
     this.killChainPhaseRepository = killChainPhaseRepository;
+  }
+
+  @Autowired
+  public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
+    this.injectorContractRepository = injectorContractRepository;
   }
 
   @GetMapping("/api/attack_patterns")
@@ -74,6 +85,12 @@ public class AttackPatternApi extends RestBehavior {
     attackPattern.setKillChainPhases(fromIterable(killChainPhaseRepository.findAllById(input.getKillChainPhasesIds())));
     attackPattern.setParent(updateRelation(input.getParentId(), attackPattern.getParent(), attackPatternRepository));
     return attackPatternRepository.save(attackPattern);
+  }
+
+  @GetMapping("/api/attack_patterns/{attackPatternId}/injector_contracts")
+  public Iterable<InjectorContract> injectorContracts(@PathVariable String attackPatternId) {
+    attackPatternRepository.findById(attackPatternId).orElseThrow();
+    return injectorContractRepository.findAll(InjectorContractSpecification.fromAttackPattern(attackPatternId));
   }
 
   @Secured(ROLE_ADMIN)

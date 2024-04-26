@@ -13,4 +13,6 @@ public interface TagRepository extends CrudRepository<Tag, String>, JpaSpecifica
 
     @NotNull
     Optional<Tag> findById(@NotNull String id);
+
+    Optional<Tag> findByName(@NotNull String name);
 }

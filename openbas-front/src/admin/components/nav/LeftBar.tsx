@@ -517,7 +517,7 @@ const LeftBar = () => {
           <StyledTooltip title={!navOpen && t('Integrations')} placement="right">
             <>
               <MenuItem
-                ref={anchors.components}
+                ref={anchors.integrations}
                 href="integrations"
                 selected={!navOpen && location.pathname.includes('/admin/integrations')}
                 dense={true}

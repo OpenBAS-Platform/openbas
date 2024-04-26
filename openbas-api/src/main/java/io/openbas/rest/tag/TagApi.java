@@ -15,6 +15,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
@@ -58,6 +60,19 @@ public class TagApi extends RestBehavior {
         Tag tag = new Tag();
         tag.setUpdateAttributes(input);
         return tagRepository.save(tag);
+    }
+
+    @Secured(ROLE_ADMIN)
+    @PostMapping("/api/tags/upsert")
+    public Tag upsertTag(@Valid @RequestBody TagCreateInput input) {
+        Optional<Tag> tag = tagRepository.findByName(input.getName());
+        if( tag.isPresent() ) {
+            return tag.get();
+        } else {
+            Tag newTag = new Tag();
+            newTag.setUpdateAttributes(input);
+            return tagRepository.save(newTag);
+        }
     }
 
     @Secured(ROLE_ADMIN)
