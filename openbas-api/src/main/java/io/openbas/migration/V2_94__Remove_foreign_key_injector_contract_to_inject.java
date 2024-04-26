@@ -13,7 +13,7 @@ public class V2_94__Remove_foreign_key_injector_contract_to_inject extends BaseJ
   public void migrate(Context context) throws Exception {
     Statement select = context.getConnection().createStatement();
     select.execute(
-        "ALTER TABLE injects DROP CONSTRAINT injector_contract_fk "
+        "ALTER TABLE injects DROP CONSTRAINT IF EXISTS injector_contract_fk"
     );
   }
 }
