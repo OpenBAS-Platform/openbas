@@ -29,7 +29,7 @@ const InjectDistributionByType: FunctionComponent<Props> = ({
 
   // Fetching data
   const { injects, injectorContractsMap } = useHelper((helper: InjectHelper & InjectorContractHelper) => ({
-    injects: helper.getScenarioInjects(exerciseId),
+    injects: helper.getExerciseInjects(exerciseId),
     injectorContractsMap: helper.getInjectorContractsMapByType(),
   }));
   useDataLoader(() => {

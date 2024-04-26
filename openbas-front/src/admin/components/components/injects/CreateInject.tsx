@@ -66,6 +66,11 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
     setActiveStep(0);
   };
 
+  const submitCreation = async (data: Inject) => {
+    handleReset();
+    await onCreateInject(data);
+  };
+
   // Fetching data
   const { attackPatterns, attackPatternsMap } = useHelper((helper: AttackPatternHelper) => ({
     attackPatterns: helper.getAttackPatterns(),
@@ -224,7 +229,7 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
               handleClose={() => setOpen(false)}
               handleBack={handleBack}
               handleReset={handleReset}
-              onCreateInject={onCreateInject}
+              onCreateInject={submitCreation}
               isAtomic={isAtomic}
               {...props}
                />

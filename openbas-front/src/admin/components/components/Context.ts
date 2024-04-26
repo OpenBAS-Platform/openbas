@@ -35,6 +35,7 @@ export type VariableContextType = {
 export type TeamContextType = {
   onAddUsersTeam: (teamId: Team['team_id'], userIds: UserStore['user_id'][]) => Promise<void>,
   onRemoveUsersTeam: (teamId: Team['team_id'], userIds: UserStore['user_id'][]) => Promise<void>,
+  onAddTeam: (teamId: Team['team_id']) => Promise<void>,
   onCreateTeam?: (team: TeamCreateInput) => Promise<{ result: string }>,
   onRemoveTeam?: (teamId: Team['team_id']) => void,
   onToggleUser?: (teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean) => void,
@@ -100,6 +101,10 @@ export const TeamContext = createContext<TeamContextType>({
     });
   },
   onRemoveUsersTeam(_teamId: Team['team_id'], _userIds: UserStore['user_id'][]): Promise<void> {
+    return new Promise<void>(() => {
+    });
+  },
+  onAddTeam(_teamId: Team['team_id']): Promise<void> {
     return new Promise<void>(() => {
     });
   },
