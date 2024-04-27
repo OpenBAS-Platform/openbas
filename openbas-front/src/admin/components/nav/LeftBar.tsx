@@ -1,29 +1,29 @@
 import React, { LegacyRef, MutableRefObject, ReactNode, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Drawer, ListItemText, Toolbar, MenuList, MenuItem, ListItemIcon, Divider, Tooltip, tooltipClasses, Collapse, Popover } from '@mui/material';
+import { Collapse, Divider, Drawer, ListItemIcon, ListItemText, MenuItem, MenuList, Popover, Toolbar, Tooltip, tooltipClasses } from '@mui/material';
 import {
-  DashboardOutlined,
-  MovieFilterOutlined,
-  HubOutlined,
-  ExtensionOutlined,
-  SettingsOutlined,
-  Groups3Outlined,
+  AttachMoneyOutlined,
+  BeenhereOutlined,
   ChevronLeft,
   ChevronRight,
-  DnsOutlined,
+  DashboardOutlined,
   DescriptionOutlined,
-  AutoAwesomeOutlined,
-  VerifiedUserOutlined,
+  DevicesOtherOutlined,
+  DnsOutlined,
+  DomainOutlined,
+  DynamicFormOutlined,
   ExpandLessOutlined,
   ExpandMoreOutlined,
-  PersonOutlined,
+  ExtensionOutlined,
+  Groups3Outlined,
   GroupsOutlined,
-  DomainOutlined,
-  RowingOutlined,
-  AttachMoneyOutlined,
-  DevicesOtherOutlined,
-  SmartButtonOutlined,
+  HubOutlined,
+  MovieFilterOutlined,
   OnlinePredictionOutlined,
+  PersonOutlined,
+  RowingOutlined,
+  SettingsOutlined,
+  SmartButtonOutlined,
   SubscriptionsOutlined,
 } from '@mui/icons-material';
 import { DramaMasks, NewspaperVariantMultipleOutline, PostOutline, SelectGroup, Target } from 'mdi-material-ui';
@@ -479,24 +479,27 @@ const LeftBar = () => {
               )}
             </MenuItem>
           </StyledTooltip>
-          <StyledTooltip title={!navOpen && t('Skills')} placement="right">
-            <MenuItem
-              component={Link}
-              to="/admin/skills"
-              selected={location.pathname === '/admin/skills'}
-              dense={true}
-              classes={{ root: classes.menuItem }}
-            >
-              <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
-                <AutoAwesomeOutlined />
-              </ListItemIcon>
-              {navOpen && (
+          <StyledTooltip title={!navOpen && t('Skills - Coming soon')} placement="right">
+            <span>
+              <MenuItem
+                component={Link}
+                to="/admin/skills"
+                selected={location.pathname === '/admin/skills'}
+                dense={true}
+                classes={{ root: classes.menuItem }}
+                disabled={true}
+              >
+                <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
+                  <BeenhereOutlined />
+                </ListItemIcon>
+                {navOpen && (
                 <ListItemText
                   classes={{ primary: classes.menuItemText }}
                   primary={t('Skills')}
                 />
-              )}
-            </MenuItem>
+                )}
+              </MenuItem>
+            </span>
           </StyledTooltip>
           <StyledTooltip title={!navOpen && t('Mitigations')} placement="right">
             <MenuItem
@@ -507,7 +510,7 @@ const LeftBar = () => {
               classes={{ root: classes.menuItem }}
             >
               <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
-                <VerifiedUserOutlined />
+                <DynamicFormOutlined />
               </ListItemIcon>
               {navOpen && (
                 <ListItemText

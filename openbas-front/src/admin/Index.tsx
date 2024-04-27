@@ -28,6 +28,7 @@ const IndexComponents = lazy(() => import('./components/components/Index'));
 const IndexIntegrations = lazy(() => import('./components/integrations/Index'));
 const LessonsTemplates = lazy(() => import('./components/lessons/LessonsTemplates'));
 const IndexLessonsTemplate = lazy(() => import('./components/lessons/Index'));
+const Mitigations = lazy(() => import('./components/mitigations/Mitigations'));
 const IndexSettings = lazy(() => import('./components/settings/Index'));
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -81,6 +82,7 @@ const Index = () => {
               <Route path="components/*" element={errorWrapper(IndexComponents)()} />
               <Route path="lessons" element={errorWrapper(LessonsTemplates)()} />
               <Route path="lessons/:lessonsTemplateId/*" element={errorWrapper(IndexLessonsTemplate)()} />
+              <Route path="mitigations" element={errorWrapper(Mitigations)()} />
               <Route path="integrations/*" element={errorWrapper(IndexIntegrations)()} />
               <Route path="settings/*" element={errorWrapper(IndexSettings)()} />
               {/* Not found */}

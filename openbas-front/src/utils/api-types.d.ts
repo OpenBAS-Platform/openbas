@@ -1351,6 +1351,43 @@ export interface LoginUserInput {
   password: string;
 }
 
+export interface Mitigation {
+  mitigation_attack_patterns?: AttackPattern[];
+  /** @format date-time */
+  mitigation_created_at?: string;
+  mitigation_description?: string;
+  mitigation_external_id: string;
+  mitigation_id: string;
+  mitigation_log_sources?: string[];
+  mitigation_name: string;
+  mitigation_stix_id: string;
+  mitigation_threat_hunting_techniques?: string;
+  /** @format date-time */
+  mitigation_updated_at?: string;
+  updateAttributes?: object;
+}
+
+export interface MitigationCreateInput {
+  mitigation_attack_patterns?: string[];
+  mitigation_description?: string;
+  mitigation_external_id: string;
+  mitigation_log_sources?: string[];
+  mitigation_name: string;
+  mitigation_stix_id?: string;
+  mitigation_threat_hunting_techniques?: string;
+}
+
+export interface MitigationUpdateInput {
+  mitigation_attack_patterns?: string[];
+  mitigation_description?: string;
+  mitigation_external_id: string;
+  mitigation_name: string;
+}
+
+export interface MitigationUpsertInput {
+  mitigations?: MitigationCreateInput[];
+}
+
 export interface OAuthProvider {
   provider_login?: string;
   provider_name?: string;
@@ -1565,6 +1602,25 @@ export interface PageKillChainPhase {
   totalPages?: number;
 }
 
+export interface PageMitigation {
+  content?: Mitigation[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PagePayload {
   content?: Payload[];
   empty?: boolean;
@@ -1680,6 +1736,10 @@ export interface PlatformSettings {
   java_version?: string;
   map_tile_server_dark?: string;
   map_tile_server_light?: string;
+  platform_ai_enabled?: boolean;
+  platform_ai_has_token?: boolean;
+  platform_ai_model?: string;
+  platform_ai_type?: string;
   platform_dark_theme?: ThemeInput;
   platform_enterprise_edition?: string;
   platform_lang?: string;
@@ -1691,10 +1751,6 @@ export interface PlatformSettings {
   postgre_version?: string;
   xtm_opencti_enable?: boolean;
   xtm_opencti_url?: string;
-  platform_ai_enabled?: boolean;
-  platform_ai_type?: string;
-  platform_ai_has_token?: string;
-  platform_ai_model?: string;
 }
 
 export interface PlatformStatistic {

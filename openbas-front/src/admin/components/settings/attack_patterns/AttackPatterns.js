@@ -85,7 +85,7 @@ const inlineStyles = {
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    textOv7erflow: 'ellipsis',
   },
   attack_pattern_updated_at: {
     float: 'left',

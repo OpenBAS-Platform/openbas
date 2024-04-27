@@ -256,6 +256,13 @@ export const payload = new schema.Entity(
 );
 export const arrayOfPayloads = new schema.Array(payload);
 
+export const mitigation = new schema.Entity(
+  'mitigations',
+  {},
+  { idAttribute: 'mitigation_id' },
+);
+export const arrayOfMitigations = new schema.Array(mitigation);
+
 token.define({ token_user: user });
 user.define({ user_organization: organization });
 
@@ -400,6 +407,10 @@ export const storeHelper = (state) => ({
   getAttackPattern: (id) => entity(id, 'attackpatterns', state),
   getAttackPatterns: () => entities('attackpatterns', state),
   getAttackPatternsMap: () => maps('attackpatterns', state),
+  // mitigations
+  getMitigation: (id) => entity(id, 'mitigations', state),
+  getMitigations: () => entities('mitigations', state),
+  getMitigationsMap: () => maps('mitigations', state),
   // injectors
   getInjector: (id) => entity(id, 'injectors', state),
   getInjectors: () => entities('injectors', state),
