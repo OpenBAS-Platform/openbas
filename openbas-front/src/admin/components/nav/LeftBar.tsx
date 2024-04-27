@@ -154,6 +154,9 @@ const LeftBar = () => {
     components: useRef<HTMLAnchorElement | null>(),
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
+    integrations: useRef<HTMLAnchorElement | null>(),
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     settings: useRef<HTMLAnchorElement | null>(),
   };
   const [selectedMenu, setSelectedMenu] = useState<string | null>(null);
@@ -514,38 +517,34 @@ const LeftBar = () => {
               )}
             </MenuItem>
           </StyledTooltip>
-          <StyledTooltip title={!navOpen && t('Integrations')} placement="right">
-            <>
-              <MenuItem
-                ref={anchors.integrations}
-                href="integrations"
-                selected={!navOpen && location.pathname.includes('/admin/integrations')}
-                dense={true}
-                classes={{ root: classes.menuItem }}
-                onClick={() => (isMobile || navOpen ? handleSelectedMenuToggle('integrations') : handleGoToPage('/admin/integrations'))}
-                onMouseEnter={() => !navOpen && handleSelectedMenuOpen('integrations')}
-                onMouseLeave={() => !navOpen && handleSelectedMenuClose()}
-              >
-                <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
-                  <ExtensionOutlined />
-                </ListItemIcon>
-                {navOpen && (
-                  <ListItemText
-                    classes={{ primary: classes.menuItemText }}
-                    primary={t('Integrations')}
-                  />
-                )}
-                {navOpen && (selectedMenu === 'integrations' ? <ExpandLessOutlined /> : <ExpandMoreOutlined />)}
-              </MenuItem>
-              {generateSubMenu(
-                'integrations',
-                [
-                  { type: 'Injectors', link: '/admin/integrations/injectors', label: 'Injectors', icon: <SmartButtonOutlined fontSize="small" /> },
-                  { type: 'Collectors', link: '/admin/integrations/collectors', label: 'Collectors', icon: <OnlinePredictionOutlined fontSize="small" /> },
-                ],
-              )}
-            </>
-          </StyledTooltip>
+          <MenuItem
+            ref={anchors.integrations}
+            href="integrations"
+            selected={!navOpen && location.pathname.includes('/admin/integrations')}
+            dense={true}
+            classes={{ root: classes.menuItem }}
+            onClick={() => (isMobile || navOpen ? handleSelectedMenuToggle('integrations') : handleGoToPage('/admin/integrations'))}
+            onMouseEnter={() => !navOpen && handleSelectedMenuOpen('integrations')}
+            onMouseLeave={() => !navOpen && handleSelectedMenuClose()}
+          >
+            <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
+              <ExtensionOutlined />
+            </ListItemIcon>
+            {navOpen && (
+            <ListItemText
+              classes={{ primary: classes.menuItemText }}
+              primary={t('Integrations')}
+            />
+            )}
+            {navOpen && (selectedMenu === 'integrations' ? <ExpandLessOutlined /> : <ExpandMoreOutlined />)}
+          </MenuItem>
+          {generateSubMenu(
+            'integrations',
+            [
+              { type: 'Injectors', link: '/admin/integrations/injectors', label: 'Injectors', icon: <SmartButtonOutlined fontSize="small" /> },
+              { type: 'Collectors', link: '/admin/integrations/collectors', label: 'Collectors', icon: <OnlinePredictionOutlined fontSize="small" /> },
+            ],
+          )}
         </MenuList>
         <Divider />
         <MenuList component="nav">

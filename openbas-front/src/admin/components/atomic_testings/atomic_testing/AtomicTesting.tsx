@@ -10,11 +10,11 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import type { AtomicTestingOutput, InjectTargetWithResult } from '../../../../utils/api-types';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import { fetchAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
-import ResponsePie from '../../components/atomic_testings/ResponsePie';
+import ResponsePie from './ResponsePie';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
-import AtomicTestingResult from '../../components/atomic_testings/AtomicTestingResult';
-import TargetResultsDetail from '../../components/atomic_testings/TargetResultsDetail';
+import AtomicTestingResult from './AtomicTestingResult';
+import TargetResultsDetail from './TargetResultsDetail';
 import SearchFilter from '../../../../components/SearchFilter';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 

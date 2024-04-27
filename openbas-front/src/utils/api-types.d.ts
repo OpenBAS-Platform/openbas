@@ -9,6 +9,16 @@
  * ---------------------------------------------------------------
  */
 
+export interface AiInput {
+  prompt_question: string;
+  prompt_type: string;
+}
+
+export interface AiResult {
+  chunk_content?: string;
+  chunk_id?: string;
+}
+
 export interface Article {
   article_author?: string;
   article_channel?: Channel;
@@ -821,7 +831,6 @@ export interface GroupUpdateUsersInput {
 }
 
 export interface Inject {
-  contract?: string;
   footer?: string;
   header?: string;
   inject_all_teams?: boolean;
@@ -834,7 +843,7 @@ export interface Inject {
   /** @format int64 */
   inject_communications_number?: number;
   inject_content?: object;
-  inject_contract?: InjectorContract;
+  inject_contract?: string;
   inject_country?: string;
   /** @format date-time */
   inject_created_at?: string;
@@ -1442,6 +1451,25 @@ export interface PageAttackPattern {
   totalPages?: number;
 }
 
+export interface PageDocument {
+  content?: Document[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageEndpoint {
   content?: Endpoint[];
   empty?: boolean;
@@ -1653,6 +1681,7 @@ export interface PlatformSettings {
   map_tile_server_dark?: string;
   map_tile_server_light?: string;
   platform_dark_theme?: ThemeInput;
+  platform_enterprise_edition?: string;
   platform_lang?: string;
   platform_light_theme?: ThemeInput;
   platform_name?: string;
@@ -1662,6 +1691,10 @@ export interface PlatformSettings {
   postgre_version?: string;
   xtm_opencti_enable?: boolean;
   xtm_opencti_url?: string;
+  platform_ai_enabled?: boolean;
+  platform_ai_type?: string;
+  platform_ai_has_token?: string;
+  platform_ai_model?: string;
 }
 
 export interface PlatformStatistic {
@@ -1874,6 +1907,10 @@ export interface SearchPaginationInput {
 
 export interface SearchTerm {
   searchTerm?: string;
+}
+
+export interface SettingsEnterpriseEditionUpdateInput {
+  platform_enterprise_edition: string;
 }
 
 export interface SettingsUpdateInput {

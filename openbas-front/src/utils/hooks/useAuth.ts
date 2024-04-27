@@ -3,6 +3,9 @@ import React, { useContext } from 'react';
 export interface Settings {
   xtm_opencti_enable?: boolean | null;
   xtm_opencti_url?: string | null;
+  platform_enterprise_edition?: string | null;
+  platform_ai_enabled?: boolean | null;
+  platform_ai_has_token?: boolean | null;
 }
 
 export interface User {

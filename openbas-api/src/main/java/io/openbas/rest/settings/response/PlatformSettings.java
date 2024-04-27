@@ -21,6 +21,9 @@ public class PlatformSettings {
   @JsonProperty("platform_lang")
   private String platformLang;
 
+  @JsonProperty("platform_enterprise_edition")
+  private String platformEnterpriseEdition;
+
   @JsonProperty("platform_openid_providers")
   private List<OAuthProvider> platformOpenIdProviders;
 
@@ -56,6 +59,18 @@ public class PlatformSettings {
 
   @JsonProperty("java_version")
   private String javaVersion;
+
+  @JsonProperty("platform_ai_enabled")
+  private Boolean aiEnabled;
+
+  @JsonProperty("platform_ai_has_token")
+  private Boolean aiHasToken;
+
+  @JsonProperty("platform_ai_type")
+  private String aiType;
+
+  @JsonProperty("platform_ai_model")
+  private String aiModel;
 
   // THEME
 

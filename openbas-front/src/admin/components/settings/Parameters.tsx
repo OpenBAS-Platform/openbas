@@ -1,27 +1,39 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import { Typography, Grid, Paper, List, ListItem, ListItemText, Switch, TextField } from '@mui/material';
+import { Typography, Grid, Paper, List, ListItem, ListItemText, Switch, TextField, Button } from '@mui/material';
 import ParametersForm from './ParametersForm';
 import { useFormatter } from '../../../components/i18n';
-import { updatePlatformParameters, updatePlatformLightParameters, updatePlatformDarkParameters, fetchPlatformParameters } from '../../../actions/Application';
+import {
+  updatePlatformParameters,
+  updatePlatformLightParameters,
+  updatePlatformDarkParameters,
+  fetchPlatformParameters,
+  updatePlatformEnterpriseEditionParameters,
+} from '../../../actions/Application';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import ItemBoolean from '../../../components/ItemBoolean';
 import ThemeForm from './ThemeForm';
 import { useAppDispatch } from '../../../utils/hooks';
 import { useHelper } from '../../../store';
 import type { LoggedHelper } from '../../../actions/helper';
-import type { PlatformSettings, SettingsUpdateInput, ThemeInput } from '../../../utils/api-types';
+import type { PlatformSettings, SettingsUpdateInput, ThemeInput, SettingsEnterpriseEditionUpdateInput } from '../../../utils/api-types';
+import Breadcrumbs from '../../../components/Breadcrumbs';
+import EnterpriseEditionButton from '../common/entreprise_edition/EnterpriseEditionButton';
 
 const useStyles = makeStyles(() => ({
-  root: {
-    flexGrow: 1,
-    paddingBottom: 50,
+  container: {
+    margin: '0 0 60px 0',
   },
   paper: {
-    position: 'relative',
-    padding: 20,
-    overflow: 'hidden',
     height: '100%',
+    minHeight: '100%',
+    margin: '10px 0 0 0',
+    padding: 20,
+    borderRadius: 4,
+  },
+  button: {
+    float: 'right',
+    marginTop: -12,
   },
 }));
 
@@ -32,7 +44,7 @@ const Parameters = () => {
   const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({
     settings: helper.getPlatformSettings(),
   }));
-
+  const isEnterpriseEdition = settings.platform_enterprise_edition === 'true';
   useDataLoader(() => {
     dispatch(fetchPlatformParameters());
   });
@@ -64,12 +76,14 @@ const Parameters = () => {
   const onUpdate = (data: SettingsUpdateInput) => dispatch(updatePlatformParameters(data));
   const onUpdateLigthParameters = (data: ThemeInput) => dispatch(updatePlatformLightParameters(data));
   const onUpdateDarkParameters = (data: ThemeInput) => dispatch(updatePlatformDarkParameters(data));
+  const updateEnterpriseEdition = (data: SettingsEnterpriseEditionUpdateInput) => dispatch(updatePlatformEnterpriseEditionParameters(data));
   return (
-    <div className={classes.root}>
+    <div className={classes.container}>
+      <Breadcrumbs variant="object" elements={[{ label: t('Settings') }, { label: t('Parameters'), current: true }]} />
       <Grid container={true} spacing={3}>
         <Grid item={true} xs={6}>
-          <Typography variant="h4">{t('Parameters')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
+          <Typography variant="h4" gutterBottom={true}>{t('Configuration')}</Typography>
+          <Paper variant="outlined" classes={{ root: classes.paper }} style={{ marginTop: 15 }}>
             <ParametersForm
               onSubmit={onUpdate}
               initialValues={{
@@ -81,16 +95,54 @@ const Parameters = () => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
-          <Typography variant="h4">{t('OpenBAS platform')}</Typography>
+          <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
+            {t('OpenBAS platform')}
+          </Typography>
+          {!isEnterpriseEdition ? (
+            <EnterpriseEditionButton inLine />
+          ) : (
+            <Button
+              size="small"
+              variant="outlined"
+              color="primary"
+              onClick={() => updateEnterpriseEdition({ platform_enterprise_edition: 'false' })}
+              classes={{ root: classes.button }}
+            >
+              {t('Disable Enterprise Edition')}
+            </Button>
+          )}
+          <div className="clearfix" />
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <List style={{ paddingTop: 0 }}>
+            <List style={{ marginTop: -20 }}>
               <ListItem divider={true}>
                 <ListItemText primary={t('Version')} />
                 <ItemBoolean variant="large" status={null} neutralLabel={settings?.platform_version?.replace('-SNAPSHOT', '')} />
               </ListItem>
               <ListItem divider={true}>
                 <ListItemText primary={t('Edition')} />
-                <ItemBoolean variant="large" status={null} neutralLabel="Community" />
+                <ItemBoolean
+                  variant="large"
+                  neutralLabel={
+                      isEnterpriseEdition
+                        ? t('Enterprise')
+                        : t('Community')
+                    }
+                  status={null}
+                />
+              </ListItem>
+              <ListItem divider={true}>
+                <ListItemText
+                  primary={t('AI Powered')}
+                />
+                <ItemBoolean
+                  variant="large"
+                  label={
+                      // eslint-disable-next-line no-nested-ternary
+                      !settings.platform_ai_enabled ? t('Disabled') : settings.platform_ai_has_token
+                        ? settings.platform_ai_type : `${settings.platform_ai_type} - ${t('Missing token')}`}
+                  status={(settings.platform_ai_enabled) && (settings.platform_ai_has_token)}
+                  tooltip={settings.platform_ai_has_token ? `${settings.platform_ai_type} - ${settings.platform_ai_model}` : t('The token is missing in your platform configuration, please ask your Filigran representative to provide you with it or with on-premise deployment instructions. Your can open a support ticket to do so.')}
+                />
               </ListItem>
               <ListItem divider={true}>
                 <TextField fullWidth={true} label={t('Filigran support key')} variant="standard" disabled={true} />

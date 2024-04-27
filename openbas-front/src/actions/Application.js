@@ -12,6 +12,14 @@ export const updatePlatformParameters = (data) => (dispatch) => {
   )(dispatch);
 };
 
+export const updatePlatformEnterpriseEditionParameters = (data) => (dispatch) => {
+  return putReferential(
+    schema.platformParameters,
+    '/api/settings/enterprise_edition',
+    data,
+  )(dispatch);
+};
+
 export const fetchPlatformParameters = () => (dispatch) => {
   return getReferential(schema.platformParameters, '/api/settings')(dispatch);
 };

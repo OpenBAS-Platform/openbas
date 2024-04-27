@@ -10,7 +10,7 @@ import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchInjects } from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
-import AtomicTestingResult from '../atomic_testings/AtomicTestingResult';
+import AtomicTestingResult from '../../atomic_testings/atomic_testing/AtomicTestingResult';
 
 const useStyles = makeStyles((theme: Theme) => ({
   button: {

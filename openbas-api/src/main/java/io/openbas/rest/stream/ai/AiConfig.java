@@ -14,14 +14,17 @@ public class AiConfig {
   @JsonProperty("type")
   private String type;
 
+  @JsonProperty("endpoint")
+  private String endpoint;
+
   @JsonProperty("token")
   private String token;
 
   @JsonProperty("model")
   private String model;
 
-  @JsonProperty("endpoint")
-  private String endpoint;
+  @JsonProperty("model_images")
+  private String modelImages;
 
   public boolean isEnabled() {
     return enabled;
@@ -37,6 +40,14 @@ public class AiConfig {
 
   public void setType(String type) {
     this.type = type;
+  }
+
+  public String getEndpoint() {
+    return endpoint;
+  }
+
+  public void setEndpoint(String endpoint) {
+    this.endpoint = endpoint;
   }
 
   public String getToken() {
@@ -55,11 +66,11 @@ public class AiConfig {
     this.model = model;
   }
 
-  public String getEndpoint() {
-    return endpoint;
+  public String getModelImages() {
+    return modelImages;
   }
 
-  public void setEndpoint(String endpoint) {
-    this.endpoint = endpoint;
+  public void setModelImages(String modelImages) {
+    this.modelImages = modelImages;
   }
 }
