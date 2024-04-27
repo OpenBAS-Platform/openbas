@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button, MenuItem } from '@mui/material';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import inject18n from '../../../../components/i18n';
 import SelectField from '../../../../components/SelectField';
 
@@ -51,14 +51,14 @@ class ChannelForm extends Component {
                 {t('tv')}
               </MenuItem>
             </SelectField>
-            <TextField
+            <OldTextField
               variant="standard"
               name="channel_name"
               fullWidth={true}
               label={t('Name')}
               style={{ marginTop: 20 }}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="channel_description"
               fullWidth={true}

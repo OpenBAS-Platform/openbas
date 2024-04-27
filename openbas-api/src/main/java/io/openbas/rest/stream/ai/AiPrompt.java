@@ -1,27 +1,16 @@
 package io.openbas.rest.stream.ai;
 
+import java.util.List;
+
 public class AiPrompt {
-
-    private static String promptEmail(String question) {
-        return question;
-    }
-
-    public static String promptGeneration(String type, String question, AiConfig aiConfig) {
-        String prompt;
-        String promptType = type != null ? type : "EMAIL";
-        prompt = switch (promptType) {
-            case "EMAIL" -> promptEmail(question);
-            default -> question;
-        };
-        return "{\n" +
-                "    \"model\": \""+ aiConfig.getModel() + "\",\n" +
-                "    \"stream\": true,\n" +
-                "    \"messages\": [\n" +
-                "        {\n" +
-                "            \"role\": \"user\",\n" +
-                "            \"content\": \" " + prompt + "\"\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}";
+    public static AiQueryModel generatePrompt(String prompt, AiConfig aiConfig) {
+        AiQueryModel aiQueryModel = new AiQueryModel();
+        aiQueryModel.setModel(aiConfig.getModel());
+        aiQueryModel.setStream(true);
+        AiQueryMessageModel aiQueryMessageModel = new AiQueryMessageModel();
+        aiQueryMessageModel.setRole("user");
+        aiQueryMessageModel.setContent(prompt);
+        aiQueryModel.setMessages(List.of(aiQueryMessageModel));
+        return aiQueryModel;
     }
 }

@@ -7,7 +7,7 @@ import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
 import { useFormatter } from '../../../../components/i18n';
 import type { EndpointInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
-import TagField from '../../../../components/field/TagField';
+import TagField from '../../../../components/fields/TagField';
 
 interface Props {
   onSubmit: SubmitHandler<EndpointInput>;

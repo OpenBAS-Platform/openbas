@@ -2,7 +2,7 @@ import React from 'react';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import { useFormatter } from '../../../../components/i18n';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import EnrichedTextField from '../../../../components/EnrichedTextField';
 import FileField from '../../../../components/FileField';
 
@@ -34,7 +34,7 @@ const CommunicationForm = ({ onSubmit, handleClose, initialValues }) => {
     >
       {({ handleSubmit, submitting, pristine }) => (
         <form id="communicationForm" onSubmit={handleSubmit}>
-          <TextField
+          <OldTextField
             variant="standard"
             name="communication_subject"
             fullWidth={true}

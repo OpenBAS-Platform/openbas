@@ -11,7 +11,7 @@ import { useHelper } from '../../../../store';
 import { AtomicTestingResultContext } from '../../components/Context';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
-import UpdateInject from '../../components/injects/UpdateInject';
+import UpdateInject from '../../common/injects/UpdateInject';
 
 interface Props {
   atomic: AtomicTestingOutput;

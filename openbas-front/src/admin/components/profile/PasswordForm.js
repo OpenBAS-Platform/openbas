@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import TextField from '../../../components/TextField';
+import OldTextField from '../../../components/OldTextField';
 import inject18n from '../../../components/i18n';
 
 class PasswordForm extends Component {
@@ -25,14 +25,14 @@ class PasswordForm extends Component {
       <Form onSubmit={onSubmit} validate={this.validate.bind(this)}>
         {({ handleSubmit, pristine, submitting }) => (
           <form id="passwordForm" onSubmit={handleSubmit}>
-            <TextField
+            <OldTextField
               variant="standard"
               name="user_current_password"
               fullWidth={true}
               type="password"
               label={t('Current password')}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="user_plain_password"
               fullWidth={true}
@@ -40,7 +40,7 @@ class PasswordForm extends Component {
               label={t('New password')}
               style={{ marginTop: 20 }}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="password_confirmation"
               fullWidth={true}

@@ -1,24 +1,24 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
 import * as R from 'ramda';
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { ControlPointOutlined, GroupsOutlined } from '@mui/icons-material';
+import { ControlPointOutlined, DescriptionOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import SearchFilter from '../../../../components/SearchFilter';
 import { useFormatter } from '../../../../components/i18n';
-import { fetchTeams } from '../../../../actions/teams/team-actions';
-import CreateTeam from '../teams/CreateTeam';
+import { fetchDocuments } from '../../../../actions/Document';
+import CreateDocument from '../../components/documents/CreateDocument';
 import { truncate } from '../../../../utils/String';
 import Transition from '../../../../components/common/Transition';
 import TagsFilter from '../../../../components/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
-import type { Theme } from '../../../../components/Theme';
+import type { Option } from '../../../../utils/Option';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { Option } from '../../../../utils/Option';
-import { PermissionsContext, TeamContext } from '../Context';
-import type { TeamStore } from '../../../../actions/teams/Team';
+import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
-import type { TeamsHelper } from '../../../../actions/teams/team-helper';
+import type { DocumentsHelper, UsersHelper } from '../../../../actions/helper';
+import { PermissionsContext } from '../../components/Context';
+import type { Document } from '../../../../utils/api-types';
 
 const useStyles = makeStyles((theme: Theme) => ({
   box: {
@@ -42,34 +42,34 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  disabled: boolean
-  handleAddTeams: (teamIds: string[]) => void;
-  injectTeamsIds: string[]
-  teams: TeamStore[]
+  hasAttachments: boolean;
+  handleAddDocuments: (documents: { document_id: string, document_attached: boolean }[]) => void;
+  injectDocumentsIds: string[];
 }
 
-const InjectAddTeams: FunctionComponent<Props> = ({
-  disabled,
-  handleAddTeams,
-  injectTeamsIds,
-  teams,
+const InjectAddDocuments: FunctionComponent<Props> = ({
+  hasAttachments,
+  handleAddDocuments,
+  injectDocumentsIds,
 }) => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
-  const { onAddTeam } = useContext(TeamContext);
 
-  const teamsMap = useHelper((helper: TeamsHelper) => helper.getTeamsMap());
+  const { documents, userAdmin } = useHelper((helper: DocumentsHelper & UsersHelper) => ({
+    documents: helper.getDocumentsMap(),
+    userAdmin: helper.getMe()?.user_admin,
+  }));
 
   useDataLoader(() => {
-    dispatch(fetchTeams());
+    dispatch(fetchDocuments());
   });
 
   const [open, setopen] = useState(false);
   const [keyword, setKeyword] = useState('');
-  const [teamsIds, setTeamsIds] = useState<string[]>([]);
+  const [documentsIds, setDocumentsIds] = useState<string[]>([]);
   const [tags, setTags] = useState<Option[]>([]);
 
   const handleOpen = () => setopen(true);
@@ -77,10 +77,10 @@ const InjectAddTeams: FunctionComponent<Props> = ({
   const handleClose = () => {
     setopen(false);
     setKeyword('');
-    setTeamsIds([]);
+    setDocumentsIds([]);
   };
 
-  const handleSearchTeams = (value: string) => {
+  const handleSearchDocuments = (value: string) => {
     setKeyword(value);
   };
 
@@ -90,45 +90,43 @@ const InjectAddTeams: FunctionComponent<Props> = ({
     }
   };
 
-  const handleClearTag = () => {
-    setTags([]);
-  };
+  const handleClearTag = () => setTags([]);
 
-  const addTeam = (teamId: string) => {
-    setTeamsIds(R.append(teamId, teamsIds));
-  };
+  const addDocument = (documentId: string) => setDocumentsIds(R.append(documentId, documentsIds));
 
-  const removeTeam = (teamId: string) => {
-    setTeamsIds(teamsIds.filter((u) => u !== teamId));
-  };
+  const removeDocument = (documentId: string) => setDocumentsIds(documentsIds.filter((u) => u !== documentId));
 
-  const submitAddTeams = () => {
-    handleAddTeams(teamsIds);
+  const submitAddDocuments = () => {
+    handleAddDocuments(documentsIds.map((n: string) => ({
+      document_id: n,
+      document_attached: hasAttachments,
+    })));
     handleClose();
   };
 
-  const onCreate = async (result: string) => {
-    addTeam(result);
-    await onAddTeam?.(result);
+  const onCreate = (result: string) => {
+    addDocument(result);
   };
 
-  const filterByKeyword = (n: TeamStore) => keyword === ''
-    || (n.team_name || '').toLowerCase().indexOf(keyword.toLowerCase())
+  const filterByKeyword = (n: Document) => keyword === ''
+    || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
     !== -1
-    || (n.team_description || '')
+    || (n.document_description || '')
       .toLowerCase()
-      .indexOf(keyword.toLowerCase()) !== -1;
-  const filteredTeams = R.pipe(
+      .indexOf(keyword.toLowerCase()) !== -1
+    || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
+    !== -1;
+  const filteredDocuments = R.pipe(
     R.filter(
-      (n: TeamStore) => tags.length === 0
+      (n: Document) => tags.length === 0
         || R.any(
-          (filter: string) => R.includes(filter, n.team_tags),
+          (filter: string) => R.includes(filter, n.document_tags),
           R.pluck('id', tags),
         ),
     ),
     R.filter(filterByKeyword),
     R.take(10),
-  )(teams);
+  )(Object.values(documents));
   return (
     <div>
       <ListItem
@@ -137,13 +135,13 @@ const InjectAddTeams: FunctionComponent<Props> = ({
         divider
         onClick={handleOpen}
         color="primary"
-        disabled={permissions.readOnly || disabled}
+        disabled={permissions.readOnly}
       >
         <ListItemIcon color="primary">
           <ControlPointOutlined color="primary" />
         </ListItemIcon>
         <ListItemText
-          primary={t('Add target teams')}
+          primary={t('Add documents')}
           classes={{ primary: classes.text }}
         />
       </ListItem>
@@ -161,14 +159,14 @@ const InjectAddTeams: FunctionComponent<Props> = ({
           },
         }}
       >
-        <DialogTitle>{t('Add target teams in this inject')}</DialogTitle>
+        <DialogTitle>{t('Add documents in this inject')}</DialogTitle>
         <DialogContent>
           <Grid container spacing={3} style={{ marginTop: -15 }}>
             <Grid item xs={8}>
               <Grid container spacing={3}>
                 <Grid item xs={6}>
                   <SearchFilter
-                    onChange={handleSearchTeams}
+                    onChange={handleSearchDocuments}
                     fullWidth
                   />
                 </Grid>
@@ -182,48 +180,50 @@ const InjectAddTeams: FunctionComponent<Props> = ({
                 </Grid>
               </Grid>
               <List>
-                {filteredTeams.map((team: TeamStore) => {
-                  const teamDisabled = teamsIds.includes(team.team_id)
-                    || injectTeamsIds.includes(team.team_id);
+                {filteredDocuments.map((document: Document) => {
+                  const disabled = documentsIds.includes(document.document_id)
+                    || injectDocumentsIds.includes(document.document_id);
                   return (
                     <ListItem
-                      key={team.team_id}
-                      disabled={teamDisabled}
+                      key={document.document_id}
+                      disabled={disabled}
                       button
                       divider
                       dense
-                      onClick={() => addTeam(team.team_id)}
+                      onClick={() => addDocument(document.document_id)}
                     >
                       <ListItemIcon>
-                        <GroupsOutlined />
+                        <DescriptionOutlined />
                       </ListItemIcon>
                       <ListItemText
-                        primary={team.team_name}
-                        secondary={team.team_description}
+                        primary={document.document_name}
+                        secondary={document.document_description}
                       />
                       <ItemTags
                         variant="list"
-                        tags={team.team_tags}
+                        tags={document.document_tags}
                       />
                     </ListItem>
                   );
                 })}
-                <CreateTeam
-                  inline
-                  onCreate={onCreate}
-                />
+                {userAdmin && (
+                  <CreateDocument
+                    inline
+                    onCreate={onCreate}
+                  />
+                )}
               </List>
             </Grid>
             <Grid item xs={4}>
               <Box className={classes.box}>
-                {teamsIds.map((teamId) => {
-                  const team = teamsMap[teamId];
+                {documentsIds.map((documentId) => {
+                  const document = documents[documentId];
                   return (
                     <Chip
-                      key={teamId}
-                      onDelete={() => removeTeam(teamId)}
-                      label={truncate(team?.team_name || '', 22)}
-                      icon={<GroupsOutlined />}
+                      key={documentId}
+                      onDelete={() => removeDocument(documentId)}
+                      label={truncate(document.document_name, 22)}
+                      icon={<DescriptionOutlined />}
                       classes={{ root: classes.chip }}
                     />
                   );
@@ -236,7 +236,7 @@ const InjectAddTeams: FunctionComponent<Props> = ({
           <Button onClick={handleClose}>{t('Cancel')}</Button>
           <Button
             color="secondary"
-            onClick={submitAddTeams}
+            onClick={submitAddDocuments}
           >
             {t('Add')}
           </Button>
@@ -245,4 +245,5 @@ const InjectAddTeams: FunctionComponent<Props> = ({
     </div>
   );
 };
-export default InjectAddTeams;
+
+export default InjectAddDocuments;

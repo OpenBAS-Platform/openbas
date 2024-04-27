@@ -17,7 +17,7 @@ import { useHelper } from '../../../../store';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import { exportData } from '../../../../utils/Environment';
 import Loader from '../../../../components/Loader';
-import { InjectContext, PermissionsContext } from '../Context';
+import { InjectContext, PermissionsContext } from '../../components/Context';
 import CreateInject from './CreateInject';
 import UpdateInject from './UpdateInject';
 import useDataLoader from '../../../../utils/ServerSideEvent';

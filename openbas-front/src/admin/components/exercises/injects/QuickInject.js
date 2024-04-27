@@ -39,17 +39,17 @@ import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
 import TeamPopover from '../../components/teams/TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
-import InjectAddTeams from '../../components/injects/InjectAddTeams';
+import InjectAddTeams from '../../common/injects/InjectAddTeams';
 import { isExerciseReadOnly, isExerciseUpdatable, secondsFromToNow } from '../../../../utils/Exercise';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import SwitchField from '../../../../components/SwitchField';
 import EnrichedTextField from '../../../../components/EnrichedTextField';
-import InjectAddDocuments from '../../components/injects/InjectAddDocuments';
+import InjectAddDocuments from '../../common/injects/InjectAddDocuments';
 import DocumentType from '../../components/documents/DocumentType';
 import DocumentPopover from '../../components/documents/DocumentPopover';
 import SelectField from '../../../../components/SelectField';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
-import InjectExpectations from '../../components/injects/expectations/InjectExpectations';
+import InjectExpectations from '../../common/injects/expectations/InjectExpectations';
 import { fetchExerciseTeams } from '../../../../actions/Exercise';
 import { fetchVariablesForExercise } from '../../../../actions/variables/variable-actions';
 
@@ -489,7 +489,7 @@ class QuickInject extends Component {
                   disabled={isExerciseReadOnly(exercise)}
                 />
               ) : (
-                <TextField
+                <OldTextField
                   variant="standard"
                   key={field.key}
                   name={field.key}
@@ -503,7 +503,7 @@ class QuickInject extends Component {
               );
             case 'number':
               return (
-                <TextField
+                <OldTextField
                   variant="standard"
                   key={field.key}
                   name={field.key}
@@ -586,7 +586,7 @@ class QuickInject extends Component {
                                     </MenuItem>
                                   )}
                                 </SelectField>
-                                <TextField
+                                <OldTextField
                                   variant="standard"
                                   name={`${name}.key`}
                                   fullWidth={true}
@@ -619,7 +619,7 @@ class QuickInject extends Component {
                                     ))}
                                   </SelectField>
                                   ) : (
-                                    <TextField
+                                    <OldTextField
                                       variant="standard"
                                       name={`${name}.value`}
                                       fullWidth={true}
@@ -745,7 +745,7 @@ class QuickInject extends Component {
               );
             default:
               return (
-                <TextField
+                <OldTextField
                   variant="standard"
                   key={field.key}
                   name={field.key}
@@ -882,7 +882,7 @@ class QuickInject extends Component {
           }
         }
       });
-    // Specific processing for some field
+    // Specific processing for some fields
     injectorContract.fields
       .filter((f) => !builtInFields.includes(f.key))
       .forEach((field) => {

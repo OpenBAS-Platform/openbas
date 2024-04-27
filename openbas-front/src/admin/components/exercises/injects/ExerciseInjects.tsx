@@ -16,7 +16,7 @@ import {
 } from '../../../../actions/Inject';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import Injects from '../../components/injects/Injects';
+import Injects from '../../common/injects/Injects';
 import { secondsFromToNow } from '../../../../utils/Exercise';
 import { fetchExerciseTeams } from '../../../../actions/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
@@ -29,8 +29,8 @@ import { fetchExerciseArticles } from '../../../../actions/channels/article-acti
 import { articleContextForExercise } from '../articles/ExerciseArticles';
 import { teamContextForExercise } from '../teams/ExerciseTeams';
 import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
-import InjectDistributionByType from '../../components/injects/InjectDistributionByType';
-import InjectDistributionByTeam from '../../components/injects/InjectDistributionByTeam';
+import InjectDistributionByType from '../../common/injects/InjectDistributionByType';
+import InjectDistributionByTeam from '../../common/injects/InjectDistributionByTeam';
 import ExerciseDistributionScoreByTeamInPercentage from '../exercise/overview/ExerciseDistributionScoreByTeamInPercentage';
 import ExerciseDistributionScoreOverTimeByInjectorContract from '../exercise/overview/ExerciseDistributionScoreOverTimeByInjectorContract';
 import ExerciseDistributionScoreOverTimeByTeam from '../exercise/overview/ExerciseDistributionScoreOverTimeByTeam';

@@ -72,7 +72,7 @@ body[data-theme="light"] {
   --ck-color-input-disabled-border: rgba(255, 255, 255, 0.5) !important;
   --ck-color-input-disabled-text: hsl(240, 3%, 31%) !important;
 
-  /* -- Overrides the default .ck-labeled-field-view class colors. ---------------------------- */
+  /* -- Overrides the default .ck-labeled-fields-view class colors. ---------------------------- */
 
   --ck-color-labeled-field-label-background: var(
     --ck-custom-background

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form } from 'react-final-form';
 import { Button, Grid } from '@mui/material';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import CheckboxField from '../../../../components/CheckboxField';
 
@@ -32,13 +32,13 @@ const ReportForm = (props) => {
     >
       {({ handleSubmit, submitting, errors }) => (
         <form id="reportFm" onSubmit={handleSubmit}>
-          <TextField
+          <OldTextField
             variant="standard"
             name="report_name"
             fullWidth={true}
             label={t('Name')}
           />
-          <TextField
+          <OldTextField
             variant="standard"
             name="report_description"
             fullWidth={true}

@@ -14,12 +14,12 @@ import Empty from '../../../../components/Empty';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import InjectIcon from '../../components/injects/InjectIcon';
+import InjectIcon from '../../common/injects/InjectIcon';
 import { splitDuration } from '../../../../utils/Time';
-import InjectPopover from '../../components/injects/InjectPopover';
-import InjectStatus from '../../components/injects/InjectStatus';
+import InjectPopover from '../../common/injects/InjectPopover';
+import InjectStatus from '../../common/injects/InjectStatus';
 import { truncate } from '../../../../utils/String';
-import InjectStatusDetails from '../../components/injects/InjectStatusDetails';
+import InjectStatusDetails from '../../common/injects/InjectStatusDetails';
 import ProgressBarCountdown from '../../../../components/ProgressBarCountdown';
 import AnimationMenu from '../AnimationMenu';
 import { usePermissions } from '../../../../utils/Exercise';
@@ -28,7 +28,7 @@ import { fetchVariablesForExercise } from '../../../../actions/variables/variabl
 import InjectOverTimeArea from './InjectOverTimeArea';
 import InjectOverTimeLine from './InjectOverTimeLine';
 import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
-import UpdateInject from '../../components/injects/UpdateInject';
+import UpdateInject from '../../common/injects/UpdateInject';
 
 const useStyles = makeStyles(() => ({
   root: {

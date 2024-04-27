@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import inject18n from '../../../../components/i18n';
 import EnrichedTextField from '../../../../components/EnrichedTextField';
 
@@ -35,7 +35,7 @@ class SendLessonsForm extends Component {
       >
         {({ handleSubmit, submitting, errors }) => (
           <form id="sendLessonsForm" onSubmit={handleSubmit}>
-            <TextField
+            <OldTextField
               variant="standard"
               name="subject"
               fullWidth={true}

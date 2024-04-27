@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useContext } from 'react';
 import { Button } from '@mui/material';
 import InjectDefinition from './InjectDefinition';
-import { PermissionsContext } from '../Context';
+import { PermissionsContext } from '../../components/Context';
 import type { Inject, Tag } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';

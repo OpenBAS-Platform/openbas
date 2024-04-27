@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { MenuItem, Button } from '@mui/material';
 import SelectField from '../../../components/SelectField';
 import inject18n from '../../../components/i18n';
-import TextField from '../../../components/TextField';
+import OldTextField from '../../../components/OldTextField';
 
 const ParametersForm = (props) => {
   const { t, onSubmit, initialValues } = props;
@@ -16,7 +16,7 @@ const ParametersForm = (props) => {
     >
       {({ handleSubmit, pristine, submitting }) => (
         <form id="parametersForm" onSubmit={handleSubmit}>
-          <TextField
+          <OldTextField
             variant="standard"
             name="platform_name"
             fullWidth={true}

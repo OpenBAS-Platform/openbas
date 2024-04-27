@@ -4,7 +4,7 @@ import Drawer from '../../../../components/common/Drawer';
 import InjectDefinition from './InjectDefinition';
 import { tagOptions } from '../../../../utils/Option';
 import { useFormatter } from '../../../../components/i18n';
-import { PermissionsContext } from '../Context';
+import { PermissionsContext } from '../../components/Context';
 import type { Inject, InjectorContract, Tag } from '../../../../utils/api-types';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import { useHelper } from '../../../../store';

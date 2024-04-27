@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button, Grid, Tooltip, Typography } from '@mui/material';
 import { InfoOutlined } from '@mui/icons-material';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import inject18n from '../../../../components/i18n';
 import SwitchField from '../../../../components/SwitchField';
 
@@ -31,14 +31,14 @@ class GroupForm extends Component {
       >
         {({ handleSubmit, pristine, submitting }) => (
           <form id="groupForm" onSubmit={handleSubmit}>
-            <TextField
+            <OldTextField
               variant="standard"
               name="group_name"
               fullWidth
               label={t('Name')}
               style={{ marginTop: 10 }}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="group_description"
               fullWidth

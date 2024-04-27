@@ -14,7 +14,7 @@ import { addInjectForScenario, deleteInjectScenario, fetchScenarioInjects, updat
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
 import type { Inject } from '../../../../../utils/api-types';
-import Injects from '../../../components/injects/Injects';
+import Injects from '../../../common/injects/Injects';
 import { articleContextForScenario } from '../articles/ScenarioArticles';
 import { teamContextForScenario } from '../teams/ScenarioTeams';
 

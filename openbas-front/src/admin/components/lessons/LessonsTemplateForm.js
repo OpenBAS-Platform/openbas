@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import TextField from '../../../components/TextField';
+import OldTextField from '../../../components/OldTextField';
 import { useFormatter } from '../../../components/i18n';
 
 const LessonsTemplateForm = (props) => {
@@ -31,13 +31,13 @@ const LessonsTemplateForm = (props) => {
     >
       {({ handleSubmit, submitting, errors }) => (
         <form id="lessonsTemplateForm" onSubmit={handleSubmit}>
-          <TextField
+          <OldTextField
             variant="standard"
             name="lessons_template_name"
             fullWidth={true}
             label={t('Name')}
           />
-          <TextField
+          <OldTextField
             variant="standard"
             name="lessons_template_description"
             fullWidth={true}

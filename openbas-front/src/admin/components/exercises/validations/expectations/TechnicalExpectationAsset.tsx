@@ -3,12 +3,12 @@ import { Alert, Button, List, ListItem, ListItemIcon, ListItemText } from '@mui/
 import { makeStyles } from '@mui/styles';
 import { KeyboardArrowRightOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
-import type { InjectExpectationsStore } from '../../../components/injects/expectations/Expectation';
+import type { InjectExpectationsStore } from '../../../common/injects/expectations/Expectation';
 import ExpectationLine from './ExpectationLine';
 import Drawer from '../../../../../components/common/Drawer';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
-import { typeIcon } from '../../../components/injects/expectations/ExpectationUtils';
+import { typeIcon } from '../../../common/injects/expectations/ExpectationUtils';
 import { truncate } from '../../../../../utils/String';
 import type { InjectExpectationResult } from '../../../../../utils/api-types';
 import type { Contract } from '../../../../../actions/contract/contract';

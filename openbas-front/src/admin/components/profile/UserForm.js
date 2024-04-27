@@ -3,7 +3,7 @@ import { Form } from 'react-final-form';
 import { MenuItem, Button } from '@mui/material';
 import { z } from 'zod';
 import SelectField from '../../../components/SelectField';
-import TextField from '../../../components/TextField';
+import OldTextField from '../../../components/OldTextField';
 import { useFormatter } from '../../../components/i18n';
 import OrganizationField from '../../../components/OrganizationField';
 import CountryField from '../../../components/CountryField';
@@ -32,21 +32,21 @@ const UserForm = ({ onSubmit, initialValues }) => {
     >
       {({ form, handleSubmit, pristine, submitting, values }) => (
         <form id="userForm" onSubmit={handleSubmit}>
-          <TextField
+          <OldTextField
             variant="standard"
             name="user_email"
             fullWidth={true}
             label={t('Email address')}
             disabled={initialValues.user_is_external}
           />
-          <TextField
+          <OldTextField
             variant="standard"
             name="user_firstname"
             fullWidth={true}
             label={t('Firstname')}
             style={{ marginTop: 20 }}
           />
-          <TextField
+          <OldTextField
             variant="standard"
             name="user_lastname"
             fullWidth={true}

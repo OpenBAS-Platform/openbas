@@ -7,7 +7,7 @@ import { InfoOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import type { AssetGroupInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
-import TagField from '../../../../components/field/TagField';
+import TagField from '../../../../components/fields/TagField';
 import FilterField from '../../../../components/common/filter/FilterField';
 import { emptyFilterGroup } from '../../../../components/common/filter/FilterUtils';
 

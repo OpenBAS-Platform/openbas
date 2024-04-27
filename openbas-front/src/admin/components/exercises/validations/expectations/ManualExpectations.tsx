@@ -5,7 +5,7 @@ import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import type { Team, Inject } from '../../../../../utils/api-types';
 import { useHelper } from '../../../../../store';
-import type { InjectExpectationsStore } from '../../../components/injects/expectations/Expectation';
+import type { InjectExpectationsStore } from '../../../common/injects/expectations/Expectation';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import colorStyles from '../../../../../components/Color';

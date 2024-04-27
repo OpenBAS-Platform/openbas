@@ -15,7 +15,7 @@ import Empty from '../../../components/Empty';
 import { addLessonsAnswers, fetchPlayerLessonsAnswers, fetchPlayerLessonsCategories, fetchPlayerLessonsQuestions } from '../../../actions/Lessons';
 import { fetchPlayerExercise } from '../../../actions/Exercise';
 import SliderField from '../../../components/SliderField';
-import TextField from '../../../components/TextField';
+import OldTextField from '../../../components/OldTextField';
 import Transition from '../../../components/common/Transition';
 
 const useStyles = makeStyles(() => ({
@@ -262,7 +262,7 @@ const LessonsPlayer = () => {
                               <Typography variant="h4">
                                 {t('What worked well')}
                               </Typography>
-                              <TextField
+                              <OldTextField
                                 disabled={lessonsAnswers.length > 0}
                                 style={{ marginTop: 10 }}
                                 name={`${question.lessonsquestion_id}_positive`}
@@ -276,7 +276,7 @@ const LessonsPlayer = () => {
                               <Typography variant="h4">
                                 {t("What didn't work well")}
                               </Typography>
-                              <TextField
+                              <OldTextField
                                 disabled={lessonsAnswers.length > 0}
                                 style={{ marginTop: 10 }}
                                 name={`${question.lessonsquestion_id}_negative`}

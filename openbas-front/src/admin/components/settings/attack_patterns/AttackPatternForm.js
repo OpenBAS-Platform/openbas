@@ -2,7 +2,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import KillChainPhaseField from '../../../../components/KillChainPhaseField';
 
@@ -33,7 +33,7 @@ const AttackPatternForm = (props) => {
     >
       {({ handleSubmit, form, values, submitting, pristine }) => (
         <form id="attackPatternForm" onSubmit={handleSubmit}>
-          <TextField
+          <OldTextField
             name="attack_pattern_external_id"
             fullWidth={true}
             label={t('External ID')}
@@ -46,13 +46,13 @@ const AttackPatternForm = (props) => {
             setFieldValue={form.mutators.setValue}
             style={{ marginTop: 20 }}
           />
-          <TextField
+          <OldTextField
             name="attack_pattern_name"
             fullWidth={true}
             label={t('Name')}
             style={{ marginTop: 20 }}
           />
-          <TextField
+          <OldTextField
             name="attack_pattern_description"
             multiline={true}
             fullWidth={true}

@@ -1,11 +1,12 @@
 import React, { FunctionComponent } from 'react';
-import { Button, TextField } from '@mui/material';
+import { Button } from '@mui/material';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useFormatter } from '../../../components/i18n';
 import type { ExerciseUpdateInput } from '../../../utils/api-types';
 import { zodImplement } from '../../../utils/Zod';
+import TextField from '../../../components/fields/TextField';
 
 interface Props {
   onSubmit: SubmitHandler<ExerciseUpdateInput>;
@@ -24,11 +25,12 @@ const ExerciseUpdateForm: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
+    setValue,
   } = useForm<ExerciseUpdateInput>({
     mode: 'onTouched',
     resolver: zodResolver(
@@ -51,6 +53,9 @@ const ExerciseUpdateForm: FunctionComponent<Props> = ({
         helperText={errors.exercise_name?.message}
         inputProps={register('exercise_name')}
         InputLabelProps={{ required: true }}
+        control={control}
+        setValue={setValue}
+        askAi={true}
       />
       <TextField
         variant="standard"
@@ -60,6 +65,9 @@ const ExerciseUpdateForm: FunctionComponent<Props> = ({
         error={!!errors.exercise_subtitle}
         helperText={errors.exercise_subtitle?.message}
         inputProps={register('exercise_subtitle')}
+        control={control}
+        setValue={setValue}
+        askAi={true}
       />
       <TextField
         variant="standard"
@@ -71,6 +79,9 @@ const ExerciseUpdateForm: FunctionComponent<Props> = ({
         error={!!errors.exercise_description}
         helperText={errors.exercise_description?.message}
         inputProps={register('exercise_description')}
+        control={control}
+        setValue={setValue}
+        askAi={true}
       />
 
       <div style={{ float: 'right', marginTop: 20 }}>

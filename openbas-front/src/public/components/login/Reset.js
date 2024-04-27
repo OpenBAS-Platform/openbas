@@ -5,7 +5,7 @@ import { Form } from 'react-final-form';
 import { makeStyles } from '@mui/styles';
 import { askReset, resetPassword, validateResetToken } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';
-import TextField from '../../../components/TextField';
+import OldTextField from '../../../components/OldTextField';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -59,7 +59,7 @@ const Reset = ({ onCancel }) => {
             >
               {({ handleSubmit, submitting, pristine }) => (
                 <form onSubmit={handleSubmit}>
-                  <TextField
+                  <OldTextField
                     name="username"
                     type="text"
                     variant="standard"
@@ -87,7 +87,7 @@ const Reset = ({ onCancel }) => {
             >
               {({ handleSubmit, submitting, pristine }) => (
                 <form onSubmit={handleSubmit}>
-                  <TextField
+                  <OldTextField
                     name="code"
                     type="text"
                     variant="standard"
@@ -116,7 +116,7 @@ const Reset = ({ onCancel }) => {
             >
               {({ handleSubmit, submitting, pristine }) => (
                 <form onSubmit={handleSubmit}>
-                  <TextField
+                  <OldTextField
                     name="password"
                     type="password"
                     variant="standard"
@@ -124,7 +124,7 @@ const Reset = ({ onCancel }) => {
                     fullWidth={true}
                     style={{ marginTop: 5 }}
                   />
-                  <TextField
+                  <OldTextField
                     name="password_validation"
                     type="password"
                     variant="standard"

@@ -4,7 +4,7 @@ import { Button, InputAdornment, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { z } from 'zod';
 import { InfoOutlined } from '@mui/icons-material';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 import OrganizationField from '../../../../components/OrganizationField';
@@ -71,21 +71,21 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
     >
       {({ handleSubmit, form, values, submitting, pristine }) => (
         <form id="playerForm" onSubmit={handleSubmit}>
-          <TextField
+          <OldTextField
             variant="standard"
             name="user_email"
             fullWidth={true}
             label={t('Email address')}
             disabled={editing && !canUpdateEmail}
           />
-          <TextField
+          <OldTextField
             variant="standard"
             name="user_firstname"
             fullWidth={true}
             label={t('Firstname')}
             style={{ marginTop: 20 }}
           />
-          <TextField
+          <OldTextField
             variant="standard"
             name="user_lastname"
             fullWidth={true}
@@ -103,7 +103,7 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
             setFieldValue={form.mutators.setValue}
           />
           {editing && (
-            <TextField
+            <OldTextField
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="start">
@@ -121,7 +121,7 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
             />
           )}
           {editing && (
-            <TextField
+            <OldTextField
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="start">
@@ -140,7 +140,7 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
 
           )}
           {editing && (
-            <TextField
+            <OldTextField
               variant="standard"
               name="user_pgp_key"
               fullWidth={true}

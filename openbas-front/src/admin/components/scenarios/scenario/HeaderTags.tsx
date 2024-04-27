@@ -5,7 +5,7 @@ import * as R from 'ramda';
 import React, { FunctionComponent, useState } from 'react';
 import Transition from '../../../../components/common/Transition';
 import TagField from '../../../../components/TagField';
-import TagChip from '../../components/tags/TagChip';
+import TagChip from '../../common/tags/TagChip';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import { Option } from '../../../../utils/Option';

@@ -1,13 +1,14 @@
 import React, { FunctionComponent } from 'react';
-import { Button, TextField } from '@mui/material';
+import { Button } from '@mui/material';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
 import { useFormatter } from '../../../components/i18n';
-import TagField from '../../../components/field/TagField';
+import TagField from '../../../components/fields/TagField';
 import type { ExerciseCreateInput } from '../../../utils/api-types';
 import { zodImplement } from '../../../utils/Zod';
+import TextField from '../../../components/fields/TextField';
 
 interface Props {
   onSubmit: SubmitHandler<ExerciseCreateInput>;
@@ -34,6 +35,7 @@ const ExerciseCreationForm: FunctionComponent<Props> = ({
     control,
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
+    setValue,
   } = useForm<ExerciseCreateInput>({
     mode: 'onTouched',
     resolver: zodResolver(
@@ -58,6 +60,9 @@ const ExerciseCreationForm: FunctionComponent<Props> = ({
         helperText={errors.exercise_name?.message}
         inputProps={register('exercise_name')}
         InputLabelProps={{ required: true }}
+        control={control}
+        setValue={setValue}
+        askAi={true}
       />
       <TextField
         variant="standard"
@@ -67,6 +72,9 @@ const ExerciseCreationForm: FunctionComponent<Props> = ({
         error={!!errors.exercise_subtitle}
         helperText={errors.exercise_subtitle?.message}
         inputProps={register('exercise_subtitle')}
+        control={control}
+        setValue={setValue}
+        askAi={true}
       />
       <TextField
         variant="standard"
@@ -78,6 +86,9 @@ const ExerciseCreationForm: FunctionComponent<Props> = ({
         error={!!errors.exercise_description}
         helperText={errors.exercise_description?.message}
         inputProps={register('exercise_description')}
+        control={control}
+        setValue={setValue}
+        askAi={true}
       />
       <Controller
         control={control}

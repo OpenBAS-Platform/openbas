@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import inject18n from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 
@@ -34,13 +34,13 @@ class LogForm extends Component {
       >
         {({ handleSubmit, form, values, submitting, pristine }) => (
           <form id="logForm" onSubmit={handleSubmit}>
-            <TextField
+            <OldTextField
               variant="standard"
               name="log_title"
               fullWidth={true}
               label={t('Title')}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="log_content"
               fullWidth={true}

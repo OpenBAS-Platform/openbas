@@ -1,7 +1,7 @@
 import React, { FunctionComponent, ReactElement } from 'react';
 import { ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import type { InjectExpectationsStore } from '../../../components/injects/expectations/Expectation';
+import type { InjectExpectationsStore } from '../../../common/injects/expectations/Expectation';
 import type { Theme } from '../../../../../components/Theme';
 import ResultChip from './ResultChip';
 

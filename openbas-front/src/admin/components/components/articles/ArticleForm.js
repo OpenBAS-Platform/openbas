@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import Autocomplete from '../../../../components/Autocomplete';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
@@ -220,13 +220,13 @@ const ArticleForm = ({
               )}
               classes={{ clearIndicator: classes.autoCompleteIndicator }}
             />
-            <TextField
+            <OldTextField
               name="article_name"
               fullWidth
               style={{ marginTop: 20 }}
               label={t('Title')}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="article_author"
               fullWidth
@@ -241,7 +241,7 @@ const ArticleForm = ({
             />
             <Grid container spacing={3} style={{ marginTop: 0 }}>
               <Grid item xs={4}>
-                <TextField
+                <OldTextField
                   variant="standard"
                   name="article_comments"
                   fullWidth
@@ -250,7 +250,7 @@ const ArticleForm = ({
                 />
               </Grid>
               <Grid item xs={4}>
-                <TextField
+                <OldTextField
                   variant="standard"
                   name="article_shares"
                   fullWidth
@@ -259,7 +259,7 @@ const ArticleForm = ({
                 />
               </Grid>
               <Grid item xs={4}>
-                <TextField
+                <OldTextField
                   variant="standard"
                   name="article_likes"
                   fullWidth

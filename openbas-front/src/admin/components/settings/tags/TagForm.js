@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import DeprecatedColorPickerField from '../../../../components/DeprecatedColorPickerField';
 import inject18n from '../../../../components/i18n';
 
@@ -30,7 +30,7 @@ class TagForm extends Component {
       >
         {({ handleSubmit, pristine, submitting }) => (
           <form id="tagForm" onSubmit={handleSubmit}>
-            <TextField
+            <OldTextField
               name="tag_name"
               fullWidth={true}
               label={t('Value')}

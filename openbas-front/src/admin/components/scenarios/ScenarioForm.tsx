@@ -2,11 +2,12 @@ import React, { FunctionComponent } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button, TextField } from '@mui/material';
+import { Button } from '@mui/material';
 import { zodImplement } from '../../../utils/Zod';
 import type { ScenarioInput } from '../../../utils/api-types';
 import { useFormatter } from '../../../components/i18n';
-import TagField from '../../../components/field/TagField';
+import TagField from '../../../components/fields/TagField';
+import TextField from '../../../components/fields/TextField';
 
 interface Props {
   onSubmit: SubmitHandler<ScenarioInput>;
@@ -34,6 +35,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
     control,
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
+    setValue,
   } = useForm<ScenarioInput>({
     mode: 'onTouched',
     resolver: zodResolver(
@@ -56,6 +58,9 @@ const ScenarioForm: FunctionComponent<Props> = ({
         helperText={errors.scenario_name?.message}
         inputProps={register('scenario_name')}
         InputLabelProps={{ required: true }}
+        control={control}
+        setValue={setValue}
+        askAi={true}
       />
       <TextField
         variant="standard"
@@ -65,6 +70,9 @@ const ScenarioForm: FunctionComponent<Props> = ({
         error={!!errors.scenario_subtitle}
         helperText={errors.scenario_subtitle?.message}
         inputProps={register('scenario_subtitle')}
+        control={control}
+        setValue={setValue}
+        askAi={true}
       />
       <TextField
         variant="standard"
@@ -76,6 +84,9 @@ const ScenarioForm: FunctionComponent<Props> = ({
         error={!!errors.scenario_description}
         helperText={errors.scenario_description?.message}
         inputProps={register('scenario_description')}
+        control={control}
+        setValue={setValue}
+        askAi={true}
       />
       <Controller
         control={control}
@@ -94,6 +105,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
 
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button
+          variant="contained"
           onClick={handleClose}
           style={{ marginRight: 10 }}
           disabled={isSubmitting}
@@ -101,6 +113,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
           {t('Cancel')}
         </Button>
         <Button
+          variant="contained"
           color="secondary"
           type="submit"
           disabled={!isDirty || isSubmitting}

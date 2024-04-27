@@ -2,7 +2,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import SwitchField from '../../../../components/SwitchField';
 import TagField from '../../../../components/TagField';
@@ -37,20 +37,20 @@ const UserForm = (props) => {
     >
       {({ handleSubmit, form, values, submitting, pristine }) => (
         <form id="userForm" onSubmit={handleSubmit}>
-          <TextField
+          <OldTextField
             name="user_email"
             fullWidth={true}
             label={t('Email address')}
             disabled={initialValues.user_email === 'admin@openbas.io'}
             style={{ marginTop: 10 }}
           />
-          <TextField
+          <OldTextField
             name="user_firstname"
             fullWidth={true}
             label={t('Firstname')}
             style={{ marginTop: 20 }}
           />
-          <TextField
+          <OldTextField
             name="user_lastname"
             fullWidth={true}
             label={t('Lastname')}
@@ -62,7 +62,7 @@ const UserForm = (props) => {
             setFieldValue={form.mutators.setValue}
           />
           {!editing && (
-            <TextField
+            <OldTextField
               variant="standard"
               name="user_plain_password"
               fullWidth={true}
@@ -72,7 +72,7 @@ const UserForm = (props) => {
             />
           )}
           {editing && (
-            <TextField
+            <OldTextField
               variant="standard"
               name="user_phone"
               fullWidth={true}
@@ -81,7 +81,7 @@ const UserForm = (props) => {
             />
           )}
           {editing && (
-            <TextField
+            <OldTextField
               variant="standard"
               name="user_phone2"
               fullWidth={true}
@@ -90,7 +90,7 @@ const UserForm = (props) => {
             />
           )}
           {editing && (
-            <TextField
+            <OldTextField
               variant="standard"
               name="user_pgp_key"
               fullWidth={true}

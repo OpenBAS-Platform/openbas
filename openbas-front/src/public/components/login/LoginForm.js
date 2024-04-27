@@ -2,7 +2,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import TextField from '../../../components/TextField';
+import OldTextField from '../../../components/OldTextField';
 import inject18n from '../../../components/i18n';
 
 const LoginForm = (props) => {
@@ -22,7 +22,7 @@ const LoginForm = (props) => {
       <Form onSubmit={onSubmit} validate={validate}>
         {({ handleSubmit, submitting, pristine }) => (
           <form onSubmit={handleSubmit}>
-            <TextField
+            <OldTextField
               name="username"
               type="text"
               variant="standard"
@@ -30,7 +30,7 @@ const LoginForm = (props) => {
               fullWidth={true}
               style={{ marginTop: 5 }}
             />
-            <TextField
+            <OldTextField
               name="password"
               type="password"
               variant="standard"

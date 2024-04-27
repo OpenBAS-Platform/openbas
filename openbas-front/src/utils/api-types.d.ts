@@ -1955,7 +1955,7 @@ export interface SearchPaginationInput {
    * @max 100
    */
   size?: number;
-  /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
+  /** List of sort fields : a fields is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
   sorts?: SortField[];
   /** Text to search within searchable attributes */
   textSearch?: string;
@@ -2002,7 +2002,7 @@ export interface SimpleExpectationResultOutput {
   target_result_type: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
 }
 
-/** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
+/** List of sort fields : a fields is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
 export interface SortField {
   direction?: string;
   property?: string;

@@ -7,7 +7,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import Dialog from '../../../../../components/common/Dialog';
 import ExpectationFormCreate from './ExpectationFormCreate';
 import type { ExpectationInput } from './Expectation';
-import { PermissionsContext } from '../../Context';
+import { PermissionsContext } from '../../../components/Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {

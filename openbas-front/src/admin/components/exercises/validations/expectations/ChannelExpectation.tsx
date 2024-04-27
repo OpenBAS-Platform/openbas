@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import type { Article, Channel } from '../../../../../utils/api-types';
-import type { InjectExpectationsStore } from '../../../components/injects/expectations/Expectation';
+import type { InjectExpectationsStore } from '../../../common/injects/expectations/Expectation';
 import ChannelIcon from '../../../components/channels/ChannelIcon';
 import ExpectationLine from './ExpectationLine';
 

@@ -2,7 +2,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import TextField from '../../../components/TextField';
+import OldTextField from '../../../components/OldTextField';
 import { useFormatter } from '../../../components/i18n';
 import AttackPatternField from '../../../components/AttackPatternField';
 
@@ -33,7 +33,7 @@ const MitigationForm = (props) => {
     >
       {({ handleSubmit, form, values, submitting, pristine }) => (
         <form id="mitigationForm" onSubmit={handleSubmit}>
-          <TextField
+          <OldTextField
             name="mitigation_external_id"
             fullWidth={true}
             label={t('External ID')}
@@ -46,13 +46,13 @@ const MitigationForm = (props) => {
             setFieldValue={form.mutators.setValue}
             style={{ marginTop: 20 }}
           />
-          <TextField
+          <OldTextField
             name="mitigation_name"
             fullWidth={true}
             label={t('Name')}
             style={{ marginTop: 20 }}
           />
-          <TextField
+          <OldTextField
             name="mitigation_description"
             multiline={true}
             fullWidth={true}

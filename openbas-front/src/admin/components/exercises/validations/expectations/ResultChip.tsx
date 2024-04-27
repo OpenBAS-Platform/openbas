@@ -4,7 +4,7 @@ import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import colorStyles from '../../../../../components/Color';
 import { useFormatter } from '../../../../../components/i18n';
-import type { InjectExpectationsStore } from '../../../components/injects/expectations/Expectation';
+import type { InjectExpectationsStore } from '../../../common/injects/expectations/Expectation';
 
 const useStyles = makeStyles(() => ({
   chipInList: {

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import TextField from '../../../components/TextField';
+import OldTextField from '../../../components/OldTextField';
 import inject18n from '../../../components/i18n';
 
 class ProfileForm extends Component {
@@ -16,20 +16,20 @@ class ProfileForm extends Component {
       >
         {({ handleSubmit, pristine, submitting }) => (
           <form id="profileForm" onSubmit={handleSubmit}>
-            <TextField
+            <OldTextField
               variant="standard"
               name="user_phone"
               fullWidth={true}
               label={t('Phone number (mobile)')}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="user_phone2"
               fullWidth={true}
               label={t('Phone number (landline)')}
               style={{ marginTop: 20 }}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="user_pgp_key"
               fullWidth={true}

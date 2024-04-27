@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import inject18n from '../../../../components/i18n';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import PlayerField from '../../../../components/PlayerField';
 
 class DryrunForm extends Component {
@@ -35,7 +35,7 @@ class DryrunForm extends Component {
       >
         {({ handleSubmit, submitting, values, form }) => (
           <form id="dryrunForm" onSubmit={handleSubmit}>
-            <TextField
+            <OldTextField
               variant="standard"
               name="dryrun_name"
               fullWidth={true}

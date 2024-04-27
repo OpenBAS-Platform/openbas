@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import TextField from '../../../../../../components/TextField';
+import OldTextField from '../../../../../../components/OldTextField';
 import { useFormatter } from '../../../../../../components/i18n';
 
 const LessonsQuestionForm = (props) => {
@@ -34,20 +34,20 @@ const LessonsQuestionForm = (props) => {
     >
       {({ handleSubmit, submitting, errors }) => (
         <form id="lessonsQuestionForm" onSubmit={handleSubmit}>
-          <TextField
+          <OldTextField
             variant="standard"
             name="lessons_question_content"
             fullWidth={true}
             label={t('Content')}
           />
-          <TextField
+          <OldTextField
             variant="standard"
             name="lessons_question_explanation"
             fullWidth={true}
             label={t('Explanation')}
             style={{ marginTop: 20 }}
           />
-          <TextField
+          <OldTextField
             variant="standard"
             name="lessons_question_order"
             fullWidth={true}

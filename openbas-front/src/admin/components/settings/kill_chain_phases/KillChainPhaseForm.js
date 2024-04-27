@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import inject18n from '../../../../components/i18n';
 
 class KillChainPhaseForm extends Component {
@@ -29,34 +29,34 @@ class KillChainPhaseForm extends Component {
       >
         {({ handleSubmit, pristine, submitting }) => (
           <form id="killChainPhaseForm" onSubmit={handleSubmit}>
-            <TextField
+            <OldTextField
               name="phase_name"
               fullWidth={true}
               label={t('Phase name')}
               style={{ marginTop: 10 }}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="phase_shortname"
               fullWidth={true}
               label={t('Phase short name')}
               style={{ marginTop: 20 }}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="phase_kill_chain_name"
               fullWidth={true}
               label={t('Kill chain name')}
               style={{ marginTop: 20 }}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="phase_external_id"
               fullWidth={true}
               label={t('External Id')}
               style={{ marginTop: 20 }}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="phase_order"
               fullWidth={true}

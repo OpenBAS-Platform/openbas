@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import inject18n from '../../../../components/i18n';
 
 class ObjectiveForm extends Component {
@@ -33,13 +33,13 @@ class ObjectiveForm extends Component {
       >
         {({ handleSubmit, submitting, pristine }) => (
           <form id="objectiveForm" onSubmit={handleSubmit}>
-            <TextField
+            <OldTextField
               variant="standard"
               name="objective_title"
               fullWidth={true}
               label={t('Title')}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="objective_description"
               fullWidth={true}
@@ -48,7 +48,7 @@ class ObjectiveForm extends Component {
               label={t('Description')}
               style={{ marginTop: 20 }}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="objective_priority"
               fullWidth={true}

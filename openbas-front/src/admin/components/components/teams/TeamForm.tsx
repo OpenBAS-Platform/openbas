@@ -3,7 +3,7 @@ import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { z } from 'zod';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 import OrganizationField from '../../../../components/OrganizationField';
@@ -54,13 +54,13 @@ const TeamForm: FunctionComponent<TeamFormProps> = ({
     >
       {({ handleSubmit, form, values, submitting, pristine }) => (
         <form id="teamForm" onSubmit={handleSubmit}>
-          <TextField
+          <OldTextField
             variant="standard"
             name="team_name"
             fullWidth={true}
             label={t('Name')}
           />
-          <TextField
+          <OldTextField
             variant="standard"
             name="team_description"
             fullWidth={true}

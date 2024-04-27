@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import inject18n from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 
@@ -35,13 +35,13 @@ class OrganizationForm extends Component {
       >
         {({ handleSubmit, form, values, submitting, pristine }) => (
           <form id="organizationForm" onSubmit={handleSubmit}>
-            <TextField
+            <OldTextField
               variant="standard"
               name="organization_name"
               fullWidth={true}
               label={t('Name')}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="organization_description"
               fullWidth={true}

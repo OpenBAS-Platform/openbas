@@ -9,13 +9,15 @@ import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 @Getter
 @Setter
-public class AiInput {
+public class AiGenericTextInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("prompt_type")
-    private String type;
+    @JsonProperty("ai_content")
+    private String content;
 
-    @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("prompt_question")
-    private String question;
+    @JsonProperty("ai_format")
+    private String format;
+
+    @JsonProperty("ai_tone")
+    private String tone;
 }

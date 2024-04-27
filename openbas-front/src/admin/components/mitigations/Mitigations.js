@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { LockPattern } from 'mdi-material-ui';
 import { useDispatch } from 'react-redux';
+import { DynamicFormOutlined } from '@mui/icons-material';
 import { searchMitigations } from '../../../actions/Mitigation';
 import CreateMitigation from './CreateMitigation';
 import MitigationPopover from './MitigationPopover';
@@ -181,7 +181,7 @@ const Mitigations = () => {
             divider={true}
           >
             <ListItemIcon>
-              <LockPattern color="primary" />
+              <DynamicFormOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={

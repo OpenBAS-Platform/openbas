@@ -13,7 +13,7 @@ import SearchFilter from '../../../../components/SearchFilter';
 import Loader from '../../../../components/Loader';
 import { useFormatter } from '../../../../components/i18n';
 import TagsFilter from '../../../../components/TagsFilter';
-import InjectIcon from '../../components/injects/InjectIcon';
+import InjectIcon from '../../common/injects/InjectIcon';
 import ItemTags from '../../../../components/ItemTags';
 import TeamOrAssetLine from './teamsOrAssets/TeamOrAssetLine';
 import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';

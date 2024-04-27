@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form } from 'react-final-form';
 import { Button, CircularProgress } from '@mui/material';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 import FileField from '../../../../components/FileField';
@@ -50,7 +50,7 @@ const DocumentForm = (props) => {
     >
       {({ handleSubmit, form, values, submitting, pristine }) => (
         <form id="documentForm" onSubmit={handleSubmit}>
-          <TextField
+          <OldTextField
             variant="standard"
             name="document_description"
             fullWidth

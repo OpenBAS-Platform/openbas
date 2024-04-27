@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { Form } from 'react-final-form';
 import { Box, Button } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import inject18n from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 import InjectIcon from './InjectIcon';
@@ -108,7 +108,7 @@ class InjectForm extends Component {
       >
         {({ handleSubmit, form, values, submitting, pristine }) => (
           <form id="injectForm" onSubmit={handleSubmit}>
-            <TextField
+            <OldTextField
               variant="standard"
               name="inject_title"
               fullWidth={true}
@@ -134,7 +134,7 @@ class InjectForm extends Component {
               )}
               classes={{ clearIndicator: classes.autoCompleteIndicator }}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="inject_description"
               fullWidth={true}
@@ -152,21 +152,21 @@ class InjectForm extends Component {
             />
             <div className={classes.duration}>
               <div className={classes.trigger}>{t('Trigger after')}</div>
-              <TextField
+              <OldTextField
                 variant="standard"
                 name="inject_depends_duration_days"
                 type="number"
                 label={t('Days')}
                 style={{ width: '20%' }}
               />
-              <TextField
+              <OldTextField
                 variant="standard"
                 name="inject_depends_duration_hours"
                 type="number"
                 label={t('Hours')}
                 style={{ width: '20%' }}
               />
-              <TextField
+              <OldTextField
                 variant="standard"
                 name="inject_depends_duration_minutes"
                 type="number"

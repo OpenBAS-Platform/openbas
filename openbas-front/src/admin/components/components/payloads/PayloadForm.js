@@ -2,7 +2,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button, MenuItem } from '@mui/material';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import SelectField from '../../../../components/SelectField';
 import TagField from '../../../../components/TagField';
@@ -48,13 +48,13 @@ const PayloadForm = (props) => {
               {t('Windows Powershell')}
             </MenuItem>
           </SelectField>
-          <TextField
+          <OldTextField
             name="payload_name"
             fullWidth={true}
             label={t('Name')}
             style={{ marginTop: 20 }}
           />
-          <TextField
+          <OldTextField
             name="payload_description"
             multiline={true}
             fullWidth={true}
@@ -62,7 +62,7 @@ const PayloadForm = (props) => {
             label={t('Description')}
             style={{ marginTop: 20 }}
           />
-          <TextField
+          <OldTextField
             name="payload_content"
             multiline={true}
             fullWidth={true}

@@ -6,7 +6,7 @@ import { Button, Grid, IconButton, List, ListItem, ListItemIcon, ListItemSeconda
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import SelectField from '../../../../components/SelectField';
 import MarkDownField from '../../../../components/MarkDownField';
@@ -171,12 +171,12 @@ const ChallengeForm = (props) => {
     >
       {({ form, handleSubmit, submitting, errors, values }) => (
         <form id="challengeForm" onSubmit={handleSubmit}>
-          <TextField
+          <OldTextField
             name="challenge_name"
             fullWidth={true}
             label={t('Name')}
           />
-          <TextField
+          <OldTextField
             name="challenge_category"
             fullWidth={true}
             label={t('Category')}
@@ -190,7 +190,7 @@ const ChallengeForm = (props) => {
           />
           <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
             <Grid item={true} xs={6}>
-              <TextField
+              <OldTextField
                 name="challenge_score"
                 fullWidth={true}
                 type="number"
@@ -198,7 +198,7 @@ const ChallengeForm = (props) => {
               />
             </Grid>
             <Grid item={true} xs={6}>
-              <TextField
+              <OldTextField
                 name="challenge_max_attempts"
                 fullWidth={true}
                 type="number"
@@ -342,7 +342,7 @@ const ChallengeForm = (props) => {
                           {t('Regular expression')}
                         </MenuItem>
                       </SelectField>
-                      <TextField
+                      <OldTextField
                         name={`${name}.flag_value`}
                         validate={required}
                         fullWidth={true}

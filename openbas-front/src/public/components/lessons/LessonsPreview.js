@@ -15,7 +15,7 @@ import Empty from '../../../components/Empty';
 import { fetchLessonsCategories, fetchLessonsQuestions } from '../../../actions/Lessons';
 import { fetchExercise } from '../../../actions/Exercise';
 import SliderField from '../../../components/SliderField';
-import TextField from '../../../components/TextField';
+import OldTextField from '../../../components/OldTextField';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -215,7 +215,7 @@ const LessonsPlayer = () => {
                               <Typography variant="h4">
                                 {t('What worked well')}
                               </Typography>
-                              <TextField
+                              <OldTextField
                                 style={{ marginTop: 10 }}
                                 name={`${question.lessonsquestion_id}_positive`}
                                 label={t('Comment (optional)')}
@@ -228,7 +228,7 @@ const LessonsPlayer = () => {
                               <Typography variant="h4">
                                 {t("What didn't work well")}
                               </Typography>
-                              <TextField
+                              <OldTextField
                                 style={{ marginTop: 10 }}
                                 name={`${question.lessonsquestion_id}_negative`}
                                 label={t('Comment (optional)')}

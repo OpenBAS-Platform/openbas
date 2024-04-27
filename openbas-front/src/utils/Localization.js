@@ -881,7 +881,7 @@ const i18n = {
       Encrypted: 'Encrypt this email',
       Attachments: 'Attachments',
       team: 'Team',
-      text: 'Text field',
+      text: 'Text fields',
       textarea: 'Text area',
       tuple: 'Key value pair',
       checkbox: 'Checkbox',

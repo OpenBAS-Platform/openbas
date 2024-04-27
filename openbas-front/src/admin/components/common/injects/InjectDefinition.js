@@ -38,21 +38,21 @@ import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
-import TeamPopover from '../teams/TeamPopover';
+import TeamPopover from '../../components/teams/TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddTeams from './InjectAddTeams';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import SwitchField from '../../../../components/SwitchField';
 import EnrichedTextField from '../../../../components/EnrichedTextField';
 import InjectAddDocuments from './InjectAddDocuments';
 import Loader from '../../../../components/Loader';
-import DocumentType from '../documents/DocumentType';
-import DocumentPopover from '../documents/DocumentPopover';
+import DocumentType from '../../components/documents/DocumentType';
+import DocumentPopover from '../../components/documents/DocumentPopover';
 import SelectField from '../../../../components/SelectField';
-import ArticlePopover from '../articles/ArticlePopover';
+import ArticlePopover from '../../components/articles/ArticlePopover';
 import InjectAddArticles from './InjectAddArticles';
-import ChannelIcon from '../channels/ChannelIcon';
-import ChallengePopover from '../challenges/ChallengePopover';
+import ChannelIcon from '../../components/channels/ChannelIcon';
+import ChallengePopover from '../../components/challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
 import AvailableVariablesDialog from '../../exercises/variables/AvailableVariablesDialog';
 import InjectExpectations from './expectations/InjectExpectations';
@@ -792,7 +792,7 @@ class InjectDefinition extends Component {
                   disabled={this.props.permissions.readOnly || field.readOnly}
                 />
               ) : (
-                <TextField
+                <OldTextField
                   variant="standard"
                   key={field.key}
                   name={field.key}
@@ -806,7 +806,7 @@ class InjectDefinition extends Component {
               );
             case 'number':
               return (
-                <TextField
+                <OldTextField
                   variant="standard"
                   key={field.key}
                   name={field.key}
@@ -894,7 +894,7 @@ class InjectDefinition extends Component {
                                     </MenuItem>
                                   )}
                                 </SelectField>
-                                <TextField
+                                <OldTextField
                                   variant="standard"
                                   name={`${name}.key`}
                                   fullWidth={true}
@@ -927,7 +927,7 @@ class InjectDefinition extends Component {
                                     ))}
                                   </SelectField>
                                   ) : (
-                                    <TextField
+                                    <OldTextField
                                       variant="standard"
                                       name={`${name}.value`}
                                       fullWidth={true}
@@ -1054,7 +1054,7 @@ class InjectDefinition extends Component {
               );
             default:
               return (
-                <TextField
+                <OldTextField
                   variant="standard"
                   key={field.key}
                   name={field.key}
@@ -1293,7 +1293,7 @@ class InjectDefinition extends Component {
           }
         });
     }
-    // Specific processing for some field
+    // Specific processing for some fields
     injectorContract.fields
       .filter((f) => !builtInFields.includes(f.key))
       .forEach((field) => {
@@ -1373,7 +1373,7 @@ class InjectDefinition extends Component {
                 <Typography variant="h2" style={{ float: 'left' }}>
                   {t('Title')}
                 </Typography>
-                <TextField style={{ marginBottom: 20 }}
+                <OldTextField style={{ marginBottom: 20 }}
                   variant="standard"
                   name="inject_title"
                   fullWidth
@@ -1381,7 +1381,7 @@ class InjectDefinition extends Component {
                 <Typography variant="h2" style={{ float: 'left' }}>
                   {t('Description')}
                 </Typography>
-                <TextField
+                <OldTextField
                   variant="standard"
                   name="inject_description"
                   fullWidth={true}
@@ -2091,21 +2091,21 @@ class InjectDefinition extends Component {
                     </List>
                     <div className={classes.duration}>
                       <div className={classes.trigger}>{t('Trigger after')}</div>
-                      <TextField
+                      <OldTextField
                         variant="standard"
                         name="inject_depends_duration_days"
                         type="number"
                         label={t('Days')}
                         style={{ width: '20%' }}
                       />
-                      <TextField
+                      <OldTextField
                         variant="standard"
                         name="inject_depends_duration_hours"
                         type="number"
                         label={t('Hours')}
                         style={{ width: '20%' }}
                       />
-                      <TextField
+                      <OldTextField
                         variant="standard"
                         name="inject_depends_duration_minutes"
                         type="number"

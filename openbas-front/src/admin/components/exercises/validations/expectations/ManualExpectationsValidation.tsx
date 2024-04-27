@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
-import type { InjectExpectationsStore } from '../../../components/injects/expectations/Expectation';
+import type { InjectExpectationsStore } from '../../../common/injects/expectations/Expectation';
 import { useFormatter } from '../../../../../components/i18n';
 import { updateInjectExpectation } from '../../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';

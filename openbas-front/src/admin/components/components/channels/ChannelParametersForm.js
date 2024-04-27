@@ -5,7 +5,7 @@ import { Button, Grid, MenuItem } from '@mui/material';
 import inject18n from '../../../../components/i18n';
 import DeprecatedColorPickerField from '../../../../components/DeprecatedColorPickerField';
 import SelectField from '../../../../components/SelectField';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 
 class ChannelParametersForm extends Component {
   render() {
@@ -42,7 +42,7 @@ class ChannelParametersForm extends Component {
                     {t('tv')}
                   </MenuItem>
                 </SelectField>
-                <TextField
+                <OldTextField
                   variant="standard"
                   name="channel_name"
                   fullWidth={true}
@@ -68,7 +68,7 @@ class ChannelParametersForm extends Component {
                 />
               </Grid>
               <Grid item={true} xs={6}>
-                <TextField
+                <OldTextField
                   variant="standard"
                   name="channel_description"
                   fullWidth={true}

@@ -46,6 +46,7 @@ type entry = {
   icon?: ReactNode,
   granted?: boolean,
   exact?: boolean,
+  disabled?: boolean,
 };
 
 const useStyles = makeStyles<Theme>((theme) => createStyles({
@@ -194,22 +195,25 @@ const LeftBar = () => {
         <MenuList component="nav" disablePadding={true}>
           {entries.filter((entry) => entry.granted !== false).map((entry) => {
             return (
-              <StyledTooltip key={entry.label} title={t(entry.label)} placement="right">
-                <MenuItem
-                  component={Link}
-                  to={entry.link}
-                  selected={entry.exact ? location.pathname === entry.link : location.pathname.includes(entry.link)}
-                  dense={true}
-                  classes={{ root: classes.menuSubItem }}
-                >
-                  {entry.icon && <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
-                    {entry.icon}
-                  </ListItemIcon>}
-                  <ListItemText
-                    classes={{ primary: classes.menuSubItemText }}
-                    primary={t(entry.label)}
-                  />
-                </MenuItem>
+              <StyledTooltip key={entry.label} title={entry.disabled ? t(`${entry.label} - Coming soon`) : t(entry.label)} placement="right">
+                <span>
+                  <MenuItem
+                    component={Link}
+                    to={entry.link}
+                    selected={entry.exact ? location.pathname === entry.link : location.pathname.includes(entry.link)}
+                    dense={true}
+                    classes={{ root: classes.menuSubItem }}
+                    disabled={entry.disabled}
+                  >
+                    {entry.icon && <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
+                      {entry.icon}
+                    </ListItemIcon>}
+                    <ListItemText
+                      classes={{ primary: classes.menuSubItemText }}
+                      primary={t(entry.label)}
+                    />
+                  </MenuItem>
+                </span>
               </StyledTooltip>
             );
           })}
@@ -244,6 +248,35 @@ const LeftBar = () => {
       >
         <MenuList component="nav">
           {entries.filter((entry) => entry.granted !== false).map((entry) => {
+            if (entry.disabled) {
+              return (
+                <StyledTooltip key={entry.label}
+                  title={entry.disabled ? t(`${entry.label} - Coming soon`) : t(entry.label)}
+                  placement="right"
+                >
+                  <span>
+                    <MenuItem
+                      key={entry.label}
+                      component={Link}
+                      to={entry.link}
+                      selected={entry.exact ? location.pathname === entry.link : location.pathname.includes(entry.link)}
+                      dense={true}
+                      classes={{ root: classes.menuHoverItem }}
+                      onClick={handleSelectedMenuClose}
+                      disabled={entry.disabled}
+                    >
+                      {entry.icon && <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
+                          {entry.icon}
+                        </ListItemIcon>}
+                      <ListItemText
+                        classes={{ primary: classes.menuItemText }}
+                        primary={t(entry.label)}
+                      />
+                    </MenuItem>
+                  </span>
+                </StyledTooltip>
+              );
+            }
             return (
               <MenuItem
                 key={entry.label}
@@ -255,8 +288,8 @@ const LeftBar = () => {
                 onClick={handleSelectedMenuClose}
               >
                 {entry.icon && <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
-                  {entry.icon}
-                </ListItemIcon>}
+                    {entry.icon}
+                  </ListItemIcon>}
                 <ListItemText
                   classes={{ primary: classes.menuItemText }}
                   primary={t(entry.label)}
@@ -450,9 +483,9 @@ const LeftBar = () => {
             'components',
             [
               { type: 'Document', link: '/admin/components/documents', label: 'Documents', icon: <DescriptionOutlined fontSize="small" /> },
-              { type: 'Variable', link: '/admin/components/variables', label: 'Custom variables', icon: <AttachMoneyOutlined fontSize="small" /> },
+              { type: 'Variable', link: '/admin/components/variables', label: 'Custom variables', icon: <AttachMoneyOutlined fontSize="small" />, disabled: true },
               { type: 'Payload', link: '/admin/components/payloads', label: 'Payloads', icon: <SubscriptionsOutlined fontSize="small" /> },
-              { type: 'Persona', link: '/admin/components/personas', label: 'Personas', icon: <DramaMasks fontSize="small" /> },
+              { type: 'Persona', link: '/admin/components/personas', label: 'Personas', icon: <DramaMasks fontSize="small" />, disabled: true },
               { type: 'Channel', link: '/admin/components/channels', label: 'Channels', icon: <PostOutline fontSize="small" /> },
               { type: 'Challenge', link: '/admin/components/challenges', label: 'Challenges', icon: <RowingOutlined fontSize="small" /> },
             ],

@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Form } from 'react-final-form';
 import { Button, MenuItem } from '@mui/material';
-import TextField from '../../../../components/TextField';
+import OldTextField from '../../../../components/OldTextField';
 import SelectField from '../../../../components/SelectField';
 import inject18n from '../../../../components/i18n';
 import DateTimePicker from '../../../../components/DateTimePicker';
@@ -45,7 +45,7 @@ class ComcheckForm extends Component {
       >
         {({ handleSubmit, submitting, pristine }) => (
           <form id="comcheckForm" onSubmit={handleSubmit}>
-            <TextField
+            <OldTextField
               variant="standard"
               name="comcheck_name"
               fullWidth={true}
@@ -89,7 +89,7 @@ class ComcheckForm extends Component {
                 style: { marginTop: 20 },
               }}
             />
-            <TextField
+            <OldTextField
               variant="standard"
               name="comcheck_subject"
               fullWidth={true}

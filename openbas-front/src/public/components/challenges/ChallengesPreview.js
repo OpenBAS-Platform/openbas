@@ -46,7 +46,7 @@ import Empty from '../../../components/Empty';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
 import DocumentType from '../../../admin/components/components/documents/DocumentType';
 import ItemTags from '../../../components/ItemTags';
-import TextField from '../../../components/TextField';
+import OldTextField from '../../../components/OldTextField';
 import Transition from '../../../components/common/Transition';
 
 const useStyles = makeStyles(() => ({
@@ -498,7 +498,7 @@ const ChallengesPreview = () => {
               >
                 {({ handleSubmit, submitting, errors }) => (
                   <form id="challengeForm" onSubmit={handleSubmit}>
-                    <TextField
+                    <OldTextField
                       variant="standard"
                       name="challenge_value"
                       fullWidth={true}

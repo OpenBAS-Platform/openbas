@@ -10,7 +10,7 @@ import ManualExpectations from '../expectations/ManualExpectations';
 import type { EndpointStore } from '../../../assets/endpoints/Endpoint';
 import type { AssetGroupStore } from '../../../assets/asset_groups/AssetGroup';
 import type { Inject, Team } from '../../../../../utils/api-types';
-import type { InjectExpectationsStore } from '../../../components/injects/expectations/Expectation';
+import type { InjectExpectationsStore } from '../../../common/injects/expectations/Expectation';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/ServerSideEvent';

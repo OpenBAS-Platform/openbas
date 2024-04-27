@@ -8,7 +8,7 @@ import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import type { UsersHelper } from '../../../actions/helper';
-import InjectIcon from '../components/injects/InjectIcon';
+import InjectIcon from '../common/injects/InjectIcon';
 import type { AtomicTestingOutput, Inject, SearchPaginationInput } from '../../../utils/api-types';
 import { createAtomicTesting, searchAtomicTestings } from '../../../actions/atomic_testings/atomic-testing-actions';
 import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
@@ -18,8 +18,8 @@ import StatusChip from './atomic_testing/StatusChip';
 import { initSorting } from '../../../components/common/pagination/Page';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
-import InjectorContract from '../components/injects/InjectorContract';
-import CreateInject from '../components/injects/CreateInject';
+import InjectorContract from '../common/injects/InjectorContract';
+import CreateInject from '../common/injects/CreateInject';
 import { useAppDispatch } from '../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({
