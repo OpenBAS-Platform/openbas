@@ -112,7 +112,13 @@ const AtomicTesting = () => {
                   <ListItemText
                     primary={
                       <div>
-                        <div style={{ color: 'gray', display: 'inline-block', float: 'left', paddingRight: 10 }}>{getIcon(target?.targetType)}</div>
+                        <div style={{
+                          color: 'gray',
+                          display: 'inline-block',
+                          float: 'left',
+                          paddingRight: 10,
+                        }}
+                        >{getIcon(target?.targetType)}</div>
                         <div className={classes.bodyTarget} style={{ width: '30%' }}>
                           {`${target?.name}`}
                         </div>

@@ -1,12 +1,11 @@
 package io.openbas.atomic_testing;
 
 import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
-import io.openbas.atomic_testing.AtomicTestingMapper.InjectTargetWithResult;
 import io.openbas.atomic_testing.AtomicTestingMapper.ResultDistribution;
+import io.openbas.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
-import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
+import jakarta.validation.constraints.NotNull;
 import java.util.stream.Collectors;
 
 public class AtomicTestingUtils {
@@ -57,6 +57,8 @@ public class AtomicTestingUtils {
     });
 
     List<InjectTargetWithResult> targets = new ArrayList<>();
+    List<InjectTargetWithResult> assetsToRefine = new ArrayList<>();
+    List<InjectTargetWithResult> assetsWithoutParent = new ArrayList<>();
 
     /* Match Target with expectations
      * */
@@ -125,7 +127,7 @@ public class AtomicTestingUtils {
       );
     }
     if (!assetExpectations.isEmpty()) {
-      targets.addAll(
+      assetsToRefine.addAll(
           assetExpectations
               .stream()
               .collect(
@@ -149,11 +151,27 @@ public class AtomicTestingUtils {
               )
           )
           .entrySet().stream()
-          .map(entry -> new InjectTargetWithResult(TargetType.ASSETS_GROUPS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue()))
+          .map(entry -> {
+            List<InjectTargetWithResult> children = new ArrayList<>();
+
+            entry.getKey().getAssets().forEach(child -> {
+                  assetsToRefine.forEach(asset -> {
+                    if (asset.getId().equals(child.getId())) {
+                      children.add(asset);
+                    } else {
+                      assetsWithoutParent.add(asset);
+                    }
+                  });
+                }
+            );
+            return new InjectTargetWithResult(TargetType.ASSETS_GROUPS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), children);
+          })
           .toList());
     }
 
-    return targets.stream().sorted(Comparator.comparing(InjectTargetWithResult::name)).toList();
+    targets.addAll(assetsWithoutParent);
+
+    return targets.stream().sorted(Comparator.comparing(InjectTargetWithResult::getName)).toList();
   }
 
   @NotNull

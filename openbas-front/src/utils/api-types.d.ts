@@ -1022,6 +1022,7 @@ export interface InjectStatusExecution {
  * @example "assets, asset groups, teams, players"
  */
 export interface InjectTargetWithResult {
+  children?: InjectTargetWithResult[];
   expectationResultsByTypes: ExpectationResultsByType[];
   id: string;
   name: string;

@@ -112,11 +112,4 @@ public class AtomicTestingMapper {
 
   }
 
-  public record InjectTargetWithResult(@NotNull TargetType targetType,
-                                       @NotNull String id,
-                                       @NotNull String name,
-                                       @NotNull List<ExpectationResultsByType> expectationResultsByTypes) {
-
-  }
-
 }
