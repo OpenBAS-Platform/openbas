@@ -33,8 +33,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import static io.openbas.atomic_testing.AtomicTestingMapper.toDto;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.CommunicationSpecification.fromInject;
@@ -240,7 +244,7 @@ public class InjectApi extends RestBehavior {
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Inject> exerciseInjects(@PathVariable String exerciseId) {
     return injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)).stream()
-        .sorted(Inject.executionComparator).toList();
+            .sorted(Inject.executionComparator).toList();
   }
 
   @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}")
@@ -399,9 +403,9 @@ public class InjectApi extends RestBehavior {
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<Inject> scenarioInjects(@PathVariable @NotBlank final String scenarioId) {
     return this.injectRepository.findAll(InjectSpecification.fromScenario(scenarioId))
-        .stream()
-        .sorted(Inject.executionComparator)
-        .toList();
+            .stream()
+            .sorted(Inject.executionComparator)
+            .toList();
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")

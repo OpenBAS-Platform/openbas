@@ -12,7 +12,7 @@ import Transition from '../../../../components/common/Transition';
 import ChannelIcon from '../../components/channels/ChannelIcon';
 import type { Theme } from '../../../../components/Theme';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { PermissionsContext } from '../../components/Context';
+import { PermissionsContext } from '../Context';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';

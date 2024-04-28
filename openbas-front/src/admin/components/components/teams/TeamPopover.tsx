@@ -13,7 +13,7 @@ import { useHelper } from '../../../../store';
 import type { OrganizationsHelper, TagsHelper } from '../../../../actions/helper';
 import type { TeamInputForm, TeamStore } from '../../../../actions/teams/Team';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
-import { TeamContext } from '../Context';
+import { TeamContext } from '../../common/Context';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 
 interface TeamPopoverProps {

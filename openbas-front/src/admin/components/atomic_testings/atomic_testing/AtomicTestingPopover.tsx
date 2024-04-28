@@ -8,7 +8,7 @@ import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { deleteAtomicTesting, fetchAtomicTestingForUpdate, updateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useHelper } from '../../../../store';
-import { AtomicTestingResultContext } from '../../components/Context';
+import { AtomicTestingResultContext } from '../../common/Context';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import UpdateInject from '../../common/injects/UpdateInject';

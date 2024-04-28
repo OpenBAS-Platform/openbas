@@ -13,7 +13,7 @@ import AtomicTestingHeader from './AtomicTestingHeader';
 import { fetchAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import type { AtomicTestingOutput } from '../../../../utils/api-types';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
-import { AtomicTestingResultContext, AtomicTestingResultContextType } from '../../components/Context';
+import { AtomicTestingResultContext, AtomicTestingResultContextType } from '../../common/Context';
 
 const AtomicTesting = lazy(() => import('./AtomicTesting'));
 const AtomicTestingDetail = lazy(() => import('./AtomicTestingDetail'));

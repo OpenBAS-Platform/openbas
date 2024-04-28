@@ -9,7 +9,7 @@ import useDataLoader from '../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../utils/hooks';
 import ExerciseHeader from './ExerciseHeader';
 import type { Exercise as ExerciseType } from '../../../utils/api-types';
-import { DocumentContext, DocumentContextType, PermissionsContext, PermissionsContextType } from '../components/Context';
+import { DocumentContext, DocumentContextType, PermissionsContext, PermissionsContextType } from '../common/Context';
 import { usePermissions } from '../../../utils/Exercise';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
 import NotFound from '../../../components/NotFound';

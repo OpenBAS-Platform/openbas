@@ -8,7 +8,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import type { ArticlesHelper } from '../../../../actions/channels/article-helper';
 import type { ArticleCreateInput, ArticleUpdateInput, Exercise } from '../../../../utils/api-types';
 import DefinitionMenu from '../../components/DefinitionMenu';
-import { ArticleContext } from '../../components/Context';
+import { ArticleContext } from '../../common/Context';
 import type { ArticleStore, FullArticleStore } from '../../../../actions/channels/Article';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 

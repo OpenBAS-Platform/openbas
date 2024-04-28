@@ -8,7 +8,7 @@ import useDataLoader from '../../../../../utils/ServerSideEvent';
 import { addVariableForScenario, deleteVariableForScenario, fetchVariablesForScenario, updateVariableForScenario } from '../../../../../actions/variables/variable-actions';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
-import { VariableContext, VariableContextType } from '../../../components/Context';
+import { VariableContext, VariableContextType } from '../../../common/Context';
 import type { Variable, VariableInput } from '../../../../../utils/api-types';
 
 const ScenarioVariables = () => {

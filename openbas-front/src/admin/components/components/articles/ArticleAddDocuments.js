@@ -14,7 +14,7 @@ import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { PermissionsContext } from '../Context';
+import { PermissionsContext } from '../../common/Context';
 
 const useStyles = makeStyles((theme) => ({
   box: {

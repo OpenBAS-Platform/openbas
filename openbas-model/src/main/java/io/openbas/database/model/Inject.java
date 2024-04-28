@@ -65,6 +65,11 @@ public class Inject implements Base, Injection {
   private String description;
 
   @Getter
+  @Transient
+  @JsonProperty("inject_injector_contract")
+  private InjectorContract injectorContract;
+
+  @Getter
   @Column(name = "inject_country")
   @JsonProperty("inject_country")
   private String country;
@@ -135,13 +140,6 @@ public class Inject implements Base, Injection {
   private Long dependsDuration;
 
   @Getter
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "inject_injector_contract")
-  @JsonSerialize(using = MonoIdDeserializer.class)
-  @JsonProperty("inject_injector_contract")
-  private InjectorContract injectorContract;
-
-  @Getter
   @ManyToOne(fetch = FetchType.LAZY)
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JoinColumn(name = "inject_user")
@@ -192,8 +190,8 @@ public class Inject implements Base, Injection {
   @Getter
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "injects_payloads",
-          joinColumns = @JoinColumn(name = "inject_id"),
-          inverseJoinColumns = @JoinColumn(name = "payload_id"))
+      joinColumns = @JoinColumn(name = "inject_id"),
+      inverseJoinColumns = @JoinColumn(name = "payload_id"))
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("inject_payloads")
   private List<Asset> payloads = new ArrayList<>();

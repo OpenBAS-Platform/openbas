@@ -17,7 +17,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import type { DocumentsHelper, UsersHelper } from '../../../../actions/helper';
-import { PermissionsContext } from '../../components/Context';
+import { PermissionsContext } from '../Context';
 import type { Document } from '../../../../utils/api-types';
 
 const useStyles = makeStyles((theme: Theme) => ({

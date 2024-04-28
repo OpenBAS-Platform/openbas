@@ -21,7 +21,7 @@ import type { OrganizationsHelper, UsersHelper } from '../../../../actions/helpe
 import type { UserStore } from '../../teams/players/Player';
 import type { Option } from '../../../../utils/Option';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
-import { PermissionsContext, TeamContext } from '../Context';
+import { PermissionsContext, TeamContext } from '../../common/Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   header: {

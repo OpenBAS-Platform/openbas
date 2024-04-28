@@ -22,7 +22,7 @@ import { useFormatter } from '../../../../components/i18n';
 import type { DocumentsHelper } from '../../../../actions/helper';
 import CreateArticle from './CreateArticle';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
-import { ArticleContext, PermissionsContext } from '../Context';
+import { ArticleContext, PermissionsContext } from '../../common/Context';
 
 const useStyles = makeStyles(() => ({
   channel: {

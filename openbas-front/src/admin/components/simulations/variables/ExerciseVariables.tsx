@@ -8,7 +8,7 @@ import Variables from '../../components/variables/Variables';
 import type { VariablesHelper } from '../../../../actions/variables/variable-helper';
 import { addVariableForExercise, deleteVariableForExercise, fetchVariablesForExercise, updateVariableForExercise } from '../../../../actions/variables/variable-actions';
 import DefinitionMenu from '../../components/DefinitionMenu';
-import { VariableContext, VariableContextType } from '../../components/Context';
+import { VariableContext, VariableContextType } from '../../common/Context';
 
 const ExerciseVariables = () => {
   // Standard hooks

@@ -8,7 +8,7 @@ import useDataLoader from '../../../../../utils/ServerSideEvent';
 import { fetchScenarioChallenges } from '../../../../../actions/Challenge';
 import DefinitionMenu from '../../../components/DefinitionMenu';
 import Challenges from '../../../components/challenges/Challenges';
-import { ChallengeContext, ChallengeContextType } from '../../../components/Context';
+import { ChallengeContext, ChallengeContextType } from '../../../common/Context';
 
 const ScenarioChallenges = () => {
   // Standard hooks

@@ -1,6 +1,6 @@
 import React from 'react';
 import TeamsComponent from '../components/teams/Teams';
-import { PermissionsContext, PermissionsContextType, TeamContext, type TeamContextType } from '../components/Context';
+import { PermissionsContext, PermissionsContextType, TeamContext, type TeamContextType } from '../common/Context';
 import { useHelper } from '../../../store';
 import type { UsersHelper } from '../../../actions/helper';
 import CreateTeam from '../components/teams/CreateTeam';

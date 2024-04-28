@@ -27,7 +27,6 @@ import { fetchExerciseArticles } from '../../../../actions/channels/article-acti
 import { fetchVariablesForExercise } from '../../../../actions/variables/variable-actions';
 import InjectOverTimeArea from './InjectOverTimeArea';
 import InjectOverTimeLine from './InjectOverTimeLine';
-import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 import UpdateInject from '../../common/injects/UpdateInject';
 
 const useStyles = makeStyles(() => ({
@@ -144,8 +143,6 @@ const Timeline = () => {
     exercise,
     teams,
     injects,
-    injectorContractsMap,
-    injectorContractsWithNoTeams,
     tagsMap,
     teamsInjectsMap,
     technicalInjectsMap,
@@ -168,18 +165,18 @@ const Timeline = () => {
       teamsInjectsMap: injectsPerTeam,
       technicalInjectsMap:
         helper.getExerciseTechnicalInjectsPerType(exerciseId),
-      injectorContractsMap: helper.getInjectorContractsMap(),
-      injectorContractsWithNoTeams: helper.getInjectorContractsWithNoTeams(),
       articles: helper.getExerciseArticles(exerciseId),
       variables: helper.getExerciseVariables(exerciseId),
       selectedInject: helper.getInject(selectedInjectId),
     };
   });
-  const technicalTeams = injectorContractsWithNoTeams
-    .filter(
-      (injectorContract) => injects.filter((i) => i.inject_type === injectorContract).length > 0,
-    )
-    .map((type) => ({ team_id: type, team_name: type }));
+  const technicalTeams = R.pipe(
+    R.groupBy(R.prop('inject_type')),
+    R.toPairs,
+    R.filter((n) => !(n[1][0].inject_injector_contract?.injector_contract_content_parsed?.fields?.filter((f) => f.key === 'teams').length > 0)),
+    R.map((n) => ({ team_id: n[0], team_name: n[0] })),
+  )(injects);
+
   const sortedNativeTeams = R.sortWith(
     [R.ascend(R.prop('team_name'))],
     teams,
@@ -187,7 +184,6 @@ const Timeline = () => {
   const sortedTeams = [...technicalTeams, ...sortedNativeTeams];
   const injectsMap = { ...teamsInjectsMap, ...technicalInjectsMap };
   useDataLoader(() => {
-    dispatch(fetchInjectorContracts());
     dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchInjects(exerciseId));
     dispatch(fetchExerciseArticles(exerciseId));
@@ -226,11 +222,6 @@ const Timeline = () => {
     [R.descend(R.prop('inject_depends_duration'))],
     injects.filter((i) => i.inject_status !== null),
   );
-  const injectorContracts = R.values(injectorContractsMap);
-  const disabledTypes = injectorContracts
-    .filter((type) => type.config.expose === false)
-    .map((type) => type.config.type);
-  const types = injectorContracts.map((type) => type.config.type);
   const grid0 = theme.palette.mode === 'light' ? 'rgba(0,0,0,0)' : 'rgba(255,255,255,0)';
   const grid5 = theme.palette.mode === 'light'
     ? 'rgba(0,0,0,0.05)'
@@ -412,8 +403,7 @@ const Timeline = () => {
               {pendingInjects.length > 0 ? (
                 <List style={{ paddingTop: 0 }}>
                   {pendingInjects.map((inject) => {
-                    const isDisabled = disabledTypes.includes(inject.inject_type)
-                      || !types.includes(inject.inject_type);
+                    const isDisabled = !inject.inject_injector_contract.injector_contract_content_parsed?.config.expose;
                     return (
                       <ListItem
                         key={inject.inject_id}
@@ -471,7 +461,6 @@ const Timeline = () => {
                             exerciseId={exerciseId}
                             exercise={exercise}
                             tagsMap={tagsMap}
-                            injectorContractsMap={injectorContractsMap}
                             setSelectedInjectId={setSelectedInjectId}
                             isDisabled={isDisabled}
                           />
@@ -576,7 +565,7 @@ const Timeline = () => {
           open={selectedInjectId !== null}
           handleClose={() => setSelectedInjectId(null)}
           onUpdateInject={onUpdateInject}
-          injectorContract={injectorContractsMap[selectedInject.inject_injector_contract]}
+          injectorContract={selectedInject.inject_injector_contract.injector_contract_content_parsed}
           inject={selectedInject}
           teamsFromExerciseOrScenario={teams}
           articlesFromExerciseOrScenario={articles}

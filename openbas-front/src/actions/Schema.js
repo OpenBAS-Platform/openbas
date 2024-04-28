@@ -271,6 +271,25 @@ const entities = (key, state) => Object.values(maps(key, state));
 const entity = (id, key, state) => state.referential.entities[key][id]?.asMutable({ deep: true });
 const me = (state) => state.referential.entities.users[R.path(['logged', 'user'], state.app)];
 
+const getInjectWithParsedInjectorContractContent = (i) => {
+  if (!i) {
+    return i;
+  }
+  return ({
+    ...i,
+    inject_injector_contract: {
+      ...i.inject_injector_contract,
+      injector_contract_content_parsed: JSON.parse(i.inject_injector_contract.injector_contract_content),
+    },
+  });
+};
+const getInjectsWithParsedInjectorContractContent = (injects) => {
+  if (R.isEmpty(injects)) {
+    return injects;
+  }
+  return injects.map(getInjectWithParsedInjectorContractContent);
+};
+
 export const storeHelper = (state) => ({
   logged: () => state.app.logged,
   getMe: () => me(state),
@@ -287,7 +306,7 @@ export const storeHelper = (state) => ({
   getExerciseTeams: (id) => entities('teams', state).filter((i) => i.team_exercises.includes(id)),
   getExerciseVariables: (id) => entities('variables', state).filter((i) => i.variable_exercise === id),
   getExerciseArticles: (id) => entities('articles', state).filter((i) => i.article_exercise === id),
-  getExerciseInjects: (id) => entities('injects', state).filter((i) => i.inject_exercise === id),
+  getExerciseInjects: (id) => getInjectsWithParsedInjectorContractContent(entities('injects', state).filter((i) => i.inject_exercise === id)),
   getExerciseCommunications: (id) => entities('communications', state).filter(
     (i) => i.communication_exercise === id,
   ),
@@ -354,12 +373,12 @@ export const storeHelper = (state) => ({
   getTags: () => entities('tags', state),
   getTagsMap: () => maps('tags', state),
   // injects
-  getInject: (id) => entity(id, 'injects', state),
+  getInject: (id) => getInjectWithParsedInjectorContractContent(entity(id, 'injects', state)),
   getAtomicTesting: (id) => entity(id, 'atomics', state),
   getAtomicTestingDetail: (id) => entity(id, 'atomicdetails', state),
   getAtomicTestings: () => entities('atomics', state),
   getTargetResults: (id, injectId) => entities('targetresults', state).filter((r) => (r.target_id === id) && (r.target_inject_id === injectId)),
-  getInjectsMap: () => maps('injects', state),
+  getInjectsMap: () => getInjectsWithParsedInjectorContractContent(maps('injects', state)),
   getNextInjects: () => {
     const sortFn = (a, b) => new Date(a.inject_date).getTime() - new Date(b.inject_date).getTime();
     const injects = entities('injects', state).filter(
@@ -417,18 +436,6 @@ export const storeHelper = (state) => ({
   getInjectorsMap: () => maps('injectors', state),
   // injectors contracts
   getInjectorContract: (id) => entity(id, 'injector_contracts', state),
-  getInjectorContracts: () => entities('injector_contracts', state),
-  getInjectorContractsMap: () => maps('injector_contracts', state),
-  getInjectorContractsMapByType: () => R.indexBy(R.path(['config', 'type']), entities('injector_contracts', state)),
-  getInjectorContractsWithNoTeams: () => R.uniq(
-    entities('injector_contracts', state)
-      .map((t) => ({
-        hasTeams: t.fields.filter((f) => f.key === 'teams').length > 0,
-        ...t,
-      }))
-      .filter((t) => !t.hasTeams)
-      .map((t) => t.config.type),
-  ),
   // collectors
   getCollector: (id) => entity(id, 'collectors', state),
   getCollectors: () => entities('collectors', state),
@@ -476,5 +483,5 @@ export const storeHelper = (state) => ({
   getScenarioVariables: (id) => entities('variables', state).filter((i) => i.variable_scenario === id),
   getScenarioArticles: (id) => entities('articles', state).filter((i) => i.article_scenario === id),
   getScenarioChallenges: (id) => entities('challenges', state).filter((c) => c.challenge_scenarios.includes(id)),
-  getScenarioInjects: (id) => entities('injects', state).filter((i) => i.inject_scenario === id),
+  getScenarioInjects: (id) => getInjectsWithParsedInjectorContractContent(entities('injects', state).filter((i) => i.inject_scenario === id)),
 });

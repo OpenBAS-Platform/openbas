@@ -12,7 +12,7 @@ import NotFound from '../../../../components/NotFound';
 import ScenarioHeader from './ScenarioHeader';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import useScenarioPermissions from '../../../../utils/Scenario';
-import { DocumentContext, DocumentContextType, PermissionsContext, PermissionsContextType } from '../../components/Context';
+import { DocumentContext, DocumentContextType, PermissionsContext, PermissionsContextType } from '../../common/Context';
 import { useFormatter } from '../../../../components/i18n';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 

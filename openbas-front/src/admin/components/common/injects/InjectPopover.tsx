@@ -4,7 +4,7 @@ import { MoreVert } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import type { InjectStore } from '../../../../actions/injects/Inject';
-import { InjectContext, PermissionsContext } from '../../components/Context';
+import { InjectContext, PermissionsContext } from '../Context';
 import type { Inject, InjectStatus, InjectStatusExecution, Tag } from '../../../../utils/api-types';
 import { tryInject } from '../../../../actions/Inject';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -12,7 +12,6 @@ import type { Contract } from '../../../../actions/contract/contract';
 
 interface Props {
   inject: InjectStore;
-  injectorContractsMap: Record<string, Contract>;
   tagsMap: Record<string, Tag>;
   setSelectedInjectId: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;

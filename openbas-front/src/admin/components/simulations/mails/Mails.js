@@ -17,7 +17,6 @@ import { useHelper } from '../../../../store';
 import { exportData } from '../../../../utils/Environment';
 import AnimationMenu from '../AnimationMenu';
 import CreateQuickInject from '../injects/CreateQuickInject';
-import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 import MailDistributionOverTimeChart from './MailDistributionOverTimeChart';
 import MailDistributionOverTimeLine from './MailDistributionOverTimeLine';
 import MailDistributionByTeam from './MailDistributionByTeam';
@@ -175,16 +174,14 @@ const Mails = () => {
   const filtering = useSearchAnFilter('inject', 'sent_at', searchColumns);
   // Fetching data
   const { exerciseId } = useParams();
-  const { exercise, injects, injectorContractsMap, tagsMap } = useHelper((helper) => {
+  const { exercise, injects, tagsMap } = useHelper((helper) => {
     return {
       exercise: helper.getExercise(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
-      injectorContractsMap: helper.getInjectorContractsMap(),
       tagsMap: helper.getTagsMap(),
     };
   });
   useDataLoader(() => {
-    dispatch(fetchInjectorContracts());
     dispatch(fetchExerciseInjects(exerciseId));
   });
   const sortedInjects = filtering
@@ -347,7 +344,7 @@ const Mails = () => {
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {sortedInjects.map((inject) => {
-          const injectContract = injectorContractsMap[inject.inject_injector_contract];
+          const injectContract = inject.inject_injector_contract.injector_contract_content_parsed;
           return (
             <ListItem
               key={inject.inject_id}

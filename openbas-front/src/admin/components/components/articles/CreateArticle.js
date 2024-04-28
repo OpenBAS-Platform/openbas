@@ -4,7 +4,7 @@ import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
 import ArticleForm from './ArticleForm';
-import { ArticleContext } from '../Context';
+import { ArticleContext } from '../../common/Context';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

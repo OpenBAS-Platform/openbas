@@ -8,7 +8,7 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import Challenges from '../../components/challenges/Challenges';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import type { ChallengesHelper } from '../../../../actions/helper';
-import { ChallengeContext, ChallengeContextType } from '../../components/Context';
+import { ChallengeContext, ChallengeContextType } from '../../common/Context';
 
 const ExerciseChallenges = () => {
   // Standard hooks

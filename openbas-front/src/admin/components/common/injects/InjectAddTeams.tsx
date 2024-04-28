@@ -15,7 +15,7 @@ import type { Theme } from '../../../../components/Theme';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { Option } from '../../../../utils/Option';
-import { PermissionsContext, TeamContext } from '../../components/Context';
+import { PermissionsContext, TeamContext } from '../Context';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import { useHelper } from '../../../../store';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';

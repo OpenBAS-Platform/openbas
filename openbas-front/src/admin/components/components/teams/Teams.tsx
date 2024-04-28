@@ -20,7 +20,7 @@ import { fetchTeams } from '../../../../actions/teams/team-actions';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import TeamPlayers from './TeamPlayers';
-import { PermissionsContext, TeamContext } from '../Context';
+import { PermissionsContext, TeamContext } from '../../common/Context';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 
 const useStyles = makeStyles(() => ({
