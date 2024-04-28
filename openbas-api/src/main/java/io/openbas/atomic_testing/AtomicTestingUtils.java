@@ -154,16 +154,16 @@ public class AtomicTestingUtils {
           .map(entry -> {
             List<InjectTargetWithResult> children = new ArrayList<>();
 
-            entry.getKey().getAssets().forEach(child -> {
-                  assetsToRefine.forEach(asset -> {
-                    if (asset.getId().equals(child.getId())) {
-                      children.add(asset);
-                    } else {
-                      assetsWithoutParent.add(asset);
-                    }
-                  });
-                }
-            );
+            assetsToRefine.forEach(asset -> {
+              boolean found = entry.getKey().getAssets().stream()
+                  .anyMatch(parentAsset -> parentAsset.getId().equals(asset.getId()));
+              if (found) {
+                children.add(asset);
+              } else {
+                assetsWithoutParent.add(asset);
+              }
+            });
+
             return new InjectTargetWithResult(TargetType.ASSETS_GROUPS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), children);
           })
           .toList());

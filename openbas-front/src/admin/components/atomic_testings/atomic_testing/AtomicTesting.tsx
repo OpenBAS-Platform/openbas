@@ -131,6 +131,37 @@ const AtomicTesting = () => {
                     }
                   />
                 </ListItemButton>
+                <List component="div" disablePadding>
+                  {target?.children?.map((child) => <Paper elevation={1} style={{ marginBottom: 5 }} key={child?.id}>
+                    <ListItemButton
+                      sx={{ pl: 6 }}
+                      key={child?.id}
+                      onClick={() => handleTargetClick(child)}
+                    >
+                      <ListItemText
+                        primary={
+                          <div>
+                            <div style={{
+                              color: 'gray',
+                              display: 'inline-block',
+                              float: 'left',
+                              paddingRight: 10,
+                            }}
+                            >{getIcon(child?.targetType)}</div>
+                            <div className={classes.bodyTarget} style={{ width: '30%' }}>
+                              {`${child?.name}`}
+                            </div>
+                            <div style={{ float: 'right' }}>
+                              <AtomicTestingResult
+                                expectations={child?.expectationResultsByTypes}
+                              />
+                            </div>
+                          </div>
+                          }
+                      />
+                    </ListItemButton>
+                  </Paper>)}
+                </List>
               </Paper>)}
             </List>
           ) : (
