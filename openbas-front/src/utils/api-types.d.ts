@@ -154,7 +154,7 @@ export interface AtomicTestingInput {
   inject_asset_groups?: string[];
   inject_assets?: string[];
   inject_content?: object;
-  inject_injector_contract?: string;
+  inject_contract?: string;
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
   inject_tags?: string[];
@@ -480,9 +480,9 @@ export interface CreateUserInput {
 
 export interface DirectInjectInput {
   inject_content?: object;
-  inject_injector_contract?: string;
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
+  inject_injector_contract?: string;
   inject_title?: string;
   inject_type?: string;
   inject_users?: string[];
@@ -855,7 +855,6 @@ export interface Inject {
   /** @format int64 */
   inject_communications_number?: number;
   inject_content?: object;
-  inject_injector_contract?: string;
   inject_country?: string;
   /** @format date-time */
   inject_created_at?: string;
@@ -873,6 +872,7 @@ export interface Inject {
   inject_exercise?: Exercise;
   inject_expectations?: InjectExpectation[];
   inject_id?: string;
+  inject_injector_contract?: InjectorContract;
   inject_payloads?: Asset[];
   inject_scenario?: Scenario;
   /** @format date-time */
@@ -953,13 +953,13 @@ export interface InjectInput {
   inject_assets?: string[];
   inject_city?: string;
   inject_content?: object;
-  inject_injector_contract?: string;
   inject_country?: string;
   /** @format int64 */
   inject_depends_duration?: number;
   inject_depends_from_another?: string;
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
+  inject_injector_contract?: string;
   inject_tags?: string[];
   inject_teams?: string[];
   inject_title?: string;
@@ -1651,6 +1651,25 @@ export interface PageMitigation {
 
 export interface PagePayload {
   content?: Payload[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageScenario {
+  content?: Scenario[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
