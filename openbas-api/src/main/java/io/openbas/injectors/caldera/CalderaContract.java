@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static io.openbas.collectors.caldera.service.CalderaCollectorService.toPlatform;
 import static io.openbas.contract.Contract.executableContract;
 import static io.openbas.contract.ContractCardinality.Multiple;
 import static io.openbas.contract.ContractDef.contractBuilder;
@@ -116,12 +117,35 @@ public class CalderaContract extends Contractor {
       builder.mandatory(obfuscatorField);
       builder.mandatoryGroup(assetField, assetGroupField);
       builder.optional(expectationsField);
+      List<String> platforms = new ArrayList<>();
+      ability.getExecutors().forEach(executor -> {
+        if( !executor.getPlatform().equals("unknown")) {
+          String platform = toPlatform(executor.getPlatform()).name();
+          if( !platforms.contains(platform) ) {
+            platforms.add(platform);
+          }
+        } else {
+          if (executor.getName().equals("psh") ) {
+            if( !platforms.contains(Endpoint.PLATFORM_TYPE.Windows.name()) ) {
+              platforms.add(Endpoint.PLATFORM_TYPE.Windows.name());
+            }
+          } else if (executor.getName().equals("sh") ) {
+            if( !platforms.contains(Endpoint.PLATFORM_TYPE.Linux.name()) ) {
+              platforms.add(Endpoint.PLATFORM_TYPE.Linux.name());
+            }
+          } else if (executor.getName().equals("cmd") ) {
+            if( !platforms.contains(Endpoint.PLATFORM_TYPE.Windows.name()) ) {
+              platforms.add(Endpoint.PLATFORM_TYPE.Windows.name());
+            }
+          }
+        }
+      });
       Contract contract = executableContract(
           contractConfig,
           ability.getAbility_id(),
           Map.of(en, ability.getName(), fr, ability.getName()),
           builder.build(),
-          List.of(Endpoint.PLATFORM_TYPE.Internal.name())
+          platforms
       );
       contract.addContext("collector-ids", String.join(", ", this.config.getCollectorIds()));
       contract.addAttackPattern(ability.getTechnique_id());

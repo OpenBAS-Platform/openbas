@@ -93,6 +93,7 @@ public class InjectorService {
                     existing.add(contract.getId());
                     contract.setManual(current.get().isManual());
                     contract.setAtomicTesting(current.get().isAtomicTesting());
+                    contract.setPlatforms(current.get().getPlatforms().toArray(new String[0]));
                     Map<String, String> labels = current.get().getLabel().entrySet().stream()
                             .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
                     contract.setLabels(labels);
@@ -117,6 +118,7 @@ public class InjectorService {
                 injectorContract.setId(in.getId());
                 injectorContract.setManual(in.isManual());
                 injectorContract.setAtomicTesting(in.isAtomicTesting());
+                injectorContract.setPlatforms(in.getPlatforms().toArray(new String[0]));
                 Map<String, String> labels = in.getLabel().entrySet().stream()
                         .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
                 injectorContract.setLabels(labels);

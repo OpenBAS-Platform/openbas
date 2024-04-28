@@ -3,6 +3,8 @@ package io.openbas.injectors.caldera.client.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Ability {
@@ -13,5 +15,6 @@ public class Ability {
   private String technique_id;
   private String name;
   private String description;
+  private List<Executor> executors;
 
 }

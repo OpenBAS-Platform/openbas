@@ -40,6 +40,15 @@ public class CalderaCollectorService implements Runnable {
 
   private final ObjectMapper objectMapper = new ObjectMapper();
 
+  public static Endpoint.PLATFORM_TYPE toPlatform(@NotBlank final String platform) {
+    return switch (platform) {
+      case "linux" -> Endpoint.PLATFORM_TYPE.Linux;
+      case "windows" -> Endpoint.PLATFORM_TYPE.Windows;
+      case "darwin" -> Endpoint.PLATFORM_TYPE.MacOS;
+      default -> throw new IllegalArgumentException("This platform is not supported : " + platform);
+    };
+  }
+
   @Autowired
   public CalderaCollectorService(CollectorService collectorService, CalderaCollectorClient client,
       CalderaCollectorConfig config, EndpointService endpointService) {
@@ -140,15 +149,6 @@ public class CalderaCollectorService implements Runnable {
     existing.getBlobs().put(this.config.getId(), blob);
     existing.setLastSeen(external.getLastSeen());
     return existing;
-  }
-
-  private Endpoint.PLATFORM_TYPE toPlatform(@NotBlank final String platform) {
-    return switch (platform) {
-      case "linux" -> Endpoint.PLATFORM_TYPE.Linux;
-      case "windows" -> Endpoint.PLATFORM_TYPE.Windows;
-      case "darwin" -> Endpoint.PLATFORM_TYPE.MacOS;
-      default -> throw new IllegalArgumentException("This platform is not supported : " + platform);
-    };
   }
 
   private Instant toInstant(@NotNull final String lastSeen) {
