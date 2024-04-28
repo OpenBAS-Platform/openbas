@@ -9,17 +9,17 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { horizontalBarsChartOptions } from '../../../../utils/Charts';
-import type { Theme } from '../../../../components/Theme';
-import { getTeamsColors } from './InjectsDistribution';
+import { computeTeamsColors } from '../overview/DistributionUtils';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import { fetchExerciseTeams } from '../../../../actions/Exercise';
-import type { TeamStore } from '../../../../actions/teams/Team';
+import type { Theme } from '../../../../components/Theme';
+import type { Team } from '../../../../utils/api-types';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
 }
 
-const InjectDistributionByTeam: FunctionComponent<Props> = ({
+const MailDistributionByTeam: FunctionComponent<Props> = ({
   exerciseId,
 }) => {
   // Standard hooks
@@ -29,25 +29,28 @@ const InjectDistributionByTeam: FunctionComponent<Props> = ({
 
   // Fetching data
   const { teams } = useHelper((helper: TeamsHelper) => ({
-    teams: helper.getExerciseTeams(exerciseId),
+    teams: helper.getTeams(),
   }));
   useDataLoader(() => {
     dispatch(fetchExerciseTeams(exerciseId));
   });
 
-  const teamsColors = getTeamsColors(teams);
-  const sortedTeamsByExpectedScore = R.pipe(
-    R.sortWith([
-      R.descend(R.prop('team_injects_expectations_total_expected_score')),
-    ]),
+  const teamsColors = computeTeamsColors(teams, theme);
+  const sortedTeamsByCommunicationNumber = R.pipe(
+    R.map((a: Team) => R.assoc(
+      'team_communications_number',
+      a.team_communications?.length,
+      a,
+    )),
+    R.sortWith([R.descend(R.prop('team_communications_number'))]),
     R.take(10),
   )(teams || []);
-  const expectedScoreByTeamData = [
+  const totalMailsByTeamData = [
     {
-      name: t('Total expected score'),
-      data: sortedTeamsByExpectedScore.map((a: TeamStore) => ({
+      name: t('Total mails'),
+      data: sortedTeamsByCommunicationNumber.map((a: Team & { team_communications_number: number }) => ({
         x: a.team_name,
-        y: a.team_injects_expectations_total_expected_score,
+        y: a.team_communications_number,
         fillColor: teamsColors[a.team_id],
       })),
     },
@@ -55,20 +58,24 @@ const InjectDistributionByTeam: FunctionComponent<Props> = ({
 
   return (
     <>
-      {sortedTeamsByExpectedScore.length > 0 ? (
+      {sortedTeamsByCommunicationNumber.length > 0 ? (
         <Chart
           // @ts-expect-error: Need to migrate Chart.js file
           options={horizontalBarsChartOptions(theme)}
-          series={expectedScoreByTeamData}
+          series={totalMailsByTeamData}
           type="bar"
           width="100%"
-          height={50 + sortedTeamsByExpectedScore.length * 50}
+          height={50 + sortedTeamsByCommunicationNumber.length * 50}
         />
       ) : (
-        <Empty message={t('No teams in this exercise.')} />
+        <Empty
+          message={t(
+            'No data to display or the simulation has not started yet',
+          )}
+        />
       )}
     </>
   );
 };
 
-export default InjectDistributionByTeam;
+export default MailDistributionByTeam;

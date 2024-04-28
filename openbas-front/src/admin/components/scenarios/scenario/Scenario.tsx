@@ -9,7 +9,7 @@ import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { fetchExercises } from '../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
-import ExerciseList from '../../exercises/ExerciseList';
+import ExerciseList from '../../simulations/ExerciseList';
 import ScenarioDistributionByExercise from './ScenarioDistributionByExercise';
 
 const Scenario = () => {

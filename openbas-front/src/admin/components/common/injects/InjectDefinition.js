@@ -54,14 +54,14 @@ import InjectAddArticles from './InjectAddArticles';
 import ChannelIcon from '../../components/channels/ChannelIcon';
 import ChallengePopover from '../../components/challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
-import AvailableVariablesDialog from '../../exercises/variables/AvailableVariablesDialog';
+import AvailableVariablesDialog from '../../simulations/variables/AvailableVariablesDialog';
 import InjectExpectations from './expectations/InjectExpectations';
 import EndpointsList from '../../assets/endpoints/EndpointsList';
 import EndpointPopover from '../../assets/endpoints/EndpointPopover';
-import InjectAddEndpoints from '../../exercises/injects/endpoints/InjectAddEndpoints';
+import InjectAddEndpoints from '../../simulations/injects/endpoints/InjectAddEndpoints';
 import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
 import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
-import InjectAddAssetGroups from '../../exercises/injects/assetgroups/InjectAddAssetGroups';
+import InjectAddAssetGroups from '../../simulations/injects/asset_groups/InjectAddAssetGroups';
 import TagField from '../../../../components/TagField';
 
 const styles = (theme) => ({
@@ -650,7 +650,7 @@ class InjectDefinition extends Component {
     }
     injectorContract.fields
       .filter(
-        (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+        (f) => !['teams', 'assets', 'asset_groups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
           f.key,
         ),
       )
@@ -738,7 +738,7 @@ class InjectDefinition extends Component {
     if (injectorContract && Array.isArray(injectorContract.fields)) {
       injectorContract.fields
         .filter(
-          (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+          (f) => !['teams', 'assets', 'asset_groups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
             f.key,
           ),
         )
@@ -1197,7 +1197,7 @@ class InjectDefinition extends Component {
     // -- ASSET GROUPS --
     const hasAssetGroups = injectorContract.fields
       .map((f) => f.key)
-      .includes('assetgroups');
+      .includes('asset_groups');
     const assetGroups = assetGroupIds
       .map((a) => assetGroupsMap[a])
       .filter((a) => a !== undefined);
@@ -1279,7 +1279,7 @@ class InjectDefinition extends Component {
     const builtInFields = [
       'teams',
       'assets',
-      'assetgroups',
+      'asset_groups',
       'articles',
       'challenges',
       'attachments',
