@@ -1,4 +1,4 @@
-package io.openbas.injects.opencti.model;
+package io.openbas.injectors.opencti.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.model.inject.form.Expectation;

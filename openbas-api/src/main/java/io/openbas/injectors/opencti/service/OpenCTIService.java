@@ -1,8 +1,8 @@
-package io.openbas.injects.opencti.service;
+package io.openbas.injectors.opencti.service;
 
 import io.openbas.database.model.DataAttachment;
 import io.openbas.database.model.Execution;
-import io.openbas.injects.opencti.config.OpenCTIConfig;
+import io.openbas.injectors.opencti.config.OpenCTIConfig;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.HttpClients;

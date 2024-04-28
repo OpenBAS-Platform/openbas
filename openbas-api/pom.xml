@@ -45,16 +45,6 @@
                 </dependency>
                 <dependency>
                     <groupId>io.openbas</groupId>
-                    <artifactId>openbas-injector-caldera</artifactId>
-                    <version>3.5.1-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                    <groupId>io.openbas</groupId>
-                    <artifactId>openbas-collector-caldera</artifactId>
-                    <version>3.5.1-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                    <groupId>io.openbas</groupId>
                     <artifactId>openbas-collector-sentinel</artifactId>
                     <version>3.5.1-SNAPSHOT</version>
                 </dependency>

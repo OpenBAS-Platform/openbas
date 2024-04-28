@@ -22,6 +22,15 @@ public class ScenarioInput {
   @JsonProperty("scenario_subtitle")
   private String subtitle;
 
+  @JsonProperty("scenario_category")
+  private String category;
+
+  @JsonProperty("scenario_main_focus")
+  private String mainFocus;
+
+  @JsonProperty("scenario_severity")
+  private String severity;
+
   @JsonProperty("scenario_tags")
   private List<String> tagIds = new ArrayList<>();
 

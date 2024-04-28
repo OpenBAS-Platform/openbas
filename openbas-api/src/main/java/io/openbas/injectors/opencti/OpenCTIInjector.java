@@ -1,4 +1,4 @@
-package io.openbas.injects.opencti;
+package io.openbas.injectors.opencti;
 
 import io.openbas.integrations.InjectorService;
 import org.springframework.beans.factory.annotation.Autowired;

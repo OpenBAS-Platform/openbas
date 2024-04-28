@@ -1,5 +1,6 @@
 package io.openbas.injects.manual;
 
+import io.openbas.injectors.manual.ManualExecutor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

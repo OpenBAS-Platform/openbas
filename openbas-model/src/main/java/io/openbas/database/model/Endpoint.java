@@ -26,8 +26,10 @@ public class Endpoint extends Asset {
     Linux,
     @JsonProperty("Windows")
     Windows,
-    @JsonProperty("Darwin")
-    Darwin,
+    @JsonProperty("MacOS")
+    MacOS,
+    @JsonProperty("Generic")
+    Generic,
   }
 
   @Queryable(filterable = true)

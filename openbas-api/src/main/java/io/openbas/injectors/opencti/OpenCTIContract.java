@@ -1,10 +1,10 @@
-package io.openbas.injects.opencti;
+package io.openbas.injectors.opencti;
 
 import io.openbas.contract.*;
 import io.openbas.contract.fields.ContractElement;
 import io.openbas.contract.fields.ContractExpectations;
 import io.openbas.database.model.Variable.VariableType;
-import io.openbas.injects.opencti.config.OpenCTIConfig;
+import io.openbas.injectors.opencti.config.OpenCTIConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

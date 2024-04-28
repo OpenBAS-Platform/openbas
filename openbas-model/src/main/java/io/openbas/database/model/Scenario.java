@@ -51,6 +51,18 @@ public class Scenario implements Base {
   @JsonProperty("scenario_subtitle")
   private String subtitle;
 
+  @Column(name = "scenario_category")
+  @JsonProperty("scenario_category")
+  private String category;
+
+  @Column(name = "scenario_main_focus")
+  @JsonProperty("scenario_main_focus")
+  private String mainFocus;
+
+  @Column(name = "scenario_severity")
+  @JsonProperty("scenario_severity")
+  private String severity;
+
   // -- RECURRENCE --
 
   @Column(name = "scenario_recurrence")
@@ -152,7 +164,7 @@ public class Scenario implements Base {
   private List<LessonsCategory> lessonsCategories = new ArrayList<>();
 
   @OneToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "scenario_exercise",
+  @JoinTable(name = "scenarios_exercises",
       joinColumns = @JoinColumn(name = "scenario_id"),
       inverseJoinColumns = @JoinColumn(name = "exercise_id"))
   @JsonSerialize(using = MultiIdDeserializer.class)

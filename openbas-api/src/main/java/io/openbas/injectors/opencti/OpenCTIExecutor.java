@@ -1,10 +1,10 @@
-package io.openbas.injects.opencti;
+package io.openbas.injectors.opencti;
 
 import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.Injector;
-import io.openbas.injects.opencti.model.CaseContent;
-import io.openbas.injects.opencti.service.OpenCTIService;
+import io.openbas.injectors.opencti.model.CaseContent;
+import io.openbas.injectors.opencti.service.OpenCTIService;
 import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ManualExpectation;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static io.openbas.database.model.InjectStatusExecution.traceError;
-import static io.openbas.injects.opencti.OpenCTIContract.OPENCTI_CREATE_CASE;
+import static io.openbas.injectors.opencti.OpenCTIContract.OPENCTI_CREATE_CASE;
 
 @Component(OpenCTIContract.TYPE)
 public class OpenCTIExecutor extends Injector {

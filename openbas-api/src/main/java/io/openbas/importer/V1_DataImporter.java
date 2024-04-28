@@ -7,7 +7,7 @@ import io.openbas.database.repository.*;
 import io.openbas.injects.challenge.model.ChallengeContent;
 import io.openbas.injects.channel.model.ChannelContent;
 import io.openbas.injects.email.EmailContract;
-import io.openbas.injects.manual.ManualContract;
+import io.openbas.injectors.manual.ManualContract;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.service.FileService;

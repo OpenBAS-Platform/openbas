@@ -130,7 +130,7 @@ public class Exercise implements Base {
 
     @Getter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinTable(name = "scenario_exercise",
+    @JoinTable(name = "scenarios_exercises",
         joinColumns = @JoinColumn(name = "exercise_id"),
         inverseJoinColumns = @JoinColumn(name = "scenario_id"))
     @JsonSerialize(using = MonoIdDeserializer.class)
