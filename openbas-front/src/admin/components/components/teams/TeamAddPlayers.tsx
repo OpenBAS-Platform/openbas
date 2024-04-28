@@ -18,7 +18,7 @@ import { resolveUserName, truncate } from '../../../../utils/String';
 import ItemTags from '../../../../components/ItemTags';
 import CreatePlayer from '../../teams/players/CreatePlayer';
 import Transition from '../../../../components/common/Transition';
-import { TeamContext } from '../Context';
+import { TeamContext } from '../../common/Context';
 
 const useStyles = makeStyles(() => ({
   createButton: {

@@ -6,7 +6,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import EndpointsDialogAdding from '../../../assets/endpoints/EndpointsDialogAdding';
 import type { EndpointStore } from '../../../assets/endpoints/Endpoint';
-import { PermissionsContext } from '../../../components/Context';
+import { PermissionsContext } from '../../../common/Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {

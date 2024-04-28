@@ -5,7 +5,7 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../utils/hooks';
 import DefinitionMenu from '../../components/DefinitionMenu';
 import Teams from '../../components/teams/Teams';
-import { PermissionsContext, TeamContext } from '../../components/Context';
+import { PermissionsContext, TeamContext } from '../../common/Context';
 import type { UserStore } from '../../teams/players/Player';
 import AddTeams from '../../components/teams/AddTeams';
 import type { Team, TeamCreateInput } from '../../../../utils/api-types';

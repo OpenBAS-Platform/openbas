@@ -4,6 +4,7 @@ import com.jayway.jsonpath.JsonPath;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.InjectRepository;
+import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.service.ScenarioService;
@@ -41,6 +42,8 @@ public class InjectApiTest {
   private ScenarioRepository scenarioRepository;
   @Autowired
   private InjectRepository injectRepository;
+  @Autowired
+  private InjectorContractRepository injectorContractRepository;
 
   static String SCENARIO_ID;
   static String INJECT_ID;
@@ -67,7 +70,7 @@ public class InjectApiTest {
     InjectInput input = new InjectInput();
     input.setTitle("Test inject");
     input.setType(TYPE);
-    input.setContract(EMAIL_DEFAULT);
+    input.setInjectorContract(EMAIL_DEFAULT);
     input.setDependsDuration(0L);
 
     // -- EXECUTE --

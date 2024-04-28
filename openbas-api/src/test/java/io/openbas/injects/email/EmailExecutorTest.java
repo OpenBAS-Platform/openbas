@@ -1,14 +1,17 @@
-package io.openbas.injectors.email;
+package io.openbas.injects.email;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Execution;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.User;
+import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
+import io.openbas.injectors.email.EmailContract;
+import io.openbas.injectors.email.EmailExecutor;
 import io.openbas.injectors.email.model.EmailContent;
 import io.openbas.model.ExecutionProcess;
 import io.openbas.model.inject.form.Expectation;
@@ -31,6 +34,8 @@ public class EmailExecutorTest {
   @Autowired
   private UserRepository userRepository;
   @Autowired
+  private InjectorContractRepository injectorContractRepository;
+  @Autowired
   private ExecutionContextService executionContextService;
   @Resource
   protected ObjectMapper mapper;
@@ -48,7 +53,7 @@ public class EmailExecutorTest {
     content.setExpectations(List.of(expectation));
     Inject inject = new Inject();
     inject.setType(EmailContract.TYPE);
-    inject.setContract(EmailContract.EMAIL_DEFAULT);
+    inject.setInjectorContract(injectorContractRepository.findById(EmailContract.EMAIL_DEFAULT).orElseThrow());
     inject.setContent(this.mapper.valueToTree(content));
     Iterable<User> users = this.userRepository.findAll();
     List<ExecutionContext> userInjectContexts = fromIterable(users).stream()

@@ -12,7 +12,7 @@ import { countryOption, Option, organizationOption, tagOptions } from '../../../
 import { useHelper } from '../../../../store';
 import type { OrganizationsHelper, TagsHelper, UsersHelper } from '../../../../actions/helper';
 import type { PlayerInputForm, UserStore } from './Player';
-import { TeamContext } from '../../components/Context';
+import { TeamContext } from '../../common/Context';
 
 interface PlayerPopoverProps {
   user: UserStore;

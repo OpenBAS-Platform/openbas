@@ -16,7 +16,6 @@ import TagsFilter from '../../../../components/TagsFilter';
 import InjectIcon from '../../common/injects/InjectIcon';
 import ItemTags from '../../../../components/ItemTags';
 import TeamOrAssetLine from './common/TeamOrAssetLine';
-import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

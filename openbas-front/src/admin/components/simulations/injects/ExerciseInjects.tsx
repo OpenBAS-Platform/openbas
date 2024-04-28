@@ -4,7 +4,7 @@ import { ReorderOutlined, SignalCellularAltOutlined } from '@mui/icons-material'
 import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import type { Exercise, Inject } from '../../../../utils/api-types';
-import { ArticleContext, InjectContext, InjectContextType, TeamContext } from '../../components/Context';
+import { ArticleContext, InjectContext, InjectContextType, TeamContext } from '../../common/Context';
 import { useAppDispatch } from '../../../../utils/hooks';
 import {
   addInjectForExercise,

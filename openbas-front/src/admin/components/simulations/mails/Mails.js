@@ -17,7 +17,6 @@ import { useHelper } from '../../../../store';
 import { exportData } from '../../../../utils/Environment';
 import AnimationMenu from '../AnimationMenu';
 import CreateQuickInject from '../injects/CreateQuickInject';
-import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 import MailDistributionOverTimeChart from './MailDistributionOverTimeChart';
 import MailDistributionOverTimeLine from './MailDistributionOverTimeLine';
 import MailDistributionByTeam from './MailDistributionByTeam';

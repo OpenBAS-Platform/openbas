@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { useParams } from 'react-router-dom';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
-import { ArticleContext, InjectContext, InjectContextType, TeamContext } from '../../../components/Context';
+import { ArticleContext, InjectContext, InjectContextType, TeamContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';

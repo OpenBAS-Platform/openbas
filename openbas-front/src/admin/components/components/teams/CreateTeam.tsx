@@ -11,7 +11,7 @@ import TeamForm from './TeamForm';
 import type { TeamCreateInput } from '../../../../utils/api-types';
 import { addTeam } from '../../../../actions/teams/team-actions';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { TeamContext } from '../Context';
+import { TeamContext } from '../../common/Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {

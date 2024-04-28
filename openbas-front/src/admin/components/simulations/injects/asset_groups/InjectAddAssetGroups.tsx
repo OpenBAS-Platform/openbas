@@ -5,7 +5,7 @@ import { ControlPointOutlined } from '@mui/icons-material';
 import type { Theme } from '../../../../../components/Theme';
 import { useFormatter } from '../../../../../components/i18n';
 import AssetGroupDialogAdding from '../../../assets/asset_groups/AssetGroupDialogAdding';
-import { PermissionsContext } from '../../../components/Context';
+import { PermissionsContext } from '../../../common/Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {

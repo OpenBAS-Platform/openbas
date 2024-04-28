@@ -243,16 +243,8 @@ public class InjectApi extends RestBehavior {
   @GetMapping("/api/exercises/{exerciseId}/injects")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Inject> exerciseInjects(@PathVariable String exerciseId) {
-    List<Inject> injects = fromIterable(injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)));
-    List<String> injectorContractFromInjects = injects.stream().map(Inject::getContract).distinct()
-        .toList();
-    Map<String, InjectorContract> injectorContracts = fromIterable(
-        this.injectorContractRepository.findAllById(injectorContractFromInjects)).stream().collect(
-        Collectors.toMap(InjectorContract::getId, Function.identity()));
-    return injects.stream().map((inject -> {
-      inject.setInjectorContract(injectorContracts.get(inject.getContract()));
-      return inject;
-    })).sorted(Inject.executionComparator).toList();
+    return injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)).stream()
+            .sorted(Inject.executionComparator).toList();
   }
 
   @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}")
@@ -410,16 +402,10 @@ public class InjectApi extends RestBehavior {
   @GetMapping(SCENARIO_URI + "/{scenarioId}/injects")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<Inject> scenarioInjects(@PathVariable @NotBlank final String scenarioId) {
-    List<Inject> injects = fromIterable(injectRepository.findAll(InjectSpecification.fromScenario(scenarioId)));
-    List<String> injectorContractFromInjects = injects.stream().map(Inject::getContract).distinct()
-        .toList();
-    Map<String, InjectorContract> injectorContracts = fromIterable(
-        this.injectorContractRepository.findAllById(injectorContractFromInjects)).stream().collect(
-        Collectors.toMap(InjectorContract::getId, Function.identity()));
-    return injects.stream().map((inject -> {
-      inject.setInjectorContract(injectorContracts.get(inject.getContract()));
-      return inject;
-    })).sorted(Inject.executionComparator).toList();
+    return this.injectRepository.findAll(InjectSpecification.fromScenario(scenarioId))
+            .stream()
+            .sorted(Inject.executionComparator)
+            .toList();
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")

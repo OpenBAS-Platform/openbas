@@ -8,7 +8,7 @@ import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/at
 import AtomicTestingPopover from './AtomicTestingPopover';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
-import { AtomicTestingResultContext } from '../../components/Context';
+import { AtomicTestingResultContext } from '../../common/Context';
 import StatusChip from './StatusChip';
 import type { AtomicTestingOutput } from '../../../../utils/api-types';
 import useDataLoader from '../../../../utils/ServerSideEvent';

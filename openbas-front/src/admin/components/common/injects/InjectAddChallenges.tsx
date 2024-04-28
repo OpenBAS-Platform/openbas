@@ -16,7 +16,7 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { ChallengesHelper } from '../../../../actions/helper';
-import { PermissionsContext } from '../../components/Context';
+import { PermissionsContext } from '../Context';
 import type { Challenge } from '../../../../utils/api-types';
 
 const useStyles = makeStyles((theme: Theme) => ({

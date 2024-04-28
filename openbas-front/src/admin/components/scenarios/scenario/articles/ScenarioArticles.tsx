@@ -10,7 +10,7 @@ import type { ArticlesHelper } from '../../../../../actions/channels/article-hel
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import type { ArticleStore, FullArticleStore } from '../../../../../actions/channels/Article';
 import type { ArticleCreateInput, ArticleUpdateInput } from '../../../../../utils/api-types';
-import { ArticleContext } from '../../../components/Context';
+import { ArticleContext } from '../../../common/Context';
 
 export const articleContextForScenario = (scenarioId: ScenarioStore['scenario_id']) => {
   const dispatch = useAppDispatch();

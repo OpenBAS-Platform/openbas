@@ -11,7 +11,7 @@ import type { Theme } from '../../../../components/Theme';
 import type { TeamInputForm } from '../../../../actions/teams/Team';
 import { schemaValidator } from '../../../../utils/Zod';
 import CheckboxField from '../../../../components/CheckboxField';
-import { TeamContext, TeamContextType } from '../Context';
+import { TeamContext, TeamContextType } from '../../common/Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {

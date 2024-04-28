@@ -65,11 +65,6 @@ public class Inject implements Base, Injection {
   private String description;
 
   @Getter
-  @Column(name = "inject_contract")
-  @JsonProperty("inject_contract")
-  private String contract;
-
-  @Getter
   @Transient
   @JsonProperty("inject_injector_contract")
   private InjectorContract injectorContract;

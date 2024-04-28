@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import * as R from 'ramda';
 import { Chip, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import { CSVLink } from 'react-csv';
 import { FileDownloadOutlined } from '@mui/icons-material';
@@ -18,7 +17,6 @@ import ItemBoolean from '../../../../components/ItemBoolean';
 import { exportData } from '../../../../utils/Environment';
 import Loader from '../../../../components/Loader';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { InjectContext, PermissionsContext } from '../Context';
 import CreateInject from './CreateInject';

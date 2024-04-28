@@ -43,6 +43,9 @@ public class ExerciseExpectationServiceTest {
     @Autowired
     private InjectExpectationRepository injectExpectationRepository;
 
+    @Autowired
+    private InjectorContractRepository injectorContractRepository;
+
     static String EXERCISE_ID;
 
     @BeforeAll
@@ -61,7 +64,7 @@ public class ExerciseExpectationServiceTest {
         Inject inject = new Inject();
         inject.setTitle("test");
         inject.setType(TYPE);
-        inject.setContract(EMAIL_DEFAULT);
+        inject.setInjectorContract(injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
         inject.setExercise(exerciseCreated);
         inject.setDependsDuration(0L);
         Inject injectCreated = this.injectRepository.save(inject);

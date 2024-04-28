@@ -9,7 +9,7 @@ import SearchFilter from '../../../../components/SearchFilter';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import TagsFilter from '../../../../components/TagsFilter';
 import { useFormatter } from '../../../../components/i18n';
-import { ChallengeContext } from '../Context';
+import { ChallengeContext } from '../../common/Context';
 
 const useStyles = makeStyles(() => ({
   flag: {

@@ -17,7 +17,7 @@ import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import type { TeamStore } from '../../../../../actions/teams/Team';
 import Teams from '../../../components/teams/Teams';
-import { PermissionsContext, TeamContext } from '../../../components/Context';
+import { PermissionsContext, TeamContext } from '../../../common/Context';
 import type { Team, TeamCreateInput } from '../../../../../utils/api-types';
 import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
 import type { UserStore } from '../../../teams/players/Player';

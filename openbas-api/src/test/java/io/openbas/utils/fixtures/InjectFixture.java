@@ -13,7 +13,6 @@ public class InjectFixture {
     Inject inject = new Inject();
     inject.setTitle(INJECT_EMAIL_NAME);
     inject.setType(TYPE);
-    inject.setContract(EMAIL_DEFAULT);
     inject.setEnabled(true);
     inject.setDependsDuration(0L);
     return inject;

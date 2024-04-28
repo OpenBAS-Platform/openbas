@@ -7,7 +7,7 @@ import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import type { Variable } from '../../../../utils/api-types';
 import SearchFilter from '../../../../components/SearchFilter';
 import CreateVariable from './CreateVariable';
-import { PermissionsContext, VariableContext } from '../Context';
+import { PermissionsContext, VariableContext } from '../../common/Context';
 
 const useStyles = makeStyles(() => ({
   itemHead: {

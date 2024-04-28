@@ -6,7 +6,7 @@ import { useFormatter } from '../../../../components/i18n';
 import VariableForm from './VariableForm';
 import type { VariableInput } from '../../../../utils/api-types';
 import Transition from '../../../../components/common/Transition';
-import { VariableContext } from '../Context';
+import { VariableContext } from '../../common/Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {
