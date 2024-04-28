@@ -2,7 +2,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { MenuItem, Button } from '@mui/material';
-import SelectField from '../../../components/SelectField';
+import SelectField from '../../../components/fields/SelectField';
 import inject18n from '../../../components/i18n';
 import OldTextField from '../../../components/OldTextField';
 

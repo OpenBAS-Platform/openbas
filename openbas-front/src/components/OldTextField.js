@@ -24,9 +24,10 @@ const TextFieldBase = ({
       InputProps={{
         endAdornment: askAi && (
         <TextFieldAskAI
+          variant="text"
           currentValue={input.value}
           setFieldValue={(val) => {
-            others.onChange(input.name, val);
+            input.onChange(val);
           }}
           format="text"
           disabled={others.disabled}

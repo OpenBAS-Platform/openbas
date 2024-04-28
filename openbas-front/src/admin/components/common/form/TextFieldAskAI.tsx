@@ -1,13 +1,15 @@
 import React, { FunctionComponent, useState } from 'react';
 import { AutoAwesomeOutlined } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, IconButton, InputAdornment, InputLabel, Menu, MenuItem, Select } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, IconButton, InputAdornment, InputLabel, Menu, MenuItem, Select, TextField } from '@mui/material';
 import EETooltip from '../entreprise_edition/EETooltip';
 import { useFormatter } from '../../../../components/i18n';
 // eslint-disable-next-line import/no-cycle
 import ResponseDialog from '../../../../utils/ai/ResponseDialog';
+// eslint-disable-next-line import/no-cycle
+import SimpleRichTextField from '../../../../components/fields/SimpleRichTextField';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 import useAI from '../../../../utils/hooks/useAI';
-import { aiChangeTone, aiExplain, aiFixSpelling, aiMakeLonger, aiMakeShorter, aiSummarize } from '../../../../actions/AskAI';
+import { aiChangeTone, aiExplain, aiFixSpelling, aiGenMessage, aiMakeLonger, aiMakeShorter, aiSummarize } from '../../../../actions/AskAI';
 
 // region types
 interface TextFieldAskAiProps {
@@ -17,6 +19,7 @@ interface TextFieldAskAiProps {
   variant: 'markdown' | 'html' | 'text' | null;
   disabled?: boolean;
   style?: object;
+  inInject?: boolean;
 }
 
 const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
@@ -26,6 +29,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   format = 'text',
   disabled,
   style,
+  inInject,
 }) => {
   const { t } = useFormatter();
   const isEnterpriseEdition = useEnterpriseEdition();
@@ -33,7 +37,14 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   const [content, setContent] = useState('');
   const [disableResponse, setDisableResponse] = useState(false);
   const [openToneOptions, setOpenToneOptions] = useState(false);
+  const [openGenMessageptions, setOpenGenMessageptions] = useState(false);
   const [tone, setTone] = useState<'tactical' | 'operational' | 'strategic'>('tactical');
+  const [messageContext, setMessageContext] = useState<string>('');
+  const [messageInput, setMessageInput] = useState<string>(currentValue);
+  const [messageParagraphs, setMessageParagraphs] = useState<number>(5);
+  const [messageTone, setMessageTone] = useState<'informal' | 'formal' | 'assertive' | 'sarcastic' | 'authoritative' | 'bitter' | 'critical' | 'arrogant' | 'aggressive'>('formal');
+  const [messageSender, setMessageSender] = useState<string>('');
+  const [messageRecipient, setMessageRecipient] = useState<string>('');
   const [isAcceptable, setIsAcceptable] = useState(true);
   const [menuOpen, setMenuOpen] = useState<{ open: boolean; anchorEl: HTMLButtonElement | null; }>({ open: false, anchorEl: null });
   const [displayAskAI, setDisplayAskAI] = useState(false);
@@ -51,6 +62,11 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
     setOpenToneOptions(true);
   };
   const handleCloseToneOptions = () => setOpenToneOptions(false);
+  const handleOpenGenMessageOptions = () => {
+    handleCloseMenu();
+    setOpenGenMessageptions(true);
+  };
+  const handleCloseGenMessageOptions = () => setOpenGenMessageptions(false);
   const handleOpenAskAI = () => setDisplayAskAI(true);
   const handleCloseAskAI = () => setDisplayAskAI(false);
   const askFixSpelling = async () => aiFixSpelling(currentValue, format, (data: string) => setContent(data));
@@ -59,6 +75,16 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   const askChangeTone = async () => aiChangeTone(currentValue, tone, format, (data: string) => setContent(data));
   const askSummarize = async () => aiSummarize(currentValue, format, (data: string) => setContent(data));
   const askExplain = async () => aiExplain(currentValue, (data: string) => setContent(data));
+  const askGenMessage = async () => aiGenMessage(
+    messageContext,
+    messageInput,
+    messageParagraphs,
+    messageTone,
+    messageSender,
+    messageRecipient,
+    format,
+    (data: string) => setContent(data),
+  );
 
   const handleAskAi = async (action: string, canBeAccepted = true) => {
     setDisableResponse(true);
@@ -90,6 +116,10 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
         await askExplain();
         setDisableResponse(false);
         break;
+      case 'genMessage':
+        await askGenMessage();
+        setDisableResponse(false);
+        break;
       default:
         // do nothing
     }
@@ -114,6 +144,11 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
           open={menuOpen.open}
           onClose={handleCloseMenu}
         >
+          {inInject && (
+          <MenuItem onClick={handleOpenGenMessageOptions}>
+            {t('Generate a message')}
+          </MenuItem>
+          )}
           <MenuItem onClick={() => handleAskAi('spelling')}>
             {t('Fix spelling & grammar')}
           </MenuItem>
@@ -148,6 +183,86 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
           format={format}
           isAcceptable={isAcceptable}
         />
+        <Dialog
+          PaperProps={{ elevation: 1 }}
+          open={openGenMessageptions}
+          onClose={handleCloseGenMessageOptions}
+          fullWidth={true}
+          maxWidth="xs"
+        >
+          <DialogTitle>{t('Select options')}</DialogTitle>
+          <DialogContent>
+            <TextField
+              label={t('Context')}
+              fullWidth={true}
+              multiline={true}
+              value={messageContext}
+              rows={5}
+              onChange={(event) => setMessageContext(event.target.value)}
+            />
+            <SimpleRichTextField
+              label={t('Input (describe what you want)')}
+              value={messageInput}
+              onChange={(value: string) => setMessageInput(value)}
+              style={{ marginTop: 20, height: 200 }}
+            />
+            <FormControl style={{ width: '100%', marginTop: 20 }}>
+              <InputLabel id="messageTone">{t('Tone')}</InputLabel>
+              <Select
+                labelId="messageTone"
+                value={messageTone}
+                onChange={(event) => setMessageTone(event.target.value as unknown as 'informal' | 'formal' | 'assertive' | 'sarcastic' | 'authoritative' | 'bitter' | 'critical' | 'arrogant' | 'aggressive')}
+                fullWidth={true}
+              >
+                <MenuItem value="formal">{t('Formal')}</MenuItem>
+                <MenuItem value="informal">{t('Informal')}</MenuItem>
+                <MenuItem value="authoritative">{t('Authoritative')}</MenuItem>
+                <MenuItem value="assertive">{t('Assertive')}</MenuItem>
+                <MenuItem value="bitter">{t('Bitter')}</MenuItem>
+                <MenuItem value="critical">{t('Critical')}</MenuItem>
+                <MenuItem value="arrogant">{t('Arrogant')}</MenuItem>
+                <MenuItem value="aggressive">{t('Aggressive')}</MenuItem>
+                <MenuItem value="sarcastic">{t('Sarcastic')}</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label={t('Who is sending?')}
+              fullWidth={true}
+              value={messageSender}
+              onChange={(event) => setMessageSender(event.target.value)}
+              style={{ marginTop: 20 }}
+            />
+            <TextField
+              label={t('Who is receiving?')}
+              fullWidth={true}
+              value={messageRecipient}
+              onChange={(event) => setMessageRecipient(event.target.value)}
+              style={{ marginTop: 20 }}
+            />
+            <TextField
+              label={t('Number of paragraphs')}
+              fullWidth={true}
+              type="number"
+              value={messageParagraphs}
+              onChange={(event) => setMessageParagraphs(Number.isNaN(parseInt(event.target.value, 10)) ? 1 : parseInt(event.target.value, 10))}
+              style={{ marginTop: 20 }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseToneOptions}>
+              {t('Cancel')}
+            </Button>
+            <Button
+              onClick={() => {
+                handleCloseGenMessageOptions();
+                handleAskAi('genMessage');
+              }}
+              color="secondary"
+            >
+              {t('Generate')}
+            </Button>
+          </DialogActions>
+        </Dialog>
         <Dialog
           PaperProps={{ elevation: 1 }}
           open={openToneOptions}
@@ -198,7 +313,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   }
   if (variant === 'html') {
     return (
-      <div style={style || { position: 'absolute', top: -12, right: 35 }}>
+      <div style={style || { position: 'absolute', top: 18, right: 20 }}>
         {renderButton()}
       </div>
     );

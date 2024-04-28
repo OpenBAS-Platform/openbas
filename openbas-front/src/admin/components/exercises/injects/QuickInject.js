@@ -42,12 +42,12 @@ import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddTeams from '../../common/injects/InjectAddTeams';
 import { isExerciseReadOnly, isExerciseUpdatable, secondsFromToNow } from '../../../../utils/Exercise';
 import OldTextField from '../../../../components/OldTextField';
-import SwitchField from '../../../../components/SwitchField';
-import EnrichedTextField from '../../../../components/EnrichedTextField';
+import SwitchField from '../../../../components/fields/SwitchField';
+import RichTextField from '../../../../components/fields/RichTextField';
 import InjectAddDocuments from '../../common/injects/InjectAddDocuments';
 import DocumentType from '../../components/documents/DocumentType';
 import DocumentPopover from '../../components/documents/DocumentPopover';
-import SelectField from '../../../../components/SelectField';
+import SelectField from '../../../../components/fields/SelectField';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
 import InjectExpectations from '../../common/injects/expectations/InjectExpectations';
 import { fetchExerciseTeams } from '../../../../actions/Exercise';
@@ -480,7 +480,7 @@ class QuickInject extends Component {
           switch (field.type) {
             case 'textarea':
               return field.richText ? (
-                <EnrichedTextField
+                <RichTextField
                   key={field.key}
                   name={field.key}
                   label={t(field.label)}

@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import OldTextField from '../../../../components/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
-import SwitchField from '../../../../components/SwitchField';
+import SwitchField from '../../../../components/fields/SwitchField';
 import TagField from '../../../../components/TagField';
 import OrganizationField from '../../../../components/OrganizationField';
 

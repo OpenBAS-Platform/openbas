@@ -42,13 +42,13 @@ import TeamPopover from '../../components/teams/TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddTeams from './InjectAddTeams';
 import OldTextField from '../../../../components/OldTextField';
-import SwitchField from '../../../../components/SwitchField';
-import EnrichedTextField from '../../../../components/EnrichedTextField';
+import SwitchField from '../../../../components/fields/SwitchField';
+import RichTextField from '../../../../components/fields/RichTextField';
 import InjectAddDocuments from './InjectAddDocuments';
 import Loader from '../../../../components/Loader';
 import DocumentType from '../../components/documents/DocumentType';
 import DocumentPopover from '../../components/documents/DocumentPopover';
-import SelectField from '../../../../components/SelectField';
+import SelectField from '../../../../components/fields/SelectField';
 import ArticlePopover from '../../components/articles/ArticlePopover';
 import InjectAddArticles from './InjectAddArticles';
 import ChannelIcon from '../../components/channels/ChannelIcon';
@@ -783,13 +783,15 @@ class InjectDefinition extends Component {
           switch (field.type) {
             case 'textarea':
               return field.richText ? (
-                <EnrichedTextField
+                <RichTextField
                   key={field.key}
                   name={field.key}
                   label={t(field.label)}
                   fullWidth={true}
                   style={{ marginTop: 20, height: 250 }}
                   disabled={this.props.permissions.readOnly || field.readOnly}
+                  askAi={true}
+                  inInject={true}
                 />
               ) : (
                 <OldTextField
@@ -802,6 +804,8 @@ class InjectDefinition extends Component {
                   label={t(field.label)}
                   style={{ marginTop: 20 }}
                   disabled={this.props.permissions.readOnly || field.readOnly}
+                  askAi={true}
+                  inInject={true}
                 />
               );
             case 'number':
@@ -1062,6 +1066,7 @@ class InjectDefinition extends Component {
                   label={t(field.label)}
                   style={{ marginTop: 20 }}
                   disabled={this.props.permissions.readOnly || field.readOnly}
+
                 />
               );
           }

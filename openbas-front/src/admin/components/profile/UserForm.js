@@ -2,7 +2,7 @@ import React from 'react';
 import { Form } from 'react-final-form';
 import { MenuItem, Button } from '@mui/material';
 import { z } from 'zod';
-import SelectField from '../../../components/SelectField';
+import SelectField from '../../../components/fields/SelectField';
 import OldTextField from '../../../components/OldTextField';
 import { useFormatter } from '../../../components/i18n';
 import OrganizationField from '../../../components/OrganizationField';

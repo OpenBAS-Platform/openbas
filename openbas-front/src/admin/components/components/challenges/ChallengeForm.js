@@ -8,7 +8,7 @@ import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
 import OldTextField from '../../../../components/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
-import SelectField from '../../../../components/SelectField';
+import SelectField from '../../../../components/fields/SelectField';
 import MarkDownField from '../../../../components/MarkDownField';
 import DocumentType from '../documents/DocumentType';
 import ItemTags from '../../../../components/ItemTags';

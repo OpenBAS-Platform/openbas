@@ -14,7 +14,7 @@ import Loader from '../../../components/Loader';
 import Empty from '../../../components/Empty';
 import { addLessonsAnswers, fetchPlayerLessonsAnswers, fetchPlayerLessonsCategories, fetchPlayerLessonsQuestions } from '../../../actions/Lessons';
 import { fetchPlayerExercise } from '../../../actions/Exercise';
-import SliderField from '../../../components/SliderField';
+import SliderField from '../../../components/fields/SliderField';
 import OldTextField from '../../../components/OldTextField';
 import Transition from '../../../components/common/Transition';
 

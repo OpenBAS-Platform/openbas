@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Button, MenuItem } from '@mui/material';
 import OldTextField from '../../../../components/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
-import SelectField from '../../../../components/SelectField';
+import SelectField from '../../../../components/fields/SelectField';
 import TagField from '../../../../components/TagField';
 
 const PayloadForm = (props) => {

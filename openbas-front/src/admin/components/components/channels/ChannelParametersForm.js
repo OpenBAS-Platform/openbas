@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Button, Grid, MenuItem } from '@mui/material';
 import inject18n from '../../../../components/i18n';
 import DeprecatedColorPickerField from '../../../../components/DeprecatedColorPickerField';
-import SelectField from '../../../../components/SelectField';
+import SelectField from '../../../../components/fields/SelectField';
 import OldTextField from '../../../../components/OldTextField';
 
 class ChannelParametersForm extends Component {

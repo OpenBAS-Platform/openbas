@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import OldTextField from '../../../../components/OldTextField';
 import inject18n from '../../../../components/i18n';
-import EnrichedTextField from '../../../../components/EnrichedTextField';
+import RichTextField from '../../../../components/fields/RichTextField';
 
 class SendLessonsForm extends Component {
   validate(values) {
@@ -42,7 +42,7 @@ class SendLessonsForm extends Component {
               label={t('Subject')}
               style={{ marginTop: 20 }}
             />
-            <EnrichedTextField
+            <RichTextField
               name="body"
               label={t('Message')}
               fullWidth={true}

@@ -4,10 +4,10 @@ import * as R from 'ramda';
 import { Form } from 'react-final-form';
 import { Button, MenuItem } from '@mui/material';
 import OldTextField from '../../../../components/OldTextField';
-import SelectField from '../../../../components/SelectField';
+import SelectField from '../../../../components/fields/SelectField';
 import inject18n from '../../../../components/i18n';
 import DateTimePicker from '../../../../components/DateTimePicker';
-import EnrichedTextField from '../../../../components/EnrichedTextField';
+import RichTextField from '../../../../components/fields/RichTextField';
 
 class ComcheckForm extends Component {
   validate(values) {
@@ -96,7 +96,7 @@ class ComcheckForm extends Component {
               label={t('Subject')}
               style={{ marginTop: 20 }}
             />
-            <EnrichedTextField
+            <RichTextField
               name="comcheck_message"
               label={t('Message')}
               fullWidth={true}

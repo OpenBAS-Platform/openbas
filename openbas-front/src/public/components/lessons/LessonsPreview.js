@@ -14,7 +14,7 @@ import Loader from '../../../components/Loader';
 import Empty from '../../../components/Empty';
 import { fetchLessonsCategories, fetchLessonsQuestions } from '../../../actions/Lessons';
 import { fetchExercise } from '../../../actions/Exercise';
-import SliderField from '../../../components/SliderField';
+import SliderField from '../../../components/fields/SliderField';
 import OldTextField from '../../../components/OldTextField';
 
 const useStyles = makeStyles(() => ({

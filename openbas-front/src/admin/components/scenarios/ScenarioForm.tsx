@@ -78,7 +78,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
         variant="standard"
         fullWidth
         multiline
-        rows={2}
+        rows={5}
         label={t('Description')}
         style={{ marginTop: 20 }}
         error={!!errors.scenario_description}
@@ -102,7 +102,6 @@ const ScenarioForm: FunctionComponent<Props> = ({
           />
         )}
       />
-
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button
           variant="contained"

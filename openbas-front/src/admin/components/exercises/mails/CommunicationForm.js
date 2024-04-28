@@ -3,7 +3,7 @@ import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import { useFormatter } from '../../../../components/i18n';
 import OldTextField from '../../../../components/OldTextField';
-import EnrichedTextField from '../../../../components/EnrichedTextField';
+import RichTextField from '../../../../components/fields/RichTextField';
 import FileField from '../../../../components/FileField';
 
 const CommunicationForm = ({ onSubmit, handleClose, initialValues }) => {
@@ -41,7 +41,7 @@ const CommunicationForm = ({ onSubmit, handleClose, initialValues }) => {
             label={t('Subject')}
             disabled={true}
           />
-          <EnrichedTextField
+          <RichTextField
             name="communication_content"
             label={t('Content')}
             fullWidth={true}

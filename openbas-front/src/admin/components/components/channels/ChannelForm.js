@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Button, MenuItem } from '@mui/material';
 import OldTextField from '../../../../components/OldTextField';
 import inject18n from '../../../../components/i18n';
-import SelectField from '../../../../components/SelectField';
+import SelectField from '../../../../components/fields/SelectField';
 
 class ChannelForm extends Component {
   validate(values) {

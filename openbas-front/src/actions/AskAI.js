@@ -56,6 +56,18 @@ export const aiExplain = async (content, eventCallback) => {
   return askAI('/ai/explain', { ai_content: content }, eventCallback);
 };
 
-export const aiGenEmail = async (content, eventCallback) => {
-  return askAI('/ai/gen_email', { ai_content: content }, eventCallback);
+export const aiGenMessage = async (context, input, paragraphs, tone, sender, recipient, format, eventCallback) => {
+  return askAI(
+    '/ai/generate_message',
+    {
+      ai_context: context,
+      ai_input: input,
+      ai_paragraphs: paragraphs,
+      ai_tone: tone,
+      ai_sender: sender,
+      ai_recipient: recipient,
+      ai_format: format,
+    },
+    eventCallback,
+  );
 };
