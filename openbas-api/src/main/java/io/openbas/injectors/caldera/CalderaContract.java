@@ -5,6 +5,7 @@ import io.openbas.contract.fields.ContractAsset;
 import io.openbas.contract.fields.ContractAssetGroup;
 import io.openbas.contract.fields.ContractExpectations;
 import io.openbas.contract.fields.ContractSelect;
+import io.openbas.database.model.Endpoint;
 import io.openbas.helper.SupportedLanguage;
 import io.openbas.injectors.caldera.client.model.Ability;
 import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
@@ -119,7 +120,8 @@ public class CalderaContract extends Contractor {
           contractConfig,
           ability.getAbility_id(),
           Map.of(en, ability.getName(), fr, ability.getName()),
-          builder.build()
+          builder.build(),
+          List.of(Endpoint.PLATFORM_TYPE.Internal.name())
       );
       contract.addContext("collector-ids", String.join(", ", this.config.getCollectorIds()));
       contract.addAttackPattern(ability.getTechnique_id());

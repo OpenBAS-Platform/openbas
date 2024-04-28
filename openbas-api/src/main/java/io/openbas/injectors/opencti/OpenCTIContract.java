@@ -3,6 +3,7 @@ package io.openbas.injectors.opencti;
 import io.openbas.contract.*;
 import io.openbas.contract.fields.ContractElement;
 import io.openbas.contract.fields.ContractExpectations;
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Variable.VariableType;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +73,7 @@ public class OpenCTIContract extends Contractor {
         .optional(expectationsField)
         .build();
     Contract createCase = executableContract(contractConfig, OPENCTI_CREATE_CASE,
-        Map.of(en, "Create a new case", fr, "Créer un nouveau case"), createCaseInstance);
+        Map.of(en, "Create a new case", fr, "Créer un nouveau case"), createCaseInstance, List.of(Endpoint.PLATFORM_TYPE.Service.name()));
     createCase.addVariable(documentUriVariable);
     List<ContractElement> createReportInstance = contractBuilder()
         .mandatory(textField("name", "Name"))
@@ -81,7 +82,7 @@ public class OpenCTIContract extends Contractor {
         .optional(expectationsField)
         .build();
     Contract createReport = executableContract(contractConfig, OPENCTI_CREATE_REPORT,
-        Map.of(en, "Create a new report", fr, "Créer un nouveau rapport"), createReportInstance);
+        Map.of(en, "Create a new report", fr, "Créer un nouveau rapport"), createReportInstance, List.of(Endpoint.PLATFORM_TYPE.Service.name()));
     createReport.addVariable(documentUriVariable);
     return List.of(createCase, createReport);
   }

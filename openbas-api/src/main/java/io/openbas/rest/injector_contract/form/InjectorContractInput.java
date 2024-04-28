@@ -39,6 +39,10 @@ public class InjectorContractInput {
     @JsonProperty("is_atomic_testing")
     private boolean isAtomicTesting = true;
 
+    @Getter
+    @JsonProperty("contract_platforms")
+    private String[] platforms = new String[0];
+
     public void setId(String id) {
         this.id = id;
     }
@@ -65,5 +69,9 @@ public class InjectorContractInput {
 
     public void setAtomicTesting(boolean atomicTesting) {
         isAtomicTesting = atomicTesting;
+    }
+
+    public void setPlatforms(String[] platforms) {
+        this.platforms = platforms;
     }
 }

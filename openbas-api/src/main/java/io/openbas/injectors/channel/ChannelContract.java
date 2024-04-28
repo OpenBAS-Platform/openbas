@@ -7,6 +7,7 @@ import io.openbas.contract.ContractorIcon;
 import io.openbas.contract.fields.ContractCheckbox;
 import io.openbas.contract.fields.ContractElement;
 import io.openbas.contract.fields.ContractExpectations;
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Variable.VariableType;
 import io.openbas.model.inject.form.Expectation;
 import org.springframework.stereotype.Component;
@@ -95,7 +96,7 @@ public class ChannelContract extends Contractor {
                         List.of(emailingField)))
                 .build();
         Contract publishArticle = executableContract(contractConfig,
-                CHANNEL_PUBLISH, Map.of(en, "Publish channel pressure", fr, "Publier de la pression médiatique"), publishInstance);
+                CHANNEL_PUBLISH, Map.of(en, "Publish channel pressure", fr, "Publier de la pression médiatique"), publishInstance, List.of(Endpoint.PLATFORM_TYPE.Internal.name()));
         // Adding generated variables
         publishArticle.addVariable(variable(VARIABLE_ARTICLES, "List of articles published by the injection", VariableType.Object, Multiple, List.of(
                 variable(VARIABLE_ARTICLE + ".id", "Id of the article in the platform", VariableType.String, One),

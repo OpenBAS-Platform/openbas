@@ -5,6 +5,7 @@ import io.openbas.contract.ContractConfig;
 import io.openbas.contract.Contractor;
 import io.openbas.contract.ContractorIcon;
 import io.openbas.contract.fields.ContractElement;
+import io.openbas.database.model.Endpoint;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
@@ -69,7 +70,7 @@ public class ChallengeContract extends Contractor {
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .build();
         Contract publishChallenge = executableContract(contractConfig,
-                CHALLENGE_PUBLISH, Map.of(en, "Publish challenges", fr, "Publier des challenges"), publishInstance);
+                CHALLENGE_PUBLISH, Map.of(en, "Publish challenges", fr, "Publier des challenges"), publishInstance, List.of(Endpoint.PLATFORM_TYPE.Internal.name()));
         publishChallenge.setAtomicTesting(false);
         return List.of(publishChallenge);
     }

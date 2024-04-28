@@ -5,6 +5,7 @@ import io.openbas.contract.ContractConfig;
 import io.openbas.contract.Contractor;
 import io.openbas.contract.ContractorIcon;
 import io.openbas.contract.fields.ContractElement;
+import io.openbas.database.model.Endpoint;
 import io.openbas.helper.SupportedLanguage;
 import org.springframework.stereotype.Component;
 
@@ -46,7 +47,7 @@ public class ManualContract extends Contractor {
         List<ContractElement> instance = contractBuilder()
                 .mandatory(textareaField("content", "Content")).build();
         return List.of(manualContract(contractConfig, MANUAL_DEFAULT,
-                Map.of(en, "Manual", fr, "Manuel"), instance));
+                Map.of(en, "Manual", fr, "Manuel"), instance, List.of(Endpoint.PLATFORM_TYPE.Internal.name())));
     }
 
     @Override

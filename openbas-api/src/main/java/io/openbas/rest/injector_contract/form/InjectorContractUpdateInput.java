@@ -34,6 +34,10 @@ public class InjectorContractUpdateInput {
     @JsonProperty("is_atomic_testing")
     private boolean isAtomicTesting = true;
 
+    @Getter
+    @JsonProperty("contract_platforms")
+    private String[] platforms = new String[0];
+
     public void setManual(boolean manual) {
         this.manual = manual;
     }
@@ -56,5 +60,13 @@ public class InjectorContractUpdateInput {
 
     public void setAtomicTesting(boolean atomicTesting) {
         isAtomicTesting = atomicTesting;
+    }
+
+    public String[] getPlatforms() {
+        return platforms;
+    }
+
+    public void setPlatforms(String[] platforms) {
+        this.platforms = platforms;
     }
 }

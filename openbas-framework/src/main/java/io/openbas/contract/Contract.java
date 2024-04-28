@@ -3,6 +3,7 @@ package io.openbas.contract;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.contract.fields.ContractElement;
 import io.openbas.contract.variables.VariableHelper;
+import io.openbas.database.model.Endpoint;
 import io.openbas.helper.SupportedLanguage;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -10,10 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 public class Contract {
@@ -52,17 +50,24 @@ public class Contract {
     @JsonProperty("is_atomic_testing")
     private boolean isAtomicTesting = true;
 
+    @Setter
+    @JsonProperty("platforms")
+    private List<String> platforms = new ArrayList<>();
+
     private Contract(
         @NotNull final ContractConfig config,
         @NotBlank final String id,
         @NotEmpty final Map<SupportedLanguage, String> label,
         final boolean manual,
-        @NotEmpty final List<ContractElement> fields) {
+        @NotEmpty final List<ContractElement> fields,
+        final List<String> platforms
+    ) {
         this.config = config;
         this.id = id;
         this.label = label;
         this.manual = manual;
         this.fields = fields;
+        this.platforms = platforms;
 
         // Default variables linked to ExecutionContext
         // User variables
@@ -79,8 +84,9 @@ public class Contract {
         @NotNull final ContractConfig config,
         @NotBlank final String id,
         @NotEmpty final Map<SupportedLanguage, String> label,
-        @NotEmpty final List<ContractElement> fields) {
-        Contract contract = new Contract(config, id, label, true, fields);
+        @NotEmpty final List<ContractElement> fields,
+        final List<String> platforms) {
+        Contract contract = new Contract(config, id, label, true, fields, platforms == null ? List.of(Endpoint.PLATFORM_TYPE.Generic.name()) : platforms);
         contract.setAtomicTesting(false);
         return contract;
     }
@@ -89,8 +95,10 @@ public class Contract {
         @NotNull final ContractConfig config,
         @NotBlank final String id,
         @NotEmpty final Map<SupportedLanguage, String> label,
-        @NotEmpty final List<ContractElement> fields) {
-        return new Contract(config, id, label, false, fields);
+        @NotEmpty final List<ContractElement> fields,
+        final List<String> platforms
+        ) {
+        return new Contract(config, id, label, false, fields, platforms == null ? List.of(Endpoint.PLATFORM_TYPE.Generic.name()) : platforms);
     }
 
     public void addContext(String key, String value) {

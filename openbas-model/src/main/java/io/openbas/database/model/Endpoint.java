@@ -28,8 +28,12 @@ public class Endpoint extends Asset {
     Windows,
     @JsonProperty("MacOS")
     MacOS,
+    @JsonProperty("Service")
+    Service,
     @JsonProperty("Generic")
     Generic,
+    @JsonProperty("Internal")
+    Internal,
   }
 
   @Queryable(filterable = true)
