@@ -28,6 +28,18 @@ public class InjectorCreateInput {
     @JsonProperty("injector_custom_contracts")
     private Boolean customContracts = false;
 
+    @JsonProperty("injector_simulation_agent")
+    private Boolean simulationAgent = false;
+
+    @JsonProperty("injector_simulation_agent_platforms")
+    private String[] simulationAgentPlatforms = new String[0];
+
+    @JsonProperty("injector_simulation_agent_doc")
+    private String simulationAgentDoc;
+
+    @JsonProperty("injector_category")
+    private String category;
+
     public String getId() {
         return id;
     }
@@ -66,5 +78,37 @@ public class InjectorCreateInput {
 
     public void setCustomContracts(Boolean customContracts) {
         this.customContracts = customContracts;
+    }
+
+    public Boolean getSimulationAgent() {
+        return simulationAgent;
+    }
+
+    public void setSimulationAgent(Boolean simulationAgent) {
+        this.simulationAgent = simulationAgent;
+    }
+
+    public String[] getSimulationAgentPlatforms() {
+        return simulationAgentPlatforms;
+    }
+
+    public void setSimulationAgentPlatforms(String[] simulationAgentPlatforms) {
+        this.simulationAgentPlatforms = simulationAgentPlatforms;
+    }
+
+    public String getSimulationAgentDoc() {
+        return simulationAgentDoc;
+    }
+
+    public void setSimulationAgentDoc(String simulationAgentDoc) {
+        this.simulationAgentDoc = simulationAgentDoc;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

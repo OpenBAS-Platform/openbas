@@ -9,7 +9,11 @@ export const isEmptyField = <T>(
 ): field is null | undefined => !isNotEmptyField(field);
 
 export const copyToClipboard = (t: (text: string) => string, text: string) => {
-  navigator.clipboard.writeText(text);
+  if ('clipboard' in navigator) {
+    navigator.clipboard.writeText(text);
+  } else {
+    document.execCommand('copy', true, text);
+  }
   MESSAGING$.notifySuccess(t('Copied to clipboard'));
 };
 

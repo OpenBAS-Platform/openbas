@@ -6,6 +6,7 @@ export interface Settings {
   platform_enterprise_edition?: string | null;
   platform_ai_enabled?: boolean | null;
   platform_ai_has_token?: boolean | null;
+  caldera_url?: string | null;
 }
 
 export interface User {

@@ -2,11 +2,14 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.hypersistence.utils.hibernate.type.array.StringArrayType;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -41,6 +44,11 @@ public class Injector implements Base {
     private String type;
 
     @Getter
+    @Column(name = "injector_category")
+    @JsonProperty("injector_category")
+    private String category;
+
+    @Getter
     @Column(name = "injector_external")
     @JsonProperty("injector_external")
     private boolean external = false;
@@ -49,6 +57,22 @@ public class Injector implements Base {
     @Column(name = "injector_custom_contracts")
     @JsonProperty("injector_custom_contracts")
     private boolean customContracts = false;
+
+    @Getter
+    @Column(name = "injector_simulation_agent")
+    @JsonProperty("injector_simulation_agent")
+    @Queryable(filterable = true, sortable = true)
+    private boolean simulationAgent = false;
+
+    @Type(StringArrayType.class)
+    @Column(name = "injector_simulation_agent_platforms", columnDefinition = "text[]")
+    @JsonProperty("injector_simulation_agent_platforms")
+    private String[] simulationAgentPlatforms = new String[0];
+
+    @Getter
+    @Column(name = "injector_simulation_agent_doc")
+    @JsonProperty("injector_simulation_agent_doc")
+    private String simulationAgentDoc;
 
     @Getter
     @Column(name = "injector_created_at")

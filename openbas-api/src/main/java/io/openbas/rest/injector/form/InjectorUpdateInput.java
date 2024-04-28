@@ -23,4 +23,16 @@ public class InjectorUpdateInput {
 
     @JsonProperty("injector_custom_contracts")
     private Boolean customContracts = false;
+
+    @JsonProperty("injector_simulation_agent")
+    private Boolean simulationAgent = false;
+
+    @JsonProperty("injector_simulation_agent_platforms")
+    private String[] simulationAgentPlatforms = new String[0];
+
+    @JsonProperty("injector_simulation_agent_doc")
+    private String simulationAgentDoc;
+
+    @JsonProperty("injector_category")
+    private String category;
 }

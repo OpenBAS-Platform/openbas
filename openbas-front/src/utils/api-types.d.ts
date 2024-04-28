@@ -9,9 +9,21 @@
  * ---------------------------------------------------------------
  */
 
-export interface AiInput {
-  prompt_question: string;
-  prompt_type: string;
+export interface AiGenericTextInput {
+  ai_content: string;
+  ai_format?: string;
+  ai_tone?: string;
+}
+
+export interface AiMessageInput {
+  ai_context?: string;
+  ai_format: string;
+  ai_input: string;
+  /** @format int32 */
+  ai_paragraphs?: number;
+  ai_recipient?: string;
+  ai_sender?: string;
+  ai_tone?: string;
 }
 
 export interface AiResult {
@@ -1021,12 +1033,16 @@ export interface InjectUpdateTriggerInput {
 }
 
 export interface Injector {
+  injector_category?: string;
   /** @format date-time */
   injector_created_at?: string;
   injector_custom_contracts?: boolean;
   injector_external?: boolean;
   injector_id: string;
   injector_name: string;
+  injector_simulation_agent?: boolean;
+  injector_simulation_agent_doc?: string;
+  injector_simulation_agent_platforms?: string[];
   injector_type: string;
   /** @format date-time */
   injector_updated_at?: string;
@@ -1095,10 +1111,14 @@ export interface InjectorContractUpdateMappingInput {
 }
 
 export interface InjectorCreateInput {
+  injector_category?: string;
   injector_contracts?: InjectorContractInput[];
   injector_custom_contracts?: boolean;
   injector_id: string;
   injector_name: string;
+  injector_simulation_agent?: boolean;
+  injector_simulation_agent_doc?: string;
+  injector_simulation_agent_platforms?: string[];
   injector_type: string;
 }
 
@@ -1108,9 +1128,13 @@ export interface InjectorRegistration {
 }
 
 export interface InjectorUpdateInput {
+  injector_category?: string;
   injector_contracts?: InjectorContractInput[];
   injector_custom_contracts?: boolean;
   injector_name: string;
+  injector_simulation_agent?: boolean;
+  injector_simulation_agent_doc?: string;
+  injector_simulation_agent_platforms?: string[];
 }
 
 export type JsonNode = object;
@@ -1733,6 +1757,7 @@ export interface PlatformSettings {
   platform_saml2_providers?: OAuthProvider[];
   auth_local_enable?: boolean;
   auth_openid_enable?: boolean;
+  caldera_url?: string;
   java_version?: string;
   map_tile_server_dark?: string;
   map_tile_server_light?: string;
@@ -1955,7 +1980,7 @@ export interface SearchPaginationInput {
    * @max 100
    */
   size?: number;
-  /** List of sort fields : a fields is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
+  /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
   sorts?: SortField[];
   /** Text to search within searchable attributes */
   textSearch?: string;
@@ -2002,7 +2027,7 @@ export interface SimpleExpectationResultOutput {
   target_result_type: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
 }
 
-/** List of sort fields : a fields is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
+/** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
 export interface SortField {
   direction?: string;
   property?: string;

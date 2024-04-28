@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AppBar, Badge, Box, Grid, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { AccountCircleOutlined, AppsOutlined, NotificationsOutlined } from '@mui/icons-material';
+import { AccountCircleOutlined, AppsOutlined, ImportantDevicesOutlined, NotificationsOutlined } from '@mui/icons-material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { logout } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';
@@ -174,6 +174,18 @@ const TopBar: React.FC = () => {
         </div>
         <div className={classes.barRight}>
           <div className={classes.barRightContainer}>
+            <Tooltip title={t('Install simulation agents')}>
+              <IconButton
+                size="medium"
+                classes={{ root: classes.button }}
+                aria-haspopup="true"
+                component={Link}
+                to="/admin/agents"
+                color={location.pathname === '/admin/agents' ? 'primary' : 'inherit'}
+              >
+                <ImportantDevicesOutlined fontSize="medium" />
+              </IconButton>
+            </Tooltip>
             <Tooltip title={t('Notifications - Coming soon')}>
               <span>
                 <IconButton
@@ -181,8 +193,8 @@ const TopBar: React.FC = () => {
                   classes={{ root: classes.button }}
                   aria-haspopup="true"
                   component={Link}
-                  to="/dashboard/profile/notifications"
-                  color={location.pathname === '/dashboard/profile/notifications' ? 'primary' : 'inherit'}
+                  to="/admin/profile/notifications"
+                  color={location.pathname === '/admin/profile/notifications' ? 'primary' : 'inherit'}
                   disabled={true}
                 >
                   <NotificationsOutlined fontSize="medium" />

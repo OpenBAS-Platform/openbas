@@ -13,7 +13,15 @@ public class ChallengeInjector {
     @Autowired
     public ChallengeInjector(InjectorService injectorService, ChallengeContract contract) {
         try {
-            injectorService.register(CHALLENGE_INJECTOR_ID, CHALLENGE_INJECTOR_NAME, contract, false);
+            injectorService.register(
+                    CHALLENGE_INJECTOR_ID,
+                    CHALLENGE_INJECTOR_NAME,
+                    contract,
+                    false,
+                    false,
+                    null,
+                    "capture-the-flag"
+            );
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

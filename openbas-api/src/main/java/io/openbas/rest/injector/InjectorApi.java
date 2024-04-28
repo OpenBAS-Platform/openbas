@@ -109,13 +109,27 @@ public class InjectorApi extends RestBehavior {
         return injectorContract;
     }
 
-    private Injector updateInjector(Injector injector, String id, String type, String name, List<InjectorContractInput> contracts, Boolean customContracts) {
+    private Injector updateInjector(
+            Injector injector,
+            String id,
+            String type,
+            String name,
+            List<InjectorContractInput> contracts,
+            Boolean customContracts,
+            Boolean simulationAgent,
+            String[] simulationAgentPlatforms,
+            String simulationAgentDoc,
+            String category) {
         injector.setUpdatedAt(Instant.now());
         injector.setId(id);
         injector.setType(type);
         injector.setName(name);
         injector.setExternal(true);
         injector.setCustomContracts(customContracts);
+        injector.setSimulationAgent(simulationAgent);
+        injector.setSimulationAgentPlatforms(simulationAgentPlatforms);
+        injector.setSimulationAgentDoc(simulationAgentDoc);
+        injector.setCategory(category);
         List<String> existing = new ArrayList<>();
         List<String> toDeletes = new ArrayList<>();
         injector.getContracts().forEach(contract -> {
@@ -133,7 +147,7 @@ public class InjectorApi extends RestBehavior {
                 } else {
                     contract.setAttackPatterns(new ArrayList<>());
                 }
-            } else if( !contract.getCustom() ) {
+            } else if (!contract.getCustom()) {
                 toDeletes.add(contract.getId());
             }
         });
@@ -149,7 +163,18 @@ public class InjectorApi extends RestBehavior {
     @PutMapping("/api/injectors/{injectorId}")
     public Injector updateInjector(@PathVariable String injectorId, @Valid @RequestBody InjectorUpdateInput input) {
         Injector injector = injectorRepository.findById(injectorId).orElseThrow();
-        return updateInjector(injector, injectorId, injector.getType(), input.getName(), input.getContracts(), input.getCustomContracts());
+        return updateInjector(
+                injector,
+                injectorId,
+                injector.getType(),
+                input.getName(),
+                input.getContracts(),
+                input.getCustomContracts(),
+                input.getSimulationAgent(),
+                input.getSimulationAgentPlatforms(),
+                input.getSimulationAgentDoc(),
+                input.getCategory()
+        );
     }
 
     @Secured(ROLE_ADMIN)
@@ -189,7 +214,18 @@ public class InjectorApi extends RestBehavior {
             // We need to support upsert for registration
             Injector injector = injectorRepository.findById(input.getId()).orElse(injectorRepository.findByType(input.getType()).orElse(null));
             if (injector != null) {
-                updateInjector(injector, input.getId(), input.getType(), input.getName(), input.getContracts(), input.getCustomContracts());
+                updateInjector(
+                        injector,
+                        input.getId(),
+                        input.getType(),
+                        input.getName(),
+                        input.getContracts(),
+                        input.getCustomContracts(),
+                        input.getSimulationAgent(),
+                        input.getSimulationAgentPlatforms(),
+                        input.getSimulationAgentDoc(),
+                        input.getCategory()
+                );
             } else {
                 // save the injector
                 Injector newInjector = new Injector();
@@ -197,6 +233,10 @@ public class InjectorApi extends RestBehavior {
                 newInjector.setExternal(true);
                 newInjector.setName(input.getName());
                 newInjector.setType(input.getType());
+                newInjector.setSimulationAgent(input.getSimulationAgent());
+                newInjector.setSimulationAgentPlatforms(input.getSimulationAgentPlatforms());
+                newInjector.setSimulationAgentDoc(input.getSimulationAgentDoc());
+                newInjector.setCategory(input.getCategory());
                 newInjector.setCustomContracts(input.getCustomContracts());
                 Injector savedInjector = injectorRepository.save(newInjector);
                 // Save the contracts

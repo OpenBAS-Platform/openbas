@@ -9,8 +9,8 @@ import { useFormatter } from '../../../../components/i18n';
 import type { Variable } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { UsersHelper } from '../../../../actions/helper';
-import { copyToClipboard } from '../../../../utils/CopyToClipboard';
 import type { Contract } from '../../../../actions/contract/contract';
+import { copyToClipboard } from '../../../../utils/utils';
 
 interface VariableChildItemProps {
   hasChildren?: boolean;
@@ -48,7 +48,7 @@ const VariableChildItem: FunctionComponent<VariableChildItemProps> = ({
       divider={true}
       dense={true}
       disabled={hasChildren}
-      onClick={() => copyToClipboard(formattedVariableKey)}
+      onClick={() => copyToClipboard(t, formattedVariableKey)}
     >
       <ListItemText
         primary={formattedVariableKey}
@@ -144,7 +144,7 @@ AvailableVariablesDialogProps
                               divider={true}
                               dense={true}
                               sx={{ pl: 4 }}
-                              onClick={() => copyToClipboard(variableChildKey)}
+                              onClick={() => copyToClipboard(t, variableChildKey)}
                             >
                               <ListItemText
                                 primary={variableChildKey}

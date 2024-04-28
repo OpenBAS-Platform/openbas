@@ -72,6 +72,9 @@ public class PlatformSettings {
   @JsonProperty("platform_ai_model")
   private String aiModel;
 
+  @JsonProperty("caldera_url")
+  private String calderaUrl;
+
   // THEME
 
   @JsonProperty("platform_light_theme")

@@ -5,6 +5,7 @@ import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Setting;
 import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
+import io.openbas.injects.caldera.config.CalderaInjectorConfig;
 import io.openbas.injects.opencti.config.OpenCTIConfig;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.settings.form.SettingsEnterpriseEditionUpdateInput;
@@ -53,6 +54,8 @@ public class PlatformSettingsApi extends RestBehavior {
 
     private AiConfig aiConfig;
 
+    private CalderaInjectorConfig calderaInjectorConfig;
+
     @Resource
     private OpenBASConfig openBASConfig;
 
@@ -64,6 +67,11 @@ public class PlatformSettingsApi extends RestBehavior {
     @Autowired
     public void setAiConfig(AiConfig aiConfig) {
         this.aiConfig = aiConfig;
+    }
+
+    @Autowired
+    public void setCalderaInjectorConfig(CalderaInjectorConfig calderaInjectorConfig) {
+        this.calderaInjectorConfig = calderaInjectorConfig;
     }
 
     @Autowired
@@ -166,13 +174,13 @@ public class PlatformSettingsApi extends RestBehavior {
         platformSettings.setPlatformLang(
                 ofNullable(dbSettings.get(DEFAULT_LANG.key())).map(Setting::getValue).orElse(DEFAULT_LANG.defaultValue())
         );
-        platformSettings.setPlatformEnterpriseEdition(
-                ofNullable(dbSettings.get(PLATFORM_ENTERPRISE_EDITION.key())).map(Setting::getValue).orElse(PLATFORM_ENTERPRISE_EDITION.defaultValue())
-        );
 
         // Build authenticated user settings
         OpenBASPrincipal user = currentUser();
         if (user != null) {
+            platformSettings.setPlatformEnterpriseEdition(
+                    ofNullable(dbSettings.get(PLATFORM_ENTERPRISE_EDITION.key())).map(Setting::getValue).orElse(PLATFORM_ENTERPRISE_EDITION.defaultValue())
+            );
             platformSettings.setMapTileServerLight(openBASConfig.getMapTileServerLight());
             platformSettings.setMapTileServerDark(openBASConfig.getMapTileServerDark());
             platformSettings.setPlatformName(
@@ -184,6 +192,8 @@ public class PlatformSettingsApi extends RestBehavior {
             platformSettings.setAiHasToken(!aiConfig.getToken().isBlank());
             platformSettings.setAiType(aiConfig.getType());
             platformSettings.setAiModel(aiConfig.getModel());
+            platformSettings.setCalderaUrl(calderaInjectorConfig.getUrl());
+
             // Build admin settings
             if (user.isAdmin()) {
                 platformSettings.setPlatformVersion(openBASConfig.getVersion());

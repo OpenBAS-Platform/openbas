@@ -26,6 +26,7 @@ const Assets = lazy(() => import('./components/assets/Index'));
 const Teams = lazy(() => import('./components/teams/Index'));
 const IndexComponents = lazy(() => import('./components/components/Index'));
 const IndexIntegrations = lazy(() => import('./components/integrations/Index'));
+const IndexAgents = lazy(() => import('./components/agents/Agents'));
 const LessonsTemplates = lazy(() => import('./components/lessons/LessonsTemplates'));
 const IndexLessonsTemplate = lazy(() => import('./components/lessons/Index'));
 const Mitigations = lazy(() => import('./components/mitigations/Mitigations'));
@@ -84,6 +85,7 @@ const Index = () => {
               <Route path="lessons/:lessonsTemplateId/*" element={errorWrapper(IndexLessonsTemplate)()} />
               <Route path="mitigations" element={errorWrapper(Mitigations)()} />
               <Route path="integrations/*" element={errorWrapper(IndexIntegrations)()} />
+              <Route path="agents/*" element={errorWrapper(IndexAgents)()} />
               <Route path="settings/*" element={errorWrapper(IndexSettings)()} />
               {/* Not found */}
               <Route path="*" element={<NotFound />} />

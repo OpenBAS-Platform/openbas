@@ -13,7 +13,15 @@ public class ChannelInjector {
     @Autowired
     public ChannelInjector(InjectorService injectorService, ChannelContract contract) {
         try {
-            injectorService.register(CHANNEL_INJECTOR_ID, CHANNEL_INJECTOR_NAME, contract, false);
+            injectorService.register(
+                    CHANNEL_INJECTOR_ID,
+                    CHANNEL_INJECTOR_NAME,
+                    contract,
+                    false,
+                    false,
+                    null,
+                    "media-pressure"
+            );
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
