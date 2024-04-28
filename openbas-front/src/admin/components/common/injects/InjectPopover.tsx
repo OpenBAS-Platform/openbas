@@ -12,7 +12,6 @@ import type { Contract } from '../../../../actions/contract/contract';
 
 interface Props {
   inject: InjectStore;
-  injectorContractsMap: Record<string, Contract>;
   tagsMap: Record<string, Tag>;
   setSelectedInjectId: (injectId: Inject['inject_id']) => void;
   isDisabled: boolean;

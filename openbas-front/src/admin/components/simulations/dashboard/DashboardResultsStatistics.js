@@ -23,7 +23,6 @@ const DashboardDefinitionStatistics = ({
   teamsMap,
   injectExpectations,
   injectsMap,
-  injectorContractsMap,
   usersMap,
   organizationsMap,
 }) => {
@@ -88,10 +87,10 @@ const DashboardDefinitionStatistics = ({
               'inject_expectation_percent_score',
               Math.round(
                 (cumulation * 100)
-                  / (teamsMap[n[0]]
-                    ? teamsMap[n[0]]
-                      .team_injects_expectations_total_expected_score
-                    : 1),
+                / (teamsMap[n[0]]
+                  ? teamsMap[n[0]]
+                    .team_injects_expectations_total_expected_score
+                  : 1),
               ),
               i,
             );
@@ -128,10 +127,9 @@ const DashboardDefinitionStatistics = ({
     {
       name: t('Total score'),
       data: sortedInjectorContractsByTotalScore.map((i) => ({
-        x: tPick(injectorContractsMap && injectorContractsMap[i.inject_type]?.label),
+        x: tPick(i.inject_injector_contract?.injector_contract_labels),
         y: i.inject_total_score,
-        fillColor:
-          injectorContractsMap && injectorContractsMap[i.inject_type]?.config?.color,
+        fillColor: i.inject_injector_contract?.injector_contract_content_parsed?.config?.color,
       })),
     },
   ];
@@ -158,8 +156,8 @@ const DashboardDefinitionStatistics = ({
       ];
     }),
     R.map((n) => ({
-      name: tPick(injectorContractsMap && injectorContractsMap[n[0]]?.label),
-      color: injectorContractsMap && injectorContractsMap[n[0]]?.config?.color,
+      name: tPick(n.inject_injector_contract?.injector_contract_labels),
+      color: n.inject_injector_contract?.injector_contract_content_parsed?.config?.color,
       data: n[1].map((i) => ({
         x: i.inject_expectation_updated_at,
         y: i.inject_expectation_cumulated_score,
@@ -276,7 +274,7 @@ const DashboardDefinitionStatistics = ({
       'team_total_percent_score',
       Math.round(
         (n.team_injects_expectations_total_score * 100)
-            / n.team_injects_expectations_total_expected_score,
+        / n.team_injects_expectations_total_expected_score,
       ),
       n,
     ),

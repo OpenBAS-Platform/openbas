@@ -180,20 +180,14 @@ const Injects = ({
     dispatch(fetchInjectorContracts());
   });
   const {
-    injectorContractsMap,
     tagsMap,
-    injectorContractsWithNoTeams,
     selectedInject,
   } = useHelper((helper) => {
     return {
-      injectorContractsMap: helper.getInjectorContractsMap(),
       tagsMap: helper.getTagsMap(),
-      injectorContractsWithNoTeams: helper.getInjectorContractsWithNoTeams(),
       selectedInject: helper.getInject(selectedInjectId),
     };
   });
-
-  const injectorContracts = Object.values(injectorContractsMap);
 
   const onCreateInject = async (data) => {
     await injectContext.onAddInject(data);
@@ -203,12 +197,8 @@ const Injects = ({
   };
 
   const sortedInjects = filtering.filterAndSort(injects);
-  const types = injectorContracts.map((type) => type.config.type);
-  const disabledTypes = injectorContracts
-    .filter((type) => type.config.expose === false)
-    .map((type) => type.config.type);
   // Rendering
-  if (injects && !R.isEmpty(injectorContractsMap)) {
+  if (injects) {
     return (
       <div className={classes.container}>
         <>
@@ -322,14 +312,12 @@ const Injects = ({
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
           {sortedInjects.map((inject) => {
-            const injectContract = injectorContractsMap[inject.inject_injector_contract];
+            const injectContract = inject.inject_injector_contract.injector_contract_content_parsed;
             const injectorContractName = tPick(injectContract?.label);
             const duration = splitDuration(inject.inject_depends_duration || 0);
-            const isDisabled = disabledTypes.includes(inject.inject_type)
-              || !types.includes(inject.inject_type);
-            const isNoTeam = injectorContractsWithNoTeams.includes(
-              inject.inject_type,
-            );
+            console.log('injectContract', injectContract);
+            const isDisabled = !injectContract?.config.expose;
+            const isNoTeam = !(injectContract?.fields.filter((f) => f.key === 'teams').length > 0);
             let injectStatus = inject.inject_enabled
               ? t('Enabled')
               : t('Disabled');
@@ -420,7 +408,6 @@ const Injects = ({
                 <ListItemSecondaryAction>
                   <InjectPopover
                     inject={inject}
-                    injectorContractsMap={injectorContractsMap}
                     tagsMap={tagsMap}
                     setSelectedInjectId={setSelectedInjectId}
                     isDisabled={!injectContract || isDisabled}
@@ -437,7 +424,7 @@ const Injects = ({
                 open={selectedInjectId !== null}
                 handleClose={() => setSelectedInjectId(null)}
                 onUpdateInject={onUpdateInject}
-                injectorContract={injectorContractsMap[selectedInject.inject_contract]}
+                injectorContract={selectedInject.inject_injector_contract.injector_contract_content_parsed}
                 inject={selectedInject}
                 teamsFromExerciseOrScenario={teams}
                 articlesFromExerciseOrScenario={articles}

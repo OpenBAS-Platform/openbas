@@ -9,28 +9,6 @@
  * ---------------------------------------------------------------
  */
 
-export interface AiGenericTextInput {
-  ai_content: string;
-  ai_format?: string;
-  ai_tone?: string;
-}
-
-export interface AiMessageInput {
-  ai_context?: string;
-  ai_format: string;
-  ai_input: string;
-  /** @format int32 */
-  ai_paragraphs?: number;
-  ai_recipient?: string;
-  ai_sender?: string;
-  ai_tone?: string;
-}
-
-export interface AiResult {
-  chunk_content?: string;
-  chunk_id?: string;
-}
-
 export interface Article {
   article_author?: string;
   article_channel?: Channel;
@@ -480,9 +458,9 @@ export interface CreateUserInput {
 
 export interface DirectInjectInput {
   inject_content?: object;
+  inject_contract?: string;
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
-  inject_injector_contract?: string;
   inject_title?: string;
   inject_type?: string;
   inject_users?: string[];
@@ -591,7 +569,7 @@ export interface Endpoint {
   endpoint_hostname?: string;
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal";
+  endpoint_platform: "Linux" | "Windows" | "Darwin";
   updateAttributes?: object;
 }
 
@@ -608,7 +586,7 @@ export interface EndpointInput {
    */
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal";
+  endpoint_platform: "Linux" | "Windows" | "Darwin";
 }
 
 export interface Evaluation {
@@ -855,6 +833,7 @@ export interface Inject {
   /** @format int64 */
   inject_communications_number?: number;
   inject_content?: object;
+  inject_contract?: string;
   inject_country?: string;
   /** @format date-time */
   inject_created_at?: string;
@@ -953,13 +932,13 @@ export interface InjectInput {
   inject_assets?: string[];
   inject_city?: string;
   inject_content?: object;
+  inject_contract?: string;
   inject_country?: string;
   /** @format int64 */
   inject_depends_duration?: number;
   inject_depends_from_another?: string;
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
-  inject_injector_contract?: string;
   inject_tags?: string[];
   inject_teams?: string[];
   inject_title?: string;
@@ -1033,16 +1012,12 @@ export interface InjectUpdateTriggerInput {
 }
 
 export interface Injector {
-  injector_category?: string;
   /** @format date-time */
   injector_created_at?: string;
   injector_custom_contracts?: boolean;
   injector_external?: boolean;
   injector_id: string;
   injector_name: string;
-  injector_simulation_agent?: boolean;
-  injector_simulation_agent_doc?: string;
-  injector_simulation_agent_platforms?: string[];
   injector_type: string;
   /** @format date-time */
   injector_updated_at?: string;
@@ -1070,7 +1045,6 @@ export interface InjectorContract {
   injector_contract_injector?: Injector;
   injector_contract_labels?: Record<string, string>;
   injector_contract_manual?: boolean;
-  injector_contract_platforms?: string[];
   /** @format date-time */
   injector_contract_updated_at?: string;
   updateAttributes?: object;
@@ -1084,7 +1058,6 @@ export interface InjectorContractAddInput {
   contract_id: string;
   contract_labels?: Record<string, string>;
   contract_manual?: boolean;
-  contract_platforms?: string[];
   injector_id: string;
   is_atomic_testing?: boolean;
 }
@@ -1096,7 +1069,6 @@ export interface InjectorContractInput {
   contract_id: string;
   contract_labels?: Record<string, string>;
   contract_manual?: boolean;
-  contract_platforms?: string[];
   is_atomic_testing?: boolean;
 }
 
@@ -1106,7 +1078,6 @@ export interface InjectorContractUpdateInput {
   contract_content: string;
   contract_labels?: Record<string, string>;
   contract_manual?: boolean;
-  contract_platforms?: string[];
   is_atomic_testing?: boolean;
 }
 
@@ -1115,14 +1086,10 @@ export interface InjectorContractUpdateMappingInput {
 }
 
 export interface InjectorCreateInput {
-  injector_category?: string;
   injector_contracts?: InjectorContractInput[];
   injector_custom_contracts?: boolean;
   injector_id: string;
   injector_name: string;
-  injector_simulation_agent?: boolean;
-  injector_simulation_agent_doc?: string;
-  injector_simulation_agent_platforms?: string[];
   injector_type: string;
 }
 
@@ -1132,13 +1099,9 @@ export interface InjectorRegistration {
 }
 
 export interface InjectorUpdateInput {
-  injector_category?: string;
   injector_contracts?: InjectorContractInput[];
   injector_custom_contracts?: boolean;
   injector_name: string;
-  injector_simulation_agent?: boolean;
-  injector_simulation_agent_doc?: string;
-  injector_simulation_agent_platforms?: string[];
 }
 
 export type JsonNode = object;
@@ -1379,43 +1342,6 @@ export interface LoginUserInput {
   password: string;
 }
 
-export interface Mitigation {
-  mitigation_attack_patterns?: AttackPattern[];
-  /** @format date-time */
-  mitigation_created_at?: string;
-  mitigation_description?: string;
-  mitigation_external_id: string;
-  mitigation_id: string;
-  mitigation_log_sources?: string[];
-  mitigation_name: string;
-  mitigation_stix_id: string;
-  mitigation_threat_hunting_techniques?: string;
-  /** @format date-time */
-  mitigation_updated_at?: string;
-  updateAttributes?: object;
-}
-
-export interface MitigationCreateInput {
-  mitigation_attack_patterns?: string[];
-  mitigation_description?: string;
-  mitigation_external_id: string;
-  mitigation_log_sources?: string[];
-  mitigation_name: string;
-  mitigation_stix_id?: string;
-  mitigation_threat_hunting_techniques?: string;
-}
-
-export interface MitigationUpdateInput {
-  mitigation_attack_patterns?: string[];
-  mitigation_description?: string;
-  mitigation_external_id: string;
-  mitigation_name: string;
-}
-
-export interface MitigationUpsertInput {
-  mitigations?: MitigationCreateInput[];
-}
-
 export interface OAuthProvider {
   provider_login?: string;
   provider_name?: string;
@@ -1630,46 +1556,8 @@ export interface PageKillChainPhase {
   totalPages?: number;
 }
 
-export interface PageMitigation {
-  content?: Mitigation[];
-  empty?: boolean;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  number?: number;
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  /** @format int32 */
-  size?: number;
-  sort?: SortObject[];
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-}
-
 export interface PagePayload {
   content?: Payload[];
-  empty?: boolean;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  number?: number;
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  /** @format int32 */
-  size?: number;
-  sort?: SortObject[];
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-}
-
-export interface PageScenario {
-  content?: Scenario[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -1780,16 +1668,10 @@ export interface PlatformSettings {
   platform_saml2_providers?: OAuthProvider[];
   auth_local_enable?: boolean;
   auth_openid_enable?: boolean;
-  caldera_url?: string;
   java_version?: string;
   map_tile_server_dark?: string;
   map_tile_server_light?: string;
-  platform_ai_enabled?: boolean;
-  platform_ai_has_token?: boolean;
-  platform_ai_model?: string;
-  platform_ai_type?: string;
   platform_dark_theme?: ThemeInput;
-  platform_enterprise_edition?: string;
   platform_lang?: string;
   platform_light_theme?: ThemeInput;
   platform_name?: string;
@@ -1907,7 +1789,6 @@ export interface Scenario {
   /** @format int64 */
   scenario_all_users_number?: number;
   scenario_articles?: Article[];
-  scenario_category?: string;
   /** @format int64 */
   scenario_communications_number?: number;
   /** @format date-time */
@@ -1921,7 +1802,6 @@ export interface Scenario {
   scenario_lessons_categories?: LessonsCategory[];
   scenario_mail_from: string;
   scenario_mails_reply_to?: string[];
-  scenario_main_focus?: string;
   scenario_message_footer?: string;
   scenario_message_header?: string;
   scenario_name: string;
@@ -1932,7 +1812,6 @@ export interface Scenario {
   scenario_recurrence_end?: string;
   /** @format date-time */
   scenario_recurrence_start?: string;
-  scenario_severity?: string;
   scenario_subtitle?: string;
   scenario_tags?: Tag[];
   scenario_teams?: Team[];
@@ -1953,11 +1832,8 @@ export interface ScenarioInformationInput {
 }
 
 export interface ScenarioInput {
-  scenario_category?: string;
   scenario_description?: string;
-  scenario_main_focus?: string;
   scenario_name: string;
-  scenario_severity?: string;
   scenario_subtitle?: string;
   scenario_tags?: string[];
 }
@@ -2017,10 +1893,6 @@ export interface SearchPaginationInput {
 
 export interface SearchTerm {
   searchTerm?: string;
-}
-
-export interface SettingsEnterpriseEditionUpdateInput {
-  platform_enterprise_edition: string;
 }
 
 export interface SettingsUpdateInput {

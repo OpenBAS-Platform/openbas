@@ -177,12 +177,11 @@ const Dryrun = () => {
   const searchColumns = ['type', 'title', 'date'];
   const filtering = useSearchAnFilter('dryinject', 'date', searchColumns);
   // Fetching data
-  const { dryrun, dryinjects, users, injectorContractsMap } = useHelper((helper) => {
+  const { dryrun, dryinjects, users } = useHelper((helper) => {
     return {
       dryrun: helper.getDryrun(dryrunId),
       dryinjects: helper.getDryrunInjects(dryrunId),
       users: helper.getDryrunUsers(dryrunId),
-      injectorContractsMap: helper.getInjectorContractsMap(),
     };
   });
   useDataLoader(() => {
@@ -190,7 +189,6 @@ const Dryrun = () => {
     dispatch(fetchPlayers());
     dispatch(fetchDryrun(exerciseId, dryrunId));
     dispatch(fetchDryinjects(exerciseId, dryrunId));
-    dispatch(fetchInjectorContracts());
   });
   return (
     <div className={classes.root}>

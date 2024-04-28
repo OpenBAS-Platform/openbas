@@ -51,7 +51,6 @@ const Validations = () => {
   // Fetching data
   const {
     exercise,
-    injectorContractsMap,
     injectExpectations,
     injectsMap,
   } = useHelper((helper) => {
@@ -59,11 +58,9 @@ const Validations = () => {
       exercise: helper.getExercise(exerciseId),
       injectsMap: helper.getInjectsMap(),
       injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
-      injectorContractsMap: helper.getInjectorContractsMap(),
     };
   });
   useDataLoader(() => {
-    dispatch(fetchInjectorContracts());
     dispatch(fetchExerciseInjectExpectations(exerciseId));
     dispatch(fetchExerciseInjects(exerciseId));
   });
@@ -132,7 +129,7 @@ const Validations = () => {
   };
 
   // Rendering
-  if (exercise && injectExpectations && !R.isEmpty(injectorContractsMap)) {
+  if (exercise && injectExpectations) {
     return (
       <div>
         <AnimationMenu exerciseId={exerciseId} />
@@ -154,7 +151,7 @@ const Validations = () => {
         <List>
           {Object.entries(groupedByInject).map(([injectId, expectationsByInject]) => {
             const inject = injectsMap[injectId] || {};
-            const injectContract = injectorContractsMap[inject.inject_injector_contract] || {};
+            const injectContract = inject.inject_injector_contract.injector_contract_content_parsed || {};
             return (
               <div key={inject.inject_id}>
                 <ListItem divider={true} classes={{ root: classes.item }}>

@@ -18,7 +18,6 @@ import DashboardDefinitionStatistics from './DashboardDefinitionStatistics';
 import DashboardDefinitionScoreStatistics from './DashboardDefinitionScoreStatistics';
 import DashboardDataStatistics from './DashboardDataStatistics';
 import DashboardResultsStatistics from './DashboardResultsStatistics';
-import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -62,7 +61,6 @@ const Dashboard = () => {
     teams,
     injects,
     challengesMap,
-    injectorContractsMap,
     teamsMap,
     injectExpectations,
     injectsMap,
@@ -82,13 +80,11 @@ const Dashboard = () => {
       organizationsMap: helper.getOrganizationsMap(),
       injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
       challengesMap: helper.getChallengesMap(),
-      injectorContractsMap: helper.getInjectorContractsMapByType(),
       communications: helper.getExerciseCommunications(exerciseId),
     };
   });
   useDataLoader(() => {
     dispatch(fetchExerciseTeams(exerciseId));
-    dispatch(fetchInjectorContracts());
     dispatch(fetchInjects(exerciseId));
     dispatch(fetchExerciseChallenges(exerciseId));
     dispatch(fetchExerciseInjectExpectations(exerciseId));
@@ -150,12 +146,10 @@ const Dashboard = () => {
       <DashboardDefinitionStatistics
         teams={teams}
         injects={injects}
-        injectorContractsMap={injectorContractsMap}
       />
       <DashboardDefinitionScoreStatistics
         teams={teams}
         injects={injects}
-        injectorContractsMap={injectorContractsMap}
         challengesMap={challengesMap}
       />
       <Typography variant="h1" style={{ marginTop: 60 }}>
@@ -175,7 +169,6 @@ const Dashboard = () => {
         usersMap={usersMap}
         injectsMap={injectsMap}
         teams={teams}
-        injectorContractsMap={injectorContractsMap}
         teamsMap={teamsMap}
         injectExpectations={injectExpectations}
         organizations={organizations}

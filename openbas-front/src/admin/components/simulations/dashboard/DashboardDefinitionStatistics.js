@@ -19,7 +19,6 @@ const useStyles = makeStyles(() => ({
 const DashboardDefinitionStatistics = ({
   teams,
   injects,
-  injectorContractsMap,
 }) => {
   const classes = useStyles();
   const { t, tPick } = useFormatter();
@@ -60,10 +59,9 @@ const DashboardDefinitionStatistics = ({
     {
       name: t('Number of injects'),
       data: injectsByType.map((a) => ({
-        x: tPick(injectorContractsMap && injectorContractsMap[a.inject_type]?.label),
+        x: tPick(a.inject_injector_contract?.injector_contract_labels),
         y: a.number,
-        fillColor:
-          injectorContractsMap && injectorContractsMap[a.inject_type]?.config?.color,
+        fillColor: a.inject_injector_contract?.injector_contract_content_parsed?.config?.color,
       })),
     },
   ];

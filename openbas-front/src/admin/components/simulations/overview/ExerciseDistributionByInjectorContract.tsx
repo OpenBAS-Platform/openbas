@@ -17,6 +17,18 @@ import type { InjectExpectationStore } from '../../../../actions/injects/Inject'
 import type { Inject } from '../../../../utils/api-types';
 import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 import type { InjectorContractHelper } from '../../../../actions/injector_contracts/injector-contract-helper';
+import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
+import Empty from '../../../../../components/Empty';
+import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
+import { useFormatter } from '../../../../../components/i18n';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import type { Theme } from '../../../../../components/Theme';
+import { useHelper } from '../../../../../store';
+import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
+import useDataLoader from '../../../../../utils/ServerSideEvent';
+import { fetchInjects } from '../../../../../actions/Inject';
+import { fetchExerciseInjectExpectations } from '../../../../../actions/Exercise';
+import type { InjectExpectationStore, InjectStore } from '../../../../../actions/injects/Inject';
 
 interface Props {
   exerciseId: ExerciseStore['exercise_id'];
@@ -31,14 +43,12 @@ const ExerciseDistributionByInjectorContract: FunctionComponent<Props> = ({
   const theme: Theme = useTheme();
 
   // Fetching data
-  const { injectsMap, injectorContractsMap, injectExpectations } = useHelper((helper: InjectHelper & InjectorContractHelper) => ({
+  const { injectsMap, injectExpectations } = useHelper((helper: InjectHelper) => ({
     injectsMap: helper.getInjectsMap(),
-    injectorContractsMap: helper.getInjectorContractsMapByType(),
     injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
   }));
   useDataLoader(() => {
     dispatch(fetchInjects(exerciseId));
-    dispatch(fetchInjectorContracts());
     dispatch(fetchExerciseInjectExpectations(exerciseId));
   });
 
@@ -62,11 +72,10 @@ const ExerciseDistributionByInjectorContract: FunctionComponent<Props> = ({
   const totalScoreByInjectorContractData = [
     {
       name: t('Total score'),
-      data: sortedInjectorContractsByTotalScore.map((i: Inject & { inject_total_score: number }) => ({
-        x: tPick(injectorContractsMap && injectorContractsMap[i.inject_type]?.label),
+      data: sortedInjectorContractsByTotalScore.map((i: InjectStore & { inject_total_score: number, }) => ({
+        x: tPick(i.inject_injector_contract?.injector_contract_labels),
         y: i.inject_total_score,
-        fillColor:
-          injectorContractsMap && injectorContractsMap[i.inject_type]?.config?.color,
+        fillColor: i.inject_injector_contract?.injector_contract_content_parsed?.config?.color,
       })),
     },
   ];

@@ -9,9 +9,14 @@ export type InjectInput = {
   inject_depends_duration_seconds: number;
 };
 
-export type InjectStore = Omit<Inject, 'inject_tags' | 'inject_content'> & {
+export type InjectStore = Omit<Inject, 'inject_tags' | 'inject_content' | 'inject_injector_contract'> & {
   inject_tags: string[] | undefined;
   inject_content: { expectationScore: number, challenges: string[] | undefined }
+  inject_injector_contract: {
+    // as we don't know the type of the content of a contract we need to put any here
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    injector_contract_content_parsed: any
+  } & Inject['inject_injector_contract']
 };
 
 export type InjectExpectationStore = Omit<InjectExpectation, 'inject_expectation_team', 'inject_expectation_inject'> & {

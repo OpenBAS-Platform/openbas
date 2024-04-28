@@ -26,7 +26,6 @@ import { fetchObjectives } from '../../../../actions/Objective';
 import LessonsObjectives from '../lessons/LessonsObjectives';
 import LessonsCategories from '../lessons/LessonsCategories';
 import ExportButtons from '../../../../components/ExportButtons';
-import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -82,7 +81,6 @@ const Dashboard = () => {
     teams,
     injects,
     challengesMap,
-    injectorContractsMap,
     teamsMap,
     injectExpectations,
     injectsMap,
@@ -107,7 +105,6 @@ const Dashboard = () => {
       organizationsMap: helper.getOrganizationsMap(),
       injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
       challengesMap: helper.getChallengesMap(),
-      injectorContractsMap: helper.getInjectorContractsMapByType(),
       communications: helper.getExerciseCommunications(exerciseId),
       objectives: helper.getExerciseObjectives(exerciseId),
       lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
@@ -118,7 +115,6 @@ const Dashboard = () => {
   useDataLoader(() => {
     dispatch(fetchReports(exerciseId));
     dispatch(fetchExerciseTeams(exerciseId));
-    dispatch(fetchInjectorContracts());
     dispatch(fetchInjects(exerciseId));
     dispatch(fetchExerciseChallenges(exerciseId));
     dispatch(fetchExerciseInjectExpectations(exerciseId));
@@ -214,14 +210,12 @@ const Dashboard = () => {
             <DashboardDefinitionStatistics
               teams={teams}
               injects={injects}
-              injectorContractsMap={injectorContractsMap}
             />
           )}
           {report.report_stats_definition_score && (
             <DashboardDefinitionScoreStatistics
               teams={teams}
               injects={injects}
-              injectorContractsMap={injectorContractsMap}
               challengesMap={challengesMap}
             />
           )}
@@ -249,7 +243,6 @@ const Dashboard = () => {
               usersMap={usersMap}
               injectsMap={injectsMap}
               teams={teams}
-              injectorContractsMap={injectorContractsMap}
               teamsMap={teamsMap}
               injectExpectations={injectExpectations}
               organizations={organizations}

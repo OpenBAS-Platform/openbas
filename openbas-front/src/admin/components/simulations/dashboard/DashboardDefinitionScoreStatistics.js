@@ -19,7 +19,6 @@ const useStyles = makeStyles(() => ({
 const DashboardDefinitionScoreStatistics = ({
   teams,
   injects,
-  injectorContractsMap,
   challengesMap,
 }) => {
   const classes = useStyles();
@@ -68,10 +67,9 @@ const DashboardDefinitionScoreStatistics = ({
     {
       name: t('Number of expectations'),
       data: sortedInjectorContractsWithScoreByNumber.map((a) => ({
-        x: tPick(injectorContractsMap && injectorContractsMap[a.inject_type]?.label),
+        x: tPick(a.inject_injector_contract?.injector_contract_labels),
         y: a.number,
-        fillColor:
-          injectorContractsMap && injectorContractsMap[a.inject_type]?.config?.color,
+        fillColor: a.inject_injector_contract?.injector_contract_content_parsed?.config?.color,
       })),
     },
   ];
@@ -83,10 +81,9 @@ const DashboardDefinitionScoreStatistics = ({
     {
       name: t('Total expected score'),
       data: sortedInjectorContractsWithScoreByScore.map((a) => ({
-        x: tPick(injectorContractsMap && injectorContractsMap[a.inject_type]?.label),
+        x: tPick(a.inject_injector_contract?.injector_contract_labels),
         y: a.score,
-        fillColor:
-          injectorContractsMap && injectorContractsMap[a.inject_type]?.config?.color,
+        fillColor: a.inject_injector_contract?.injector_contract_content_parsed?.config?.color,
       })),
     },
   ];
