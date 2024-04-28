@@ -1,8 +1,8 @@
 package io.openbas.migration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.injects.email.model.EmailContent;
-import io.openbas.injects.channel.model.ChannelContent;
+import io.openbas.injectors.email.model.EmailContent;
+import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.model.inject.form.Expectation;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

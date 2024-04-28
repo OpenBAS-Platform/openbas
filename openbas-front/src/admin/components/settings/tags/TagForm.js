@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
-import OldTextField from '../../../../components/OldTextField';
+import OldTextField from '../../../../components/fields/OldTextField';
 import DeprecatedColorPickerField from '../../../../components/DeprecatedColorPickerField';
 import inject18n from '../../../../components/i18n';
 

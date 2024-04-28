@@ -1,4 +1,4 @@
-package io.openbas.injects.email;
+package io.openbas.injectors.email;
 
 import io.openbas.integrations.InjectorService;
 import org.springframework.beans.factory.annotation.Autowired;

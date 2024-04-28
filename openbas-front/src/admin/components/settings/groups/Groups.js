@@ -34,91 +34,36 @@ const useStyles = makeStyles(() => ({
     height: 50,
   },
   bodyItem: {
-    height: '100%',
     fontSize: 13,
+    float: 'left',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
 }));
 
-const headerStyles = {
-  group_name: {
-    width: '15%',
-  },
-  group_default_user_assign: {
-    width: '15%',
-  },
-  group_default_scenario_observer: {
-    width: '15%',
-  },
-  group_default_scenario_planner: {
-    width: '15%',
-  },
-  group_default_exercise_observer: {
-    width: '15%',
-  },
-  group_default_exercise_planner: {
-    width: '15%',
-  },
-  group_users_number: {
-    width: '10%',
-  },
-};
-
 const inlineStyles = {
   group_name: {
-    float: 'left',
     width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   group_default_user_assign: {
-    float: 'left',
     width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   group_default_scenario_observer: {
-    float: 'left',
     width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   group_default_scenario_planner: {
-    float: 'left',
     width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   group_default_exercise_observer: {
-    float: 'left',
     width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   group_default_exercise_planner: {
-    float: 'left',
     width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   group_users_number: {
-    float: 'left',
     width: '10%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
 };
 
@@ -174,7 +119,6 @@ const Groups = () => {
         setContent={setGroups}
         exportProps={exportProps}
       />
-      <div className="clearfix" />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -196,7 +140,7 @@ const Groups = () => {
             primary={
               <SortHeadersComponent
                 headers={headers}
-                inlineStylesHeaders={headerStyles}
+                inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />

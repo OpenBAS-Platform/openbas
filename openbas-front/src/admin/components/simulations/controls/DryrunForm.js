@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import inject18n from '../../../../components/i18n';
-import OldTextField from '../../../../components/OldTextField';
+import OldTextField from '../../../../components/fields/OldTextField';
 import PlayerField from '../../../../components/PlayerField';
 
 class DryrunForm extends Component {

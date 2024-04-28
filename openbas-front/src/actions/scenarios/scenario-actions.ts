@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux';
-import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
+import { delReferential, getReferential, postReferential, putReferential, simplePostCall } from '../../utils/Action';
 import { arrayOfScenarios, scenario } from './scenario-schema';
 import type {
   Scenario,
@@ -9,6 +9,7 @@ import type {
   ScenarioTeamPlayersEnableInput,
   ScenarioUpdateTagsInput,
   ScenarioUpdateTeamsInput,
+  SearchPaginationInput,
   Team,
 } from '../../utils/api-types';
 import * as schema from '../Schema';
@@ -21,6 +22,12 @@ export const addScenario = (data: ScenarioInput) => (dispatch: Dispatch) => {
 
 export const fetchScenarios = () => (dispatch: Dispatch) => {
   return getReferential(arrayOfScenarios, SCENARIO_URI)(dispatch);
+};
+
+export const searchScenarios = (paginationInput: SearchPaginationInput) => {
+  const data = paginationInput;
+  const uri = '/api/scenarios/search';
+  return simplePostCall(uri, data);
 };
 
 export const fetchScenario = (scenarioId: string) => (dispatch: Dispatch) => {

@@ -45,7 +45,7 @@ const AtomicPopover: FunctionComponent<Props> = ({
         'inject_tags',
         'inject_title',
         'inject_type',
-        'inject_contract',
+        'inject_injector_contract',
         'inject_description',
         'inject_content',
         'inject_all_teams',

@@ -9,7 +9,7 @@ import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ChallengeRepository;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
-import io.openbas.injects.challenge.model.ChallengeContent;
+import io.openbas.injectors.challenge.model.ChallengeContent;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.injects.challenge.ChallengeContract.CHALLENGE_PUBLISH;
+import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 
 @Service
 public class ChallengeService {
@@ -73,7 +73,7 @@ public class ChallengeService {
 
   private Stream<Challenge> resolveChallenges(@NotNull final List<Inject> injects) {
     List<String> challenges = injects.stream()
-        .filter(inject -> inject.getContract().equals(CHALLENGE_PUBLISH))
+        .filter(inject -> inject.getInjectorContract().getId().equals(CHALLENGE_PUBLISH))
         .filter(inject -> inject.getContent() != null)
         .flatMap(inject -> {
           try {

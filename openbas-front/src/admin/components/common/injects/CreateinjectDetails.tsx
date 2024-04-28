@@ -80,7 +80,7 @@ const CreateInjectDetails: FunctionComponent<Props> = ({
   return (
     <InjectDefinition
       inject={{
-        inject_contract: contractId,
+        inject_injector_contract: contractId,
         inject_type: contractContent.config.type,
         inject_teams: [],
         inject_assets: [],

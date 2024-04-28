@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
-import io.openbas.injects.challenge.model.ChallengeContent;
+import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.rest.document.form.DocumentCreateInput;
 import io.openbas.rest.document.form.DocumentTagUpdateInput;
 import io.openbas.rest.document.form.DocumentUpdateInput;
@@ -42,7 +42,7 @@ import java.util.stream.Stream;
 import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.injects.challenge.ChallengeContract.CHALLENGE_PUBLISH;
+import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 
@@ -302,7 +302,7 @@ public class DocumentApi extends RestBehavior {
         Stream<Document> articlesDocs = articles.stream()
                 .flatMap(article -> article.getDocuments().stream());
         List<String> challenges = injects.stream()
-                .filter(inject -> inject.getContract().equals(CHALLENGE_PUBLISH))
+                .filter(inject -> inject.getInjectorContract().getId().equals(CHALLENGE_PUBLISH))
                 .filter(inject -> inject.getContent() != null)
                 .flatMap(inject -> {
                     try {

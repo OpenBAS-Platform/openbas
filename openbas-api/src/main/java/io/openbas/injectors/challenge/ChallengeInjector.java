@@ -1,4 +1,4 @@
-package io.openbas.injects.challenge;
+package io.openbas.injectors.challenge;
 
 import io.openbas.integrations.InjectorService;
 import org.springframework.beans.factory.annotation.Autowired;

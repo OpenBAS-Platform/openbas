@@ -1,12 +1,12 @@
-package io.openbas.injects.email;
+package io.openbas.injectors.email;
 
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
-import io.openbas.injects.email.model.EmailContent;
-import io.openbas.injects.email.service.EmailService;
+import io.openbas.injectors.email.model.EmailContent;
+import io.openbas.injectors.email.service.EmailService;
 import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ManualExpectation;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static io.openbas.database.model.InjectStatusExecution.traceError;
-import static io.openbas.injects.email.EmailContract.EMAIL_GLOBAL;
+import static io.openbas.injectors.email.EmailContract.EMAIL_GLOBAL;
 
 @Component(EmailContract.TYPE)
 public class EmailExecutor extends Injector {
@@ -78,7 +78,7 @@ public class EmailExecutor extends Injector {
     String from = exercise != null ? exercise.getFrom() : this.openBASConfig.getDefaultMailer();
     List<String> replyTos = exercise != null ? exercise.getReplyTos() : List.of(this.openBASConfig.getDefaultReplyTo());
     //noinspection SwitchStatementWithTooFewBranches
-    switch (inject.getContract()) {
+    switch (inject.getInjectorContract().getId()) {
       case EMAIL_GLOBAL -> sendMulti(execution, users, from, replyTos, inReplyTo, subject, message, attachments);
       default -> sendSingle(execution, users, from, replyTos, inReplyTo, mustBeEncrypted, subject, message, attachments);
     }

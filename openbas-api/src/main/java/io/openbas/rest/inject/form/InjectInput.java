@@ -3,6 +3,8 @@ package io.openbas.rest.inject.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.InjectorContract;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,8 +24,8 @@ public class InjectInput {
     @JsonProperty("inject_type")
     private String type;
 
-    @JsonProperty("inject_contract")
-    private String contract;
+    @JsonProperty("inject_injector_contract")
+    private String injectorContract;
 
     @JsonProperty("inject_content")
     private ObjectNode content;
@@ -58,13 +60,13 @@ public class InjectInput {
     @JsonProperty("inject_tags")
     private List<String> tagIds = new ArrayList<>();
 
-    public Inject toInject() {
+    public Inject toInject(@NotNull final InjectorContract injectorContract) {
         Inject inject = new Inject();
         inject.setTitle(getTitle());
         inject.setDescription(getDescription());
         inject.setContent(getContent());
         inject.setType(getType());
-        inject.setContract(getContract());
+        inject.setInjectorContract(injectorContract);
         inject.setDependsDuration(getDependsDuration());
         inject.setAllTeams(isAllTeams());
         inject.setCountry(getCountry());

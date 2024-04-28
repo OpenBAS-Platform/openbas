@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form } from 'react-final-form';
 import { Button, Grid } from '@mui/material';
-import OldTextField from '../../../../components/OldTextField';
+import OldTextField from '../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import CheckboxField from '../../../../components/CheckboxField';
 

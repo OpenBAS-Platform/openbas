@@ -63,7 +63,7 @@ public class CalderaExecutor extends Injector {
 
     // Execute inject for all assets
     Map<String, Asset> paws = computePaws(assets.keySet().stream().toList());
-    String contract = inject.getContract();
+    String contract = inject.getInjectorContract().getId();
     for (Map.Entry<String, Asset> entryPaw : paws.entrySet()) {
       try {
         this.calderaService.exploit(obfuscator, entryPaw.getKey(), contract);

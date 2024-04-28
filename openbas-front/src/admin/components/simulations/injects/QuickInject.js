@@ -41,13 +41,13 @@ import TeamPopover from '../../components/teams/TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddTeams from '../../common/injects/InjectAddTeams';
 import { isExerciseReadOnly, isExerciseUpdatable, secondsFromToNow } from '../../../../utils/Exercise';
-import OldTextField from '../../../../components/OldTextField';
+import OldTextField from '../../../../components/fields/OldTextField';
 import SwitchField from '../../../../components/fields/SwitchField';
 import RichTextField from '../../../../components/fields/RichTextField';
 import InjectAddDocuments from '../../common/injects/InjectAddDocuments';
 import DocumentType from '../../components/documents/DocumentType';
 import DocumentPopover from '../../components/documents/DocumentPopover';
-import SelectField from '../../../../components/fields/SelectField';
+import OldSelectField from '../../../../components/fields/OldSelectField';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
 import InjectExpectations from '../../common/injects/expectations/InjectExpectations';
 import { fetchExerciseTeams } from '../../../../actions/Exercise';
@@ -436,7 +436,7 @@ class QuickInject extends Component {
     );
     const values = {
       inject_title: finalData.subject,
-      inject_contract: EMAIL_CONTRACT,
+      inject_injector_contract: EMAIL_CONTRACT,
       inject_depends_duration:
         injectDependsDuration > 0 ? injectDependsDuration : 0,
       inject_content: finalData,
@@ -564,7 +564,7 @@ class QuickInject extends Component {
                                 classes={{ root: classes.tuple }}
                                 divider={false}
                               >
-                                <SelectField
+                                <OldSelectField
                                   variant="standard"
                                   name={`${name}.type`}
                                   fullWidth={true}
@@ -585,7 +585,7 @@ class QuickInject extends Component {
                                       </ListItemText>
                                     </MenuItem>
                                   )}
-                                </SelectField>
+                                </OldSelectField>
                                 <OldTextField
                                   variant="standard"
                                   name={`${name}.key`}
@@ -599,7 +599,7 @@ class QuickInject extends Component {
                                 && values[field.key][index]
                                 && values[field.key][index].type
                                 === 'attachment' ? (
-                                  <SelectField
+                                  <OldSelectField
                                     variant="standard"
                                     name={`${name}.value`}
                                     fullWidth={true}
@@ -617,7 +617,7 @@ class QuickInject extends Component {
                                         </ListItemText>
                                       </MenuItem>
                                     ))}
-                                  </SelectField>
+                                  </OldSelectField>
                                   ) : (
                                     <OldTextField
                                       variant="standard"
@@ -650,7 +650,7 @@ class QuickInject extends Component {
               );
             case 'select':
               return field.cardinality === 'n' ? (
-                <SelectField
+                <OldSelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -670,9 +670,9 @@ class QuickInject extends Component {
                         </ListItemText>
                       </MenuItem>
                     ))}
-                </SelectField>
+                </OldSelectField>
               ) : (
-                <SelectField
+                <OldSelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -694,7 +694,7 @@ class QuickInject extends Component {
                         </ListItemText>
                       </MenuItem>
                     ))}
-                </SelectField>
+                </OldSelectField>
               );
             case 'dependency-select':
               // eslint-disable-next-line no-case-declarations
@@ -702,7 +702,7 @@ class QuickInject extends Component {
               // eslint-disable-next-line no-case-declarations
               const choices = field.choices[depValue] ?? {};
               return field.cardinality === 'n' ? (
-                <SelectField
+                <OldSelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -720,9 +720,9 @@ class QuickInject extends Component {
                         <ListItemText>{v}</ListItemText>
                       </MenuItem>
                     ))}
-                </SelectField>
+                </OldSelectField>
               ) : (
-                <SelectField
+                <OldSelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -741,7 +741,7 @@ class QuickInject extends Component {
                         </ListItemText>
                       </MenuItem>
                     ))}
-                </SelectField>
+                </OldSelectField>
               );
             default:
               return (

@@ -2,6 +2,7 @@ package io.openbas.integrations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Collector;
+import io.openbas.database.model.Injector;
 import io.openbas.database.repository.CollectorRepository;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
@@ -38,9 +39,14 @@ public class CollectorService {
         if (iconData != null) {
             fileService.uploadStream(COLLECTORS_IMAGES_BASE_PATH, type + ".png", iconData);
         }
-        Collector collector = collectorRepository.findById(id).orElse(collectorRepository.findByType(type).orElse(null));
+        Collector collector = collectorRepository.findById(id).orElse(null);
+        if( collector == null ) {
+            Collector collectorChecking = collectorRepository.findByType(type).orElse(null);
+            if (collectorChecking != null ) {
+                throw new Exception("The collector " + type + " already exists with a different ID, please delete it or contact your administrator.");
+            }
+        }
         if (collector != null) {
-            collector.setId(id);
             collector.setName(name);
             collector.setExternal(false);
             collector.setType(type);

@@ -1,4 +1,4 @@
-package io.openbas.injects.email.service;
+package io.openbas.injectors.email.service;
 
 
 import io.openbas.database.model.Communication;

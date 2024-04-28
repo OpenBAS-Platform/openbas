@@ -31,69 +31,31 @@ const useStyles = makeStyles(() => ({
     height: 50,
   },
   bodyItem: {
-    height: '100%',
     fontSize: 13,
+    float: 'left',
+    width: '20%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
 }));
 
-const headerStyles = {
-  kill_chain_phase: {
-    width: '20%',
-  },
-  attack_pattern_external_id: {
-    width: '15%',
-  },
-  attack_pattern_name: {
-    width: '35%',
-  },
-  attack_pattern_created_at: {
-    width: '12%',
-  },
-  attack_pattern_updated_at: {
-    width: '12%',
-  },
-};
-
 const inlineStyles = {
   kill_chain_phase: {
-    float: 'left',
     width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   attack_pattern_external_id: {
-    float: 'left',
     width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   attack_pattern_name: {
-    float: 'left',
     width: '35%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   attack_pattern_created_at: {
-    float: 'left',
     width: '12%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOv7erflow: 'ellipsis',
   },
   attack_pattern_updated_at: {
-    float: 'left',
     width: '12%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
 };
 
@@ -146,7 +108,6 @@ const AttackPatterns = () => {
         setContent={setAttackPatterns}
         exportProps={exportProps}
       />
-      <div className="clearfix" />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -168,7 +129,7 @@ const AttackPatterns = () => {
             primary={
               <SortHeadersComponent
                 headers={headers}
-                inlineStylesHeaders={headerStyles}
+                inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />

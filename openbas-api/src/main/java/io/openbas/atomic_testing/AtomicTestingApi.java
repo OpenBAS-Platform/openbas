@@ -53,22 +53,14 @@ public class AtomicTestingApi extends RestBehavior {
   public Page<AtomicTestingOutput> findAllAtomicTestings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return this.atomicTestingService.findAllAtomicTestings(searchPaginationInput)
-        .map((inject) -> {
-          InjectorContract injectorContract = this.injectorContractRepository
-              .findById(inject.getContract()).orElseThrow();
-          return toDto(inject, injectorContract);
-        });
+        .map(AtomicTestingMapper::toDto);
   }
 
 
   @GetMapping("/{injectId}")
   public AtomicTestingOutput findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId)
-        .map(inject -> {
-          InjectorContract injectorContract = this.injectorContractRepository
-              .findById(inject.getContract()).orElseThrow();
-          return toDtoWithTargetResults(inject, injectorContract);
-        })
+        .map(AtomicTestingMapper::toDtoWithTargetResults)
         .orElseThrow();
   }
 
@@ -92,9 +84,7 @@ public class AtomicTestingApi extends RestBehavior {
   @PostMapping()
   public AtomicTestingOutput createAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {
     Inject inject = this.atomicTestingService.createOrUpdate(input, null);
-    InjectorContract injectorContract = this.injectorContractRepository
-        .findById(inject.getContract()).orElseThrow();
-    return toDto(inject, injectorContract);
+    return toDto(inject);
   }
 
   @PutMapping("/{injectId}")
@@ -102,9 +92,7 @@ public class AtomicTestingApi extends RestBehavior {
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingInput input) {
     Inject inject = this.atomicTestingService.createOrUpdate(input, injectId);
-    InjectorContract injectorContract = this.injectorContractRepository
-        .findById(inject.getContract()).orElseThrow();
-    return toDto(inject, injectorContract);
+    return toDto(inject);
   }
 
   @DeleteMapping("/{injectId}")

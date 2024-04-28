@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static io.openbas.contract.variables.VariableHelper.*;
+import static io.openbas.injector_contract.variables.VariableHelper.*;
 
 @RequiredArgsConstructor
 @Service

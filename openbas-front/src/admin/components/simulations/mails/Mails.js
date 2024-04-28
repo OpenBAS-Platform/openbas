@@ -347,7 +347,7 @@ const Mails = () => {
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {sortedInjects.map((inject) => {
-          const injectContract = injectorContractsMap[inject.inject_contract];
+          const injectContract = injectorContractsMap[inject.inject_injector_contract];
           return (
             <ListItem
               key={inject.inject_id}

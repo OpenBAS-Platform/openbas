@@ -33,80 +33,33 @@ const useStyles = makeStyles(() => ({
     height: 50,
   },
   bodyItem: {
-    height: '100%',
     fontSize: 13,
+    float: 'left',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
 }));
 
-const headerStyles = {
-  user_email: {
-    width: '25%',
-  },
-  user_firstname: {
-    width: '15%',
-  },
-  user_lastname: {
-    width: '15%',
-  },
-  user_organization: {
-    width: '20%',
-  },
-  user_admin: {
-    width: '10%',
-  },
-  user_tags: {
-    width: '12%',
-  },
-};
-
 const inlineStyles = {
   user_email: {
-    float: 'left',
     width: '25%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   user_firstname: {
-    float: 'left',
     width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   user_lastname: {
-    float: 'left',
     width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   user_organization: {
-    float: 'left',
     width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   user_admin: {
-    float: 'left',
     width: '10%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   user_tags: {
-    float: 'left',
     width: '12%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
 };
 
@@ -160,7 +113,6 @@ const Users = () => {
         setContent={setUsers}
         exportProps={exportProps}
       />
-      <div className="clearfix" />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -182,7 +134,7 @@ const Users = () => {
             primary={
               <SortHeadersComponent
                 headers={headers}
-                inlineStylesHeaders={headerStyles}
+                inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />

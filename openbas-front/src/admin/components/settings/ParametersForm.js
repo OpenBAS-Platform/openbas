@@ -2,9 +2,9 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { MenuItem, Button } from '@mui/material';
-import SelectField from '../../../components/fields/SelectField';
+import OldSelectField from '../../../components/fields/OldSelectField';
 import inject18n from '../../../components/i18n';
-import OldTextField from '../../../components/OldTextField';
+import OldTextField from '../../../components/fields/OldTextField';
 
 const ParametersForm = (props) => {
   const { t, onSubmit, initialValues } = props;
@@ -22,7 +22,7 @@ const ParametersForm = (props) => {
             fullWidth={true}
             label={t('Platform name')}
           />
-          <SelectField
+          <OldSelectField
             variant="standard"
             label={t('Default theme')}
             name="platform_theme"
@@ -35,8 +35,8 @@ const ParametersForm = (props) => {
             <MenuItem key="light" value="light">
               {t('Light')}
             </MenuItem>
-          </SelectField>
-          <SelectField
+          </OldSelectField>
+          <OldSelectField
             variant="standard"
             label={t('Default language')}
             name="platform_lang"
@@ -52,7 +52,7 @@ const ParametersForm = (props) => {
             <MenuItem key="fr" value="fr">
               Français
             </MenuItem>
-          </SelectField>
+          </OldSelectField>
           <div style={{ marginTop: 20 }}>
             <Button
               variant="contained"

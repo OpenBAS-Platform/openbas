@@ -2,7 +2,7 @@ package io.openbas.rest.security;
 
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.UserRepository;
-import io.openbas.scenario.ScenarioService;
+import io.openbas.service.ScenarioService;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;

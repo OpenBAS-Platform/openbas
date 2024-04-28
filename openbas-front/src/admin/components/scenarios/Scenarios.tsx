@@ -1,36 +1,23 @@
 import { makeStyles } from '@mui/styles';
-import { CSVLink } from 'react-csv';
-import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
-import { FileDownloadOutlined, KeyboardArrowRight, MovieFilterOutlined } from '@mui/icons-material';
-import React, { CSSProperties } from 'react';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { KeyboardArrowRight, MovieFilterOutlined } from '@mui/icons-material';
+import React, { CSSProperties, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAppDispatch } from '../../../utils/hooks';
 import { useFormatter } from '../../../components/i18n';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { useHelper } from '../../../store';
 import type { TagsHelper, UsersHelper } from '../../../actions/helper';
-import useDataLoader from '../../../utils/ServerSideEvent';
-import type { ScenariosHelper } from '../../../actions/scenarios/scenario-helper';
-import { fetchScenarios } from '../../../actions/scenarios/scenario-actions';
+import { searchScenarios } from '../../../actions/scenarios/scenario-actions';
 import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
-import SearchFilter from '../../../components/SearchFilter';
-import TagsFilter from '../../../components/TagsFilter';
-import { exportData } from '../../../utils/Environment';
-import ItemTags from '../../../components/ItemTags';
 import ScenarioCreation from './ScenarioCreation';
 import Breadcrumbs from '../../../components/Breadcrumbs';
+import { initSorting } from '../../../components/common/pagination/Page';
+import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
+import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
+import type { SearchPaginationInput } from '../../../utils/api-types';
+import ItemTags from '../../../components/ItemTags';
 
 const useStyles = makeStyles(() => ({
-  parameters: {
-    marginTop: -10,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  filters: {
-    display: 'flex',
-    gap: '10px',
-  },
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -38,139 +25,100 @@ const useStyles = makeStyles(() => ({
   },
   item: {
     paddingLeft: 10,
-    height: 50,
+    height: 80,
   },
   bodyItem: {
-    height: 20,
+    height: 80,
     fontSize: 13,
     float: 'left',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     paddingRight: 10,
+
   },
   goIcon: {
     position: 'absolute',
     right: -10,
   },
-  downloadButton: {
-    marginRight: 15,
-  },
 }));
-
-const inlineStylesHeaders: Record<string, CSSProperties> = {
-  iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 5px',
-    padding: 0,
-    top: '0px',
-  },
-  scenario_name: {
-    float: 'left',
-    width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  scenario_subtitle: {
-    float: 'left',
-    width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  scenario_description: {
-    float: 'left',
-    width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  scenario_tags: {
-    float: 'left',
-    width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-};
 
 const inlineStyles: Record<string, CSSProperties> = {
   scenario_name: {
     width: '25%',
   },
-  scenario_subtitle: {
-    width: '25%',
+  scenario_severity: {
+    width: '8%',
   },
-  scenario_description: {
-    width: '25%',
+  scenario_category: {
+    width: '12%',
+  },
+  scenario_main_focus: {
+    width: '12%',
+  },
+  scenario_platforms: {
+    width: '12%',
   },
   scenario_tags: {
-    width: '25%',
+    width: '18%',
+  },
+  scenario_updated_at: {
+    width: '10%',
   },
 };
 
 const Scenarios = () => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useAppDispatch();
-  const { t } = useFormatter();
+  const { t, nsdt } = useFormatter();
   // Filter and sort hook
   const filtering = useSearchAnFilter('scenario', 'name', ['name']);
   // Fetching data
-  const { scenarios, tagsMap, userAdmin } = useHelper((helper: ScenariosHelper & TagsHelper & UsersHelper) => ({
-    scenarios: helper.getScenarios(),
-    tagsMap: helper.getTagsMap(),
+  const { userAdmin } = useHelper((helper: TagsHelper & UsersHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
-  useDataLoader(() => {
-    dispatch(fetchScenarios());
-  });
 
   // Headers
-  const fields = [
-    { name: 'scenario_name', label: 'Name', isSortable: true, value: (scenario: ScenarioStore) => scenario.scenario_name },
-    { name: 'scenario_subtitle', label: 'Subtitle', isSortable: true, value: (scenario: ScenarioStore) => scenario.scenario_subtitle },
-    { name: 'scenario_description', label: 'Description', isSortable: true, value: (scenario: ScenarioStore) => scenario.scenario_description },
-    { name: 'scenario_tags', label: 'Tags', isSortable: true, value: (scenario: ScenarioStore) => <ItemTags variant="list" tags={scenario.scenario_tags} /> },
+  const headers = [
+    { field: 'scenario_name', label: 'Name', isSortable: true },
+    { field: 'scenario_severity', label: 'Severity', isSortable: true },
+    { field: 'scenario_category', label: 'Category', isSortable: true },
+    { field: 'scenario_main_focus', label: 'Main focus', isSortable: true },
+    { field: 'scenario_platforms', label: 'Platforms', isSortable: true },
+    { field: 'scenario_tags', label: 'Tags', isSortable: true },
+    { field: 'scenario_updated_at', label: 'Updated', isSortable: true },
   ];
+
+  const [scenarios, setScenarios] = useState([]);
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
+    sorts: initSorting('scenario_name'),
+  });
+
+  // Export
+  const exportProps = {
+    exportType: 'scenario',
+    exportKeys: [
+      'scenario_name',
+      'scenario_severity',
+      'scenario_category',
+      'scenario_main_focus',
+      'scenario_platforms',
+      'scenario_tags',
+      'scenario_updated_at',
+    ],
+    exportData: scenarios,
+    exportFileName: `${t('Scenarios')}.csv`,
+  };
   const sortedScenarios: ScenarioStore[] = filtering.filterAndSort(scenarios);
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
-      <div className={classes.parameters}>
-        <div className={classes.filters}>
-          <SearchFilter
-            small
-            onChange={filtering.handleSearch}
-            keyword={filtering.keyword}
-          />
-          <TagsFilter
-            onAddTag={filtering.handleAddTag}
-            onRemoveTag={filtering.handleRemoveTag}
-            currentTags={filtering.tags}
-          />
-        </div>
-        <div className={classes.downloadButton}>
-          {sortedScenarios.length > 0 ? (
-            <CSVLink
-              data={exportData(
-                'scenario',
-                fields.map((field) => field.name),
-                sortedScenarios,
-                tagsMap,
-              )}
-              filename={'Scenarios.csv'}
-            >
-              <Tooltip title={t('Export this list')}>
-                <IconButton size="large">
-                  <FileDownloadOutlined color="primary" />
-                </IconButton>
-              </Tooltip>
-            </CSVLink>
-          ) : (
-            <IconButton size="large" disabled>
-              <FileDownloadOutlined />
-            </IconButton>
-          )}
-        </div>
-      </div>
+      <PaginationComponent
+        fetch={searchScenarios}
+        searchPaginationInput={searchPaginationInput}
+        setContent={setScenarios}
+        exportProps={exportProps}
+      />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -190,23 +138,15 @@ const Scenarios = () => {
           </ListItemIcon>
           <ListItemText
             primary={
-              <>
-                {fields.map((header) => (
-                  <div key={header.name}>
-                    {
-                      filtering.buildHeader(
-                        header.name,
-                        header.label,
-                        header.isSortable,
-                        inlineStylesHeaders,
-                      )
-                    }
-                  </div>
-                ))
-                }
-              </>
-            }
+              <SortHeadersComponent
+                headers={headers}
+                inlineStylesHeaders={inlineStyles}
+                searchPaginationInput={searchPaginationInput}
+                setSearchPaginationInput={setSearchPaginationInput}
+              />
+              }
           />
+          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {sortedScenarios.map((scenario) => (
           <ListItemButton
@@ -221,18 +161,51 @@ const Scenarios = () => {
             </ListItemIcon>
             <ListItemText
               primary={
-                <>
-                  {fields.map((field) => (
-                    <div
-                      key={field.name}
-                      className={classes.bodyItem}
-                      style={inlineStyles[field.name]}
-                    >
-                      {field.value(scenario)}
-                    </div>
-                  ))}
-                </>
-              }
+                <div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.scenario_name}
+                  >
+                    {scenario.scenario_name}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.scenario_severity}
+                  >
+
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.scenario_category}
+                  >
+
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.scenario_main_focus}
+                  >
+
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.scenario_platforms}
+                  >
+
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.scenario_tags}
+                  >
+                    <ItemTags variant="list" tags={scenario.scenario_tags} />
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.scenario_updated_at}
+                  >
+                    {nsdt(scenario.scenario_updated_at)}
+                  </div>
+                </div>
+                }
             />
             <ListItemIcon classes={{ root: classes.goIcon }}>
               <KeyboardArrowRight />

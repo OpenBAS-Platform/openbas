@@ -1,7 +1,7 @@
 import type { Inject, InjectExpectation } from '../../utils/api-types';
 
 export type InjectInput = {
-  inject_contract: { id: string, type: string };
+  inject_injector_contract: { id: string, type: string };
   inject_tags: string[];
   inject_depends_duration_days: number;
   inject_depends_duration_hours: number;

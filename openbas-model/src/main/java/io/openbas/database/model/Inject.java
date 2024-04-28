@@ -65,11 +65,6 @@ public class Inject implements Base, Injection {
   private String description;
 
   @Getter
-  @Column(name = "inject_contract")
-  @JsonProperty("inject_contract")
-  private String contract;
-
-  @Getter
   @Column(name = "inject_country")
   @JsonProperty("inject_country")
   private String country;
@@ -138,6 +133,13 @@ public class Inject implements Base, Injection {
   @NotNull
   @Min(value = 0L, message = "The value must be positive")
   private Long dependsDuration;
+
+  @Getter
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "inject_injector_contract")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("inject_injector_contract")
+  private InjectorContract injectorContract;
 
   @Getter
   @ManyToOne(fetch = FetchType.LAZY)

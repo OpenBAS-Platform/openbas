@@ -7,11 +7,12 @@ import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ComcheckRepository;
 import io.openbas.database.repository.ComcheckStatusRepository;
+import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
-import io.openbas.injects.email.EmailContract;
-import io.openbas.injects.email.EmailExecutor;
+import io.openbas.injectors.email.EmailContract;
+import io.openbas.injectors.email.EmailExecutor;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
@@ -29,7 +30,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static io.openbas.contract.variables.VariableHelper.COMCHECK;
+import static io.openbas.injector_contract.variables.VariableHelper.COMCHECK;
 import static io.openbas.database.model.Comcheck.COMCHECK_STATUS.EXPIRED;
 import static io.openbas.database.specification.ComcheckStatusSpecification.thatNeedExecution;
 import static java.time.Instant.now;
@@ -45,6 +46,8 @@ public class ComchecksExecutionJob implements Job {
     private ApplicationContext context;
     private ComcheckRepository comcheckRepository;
     private ComcheckStatusRepository comcheckStatusRepository;
+
+    private InjectorContractRepository injectorContractRepository;
     private ExecutionContextService executionContextService;
 
     @Resource
@@ -71,13 +74,18 @@ public class ComchecksExecutionJob implements Job {
     }
 
     @Autowired
+    public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
+        this.injectorContractRepository = injectorContractRepository;
+    }
+
+    @Autowired
     public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
         this.executionContextService = executionContextService;
     }
 
     private Inject buildComcheckEmail(Comcheck comCheck) {
         Inject emailInject = new Inject();
-        emailInject.setContract(EmailContract.EMAIL_DEFAULT);
+        emailInject.setInjectorContract(injectorContractRepository.findById(EmailContract.EMAIL_DEFAULT).orElseThrow());
         emailInject.setExercise(comCheck.getExercise());
         ObjectNode content = mapper.createObjectNode();
         content.set("subject", mapper.convertValue(comCheck.getSubject(), JsonNode.class));

@@ -2,9 +2,9 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button, MenuItem } from '@mui/material';
-import OldTextField from '../../../../components/OldTextField';
+import OldTextField from '../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
-import SelectField from '../../../../components/fields/SelectField';
+import OldSelectField from '../../../../components/fields/OldSelectField';
 import TagField from '../../../../components/TagField';
 
 const PayloadForm = (props) => {
@@ -34,7 +34,7 @@ const PayloadForm = (props) => {
     >
       {({ handleSubmit, form, values, submitting, pristine }) => (
         <form id="payloadForm" onSubmit={handleSubmit}>
-          <SelectField
+          <OldSelectField
             variant="standard"
             label={t('Type')}
             name="payload_type"
@@ -47,7 +47,7 @@ const PayloadForm = (props) => {
             <MenuItem key="windows_powershell" value="windows_powershell">
               {t('Windows Powershell')}
             </MenuItem>
-          </SelectField>
+          </OldSelectField>
           <OldTextField
             name="payload_name"
             fullWidth={true}

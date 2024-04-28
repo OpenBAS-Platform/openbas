@@ -2,8 +2,8 @@ package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.Inject;
 
-import static io.openbas.injects.email.EmailContract.EMAIL_DEFAULT;
-import static io.openbas.injects.email.EmailContract.TYPE;
+import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
+import static io.openbas.injectors.email.EmailContract.TYPE;
 
 public class InjectFixture {
 

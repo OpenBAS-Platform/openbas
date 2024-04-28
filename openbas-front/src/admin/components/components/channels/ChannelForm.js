@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { Button, MenuItem } from '@mui/material';
-import OldTextField from '../../../../components/OldTextField';
+import OldTextField from '../../../../components/fields/OldTextField';
 import inject18n from '../../../../components/i18n';
-import SelectField from '../../../../components/fields/SelectField';
+import OldSelectField from '../../../../components/fields/OldSelectField';
 
 class ChannelForm extends Component {
   validate(values) {
@@ -35,7 +35,7 @@ class ChannelForm extends Component {
       >
         {({ handleSubmit, submitting, pristine }) => (
           <form id="channelForm" onSubmit={handleSubmit}>
-            <SelectField
+            <OldSelectField
               variant="standard"
               label={t('Type')}
               name="channel_type"
@@ -50,7 +50,7 @@ class ChannelForm extends Component {
               <MenuItem key="tv" value="tv">
                 {t('tv')}
               </MenuItem>
-            </SelectField>
+            </OldSelectField>
             <OldTextField
               variant="standard"
               name="channel_name"

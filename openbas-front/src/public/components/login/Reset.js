@@ -5,7 +5,7 @@ import { Form } from 'react-final-form';
 import { makeStyles } from '@mui/styles';
 import { askReset, resetPassword, validateResetToken } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';
-import OldTextField from '../../../components/OldTextField';
+import OldTextField from '../../../components/fields/OldTextField';
 
 const useStyles = makeStyles(() => ({
   container: {

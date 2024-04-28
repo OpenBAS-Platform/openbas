@@ -2,8 +2,8 @@ import React from 'react';
 import { Form } from 'react-final-form';
 import { MenuItem, Button } from '@mui/material';
 import { z } from 'zod';
-import SelectField from '../../../components/fields/SelectField';
-import OldTextField from '../../../components/OldTextField';
+import OldSelectField from '../../../components/fields/OldSelectField';
+import OldTextField from '../../../components/fields/OldTextField';
 import { useFormatter } from '../../../components/i18n';
 import OrganizationField from '../../../components/OrganizationField';
 import CountryField from '../../../components/CountryField';
@@ -63,7 +63,7 @@ const UserForm = ({ onSubmit, initialValues }) => {
             values={values}
             setFieldValue={form.mutators.setValue}
           />
-          <SelectField
+          <OldSelectField
             variant="standard"
             label={t('Theme')}
             name="user_theme"
@@ -79,8 +79,8 @@ const UserForm = ({ onSubmit, initialValues }) => {
             <MenuItem key="light" value="light">
               {t('Light')}
             </MenuItem>
-          </SelectField>
-          <SelectField
+          </OldSelectField>
+          <OldSelectField
             variant="standard"
             label={t('Language')}
             name="user_lang"
@@ -96,7 +96,7 @@ const UserForm = ({ onSubmit, initialValues }) => {
             <MenuItem key="fr" value="fr">
               Français
             </MenuItem>
-          </SelectField>
+          </OldSelectField>
           <div style={{ marginTop: 20 }}>
             <Button
               variant="contained"

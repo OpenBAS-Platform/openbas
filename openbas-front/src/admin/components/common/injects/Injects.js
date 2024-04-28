@@ -322,7 +322,7 @@ const Injects = ({
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
           {sortedInjects.map((inject) => {
-            const injectContract = injectorContractsMap[inject.inject_contract];
+            const injectContract = injectorContractsMap[inject.inject_injector_contract];
             const injectorContractName = tPick(injectContract?.label);
             const duration = splitDuration(inject.inject_depends_duration || 0);
             const isDisabled = disabledTypes.includes(inject.inject_type)
@@ -437,7 +437,7 @@ const Injects = ({
                 open={selectedInjectId !== null}
                 handleClose={() => setSelectedInjectId(null)}
                 onUpdateInject={onUpdateInject}
-                injectorContract={injectorContractsMap[selectedInject.inject_contract]}
+                injectorContract={injectorContractsMap[selectedInject.inject_injector_contract]}
                 inject={selectedInject}
                 teamsFromExerciseOrScenario={teams}
                 articlesFromExerciseOrScenario={articles}

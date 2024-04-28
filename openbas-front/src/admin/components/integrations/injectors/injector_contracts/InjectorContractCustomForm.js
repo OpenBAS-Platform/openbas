@@ -9,7 +9,7 @@ import { Button, Typography, Grid, Switch, TextField as MUITextField } from '@mu
 import { useTheme } from '@mui/styles';
 import { useFormatter } from '../../../../../components/i18n';
 import AttackPatternField from '../../../../../components/AttackPatternField';
-import OldTextField from '../../../../../components/OldTextField';
+import OldTextField from '../../../../../components/fields/OldTextField';
 
 const InjectorContractForm = (props) => {
   const { onSubmit, initialValues, editing, handleClose, contractTemplate } = props;

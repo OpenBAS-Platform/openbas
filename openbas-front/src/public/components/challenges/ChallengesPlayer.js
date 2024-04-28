@@ -48,7 +48,7 @@ import Empty from '../../../components/Empty';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
 import DocumentType from '../../../admin/components/components/documents/DocumentType';
 import ItemTags from '../../../components/ItemTags';
-import OldTextField from '../../../components/OldTextField';
+import OldTextField from '../../../components/fields/OldTextField';
 import Transition from '../../../components/common/Transition';
 
 const useStyles = makeStyles(() => ({

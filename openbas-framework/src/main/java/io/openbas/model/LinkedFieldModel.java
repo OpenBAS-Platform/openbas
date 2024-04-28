@@ -1,7 +1,7 @@
 package io.openbas.model;
 
-import io.openbas.contract.ContractType;
-import io.openbas.contract.fields.ContractElement;
+import io.openbas.injector_contract.ContractType;
+import io.openbas.injector_contract.fields.ContractElement;
 
 public class LinkedFieldModel {
 

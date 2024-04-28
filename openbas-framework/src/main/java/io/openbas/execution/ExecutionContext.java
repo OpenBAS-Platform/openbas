@@ -1,6 +1,6 @@
 package io.openbas.execution;
 
-import io.openbas.contract.variables.VariableHelper;
+import io.openbas.injector_contract.variables.VariableHelper;
 import io.openbas.database.model.User;
 
 import java.util.HashMap;

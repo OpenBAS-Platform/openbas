@@ -4,13 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.User;
+import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Injector;
-import io.openbas.injects.email.EmailContract;
-import io.openbas.injects.email.model.EmailContent;
+import io.openbas.injectors.email.EmailContract;
+import io.openbas.injectors.email.model.EmailContent;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +34,18 @@ public class MailingService {
 
   private UserRepository userRepository;
 
+  private InjectorContractRepository injectorContractRepository;
+
   private ExecutionContextService executionContextService;
 
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
     this.userRepository = userRepository;
+  }
+
+  @Autowired
+  public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
+    this.injectorContractRepository = injectorContractRepository;
   }
 
   @Autowired
@@ -56,7 +64,7 @@ public class MailingService {
     emailContent.setBody(body);
     Inject inject = new Inject();
     inject.setContent(this.mapper.valueToTree(emailContent));
-    inject.setContract(EmailContract.EMAIL_DEFAULT);
+    inject.setInjectorContract(this.injectorContractRepository.findById(EmailContract.EMAIL_DEFAULT).orElseThrow());
     inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setType(EmailContract.TYPE);
     exercise.ifPresent(inject::setExercise);

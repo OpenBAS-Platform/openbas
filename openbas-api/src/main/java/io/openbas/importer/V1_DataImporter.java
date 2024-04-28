@@ -4,15 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
-import io.openbas.injects.challenge.model.ChallengeContent;
-import io.openbas.injects.channel.model.ChannelContent;
-import io.openbas.injects.email.EmailContract;
+import io.openbas.injectors.challenge.model.ChallengeContent;
+import io.openbas.injectors.channel.model.ChannelContent;
+import io.openbas.injectors.email.EmailContract;
 import io.openbas.injectors.manual.ManualContract;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.service.FileService;
 import io.openbas.service.ImportEntry;
-import io.openbas.scenario.ScenarioService;
+import io.openbas.service.ScenarioService;
 import jakarta.activation.MimetypesFileTypeMap;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.injects.challenge.ChallengeContract.CHALLENGE_PUBLISH;
-import static io.openbas.injects.channel.ChannelContract.CHANNEL_PUBLISH;
+import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
+import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
 import static java.util.Optional.ofNullable;
 
 @Component

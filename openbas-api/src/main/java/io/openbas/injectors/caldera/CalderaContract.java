@@ -1,10 +1,10 @@
 package io.openbas.injectors.caldera;
 
-import io.openbas.contract.*;
-import io.openbas.contract.fields.ContractAsset;
-import io.openbas.contract.fields.ContractAssetGroup;
-import io.openbas.contract.fields.ContractExpectations;
-import io.openbas.contract.fields.ContractSelect;
+import io.openbas.injector_contract.*;
+import io.openbas.injector_contract.fields.ContractAsset;
+import io.openbas.injector_contract.fields.ContractAssetGroup;
+import io.openbas.injector_contract.fields.ContractExpectations;
+import io.openbas.injector_contract.fields.ContractSelect;
 import io.openbas.database.model.Endpoint;
 import io.openbas.helper.SupportedLanguage;
 import io.openbas.injectors.caldera.client.model.Ability;
@@ -23,13 +23,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.openbas.collectors.caldera.service.CalderaCollectorService.toPlatform;
-import static io.openbas.contract.Contract.executableContract;
-import static io.openbas.contract.ContractCardinality.Multiple;
-import static io.openbas.contract.ContractDef.contractBuilder;
-import static io.openbas.contract.fields.ContractAsset.assetField;
-import static io.openbas.contract.fields.ContractAssetGroup.assetGroupField;
-import static io.openbas.contract.fields.ContractExpectations.expectationsField;
-import static io.openbas.contract.fields.ContractSelect.selectFieldWithDefault;
+import static io.openbas.injector_contract.Contract.executableContract;
+import static io.openbas.injector_contract.ContractCardinality.Multiple;
+import static io.openbas.injector_contract.ContractDef.contractBuilder;
+import static io.openbas.injector_contract.fields.ContractAsset.assetField;
+import static io.openbas.injector_contract.fields.ContractAssetGroup.assetGroupField;
+import static io.openbas.injector_contract.fields.ContractExpectations.expectationsField;
+import static io.openbas.injector_contract.fields.ContractSelect.selectFieldWithDefault;
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.DETECTION;
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVENTION;
 import static io.openbas.helper.SupportedLanguage.en;

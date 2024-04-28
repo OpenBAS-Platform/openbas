@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { Form } from 'react-final-form';
 import { Box, Button } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import OldTextField from '../../../../components/OldTextField';
+import OldTextField from '../../../../components/fields/OldTextField';
 import inject18n from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 import InjectIcon from './InjectIcon';
@@ -45,7 +45,7 @@ class InjectForm extends Component {
     const errors = {};
     const requiredFields = [
       'inject_title',
-      'inject_contract',
+      'inject_injector_contract',
       'inject_depends_duration_days',
       'inject_depends_duration_hours',
       'inject_depends_duration_minutes',
@@ -86,10 +86,10 @@ class InjectForm extends Component {
     }));
     const finalInitialValues = editing
       ? R.assoc(
-        'inject_contract',
+        'inject_injector_contract',
         {
-          id: initialValues.inject_contract,
-          label: tPick(injectorContractsMap[initialValues.inject_contract]?.label),
+          id: initialValues.inject_injector_contract,
+          label: tPick(injectorContractsMap[initialValues.inject_injector_contract]?.label),
         },
         initialValues,
       )
@@ -117,7 +117,7 @@ class InjectForm extends Component {
             <Autocomplete
               variant="standard"
               size="small"
-              name="inject_contract"
+              name="inject_injector_contract"
               label={t('Type')}
               fullWidth={true}
               multiple={false}

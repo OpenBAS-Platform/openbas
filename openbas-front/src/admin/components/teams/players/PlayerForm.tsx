@@ -4,7 +4,7 @@ import { Button, InputAdornment, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { z } from 'zod';
 import { InfoOutlined } from '@mui/icons-material';
-import OldTextField from '../../../../components/OldTextField';
+import OldTextField from '../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 import OrganizationField from '../../../../components/OrganizationField';

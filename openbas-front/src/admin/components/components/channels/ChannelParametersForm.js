@@ -4,8 +4,8 @@ import { Form } from 'react-final-form';
 import { Button, Grid, MenuItem } from '@mui/material';
 import inject18n from '../../../../components/i18n';
 import DeprecatedColorPickerField from '../../../../components/DeprecatedColorPickerField';
-import SelectField from '../../../../components/fields/SelectField';
-import OldTextField from '../../../../components/OldTextField';
+import OldSelectField from '../../../../components/fields/OldSelectField';
+import OldTextField from '../../../../components/fields/OldTextField';
 
 class ChannelParametersForm extends Component {
   render() {
@@ -25,7 +25,7 @@ class ChannelParametersForm extends Component {
           <form id="channelParametersForm" onSubmit={handleSubmit}>
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
-                <SelectField
+                <OldSelectField
                   variant="standard"
                   label={t('Type')}
                   name="channel_type"
@@ -41,7 +41,7 @@ class ChannelParametersForm extends Component {
                   <MenuItem key="tv" value="tv">
                     {t('tv')}
                   </MenuItem>
-                </SelectField>
+                </OldSelectField>
                 <OldTextField
                   variant="standard"
                   name="channel_name"
@@ -75,7 +75,7 @@ class ChannelParametersForm extends Component {
                   disabled={disabled}
                   label={t('Subtitle')}
                 />
-                <SelectField
+                <OldSelectField
                   variant="standard"
                   label={t('Header mode')}
                   name="channel_mode"
@@ -92,7 +92,7 @@ class ChannelParametersForm extends Component {
                   <MenuItem key="logo-title" value="logo-title">
                     {t('logo-title')}
                   </MenuItem>
-                </SelectField>
+                </OldSelectField>
                 <DeprecatedColorPickerField
                   variant="standard"
                   name="channel_primary_color_light"

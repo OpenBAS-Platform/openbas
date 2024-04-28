@@ -1,4 +1,4 @@
-package io.openbas.injects.email.model;
+package io.openbas.injectors.email.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.execution.ExecutableInject;

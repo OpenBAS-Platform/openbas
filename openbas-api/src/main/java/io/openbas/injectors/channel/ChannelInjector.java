@@ -1,4 +1,4 @@
-package io.openbas.injects.channel;
+package io.openbas.injectors.channel;
 
 import io.openbas.integrations.InjectorService;
 import org.springframework.beans.factory.annotation.Autowired;

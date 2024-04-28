@@ -2,7 +2,7 @@ package io.openbas.service;
 
 import io.openbas.database.model.Execution;
 import io.openbas.execution.ExecutionContext;
-import io.openbas.injects.email.service.EmailService;
+import io.openbas.injectors.email.service.EmailService;
 import io.openbas.utils.fixtures.UserFixture;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;

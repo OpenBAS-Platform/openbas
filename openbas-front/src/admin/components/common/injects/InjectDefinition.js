@@ -41,14 +41,14 @@ import { storeHelper } from '../../../../actions/Schema';
 import TeamPopover from '../../components/teams/TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddTeams from './InjectAddTeams';
-import OldTextField from '../../../../components/OldTextField';
+import OldTextField from '../../../../components/fields/OldTextField';
 import SwitchField from '../../../../components/fields/SwitchField';
 import RichTextField from '../../../../components/fields/RichTextField';
 import InjectAddDocuments from './InjectAddDocuments';
 import Loader from '../../../../components/Loader';
 import DocumentType from '../../components/documents/DocumentType';
 import DocumentPopover from '../../components/documents/DocumentPopover';
-import SelectField from '../../../../components/fields/SelectField';
+import OldSelectField from '../../../../components/fields/OldSelectField';
 import ArticlePopover from '../../components/articles/ArticlePopover';
 import InjectAddArticles from './InjectAddArticles';
 import ChannelIcon from '../../components/channels/ChannelIcon';
@@ -627,7 +627,7 @@ class InjectDefinition extends Component {
   async onSubmit(data) {
     const { inject, injectorContracts, onCreateInject, onUpdateInject } = this.props;
     const injectorContract = R.head(
-      injectorContracts.filter((i) => i.contract_id === inject.inject_contract),
+      injectorContracts.filter((i) => i.contract_id === inject.inject_injector_contract),
     );
     const finalData = {};
     const hasArticles = injectorContract.fields
@@ -707,7 +707,7 @@ class InjectDefinition extends Component {
 
     const values = {
       inject_title: data.inject_title,
-      inject_contract: inject.inject_contract,
+      inject_injector_contract: inject.inject_injector_contract,
       inject_type: inject.inject_type,
       inject_description: data.inject_description,
       inject_tags,
@@ -733,7 +733,7 @@ class InjectDefinition extends Component {
     const { t, injectorContracts, inject } = this.props;
     const errors = {};
     const injectorContract = R.head(
-      injectorContracts.filter((i) => i.contract_id === inject.inject_contract),
+      injectorContracts.filter((i) => i.contract_id === inject.inject_injector_contract),
     );
     if (injectorContract && Array.isArray(injectorContract.fields)) {
       injectorContract.fields
@@ -876,7 +876,7 @@ class InjectDefinition extends Component {
                                 classes={{ root: classes.tuple }}
                                 divider={false}
                               >
-                                <SelectField
+                                <OldSelectField
                                   variant="standard"
                                   name={`${name}.type`}
                                   fullWidth={true}
@@ -897,7 +897,7 @@ class InjectDefinition extends Component {
                                       </ListItemText>
                                     </MenuItem>
                                   )}
-                                </SelectField>
+                                </OldSelectField>
                                 <OldTextField
                                   variant="standard"
                                   name={`${name}.key`}
@@ -911,7 +911,7 @@ class InjectDefinition extends Component {
                                 && values[field.key][index]
                                 && values[field.key][index].type
                                 === 'attachment' ? (
-                                  <SelectField
+                                  <OldSelectField
                                     variant="standard"
                                     name={`${name}.value`}
                                     fullWidth={true}
@@ -929,7 +929,7 @@ class InjectDefinition extends Component {
                                         </ListItemText>
                                       </MenuItem>
                                     ))}
-                                  </SelectField>
+                                  </OldSelectField>
                                   ) : (
                                     <OldTextField
                                       variant="standard"
@@ -962,7 +962,7 @@ class InjectDefinition extends Component {
               );
             case 'select':
               return field.cardinality === 'n' ? (
-                <SelectField
+                <OldSelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -982,9 +982,9 @@ class InjectDefinition extends Component {
                         </ListItemText>
                       </MenuItem>
                     ))}
-                </SelectField>
+                </OldSelectField>
               ) : (
-                <SelectField
+                <OldSelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -1006,7 +1006,7 @@ class InjectDefinition extends Component {
                         </ListItemText>
                       </MenuItem>
                     ))}
-                </SelectField>
+                </OldSelectField>
               );
             case 'dependency-select':
               // eslint-disable-next-line no-case-declarations
@@ -1014,7 +1014,7 @@ class InjectDefinition extends Component {
               // eslint-disable-next-line no-case-declarations
               const choices = field.choices[depValue] ?? {};
               return field.cardinality === 'n' ? (
-                <SelectField
+                <OldSelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -1032,9 +1032,9 @@ class InjectDefinition extends Component {
                         <ListItemText>{v}</ListItemText>
                       </MenuItem>
                     ))}
-                </SelectField>
+                </OldSelectField>
               ) : (
-                <SelectField
+                <OldSelectField
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
@@ -1054,7 +1054,7 @@ class InjectDefinition extends Component {
                         </ListItemText>
                       </MenuItem>
                     ))}
-                </SelectField>
+                </OldSelectField>
               );
             default:
               return (
@@ -1078,7 +1078,7 @@ class InjectDefinition extends Component {
   resetDefaultvalues(setFieldValue, builtInFields) {
     const { inject, injectorContracts } = this.props;
     const injectorContract = R.head(
-      injectorContracts.filter((i) => i.contract_id === inject.inject_contract),
+      injectorContracts.filter((i) => i.contract_id === inject.inject_injector_contract),
     );
     injectorContract.fields
       .filter((f) => !builtInFields.includes(f.key) && !f.expectation)
@@ -1167,7 +1167,7 @@ class InjectDefinition extends Component {
       openVariables,
     } = this.state;
     const injectorContract = R.head(
-      injectorContracts.filter((i) => i.contract_id === inject.inject_contract),
+      injectorContracts.filter((i) => i.contract_id === inject.inject_injector_contract),
     );
     // -- TEAMS --
     const teams = teamsIds

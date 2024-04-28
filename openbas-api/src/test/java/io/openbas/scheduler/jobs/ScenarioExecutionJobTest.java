@@ -3,7 +3,7 @@ package io.openbas.scheduler.jobs;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ExerciseRepository;
-import io.openbas.scenario.ScenarioService;
+import io.openbas.service.ScenarioService;
 import org.junit.jupiter.api.*;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -132,7 +132,7 @@ const AtomicTestings = () => {
       R.assoc('inject_asset_groups', data.inject_asset_groups),
       R.assoc('inject_assets', data.inject_assets),
       R.assoc('inject_content', data.inject_content),
-      R.assoc('inject_contract', data.inject_contract),
+      R.assoc('inject_injector_contract', data.inject_injector_contract),
       R.assoc('inject_description', data.inject_description),
       R.assoc('inject_documents', data.inject_documents),
       R.assoc('inject_teams', data.inject_teams),

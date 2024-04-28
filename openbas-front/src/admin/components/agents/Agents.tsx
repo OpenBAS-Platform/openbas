@@ -78,10 +78,10 @@ const Injectors = () => {
     dispatch(fetchInjectors());
   });
   const sortedInjectors = filtering.filterAndSort(injectors);
-  const windowsInjectors = sortedInjectors.filter((injector: Injector) => injector.injector_simulation_agent_platforms?.includes('windows'));
-  const linuxInjectors = sortedInjectors.filter((injector: Injector) => injector.injector_simulation_agent_platforms?.includes('linux'));
-  const macOsInjectors = sortedInjectors.filter((injector: Injector) => injector.injector_simulation_agent_platforms?.includes('macos'));
-  const browserInjectors = sortedInjectors.filter((injector: Injector) => injector.injector_simulation_agent_platforms?.some((n) => ['chrome', 'firefox', 'edge', 'safari'].includes(n)));
+  const windowsInjectors = sortedInjectors.filter((injector: Injector) => injector.injector_simulation_agent_platforms?.includes('Windows'));
+  const linuxInjectors = sortedInjectors.filter((injector: Injector) => injector.injector_simulation_agent_platforms?.includes('Linux'));
+  const macOsInjectors = sortedInjectors.filter((injector: Injector) => injector.injector_simulation_agent_platforms?.includes('MacOS'));
+  const browserInjectors = sortedInjectors.filter((injector: Injector) => injector.injector_simulation_agent_platforms?.some((n) => ['Chrome', 'Firefox', 'Edge', 'Safari'].includes(n)));
 
   // Selection
   const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
@@ -159,14 +159,21 @@ chmod +x ${implantName};
       <Grid container={true} spacing={3}>
         <Grid item={true} xs={3}>
           <Card classes={{ root: classes.card }} variant="outlined">
-            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('windows', windowsInjectors)}>
+            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('windows', windowsInjectors)} disabled={windowsInjectors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
                   <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? windowsDark : windowsLight} alt="Windows" />
                 </div>
                 <Typography
                   variant="h6"
-                  style={{ fontSize: 15, margin: '20px 0 40px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  style={{
+                    fontSize: 15,
+                    margin: '20px 0 40px 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: windowsInjectors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
+                  }}
                 >
                   <DownloadingOutlined style={{ marginRight: 10 }} /> Install Windows Agent
                 </Typography>
@@ -188,14 +195,21 @@ chmod +x ${implantName};
         </Grid>
         <Grid item={true} xs={3}>
           <Card classes={{ root: classes.card }} variant="outlined">
-            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('linux', linuxInjectors)}>
+            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('linux', linuxInjectors)} disabled={linuxInjectors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
                   <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? linuxDark : linuxLight} alt="Linux" />
                 </div>
                 <Typography
                   variant="h6"
-                  style={{ fontSize: 15, margin: '20px 0 40px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  style={{
+                    fontSize: 15,
+                    margin: '20px 0 40px 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: linuxInjectors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
+                  }}
                 >
                   <DownloadingOutlined style={{ marginRight: 10 }} /> Install Linux Agent
                 </Typography>
@@ -217,19 +231,26 @@ chmod +x ${implantName};
         </Grid>
         <Grid item={true} xs={3}>
           <Card classes={{ root: classes.card }} variant="outlined">
-            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('macos', macOsInjectors)}>
+            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('macos', macOsInjectors)} disabled={macOsInjectors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
                   <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? macosDark : macosLight} alt="MacOS" />
                 </div>
                 <Typography
                   variant="h6"
-                  style={{ fontSize: 15, margin: '20px 0 40px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  style={{
+                    fontSize: 15,
+                    margin: '20px 0 40px 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: macOsInjectors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
+                  }}
                 >
                   <DownloadingOutlined style={{ marginRight: 10 }} /> Install MacOS Agent
                 </Typography>
                 <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {windowsInjectors.map((injector: Injector) => {
+                  {macOsInjectors.map((injector: Injector) => {
                     return (
                       <img
                         key={injector.injector_id}

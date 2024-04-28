@@ -27,8 +27,12 @@ const useStyles = makeStyles(() => ({
     height: 50,
   },
   bodyItem: {
-    height: '100%',
     fontSize: 13,
+    float: 'left',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
   chipInList: {
     fontSize: 12,
@@ -39,53 +43,18 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const headerStyles = {
-  phase_kill_chain_name: {
-    width: '20%',
-  },
-  phase_name: {
-    width: '35%',
-  },
-  phase_order: {
-    width: '15%',
-  },
-  phase_created_at: {
-    width: '15%',
-  },
-};
-
 const inlineStyles = {
   phase_kill_chain_name: {
-    float: 'left',
     width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   phase_name: {
-    float: 'left',
     width: '35%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   phase_order: {
-    float: 'left',
     width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   phase_created_at: {
-    float: 'left',
     width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
 };
 
@@ -130,7 +99,6 @@ const KillChainPhases = () => {
         setContent={setKillChainPhases}
         exportProps={exportProps}
       />
-      <div className="clearfix" />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -152,7 +120,7 @@ const KillChainPhases = () => {
             primary={
               <SortHeadersComponent
                 headers={headers}
-                inlineStylesHeaders={headerStyles}
+                inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />

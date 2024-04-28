@@ -329,7 +329,7 @@ const Dryrun = () => {
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
           {filtering.filterAndSort(dryinjects).map((dryinject) => {
-            const injectContract = injectorContractsMap[dryinject.dryinject_inject.inject_contract];
+            const injectContract = injectorContractsMap[dryinject.dryinject_inject.inject_injector_contract];
             const injectorContractName = tPick(injectContract?.label);
             return (
               <ListItem

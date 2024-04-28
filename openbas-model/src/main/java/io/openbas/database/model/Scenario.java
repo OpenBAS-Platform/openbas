@@ -16,6 +16,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -224,4 +225,10 @@ public class Scenario implements Base {
         .toList();
   }
 
+  // -- PLATFORMS --
+  /* @JsonProperty("scenario_platforms")
+  public List<String> getPlatforms() {
+    return getInjects().stream().flatMap(inject -> Arrays.stream(inject.getContractDefinition() == null ? new String[0] : inject.getContractDefinition().getPlatforms())).distinct().toList();
+  }
+  */
 }

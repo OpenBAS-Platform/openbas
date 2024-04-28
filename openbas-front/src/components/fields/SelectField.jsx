@@ -1,70 +1,52 @@
 import React from 'react';
-import { Select as MUISelect, FormControl, InputLabel, FormHelperText } from '@mui/material';
-import { Field } from 'react-final-form';
+import { FormControl, FormHelperText, InputLabel, Select as MUISelect } from '@mui/material';
+import { Controller } from 'react-hook-form';
 
-const renderHelper = ({ touched, error, submitError, helperText, variant }) => {
-  if (!(touched && error)) {
-    return helperText;
-  }
+const SelectField = (props) => {
+  const {
+    name,
+    label,
+    children,
+    fullWidth,
+    style,
+    helperText,
+    control,
+    defaultValue,
+    ...others
+  } = props;
   return (
-    <FormHelperText variant={variant}>
-      {touched && (error || submitError)}
-    </FormHelperText>
+    <FormControl fullWidth={fullWidth} style={style}>
+      {others.displayEmpty ? (
+        <InputLabel
+          shrink={true}
+          htmlFor={name}
+          variant={others.variant || 'standard'}
+        >
+          {label}
+        </InputLabel>
+      ) : (
+        <InputLabel htmlFor={name} variant={others.variant || 'standard'}>
+          {label}
+        </InputLabel>
+      )}
+      <Controller
+        name="level"
+        id="level"
+        defaultValue={defaultValue}
+        control={control}
+        render={({ field }) => (
+          <MUISelect {...field}>
+            {children}
+          </MUISelect>
+        )}
+      />
+      {helperText && (
+        <FormHelperText variant={others.variant}>
+          {helperText}
+        </FormHelperText>
+      )}
+    </FormControl>
   );
 };
-
-const renderSelectField = ({
-  name,
-  input: { onChange, ...inputProps },
-  label,
-  meta: { touched, error, submitError },
-  children,
-  fullWidth,
-  style,
-  onChange: onChangePassed,
-  helperText,
-  ...others
-}) => (
-  <FormControl error={touched && error} fullWidth={fullWidth} style={style}>
-    {others.displayEmpty ? (
-      <InputLabel
-        shrink={true}
-        htmlFor={name}
-        variant={others.variant || 'standard'}
-      >
-        {label}
-      </InputLabel>
-    ) : (
-      <InputLabel htmlFor={name} variant={others.variant || 'standard'}>
-        {label}
-      </InputLabel>
-    )}
-    <MUISelect
-      onChange={(event) => {
-        onChange(event.target.value);
-        if (typeof onChangePassed === 'function') {
-          onChangePassed(event);
-        }
-      }}
-      {...inputProps}
-      {...others}
-      inputProps={{ name, id: name }}
-      style={{ height: 30 }}
-    >
-      {children}
-    </MUISelect>
-    {renderHelper({
-      touched,
-      error,
-      submitError,
-      helperText,
-      variant: others.variant || 'standard',
-    })}
-  </FormControl>
-);
-
-const SelectField = (props) => (
-  <Field name={props.name} component={renderSelectField} {...props} />
-);
 
 export default SelectField;

@@ -1,4 +1,4 @@
-package io.openbas.injects;
+package io.openbas.injectors;
 
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
@@ -11,8 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
-import static io.openbas.injects.email.EmailContract.EMAIL_DEFAULT;
-import static io.openbas.injects.email.EmailContract.TYPE;
+import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
+import static io.openbas.injectors.email.EmailContract.TYPE;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest

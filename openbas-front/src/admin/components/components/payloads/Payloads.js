@@ -28,8 +28,12 @@ const useStyles = makeStyles(() => ({
     height: 50,
   },
   bodyItem: {
-    height: '100%',
     fontSize: 13,
+    float: 'left',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
   chipInList: {
     fontSize: 12,
@@ -41,75 +45,24 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const headerStyles = {
-  payload_type: {
-    width: '15%',
-  },
-  payload_name: {
-    width: '20%',
-  },
-  payload_description: {
-    width: '20%',
-  },
-  payload_tags: {
-    width: '20%',
-  },
-  payload_created_at: {
-    width: '12%',
-  },
-  payload_updated_at: {
-    width: '12%',
-  },
-};
-
 const inlineStyles = {
   payload_type: {
-    float: 'left',
     width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   payload_name: {
-    float: 'left',
     width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   payload_description: {
-    float: 'left',
     width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   payload_tags: {
-    float: 'left',
     width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   payload_created_at: {
-    float: 'left',
     width: '12%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   payload_updated_at: {
-    float: 'left',
     width: '12%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
 };
 
@@ -164,7 +117,6 @@ const Payloads = () => {
         setContent={setPayloads}
         exportProps={exportProps}
       />
-      <div className="clearfix" />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -186,7 +138,7 @@ const Payloads = () => {
             primary={
               <SortHeadersComponent
                 headers={headers}
-                inlineStylesHeaders={headerStyles}
+                inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />

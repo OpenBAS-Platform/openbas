@@ -1,4 +1,4 @@
-package io.openbas.injects.channel.model;
+package io.openbas.injectors.channel.model;
 
 import lombok.Getter;
 import lombok.Setter;

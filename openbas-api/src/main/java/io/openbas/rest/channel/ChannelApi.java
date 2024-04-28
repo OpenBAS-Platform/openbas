@@ -3,12 +3,12 @@ package io.openbas.rest.channel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
-import io.openbas.injects.channel.model.ChannelContent;
+import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.rest.channel.form.*;
 import io.openbas.rest.channel.model.VirtualArticle;
 import io.openbas.rest.channel.response.ChannelReader;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.scenario.ScenarioService;
+import io.openbas.service.ScenarioService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -25,8 +25,8 @@ import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
 import static io.openbas.database.model.Inject.SPEED_STANDARD;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.injects.channel.ChannelContract.CHANNEL_PUBLISH;
-import static io.openbas.scenario.ScenarioApi.SCENARIO_URI;
+import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
+import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsFirst;
 
@@ -132,7 +132,7 @@ public class ChannelApi extends RestBehavior {
   private List<Article> enrichArticleWithVirtualPublication(List<Inject> injects, List<Article> articles) {
     Instant now = Instant.now();
     Map<String, Instant> toPublishArticleIdsMap = injects.stream()
-        .filter(inject -> inject.getContract().equals(CHANNEL_PUBLISH))
+        .filter(inject -> inject.getInjectorContract().getId().equals(CHANNEL_PUBLISH))
         .filter(inject -> inject.getContent() != null)
         // TODO take into account depends_another here, depends_duration is not enough to order articles
         .sorted(Comparator.comparing(Inject::getDependsDuration))
@@ -207,7 +207,7 @@ public class ChannelApi extends RestBehavior {
       throw new UnsupportedOperationException("User must be logged or dynamic player is required");
     }
     Map<String, Instant> toPublishArticleIdsMap = injects.stream()
-        .filter(inject -> inject.getContract().equals(CHANNEL_PUBLISH))
+        .filter(inject -> inject.getInjectorContract().getId().equals(CHANNEL_PUBLISH))
         .filter(inject -> inject.getStatus().isPresent())
         .sorted(Comparator.comparing(inject -> inject.getStatus().get().getTrackingSentDate()))
         .flatMap(inject -> {

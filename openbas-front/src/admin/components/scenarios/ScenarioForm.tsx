@@ -2,12 +2,13 @@ import React, { FunctionComponent } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button } from '@mui/material';
+import { Button, MenuItem } from '@mui/material';
 import { zodImplement } from '../../../utils/Zod';
 import type { ScenarioInput } from '../../../utils/api-types';
 import { useFormatter } from '../../../components/i18n';
 import TagField from '../../../components/fields/TagField';
 import TextField from '../../../components/fields/TextField';
+import SelectField from '../../../components/fields/SelectField';
 
 interface Props {
   onSubmit: SubmitHandler<ScenarioInput>;
@@ -22,6 +23,9 @@ const ScenarioForm: FunctionComponent<Props> = ({
   editing,
   initialValues = {
     scenario_name: '',
+    scenario_category: 'attack-scenario',
+    scenario_main_focus: '',
+    scenario_severity: '',
     scenario_subtitle: '',
     scenario_description: '',
     scenario_tags: [],
@@ -41,6 +45,9 @@ const ScenarioForm: FunctionComponent<Props> = ({
     resolver: zodResolver(
       zodImplement<ScenarioInput>().with({
         scenario_name: z.string().min(1, { message: t('Should not be empty') }),
+        scenario_category: z.string().optional(),
+        scenario_main_focus: z.string().optional(),
+        scenario_severity: z.string().optional(),
         scenario_subtitle: z.string().optional(),
         scenario_description: z.string().optional(),
         scenario_tags: z.string().array().optional(),
@@ -62,6 +69,41 @@ const ScenarioForm: FunctionComponent<Props> = ({
         setValue={setValue}
         askAi={true}
       />
+      <SelectField
+        variant="standard"
+        fullWidth={true}
+        name='scenario_category'
+        label={t('Category')}
+        style={{ marginTop: 20 }}
+        error={!!errors.scenario_category}
+        control={control}
+        defaultValue={initialValues.scenario_category}
+      >
+        <MenuItem key="global-crisis" value="global-crisis">
+          {t('Global Crisis')}
+        </MenuItem>
+        <MenuItem key="attack-scenario" value="attack-scenario">
+          {t('Attack Scenario')}
+        </MenuItem>
+        <MenuItem key="media-pressure" value="media-pressure">
+          {t('Media Pressure')}
+        </MenuItem>
+        <MenuItem key="data-exfiltration" value="data-exfiltration">
+          {t('Data Exfiltration')}
+        </MenuItem>
+        <MenuItem key="capture-the-flag" value="capture-the-flag">
+          {t('Capture The Flag')}
+        </MenuItem>
+        <MenuItem key="vulnerability-exploitation" value="vulnerability-exploitation">
+          {t('Vulnerability Exploitation')}
+        </MenuItem>
+        <MenuItem key="lateral-movement" value="lateral-movement">
+          {t('Lateral Movement')}
+        </MenuItem>
+        <MenuItem key="url-filtering" value="url-filtering">
+          {t('URL Filtering')}
+        </MenuItem>
+      </SelectField>
       <TextField
         variant="standard"
         fullWidth

@@ -15,7 +15,7 @@ import Empty from '../../../components/Empty';
 import { addLessonsAnswers, fetchPlayerLessonsAnswers, fetchPlayerLessonsCategories, fetchPlayerLessonsQuestions } from '../../../actions/Lessons';
 import { fetchPlayerExercise } from '../../../actions/Exercise';
 import SliderField from '../../../components/fields/SliderField';
-import OldTextField from '../../../components/OldTextField';
+import OldTextField from '../../../components/fields/OldTextField';
 import Transition from '../../../components/common/Transition';
 
 const useStyles = makeStyles(() => ({

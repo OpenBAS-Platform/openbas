@@ -1,8 +1,8 @@
-package io.openbas.injects.email;
+package io.openbas.injectors.email;
 
-import io.openbas.contract.*;
-import io.openbas.contract.fields.ContractElement;
-import io.openbas.contract.fields.ContractExpectations;
+import io.openbas.injector_contract.*;
+import io.openbas.injector_contract.fields.ContractElement;
+import io.openbas.injector_contract.fields.ContractExpectations;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Variable.VariableType;
 import org.springframework.stereotype.Component;
@@ -11,17 +11,17 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import static io.openbas.contract.Contract.executableContract;
-import static io.openbas.contract.ContractCardinality.Multiple;
-import static io.openbas.contract.ContractCardinality.One;
-import static io.openbas.contract.ContractDef.contractBuilder;
-import static io.openbas.contract.ContractVariable.variable;
-import static io.openbas.contract.fields.ContractAttachment.attachmentField;
-import static io.openbas.contract.fields.ContractTeam.teamField;
-import static io.openbas.contract.fields.ContractCheckbox.checkboxField;
-import static io.openbas.contract.fields.ContractExpectations.expectationsField;
-import static io.openbas.contract.fields.ContractText.textField;
-import static io.openbas.contract.fields.ContractTextArea.richTextareaField;
+import static io.openbas.injector_contract.Contract.executableContract;
+import static io.openbas.injector_contract.ContractCardinality.Multiple;
+import static io.openbas.injector_contract.ContractCardinality.One;
+import static io.openbas.injector_contract.ContractDef.contractBuilder;
+import static io.openbas.injector_contract.ContractVariable.variable;
+import static io.openbas.injector_contract.fields.ContractAttachment.attachmentField;
+import static io.openbas.injector_contract.fields.ContractTeam.teamField;
+import static io.openbas.injector_contract.fields.ContractCheckbox.checkboxField;
+import static io.openbas.injector_contract.fields.ContractExpectations.expectationsField;
+import static io.openbas.injector_contract.fields.ContractText.textField;
+import static io.openbas.injector_contract.fields.ContractTextArea.richTextareaField;
 import static io.openbas.helper.SupportedLanguage.en;
 import static io.openbas.helper.SupportedLanguage.fr;
 

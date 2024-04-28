@@ -6,9 +6,9 @@ import { Button, Grid, IconButton, List, ListItem, ListItemIcon, ListItemSeconda
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
-import OldTextField from '../../../../components/OldTextField';
+import OldTextField from '../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
-import SelectField from '../../../../components/fields/SelectField';
+import OldSelectField from '../../../../components/fields/OldSelectField';
 import MarkDownField from '../../../../components/MarkDownField';
 import DocumentType from '../documents/DocumentType';
 import ItemTags from '../../../../components/ItemTags';
@@ -326,7 +326,7 @@ const ChallengeForm = (props) => {
                       classes={{ root: classes.tuple }}
                       divider={false}
                     >
-                      <SelectField
+                      <OldSelectField
                         name={`${name}.flag_type`}
                         label={t('Flag type')}
                         fullWidth={true}
@@ -341,7 +341,7 @@ const ChallengeForm = (props) => {
                         <MenuItem key="REGEXP" value="REGEXP">
                           {t('Regular expression')}
                         </MenuItem>
-                      </SelectField>
+                      </OldSelectField>
                       <OldTextField
                         name={`${name}.flag_value`}
                         validate={required}

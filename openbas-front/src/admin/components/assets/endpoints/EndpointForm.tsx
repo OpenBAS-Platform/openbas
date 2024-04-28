@@ -57,7 +57,7 @@ const EndpointForm: React.FC<Props> = ({
             /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9a-fA-F]{4}.[0-9a-fA-F]{4}.[0-9a-fA-F]{4})$/,
             t('Invalid MAC address'),
           ).array().optional(),
-        endpoint_platform: z.enum(['Linux', 'Windows', 'Darwin']),
+        endpoint_platform: z.enum(['Linux', 'Windows', 'MacOS', 'Service', 'Generic', 'Internal']),
       }),
     ),
     defaultValues: initialValues,
@@ -91,7 +91,6 @@ const EndpointForm: React.FC<Props> = ({
         helperText={errors.asset_description?.message}
         inputProps={register('asset_description')}
       />
-
       <Controller
         control={control}
         name="asset_last_seen"
@@ -118,7 +117,6 @@ const EndpointForm: React.FC<Props> = ({
           />
         )}
       />
-
       <TextField
         variant="standard"
         fullWidth
@@ -128,7 +126,6 @@ const EndpointForm: React.FC<Props> = ({
         helperText={errors.endpoint_hostname?.message}
         inputProps={register('endpoint_hostname')}
       />
-
       <Controller
         control={control}
         name="endpoint_ips"
@@ -149,7 +146,7 @@ const EndpointForm: React.FC<Props> = ({
                 fullWidth
                 multiline
                 rows={3}
-                label={t('Ip Addresses')}
+                label={t('IP Addresses')}
                 style={{ marginTop: 20 }}
                 error={!!errors.endpoint_ips}
                 helperText={errors.endpoint_ips?.reduce?.((accumulator, current, index) => `${accumulator !== '' ? `${accumulator}, ` : ''}${index + 1} - ${current?.message}`, '')}
@@ -165,7 +162,6 @@ const EndpointForm: React.FC<Props> = ({
           );
         }}
       />
-
       <Controller
         control={control}
         name="endpoint_mac_addresses"
@@ -201,7 +197,6 @@ const EndpointForm: React.FC<Props> = ({
           );
         }}
       />
-
       <Controller
         control={control}
         name="endpoint_platform"
@@ -218,13 +213,12 @@ const EndpointForm: React.FC<Props> = ({
             inputProps={register('endpoint_platform')}
             InputLabelProps={{ required: true }}
           >
-            <MenuItem value={'Linux'}>{'Linux'}</MenuItem>
-            <MenuItem value={'Windows'}>{'Windows'}</MenuItem>
-            <MenuItem value={'Darwin'}>{'Darwin'}</MenuItem>
+            <MenuItem value='Linux'>Linux</MenuItem>
+            <MenuItem value='Windows'>Windows</MenuItem>
+            <MenuItem value='MacOS'>MacOS</MenuItem>
           </TextField>
         )}
       />
-
       <Controller
         control={control}
         name="asset_tags"
@@ -239,7 +233,6 @@ const EndpointForm: React.FC<Props> = ({
           />
         )}
       />
-
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button
           variant="contained"

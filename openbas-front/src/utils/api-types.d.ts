@@ -154,7 +154,7 @@ export interface AtomicTestingInput {
   inject_asset_groups?: string[];
   inject_assets?: string[];
   inject_content?: object;
-  inject_contract?: string;
+  inject_injector_contract?: string;
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
   inject_tags?: string[];
@@ -480,7 +480,7 @@ export interface CreateUserInput {
 
 export interface DirectInjectInput {
   inject_content?: object;
-  inject_contract?: string;
+  inject_injector_contract?: string;
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
   inject_title?: string;
@@ -591,7 +591,7 @@ export interface Endpoint {
   endpoint_hostname?: string;
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: "Linux" | "Windows" | "Darwin";
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal";
   updateAttributes?: object;
 }
 
@@ -608,7 +608,7 @@ export interface EndpointInput {
    */
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: "Linux" | "Windows" | "Darwin";
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal";
 }
 
 export interface Evaluation {
@@ -855,7 +855,7 @@ export interface Inject {
   /** @format int64 */
   inject_communications_number?: number;
   inject_content?: object;
-  inject_contract?: string;
+  inject_injector_contract?: string;
   inject_country?: string;
   /** @format date-time */
   inject_created_at?: string;
@@ -953,7 +953,7 @@ export interface InjectInput {
   inject_assets?: string[];
   inject_city?: string;
   inject_content?: object;
-  inject_contract?: string;
+  inject_injector_contract?: string;
   inject_country?: string;
   /** @format int64 */
   inject_depends_duration?: number;
@@ -1070,6 +1070,7 @@ export interface InjectorContract {
   injector_contract_injector?: Injector;
   injector_contract_labels?: Record<string, string>;
   injector_contract_manual?: boolean;
+  injector_contract_platforms?: string[];
   /** @format date-time */
   injector_contract_updated_at?: string;
   updateAttributes?: object;
@@ -1083,6 +1084,7 @@ export interface InjectorContractAddInput {
   contract_id: string;
   contract_labels?: Record<string, string>;
   contract_manual?: boolean;
+  contract_platforms?: string[];
   injector_id: string;
   is_atomic_testing?: boolean;
 }
@@ -1094,6 +1096,7 @@ export interface InjectorContractInput {
   contract_id: string;
   contract_labels?: Record<string, string>;
   contract_manual?: boolean;
+  contract_platforms?: string[];
   is_atomic_testing?: boolean;
 }
 
@@ -1103,6 +1106,7 @@ export interface InjectorContractUpdateInput {
   contract_content: string;
   contract_labels?: Record<string, string>;
   contract_manual?: boolean;
+  contract_platforms?: string[];
   is_atomic_testing?: boolean;
 }
 
@@ -1884,6 +1888,7 @@ export interface Scenario {
   /** @format int64 */
   scenario_all_users_number?: number;
   scenario_articles?: Article[];
+  scenario_category?: string;
   /** @format int64 */
   scenario_communications_number?: number;
   /** @format date-time */
@@ -1897,6 +1902,7 @@ export interface Scenario {
   scenario_lessons_categories?: LessonsCategory[];
   scenario_mail_from: string;
   scenario_mails_reply_to?: string[];
+  scenario_main_focus?: string;
   scenario_message_footer?: string;
   scenario_message_header?: string;
   scenario_name: string;
@@ -1907,6 +1913,7 @@ export interface Scenario {
   scenario_recurrence_end?: string;
   /** @format date-time */
   scenario_recurrence_start?: string;
+  scenario_severity?: string;
   scenario_subtitle?: string;
   scenario_tags?: Tag[];
   scenario_teams?: Team[];
@@ -1927,8 +1934,11 @@ export interface ScenarioInformationInput {
 }
 
 export interface ScenarioInput {
+  scenario_category?: string;
   scenario_description?: string;
+  scenario_main_focus?: string;
   scenario_name: string;
+  scenario_severity?: string;
   scenario_subtitle?: string;
   scenario_tags?: string[];
 }

@@ -1,4 +1,4 @@
-package io.openbas.injects.email;
+package io.openbas.injectors.email;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Execution;
@@ -9,7 +9,7 @@ import io.openbas.database.repository.UserRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
-import io.openbas.injects.email.model.EmailContent;
+import io.openbas.injectors.email.model.EmailContent;
 import io.openbas.model.ExecutionProcess;
 import io.openbas.model.inject.form.Expectation;
 import jakarta.annotation.Resource;

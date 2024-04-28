@@ -3,8 +3,8 @@ import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Form } from 'react-final-form';
 import { Button, MenuItem } from '@mui/material';
-import OldTextField from '../../../../components/OldTextField';
-import SelectField from '../../../../components/fields/SelectField';
+import OldTextField from '../../../../components/fields/OldTextField';
+import OldSelectField from '../../../../components/fields/OldSelectField';
 import inject18n from '../../../../components/i18n';
 import DateTimePicker from '../../../../components/DateTimePicker';
 import RichTextField from '../../../../components/fields/RichTextField';
@@ -51,7 +51,7 @@ class ComcheckForm extends Component {
               fullWidth={true}
               label={t('Name')}
             />
-            <SelectField
+            <OldSelectField
               variant="standard"
               name="comcheck_teams"
               fullWidth={true}
@@ -77,7 +77,7 @@ class ComcheckForm extends Component {
                   {team.team_name}
                 </MenuItem>
               ))}
-            </SelectField>
+            </OldSelectField>
             <DateTimePicker
               name="comcheck_end_date"
               label={t('End date')}

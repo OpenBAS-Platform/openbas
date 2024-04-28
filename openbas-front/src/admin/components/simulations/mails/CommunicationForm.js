@@ -2,7 +2,7 @@ import React from 'react';
 import { Form } from 'react-final-form';
 import { Button } from '@mui/material';
 import { useFormatter } from '../../../../components/i18n';
-import OldTextField from '../../../../components/OldTextField';
+import OldTextField from '../../../../components/fields/OldTextField';
 import RichTextField from '../../../../components/fields/RichTextField';
 import FileField from '../../../../components/FileField';
 

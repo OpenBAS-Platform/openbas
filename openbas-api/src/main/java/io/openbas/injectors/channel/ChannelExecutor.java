@@ -1,4 +1,4 @@
-package io.openbas.injects.channel;
+package io.openbas.injectors.channel;
 
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
@@ -6,9 +6,9 @@ import io.openbas.database.repository.ArticleRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
-import io.openbas.injects.channel.model.ArticleVariable;
-import io.openbas.injects.channel.model.ChannelContent;
-import io.openbas.injects.email.service.EmailService;
+import io.openbas.injectors.channel.model.ArticleVariable;
+import io.openbas.injectors.channel.model.ChannelContent;
+import io.openbas.injectors.email.service.EmailService;
 import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ChannelExpectation;
@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 import static io.openbas.database.model.InjectStatusExecution.traceError;
 import static io.openbas.database.model.InjectStatusExecution.traceSuccess;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.injects.channel.ChannelContract.CHANNEL_PUBLISH;
+import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
 
 @Component(ChannelContract.TYPE)
 public class ChannelExecutor extends Injector {
@@ -69,7 +69,7 @@ public class ChannelExecutor extends Injector {
     try {
       ChannelContent content = contentConvert(injection, ChannelContent.class);
       List<Article> articles = fromIterable(articleRepository.findAllById(content.getArticles()));
-      String contract = injection.getInjection().getInject().getContract();
+      String contract = injection.getInjection().getInject().getInjectorContract().getId();
       if (contract.equals(CHANNEL_PUBLISH)) {
         // Article publishing is only linked to execution date of this inject.
         String articleNames = articles.stream().map(Article::getName).collect(Collectors.joining(","));

@@ -1,10 +1,10 @@
 package io.openbas.injectors.manual;
 
-import io.openbas.contract.Contract;
-import io.openbas.contract.ContractConfig;
-import io.openbas.contract.Contractor;
-import io.openbas.contract.ContractorIcon;
-import io.openbas.contract.fields.ContractElement;
+import io.openbas.injector_contract.Contract;
+import io.openbas.injector_contract.ContractConfig;
+import io.openbas.injector_contract.Contractor;
+import io.openbas.injector_contract.ContractorIcon;
+import io.openbas.injector_contract.fields.ContractElement;
 import io.openbas.database.model.Endpoint;
 import io.openbas.helper.SupportedLanguage;
 import org.springframework.stereotype.Component;
@@ -13,9 +13,9 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import static io.openbas.contract.Contract.manualContract;
-import static io.openbas.contract.ContractDef.contractBuilder;
-import static io.openbas.contract.fields.ContractTextArea.textareaField;
+import static io.openbas.injector_contract.Contract.manualContract;
+import static io.openbas.injector_contract.ContractDef.contractBuilder;
+import static io.openbas.injector_contract.fields.ContractTextArea.textareaField;
 import static io.openbas.helper.SupportedLanguage.en;
 import static io.openbas.helper.SupportedLanguage.fr;
 

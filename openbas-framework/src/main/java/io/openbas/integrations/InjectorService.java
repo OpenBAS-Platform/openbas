@@ -2,8 +2,8 @@ package io.openbas.integrations;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.contract.Contract;
-import io.openbas.contract.Contractor;
+import io.openbas.injector_contract.Contract;
+import io.openbas.injector_contract.Contractor;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Injector;
 import io.openbas.database.model.InjectorContract;
@@ -70,10 +70,16 @@ public class InjectorService {
             fileService.uploadStream(INJECTORS_IMAGES_BASE_PATH, contractor.getType() + ".png", iconData);
         }
         // We need to support upsert for registration
-        Injector injector = injectorRepository.findById(id).orElse(injectorRepository.findByType(contractor.getType()).orElse(null));
+        Injector injector = injectorRepository.findById(id).orElse(null);
+        if( injector == null ) {
+            Injector injectorChecking = injectorRepository.findByType(contractor.getType()).orElse(null);
+            if (injectorChecking != null ) {
+                throw new Exception("The injector " + contractor.getType() + " already exists with a different ID, please delete it or contact your administrator.");
+            }
+        }
+        // Check error to avoid changing ID
         List<Contract> contracts = contractor.contracts();
         if (injector != null) {
-            injector.setId(id);
             injector.setName(name);
             injector.setExternal(false);
             injector.setCustomContracts(isCustomizable);

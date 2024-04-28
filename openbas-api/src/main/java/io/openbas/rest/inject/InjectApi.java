@@ -15,7 +15,7 @@ import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
-import io.openbas.scenario.ScenarioService;
+import io.openbas.service.ScenarioService;
 import io.openbas.service.*;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
@@ -41,7 +41,7 @@ import static io.openbas.database.specification.CommunicationSpecification.fromI
 import static io.openbas.helper.DatabaseHelper.resolveOptionalRelation;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.scenario.ScenarioApi.SCENARIO_URI;
+import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static java.time.Instant.now;
 
 @RestController
@@ -270,7 +270,7 @@ public class InjectApi extends RestBehavior {
   public Inject createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
     // Get common attributes
-    Inject inject = input.toInject();
+    Inject inject = input.toInject(injectorContractRepository.findById(input.getInjectorContract()).orElseThrow());
     inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setExercise(exercise);
     // Set dependencies
@@ -294,7 +294,7 @@ public class InjectApi extends RestBehavior {
   public InjectStatus executeInject(@PathVariable String exerciseId,
       @Valid @RequestPart("input") DirectInjectInput input,
       @RequestPart("file") Optional<MultipartFile> file) {
-    Inject inject = input.toInject();
+    Inject inject = input.toInject(injectorContractRepository.findById(input.getInjectorContract()).orElseThrow());
     inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
     Iterable<User> users = userRepository.findAllById(input.getUserIds());
@@ -376,7 +376,7 @@ public class InjectApi extends RestBehavior {
       @Valid @RequestBody InjectInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     // Get common attributes
-    Inject inject = input.toInject();
+    Inject inject = input.toInject(injectorContractRepository.findById(input.getInjectorContract()).orElseThrow());
     inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setScenario(scenario);
     // Set dependencies

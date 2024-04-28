@@ -112,7 +112,6 @@ public class InjectorApi extends RestBehavior {
 
     private Injector updateInjector(
             Injector injector,
-            String id,
             String type,
             String name,
             List<InjectorContractInput> contracts,
@@ -122,7 +121,6 @@ public class InjectorApi extends RestBehavior {
             String simulationAgentDoc,
             String category) {
         injector.setUpdatedAt(Instant.now());
-        injector.setId(id);
         injector.setType(type);
         injector.setName(name);
         injector.setExternal(true);
@@ -142,6 +140,7 @@ public class InjectorApi extends RestBehavior {
                 contract.setLabels(current.get().getLabels());
                 contract.setContent(current.get().getContent());
                 contract.setAtomicTesting(current.get().isAtomicTesting());
+                contract.setPlatforms(current.get().getPlatforms());
                 if (!current.get().getAttackPatternsExternalIds().isEmpty()) {
                     List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(current.get().getAttackPatternsExternalIds()));
                     contract.setAttackPatterns(attackPatterns);
@@ -166,7 +165,6 @@ public class InjectorApi extends RestBehavior {
         Injector injector = injectorRepository.findById(injectorId).orElseThrow();
         return updateInjector(
                 injector,
-                injectorId,
                 injector.getType(),
                 input.getName(),
                 input.getContracts(),
@@ -213,11 +211,16 @@ public class InjectorApi extends RestBehavior {
             channel.exchangeDeclare(exchangeKey, "direct", true);
             channel.queueBind(queueName, exchangeKey, routingKey);
             // We need to support upsert for registration
-            Injector injector = injectorRepository.findById(input.getId()).orElse(injectorRepository.findByType(input.getType()).orElse(null));
+            Injector injector = injectorRepository.findById(input.getId()).orElse(null);
+            if( injector == null ) {
+                Injector injectorChecking = injectorRepository.findByType(input.getType()).orElse(null);
+                if (injectorChecking != null ) {
+                    throw new Exception("The injector " + input.getType() + " already exists with a different ID, please delete it or contact your administrator.");
+                }
+            }
             if (injector != null) {
                 updateInjector(
                         injector,
-                        input.getId(),
                         input.getType(),
                         input.getName(),
                         input.getContracts(),

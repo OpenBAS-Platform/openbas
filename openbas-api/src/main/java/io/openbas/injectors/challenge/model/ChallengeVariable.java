@@ -1,4 +1,4 @@
-package io.openbas.injects.challenge.model;
+package io.openbas.injectors.challenge.model;
 
 public class ChallengeVariable {
     private String id;

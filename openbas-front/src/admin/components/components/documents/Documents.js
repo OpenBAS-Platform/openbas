@@ -32,8 +32,12 @@ const useStyles = makeStyles(() => ({
     height: 50,
   },
   bodyItem: {
-    height: '100%',
     fontSize: 13,
+    float: 'left',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
   exercise: {
     fontSize: 12,
@@ -51,75 +55,24 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const headerStyles = {
-  document_name: {
-    width: '20%',
-  },
-  document_description: {
-    width: '15%',
-  },
-  document_exercises: {
-    width: '20%',
-  },
-  document_scenarios: {
-    width: '20%',
-  },
-  document_type: {
-    width: '12%',
-  },
-  document_tags: {
-    width: '13%',
-  },
-};
-
 const inlineStyles = {
   document_name: {
-    float: 'left',
     width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   document_description: {
-    float: 'left',
     width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   document_exercises: {
-    float: 'left',
     width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   document_scenarios: {
-    float: 'left',
     width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   document_type: {
-    float: 'left',
     width: '12%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   document_tags: {
-    float: 'left',
     width: '13%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
 };
 
@@ -175,7 +128,6 @@ const Documents = () => {
         setContent={setDocuments}
         exportProps={exportProps}
       />
-      <div className="clearfix" />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -197,7 +149,7 @@ const Documents = () => {
             primary={
               <SortHeadersComponent
                 headers={headers}
-                inlineStylesHeaders={headerStyles}
+                inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />

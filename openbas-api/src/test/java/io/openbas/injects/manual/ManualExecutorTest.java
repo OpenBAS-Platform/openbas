@@ -1,4 +1,4 @@
-package io.openbas.injects.manual;
+package io.openbas.injectors.manual;
 
 import io.openbas.injectors.manual.ManualExecutor;
 import org.junit.jupiter.api.Assertions;

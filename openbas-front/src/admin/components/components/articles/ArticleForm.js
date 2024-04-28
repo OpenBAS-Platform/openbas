@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
-import OldTextField from '../../../../components/OldTextField';
+import OldTextField from '../../../../components/fields/OldTextField';
 import Autocomplete from '../../../../components/Autocomplete';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';

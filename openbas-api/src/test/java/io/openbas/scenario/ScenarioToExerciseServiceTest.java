@@ -3,6 +3,8 @@ package io.openbas.scenario;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.service.LoadService;
+import io.openbas.service.ScenarioService;
+import io.openbas.service.ScenarioToExerciseService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.openbas.injects.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.utils.fixtures.ArticleFixture.ARTICLE_NAME;
 import static io.openbas.utils.fixtures.ArticleFixture.getArticle;
 import static io.openbas.utils.fixtures.DocumentFixture.getDocumentJpeg;

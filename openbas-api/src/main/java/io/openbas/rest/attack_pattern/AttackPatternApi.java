@@ -7,7 +7,6 @@ import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.KillChainPhaseRepository;
 import io.openbas.database.specification.InjectorContractSpecification;
-import io.openbas.database.specification.LessonsQuestionSpecification;
 import io.openbas.rest.attack_pattern.form.AttackPatternCreateInput;
 import io.openbas.rest.attack_pattern.form.AttackPatternUpdateInput;
 import io.openbas.rest.attack_pattern.form.AttackPatternUpsertInput;
@@ -37,128 +36,128 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 @Secured(ROLE_USER)
 public class AttackPatternApi extends RestBehavior {
 
-  private AttackPatternRepository attackPatternRepository;
+    private AttackPatternRepository attackPatternRepository;
 
-  private InjectorContractRepository injectorContractRepository;
-  private KillChainPhaseRepository killChainPhaseRepository;
+    private InjectorContractRepository injectorContractRepository;
+    private KillChainPhaseRepository killChainPhaseRepository;
 
-  @Autowired
-  public void setAttackPatternRepository(AttackPatternRepository attackPatternRepository) {
-    this.attackPatternRepository = attackPatternRepository;
-  }
+    @Autowired
+    public void setAttackPatternRepository(AttackPatternRepository attackPatternRepository) {
+        this.attackPatternRepository = attackPatternRepository;
+    }
 
-  @Autowired
-  public void setKillChainPhaseRepository(KillChainPhaseRepository killChainPhaseRepository) {
-    this.killChainPhaseRepository = killChainPhaseRepository;
-  }
+    @Autowired
+    public void setKillChainPhaseRepository(KillChainPhaseRepository killChainPhaseRepository) {
+        this.killChainPhaseRepository = killChainPhaseRepository;
+    }
 
-  @Autowired
-  public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
-    this.injectorContractRepository = injectorContractRepository;
-  }
+    @Autowired
+    public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
+        this.injectorContractRepository = injectorContractRepository;
+    }
 
-  @GetMapping("/api/attack_patterns")
-  public Iterable<AttackPattern> attackPatterns() {
-    return attackPatternRepository.findAll();
-  }
+    @GetMapping("/api/attack_patterns")
+    public Iterable<AttackPattern> attackPatterns() {
+        return attackPatternRepository.findAll();
+    }
 
-  @PostMapping("/api/attack_patterns/search")
-  public Page<AttackPattern> attackPatterns(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return buildPaginationJPA(
-        (Specification<AttackPattern> specification, Pageable pageable) -> this.attackPatternRepository.findAll(
-            specification, pageable),
-        searchPaginationInput,
-        AttackPattern.class
-    );
-  }
+    @PostMapping("/api/attack_patterns/search")
+    public Page<AttackPattern> attackPatterns(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+        return buildPaginationJPA(
+                (Specification<AttackPattern> specification, Pageable pageable) -> this.attackPatternRepository.findAll(
+                        specification, pageable),
+                searchPaginationInput,
+                AttackPattern.class
+        );
+    }
 
-  @GetMapping("/api/attack_patterns/{attackPatternId}")
-  public AttackPattern attackPattern(@PathVariable String attackPatternId) {
-    return attackPatternRepository.findById(attackPatternId).orElseThrow();
-  }
+    @GetMapping("/api/attack_patterns/{attackPatternId}")
+    public AttackPattern attackPattern(@PathVariable String attackPatternId) {
+        return attackPatternRepository.findById(attackPatternId).orElseThrow();
+    }
 
-  @Secured(ROLE_ADMIN)
-  @PostMapping("/api/attack_patterns")
-  public AttackPattern createAttackPattern(@Valid @RequestBody AttackPatternCreateInput input) {
-    AttackPattern attackPattern = new AttackPattern();
-    attackPattern.setUpdateAttributes(input);
-    attackPattern.setKillChainPhases(fromIterable(killChainPhaseRepository.findAllById(input.getKillChainPhasesIds())));
-    attackPattern.setParent(updateRelation(input.getParentId(), attackPattern.getParent(), attackPatternRepository));
-    return attackPatternRepository.save(attackPattern);
-  }
+    @Secured(ROLE_ADMIN)
+    @PostMapping("/api/attack_patterns")
+    public AttackPattern createAttackPattern(@Valid @RequestBody AttackPatternCreateInput input) {
+        AttackPattern attackPattern = new AttackPattern();
+        attackPattern.setUpdateAttributes(input);
+        attackPattern.setKillChainPhases(fromIterable(killChainPhaseRepository.findAllById(input.getKillChainPhasesIds())));
+        attackPattern.setParent(updateRelation(input.getParentId(), attackPattern.getParent(), attackPatternRepository));
+        return attackPatternRepository.save(attackPattern);
+    }
 
-  @GetMapping("/api/attack_patterns/{attackPatternId}/injector_contracts")
-  public Iterable<InjectorContract> injectorContracts(@PathVariable String attackPatternId) {
-    attackPatternRepository.findById(attackPatternId).orElseThrow();
-    return injectorContractRepository.findAll(InjectorContractSpecification.fromAttackPattern(attackPatternId));
-  }
+    @GetMapping("/api/attack_patterns/{attackPatternId}/injector_contracts")
+    public Iterable<InjectorContract> injectorContracts(@PathVariable String attackPatternId) {
+        attackPatternRepository.findById(attackPatternId).orElseThrow();
+        return injectorContractRepository.findAll(InjectorContractSpecification.fromAttackPattern(attackPatternId));
+    }
 
-  @Secured(ROLE_ADMIN)
-  @PutMapping("/api/attack_patterns/{attackPatternId}")
-  public AttackPattern updateAttackPattern(
-      @NotBlank @PathVariable final String attackPatternId,
-      @Valid @RequestBody AttackPatternUpdateInput input) {
-    AttackPattern attackPattern = this.attackPatternRepository.findById(attackPatternId).orElseThrow();
-    attackPattern.setUpdateAttributes(input);
-    attackPattern.setKillChainPhases(fromIterable(this.killChainPhaseRepository.findAllById(input.getKillChainPhasesIds())));
-    attackPattern.setUpdatedAt(Instant.now());
-    return attackPatternRepository.save(attackPattern);
-  }
+    @Secured(ROLE_ADMIN)
+    @PutMapping("/api/attack_patterns/{attackPatternId}")
+    public AttackPattern updateAttackPattern(
+            @NotBlank @PathVariable final String attackPatternId,
+            @Valid @RequestBody AttackPatternUpdateInput input) {
+        AttackPattern attackPattern = this.attackPatternRepository.findById(attackPatternId).orElseThrow();
+        attackPattern.setUpdateAttributes(input);
+        attackPattern.setKillChainPhases(fromIterable(this.killChainPhaseRepository.findAllById(input.getKillChainPhasesIds())));
+        attackPattern.setUpdatedAt(Instant.now());
+        return attackPatternRepository.save(attackPattern);
+    }
 
-  private List<AttackPattern> upsertAttackPatterns(List<AttackPatternCreateInput> attackPatterns) {
-    List<AttackPattern> upserted = new ArrayList<>();
-    attackPatterns.forEach(attackPatternInput -> {
-          String attackPatternExternalId = attackPatternInput.getExternalId();
-          Optional<AttackPattern> optionalAttackPattern = attackPatternRepository.findByExternalId(
-              attackPatternExternalId);
-          List<KillChainPhase> killChainPhases = !attackPatternInput.getKillChainPhasesIds().isEmpty() ?
-              fromIterable(killChainPhaseRepository.findAllById(attackPatternInput.getKillChainPhasesIds()))
-              : List.of();
-          AttackPattern attackPatternParent = attackPatternInput.getParentId() != null ?
-              attackPatternRepository.findByStixId(attackPatternInput.getParentId()).orElseThrow() : null;
-          if (optionalAttackPattern.isEmpty()) {
-            AttackPattern newAttackPattern = new AttackPattern();
-            newAttackPattern.setStixId(attackPatternInput.getStixId());
-            newAttackPattern.setExternalId(attackPatternExternalId);
-            newAttackPattern.setKillChainPhases(killChainPhases);
-            newAttackPattern.setName(attackPatternInput.getName());
-            newAttackPattern.setDescription(attackPatternInput.getDescription());
-            newAttackPattern.setPlatforms(attackPatternInput.getPlatforms());
-            newAttackPattern.setPermissionsRequired(attackPatternInput.getPermissionsRequired());
-            newAttackPattern.setParent(attackPatternParent);
-            upserted.add(newAttackPattern);
-          } else {
-            AttackPattern attackPattern = optionalAttackPattern.get();
-            attackPattern.setStixId(attackPatternInput.getStixId());
-            attackPattern.setKillChainPhases(killChainPhases);
-            attackPattern.setName(attackPatternInput.getName());
-            attackPattern.setDescription(attackPatternInput.getDescription());
-            attackPattern.setPlatforms(attackPatternInput.getPlatforms());
-            attackPattern.setPermissionsRequired(attackPatternInput.getPermissionsRequired());
-            attackPattern.setParent(attackPatternParent);
-            upserted.add(attackPattern);
-          }
+    private List<AttackPattern> upsertAttackPatterns(List<AttackPatternCreateInput> attackPatterns) {
+        List<AttackPattern> upserted = new ArrayList<>();
+        attackPatterns.forEach(attackPatternInput -> {
+            String attackPatternExternalId = attackPatternInput.getExternalId();
+            Optional<AttackPattern> optionalAttackPattern = attackPatternRepository.findByExternalId(
+                    attackPatternExternalId);
+            List<KillChainPhase> killChainPhases = !attackPatternInput.getKillChainPhasesIds().isEmpty() ?
+                    fromIterable(killChainPhaseRepository.findAllById(attackPatternInput.getKillChainPhasesIds()))
+                    : List.of();
+            AttackPattern attackPatternParent = attackPatternInput.getParentId() != null ?
+                    attackPatternRepository.findByStixId(attackPatternInput.getParentId()).orElseThrow() : null;
+            if (optionalAttackPattern.isEmpty()) {
+                AttackPattern newAttackPattern = new AttackPattern();
+                newAttackPattern.setStixId(attackPatternInput.getStixId());
+                newAttackPattern.setExternalId(attackPatternExternalId);
+                newAttackPattern.setKillChainPhases(killChainPhases);
+                newAttackPattern.setName(attackPatternInput.getName());
+                newAttackPattern.setDescription(attackPatternInput.getDescription());
+                newAttackPattern.setPlatforms(attackPatternInput.getPlatforms());
+                newAttackPattern.setPermissionsRequired(attackPatternInput.getPermissionsRequired());
+                newAttackPattern.setParent(attackPatternParent);
+                upserted.add(newAttackPattern);
+            } else {
+                AttackPattern attackPattern = optionalAttackPattern.get();
+                attackPattern.setStixId(attackPatternInput.getStixId());
+                attackPattern.setKillChainPhases(killChainPhases);
+                attackPattern.setName(attackPatternInput.getName());
+                attackPattern.setDescription(attackPatternInput.getDescription());
+                attackPattern.setPlatforms(attackPatternInput.getPlatforms());
+                attackPattern.setPermissionsRequired(attackPatternInput.getPermissionsRequired());
+                attackPattern.setParent(attackPatternParent);
+                upserted.add(attackPattern);
+            }
         });
-    return fromIterable(this.attackPatternRepository.saveAll(upserted));
-  }
+        return fromIterable(this.attackPatternRepository.saveAll(upserted));
+    }
 
-  @Secured(ROLE_ADMIN)
-  @PostMapping("/api/attack_patterns/upsert")
-  public Iterable<AttackPattern> upsertKillChainPhases(@Valid @RequestBody AttackPatternUpsertInput input) {
-    List<AttackPattern> upserted = new ArrayList<>();
-    List<AttackPatternCreateInput> attackPatterns = input.getAttackPatterns();
-    List<AttackPatternCreateInput> patternsWithoutParent = attackPatterns.stream().filter(a -> a.getParentId() == null)
-        .toList();
-    List<AttackPatternCreateInput> patternsWithParent = attackPatterns.stream().filter(a -> a.getParentId() != null)
-        .toList();
-    upserted.addAll(upsertAttackPatterns(patternsWithoutParent));
-    upserted.addAll(upsertAttackPatterns(patternsWithParent));
-    return upserted;
-  }
+    @Secured(ROLE_ADMIN)
+    @PostMapping("/api/attack_patterns/upsert")
+    public Iterable<AttackPattern> upsertKillChainPhases(@Valid @RequestBody AttackPatternUpsertInput input) {
+        List<AttackPattern> upserted = new ArrayList<>();
+        List<AttackPatternCreateInput> attackPatterns = input.getAttackPatterns();
+        List<AttackPatternCreateInput> patternsWithoutParent = attackPatterns.stream().filter(a -> a.getParentId() == null)
+                .toList();
+        List<AttackPatternCreateInput> patternsWithParent = attackPatterns.stream().filter(a -> a.getParentId() != null)
+                .toList();
+        upserted.addAll(upsertAttackPatterns(patternsWithoutParent));
+        upserted.addAll(upsertAttackPatterns(patternsWithParent));
+        return upserted;
+    }
 
-  @Secured(ROLE_ADMIN)
-  @DeleteMapping("/api/attack_patterns/{attackPatternId}")
-  public void deleteAttackPattern(@PathVariable String attackPatternId) {
-    attackPatternRepository.deleteById(attackPatternId);
-  }
+    @Secured(ROLE_ADMIN)
+    @DeleteMapping("/api/attack_patterns/{attackPatternId}")
+    public void deleteAttackPattern(@PathVariable String attackPatternId) {
+        attackPatternRepository.deleteById(attackPatternId);
+    }
 }
