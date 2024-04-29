@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class ExerciseExpectationApi extends RestBehavior {
 
   @GetMapping(value = "/api/exercises/{exerciseId}/expectations")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
+  @Transactional(readOnly = true)
   public List<InjectExpectation> exerciseInjectExpectations(@PathVariable @NotBlank final String exerciseId) {
     return this.exerciseExpectationService.injectExpectations(exerciseId);
   }

@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
-import { Typography, Alert, Button, TextField as MuiTextField, Chip } from '@mui/material';
+import { Alert, Button, Chip, TextField as MuiTextField, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -124,6 +124,7 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({
           <Button
             type="submit"
             disabled={validated || isSubmitting}
+            variant="contained"
           >
             {t('Validate')}
           </Button>
@@ -149,7 +150,6 @@ const ManualExpectationsValidation: FunctionComponent<Props> = ({
   onClose,
 }) => {
   const { t } = useFormatter();
-  const classes = useStyles();
 
   return (
     <Drawer
@@ -161,14 +161,6 @@ const ManualExpectationsValidation: FunctionComponent<Props> = ({
         {expectations
           && expectations.map((e) => <ManualExpectationsValidationForm key={e.inject_expectation_id} exerciseId={exerciseId} expectation={e} />)
         }
-        <div className={classes.buttons}>
-          <Button
-            variant="contained"
-            onClick={onClose}
-          >
-            {t('Close')}
-          </Button>
-        </div>
       </>
     </Drawer>
   );
