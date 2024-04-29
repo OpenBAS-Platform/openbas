@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import type { ExerciseInjectExpectationResultsByTypeStore } from '../../../../actions/exercises/Exercise';
+import type { InjectExpectationResultsByAttackPatternStore } from '../../../../actions/exercises/Exercise';
 import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
 import AttackPatternBox from './AttackPatternBox';
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
@@ -18,7 +18,7 @@ interface KillChainPhaseComponentProps {
   goToLink?: string;
   killChainPhase: KillChainPhase;
   attackPatterns: AttackPattern[];
-  injectResults: ExerciseInjectExpectationResultsByTypeStore[];
+  injectResults: InjectExpectationResultsByAttackPatternStore[];
 }
 
 const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import type { ExerciseInjectExpectationResultsByTypeStore, ExerciseStore } from '../../../../actions/exercises/Exercise';
+import type { InjectExpectationResultsByAttackPatternStore, ExerciseStore } from '../../../../actions/exercises/Exercise';
 import ExerciseDistribution from './ExerciseDistribution';
 import ResponsePie from '../../atomic_testings/atomic_testing/ResponsePie';
 import { fetchExerciseExpectationResult, fetchExerciseInjectExpectationResults } from '../../../../actions/exercises/exercise-action';
@@ -22,10 +22,10 @@ const Exercise = () => {
   });
 
   const [results, setResults] = useState<ExpectationResultsByType[] | null>(null);
-  const [injectResults, setInjectResults] = useState<ExerciseInjectExpectationResultsByTypeStore[] | null>(null);
+  const [injectResults, setInjectResults] = useState<InjectExpectationResultsByAttackPatternStore[] | null>(null);
   useEffect(() => {
     fetchExerciseExpectationResult(exerciseId).then((result: { data: ExpectationResultsByType[] }) => setResults(result.data));
-    fetchExerciseInjectExpectationResults(exerciseId).then((result: { data: ExerciseInjectExpectationResultsByTypeStore[] }) => setInjectResults(result.data));
+    fetchExerciseInjectExpectationResults(exerciseId).then((result: { data: InjectExpectationResultsByAttackPatternStore[] }) => setInjectResults(result.data));
   }, [exerciseId]);
 
   const goToLink = `/admin/exercises/${exerciseId}/injects`;

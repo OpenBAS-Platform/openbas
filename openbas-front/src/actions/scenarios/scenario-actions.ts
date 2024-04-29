@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux';
-import { delReferential, getReferential, postReferential, putReferential, simplePostCall } from '../../utils/Action';
+import { delReferential, getReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import { arrayOfScenarios, scenario } from './scenario-schema';
 import type {
   Scenario,
@@ -123,4 +123,11 @@ export const updateScenarioRecurrence = (
 ) => (dispatch: Dispatch) => {
   const uri = `${SCENARIO_URI}/${scenarioId}/recurrence`;
   return putReferential(scenario, uri, data)(dispatch);
+};
+
+// -- STATISTIC --
+
+export const fetchScenarioStatistic = () => {
+  const uri = `${SCENARIO_URI}/statistics`;
+  return simpleCall(uri);
 };

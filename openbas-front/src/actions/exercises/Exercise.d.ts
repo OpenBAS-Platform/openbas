@@ -1,4 +1,4 @@
-import type { Exercise, ExerciseInjectExpectationResultsByType, ExerciseSimple, InjectExpectationResultsByType, Team, User } from '../../utils/api-types';
+import type { Exercise, ExerciseSimple, InjectExpectationResultsByAttackPattern, InjectExpectationResultsByType, Team, User } from '../../utils/api-types';
 
 export type ExerciseTeamUserStore = Omit<Exercise['exercise_teams_users'], 'exercise_id', 'team_id', 'user_id'> & {
   exercise_id?: Exercise['exercise_id'];
@@ -19,7 +19,7 @@ export type InjectExpectationResultsByTypeStore = Omit<InjectExpectationResultsB
   inject: string | undefined
 };
 
-export type ExerciseInjectExpectationResultsByTypeStore = Omit<ExerciseInjectExpectationResultsByType, 'inject_attack_pattern' | 'exercise_inject_results_injects'> & {
+export type InjectExpectationResultsByAttackPatternStore = Omit<InjectExpectationResultsByAttackPattern, 'inject_attack_pattern' | 'exercise_inject_results_injects'> & {
   inject_attack_pattern: string[] | undefined;
   inject_expectation_results: InjectExpectationResultsByTypeStore[] | undefined;
 };

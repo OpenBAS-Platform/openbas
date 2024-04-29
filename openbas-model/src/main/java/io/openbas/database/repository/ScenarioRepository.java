@@ -1,6 +1,7 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Scenario;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -33,5 +34,12 @@ public interface ScenarioRepository extends CrudRepository<Scenario, String>,
   @Override
   @Query("select count(distinct s) from Scenario s where s.createdAt < :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
+
+  @Query(value = "SELECT scenario_category, COUNT(*) AS category_count " +
+      "FROM scenarios " +
+      "GROUP BY scenario_category " +
+      "ORDER BY category_count DESC " +
+      "LIMIT :limit", nativeQuery = true)
+  List<Object[]> findTopCategories(@Param("limit") @NotNull final int limit);
 
 }

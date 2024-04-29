@@ -2028,6 +2028,12 @@ export interface ScenarioSimple {
   scenario_tags?: Tag[];
 }
 
+export interface ScenarioStatistic {
+  scenarios_attack_scenario_count?: Record<string, number>;
+  /** @format int64 */
+  scenarios_global_count?: number;
+}
+
 export interface ScenarioTeamPlayersEnableInput {
   scenario_team_players?: string[];
 }
