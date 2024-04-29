@@ -1,7 +1,6 @@
 package io.openbas.atomic_testing;
 
 import io.openbas.atomic_testing.form.AtomicTestingInput;
-import io.openbas.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;

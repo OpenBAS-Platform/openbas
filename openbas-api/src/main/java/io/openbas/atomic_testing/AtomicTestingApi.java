@@ -33,7 +33,11 @@ public class AtomicTestingApi extends RestBehavior {
 
   private AtomicTestingService atomicTestingService;
   private InjectExpectationService injectExpectationService;
+<<<<<<< HEAD
   private InjectorContractRepository injectorContractRepository;
+=======
+
+>>>>>>> a20c5fe6 (Cleaning)
 
   @Autowired
   public void setAtomicTestingService(AtomicTestingService atomicTestingService) {
