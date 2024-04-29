@@ -10,7 +10,6 @@ import QuickInject from './QuickInject';
 import { storeHelper } from '../../../../actions/Schema';
 import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchTags } from '../../../../actions/Tag';
-import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 
 const styles = (theme) => ({
   createButton: {
@@ -98,7 +97,6 @@ export default R.compose(
   connect(select, {
     fetchExercises,
     fetchTags,
-    fetchInjectorContracts,
   }),
   inject18n,
   withTheme,

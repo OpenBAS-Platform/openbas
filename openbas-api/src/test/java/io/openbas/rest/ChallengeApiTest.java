@@ -7,6 +7,7 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ChallengeRepository;
 import io.openbas.database.repository.InjectRepository;
+import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.service.ScenarioService;
@@ -47,6 +48,8 @@ public class ChallengeApiTest {
   private InjectRepository injectRepository;
   @Autowired
   private ChallengeRepository challengeRepository;
+  @Autowired
+  private InjectorContractRepository injectorContractRepository;
   @Resource
   private ObjectMapper objectMapper;
 
@@ -84,7 +87,7 @@ public class ChallengeApiTest {
     Inject inject = new Inject();
     inject.setTitle("Test inject");
     inject.setType(TYPE);
-    inject.setContract(CHALLENGE_PUBLISH);
+    inject.setInjectorContract(this.injectorContractRepository.findById(CHALLENGE_PUBLISH).orElseThrow());
     inject.setContent(this.objectMapper.valueToTree(content));
     inject.setDependsDuration(0L);
     inject.setScenario(scenario);

@@ -22,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
+import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -53,7 +54,7 @@ public class EmailExecutorTest {
     content.setExpectations(List.of(expectation));
     Inject inject = new Inject();
     inject.setType(EmailContract.TYPE);
-    inject.setInjectorContract(injectorContractRepository.findById(EmailContract.EMAIL_DEFAULT).orElseThrow());
+    inject.setInjectorContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
     inject.setContent(this.mapper.valueToTree(content));
     Iterable<User> users = this.userRepository.findAll();
     List<ExecutionContext> userInjectContexts = fromIterable(users).stream()

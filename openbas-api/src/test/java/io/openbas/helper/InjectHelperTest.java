@@ -78,7 +78,7 @@ public class InjectHelperTest {
         Inject inject = new Inject();
         inject.setTitle("Test inject");
         inject.setType(TYPE);
-        inject.setInjectorContract(injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+        inject.setInjectorContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
         inject.setEnabled(true);
         inject.setExercise(exerciseSaved);
         inject.setTeams(List.of(team));

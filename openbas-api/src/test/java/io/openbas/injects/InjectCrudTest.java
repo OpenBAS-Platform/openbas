@@ -5,7 +5,6 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectorContractRepository;
-import io.openbas.injectors.email.EmailContract;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,7 @@ public class InjectCrudTest {
 
   @Autowired
   private ExerciseRepository exerciseRepository;
+
   @Autowired
   private InjectorContractRepository injectorContractRepository;
 
@@ -40,7 +40,7 @@ public class InjectCrudTest {
     Inject inject = new Inject();
     inject.setTitle("test");
     inject.setType(TYPE);
-    inject.setInjectorContract(injectorContractRepository.findById(EmailContract.EMAIL_DEFAULT).orElseThrow());
+    inject.setInjectorContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
     inject.setExercise(exerciseCreated);
     inject.setDependsDuration(0L);
 

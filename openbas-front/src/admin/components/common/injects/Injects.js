@@ -16,8 +16,6 @@ import { useHelper } from '../../../../store';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import { exportData } from '../../../../utils/Environment';
 import Loader from '../../../../components/Loader';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import { useAppDispatch } from '../../../../utils/hooks';
 import { InjectContext, PermissionsContext } from '../Context';
 import CreateInject from './CreateInject';
 import UpdateInject from './UpdateInject';
@@ -159,7 +157,6 @@ const Injects = ({
 }) => {
   // Standard hooks
   const classes = useStyles();
-  const dispatch = useAppDispatch();
   const { t, tPick } = useFormatter();
 
   const [selectedInjectId, setSelectedInjectId] = useState(null);
@@ -174,9 +171,6 @@ const Injects = ({
     searchColumns,
   );
   // Fetching data
-  useDataLoader(() => {
-    dispatch(fetchInjectorContracts());
-  });
   const {
     tagsMap,
     selectedInject,
@@ -313,7 +307,6 @@ const Injects = ({
             const injectContract = inject.inject_injector_contract.injector_contract_content_parsed;
             const injectorContractName = tPick(injectContract?.label);
             const duration = splitDuration(inject.inject_depends_duration || 0);
-            console.log('injectContract', injectContract);
             const isDisabled = !injectContract?.config.expose;
             const isNoTeam = !(injectContract?.fields.filter((f) => f.key === 'teams').length > 0);
             let injectStatus = inject.inject_enabled

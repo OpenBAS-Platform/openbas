@@ -65,11 +65,6 @@ public class Inject implements Base, Injection {
   private String description;
 
   @Getter
-  @Transient
-  @JsonProperty("inject_injector_contract")
-  private InjectorContract injectorContract;
-
-  @Getter
   @Column(name = "inject_country")
   @JsonProperty("inject_country")
   private String country;
@@ -140,9 +135,15 @@ public class Inject implements Base, Injection {
   private Long dependsDuration;
 
   @Getter
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "inject_injector_contract")
+  @JsonProperty("inject_injector_contract")
+  private InjectorContract injectorContract;
+
+  @Getter
   @ManyToOne(fetch = FetchType.LAZY)
-  @JsonSerialize(using = MonoIdDeserializer.class)
   @JoinColumn(name = "inject_user")
+  @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_user")
   private User user;
 

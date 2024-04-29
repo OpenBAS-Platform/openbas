@@ -73,7 +73,7 @@ public class InjectorContract implements Base {
     private Injector injector;
 
     @Setter
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "injectors_contracts_attack_patterns",
             joinColumns = @JoinColumn(name = "injector_contract_id"),
             inverseJoinColumns = @JoinColumn(name = "attack_pattern_id"))

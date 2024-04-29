@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.utils.fixtures.ArticleFixture.ARTICLE_NAME;
 import static io.openbas.utils.fixtures.ArticleFixture.getArticle;
 import static io.openbas.utils.fixtures.DocumentFixture.getDocumentJpeg;
@@ -196,7 +197,7 @@ public class ScenarioToExerciseServiceTest {
     }});
 
     // Inject
-    Inject inject = getInjectForEmailContract();
+    Inject inject = getInjectForEmailContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
     inject.setTeams(new ArrayList<>() {{
       add(teamSaved);
       add(contextualTeamSaved);

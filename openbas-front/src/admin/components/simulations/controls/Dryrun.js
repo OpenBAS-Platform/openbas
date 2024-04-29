@@ -20,7 +20,6 @@ import InjectStatus from '../../common/injects/InjectStatus';
 import InjectStatusDetails from '../../common/injects/InjectStatusDetails';
 import { resolveUserName } from '../../../../utils/String';
 import DryrunProgress from './DryrunProgress';
-import { fetchInjectorContracts } from '../../../../actions/InjectorContracts';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -327,7 +326,7 @@ const Dryrun = () => {
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
           {filtering.filterAndSort(dryinjects).map((dryinject) => {
-            const injectContract = injectorContractsMap[dryinject.dryinject_inject.inject_injector_contract];
+            const injectContract = dryinject.inject_injector_contract.injector_contract_content_parsed;
             const injectorContractName = tPick(injectContract?.label);
             return (
               <ListItem

@@ -226,9 +226,8 @@ public class Scenario implements Base {
   }
 
   // -- PLATFORMS --
-  /* @JsonProperty("scenario_platforms")
+  @JsonProperty("scenario_platforms")
   public List<String> getPlatforms() {
-    return getInjects().stream().flatMap(inject -> Arrays.stream(inject.getContractDefinition() == null ? new String[0] : inject.getContractDefinition().getPlatforms())).distinct().toList();
+    return getInjects().stream().flatMap(inject -> Arrays.stream(inject.getInjectorContract().getPlatforms())).distinct().toList();
   }
-  */
 }

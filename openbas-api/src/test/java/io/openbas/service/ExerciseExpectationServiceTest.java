@@ -64,7 +64,7 @@ public class ExerciseExpectationServiceTest {
         Inject inject = new Inject();
         inject.setTitle("test");
         inject.setType(TYPE);
-        inject.setInjectorContract(injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+        inject.setInjectorContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
         inject.setExercise(exerciseCreated);
         inject.setDependsDuration(0L);
         Inject injectCreated = this.injectRepository.save(inject);

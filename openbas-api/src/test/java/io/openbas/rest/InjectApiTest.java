@@ -146,7 +146,7 @@ public class InjectApiTest {
     String injectTitle = "A new title";
     input.setTitle(injectTitle);
     input.setType(inject.getType());
-    input.setContract(inject.getContract());
+    input.setInjectorContract(inject.getInjectorContract().getId());
     input.setDependsDuration(inject.getDependsDuration());
 
     // -- EXECUTE --
