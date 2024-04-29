@@ -21,12 +21,12 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  exerciseId: string;
+  goToLink?: string;
   injectResults: ExerciseInjectExpectationResultsByTypeStore[];
 }
 
 const MitreMatrix: FunctionComponent<Props> = ({
-  exerciseId,
+  goToLink,
   injectResults,
 }) => {
   // Standard hooks
@@ -45,8 +45,8 @@ const MitreMatrix: FunctionComponent<Props> = ({
 
   // Attack Pattern
   const resultAttackPatternIds = injectResults
-    .filter((injectResult) => !!injectResult.exercise_inject_results_attack_pattern)
-    .flatMap((injectResult) => injectResult.exercise_inject_results_attack_pattern) as unknown as string[];
+    .filter((injectResult) => !!injectResult.inject_attack_pattern)
+    .flatMap((injectResult) => injectResult.inject_attack_pattern) as unknown as string[];
 
   const resultAttackPatterns: AttackPatternStore[] = resultAttackPatternIds.map((attackPatternId) => attackPatternMap[attackPatternId]).filter((attackPattern) => !!attackPattern);
 
@@ -66,11 +66,11 @@ const MitreMatrix: FunctionComponent<Props> = ({
 
   return (
     <div className={classes.container}>
-      {resultKillChainPhases.sort(sortKillChainPhase)
+      {[...resultKillChainPhases].sort(sortKillChainPhase)
         .map((killChainPhase: KillChainPhase) => (
           <KillChainPhaseColumn
             key={killChainPhase.phase_id}
-            exerciseId={exerciseId}
+            goToLink={goToLink}
             killChainPhase={killChainPhase}
             attackPatterns={getAttackPatterns(killChainPhase)}
             injectResults={injectResults}

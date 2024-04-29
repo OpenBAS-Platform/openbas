@@ -18,8 +18,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.openbas.rest.exercise.ExerciseService.computeGlobalExpectationResults;
-import static io.openbas.rest.exercise.ExerciseService.computeTargetResults;
+import static io.openbas.utils.ResultUtils.computeGlobalExpectationResults;
+import static io.openbas.utils.ResultUtils.computeTargetResults;
 
 @Setter
 @Getter
@@ -58,8 +58,8 @@ public class ExerciseSimple {
         ExerciseSimple simple = new ExerciseSimple();
         BeanUtils.copyProperties(exercise, simple);
         simple.setStart(exercise.getStart().orElse(null));
-        simple.setExpectationResultByTypes(computeGlobalExpectationResults(exercise));
-        simple.setTargets(computeTargetResults(exercise));
+        simple.setExpectationResultByTypes(computeGlobalExpectationResults(exercise.getInjects()));
+        simple.setTargets(computeTargetResults(exercise.getInjects()));
         return simple;
     }
 

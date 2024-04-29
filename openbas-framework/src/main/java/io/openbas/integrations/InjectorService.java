@@ -103,11 +103,12 @@ public class InjectorService {
                     Map<String, String> labels = current.get().getLabel().entrySet().stream()
                             .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
                     contract.setLabels(labels);
-                    if (!current.get().getAttackPatternsExternalIds().isEmpty()) {
-                        List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(current.get().getAttackPatternsExternalIds()));
-                        contract.setAttackPatterns(attackPatterns);
-                    } else {
-                        contract.setAttackPatterns(new ArrayList<>());
+                    // If no override of TTPs, retrieve those of the contract
+                    if (contract.getAttackPatterns().isEmpty()) {
+                        if (!current.get().getAttackPatternsExternalIds().isEmpty()) {
+                            List<AttackPattern> attackPatterns = fromIterable(attackPatternRepository.findAllByExternalIdInIgnoreCase(current.get().getAttackPatternsExternalIds()));
+                            contract.setAttackPatterns(attackPatterns);
+                        }
                     }
                     try {
                         contract.setContent(mapper.writeValueAsString(current.get()));

@@ -14,7 +14,9 @@ import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.exercise.form.*;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.service.*;
+import io.openbas.utils.ResultUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -99,7 +101,6 @@ public class ExerciseApi extends RestBehavior {
   private InjectService injectService;
   private ChallengeService challengeService;
   private VariableService variableService;
-  private ExerciseService exerciseService;
   // endregion
 
   // region setters
@@ -217,11 +218,6 @@ public class ExerciseApi extends RestBehavior {
   @Autowired
   public void setVariableService(@NotNull final VariableService variableService) {
     this.variableService = variableService;
-  }
-
-  @Autowired
-  public void setExerciseService(@NotNull final ExerciseService exerciseService) {
-    this.exerciseService = exerciseService;
   }
   // endregion
 
@@ -511,15 +507,17 @@ public class ExerciseApi extends RestBehavior {
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public List<ExpectationResultsByType> globalResults(@NotBlank final @PathVariable String exerciseId) {
     return exerciseRepository.findById(exerciseId)
-        .map((ExerciseService::computeGlobalExpectationResults))
+        .map(Exercise::getInjects)
+        .map((ResultUtils::computeGlobalExpectationResults))
         .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + exerciseId));
   }
 
   @GetMapping("/api/exercises/{exerciseId}/injects/results")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public List<ExerciseInjectExpectationResultsByType> injectResults(@NotBlank final @PathVariable String exerciseId) {
+  public List<InjectExpectationResultsByAttackPattern> injectResults(@NotBlank final @PathVariable String exerciseId) {
     return exerciseRepository.findById(exerciseId)
-        .map((e) -> this.exerciseService.computeInjectExpectationResults(e))
+        .map(Exercise::getInjects)
+        .map(ResultUtils::computeInjectExpectationResults)
         .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + exerciseId));
   }
 

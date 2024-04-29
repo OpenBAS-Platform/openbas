@@ -1,7 +1,11 @@
 package io.openbas.rest.statistic.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 public class StatisticElement {
     @JsonProperty("global_count")
     private long global;
@@ -14,19 +18,4 @@ public class StatisticElement {
         this.progression = progression;
     }
 
-    public long getGlobal() {
-        return global;
-    }
-
-    public void setGlobal(long global) {
-        this.global = global;
-    }
-
-    public long getProgression() {
-        return progression;
-    }
-
-    public void setProgression(long progression) {
-        this.progression = progression;
-    }
 }

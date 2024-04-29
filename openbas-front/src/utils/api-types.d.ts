@@ -690,11 +690,6 @@ export interface ExerciseCreateInput {
   exercise_tags?: string[];
 }
 
-export interface ExerciseInjectExpectationResultsByType {
-  exercise_inject_results_attack_pattern?: AttackPattern;
-  exercise_inject_results_results?: InjectExpectationResultsByType[];
-}
-
 export interface ExerciseLessonsInput {
   exercise_lessons_anonymized?: boolean;
 }
@@ -753,7 +748,6 @@ export interface ExerciseUpdateTeamsInput {
   exercise_teams?: string[];
 }
 
-/** Result of expectations */
 export interface ExpectationResultsByType {
   avgResult?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
   distribution?: ResultDistribution[];
@@ -940,6 +934,11 @@ export interface InjectExpectationResult {
   result: string;
   sourceId?: string;
   sourceName?: string;
+}
+
+export interface InjectExpectationResultsByAttackPattern {
+  inject_attack_pattern?: AttackPattern;
+  inject_expectation_results?: InjectExpectationResultsByType[];
 }
 
 export interface InjectExpectationResultsByType {
@@ -1802,9 +1801,15 @@ export interface PlatformSettings {
 }
 
 export interface PlatformStatistic {
+  asset_groups_count?: StatisticElement;
+  assets_count?: StatisticElement;
   exercises_count?: StatisticElement;
+  expectation_results?: ExpectationResultsByType[];
+  inject_expectation_results?: InjectExpectationResultsByAttackPattern[];
   injects_count?: StatisticElement;
   platform_id?: string;
+  scenarios_count?: StatisticElement;
+  teams_count?: StatisticElement;
   users_count?: StatisticElement;
 }
 
