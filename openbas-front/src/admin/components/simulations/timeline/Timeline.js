@@ -153,9 +153,11 @@ const Timeline = () => {
     const exerciseTeams = helper.getExerciseTeams(exerciseId);
     const injectsPerTeam = R.mergeAll(
       exerciseTeams.map((a) => ({
-        [a.team_id]: helper.getTeamInjects(a.team_id),
+        [a.team_id]: helper.getTeamExerciseInjects(a.team_id),
       })),
     );
+    const techicalInjectsWithNoTeam = helper.getExerciseTechnicalInjectsWithNoTeam(exerciseId);
+    const technicalInjectsPerType = R.groupBy(R.prop('inject_type'))(techicalInjectsWithNoTeam);
     return {
       exercise: helper.getExercise(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
@@ -163,8 +165,7 @@ const Timeline = () => {
       exercisesMap: helper.getExercisesMap(),
       tagsMap: helper.getTagsMap(),
       teamsInjectsMap: injectsPerTeam,
-      technicalInjectsMap:
-        helper.getExerciseTechnicalInjectsPerType(exerciseId),
+      technicalInjectsMap: technicalInjectsPerType,
       articles: helper.getExerciseArticles(exerciseId),
       variables: helper.getExerciseVariables(exerciseId),
       selectedInject: helper.getInject(selectedInjectId),
@@ -233,7 +234,7 @@ const Timeline = () => {
     ? '1px dashed rgba(0, 0, 0, 0.15)'
     : '1px dashed rgba(255, 255, 255, 0.15)';
 
-  const onUpdateInject = (injectId, inject) => dispatch(updateInjectForExercise(exerciseId, injectId, inject));
+  const onUpdateInject = (inject) => dispatch(updateInjectForExercise(exerciseId, selectedInjectId, inject));
   return (
     <div className={classes.root}>
       <AnimationMenu exerciseId={exerciseId} />

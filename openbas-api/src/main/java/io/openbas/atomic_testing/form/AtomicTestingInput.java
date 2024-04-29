@@ -22,8 +22,8 @@ public class AtomicTestingInput {
   @JsonProperty("inject_type")
   private String type;
 
-  @JsonProperty("inject_contract")
-  private String contract;
+  @JsonProperty("inject_injector_contract")
+  private String injectorContract;
 
   @JsonProperty("inject_content")
   private ObjectNode content;
