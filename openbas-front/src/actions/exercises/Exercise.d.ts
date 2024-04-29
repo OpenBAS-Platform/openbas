@@ -19,7 +19,7 @@ export type InjectExpectationResultsByTypeStore = Omit<InjectExpectationResultsB
   inject: string | undefined
 };
 
-export type ExerciseInjectExpectationResultsByTypeStore = Omit<ExerciseInjectExpectationResultsByType, 'exercise_inject_results_attack_pattern' | 'exercise_inject_results_injects'> & {
-  exercise_inject_results_attack_pattern: string[] | undefined;
-  exercise_inject_results_results: InjectExpectationResultsByTypeStore[] | undefined;
+export type ExerciseInjectExpectationResultsByTypeStore = Omit<ExerciseInjectExpectationResultsByType, 'inject_attack_pattern' | 'exercise_inject_results_injects'> & {
+  inject_attack_pattern: string[] | undefined;
+  inject_expectation_results: InjectExpectationResultsByTypeStore[] | undefined;
 };

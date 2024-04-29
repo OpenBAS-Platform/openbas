@@ -12,6 +12,7 @@ import io.openbas.rest.attack_pattern.form.AttackPatternUpdateInput;
 import io.openbas.rest.attack_pattern.form.AttackPatternUpsertInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,6 +144,7 @@ public class AttackPatternApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/attack_patterns/upsert")
+    @Transactional(rollbackOn = Exception.class)
     public Iterable<AttackPattern> upsertKillChainPhases(@Valid @RequestBody AttackPatternUpsertInput input) {
         List<AttackPattern> upserted = new ArrayList<>();
         List<AttackPatternCreateInput> attackPatterns = input.getAttackPatterns();

@@ -66,6 +66,7 @@ export default ({ mode }: { mode: string }) => {
         'ckeditor5-custom-build/build/ckeditor',
         'cronstrue',
         '@microsoft/fetch-event-source',
+        'uuid',
       ],
     },
 

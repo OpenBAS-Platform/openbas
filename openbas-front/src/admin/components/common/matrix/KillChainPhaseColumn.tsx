@@ -15,14 +15,14 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface KillChainPhaseComponentProps {
-  exerciseId: string;
+  goToLink?: string;
   killChainPhase: KillChainPhase;
   attackPatterns: AttackPattern[];
   injectResults: ExerciseInjectExpectationResultsByTypeStore[];
 }
 
 const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
-  exerciseId,
+  goToLink,
   killChainPhase,
   attackPatterns,
   injectResults,
@@ -46,18 +46,18 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
 
   // Inject Results
   const getInjectResult = (attack: AttackPatternStore) => {
-    return injectResults.find((injectResult) => injectResult.exercise_inject_results_attack_pattern === attack.attack_pattern_id);
+    return injectResults.find((injectResult) => injectResult.inject_attack_pattern === attack.attack_pattern_id);
   };
 
   return (
     <div style={{ marginBottom: 16 }}>
       <Typography variant="h3">{killChainPhase.phase_name}</Typography>
       <div className={classes.column}>
-        {techniques.sort(sortAttackPattern)
+        {[...techniques].sort(sortAttackPattern)
           .map((attackPattern) => (
             <AttackPatternBox
               key={attackPattern.attack_pattern_id}
-              exerciseId={exerciseId}
+              goToLink={goToLink}
               attackPattern={attackPattern}
               injectResult={getInjectResult(attackPattern)}
             />

@@ -1,11 +1,22 @@
 package io.openbas.rest.statistic.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
+import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.List;
+
+@Setter
+@Getter
 public class PlatformStatistic {
 
     @JsonProperty("platform_id")
     private String platformId = "openbas";
+
+    @JsonProperty("scenarios_count")
+    private StatisticElement scenariosCount;
 
     @JsonProperty("exercises_count")
     private StatisticElement exercisesCount;
@@ -13,42 +24,26 @@ public class PlatformStatistic {
     @JsonProperty("users_count")
     private StatisticElement usersCount;
 
+    @JsonProperty("teams_count")
+    private StatisticElement teamsCount;
+
+    @JsonProperty("assets_count")
+    private StatisticElement assetsCount;
+
+    @JsonProperty("asset_groups_count")
+    private StatisticElement assetGroupsCount;
+
     @JsonProperty("injects_count")
     private StatisticElement injectsCount;
+
+    @JsonProperty("expectation_results")
+    private List<ExpectationResultsByType> results;
+
+    @JsonProperty("inject_expectation_results")
+    private List<InjectExpectationResultsByAttackPattern> injectResults;
 
     public PlatformStatistic() {
         // Default constructor
     }
 
-    public String getPlatformId() {
-        return platformId;
-    }
-
-    public void setPlatformId(String platformId) {
-        this.platformId = platformId;
-    }
-
-    public StatisticElement getExercisesCount() {
-        return exercisesCount;
-    }
-
-    public void setExercisesCount(StatisticElement exercisesCount) {
-        this.exercisesCount = exercisesCount;
-    }
-
-    public StatisticElement getUsersCount() {
-        return usersCount;
-    }
-
-    public void setUsersCount(StatisticElement usersCount) {
-        this.usersCount = usersCount;
-    }
-
-    public StatisticElement getInjectsCount() {
-        return injectsCount;
-    }
-
-    public void setInjectsCount(StatisticElement injectsCount) {
-        this.injectsCount = injectsCount;
-    }
 }

@@ -7,10 +7,19 @@ import { fetchExerciseExpectationResult, fetchExerciseInjectExpectationResults }
 import type { ExpectationResultsByType } from '../../../../utils/api-types';
 import MitreMatrix from '../../common/matrix/MitreMatrix';
 import Loader from '../../../../components/Loader';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import { fetchInjects } from '../../../../actions/Inject';
 
 const Exercise = () => {
+  // Standard hooks
+  const dispatch = useAppDispatch();
+
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: ExerciseStore['exercise_id'] };
+  useDataLoader(() => {
+    dispatch(fetchInjects(exerciseId));
+  });
 
   const [results, setResults] = useState<ExpectationResultsByType[] | null>(null);
   const [injectResults, setInjectResults] = useState<ExerciseInjectExpectationResultsByTypeStore[] | null>(null);
@@ -18,6 +27,8 @@ const Exercise = () => {
     fetchExerciseExpectationResult(exerciseId).then((result: { data: ExpectationResultsByType[] }) => setResults(result.data));
     fetchExerciseInjectExpectationResults(exerciseId).then((result: { data: ExerciseInjectExpectationResultsByTypeStore[] }) => setInjectResults(result.data));
   }, [exerciseId]);
+
+  const goToLink = `/admin/exercises/${exerciseId}/injects`;
 
   return (
     <>
@@ -28,7 +39,7 @@ const Exercise = () => {
       {injectResults == null
         ? <Loader variant="inElement" />
         : <div style={{ marginTop: 16, marginBottom: 16 }}>
-          <MitreMatrix exerciseId={exerciseId} injectResults={injectResults} />
+          <MitreMatrix goToLink={goToLink} injectResults={injectResults} />
         </div>
       }
       <ExerciseDistribution exerciseId={exerciseId} />

@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   title: string;
   icon: React.ReactElement;
-  number: number;
+  number?: number;
 }
 
 const PaperMetric: FunctionComponent<Props> = ({
