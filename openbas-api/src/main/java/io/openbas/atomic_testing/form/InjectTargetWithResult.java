@@ -2,10 +2,12 @@ package io.openbas.atomic_testing.form;
 
 import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.atomic_testing.TargetType;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
+import lombok.Getter;
 
+@Getter
 public class InjectTargetWithResult {
 
   private final TargetType targetType;
@@ -28,25 +30,5 @@ public class InjectTargetWithResult {
     this.id = id;
     this.name = name;
     this.expectationResultsByTypes = expectationResultsByTypes;
-  }
-
-  public TargetType getTargetType() {
-    return targetType;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public List<ExpectationResultsByType> getExpectationResultsByTypes() {
-    return expectationResultsByTypes;
-  }
-
-  public List<InjectTargetWithResult> getChildren() {
-    return children;
   }
 }
