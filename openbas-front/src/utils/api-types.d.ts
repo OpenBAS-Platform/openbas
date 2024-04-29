@@ -1927,6 +1927,7 @@ export interface Scenario {
   scenario_name: string;
   scenario_observers?: User[];
   scenario_planners?: User[];
+  scenario_platforms?: string[];
   scenario_recurrence?: string;
   /** @format date-time */
   scenario_recurrence_end?: string;
