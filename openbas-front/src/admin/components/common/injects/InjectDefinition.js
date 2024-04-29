@@ -727,7 +727,7 @@ class InjectDefinition extends Component {
   }
 
   validate(values) {
-    const { t, injectorContract, inject } = this.props;
+    const { t, injectorContract } = this.props;
     const errors = {};
     if (injectorContract && Array.isArray(injectorContract.fields)) {
       injectorContract.fields
@@ -1070,7 +1070,7 @@ class InjectDefinition extends Component {
   }
 
   resetDefaultvalues(setFieldValue, builtInFields) {
-    const { inject, injectorContract } = this.props;
+    const { injectorContract } = this.props;
     injectorContract.fields
       .filter((f) => !builtInFields.includes(f.key) && !f.expectation)
       .forEach((field) => {
