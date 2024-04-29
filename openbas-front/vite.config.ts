@@ -65,8 +65,7 @@ export default ({ mode }: { mode: string }) => {
         'zod',
         'ckeditor5-custom-build/build/ckeditor',
         'cronstrue',
-        'cron-time-generator',
-        'cron-parser',
+        '@microsoft/fetch-event-source',
       ],
     },
 

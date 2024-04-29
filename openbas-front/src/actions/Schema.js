@@ -12,13 +12,6 @@ export const arrayOfDocuments = new schema.Array(document);
 export const tag = new schema.Entity('tags', {}, { idAttribute: 'tag_id' });
 export const arrayOfTags = new schema.Array(tag);
 
-export const injectorContract = new schema.Entity(
-  'injector_contracts',
-  {},
-  { idAttribute: 'injector_contract_id' },
-);
-export const arrayOfInjectorContracts = new schema.Array(injectorContract);
-
 export const injectStatus = new schema.Entity(
   'inject_statuses',
   {},
@@ -310,24 +303,10 @@ export const storeHelper = (state) => ({
   getExerciseCommunications: (id) => entities('communications', state).filter(
     (i) => i.communication_exercise === id,
   ),
-  getExerciseTechnicalInjectsPerType: (id) => {
-    const typesWithNoTeams = R.uniq(
-      entities('injector_contracts', state)
-        .map((t) => ({
-          type: t.config.type,
-          hasTeams:
-            t.fields.filter((f) => f.name === 'teams').length > 0,
-        }))
-        .filter((t) => !t.hasTeams)
-        .map((t) => t.type),
-    );
-    return R.mergeAll(
-      typesWithNoTeams.map((t) => ({
-        [t]: entities('injects', state).filter(
-          (i) => i.inject_type === t && i.inject_exercise === id,
-        ),
-      })),
-    );
+  getExerciseTechnicalInjectsWithNoTeam: (id) => {
+    return getInjectsWithParsedInjectorContractContent(
+      entities('injects', state),
+    ).filter((i) => !(i.inject_injector_contract?.injector_contract_content_parsed.fields.filter((f) => f.name === 'teams').length > 0) && i.inject_exercise === id);
   },
   getExerciseObjectives: (id) => entities('objectives', state).filter((o) => o.objective_exercise === id),
   getExerciseLogs: (id) => entities('logs', state).filter((l) => l.log_exercise === id),
@@ -378,7 +357,7 @@ export const storeHelper = (state) => ({
   getAtomicTestingDetail: (id) => entity(id, 'atomicdetails', state),
   getAtomicTestings: () => entities('atomics', state),
   getTargetResults: (id, injectId) => entities('targetresults', state).filter((r) => (r.target_id === id) && (r.target_inject_id === injectId)),
-  getInjectsMap: () => getInjectsWithParsedInjectorContractContent(maps('injects', state)),
+  getInjectsMap: () => getInjectsWithParsedInjectorContractContent(entities('injects', state)),
   getNextInjects: () => {
     const sortFn = (a, b) => new Date(a.inject_date).getTime() - new Date(b.inject_date).getTime();
     const injects = entities('injects', state).filter(
@@ -403,7 +382,7 @@ export const storeHelper = (state) => ({
   getTeamUsers: (id) => entities('users', state).filter((u) => (entity(id, 'teams', state) || {}).team_users?.includes(
     u.user_id,
   )),
-  getTeamInjects: (id) => entities('injects', state).filter((i) => (entity(id, 'teams', state) || {}).team_injects?.includes(
+  getTeamExerciseInjects: (id) => entities('injects', state).filter((i) => (entity(id, 'teams', state) || {}).team_exercise_injects?.includes(
     i.inject_id,
   )),
   getTeams: () => entities('teams', state),
@@ -434,8 +413,6 @@ export const storeHelper = (state) => ({
   getInjector: (id) => entity(id, 'injectors', state),
   getInjectors: () => entities('injectors', state),
   getInjectorsMap: () => maps('injectors', state),
-  // injectors contracts
-  getInjectorContract: (id) => entity(id, 'injector_contracts', state),
   // collectors
   getCollector: (id) => entity(id, 'collectors', state),
   getCollectors: () => entities('collectors', state),

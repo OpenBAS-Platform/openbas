@@ -80,7 +80,7 @@ const CreateInjectDetails: FunctionComponent<Props> = ({
   return (
     <InjectDefinition
       inject={{
-        inject_injector_contract: contractId,
+        inject_injector_contract: { injector_contract_id: contractId },
         inject_type: contractContent.config.type,
         inject_teams: [],
         inject_assets: [],
@@ -92,7 +92,7 @@ const CreateInjectDetails: FunctionComponent<Props> = ({
         inject_depends_duration_minutes: 0,
         inject_depends_duration_seconds: 0,
       }}
-      injectorContracts={[contractContent]}
+      injectorContract={contractContent}
       handleClose={handleClose}
       tagsMap={tagsMap}
       permissions={permissions}

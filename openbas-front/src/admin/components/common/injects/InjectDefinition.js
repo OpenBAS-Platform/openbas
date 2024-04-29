@@ -625,10 +625,7 @@ class InjectDefinition extends Component {
   }
 
   async onSubmit(data) {
-    const { inject, injectorContracts, onCreateInject, onUpdateInject } = this.props;
-    const injectorContract = R.head(
-      injectorContracts.filter((i) => i.contract_id === inject.inject_injector_contract),
-    );
+    const { inject, injectorContract, onCreateInject, onUpdateInject } = this.props;
     const finalData = {};
     const hasArticles = injectorContract.fields
       .map((f) => f.key)
@@ -707,7 +704,7 @@ class InjectDefinition extends Component {
 
     const values = {
       inject_title: data.inject_title,
-      inject_injector_contract: inject.inject_injector_contract,
+      inject_injector_contract: inject.inject_injector_contract.injector_contract_id,
       inject_type: inject.inject_type,
       inject_description: data.inject_description,
       inject_tags,
@@ -730,11 +727,8 @@ class InjectDefinition extends Component {
   }
 
   validate(values) {
-    const { t, injectorContracts, inject } = this.props;
+    const { t, injectorContract } = this.props;
     const errors = {};
-    const injectorContract = R.head(
-      injectorContracts.filter((i) => i.contract_id === inject.inject_injector_contract),
-    );
     if (injectorContract && Array.isArray(injectorContract.fields)) {
       injectorContract.fields
         .filter(
@@ -1076,10 +1070,7 @@ class InjectDefinition extends Component {
   }
 
   resetDefaultvalues(setFieldValue, builtInFields) {
-    const { inject, injectorContracts } = this.props;
-    const injectorContract = R.head(
-      injectorContracts.filter((i) => i.contract_id === inject.inject_injector_contract),
-    );
+    const { injectorContract } = this.props;
     injectorContract.fields
       .filter((f) => !builtInFields.includes(f.key) && !f.expectation)
       .forEach((field) => {
@@ -1132,7 +1123,7 @@ class InjectDefinition extends Component {
       t,
       classes,
       inject,
-      injectorContracts,
+      injectorContract,
       teamsMap,
       endpointsMap,
       assetGroupsMap,
@@ -1166,9 +1157,6 @@ class InjectDefinition extends Component {
       challengesIds,
       openVariables,
     } = this.state;
-    const injectorContract = R.head(
-      injectorContracts.filter((i) => i.contract_id === inject.inject_injector_contract),
-    );
     // -- TEAMS --
     const teams = teamsIds
       .map((a) => teamsMap[a])
@@ -2148,7 +2136,7 @@ InjectDefinition.propTypes = {
   fetchChannels: PropTypes.func,
   fetchChallenges: PropTypes.func,
   handleClose: PropTypes.func,
-  injectorContracts: PropTypes.array,
+  injectorContract: PropTypes.object,
   fetchDocuments: PropTypes.func,
   tagsMap: PropTypes.object,
   teamsFromExerciseOrScenario: PropTypes.array,

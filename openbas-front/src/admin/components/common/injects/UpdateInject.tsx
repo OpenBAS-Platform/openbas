@@ -82,7 +82,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, inje
           inject_depends_duration_hours,
           inject_depends_duration_minutes,
         }}
-        injectorContracts={[injectorContract]}
+        injectorContract={injectorContract}
         handleClose={handleClose}
         tagsMap={tagsMap}
         permissions={permissions}
