@@ -70,7 +70,7 @@ const Detail: FunctionComponent<Props> = () => {
                   atomicDetail.atomic_expectations !== undefined && atomicDetail.atomic_expectations.length > 0
                     ? atomicDetail.atomic_expectations.map((expectation, index) => (
                       <Typography key={index} variant="body1">
-                        {expectation.atomic_expectation_name}
+                        {expectation.expectation_name}
                       </Typography>
                     )) : <Typography variant="body1" gutterBottom>
                       {'-'}

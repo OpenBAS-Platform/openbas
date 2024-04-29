@@ -1,19 +1,24 @@
 package io.openbas.atomic_testing;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
-import io.openbas.atomic_testing.form.AtomicTestingExpectation;
 import io.openbas.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput.AtomicTestingOutputBuilder;
 import io.openbas.atomic_testing.form.SimpleExpectationResultOutput;
 import io.openbas.database.model.*;
+import io.openbas.model.inject.form.Expectation;
+import org.hibernate.mapping.Collection;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AtomicTestingMapper {
 
@@ -88,32 +93,14 @@ public class AtomicTestingMapper {
 
   }
 
-  public static List<AtomicTestingExpectation> getAtomicTestingExpectations(ObjectNode content) {
-    List<AtomicTestingExpectation> atomicTestingExpectations = new ArrayList<>();
-    if (content.has("expectations")) {
-      JsonNode expectationsArray = content.get("expectations");
-      for (JsonNode expectation : expectationsArray) {
-        AtomicTestingExpectation atomicTestingExpectation = new AtomicTestingExpectation();
-        if (expectation.has("expectation_type")) {
-          atomicTestingExpectation.setType(
-              AtomicTestingExpectation.EXPECTATION_TYPE.valueOf(expectation.get("expectation_type").asText()));
-        }
-        if (expectation.has("expectation_name")) {
-          atomicTestingExpectation.setName(expectation.get("expectation_name").asText());
-        }
-        if (expectation.has("expectation_description")) {
-          atomicTestingExpectation.setDescription(expectation.get("expectation_description").asText());
-        }
-        if (expectation.has("expectation_score")) {
-          atomicTestingExpectation.setScore(expectation.get("expectation_score").asInt());
-        }
-        if (expectation.has("expectation_expectation_group")) {
-          atomicTestingExpectation.setExpectationGroup(expectation.get("expectation_expectation_group").asBoolean());
-        }
-        atomicTestingExpectations.add(atomicTestingExpectation);
-      }
+  @SuppressWarnings("unchecked")
+  public static List<Expectation> getAtomicTestingExpectations(ObjectNode content) {
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      return mapper.treeToValue(content.get("expectations"), List.class);
+    } catch (JsonProcessingException e) {
+      return Collections.emptyList();
     }
-    return atomicTestingExpectations;
   }
 
   public record ExpectationResultsByType(@NotNull ExpectationType type, @NotNull ExpectationStatus avgResult,

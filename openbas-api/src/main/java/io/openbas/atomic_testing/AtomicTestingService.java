@@ -167,9 +167,7 @@ public class AtomicTestingService {
     return injectRepository.save(injectToSave);
   }
 
-  public Inject updateAtomicTestingTags(
-      @PathVariable @NotBlank final String injectId,
-      @Valid @RequestBody final AtomicTestingUpdateTagsInput input) {
+  public Inject updateAtomicTestingTags(String injectId, AtomicTestingUpdateTagsInput input) {
 
     Inject inject = injectRepository.findById(injectId).orElseThrow();
     inject.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));

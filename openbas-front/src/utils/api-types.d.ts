@@ -129,7 +129,7 @@ export interface AtomicTestingDetailOutput {
   atomic_content?: object;
   atomic_description?: string;
   atomic_documents?: InjectDocument[];
-  atomic_expectations?: AtomicTestingExpectation[];
+  atomic_expectations?: Expectation[];
   atomic_id: string;
   atomic_tags?: Tag[];
   status_label?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
@@ -150,23 +150,14 @@ export interface AtomicTestingDetailOutput {
   tracking_total_success?: number;
 }
 
-export interface AtomicTestingExpectation {
-  atomic_expectation_description?: string;
-  atomic_expectation_expectation_group?: boolean;
-  atomic_expectation_name?: string;
-  /** @format int32 */
-  atomic_expectation_score?: number;
-  atomic_expectation_type: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
-}
-
 export interface AtomicTestingInput {
   inject_all_teams?: boolean;
   inject_asset_groups?: string[];
   inject_assets?: string[];
   inject_content?: object;
-  inject_contract?: string;
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
+  inject_injector_contract?: string;
   inject_tags?: string[];
   inject_teams?: string[];
   inject_title?: string;
@@ -763,6 +754,16 @@ export interface ExerciseUpdateTeamsInput {
   exercise_teams?: string[];
 }
 
+export interface Expectation {
+  expectation_description?: string;
+  expectation_expectation_group?: boolean;
+  expectation_name?: string;
+  /** @format int32 */
+  expectation_score?: number;
+  expectation_type?: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
+}
+
+/** Result of expectations */
 export interface ExpectationResultsByType {
   avgResult?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
   distribution?: ResultDistribution[];
