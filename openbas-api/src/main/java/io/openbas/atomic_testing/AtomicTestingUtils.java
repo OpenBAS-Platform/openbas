@@ -165,13 +165,16 @@ public class AtomicTestingUtils {
               }
             });
 
-            return new InjectTargetWithResult(TargetType.ASSETS_GROUPS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), children);
+            return new InjectTargetWithResult(TargetType.ASSETS_GROUPS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), sortResults(children));
           })
           .toList());
     }
 
     targets.addAll(assetsWithoutParent);
+    return sortResults(targets);
+  }
 
+  private static List<InjectTargetWithResult> sortResults(List<InjectTargetWithResult> targets) {
     return targets.stream().sorted(Comparator.comparing(InjectTargetWithResult::getName)).toList();
   }
 

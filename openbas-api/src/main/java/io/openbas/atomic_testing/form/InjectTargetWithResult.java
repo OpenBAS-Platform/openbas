@@ -25,7 +25,7 @@ public class InjectTargetWithResult {
     this.children.addAll(children);
   }
 
-  public InjectTargetWithResult(TargetType targetType, String id, String name, List<ExpectationResultsByType> expectationResultsByTypes) {
+  public InjectTargetWithResult(@NotNull TargetType targetType, @NotNull String id, @NotNull String name, @NotNull List<ExpectationResultsByType> expectationResultsByTypes) {
     this.targetType = targetType;
     this.id = id;
     this.name = name;
