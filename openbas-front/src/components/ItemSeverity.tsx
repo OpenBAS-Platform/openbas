@@ -14,12 +14,12 @@ const useStyles = makeStyles(() => ({
     width: 80,
   },
   chipInList: {
-    fontSize: 15,
-    height: 30,
+    fontSize: 12,
+    height: 25,
     float: 'left',
     textTransform: 'uppercase',
     borderRadius: 4,
-    width: 90,
+    width: 100,
   },
 }));
 

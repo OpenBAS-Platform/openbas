@@ -36,7 +36,7 @@ const ItemMainFocus: FunctionComponent<ItemMainFocusProps> = ({
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {renderIcon(mainFocus, size)}
       <span style={{
-        fontSize: 12,
+        fontSize: 14,
         whiteSpace: 'nowrap',
         overflow: 'hidden',
         textOverflow: 'ellipsis',

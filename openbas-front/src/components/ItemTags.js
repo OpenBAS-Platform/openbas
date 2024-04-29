@@ -28,7 +28,7 @@ const useStyles = makeStyles(() => ({
   },
   tagInLargeList: {
     fontSize: 12,
-    height: 30,
+    height: 25,
     float: 'left',
     marginRight: 7,
     borderRadius: 4,

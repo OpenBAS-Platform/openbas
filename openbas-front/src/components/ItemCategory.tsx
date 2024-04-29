@@ -47,7 +47,7 @@ const ItemCategory: FunctionComponent<ItemCategoryProps> = ({
       {renderIcon(category, size)}
       {label && (
         <span style={{
-          fontSize: 15,
+          fontSize: 14,
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',

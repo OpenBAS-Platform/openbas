@@ -40,7 +40,7 @@ const useStyles = makeStyles(() => ({
   },
   item: {
     paddingLeft: 10,
-    height: 80,
+    height: 70,
   },
   bodyItem: {
     fontSize: 13,
@@ -231,7 +231,7 @@ const Scenarios = () => {
             to={`/admin/scenarios/${scenario.scenario_id}`}
           >
             <ListItemIcon>
-              <MovieFilterOutlined color="primary" fontSize="large" />
+              <MovieFilterOutlined color="primary" fontSize="medium" />
             </ListItemIcon>
             <ListItemText
               primary={
@@ -240,7 +240,7 @@ const Scenarios = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.scenario_name}
                   >
-                    <Typography variant="h1" style={{ fontSize: 20 }}>{scenario.scenario_name}</Typography>
+                    <Typography variant="h1" style={{ fontSize: 17 }}>{scenario.scenario_name}</Typography>
                     <Typography variant="body2"><strong>{scenario.scenario_injects_statistics.total_count}</strong> {t('injects in this scenario')}</Typography>
                   </div>
                   <div
@@ -253,7 +253,7 @@ const Scenarios = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.scenario_category}
                   >
-                    <ItemCategory category={scenario.scenario_category ?? 'Unknown'} label={t(scenario.scenario_category ?? 'Unknown')} size="large" />
+                    <ItemCategory category={scenario.scenario_category ?? 'Unknown'} label={t(scenario.scenario_category ?? 'Unknown')} size="medium" />
                   </div>
                   <div
                     className={classes.bodyItem}
