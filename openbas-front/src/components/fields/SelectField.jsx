@@ -30,8 +30,8 @@ const SelectField = (props) => {
         </InputLabel>
       )}
       <Controller
-        name="level"
-        id="level"
+        name={name}
+        id={name}
         defaultValue={defaultValue}
         control={control}
         render={({ field }) => (

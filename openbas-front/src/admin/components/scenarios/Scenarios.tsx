@@ -1,5 +1,5 @@
 import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { Card, CardActionArea, CardContent, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material';
 import { KeyboardArrowRight, MovieFilterOutlined } from '@mui/icons-material';
 import React, { CSSProperties, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -16,8 +16,23 @@ import PaginationComponent from '../../../components/common/pagination/Paginatio
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
 import type { SearchPaginationInput } from '../../../utils/api-types';
 import ItemTags from '../../../components/ItemTags';
+import ItemSeverity from '../../../components/ItemSeverity';
+import PlatformIcon from '../../../components/PlatformIcon';
+import ItemCategory from '../../../components/ItemCategory';
+import ItemMainFocus from '../../../components/ItemMainFocus';
+import type { Theme } from '../../../components/Theme';
 
 const useStyles = makeStyles(() => ({
+  card: {
+    overflow: 'hidden',
+    width: 250,
+    height: 100,
+    marginRight: 20,
+  },
+  area: {
+    width: '100%',
+    height: '100%',
+  },
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -28,14 +43,11 @@ const useStyles = makeStyles(() => ({
     height: 80,
   },
   bodyItem: {
-    height: 80,
     fontSize: 13,
-    float: 'left',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     paddingRight: 10,
-
   },
   goIcon: {
     position: 'absolute',
@@ -69,6 +81,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 const Scenarios = () => {
   // Standard hooks
+  const theme = useTheme<Theme>();
   const classes = useStyles();
   const { t, nsdt } = useFormatter();
   // Filter and sort hook
@@ -113,6 +126,68 @@ const Scenarios = () => {
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
+      <div style={{ display: 'flex', marginBottom: 30 }}>
+        <Card classes={{ root: classes.card }} variant="outlined" style={{ border: `1px solid ${theme.palette.secondary.main}` }}>
+          <CardActionArea classes={{ root: classes.area }}>
+            <CardContent>
+              <div style={{ marginBottom: 10 }}>
+                <ItemCategory category='all' size="small" />
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 600 }}>
+                {t('All categories')}
+              </div>
+              <div style={{ marginTop: 10, fontSize: 12, fontWeight: 500 }}>
+                {scenarios.length} {t('scenarios')}
+              </div>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+        <Card classes={{ root: classes.card }} variant="outlined">
+          <CardActionArea classes={{ root: classes.area }}>
+            <CardContent>
+              <div style={{ marginBottom: 10 }}>
+                <ItemCategory category='attack-scenario' size="small" />
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 600 }}>
+                {t('Attack Scenarios')}
+              </div>
+              <div style={{ marginTop: 10, fontSize: 12, fontWeight: 500 }}>
+                {scenarios.length} {t('attack scenarios')}
+              </div>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+        <Card classes={{ root: classes.card }} variant="outlined">
+          <CardActionArea classes={{ root: classes.area }}>
+            <CardContent>
+              <div style={{ marginBottom: 10 }}>
+                <ItemCategory category='global-crisis' size="small" />
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 600 }}>
+                {t('Global Crisis')}
+              </div>
+              <div style={{ marginTop: 10, fontSize: 12, fontWeight: 500 }}>
+                {scenarios.length} {t('attack scenarios')}
+              </div>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+        <Card classes={{ root: classes.card }} variant="outlined">
+          <CardActionArea classes={{ root: classes.area }}>
+            <CardContent>
+              <div style={{ marginBottom: 10 }}>
+                <ItemCategory category='lateral-movement' size="small" />
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 600 }}>
+                {t('Lateral Movement')}
+              </div>
+              <div style={{ marginTop: 10, fontSize: 12, fontWeight: 500 }}>
+                {scenarios.length} {t('attack scenarios')}
+              </div>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+      </div>
       <PaginationComponent
         fetch={searchScenarios}
         searchPaginationInput={searchPaginationInput}
@@ -146,7 +221,6 @@ const Scenarios = () => {
               />
               }
           />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {sortedScenarios.map((scenario) => (
           <ListItemButton
@@ -157,46 +231,51 @@ const Scenarios = () => {
             to={`/admin/scenarios/${scenario.scenario_id}`}
           >
             <ListItemIcon>
-              <MovieFilterOutlined color="primary" />
+              <MovieFilterOutlined color="primary" fontSize="large" />
             </ListItemIcon>
             <ListItemText
               primary={
-                <div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.scenario_name}
                   >
-                    {scenario.scenario_name}
+                    <Typography variant="h1" style={{ fontSize: 20 }}>{scenario.scenario_name}</Typography>
+                    <Typography variant="body2"><strong>{scenario.scenario_injects_statistics.total_count}</strong> {t('injects in this scenario')}</Typography>
                   </div>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.scenario_severity}
                   >
-
+                    <ItemSeverity label={t(scenario.scenario_severity ?? 'Unknown')} severity={scenario.scenario_severity ?? 'Unknown'} variant="inList" />
                   </div>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.scenario_category}
                   >
-
+                    <ItemCategory category={scenario.scenario_category ?? 'Unknown'} label={t(scenario.scenario_category ?? 'Unknown')} size="large" />
                   </div>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.scenario_main_focus}
                   >
-
+                    <ItemMainFocus mainFocus={scenario.scenario_main_focus ?? 'Unknown'} label={t(scenario.scenario_main_focus ?? 'Unknown')} size="medium" />
                   </div>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.scenario_platforms}
                   >
-
+                    {scenario.scenario_platforms?.length === 0 ? (
+                      <PlatformIcon platform={t('No inject in this scenario')} tooltip={true} width={25} />
+                    ) : scenario.scenario_platforms.map(
+                      (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={25} marginRight={10} />,
+                    )}
                   </div>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.scenario_tags}
                   >
-                    <ItemTags variant="list" tags={scenario.scenario_tags} />
+                    <ItemTags variant="largeList" tags={scenario.scenario_tags} />
                   </div>
                   <div
                     className={classes.bodyItem}

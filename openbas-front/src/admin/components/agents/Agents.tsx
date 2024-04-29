@@ -13,17 +13,10 @@ import { fetchInjectors } from '../../../actions/Injectors';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import type { Theme } from '../../../components/Theme';
 import Breadcrumbs from '../../../components/Breadcrumbs';
-import windowsDark from '../../../static/images/platforms/windows-dark.png';
-import windowsLight from '../../../static/images/platforms/windows-light.png';
-import linuxDark from '../../../static/images/platforms/linux-dark.png';
-import linuxLight from '../../../static/images/platforms/linux-light.png';
-import macosDark from '../../../static/images/platforms/macos-dark.png';
-import macosLight from '../../../static/images/platforms/macos-light.png';
-import browserDark from '../../../static/images/platforms/browser-dark.png';
-import browserLight from '../../../static/images/platforms/browser-light.png';
 import Transition from '../../../components/common/Transition';
 import { copyToClipboard } from '../../../utils/utils';
 import useAuth from '../../../utils/hooks/useAuth';
+import PlatformIcon from '../../../components/PlatformIcon';
 
 const useStyles = makeStyles(() => ({
   card: {
@@ -108,7 +101,7 @@ const Injectors = () => {
           displayedCode: `$server="${settings.caldera_url}";
 $url="$server/file/download";
 $wc=New-Object System.Net.WebClient;
-$wc.Headers.add("platform","windows");
+$wc.Headers.add("pl7atform","windows");
 $wc.Headers.add("file","sandcat.go");
 $data=$wc.DownloadData($url);
 get-process | ? {$_.modules.filename -like "C:\\Users\\Public\\${implantName}.exe"} | stop-process -f;
@@ -162,7 +155,7 @@ chmod +x ${implantName};
             <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('windows', windowsInjectors)} disabled={windowsInjectors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
-                  <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? windowsDark : windowsLight} alt="Windows" />
+                  <PlatformIcon platform='Windows' width={40} />
                 </div>
                 <Typography
                   variant="h6"
@@ -198,7 +191,7 @@ chmod +x ${implantName};
             <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('linux', linuxInjectors)} disabled={linuxInjectors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
-                  <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? linuxDark : linuxLight} alt="Linux" />
+                  <PlatformIcon platform="Linux" width={40} />
                 </div>
                 <Typography
                   variant="h6"
@@ -234,7 +227,7 @@ chmod +x ${implantName};
             <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('macos', macOsInjectors)} disabled={macOsInjectors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
-                  <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? macosDark : macosLight} alt="MacOS" />
+                  <PlatformIcon platform="MacOS" width={40} />
                 </div>
                 <Typography
                   variant="h6"
@@ -270,7 +263,7 @@ chmod +x ${implantName};
             <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('browser', browserInjectors)} disabled={browserInjectors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
-                  <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? browserDark : browserLight} alt="Browser" />
+                  <PlatformIcon platform="Browser" width={40} />
                 </div>
                 <Typography
                   variant="h6"

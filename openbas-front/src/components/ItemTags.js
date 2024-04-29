@@ -17,17 +17,27 @@ const useStyles = makeStyles(() => ({
     height: 25,
     fontSize: 12,
     margin: '0 7px 7px 0',
+    borderRadius: 4,
   },
   tagInList: {
     fontSize: 12,
     height: 20,
     float: 'left',
     marginRight: 7,
+    borderRadius: 4,
+  },
+  tagInLargeList: {
+    fontSize: 12,
+    height: 30,
+    float: 'left',
+    marginRight: 7,
+    borderRadius: 4,
   },
   tagInSearch: {
     height: 25,
     fontSize: 12,
     margin: '0 7px 0 0',
+    borderRadius: 4,
   },
 }));
 
@@ -39,6 +49,9 @@ const ItemTags = (props) => {
   let style = classes.tag;
   if (variant === 'list') {
     style = classes.tagInList;
+  }
+  if (variant === 'largeList') {
+    style = classes.tagInLargeList;
   }
   if (variant === 'search') {
     style = classes.tagInSearch;

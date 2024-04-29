@@ -28,10 +28,16 @@ const ScenarioPopover: FunctionComponent<Props> = ({
     scenario_name,
     scenario_subtitle,
     scenario_description,
+    scenario_category,
+    scenario_main_focus,
+    scenario_severity,
     scenario_tags,
   }) => ({
     scenario_name,
     scenario_subtitle: scenario_subtitle ?? '',
+    scenario_category: scenario_category ?? 'attack-scenario',
+    scenario_main_focus: scenario_main_focus ?? 'incident-response',
+    scenario_severity: scenario_severity ?? 'high',
     scenario_description: scenario_description ?? '',
     scenario_tags: scenario_tags ?? [],
   }))(scenario);

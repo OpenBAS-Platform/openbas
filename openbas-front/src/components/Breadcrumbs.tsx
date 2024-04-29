@@ -20,7 +20,7 @@ interface BreadcrumbsProps {
 const useStyles = makeStyles(() => ({
   breadcrumbsList: {
     marginTop: -5,
-    marginBottom: 25,
+    marginBottom: 15,
   },
   breadcrumbsObject: {
     marginTop: -5,
