@@ -51,10 +51,8 @@ const AtomicTestingHeader = () => {
     dispatch(fetchAtomicTestingDetail(atomicId));
   });
 
-  const [tags, setTags] = useState(atomic.atomic_tags);
   const updateTags = (injectId: string, tagIds: string[]) => {
-    dispatch(updateAtomicTestingTags(injectId, { atomic_tags: tagIds }))
-      .then((result: { entities: { atomics: Record<string, AtomicTestingOutput> }, result: string }) => setTags(result.entities.atomics[result.result].atomic_tags));
+    dispatch(updateAtomicTestingTags(injectId, { atomic_tags: tagIds }));
   };
   // Launch atomic testing
   const [open, setOpen] = useState(false);
@@ -109,7 +107,7 @@ const AtomicTestingHeader = () => {
       <div style={{ display: 'flex', justifyContent: 'flex-end', alignSelf: 'center' }}>
         <div style={{ alignSelf: 'center' }}>
           <HeaderTags
-            tags={tags}
+            tags={atomic.atomic_tags}
             updateTags={(tagIds: string[]) => updateTags(atomicId, tagIds)}
           />
         </div>
