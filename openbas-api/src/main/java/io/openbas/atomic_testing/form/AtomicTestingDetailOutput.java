@@ -36,6 +36,9 @@ public class AtomicTestingDetailOutput {
   @JsonProperty("atomic_content")
   private ObjectNode content;
 
+  @JsonProperty("atomic_expectations")
+  private List<AtomicTestingExpectation> expectations = new ArrayList<>();
+
   @JsonProperty("atomic_tags")
   private List<Tag> tags = new ArrayList<>();
 

@@ -1,6 +1,7 @@
 import React, { FunctionComponent, lazy, Suspense } from 'react';
 import { Link, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { Box, Tab, Tabs } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import Loader from '../../../../components/Loader';
 import { errorWrapper } from '../../../../components/Error';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -15,12 +16,25 @@ import type { AtomicTestingOutput } from '../../../../utils/api-types';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import { AtomicTestingResultContext, AtomicTestingResultContextType } from '../../common/Context';
 
+const useStyles = makeStyles(() => ({
+  item: {
+    height: 30,
+    fontSize: 13,
+    float: 'left',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    paddingRight: 10,
+  },
+}));
+
 const AtomicTesting = lazy(() => import('./AtomicTesting'));
 const AtomicTestingDetail = lazy(() => import('./AtomicTestingDetail'));
 
 const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutput }> = ({
   atomic,
 }) => {
+  const classes = useStyles();
   const { t } = useFormatter();
   const location = useLocation();
   let tabValue = location.pathname;
@@ -48,13 +62,15 @@ const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutp
             component={Link}
             to={`/admin/atomic_testings/${atomic.atomic_id}`}
             value={`/admin/atomic_testings/${atomic.atomic_id}`}
-            label={t('Response')}
+            label={t('Targets response')}
+            className={classes.item}
           />
           <Tab
             component={Link}
             to={`/admin/atomic_testings/${atomic.atomic_id}/detail`}
             value={`/admin/atomic_testings/${atomic.atomic_id}/detail`}
-            label={t('Detail')}
+            label={t('Inject details')}
+            className={classes.item}
           />
         </Tabs>
       </Box>

@@ -129,6 +129,7 @@ export interface AtomicTestingDetailOutput {
   atomic_content?: object;
   atomic_description?: string;
   atomic_documents?: InjectDocument[];
+  atomic_expectations?: AtomicTestingExpectation[];
   atomic_id: string;
   atomic_tags?: Tag[];
   status_label?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
@@ -147,6 +148,15 @@ export interface AtomicTestingDetailOutput {
   tracking_total_execution_time?: number;
   /** @format int32 */
   tracking_total_success?: number;
+}
+
+export interface AtomicTestingExpectation {
+  atomic_expectation_description?: string;
+  atomic_expectation_expectation_group?: boolean;
+  atomic_expectation_name?: string;
+  /** @format int32 */
+  atomic_expectation_score?: number;
+  atomic_expectation_type: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
 }
 
 export interface AtomicTestingInput {
@@ -183,6 +193,7 @@ export interface AtomicTestingOutput {
   atomic_last_execution_start_date?: string;
   /** Status of execution */
   atomic_status: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  atomic_tags?: string[];
   /**
    * Specifies the categories of targetResults for atomic testing.
    * @example "assets, asset groups, teams, players"
@@ -192,6 +203,10 @@ export interface AtomicTestingOutput {
   atomic_title: string;
   /** Type */
   atomic_type: string;
+}
+
+export interface AtomicTestingUpdateTagsInput {
+  atomic_tags?: string[];
 }
 
 export interface AttackPattern {

@@ -12,13 +12,13 @@ import { Option } from '../../../../utils/Option';
 
 interface Props {
   tags: string[] | undefined;
-  disabled: boolean;
+  disabled?: boolean;
   updateTags: (tagIds: string[]) => (dispatch: void) => Promise<void>;
 }
 
 const HeaderTags: FunctionComponent<Props> = ({
   tags,
-  disabled,
+  disabled = false,
   updateTags,
 }) => {
   // Standard hooks

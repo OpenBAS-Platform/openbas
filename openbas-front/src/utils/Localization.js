@@ -848,8 +848,7 @@ const i18n = {
       // Atomic Testing
       'No targets available': 'Aucune cible disponible',
       'No target data available': 'Aucune donnée de cible disponible',
-      Response: 'Réponse',
-      Detail: 'Détail',
+      'Targets response': 'Réponse des cibles',
       'Update the atomic testing': 'Mettre à jour le test atomique',
       'Create a new atomic test': 'Créer un nouveau test atomique',
       'Mitre Filter': 'Filtre Mitre',
@@ -857,7 +856,7 @@ const i18n = {
       'Unknown Data': 'Données inconnues',
       'No data available': 'Aucune donnée disponible (répété)',
       Expectations: 'Objectifs',
-      'Atomic testing details': 'Détails de test atomique',
+      Traces: 'Traces',
       'Tracking Sent Date': 'Date d\'envoi',
       'Tracking Ack Date': 'Date de réception',
       'Tracking End Date': 'Date de fin',

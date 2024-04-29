@@ -3,17 +3,18 @@ import React, { useContext, useState } from 'react';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, Typography } from '@mui/material';
 import { PlayArrowOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { fetchAtomicTesting, tryAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import { fetchAtomicTesting, fetchAtomicTestingDetail, tryAtomicTesting, updateAtomicTestingTags } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import AtomicTestingPopover from './AtomicTestingPopover';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import { AtomicTestingResultContext } from '../../common/Context';
 import StatusChip from './StatusChip';
-import type { AtomicTestingOutput } from '../../../../utils/api-types';
+import type { AtomicTestingDetailOutput, AtomicTestingOutput } from '../../../../utils/api-types';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
+import HeaderTags from '../../scenarios/scenario/HeaderTags';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -40,11 +41,13 @@ const AtomicTestingHeader = () => {
   const { onLaunchAtomicTesting } = useContext(AtomicTestingResultContext);
 
   // Fetching data
-  const { atomic }: { atomic: AtomicTestingOutput } = useHelper((helper: AtomicTestingHelper) => ({
+  const { atomic, atomicDetail }: { atomic: AtomicTestingOutput, atomicDetail: AtomicTestingDetailOutput, } = useHelper((helper: AtomicTestingHelper) => ({
     atomic: helper.getAtomicTesting(atomicId),
+    atomicDetail: helper.getAtomicTestingDetail(atomicId!),
   }));
   useDataLoader(() => {
     dispatch(fetchAtomicTesting(atomicId));
+    dispatch(fetchAtomicTestingDetail(atomicId));
   });
 
   // Launch atomic testing
@@ -65,8 +68,10 @@ const AtomicTestingHeader = () => {
         <Typography variant="h1" gutterBottom classes={{ root: classes.title }}>
           {atomic.atomic_title}
         </Typography>
+        {atomicDetail?.status_label
+          && <StatusChip status={atomicDetail?.status_label} />
+        }
         <AtomicTestingPopover atomic={atomic} />
-        <StatusChip status={atomic.atomic_status} />
         <Dialog
           open={open}
           onClose={() => setOpen(false)}
@@ -94,16 +99,26 @@ const AtomicTestingHeader = () => {
           </DialogActions>
         </Dialog>
       </div>
-      <Button
-        variant="contained"
-        startIcon={<PlayArrowOutlined />}
-        color="info"
-        onClick={() => setOpen(true)}
-        sx={{ width: 120, height: 40 }}
-        disabled={!atomic.atomic_targets || !(atomic.atomic_targets.length > 0) || !availableLaunch}
-      >
-        {t('Launch')}
-      </Button>
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignSelf: 'center' }}>
+        <div style={{ alignSelf: 'center' }}>
+          <HeaderTags
+            tags={atomic.atomic_tags}
+            updateTags={(tagIds: string[]) => updateAtomicTestingTags(atomicId, { atomic_tags: tagIds })}
+          />
+        </div>
+
+        <Button
+          variant="contained"
+          startIcon={<PlayArrowOutlined />}
+          color="info"
+          onClick={() => setOpen(true)}
+          sx={{ width: 110, height: 40 }}
+          disabled={!atomic.atomic_targets || !(atomic.atomic_targets.length > 0) || !availableLaunch}
+        >
+          {t('Launch')}
+        </Button>
+      </div>
     </div>
   );
 };

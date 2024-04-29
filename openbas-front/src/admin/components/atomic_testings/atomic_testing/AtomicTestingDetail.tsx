@@ -9,11 +9,21 @@ import { useHelper } from '../../../../store';
 import type { AtomicTestingDetailOutput } from '../../../../utils/api-types';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import { fetchAtomicTestingDetail } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import StatusChip from '../../components/atomic_testings/StatusChip';
 
 const useStyles = makeStyles(() => ({
   paper: {
+    position: 'relative',
     padding: 20,
-    marginBottom: 20,
+    overflow: 'hidden',
+    height: '100%',
+  },
+  flexContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+  header: {
+    fontWeight: 'bold',
   },
   listItem: {
     marginBottom: 8,
@@ -39,72 +49,82 @@ const Detail: FunctionComponent<Props> = () => {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
+      <Grid item xs={12} style={{ marginBottom: 30 }}>
+        <Typography variant="h4">Configuration</Typography>
         {atomicDetail ? (
-          <>
-            <Paper elevation={3} className={classes.paper}>
-              <Typography variant="h2" gutterBottom>
-                {t('Atomic testing details')}
-              </Typography>
-              <Typography variant="subtitle1" gutterBottom>
-                {t('Description')}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                {atomicDetail?.atomic_description || 'N/A'}
-              </Typography>
-              <Typography variant="subtitle1" gutterBottom>
-                {t('Tags')}
-              </Typography>
-              {
-                atomicDetail.atomic_tags?.map((tag, index) => {
-                  return (
-                    <Typography key={index} component="li" variant="body1">
-                      {tag.tag_name}
+          <Paper variant="outlined" classes={{ root: classes.paper }}>
+            <div className={classes.flexContainer}>
+              <div>
+                <Typography variant="subtitle1" className={classes.header} gutterBottom>
+                  {t('Description')}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  {atomicDetail?.atomic_description || '-'}
+                </Typography>
+              </div>
+              <div>
+                <Typography variant="subtitle1" className={classes.header} gutterBottom>
+                  {t('Expectations')}
+                </Typography>
+                {
+                  atomicDetail.atomic_expectations !== undefined && atomicDetail.atomic_expectations.length > 0
+                    ? atomicDetail.atomic_expectations.map((expectation, index) => (
+                      <Typography key={index} variant="body1">
+                        {expectation.atomic_expectation_name}
+                      </Typography>
+                    )) : <Typography variant="body1" gutterBottom>
+                      {'-'}
                     </Typography>
-                  );
-                })
-              }
-              <Typography variant="subtitle1" gutterBottom>
-                {t('Documents')}
-              </Typography>
-              {
-                atomicDetail.atomic_documents?.map((document, index) => {
-                  return (
-                    <Typography key={index} component="li" variant="body1">
-                      {document.document_name}
+                }
+              </div>
+              <div style={{ marginRight: 50 }}>
+                <Typography variant="subtitle1" className={classes.header} gutterBottom>
+                  {t('Documents')}
+                </Typography>
+                {
+                  atomicDetail.atomic_documents !== undefined && atomicDetail.atomic_documents.length > 0
+                    ? atomicDetail.atomic_documents.map((document, index) => {
+                      return (
+                        <Typography key={index} variant="body1">
+                          {document.document_name}
+                        </Typography>
+                      );
+                    }) : <Typography variant="body1" gutterBottom>
+                      {'-'}
                     </Typography>
-                  );
-                })
-              }
-              <Typography variant="subtitle1" gutterBottom>
-                {t('Expectations')}
-              </Typography>
-              {/* { */}
-              {/*  atomicDetail.atomic_content.expectations?.map((content, index) => ( */}
-              {/*    <Typography key={index} component="li" variant="body1"> */}
-              {/*      {content.expectation_name} */}
-              {/*    </Typography> */}
-              {/*  )) */}
-              {/* } */}
-            </Paper>
-            <Paper elevation={3} className={classes.paper}>
-              <Typography variant="h2" gutterBottom>
-                {t('Status')} : {atomicDetail.status_label}
-              </Typography>
+                }
+              </div>
+            </div>
+          </Paper>
+        ) : (
+          <Paper variant="outlined" classes={{ root: classes.paper }}>
+            <Typography variant="body1">{t('No data available')}</Typography>
+          </Paper>
+        )}
+      </Grid>
+      <Grid item xs={12}>
+        <Typography variant="h4">Execution logs</Typography>
+        {atomicDetail ? (
+          <Paper variant="outlined" classes={{ root: classes.paper }}>
+            <Typography variant="subtitle1" className={classes.header} gutterBottom>
+              {t('Status')}
+            </Typography>
+            {atomicDetail.status_label
+              && <StatusChip status={atomicDetail.status_label} />
+            }
+            <Typography variant="subtitle1" className={classes.header} style={{ marginTop: 20 }} gutterBottom>
+              {t('Traces')}
+            </Typography>
+            <pre>
               {atomicDetail.status_traces && (
-                <>
-                  <Typography variant="body1" sx={{ marginTop: 2 }}>Traces:</Typography>
-                  <ul>
-                    {atomicDetail.status_traces.map((trace, index) => (
-                      <li key={index} className={classes.listItem}>
-                        {trace}
-                      </li>
-                    ))}
-                  </ul>
-                </>
+              <ul>
+                {atomicDetail.status_traces.map((trace, index) => (
+                  <li key={index} className={classes.listItem}>
+                    {trace}
+                  </li>
+                ))}
+              </ul>
               )}
-            </Paper>
-            <Paper elevation={3} className={classes.paper}>
               <Typography variant="body1" gutterBottom>
                 {t('Tracking Sent Date')}: {atomicDetail.tracking_sent_date || 'N/A'}
               </Typography>
@@ -114,8 +134,6 @@ const Detail: FunctionComponent<Props> = () => {
               <Typography variant="body1" gutterBottom>
                 {t('Tracking End Date')}: {atomicDetail.tracking_end_date || 'N/A'}
               </Typography>
-            </Paper>
-            <Paper elevation={3} className={classes.paper}>
               <Typography variant="body1" gutterBottom>
                 {t('Tracking Total Execution')}
                 {t('Time')}: {atomicDetail.tracking_total_execution_time || 'N/A'} ms
@@ -129,10 +147,10 @@ const Detail: FunctionComponent<Props> = () => {
               <Typography variant="body1" gutterBottom>
                 {t('Tracking Total Success')}: {atomicDetail.tracking_total_success || 'N/A'}
               </Typography>
-            </Paper>
-          </>
+            </pre>
+          </Paper>
         ) : (
-          <Paper elevation={3} className={classes.paper}>
+          <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Typography variant="body1">{t('No data available')}</Typography>
           </Paper>
         )}
