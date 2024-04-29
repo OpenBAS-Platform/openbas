@@ -53,7 +53,7 @@ public class OpenCTIContract extends Contractor {
 
   @Override
   public ContractConfig getConfig() {
-    return new ContractConfig(TYPE, Map.of(en, "OpenCTI", fr, "OpenCTI"), "#0fbcff", "#001bda", "/img/opencti.png", isExpose());
+    return new ContractConfig(TYPE, Map.of(en, "OpenCTI", fr, "OpenCTI"), "#0fbcff", "#001bda", "/img/icon-opencti.png", isExpose());
   }
 
   @Override

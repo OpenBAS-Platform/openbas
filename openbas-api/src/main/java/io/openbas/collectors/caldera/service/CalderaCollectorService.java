@@ -56,10 +56,9 @@ public class CalderaCollectorService implements Runnable {
     this.config = config;
     this.endpointService = endpointService;
     try {
-      collectorService.register(this.config.getId(), CALDERA_COLLECTOR_TYPE, CALDERA_COLLECTOR_NAME,
-          getClass().getResourceAsStream("/img/icon-caldera.png"));
+      collectorService.register(this.config.getId(), CALDERA_COLLECTOR_TYPE, CALDERA_COLLECTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"));
     } catch (Exception e) {
-      log.log(Level.SEVERE, "Error creating caldera collector");
+      log.log(Level.SEVERE, "Error creating caldera collector: " + e);
     }
   }
 
