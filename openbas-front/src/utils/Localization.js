@@ -935,7 +935,7 @@ const i18n = {
       // -- FILTERS --
       // Endpoint
       endpoint_hostname: 'Hostname',
-      endpoint_ips: 'Ips address',
+      endpoint_ips: 'IP addresses',
       endpoint_platform: 'Platform',
       recurrence_The: 'The',
       recurrence_at: 'at',

@@ -1,3 +1,5 @@
+import { isNotEmptyField } from './utils';
+
 export const truncate = (str, limit) => {
   if (str === undefined || str === null || str.length <= limit) {
     return str;
@@ -31,3 +33,5 @@ export const resolveUserNames = (users, withEmailAddress = false) => {
     })
     .join(', ');
 };
+
+export const emptyFilled = (str) => (isNotEmptyField(str) ? str : '-');

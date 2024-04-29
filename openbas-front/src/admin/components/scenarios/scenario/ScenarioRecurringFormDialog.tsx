@@ -42,7 +42,6 @@ const defaultFormValues = {
 
 const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurring, onSelectRecurring, initialValues, open, setOpen }) => {
   const { t } = useFormatter();
-
   const submit = (data: Recurrence) => {
     // case day
     let cron: string = generateDailyCron(new Date(data.time).getUTCHours(), new Date(data.time).getUTCMinutes(), data.onlyWeekday);
@@ -61,7 +60,6 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
       default:
         break;
     }
-
     onSubmit(cron, start, end);
   };
 
@@ -297,9 +295,8 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
             {t('Cancel')}
           </Button>
           <Button
-            color="primary"
+            color="secondary"
             type="submit"
-            variant="contained"
           >
             {t('Start')}
           </Button>

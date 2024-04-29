@@ -41,6 +41,26 @@ export const colors = (temp) => [
   C.blueGrey[temp + 100],
 ];
 
+export const resultColors = (temp) => [
+  C.deepPurple[temp],
+  C.indigo[temp],
+  C.lightBlue[temp],
+];
+
+const toolbarOptions = {
+  show: false,
+  export: {
+    csv: {
+      columnDelimiter: ',',
+      headerCategory: 'category',
+      headerValue: 'value',
+      dateFormatter(timestamp) {
+        return new Date(timestamp).toDateString();
+      },
+    },
+  },
+};
+
 export const lineChartOptions = (
   theme,
   isTimeSeries = false,
@@ -213,20 +233,37 @@ export const areaChartOptions = (
   },
 });
 
+/**
+ * @param {Theme} theme
+ * @param {function} xFormatter
+ * @param {function} yFormatter
+ * @param {boolean} distributed
+ * @param {boolean} isTimeSeries
+ * @param {boolean} isStacked
+ * @param {boolean} legend
+ * @param {number | 'dataPoints'} tickAmount
+ * @param {boolean} isResult
+ * @param {boolean} isFakeData
+ */
 export const verticalBarsChartOptions = (
   theme,
   xFormatter = null,
   yFormatter = null,
   distributed = false,
   isTimeSeries = false,
+  isStacked = false,
+  legend = false,
+  tickAmount = undefined,
+  isResult = false,
+  isFakeData = false,
 ) => ({
   chart: {
-    type: 'bar',
     background: 'transparent',
-    toolbar: {
-      show: false,
-    },
+    toolbar: toolbarOptions,
     foreColor: theme.palette.text.secondary,
+    stacked: isStacked,
+    width: '100%',
+    height: '100%',
   },
   theme: {
     mode: theme.palette.mode,
@@ -234,9 +271,8 @@ export const verticalBarsChartOptions = (
   dataLabels: {
     enabled: false,
   },
-  colors: distributed
-    ? colors(theme.palette.mode === 'dark' ? 400 : 600)
-    : [theme.palette.primary.main],
+  // eslint-disable-next-line no-nested-ternary
+  colors: isResult ? resultColors(theme.palette.mode === 'dark' ? 400 : 600) : distributed ? colors(theme.palette.mode === 'dark' ? 400 : 600) : [theme.palette.primary.main],
   states: {
     hover: {
       filter: {
@@ -247,19 +283,24 @@ export const verticalBarsChartOptions = (
   },
   grid: {
     borderColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, .1)'
-        : 'rgba(0, 0, 0, .1)',
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, .1)'
+          : 'rgba(0, 0, 0, .1)',
     strokeDashArray: 3,
   },
   legend: {
-    show: false,
+    show: legend,
+    itemMargin: {
+      horizontal: 5,
+      vertical: 20,
+    },
   },
   tooltip: {
     theme: theme.palette.mode,
   },
   xaxis: {
     type: isTimeSeries ? 'datetime' : 'category',
+    tickAmount,
     tickPlacement: 'on',
     labels: {
       formatter: (value) => (xFormatter ? xFormatter(value) : value),
@@ -271,6 +312,13 @@ export const verticalBarsChartOptions = (
     axisBorder: {
       show: false,
     },
+  },
+  fill: {
+    opacity: isFakeData ? 0.1 : 1,
+  },
+  stroke: {
+    colors: isResult ? ['transparent'] : undefined,
+    width: isResult ? 5 : 2,
   },
   yaxis: {
     labels: {
@@ -287,7 +335,9 @@ export const verticalBarsChartOptions = (
     bar: {
       horizontal: false,
       barHeight: '30%',
-      borderRadius: 5,
+      borderRadius: 4,
+      borderRadiusApplication: 'end',
+      borderRadiusWhenStacked: 'last',
       distributed,
     },
   },

@@ -131,10 +131,12 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 interface Props {
   exercises: ExerciseSimpleStore[];
+  withoutSearch?: boolean;
 }
 
 const ExerciseList: FunctionComponent<Props> = ({
   exercises = [],
+  withoutSearch,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -144,14 +146,12 @@ const ExerciseList: FunctionComponent<Props> = ({
   const { tagsMap } = useHelper((helper: TagsHelper) => ({
     tagsMap: helper.getTagsMap(),
   }));
-
   const searchColumns = ['name'];
   const filtering = useSearchAnFilter('exercise', 'name', searchColumns);
-
   const sortedExercises = filtering.filterAndSort(exercises);
-
   return (
     <>
+      {!withoutSearch && (
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter
@@ -195,6 +195,7 @@ const ExerciseList: FunctionComponent<Props> = ({
           )}
         </div>
       </div>
+      )}
       <div className="clearfix" />
       <List>
         <ListItem

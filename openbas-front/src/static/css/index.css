@@ -128,3 +128,15 @@ input[type="file"] {
 .marker-yellow {
   background-color: rgb(255, 255, 0) !important;
 }
+
+@keyframes pulse-red {
+  0% { box-shadow:0 0 4px #f44336, inset 0 0 4px #f44336; }
+  50% { box-shadow:0 0 8px #f44336, inset 0 0 7px #f44336; }
+  100% { box-shadow:0 0 4px #f44336, inset 0 0 4px #f44336; }
+}
+
+@keyframes pulse-green {
+  0% { box-shadow:0 0 4px #4caf50, inset 0 0 4px #4caf50; }
+  50% { box-shadow:0 0 8px #4caf50, inset 0 0 7px #4caf50; }
+  100% { box-shadow:0 0 4px #4caf50, inset 0 0 4px #4caf50; }
+}

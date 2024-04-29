@@ -1,4 +1,4 @@
-import { IconButton, Menu, MenuItem } from '@mui/material';
+import { Menu, MenuItem, ToggleButton } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import React, { FunctionComponent, useState } from 'react';
 import { useFormatter } from '../i18n';
@@ -23,17 +23,16 @@ const ButtonPopover: FunctionComponent<Props> = ({
 
   return (
     <>
-      <IconButton
+      <ToggleButton
+        value="popover"
+        size="small"
         onClick={(ev) => {
           ev.stopPropagation();
           setAnchorEl(ev.currentTarget);
         }}
-        aria-haspopup="true"
-        aria-label="More actions"
-        size="large"
       >
-        <MoreVert />
-      </IconButton>
+        <MoreVert fontSize="small" color="primary" />
+      </ToggleButton>
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}

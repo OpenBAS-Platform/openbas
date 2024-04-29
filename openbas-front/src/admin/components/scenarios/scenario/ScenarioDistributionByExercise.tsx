@@ -1,111 +1,86 @@
 import Chart from 'react-apexcharts';
 import React, { FunctionComponent } from 'react';
 import { useTheme } from '@mui/styles';
+import type { ApexOptions } from 'apexcharts';
 import type { ExerciseSimpleStore } from '../../../../actions/exercises/Exercise';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import Empty from '../../../../components/Empty';
+import { verticalBarsChartOptions } from '../../../../utils/Charts';
+import { random } from '../../../../utils/Number';
 
 interface Props {
   exercises: ExerciseSimpleStore[];
 }
 
+const generateFakeData = (): ExerciseSimpleStore[] => {
+  const now = new Date();
+  return Array.from(Array(5), (e, i) => {
+    now.setHours(now.getHours() + 1);
+    return {
+      exercise_id: `fake-${i}`,
+      exercise_name: 'fake',
+      exercise_start_date: now.toISOString(),
+      exercise_global_score: [
+        { type: 'PREVENTION', distribution: [{ value: random(10, 100) }] },
+        { type: 'DETECTION', distribution: [{ value: random(10, 100) }] },
+        { type: 'HUMAN_RESPONSE', distribution: [{ value: random(10, 100) }] },
+      ],
+      exercise_targets: [],
+      exercise_tags: undefined,
+    };
+  });
+};
 const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
   exercises = [],
 }) => {
   // Standard hooks
-  const { t } = useFormatter();
+  const { t, nsdt } = useFormatter();
   const theme: Theme = useTheme();
-
-  const exerciseNames = exercises.map((exercise) => exercise.exercise_name);
-  const exercisePrevention: number[] = [];
-  const exerciseDetection: number[] = [];
-  const exerciseHumanResponse: number[] = [];
-  exercises.forEach((exercise) => exercise.exercise_global_score?.forEach((score) => {
-    if (score.type === 'PREVENTION') {
-      exercisePrevention.push(score.distribution?.[0].value ?? 0);
-    }
-    if (score.type === 'DETECTION') {
-      exerciseDetection.push(score.distribution?.[0].value ?? 0);
-    }
-    if (score.type === 'HUMAN_RESPONSE') {
-      exerciseHumanResponse.push(score.distribution?.[0].value ?? 0);
-    }
-  }));
-
-  const exerciseSeries = exercises.map((exercise) => ({
-    name: exercise.exercise_name,
-    data: exercise.exercise_global_score?.map((score) => (
-      score.distribution?.[0]?.value ?? 0
-    )),
-  }));
-
-  const series = [{
-    name: 'Detection',
-    data: exercisePrevention,
-  }, {
-    name: 'Prevention',
-    data: exerciseDetection,
-  }, {
-    name: 'Human response',
-    data: exerciseHumanResponse,
-  }];
-  const options = {
-    chart: {
-      background: 'transparent',
-      toolbar: {
-        show: false,
-      },
-      foreColor: theme.palette.text?.secondary,
+  const data = exercises.length > 1 ? exercises : generateFakeData();
+  const series = [
+    {
+      name: t('Prevention'),
+      data: data.map((exercise) => ({
+        x: new Date(exercise.exercise_start_date ?? 0),
+        y: exercise.exercise_global_score?.filter((score) => score.type === 'PREVENTION').at(0)?.distribution?.[0].value ?? 100,
+      })),
     },
-    plotOptions: {
-      bar: {
-        horizontal: false,
-      },
+    {
+      name: t('Detection'),
+      data: data.map((exercise) => ({
+        x: new Date(exercise.exercise_start_date ?? 0),
+        y: exercise.exercise_global_score?.filter((score) => score.type === 'DETECTION').at(0)?.distribution?.[0].value ?? 10,
+      })),
     },
-    dataLabels: {
-      enabled: false,
+    {
+      name: t('Human Response'),
+      data: data.map((exercise) => ({
+        x: new Date(exercise.exercise_start_date ?? 0),
+        y: exercise.exercise_global_score?.filter((score) => score.type === 'HUMAN_RESPONSE').at(0)?.distribution?.[0].value ?? 10,
+      })),
     },
-    stroke: {
-      show: true,
-      width: 2,
-      colors: ['transparent'],
-    },
-    xaxis: {
-      categories: exerciseNames,
-      axisBorder: {
-        show: false,
-      },
-    },
-    yaxis: {
-      axisBorder: {
-        show: false,
-      },
-    },
-    theme: {
-      mode: theme.palette.mode,
-    },
-    colors: [theme.palette.primary.main, theme.palette.secondary.main, theme.palette.background.accent],
-    grid: {
-      borderColor:
-        theme.palette.mode === 'dark'
-          ? 'rgba(255, 255, 255, .1)'
-          : 'rgba(0, 0, 0, .1)',
-    },
-    tooltip: {
-      theme: theme.palette.mode,
-    },
-  };
-
+  ];
   return (
     <>
-      {exerciseSeries.length > 0 ? (
+      {data.length > 0 ? (
         <Chart
-          options={options}
+          options={verticalBarsChartOptions(
+            theme,
+            nsdt,
+            (value: number) => `${value}%`,
+            false,
+            true,
+            false,
+            true,
+            'dataPoints',
+            true,
+            exercises.length === 0,
+          ) as ApexOptions}
           series={series}
           type="bar"
           width="100%"
-          height={350}
+          height={300}
         />
       ) : (
         <Empty

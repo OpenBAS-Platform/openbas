@@ -230,4 +230,14 @@ public class Scenario implements Base {
   public List<String> getPlatforms() {
     return getInjects().stream().flatMap(inject -> Arrays.stream(inject.getInjectorContract().getPlatforms())).distinct().toList();
   }
+
+  // -- KILL CHAIN PHASES --
+  @JsonProperty("scenario_kill_chain_phases")
+  public List<String> getKillChainPhases() {
+    return getInjects().stream().flatMap(
+            inject -> inject.getInjectorContract().getAttackPatterns().stream().flatMap(
+                            attackPattern -> attackPattern.getKillChainPhases().stream().map(KillChainPhase::getName).toList().stream()
+                    )
+            ).distinct().toList();
+  }
 }

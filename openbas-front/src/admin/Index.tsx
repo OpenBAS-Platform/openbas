@@ -21,7 +21,7 @@ const IndexExercise = lazy(() => import('./components/simulations/Index'));
 const AtomicTestings = lazy(() => import('./components/atomic_testings/AtomicTestings'));
 const IndexAtomicTesting = lazy(() => import('./components/atomic_testings/atomic_testing/IndexAtomicTesting'));
 const Scenarios = lazy(() => import('./components/scenarios/Scenarios'));
-const IndexScenario = lazy(() => import('./components/scenarios/scenario/IndexScenario'));
+const IndexScenario = lazy(() => import('./components/scenarios/scenario/Index'));
 const Assets = lazy(() => import('./components/assets/Index'));
 const Teams = lazy(() => import('./components/teams/Index'));
 const IndexComponents = lazy(() => import('./components/components/Index'));

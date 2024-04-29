@@ -279,7 +279,7 @@ const TopBar: React.FC = () => {
               onClick={handleOpenMenu}
               size="medium"
               color={
-                location.pathname === '/admin/profile' ? 'secondary' : 'inherit'
+                location.pathname === '/admin/profile' ? 'primary' : 'inherit'
               }
             >
               <AccountCircleOutlined fontSize="medium" />

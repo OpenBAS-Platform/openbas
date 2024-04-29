@@ -1923,6 +1923,7 @@ export interface Scenario {
   scenario_id: string;
   scenario_injects?: Inject[];
   scenario_injects_statistics?: Record<string, number>;
+  scenario_kill_chain_phases?: string[];
   scenario_lessons_categories?: LessonsCategory[];
   scenario_mail_from: string;
   scenario_mails_reply_to?: string[];

@@ -1,6 +1,9 @@
-import React, { FunctionComponent, lazy, Suspense } from 'react';
+import React, { FunctionComponent, lazy, Suspense, useState } from 'react';
 import { Link, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
-import { Box, Tab, Tabs } from '@mui/material';
+import { Box, Tooltip, IconButton, Tab, Tabs } from '@mui/material';
+import cronstrue from 'cronstrue';
+import { makeStyles, useTheme } from '@mui/styles';
+import { UpdateOutlined } from '@mui/icons-material';
 import Loader from '../../../../components/Loader';
 import { errorWrapper } from '../../../../components/Error';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -15,6 +18,8 @@ import useScenarioPermissions from '../../../../utils/Scenario';
 import { DocumentContext, DocumentContextType, PermissionsContext, PermissionsContextType } from '../../common/Context';
 import { useFormatter } from '../../../../components/i18n';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
+import { parseCron, ParsedCron } from '../../../../utils/Cron';
+import type { Theme } from '../../../../components/Theme';
 
 const Scenario = lazy(() => import('./Scenario'));
 const ScenarioSettings = lazy(() => import('./definition/ScenarioSettings'));
@@ -24,11 +29,25 @@ const Challenges = lazy(() => import('./challenges/ScenarioChallenges'));
 const Variables = lazy(() => import('./variables/ScenarioVariables'));
 const Injects = lazy(() => import('./injects/ScenarioInjects'));
 
+// eslint-disable-next-line no-underscore-dangle
+const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+const useStyles = makeStyles(() => ({
+  scheduling: {
+    display: 'flex',
+    margin: '-35px 8px 0 0',
+    float: 'right',
+    alignItems: 'center',
+  },
+}));
+
 const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = ({
   scenario,
 }) => {
-  const { t } = useFormatter();
+  const { t, nsd, ft, locale } = useFormatter();
   const location = useLocation();
+  const theme = useTheme<Theme>();
+  const classes = useStyles();
   const permissionsContext: PermissionsContextType = {
     permissions: useScenarioPermissions(scenario.scenario_id),
   };
@@ -43,16 +62,49 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
   if (location.pathname.includes(`/admin/scenarios/${scenario.scenario_id}/definition`)) {
     tabValue = `/admin/scenarios/${scenario.scenario_id}/definition`;
   }
+  const [openScenarioRecurringFormDialog, setOpenScenarioRecurringFormDialog] = useState<boolean>(false);
+  const [selectRecurring, setSelectRecurring] = useState('noRepeat');
+  const [cronExpression, setCronExpression] = useState<string | null>(scenario.scenario_recurrence || null);
+  const [parsedCronExpression, setParsedCronExpression] = useState<ParsedCron | null>(scenario.scenario_recurrence ? parseCron(scenario.scenario_recurrence) : null);
+  const noRepeat = scenario.scenario_recurrence_end && scenario.scenario_recurrence_start
+      && new Date(scenario.scenario_recurrence_end).getTime() - new Date(scenario.scenario_recurrence_start).getTime() <= _MS_PER_DAY
+      && ['noRepeat', 'daily'].includes(selectRecurring);
+  const getHumanReadableScheduling = () => {
+    if (!cronExpression || !parsedCronExpression) {
+      return null;
+    }
+    let sentence = '';
+    if (noRepeat) {
+      sentence = `${nsd(scenario.scenario_recurrence_start)} ${t('recurrence_at')} ${ft(new Date().setUTCHours(parsedCronExpression.h, parsedCronExpression.m))}`;
+    } else {
+      sentence = cronstrue.toString(cronExpression, {
+        verbose: true,
+        tzOffset: -new Date().getTimezoneOffset() / 60,
+        locale,
+      });
+      if (scenario.scenario_recurrence_end) {
+        sentence += ` ${t('recurrence_from')} ${nsd(scenario.scenario_recurrence_start)}`;
+        sentence += ` ${t('recurrence_to')} ${nsd(scenario.scenario_recurrence_end)}`;
+      } else {
+        sentence += ` ${t('recurrence_starting_from')} ${nsd(scenario.scenario_recurrence_start)}`;
+      }
+    }
+    return sentence;
+  };
   return (
     <PermissionsContext.Provider value={permissionsContext}>
       <DocumentContext.Provider value={documentContext}>
         <div style={{ paddingRight: ['/definition'].some((el) => location.pathname.includes(el)) ? 200 : 0 }}>
-          <Breadcrumbs variant="object" elements={[
-            { label: t('Scenarios') },
-            { label: scenario.scenario_name, current: true },
-          ]}
+          <Breadcrumbs variant="object" elements={[{ label: t('Scenarios') }, { label: scenario.scenario_name, current: true }]} />
+          <ScenarioHeader
+            setCronExpression={setCronExpression}
+            setParsedCronExpression={setParsedCronExpression}
+            setSelectRecurring={setSelectRecurring}
+            selectRecurring={selectRecurring}
+            setOpenScenarioRecurringFormDialog={setOpenScenarioRecurringFormDialog}
+            openScenarioRecurringFormDialog={openScenarioRecurringFormDialog}
+            noRepeat={noRepeat}
           />
-          <ScenarioHeader />
           <Box
             sx={{
               borderBottom: 1,
@@ -80,11 +132,32 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
                 label={t('Injects')}
               />
             </Tabs>
+            <div className={classes.scheduling}>
+              {!cronExpression && (
+              <IconButton size="small" style={{ cursor: 'default', marginRight: 5 }} disabled={true}>
+                <UpdateOutlined />
+              </IconButton>
+              )}
+              {cronExpression && !scenario.scenario_recurrence && (
+                <IconButton size="small" style={{ cursor: 'default', marginRight: 5 }}>
+                  <UpdateOutlined />
+                </IconButton>
+              )}
+              {cronExpression && scenario.scenario_recurrence && (
+              <Tooltip title={(t('Modify the scheduling'))}>
+                <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: 5 }}>
+                  <UpdateOutlined color="primary" />
+                </IconButton>
+              </Tooltip>
+              )}
+              <span style={{ color: theme.palette.text?.disabled }}>{!cronExpression && t('Not scheduled')}</span>
+              {cronExpression && <span>{getHumanReadableScheduling()}</span>}
+            </div>
           </Box>
           <Suspense fallback={<Loader />}>
             <Routes>
-              <Route path="" element={errorWrapper(Scenario)()} />
-              <Route path="definition" element={<Navigate to="settings" replace/>}/>
+              <Route path="" element={errorWrapper(Scenario)({ setOpenScenarioRecurringFormDialog })} />
+              <Route path="definition" element={<Navigate to="settings" replace />}/>
               <Route path="definition/settings" element={errorWrapper(ScenarioSettings)()} />
               <Route path="definition/teams" element={errorWrapper(Teams)({ scenarioTeamsUsers: scenario.scenario_teams_users })} />
               <Route path="definition/articles" element={errorWrapper(Articles)()} />
@@ -101,7 +174,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
   );
 };
 
-const IndexScenario = () => {
+const Index = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
   // Fetching data
@@ -116,4 +189,4 @@ const IndexScenario = () => {
   return <Loader />;
 };
 
-export default IndexScenario;
+export default Index;

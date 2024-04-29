@@ -228,11 +228,7 @@ const Articles: FunctionComponent<Props> = ({
                   >
                     {article.article_name}
                   </Typography>
-                  <ExpandableMarkdown
-                    source={article.article_content ?? ''}
-                    limit={500}
-                    controlled
-                  />
+                  <ExpandableMarkdown source={article.article_content ?? ''} limit={500} />
                   <div className={classes.footer}>
                     <div style={{ float: 'left' }}>
                       <Tooltip title={article.article_fullchannel.channel_name}>
