@@ -3772,7 +3772,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/uuid@npm:^9":
+"@types/uuid@npm:9.0.8":
   version: 9.0.8
   resolution: "@types/uuid@npm:9.0.8"
   checksum: 10c0/b411b93054cb1d4361919579ef3508a1f12bf15b5fdd97337d3d351bece6c921b52b6daeef89b62340fd73fd60da407878432a1af777f40648cbe53a01723489
@@ -10874,7 +10874,7 @@ __metadata:
     "@types/react-csv": "npm:1.1.10"
     "@types/react-dom": "npm:18.2.24"
     "@types/seamless-immutable": "npm:7.1.19"
-    "@types/uuid": "npm:^9"
+    "@types/uuid": "npm:9.0.8"
     "@typescript-eslint/eslint-plugin": "npm:7.5.0"
     "@typescript-eslint/parser": "npm:7.5.0"
     "@uiw/react-md-editor": "npm:4.0.4"
@@ -10939,7 +10939,7 @@ __metadata:
     redux-thunk: "npm:2.4.2"
     remark-flexible-markers: "npm:1.2.1"
     remark-gfm: "npm:4.0.0"
-    remark-parse: "npm:^11.0.0"
+    remark-parse: "npm:11.0.0"
     rxjs: "npm:7.8.1"
     seamless-immutable: "npm:7.1.4"
     swagger-typescript-api: "npm:13.0.3"
@@ -12568,7 +12568,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remark-parse@npm:^11.0.0":
+"remark-parse@npm:11.0.0, remark-parse@npm:^11.0.0":
   version: 11.0.0
   resolution: "remark-parse@npm:11.0.0"
   dependencies:

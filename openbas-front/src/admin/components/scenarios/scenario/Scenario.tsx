@@ -87,7 +87,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
                 >
                   {t('Severity')}
                 </Typography>
-                <ItemSeverity severity={scenario.scenario_severity} label={t(scenario.scenario_severity)} />
+                <ItemSeverity severity={scenario.scenario_severity} label={t(scenario.scenario_severity ?? 'Unknown')} />
               </Grid>
               <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
                 <Typography
@@ -97,7 +97,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
                 >
                   {t('Category')}
                 </Typography>
-                <ItemCategory category={scenario.scenario_category} label={t(scenario.scenario_category)} />
+                <ItemCategory category={scenario.scenario_category} label={t(scenario.scenario_category ?? 'Unknown')} />
               </Grid>
               <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
                 <Typography
@@ -107,7 +107,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
                 >
                   {t('Main Focus')}
                 </Typography>
-                <ItemMainFocus mainFocus={scenario.scenario_main_focus} label={t(scenario.scenario_main_focus)} />
+                <ItemMainFocus mainFocus={scenario.scenario_main_focus} label={t(scenario.scenario_main_focus ?? 'Unknown')} />
               </Grid>
               <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
                 <Typography

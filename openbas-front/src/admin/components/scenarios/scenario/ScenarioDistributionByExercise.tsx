@@ -37,7 +37,7 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
   // Standard hooks
   const { t, nsdt } = useFormatter();
   const theme: Theme = useTheme();
-  const data = exercises.length > 1 ? exercises : generateFakeData();
+  const data = exercises.length > 0 ? exercises : generateFakeData();
   const series = [
     {
       name: t('Prevention'),
