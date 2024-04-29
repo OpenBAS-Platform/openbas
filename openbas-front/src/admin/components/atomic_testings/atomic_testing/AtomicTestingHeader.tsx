@@ -29,6 +29,7 @@ const useStyles = makeStyles(() => ({
     textTransform: 'uppercase',
     marginTop: 5,
     marginBottom: 5,
+    marginRight: 8,
   },
 }));
 
@@ -50,6 +51,11 @@ const AtomicTestingHeader = () => {
     dispatch(fetchAtomicTestingDetail(atomicId));
   });
 
+  const [tags, setTags] = useState(atomic.atomic_tags);
+  const updateTags = (injectId: string, tagIds: string[]) => {
+    dispatch(updateAtomicTestingTags(injectId, { atomic_tags: tagIds }))
+      .then((result: { entities: { atomics: Record<string, AtomicTestingOutput> }, result: string }) => setTags(result.entities.atomics[result.result].atomic_tags));
+  };
   // Launch atomic testing
   const [open, setOpen] = useState(false);
   const [availableLaunch, setAvailableLaunch] = useState(true);
@@ -103,8 +109,8 @@ const AtomicTestingHeader = () => {
       <div style={{ display: 'flex', justifyContent: 'flex-end', alignSelf: 'center' }}>
         <div style={{ alignSelf: 'center' }}>
           <HeaderTags
-            tags={atomic.atomic_tags}
-            updateTags={(tagIds: string[]) => updateAtomicTestingTags(atomicId, { atomic_tags: tagIds })}
+            tags={tags}
+            updateTags={(tagIds: string[]) => updateTags(atomicId, tagIds)}
           />
         </div>
 
@@ -113,7 +119,7 @@ const AtomicTestingHeader = () => {
           startIcon={<PlayArrowOutlined />}
           color="info"
           onClick={() => setOpen(true)}
-          sx={{ width: 110, height: 40 }}
+          sx={{ width: 110, height: 40, marginLeft: 1 }}
           disabled={!atomic.atomic_targets || !(atomic.atomic_targets.length > 0) || !availableLaunch}
         >
           {t('Launch')}

@@ -9,11 +9,13 @@ import TagChip from '../tags/TagChip';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import { Option } from '../../../../utils/Option';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import { fetchTags } from '../../../../actions/Tag';
 
 interface Props {
   tags: string[] | undefined;
   disabled?: boolean;
-  updateTags: (tagIds: string[]) => (dispatch: void) => Promise<void>;
+  updateTags: (tagIds: string[]) => void;
 }
 
 const HeaderTags: FunctionComponent<Props> = ({
@@ -23,8 +25,10 @@ const HeaderTags: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const dispatch = useAppDispatch();
+  useDataLoader(() => {
+    dispatch(fetchTags());
+  });
   const { t } = useFormatter();
-
   const [openTagAdd, setOpenTagAdd] = useState(false);
   const handleToggleAddTag = () => setOpenTagAdd(!openTagAdd);
 

@@ -52,7 +52,7 @@ export const createAtomicTesting = (data: AtomicTestingInput) => (dispatch: Disp
   return postReferential(atomicTesting, ATOMIC_TESTING_URI, data)(dispatch);
 };
 
-export const updateAtomicTestingTags = (injectId: string, data: AtomicTestingUpdateTagsInput) => {
+export const updateAtomicTestingTags = (injectId: string, data: AtomicTestingUpdateTagsInput) => (dispatch: Dispatch) => {
   const uri = `${ATOMIC_TESTING_URI}/${injectId}/tags`;
-  return putReferential(atomicTesting.key, uri, data);
+  return putReferential(atomicTesting, uri, data)(dispatch);
 };
