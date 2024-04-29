@@ -44,7 +44,7 @@ const AtomicTestingHeader = () => {
   // Fetching data
   const { atomic, atomicDetail }: { atomic: AtomicTestingOutput, atomicDetail: AtomicTestingDetailOutput, } = useHelper((helper: AtomicTestingHelper) => ({
     atomic: helper.getAtomicTesting(atomicId),
-    atomicDetail: helper.getAtomicTestingDetail(atomicId!),
+    atomicDetail: helper.getAtomicTestingDetail(atomicId),
   }));
   useDataLoader(() => {
     dispatch(fetchAtomicTesting(atomicId));

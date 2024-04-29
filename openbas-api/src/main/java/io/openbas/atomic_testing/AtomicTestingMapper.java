@@ -19,27 +19,27 @@ public class AtomicTestingMapper {
 
   public static AtomicTestingOutput toDtoWithTargetResults(Inject inject) {
     return getAtomicTestingOutputBuilder(inject)
-            .targets(AtomicTestingUtils.getTargetsWithResults(inject))
-            .build();
+        .targets(AtomicTestingUtils.getTargetsWithResults(inject))
+        .build();
   }
 
   public static AtomicTestingOutput toDto(Inject inject) {
     return getAtomicTestingOutputBuilder(inject)
-            .targets(AtomicTestingUtils.getTargets(inject))
-            .build();
+        .targets(AtomicTestingUtils.getTargets(inject))
+        .build();
   }
 
   private static AtomicTestingOutputBuilder getAtomicTestingOutputBuilder(Inject inject) {
     return AtomicTestingOutput
-            .builder()
-            .id(inject.getId())
-            .title(inject.getTitle())
-            .type(inject.getType())
-            .tagIds(inject.getTags().stream().map(Tag::getId).toList())
+        .builder()
+        .id(inject.getId())
+        .title(inject.getTitle())
+        .type(inject.getType())
+        .tagIds(inject.getTags().stream().map(Tag::getId).toList())
         .injectorContract(inject.getInjectorContract())
-            .lastExecutionStartDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))
-            .lastExecutionEndDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))
-            .status(inject.getStatus().map(InjectStatus::getName).orElse(ExecutionStatus.DRAFT))
+        .lastExecutionStartDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))
+        .lastExecutionEndDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))
+        .status(inject.getStatus().map(InjectStatus::getName).orElse(ExecutionStatus.DRAFT))
         .expectationResultByTypes(AtomicTestingUtils.getExpectations(inject.getExpectations()));
   }
 

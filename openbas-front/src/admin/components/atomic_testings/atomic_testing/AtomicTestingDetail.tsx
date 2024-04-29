@@ -9,7 +9,7 @@ import { useHelper } from '../../../../store';
 import type { AtomicTestingDetailOutput } from '../../../../utils/api-types';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import { fetchAtomicTestingDetail } from '../../../../actions/atomic_testings/atomic-testing-actions';
-import StatusChip from '../../components/atomic_testings/StatusChip';
+import StatusChip from './StatusChip';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -117,13 +117,13 @@ const Detail: FunctionComponent<Props> = () => {
             </Typography>
             <pre>
               {atomicDetail.status_traces && (
-              <ul>
-                {atomicDetail.status_traces.map((trace, index) => (
-                  <li key={index} className={classes.listItem}>
-                    {trace}
-                  </li>
-                ))}
-              </ul>
+                <ul>
+                  {atomicDetail.status_traces.map((trace, index) => (
+                    <li key={index} className={classes.listItem}>
+                      {trace}
+                    </li>
+                  ))}
+                </ul>
               )}
               <Typography variant="body1" gutterBottom>
                 {t('Tracking Sent Date')}: {atomicDetail.tracking_sent_date || 'N/A'}
