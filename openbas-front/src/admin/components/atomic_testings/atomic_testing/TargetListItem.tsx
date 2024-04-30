@@ -20,11 +20,11 @@ const useStyles = makeStyles(() => ({
   dividerL: {
     content: '',
     position: 'absolute',
-    backgroundColor: 'rgba(105, 103, 103, 0.45)', // Adjust the color and opacity
-    width: '2px', // Set the width of the dots
+    backgroundColor: 'rgba(105, 103, 103, 0.45)',
+    width: '2px',
     bottom: '0',
-    left: '30px', // Adjust the left position
-    height: '99%', // Set the height of the dots
+    left: '30px',
+    height: '99%',
   },
 }));
 
