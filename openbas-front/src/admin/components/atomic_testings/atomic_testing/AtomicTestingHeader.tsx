@@ -3,14 +3,14 @@ import React, { useContext, useState } from 'react';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, Typography } from '@mui/material';
 import { PlayArrowOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { fetchAtomicTesting, fetchAtomicTestingDetail, tryAtomicTesting, updateAtomicTestingTags } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import { fetchAtomicTesting, tryAtomicTesting, updateAtomicTestingTags } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import AtomicTestingPopover from './AtomicTestingPopover';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import { AtomicTestingResultContext } from '../../common/Context';
 import StatusChip from './StatusChip';
-import type { AtomicTestingDetailOutput, AtomicTestingOutput } from '../../../../utils/api-types';
+import type { AtomicTestingOutput } from '../../../../utils/api-types';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -42,13 +42,11 @@ const AtomicTestingHeader = () => {
   const { onLaunchAtomicTesting } = useContext(AtomicTestingResultContext);
 
   // Fetching data
-  const { atomic, atomicDetail }: { atomic: AtomicTestingOutput, atomicDetail: AtomicTestingDetailOutput, } = useHelper((helper: AtomicTestingHelper) => ({
+  const { atomic }: { atomic: AtomicTestingOutput } = useHelper((helper: AtomicTestingHelper) => ({
     atomic: helper.getAtomicTesting(atomicId),
-    atomicDetail: helper.getAtomicTestingDetail(atomicId),
   }));
   useDataLoader(() => {
     dispatch(fetchAtomicTesting(atomicId));
-    dispatch(fetchAtomicTestingDetail(atomicId));
   });
 
   const updateTags = (injectId: string, tagIds: string[]) => {
@@ -72,9 +70,7 @@ const AtomicTestingHeader = () => {
         <Typography variant="h1" gutterBottom classes={{ root: classes.title }}>
           {atomic.atomic_title}
         </Typography>
-        {atomicDetail?.status_label
-          && <StatusChip status={atomicDetail?.status_label} />
-        }
+        <StatusChip status={atomic.atomic_status} />
         <AtomicTestingPopover atomic={atomic} />
         <Dialog
           open={open}
