@@ -33,8 +33,8 @@ const _MS_DELAY_TOO_CLOSE = 1000 * 60 * 2;
 
 const defaultFormValues = {
   startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
-  endDate: '',
-  time: '',
+  endDate: null,
+  time: null,
   onlyWeekday: false,
   dayOfWeek: 1 as Recurrence['dayOfWeek'],
   weekOfMonth: 1 as Recurrence['weekOfMonth'],
@@ -68,9 +68,9 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
     resolver: zodResolver(
       zodImplement<Recurrence>().with({
         startDate: z.string().min(1, t('Required')),
-        endDate: z.string().optional(),
+        endDate: z.string().optional().nullable(),
         onlyWeekday: z.boolean(),
-        time: z.string().min(1, t('Required')),
+        time: z.string().min(1, t('Required')).nullable(),
         // @ts-expect-error zodImplement cannot handle refine
         dayOfWeek: z.number().optional().refine((value) => {
           if (['weekly', 'monthly'].includes(selectRecurring)) {
@@ -271,7 +271,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                 render={({ field, fieldState }) => (
                   <DateTimePicker
                     views={['year', 'month', 'day']}
-                    value={field.value}
+                    value={field.value || null}
                     minDate={new Date(new Date().setUTCHours(24, 0, 0, 0)).toISOString()}
                     onChange={(endDate) => {
                       return (endDate ? field.onChange(new Date(new Date(endDate).setUTCHours(0, 0, 0, 0)).toISOString()) : field.onChange(''));
