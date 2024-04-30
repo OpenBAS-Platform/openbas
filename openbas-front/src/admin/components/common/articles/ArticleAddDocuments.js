@@ -95,7 +95,7 @@ const ArticleAddDocuments = (props) => {
   };
 
   const onCreate = (result) => {
-    addDocument(result);
+    addDocument(result.document_id);
   };
   const filterByKeyword = (n) => keyword === ''
     || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())

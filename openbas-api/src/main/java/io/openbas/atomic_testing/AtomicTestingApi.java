@@ -1,13 +1,8 @@
 package io.openbas.atomic_testing;
 
-import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
-import io.openbas.atomic_testing.form.AtomicTestingInput;
-import io.openbas.atomic_testing.form.AtomicTestingOutput;
-import io.openbas.atomic_testing.form.AtomicTestingUpdateTagsInput;
-import io.openbas.atomic_testing.form.SimpleExpectationResultOutput;
+import io.openbas.atomic_testing.form.*;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectStatus;
-import io.openbas.database.model.InjectorContract;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.helper.RestBehavior;
@@ -24,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static io.openbas.atomic_testing.AtomicTestingMapper.toDto;
-import static io.openbas.atomic_testing.AtomicTestingMapper.toDtoWithTargetResults;
 
 @RestController
 @RequestMapping("/api/atomic_testings")

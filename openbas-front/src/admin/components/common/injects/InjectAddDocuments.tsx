@@ -104,8 +104,8 @@ const InjectAddDocuments: FunctionComponent<Props> = ({
     handleClose();
   };
 
-  const onCreate = (result: string) => {
-    addDocument(result);
+  const onCreate = (result: Document) => {
+    addDocument(result.document_id);
   };
 
   const filterByKeyword = (n: Document) => keyword === ''

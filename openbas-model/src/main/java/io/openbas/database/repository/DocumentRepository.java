@@ -30,11 +30,4 @@ public interface DocumentRepository extends CrudRepository<Document, String>, Jp
             "where d.id = :id and user.id = :userId")
     Optional<Document> findByIdGranted(@Param("id") String documentId, @Param("userId") String userId);
 
-    @Query("select distinct d from Document d " +
-            "join d.exercises as exercise " +
-            "join exercise.grants as grant " +
-            "join grant.group as g " +
-            "join g.users as user " +
-            "where user.id = :userId")
-    List<Document> findAllGranted(@Param("userId") String userId);
 }

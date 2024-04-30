@@ -56,7 +56,8 @@ const CreateDocument = (props) => {
     return props.addDocument(formData).then((result) => {
       if (result.result) {
         if (props.onCreate) {
-          props.onCreate(result.result);
+          const created = result.entities.documents[result.result];
+          props.onCreate(created);
         }
         return setOpen(false);
       }
