@@ -33,8 +33,7 @@ public class AtomicTestingUtils {
   }
 
   public static List<InjectTargetWithResult> getTargetsWithResults(final Inject inject) {
-    List<ExpectationType> types = getExpectationTypes(inject);
-    List<ExpectationResultsByType> resultsByTypes = getDefaultExpectationResultsByTypes(types);
+    List<ExpectationResultsByType> resultsByTypes = getDefaultExpectationResultsByTypes();
     List<InjectExpectation> expectations = inject.getExpectations();
 
     List<InjectExpectation> teamExpectations = new ArrayList<>();
@@ -154,25 +153,13 @@ public class AtomicTestingUtils {
   }
 
   @NotNull
-  private static List<ExpectationResultsByType> getDefaultExpectationResultsByTypes(final List<ExpectationType> types) {
+  private static List<ExpectationResultsByType> getDefaultExpectationResultsByTypes() {
+    List<ExpectationType> types = List.of(ExpectationType.DETECTION, ExpectationType.PREVENTION, ExpectationType.HUMAN_RESPONSE);
     return types.stream()
         .map(type -> getExpectationByType(type, Collections.singletonList(null)))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toList();
-  }
-
-  private static List<ExpectationType> getExpectationTypes(final Inject inject) {
-    List<ExpectationType> expectationTypes = new ArrayList<>();
-    if (inject.getContent() != null && inject.getContent().has("expectations")) {
-      JsonNode expectationsArray = inject.getContent().get("expectations");
-      for (JsonNode expectation : expectationsArray) {
-        if (expectation.has("expectation_type")) {
-          expectationTypes.add(ExpectationType.of(expectation.get("expectation_type").asText()));
-        }
-      }
-    }
-    return expectationTypes;
   }
 
   @NotNull
