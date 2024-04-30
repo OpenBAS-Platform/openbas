@@ -58,7 +58,7 @@ class DocumentType extends Component {
 
 DocumentType.propTypes = {
   classes: PropTypes.object.isRequired,
-  type: PropTypes.object,
+  type: PropTypes.string,
   variant: PropTypes.string,
   t: PropTypes.func,
   disabled: PropTypes.bool,
