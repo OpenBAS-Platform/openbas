@@ -265,7 +265,7 @@ const Documents = () => {
       </List>
       {userAdmin && <CreateDocument
         onCreate={(result) => setDocuments([result, ...documents])}
-      />}
+                    />}
     </>
   );
 };
