@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { useFormatter } from '../../../components/i18n';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { useHelper } from '../../../store';
-import type { TagsHelper, UsersHelper } from '../../../actions/helper';
+import type { UsersHelper } from '../../../actions/helper';
 import { searchScenarios } from '../../../actions/scenarios/scenario-actions';
 import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import ScenarioCreation from './ScenarioCreation';
@@ -21,6 +21,7 @@ import PlatformIcon from '../../../components/PlatformIcon';
 import ItemCategory from '../../../components/ItemCategory';
 import ItemMainFocus from '../../../components/ItemMainFocus';
 import type { Theme } from '../../../components/Theme';
+import type { ScenariosHelper } from '../../../actions/scenarios/scenario-helper';
 
 const useStyles = makeStyles(() => ({
   card: {
@@ -87,8 +88,9 @@ const Scenarios = () => {
   // Filter and sort hook
   const filtering = useSearchAnFilter('scenario', 'name', ['name']);
   // Fetching data
-  const { userAdmin } = useHelper((helper: TagsHelper & UsersHelper) => ({
+  const { userAdmin, scenarios: scenariosFromStore } = useHelper((helper: ScenariosHelper & UsersHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
+    scenarios: helper.getScenarios(),
   }));
 
   // Headers
@@ -193,6 +195,7 @@ const Scenarios = () => {
         searchPaginationInput={searchPaginationInput}
         setContent={setScenarios}
         exportProps={exportProps}
+        refetchDependencies={[scenariosFromStore]}
       />
       <List>
         <ListItem
@@ -219,7 +222,7 @@ const Scenarios = () => {
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-              }
+            }
           />
         </ListItem>
         {sortedScenarios.map((scenario) => (
@@ -284,7 +287,7 @@ const Scenarios = () => {
                     {nsdt(scenario.scenario_updated_at)}
                   </div>
                 </div>
-                }
+              }
             />
             <ListItemIcon classes={{ root: classes.goIcon }}>
               <KeyboardArrowRight />

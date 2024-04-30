@@ -25,9 +25,10 @@ interface Props<T> {
   setContent: (data: T[]) => void;
   exportProps?: ExportProps<T>;
   searchEnable?: boolean;
+  refetchDependencies?: unknown[]
 }
 
-const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, setContent, exportProps, searchEnable = true }: Props<T>) => {
+const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, setContent, exportProps, searchEnable = true, refetchDependencies = [] }: Props<T>) => {
   // Standard hooks
   const classes = useStyles();
 
@@ -70,7 +71,7 @@ const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, s
       setContent(data.content);
       setTotalElements(data.totalElements);
     });
-  }, [searchPaginationInput, page, rowsPerPage, textSearch]);
+  }, [searchPaginationInput, page, rowsPerPage, textSearch, ...refetchDependencies]);
 
   return (
     <div className={classes.parameters}>

@@ -67,6 +67,8 @@ export default ({ mode }: { mode: string }) => {
         'cronstrue',
         '@microsoft/fetch-event-source',
         'uuid',
+        'react-markdown',
+        'remark-flexible-markers',
       ],
     },
 
