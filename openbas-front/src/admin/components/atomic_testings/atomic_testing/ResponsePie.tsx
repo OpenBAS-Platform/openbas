@@ -142,7 +142,7 @@ const ResponsePie: FunctionComponent<Props> = ({
                   <Chart
                     options={{
                       ...chartOptions,
-                      colors: ['rgb(202,203,206)'],
+                      colors: ['rgba(202,203,206,0.18)'],
                       labels: [t('Unknown Data')],
                     }}
                     series={[1]}
@@ -172,7 +172,7 @@ const ResponsePie: FunctionComponent<Props> = ({
             <Chart
               options={{
                 ...chartOptions,
-                colors: ['rgb(202,203,206)'],
+                colors: ['rgba(202,203,206,0.18)'],
                 labels: [t('No data available')],
               }}
               series={[1]}

@@ -10,7 +10,7 @@ const useStyles = makeStyles(() => ({
     display: 'inline-block',
   },
   target: {
-    height: 25,
+    height: 20,
     fontSize: 12,
     borderRadius: 4,
     borderColor: 'rgb(134,134,134)',

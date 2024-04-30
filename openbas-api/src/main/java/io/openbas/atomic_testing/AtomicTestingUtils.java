@@ -1,15 +1,19 @@
 package io.openbas.atomic_testing;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.atomic_testing.AtomicTestingMapper.InjectTargetWithResult;
 import io.openbas.atomic_testing.AtomicTestingMapper.ResultDistribution;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.*;
+import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 public class AtomicTestingUtils {
@@ -33,8 +37,7 @@ public class AtomicTestingUtils {
   }
 
   public static List<InjectTargetWithResult> getTargetsWithResults(final Inject inject) {
-    List<ExpectationType> types = getExpectationTypes(inject);
-    List<ExpectationResultsByType> resultsByTypes = getDefaultExpectationResultsByTypes(types);
+    List<ExpectationResultsByType> resultsByTypes = getDefaultExpectationResultsByTypes();
     List<InjectExpectation> expectations = inject.getExpectations();
 
     List<InjectExpectation> teamExpectations = new ArrayList<>();
@@ -154,25 +157,13 @@ public class AtomicTestingUtils {
   }
 
   @NotNull
-  private static List<ExpectationResultsByType> getDefaultExpectationResultsByTypes(final List<ExpectationType> types) {
+  private static List<ExpectationResultsByType> getDefaultExpectationResultsByTypes() {
+    List<ExpectationType> types = List.of(ExpectationType.DETECTION, ExpectationType.PREVENTION, ExpectationType.HUMAN_RESPONSE);
     return types.stream()
         .map(type -> getExpectationByType(type, Collections.singletonList(null)))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toList();
-  }
-
-  private static List<ExpectationType> getExpectationTypes(final Inject inject) {
-    List<ExpectationType> expectationTypes = new ArrayList<>();
-    if (inject.getContent() != null && inject.getContent().has("expectations")) {
-      JsonNode expectationsArray = inject.getContent().get("expectations");
-      for (JsonNode expectation : expectationsArray) {
-        if (expectation.has("expectation_type")) {
-          expectationTypes.add(ExpectationType.of(expectation.get("expectation_type").asText()));
-        }
-      }
-    }
-    return expectationTypes;
   }
 
   @NotNull
@@ -192,7 +183,7 @@ public class AtomicTestingUtils {
 
   public static Optional<ExpectationResultsByType> getExpectationByType(final ExpectationType type, final List<Integer> scores) {
     if (scores.isEmpty()) {
-      return Optional.empty();
+      return Optional.of(new ExpectationResultsByType(type, ExpectationStatus.UNKNOWN, Collections.emptyList()));
     }
     OptionalDouble avgResponse = calculateAverageFromExpectations(scores);
     if (avgResponse.isPresent()) {
