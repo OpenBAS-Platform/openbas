@@ -10,7 +10,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import type { Theme } from '../../../../components/Theme';
 import type { CreatePlayerInput } from '../../../../utils/api-types';
 import { Option } from '../../../../utils/Option';
-import type { PlayerInputForm } from './Player';
+import type { PlayerInputForm, UserStore } from './Player';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {
@@ -26,12 +26,12 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface CreatePlayerProps {
-  inline: boolean;
-  onCreate: (result: string) => void;
+  inline?: boolean;
+  onCreate: (result: UserStore) => void;
 }
 
 const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
-  inline,
+  inline = false,
   onCreate,
 }) => {
   const classes = useStyles();
@@ -51,10 +51,11 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
       user_tags: data.user_tags?.map((tag: Option) => tag.id),
     };
     return dispatch(addPlayer(inputValues)).then(
-      (result: { result: string }) => {
+      (result: { result: string, entities: { users: Record<string, UserStore> } }) => {
         if (result.result) {
           if (onCreate) {
-            onCreate(result.result);
+            const created = result.entities.users[result.result];
+            onCreate(created);
           }
           return handleClose();
         }

@@ -182,7 +182,7 @@ const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
                 })}
                 <CreatePlayer
                   inline={true}
-                  onCreate={(userId) => setUsersIds([...usersIds, userId])}
+                  onCreate={(user) => setUsersIds([...usersIds, user.user_id])}
                 />
               </List>
             </Grid>

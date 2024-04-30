@@ -17,13 +17,17 @@ import { TeamContext } from '../../common/Context';
 interface PlayerPopoverProps {
   user: UserStore;
   teamId?: string;
-  openEditOnInit?: boolean,
+  openEditOnInit?: boolean;
+  onUpdate?: (result: UserStore) => void;
+  onDelete?: (result: string) => void;
 }
 
 const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   user,
   teamId,
   openEditOnInit = false,
+  onUpdate,
+  onDelete,
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -69,7 +73,14 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
       user_country: data.user_country?.id,
       user_tags: data.user_tags?.map((tag: Option) => tag.id),
     };
-    return dispatch(updatePlayer(user.user_id, inputValues)).then(() => handleCloseEdit());
+    return dispatch(updatePlayer(user.user_id, inputValues))
+      .then((result: { result: string, entities: { users: Record<string, UserStore> } }) => {
+        if (onUpdate) {
+          const updated = result.entities.users[result.result];
+          onUpdate(updated);
+        }
+        handleCloseEdit();
+      });
   };
 
   // Deletion
@@ -81,7 +92,15 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   const handleCloseDelete = () => setOpenDelete(false);
 
   const submitDelete = () => {
-    dispatch(deletePlayer(user.user_id)).then(() => handleCloseDelete());
+    dispatch(deletePlayer(user.user_id))
+      .then(
+        () => {
+          if (onDelete) {
+            onDelete(user.user_id);
+          }
+          handleCloseDelete();
+        },
+      );
   };
 
   // Remove
