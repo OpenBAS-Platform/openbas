@@ -12,6 +12,13 @@ export const arrayOfDocuments = new schema.Array(document);
 export const tag = new schema.Entity('tags', {}, { idAttribute: 'tag_id' });
 export const arrayOfTags = new schema.Array(tag);
 
+export const injectorContract = new schema.Entity(
+  'injector_contracts',
+  {},
+  { idAttribute: 'injector_contract_id' },
+);
+export const arrayOfInjectorContracts = new schema.Array(injectorContract);
+
 export const injectStatus = new schema.Entity(
   'inject_statuses',
   {},
