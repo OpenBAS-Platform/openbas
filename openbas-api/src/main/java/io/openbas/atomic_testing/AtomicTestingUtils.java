@@ -192,7 +192,7 @@ public class AtomicTestingUtils {
 
   public static Optional<ExpectationResultsByType> getExpectationByType(final ExpectationType type, final List<Integer> scores) {
     if (scores.isEmpty()) {
-      return Optional.empty();
+      return Optional.of(new ExpectationResultsByType(type, ExpectationStatus.UNKNOWN, Collections.emptyList()));
     }
     OptionalDouble avgResponse = calculateAverageFromExpectations(scores);
     if (avgResponse.isPresent()) {

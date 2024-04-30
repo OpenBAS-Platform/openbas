@@ -1,24 +1,24 @@
 package io.openbas.atomic_testing;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput.AtomicTestingOutputBuilder;
 import io.openbas.atomic_testing.form.SimpleExpectationResultOutput;
-import io.openbas.database.model.*;
+import io.openbas.database.model.ExecutionStatus;
+import io.openbas.database.model.Inject;
+import io.openbas.database.model.InjectExpectation;
+import io.openbas.database.model.InjectExpectationResult;
+import io.openbas.database.model.InjectStatus;
+import io.openbas.database.model.Tag;
 import io.openbas.model.inject.form.Expectation;
-import org.hibernate.mapping.Collection;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
 
 public class AtomicTestingMapper {
 
@@ -64,7 +64,7 @@ public class AtomicTestingMapper {
             .map(results -> results.stream().map(InjectExpectationResult::getResult)
                 .collect(Collectors.joining(", ")))
             .orElse(null))
-        .response(injectExpectation.getScore() == null ? ExpectationStatus.UNKNOWN
+        .response(injectExpectation.getScore() == null ? ExpectationStatus.PENDING
             : (injectExpectation.getScore() == 0 ? ExpectationStatus.FAILED : ExpectationStatus.VALIDATED))
         .build();
   }
