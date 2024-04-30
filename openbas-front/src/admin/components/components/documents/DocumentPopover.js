@@ -19,7 +19,7 @@ const DocumentPopover = (props) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
 
-  const { document, disabled, onRemoveDocument, attached, onToggleAttach, inline } = props;
+  const { document, disabled, onRemoveDocument, attached, onToggleAttach, inline, onUpdate, onDelete } = props;
 
   // Fetching data
   const { tagsMap, exercisesMap, scenariosMap } = useHelper((helper) => ({
@@ -62,7 +62,13 @@ const DocumentPopover = (props) => {
       R.assoc('document_scenarios', R.pluck('id', data.document_scenarios)),
     )(data);
     return dispatch(updateDocument(document.document_id, inputValues))
-      .then(() => handleCloseEdit());
+      .then((result) => {
+        if (onUpdate) {
+          const updated = result.entities.documents[result.result];
+          onUpdate(updated);
+        }
+        handleCloseEdit();
+      });
   };
 
   const handleOpenDelete = () => {
@@ -75,7 +81,13 @@ const DocumentPopover = (props) => {
   };
 
   const submitDelete = () => {
-    dispatch(deleteDocument(document.document_id));
+    dispatch(deleteDocument(document.document_id)).then(
+      () => {
+        if (onDelete) {
+          onDelete(document.document_id);
+        }
+      },
+    );
     handleCloseDelete();
   };
 

@@ -40,6 +40,7 @@ import java.util.stream.Stream;
 
 import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
 import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.specification.DocumentSpecification.findGrantedFor;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
@@ -177,12 +178,12 @@ public class DocumentApi extends RestBehavior {
         if (user.isAdmin()) {
             return documentRepository.findAll(null, sorting);
         } else {
-            return documentRepository.findAllGranted(user.getId());
+            return documentRepository.findAll(findGrantedFor(user.getId()));
         }
     }
 
     @PostMapping("/api/documents/search")
-    public Page<Document> attackPatterns(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    public Page<Document> searchDocuments(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
         OpenBASPrincipal user = currentUser();
         if (user.isAdmin()) {
             return buildPaginationJPA(
@@ -192,8 +193,14 @@ public class DocumentApi extends RestBehavior {
                     Document.class
             );
         } else {
-            // TODO Sam / Romu / Ju before release!
-            return null;
+            return buildPaginationJPA(
+                (Specification<Document> specification, Pageable pageable) -> this.documentRepository.findAll(
+                    findGrantedFor(user.getId()).and(specification),
+                    pageable
+                ),
+                searchPaginationInput,
+                Document.class
+            );
         }
     }
 
