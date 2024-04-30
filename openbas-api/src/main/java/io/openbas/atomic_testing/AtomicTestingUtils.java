@@ -81,7 +81,6 @@ public class AtomicTestingUtils {
       // Check if there are no expectations matching the current asset (t)
       boolean noMatchingExpectations = assetExpectations.stream()
           .noneMatch(exp -> exp.getAsset().getId().equals(asset.getId()));
-
       if (noMatchingExpectations) {
         InjectTargetWithResult target = new InjectTargetWithResult(
             TargetType.ASSETS,
@@ -90,33 +89,19 @@ public class AtomicTestingUtils {
             resultsByTypes
         );
 
-        assetsToRefine.add(target);
+        targets.add(target);
       }
     });
     inject.getAssetGroups().forEach(assetGroup -> {
       // Check if there are no expectations matching the current assetgroup (t)
       boolean noMatchingExpectations = assetGroupExpectations.stream()
           .noneMatch(exp -> exp.getAssetGroup().getId().equals(assetGroup.getId()));
-
-        List<InjectTargetWithResult> children = new ArrayList<>();
-
-        assetsToRefine.forEach(asset -> {
-          boolean found = assetGroup.getAssets().stream()
-              .anyMatch(parentAsset -> parentAsset.getId().equals(asset.getId()));
-          if (found) {
-            children.add(asset);
-          } else {
-            assetsWithoutParent.add(asset);
-          }
-        });
-
       if (noMatchingExpectations) {
         InjectTargetWithResult target = new InjectTargetWithResult(
             TargetType.ASSETS_GROUPS,
             assetGroup.getId(),
             assetGroup.getName(),
-            resultsByTypes,
-            sortResults(children)
+            resultsByTypes
         );
 
         targets.add(target);
@@ -170,11 +155,24 @@ public class AtomicTestingUtils {
 
             assetsToRefine.forEach(asset -> {
               boolean found = entry.getKey().getAssets().stream()
-                  .anyMatch(parentAsset -> parentAsset.getId().equals(asset.getId()));
+                  .anyMatch(assetChild -> assetChild.getId().equals(asset.getId()));
               if (found) {
                 children.add(asset);
               } else {
                 assetsWithoutParent.add(asset);
+              }
+            });
+
+            entry.getKey().getAssets().forEach(asset -> {
+              boolean found = children.stream()
+                  .noneMatch(child -> child.getId().equals(asset.getId()));
+              if (found) {
+                children.add(new InjectTargetWithResult(
+                    TargetType.ASSETS,
+                    asset.getId(),
+                    asset.getName(),
+                    resultsByTypes
+                ));
               }
             });
 
