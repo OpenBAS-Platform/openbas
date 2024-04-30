@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../utils/hooks';
-import DefinitionMenu from '../../components/DefinitionMenu';
+import DefinitionMenu from '../../common/simulate/DefinitionMenu';
 import Teams from '../../components/teams/Teams';
 import { PermissionsContext, TeamContext } from '../../common/Context';
 import type { UserStore } from '../../teams/players/Player';

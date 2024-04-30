@@ -7,7 +7,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import Variables from '../../components/variables/Variables';
 import type { VariablesHelper } from '../../../../actions/variables/variable-helper';
 import { addVariableForExercise, deleteVariableForExercise, fetchVariablesForExercise, updateVariableForExercise } from '../../../../actions/variables/variable-actions';
-import DefinitionMenu from '../../components/DefinitionMenu';
+import DefinitionMenu from '../../common/simulate/DefinitionMenu';
 import { VariableContext, VariableContextType } from '../../common/Context';
 
 const ExerciseVariables = () => {

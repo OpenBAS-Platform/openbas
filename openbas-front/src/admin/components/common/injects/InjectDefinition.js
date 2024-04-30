@@ -49,7 +49,7 @@ import Loader from '../../../../components/Loader';
 import DocumentType from '../../components/documents/DocumentType';
 import DocumentPopover from '../../components/documents/DocumentPopover';
 import OldSelectField from '../../../../components/fields/OldSelectField';
-import ArticlePopover from '../../components/articles/ArticlePopover';
+import ArticlePopover from '../articles/ArticlePopover';
 import InjectAddArticles from './InjectAddArticles';
 import ChannelIcon from '../../components/channels/ChannelIcon';
 import ChallengePopover from '../../components/challenges/ChallengePopover';

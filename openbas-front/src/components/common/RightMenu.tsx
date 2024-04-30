@@ -4,6 +4,7 @@ import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/mat
 import { Link, useLocation } from 'react-router-dom';
 import type { Theme } from '../Theme';
 import { useFormatter } from '../i18n';
+import { isNotEmptyField } from '../../utils/utils';
 
 const useStyles = makeStyles((theme: Theme) => ({
   drawer: {
@@ -25,6 +26,7 @@ export interface RightMenuEntry {
   path: string;
   icon: () => React.ReactElement;
   label: string;
+  number?: number;
 }
 
 const RightMenu: FunctionComponent<{ entries: RightMenuEntry[] }> = ({
@@ -34,7 +36,6 @@ const RightMenu: FunctionComponent<{ entries: RightMenuEntry[] }> = ({
   const location = useLocation();
   const classes = useStyles();
   const { t } = useFormatter();
-
   return (
     <Drawer
       variant="permanent"
@@ -56,7 +57,7 @@ const RightMenu: FunctionComponent<{ entries: RightMenuEntry[] }> = ({
               <ListItemIcon>
                 {entry.icon()}
               </ListItemIcon>
-              <ListItemText primary={t(entry.label)} />
+              <ListItemText primary={isNotEmptyField(entry.number) ? `${t(entry.label)} (${entry.number})` : t(entry.label)} />
             </MenuItem>
           );
         })}

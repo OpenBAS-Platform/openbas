@@ -175,6 +175,7 @@ const ChallengeForm = (props) => {
             name="challenge_name"
             fullWidth={true}
             label={t('Name')}
+            style={{ marginTop: 10 }}
           />
           <OldTextField
             name="challenge_category"

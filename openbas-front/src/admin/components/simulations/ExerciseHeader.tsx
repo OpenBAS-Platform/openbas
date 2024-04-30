@@ -12,7 +12,7 @@ import { usePermissions } from '../../../utils/Exercise';
 import ExerciseDatePopover from './ExerciseDatePopover';
 import Countdown from '../../../components/Countdown';
 import ExerciseStatus from './ExerciseStatus';
-import HeaderTags from '../scenarios/scenario/HeaderTags';
+import HeaderTags from '../common/simulate/HeaderTags';
 import { useAppDispatch } from '../../../utils/hooks';
 import type { ExerciseStore } from '../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';

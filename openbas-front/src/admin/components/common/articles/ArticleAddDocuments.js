@@ -6,7 +6,7 @@ import { makeStyles } from '@mui/styles';
 import SearchFilter from '../../../../components/SearchFilter';
 import { useFormatter } from '../../../../components/i18n';
 import { fetchDocuments } from '../../../../actions/Document';
-import CreateDocument from '../documents/CreateDocument';
+import CreateDocument from '../../components/documents/CreateDocument';
 import { truncate } from '../../../../utils/String';
 import Transition from '../../../../components/common/Transition';
 import TagsFilter from '../../../../components/TagsFilter';
@@ -14,7 +14,7 @@ import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { PermissionsContext } from '../../common/Context';
+import { PermissionsContext } from '../Context';
 
 const useStyles = makeStyles((theme) => ({
   box: {

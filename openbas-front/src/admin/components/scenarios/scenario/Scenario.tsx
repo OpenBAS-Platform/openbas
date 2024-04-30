@@ -7,7 +7,6 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { fetchExercises } from '../../../../actions/Exercise';
@@ -49,7 +48,6 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
     exercises: helper.getExercisesMap(),
   }));
   useDataLoader(() => {
-    dispatch(fetchScenario(scenarioId));
     dispatch(fetchExercises());
   });
   const scenarioExercises = scenario.scenario_exercises?.map((exerciseId: string) => exercises[exerciseId]).filter((ex: ExerciseStore) => !!ex);
@@ -160,7 +158,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
       </div>
       {scenarioExercises.length === 0 && (
         <div style={{ marginTop: 100, textAlign: 'center' }}>
-          <div style={{ fontSize: 20, fontWeight: 400, fontFamily: 'Geologica' }}>
+          <div style={{ fontSize: 20, fontFamily: 'Geologica Thin' }}>
             {t('This scenario has never run, schedule or run it now!')}
           </div>
           <Button

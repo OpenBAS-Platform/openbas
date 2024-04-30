@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import * as R from 'ramda';
-import { Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Fab, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, GroupsOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { truncate } from '../../../../utils/String';
@@ -22,9 +22,8 @@ import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 
 const useStyles = makeStyles(() => ({
   createButton: {
-    position: 'fixed',
-    bottom: 30,
-    right: 230,
+    float: 'left',
+    marginTop: -15,
   },
   box: {
     width: '100%',
@@ -55,7 +54,6 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
   const [keyword, setKeyword] = useState('');
   const [teamIds, setTeamIds] = useState<Team['team_id'][]>([]);
   const [tags, setTags] = useState<Option[]>([]);
-
   const { teamsMap, organizationsMap }: {
     organizationsMap: Record<string, Organization>,
     teamsMap: Record<string, TeamStore>
@@ -63,11 +61,9 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
     teamsMap: helper.getTeamsMap(),
     organizationsMap: helper.getOrganizationsMap(),
   }));
-
   useDataLoader(() => {
     dispatch(fetchTeams());
   });
-
   const submitAddTeams = async () => {
     await onAddTeams(teamIds);
     setOpen(false);
@@ -98,17 +94,17 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
     R.filter(filterByKeyword),
     R.take(10),
   )(R.values(teamsMap));
-
   return (
     <>
-      <Fab
-        onClick={() => setOpen(true)}
+      <IconButton
         color="primary"
         aria-label="Add"
-        className={classes.createButton}
+        onClick={() => setOpen(true)}
+        classes={{ root: classes.createButton }}
+        size="large"
       >
-        <Add />
-      </Fab>
+        <Add fontSize="small" />
+      </IconButton>
       <Dialog
         open={open}
         TransitionComponent={Transition}

@@ -44,9 +44,8 @@ const VariablePopover: React.FC<Props> = ({
     onDelete(variable);
     setDeleteVar(false);
   };
-
   return (
-    <div>
+    <>
       <IconButton
         onClick={(ev) => {
           ev.stopPropagation();
@@ -54,6 +53,7 @@ const VariablePopover: React.FC<Props> = ({
         }}
         aria-haspopup="true"
         size="large"
+        color="primary"
         disabled={disabled}
       >
         <MoreVert />
@@ -118,7 +118,7 @@ const VariablePopover: React.FC<Props> = ({
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 };
 

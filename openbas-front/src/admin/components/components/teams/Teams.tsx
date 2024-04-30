@@ -82,19 +82,7 @@ const headerStyles: Record<string, CSSProperties> = {
   },
   team_users_number: {
     float: 'left',
-    width: '12%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  team_users_enabled_number: {
-    float: 'left',
-    width: '12%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  team_enabled: {
-    float: 'left',
-    width: '15%',
+    width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -107,6 +95,51 @@ const headerStyles: Record<string, CSSProperties> = {
   team_contextual: {
     float: 'left',
     width: '10%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  team_updated_at: {
+    float: 'left',
+    width: '12%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+};
+
+const headerStylesContextual: Record<string, CSSProperties> = {
+  iconSort: {
+    position: 'absolute',
+    margin: '0 0 0 5px',
+    padding: 0,
+    top: '0px',
+  },
+  team_name: {
+    float: 'left',
+    width: '35%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  team_users_number: {
+    float: 'left',
+    width: '12%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  team_users_enabled_number: {
+    float: 'left',
+    width: '12%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  team_tags: {
+    float: 'left',
+    width: '25%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  team_contextual: {
+    float: 'left',
+    width: '8%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -131,15 +164,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   team_users_number: {
     float: 'left',
-    width: '12%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  team_users_enabled_number: {
-    float: 'left',
-    width: '12%',
+    width: '10%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -161,6 +186,57 @@ const inlineStyles: Record<string, CSSProperties> = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
+  team_updated_at: {
+    float: 'left',
+    width: '12%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+};
+
+const inlineStylesContextual: Record<string, CSSProperties> = {
+  team_name: {
+    float: 'left',
+    width: '35%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  team_users_number: {
+    float: 'left',
+    width: '12%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  team_users_enabled_number: {
+    float: 'left',
+    width: '12%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  team_tags: {
+    float: 'left',
+    width: '25%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  team_contextual: {
+    float: 'left',
+    width: '8%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
 };
 
 interface Props {
@@ -176,13 +252,12 @@ const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
   // Standard hooks
   const dispatch = useAppDispatch();
   const classes = useStyles();
-  const { t } = useFormatter();
+  const { t, nsdt } = useFormatter();
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
   const { teams, tagsMap }: { teams: TeamStore[], tagsMap: Record<string, Tag> } = useHelper((helper: TagsHelper & TeamsHelper) => ({
     teams: helper.getTeams(),
     tagsMap: helper.getTagsMap(),
   }));
-
   const { computeTeamUsersEnabled } = useContext(TeamContext);
   const { permissions } = useContext(PermissionsContext);
 
@@ -205,7 +280,6 @@ const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
     ],
     { defaultKeyword: search },
   );
-
   const sortedTeams = filtering.filterAndSort(teams.filter((team) => teamIds.includes(team.team_id)).map((team) => {
     if (computeTeamUsersEnabled) {
       return ({
@@ -215,54 +289,55 @@ const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
     }
     return team;
   }));
-
   return (
     <>
-      {!contextual && <Breadcrumbs variant="list" elements={[{ label: t('Teams') }, { label: t('Teams of players'), current: true }]} />}
-      <div className={classes.parameters}>
-        <div className={classes.filters}>
-          <SearchFilter
-            variant="small"
-            onChange={filtering.handleSearch}
-            keyword={filtering.keyword}
-          />
-          <TagsFilter
-            onAddTag={filtering.handleAddTag}
-            onRemoveTag={filtering.handleRemoveTag}
-            currentTags={filtering.tags}
-          />
+      {!contextual && (<Breadcrumbs variant="list" elements={[{ label: t('Teams') }, { label: t('Teams of players'), current: true }]} />)}
+      {!contextual && (
+        <div className={classes.parameters}>
+          <div className={classes.filters}>
+            <SearchFilter
+              variant="small"
+              onChange={filtering.handleSearch}
+              keyword={filtering.keyword}
+            />
+            <TagsFilter
+              onAddTag={filtering.handleAddTag}
+              onRemoveTag={filtering.handleRemoveTag}
+              currentTags={filtering.tags}
+            />
+          </div>
+          <div className={classes.downloadButton}>
+            {sortedTeams.length > 0 ? (
+              <CSVLink
+                data={exportData(
+                  'team',
+                  [
+                    'team_name',
+                    'team_description',
+                    'team_users_number',
+                    ...(computeTeamUsersEnabled ? ['team_users_enabled_number'] : []),
+                    'team_enabled',
+                    'team_tags',
+                  ],
+                  sortedTeams,
+                  tagsMap,
+                )}
+                filename={`${t('Teams')}.csv`}
+              >
+                <Tooltip title={t('Export this list')}>
+                  <IconButton size="large">
+                    <FileDownloadOutlined color="primary" />
+                  </IconButton>
+                </Tooltip>
+              </CSVLink>
+            ) : (
+              <IconButton size="large" disabled={true}>
+                <FileDownloadOutlined />
+              </IconButton>
+            )}
+          </div>
         </div>
-        <div className={classes.downloadButton}>
-          {sortedTeams.length > 0 ? (
-            <CSVLink
-              data={exportData(
-                'team',
-                [
-                  'team_name',
-                  'team_description',
-                  'team_users_number',
-                  ...(computeTeamUsersEnabled ? ['team_users_enabled_number'] : []),
-                  'team_enabled',
-                  'team_tags',
-                ],
-                sortedTeams,
-                tagsMap,
-              )}
-              filename={`${t('Teams')}.csv`}
-            >
-              <Tooltip title={t('Export this list')}>
-                <IconButton size="large">
-                  <FileDownloadOutlined color="primary" />
-                </IconButton>
-              </Tooltip>
-            </CSVLink>
-          ) : (
-            <IconButton size="large" disabled={true}>
-              <FileDownloadOutlined />
-            </IconButton>
-          )}
-        </div>
-      </div>
+      )}
       <div className="clearfix" />
       <List>
         <ListItem
@@ -279,14 +354,14 @@ const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
           </ListItemIcon>
           <ListItemText
             primary={
-              <div>
+              <>
                 {filtering.buildHeader(
                   'team_name',
                   'Name',
                   true,
-                  headerStyles,
+                  contextual ? headerStylesContextual : headerStyles,
                 )}
-                {filtering.buildHeader(
+                {!contextual && filtering.buildHeader(
                   'team_description',
                   'Description',
                   true,
@@ -296,27 +371,33 @@ const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
                   'team_users_number',
                   'Players',
                   true,
-                  headerStyles,
+                  contextual ? headerStylesContextual : headerStyles,
                 )}
-                {computeTeamUsersEnabled && filtering.buildHeader(
+                {contextual && computeTeamUsersEnabled && filtering.buildHeader(
                   'team_users_enabled_number',
-                  'Enabled players',
+                  'Enabled',
                   true,
-                  headerStyles,
+                  headerStylesContextual,
                 )}
                 {filtering.buildHeader(
                   'team_tags',
                   'Tags',
                   true,
-                  headerStyles,
+                  contextual ? headerStylesContextual : headerStyles,
                 )}
                 {filtering.buildHeader(
                   'team_contextual',
                   'Contextual',
                   true,
+                  contextual ? headerStylesContextual : headerStyles,
+                )}
+                {!contextual && filtering.buildHeader(
+                  'team_updated_at',
+                  'Updated',
+                  true,
                   headerStyles,
                 )}
-              </div>
+              </>
             }
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
@@ -337,39 +418,41 @@ const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
                 <div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.team_name}
+                    style={contextual ? inlineStylesContextual.team_name : inlineStyles.team_name}
                   >
                     {team.team_name}
                   </div>
+                  {!contextual && (
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.team_description}
+                    >
+                      {team.team_description}
+                    </div>
+                  )}
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.team_description}
-                  >
-                    {team.team_description}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.team_users_number}
+                    style={contextual ? inlineStylesContextual.team_users_number : inlineStyles.team_users_number}
                   >
                     {team.team_users_number}
                   </div>
-                  {computeTeamUsersEnabled
-                    && <div
+                  {contextual && computeTeamUsersEnabled && (
+                    <div
                       className={classes.bodyItem}
-                      style={inlineStyles.team_users_enabled_number}
-                       >
+                      style={inlineStylesContextual.team_users_enabled_number}
+                    >
                       {team.team_users_enabled_number}
                     </div>
-                  }
+                  )}
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.team_tags}
+                    style={contextual ? inlineStylesContextual.team_tags : inlineStyles.team_tags}
                   >
                     <ItemTags variant="list" tags={team.team_tags} />
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.team_contextual}
+                    style={contextual ? inlineStylesContextual.team_contextual : inlineStyles.team_contextual}
                   >
                     {team.team_contextual ? (
                       <CheckCircleOutlined fontSize="small" />
@@ -377,6 +460,14 @@ const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
                       '-'
                     )}
                   </div>
+                  {!contextual && (
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.team_updated_at}
+                    >
+                      {nsdt(team.team_updated_at)}
+                    </div>
+                  )}
                 </div>
               }
             />

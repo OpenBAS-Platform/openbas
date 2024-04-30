@@ -13,11 +13,11 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
-import ChannelIcon from '../channels/ChannelIcon';
+import ChannelIcon from '../../components/channels/ChannelIcon';
 import MarkDownField from '../../../../components/MarkDownField';
-import DocumentType from '../documents/DocumentType';
+import DocumentType from '../../components/documents/DocumentType';
 import ItemTags from '../../../../components/ItemTags';
-import DocumentPopover from '../documents/DocumentPopover';
+import DocumentPopover from '../../components/documents/DocumentPopover';
 import ArticleAddDocuments from './ArticleAddDocuments';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 

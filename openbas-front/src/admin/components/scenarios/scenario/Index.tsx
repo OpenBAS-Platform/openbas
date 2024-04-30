@@ -1,6 +1,6 @@
 import React, { FunctionComponent, lazy, Suspense, useState } from 'react';
-import { Link, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
-import { Box, Tooltip, IconButton, Tab, Tabs } from '@mui/material';
+import { Link, Route, Routes, useLocation, useParams } from 'react-router-dom';
+import { Box, IconButton, Tab, Tabs, Tooltip } from '@mui/material';
 import cronstrue from 'cronstrue';
 import { makeStyles, useTheme } from '@mui/styles';
 import { UpdateOutlined } from '@mui/icons-material';
@@ -22,11 +22,7 @@ import { parseCron, ParsedCron } from '../../../../utils/Cron';
 import type { Theme } from '../../../../components/Theme';
 
 const Scenario = lazy(() => import('./Scenario'));
-const ScenarioSettings = lazy(() => import('./definition/ScenarioSettings'));
-const Teams = lazy(() => import('./teams/ScenarioTeams'));
-const Articles = lazy(() => import('./articles/ScenarioArticles'));
-const Challenges = lazy(() => import('./challenges/ScenarioChallenges'));
-const Variables = lazy(() => import('./variables/ScenarioVariables'));
+const ScenarioDefinition = lazy(() => import('./ScenarioDefinition'));
 const Injects = lazy(() => import('./injects/ScenarioInjects'));
 
 // eslint-disable-next-line no-underscore-dangle
@@ -94,7 +90,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
   return (
     <PermissionsContext.Provider value={permissionsContext}>
       <DocumentContext.Provider value={documentContext}>
-        <div style={{ paddingRight: ['/definition'].some((el) => location.pathname.includes(el)) ? 200 : 0 }}>
+        <>
           <Breadcrumbs variant="object" elements={[{ label: t('Scenarios') }, { label: scenario.scenario_name, current: true }]} />
           <ScenarioHeader
             setCronExpression={setCronExpression}
@@ -157,18 +153,13 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
           <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="" element={errorWrapper(Scenario)({ setOpenScenarioRecurringFormDialog })} />
-              <Route path="definition" element={<Navigate to="settings" replace />}/>
-              <Route path="definition/settings" element={errorWrapper(ScenarioSettings)()} />
-              <Route path="definition/teams" element={errorWrapper(Teams)({ scenarioTeamsUsers: scenario.scenario_teams_users })} />
-              <Route path="definition/articles" element={errorWrapper(Articles)()} />
-              <Route path="definition/challenges" element={errorWrapper(Challenges)()} />
-              <Route path="definition/variables" element={errorWrapper(Variables)()} />
+              <Route path="definition" element={errorWrapper(ScenarioDefinition)()}/>
               <Route path="injects" element={errorWrapper(Injects)()} />
               {/* Not found */}
               <Route path="*" element={<NotFound/>}/>
             </Routes>
           </Suspense>
-        </div>
+        </>
       </DocumentContext.Provider>
     </PermissionsContext.Provider>
   );

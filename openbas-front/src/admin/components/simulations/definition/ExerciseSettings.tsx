@@ -6,18 +6,18 @@ import { Groups3Outlined, MailOutlined, NotificationsOutlined, PersonOutlined } 
 import ExerciseInformation from './ExerciseInformation';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import { useFormatter } from '../../../../components/i18n';
-import SettingsForm, { SettingUpdateInput } from '../../components/SettingsForm';
+import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
 import { fetchExercise, updateExercise } from '../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { usePermissions } from '../../../../utils/Exercise';
-import DefinitionMenu from '../../components/DefinitionMenu';
+import DefinitionMenu from '../../common/simulate/DefinitionMenu';
 import { useHelper } from '../../../../store';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import CreateControl from '../controls/CreateControl';
 import ExerciseControlDryRuns from './ExerciseControlDryRuns';
 import ExerciseControlComChecks from './ExerciseControlComChecks';
-import PaperMetric from '../../components/PaperMetric';
+import PaperMetric from '../../common/simulate/PaperMetric';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -86,7 +86,7 @@ const ExerciseSettings = () => {
         <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="h4">{t('Settings')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <SettingsForm
+            <EmailParametersForm
               initialValues={settingsMapping(exercise)}
               onSubmit={submitUpdate}
               disabled={permissions.readOnly}

@@ -2,17 +2,16 @@ import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, Chip, Grid, I
 import { green, orange } from '@mui/material/colors';
 import React, { FunctionComponent, useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, ShareOutlined, VisibilityOutlined } from '@mui/icons-material';
+import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, NewspaperOutlined, ShareOutlined, VisibilityOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
-import SearchFilter from '../../../../components/SearchFilter';
-import ChannelsFilter from '../channels/ChannelsFilter';
+import ChannelsFilter from '../../components/channels/ChannelsFilter';
 import ArticlePopover from './ArticlePopover';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
-import ChannelIcon from '../channels/ChannelIcon';
+import ChannelIcon from '../../components/channels/ChannelIcon';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import type { ArticleStore, FullArticleStore } from '../../../../actions/channels/Article';
-import type { ChannelOption } from '../channels/ChannelOption';
+import type { ChannelOption } from '../../components/channels/ChannelOption';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
@@ -22,7 +21,8 @@ import { useFormatter } from '../../../../components/i18n';
 import type { DocumentsHelper } from '../../../../actions/helper';
 import CreateArticle from './CreateArticle';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
-import { ArticleContext, PermissionsContext } from '../../common/Context';
+import { ArticleContext, PermissionsContext } from '../Context';
+import Empty from '../../../../components/Empty';
 
 const useStyles = makeStyles(() => ({
   channel: {
@@ -30,6 +30,7 @@ const useStyles = makeStyles(() => ({
     float: 'left',
     marginRight: 7,
     maxWidth: 300,
+    borderRadius: 4,
   },
   card: {
     position: 'relative',
@@ -50,9 +51,7 @@ interface Props {
   articles: ArticleStore[];
 }
 
-const Articles: FunctionComponent<Props> = ({
-  articles,
-}) => {
+const Articles: FunctionComponent<Props> = ({ articles }) => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -67,6 +66,12 @@ const Articles: FunctionComponent<Props> = ({
     dispatch(fetchChannels());
     dispatch(fetchDocuments());
   });
+
+  // Creation
+  const [openCreate, setOpenCreate] = useState(false);
+  const handleOpenCreate = () => setOpenCreate(true);
+  const handleCloseCreate = () => setOpenCreate(false);
+
   // Filter and sort hook
   const [channels, setChannels] = useState<ChannelOption[]>([]);
   const handleAddChannel = (value?: ChannelOption) => {
@@ -109,25 +114,43 @@ const Articles: FunctionComponent<Props> = ({
 
   return (
     <>
-      <div>
-        <div style={{ float: 'left', marginRight: 10 }}>
-          <SearchFilter
-            variant="small"
-            onChange={filtering.handleSearch}
-            keyword={filtering.keyword}
-          />
-        </div>
-        <div style={{ float: 'left', marginRight: 10 }}>
-          <ChannelsFilter
-            onAddChannel={handleAddChannel}
-            onRemoveChannel={handleRemoveChannel}
-            currentChannels={channels}
-          />
-        </div>
-      </div>
+      {permissions.canWrite && (
+        <CreateArticle
+          openCreate={openCreate}
+          handleOpenCreate={handleOpenCreate}
+          handleCloseCreate={handleCloseCreate}
+        />
+      )}
+      {sortedArticles.length > 0 && (
+        <ChannelsFilter
+          onAddChannel={handleAddChannel}
+          onRemoveChannel={handleRemoveChannel}
+          currentChannels={channels}
+        />
+      )}
       <div className="clearfix" />
+      {sortedArticles.length === 0 && (
+        <Empty message={
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 18, fontFamily: 'Geologica Thin' }}>
+              {t('No article available in this simulation yet.')}
+            </div>
+            <Button
+              style={{ marginTop: 20 }}
+              startIcon={<NewspaperOutlined />}
+              variant="outlined"
+              color="primary"
+              size="small"
+              onClick={handleOpenCreate}
+            >
+              {t('Create an article')}
+            </Button>
+          </div>
+            }
+        />
+      )}
       <Grid container spacing={3}>
-        {sortedArticles.map((article) => {
+        {sortedArticles.map((article, index) => {
           const docs = (article.article_documents ?? [])
             .map((docId) => (documentsMap[docId] ? documentsMap[docId] : undefined))
             .filter((d) => d !== undefined);
@@ -151,7 +174,7 @@ const Articles: FunctionComponent<Props> = ({
           }
           // const shouldBeTruncated = (article.article_content || '').length > 500;
           return (
-            <Grid key={article.article_id} item xs={4}>
+            <Grid key={article.article_id} item xs={4} style={index < 3 ? { paddingTop: 0 } : undefined}>
               <Card
                 variant="outlined"
                 classes={{ root: classes.card }}
@@ -283,9 +306,6 @@ const Articles: FunctionComponent<Props> = ({
           );
         })}
       </Grid>
-      {permissions.canWrite && (
-        <CreateArticle />
-      )}
     </>
   );
 };

@@ -1,163 +1,307 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { makeStyles } from '@mui/styles';
-import { Avatar, Button, Card, CardContent, CardHeader, Chip, Grid, Tooltip, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Tooltip, Chip } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { EmojiEventsOutlined, RowingOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
-import { CrisisAlertOutlined, DescriptionOutlined, EmojiEventsOutlined, OutlinedFlagOutlined, SportsScoreOutlined, VisibilityOutlined } from '@mui/icons-material';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import { Link } from 'react-router-dom';
 import SearchFilter from '../../../../components/SearchFilter';
-import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import { useHelper } from '../../../../store';
+import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import { fetchChallenges } from '../../../../actions/Challenge';
+import ChallengePopover from './ChallengePopover';
+import CreateChallenge from './CreateChallenge';
+import { fetchTags } from '../../../../actions/Tag';
 import TagsFilter from '../../../../components/TagsFilter';
+import ItemTags from '../../../../components/ItemTags';
+import { fetchDocuments } from '../../../../actions/Document';
+import { fetchExercises } from '../../../../actions/Exercise';
+import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { useFormatter } from '../../../../components/i18n';
-import { ChallengeContext } from '../../common/Context';
 
 const useStyles = makeStyles(() => ({
-  flag: {
+  parameters: {
+    marginTop: -10,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  filters: {
+    display: 'flex',
+    gap: '10px',
+  },
+  itemHead: {
+    paddingLeft: 10,
+    textTransform: 'uppercase',
+    cursor: 'pointer',
+  },
+  item: {
+    paddingLeft: 10,
+    height: 50,
+  },
+  bodyItem: {
+    height: '100%',
+    fontSize: 13,
+  },
+  exercise: {
     fontSize: 12,
+    height: 20,
     float: 'left',
     marginRight: 7,
-    maxWidth: 300,
-  },
-  card: {
-    position: 'relative',
-  },
-  footer: {
-    width: '100%',
-    position: 'absolute',
-    padding: '0 15px 0 15px',
-    left: 0,
-    bottom: 10,
-  },
-  button: {
-    cursor: 'default',
+    width: 120,
   },
 }));
 
-const Challenges = ({ challenges }) => {
+const headerStyles = {
+  iconSort: {
+    position: 'absolute',
+    margin: '0 0 0 5px',
+    padding: 0,
+    top: '0px',
+  },
+  challenge_name: {
+    float: 'left',
+    width: '25%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  challenge_category: {
+    float: 'left',
+    width: '20%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  challenge_score: {
+    float: 'left',
+    width: '10%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  challenge_exercises: {
+    float: 'left',
+    width: '20%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  challenge_tags: {
+    float: 'left',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+};
+
+const inlineStyles = {
+  challenge_name: {
+    float: 'left',
+    width: '25%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  challenge_category: {
+    float: 'left',
+    width: '20%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  challenge_score: {
+    float: 'left',
+    width: '10%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  challenge_exercises: {
+    float: 'left',
+    width: '20%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  challenge_tags: {
+    float: 'left',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+};
+
+const Challenges = () => {
   // Standard hooks
   const classes = useStyles();
+  const dispatch = useDispatch();
   const { t } = useFormatter();
 
-  // Context
-  const { previewChallengeUrl } = useContext(ChallengeContext);
-
   // Filter and sort hook
-  const searchColumns = ['name', 'category', 'content'];
+  const searchColumns = ['name', 'content', 'category'];
   const filtering = useSearchAnFilter('challenge', 'name', searchColumns);
-  // Rendering
-  const groupChallenges = R.groupBy(R.prop('challenge_category'));
-  const sortedChallenges = groupChallenges(filtering.filterAndSort(challenges));
+  // Fetching data
+  const { challenges, documentsMap, exercisesMap } = useHelper((helper) => ({
+    exercisesMap: helper.getExercisesMap(),
+    challenges: helper.getChallenges(),
+    documentsMap: helper.getDocumentsMap(),
+  }));
+  useDataLoader(() => {
+    dispatch(fetchExercises());
+    dispatch(fetchChallenges());
+    dispatch(fetchTags());
+    dispatch(fetchDocuments());
+  });
+  const sortedChallenges = filtering.filterAndSort(challenges);
   return (
     <>
-      <div>
-        <div style={{ float: 'left', marginRight: 10 }}>
+      <Breadcrumbs variant="list" elements={[{ label: t('Components') }, { label: t('Challenges'), current: true }]} />
+      <div className={classes.parameters}>
+        <div className={classes.filters}>
           <SearchFilter
             variant="small"
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
           />
-        </div>
-        <div style={{ float: 'left', marginRight: 10 }}>
           <TagsFilter
             onAddTag={filtering.handleAddTag}
             onRemoveTag={filtering.handleRemoveTag}
             currentTags={filtering.tags}
           />
         </div>
-        <div style={{ float: 'right' }}>
-          <Button
-            startIcon={<VisibilityOutlined />}
-            color="secondary"
-            variant="outlined"
-            component={Link}
-            to={previewChallengeUrl()}
-          >
-            {t('Preview challenges page')}
-          </Button>
-        </div>
       </div>
       <div className="clearfix" />
-      {Object.keys(sortedChallenges).map((category) => {
-        return (
-          <div key={category}>
-            <Typography variant="h1" style={{ margin: '30px 0 30px 0' }}>
-              {category !== 'null' ? category : t('No category')}
-            </Typography>
-            <Grid container={true} spacing={3}>
-              {sortedChallenges[category].map((challenge) => {
-                return (
-                  <Grid key={challenge.challenge_id} item={true} xs={4}>
-                    <Card
-                      variant="outlined"
-                      classes={{ root: classes.card }}
-                      sx={{ width: '100%', height: '100%' }}
+      <List>
+        <ListItem
+          classes={{ root: classes.itemHead }}
+          divider={false}
+          style={{ paddingTop: 0 }}
+        >
+          <ListItemIcon>
+            <span
+              style={{ padding: '0 8px 0 8px', fontWeight: 700, fontSize: 12 }}
+            >
+              &nbsp;
+            </span>
+          </ListItemIcon>
+          <ListItemText
+            primary={
+              <div>
+                {filtering.buildHeader(
+                  'challenge_name',
+                  'Name',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'challenge_category',
+                  'Category',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'challenge_score',
+                  'Score',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'challenge_exercises',
+                  'Simulations',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'challenge_tags',
+                  'Tags',
+                  true,
+                  headerStyles,
+                )}
+              </div>
+            }
+          />
+          <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
+        </ListItem>
+        {sortedChallenges.map((challenge) => {
+          const docs = challenge.challenge_documents
+            .map((d) => (documentsMap[d] ? documentsMap[d] : undefined))
+            .filter((d) => d !== undefined);
+          return (
+            <ListItem
+              key={challenge.challenge_id}
+              classes={{ root: classes.item }}
+              divider={true}
+            >
+              <ListItemIcon>
+                <EmojiEventsOutlined color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.challenge_name}
                     >
-                      <CardHeader
-                        avatar={
-                          <Avatar sx={{ bgcolor: '#e91e63' }}>
-                            <EmojiEventsOutlined />
-                          </Avatar>
-                        }
-                        title={challenge.challenge_name}
-                        subheader={challenge.challenge_category}
+                      {challenge.challenge_name}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.challenge_category}
+                    >
+                      {challenge.challenge_category}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.challenge_score}
+                    >
+                      {challenge.challenge_score}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.challenge_exercises}
+                    >
+                      {R.take(3, challenge.challenge_exercises).map((e) => {
+                        const exercise = exercisesMap[e] || {};
+                        return (
+                          <Tooltip
+                            key={exercise.exercise_id}
+                            title={exercise.exercise_name}
+                          >
+                            <Chip
+                              icon={<RowingOutlined style={{ fontSize: 12 }} />}
+                              classes={{ root: classes.exercise }}
+                              variant="outlined"
+                              label={exercise.exercise_name}
+                              component={Link}
+                              clickable={true}
+                              to={`/admin/exercises/${exercise.exercise_id}`}
+                            />
+                          </Tooltip>
+                        );
+                      })}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.challenge_tags}
+                    >
+                      <ItemTags
+                        variant="list"
+                        tags={challenge.challenge_tags}
                       />
-                      <CardContent style={{ margin: '-20px 0 30px 0' }}>
-                        <ExpandableMarkdown
-                          source={challenge.challenge_content}
-                          limit={500}
-                          controlled={true}
-                        />
-                        <div className={classes.footer}>
-                          <div style={{ float: 'left' }}>
-                            {challenge.challenge_flags.map((flag) => {
-                              return (
-                                <Tooltip
-                                  key={flag.flag_id}
-                                  title={t(flag.flag_type)}
-                                >
-                                  <Chip
-                                    icon={<OutlinedFlagOutlined />}
-                                    classes={{ root: classes.flag }}
-                                    variant="outlined"
-                                    label={t(flag.flag_type)}
-                                  />
-                                </Tooltip>
-                              );
-                            })}
-                          </div>
-                          <div style={{ float: 'right' }}>
-                            <Button
-                              size="small"
-                              startIcon={<SportsScoreOutlined />}
-                              className={classes.button}
-                            >
-                              {challenge.challenge_score || 0}
-                            </Button>
-                            <Button
-                              size="small"
-                              startIcon={<CrisisAlertOutlined />}
-                              className={classes.button}
-                            >
-                              {challenge.challenge_max_attempts || 0}
-                            </Button>
-                            <Button
-                              size="small"
-                              startIcon={<DescriptionOutlined />}
-                              className={classes.button}
-                            >
-                              {challenge.challenge_documents.length || 0}
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </div>
-        );
-      })}
+                    </div>
+                  </div>
+                }
+              />
+              <ListItemSecondaryAction>
+                <ChallengePopover challenge={challenge} documents={docs} />
+              </ListItemSecondaryAction>
+            </ListItem>
+          );
+        })}
+      </List>
+      <CreateChallenge />
     </>
   );
 };

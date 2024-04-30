@@ -2,7 +2,7 @@ import { Grid, Paper, Typography } from '@mui/material';
 import React from 'react';
 import { ComputerOutlined, GroupsOutlined, Kayaking, LanOutlined, MovieFilterOutlined, PersonOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../components/i18n';
-import PaperMetric from './components/PaperMetric';
+import PaperMetric from './common/simulate/PaperMetric';
 import { useAppDispatch } from '../../utils/hooks';
 import { useHelper } from '../../store';
 import useDataLoader from '../../utils/ServerSideEvent';

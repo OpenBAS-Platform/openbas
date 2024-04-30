@@ -4,7 +4,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { MoreVert } from '@mui/icons-material';
 import { useFormatter } from '../../../../components/i18n';
 import ArticleForm from './ArticleForm';
-import { ArticleContext, PermissionsContext } from '../../common/Context';
+import { ArticleContext, PermissionsContext } from '../Context';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

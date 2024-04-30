@@ -1,11 +1,11 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import DefinitionMenu from '../../components/DefinitionMenu';
+import DefinitionMenu from '../../common/simulate/DefinitionMenu';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { Exercise } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import Challenges from '../../components/challenges/Challenges';
+import ContextualChallenges from '../../common/challenges/ContextualChallenges';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import type { ChallengesHelper } from '../../../../actions/helper';
 import { ChallengeContext, ChallengeContextType } from '../../common/Context';
@@ -28,7 +28,7 @@ const ExerciseChallenges = () => {
   return (
     <ChallengeContext.Provider value={context}>
       <DefinitionMenu base="/admin/exercises" id={exerciseId} />
-      <Challenges challenges={challenges} />
+      <ContextualChallenges challenges={challenges} linkToInjects={`/admin/exercises/${exerciseId}/injects`} />
     </ChallengeContext.Provider>
   );
 };

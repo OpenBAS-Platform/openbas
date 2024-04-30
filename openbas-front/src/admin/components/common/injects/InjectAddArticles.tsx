@@ -6,7 +6,7 @@ import { makeStyles } from '@mui/styles';
 import SearchFilter from '../../../../components/SearchFilter';
 import { useFormatter } from '../../../../components/i18n';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
-import CreateArticle from '../../components/articles/CreateArticle';
+import CreateArticle from '../articles/CreateArticle';
 import { truncate } from '../../../../utils/String';
 import Transition from '../../../../components/common/Transition';
 import ChannelIcon from '../../components/channels/ChannelIcon';

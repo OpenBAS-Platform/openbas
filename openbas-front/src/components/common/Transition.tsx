@@ -1,6 +1,6 @@
 import React, { JSXElementConstructor } from 'react';
 import { Slide } from '@mui/material';
-import { TransitionProps } from '@mui/material/transitions';
+import type { TransitionProps } from '@mui/material/transitions';
 
 const Transition = React.forwardRef(
   (

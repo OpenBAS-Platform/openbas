@@ -1,16 +1,18 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { ScenarioInput } from '../../../../utils/api-types';
+import { Box, Tabs, Tab } from '@mui/material';
+import type { ScenarioInput, ScenarioInformationInput } from '../../../../utils/api-types';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
-import { deleteScenario, exportScenarioUri, updateScenario } from '../../../../actions/scenarios/scenario-actions';
+import { deleteScenario, exportScenarioUri, updateScenario, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import Drawer from '../../../../components/common/Drawer';
 import ScenarioForm from '../ScenarioForm';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import ScenarioExportDialog from './ScenarioExportDialog';
 import useScenarioPermissions from '../../../../utils/Scenario';
+import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
 
 interface Props {
   scenario: ScenarioStore;
@@ -23,6 +25,8 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [currentTab, setCurrentTab] = useState(0);
+  const handleChangeTab = (event: React.SyntheticEvent, value: number) => setCurrentTab(value);
 
   const initialValues = (({
     scenario_name,
@@ -44,7 +48,6 @@ const ScenarioPopover: FunctionComponent<Props> = ({
 
   // Edition
   const [edition, setEdition] = useState(false);
-
   const handleEdit = () => {
     setEdition(true);
   };
@@ -53,13 +56,28 @@ const ScenarioPopover: FunctionComponent<Props> = ({
     setEdition(false);
   };
 
+  // Email parameters
+  const initialValuesEmailParameters = {
+    setting_mail_from: scenario.scenario_mail_from,
+    setting_mails_reply_to: scenario.scenario_mails_reply_to,
+    setting_message_header: scenario.scenario_message_header,
+    setting_message_footer: scenario.scenario_message_footer,
+  };
+  const submitUpdateEmailParameters = (data: SettingUpdateInput) => {
+    const scenarioInformationInput: ScenarioInformationInput = {
+      scenario_mail_from: data.setting_mail_from || '',
+      scenario_mails_reply_to: data.setting_mails_reply_to,
+      scenario_message_header: data.setting_message_header,
+      scenario_message_footer: scenario.scenario_message_footer,
+    };
+    dispatch(updateScenarioInformation(scenario.scenario_id, scenarioInformationInput));
+  };
+
   // Export
   const [openExport, setOpenExport] = useState(false);
-
   const handleExport = () => {
     setOpenExport(true);
   };
-
   const submitExport = (exportPlayers: boolean, exportVariableValues: boolean) => {
     const link = document.createElement('a');
     link.href = exportScenarioUri(scenario.scenario_id, exportPlayers, exportVariableValues);
@@ -68,7 +86,6 @@ const ScenarioPopover: FunctionComponent<Props> = ({
 
   // Deletion
   const [deletion, setDeletion] = useState(false);
-
   const handleDelete = () => {
     setDeletion(true);
   };
@@ -95,12 +112,29 @@ const ScenarioPopover: FunctionComponent<Props> = ({
         handleClose={() => setEdition(false)}
         title={t('Update the scenario')}
       >
-        <ScenarioForm
-          initialValues={initialValues}
-          editing
-          onSubmit={submitEdit}
-          handleClose={() => setEdition(false)}
-        />
+        <>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={currentTab} onChange={handleChangeTab}>
+              <Tab label={t('Overview')} />
+              <Tab label={t('Mail configuration')} />
+            </Tabs>
+          </Box>
+          {currentTab === 0 && (
+            <ScenarioForm
+              initialValues={initialValues}
+              editing
+              onSubmit={submitEdit}
+              handleClose={() => setEdition(false)}
+            />
+          )}
+          {currentTab === 1 && (
+            <EmailParametersForm
+              initialValues={initialValuesEmailParameters}
+              onSubmit={submitUpdateEmailParameters}
+              disabled={permissions.readOnly}
+            />
+          )}
+        </>
       </Drawer>
       <ScenarioExportDialog
         open={openExport}

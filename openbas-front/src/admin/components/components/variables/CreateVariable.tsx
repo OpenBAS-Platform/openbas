@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Dialog, DialogContent, DialogTitle, Fab, ListItem, ListItemIcon, ListItemText, Theme } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, IconButton, ListItem, ListItemIcon, ListItemText, Theme } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
@@ -10,9 +10,8 @@ import { VariableContext } from '../../common/Context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {
-    position: 'fixed',
-    bottom: 30,
-    right: 230,
+    float: 'left',
+    marginTop: -15,
   },
   text: {
     fontSize: 15,
@@ -43,7 +42,7 @@ const CreateVariable: React.FC<Props> = ({
   };
 
   return (
-    <div>
+    <>
       {inline ? (
         <ListItem
           button
@@ -60,14 +59,15 @@ const CreateVariable: React.FC<Props> = ({
           />
         </ListItem>
       ) : (
-        <Fab
-          onClick={() => setOpen(true)}
+        <IconButton
           color="primary"
           aria-label="Add"
-          className={classes.createButton}
+          onClick={() => setOpen(true)}
+          classes={{ root: classes.createButton }}
+          size="large"
         >
-          <Add />
-        </Fab>
+          <Add fontSize="small" />
+        </IconButton>
       )}
       <Dialog
         open={open}
@@ -85,7 +85,7 @@ const CreateVariable: React.FC<Props> = ({
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 };
 

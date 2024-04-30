@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
-import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
-import { Autocomplete, Box, Chip, TextField } from '@mui/material';
+import { Autocomplete, Box, TextField } from '@mui/material';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -20,13 +19,6 @@ const useStyles = makeStyles(() => ({
     display: 'inline-block',
     flexGrow: 1,
     marginLeft: 10,
-  },
-  filters: {
-    float: 'left',
-    margin: '5px 0 0 15px',
-  },
-  filter: {
-    marginRight: 10,
   },
 }));
 
@@ -53,10 +45,7 @@ const ChannelsFilter: React.FC<Props> = (props) => {
     dispatch(fetchChannels());
   }, []);
   const channels = useHelper((helper: ChannelsHelper) => helper.getChannels());
-  const {
-    onAddChannel, onClearChannel = () => {
-    }, onRemoveChannel, currentChannels, fullWidth,
-  } = props;
+  const { onAddChannel, onClearChannel = () => { }, fullWidth } = props;
   const channelColor = (type?: string) => {
     switch (type) {
       case 'newspaper':
@@ -77,9 +66,9 @@ const ChannelsFilter: React.FC<Props> = (props) => {
   });
   const channelsOptions: ChannelTransformed[] = channels.map(channelTransform);
   return (
-    <>
+    <div style={{ display: 'flex', float: 'right', marginTop: -15 }}>
       <Autocomplete
-        sx={{ width: fullWidth ? '100%' : 250, float: 'left' }}
+        sx={{ width: fullWidth ? '100%' : 250 }}
         selectOnFocus={true}
         openOnFocus={true}
         autoSelect={false}
@@ -109,22 +98,7 @@ const ChannelsFilter: React.FC<Props> = (props) => {
           />
         )}
       />
-      {!fullWidth && (
-        <div className={classes.filters}>
-          {R.map(
-            (currentChannel: ChannelOption) => (
-              <Chip
-                key={currentChannel.id}
-                classes={{ root: classes.filter }}
-                label={currentChannel.label}
-                onDelete={() => onRemoveChannel(currentChannel.id)}
-              />
-            ),
-            currentChannels,
-          )}
-        </div>
-      )}
-    </>
+    </div>
   );
 };
 

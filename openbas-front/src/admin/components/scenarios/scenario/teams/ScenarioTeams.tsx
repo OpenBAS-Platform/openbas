@@ -1,5 +1,7 @@
 import { useParams } from 'react-router-dom';
 import React, { useContext } from 'react';
+import { Paper, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../../utils/hooks';
@@ -12,7 +14,6 @@ import {
   removeScenarioTeamPlayers,
   removeScenarioTeams,
 } from '../../../../../actions/scenarios/scenario-actions';
-import DefinitionMenu from '../../../components/DefinitionMenu';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import type { TeamStore } from '../../../../../actions/teams/Team';
@@ -22,6 +23,19 @@ import type { Team, TeamCreateInput } from '../../../../../utils/api-types';
 import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
 import type { UserStore } from '../../../teams/players/Player';
 import AddTeams from '../../../components/teams/AddTeams';
+import { useFormatter } from '../../../../../components/i18n';
+
+// Deprecated - https://mui.com/system/styles/basics/
+// Do not use it for new code.
+const useStyles = makeStyles(() => ({
+  paper: {
+    height: '100%',
+    minHeight: '100%',
+    margin: '-4px 0 0 0',
+    padding: '15px 15px 0 15px',
+    borderRadius: 4,
+  },
+}));
 
 interface Props {
   scenarioTeamsUsers: ScenarioStore['scenario_teams_users'],
@@ -66,28 +80,29 @@ export const teamContextForScenario = (scenarioId: ScenarioStore['scenario_id'],
 
 const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
   // Standard hooks
+  const { t } = useFormatter();
+  const classes = useStyles();
   const dispatch = useAppDispatch();
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
-
   const { teams }: { scenario: ScenarioStore, teams: TeamStore[] } = useHelper((helper: ScenariosHelper) => ({
     teams: helper.getScenarioTeams(scenarioId),
   }));
-
   const { permissions } = useContext(PermissionsContext);
-
   useDataLoader(() => {
     dispatch(fetchScenarioTeams(scenarioId));
   });
-
-  const teamIds = teams.map((t) => t.team_id);
-
+  const teamIds = teams.map((team) => team.team_id);
   const onAddTeams = (ids: Team['team_id'][]) => dispatch(addScenarioTeams(scenarioId, { scenario_teams: ids }));
-
   return (
     <TeamContext.Provider value={teamContextForScenario(scenarioId, scenarioTeamsUsers)}>
-      <DefinitionMenu base="/admin/scenarios" id={scenarioId} />
-      <Teams teamIds={teamIds} contextual={true} />
+      <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
+        {t('Teams')}
+      </Typography>
       {permissions.canWrite && <AddTeams addedTeamIds={teamIds} onAddTeams={onAddTeams} />}
+      <div className="clearfix" />
+      <Paper classes={{ root: classes.paper }} variant="outlined">
+        <Teams teamIds={teamIds} contextual={true} />
+      </Paper>
     </TeamContext.Provider>
   );
 };

@@ -5,8 +5,6 @@ import { makeStyles } from '@mui/styles';
 import VariablePopover from './VariablePopover';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import type { Variable } from '../../../../utils/api-types';
-import SearchFilter from '../../../../components/SearchFilter';
-import CreateVariable from './CreateVariable';
 import { PermissionsContext, VariableContext } from '../../common/Context';
 
 const useStyles = makeStyles(() => ({
@@ -90,123 +88,102 @@ interface Props {
   variables: Variable[];
 }
 
-const Variables: FunctionComponent<Props> = ({
-  variables,
-}) => {
+const Variables: FunctionComponent<Props> = ({ variables }) => {
   // Standard hooks
   const classes = useStyles();
-
   // Context
   const { onEditVariable, onDeleteVariable } = useContext(VariableContext);
   const { permissions } = useContext(PermissionsContext);
-
   // Filter and sort hook
   const filtering = useSearchAnFilter('variable', 'key', [
     'key',
     'description',
   ]);
-
   const sortedVariables: [Variable] = filtering.filterAndSort(variables);
   return (
-    <>
-      <div>
-        <div style={{ float: 'left', marginRight: 10 }}>
-          <SearchFilter
-            variant="small"
-            onChange={filtering.handleSearch}
-            keyword={filtering.keyword}
-          />
-        </div>
-      </div>
-      <div className="clearfix" />
-
-      <List style={{ marginTop: 10 }}>
+    <List>
+      <ListItem
+        classes={{ root: classes.itemHead }}
+        divider={false}
+        style={{ paddingTop: 0 }}
+      >
+        <ListItemIcon>
+          <span
+            style={{ padding: '0 8px 0 10px', fontWeight: 700, fontSize: 12 }}
+          >
+            #
+          </span>
+        </ListItemIcon>
+        <ListItemText
+          primary={
+            <>
+              {filtering.buildHeader(
+                'variable_key',
+                'Key',
+                true,
+                headerStyles,
+              )}
+              {filtering.buildHeader(
+                'variable_description',
+                'Description',
+                true,
+                headerStyles,
+              )}
+              {filtering.buildHeader(
+                'variable_value',
+                'Value',
+                true,
+                headerStyles,
+              )}
+            </>
+            }
+        />
+        <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
+      </ListItem>
+      {sortedVariables.map((variable) => (
         <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
+          key={variable.variable_id}
+          classes={{ root: classes.item }}
+          divider
         >
           <ListItemIcon>
-            <span
-              style={{ padding: '0 8px 0 10px', fontWeight: 700, fontSize: 12 }}
-            >
-              #
-            </span>
+            <AttachMoneyOutlined color="primary" />
           </ListItemIcon>
           <ListItemText
             primary={
-              <div>
-                {filtering.buildHeader(
-                  'variable_key',
-                  'Key',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'variable_description',
-                  'Description',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'variable_value',
-                  'Value',
-                  true,
-                  headerStyles,
-                )}
-              </div>
-            }
-          />
-          <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
-        </ListItem>
-        {sortedVariables.map((variable) => (
-          <ListItem
-            key={variable.variable_id}
-            classes={{ root: classes.item }}
-            divider
-          >
-            <ListItemIcon>
-              <AttachMoneyOutlined />
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.variable_key}
-                  >
-                    {variable.variable_key}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.variable_description}
-                  >
-                    {variable.variable_description}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.variable_value}
-                  >
-                    {variable.variable_value}
-                  </div>
+              <>
+                <div
+                  className={classes.bodyItem}
+                  style={inlineStyles.variable_key}
+                >
+                  {variable.variable_key}
                 </div>
+                <div
+                  className={classes.bodyItem}
+                  style={inlineStyles.variable_description}
+                >
+                  {variable.variable_description}
+                </div>
+                <div
+                  className={classes.bodyItem}
+                  style={inlineStyles.variable_value}
+                >
+                  {variable.variable_value}
+                </div>
+              </>
               }
+          />
+          <ListItemSecondaryAction>
+            <VariablePopover
+              variable={variable}
+              disabled={permissions?.readOnly}
+              onEdit={onEditVariable}
+              onDelete={onDeleteVariable}
             />
-            <ListItemSecondaryAction>
-              <VariablePopover
-                variable={variable}
-                disabled={permissions?.readOnly}
-                onEdit={onEditVariable}
-                onDelete={onDeleteVariable}
-              />
-            </ListItemSecondaryAction>
-          </ListItem>
-        ))}
-      </List>
-      {permissions.canWrite && (
-        <CreateVariable />
-      )}
-    </>
+          </ListItemSecondaryAction>
+        </ListItem>
+      ))}
+    </List>
   );
 };
 

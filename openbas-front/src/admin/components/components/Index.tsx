@@ -9,7 +9,7 @@ const IndexChannel = lazy(() => import('./channels/Index'));
 const Channels = lazy(() => import('./channels/Channels'));
 const Documents = lazy(() => import('./documents/Documents'));
 const Payloads = lazy(() => import('./payloads/Payloads'));
-const Challenges = lazy(() => import('./Challenges'));
+const Challenges = lazy(() => import('./challenges/Challenges'));
 
 const useStyles = makeStyles(() => ({
   root: {

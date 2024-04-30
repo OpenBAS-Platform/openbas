@@ -1,21 +1,16 @@
-import React, { useContext, useState } from 'react';
-import { Dialog, DialogContent, DialogTitle, Fab, ListItem, ListItemIcon, ListItemText, Slide } from '@mui/material';
+import React, { useContext } from 'react';
+import { Dialog, DialogContent, DialogTitle, IconButton, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
 import ArticleForm from './ArticleForm';
-import { ArticleContext } from '../../common/Context';
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
+import { ArticleContext } from '../Context';
+import Transition from '../../../../components/common/Transition';
 
 const useStyles = makeStyles((theme) => ({
   createButton: {
-    position: 'fixed',
-    bottom: 30,
-    right: 230,
+    float: 'left',
+    marginTop: -15,
   },
   text: {
     fontSize: 15,
@@ -25,12 +20,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CreateArticle = (props) => {
-  const { onCreate, inline } = props;
+  const { onCreate, inline, openCreate, handleOpenCreate, handleCloseCreate } = props;
   const classes = useStyles();
   const { t } = useFormatter();
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
 
   // Context
   const { onAddArticle } = useContext(ArticleContext);
@@ -43,19 +35,19 @@ const CreateArticle = (props) => {
           if (onCreate) {
             onCreate(result.result);
           }
-          return handleClose();
+          return handleCloseCreate();
         }
         return result;
       },
     );
   };
   return (
-    <div>
+    <>
       {inline === true ? (
         <ListItem
           button
           divider
-          onClick={handleOpen}
+          onClick={handleOpenCreate}
           color="primary"
         >
           <ListItemIcon color="primary">
@@ -67,19 +59,20 @@ const CreateArticle = (props) => {
           />
         </ListItem>
       ) : (
-        <Fab
-          onClick={handleOpen}
+        <IconButton
           color="primary"
           aria-label="Add"
-          className={classes.createButton}
+          onClick={handleOpenCreate}
+          classes={{ root: classes.createButton }}
+          size="large"
         >
-          <Add />
-        </Fab>
+          <Add fontSize="small" />
+        </IconButton>
       )}
       <Dialog
-        open={open}
+        open={openCreate}
         TransitionComponent={Transition}
-        onClose={handleClose}
+        onClose={handleCloseCreate}
         fullWidth
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
@@ -89,12 +82,12 @@ const CreateArticle = (props) => {
           <ArticleForm
             editing={false}
             onSubmit={onSubmit}
-            handleClose={handleClose}
+            handleClose={handleCloseCreate}
             initialValues={{ article_name: '', article_channel: '' }}
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 };
 

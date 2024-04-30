@@ -8,21 +8,31 @@ const useStyles = makeStyles<Theme>((theme: Theme) => ({
   drawerPaperHalf: {
     minHeight: '100vh',
     width: '50%',
+    position: 'fixed',
+    overflow: 'auto',
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
   },
   drawerPaperFull: {
     minHeight: '100vh',
-    width: '100%',
+    width: '100vw',
+    position: 'fixed',
+    overflow: 'auto',
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
   },
   header: {
-    backgroundColor: theme.palette.background.nav,
-    padding: `${theme.spacing(1)} 0`,
+    backgroundColor: theme.palette.mode === 'light' ? theme.palette.background.default : theme.palette.background.nav,
+    padding: '10px 0',
     display: 'inline-flex',
     alignItems: 'center',
   },
   container: {
-    padding: `${theme.spacing(2)} ${theme.spacing(3)} ${theme.spacing(
-      3,
-    )} ${theme.spacing(3)}`,
+    padding: '10px 20px 20px 20px',
   },
 }));
 
