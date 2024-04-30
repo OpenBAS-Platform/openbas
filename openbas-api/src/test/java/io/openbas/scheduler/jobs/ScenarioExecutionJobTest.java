@@ -56,7 +56,7 @@ public class ScenarioExecutionJobTest {
     int hourToStart = zonedDateTime.getHour() == 23 ? 0 : zonedDateTime.getHour() + 1;
 
     Scenario scenario = getScenario();
-    scenario.setRecurrence("0 0 " + hourToStart + " * * *"); // Every day at 23 hours
+    scenario.setRecurrence("0 0 " + hourToStart + " * * *"); // Every day now + 1 hour
     Scenario scenarioSaved = this.scenarioService.createScenario(scenario);
     SCENARIO_ID_1 = scenarioSaved.getId();
 
@@ -82,8 +82,8 @@ public class ScenarioExecutionJobTest {
     ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("UTC"));
 
     Scenario scenario = getScenario();
-    scenario.setRecurrence(
-        "0 " + (zonedDateTime.getMinute() + 1) + " " + zonedDateTime.getHour() + " * * *"); // Every day now + 1 minute
+    int minuteToStart = zonedDateTime.getMinute() == 59 ? 0 : zonedDateTime.getMinute() + 1;
+    scenario.setRecurrence("0 " + minuteToStart + " " + zonedDateTime.getHour() + " * * *"); // Every day now + 1 minute
     Scenario scenarioSaved = this.scenarioService.createScenario(scenario);
     SCENARIO_ID_2 = scenarioSaved.getId();
 
@@ -130,8 +130,8 @@ public class ScenarioExecutionJobTest {
     ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("UTC"));
 
     Scenario scenario = getScenario();
-    scenario.setRecurrence(
-        "0 " + (zonedDateTime.getMinute() + 1) + " " + zonedDateTime.getHour() + " * * *"); // Every day now + 1 minute
+    int minuteToStart = zonedDateTime.getMinute() == 59 ? 0 : zonedDateTime.getMinute() + 1;
+    scenario.setRecurrence("0 " + minuteToStart + " " + zonedDateTime.getHour() + " * * *"); // Every day now + 1 minute
     scenario.setRecurrenceEnd(Instant.now().minus(0, ChronoUnit.DAYS));
     Scenario scenarioSaved = this.scenarioService.createScenario(scenario);
     SCENARIO_ID_3 = scenarioSaved.getId();
