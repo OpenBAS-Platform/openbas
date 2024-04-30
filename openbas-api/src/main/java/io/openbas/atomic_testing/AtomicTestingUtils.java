@@ -119,7 +119,7 @@ public class AtomicTestingUtils {
               .collect(
                   Collectors.groupingBy(InjectExpectation::getTeam,
                       Collectors.collectingAndThen(
-                          Collectors.toList(), AtomicTestingUtils::getExpectations)
+                          Collectors.toList(), AtomicTestingUtils::getExpectationResultByTypes)
                   )
               )
               .entrySet().stream()
@@ -134,7 +134,7 @@ public class AtomicTestingUtils {
               .collect(
                   Collectors.groupingBy(InjectExpectation::getAsset,
                       Collectors.collectingAndThen(
-                          Collectors.toList(), AtomicTestingUtils::getExpectations)
+                          Collectors.toList(), AtomicTestingUtils::getExpectationResultByTypes)
                   )
               )
               .entrySet().stream()
@@ -148,7 +148,7 @@ public class AtomicTestingUtils {
           .collect(
               Collectors.groupingBy(InjectExpectation::getAssetGroup,
                   Collectors.collectingAndThen(
-                      Collectors.toList(), AtomicTestingUtils::getExpectations)
+                      Collectors.toList(), AtomicTestingUtils::getExpectationResultByTypes)
               )
           )
           .entrySet().stream()
@@ -189,7 +189,7 @@ public class AtomicTestingUtils {
   }
 
   @NotNull
-  public static List<ExpectationResultsByType> getExpectations(final List<InjectExpectation> expectations) {
+  public static List<ExpectationResultsByType> getExpectationResultByTypes(final List<InjectExpectation> expectations) {
     List<Integer> preventionScores = getScores(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
     List<Integer> detectionScores = getScores(List.of(EXPECTATION_TYPE.DETECTION), expectations);
     List<Integer> humanScores = getScores(List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL), expectations);
@@ -212,6 +212,14 @@ public class AtomicTestingUtils {
       return Optional.of(new ExpectationResultsByType(type, getResult(avgResponse), getResultDetail(type, scores)));
     }
     return Optional.of(new ExpectationResultsByType(type, ExpectationStatus.PENDING, getResultDetail(type, scores)));
+  }
+
+  public static List<InjectExpectation> getRefinedExpectations(Inject inject, List<String> targetIds) {
+    return inject
+        .getExpectations()
+        .stream()
+        .filter(expectation -> targetIds.contains(expectation.getTargetId()))
+        .toList();
   }
 
   public static List<ResultDistribution> getResultDetail(final ExpectationType type, final List<Integer> normalizedScores) {

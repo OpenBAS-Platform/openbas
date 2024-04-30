@@ -1,11 +1,14 @@
 package io.openbas.atomic_testing;
 
+import static io.openbas.atomic_testing.AtomicTestingUtils.getRefinedExpectations;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput.AtomicTestingOutputBuilder;
+import io.openbas.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.atomic_testing.form.SimpleExpectationResultOutput;
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.Inject;
@@ -23,14 +26,26 @@ import java.util.stream.Collectors;
 public class AtomicTestingMapper {
 
   public static AtomicTestingOutput toDtoWithTargetResults(Inject inject) {
+    List<InjectTargetWithResult> targets = AtomicTestingUtils.getTargetsWithResults(inject);
+    List<String> targetIds = targets.stream().map(InjectTargetWithResult::getId).toList();
+
     return getAtomicTestingOutputBuilder(inject)
-        .targets(AtomicTestingUtils.getTargetsWithResults(inject))
+        .targets(targets)
+        .expectationResultByTypes(AtomicTestingUtils.getExpectationResultByTypes(
+            getRefinedExpectations(inject, targetIds)
+        ))
         .build();
   }
 
   public static AtomicTestingOutput toDto(Inject inject) {
+    List<InjectTargetWithResult> targets = AtomicTestingUtils.getTargets(inject);
+    List<String> targetIds = targets.stream().map(InjectTargetWithResult::getId).toList();
+
     return getAtomicTestingOutputBuilder(inject)
-        .targets(AtomicTestingUtils.getTargets(inject))
+        .targets(targets)
+        .expectationResultByTypes(AtomicTestingUtils.getExpectationResultByTypes(
+            getRefinedExpectations(inject, targetIds)
+        ))
         .build();
   }
 
@@ -44,8 +59,7 @@ public class AtomicTestingMapper {
         .injectorContract(inject.getInjectorContract())
         .lastExecutionStartDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))
         .lastExecutionEndDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))
-        .status(inject.getStatus().map(InjectStatus::getName).orElse(ExecutionStatus.DRAFT))
-        .expectationResultByTypes(AtomicTestingUtils.getExpectations(inject.getExpectations()));
+        .status(inject.getStatus().map(InjectStatus::getName).orElse(ExecutionStatus.DRAFT));
   }
 
   public static SimpleExpectationResultOutput toTargetResultDto(InjectExpectation injectExpectation,
