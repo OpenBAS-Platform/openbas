@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
-import jakarta.validation.constraints.NotNull;
 import java.util.stream.Collectors;
 
 public class AtomicTestingUtils {
@@ -193,7 +192,7 @@ public class AtomicTestingUtils {
 
   @NotNull
   private static List<ExpectationResultsByType> getDefaultExpectationResultsByTypes() {
-    List<ExpectationType> types = List.of(ExpectationType.DETECTION, ExpectationType.PREVENTION, ExpectationType.HUMAN_RESPONSE);
+    List<ExpectationType> types = List.of(ExpectationType.PREVENTION, ExpectationType.DETECTION, ExpectationType.HUMAN_RESPONSE);
     return types.stream()
         .map(type -> getExpectationByType(type, Collections.singletonList(null)))
         .filter(Optional::isPresent)

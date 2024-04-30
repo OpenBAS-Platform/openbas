@@ -76,6 +76,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState(0);
   const [steps, setSteps] = useState<Steptarget[]>([]);
+  const initialSteps = [{ label: 'Attack started' }, { label: 'Attack ended' }];
   // Fetching data
   const { targetresults }: {
     targetresults: SimpleExpectationResultOutput[],
@@ -85,6 +86,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
 
   useEffect(() => {
     if (target) {
+      setSteps([...initialSteps, ...[{ label: 'Unknown Data' }]]);
       dispatch(fetchTargetResult(injectId, target.id!, target.targetType!));
       setActiveTab(0);
     }
@@ -120,6 +122,9 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     if (status === 'UNKNOWN') {
       return 'Unknown Data';
     }
+    if (status === 'PENDING') {
+      return 'Waiting response';
+    }
     switch (type) {
       case 'PREVENTION':
         return status === 'VALIDATED' ? 'Attack Blocked' : 'Attack Unblocked';
@@ -143,6 +148,10 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
       case 'FAILED':
         color = 'rgb(220, 81, 72)';
         background = 'rgba(192, 113, 113, 0.29)';
+        break;
+      case 'PENDING':
+        color = 'rgb(202,203,206)';
+        background = 'rgba(128,128,128, 0.5)';
         break;
       default: // Unknown status fow unknown expectation score
         color = 'rgb(202,203,206)';
@@ -198,7 +207,6 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   };
 
   // Define steps
-  const initialSteps = [{ label: 'Attack started' }, { label: 'Attack ended' }];
   useEffect(() => {
     if (targetresults && targetresults.length > 0) {
       const newSteps = targetresults.map((result) => ({
