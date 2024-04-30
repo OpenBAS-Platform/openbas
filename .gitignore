@@ -5,6 +5,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 logs/**
+openbas-dev/.env
 
 ### STS ###
 .apt_generated

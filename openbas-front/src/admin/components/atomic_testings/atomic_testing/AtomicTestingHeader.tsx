@@ -14,7 +14,7 @@ import type { AtomicTestingOutput } from '../../../../utils/api-types';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
-import HeaderTags from '../../scenarios/scenario/HeaderTags';
+import HeaderTags from '../../common/simulate/HeaderTags';
 
 const useStyles = makeStyles(() => ({
   container: {

@@ -6,7 +6,6 @@ import React, { FunctionComponent, useState } from 'react';
 import Transition from '../../../../components/common/Transition';
 import TagField from '../../../../components/TagField';
 import TagChip from '../tags/TagChip';
-import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import { Option } from '../../../../utils/Option';
 
@@ -22,23 +21,20 @@ const HeaderTags: FunctionComponent<Props> = ({
   updateTags,
 }) => {
   // Standard hooks
-  const dispatch = useAppDispatch();
   const { t } = useFormatter();
   const [openTagAdd, setOpenTagAdd] = useState(false);
   const handleToggleAddTag = () => setOpenTagAdd(!openTagAdd);
 
   const deleteTag = (tagId: string) => {
     const tagIds = tags?.filter((id: string) => id !== tagId) ?? [];
-    dispatch(updateTags(tagIds));
+    updateTags(tagIds);
   };
   const submitTags = (values: { tags: Option[] }) => {
     handleToggleAddTag();
-    dispatch(
-      updateTags(R.uniq([
-        ...values.tags.map((tag) => tag.id),
-        ...(tags ?? []),
-      ])),
-    );
+    updateTags(R.uniq([
+      ...values.tags.map((tag) => tag.id),
+      ...(tags ?? []),
+    ]));
   };
   return (
     <div>

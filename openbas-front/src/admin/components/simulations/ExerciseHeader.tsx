@@ -16,7 +16,7 @@ import HeaderTags from '../common/simulate/HeaderTags';
 import { useAppDispatch } from '../../../utils/hooks';
 import type { ExerciseStore } from '../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
-import type { Exercise as ExerciseType } from '../../../utils/api-types';
+import type { Exercise as ExerciseType, Tag } from '../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -166,6 +166,7 @@ const Buttons = ({ exerciseId, exerciseStatus }: { exerciseId: ExerciseStore['ex
 
 const ExerciseHeader = () => {
   const classes = useStyles();
+  const dispatch = useAppDispatch();
   const { t, fldt } = useFormatter();
   const { exerciseId } = useParams() as { exerciseId: ExerciseType['exercise_id'] };
   const permissions = usePermissions(exerciseId);
@@ -178,6 +179,8 @@ const ExerciseHeader = () => {
   const nextInjectDate = exercise.exercise_next_inject_date
     ? new Date(exercise.exercise_next_inject_date).getTime()
     : Date.now();
+
+  const updateTags = (tagIds: Tag['tag_id'][]) => dispatch(updateExerciseTags(exercise.exercise_id, { exercise_tags: tagIds }));
 
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -208,7 +211,7 @@ const ExerciseHeader = () => {
           <HeaderTags
             tags={exercise.exercise_tags}
             disabled={permissions.readOnlyBypassStatus}
-            updateTags={(tagIds) => updateExerciseTags(exercise.exercise_id, { exercise_tags: tagIds })}
+            updateTags={updateTags}
           />
           {<Buttons exerciseId={exercise.exercise_id} exerciseStatus={exercise.exercise_status} />}
         </div>
