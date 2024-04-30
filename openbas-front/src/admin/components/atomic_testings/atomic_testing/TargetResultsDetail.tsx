@@ -123,7 +123,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
       return 'Unknown Data';
     }
     if (status === 'PENDING') {
-      return 'Waiting response';
+      return 'Waiting Response';
     }
     switch (type) {
       case 'PREVENTION':
@@ -149,20 +149,16 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         color = 'rgb(220, 81, 72)';
         background = 'rgba(192, 113, 113, 0.29)';
         break;
-      case 'PENDING':
-        color = 'rgb(202,203,206)';
-        background = 'rgba(128,128,128, 0.5)';
-        break;
       default: // Unknown status fow unknown expectation score
         color = 'rgb(202,203,206)';
-        background = 'rgba(202,203,206, 0.5)';
+        background = 'rgba(128,128,128, 0.5)';
         break;
     }
     return { color, background };
   };
 
   const getStepIcon = (index: number, type: string, status: string) => {
-    if (index >= 2) {
+    if (index >= 2 && type) {
       let IconComponent;
       switch (type) {
         case 'PREVENTION':
