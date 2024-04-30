@@ -72,4 +72,7 @@ public class AtomicTestingOutput {
   @JsonProperty("atomic_expectation_results")
   @NotNull
   private List<ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
+
+  @JsonProperty("atomic_tags")
+  private List<String> tagIds = new ArrayList<>();
 }

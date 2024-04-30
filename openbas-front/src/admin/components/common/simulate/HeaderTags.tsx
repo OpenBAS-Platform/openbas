@@ -6,40 +6,35 @@ import React, { FunctionComponent, useState } from 'react';
 import Transition from '../../../../components/common/Transition';
 import TagField from '../../../../components/TagField';
 import TagChip from '../tags/TagChip';
-import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import { Option } from '../../../../utils/Option';
 
 interface Props {
   tags: string[] | undefined;
-  disabled: boolean;
-  updateTags: (tagIds: string[]) => (dispatch: void) => Promise<void>;
+  disabled?: boolean;
+  updateTags: (tagIds: string[]) => void;
 }
 
 const HeaderTags: FunctionComponent<Props> = ({
   tags,
-  disabled,
+  disabled = false,
   updateTags,
 }) => {
   // Standard hooks
-  const dispatch = useAppDispatch();
   const { t } = useFormatter();
-
   const [openTagAdd, setOpenTagAdd] = useState(false);
   const handleToggleAddTag = () => setOpenTagAdd(!openTagAdd);
 
   const deleteTag = (tagId: string) => {
     const tagIds = tags?.filter((id: string) => id !== tagId) ?? [];
-    dispatch(updateTags(tagIds));
+    updateTags(tagIds);
   };
   const submitTags = (values: { tags: Option[] }) => {
     handleToggleAddTag();
-    dispatch(
-      updateTags(R.uniq([
-        ...values.tags.map((tag) => tag.id),
-        ...(tags ?? []),
-      ])),
-    );
+    updateTags(R.uniq([
+      ...values.tags.map((tag) => tag.id),
+      ...(tags ?? []),
+    ]));
   };
   return (
     <div>

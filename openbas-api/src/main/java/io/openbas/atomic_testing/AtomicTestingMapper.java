@@ -1,40 +1,50 @@
 package io.openbas.atomic_testing;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput.AtomicTestingOutputBuilder;
 import io.openbas.atomic_testing.form.SimpleExpectationResultOutput;
 import io.openbas.database.model.*;
+import io.openbas.model.inject.form.Expectation;
+import org.hibernate.mapping.Collection;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AtomicTestingMapper {
 
   public static AtomicTestingOutput toDtoWithTargetResults(Inject inject) {
     return getAtomicTestingOutputBuilder(inject)
-            .targets(AtomicTestingUtils.getTargetsWithResults(inject))
-            .build();
+        .targets(AtomicTestingUtils.getTargetsWithResults(inject))
+        .build();
   }
 
   public static AtomicTestingOutput toDto(Inject inject) {
     return getAtomicTestingOutputBuilder(inject)
-            .targets(AtomicTestingUtils.getTargets(inject))
-            .build();
+        .targets(AtomicTestingUtils.getTargets(inject))
+        .build();
   }
 
   private static AtomicTestingOutputBuilder getAtomicTestingOutputBuilder(Inject inject) {
     return AtomicTestingOutput
-            .builder()
-            .id(inject.getId())
-            .title(inject.getTitle())
-            .type(inject.getType())
-            .injectorContract(inject.getInjectorContract())
-            .lastExecutionStartDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))
-            .lastExecutionEndDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))
-            .status(inject.getStatus().map(InjectStatus::getName).orElse(ExecutionStatus.DRAFT))
+        .builder()
+        .id(inject.getId())
+        .title(inject.getTitle())
+        .type(inject.getType())
+        .tagIds(inject.getTags().stream().map(Tag::getId).toList())
+        .injectorContract(inject.getInjectorContract())
+        .lastExecutionStartDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))
+        .lastExecutionEndDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))
+        .status(inject.getStatus().map(InjectStatus::getName).orElse(ExecutionStatus.DRAFT))
         .expectationResultByTypes(AtomicTestingUtils.getExpectations(inject.getExpectations()));
   }
 
@@ -66,6 +76,7 @@ public class AtomicTestingMapper {
             .atomicId(inject.getId())
             .description(inject.getDescription())
             .content(inject.getContent())
+            .expectations(getAtomicTestingExpectations(inject.getContent()))
             .tags(inject.getTags())
             .documents(inject.getDocuments())
             .status(status.getName())
@@ -82,6 +93,15 @@ public class AtomicTestingMapper {
 
   }
 
+  @SuppressWarnings("unchecked")
+  public static List<Expectation> getAtomicTestingExpectations(ObjectNode content) {
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      return mapper.treeToValue(content.get("expectations"), List.class);
+    } catch (JsonProcessingException e) {
+      return Collections.emptyList();
+    }
+  }
 
   public record ExpectationResultsByType(@NotNull ExpectationType type, @NotNull ExpectationStatus avgResult,
                                          @NotNull List<ResultDistribution> distribution) {

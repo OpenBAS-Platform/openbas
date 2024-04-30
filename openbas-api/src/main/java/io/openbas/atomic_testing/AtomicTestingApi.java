@@ -3,6 +3,7 @@ package io.openbas.atomic_testing;
 import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
 import io.openbas.atomic_testing.form.AtomicTestingInput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput;
+import io.openbas.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.atomic_testing.form.SimpleExpectationResultOutput;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectStatus;
@@ -33,6 +34,7 @@ public class AtomicTestingApi extends RestBehavior {
   private AtomicTestingService atomicTestingService;
   private InjectExpectationService injectExpectationService;
   private InjectorContractRepository injectorContractRepository;
+
 
   @Autowired
   public void setAtomicTestingService(AtomicTestingService atomicTestingService) {
@@ -114,5 +116,14 @@ public class AtomicTestingApi extends RestBehavior {
         .map(expectation -> AtomicTestingMapper.toTargetResultDto(expectation, targetId))
         .toList();
   }
+
+  @PutMapping("/{injectId}/tags")
+  public AtomicTestingOutput updateAtomicTestingTags(
+      @PathVariable @NotBlank final String injectId,
+      @Valid @RequestBody final AtomicTestingUpdateTagsInput input) {
+
+    return AtomicTestingMapper.toDto(atomicTestingService.updateAtomicTestingTags(injectId, input));
+  }
+
 
 }
