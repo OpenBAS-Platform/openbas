@@ -96,7 +96,7 @@ const AtomicTesting = () => {
         </Grid>
         <Grid item xs={7} style={{ paddingBottom: 24 }}>
           <Paper variant="outlined" classes={{ root: classes.resultDetail }}>
-            {selectedTarget && <TargetResultsDetail target={selectedTarget} injectId={atomicId}
+            {selectedTarget && <TargetResultsDetail target={selectedTarget} injectId={atomicId} injectType={atomic.atomic_type}
               lastExecutionStartDate={atomic.atomic_last_execution_start_date || ''}
               lastExecutionEndDate={atomic.atomic_last_execution_end_date || ''}
                                />}

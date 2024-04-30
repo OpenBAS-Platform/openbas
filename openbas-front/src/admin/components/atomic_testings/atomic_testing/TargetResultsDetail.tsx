@@ -2,13 +2,15 @@ import React, { FunctionComponent, useEffect, useState } from 'react';
 import { Box, Paper, Step, StepLabel, Stepper, Tab, Tabs, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
-import type { InjectTargetWithResult, SimpleExpectationResultOutput } from '../../../../utils/api-types';
+import type { ExpectationResultOutput, InjectTargetWithResult } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import { fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
+import InjectIcon from '../../common/injects/InjectIcon';
+import Empty from '../../../../components/Empty';
 
 interface Steptarget {
   label: string;
@@ -60,6 +62,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
 
 interface Props {
   injectId: string,
+  injectType: string,
   lastExecutionStartDate: string,
   lastExecutionEndDate: string,
   target: InjectTargetWithResult,
@@ -67,6 +70,7 @@ interface Props {
 
 const TargetResultsDetail: FunctionComponent<Props> = ({
   injectId,
+  injectType,
   lastExecutionStartDate,
   lastExecutionEndDate,
   target,
@@ -79,7 +83,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   const initialSteps = [{ label: 'Attack started' }, { label: 'Attack ended' }];
   // Fetching data
   const { targetresults }: {
-    targetresults: SimpleExpectationResultOutput[],
+    targetresults: ExpectationResultOutput[],
   } = useHelper((helper: AtomicTestingHelper) => ({
     targetresults: helper.getTargetResults(target.id!, injectId),
   }));
@@ -178,27 +182,36 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     return null;
   };
 
-  const renderLogs = (targetResult: SimpleExpectationResultOutput[]) => {
+  const renderLogs = (targetResult: ExpectationResultOutput[]) => {
     return (
-      <Paper elevation={3} style={{ padding: 20, marginTop: 25, minHeight: 200 }}>
-        {/* Render logs for each target result */}
+      <>
         {targetResult.map((result) => (
-          <div key={result.target_result_id}>
-            <Typography variant="body1" gutterBottom>
-              {t(`TYPE_${result.target_result_subtype}`)}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {t(result.target_result_response_status)}
-            </Typography>
-            {result.target_result_logs !== null && (
-            <Typography variant="body1">
-              {result.target_result_logs}
-            </Typography>
+          <Paper elevation={2} style={{ padding: 20, marginTop: 15, minHeight: 80 }}
+            key={result.target_result_id}
+          >
+            {result.target_results && result.target_results.length > 0 ? (
+              result.target_results.map((collector, index) => (
+                <div key={index}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <InjectIcon
+                      tooltip={t(injectType)}
+                      type={injectType}
+                    />
+                    <Typography variant="body1" sx={{ marginLeft: 1 }}>
+                      {collector.sourceName}
+                    </Typography>
+                  </div>
+                  <Typography variant="body1" sx={{ marginTop: 1 }}>
+                    {collector.result}
+                  </Typography>
+                </div>
+              ))
+            ) : (
+              <Empty message={t('No logs available')}/>
             )}
-            <br/>
-          </div>
+          </Paper>
         ))}
-      </Paper>
+      </>
     );
   };
 
@@ -216,7 +229,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   }, [targetresults]);
 
   // Define Tabs
-  const groupedResults: Record<string, SimpleExpectationResultOutput[]> = {};
+  const groupedResults: Record<string, ExpectationResultOutput[]> = {};
   targetresults.forEach((result) => {
     const type = result.target_result_type;
     if (!groupedResults[type]) {

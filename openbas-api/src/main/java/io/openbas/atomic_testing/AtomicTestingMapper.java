@@ -9,18 +9,16 @@ import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput.AtomicTestingOutputBuilder;
 import io.openbas.atomic_testing.form.InjectTargetWithResult;
-import io.openbas.atomic_testing.form.SimpleExpectationResultOutput;
+import io.openbas.atomic_testing.form.ExpectationResultOutput;
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
-import io.openbas.database.model.InjectExpectationResult;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.model.Tag;
 import io.openbas.model.inject.form.Expectation;
 import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class AtomicTestingMapper {
@@ -62,9 +60,9 @@ public class AtomicTestingMapper {
         .status(inject.getStatus().map(InjectStatus::getName).orElse(ExecutionStatus.DRAFT));
   }
 
-  public static SimpleExpectationResultOutput toTargetResultDto(InjectExpectation injectExpectation,
+  public static ExpectationResultOutput toTargetResultDto(InjectExpectation injectExpectation,
       final String targetId) {
-    return SimpleExpectationResultOutput
+    return ExpectationResultOutput
         .builder()
         .id(injectExpectation.getId())
         .injectId(injectExpectation.getInject().getId())
@@ -73,11 +71,7 @@ public class AtomicTestingMapper {
         .subtype(injectExpectation.getType().name())
         .startedAt(injectExpectation.getCreatedAt())
         .endedAt(injectExpectation.getUpdatedAt())
-        .logs(Optional.ofNullable(
-                injectExpectation.getResults())
-            .map(results -> results.stream().map(InjectExpectationResult::getResult)
-                .collect(Collectors.joining(", ")))
-            .orElse(null))
+        .results(injectExpectation.getResults())
         .response(injectExpectation.getScore() == null ? ExpectationStatus.PENDING
             : (injectExpectation.getScore() == 0 ? ExpectationStatus.FAILED : ExpectationStatus.VALIDATED))
         .build();

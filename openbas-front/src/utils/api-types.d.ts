@@ -763,6 +763,33 @@ export interface Expectation {
   expectation_type?: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
 }
 
+export interface ExpectationResultOutput {
+  /** Target id */
+  target_id: string;
+  /** Inject id */
+  target_inject_id: string;
+  /**
+   * End date of inject
+   * @format date-time
+   */
+  target_result_ended_at?: string;
+  /** Expectation Id */
+  target_result_id: string;
+  /** Response status */
+  target_result_response_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
+  /**
+   * Started date of inject
+   * @format date-time
+   */
+  target_result_started_at: string;
+  /** Subtype */
+  target_result_subtype: string;
+  /** Type */
+  target_result_type: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
+  /** Results */
+  target_results?: InjectExpectationResult[];
+}
+
 export interface ExpectationResultsByType {
   avgResult: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
   distribution: ResultDistribution[];
@@ -942,6 +969,7 @@ export interface InjectExpectation {
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: User;
+  targetId?: string;
   updateAttributes?: object;
 }
 
@@ -2050,33 +2078,6 @@ export interface SettingsUpdateInput {
   platform_lang: string;
   platform_name: string;
   platform_theme: string;
-}
-
-export interface SimpleExpectationResultOutput {
-  /** Target id */
-  target_id: string;
-  /** Inject id */
-  target_inject_id: string;
-  /**
-   * End date of inject
-   * @format date-time
-   */
-  target_result_ended_at?: string;
-  /** Expectation Id */
-  target_result_id: string;
-  /** Logs */
-  target_result_logs?: string;
-  /** Response status */
-  target_result_response_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
-  /**
-   * Started date of inject
-   * @format date-time
-   */
-  target_result_started_at: string;
-  /** Subtype */
-  target_result_subtype: string;
-  /** Type */
-  target_result_type: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
 }
 
 /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
