@@ -29,7 +29,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Buttons = ({ exerciseId, exerciseStatus }: { exerciseId: ExerciseStore['exercise_id'], exerciseStatus: ExerciseStore['exercise_status'] }) => {
+const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: { exerciseId: ExerciseStore['exercise_id'], exerciseStatus: ExerciseStore['exercise_status'], exerciseName: ExerciseStore['exercise_name'] }) => {
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -132,6 +132,17 @@ const Buttons = ({ exerciseId, exerciseStatus }: { exerciseId: ExerciseStore['ex
         return (<></>);
     }
   };
+
+  const dialogContentText = () => {
+    switch (openChangeStatus) {
+      case 'RUNNING': return `${exerciseName} ${t('will be started, do you want to continue?')}`;
+      case 'PAUSED': return `${t('Injects will be paused, do you want to continue?')}`;
+      case 'SCHEDULED': return `${exerciseName} ${t('data will be reset, do you want to restart?')}`;
+      case 'CANCELED': return `${exerciseName} ${t('data will be reset, do you want to restart?')}`;
+      default:
+        return 'Do you want to change the status of this simulation?';
+    }
+  };
   return (
     <>
       {executionButton()}
@@ -144,7 +155,7 @@ const Buttons = ({ exerciseId, exerciseStatus }: { exerciseId: ExerciseStore['ex
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to change the status of this simulation?')}
+            {dialogContentText()}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -210,7 +221,7 @@ const ExerciseHeader = () => {
             disabled={permissions.readOnlyBypassStatus}
             updateTags={(tagIds) => updateExerciseTags(exercise.exercise_id, { exercise_tags: tagIds })}
           />
-          {<Buttons exerciseId={exercise.exercise_id} exerciseStatus={exercise.exercise_status} />}
+          {<Buttons exerciseId={exercise.exercise_id} exerciseStatus={exercise.exercise_status} exerciseName={exercise.exercise_name}/>}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', placeContent: 'end', marginTop: 8, gap: 8 }}>
           <Typography variant="h3" style={{ margin: 0 }}>

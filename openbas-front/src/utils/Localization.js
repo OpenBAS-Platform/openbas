@@ -340,6 +340,9 @@ const i18n = {
       d: 'j',
       'Do you want to change the status of this simulation?':
         'Souhaitez-vous changer le statut de cette simulation ?',
+      'will be started, do you want to continue?': 'va démarrer, voulez-vous continuer ?',
+      'Injects will be paused, do you want to continue?': 'Les stimulis seront interrompues. Voulez-vous continuer ?',
+      'data will be reset, do you want to restart?': 'les données seront réinitialisées, souhaitez-vous redémarrer ?',
       Confirm: 'Confirmer',
       Text: 'Texte',
       'Sender email address': "Adresse email de l'expéditeur",
