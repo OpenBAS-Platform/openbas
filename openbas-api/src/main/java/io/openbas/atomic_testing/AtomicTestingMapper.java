@@ -14,11 +14,11 @@ import io.openbas.database.model.InjectExpectationResult;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.model.Tag;
 import io.openbas.model.inject.form.Expectation;
+import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.jetbrains.annotations.NotNull;
 
 public class AtomicTestingMapper {
 
