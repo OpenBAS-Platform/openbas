@@ -21,8 +21,8 @@ interface Props {
 
 interface Recurrence {
   startDate: string,
-  endDate?: string,
-  time: string,
+  endDate?: string | null,
+  time: string | null,
   onlyWeekday: boolean,
   dayOfWeek?: 1 | 2 | 3 | 4 | 5 | 6 | 7,
   weekOfMonth?: 1 | 2 | 3 | 4 | 5,
@@ -33,8 +33,8 @@ const _MS_DELAY_TOO_CLOSE = 1000 * 60 * 2;
 
 const defaultFormValues = {
   startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
-  endDate: '',
-  time: '',
+  endDate: null,
+  time: null,
   onlyWeekday: false,
   dayOfWeek: 1 as Recurrence['dayOfWeek'],
   weekOfMonth: 1 as Recurrence['weekOfMonth'],
@@ -43,8 +43,9 @@ const defaultFormValues = {
 const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurring, onSelectRecurring, initialValues, open, setOpen }) => {
   const { t } = useFormatter();
   const submit = (data: Recurrence) => {
+    const { time } = data as Omit<Recurrence, 'time'> & { time: string };
     // case day
-    let cron: string = generateDailyCron(new Date(data.time).getUTCHours(), new Date(data.time).getUTCMinutes(), data.onlyWeekday);
+    let cron: string = generateDailyCron(new Date(time).getUTCHours(), new Date(time).getUTCMinutes(), data.onlyWeekday);
     const start = data.startDate;
     let end = data.endDate;
     switch (selectRecurring) {
@@ -52,15 +53,15 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
         end = new Date(new Date(data.startDate).setUTCHours(24, 0, 0, 0)).toISOString();
         break;
       case 'weekly':
-        cron = generateWeeklyCron(data.dayOfWeek!, new Date(data.time).getUTCHours(), new Date(data.time).getUTCMinutes());
+        cron = generateWeeklyCron(data.dayOfWeek!, new Date(time).getUTCHours(), new Date(time).getUTCMinutes());
         break;
       case 'monthly':
-        cron = generateMonthlyCron(data.weekOfMonth!, data.dayOfWeek!, new Date(data.time).getUTCHours(), new Date(data.time).getUTCMinutes());
+        cron = generateMonthlyCron(data.weekOfMonth!, data.dayOfWeek!, new Date(time).getUTCHours(), new Date(time).getUTCMinutes());
         break;
       default:
         break;
     }
-    onSubmit(cron, start, end);
+    onSubmit(cron, start, end || '');
   };
 
   const { handleSubmit, control, reset, getValues, clearErrors } = useForm<Recurrence>({
@@ -68,9 +69,9 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
     resolver: zodResolver(
       zodImplement<Recurrence>().with({
         startDate: z.string().min(1, t('Required')),
-        endDate: z.string().optional(),
+        endDate: z.string().optional().nullable(),
         onlyWeekday: z.boolean(),
-        time: z.string().min(1, t('Required')),
+        time: z.string().min(1, t('Required')).nullable(),
         // @ts-expect-error zodImplement cannot handle refine
         dayOfWeek: z.number().optional().refine((value) => {
           if (['weekly', 'monthly'].includes(selectRecurring)) {
@@ -88,8 +89,10 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
       }).refine(
         (data) => {
           if (['noRepeat'].includes(selectRecurring)) {
-            return new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() !== new Date(data.startDate).getTime()
-              || (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
+            if (data.time) {
+              return new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() !== new Date(data.startDate).getTime()
+                || (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
+            }
           }
           return true;
         },
@@ -271,7 +274,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                 render={({ field, fieldState }) => (
                   <DateTimePicker
                     views={['year', 'month', 'day']}
-                    value={field.value}
+                    value={field.value || null}
                     minDate={new Date(new Date().setUTCHours(24, 0, 0, 0)).toISOString()}
                     onChange={(endDate) => {
                       return (endDate ? field.onChange(new Date(new Date(endDate).setUTCHours(0, 0, 0, 0)).toISOString()) : field.onChange(''));
