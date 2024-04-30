@@ -90,7 +90,7 @@ public class AtomicTestingUtils {
             resultsByTypes
         );
 
-        targets.add(target);
+        assetsToRefine.add(target);
       }
     });
     inject.getAssetGroups().forEach(assetGroup -> {
@@ -98,12 +98,25 @@ public class AtomicTestingUtils {
       boolean noMatchingExpectations = assetGroupExpectations.stream()
           .noneMatch(exp -> exp.getAssetGroup().getId().equals(assetGroup.getId()));
 
+        List<InjectTargetWithResult> children = new ArrayList<>();
+
+        assetsToRefine.forEach(asset -> {
+          boolean found = assetGroup.getAssets().stream()
+              .anyMatch(parentAsset -> parentAsset.getId().equals(asset.getId()));
+          if (found) {
+            children.add(asset);
+          } else {
+            assetsWithoutParent.add(asset);
+          }
+        });
+
       if (noMatchingExpectations) {
         InjectTargetWithResult target = new InjectTargetWithResult(
             TargetType.ASSETS_GROUPS,
             assetGroup.getId(),
             assetGroup.getName(),
-            resultsByTypes
+            resultsByTypes,
+            sortResults(children)
         );
 
         targets.add(target);
