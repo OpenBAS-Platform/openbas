@@ -1,5 +1,5 @@
 import React from 'react';
-import { ListItemButton, ListItemText } from '@mui/material';
+import { ListItemButton, ListItemText, Paper, Divider } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { DevicesOtherOutlined, Groups3Outlined } from '@mui/icons-material';
 import { SelectGroup } from 'mdi-material-ui';
@@ -17,6 +17,15 @@ const useStyles = makeStyles(() => ({
     verticalAlign: 'middle',
     textOverflow: 'ellipsis',
   },
+  dividerL: {
+    content: '',
+    position: 'absolute',
+    backgroundColor: 'rgba(105, 103, 103, 0.45)', // Adjust the color and opacity
+    width: '2px', // Set the width of the dots
+    bottom: '0',
+    left: '30px', // Adjust the left position
+    height: '99%', // Set the height of the dots
+  },
 }));
 
 interface Props {
@@ -27,7 +36,7 @@ interface Props {
 
 const TargetListItem: React.FC<Props> = ({ isChild, onClick, target }) => {
   const classes = useStyles();
-  const style = isChild ? { paddingLeft: 6 } : {};
+  const style = isChild ? { marginBottom: 1, marginLeft: 5 } : { marginBottom: 1 };
 
   const handleItemClick = () => {
     onClick(target);
@@ -45,29 +54,37 @@ const TargetListItem: React.FC<Props> = ({ isChild, onClick, target }) => {
   };
 
   return (
-    <ListItemButton sx={style} onClick={handleItemClick}>
-      <ListItemText
-        primary={
-          <div>
-            <div style={{
-              color: 'gray',
-              display: 'inline-block',
-              float: 'left',
-              paddingRight: 10,
-            }}
-            >{getIcon(target?.targetType)}</div>
-            <div className={classes.bodyTarget} style={{ width: '30%' }}>
-              {`${target?.name}`}
-            </div>
-            <div style={{ float: 'right' }}>
-              <AtomicTestingResult
-                expectations={target?.expectationResultsByTypes}
-              />
-            </div>
-          </div>
+    <div>
+      <div>{isChild && <Divider className={classes.dividerL}/>}</div>
+      <Paper elevation={3}
+        sx={style}
+        key={target?.id}
+      >
+        <ListItemButton onClick={handleItemClick}>
+          <ListItemText
+            primary={
+              <div>
+                <div style={{
+                  color: 'gray',
+                  display: 'inline-block',
+                  float: 'left',
+                  paddingRight: 5,
+                }}
+                >{getIcon(target?.targetType)}</div>
+                <div className={classes.bodyTarget} style={{ width: '30%' }}>
+                  {`${target?.name}`}
+                </div>
+                <div style={{ float: 'right' }}>
+                  <AtomicTestingResult
+                    expectations={target?.expectationResultsByTypes}
+                  />
+                </div>
+              </div>
             }
-      />
-    </ListItemButton>
+          />
+        </ListItemButton>
+      </Paper>
+    </div>
   );
 };
 

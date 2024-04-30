@@ -70,7 +70,7 @@ const AtomicTesting = () => {
       </Grid>
       <Grid container spacing={2} classes={{ root: classes.container }}>
         <Grid item xs={5} style={{ paddingBottom: 24 }}>
-          <div style={{ padding: 10 }}>
+          <div style={{ paddingBottom: 10 }}>
             <SearchFilter
               fullWidth
               small
@@ -80,20 +80,15 @@ const AtomicTesting = () => {
             />
           </div>
           {sortedTargets.length > 0 ? (
-            <List style={{ paddingTop: 10 }}>
-              {sortedTargets.map((target) => <Paper elevation={3} style={{ marginBottom: 10 }}
-                key={target?.id}
-                                             >
-                <TargetListItem onClick={handleTargetClick} target={target}/>
+            <List>
+              {sortedTargets.map((target) => <div key={target?.id} style={{ marginBottom: 10 }}>
+                <Paper elevation={3} >
+                  <TargetListItem onClick={handleTargetClick} target={target}/>
+                </Paper>
                 <List component="div" disablePadding>
-                  {target?.children?.map((child) => <Paper elevation={1}
-                    style={{ marginBottom: 5 }}
-                    key={child?.id}
-                                                    >
-                    <TargetListItem isChild onClick={handleTargetClick} target={child}/>
-                  </Paper>)}
+                  {target?.children?.map((child) => <TargetListItem key={child?.id} isChild onClick={handleTargetClick} target={child}/>)}
                 </List>
-              </Paper>)}
+              </div>)}
             </List>
           ) : (
             <Empty message={t('No targets available')}/>
