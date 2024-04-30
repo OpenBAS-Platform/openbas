@@ -2048,7 +2048,7 @@ class InjectDefinition extends Component {
                                     }}
                                     disabled={
                                       this.props.permissions.readOnly
-                                      || fieldAttachements.readOnly
+                                      || (hasAttachments && fieldAttachements.readOnly)
                                       || !hasAttachments
                                     }
                                   />
@@ -2069,7 +2069,7 @@ class InjectDefinition extends Component {
                                   : null
                               }
                               attached={document.document_attached}
-                              disabled={this.props.permissions.readOnly || fieldAttachements.readOnly}
+                              disabled={this.props.permissions.readOnly || (hasAttachments && fieldAttachements.readOnly)}
                             />
                           </ListItemSecondaryAction>
                         </ListItem>
