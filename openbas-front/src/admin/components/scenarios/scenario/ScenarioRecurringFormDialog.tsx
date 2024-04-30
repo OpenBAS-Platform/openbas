@@ -11,7 +11,7 @@ import { generateDailyCron, generateMonthlyCron, generateWeeklyCron, parseCron }
 import Transition from '../../../../components/common/Transition';
 
 interface Props {
-  onSubmit: (cron: string, start: string, end?: string | null) => void,
+  onSubmit: (cron: string, start: string, end?: string) => void,
   onSelectRecurring: (selectRecurring: string) => void,
   selectRecurring: string,
   initialValues: ScenarioRecurrenceInput
@@ -61,7 +61,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
       default:
         break;
     }
-    onSubmit(cron, start, end);
+    onSubmit(cron, start, end || '');
   };
 
   const { handleSubmit, control, reset, getValues, clearErrors } = useForm<Recurrence>({
