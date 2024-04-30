@@ -59,7 +59,6 @@ public class AtomicTestingUtils {
 
     List<InjectTargetWithResult> targets = new ArrayList<>();
     List<InjectTargetWithResult> assetsToRefine = new ArrayList<>();
-    List<InjectTargetWithResult> assetsWithoutParent = new ArrayList<>();
 
     /* Match Target with expectations
      * */
@@ -153,15 +152,18 @@ public class AtomicTestingUtils {
           .map(entry -> {
             List<InjectTargetWithResult> children = new ArrayList<>();
 
-            assetsToRefine.forEach(asset -> {
-              boolean found = entry.getKey().getAssets().stream()
-                  .anyMatch(assetChild -> assetChild.getId().equals(asset.getId()));
-              if (found) {
-                children.add(asset);
-              } else {
-                assetsWithoutParent.add(asset);
+            if (assetsToRefine != null) {
+              List<InjectTargetWithResult> assetsToRemove = new ArrayList<>();
+              for (InjectTargetWithResult asset : assetsToRefine) {
+                boolean found = entry.getKey().getAssets().stream()
+                    .anyMatch(assetChild -> assetChild.getId().equals(asset.getId()));
+                if (found) {
+                  children.add(asset);
+                  assetsToRemove.add(asset);
+                }
               }
-            });
+              assetsToRefine.removeAll(assetsToRemove);
+            }
 
             entry.getKey().getAssets().forEach(asset -> {
               boolean found = children.stream()
@@ -181,7 +183,7 @@ public class AtomicTestingUtils {
           .toList());
     }
 
-    targets.addAll(assetsWithoutParent);
+    targets.addAll(assetsToRefine);
     return sortResults(targets);
   }
 

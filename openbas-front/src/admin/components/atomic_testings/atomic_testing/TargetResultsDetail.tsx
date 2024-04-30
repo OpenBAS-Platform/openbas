@@ -144,7 +144,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         color = 'rgb(220, 81, 72)';
         background = 'rgba(192, 113, 113, 0.29)';
         break;
-      default: // Unknown status fow unknown spectation score
+      default: // Unknown status fow unknown expectation score
         color = 'rgb(202,203,206)';
         background = 'rgba(202,203,206, 0.5)';
         break;
