@@ -65,7 +65,7 @@ const ResponsePie: FunctionComponent<Props> = ({
       Blocked: 'rgb(107, 235, 112)',
       Detected: 'rgb(107, 235, 112)',
       Successful: 'rgb(107, 235, 112)',
-      Pending: 'rgb(192,111,0)',
+      Pending: 'rgb(128,128,128)',
     };
 
     return colorMap[result ?? ''] ?? 'rgb(220, 81, 72)';

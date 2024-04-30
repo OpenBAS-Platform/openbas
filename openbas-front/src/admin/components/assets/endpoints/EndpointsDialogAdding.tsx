@@ -60,7 +60,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   onClose,
   onSubmit,
   title,
-  filter = () => true,
+  filter,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -80,7 +80,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
 
   const [disableFilter, setDisableFilter] = useState(false);
 
-  const sortedEndpoints: EndpointStore[] = filtering.filterAndSort(R.values(endpointsMap).filter(!disableFilter ? filter : () => true));
+  const sortedEndpoints: EndpointStore[] = filtering.filterAndSort(R.values(endpointsMap).filter((!disableFilter && !!filter) ? filter : () => true));
 
   const [endpointIds, setEndpointIds] = useState<string[]>(initialState);
   useEffect(() => {
@@ -140,14 +140,16 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
                   currentTags={filtering.tags}
                 />
               </Grid>
-              <Grid item xs={4}>
-                <Tooltip title={t('By default, only assets compliant with the injector are displayed')}>
-                  <FormControlLabel
-                    control={<Switch checked={disableFilter} onChange={(_e, checked) => setDisableFilter(checked)} />}
-                    label={t('Show all assets')}
-                  />
-                </Tooltip>
-              </Grid>
+              {!!filter
+                && <Grid item xs={4}>
+                  <Tooltip title={t('By default, only assets compliant with the injector are displayed')}>
+                    <FormControlLabel
+                      control={<Switch checked={disableFilter} onChange={(_e, checked) => setDisableFilter(checked)} />}
+                      label={t('Show all assets')}
+                    />
+                  </Tooltip>
+                </Grid>
+              }
             </Grid>
             <List>
               {sortedEndpoints.map((endpoint) => {
