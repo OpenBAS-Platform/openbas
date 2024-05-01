@@ -46,14 +46,16 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   connectorLabel: {
     color: theme.palette.common,
-    fontSize: '0.7rem',
+    fontSize: '0.8rem',
     position: 'absolute',
     bottom: 'calc(60%)',
+    left: 'calc(-14%)',
   },
   icon: {
     position: 'absolute',
-    bottom: 'calc(82%)',
-    right: 'calc(46%)',
+    bottom: 'calc(77%)',
+    width: 30,
+    height: 30,
   },
   tabs: {
     marginLeft: 'auto',
@@ -105,18 +107,25 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
       return null;
     }
     const dateToDisplay = index === 0 ? lastExecutionStartDate : lastExecutionEndDate;
-    // eslint-disable-next-line no-nested-ternary
-    const leftPos = steps.length === 4
-      ? 'calc(-25%)'
-      : steps.length > 4
-        ? 'calc(-30%)'
-        : 'calc(-20%)';
+
+    const formatDate = (date: string) => {
+      const dateString = nsdt(date);
+      if (!dateString) return '';
+      const [firstPart, secondPart, thirdPart] = dateString.split(', ');
+      return (
+        <>
+          {firstPart} {secondPart}
+          <br />
+          {thirdPart}
+        </>
+      );
+    };
 
     return (
       <>
         <hr className={classes.connector}/>
-        <Typography variant="body2" className={classes.connectorLabel} style={{ left: leftPos }}>
-          {dateToDisplay && nsdt(dateToDisplay)}
+        <Typography variant="body2" className={classes.connectorLabel}>
+          {dateToDisplay && formatDate(dateToDisplay)}
         </Typography>
       </>
     );
@@ -130,12 +139,12 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
       return 'Waiting Response';
     }
     switch (type) {
-      case 'PREVENTION':
-        return status === 'VALIDATED' ? 'Attack Blocked' : 'Attack Unblocked';
       case 'DETECTION':
         return status === 'VALIDATED' ? 'Attack Detected' : 'Attack Undetected';
       case 'HUMAN_RESPONSE':
         return status === 'VALIDATED' ? 'Attack Successful' : 'Attack Failed';
+      case 'PREVENTION':
+        return status === 'VALIDATED' ? 'Attack Blocked' : 'Attack Unblocked';
       default:
         return '';
     }
@@ -165,11 +174,11 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     if (index >= 2 && type) {
       let IconComponent;
       switch (type) {
-        case 'PREVENTION':
-          IconComponent = Shield;
-          break;
         case 'DETECTION':
           IconComponent = TrackChanges;
+          break;
+        case 'PREVENTION':
+          IconComponent = Shield;
           break;
         default:
           IconComponent = SensorOccupied;
@@ -186,7 +195,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     return (
       <>
         {targetResult.map((result) => (
-          <Paper elevation={2} style={{ padding: 20, marginTop: 15, minHeight: 80 }}
+          <Paper elevation={2} style={{ padding: 20, marginTop: 15, minHeight: 125 }}
             key={result.target_result_id}
           >
             {result.target_results && result.target_results.length > 0 ? (

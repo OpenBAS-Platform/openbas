@@ -192,7 +192,7 @@ public class AtomicTestingUtils {
 
   @NotNull
   private static List<ExpectationResultsByType> getDefaultExpectationResultsByTypes() {
-    List<ExpectationType> types = List.of(ExpectationType.PREVENTION, ExpectationType.DETECTION, ExpectationType.HUMAN_RESPONSE);
+    List<ExpectationType> types = List.of(ExpectationType.DETECTION, ExpectationType.HUMAN_RESPONSE, ExpectationType.PREVENTION);
     return types.stream()
         .map(type -> getExpectationByType(type, Collections.singletonList(null)))
         .filter(Optional::isPresent)
@@ -202,15 +202,15 @@ public class AtomicTestingUtils {
 
   @NotNull
   public static List<ExpectationResultsByType> getExpectationResultByTypes(final List<InjectExpectation> expectations) {
-    List<Integer> preventionScores = getScores(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
     List<Integer> detectionScores = getScores(List.of(EXPECTATION_TYPE.DETECTION), expectations);
     List<Integer> humanScores = getScores(List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL), expectations);
+    List<Integer> preventionScores = getScores(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
 
     List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
 
-    getExpectationByType(ExpectationType.PREVENTION, preventionScores).map(resultAvgOfExpectations::add);
     getExpectationByType(ExpectationType.DETECTION, detectionScores).map(resultAvgOfExpectations::add);
     getExpectationByType(ExpectationType.HUMAN_RESPONSE, humanScores).map(resultAvgOfExpectations::add);
+    getExpectationByType(ExpectationType.PREVENTION, preventionScores).map(resultAvgOfExpectations::add);
 
     return resultAvgOfExpectations;
   }
