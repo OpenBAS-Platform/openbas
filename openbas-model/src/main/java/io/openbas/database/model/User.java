@@ -53,11 +53,13 @@ public class User implements Base {
   @Setter
   @Column(name = "user_firstname")
   @JsonProperty("user_firstname")
+  @Queryable(searchable = true, sortable = true)
   private String firstname;
 
   @Setter
   @Column(name = "user_lastname")
   @JsonProperty("user_lastname")
+  @Queryable(searchable = true, sortable = true)
   private String lastname;
 
   @Getter(NONE)
@@ -76,7 +78,7 @@ public class User implements Base {
   @Column(name = "user_email")
   @JsonProperty("user_email")
   @NotBlank
-  @Queryable(searchable = true)
+  @Queryable(searchable = true, sortable = true)
   private String email;
 
   @Setter
@@ -163,6 +165,7 @@ public class User implements Base {
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("user_tags")
+  @Queryable(sortable = true)
   private List<Tag> tags = new ArrayList<>();
 
   @Setter
