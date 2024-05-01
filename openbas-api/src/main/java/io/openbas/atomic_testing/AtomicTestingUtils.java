@@ -37,7 +37,7 @@ public class AtomicTestingUtils {
   }
 
   public static List<InjectTargetWithResult> getTargetsWithResults(final Inject inject) {
-    List<ExpectationResultsByType> resultsByTypes = getDefaultExpectationResultsByTypes();
+    List<ExpectationResultsByType> defaultExpectationResultsByTypes = getDefaultExpectationResultsByTypes();
     List<InjectExpectation> expectations = inject.getExpectations();
 
     List<InjectExpectation> teamExpectations = new ArrayList<>();
@@ -70,7 +70,7 @@ public class AtomicTestingUtils {
             TargetType.TEAMS,
             team.getId(),
             team.getName(),
-            resultsByTypes
+            defaultExpectationResultsByTypes
         );
         targets.add(target);
       }
@@ -84,7 +84,7 @@ public class AtomicTestingUtils {
             TargetType.ASSETS,
             asset.getId(),
             asset.getName(),
-            resultsByTypes
+            defaultExpectationResultsByTypes
         );
 
         targets.add(target);
@@ -94,12 +94,25 @@ public class AtomicTestingUtils {
       // Check if there are no expectations matching the current assetgroup (t)
       boolean noMatchingExpectations = assetGroupExpectations.stream()
           .noneMatch(exp -> exp.getAssetGroup().getId().equals(assetGroup.getId()));
+
+      List<InjectTargetWithResult> children = new ArrayList<>();
+
+      assetGroup.getAssets().forEach(asset -> {
+          children.add(new InjectTargetWithResult(
+              TargetType.ASSETS,
+              asset.getId(),
+              asset.getName(),
+              defaultExpectationResultsByTypes
+          ));
+      });
+
       if (noMatchingExpectations) {
         InjectTargetWithResult target = new InjectTargetWithResult(
             TargetType.ASSETS_GROUPS,
             assetGroup.getId(),
             assetGroup.getName(),
-            resultsByTypes
+            defaultExpectationResultsByTypes,
+            children
         );
 
         targets.add(target);
@@ -172,7 +185,7 @@ public class AtomicTestingUtils {
                     TargetType.ASSETS,
                     asset.getId(),
                     asset.getName(),
-                    resultsByTypes
+                    defaultExpectationResultsByTypes
                 ));
               }
             });
@@ -194,7 +207,7 @@ public class AtomicTestingUtils {
   private static List<ExpectationResultsByType> getDefaultExpectationResultsByTypes() {
     List<ExpectationType> types = List.of(ExpectationType.DETECTION, ExpectationType.HUMAN_RESPONSE, ExpectationType.PREVENTION);
     return types.stream()
-        .map(type -> getExpectationByType(type, Collections.singletonList(null)))
+        .map(type -> getExpectationByType(type, Collections.emptyList()))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toList();
