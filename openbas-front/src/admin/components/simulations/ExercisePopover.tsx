@@ -39,6 +39,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openExport, setOpenExport] = useState(false);
+  const [exportTeams, setExportTeams] = useState(false);
   const [exportPlayers, setExportPlayers] = useState(false);
   const [exportVariableValues, setExportVariableValues] = useState(false);
 
@@ -82,11 +83,12 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
 
   const submitExport = () => {
     const link = document.createElement('a');
-    link.href = `/api/exercises/${exercise.exercise_id}/export?isWithPlayers=${exportPlayers}&isWithVariableValues=${exportVariableValues}`;
+    link.href = `/api/exercises/${exercise.exercise_id}/export?isWithTeams=${exportTeams}&isWithPlayers=${exportPlayers}&isWithVariableValues=${exportVariableValues}`;
     link.click();
     handleCloseExport();
   };
 
+  const handleToggleExportTeams = () => setExportTeams(!exportTeams);
   const handleToggleExportPlayers = () => setExportPlayers(!exportPlayers);
   const handleToggleExportVariableValues = () => setExportVariableValues(!exportVariableValues);
 
@@ -169,7 +171,10 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
                 <TableRow>
                   <TableCell>{t('Teams')}</TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
-                    <Checkbox checked={true} disabled={true} />
+                    <Checkbox
+                      checked={exportTeams}
+                      onChange={handleToggleExportTeams}
+                    />
                   </TableCell>
                 </TableRow>
                 <TableRow>

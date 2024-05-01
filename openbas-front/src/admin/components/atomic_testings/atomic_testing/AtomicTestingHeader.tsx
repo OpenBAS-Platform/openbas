@@ -80,7 +80,7 @@ const AtomicTestingHeader = () => {
         >
           <DialogContent>
             <DialogContentText>
-              <span>{t('Do you want to try this inject?')}</span>
+              <span>{t('Do you want to launch this inject?')}</span>
             </DialogContentText>
             <Alert severity="info" style={{ marginTop: 20 }}>
               {t('The previous results will be deleted.')}

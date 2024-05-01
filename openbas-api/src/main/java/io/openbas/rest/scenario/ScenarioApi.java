@@ -125,16 +125,17 @@ public class ScenarioApi {
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public void exportScenario(
       @PathVariable @NotBlank final String scenarioId,
+      @RequestParam(required = false) final boolean isWithTeams,
       @RequestParam(required = false) final boolean isWithPlayers,
       @RequestParam(required = false) final boolean isWithVariableValues,
       HttpServletResponse response)
       throws IOException {
-    this.scenarioService.exportScenario(scenarioId, isWithPlayers, isWithVariableValues, response);
+    this.scenarioService.exportScenario(scenarioId, isWithTeams, isWithPlayers, isWithVariableValues, response);
   }
 
   // -- IMPORT --
 
-  @GetMapping(SCENARIO_URI + "/import")
+  @PostMapping(SCENARIO_URI + "/import")
   @Secured(ROLE_ADMIN)
   public void importScenario(@RequestPart("file") @NotNull MultipartFile file) throws Exception {
     this.importService.handleFileImport(file);

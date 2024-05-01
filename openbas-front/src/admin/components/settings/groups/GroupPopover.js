@@ -452,7 +452,7 @@ class GroupPopover extends Component {
               aria-label="secondary tabs example"
             >
               <Tab label="Scenarios" />
-              <Tab label="Exercises" />
+              <Tab label="Simulations" />
               <Tab label="Organizations" />
             </Tabs>
             <TabPanel value={this.state.tabSelect} index={0}>

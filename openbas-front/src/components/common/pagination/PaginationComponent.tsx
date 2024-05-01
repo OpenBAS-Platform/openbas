@@ -27,9 +27,10 @@ interface Props<T> {
   exportProps?: ExportProps<T>;
   searchEnable?: boolean;
   handleOpenMitreFilter?: () => void;
+  children?: React.ReactElement | null;
 }
 
-const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, setContent, exportProps, searchEnable = true, handleOpenMitreFilter }: Props<T>) => {
+const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, setContent, exportProps, searchEnable = true, handleOpenMitreFilter, children }: Props<T>) => {
   // Standard hooks
   const classes = useStyles();
 
@@ -74,6 +75,12 @@ const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, s
     });
   }, [searchPaginationInput, page, rowsPerPage, textSearch]);
 
+  // Children
+  let component;
+  if (children) {
+    component = React.cloneElement(children as React.ReactElement);
+  }
+
   return (
     <div className={classes.parameters}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -101,6 +108,7 @@ const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, s
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
         {exportProps && <ExportButton totalElements={totalElements} exportProps={exportProps} />}
+        {!!component && component}
       </div>
     </div>
   );

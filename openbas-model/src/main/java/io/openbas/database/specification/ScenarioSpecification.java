@@ -1,6 +1,7 @@
 package io.openbas.database.specification;
 
 import io.openbas.database.model.Scenario;
+import jakarta.persistence.criteria.Path;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -24,6 +25,16 @@ public class ScenarioSpecification {
         cb.isNull(root.get("recurrenceEnd")),
         cb.greaterThanOrEqualTo(root.get("recurrenceEnd"), stopDate)
     );
+  }
+
+  public static Specification<Scenario> findGrantedFor(String userId) {
+    return (root, query, criteriaBuilder) -> {
+      Path<Object> path = root
+          .join("grants")
+          .join("group")
+          .join("users").get("id");
+      return criteriaBuilder.equal(path, userId);
+    };
   }
 
 }

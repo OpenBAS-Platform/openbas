@@ -403,7 +403,7 @@ class InjectDefinition extends Component {
   handleAddAssets(assetIds) {
     this.setState({
       assetIds,
-    });
+    }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveAsset(assetId) {

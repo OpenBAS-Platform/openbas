@@ -1,5 +1,5 @@
 import React, { ChangeEvent, FunctionComponent, useRef, useState } from 'react';
-import { CircularProgress, IconButton, Tooltip, CircularProgressProps } from '@mui/material';
+import { CircularProgress, CircularProgressProps, IconButton, ToggleButton, Tooltip } from '@mui/material';
 import { CloudUploadOutlined } from '@mui/icons-material';
 import { useFormatter } from '../i18n';
 import { useHelper } from '../../store';
@@ -62,20 +62,20 @@ const ImportUploader: FunctionComponent<Props> = ({
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip
-          title={t(title)}
-          aria-label={title}
+        <ToggleButton
+          value="import" aria-label="import" size="small"
+          onClick={handleOpenUpload} disabled={!userAdmin}
         >
-          <IconButton
-            onClick={handleOpenUpload}
-            aria-haspopup="true"
-            size="small"
-            style={{ marginRight: 10 }}
-            disabled={!userAdmin}
+          <Tooltip
+            title={t(title)}
+            aria-label={title}
           >
-            <CloudUploadOutlined />
-          </IconButton>
-        </Tooltip>
+            <CloudUploadOutlined
+              color="primary"
+              fontSize="small"
+            />
+          </Tooltip>
+        </ToggleButton>
       )}
     </>
   );
