@@ -1,5 +1,5 @@
 import { makeStyles } from '@mui/styles';
-import { Card, CardActionArea, Tooltip, CardContent, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material';
+import { Card, CardActionArea, CardContent, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip, useTheme } from '@mui/material';
 import { KeyboardArrowRight, MovieFilterOutlined } from '@mui/icons-material';
 import React, { CSSProperties, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -40,7 +40,7 @@ const useStyles = makeStyles(() => ({
   },
   item: {
     paddingLeft: 10,
-    height: 70,
+    height: 60,
   },
   bodyItem: {
     fontSize: 13,
@@ -241,17 +241,7 @@ const Scenarios = () => {
                       className={classes.bodyItem}
                       style={inlineStyles.scenario_name}
                     >
-                      <div style={{
-                        fontSize: 16,
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        marginBottom: 5,
-                      }}
-                      >
-                        {scenario.scenario_name}
-                      </div>
-                      <Typography variant="body2"><strong>{scenario.scenario_injects_statistics.total_count}</strong> {t('injects in this scenario')}</Typography>
+                      {scenario.scenario_name}
                     </div>
                   </Tooltip>
                   <div

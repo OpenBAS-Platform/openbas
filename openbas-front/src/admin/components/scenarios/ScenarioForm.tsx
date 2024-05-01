@@ -61,7 +61,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
         variant="standard"
         fullWidth
         label={t('Name')}
-        style={{ marginTop: 20 }}
+        style={{ marginTop: 10 }}
         error={!!errors.scenario_name}
         helperText={errors.scenario_name?.message}
         inputProps={register('scenario_name')}

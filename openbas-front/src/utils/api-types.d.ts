@@ -129,6 +129,7 @@ export interface AtomicTestingDetailOutput {
   atomic_content?: object;
   atomic_description?: string;
   atomic_documents?: InjectDocument[];
+  atomic_expectations?: Expectation[];
   atomic_id: string;
   atomic_tags?: Tag[];
   status_label?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
@@ -183,6 +184,7 @@ export interface AtomicTestingOutput {
   atomic_last_execution_start_date?: string;
   /** Status of execution */
   atomic_status: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  atomic_tags?: string[];
   /**
    * Specifies the categories of targetResults for atomic testing.
    * @example "assets, asset groups, teams, players"
@@ -192,6 +194,10 @@ export interface AtomicTestingOutput {
   atomic_title: string;
   /** Type */
   atomic_type: string;
+}
+
+export interface AtomicTestingUpdateTagsInput {
+  atomic_tags?: string[];
 }
 
 export interface AttackPattern {
@@ -748,10 +754,19 @@ export interface ExerciseUpdateTeamsInput {
   exercise_teams?: string[];
 }
 
+export interface Expectation {
+  expectation_description?: string;
+  expectation_expectation_group?: boolean;
+  expectation_name?: string;
+  /** @format int32 */
+  expectation_score?: number;
+  expectation_type?: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
+}
+
 export interface ExpectationResultsByType {
-  avgResult?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
-  distribution?: ResultDistribution[];
-  type?: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
+  avgResult: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
+  distribution: ResultDistribution[];
+  type: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
 }
 
 export interface ExpectationUpdateInput {
@@ -1007,10 +1022,10 @@ export interface InjectStatusExecution {
  * @example "assets, asset groups, teams, players"
  */
 export interface InjectTargetWithResult {
-  expectationResultsByTypes?: ExpectationResultsByType[];
-  id?: string;
-  name?: string;
-  targetType?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
+  expectationResultsByTypes: ExpectationResultsByType[];
+  id: string;
+  name: string;
+  targetType: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
 export interface InjectTeamsInput {
@@ -1903,9 +1918,9 @@ export interface ResetUserInput {
 }
 
 export interface ResultDistribution {
-  label?: string;
+  label: string;
   /** @format int32 */
-  value?: number;
+  value: number;
 }
 
 export interface Scenario {

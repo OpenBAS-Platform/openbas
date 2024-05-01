@@ -13,30 +13,30 @@ interface Props {
   exercises: ExerciseSimpleStore[];
 }
 
-const generateFakeData = (): ExerciseSimpleStore[] => {
-  const now = new Date();
-  return Array.from(Array(5), (e, i) => {
-    now.setHours(now.getHours() + 1);
-    return {
-      exercise_id: `fake-${i}`,
-      exercise_name: 'fake',
-      exercise_start_date: now.toISOString(),
-      exercise_global_score: [
-        { type: 'PREVENTION', distribution: [{ value: random(10, 100) }] },
-        { type: 'DETECTION', distribution: [{ value: random(10, 100) }] },
-        { type: 'HUMAN_RESPONSE', distribution: [{ value: random(10, 100) }] },
-      ],
-      exercise_targets: [],
-      exercise_tags: undefined,
-    };
-  });
-};
 const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
   exercises = [],
 }) => {
   // Standard hooks
   const { t, nsdt } = useFormatter();
   const theme: Theme = useTheme();
+  const generateFakeData = (): ExerciseSimpleStore[] => {
+    const now = new Date();
+    return Array.from(Array(5), (e, i) => {
+      now.setHours(now.getHours() + 1);
+      return {
+        exercise_id: `fake-${i}`,
+        exercise_name: 'fake',
+        exercise_start_date: now.toISOString(),
+        exercise_global_score: [
+          { type: 'PREVENTION', distribution: [{ value: random(10, 100), label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'DETECTION', distribution: [{ value: random(10, 100), label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'HUMAN_RESPONSE', distribution: [{ value: random(10, 100), label: t('Unknown') }], avgResult: 'PARTIAL' },
+        ],
+        exercise_targets: [],
+        exercise_tags: undefined,
+      };
+    });
+  };
   const data = exercises.length > 0 ? exercises : generateFakeData();
   const series = [
     {
