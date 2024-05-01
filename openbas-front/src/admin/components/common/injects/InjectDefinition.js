@@ -15,9 +15,9 @@ import {
   ListItemText,
   MenuItem,
   Switch,
+  Tooltip,
   Typography,
 } from '@mui/material';
-import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
 import {
   ArrowDropDownOutlined,
@@ -28,8 +28,8 @@ import {
   EmojiEventsOutlined,
   GroupsOutlined,
   HelpOutlineOutlined,
+  RotateLeftOutlined,
 } from '@mui/icons-material';
-import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
 import { fetchInjectTeams } from '../../../../actions/Inject';
@@ -62,7 +62,6 @@ import InjectAddEndpoints from '../../simulations/injects/endpoints/InjectAddEnd
 import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
 import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
 import InjectAddAssetGroups from '../../simulations/injects/asset_groups/InjectAddAssetGroups';
-import TagField from '../../../../components/TagField';
 
 const styles = (theme) => ({
   header: {
@@ -101,10 +100,7 @@ const styles = (theme) => ({
   },
   allTeams: {
     float: 'right',
-    marginTop: -7,
-  },
-  container: {
-    padding: 20,
+    marginTop: -10,
   },
   errorColor: {
     color: theme.palette.error.main,
@@ -356,16 +352,16 @@ class InjectDefinition extends Component {
       teamsIds: props.inject.inject_teams,
       assetIds: props.inject.inject_assets,
       assetGroupIds: props.inject.inject_asset_groups,
+      articlesIds: props.inject.inject_content?.articles || [],
+      challengesIds: props.inject.inject_content?.challenges || [],
       documents: props.inject.inject_documents,
       expectations: props.inject.inject_content?.expectations || [],
       teamsSortBy: 'team_name',
       teamsOrderAsc: true,
       documentsSortBy: 'document_name',
       documentsOrderAsc: true,
-      articlesIds: props.inject.inject_content?.articles || [],
       articlesSortBy: 'article_name',
       articlesOrderAsc: true,
-      challengesIds: props.inject.inject_content?.challenges || [],
       challengesSortBy: 'challenge_name',
       challengesOrderAsc: true,
       openVariables: false,
@@ -379,7 +375,7 @@ class InjectDefinition extends Component {
   }
 
   toggleAll() {
-    this.setState({ allTeams: !this.state.allTeams });
+    this.setState({ allTeams: !this.state.allTeams }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleOpenVariables() {
@@ -394,13 +390,13 @@ class InjectDefinition extends Component {
   handleAddTeams(teamsIds) {
     this.setState({
       teamsIds: [...this.state.teamsIds, ...teamsIds],
-    });
+    }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveTeam(teamId) {
     this.setState({
       teamsIds: this.state.teamsIds.filter((a) => a !== teamId),
-    });
+    }, () => this.props.setInjectDetailsState(this.state));
   }
 
   // Assets
@@ -413,53 +409,53 @@ class InjectDefinition extends Component {
   handleRemoveAsset(assetId) {
     this.setState({
       assetIds: this.state.assetIds.filter((a) => a !== assetId),
-    });
+    }, () => this.props.setInjectDetailsState(this.state));
   }
 
   // Asset Groups
   handleAddAssetGroups(assetGroupIds) {
     this.setState({
       assetGroupIds,
-    });
+    }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveAssetGroup(assetGroupId) {
     this.setState({
       assetGroupIds: this.state.assetGroupIds.filter((a) => a !== assetGroupId),
-    });
+    }, () => this.props.setInjectDetailsState(this.state));
   }
 
   // Articles
   handleAddArticles(articlesIds) {
     this.setState({
       articlesIds: [...this.state.articlesIds, ...articlesIds],
-    });
+    }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveArticle(articleId) {
     this.setState({
       articlesIds: this.state.articlesIds.filter((a) => a !== articleId),
-    });
+    }, () => this.props.setInjectDetailsState(this.state));
   }
 
   // Challenges
   handleAddChallenges(challengesIds) {
     this.setState({
       challengesIds: [...this.state.challengesIds, ...challengesIds],
-    });
+    }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveChallenge(challengeId) {
     this.setState({
       challengesIds: this.state.challengesIds.filter((a) => a !== challengeId),
-    });
+    }, () => this.props.setInjectDetailsState(this.state));
   }
 
   // Documents
   handleAddDocuments(documents) {
     this.setState({
       documents: [...this.state.documents, ...documents],
-    });
+    }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveDocument(documentId) {
@@ -467,12 +463,12 @@ class InjectDefinition extends Component {
       documents: this.state.documents.filter(
         (d) => d.document_id !== documentId,
       ),
-    });
+    }, () => this.props.setInjectDetailsState(this.state));
   }
 
   // Expectations
   handleExpectations(expectations) {
-    this.setState({ expectations });
+    this.setState({ expectations }, () => this.props.setInjectDetailsState(this.state));
   }
 
   toggleAttachment(documentId) {
@@ -483,13 +479,7 @@ class InjectDefinition extends Component {
           document_attached: !d.document_attached,
         }
         : d)),
-    });
-  }
-
-  selectTupleFieldType(name, type) {
-    this.setState({
-      tupleFieldTypes: R.assoc(name, type, this.state.tupleFieldTypes),
-    });
+    }, () => this.props.setInjectDetailsState(this.state));
   }
 
   teamsReverseBy(field) {
@@ -622,151 +612,6 @@ class InjectDefinition extends Component {
         <span>{t(label)}</span>
       </div>
     );
-  }
-
-  async onSubmit(data) {
-    const { inject, injectorContract, onCreateInject, onUpdateInject } = this.props;
-    const finalData = {};
-    const hasArticles = injectorContract.fields
-      .map((f) => f.key)
-      .includes('articles');
-    if (hasArticles) {
-      finalData.articles = this.state.articlesIds;
-    }
-    const hasChallenges = injectorContract.fields
-      .map((f) => f.key)
-      .includes('challenges');
-    if (hasChallenges) {
-      finalData.challenges = this.state.challengesIds;
-    }
-    const hasExpectations = injectorContract.fields
-      .map((f) => f.key)
-      .includes('expectations');
-    if (hasExpectations) {
-      finalData.expectations = this.state.expectations;
-    }
-    injectorContract.fields
-      .filter(
-        (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
-          f.key,
-        ),
-      )
-      .forEach((field) => {
-        if (field.type === 'number') {
-          finalData[field.key] = parseInt(data[field.key], 10);
-        } else if (
-          field.type === 'textarea'
-          && field.richText
-          && data[field.key]
-          && data[field.key].length > 0
-        ) {
-          finalData[field.key] = data[field.key]
-            .replaceAll(
-              '&lt;#list challenges as challenge&gt;',
-              '<#list challenges as challenge>',
-            )
-            .replaceAll(
-              '&lt;#list articles as article&gt;',
-              '<#list articles as article>',
-            )
-            .replaceAll('&lt;/#list&gt;', '</#list>');
-        } else if (data[field.key] && field.type === 'tuple') {
-          if (field.cardinality && field.cardinality === '1') {
-            if (finalData[field.key].type === 'attachment') {
-              finalData[field.key] = {
-                key: data[field.key].key,
-                value: `${field.tupleFilePrefix}${data[field.key].value}`,
-              };
-            } else {
-              finalData[field.key] = R.dissoc('type', data[field.key]);
-            }
-          } else {
-            finalData[field.key] = data[field.key].map((pair) => {
-              if (pair.type === 'attachment') {
-                return {
-                  key: pair.key,
-                  value: `${field.tupleFilePrefix}${pair.value}`,
-                };
-              }
-              return R.dissoc('type', pair);
-            });
-          }
-        } else {
-          finalData[field.key] = data[field.key];
-        }
-      });
-    const { allTeams, teamsIds, assetIds, assetGroupIds, documents } = this.state;
-
-    const inject_depends_duration = data.inject_depends_duration_days * 3600 * 24
-      + data.inject_depends_duration_hours * 3600
-      + data.inject_depends_duration_minutes * 60;
-    const inject_tags = !R.isEmpty(data.inject_tags) ? R.pluck('id', data.inject_tags) : [];
-
-    const values = {
-      inject_title: data.inject_title,
-      inject_injector_contract: inject.inject_injector_contract.injector_contract_id,
-      inject_type: inject.inject_type,
-      inject_description: data.inject_description,
-      inject_tags,
-      inject_depends_from_another: inject.inject_depends_from_another,
-      inject_content: finalData,
-      inject_all_teams: allTeams,
-      inject_teams: teamsIds,
-      inject_assets: assetIds,
-      inject_asset_groups: assetGroupIds,
-      inject_documents: documents,
-      inject_depends_duration,
-    };
-
-    if (onCreateInject) {
-      await onCreateInject(values);
-    } else {
-      await onUpdateInject(values);
-    }
-    this.props.handleClose();
-  }
-
-  validate(values) {
-    const { t, injectorContract } = this.props;
-    const errors = {};
-    if (injectorContract && Array.isArray(injectorContract.fields)) {
-      injectorContract.fields
-        .filter(
-          (f) => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
-            f.key,
-          ),
-        )
-        .forEach((field) => {
-          const value = values[field.key];
-          if (field.mandatory && (value === undefined || R.isEmpty(value))) {
-            errors[field.key] = t('This field is required.');
-          }
-          if (field.mandatoryGroups) {
-            const { mandatoryGroups } = field;
-            const conditionOk = mandatoryGroups?.some((mandatoryKey) => {
-              const v = values[mandatoryKey];
-              return v !== undefined && !R.isEmpty(v);
-            });
-            // If condition are not filled
-            if (!conditionOk) {
-              const labels = mandatoryGroups.map((key) => injectorContract.fields.find((f) => f.key === key).label).join(', ');
-              errors[field.key] = t(`One of this field is required : ${labels}.`);
-            }
-          }
-        });
-    }
-    const requiredFields = [
-      'inject_title',
-      'inject_depends_duration_days',
-      'inject_depends_duration_hours',
-      'inject_depends_duration_minutes',
-    ];
-    requiredFields.forEach((field) => {
-      if (R.isNil(values[field])) {
-        errors[field] = t('This field is required.');
-      }
-    });
-    return errors;
   }
 
   renderFields(renderedFields, values, attachedDocs) {
@@ -1122,6 +967,9 @@ class InjectDefinition extends Component {
     const {
       t,
       classes,
+      form,
+      values,
+      submitting,
       inject,
       injectorContract,
       teamsMap,
@@ -1252,18 +1100,6 @@ class InjectDefinition extends Component {
     const expectationsNotManual = injectorContract.fields.filter(
       (f) => f.expectation === true,
     );
-
-    const initialValues = {
-      ...inject.inject_content,
-      inject_title: inject.inject_title,
-      inject_description: inject.inject_description,
-      inject_tags: inject.inject_tags,
-      inject_depends_duration_days: inject.inject_depends_duration_days,
-      inject_depends_duration_hours: inject.inject_depends_duration_hours,
-      inject_depends_duration_minutes: inject.inject_depends_duration_minutes,
-      inject_depends_duration_seconds: inject.inject_depends_duration_seconds,
-    };
-    // Enrich initialValues with default contract value
     const builtInFields = [
       'teams',
       'assets',
@@ -1273,848 +1109,482 @@ class InjectDefinition extends Component {
       'attachments',
       'expectations',
     ];
-    if (inject.inject_content === null) {
-      injectorContract.fields
-        .filter((f) => !builtInFields.includes(f.key))
-        .forEach((field) => {
-          if (!initialValues[field.key]) {
-            if (field.cardinality && field.cardinality === '1') {
-              initialValues[field.key] = R.head(field.defaultValue);
-            } else {
-              initialValues[field.key] = field.defaultValue;
-            }
-          }
-        });
-    }
-    // Specific processing for some fields
-    injectorContract.fields
-      .filter((f) => !builtInFields.includes(f.key))
-      .forEach((field) => {
-        if (
-          field.type === 'textarea'
-          && field.richText
-          && initialValues[field.key]
-          && initialValues[field.key].length > 0
-        ) {
-          initialValues[field.key] = initialValues[field.key]
-            .replaceAll(
-              '<#list challenges as challenge>',
-              '&lt;#list challenges as challenge&gt;',
-            )
-            .replaceAll(
-              '<#list articles as article>',
-              '&lt;#list articles as article&gt;',
-            )
-            .replaceAll('</#list>', '&lt;/#list&gt;');
-        } else if (field.type === 'tuple' && initialValues[field.key]) {
-          if (field.cardinality && field.cardinality === '1') {
-            if (
-              initialValues[field.key].value
-              && initialValues[field.key].value.includes(
-                `${field.tupleFilePrefix}`,
-              )
-            ) {
-              initialValues[field.key] = {
-                type: 'attachment',
-                key: initialValues[field.key].key,
-                value: initialValues[field.key].value.replace(
-                  `${field.tupleFilePrefix}`,
-                  '',
-                ),
-              };
-            } else {
-              initialValues[field.key] = R.assoc(
-                'type',
-                'text',
-                initialValues[field.key],
-              );
-            }
-          } else {
-            initialValues[field.key] = initialValues[field.key].map((pair) => {
-              if (
-                pair.value
-                && pair.value.includes(`${field.tupleFilePrefix}`)
-              ) {
-                return {
-                  type: 'attachment',
-                  key: pair.key,
-                  value: pair.value.replace(`${field.tupleFilePrefix}`, ''),
-                };
-              }
-              return R.assoc('type', 'text', pair);
-            });
-          }
-        }
-      });
     return (
       <>
-        <div className={classes.container}>
-          <Form
-            keepDirtyOnReinitialize={true}
-            initialValues={initialValues}
-            onSubmit={this.onSubmit.bind(this)}
-            validate={this.validate.bind(this)}
-            mutators={{
-              ...arrayMutators,
-              setValue: ([field, value], state, { changeValue }) => {
-                changeValue(state, field, () => value);
-              },
-            }}
-          >
-            {({ form, handleSubmit, submitting, values }) => (
-              <form id="injectContentForm" onSubmit={handleSubmit}>
-                <Typography variant="h2" style={{ float: 'left' }}>
-                  {t('Title')}
-                </Typography>
-                <OldTextField style={{ marginBottom: 20 }}
-                  variant="standard"
-                  name="inject_title"
-                  fullWidth
+        <>
+          {hasTeams && (
+            <div style={{ marginTop: 25 }}>
+              <Typography variant="h5" style={{ fontWeight: 500, float: 'left' }}>
+                {t('Targeted teams')}
+              </Typography>
+              <FormGroup row={true} classes={{ root: classes.allTeams }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={allTeams}
+                      onChange={this.toggleAll.bind(this)}
+                      color="primary"
+                      size="small"
+                      disabled={this.props.permissions.readOnly || fieldTeams.readOnly}
+                    />
+                  }
+                  label={<strong>{t('All teams')}</strong>}
                 />
-                <Typography variant="h2" style={{ float: 'left' }}>
-                  {t('Description')}
-                </Typography>
-                <OldTextField
-                  variant="standard"
-                  name="inject_description"
-                  fullWidth={true}
-                  multiline={true}
-                  rows={2}
-                />
-                <Typography variant="h2" style={{ float: 'left', marginTop: 20 }}>
-                  {t('Tags')}
-                </Typography>
-                <TagField
-                  name="inject_tags"
-                  values={values}
-                  setFieldValue={form.mutators.setValue}
-                  style={{ marginBottom: 20 }}
-                />
-                {hasTeams && (
-                  <div>
-                    <Typography variant="h2" style={{ float: 'left' }}>
-                      {t('Targeted teams')}
-                    </Typography>
-                    <FormGroup
-                      row={true}
-                      classes={{ root: classes.allTeams }}
-                    >
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={allTeams}
-                            onChange={this.toggleAll.bind(this)}
-                            color="primary"
+              </FormGroup>
+              <div className="clearfix" />
+              <List>
+                {allTeams ? (
+                  <ListItem classes={{ root: classes.item }} divider={true}>
+                    <ListItemIcon>
+                      <GroupsOutlined />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.team_name}
+                          >
+                            <i>{t('All teams')}</i>
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.team_users_number}
+                          >
+                            <strong>
+                              {this.props.allUsersNumber}
+                            </strong>
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.team_users_enabled_number}
+                          >
+                            <strong>
+                              {this.props.usersNumber}
+                            </strong>
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.team_tags}
+                          >
+                            <ItemTags variant="list" tags={[]} />
+                          </div>
+                        </>
+                      }
+                    />
+                    <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
+                  </ListItem>
+                ) : (
+                  <>
+                    {sortedTeams.map((team) => (
+                      <ListItem
+                        key={team.team_id}
+                        classes={{ root: classes.item }}
+                        divider={true}
+                      >
+                        <ListItemIcon>
+                          <GroupsOutlined />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <>
+                              <div
+                                className={classes.bodyItem}
+                                style={inlineStyles.team_name}
+                              >
+                                {team.team_name}
+                              </div>
+                              <div
+                                className={classes.bodyItem}
+                                style={inlineStyles.team_users_number}
+                              >
+                                {team.team_users_number}
+                              </div>
+                              <div
+                                className={classes.bodyItem}
+                                style={inlineStyles.team_users_enabled_number}
+                              >
+                                {team.team_users_enabled_number}
+                              </div>
+                              <div
+                                className={classes.bodyItem}
+                                style={inlineStyles.team_tags}
+                              >
+                                <ItemTags variant="list" tags={team.team_tags} />
+                              </div>
+                            </>
+                           }
+                        />
+                        <ListItemSecondaryAction>
+                          <TeamPopover
+                            team={team}
+                            onRemoveTeam={this.handleRemoveTeam.bind(this)}
                             disabled={this.props.permissions.readOnly || fieldTeams.readOnly}
                           />
-                        }
-                        label={<strong>{t('All teams')}</strong>}
-                      />
-                    </FormGroup>
-                    <div className="clearfix" />
-                    <List>
-                      <ListItem
-                        classes={{ root: classes.itemHead }}
-                        divider={false}
-                        style={{ paddingTop: 0 }}
-                      >
-                        <ListItemIcon>
-                          <span
-                            style={{
-                              padding: '0 8px 0 8px',
-                              fontWeight: 700,
-                              fontSize: 12,
-                            }}
-                          >
-                            &nbsp;
-                          </span>
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <div>
-                              {this.teamsSortHeader(
-                                'team_name',
-                                'Name',
-                                true,
-                              )}
-                              {this.teamsSortHeader(
-                                'team_users_number',
-                                'Players',
-                                true,
-                              )}
-                              {this.teamsSortHeader(
-                                'team_users_enabled_number',
-                                'Enabled players',
-                                true,
-                              )}
-                              {this.teamsSortHeader(
-                                'team_tags',
-                                'Tags',
-                                true,
-                              )}
-                            </div>
-                          }
-                        />
-                        <ListItemSecondaryAction>
-                          &nbsp;
                         </ListItemSecondaryAction>
                       </ListItem>
-                      {allTeams ? (
-                        <ListItem
-                          classes={{ root: classes.item }}
-                          divider={true}
-                        >
-                          <ListItemIcon>
-                            <GroupsOutlined />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.team_name}
-                                >
-                                  <i>{t('All teams')}</i>
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.team_users_number}
-                                >
-                                  <strong>
-                                    {this.props.allUsersNumber}
-                                  </strong>
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.team_users_enabled_number}
-                                >
-                                  <strong>
-                                    {this.props.usersNumber}
-                                  </strong>
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.team_tags}
-                                >
-                                  <ItemTags variant="list" tags={[]} />
-                                </div>
-                              </div>
-                            }
-                          />
-                          <ListItemSecondaryAction>
-                            &nbsp;
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                      ) : (
-                        <div>
-                          {sortedTeams.map((team) => (
-                            <ListItem
-                              key={team.team_id}
-                              classes={{ root: classes.item }}
-                              divider={true}
-                            >
-                              <ListItemIcon>
-                                <GroupsOutlined />
-                              </ListItemIcon>
-                              <ListItemText
-                                primary={
-                                  <div>
-                                    <div
-                                      className={classes.bodyItem}
-                                      style={inlineStyles.team_name}
-                                    >
-                                      {team.team_name}
-                                    </div>
-                                    <div
-                                      className={classes.bodyItem}
-                                      style={inlineStyles.team_users_number}
-                                    >
-                                      {team.team_users_number}
-                                    </div>
-                                    <div
-                                      className={classes.bodyItem}
-                                      style={inlineStyles.team_users_enabled_number}
-                                    >
-                                      {team.team_users_enabled_number}
-                                    </div>
-                                    <div
-                                      className={classes.bodyItem}
-                                      style={inlineStyles.team_tags}
-                                    >
-                                      <ItemTags
-                                        variant="list"
-                                        tags={team.team_tags}
-                                      />
-                                    </div>
-                                  </div>
-                                }
-                              />
-                              <ListItemSecondaryAction>
-                                <TeamPopover
-                                  team={team}
-                                  onRemoveTeam={this.handleRemoveTeam.bind(
-                                    this,
-                                  )}
-                                  disabled={this.props.permissions.readOnly || fieldTeams.readOnly}
-                                />
-                              </ListItemSecondaryAction>
-                            </ListItem>
-                          ))}
-                          <InjectAddTeams
-                            teams={teamsFromExerciseOrScenario}
-                            injectTeamsIds={teamsIds}
-                            handleAddTeams={this.handleAddTeams.bind(
-                              this,
-                            )}
-                          />
-                        </div>
-                      )}
-                    </List>
-                  </div>
-                )}
-                {hasAssets && (
-                  <>
-                    <Typography variant="h2" style={{ float: 'left' }}>
-                      {t('Targeted assets')}
-                    </Typography>
-                    <EndpointsList
-                      endpoints={assets}
-                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      // @ts-ignore: Endpoint property handle by EndpointsList
-                      actions={<EndpointPopover inline onRemoveEndpointFromInject={this.handleRemoveAsset.bind(this)} />}
-                    />
-                    <InjectAddEndpoints
-                      endpointIds={assetIds}
-                      onSubmit={this.handleAddAssets.bind(this)}
-                      filter={(e) => Object.keys(e.asset_sources).length > 0 && injectorContract.context['collector-ids']?.includes(Object.keys(e.asset_sources))}
-                      disabled={fieldAssets.readOnly}
+                    ))}
+                    <InjectAddTeams
+                      teams={teamsFromExerciseOrScenario}
+                      injectTeamsIds={teamsIds}
+                      handleAddTeams={this.handleAddTeams.bind(this)}
                     />
                   </>
                 )}
-                {hasAssetGroups && (
-                  <>
-                    <Typography variant="h2" style={{ float: 'left', marginTop: hasAssets ? 30 : 0 }}>
-                      {t('Targeted asset groups')}
-                    </Typography>
-                    <AssetGroupsList
-                      assetGroups={assetGroups}
-                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      // @ts-ignore: Endpoint property handle by EndpointsList
-                      actions={<AssetGroupPopover inline onRemoveAssetGroupFromInject={this.handleRemoveAssetGroup.bind(this)} />}
-                    />
-                    <InjectAddAssetGroups assetGroupIds={assetGroupIds} onSubmit={this.handleAddAssetGroups.bind(this)} />
-                  </>
-                )}
-                {hasArticles && (
-                  <div>
-                    <Typography
-                      variant="h2"
-                      style={{ marginTop: hasTeams ? 30 : 0 }}
-                    >
-                      {t('Channel pressure to publish')}
-                    </Typography>
-                    <List>
-                      <ListItem
-                        classes={{ root: classes.itemHead }}
-                        divider={false}
-                        style={{ paddingTop: 0 }}
-                      >
-                        <ListItemIcon>
-                          <span
-                            style={{
-                              padding: '0 8px 0 8px',
-                              fontWeight: 700,
-                              fontSize: 12,
-                            }}
-                          >
-                            &nbsp;
-                          </span>
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <div>
-                              {this.articlesSortHeader(
-                                'article_channel_type',
-                                'Type',
-                                true,
-                              )}
-                              {this.articlesSortHeader(
-                                'article_channel_name',
-                                'Channel',
-                                true,
-                              )}
-                              {this.articlesSortHeader(
-                                'article_name',
-                                'Name',
-                                true,
-                              )}
-                              {this.articlesSortHeader(
-                                'article_author',
-                                'Author',
-                                true,
-                              )}
-                            </div>
-                          }
-                        />
-                        <ListItemSecondaryAction>
-                          &nbsp;
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                      {sortedArticles.map((article) => (
-                        <ListItem
-                          key={article.article_id}
-                          classes={{ root: classes.item }}
-                          divider={true}
-                        >
-                          <ListItemIcon>
-                            <ChannelIcon
-                              type={article.article_channel_type}
-                              variant="inline"
-                            />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.article_channel_type}
-                                >
-                                  {t(article.article_channel_type || 'Unknown')}
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.article_channel_name}
-                                >
-                                  {article.article_channel_name}
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.article_name}
-                                >
-                                  {article.article_name}
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.article_author}
-                                >
-                                  {article.article_author}
-                                </div>
-                              </div>
-                            }
-                          />
-                          <ListItemSecondaryAction>
-                            <ArticlePopover
-                              article={article}
-                              onRemoveArticle={this.handleRemoveArticle.bind(
-                                this,
-                              )}
-                              disabled={this.props.permissions.readOnly || fieldArticles.readOnly}
-                            />
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                      ))}
-                      <InjectAddArticles
-                        articles={articlesFromExerciseOrScenario}
-                        injectArticlesIds={articlesIds}
-                        handleAddArticles={this.handleAddArticles.bind(this)}
+              </List>
+            </div>
+          )}
+          {hasAssets && (
+            <>
+              <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams ? 20 : 0 }}>
+                {t('Targeted assets')}
+              </Typography>
+              <EndpointsList
+                endpoints={assets}
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore: Endpoint property handle by EndpointsList
+                actions={
+                  <EndpointPopover inline onRemoveEndpointFromInject={this.handleRemoveAsset.bind(this)} />
+                }
+              />
+              <InjectAddEndpoints
+                endpointIds={assetIds}
+                onSubmit={this.handleAddAssets.bind(this)}
+                filter={(e) => Object.keys(e.asset_sources).length > 0 && injectorContract.context['collector-ids']?.includes(Object.keys(e.asset_sources))}
+                disabled={fieldAssets.readOnly}
+              />
+            </>
+          )}
+          {hasAssetGroups && (
+            <>
+              <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets ? 20 : 0 }}>
+                {t('Targeted asset groups')}
+              </Typography>
+              <AssetGroupsList
+                assetGroups={assetGroups}
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore: Endpoint property handle by EndpointsList
+                actions={
+                  <AssetGroupPopover inline onRemoveAssetGroupFromInject={this.handleRemoveAssetGroup.bind(this)} />
+                }
+              />
+              <InjectAddAssetGroups assetGroupIds={assetGroupIds} onSubmit={this.handleAddAssetGroups.bind(this)} />
+            </>
+          )}
+          {hasArticles && (
+            <>
+              <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets || hasAssetGroups ? 20 : 0 }}>
+                {t('Channel pressure to publish')}
+              </Typography>
+              <List>
+                {sortedArticles.map((article) => (
+                  <ListItem
+                    key={article.article_id}
+                    classes={{ root: classes.item }}
+                    divider={true}
+                  >
+                    <ListItemIcon>
+                      <ChannelIcon
+                        type={article.article_channel_type}
+                        variant="inline"
                       />
-                    </List>
-                  </div>
-                )}
-                {hasChallenges && (
-                  <div>
-                    <Typography
-                      variant="h2"
-                      style={{ marginTop: hasTeams ? 30 : 0 }}
-                    >
-                      {t('Challenges to publish')}
-                    </Typography>
-                    <List>
-                      <ListItem
-                        classes={{ root: classes.itemHead }}
-                        divider={false}
-                        style={{ paddingTop: 0 }}
-                      >
-                        <ListItemIcon>
-                          <span
-                            style={{
-                              padding: '0 8px 0 8px',
-                              fontWeight: 700,
-                              fontSize: 12,
-                            }}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.article_channel_type}
                           >
-                            &nbsp;
-                          </span>
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <div>
-                              {this.challengesSortHeader(
-                                'challenge_category',
-                                'Category',
-                                true,
-                              )}
-                              {this.challengesSortHeader(
-                                'challenge_name',
-                                'Name',
-                                true,
-                              )}
-                              {this.challengesSortHeader(
-                                'challenge_tags',
-                                'Tags',
-                                true,
-                              )}
-                            </div>
-                          }
-                        />
-                        <ListItemSecondaryAction>
-                          &nbsp;
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                      {sortedChallenges.map((challenge) => (
-                        <ListItem
-                          key={challenge.challenge_id}
-                          classes={{ root: classes.item }}
-                          divider={true}
-                        >
-                          <ListItemIcon>
-                            <EmojiEventsOutlined />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.challenge_category}
-                                >
-                                  {t(challenge.challenge_category || 'Unknown')}
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.challenge_name}
-                                >
-                                  {challenge.challenge_name}
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.challenge_tags}
-                                >
-                                  <ItemTags
-                                    variant="list"
-                                    tags={challenge.challenge_tags}
-                                  />
-                                </div>
-                              </div>
-                            }
-                          />
-                          <ListItemSecondaryAction>
-                            <ChallengePopover
-                              inline
-                              challenge={challenge}
-                              onRemoveChallenge={this.handleRemoveChallenge.bind(
-                                this,
-                              )}
-                              disabled={this.props.permissions.readOnly || fieldChallenges.readOnly}
+                            {t(article.article_channel_type || 'Unknown')}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.article_channel_name}
+                          >
+                            {article.article_channel_name}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.article_name}
+                          >
+                            {article.article_name}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.article_author}
+                          >
+                            {article.article_author}
+                          </div>
+                        </>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <ArticlePopover
+                        article={article}
+                        onRemoveArticle={this.handleRemoveArticle.bind(this)}
+                        disabled={this.props.permissions.readOnly || fieldArticles.readOnly}
+                      />
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                ))}
+                <InjectAddArticles
+                  articles={articlesFromExerciseOrScenario}
+                  injectArticlesIds={articlesIds}
+                  handleAddArticles={this.handleAddArticles.bind(this)}
+                />
+              </List>
+            </>
+          )}
+          {hasChallenges && (
+            <>
+              <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles ? 20 : 0 }}>
+                {t('Challenges to publish')}
+              </Typography>
+              <List>
+                {sortedChallenges.map((challenge) => (
+                  <ListItem
+                    key={challenge.challenge_id}
+                    classes={{ root: classes.item }}
+                    divider={true}
+                  >
+                    <ListItemIcon>
+                      <EmojiEventsOutlined />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.challenge_category}
+                          >
+                            {t(challenge.challenge_category || 'Unknown')}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.challenge_name}
+                          >
+                            {challenge.challenge_name}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.challenge_tags}
+                          >
+                            <ItemTags
+                              variant="list"
+                              tags={challenge.challenge_tags}
                             />
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                      ))}
-                      <InjectAddChallenges
-                        injectChallengesIds={challengesIds}
-                        handleAddChallenges={this.handleAddChallenges.bind(
+                          </div>
+                        </>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <ChallengePopover
+                        inline
+                        challenge={challenge}
+                        onRemoveChallenge={this.handleRemoveChallenge.bind(
                           this,
                         )}
+                        disabled={this.props.permissions.readOnly || fieldChallenges.readOnly}
                       />
-                    </List>
-                  </div>
-                )}
-                <div style={{ marginTop: (hasTeams || hasAssets || hasAssetGroups) ? 30 : 0 }}>
-                  <div style={{ float: 'left' }}>
-                    <Typography variant="h2">{t('Inject data')}</Typography>
-                  </div>
-                  <div style={{ float: 'right' }}>
-                    <Button
-                      color="primary"
-                      variant="outlined"
-                      onClick={this.handleOpenVariables.bind(this)}
-                      startIcon={<HelpOutlineOutlined />}
-                    >
-                      {t('Available variables')}
-                    </Button>
-                  </div>
-                  <div className="clearfix" />
-                </div>
-                <div style={{ marginTop: -15 }}>
-                  {this.renderFields(
-                    injectorContract.fields
-                      .filter(
-                        (f) => !builtInFields.includes(f.key) && !f.expectation,
-                      )
-                      .filter((f) => {
-                        // Filter display if linked fields
-                        for (
-                          let index = 0;
-                          index < f.linkedFields.length;
-                          index += 1
-                        ) {
-                          const linkedField = f.linkedFields[index];
-                          if (
-                            linkedField.type === 'checkbox'
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                ))}
+                <InjectAddChallenges
+                  injectChallengesIds={challengesIds}
+                  handleAddChallenges={this.handleAddChallenges.bind(
+                    this,
+                  )}
+                />
+              </List>
+            </>
+          )}
+          <div style={{ marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles || hasChallenges ? 24 : 0 }}>
+            <div style={{ float: 'left' }}>
+              <Typography variant="h5" style={{ fontWeight: 500 }}>{t('Inject data')}</Typography>
+            </div>
+            <div style={{ float: 'left' }}>
+              <Tooltip title={t('Reset to default values')}>
+                <IconButton
+                  color="primary"
+                  variant="outlined"
+                  disabled={submitting || this.props.permissions.readOnly}
+                  onClick={this.resetDefaultvalues.bind(this, form.mutators.setValue, builtInFields)}
+                  size="small"
+                  style={{ margin: '-12px 0 0 5px' }}
+                >
+                  <RotateLeftOutlined />
+                </IconButton>
+              </Tooltip>
+            </div>
+            <div style={{ float: 'right' }}>
+              <Button
+                color="primary"
+                variant="outlined"
+                size="small"
+                onClick={this.handleOpenVariables.bind(this)}
+                startIcon={<HelpOutlineOutlined />}
+                style={{ marginTop: -10 }}
+              >
+                {t('Available variables')}
+              </Button>
+            </div>
+            <div className="clearfix" />
+          </div>
+          <>
+            {this.renderFields(
+              injectorContract.fields
+                .filter(
+                  (f) => !builtInFields.includes(f.key) && !f.expectation,
+                )
+                .filter((f) => {
+                  // Filter display if linked fields
+                  for (
+                    let index = 0;
+                    index < f.linkedFields.length;
+                    index += 1
+                  ) {
+                    const linkedField = f.linkedFields[index];
+                    if (
+                      linkedField.type === 'checkbox'
                             && values[linkedField.key] === false
-                          ) {
+                    ) {
+                      return false;
+                    }
+                    if (
+                      linkedField.type === 'select'
+                            && !f.linkedValues.includes(values[linkedField.key])
+                    ) {
+                      return false;
+                    }
+                  }
+                  return true;
+                }),
+              values,
+              attachedDocs,
+            )}
+          </>
+          {(hasExpectations || expectationsNotManual.length > 0) && (
+            <>
+              <Typography variant="h5" style={{ marginTop: 20, fontWeight: 500 }}>
+                {t('Inject expectations')}
+              </Typography>
+              {expectationsNotManual.length > 0 && (
+                <>
+                  <div style={{ marginTop: -15 }}>
+                    {this.renderFields(
+                      expectationsNotManual.filter((f) => {
+                        // Filter display if linked fields
+                        for (let index = 0; index < f.linkedFields.length; index += 1) {
+                          const linkedField = f.linkedFields[index];
+                          if (linkedField.type === 'checkbox' && values[linkedField.key] === false) {
                             return false;
                           }
-                          if (
-                            linkedField.type === 'select'
-                            && !f.linkedValues.includes(values[linkedField.key])
-                          ) {
+                          if (linkedField.type === 'select' && !f.linkedValues.includes(values[linkedField.key])) {
                             return false;
                           }
                         }
                         return true;
                       }),
-                    values,
-                    attachedDocs,
-                  )}
-                  <Button
-                    color="secondary"
-                    variant="outlined"
-                    disabled={submitting || this.props.permissions.readOnly}
-                    onClick={this.resetDefaultvalues.bind(
-                      this,
-                      form.mutators.setValue,
-                      builtInFields,
+                      values,
+                      attachedDocs,
                     )}
-                    style={{ marginTop: 10 }}
+                  </div>
+                </>
+              )}
+              {hasExpectations && (
+                <InjectExpectations
+                  predefinedExpectationDatas={predefinedExpectations}
+                  expectationDatas={expectations}
+                  handleExpectations={this.handleExpectations.bind(this)}
+                />
+              )}
+            </>
+          )}
+          {!isAtomic && (
+            <>
+              <Typography variant="h5" style={{ fontWeight: 500, marginTop: 20 }}>
+                {t('Inject documents')}
+              </Typography>
+              <List>
+                {sortedDocuments.map((document) => (
+                  <ListItem
+                    key={document.document_id}
+                    classes={{ root: classes.item }}
+                    divider={true}
+                    button={true}
+                    component="a"
+                    href={`/api/documents/${document.document_id}/file`}
                   >
-                    {t('Reset to default values')}
-                  </Button>
-                </div>
-                {(hasExpectations || expectationsNotManual.length > 0)
-                  && <>
-                    <Typography variant="h2" style={{ marginTop: 30 }}>
-                      {t('Inject expectations')}
-                    </Typography>
-                    {expectationsNotManual.length > 0 && (
-                      <div>
-                        <div style={{ marginTop: -15 }}>
-                          {this.renderFields(
-                            expectationsNotManual.filter((f) => {
-                              // Filter display if linked fields
-                              for (
-                                let index = 0;
-                                index < f.linkedFields.length;
-                                index += 1
-                              ) {
-                                const linkedField = f.linkedFields[index];
-                                if (
-                                  linkedField.type === 'checkbox'
-                                  && values[linkedField.key] === false
-                                ) {
-                                  return false;
-                                }
-                                if (
-                                  linkedField.type === 'select'
-                                  && !f.linkedValues.includes(values[linkedField.key])
-                                ) {
-                                  return false;
-                                }
-                              }
-                              return true;
-                            }),
-                            values,
-                            attachedDocs,
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    {hasExpectations
-                      && <InjectExpectations
-                        predefinedExpectationDatas={predefinedExpectations}
-                        expectationDatas={expectations}
-                        handleExpectations={this.handleExpectations.bind(this)}
-                         />
-                    }
-                  </>
-                }
-                {!isAtomic
-                  && <>
-                    <Typography variant="h2" style={{ marginTop: 30 }}>
-                      {t('Inject documents')}
-                    </Typography>
-                    <List>
-                      <ListItem
-                        classes={{ root: classes.itemHead }}
-                        divider={false}
-                        style={{ paddingTop: 0 }}
-                      >
-                        <ListItemIcon>
-                          <span
-                            style={{
-                              padding: '0 8px 0 8px',
-                              fontWeight: 700,
-                              fontSize: 12,
-                            }}
+                    <ListItemIcon>
+                      <AttachmentOutlined />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.document_name}
                           >
-                          &nbsp;
-                          </span>
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <div>
-                              {this.documentsSortHeader(
-                                'document_name',
-                                'Name',
-                                true,
-                              )}
-                              {this.documentsSortHeader(
-                                'document_type',
-                                'Type',
-                                true,
-                              )}
-                              {this.documentsSortHeader(
-                                'document_tags',
-                                'Tags',
-                                true,
-                              )}
-                              {this.documentsSortHeader(
-                                'document_attached',
-                                'Attachment',
-                                true,
-                              )}
-                            </div>
-                          }
-                        />
-                        <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
-                      </ListItem>
-                      {sortedDocuments.map((document) => (
-                        <ListItem
-                          key={document.document_id}
-                          classes={{ root: classes.item }}
-                          divider={true}
-                          button={true}
-                          component="a"
-                          href={`/api/documents/${document.document_id}/file`}
-                        >
-                          <ListItemIcon>
-                            <AttachmentOutlined />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.document_name}
-                                >
-                                  {document.document_name}
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.document_type}
-                                >
-                                  <DocumentType
-                                    type={document.document_type}
-                                    variant="list"
-                                  />
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.document_tags}
-                                >
-                                  <ItemTags
-                                    variant="list"
-                                    tags={document.document_tags}
-                                  />
-                                </div>
-                                <div
-                                  className={classes.bodyItem}
-                                  style={inlineStyles.document_attached}
-                                >
-                                  <ItemBoolean
-                                    status={
-                                      hasAttachments
-                                        ? document.document_attached
-                                        : null
-                                    }
-                                    label={
-                                      document.document_attached
-                                        ? t('Yes')
-                                        : t('No')
-                                    }
-                                    variant="inList"
-                                    onClick={(event) => {
-                                      event.preventDefault();
-                                      this.toggleAttachment(document.document_id);
-                                    }}
-                                    disabled={
-                                      this.props.permissions.readOnly
-                                      || (hasAttachments && fieldAttachements.readOnly)
-                                      || !hasAttachments
-                                    }
-                                  />
-                                </div>
-                              </div>
-                            }
-                          />
-                          <ListItemSecondaryAction>
-                            <DocumentPopover
-                              inline
-                              document={document}
-                              onRemoveDocument={this.handleRemoveDocument.bind(
-                                this,
-                              )}
-                              onToggleAttach={
-                                hasAttachments
-                                  ? this.toggleAttachment.bind(this)
-                                  : null
-                              }
-                              attached={document.document_attached}
-                              disabled={this.props.permissions.readOnly || (hasAttachments && fieldAttachements.readOnly)}
+                            {document.document_name}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.document_type}
+                          >
+                            <DocumentType
+                              type={document.document_type}
+                              variant="list"
                             />
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                      ))}
-                      <InjectAddDocuments
-                        injectDocumentsIds={documents
-                          .filter((a) => !a.inject_document_attached)
-                          .map((d) => d.document_id)}
-                        handleAddDocuments={this.handleAddDocuments.bind(this)}
-                        hasAttachments={hasAttachments}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.document_tags}
+                          >
+                            <ItemTags
+                              variant="list"
+                              tags={document.document_tags}
+                            />
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.document_attached}
+                          >
+                            <ItemBoolean
+                              status={hasAttachments ? document.document_attached : null}
+                              label={document.document_attached ? t('Yes') : t('No') }
+                              variant="inList"
+                              onClick={(event) => {
+                                event.preventDefault();
+                                this.toggleAttachment(document.document_id);
+                              }}
+                              disabled={this.props.permissions.readOnly || fieldAttachements.readOnly || !hasAttachments}
+                            />
+                          </div>
+                        </>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <DocumentPopover
+                        inline
+                        document={document}
+                        onRemoveDocument={this.handleRemoveDocument.bind(this)}
+                        onToggleAttach={hasAttachments ? this.toggleAttachment.bind(this) : null}
+                        attached={document.document_attached}
+                        disabled={this.props.permissions.readOnly || fieldAttachements.readOnly}
                       />
-                    </List>
-                    <div className={classes.duration}>
-                      <div className={classes.trigger}>{t('Trigger after')}</div>
-                      <OldTextField
-                        variant="standard"
-                        name="inject_depends_duration_days"
-                        type="number"
-                        label={t('Days')}
-                        style={{ width: '20%' }}
-                      />
-                      <OldTextField
-                        variant="standard"
-                        name="inject_depends_duration_hours"
-                        type="number"
-                        label={t('Hours')}
-                        style={{ width: '20%' }}
-                      />
-                      <OldTextField
-                        variant="standard"
-                        name="inject_depends_duration_minutes"
-                        type="number"
-                        label={t('Minutes')}
-                        style={{ width: '20%' }}
-                      />
-                    </div>
-                  </>
-                }
-                {
-                  this.props.getFooter(submitting)
-                }
-              </form>
-            )}
-          </Form>
-        </div>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                ))}
+                <InjectAddDocuments
+                  injectDocumentsIds={documents.filter((a) => !a.inject_document_attached).map((d) => d.document_id)}
+                  handleAddDocuments={this.handleAddDocuments.bind(this)}
+                  hasAttachments={hasAttachments}
+                />
+              </List>
+            </>
+          )}
+        </>
         <AvailableVariablesDialog
           uriVariable={this.props.uriVariable}
           variables={this.props.variablesFromExerciseOrScenario}
@@ -2149,7 +1619,6 @@ InjectDefinition.propTypes = {
   allUsersNumber: PropTypes.number,
   usersNumber: PropTypes.number,
   teamsUsers: PropTypes.array,
-  getFooter: PropTypes.func,
   isAtomic: PropTypes.bool,
 };
 

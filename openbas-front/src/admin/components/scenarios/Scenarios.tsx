@@ -1,5 +1,5 @@
 import { makeStyles } from '@mui/styles';
-import { Card, CardActionArea, CardContent, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material';
+import { Card, CardActionArea, Tooltip, CardContent, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material';
 import { KeyboardArrowRight, MovieFilterOutlined } from '@mui/icons-material';
 import React, { CSSProperties, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -236,13 +236,24 @@ const Scenarios = () => {
             <ListItemText
               primary={
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.scenario_name}
-                  >
-                    <Typography variant="h1" style={{ fontSize: 17 }}>{scenario.scenario_name}</Typography>
-                    <Typography variant="body2"><strong>{scenario.scenario_injects_statistics.total_count}</strong> {t('injects in this scenario')}</Typography>
-                  </div>
+                  <Tooltip title={scenario.scenario_name}>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.scenario_name}
+                    >
+                      <div style={{
+                        fontSize: 16,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        marginBottom: 5,
+                      }}
+                      >
+                        {scenario.scenario_name}
+                      </div>
+                      <Typography variant="body2"><strong>{scenario.scenario_injects_statistics.total_count}</strong> {t('injects in this scenario')}</Typography>
+                    </div>
+                  </Tooltip>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.scenario_severity}

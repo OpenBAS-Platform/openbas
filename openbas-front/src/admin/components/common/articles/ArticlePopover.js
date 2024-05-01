@@ -103,7 +103,7 @@ const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to delete this channel pressure?')}
+            {t('Do you want to delete this media pressure article?')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -121,7 +121,7 @@ const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
-        <DialogTitle>{t('Update the channel pressure')}</DialogTitle>
+        <DialogTitle>{t('Update the media pressure article')}</DialogTitle>
         <DialogContent style={{ overflowX: 'hidden' }}>
           <ArticleForm
             editing
@@ -140,7 +140,7 @@ const ArticlePopover = ({ article, documents, onRemoveArticle = null }) => {
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to remove this channel pressure from the inject?')}
+            {t('Do you want to remove this media pressure article from the inject?')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

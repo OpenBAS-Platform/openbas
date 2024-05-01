@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import type { Theme } from '../../../../../components/Theme';
 import InjectAddExpectation from './InjectAddExpectation';
@@ -19,15 +18,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   column: {
     display: 'grid',
     gridTemplateColumns: '2fr 1fr 1fr 1fr',
-  },
-  header: {
-    display: 'inline-flex',
-    placeItems: 'center',
-    gap: 5,
-    fontSize: theme.typography.h4.fontSize,
-    fontWeight: 700,
-    textTransform: 'uppercase',
-    cursor: 'pointer',
   },
   bodyItem: {
     fontSize: theme.typography.h3.fontSize,
@@ -54,62 +44,10 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
   const predefinedExpectations = predefinedExpectationDatas
     .filter((pe) => !expectations.map((e) => e.expectation_type).includes(pe.expectation_type));
 
-  const headers = [
-    {
-      field: 'expectation_name',
-      label: 'Name',
-      isSortable: true,
-    },
-    {
-      field: 'expectation_description',
-      label: 'Description',
-      isSortable: true,
-    },
-    {
-      field: 'expectation_score',
-      label: 'Score',
-      isSortable: true,
-    },
-    {
-      field: 'expectation_type',
-      label: 'Type',
-      isSortable: true,
-    },
-  ];
-
   // -- SORT HEADERS --
 
-  const [sortBy, setSortBy] = useState('expectation_name');
-  const [sortAsc, setSortAsc] = useState(true);
-
-  const sortComponent = (asc: boolean) => {
-    return asc ? (
-      <ArrowDropDownOutlined />
-    ) : (
-      <ArrowDropUpOutlined />
-    );
-  };
-
-  const reverseBy = (field: string) => {
-    setSortBy(field);
-    setSortAsc(!sortAsc);
-  };
-
-  const sortHeader = (header: { field: string, label: string, isSortable: boolean }) => {
-    if (header.isSortable) {
-      return (
-        <div key={header.label} className={classes.header} onClick={() => reverseBy(header.field)}>
-          <span>{t(header.label)}</span>
-          {sortBy === header.field ? sortComponent(sortAsc) : ''}
-        </div>
-      );
-    }
-    return (
-      <div key={header.label} className={classes.header}>
-        <span>{t(header.label)}</span>
-      </div>
-    );
-  };
+  const [sortBy] = useState('expectation_name');
+  const [sortAsc] = useState(true);
 
   const sortExpectations = R.sortWith(
     sortAsc
@@ -150,19 +88,6 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
   return (
     <>
       <List>
-        <ListItem classes={{ root: classes.item }}>
-          <ListItemIcon>
-          </ListItemIcon>
-          <ListItemText
-            primary={
-              <div className={classes.column}>
-                {headers.map((header) => (sortHeader(header)))}
-              </div>
-            }
-          />
-          <ListItemSecondaryAction>
-          </ListItemSecondaryAction>
-        </ListItem>
         {sortedExpectations.map((expectation, idx) => (
           <ListItem
             key={expectation.expectation_name}

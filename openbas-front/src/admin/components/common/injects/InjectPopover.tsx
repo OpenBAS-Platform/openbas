@@ -138,11 +138,12 @@ const InjectPopover: FunctionComponent<Props> = ({
   };
 
   return (
-    <div>
+    <>
       <IconButton
         onClick={handlePopoverOpen}
         aria-haspopup="true"
         size="large"
+        color="primary"
         disabled={permissions.readOnly}
       >
         <MoreVert />
@@ -385,7 +386,7 @@ const InjectPopover: FunctionComponent<Props> = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 };
 

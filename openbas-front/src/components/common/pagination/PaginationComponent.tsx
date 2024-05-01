@@ -5,6 +5,7 @@ import SearchFilter from '../../SearchFilter';
 import type { Page } from './Page';
 import type { SearchPaginationInput } from '../../../utils/api-types';
 import ExportButton, { ExportProps } from '../ExportButton';
+import mitreAttack from '../../../static/images/misc/attack.png';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -25,9 +26,10 @@ interface Props<T> {
   setContent: (data: T[]) => void;
   exportProps?: ExportProps<T>;
   searchEnable?: boolean;
+  handleOpenMitreFilter?: () => void;
 }
 
-const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, setContent, exportProps, searchEnable = true }: Props<T>) => {
+const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, setContent, exportProps, searchEnable = true, handleOpenMitreFilter }: Props<T>) => {
   // Standard hooks
   const classes = useStyles();
 
@@ -74,15 +76,20 @@ const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, s
 
   return (
     <div className={classes.parameters}>
-      <>
-        {searchEnable
-          && <SearchFilter
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {searchEnable && (
+          <SearchFilter
             variant="small"
             onChange={handleTextSearch}
             keyword={textSearch}
-             />
-        }
-      </>
+          />
+        )}
+        {handleOpenMitreFilter && (
+          <div style={{ cursor: 'pointer' }} onClick={handleOpenMitreFilter}>
+            <img src={mitreAttack} alt="MITRE ATT&CK" style={{ marginLeft: searchEnable ? 10 : 0, width: 60 }} />
+          </div>
+        )}
+      </div>
       <div className={classes.container}>
         <TablePagination
           component="div"

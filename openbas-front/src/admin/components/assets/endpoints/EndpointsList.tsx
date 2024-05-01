@@ -2,18 +2,10 @@ import React, { CSSProperties, FunctionComponent, useEffect, useState } from 're
 import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { ComputerOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import SortHeadersList, { Header } from '../../../../components/common/SortHeadersList';
 import type { EndpointStore } from './Endpoint';
 import ItemTags from '../../../../components/ItemTags';
 
 const useStyles = makeStyles(() => ({
-  container: {
-    marginTop: 10,
-  },
-  itemHead: {
-    textTransform: 'uppercase',
-    cursor: 'pointer',
-  },
   item: {
     height: 50,
   },
@@ -33,33 +25,6 @@ const useStyles = makeStyles(() => ({
     marginBottom: 5,
   },
 }));
-
-const inlineStylesHeaders: Record<string, CSSProperties> = {
-  iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 5px',
-    padding: 0,
-    top: '0px',
-  },
-  asset_name: {
-    float: 'left',
-    width: '40%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  asset_tags: {
-    float: 'left',
-    width: '40%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  asset_type: {
-    float: 'left',
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-};
 
 const inlineStyles: Record<string, CSSProperties> = {
   asset_name: {
@@ -87,13 +52,6 @@ const EndpointsList: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
 
-  // Headers
-  const headers: Header[] = [
-    { field: 'asset_name', label: 'Name', isSortable: true },
-    { field: 'asset_tags', label: 'Tags', isSortable: true },
-    { field: 'asset_type', label: 'Type', isSortable: false },
-  ];
-
   const component = (endpoint: EndpointStore) => {
     return React.cloneElement(actions as React.ReactElement, { endpoint });
   };
@@ -104,38 +62,7 @@ const EndpointsList: FunctionComponent<Props> = ({
   }, [endpoints]);
 
   return (
-    <List classes={{ root: classes.container }}>
-      <ListItem
-        classes={{ root: classes.itemHead }}
-        divider={false}
-        style={{ paddingTop: 0 }}
-      >
-        <ListItemIcon>
-          <span
-            style={{
-              padding: '0 8px 0 8px',
-              fontWeight: 700,
-              fontSize: 12,
-            }}
-          >
-                &nbsp;
-          </span>
-        </ListItemIcon>
-        <ListItemText
-          primary={
-            <div>
-              <SortHeadersList
-                headers={headers}
-                inlineStylesHeaders={inlineStylesHeaders}
-                initialSortBy={'asset_name'}
-                datas={sortedEndpoints}
-                setDatas={setSortedEndpoints}
-              />
-            </div>
-          }
-        />
-        <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
-      </ListItem>
+    <List>
       {sortedEndpoints?.map((endpoint) => {
         return (
           <ListItem

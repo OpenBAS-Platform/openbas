@@ -98,7 +98,7 @@ export const updateInjectActivationForScenario = (exerciseId, injectId, data) =>
   return putReferential(schema.inject, uri, data)(dispatch);
 };
 
-export const deleteInjectScenario = (scenarioId, injectId, data) => (dispatch) => {
+export const deleteInjectScenario = (scenarioId, injectId) => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/injects/${injectId}`;
-  return delReferential(schema.inject, uri, data)(dispatch);
+  return delReferential(uri, 'injects', injectId)(dispatch);
 };

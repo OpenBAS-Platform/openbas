@@ -1,12 +1,13 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
-import { Box, Button, Typography, Stepper, Step, StepLabel, Chip, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
+import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
+import { Grid, List, Tooltip, ListItemButton, ListItemIcon, ListItemText, Chip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { KeyboardArrowRight } from '@mui/icons-material';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import { useFormatter } from '../../../../components/i18n';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
 import MitreFilter, { MITRE_FILTER_KEY } from './MitreFilter';
-import computeAttackPattern from '../../../../utils/injector_contract/InjectorContractUtils';
+import computeAttackPatterns from '../../../../utils/injector_contract/InjectorContractUtils';
 import type { InjectorContractStore } from '../../../../actions/injector_contracts/InjectorContract';
 import type { FilterGroup, Inject, SearchPaginationInput } from '../../../../utils/api-types';
 import { initSorting } from '../../../../components/common/pagination/Page';
@@ -18,18 +19,56 @@ import type { AttackPatternHelper } from '../../../../actions/attack_patterns/at
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import Drawer from '../../../../components/common/Drawer';
-import CreateinjectDetails from './CreateinjectDetails';
+import CreateInjectDetails from './CreateInjectDetails';
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
+import InjectIcon from './InjectIcon';
+import type { InjectorHelper } from '../../../../actions/injectors/injector-helper';
+import { fetchInjectors } from '../../../../actions/Injectors';
+import PlatformIcon from '../../../../components/PlatformIcon';
+import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
+import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 
 const useStyles = makeStyles(() => ({
-  menuContainer: {
-    marginLeft: 30,
-  },
   container: {
+    height: 30,
     display: 'flex',
-    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  containerItem: {
+    float: 'left',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    paddingRight: 20,
+  },
+  chipInList: {
+    fontSize: 12,
+    height: 20,
+    float: 'left',
+    textTransform: 'uppercase',
+    borderRadius: 4,
+    width: 80,
+  },
+  goIcon: {
+    position: 'absolute',
+    right: -10,
   },
 }));
+
+const inlineStyles = {
+  killChainPhase: {
+    width: '20%',
+  },
+  label: {
+    width: '45%',
+  },
+  platform: {
+    width: '12%',
+  },
+  attackPatterns: {
+    width: '20%',
+  },
+};
 
 interface Props {
   title: string
@@ -51,28 +90,21 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
   // Standard hooks
   const [open, setOpen] = useState(false);
   const classes = useStyles();
+  const drawerRef = useRef(null);
   const dispatch = useAppDispatch();
   const { t, tPick } = useFormatter();
 
-  const steps = ['Inject type', 'Inject details'];
-  const [activeStep, setActiveStep] = React.useState(0);
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-  const handleReset = () => {
-    setActiveStep(0);
-  };
-
   // Fetching data
-  const { attackPatterns, attackPatternsMap } = useHelper((helper: AttackPatternHelper) => ({
+  const { attackPatterns, attackPatternsMap, injectorsMap, killChainPhasesMap } = useHelper((helper: AttackPatternHelper & KillChainPhaseHelper & InjectorHelper) => ({
     attackPatterns: helper.getAttackPatterns(),
     attackPatternsMap: helper.getAttackPatternsMap(),
+    killChainPhasesMap: helper.getKillChainPhasesMap(),
+    injectorsMap: helper.getInjectorsMap(),
   }));
   useDataLoader(() => {
+    dispatch(fetchKillChainPhases());
     dispatch(fetchAttackPatterns());
+    dispatch(fetchInjectors());
   });
 
   // Filter
@@ -87,19 +119,15 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
     sorts: initSorting('injector_contract_labels'),
     filterGroup: isAtomic ? atomicFilter : emptyFilterGroup,
   });
-
   const [filterGroup, helpers] = useFiltersState(isAtomic ? atomicFilter : emptyFilterGroup, (f: FilterGroup) => setSearchPaginationInput({
     ...searchPaginationInput,
     filterGroup: f,
   }));
-
   const [selectedContract, setSelectedContract] = useState<number | null>(null);
-
   const handleCloseDrawer = () => {
+    setSelectedContract(null);
     setOpen(false);
-    handleReset();
   };
-
   useEffect(() => {
     if (contracts && contracts.length > 0) {
       setParsedContentContracts(contracts.map((c) => JSON.parse(c.injector_contract_content)));
@@ -113,6 +141,14 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
         .find((a: AttackPatternStore) => a.attack_pattern_external_id === externalId)?.attack_pattern_name);
   };
 
+  let selectedContractKillChainPhase = null;
+  if (selectedContract) {
+    const selectedContractAttackPatterns = computeAttackPatterns(contracts[selectedContract], attackPatternsMap);
+    // eslint-disable-next-line max-len
+    const killChainPhaseforSelection = selectedContractAttackPatterns.map((contractAttackPattern: AttackPatternStore) => contractAttackPattern.attack_pattern_kill_chain_phases).flat().at(0);
+    selectedContractKillChainPhase = killChainPhaseforSelection && killChainPhasesMap[killChainPhaseforSelection] && killChainPhasesMap[killChainPhaseforSelection].phase_name;
+  }
+
   return (
     <>
       <ButtonCreate onClick={() => setOpen(true)} />
@@ -120,116 +156,104 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
         open={open}
         handleClose={handleCloseDrawer}
         title={title}
-        variant={'full'}
+        variant='full'
+        PaperProps={{
+          ref: drawerRef,
+        }}
       >
-        <Box
-          sx={{
-            borderBottom: 1,
-            borderColor: 'transparent',
-            marginBottom: 4,
-            width: '90%',
-            marginTop: 2,
-            marginLeft: 10,
-          }}
-        >
-          <Stepper sx={{ marginBottom: 6 }} activeStep={activeStep}>
-            {steps.map((label) => {
-              const stepProps: { completed?: boolean } = {};
-              const labelProps: {
-                optional?: React.ReactNode;
-              } = {};
-              return (
-                <Step key={label} {...stepProps}>
-                  <StepLabel {...labelProps}>{label}</StepLabel>
-                </Step>
-              );
-            })}
-          </Stepper>
-          {
-            activeStep === 0
-            && <div className={classes.menuContainer}>
-              <PaginationComponent
-                fetch={searchInjectorContracts}
-                searchPaginationInput={searchPaginationInput}
-                setContent={setContracts}
+        <Grid container={true} spacing={3}>
+          <Grid item={true} xs={6} style={{ paddingTop: 30 }}>
+            <PaginationComponent
+              fetch={searchInjectorContracts}
+              searchPaginationInput={searchPaginationInput}
+              setContent={setContracts}
+              handleOpenMitreFilter={() => setOpenMitreFilter(true)}
+            />
+            {!isEmptyFilter(filterGroup, MITRE_FILTER_KEY) && (
+              <Chip
+                style={{ borderRadius: 4, marginTop: 5 }}
+                label={`Attack Pattern = ${computeAttackPatternNameForFilter()}`}
+                onDelete={() => helpers.handleClearAllFilters()}
               />
-              <div className={classes.container} style={{ marginTop: 10 }}>
-                <div>
-                  {!isEmptyFilter(filterGroup, MITRE_FILTER_KEY)
-                    && <Chip
-                      label={`Attack pattern = ${computeAttackPatternNameForFilter()}`}
-                      onDelete={() => helpers.handleClearAllFilters()}
-                      component="a"
-                       />
-                  }
-                </div>
-                <Button
-                  variant="outlined"
-                  color="inherit"
-                  type="submit"
-                  onClick={() => setOpenMitreFilter(true)}
-                >
-                  {t('Mitre Filter')}
-                </Button>
-              </div>
-              <List>
-                {contracts.map((contract, index) => {
-                  const [attackPattern] = computeAttackPattern(contract, attackPatternsMap);
-                  return (
-                    <ListItem key={contract.injector_contract_id} divider>
-                      <ListItemButton
-                        onClick={() => {
-                          setSelectedContract(index);
-                          handleNext();
-                        }}
-                      >
-                        <ListItemText
-                          primary={<div className={classes.container}>
-                            <div>
-                              {attackPattern
-                                && <span>
-                                  [{attackPattern.attack_pattern_external_id}]
-                                  {' - '}
-                                </span>
-                              }
-                              <span>
-                                {tPick(contract.injector_contract_labels)}
-                              </span>
+            )}
+            <List>
+              {contracts.map((contract, index) => {
+                const contractAttackPatterns = computeAttackPatterns(contract, attackPatternsMap);
+                // eslint-disable-next-line max-len
+                const contractKillChainPhase = contractAttackPatterns.map((contractAttackPattern: AttackPatternStore) => contractAttackPattern.attack_pattern_kill_chain_phases).flat().at(0);
+                const resolvedContractKillChainPhase = contractKillChainPhase && killChainPhasesMap[contractKillChainPhase];
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                const injector = contract.injector_contract_injector && injectorsMap[contract.injector_contract_injector];
+                return (
+                  <ListItemButton
+                    key={contract.injector_contract_id}
+                    divider={true}
+                    onClick={() => setSelectedContract(index)}
+                    selected={selectedContract === index}
+                    disabled={!!(selectedContract && selectedContract !== index)}
+                  >
+                    <ListItemIcon>
+                      <InjectIcon type={injector.injector_type} />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <div className={classes.container}>
+                          <div className={classes.containerItem} style={inlineStyles.killChainPhase}>
+                            {resolvedContractKillChainPhase ? resolvedContractKillChainPhase.phase_name : t('Unknown')}
+                          </div>
+                          <Tooltip title={tPick(contract.injector_contract_labels)}>
+                            <div className={classes.containerItem} style={inlineStyles.label}>
+                              {tPick(contract.injector_contract_labels)}
                             </div>
-
-                            <Typography variant="h3" sx={{ m: 0 }}>{attackPattern?.attack_pattern_name}</Typography>
-                          </div>}
-                        />
-                      </ListItemButton>
-
-                    </ListItem>
-                  );
-                })}
-              </List>
-              <Drawer
-                open={openMitreFilter}
-                handleClose={() => setOpenMitreFilter(false)}
-                title={t('ATT&CK Matrix')}
-                variant={'full'}
-              >
-                <MitreFilter helpers={helpers} onClick={() => setOpenMitreFilter(false)} />
-              </Drawer>
-            </div>
-          }
-          {
-            activeStep === 1 && selectedContract !== null
-            && <CreateinjectDetails
-              contractId={contracts[selectedContract].injector_contract_id}
-              contractContent={parsedContentContracts[selectedContract]}
-              handleClose={() => setOpen(false)}
-              handleBack={handleBack}
-              handleReset={handleReset}
+                          </Tooltip>
+                          <div className={classes.containerItem} style={inlineStyles.platform}>
+                            {contract.injector_contract_platforms?.map((platform) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />)}
+                          </div>
+                          <div className={classes.containerItem} style={inlineStyles.attackPatterns}>
+                            {contractAttackPatterns.map((contractAttackPattern) => (
+                              <Chip
+                                key={contractAttackPattern.attackPatternId}
+                                variant="outlined"
+                                classes={{ root: classes.chipInList }}
+                                color="primary"
+                                label={contractAttackPattern.attack_pattern_external_id}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        }
+                    />
+                    <ListItemIcon classes={{ root: classes.goIcon }}>
+                      <KeyboardArrowRight />
+                    </ListItemIcon>
+                  </ListItemButton>
+                );
+              })}
+            </List>
+            <Drawer
+              open={openMitreFilter}
+              handleClose={() => setOpenMitreFilter(false)}
+              title={t('ATT&CK Matrix')}
+              variant='full'
+            >
+              <MitreFilter helpers={helpers} onClick={() => setOpenMitreFilter(false)} />
+            </Drawer>
+          </Grid>
+          <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
+            <CreateInjectDetails
+              drawerRef={drawerRef}
+              contractId={selectedContract ? contracts[selectedContract].injector_contract_id : null}
+              contractContent={selectedContract ? parsedContentContracts[selectedContract] : null}
+              setSelectedContract={setSelectedContract}
+              selectedContractKillChainPhase={selectedContractKillChainPhase}
+              handleClose={handleCloseDrawer}
               onCreateInject={onCreateInject}
               isAtomic={isAtomic}
               {...props}
-               />
-          }
-        </Box>
+            />
+          </Grid>
+        </Grid>
       </Drawer>
     </>
   );

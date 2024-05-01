@@ -415,7 +415,7 @@ const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
             </ListItemIcon>
             <ListItemText
               primary={
-                <div>
+                <>
                   <div
                     className={classes.bodyItem}
                     style={contextual ? inlineStylesContextual.team_name : inlineStyles.team_name}
@@ -454,11 +454,7 @@ const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
                     className={classes.bodyItem}
                     style={contextual ? inlineStylesContextual.team_contextual : inlineStyles.team_contextual}
                   >
-                    {team.team_contextual ? (
-                      <CheckCircleOutlined fontSize="small" />
-                    ) : (
-                      '-'
-                    )}
+                    {team.team_contextual ? <CheckCircleOutlined fontSize="small" /> : '-'}
                   </div>
                   {!contextual && (
                     <div
@@ -468,7 +464,7 @@ const Teams: React.FC<Props> = ({ teamIds, contextual = false }) => {
                       {nsdt(team.team_updated_at)}
                     </div>
                   )}
-                </div>
+                </>
               }
             />
             <ListItemSecondaryAction>

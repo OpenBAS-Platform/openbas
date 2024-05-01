@@ -2,18 +2,10 @@ import React, { CSSProperties, FunctionComponent, useEffect, useState } from 're
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { LanOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import SortHeadersList, { Header } from '../../../../components/common/SortHeadersList';
 import ItemTags from '../../../../components/ItemTags';
 import type { AssetGroupStore } from './AssetGroup';
 
 const useStyles = makeStyles(() => ({
-  container: {
-    marginTop: 10,
-  },
-  itemHead: {
-    textTransform: 'uppercase',
-    cursor: 'pointer',
-  },
   item: {
     height: 50,
   },
@@ -26,27 +18,6 @@ const useStyles = makeStyles(() => ({
     textOverflow: 'ellipsis',
   },
 }));
-
-const inlineStylesHeaders: Record<string, CSSProperties> = {
-  iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 5px',
-    padding: 0,
-    top: '0px',
-  },
-  asset_group_name: {
-    float: 'left',
-    width: '50%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  asset_group_tags: {
-    float: 'left',
-    width: '50%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-};
 
 const inlineStyles: Record<string, CSSProperties> = {
   asset_group_name: {
@@ -69,12 +40,6 @@ const AssetGroupsList: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
 
-  // Headers
-  const headers: Header[] = [
-    { field: 'asset_group_name', label: 'Name', isSortable: true },
-    { field: 'asset_group_tags', label: 'Tags', isSortable: true },
-  ];
-
   const component = (assetGroup: AssetGroupStore) => {
     return React.cloneElement(actions as React.ReactElement, { assetGroup });
   };
@@ -85,38 +50,7 @@ const AssetGroupsList: FunctionComponent<Props> = ({
   }, [assetGroups]);
 
   return (
-    <List classes={{ root: classes.container }}>
-      <ListItem
-        classes={{ root: classes.itemHead }}
-        divider={false}
-        style={{ paddingTop: 0 }}
-      >
-        <ListItemIcon>
-          <span
-            style={{
-              padding: '0 8px 0 8px',
-              fontWeight: 700,
-              fontSize: 12,
-            }}
-          >
-                &nbsp;
-          </span>
-        </ListItemIcon>
-        <ListItemText
-          primary={
-            <div>
-              <SortHeadersList
-                headers={headers}
-                inlineStylesHeaders={inlineStylesHeaders}
-                initialSortBy={'asset_group_name'}
-                datas={sortedAssetGroups}
-                setDatas={setSortedAssetGroups}
-              />
-            </div>
-          }
-        />
-        <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
-      </ListItem>
+    <List>
       {sortedAssetGroups?.map((assetGroup) => {
         return (
           <ListItem

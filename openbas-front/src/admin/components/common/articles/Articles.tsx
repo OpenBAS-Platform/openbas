@@ -132,8 +132,8 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
       {sortedArticles.length === 0 && (
         <Empty message={
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 18, fontFamily: 'Geologica Thin' }}>
-              {t('No article available in this simulation yet.')}
+            <div style={{ fontSize: 18 }}>
+              {t('No media pressure article available in this simulation yet.')}
             </div>
             <Button
               style={{ marginTop: 20 }}

@@ -74,6 +74,7 @@ class TagField extends Component {
       label,
       placeholder,
       userAdmin,
+      disabled,
     } = this.props;
     const tagsOptions = R.map(
       (n) => ({
@@ -91,11 +92,12 @@ class TagField extends Component {
           name={name}
           fullWidth={true}
           multiple={true}
+          disabled={disabled}
           label={label}
           placeholder={placeholder}
           options={tagsOptions}
           style={style}
-          openCreate={userAdmin ? this.handleOpenTagCreation.bind(this) : null}
+          openCreate={userAdmin && !disabled ? this.handleOpenTagCreation.bind(this) : null}
           onKeyDown={onKeyDown}
           renderOption={(props, option) => (
             <Box component="li" {...props}>

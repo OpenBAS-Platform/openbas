@@ -78,7 +78,7 @@ const ContextualChallenges = ({ challenges, linkToInjects }) => {
       {sortedChallenges.length === 0 && (
       <Empty message={
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 18, fontFamily: 'Geologica Thin' }}>
+          <div style={{ fontSize: 18 }}>
             {t('No challenge are used in the injects of this simulation.')}
           </div>
           {linkToInjects && (

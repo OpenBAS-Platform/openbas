@@ -22,7 +22,7 @@ import UpdateInject from './UpdateInject';
 
 const useStyles = makeStyles(() => ({
   container: {
-    margin: '10px 0 50px 0',
+    margin: '-12px 0 50px 0',
   },
   itemHead: {
     paddingLeft: 10,
@@ -158,7 +158,6 @@ const Injects = ({
   // Standard hooks
   const classes = useStyles();
   const { t, tPick } = useFormatter();
-
   const [selectedInjectId, setSelectedInjectId] = useState(null);
   const { permissions } = useContext(PermissionsContext);
   const injectContext = useContext(InjectContext);
@@ -242,7 +241,7 @@ const Injects = ({
           </div>
         </>
         <div className="clearfix" />
-        <List classes={{ root: classes.container }}>
+        <List>
           <ListItem
             classes={{ root: classes.itemHead }}
             divider={false}
@@ -410,22 +409,20 @@ const Injects = ({
         </List>
         {permissions.canWrite && (
           <>
-            {selectedInject
-              && <UpdateInject
-                open={selectedInjectId !== null}
-                handleClose={() => setSelectedInjectId(null)}
-                onUpdateInject={onUpdateInject}
-                injectorContract={selectedInject.inject_injector_contract.injector_contract_content_parsed}
-                inject={selectedInject}
-                teamsFromExerciseOrScenario={teams}
-                articlesFromExerciseOrScenario={articles}
-                variablesFromExerciseOrScenario={variables}
-                uriVariable={uriVariable}
-                allUsersNumber={allUsersNumber}
-                usersNumber={usersNumber}
-                teamsUsers={teamsUsers}
-                 />
-            }
+            <UpdateInject
+              open={selectedInjectId !== null}
+              handleClose={() => setSelectedInjectId(null)}
+              onUpdateInject={onUpdateInject}
+              injectorContract={selectedInject?.inject_injector_contract?.injector_contract_content_parsed}
+              inject={selectedInject}
+              teamsFromExerciseOrScenario={teams}
+              articlesFromExerciseOrScenario={articles}
+              variablesFromExerciseOrScenario={variables}
+              uriVariable={uriVariable}
+              allUsersNumber={allUsersNumber}
+              usersNumber={usersNumber}
+              teamsUsers={teamsUsers}
+            />
             <CreateInject
               title={t('Create a new inject')}
               onCreateInject={onCreateInject}

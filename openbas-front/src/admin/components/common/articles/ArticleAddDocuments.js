@@ -175,7 +175,7 @@ const ArticleAddDocuments = (props) => {
           },
         }}
       >
-        <DialogTitle>{t('Add documents in this channel pressure')}</DialogTitle>
+        <DialogTitle>{t('Add documents in this media pressure article')}</DialogTitle>
         <DialogContent>
           <Grid container spacing={3} style={{ marginTop: -15 }}>
             <Grid item xs={8}>

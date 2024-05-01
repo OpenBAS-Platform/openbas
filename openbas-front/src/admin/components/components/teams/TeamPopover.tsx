@@ -21,6 +21,7 @@ interface TeamPopoverProps {
   managePlayers?: () => void,
   disabled?: boolean,
   openEditOnInit?: boolean,
+  onRemoveTeamFromInject?: (teamId: string) => void;
 }
 
 const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
@@ -28,6 +29,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   managePlayers,
   disabled,
   openEditOnInit = false,
+  onRemoveTeamFromInject = null,
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -47,6 +49,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(openEditOnInit);
   const [openRemove, setOpenRemove] = useState(false);
+  const [openRemoveFromInject, setOpenRemoveFromInject] = useState(false);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   // Popover
@@ -95,9 +98,19 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   const handleCloseRemove = () => setOpenRemove(false);
 
   const submitRemove = () => {
-    return dispatch(
-      onRemoveTeam!(team.team_id),
-    ).then(() => handleCloseRemove());
+    return dispatch(onRemoveTeam!(team.team_id)).then(() => handleCloseRemove());
+  };
+
+  // Remove
+  const handleOpenRemoveFromInject = () => {
+    setOpenRemoveFromInject(true);
+    handlePopoverClose();
+  };
+
+  const handleCloseRemoveFromInject = () => setOpenRemoveFromInject(false);
+
+  const submitRemoveFromInject = () => {
+    return dispatch(onRemoveTeamFromInject!(team.team_id)).then(() => handleCloseRemoveFromInject());
   };
 
   const initialValues: TeamInputForm = {
@@ -129,12 +142,8 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
             {t('Manage players')}
           </MenuItem>
         )}
-        {
-          onRemoveTeam && !team.team_contextual
-          && <MenuItem onClick={handleOpenRemove}>
-            {t('Remove from the context')}
-          </MenuItem>
-        }
+        {onRemoveTeam && !onRemoveTeamFromInject && !team.team_contextual && <MenuItem onClick={handleOpenRemove}> {t('Remove from the context')}</MenuItem>}
+        {onRemoveTeamFromInject && <MenuItem onClick={handleOpenRemoveFromInject}> {t('Remove from the inject')}</MenuItem>}
         <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
       </Menu>
       <MuiDialog
@@ -181,6 +190,24 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
         <DialogActions>
           <Button onClick={handleCloseRemove}>{t('Cancel')}</Button>
           <Button color="secondary" onClick={submitRemove}>
+            {t('Remove')}
+          </Button>
+        </DialogActions>
+      </MuiDialog>
+      <MuiDialog
+        open={openRemoveFromInject}
+        TransitionComponent={Transition}
+        onClose={handleCloseRemoveFromInject}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t('Do you want to remove the team from this inject?')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseRemoveFromInject}>{t('Cancel')}</Button>
+          <Button color="secondary" onClick={submitRemoveFromInject}>
             {t('Remove')}
           </Button>
         </DialogActions>

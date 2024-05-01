@@ -128,7 +128,7 @@ const InjectAddDocuments: FunctionComponent<Props> = ({
     R.take(10),
   )(Object.values(documents));
   return (
-    <div>
+    <>
       <ListItem
         classes={{ root: classes.item }}
         button
@@ -242,7 +242,7 @@ const InjectAddDocuments: FunctionComponent<Props> = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 };
 

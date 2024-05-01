@@ -66,9 +66,14 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
     <InjectContext.Provider value={context}>
       <ArticleContext.Provider value={articleContext}>
         <TeamContext.Provider value={teamContext}>
-          <Injects injects={injects} teams={teams} articles={articles}
-            variables={variables} uriVariable={`/admin/scenarios/${scenarioId}/definition/variables`}
-            allUsersNumber={scenario.scenario_all_users_number} usersNumber={scenario.scenario_users_number}
+          <Injects
+            injects={injects}
+            teams={teams}
+            articles={articles}
+            variables={variables}
+            uriVariable={`/admin/scenarios/${scenarioId}/definition/variables`}
+            allUsersNumber={scenario.scenario_all_users_number}
+            usersNumber={scenario.scenario_users_number}
             teamsUsers={scenario.scenario_teams_users}
           />
         </TeamContext.Provider>

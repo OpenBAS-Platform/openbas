@@ -54,7 +54,7 @@ const CreateArticle = (props) => {
             <ControlPointOutlined color="primary" />
           </ListItemIcon>
           <ListItemText
-            primary={t('Create a new channel pressure')}
+            primary={t('Create a new media pressure article')}
             classes={{ primary: classes.text }}
           />
         </ListItem>
@@ -77,7 +77,7 @@ const CreateArticle = (props) => {
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
-        <DialogTitle>{t('Create a new channel pressure')}</DialogTitle>
+        <DialogTitle>{t('Create a new media pressure article')}</DialogTitle>
         <DialogContent style={{ overflowX: 'hidden' }}>
           <ArticleForm
             editing={false}

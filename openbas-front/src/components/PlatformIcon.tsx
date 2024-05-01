@@ -12,6 +12,8 @@ import macosDark from '../static/images/platforms/macos-dark.png';
 import macosLight from '../static/images/platforms/macos-light.png';
 import serviceDark from '../static/images/platforms/service-dark.png';
 import serviceLight from '../static/images/platforms/service-light.png';
+import internalDark from '../static/images/platforms/internal-dark.png';
+import internalLight from '../static/images/platforms/internal-light.png';
 import unknownDark from '../static/images/platforms/unknown-dark.png';
 import unknownLight from '../static/images/platforms/unknown-light.png';
 
@@ -36,6 +38,8 @@ const renderIcon = (platform: string, width: number | undefined, borderRadius: n
       return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? browserDark : browserLight} alt="Browser" />);
     case 'Service':
       return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? serviceDark : serviceLight} alt="Service" />);
+    case 'Internal':
+      return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? internalDark : internalLight} alt="Internal" />);
     default:
       return (<img style={{ width: width ?? 40, borderRadius: borderRadius ?? 0, marginRight: marginRight ?? 0 }} src={theme.palette.mode === 'dark' ? unknownDark : unknownLight} alt="Unknown" />);
   }
