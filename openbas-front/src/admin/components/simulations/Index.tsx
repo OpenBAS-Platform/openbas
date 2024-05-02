@@ -61,7 +61,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
       <DocumentContext.Provider value={documentContext}>
         <div style={{ paddingRight: ['/definition', '/results', '/animation'].some((el) => location.pathname.includes(el)) ? 200 : 0 }}>
           <Breadcrumbs variant="object" elements={[
-            { label: t('Simulations') },
+            { label: t('Simulations'), link: '/admin/exercises' },
             { label: exercise.exercise_name, current: true },
           ]}
           />
