@@ -1,14 +1,15 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import { Typography, Grid, Paper, List, ListItem, ListItemText, Switch, TextField, Button } from '@mui/material';
+import { Button, Grid, List, ListItem, ListItemText, Paper, Switch, TextField, Typography } from '@mui/material';
 import ParametersForm from './ParametersForm';
 import { useFormatter } from '../../../components/i18n';
 import {
-  updatePlatformParameters,
-  updatePlatformLightParameters,
-  updatePlatformDarkParameters,
   fetchPlatformParameters,
+  updatePlatformDarkParameters,
   updatePlatformEnterpriseEditionParameters,
+  updatePlatformLightParameters,
+  updatePlatformParameters,
+  updatePlatformWhitemarkParameters,
 } from '../../../actions/Application';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import ItemBoolean from '../../../components/ItemBoolean';
@@ -16,7 +17,7 @@ import ThemeForm from './ThemeForm';
 import { useAppDispatch } from '../../../utils/hooks';
 import { useHelper } from '../../../store';
 import type { LoggedHelper } from '../../../actions/helper';
-import type { PlatformSettings, SettingsUpdateInput, ThemeInput, SettingsEnterpriseEditionUpdateInput } from '../../../utils/api-types';
+import type { PlatformSettings, SettingsEnterpriseEditionUpdateInput, SettingsPlatformWhitemarkUpdateInput, SettingsUpdateInput, ThemeInput } from '../../../utils/api-types';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import EnterpriseEditionButton from '../common/entreprise_edition/EnterpriseEditionButton';
 
@@ -77,6 +78,7 @@ const Parameters = () => {
   const onUpdateLigthParameters = (data: ThemeInput) => dispatch(updatePlatformLightParameters(data));
   const onUpdateDarkParameters = (data: ThemeInput) => dispatch(updatePlatformDarkParameters(data));
   const updateEnterpriseEdition = (data: SettingsEnterpriseEditionUpdateInput) => dispatch(updatePlatformEnterpriseEditionParameters(data));
+  const updatePlatformWhitemark = (data: SettingsPlatformWhitemarkUpdateInput) => dispatch(updatePlatformWhitemarkParameters(data));
   return (
     <div className={classes.container}>
       <Breadcrumbs variant="object" elements={[{ label: t('Settings') }, { label: t('Parameters'), current: true }]} />
@@ -123,10 +125,10 @@ const Parameters = () => {
                 <ItemBoolean
                   variant="large"
                   neutralLabel={
-                      isEnterpriseEdition
-                        ? t('Enterprise')
-                        : t('Community')
-                    }
+                    isEnterpriseEdition
+                      ? t('Enterprise')
+                      : t('Community')
+                  }
                   status={null}
                 />
               </ListItem>
@@ -137,9 +139,9 @@ const Parameters = () => {
                 <ItemBoolean
                   variant="large"
                   label={
-                      // eslint-disable-next-line no-nested-ternary
-                      !settings.platform_ai_enabled ? t('Disabled') : settings.platform_ai_has_token
-                        ? settings.platform_ai_type : `${settings.platform_ai_type} - ${t('Missing token')}`}
+                    // eslint-disable-next-line no-nested-ternary
+                    !settings.platform_ai_enabled ? t('Disabled') : settings.platform_ai_has_token
+                      ? settings.platform_ai_type : `${settings.platform_ai_type} - ${t('Missing token')}`}
                   status={(settings.platform_ai_enabled) && (settings.platform_ai_has_token)}
                   tooltip={settings.platform_ai_has_token ? `${settings.platform_ai_type} - ${settings.platform_ai_model}` : t('The token is missing in your platform configuration, please ask your Filigran representative to provide you with it or with on-premise deployment instructions. Your can open a support ticket to do so.')}
                 />
@@ -149,7 +151,11 @@ const Parameters = () => {
               </ListItem>
               <ListItem divider={true}>
                 <ListItemText primary={t('Remove Filigran logos')} />
-                <Switch disabled={true} />
+                <Switch
+                  disabled={settings.platform_enterprise_edition === 'false'}
+                  value={settings.platform_whitemark ?? false}
+                  onChange={(_event, checked) => updatePlatformWhitemark({ platform_whitemark: checked.toString() })}
+                />
               </ListItem>
             </List>
           </Paper>

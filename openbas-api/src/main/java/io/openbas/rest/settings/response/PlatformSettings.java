@@ -24,6 +24,9 @@ public class PlatformSettings {
   @JsonProperty("platform_enterprise_edition")
   private String platformEnterpriseEdition;
 
+  @JsonProperty("platform_whitemark")
+  private String platformWhitemark;
+
   @JsonProperty("platform_openid_providers")
   private List<OAuthProvider> platformOpenIdProviders;
 

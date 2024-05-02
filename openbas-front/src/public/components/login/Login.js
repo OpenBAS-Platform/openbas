@@ -80,17 +80,24 @@ const Login = (props) => {
   const loginLogo = theme.palette.mode === 'dark'
     ? parameters?.platform_dark_theme?.logo_login_url
     : parameters?.platform_light_theme?.logo_login_url;
+
+  const isWhitemarkEnable = !parameters.platform_whitemark || !parameters.platform_enterprise_edition;
+
   return (
     <div data-testid="login-page" className={classes.container} style={{ marginTop }}>
-      <img src={loginLogo && loginLogo.length > 0 ? loginLogo : fileUri(theme.palette.mode === 'dark' ? logoDark : logoLight)} alt="logo"
-        className={classes.logo}
-      />
-      <div className={classes.byFiligran} style={{ marginBottom: 20 }}>
-        <img
-          src={fileUri(theme.palette.mode === 'dark' ? byFiligranDark : byFiligranLight)}
-          className={classes.byFiligranLogo}
+      {isWhitemarkEnable && (!loginLogo || loginLogo.length === 0) && (
+        <img src={loginLogo && loginLogo.length > 0 ? loginLogo : fileUri(theme.palette.mode === 'dark' ? logoDark : logoLight)} alt="logo"
+          className={classes.logo}
         />
-      </div>
+      )}
+      {isWhitemarkEnable && loginLogo && loginLogo.length > 0 && (
+        <div className={classes.byFiligran} style={{ marginBottom: 20 }}>
+          <img
+            src={fileUri(theme.palette.mode === 'dark' ? byFiligranDark : byFiligranLight)}
+            className={classes.byFiligranLogo}
+          />
+        </div>
+      )}
       {isLocal && !reset && (
         <Paper variant="outlined" classes={{ root: classes.login }}>
           <LoginForm onSubmit={onSubmit} />

@@ -785,7 +785,7 @@ export interface ExpectationResultOutput {
   /** Subtype */
   target_result_subtype: string;
   /** Type */
-  target_result_type: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
+  target_result_type: "DETECTION" | "HUMAN_RESPONSE" | "PREVENTION";
   /** Results */
   target_results?: InjectExpectationResult[];
 }
@@ -793,7 +793,7 @@ export interface ExpectationResultOutput {
 export interface ExpectationResultsByType {
   avgResult: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
   distribution: ResultDistribution[];
-  type: "PREVENTION" | "DETECTION" | "HUMAN_RESPONSE";
+  type: "DETECTION" | "HUMAN_RESPONSE" | "PREVENTION";
 }
 
 export interface ExpectationUpdateInput {
@@ -1051,10 +1051,10 @@ export interface InjectStatusExecution {
  */
 export interface InjectTargetWithResult {
   children?: InjectTargetWithResult[];
-  expectationResultsByTypes: ExpectationResultsByType[];
-  id: string;
-  name: string;
-  targetType: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
+  expectationResultsByTypes?: ExpectationResultsByType[];
+  id?: string;
+  name?: string;
+  targetType?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
 export interface InjectTeamsInput {
@@ -1749,6 +1749,25 @@ export interface PageTag {
   totalPages?: number;
 }
 
+export interface PageTeam {
+  content?: Team[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageUser {
   content?: User[];
   empty?: boolean;
@@ -1839,6 +1858,7 @@ export interface PlatformSettings {
   platform_openid_providers?: OAuthProvider[];
   platform_theme?: string;
   platform_version?: string;
+  platform_whitemark?: string;
   postgre_version?: string;
   xtm_opencti_enable?: boolean;
   xtm_opencti_url?: string;
@@ -2078,6 +2098,10 @@ export interface SearchTerm {
 
 export interface SettingsEnterpriseEditionUpdateInput {
   platform_enterprise_edition: string;
+}
+
+export interface SettingsPlatformWhitemarkUpdateInput {
+  platform_whitemark: string;
 }
 
 export interface SettingsUpdateInput {

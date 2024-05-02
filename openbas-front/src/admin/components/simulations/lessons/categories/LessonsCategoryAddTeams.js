@@ -114,7 +114,7 @@ class LessonsCategoryAddTeams extends Component {
   }
 
   onCreate(result) {
-    this.addTeam(result);
+    this.addTeam(result.team_id);
   }
 
   render() {
