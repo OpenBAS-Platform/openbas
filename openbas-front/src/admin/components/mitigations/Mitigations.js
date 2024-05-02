@@ -14,6 +14,7 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { fetchAttackPatterns } from '../../../actions/AttackPattern';
+import { fetchKillChainPhases } from '../../../actions/KillChainPhase';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -100,11 +101,13 @@ const Mitigations = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t, nsdt } = useFormatter();
-  const { attackPatternsMap } = useHelper((helper) => ({
+  const { attackPatternsMap, killChainPhasesMap } = useHelper((helper) => ({
     attackPatternsMap: helper.getAttackPatternsMap(),
+    killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchAttackPatterns());
+    dispatch(fetchKillChainPhases());
   });
 
   // Headers
@@ -223,6 +226,7 @@ const Mitigations = () => {
               <MitigationPopover
                 mitigation={mitigation}
                 attackPatternsMap={attackPatternsMap}
+                killChainPhasesMap={killChainPhasesMap}
                 onUpdate={(result) => setMitigations(mitigations.map((a) => (a.mitigation_id !== result.mitigation_id ? a : result)))}
                 onDelete={(result) => setMitigations(mitigations.filter((a) => (a.mitigation_id !== result)))}
               />

@@ -96,8 +96,8 @@ const Documents = () => {
   const headers = [
     { field: 'document_name', label: 'Name', isSortable: true },
     { field: 'document_description', label: 'Description', isSortable: true },
-    { field: 'document_exercises', label: 'Simulations', isSortable: true },
-    { field: 'document_scenarios', label: 'Scenarios', isSortable: true },
+    { field: 'document_exercises', label: 'Simulations', isSortable: false },
+    { field: 'document_scenarios', label: 'Scenarios', isSortable: false },
     { field: 'document_type', label: 'Type', isSortable: true },
     { field: 'document_tags', label: 'Tags', isSortable: true },
   ];

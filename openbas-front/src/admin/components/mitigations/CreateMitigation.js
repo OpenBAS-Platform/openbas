@@ -34,7 +34,7 @@ class CreateMitigation extends Component {
 
   onSubmit(data) {
     const inputValues = R.pipe(
-      R.assoc('mitigation_kill_chain_phases', R.pluck('id', data.mitigation_kill_chain_phases)),
+      R.assoc('mitigation_attack_patterns', R.pluck('id', data.mitigation_attack_patterns)),
     )(data);
     return this.props
       .addMitigation(inputValues)
