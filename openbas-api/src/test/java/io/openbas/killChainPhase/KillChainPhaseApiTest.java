@@ -65,7 +65,7 @@ public class KillChainPhaseApiTest extends IntegrationTest {
     @DisplayName("Fetching first page of kill chain phases failed with bad request")
     void given_a_bad_search_input_should_throw_bad_request() throws Exception {
       SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
-          .size(110)
+          .size(1110)
           .build();
 
       mvc.perform(post("/api/kill_chain_phases/search")

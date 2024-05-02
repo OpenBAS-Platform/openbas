@@ -51,7 +51,7 @@ class InjectorContratApiTest extends IntegrationTest {
       @DisplayName("Fetching first page of contracts failed with bad request")
       void given_a_bad_search_input_should_throw_bad_request() throws Exception {
         SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault()
-            .size(110)
+            .size(1110)
             .build();
 
         mvc.perform(post("/api/injector_contracts/search")
