@@ -157,7 +157,7 @@ const Scenarios = () => {
             <ItemCategory category={category} size="small" />
           </div>
           <div style={{ fontSize: 15, fontWeight: 600 }}>
-            {t(scenarioCategories.get(category))}
+            {t(scenarioCategories.get(category) ?? category)}
           </div>
           <div style={{ marginTop: 10, fontSize: 12, fontWeight: 500 }}>
             {count} {t('scenarios')}
