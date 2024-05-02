@@ -14,7 +14,7 @@ import Empty from '../../../../components/Empty';
 
 interface Steptarget {
   label: string;
-  type?: string;
+  type: string;
   status?: string;
 }
 
@@ -82,7 +82,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState(0);
   const [steps, setSteps] = useState<Steptarget[]>([]);
-  const initialSteps = [{ label: 'Attack started' }, { label: 'Attack ended' }];
+  const initialSteps = [{ label: 'Attack started', type: '' }, { label: 'Attack ended', type: '' }];
   // Fetching data
   const { targetresults }: {
     targetresults: ExpectationResultOutput[],
@@ -92,7 +92,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
 
   useEffect(() => {
     if (target) {
-      setSteps([...initialSteps, ...[{ label: 'Unknown Data' }]]);
+      setSteps([...initialSteps, ...[{ label: 'Unknown Data', type: '' }]]);
       dispatch(fetchTargetResult(injectId, target.id!, target.targetType!));
       setActiveTab(0);
     }
@@ -244,6 +244,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         status: result.target_result_response_status,
       }));
       const mergedSteps: Steptarget[] = [...initialSteps, ...newSteps];
+      mergedSteps.sort((a, b) => a.type.localeCompare(b.type));
       setSteps(mergedSteps);
     }
   }, [targetresults]);
@@ -256,6 +257,15 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
       groupedResults[type] = [];
     }
     groupedResults[type].push(result);
+  });
+
+  // Sort the keys alphabetically
+  const sortedKeys = Object.keys(groupedResults).sort();
+
+  // Map over the sorted keys to retrieve the sorted results
+  const sortedGroupedResults: Record<string, ExpectationResultOutput[]> = {};
+  sortedKeys.forEach((key) => {
+    sortedGroupedResults[key] = groupedResults[key];
   });
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -288,13 +298,13 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         <Tabs value={activeTab} onChange={handleTabChange} indicatorColor="primary"
           textColor="primary" className={classes.tabs}
         >
-          {Object.keys(groupedResults).map((type, index) => (
+          {Object.keys(sortedGroupedResults).map((type, index) => (
             <Tab key={index} label={t(`TYPE_${type}`)}/>
           ))}
         </Tabs>
-        {Object.keys(groupedResults).map((targetResult, index) => (
+        {Object.keys(sortedGroupedResults).map((targetResult, index) => (
           <div key={index} hidden={activeTab !== index}>
-            {renderLogs(groupedResults[targetResult])}
+            {renderLogs(sortedGroupedResults[targetResult])}
           </div>
         ))}
       </Box>
