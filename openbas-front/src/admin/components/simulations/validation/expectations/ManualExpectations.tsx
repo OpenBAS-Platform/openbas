@@ -46,7 +46,6 @@ interface Props {
 }
 
 const ManualExpectations: FunctionComponent<Props> = ({
-  exerciseId,
   inject,
   expectations,
 }) => {
@@ -126,8 +125,8 @@ const ManualExpectations: FunctionComponent<Props> = ({
             );
           })}
       </List>
+
       <ManualExpectationsValidation
-        exerciseId={exerciseId}
         inject={inject}
         expectations={currentExpectations}
         open={currentExpectations !== null}

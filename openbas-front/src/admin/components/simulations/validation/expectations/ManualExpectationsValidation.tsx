@@ -42,13 +42,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface FormProps {
-  exerciseId: string;
   expectation: InjectExpectationsStore;
+  onUpdate?: () => void;
 }
 
 const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({
-  exerciseId,
   expectation,
+  onUpdate,
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
@@ -63,10 +63,11 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({
 
   const onSubmit = (data: { expectation_score: number }) => {
     dispatch(
-      updateInjectExpectation(exerciseId, expectation.inject_expectation_id, data),
+      updateInjectExpectation(expectation.inject_expectation_id, data),
     ).then((e: InjectExpectationsStore) => {
       setValidated(isValid(e));
       setLabel(isValid(e) ? t('Validated') : t('Pending validation'));
+      onUpdate?.();
     });
   };
 
@@ -135,22 +136,21 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({
 };
 
 interface Props {
-  exerciseId: string;
   inject: Inject;
   expectations: InjectExpectationsStore[] | null;
   open: boolean;
   onClose: () => void;
+  onUpdate?: () => void;
 }
 
 const ManualExpectationsValidation: FunctionComponent<Props> = ({
-  exerciseId,
   inject,
   expectations,
   open,
   onClose,
+  onUpdate,
 }) => {
   const { t } = useFormatter();
-
   return (
     <Drawer
       open={open}
@@ -158,8 +158,9 @@ const ManualExpectationsValidation: FunctionComponent<Props> = ({
       title={t('Expectations of ') + inject.inject_title}
     >
       <>
-        {expectations
-          && expectations.map((e) => <ManualExpectationsValidationForm key={e.inject_expectation_id} exerciseId={exerciseId} expectation={e} />)
+        {
+          expectations
+          && expectations.map((e) => <ManualExpectationsValidationForm key={e.inject_expectation_id} expectation={e} onUpdate={onUpdate} />)
         }
       </>
     </Drawer>

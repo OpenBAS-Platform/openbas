@@ -1,16 +1,19 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import { Box, Paper, Step, StepLabel, Stepper, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Button, Paper, Step, StepLabel, Stepper, Tab, Tabs, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
-import type { ExpectationResultOutput, InjectTargetWithResult } from '../../../../utils/api-types';
+import type { AtomicTestingDetailOutput, AtomicTestingOutput, ExpectationResultOutput, InjectTargetWithResult } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
-import { fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import { fetchAtomicTestingDetail, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import InjectIcon from '../../common/injects/InjectIcon';
 import Empty from '../../../../components/Empty';
+import ManualExpectationsValidation from '../../simulations/validation/expectations/ManualExpectationsValidation';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import type { InjectExpectationStore } from '../../../../actions/injects/Inject';
 
 interface Steptarget {
   label: string;
@@ -86,11 +89,21 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   const initialSteps = [{ label: 'Attack started', type: '' }, { label: 'Attack ended', type: '' }];
   const sortOrder = ['PREVENTION', 'DETECTION', 'HUMAN_RESPONSE'];
   // Fetching data
-  const { targetresults }: {
-    targetresults: ExpectationResultOutput[],
+  const { targetResults, atomicTesting, atomicTestingDetails }: {
+    targetResults: ExpectationResultOutput[],
+    atomicTesting: AtomicTestingOutput,
+    atomicTestingDetails: AtomicTestingDetailOutput,
   } = useHelper((helper: AtomicTestingHelper) => ({
-    targetresults: helper.getTargetResults(target.id!, injectId),
+    targetResults: helper.getTargetResults(target.id!, injectId),
+    atomicTesting: helper.getAtomicTesting(injectId),
+    atomicTestingDetails: helper.getAtomicTestingDetail(injectId),
   }));
+
+  useDataLoader(() => {
+    dispatch(fetchAtomicTestingDetail(injectId));
+  });
+
+  const [openManualExpectationDrawer, setOpenManualExpectationDrawer] = useState<boolean>(false);
 
   useEffect(() => {
     if (target) {
@@ -136,7 +149,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
 
     return (
       <>
-        <hr className={classes.connector}/>
+        <hr className={classes.connector} />
         <Typography variant="body2" className={classes.connectorLabel}>
           {dateToDisplay && formatDate(dateToDisplay)}
         </Typography>
@@ -233,7 +246,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
                 </div>
               ))
             ) : (
-              <Empty message={t('No logs available')}/>
+              <Empty message={t('No logs available')} />
             )}
           </Paper>
         ))}
@@ -243,8 +256,8 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
 
   // Define steps
   useEffect(() => {
-    if (targetresults && targetresults.length > 0) {
-      const newSteps = targetresults.map((result) => ({
+    if (targetResults && targetResults.length > 0) {
+      const newSteps = targetResults.map((result) => ({
         label: getStatusLabel(result.target_result_type, result.target_result_response_status!),
         type: result.target_result_type,
         status: result.target_result_response_status,
@@ -260,11 +273,11 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
 
       setSteps(mergedSteps);
     }
-  }, [steps, targetresults]);
+  }, [steps, targetResults]);
 
   // Define Tabs
   const groupedResults: Record<string, ExpectationResultOutput[]> = {};
-  targetresults.forEach((result) => {
+  targetResults.forEach((result) => {
     const type = result.target_result_type;
     if (!groupedResults[type]) {
       groupedResults[type] = [];
@@ -285,9 +298,52 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     setActiveTab(newValue);
   };
 
+  const onUpdateManualValidation = () => {
+    dispatch(fetchAtomicTestingDetail(injectId));
+  };
+
+  let manualExpectationsNumber: number = 0;
+  if (atomicTestingDetails) {
+    atomicTestingDetails?.atomic_expectations?.map((expectation) => {
+      if (expectation.inject_expectation_type === 'MANUAL') {
+        manualExpectationsNumber += 1;
+      }
+      return manualExpectationsNumber;
+    });
+  }
+
   return (
     <div>
-      <Typography variant="h1" className="pageTitle">{target.name}</Typography>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div>
+          <Typography variant="h1" className="pageTitle">{target.name}</Typography>
+        </div>
+        {
+          manualExpectationsNumber > 0 && (
+            <div>
+              <Button
+                type="submit"
+                variant="contained"
+                onClick={() => setOpenManualExpectationDrawer(true)}
+              >{t('Evaluate')}</Button>
+              <ManualExpectationsValidation
+                inject={{
+                  inject_id: atomicTesting.atomic_id,
+                  inject_title: atomicTesting.atomic_title,
+                  inject_type: atomicTesting.atomic_type,
+                  inject_depends_duration: 0,
+                }}
+                expectations={atomicTestingDetails.atomic_expectations as InjectExpectationStore[]}
+                open={openManualExpectationDrawer}
+                onClose={() => setOpenManualExpectationDrawer(false)}
+                onUpdate={onUpdateManualValidation}
+              />
+            </div>
+          )
+        }
+
+      </div>
+
       <Box marginTop={5}>
         <Stepper alternativeLabel connector={<></>}>
           {steps.map((step, index) => (
@@ -302,7 +358,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
                   </div>
                 )}
               />
-              <CustomConnector index={index}/>
+              <CustomConnector index={index} />
             </Step>
           ))}
         </Stepper>
@@ -312,7 +368,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
           textColor="primary" className={classes.tabs}
         >
           {Object.keys(sortedGroupedResults).map((type, index) => (
-            <Tab key={index} label={t(`TYPE_${type}`)}/>
+            <Tab key={index} label={t(`TYPE_${type}`)} />
           ))}
         </Tabs>
         {Object.keys(sortedGroupedResults).map((targetResult, index) => (

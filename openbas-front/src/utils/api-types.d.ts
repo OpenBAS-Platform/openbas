@@ -129,7 +129,7 @@ export interface AtomicTestingDetailOutput {
   atomic_content?: object;
   atomic_description?: string;
   atomic_documents?: InjectDocument[];
-  atomic_expectations?: Expectation[];
+  atomic_expectations?: InjectExpectation[];
   atomic_id: string;
   atomic_tags?: Tag[];
   status_label?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
@@ -752,15 +752,6 @@ export interface ExerciseUpdateTagsInput {
 
 export interface ExerciseUpdateTeamsInput {
   exercise_teams?: string[];
-}
-
-export interface Expectation {
-  expectation_description?: string;
-  expectation_expectation_group?: boolean;
-  expectation_name?: string;
-  /** @format int32 */
-  expectation_score?: number;
-  expectation_type?: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
 }
 
 export interface ExpectationResultOutput {

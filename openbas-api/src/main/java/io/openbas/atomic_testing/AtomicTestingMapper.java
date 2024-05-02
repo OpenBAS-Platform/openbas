@@ -2,9 +2,6 @@ package io.openbas.atomic_testing;
 
 import static io.openbas.atomic_testing.AtomicTestingUtils.getRefinedExpectations;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput.AtomicTestingOutputBuilder;
@@ -15,9 +12,8 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.model.Tag;
-import io.openbas.model.inject.form.Expectation;
 import jakarta.validation.constraints.NotNull;
-import java.util.Collections;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -84,7 +80,7 @@ public class AtomicTestingMapper {
             .atomicId(inject.getId())
             .description(inject.getDescription())
             .content(inject.getContent())
-            .expectations(getAtomicTestingExpectations(inject.getContent()))
+            .expectations(inject.getExpectations())
             .tags(inject.getTags())
             .documents(inject.getDocuments())
             .status(status.getName())
@@ -99,16 +95,6 @@ public class AtomicTestingMapper {
             .build()
     ).orElse(AtomicTestingDetailOutput.builder().status(ExecutionStatus.DRAFT).build());
 
-  }
-
-  @SuppressWarnings("unchecked")
-  public static List<Expectation> getAtomicTestingExpectations(ObjectNode content) {
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      return mapper.treeToValue(content.get("expectations"), List.class);
-    } catch (JsonProcessingException e) {
-      return Collections.emptyList();
-    }
   }
 
   public record ExpectationResultsByType(@NotNull ExpectationType type, @NotNull ExpectationStatus avgResult,

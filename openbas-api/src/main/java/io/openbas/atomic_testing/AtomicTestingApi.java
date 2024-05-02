@@ -1,23 +1,23 @@
 package io.openbas.atomic_testing;
 
-import static io.openbas.atomic_testing.AtomicTestingMapper.toDto;
-
 import io.openbas.atomic_testing.form.*;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectStatus;
-import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import java.util.List;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import static io.openbas.atomic_testing.AtomicTestingMapper.toDto;
 
 @RestController
 @RequestMapping("/api/atomic_testings")
@@ -26,7 +26,6 @@ public class AtomicTestingApi extends RestBehavior {
 
   private AtomicTestingService atomicTestingService;
   private InjectExpectationService injectExpectationService;
-  private InjectorContractRepository injectorContractRepository;
 
 
   @Autowired
@@ -37,11 +36,6 @@ public class AtomicTestingApi extends RestBehavior {
   @Autowired
   public void setInjectExpectationService(InjectExpectationService injectExpectationService) {
     this.injectExpectationService = injectExpectationService;
-  }
-
-  @Autowired
-  public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
-    this.injectorContractRepository = injectorContractRepository;
   }
 
   @PostMapping("/search")
@@ -66,6 +60,7 @@ public class AtomicTestingApi extends RestBehavior {
         .map(inject -> {
           Hibernate.initialize(inject.getTags());
           Hibernate.initialize(inject.getDocuments());
+          Hibernate.initialize(inject.getExpectations());
           return AtomicTestingMapper.toDetailDto(inject);
         })
         .orElseThrow();
