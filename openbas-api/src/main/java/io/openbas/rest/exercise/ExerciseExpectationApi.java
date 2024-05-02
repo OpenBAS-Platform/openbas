@@ -26,13 +26,5 @@ public class ExerciseExpectationApi extends RestBehavior {
     return this.exerciseExpectationService.injectExpectations(exerciseId);
   }
 
-  @PutMapping("/api/exercises/{exerciseId}/expectations/{expectationId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public InjectExpectation updateInjectExpectation(
-      @PathVariable @NotBlank final String exerciseId,
-      @PathVariable @NotBlank final String expectationId,
-      @Valid @RequestBody final ExpectationUpdateInput input) {
-    return this.exerciseExpectationService.updateInjectExpectation(expectationId, input);
-  }
 
 }

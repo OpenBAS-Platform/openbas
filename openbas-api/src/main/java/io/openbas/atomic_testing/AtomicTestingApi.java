@@ -11,7 +11,9 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+
 import java.util.List;
+
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -66,6 +68,7 @@ public class AtomicTestingApi extends RestBehavior {
         .map(inject -> {
           Hibernate.initialize(inject.getTags());
           Hibernate.initialize(inject.getDocuments());
+          Hibernate.initialize(inject.getExpectations());
           return AtomicTestingMapper.toDetailDto(inject);
         })
         .orElseThrow();

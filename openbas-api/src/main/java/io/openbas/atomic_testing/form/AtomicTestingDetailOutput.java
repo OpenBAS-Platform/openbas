@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.InjectDocument;
+import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.Tag;
-import io.openbas.model.inject.form.Expectation;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
@@ -34,7 +34,7 @@ public class AtomicTestingDetailOutput {
   private ObjectNode content;
 
   @JsonProperty("atomic_expectations")
-  private List<Expectation> expectations = new ArrayList<>();
+  private List<InjectExpectation> expectations = new ArrayList<>();
 
   @JsonProperty("atomic_tags")
   private List<Tag> tags = new ArrayList<>();
