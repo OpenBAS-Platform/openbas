@@ -358,6 +358,7 @@ const i18n = {
       tuple: 'Duo clef valeur',
       checkbox: 'Case à cocher',
       'Do you want to try this inject?': 'Souhaitez-vous tester ce stimuli ?',
+      'Do you want to launch this inject?': 'Souhaitez-vous lancer ce stimuli ?',
       'The inject will only be sent to you.':
         'Le stimuli sera uniquement envoyé à vous même.',
       Try: 'Tester',

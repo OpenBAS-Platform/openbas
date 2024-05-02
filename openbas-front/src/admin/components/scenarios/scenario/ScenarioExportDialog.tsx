@@ -6,7 +6,7 @@ import { useFormatter } from '../../../../components/i18n';
 interface Props {
   open: boolean;
   handleClose: () => void;
-  handleSubmit: (exportPlayers: boolean, exportVariableValues: boolean) => void;
+  handleSubmit: (exportTeams: boolean, exportPlayers: boolean, exportVariableValues: boolean) => void;
 }
 
 const ScenarioExportDialog: FunctionComponent<Props> = ({
@@ -16,6 +16,9 @@ const ScenarioExportDialog: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
+
+  const [exportTeams, setExportTeams] = useState(false);
+  const handleToggleExportTeams = () => setExportTeams(!exportTeams);
 
   const [exportPlayers, setExportPlayers] = useState(false);
   const handleToggleExportPlayers = () => setExportPlayers(!exportPlayers);
@@ -54,7 +57,10 @@ const ScenarioExportDialog: FunctionComponent<Props> = ({
               <TableRow>
                 <TableCell>{t('Teams')}</TableCell>
                 <TableCell style={{ textAlign: 'center' }}>
-                  <Checkbox checked disabled />
+                  <Checkbox
+                    checked={exportTeams}
+                    onChange={handleToggleExportTeams}
+                  />
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -81,7 +87,7 @@ const ScenarioExportDialog: FunctionComponent<Props> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>{t('Cancel')}</Button>
-        <Button color="secondary" onClick={() => handleSubmit(exportPlayers, exportVariableValues)}>
+        <Button color="secondary" onClick={() => handleSubmit(exportTeams, exportPlayers, exportVariableValues)}>
           {t('Export')}
         </Button>
       </DialogActions>

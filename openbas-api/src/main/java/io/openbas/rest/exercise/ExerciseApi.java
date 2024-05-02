@@ -642,6 +642,7 @@ public class ExerciseApi extends RestBehavior {
   @GetMapping("/api/exercises/{exerciseId}/export")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public void exerciseExport(@NotBlank @PathVariable final String exerciseId,
+      @RequestParam(required = false) final boolean isWithTeams,
       @RequestParam(required = false) final boolean isWithPlayers,
       @RequestParam(required = false) final boolean isWithVariableValues, HttpServletResponse response)
       throws IOException {
@@ -675,15 +676,17 @@ public class ExerciseApi extends RestBehavior {
         .flatMap(category -> category.getQuestions().stream()).toList();
     importExport.setLessonsQuestions(lessonsQuestions);
     objectMapper.addMixIn(LessonsQuestion.class, ExerciseExportMixins.LessonsQuestion.class);
-    // Teams
-    List<Team> teams = exercise.getTeams();
-    importExport.setTeams(teams);
-    objectMapper.addMixIn(Team.class,
-        isWithPlayers ? ExerciseExportMixins.Team.class : ExerciseExportMixins.EmptyTeam.class);
-    exerciseTags.addAll(teams.stream().flatMap(team -> team.getTags().stream()).toList());
+    if (isWithTeams) {
+      // Teams
+      List<Team> teams = exercise.getTeams();
+      importExport.setTeams(teams);
+      objectMapper.addMixIn(Team.class,
+          isWithPlayers ? ExerciseExportMixins.Team.class : ExerciseExportMixins.EmptyTeam.class);
+      exerciseTags.addAll(teams.stream().flatMap(team -> team.getTags().stream()).toList());
+    }
     if (isWithPlayers) {
       // players
-      List<User> players = teams.stream().flatMap(team -> team.getUsers().stream()).distinct().toList();
+      List<User> players = exercise.getTeams().stream().flatMap(team -> team.getUsers().stream()).distinct().toList();
       exerciseTags.addAll(players.stream().flatMap(user -> user.getTags().stream()).toList());
       importExport.setUsers(players);
       objectMapper.addMixIn(User.class, ExerciseExportMixins.User.class);
@@ -727,9 +730,13 @@ public class ExerciseApi extends RestBehavior {
       objectMapper.addMixIn(Variable.class, VariableMixin.class);
     }
     // Build the response
-    String infos =
-        "(" + (isWithPlayers ? "with_players" : "no_players") + " & " + (isWithVariableValues ? "with_variable_values"
-            : "no_variable_values") + ")";
+    String infos = "(" +
+        (isWithTeams ? "with_teams" : "no_teams") +
+        " & " +
+        (isWithPlayers ? "with_players" : "no_players") +
+        " & " +
+        (isWithVariableValues ? "with_variable_values" : "no_variable_values") +
+        ")";
     String zipName = (exercise.getName() + "_" + now().toString()) + "_" + infos + ".zip";
     response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
     response.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip");

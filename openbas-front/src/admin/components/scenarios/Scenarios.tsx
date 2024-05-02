@@ -21,6 +21,7 @@ import PlatformIcon from '../../../components/PlatformIcon';
 import ItemCategory from '../../../components/ItemCategory';
 import ItemMainFocus from '../../../components/ItemMainFocus';
 import type { Theme } from '../../../components/Theme';
+import ImportUploaderScenario from './ImportUploaderScenario';
 import useFiltersState from '../../../components/common/filter/useFiltersState';
 import { buildEmptyFilter } from '../../../components/common/filter/FilterUtils';
 import { scenarioCategories } from './ScenarioForm';
@@ -209,12 +210,16 @@ const Scenarios = () => {
           categoryCard(key, value)
         ))}
       </div>
-      <PaginationComponent
-        fetch={searchScenarios}
-        searchPaginationInput={searchPaginationInput}
-        setContent={setScenarios}
-        exportProps={exportProps}
-      />
+      <div>
+        <PaginationComponent
+          fetch={searchScenarios}
+          searchPaginationInput={searchPaginationInput}
+          setContent={setScenarios}
+          exportProps={exportProps}
+        >
+          <ImportUploaderScenario />
+        </PaginationComponent>
+      </div>
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
