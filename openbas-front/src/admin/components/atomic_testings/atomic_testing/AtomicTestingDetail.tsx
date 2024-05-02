@@ -102,7 +102,7 @@ const Detail: FunctionComponent<Props> = () => {
           </Paper>
         )}
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} style={{ marginBottom: 30 }}>
         <Typography variant="h4">{t('Execution logs')}</Typography>
         {atomicDetail ? (
           <Paper variant="outlined" classes={{ root: classes.paper }}>

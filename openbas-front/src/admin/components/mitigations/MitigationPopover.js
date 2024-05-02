@@ -10,7 +10,7 @@ import Transition from '../../../components/common/Transition';
 import Drawer from '../../../components/common/Drawer';
 import { attackPatternsOptions } from '../../../utils/Option';
 
-const MitigationPopover = ({ mitigation, attackPatternsMap, onUpdate, onDelete }) => {
+const MitigationPopover = ({ mitigation, attackPatternsMap, killChainPhasesMap, onUpdate, onDelete }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -54,14 +54,14 @@ const MitigationPopover = ({ mitigation, attackPatternsMap, onUpdate, onDelete }
     );
     handleCloseDelete();
   };
-  const mitigationKillChainPhases = attackPatternsOptions(mitigation.mitigation_attack_patterns, attackPatternsMap);
+  const mitigationAttackPatterns = attackPatternsOptions(mitigation.mitigation_attack_patterns, attackPatternsMap, killChainPhasesMap);
   const initialValues = R.pipe(
     R.pick([
       'mitigation_external_id',
       'mitigation_name',
       'mitigation_description',
     ]),
-    R.assoc('mitigation_kill_chain_phases', mitigationKillChainPhases),
+    R.assoc('mitigation_attack_patterns', mitigationAttackPatterns),
   )(mitigation);
   return (
     <>

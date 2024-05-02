@@ -1,11 +1,10 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { Box, Button, Paper, Step, StepLabel, Stepper, Tab, Tabs, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
-import { SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
 import type { AtomicTestingDetailOutput, AtomicTestingOutput, ExpectationResultOutput, InjectTargetWithResult } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
-import { fetchAtomicTestingDetail, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import { fetchAtomicTesting, fetchAtomicTestingDetail, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
@@ -168,7 +167,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
       case 'DETECTION':
         return status === 'VALIDATED' ? 'Attack Detected' : 'Attack Undetected';
       case 'HUMAN_RESPONSE':
-        return status === 'VALIDATED' ? 'Attack Successful' : 'Attack Failed';
+        return status === 'VALIDATED' ? 'Validation Success' : 'Validation Failed';
       case 'PREVENTION':
         return status === 'VALIDATED' ? 'Attack Blocked' : 'Attack Unblocked';
       default:
@@ -200,26 +199,26 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     return { color, background };
   };
 
-  const getStepIcon = (index: number, type: string, status: string) => {
-    if (index >= 2 && type) {
-      let IconComponent;
-      switch (type) {
-        case 'DETECTION':
-          IconComponent = TrackChanges;
-          break;
-        case 'PREVENTION':
-          IconComponent = Shield;
-          break;
-        default:
-          IconComponent = SensorOccupied;
-          break;
-      }
-      return <IconComponent style={{ color: getCircleColor(status).color }}
-        className={classes.icon}
-             />;
-    }
-    return null;
-  };
+  // const getStepIcon = (index: number, type: string, status: string) => {
+  //   if (index >= 2 && type) {
+  //     let IconComponent;
+  //     switch (type) {
+  //       case 'DETECTION':
+  //         IconComponent = TrackChanges;
+  //         break;
+  //       case 'PREVENTION':
+  //         IconComponent = Shield;
+  //         break;
+  //       default:
+  //         IconComponent = SensorOccupied;
+  //         break;
+  //     }
+  //     return <IconComponent style={{ color: getCircleColor(status).color }}
+  //       className={classes.icon}
+  //            />;
+  //   }
+  //   return null;
+  // };
 
   const renderLogs = (targetResult: ExpectationResultOutput[]) => {
     return (
@@ -294,12 +293,13 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     sortedGroupedResults[key] = groupedResults[key];
   });
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
 
   const onUpdateManualValidation = () => {
     dispatch(fetchAtomicTestingDetail(injectId));
+    dispatch(fetchAtomicTesting(injectId));
   };
 
   let manualExpectationsNumber: number = 0;
@@ -353,7 +353,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
                   <div className={classes.circle}
                     style={index >= 2 ? getCircleColor(step.status!) : {}}
                   >
-                    {getStepIcon(index, step.type!, step.status!)}
+                    {/* {getStepIcon(index, step.type!, step.status!)} */}
                     <Typography className={classes.circleLabel}>{t(step.label)}</Typography>
                   </div>
                 )}

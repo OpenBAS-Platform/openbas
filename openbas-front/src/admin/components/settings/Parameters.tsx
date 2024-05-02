@@ -153,7 +153,7 @@ const Parameters = () => {
                 <ListItemText primary={t('Remove Filigran logos')} />
                 <Switch
                   disabled={settings.platform_enterprise_edition === 'false'}
-                  value={settings.platform_whitemark ?? false}
+                  checked={settings.platform_whitemark === 'true'}
                   onChange={(_event, checked) => updatePlatformWhitemark({ platform_whitemark: checked.toString() })}
                 />
               </ListItem>

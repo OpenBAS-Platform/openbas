@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -28,11 +29,13 @@ public class Tag implements Base {
   @Getter
   @Column(name = "tag_name")
   @JsonProperty("tag_name")
+  @Queryable(searchable = true, sortable = true)
   private String name;
 
   @Getter
   @Column(name = "tag_color")
   @JsonProperty("tag_color")
+  @Queryable(sortable = true)
   private String color;
 
   @JsonIgnore

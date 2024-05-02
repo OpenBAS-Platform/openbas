@@ -43,15 +43,12 @@ const inlineStyles = {
   tag_color: {
     width: '20%',
   },
-  tag_created_at: {
-    width: '30%',
-  },
 };
 
 const Tags = () => {
   // Standard hooks
   const classes = useStyles();
-  const { t, nsdt } = useFormatter();
+  const { t } = useFormatter();
 
   // Headers
   const headers = [
@@ -118,7 +115,7 @@ const Tags = () => {
           <ListItem
             key={tag.tag_id}
             classes={{ root: classes.item }}
-            divider={true}
+            divider
           >
             <ListItemIcon style={{ color: tag.tag_color }}>
               <LabelOutlined />
@@ -137,12 +134,6 @@ const Tags = () => {
                     style={inlineStyles.tag_color}
                   >
                     {tag.tag_color}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.tag_created_at}
-                  >
-                    {nsdt(tag.tag_created_at)}
                   </div>
                 </>
                     }

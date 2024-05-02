@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static org.springframework.util.StringUtils.hasText;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,8 +37,10 @@ public class ScenarioStatisticApi extends RestBehavior {
     Map<String, Long> categoryCount = new LinkedHashMap<>();
     for (Object[] result : results) {
       String category = (String) result[0];
-      Long count = (Long) result[1];
-      categoryCount.put(category, count);
+      if (hasText(category)) {
+        Long count = (Long) result[1];
+        categoryCount.put(category, count);
+      }
     }
     return categoryCount;
   }

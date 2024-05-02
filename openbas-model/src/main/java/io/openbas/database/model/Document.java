@@ -3,6 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MultiIdDeserializer;
 import jakarta.validation.constraints.NotBlank;
@@ -32,6 +33,7 @@ public class Document implements Base {
 
     @Column(name = "document_name")
     @JsonProperty("document_name")
+    @Queryable(searchable = true, sortable = true)
     private String name;
 
     @Column(name = "document_target")
@@ -40,10 +42,12 @@ public class Document implements Base {
 
     @Column(name = "document_description")
     @JsonProperty("document_description")
+    @Queryable(searchable = true, sortable = true)
     private String description;
 
     @Column(name = "document_type")
     @JsonProperty("document_type")
+    @Queryable(searchable = true, sortable = true)
     private String type;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -52,6 +56,7 @@ public class Document implements Base {
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("document_tags")
+    @Queryable(sortable = true)
     private List<Tag> tags = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
