@@ -266,8 +266,8 @@ const LeftBar = () => {
                       disabled={entry.disabled}
                     >
                       {entry.icon && <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
-                          {entry.icon}
-                        </ListItemIcon>}
+                        {entry.icon}
+                      </ListItemIcon>}
                       <ListItemText
                         classes={{ primary: classes.menuItemText }}
                         primary={t(entry.label)}
@@ -288,8 +288,8 @@ const LeftBar = () => {
                 onClick={handleSelectedMenuClose}
               >
                 {entry.icon && <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
-                    {entry.icon}
-                  </ListItemIcon>}
+                  {entry.icon}
+                </ListItemIcon>}
                 <ListItemText
                   classes={{ primary: classes.menuItemText }}
                   primary={t(entry.label)}
@@ -500,6 +500,7 @@ const LeftBar = () => {
               selected={location.pathname.includes('/admin/reports')}
               dense={true}
               classes={{ root: classes.menuItem }}
+              disabled={true}
             >
               <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
                 <DescriptionOutlined />
@@ -526,10 +527,10 @@ const LeftBar = () => {
                   <BeenhereOutlined />
                 </ListItemIcon>
                 {navOpen && (
-                <ListItemText
-                  classes={{ primary: classes.menuItemText }}
-                  primary={t('Skills')}
-                />
+                  <ListItemText
+                    classes={{ primary: classes.menuItemText }}
+                    primary={t('Skills')}
+                  />
                 )}
               </MenuItem>
             </span>
@@ -567,10 +568,10 @@ const LeftBar = () => {
               <ExtensionOutlined />
             </ListItemIcon>
             {navOpen && (
-            <ListItemText
-              classes={{ primary: classes.menuItemText }}
-              primary={t('Integrations')}
-            />
+              <ListItemText
+                classes={{ primary: classes.menuItemText }}
+                primary={t('Integrations')}
+              />
             )}
             {navOpen && (selectedMenu === 'integrations' ? <ExpandLessOutlined /> : <ExpandMoreOutlined />)}
           </MenuItem>
