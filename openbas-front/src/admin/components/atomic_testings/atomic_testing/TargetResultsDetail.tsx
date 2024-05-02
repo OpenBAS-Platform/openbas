@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { Box, Paper, Step, StepLabel, Stepper, Tab, Tabs, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import { SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
 import type { ExpectationResultOutput, InjectTargetWithResult } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
@@ -78,6 +78,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   target,
 }) => {
   const classes = useStyles();
+  const theme = useTheme<Theme>();
   const { nsdt, t } = useFormatter();
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState(0);
@@ -173,9 +174,13 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         color = 'rgb(220, 81, 72)';
         background = 'rgba(192, 113, 113, 0.29)';
         break;
+      case 'PENDING':
+        color = theme.palette.mode === 'dark' ? 'rgb(42,42,42)' : 'rgb(0,0,0)';
+        background = 'rgb(128,128,128)';
+        break;
       default: // Unknown status fow unknown expectation score
-        color = 'rgb(202,203,206)';
-        background = 'rgba(128,128,128, 0.5)';
+        color = theme.palette.mode === 'dark' ? 'rgb(250,250,250)' : 'rgb(0,0,0)';
+        background = 'rgba(128,127,127,0.37)';
         break;
     }
     return { color, background };
