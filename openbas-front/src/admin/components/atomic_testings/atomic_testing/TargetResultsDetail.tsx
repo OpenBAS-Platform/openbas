@@ -49,7 +49,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     fontSize: '0.8rem',
     position: 'absolute',
     bottom: 'calc(60%)',
-    left: 'calc(-14%)',
+    left: 'calc(-9%)',
   },
   icon: {
     position: 'absolute',
