@@ -59,6 +59,7 @@ class InjectForm extends Component {
       form,
       classes,
       disabled,
+      isAtomic = false,
     } = this.props;
     return (
       <>
@@ -87,33 +88,36 @@ class InjectForm extends Component {
           style={{ marginTop: 20 }}
           disabled={disabled}
         />
-        <div className={disabled ? classes.durationDisabled : classes.duration}>
-          <div className={disabled ? classes.triggerDisabled : classes.trigger}>{t('Trigger after')}</div>
-          <OldTextField
-            variant="standard"
-            name="inject_depends_duration_days"
-            type="number"
-            label={t('Days')}
-            style={{ width: '20%' }}
-            disabled={disabled}
-          />
-          <OldTextField
-            variant="standard"
-            name="inject_depends_duration_hours"
-            type="number"
-            label={t('Hours')}
-            style={{ width: '20%' }}
-            disabled={disabled}
-          />
-          <OldTextField
-            variant="standard"
-            name="inject_depends_duration_minutes"
-            type="number"
-            label={t('Minutes')}
-            style={{ width: '20%' }}
-            disabled={disabled}
-          />
-        </div>
+        {!isAtomic
+          && (
+            <div className={disabled ? classes.durationDisabled : classes.duration}>
+              <div className={disabled ? classes.triggerDisabled : classes.trigger}>{t('Trigger after')}</div>
+              <OldTextField
+                variant="standard"
+                name="inject_depends_duration_days"
+                type="number"
+                label={t('Days')}
+                style={{ width: '20%' }}
+                disabled={disabled}
+              />
+              <OldTextField
+                variant="standard"
+                name="inject_depends_duration_hours"
+                type="number"
+                label={t('Hours')}
+                style={{ width: '20%' }}
+                disabled={disabled}
+              />
+              <OldTextField
+                variant="standard"
+                name="inject_depends_duration_minutes"
+                type="number"
+                label={t('Minutes')}
+                style={{ width: '20%' }}
+                disabled={disabled}
+              />
+            </div>
+          )}
       </>
     );
   }
@@ -126,6 +130,7 @@ InjectForm.propTypes = {
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
   injectorContractsMap: PropTypes.object,
+  isAtomic: PropTypes.bool,
 };
 
 export default R.compose(inject18n, withStyles(styles))(InjectForm);

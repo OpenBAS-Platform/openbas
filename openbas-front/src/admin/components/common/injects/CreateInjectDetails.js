@@ -357,7 +357,7 @@ const CreateInjectDetails = ({
         {({ form, handleSubmit, submitting, values, errors }) => {
           return (
             <form id="injectContentForm" onSubmit={handleSubmit} style={{ marginTop: 40 }}>
-              <InjectForm form={form} values={values} disabled={!contractContent} />
+              <InjectForm form={form} values={values} disabled={!contractContent} isAtomic={isAtomic} />
               {contractContent && (
               <div className={classes.details}>
                 {openDetails && (

@@ -89,7 +89,7 @@ const UpdateInjectDetails = ({
               const v = values[mandatoryKey];
               return v !== undefined && !R.isEmpty(v);
             });
-              // If condition are not filled
+            // If condition are not filled
             if (!conditionOk) {
               const labels = mandatoryGroups.map((key) => contractContent.fields.find((f) => f.key === key).label).join(', ');
               errors[field.key] = t(`One of this field is required : ${labels}.`);
@@ -143,9 +143,9 @@ const UpdateInjectDetails = ({
               finalData[field.key] = parseInt(data[field.key], 10);
             } else if (
               field.type === 'textarea'
-                  && field.richText
-                  && data[field.key]
-                  && data[field.key].length > 0
+              && field.richText
+              && data[field.key]
+              && data[field.key].length > 0
             ) {
               finalData[field.key] = data[field.key]
                 .replaceAll(
@@ -185,8 +185,8 @@ const UpdateInjectDetails = ({
       }
       const { allTeams, teamsIds, assetIds, assetGroupIds, documents } = injectDetailsState;
       const inject_depends_duration = data.inject_depends_duration_days * 3600 * 24
-          + data.inject_depends_duration_hours * 3600
-          + data.inject_depends_duration_minutes * 60;
+        + data.inject_depends_duration_hours * 3600
+        + data.inject_depends_duration_minutes * 60;
       const inject_tags = !R.isEmpty(data.inject_tags) ? R.pluck('id', data.inject_tags) : [];
       const values = {
         inject_title: data.inject_title,
@@ -246,9 +246,9 @@ const UpdateInjectDetails = ({
     .forEach((field) => {
       if (
         field.type === 'textarea'
-            && field.richText
-            && initialValues[field.key]
-            && initialValues[field.key].length > 0
+        && field.richText
+        && initialValues[field.key]
+        && initialValues[field.key].length > 0
       ) {
         initialValues[field.key] = initialValues[field.key]
           .replaceAll(
@@ -264,9 +264,9 @@ const UpdateInjectDetails = ({
         if (field.cardinality && field.cardinality === '1') {
           if (
             initialValues[field.key].value
-                && initialValues[field.key].value.includes(
-                  `${field.tupleFilePrefix}`,
-                )
+            && initialValues[field.key].value.includes(
+              `${field.tupleFilePrefix}`,
+            )
           ) {
             initialValues[field.key] = {
               type: 'attachment',
@@ -287,7 +287,7 @@ const UpdateInjectDetails = ({
           initialValues[field.key] = initialValues[field.key].map((pair) => {
             if (
               pair.value
-                  && pair.value.includes(`${field.tupleFilePrefix}`)
+              && pair.value.includes(`${field.tupleFilePrefix}`)
             ) {
               return {
                 type: 'attachment',
@@ -316,7 +316,7 @@ const UpdateInjectDetails = ({
       {({ form, handleSubmit, submitting, values, errors }) => {
         return (
           <form id="injectContentForm" onSubmit={handleSubmit} style={{ marginTop: 10 }}>
-            <InjectForm form={form} values={values} disabled={!contractContent} />
+            <InjectForm form={form} values={values} disabled={!contractContent} isAtomic={isAtomic} />
             {contractContent && (
               <div className={classes.details}>
                 {openDetails && (
