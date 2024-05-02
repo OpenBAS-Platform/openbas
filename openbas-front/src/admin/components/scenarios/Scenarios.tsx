@@ -289,7 +289,7 @@ const Scenarios = () => {
                   >
                     {scenario.scenario_platforms?.length === 0 ? (
                       <PlatformIcon platform={t('No inject in this scenario')} tooltip={true} width={25} />
-                    ) : scenario.scenario_platforms.map(
+                    ) : scenario.scenario_platforms?.map(
                       (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={25} marginRight={10} />,
                     )}
                   </div>
