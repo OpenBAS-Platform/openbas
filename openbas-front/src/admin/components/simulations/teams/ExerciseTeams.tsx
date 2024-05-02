@@ -4,7 +4,6 @@ import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../../utils/hooks';
 import DefinitionMenu from '../../common/simulate/DefinitionMenu';
-import Teams from '../../components/teams/Teams';
 import { PermissionsContext, TeamContext } from '../../common/Context';
 import type { UserStore } from '../../teams/players/Player';
 import AddTeams from '../../components/teams/AddTeams';
@@ -22,6 +21,7 @@ import {
 import { addTeam, fetchTeams } from '../../../../actions/teams/team-actions';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
+import ContextualTeams from '../../components/teams/ContextualTeams';
 
 interface Props {
   exerciseTeamsUsers: ExerciseStore['exercise_teams_users'],
@@ -88,7 +88,7 @@ const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
   return (
     <TeamContext.Provider value={teamContextForExercise(exerciseId, exerciseTeamsUsers)}>
       <DefinitionMenu base="/admin/exercises" id={exerciseId} />
-      <Teams teamIds={teamIds} contextual={true} />
+      <ContextualTeams teamIds={teamIds} />
       {permissions.canWrite && <AddTeams addedTeamIds={teamIds} onAddTeams={onAddTeams} />}
     </TeamContext.Provider>
   );

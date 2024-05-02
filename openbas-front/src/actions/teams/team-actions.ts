@@ -1,11 +1,16 @@
 import type { Dispatch } from 'redux';
 import * as schema from '../Schema';
-import { getReferential, putReferential, postReferential, delReferential } from '../../utils/Action';
-import type { Team, TeamCreateInput, TeamUpdateInput, User } from '../../utils/api-types';
+import { getReferential, putReferential, postReferential, delReferential, simplePostCall } from '../../utils/Action';
+import type { SearchPaginationInput, Team, TeamCreateInput, TeamUpdateInput, User } from '../../utils/api-types';
 
 export const fetchTeams = () => (dispatch: Dispatch) => {
   const uri = '/api/teams';
   return getReferential(schema.arrayOfTeams, uri)(dispatch);
+};
+export const searchTeams = (searchPaginationInput: SearchPaginationInput) => {
+  const data = searchPaginationInput;
+  const uri = '/api/teams/search';
+  return simplePostCall(uri, data);
 };
 
 export const fetchTeamPlayers = (teamId: Team['team_id']) => (dispatch: Dispatch) => {
