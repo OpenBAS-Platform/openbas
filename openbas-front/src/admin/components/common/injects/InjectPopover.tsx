@@ -61,10 +61,10 @@ const InjectPopover: FunctionComponent<Props> = ({
     handleCloseDelete();
   };
 
-  const handleOpenTry = () => {
-    setOpenTry(true);
-    handlePopoverClose();
-  };
+  // const handleOpenTry = () => {
+  //   setOpenTry(true);
+  //   handlePopoverClose();
+  // };
 
   const handleCloseTry = () => setOpenTry(false);
 
