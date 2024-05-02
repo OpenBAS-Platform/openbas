@@ -175,14 +175,15 @@ const InjectPopover: FunctionComponent<Props> = ({
             {t('Trigger now')}
           </MenuItem>
         )}
-        {inject.inject_type !== 'openbas_manual' && (
-          <MenuItem
-            onClick={handleOpenTry}
-            disabled={isDisabled}
-          >
-            {t('Try the inject')}
-          </MenuItem>
-        )}
+        {/* TODO create an atomic testing when using this button */}
+        {/* {inject.inject_type !== 'openbas_manual' && ( */}
+        {/*  <MenuItem */}
+        {/*    onClick={handleOpenTry} */}
+        {/*    disabled={isDisabled} */}
+        {/*  > */}
+        {/*    {t('Try the inject')} */}
+        {/*  </MenuItem> */}
+        {/* )} */}
         {inject.inject_enabled ? (
           <MenuItem
             onClick={handleOpenDisable}
