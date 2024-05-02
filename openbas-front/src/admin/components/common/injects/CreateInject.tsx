@@ -27,6 +27,7 @@ import { fetchInjectors } from '../../../../actions/Injectors';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
+import Loader from '../../../../components/Loader';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -142,7 +143,7 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
   };
 
   let selectedContractKillChainPhase = null;
-  if (selectedContract) {
+  if (selectedContract !== null) {
     const selectedContractAttackPatterns = computeAttackPatterns(contracts[selectedContract], attackPatternsMap);
     // eslint-disable-next-line max-len
     const killChainPhaseforSelection = selectedContractAttackPatterns.map((contractAttackPattern: AttackPatternStore) => contractAttackPattern.attack_pattern_kill_chain_phases).flat().at(0);
@@ -176,6 +177,7 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
                 onDelete={() => helpers.handleClearAllFilters()}
               />
             )}
+            {!contracts.length && <Loader variant="inElement" />}
             <List>
               {contracts.map((contract, index) => {
                 const contractAttackPatterns = computeAttackPatterns(contract, attackPatternsMap);
@@ -191,7 +193,7 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
                     divider={true}
                     onClick={() => setSelectedContract(index)}
                     selected={selectedContract === index}
-                    disabled={!!(selectedContract && selectedContract !== index)}
+                    disabled={!!(selectedContract !== null && selectedContract !== index)}
                   >
                     <ListItemIcon>
                       <InjectIcon type={injector.injector_type} />
@@ -213,7 +215,7 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
                           <div className={classes.containerItem} style={inlineStyles.attackPatterns}>
                             {contractAttackPatterns.map((contractAttackPattern) => (
                               <Chip
-                                key={contractAttackPattern.attackPatternId}
+                                key={`${contract.injector_contract_id}-${contractAttackPattern.attackPatternId}`}
                                 variant="outlined"
                                 classes={{ root: classes.chipInList }}
                                 color="primary"
@@ -222,7 +224,7 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
                             ))}
                           </div>
                         </div>
-                        }
+                      }
                     />
                     <ListItemIcon classes={{ root: classes.goIcon }}>
                       <KeyboardArrowRight />
@@ -243,8 +245,8 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
           <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
             <CreateInjectDetails
               drawerRef={drawerRef}
-              contractId={selectedContract ? contracts[selectedContract].injector_contract_id : null}
-              contractContent={selectedContract ? parsedContentContracts[selectedContract] : null}
+              contractId={selectedContract !== null ? contracts[selectedContract].injector_contract_id : null}
+              contractContent={selectedContract !== null ? parsedContentContracts[selectedContract] : null}
               setSelectedContract={setSelectedContract}
               selectedContractKillChainPhase={selectedContractKillChainPhase}
               handleClose={handleCloseDrawer}
