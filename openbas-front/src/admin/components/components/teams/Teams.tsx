@@ -14,6 +14,10 @@ import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { initSorting } from '../../../../components/common/pagination/Page';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+import CreateTeam from './CreateTeam';
+import { useHelper } from '../../../../store';
+import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
+import type { TagsHelper, UsersHelper } from '../../../../actions/helper';
 
 const useStyles = makeStyles(() => ({
   itemHeader: {
@@ -116,6 +120,11 @@ const Teams = () => {
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
   const [searchId] = searchParams.getAll('id');
+
+  // Fetching data
+  const { userAdmin } = useHelper((helper: EndpointsHelper & UsersHelper & TagsHelper) => ({
+    userAdmin: helper.getMe()?.user_admin ?? false,
+  }));
 
   // Headers
   const headers = [
@@ -230,6 +239,8 @@ const Teams = () => {
               <TeamPopover
                 team={team}
                 managePlayers={() => setSelectedTeam(team.team_id)}
+                onUpdate={(result) => setTeams(teams.map((t) => (t.team_id !== result.team_id ? t : result)))}
+                onDelete={(result) => setTeams(teams.filter((t) => (t.team_id !== result)))}
                 openEditOnInit={team.team_id === searchId}
               />
             </ListItemSecondaryAction>
@@ -252,6 +263,7 @@ const Teams = () => {
           />
         )}
       </Drawer>
+      {userAdmin && (<CreateTeam onCreate={(result) => setTeams([result, ...teams])}/>)}
     </>
   );
 };

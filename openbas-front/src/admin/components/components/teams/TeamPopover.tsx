@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
-import { Dialog as MuiDialog, DialogContent, DialogContentText, DialogActions, Button, IconButton, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog as MuiDialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import Dialog from '../../../../components/common/Dialog';
 import { deleteTeam, updateTeam } from '../../../../actions/teams/team-actions';
@@ -22,6 +22,8 @@ interface TeamPopoverProps {
   disabled?: boolean,
   openEditOnInit?: boolean,
   onRemoveTeamFromInject?: (teamId: string) => void;
+  onUpdate?: (result: TeamStore) => void;
+  onDelete?: (result: string) => void;
 }
 
 const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
@@ -30,6 +32,8 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   disabled,
   openEditOnInit = false,
   onRemoveTeamFromInject = null,
+  onUpdate,
+  onDelete,
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -74,7 +78,18 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
       team_organization: data.team_organization?.id,
       team_tags: data.team_tags?.map((tag: Option) => tag.id),
     };
-    return dispatch(updateTeam(team.team_id, inputValues)).then(() => handleCloseEdit());
+    return dispatch(updateTeam(team.team_id, inputValues)).then(
+      (result: { result: string, entities: { teams: Record<string, TeamStore> } }) => {
+        if (result.entities) {
+          if (onUpdate) {
+            const updated = result.entities.teams[result.result];
+            onUpdate(updated);
+          }
+        }
+        handleCloseEdit();
+        return result;
+      },
+    );
   };
 
   // Deletion
@@ -86,7 +101,14 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   const handleCloseDelete = () => setOpenDelete(false);
 
   const submitDelete = () => {
-    dispatch(deleteTeam(team.team_id)).then(() => handleCloseDelete());
+    dispatch(deleteTeam(team.team_id)).then(
+      () => {
+        if (onDelete) {
+          onDelete(team.team_id);
+        }
+        handleCloseDelete();
+      },
+    );
   };
 
   // Remove
