@@ -71,12 +71,12 @@ const ResponsePie: FunctionComponent<Props> = ({
     return colorMap[result ?? ''] ?? 'rgb(220, 81, 72)';
   };
 
-  const getChartIcon = (type: 'PREVENTION' | 'DETECTION' | 'HUMAN_RESPONSE' | undefined) => {
+  const getChartIcon = (type: 'DETECTION' | 'HUMAN_RESPONSE' | 'PREVENTION' | undefined) => {
     switch (type) {
-      case 'PREVENTION':
-        return <Shield className={classes.iconOverlay} />;
       case 'DETECTION':
         return <TrackChanges className={classes.iconOverlay} />;
+      case 'PREVENTION':
+        return <Shield className={classes.iconOverlay} />;
       default:
         return <SensorOccupied className={classes.iconOverlay} />;
     }

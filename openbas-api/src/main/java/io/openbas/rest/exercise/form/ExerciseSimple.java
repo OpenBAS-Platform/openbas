@@ -3,6 +3,7 @@ package io.openbas.rest.exercise.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.atomic_testing.AtomicTestingMapper;
+import io.openbas.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Tag;
 import io.openbas.helper.MultiIdDeserializer;
@@ -52,7 +53,7 @@ public class ExerciseSimple {
 
     @JsonProperty("exercise_targets")
     @NotNull
-    private List<AtomicTestingMapper.InjectTargetWithResult> targets;
+    private List<InjectTargetWithResult> targets;
 
     public static ExerciseSimple fromExercise(Exercise exercise) {
         ExerciseSimple simple = new ExerciseSimple();

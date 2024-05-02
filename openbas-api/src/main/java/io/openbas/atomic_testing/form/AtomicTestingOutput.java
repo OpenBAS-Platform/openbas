@@ -2,7 +2,6 @@ package io.openbas.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
-import io.openbas.atomic_testing.AtomicTestingMapper.InjectTargetWithResult;
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.InjectorContract;
 import io.swagger.v3.oas.annotations.media.Schema;

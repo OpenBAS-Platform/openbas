@@ -5,11 +5,11 @@ import { useFormatter } from '../../../../components/i18n';
 
 const useStyles = makeStyles(() => ({
   chip: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: 800,
     textTransform: 'uppercase',
-    borderRadius: 4,
-    width: 150,
+    borderRadius: 0,
+    marginRight: 10,
   },
   chipInList: {
     fontSize: 12,
@@ -17,7 +17,7 @@ const useStyles = makeStyles(() => ({
     height: 20,
     float: 'left',
     textTransform: 'uppercase',
-    borderRadius: 4,
+    borderRadius: 0,
     width: 120,
   },
 }));

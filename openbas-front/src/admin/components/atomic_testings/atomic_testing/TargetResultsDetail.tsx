@@ -2,13 +2,15 @@ import React, { FunctionComponent, useEffect, useState } from 'react';
 import { Box, Paper, Step, StepLabel, Stepper, Tab, Tabs, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
-import type { InjectTargetWithResult, SimpleExpectationResultOutput } from '../../../../utils/api-types';
+import type { ExpectationResultOutput, InjectTargetWithResult } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import { fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
+import InjectIcon from '../../common/injects/InjectIcon';
+import Empty from '../../../../components/Empty';
 
 interface Steptarget {
   label: string;
@@ -44,14 +46,16 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   connectorLabel: {
     color: theme.palette.common,
-    fontSize: '0.7rem',
+    fontSize: '0.8rem',
     position: 'absolute',
     bottom: 'calc(60%)',
+    left: 'calc(-14%)',
   },
   icon: {
     position: 'absolute',
-    bottom: 'calc(82%)',
-    right: 'calc(46%)',
+    bottom: 'calc(77%)',
+    width: 30,
+    height: 30,
   },
   tabs: {
     marginLeft: 'auto',
@@ -60,6 +64,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
 
 interface Props {
   injectId: string,
+  injectType: string,
   lastExecutionStartDate: string,
   lastExecutionEndDate: string,
   target: InjectTargetWithResult,
@@ -67,6 +72,7 @@ interface Props {
 
 const TargetResultsDetail: FunctionComponent<Props> = ({
   injectId,
+  injectType,
   lastExecutionStartDate,
   lastExecutionEndDate,
   target,
@@ -76,15 +82,17 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState(0);
   const [steps, setSteps] = useState<Steptarget[]>([]);
+  const initialSteps = [{ label: 'Attack started' }, { label: 'Attack ended' }];
   // Fetching data
   const { targetresults }: {
-    targetresults: SimpleExpectationResultOutput[],
+    targetresults: ExpectationResultOutput[],
   } = useHelper((helper: AtomicTestingHelper) => ({
     targetresults: helper.getTargetResults(target.id!, injectId),
   }));
 
   useEffect(() => {
     if (target) {
+      setSteps([...initialSteps, ...[{ label: 'Unknown Data' }]]);
       dispatch(fetchTargetResult(injectId, target.id!, target.targetType!));
       setActiveTab(0);
     }
@@ -99,18 +107,25 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
       return null;
     }
     const dateToDisplay = index === 0 ? lastExecutionStartDate : lastExecutionEndDate;
-    // eslint-disable-next-line no-nested-ternary
-    const leftPos = steps.length === 4
-      ? 'calc(-25%)'
-      : steps.length > 4
-        ? 'calc(-30%)'
-        : 'calc(-20%)';
+
+    const formatDate = (date: string) => {
+      const dateString = nsdt(date);
+      if (!dateString) return '';
+      const [firstPart, secondPart, thirdPart] = dateString.split(', ');
+      return (
+        <>
+          {firstPart} {secondPart}
+          <br />
+          {thirdPart}
+        </>
+      );
+    };
 
     return (
       <>
         <hr className={classes.connector}/>
-        <Typography variant="body2" className={classes.connectorLabel} style={{ left: leftPos }}>
-          {dateToDisplay && nsdt(dateToDisplay)}
+        <Typography variant="body2" className={classes.connectorLabel}>
+          {dateToDisplay && formatDate(dateToDisplay)}
         </Typography>
       </>
     );
@@ -120,13 +135,16 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     if (status === 'UNKNOWN') {
       return 'Unknown Data';
     }
+    if (status === 'PENDING') {
+      return 'Waiting Response';
+    }
     switch (type) {
-      case 'PREVENTION':
-        return status === 'VALIDATED' ? 'Attack Blocked' : 'Attack Unblocked';
       case 'DETECTION':
         return status === 'VALIDATED' ? 'Attack Detected' : 'Attack Undetected';
       case 'HUMAN_RESPONSE':
         return status === 'VALIDATED' ? 'Attack Successful' : 'Attack Failed';
+      case 'PREVENTION':
+        return status === 'VALIDATED' ? 'Attack Blocked' : 'Attack Unblocked';
       default:
         return '';
     }
@@ -144,23 +162,23 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         color = 'rgb(220, 81, 72)';
         background = 'rgba(192, 113, 113, 0.29)';
         break;
-      default: // Unknown status fow unknown spectation score
+      default: // Unknown status fow unknown expectation score
         color = 'rgb(202,203,206)';
-        background = 'rgba(202,203,206, 0.5)';
+        background = 'rgba(128,128,128, 0.5)';
         break;
     }
     return { color, background };
   };
 
   const getStepIcon = (index: number, type: string, status: string) => {
-    if (index >= 2) {
+    if (index >= 2 && type) {
       let IconComponent;
       switch (type) {
-        case 'PREVENTION':
-          IconComponent = Shield;
-          break;
         case 'DETECTION':
           IconComponent = TrackChanges;
+          break;
+        case 'PREVENTION':
+          IconComponent = Shield;
           break;
         default:
           IconComponent = SensorOccupied;
@@ -173,32 +191,40 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     return null;
   };
 
-  const renderLogs = (targetResult: SimpleExpectationResultOutput[]) => {
+  const renderLogs = (targetResult: ExpectationResultOutput[]) => {
     return (
-      <Paper elevation={3} style={{ padding: 20, marginTop: 25, minHeight: 200 }}>
-        {/* Render logs for each target result */}
+      <>
         {targetResult.map((result) => (
-          <div key={result.target_result_id}>
-            <Typography variant="body1" gutterBottom>
-              {t(`TYPE_${result.target_result_subtype}`)}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {t(result.target_result_response_status)}
-            </Typography>
-            {result.target_result_logs !== null && (
-            <Typography variant="body1">
-              {result.target_result_logs}
-            </Typography>
+          <Paper elevation={2} style={{ padding: 20, marginTop: 15, minHeight: 125 }}
+            key={result.target_result_id}
+          >
+            {result.target_results && result.target_results.length > 0 ? (
+              result.target_results.map((collector, index) => (
+                <div key={index}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <InjectIcon
+                      tooltip={t(injectType)}
+                      type={injectType}
+                    />
+                    <Typography variant="body1" sx={{ marginLeft: 1 }}>
+                      {collector.sourceName}
+                    </Typography>
+                  </div>
+                  <Typography variant="body1" sx={{ marginTop: 1 }}>
+                    {collector.result}
+                  </Typography>
+                </div>
+              ))
+            ) : (
+              <Empty message={t('No logs available')}/>
             )}
-            <br/>
-          </div>
+          </Paper>
         ))}
-      </Paper>
+      </>
     );
   };
 
   // Define steps
-  const initialSteps = [{ label: 'Attack started' }, { label: 'Attack ended' }];
   useEffect(() => {
     if (targetresults && targetresults.length > 0) {
       const newSteps = targetresults.map((result) => ({
@@ -212,7 +238,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   }, [targetresults]);
 
   // Define Tabs
-  const groupedResults: Record<string, SimpleExpectationResultOutput[]> = {};
+  const groupedResults: Record<string, ExpectationResultOutput[]> = {};
   targetresults.forEach((result) => {
     const type = result.target_result_type;
     if (!groupedResults[type]) {

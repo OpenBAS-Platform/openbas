@@ -20,6 +20,8 @@ const useStyles = makeStyles(() => ({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    paddingLeft: 2,
+    marginRight: 5,
   },
 }));
 

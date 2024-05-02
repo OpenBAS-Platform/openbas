@@ -1,9 +1,7 @@
 import { useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import { Grid, List, ListItemButton, ListItemText, Paper } from '@mui/material';
+import { Grid, List, Paper } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { DevicesOtherOutlined, Groups3Outlined } from '@mui/icons-material';
-import { SelectGroup } from 'mdi-material-ui';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
@@ -13,10 +11,10 @@ import { fetchAtomicTesting } from '../../../../actions/atomic_testings/atomic-t
 import ResponsePie from './ResponsePie';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
-import AtomicTestingResult from './AtomicTestingResult';
 import TargetResultsDetail from './TargetResultsDetail';
 import SearchFilter from '../../../../components/SearchFilter';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import TargetListItem from './TargetListItem';
 
 const useStyles = makeStyles(() => ({
   resultDetail: {
@@ -25,16 +23,6 @@ const useStyles = makeStyles(() => ({
   },
   container: {
     padding: '20px',
-  },
-  bodyTarget: {
-    float: 'left',
-    height: 25,
-    fontSize: 13,
-    lineHeight: '25px',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    verticalAlign: 'middle',
-    textOverflow: 'ellipsis',
   },
 }));
 
@@ -73,27 +61,16 @@ const AtomicTesting = () => {
     setSelectedTarget(target);
   };
 
-  // Icon
-  const getIcon = (type: string | undefined) => {
-    if (type === 'ASSETS') {
-      return <DevicesOtherOutlined />;
-    }
-    if (type === 'ASSETS_GROUPS') {
-      return <SelectGroup />;
-    }
-    return <Groups3Outlined />; // Teams
-  };
-
   return (
     <>
       <Grid container spacing={2} classes={{ root: classes.container }}>
         <Grid item xs={12}>
-          <ResponsePie expectations={atomic.atomic_expectation_results} />
+          <ResponsePie expectations={atomic.atomic_expectation_results}/>
         </Grid>
       </Grid>
       <Grid container spacing={2} classes={{ root: classes.container }}>
         <Grid item xs={5} style={{ paddingBottom: 24 }}>
-          <div style={{ padding: 10 }}>
+          <div style={{ paddingBottom: 10 }}>
             <SearchFilter
               fullWidth
               small
@@ -103,37 +80,23 @@ const AtomicTesting = () => {
             />
           </div>
           {sortedTargets.length > 0 ? (
-            <List style={{ paddingTop: 10 }}>
-              {sortedTargets.map((target) => <Paper elevation={3} style={{ marginBottom: 10 }} key={target?.id}>
-                <ListItemButton
-                  key={target?.id}
-                  onClick={() => handleTargetClick(target)}
-                >
-                  <ListItemText
-                    primary={
-                      <div>
-                        <div style={{ color: 'gray', display: 'inline-block', float: 'left', paddingRight: 10 }}>{getIcon(target?.targetType)}</div>
-                        <div className={classes.bodyTarget} style={{ width: '30%' }}>
-                          {`${target?.name}`}
-                        </div>
-                        <div style={{ float: 'right' }}>
-                          <AtomicTestingResult
-                            expectations={target?.expectationResultsByTypes}
-                          />
-                        </div>
-                      </div>
-                    }
-                  />
-                </ListItemButton>
-              </Paper>)}
+            <List>
+              {sortedTargets.map((target) => <div key={target?.id} style={{ marginBottom: 10 }}>
+                <Paper elevation={3} >
+                  <TargetListItem onClick={handleTargetClick} target={target}/>
+                </Paper>
+                <List component="div" disablePadding>
+                  {target?.children?.map((child) => <TargetListItem key={child?.id} isChild onClick={handleTargetClick} target={child}/>)}
+                </List>
+              </div>)}
             </List>
           ) : (
-            <Empty message={t('No targets available')} />
+            <Empty message={t('No targets available')}/>
           )}
         </Grid>
         <Grid item xs={7} style={{ paddingBottom: 24 }}>
           <Paper variant="outlined" classes={{ root: classes.resultDetail }}>
-            {selectedTarget && <TargetResultsDetail target={selectedTarget} injectId={atomicId}
+            {selectedTarget && <TargetResultsDetail target={selectedTarget} injectId={atomicId} injectType={atomic.atomic_type}
               lastExecutionStartDate={atomic.atomic_last_execution_start_date || ''}
               lastExecutionEndDate={atomic.atomic_last_execution_end_date || ''}
                                />}
@@ -147,7 +110,7 @@ const AtomicTesting = () => {
               }}
               >
                 {!selectedTarget && (
-                  <Empty message={t('No target data available')} />
+                <Empty message={t('No target data available')}/>
                 )}
               </div>
             )}

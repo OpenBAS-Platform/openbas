@@ -89,7 +89,7 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
           )}
         />
       )
-      }
+        }
     </>
   );
 };

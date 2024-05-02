@@ -1,7 +1,8 @@
 package io.openbas.utils;
 
 import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
-import io.openbas.atomic_testing.AtomicTestingMapper.InjectTargetWithResult;
+import io.openbas.atomic_testing.AtomicTestingUtils;
+import io.openbas.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.database.model.*;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static io.openbas.atomic_testing.AtomicTestingUtils.getExpectations;
 import static io.openbas.atomic_testing.AtomicTestingUtils.getTargetsWithResults;
 
 public class ResultUtils {
@@ -22,7 +22,7 @@ public class ResultUtils {
         .stream()
         .flatMap((inject) -> inject.getExpectations().stream())
         .toList();
-    return getExpectations(expectations);
+    return AtomicTestingUtils.getExpectationResultByTypes(expectations);
   }
 
   public static List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(@NotNull final List<Inject> injects) {
