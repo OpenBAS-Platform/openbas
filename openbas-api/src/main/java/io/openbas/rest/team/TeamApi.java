@@ -9,19 +9,27 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.team.form.TeamCreateInput;
 import io.openbas.rest.team.form.TeamUpdateInput;
 import io.openbas.rest.team.form.UpdateUsersTeamInput;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.database.specification.TeamSpecification.contextual;
+import static io.openbas.database.specification.TeamSpecification.teamsAccessibleFromOrganizations;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
 @RestController
@@ -81,6 +89,30 @@ public class TeamApi extends RestBehavior {
             teams = teamRepository.teamsAccessibleFromOrganizations(organizationIds);
         }
         return teams;
+    }
+
+    @PostMapping("/api/teams/search")
+    @PreAuthorize("isObserver()")
+    public Page<Team> teams(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+        BiFunction<Specification<Team>, Pageable, Page<Team>> teamsFunction;
+        OpenBASPrincipal currentUser = currentUser();
+        if (currentUser.isAdmin()) {
+            teamsFunction = (Specification<Team> specification, Pageable pageable) -> this.teamRepository
+                .findAll(contextual(false).and(specification), pageable);
+        } else {
+            User local = this.userRepository.findById(currentUser.getId()).orElseThrow();
+            List<String> organizationIds = local.getGroups().stream()
+                .flatMap(group -> group.getOrganizations().stream())
+                .map(Organization::getId)
+                .toList();
+            teamsFunction = (Specification<Team> specification, Pageable pageable) -> this.teamRepository
+                .findAll(contextual(false).and(teamsAccessibleFromOrganizations(organizationIds).and(specification)), pageable);
+        }
+        return buildPaginationJPA(
+            teamsFunction,
+            searchPaginationInput,
+            Team.class
+        );
     }
 
     @GetMapping("/api/teams/{teamId}")

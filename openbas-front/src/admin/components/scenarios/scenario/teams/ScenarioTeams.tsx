@@ -17,13 +17,13 @@ import {
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import type { TeamStore } from '../../../../../actions/teams/Team';
-import Teams from '../../../components/teams/Teams';
 import { PermissionsContext, TeamContext } from '../../../common/Context';
 import type { Team, TeamCreateInput } from '../../../../../utils/api-types';
 import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
 import type { UserStore } from '../../../teams/players/Player';
 import AddTeams from '../../../components/teams/AddTeams';
 import { useFormatter } from '../../../../../components/i18n';
+import ContextualTeams from '../../../components/teams/ContextualTeams';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -101,7 +101,7 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
       {permissions.canWrite && <AddTeams addedTeamIds={teamIds} onAddTeams={onAddTeams} />}
       <div className="clearfix" />
       <Paper classes={{ root: classes.paper }} variant="outlined">
-        <Teams teamIds={teamIds} contextual={true} />
+        <ContextualTeams teamIds={teamIds} />
       </Paper>
     </TeamContext.Provider>
   );

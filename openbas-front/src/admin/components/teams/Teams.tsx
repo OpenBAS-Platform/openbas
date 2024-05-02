@@ -42,7 +42,7 @@ const Teams = () => {
   return (
     <PermissionsContext.Provider value={permissionsContext}>
       <TeamContext.Provider value={teamContext}>
-        <TeamsComponent teamIds={teams.filter((t) => !t.team_contextual).map((t) => t.team_id)} />
+        <TeamsComponent />
         {(user.user_is_planner && (<CreateTeam onCreate={() => {}}/>))}
       </TeamContext.Provider>
     </PermissionsContext.Provider>
