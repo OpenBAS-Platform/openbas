@@ -302,6 +302,16 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     dispatch(fetchAtomicTestingDetail(injectId));
   };
 
+  let manualExpectationsNumber: number = 0;
+  if (atomicTestingDetails) {
+    atomicTestingDetails?.atomic_expectations?.map((expectation) => {
+      if (expectation.inject_expectation_type === 'MANUAL') {
+        manualExpectationsNumber += 1;
+      }
+      return manualExpectationsNumber;
+    });
+  }
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -309,7 +319,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
           <Typography variant="h1" className="pageTitle">{target.name}</Typography>
         </div>
         {
-          atomicTestingDetails?.atomic_expectations && (
+          manualExpectationsNumber > 0 && (
             <div>
               <Button
                 type="submit"
