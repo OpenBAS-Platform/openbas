@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { Box, Paper, Step, StepLabel, Stepper, Tab, Tabs, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import { SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
 import type { ExpectationResultOutput, InjectTargetWithResult } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
@@ -14,7 +14,7 @@ import Empty from '../../../../components/Empty';
 
 interface Steptarget {
   label: string;
-  type?: string;
+  type: string;
   status?: string;
 }
 
@@ -49,7 +49,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     fontSize: '0.8rem',
     position: 'absolute',
     bottom: 'calc(60%)',
-    left: 'calc(-14%)',
+    left: 'calc(-9%)',
   },
   icon: {
     position: 'absolute',
@@ -78,11 +78,12 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   target,
 }) => {
   const classes = useStyles();
+  const theme = useTheme<Theme>();
   const { nsdt, t } = useFormatter();
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState(0);
   const [steps, setSteps] = useState<Steptarget[]>([]);
-  const initialSteps = [{ label: 'Attack started' }, { label: 'Attack ended' }];
+  const initialSteps = [{ label: 'Attack started', type: '' }, { label: 'Attack ended', type: '' }];
   // Fetching data
   const { targetresults }: {
     targetresults: ExpectationResultOutput[],
@@ -92,7 +93,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
 
   useEffect(() => {
     if (target) {
-      setSteps([...initialSteps, ...[{ label: 'Unknown Data' }]]);
+      setSteps([...initialSteps, ...[{ label: 'Unknown Data', type: '' }]]);
       dispatch(fetchTargetResult(injectId, target.id!, target.targetType!));
       setActiveTab(0);
     }
@@ -111,12 +112,23 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     const formatDate = (date: string) => {
       const dateString = nsdt(date);
       if (!dateString) return '';
-      const [firstPart, secondPart, thirdPart] = dateString.split(', ');
+
+      const dateParts = dateString.split(', ');
+      const firstPart = dateParts[0] ?? '';
+      const secondPart = dateParts[1] ?? '';
+      const thirdPart = dateParts[2] ?? '';
+
       return (
         <>
-          {firstPart} {secondPart}
-          <br />
-          {thirdPart}
+          {firstPart}{' '}
+          {secondPart && !thirdPart && <><br />{secondPart}{' '}</>}
+          {secondPart && thirdPart && `, ${secondPart} `}
+          {thirdPart && (
+            <>
+              <br />
+              {thirdPart}
+            </>
+          )}
         </>
       );
     };
@@ -162,9 +174,13 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         color = 'rgb(220, 81, 72)';
         background = 'rgba(192, 113, 113, 0.29)';
         break;
+      case 'PENDING':
+        color = theme.palette.mode === 'dark' ? 'rgb(56,56,56)' : 'rgb(0,0,0)';
+        background = 'rgb(128,128,128)';
+        break;
       default: // Unknown status fow unknown expectation score
-        color = 'rgb(202,203,206)';
-        background = 'rgba(128,128,128, 0.5)';
+        color = theme.palette.mode === 'dark' ? 'rgb(250,250,250)' : 'rgb(0,0,0)';
+        background = 'rgba(128,127,127,0.37)';
         break;
     }
     return { color, background };
@@ -233,6 +249,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         status: result.target_result_response_status,
       }));
       const mergedSteps: Steptarget[] = [...initialSteps, ...newSteps];
+      mergedSteps.sort((a, b) => a.type.localeCompare(b.type));
       setSteps(mergedSteps);
     }
   }, [targetresults]);
@@ -245,6 +262,15 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
       groupedResults[type] = [];
     }
     groupedResults[type].push(result);
+  });
+
+  // Sort the keys alphabetically
+  const sortedKeys = Object.keys(groupedResults).sort();
+
+  // Map over the sorted keys to retrieve the sorted results
+  const sortedGroupedResults: Record<string, ExpectationResultOutput[]> = {};
+  sortedKeys.forEach((key) => {
+    sortedGroupedResults[key] = groupedResults[key];
   });
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -277,13 +303,13 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         <Tabs value={activeTab} onChange={handleTabChange} indicatorColor="primary"
           textColor="primary" className={classes.tabs}
         >
-          {Object.keys(groupedResults).map((type, index) => (
+          {Object.keys(sortedGroupedResults).map((type, index) => (
             <Tab key={index} label={t(`TYPE_${type}`)}/>
           ))}
         </Tabs>
-        {Object.keys(groupedResults).map((targetResult, index) => (
+        {Object.keys(sortedGroupedResults).map((targetResult, index) => (
           <div key={index} hidden={activeTab !== index}>
-            {renderLogs(groupedResults[targetResult])}
+            {renderLogs(sortedGroupedResults[targetResult])}
           </div>
         ))}
       </Box>

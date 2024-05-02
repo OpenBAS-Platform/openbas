@@ -6,6 +6,7 @@ import { Chip, Slide } from '@mui/material';
 import { hexToRGB } from '../utils/Colors';
 import { useFormatter } from './i18n';
 import { useHelper } from '../store';
+import { truncate } from '../utils/String';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -70,7 +71,7 @@ const ItemTags = (props) => {
               key={tag.tag_id}
               variant="outlined"
               classes={{ root: style }}
-              label={tag.tag_name}
+              label={truncate(tag.tag_name, 10)}
               style={{
                 color: tag.tag_color,
                 borderColor: tag.tag_color,
