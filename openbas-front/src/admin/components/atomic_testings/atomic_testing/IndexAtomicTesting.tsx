@@ -43,7 +43,7 @@ const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutp
   }
   return (
     <div>
-      <Breadcrumbs variant="object"elements={[
+      <Breadcrumbs variant="object" elements={[
         { label: t('Atomic testings'), link: '/admin/atomic_testings' },
         { label: atomic.atomic_title, current: true },
       ]}
