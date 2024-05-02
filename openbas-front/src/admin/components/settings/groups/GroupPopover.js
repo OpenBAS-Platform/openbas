@@ -185,13 +185,13 @@ class GroupPopover extends Component {
     if (isChecked) {
       this.props
         .addGrant(this.props.group.group_id, data)
-        .then(this.fetchAndUpdateGroup);
+        .then(this.fetchAndUpdateGroup.bind(this));
     }
     // the grand does not exist
     if (!isChecked && grantId !== null) {
       this.props
         .deleteGrant(this.props.group.group_id, grantId)
-        .then(this.fetchAndUpdateGroup);
+        .then(this.fetchAndUpdateGroup.bind(this));
     }
   }
 
