@@ -1,14 +1,8 @@
 package io.openbas.config;
 
-import io.openbas.database.model.User;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
+import io.openbas.database.model.User;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSessionEvent;
 import jakarta.servlet.http.HttpSessionListener;
@@ -16,8 +10,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
-
-import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
 @Configuration
 public class SessionManager {
@@ -92,8 +91,7 @@ public class SessionManager {
               oAuth2User, oAuth2User.getAuthorities(), oauth.getAuthorizedClientRegistrationId());
           securityContext.setAuthentication(newAuth);
         } else if (authentication instanceof PreAuthenticatedAuthenticationToken) {
-          Authentication newAuth = new PreAuthenticatedAuthenticationToken(
-              databaseUser, databaseUser.getPassword(), user.getAuthorities());
+          Authentication newAuth = new PreAuthenticatedAuthenticationToken(user, databaseUser.getPassword(), user.getAuthorities());
           securityContext.setAuthentication(newAuth);
         }
         // TODO ADD SAML2
