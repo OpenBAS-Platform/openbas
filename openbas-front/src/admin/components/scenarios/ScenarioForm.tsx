@@ -17,6 +17,17 @@ interface Props {
   initialValues?: ScenarioInput;
 }
 
+export const scenarioCategories = new Map([
+  ['global-crisis', 'Global Crisis'],
+  ['attack-scenario', 'Attack Scenario'],
+  ['media-pressure', 'Media Pressure'],
+  ['data-exfiltration', 'Data Exfiltration'],
+  ['capture-the-flag', 'Capture The Flag'],
+  ['vulnerability-exploitation', 'Vulnerability Exploitation'],
+  ['lateral-movement', 'Lateral Movement'],
+  ['url-filtering', 'URL Filtering'],
+]);
+
 const ScenarioForm: FunctionComponent<Props> = ({
   onSubmit,
   handleClose,
@@ -80,30 +91,11 @@ const ScenarioForm: FunctionComponent<Props> = ({
         control={control}
         defaultValue={initialValues.scenario_category}
       >
-        <MenuItem key="global-crisis" value="global-crisis">
-          {t('Global Crisis')}
-        </MenuItem>
-        <MenuItem key="attack-scenario" value="attack-scenario">
-          {t('Attack Scenario')}
-        </MenuItem>
-        <MenuItem key="media-pressure" value="media-pressure">
-          {t('Media Pressure')}
-        </MenuItem>
-        <MenuItem key="data-exfiltration" value="data-exfiltration">
-          {t('Data Exfiltration')}
-        </MenuItem>
-        <MenuItem key="capture-the-flag" value="capture-the-flag">
-          {t('Capture The Flag')}
-        </MenuItem>
-        <MenuItem key="vulnerability-exploitation" value="vulnerability-exploitation">
-          {t('Vulnerability Exploitation')}
-        </MenuItem>
-        <MenuItem key="lateral-movement" value="lateral-movement">
-          {t('Lateral Movement')}
-        </MenuItem>
-        <MenuItem key="url-filtering" value="url-filtering">
-          {t('URL Filtering')}
-        </MenuItem>
+        {Array.from(scenarioCategories).map(([key, value]) => (
+          <MenuItem key={key} value={key}>
+            {t(value)}
+          </MenuItem>
+        ))}
       </SelectField>
       <SelectField
         variant="standard"

@@ -9,7 +9,7 @@ import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { KillChainPhase } from '../../../../utils/api-types';
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
-import type { ExerciseInjectExpectationResultsByTypeStore } from '../../../../actions/exercises/Exercise';
+import type { InjectExpectationResultsByAttackPatternStore } from '../../../../actions/exercises/Exercise';
 import KillChainPhaseColumn from './KillChainPhaseColumn';
 
 const useStyles = makeStyles(() => ({
@@ -22,7 +22,7 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   goToLink?: string;
-  injectResults: ExerciseInjectExpectationResultsByTypeStore[];
+  injectResults: InjectExpectationResultsByAttackPatternStore[];
 }
 
 const MitreMatrix: FunctionComponent<Props> = ({

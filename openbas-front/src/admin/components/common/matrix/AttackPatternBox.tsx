@@ -3,7 +3,7 @@ import { Button, ListItemText, Menu, MenuItem, Typography } from '@mui/material'
 import React, { FunctionComponent, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import type { AttackPattern } from '../../../../utils/api-types';
-import type { ExerciseInjectExpectationResultsByTypeStore, InjectExpectationResultsByTypeStore } from '../../../../actions/exercises/Exercise';
+import type { InjectExpectationResultsByAttackPatternStore, InjectExpectationResultsByTypeStore } from '../../../../actions/exercises/Exercise';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface AttackPatternBoxProps {
   goToLink?: string;
   attackPattern: AttackPattern;
-  injectResult: ExerciseInjectExpectationResultsByTypeStore | undefined;
+  injectResult: InjectExpectationResultsByAttackPatternStore | undefined;
 }
 
 const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({

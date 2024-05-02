@@ -7,7 +7,7 @@ import { useAppDispatch } from '../../utils/hooks';
 import { useHelper } from '../../store';
 import useDataLoader from '../../utils/ServerSideEvent';
 import { fetchStatistics } from '../../actions/Application';
-import type { PlatformStatistic, StatisticsHelper } from '../../actions/statistics/statistics-helper';
+import type { StatisticsHelper } from '../../actions/statistics/statistics-helper';
 import ResponsePie from './atomic_testings/atomic_testing/ResponsePie';
 import MitreMatrix from './common/matrix/MitreMatrix';
 import Empty from '../../components/Empty';
@@ -18,7 +18,7 @@ const Dashboard = () => {
   const dispatch = useAppDispatch();
 
   // Fetching data
-  const statistics: PlatformStatistic | undefined = useHelper((helper: StatisticsHelper) => helper.getStatistics());
+  const statistics = useHelper((helper: StatisticsHelper) => helper.getStatistics());
   useDataLoader(() => {
     dispatch(fetchStatistics());
   });
