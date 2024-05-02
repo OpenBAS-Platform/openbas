@@ -3,6 +3,7 @@ package io.openbas.atomic_testing;
 import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.atomic_testing.AtomicTestingMapper.ResultDistribution;
 import io.openbas.atomic_testing.form.InjectTargetWithResult;
+import io.openbas.database.model.Asset;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
@@ -151,6 +152,8 @@ public class AtomicTestingUtils {
               .toList()
       );
     }
+
+    List<InjectTargetWithResult> assetsToRemove = new ArrayList<>();
     if (!assetGroupExpectations.isEmpty()) {
       targets.addAll(assetGroupExpectations
           .stream()
@@ -164,8 +167,6 @@ public class AtomicTestingUtils {
           .map(entry -> {
             List<InjectTargetWithResult> children = new ArrayList<>();
 
-            if (assetsToRefine != null) {
-              List<InjectTargetWithResult> assetsToRemove = new ArrayList<>();
               for (InjectTargetWithResult asset : assetsToRefine) {
                 boolean found = entry.getKey().getAssets().stream()
                     .anyMatch(assetChild -> assetChild.getId().equals(asset.getId()));
@@ -174,8 +175,6 @@ public class AtomicTestingUtils {
                   assetsToRemove.add(asset);
                 }
               }
-              assetsToRefine.removeAll(assetsToRemove);
-            }
 
             entry.getKey().getAssets().forEach(asset -> {
               boolean found = children.stream()
@@ -195,6 +194,17 @@ public class AtomicTestingUtils {
           .toList());
     }
 
+    List<String> injectAssetIds = inject.getAssets().stream()
+        .map(Asset::getId)
+        .collect(Collectors.toList());
+
+    assetsToRefine.removeAll(
+        assetsToRemove
+            .stream()
+            .filter(
+                asset->!injectAssetIds.contains(asset.getId()))
+            .toList());
+
     targets.addAll(assetsToRefine);
     return sortResults(targets);
   }
@@ -205,7 +215,7 @@ public class AtomicTestingUtils {
 
   @NotNull
   private static List<ExpectationResultsByType> getDefaultExpectationResultsByTypes() {
-    List<ExpectationType> types = List.of(ExpectationType.DETECTION, ExpectationType.HUMAN_RESPONSE, ExpectationType.PREVENTION);
+    List<ExpectationType> types = List.of(ExpectationType.PREVENTION, ExpectationType.DETECTION, ExpectationType.HUMAN_RESPONSE);
     return types.stream()
         .map(type -> getExpectationByType(type, Collections.emptyList()))
         .filter(Optional::isPresent)
@@ -215,15 +225,15 @@ public class AtomicTestingUtils {
 
   @NotNull
   public static List<ExpectationResultsByType> getExpectationResultByTypes(final List<InjectExpectation> expectations) {
+    List<Integer> preventionScores = getScores(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
     List<Integer> detectionScores = getScores(List.of(EXPECTATION_TYPE.DETECTION), expectations);
     List<Integer> humanScores = getScores(List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL), expectations);
-    List<Integer> preventionScores = getScores(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
 
     List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
 
+    getExpectationByType(ExpectationType.PREVENTION, preventionScores).map(resultAvgOfExpectations::add);
     getExpectationByType(ExpectationType.DETECTION, detectionScores).map(resultAvgOfExpectations::add);
     getExpectationByType(ExpectationType.HUMAN_RESPONSE, humanScores).map(resultAvgOfExpectations::add);
-    getExpectationByType(ExpectationType.PREVENTION, preventionScores).map(resultAvgOfExpectations::add);
 
     return resultAvgOfExpectations;
   }
