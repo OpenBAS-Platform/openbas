@@ -76,7 +76,7 @@ const AtomicTesting = () => {
               small
               onChange={filtering.handleSearch}
               keyword={filtering.keyword}
-              placeholder={'Search by target name'}
+              placeholder={t('Search by target name')}
             />
           </div>
           {sortedTargets.length > 0 ? (

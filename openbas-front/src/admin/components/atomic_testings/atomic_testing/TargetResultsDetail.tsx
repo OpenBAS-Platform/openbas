@@ -264,7 +264,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
                     style={index >= 2 ? getCircleColor(step.status!) : {}}
                   >
                     {getStepIcon(index, step.type!, step.status!)}
-                    <Typography className={classes.circleLabel}>{step.label}</Typography>
+                    <Typography className={classes.circleLabel}>{t(step.label)}</Typography>
                   </div>
                 )}
               />

@@ -50,7 +50,7 @@ const Detail: FunctionComponent<Props> = () => {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12} style={{ marginBottom: 30 }}>
-        <Typography variant="h4">Configuration</Typography>
+        <Typography variant="h4">{t('Configuration')}</Typography>
         {atomicDetail ? (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <div className={classes.flexContainer}>
@@ -103,7 +103,7 @@ const Detail: FunctionComponent<Props> = () => {
         )}
       </Grid>
       <Grid item xs={12}>
-        <Typography variant="h4">Execution logs</Typography>
+        <Typography variant="h4">{t('Execution logs')}</Typography>
         {atomicDetail ? (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Typography variant="subtitle1" className={classes.header} gutterBottom>
