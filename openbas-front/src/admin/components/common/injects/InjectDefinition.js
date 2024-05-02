@@ -1558,7 +1558,7 @@ class InjectDefinition extends Component {
                                 event.preventDefault();
                                 this.toggleAttachment(document.document_id);
                               }}
-                              disabled={this.props.permissions.readOnly || fieldAttachements.readOnly || !hasAttachments}
+                              disabled={this.props.permissions.readOnly || (hasAttachments && fieldAttachements.readOnly) || !hasAttachments}
                             />
                           </div>
                         </>
@@ -1571,7 +1571,7 @@ class InjectDefinition extends Component {
                         onRemoveDocument={this.handleRemoveDocument.bind(this)}
                         onToggleAttach={hasAttachments ? this.toggleAttachment.bind(this) : null}
                         attached={document.document_attached}
-                        disabled={this.props.permissions.readOnly || fieldAttachements.readOnly}
+                        disabled={this.props.permissions.readOnly || (hasAttachments && fieldAttachements.readOnly)}
                       />
                     </ListItemSecondaryAction>
                   </ListItem>

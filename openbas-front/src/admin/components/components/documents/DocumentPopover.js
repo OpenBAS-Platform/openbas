@@ -148,9 +148,9 @@ const DocumentPopover = (props) => {
         open={Boolean(anchorEl)}
         onClose={handlePopoverClose}
       >
-        <MenuItem onClick={handleOpenEdit}>
+        {onUpdate && <MenuItem onClick={handleOpenEdit}>
           {t('Update')}
-        </MenuItem>
+        </MenuItem>}
         {onToggleAttach && (
           <MenuItem onClick={handleToggleAttachement}>
             {attached ? t('Disable attachment') : t('Enable attachment')}
