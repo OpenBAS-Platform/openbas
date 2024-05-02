@@ -84,6 +84,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   const [activeTab, setActiveTab] = useState(0);
   const [steps, setSteps] = useState<Steptarget[]>([]);
   const initialSteps = [{ label: 'Attack started', type: '' }, { label: 'Attack ended', type: '' }];
+  const sortOrder = ['PREVENTION', 'DETECTION', 'HUMAN_RESPONSE'];
   // Fetching data
   const { targetresults }: {
     targetresults: ExpectationResultOutput[],
@@ -175,11 +176,11 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         background = 'rgba(192, 113, 113, 0.29)';
         break;
       case 'PENDING':
-        color = theme.palette.mode === 'dark' ? 'rgb(56,56,56)' : 'rgb(0,0,0)';
+        color = theme.palette.mode === 'dark' ? 'rgb(231,231,231)' : 'rgb(0,0,0)';
         background = 'rgb(128,128,128)';
         break;
       default: // Unknown status fow unknown expectation score
-        color = theme.palette.mode === 'dark' ? 'rgb(250,250,250)' : 'rgb(0,0,0)';
+        color = theme.palette.mode === 'dark' ? 'rgb(231,231,231)' : 'rgb(0,0,0)';
         background = 'rgba(128,127,127,0.37)';
         break;
     }
@@ -249,10 +250,17 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         status: result.target_result_response_status,
       }));
       const mergedSteps: Steptarget[] = [...initialSteps, ...newSteps];
-      mergedSteps.sort((a, b) => a.type.localeCompare(b.type));
+
+      // Custom sorting function
+      mergedSteps.sort((a, b) => {
+        const typeAIndex = sortOrder.indexOf(a.type);
+        const typeBIndex = sortOrder.indexOf(b.type);
+        return typeAIndex - typeBIndex;
+      });
+
       setSteps(mergedSteps);
     }
-  }, [targetresults]);
+  }, [steps, targetresults]);
 
   // Define Tabs
   const groupedResults: Record<string, ExpectationResultOutput[]> = {};
@@ -264,10 +272,10 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     groupedResults[type].push(result);
   });
 
-  // Sort the keys alphabetically
-  const sortedKeys = Object.keys(groupedResults).sort();
+  const sortedKeys = Object.keys(groupedResults).sort((a, b) => {
+    return sortOrder.indexOf(a) - sortOrder.indexOf(b);
+  });
 
-  // Map over the sorted keys to retrieve the sorted results
   const sortedGroupedResults: Record<string, ExpectationResultOutput[]> = {};
   sortedKeys.forEach((key) => {
     sortedGroupedResults[key] = groupedResults[key];

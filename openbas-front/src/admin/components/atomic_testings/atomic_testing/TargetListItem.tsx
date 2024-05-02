@@ -60,7 +60,7 @@ const TargetListItem: React.FC<Props> = ({ isChild, onClick, target }) => {
         sx={style}
         key={target?.id}
       >
-        <ListItemButton onClick={handleItemClick}>
+        <ListItemButton onClick={handleItemClick} style={{ marginBottom: 15 }}>
           <ListItemText
             primary={
               <div>
