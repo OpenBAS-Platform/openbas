@@ -156,7 +156,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
       <div style={{ marginTop: 50 }}>
         <ExerciseList exercises={scenarioExercises} withoutSearch={true} />
       </div>
-      {scenarioExercises.length === 0 && (
+      {(scenarioExercises ?? 0).length === 0 && (
         <div style={{ marginTop: 100, textAlign: 'center' }}>
           <div style={{ fontSize: 20 }}>
             {t('This scenario has never run, schedule or run it now!')}

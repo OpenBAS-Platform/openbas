@@ -34,6 +34,9 @@ public class CalderaInjectorConfig {
   @NotBlank
   private String url;
 
+  @NotBlank
+  private String publicUrl;
+
   @Getter
   @NotBlank
   private String apiKey;
@@ -52,5 +55,9 @@ public class CalderaInjectorConfig {
 
   public String getUrl() {
     return url;
+  }
+
+  public String getPublicUrl() {
+    return publicUrl;
   }
 }

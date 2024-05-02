@@ -196,7 +196,7 @@ public class PlatformSettingsApi extends RestBehavior {
             platformSettings.setAiHasToken(!aiConfig.getToken().isBlank());
             platformSettings.setAiType(aiConfig.getType());
             platformSettings.setAiModel(aiConfig.getModel());
-            platformSettings.setCalderaUrl(calderaInjectorConfig.getUrl());
+            platformSettings.setCalderaPublicUrl(calderaInjectorConfig.getPublicUrl());
 
             // Build admin settings
             if (user.isAdmin()) {

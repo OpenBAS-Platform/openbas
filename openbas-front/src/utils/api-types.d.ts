@@ -1833,7 +1833,7 @@ export interface PlatformSettings {
   platform_saml2_providers?: OAuthProvider[];
   auth_local_enable?: boolean;
   auth_openid_enable?: boolean;
-  caldera_url?: string;
+  caldera_public_url?: string;
   java_version?: string;
   map_tile_server_dark?: string;
   map_tile_server_light?: string;
@@ -2074,7 +2074,7 @@ export interface SearchPaginationInput {
   /**
    * Element number by page
    * @format int32
-   * @max 100
+   * @max 1000
    */
   size?: number;
   /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
