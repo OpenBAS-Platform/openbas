@@ -261,7 +261,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
 
       setSteps(mergedSteps);
     }
-  }, [targetresults]);
+  }, [steps, targetresults]);
 
   // Define Tabs
   const groupedResults: Record<string, ExpectationResultOutput[]> = {};
