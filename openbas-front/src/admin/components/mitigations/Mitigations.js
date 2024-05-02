@@ -14,7 +14,7 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { fetchAttackPatterns } from '../../../actions/AttackPattern';
-import { fetchKillChainPhases } from '../../../actions/KillChainPhase.js';
+import { fetchKillChainPhases } from '../../../actions/KillChainPhase';
 
 const useStyles = makeStyles(() => ({
   container: {
