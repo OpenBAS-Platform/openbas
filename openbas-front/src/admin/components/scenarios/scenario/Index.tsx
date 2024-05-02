@@ -91,7 +91,13 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
     <PermissionsContext.Provider value={permissionsContext}>
       <DocumentContext.Provider value={documentContext}>
         <>
-          <Breadcrumbs variant="object" elements={[{ label: t('Scenarios') }, { label: scenario.scenario_name, current: true }]} />
+          <Breadcrumbs
+            variant="list"
+            elements={[
+              { label: t('Scenarios'), link: '/admin/scenarios' },
+              { label: scenario.scenario_name, current: true },
+            ]}
+          />
           <ScenarioHeader
             setCronExpression={setCronExpression}
             setParsedCronExpression={setParsedCronExpression}
