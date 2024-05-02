@@ -84,6 +84,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   const [activeTab, setActiveTab] = useState(0);
   const [steps, setSteps] = useState<Steptarget[]>([]);
   const initialSteps = [{ label: 'Attack started', type: '' }, { label: 'Attack ended', type: '' }];
+  const sortOrder = ['PREVENTION', 'DETECTION', 'HUMAN_RESPONSE'];
   // Fetching data
   const { targetresults }: {
     targetresults: ExpectationResultOutput[],
@@ -249,8 +250,6 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         status: result.target_result_response_status,
       }));
       const mergedSteps: Steptarget[] = [...initialSteps, ...newSteps];
-      // Define the sorting order
-      const sortOrder = ['PREVENTION', 'DETECTION', 'HUMAN_RESPONSE'];
 
       // Custom sorting function
       mergedSteps.sort((a, b) => {
@@ -272,8 +271,6 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     }
     groupedResults[type].push(result);
   });
-
-  const sortOrder = ['PREVENTION', 'DETECTION', 'HUMAN_RESPONSE'];
 
   const sortedKeys = Object.keys(groupedResults).sort((a, b) => {
     return sortOrder.indexOf(a) - sortOrder.indexOf(b);
