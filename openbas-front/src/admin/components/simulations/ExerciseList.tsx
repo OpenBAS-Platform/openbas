@@ -69,12 +69,12 @@ const headerStyles: Record<string, CSSProperties> = {
     fontWeight: '700',
   },
   exercise_status: {
-    width: '15%',
+    width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
   exercise_tags: {
-    width: '10%',
+    width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -104,13 +104,13 @@ const inlineStyles: Record<string, CSSProperties> = {
     textOverflow: 'ellipsis',
   },
   exercise_status: {
-    width: '15%',
+    width: '10%',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
   exercise_tags: {
-    width: '10%',
+    width: '15%',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -279,7 +279,7 @@ const ExerciseList: FunctionComponent<Props> = ({
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.exercise_start_date}
+                    style={inlineStyles.exercise_status}
                   >
                     <ExerciseStatus
                       variant="list"

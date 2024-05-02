@@ -111,12 +111,23 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     const formatDate = (date: string) => {
       const dateString = nsdt(date);
       if (!dateString) return '';
-      const [firstPart, secondPart, thirdPart] = dateString.split(', ');
+
+      const dateParts = dateString.split(', ');
+      const firstPart = dateParts[0] ?? '';
+      const secondPart = dateParts[1] ?? '';
+      const thirdPart = dateParts[2] ?? '';
+
       return (
         <>
-          {firstPart} {secondPart}
-          <br />
-          {thirdPart}
+          {firstPart}{' '}
+          {secondPart && !thirdPart && <><br />{secondPart}{' '}</>}
+          {secondPart && thirdPart && `, ${secondPart} `}
+          {thirdPart && (
+            <>
+              <br />
+              {thirdPart}
+            </>
+          )}
         </>
       );
     };

@@ -60,6 +60,12 @@ const ItemTags = (props) => {
     const allTags = helper.getTags() ?? [];
     return allTags.filter((tag) => (tags ?? []).includes(tag.tag_id));
   });
+  const truncateText = (text, limit) => {
+    if (text.length > limit) {
+      return `${text.slice(0, limit)}...`;
+    }
+    return text;
+  };
   const orderedTags = R.sortWith([R.ascend(R.prop('tag_name'))], resolvedTags);
   return (
     <div>
@@ -70,7 +76,7 @@ const ItemTags = (props) => {
               key={tag.tag_id}
               variant="outlined"
               classes={{ root: style }}
-              label={tag.tag_name}
+              label={truncateText(tag.tag_name, 10)}
               style={{
                 color: tag.tag_color,
                 borderColor: tag.tag_color,
