@@ -1,13 +1,5 @@
 import React, { useContext } from 'react';
-
-export interface Settings {
-  xtm_opencti_enable?: boolean | null;
-  xtm_opencti_url?: string | null;
-  platform_enterprise_edition?: string | null;
-  platform_ai_enabled?: boolean | null;
-  platform_ai_has_token?: boolean | null;
-  caldera_url?: string | null;
-}
+import type { PlatformSettings } from '../api-types';
 
 export interface User {
   id?: string | null,
@@ -15,7 +7,7 @@ export interface User {
 
 export interface UserContextType {
   me: User;
-  settings: Settings | undefined;
+  settings: PlatformSettings | undefined;
 }
 
 const defaultContext = {

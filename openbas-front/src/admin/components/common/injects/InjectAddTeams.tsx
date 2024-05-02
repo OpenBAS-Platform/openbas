@@ -107,9 +107,9 @@ const InjectAddTeams: FunctionComponent<Props> = ({
     handleClose();
   };
 
-  const onCreate = async (result: string) => {
-    addTeam(result);
-    await onAddTeam?.(result);
+  const onCreate = async (result: TeamStore) => {
+    addTeam(result.team_id);
+    await onAddTeam?.(result.team_id);
   };
 
   const filterByKeyword = (n: TeamStore) => keyword === ''

@@ -6,7 +6,7 @@ import { useFormatter } from '../../../../components/i18n';
 import Dialog from '../../../../components/common/Dialog';
 import type { Theme } from '../../../../components/Theme';
 import { Option } from '../../../../utils/Option';
-import type { TeamInputForm } from '../../../../actions/teams/Team';
+import type { TeamInputForm, TeamStore } from '../../../../actions/teams/Team';
 import TeamForm from './TeamForm';
 import type { TeamCreateInput } from '../../../../utils/api-types';
 import { addTeam } from '../../../../actions/teams/team-actions';
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface CreateTeamProps {
   inline?: boolean;
-  onCreate: (result: string) => void;
+  onCreate: (result: TeamStore) => void;
 }
 
 const CreateTeam: FunctionComponent<CreateTeamProps> = ({
@@ -54,9 +54,10 @@ const CreateTeam: FunctionComponent<CreateTeamProps> = ({
     } else {
       value = await dispatch(addTeam(inputValues));
     }
-    if (value.result) {
+    if (value.entities) {
       if (onCreate) {
-        onCreate(value.result);
+        const created = value.entities.teams[value.result];
+        onCreate(created);
       }
       handleClose();
     }

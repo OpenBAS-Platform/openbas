@@ -3,7 +3,6 @@ import TeamsComponent from '../components/teams/Teams';
 import { PermissionsContext, PermissionsContextType, TeamContext, type TeamContextType } from '../common/Context';
 import { useHelper } from '../../../store';
 import type { UsersHelper } from '../../../actions/helper';
-import CreateTeam from '../components/teams/CreateTeam';
 import type { TeamStore } from '../../../actions/teams/Team';
 import type { Team, User } from '../../../utils/api-types';
 import type { TeamsHelper } from '../../../actions/teams/team-helper';
@@ -43,7 +42,6 @@ const Teams = () => {
     <PermissionsContext.Provider value={permissionsContext}>
       <TeamContext.Provider value={teamContext}>
         <TeamsComponent />
-        {(user.user_is_planner && (<CreateTeam onCreate={() => {}}/>))}
       </TeamContext.Provider>
     </PermissionsContext.Provider>
   );

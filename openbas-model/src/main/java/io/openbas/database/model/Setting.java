@@ -15,6 +15,7 @@ public class Setting implements Base {
     public enum SETTING_KEYS {
         PLATFORM_NAME("platform_name", "OpenBAS - Breach and Attack Simulation Platform"),
         PLATFORM_ENTERPRISE_EDITION("platform_enterprise_edition", "false"),
+        PLATFORM_WHITEMARK("platform_whitemark", "false"),
         DEFAULT_THEME("platform_theme", "dark"),
         DEFAULT_LANG("platform_lang", "auto");
 
