@@ -239,8 +239,8 @@ const Teams = () => {
               <TeamPopover
                 team={team}
                 managePlayers={() => setSelectedTeam(team.team_id)}
-                onUpdate={(result) => setTeams(teams.map((t) => (t.team_id !== result.team_id ? t : result)))}
-                onDelete={(result) => setTeams(teams.filter((t) => (t.team_id !== result)))}
+                onUpdate={(result) => setTeams(teams.map((v) => (v.team_id !== result.team_id ? v : result)))}
+                onDelete={(result) => setTeams(teams.filter((v) => (v.team_id !== result)))}
                 openEditOnInit={team.team_id === searchId}
               />
             </ListItemSecondaryAction>

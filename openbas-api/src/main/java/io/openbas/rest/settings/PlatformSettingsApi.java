@@ -9,6 +9,7 @@ import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.settings.form.SettingsEnterpriseEditionUpdateInput;
+import io.openbas.rest.settings.form.SettingsPlatformWhitemarkUpdateInput;
 import io.openbas.rest.settings.form.SettingsUpdateInput;
 import io.openbas.rest.settings.form.ThemeInput;
 import io.openbas.rest.settings.response.OAuthProvider;
@@ -181,6 +182,9 @@ public class PlatformSettingsApi extends RestBehavior {
             platformSettings.setPlatformEnterpriseEdition(
                     ofNullable(dbSettings.get(PLATFORM_ENTERPRISE_EDITION.key())).map(Setting::getValue).orElse(PLATFORM_ENTERPRISE_EDITION.defaultValue())
             );
+            platformSettings.setPlatformWhitemark(
+                ofNullable(dbSettings.get(PLATFORM_WHITEMARK.key())).map(Setting::getValue).orElse(PLATFORM_WHITEMARK.defaultValue())
+            );
             platformSettings.setMapTileServerLight(openBASConfig.getMapTileServerLight());
             platformSettings.setMapTileServerDark(openBASConfig.getMapTileServerDark());
             platformSettings.setPlatformName(
@@ -248,6 +252,16 @@ public class PlatformSettingsApi extends RestBehavior {
         Map<String, Setting> dbSettings = mapOfSettings();
         List<Setting> settingsToSave = new ArrayList<>();
         settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_ENTERPRISE_EDITION.key(), input.getEnterpriseEdition()));
+        settingRepository.saveAll(settingsToSave);
+        return settings();
+    }
+
+    @Secured(ROLE_ADMIN)
+    @PutMapping("/api/settings/platform_whitemark")
+    public PlatformSettings updateSettingsPlatformWhitemark(@Valid @RequestBody SettingsPlatformWhitemarkUpdateInput input) {
+        Map<String, Setting> dbSettings = mapOfSettings();
+        List<Setting> settingsToSave = new ArrayList<>();
+        settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_WHITEMARK.key(), input.getPlatformWhitemark()));
         settingRepository.saveAll(settingsToSave);
         return settings();
     }

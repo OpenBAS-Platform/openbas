@@ -38,6 +38,7 @@ import logoFiligranLight from '../../../static/images/logo_filigran_light.png';
 import logoFiligranTextDark from '../../../static/images/logo_filigran_text_dark.png';
 import logoFiligranTextLight from '../../../static/images/logo_filigran_text_light.png';
 import useDimensions from '../../../utils/hooks/useDimensions';
+import useAuth from '../../../utils/hooks/useAuth';
 
 type entry = {
   type?: string,
@@ -138,6 +139,9 @@ const StyledTooltip = styled(({ className, ...props }) => (
 }));
 
 const LeftBar = () => {
+  const {
+    settings: { platform_whitemark, platform_enterprise_edition },
+  } = useAuth();
   const theme = useTheme<Theme>();
   const location = useLocation();
   const navigate = useNavigate();
@@ -619,32 +623,34 @@ const LeftBar = () => {
       </div>
       <div style={{ marginTop: 'auto' }}>
         <MenuList component="nav">
-          <MenuItem
-            dense={true}
-            classes={{
-              root: navOpen ? classes.menuLogoOpen : classes.menuLogo,
-            }}
-            onClick={() => window.open('https://filigran.io/', '_blank')}
-          >
-            <Tooltip title={'By Filigran'}>
-              <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
-                <img
-                  src={fileUri(theme.palette.mode === 'dark' ? logoFiligranDark : logoFiligranLight)}
-                  alt="logo"
-                  width={20}
-                />
-              </ListItemIcon>
-            </Tooltip>
-            {navOpen && (
-              <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20, padding: '4px 0 0 15px' }}>
-                <img
-                  src={fileUri(theme.palette.mode === 'dark' ? logoFiligranTextDark : logoFiligranTextLight)}
-                  alt="logo"
-                  width={50}
-                />
-              </ListItemIcon>
-            )}
-          </MenuItem>
+          {(platform_whitemark === 'false' || platform_enterprise_edition === 'false') && (
+            <MenuItem
+              dense={true}
+              classes={{
+                root: navOpen ? classes.menuLogoOpen : classes.menuLogo,
+              }}
+              onClick={() => window.open('https://filigran.io/', '_blank')}
+            >
+              <Tooltip title={'By Filigran'}>
+                <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
+                  <img
+                    src={fileUri(theme.palette.mode === 'dark' ? logoFiligranDark : logoFiligranLight)}
+                    alt="logo"
+                    width={20}
+                  />
+                </ListItemIcon>
+              </Tooltip>
+              {navOpen && (
+                <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20, padding: '4px 0 0 15px' }}>
+                  <img
+                    src={fileUri(theme.palette.mode === 'dark' ? logoFiligranTextDark : logoFiligranTextLight)}
+                    alt="logo"
+                    width={50}
+                  />
+                </ListItemIcon>
+              )}
+            </MenuItem>
+          )}
           <MenuItem
             dense={true}
             classes={{

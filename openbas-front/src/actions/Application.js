@@ -19,6 +19,14 @@ export const updatePlatformEnterpriseEditionParameters = (data) => (dispatch) =>
   )(dispatch);
 };
 
+export const updatePlatformWhitemarkParameters = (data) => (dispatch) => {
+  return putReferential(
+    schema.platformParameters,
+    '/api/settings/platform_whitemark',
+    data,
+  )(dispatch);
+};
+
 export const fetchPlatformParameters = () => (dispatch) => {
   return getReferential(schema.platformParameters, '/api/settings')(dispatch);
 };
