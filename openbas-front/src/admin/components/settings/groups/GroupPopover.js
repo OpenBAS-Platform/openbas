@@ -172,20 +172,26 @@ class GroupPopover extends Component {
     this.setState({ tabSelect: tabKey });
   }
 
+  fetchAndUpdateGroup() {
+    this.props.fetchGroup(this.props.group.group_id).then((result) => {
+      if (this.props.onUpdate) {
+        this.props.onUpdate(result.entities.groups[this.props.group.group_id]);
+      }
+    });
+  }
+
   handleGrantCheck(data, grantId, event) {
     const isChecked = event.target.checked;
     if (isChecked) {
       this.props
         .addGrant(this.props.group.group_id, data)
-        .then(() => {
-          this.props.fetchGroup(this.props.group.group_id);
-        });
+        .then(this.fetchAndUpdateGroup);
     }
     // the grand does not exist
     if (!isChecked && grantId !== null) {
-      this.props.deleteGrant(this.props.group.group_id, grantId).then(() => {
-        this.props.fetchGroup(this.props.group.group_id);
-      });
+      this.props
+        .deleteGrant(this.props.group.group_id, grantId)
+        .then(this.fetchAndUpdateGroup);
     }
   }
 
