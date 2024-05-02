@@ -81,7 +81,7 @@ const AtomicTesting = () => {
           </div>
           {sortedTargets.length > 0 ? (
             <List>
-              {sortedTargets.map((target) => <div key={target?.id} style={{ marginBottom: 10 }}>
+              {sortedTargets.map((target) => <div key={target?.id} style={{ marginBottom: 15 }}>
                 <Paper elevation={3} >
                   <TargetListItem onClick={handleTargetClick} target={target}/>
                 </Paper>
