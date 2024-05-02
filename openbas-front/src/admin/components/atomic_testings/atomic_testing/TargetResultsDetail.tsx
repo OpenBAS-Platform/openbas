@@ -176,11 +176,11 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         background = 'rgba(192, 113, 113, 0.29)';
         break;
       case 'PENDING':
-        color = theme.palette.mode === 'dark' ? 'rgb(255,255,255)' : 'rgb(0,0,0)';
+        color = theme.palette.mode === 'dark' ? 'rgb(231,231,231)' : 'rgb(0,0,0)';
         background = 'rgb(128,128,128)';
         break;
       default: // Unknown status fow unknown expectation score
-        color = theme.palette.mode === 'dark' ? 'rgb(250,250,250)' : 'rgb(0,0,0)';
+        color = theme.palette.mode === 'dark' ? 'rgb(231,231,231)' : 'rgb(0,0,0)';
         background = 'rgba(128,127,127,0.37)';
         break;
     }
