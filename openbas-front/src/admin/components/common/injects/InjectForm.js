@@ -88,7 +88,7 @@ class InjectForm extends Component {
           disabled={disabled}
         />
         <div className={disabled ? classes.durationDisabled : classes.duration}>
-          <div className={disabled ? classes.triggerDisabled : classes.trigger }>{t('Trigger after')}</div>
+          <div className={disabled ? classes.triggerDisabled : classes.trigger}>{t('Trigger after')}</div>
           <OldTextField
             variant="standard"
             name="inject_depends_duration_days"
@@ -123,7 +123,6 @@ InjectForm.propTypes = {
   classes: PropTypes.object,
   t: PropTypes.func,
   tPick: PropTypes.func,
-  onSubmit: PropTypes.func.isRequired,
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
   injectorContractsMap: PropTypes.object,

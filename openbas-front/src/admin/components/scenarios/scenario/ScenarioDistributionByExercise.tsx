@@ -28,9 +28,9 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
         exercise_name: 'fake',
         exercise_start_date: now.toISOString(),
         exercise_global_score: [
-          { type: 'PREVENTION', distribution: [{ value: random(10, 100), label: t('Unknown') }], avgResult: 'PARTIAL' },
-          { type: 'DETECTION', distribution: [{ value: random(10, 100), label: t('Unknown') }], avgResult: 'PARTIAL' },
-          { type: 'HUMAN_RESPONSE', distribution: [{ value: random(10, 100), label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'PREVENTION', distribution: [{ value: Math.round(random(10, 100)), label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'DETECTION', distribution: [{ value: Math.round(random(10, 100)), label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'HUMAN_RESPONSE', distribution: [{ value: Math.round(random(10, 100)), label: t('Unknown') }], avgResult: 'PARTIAL' },
         ],
         exercise_targets: [],
         exercise_tags: undefined,
@@ -43,21 +43,21 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
       name: t('Prevention'),
       data: data.map((exercise) => ({
         x: new Date(exercise.exercise_start_date ?? 0),
-        y: exercise.exercise_global_score?.filter((score) => score.type === 'PREVENTION').at(0)?.distribution?.[0].value ?? 100,
+        y: exercise.exercise_global_score?.filter((score) => score.type === 'PREVENTION').at(0)?.distribution?.[0]?.value ?? 100,
       })),
     },
     {
       name: t('Detection'),
       data: data.map((exercise) => ({
         x: new Date(exercise.exercise_start_date ?? 0),
-        y: exercise.exercise_global_score?.filter((score) => score.type === 'DETECTION').at(0)?.distribution?.[0].value ?? 10,
+        y: exercise.exercise_global_score?.filter((score) => score.type === 'DETECTION').at(0)?.distribution?.[0]?.value ?? 100,
       })),
     },
     {
       name: t('Human Response'),
       data: data.map((exercise) => ({
         x: new Date(exercise.exercise_start_date ?? 0),
-        y: exercise.exercise_global_score?.filter((score) => score.type === 'HUMAN_RESPONSE').at(0)?.distribution?.[0].value ?? 10,
+        y: exercise.exercise_global_score?.filter((score) => score.type === 'HUMAN_RESPONSE').at(0)?.distribution?.[0]?.value ?? 100,
       })),
     },
   ];
@@ -89,7 +89,7 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
           )}
         />
       )
-        }
+      }
     </>
   );
 };

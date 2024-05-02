@@ -625,7 +625,7 @@ class InjectDefinition extends Component {
                 <RichTextField
                   key={field.key}
                   name={field.key}
-                  label={t(field.label)}
+                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
                   fullWidth={true}
                   style={{ marginTop: 20, height: 250 }}
                   disabled={this.props.permissions.readOnly || field.readOnly}
@@ -640,7 +640,7 @@ class InjectDefinition extends Component {
                   fullWidth={true}
                   multiline={true}
                   rows={10}
-                  label={t(field.label)}
+                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
                   style={{ marginTop: 20 }}
                   disabled={this.props.permissions.readOnly || field.readOnly}
                   askAi={true}
@@ -655,7 +655,7 @@ class InjectDefinition extends Component {
                   name={field.key}
                   fullWidth={true}
                   type="number"
-                  label={t(field.label)}
+                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
                   style={{ marginTop: 20 }}
                   disabled={this.props.permissions.readOnly || field.readOnly}
                 />
@@ -665,7 +665,7 @@ class InjectDefinition extends Component {
                 <SwitchField
                   key={field.key}
                   name={field.key}
-                  label={t(field.label)}
+                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
                   style={{ marginTop: 20 }}
                   disabled={this.props.permissions.readOnly || field.readOnly}
                 />
@@ -682,7 +682,7 @@ class InjectDefinition extends Component {
                             shrink={true}
                             disabled={this.props.permissions.readOnly}
                           >
-                            {t(field.label)}
+                            {`${t(field.label)}${field.mandatory ? '*' : ''}`}
                             {field.cardinality === 'n' && (
                               <IconButton
                                 onClick={() => fields.push({
@@ -803,7 +803,7 @@ class InjectDefinition extends Component {
               return field.cardinality === 'n' ? (
                 <OldSelectField
                   variant="standard"
-                  label={t(field.label)}
+                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
                   key={field.key}
                   multiple
                   renderValue={(v) => v.map((a) => field.choices[a]).join(', ')}
@@ -825,7 +825,7 @@ class InjectDefinition extends Component {
               ) : (
                 <OldSelectField
                   variant="standard"
-                  label={t(field.label)}
+                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
                   key={field.key}
                   renderValue={(v) => (field.expectation
                     ? t(field.choices[v] || 'Unknown')
@@ -855,7 +855,7 @@ class InjectDefinition extends Component {
               return field.cardinality === 'n' ? (
                 <OldSelectField
                   variant="standard"
-                  label={t(field.label)}
+                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
                   key={field.key}
                   multiple
                   renderValue={(v) => v.map((a) => choices[a]).join(', ')}
@@ -875,7 +875,7 @@ class InjectDefinition extends Component {
               ) : (
                 <OldSelectField
                   variant="standard"
-                  label={t(field.label)}
+                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
                   key={field.key}
                   renderValue={(v) => (field.expectation ? t(choices[v] || 'Unknown') : choices[v])
                   }
@@ -902,7 +902,7 @@ class InjectDefinition extends Component {
                   key={field.key}
                   name={field.key}
                   fullWidth={true}
-                  label={t(field.label)}
+                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
                   style={{ marginTop: 20 }}
                   disabled={this.props.permissions.readOnly || field.readOnly}
 
@@ -1213,7 +1213,7 @@ class InjectDefinition extends Component {
                                 <ItemTags variant="list" tags={team.team_tags} />
                               </div>
                             </>
-                           }
+                          }
                         />
                         <ListItemSecondaryAction>
                           <TeamPopover
@@ -1447,13 +1447,13 @@ class InjectDefinition extends Component {
                     const linkedField = f.linkedFields[index];
                     if (
                       linkedField.type === 'checkbox'
-                            && values[linkedField.key] === false
+                      && values[linkedField.key] === false
                     ) {
                       return false;
                     }
                     if (
                       linkedField.type === 'select'
-                            && !f.linkedValues.includes(values[linkedField.key])
+                      && !f.linkedValues.includes(values[linkedField.key])
                     ) {
                       return false;
                     }
@@ -1552,7 +1552,7 @@ class InjectDefinition extends Component {
                           >
                             <ItemBoolean
                               status={hasAttachments ? document.document_attached : null}
-                              label={document.document_attached ? t('Yes') : t('No') }
+                              label={document.document_attached ? t('Yes') : t('No')}
                               variant="inList"
                               onClick={(event) => {
                                 event.preventDefault();
