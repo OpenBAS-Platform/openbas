@@ -249,7 +249,16 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         status: result.target_result_response_status,
       }));
       const mergedSteps: Steptarget[] = [...initialSteps, ...newSteps];
-      mergedSteps.sort((a, b) => a.type.localeCompare(b.type));
+      // Define the sorting order
+      const sortOrder = ['PREVENTION', 'DETECTION', 'HUMAN_RESPONSE'];
+
+      // Custom sorting function
+      mergedSteps.sort((a, b) => {
+        const typeAIndex = sortOrder.indexOf(a.type);
+        const typeBIndex = sortOrder.indexOf(b.type);
+        return typeAIndex - typeBIndex;
+      });
+
       setSteps(mergedSteps);
     }
   }, [targetresults]);
@@ -264,10 +273,12 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     groupedResults[type].push(result);
   });
 
-  // Sort the keys alphabetically
-  const sortedKeys = Object.keys(groupedResults).sort();
+  const sortOrder = ['PREVENTION', 'DETECTION', 'HUMAN_RESPONSE'];
 
-  // Map over the sorted keys to retrieve the sorted results
+  const sortedKeys = Object.keys(groupedResults).sort((a, b) => {
+    return sortOrder.indexOf(a) - sortOrder.indexOf(b);
+  });
+
   const sortedGroupedResults: Record<string, ExpectationResultOutput[]> = {};
   sortedKeys.forEach((key) => {
     sortedGroupedResults[key] = groupedResults[key];
