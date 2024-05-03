@@ -11,6 +11,8 @@ import { addAssetGroup } from '../../../../actions/asset_groups/assetgroup-actio
 import AssetGroupForm from './AssetGroupForm';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Dialog from '../../../../components/common/Dialog';
+import { AssetGroupStore } from './AssetGroup';
+import type { UserStore } from '../../teams/players/Player';
 
 const useStyles = makeStyles((theme: Theme) => ({
   text: {
@@ -22,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   inline?: boolean;
-  onCreate?: (result: string) => void;
+  onCreate?: (result: AssetGroupStore) => void;
 }
 
 const AssetGroupCreation: FunctionComponent<Props> = ({
@@ -37,10 +39,11 @@ const AssetGroupCreation: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const onSubmit = (data: AssetGroupInput) => {
     dispatch(addAssetGroup(data)).then(
-      (result: { result: string }) => {
+      (result: { result: string, entities: { asset_groups: Record<string, UserStore> } }) => {
         if (result.result) {
           if (onCreate) {
-            onCreate(result.result);
+            const created = result.entities.asset_groups[result.result];
+            onCreate(created);
           }
           setOpen(false);
         }

@@ -1,6 +1,6 @@
 import { IconButton, Typography } from '@mui/material';
 import { CloseRounded } from '@mui/icons-material';
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../../../../components/Theme';
 import TagsFilter from '../../../../components/TagsFilter';
@@ -17,6 +17,7 @@ import EndpointsList, { EndpointStoreWithType } from '../endpoints/EndpointsList
 import EndpointPopover from '../endpoints/EndpointPopover';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
+import { AssetGroupStore } from './AssetGroup';
 
 const useStyles = makeStyles((theme: Theme) => ({
   // Drawer Header
@@ -51,11 +52,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   assetGroupId: string;
   handleClose: () => void;
+  onUpdate?: (result: AssetGroupStore) => void;
 }
 
 const AssetGroupManagement: FunctionComponent<Props> = ({
   assetGroupId,
   handleClose,
+  onUpdate,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -77,8 +80,8 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
   const getAssetFromMap = (assets: string[]) => assets?.filter((endpointId: string) => !!endpointsMap[endpointId]).map((endpointId: string) => endpointsMap[endpointId]);
 
   const filteringAssets = useSearchAnFilter('asset', 'name', ['name']);
-  const assets = getAssetFromMap(assetGroup.asset_group_assets ?? [])?.map((a) => ({ ...a, type: 'static' }))
-    .concat(getAssetFromMap(assetGroup.asset_group_dynamic_assets ?? [])?.map((a) => ({ ...a, type: 'dynamic' })));
+  const assets = getAssetFromMap(assetGroup?.asset_group_assets ?? [])?.map((a) => ({ ...a, type: 'static' }))
+    .concat(getAssetFromMap(assetGroup?.asset_group_dynamic_assets ?? [])?.map((a) => ({ ...a, type: 'dynamic' })));
   const sortedAsset: EndpointStoreWithType[] = filteringAssets.filterAndSort(assets);
 
   return (
@@ -94,7 +97,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
           <CloseRounded fontSize="small" color="primary" />
         </IconButton>
         <Typography variant="h6" classes={{ root: classes.title }}>
-          {assetGroup.asset_group_name}
+          {assetGroup?.asset_group_name}
         </Typography>
         <div className={classes.parameters}>
           <div className={classes.tags}>
@@ -123,16 +126,17 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
             // @ts-ignore: Endpoint property handle by EndpointsList
             ? (<EndpointPopover
                 inline
-                assetGroupId={assetGroup.asset_group_id}
-                assetGroupEndpointIds={assetGroup.asset_group_assets ?? []}
+                assetGroupId={assetGroup?.asset_group_id}
+                assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
                />)
             : <span> &nbsp; </span>
           }
       />
       {userAdmin
         && (<AssetGroupAddEndpoints
-          assetGroupId={assetGroup.asset_group_id}
-          assetGroupEndpointIds={assetGroup.asset_group_assets ?? []}
+          assetGroupId={assetGroup?.asset_group_id}
+          assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
+          onUpdate={onUpdate}
             />)
       }
     </>

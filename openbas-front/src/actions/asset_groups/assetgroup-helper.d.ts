@@ -3,5 +3,5 @@ import type { AssetGroupStore } from '../../admin/components/assets/asset_groups
 export interface AssetGroupsHelper {
   getAssetGroups: () => AssetGroupStore[];
   getAssetGroupMaps: () => Record<string, AssetGroupStore>;
-  getAssetGroup: (assetGroupId: string) => AssetGroupStore;
+  getAssetGroup: (assetGroupId: string) => AssetGroupStore | undefined;
 }
