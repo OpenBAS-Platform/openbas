@@ -6,13 +6,10 @@ import { lineChartOptions } from '../../../../utils/Charts';
 import Empty from '../../../../components/Empty';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import { useFormatter } from '../../../../components/i18n';
-import { useAppDispatch } from '../../../../utils/hooks';
 import type { Theme } from '../../../../components/Theme';
 import type { InjectExpectation } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../actions/Exercise';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import { computeTeamsColors } from './DistributionUtils';
 import type { InjectExpectationStore } from '../../../../actions/injects/Inject';
@@ -26,7 +23,6 @@ const ExerciseDistributionScoreOverTimeByTeam: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t, nsdt } = useFormatter();
-  const dispatch = useAppDispatch();
   const theme: Theme = useTheme();
 
   // Fetching data
@@ -35,10 +31,6 @@ const ExerciseDistributionScoreOverTimeByTeam: FunctionComponent<Props> = ({
     teams: helper.getExerciseTeams(exerciseId),
     teamsMap: helper.getTeamsMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchExerciseTeams(exerciseId));
-    dispatch(fetchExerciseInjectExpectations(exerciseId));
-  });
 
   const teamsColors = computeTeamsColors(teams, theme);
 

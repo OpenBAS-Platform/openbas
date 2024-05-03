@@ -977,7 +977,7 @@ export interface InjectExpectationResultsByAttackPattern {
 }
 
 export interface InjectExpectationResultsByType {
-  inject?: Inject;
+  inject_title?: string;
   results?: ExpectationResultsByType[];
 }
 

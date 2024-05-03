@@ -18,7 +18,7 @@ import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import Injects from '../../common/injects/Injects';
 import { secondsFromToNow } from '../../../../utils/Exercise';
-import { fetchExerciseTeams } from '../../../../actions/Exercise';
+import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../actions/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import type { ArticlesHelper } from '../../../../actions/channels/article-helper';
 import type { ChallengesHelper } from '../../../../actions/helper';
@@ -72,6 +72,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
     dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchExerciseArticles(exerciseId));
     dispatch(fetchVariablesForExercise(exerciseId));
+    dispatch(fetchExerciseInjectExpectations(exerciseId));
   });
 
   const articleContext = articleContextForExercise(exerciseId);

@@ -5,8 +5,6 @@ import { makeStyles } from '@mui/styles';
 import type { AttackPattern } from '../../../../utils/api-types';
 import type { InjectExpectationResultsByAttackPatternStore, InjectExpectationResultsByTypeStore } from '../../../../actions/exercises/Exercise';
 import type { Theme } from '../../../../components/Theme';
-import { useHelper } from '../../../../store';
-import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import AtomicTestingResult from '../../atomic_testings/atomic_testing/AtomicTestingResult';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -39,11 +37,6 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
   // Standard hooks
   const classes = useStyles();
 
-  // Fetching data
-  const { injectsMap } = useHelper((helper: InjectHelper) => ({
-    injectsMap: helper.getInjectsMap(),
-  }));
-
   const [open, setOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
@@ -55,7 +48,7 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
         <Typography variant="caption">
           {attackPattern.attack_pattern_name}
         </Typography>
-        <AtomicTestingResult expectations={injectResult?.inject_expectation_results?.[0].results ?? []} />
+        <AtomicTestingResult expectations={results[0]?.results ?? []} />
       </div>
     );
 
@@ -91,6 +84,8 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
   return (
     <>
       <Button
+        aria-haspopup="true"
+        aria-expanded={open ? 'true' : undefined}
         className={classes.button}
         onClick={(event) => handleOpen(event)}
       >
@@ -103,22 +98,22 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
       <Menu
         anchorEl={anchorEl}
         open={open}
-        onClose={() => setAnchorEl(null)}
+        onClose={() => {
+          setAnchorEl(null);
+          setOpen(false);
+        }}
         anchorOrigin={{
           vertical: 'top',
           horizontal: 'right',
         }}
         transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
+          vertical: 'top', horizontal: 'left',
         }}
       >
         {results?.map((result, idx) => {
-          const inject = injectsMap[result.inject ?? ''];
-
           const content = () => (
             <>
-              <ListItemText primary={inject.inject_title} />
+              <ListItemText primary={result.inject_title} />
               <AtomicTestingResult expectations={result.results ?? []} />
             </>
           );
@@ -139,7 +134,7 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
           return (
             <MenuItem
               key={`inject-result-${idx}`}
-              style={{ display: 'flex', gap: 8 }}
+              style={{ display: 'flex', gap: 8, pointerEvents: 'none' }}
             >
               {content()}
             </MenuItem>

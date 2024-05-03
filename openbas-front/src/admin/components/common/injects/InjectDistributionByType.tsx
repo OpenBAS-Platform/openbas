@@ -28,9 +28,8 @@ const InjectDistributionByType: FunctionComponent<Props> = ({
   const theme: Theme = useTheme();
 
   // Fetching data
-  const { injects, injectorContractsMap } = useHelper((helper: InjectHelper & InjectorContractHelper) => ({
+  const { injects } = useHelper((helper: InjectHelper & InjectorContractHelper) => ({
     injects: helper.getExerciseInjects(exerciseId),
-    injectorContractsMap: helper.getInjectorContractsMapByType(),
   }));
   useDataLoader(() => {
     dispatch(fetchInjects(exerciseId));
@@ -50,10 +49,9 @@ const InjectDistributionByType: FunctionComponent<Props> = ({
     {
       name: t('Number of injects'),
       data: injectsByType.map((a: InjectStore & { number: number }) => ({
-        x: tPick(injectorContractsMap && injectorContractsMap[a.inject_type]?.label),
+        x: tPick(a.inject_injector_contract?.injector_contract_labels),
         y: a.number,
-        fillColor:
-          injectorContractsMap && injectorContractsMap[a.inject_type]?.config?.color,
+        fillColor: a.inject_injector_contract?.injector_contract_content_parsed?.config?.color,
       })),
     },
   ];

@@ -1,5 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
@@ -7,7 +8,7 @@ import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { KillChainPhase } from '../../../../utils/api-types';
+import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import type { InjectExpectationResultsByAttackPatternStore } from '../../../../actions/exercises/Exercise';
 import KillChainPhaseColumn from './KillChainPhaseColumn';
@@ -34,7 +35,10 @@ const MitreMatrix: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
 
   // Fetching data
-  const { attackPatternMap, killChainPhaseMap } = useHelper((helper: AttackPatternHelper & KillChainPhaseHelper) => ({
+  const { attackPatternMap, killChainPhaseMap }: {
+    attackPatternMap: Record<string, AttackPattern>,
+    killChainPhaseMap: Record<string, KillChainPhase>
+  } = useHelper((helper: AttackPatternHelper & KillChainPhaseHelper) => ({
     attackPatternMap: helper.getAttackPatternsMap(),
     killChainPhaseMap: helper.getKillChainPhasesMap(),
   }));
@@ -44,21 +48,24 @@ const MitreMatrix: FunctionComponent<Props> = ({
   });
 
   // Attack Pattern
-  const resultAttackPatternIds = injectResults
-    .filter((injectResult) => !!injectResult.inject_attack_pattern)
-    .flatMap((injectResult) => injectResult.inject_attack_pattern) as unknown as string[];
+  const resultAttackPatternIds = R.uniq(
+    injectResults
+      .filter((injectResult) => !!injectResult.inject_attack_pattern)
+      .flatMap((injectResult) => injectResult.inject_attack_pattern) as unknown as string[],
+  );
 
-  const resultAttackPatterns: AttackPatternStore[] = resultAttackPatternIds.map((attackPatternId) => attackPatternMap[attackPatternId]).filter((attackPattern) => !!attackPattern);
+  const resultAttackPatterns: AttackPatternStore[] = resultAttackPatternIds.map((attackPatternId: string) => attackPatternMap[attackPatternId])
+    .filter((attackPattern: AttackPattern) => !!attackPattern);
 
   const getAttackPatterns = (killChainPhase: KillChainPhase) => {
     return resultAttackPatterns.filter((attackPattern: AttackPatternStore) => attackPattern.attack_pattern_kill_chain_phases?.includes(killChainPhase.phase_id));
   };
 
   // Kill Chain Phase
-  const resultKillChainPhases = resultAttackPatterns
+  const resultKillChainPhases = R.uniq(resultAttackPatterns
     .flatMap((attackPattern) => (attackPattern.attack_pattern_kill_chain_phases ?? []))
     .map((killChainPhaseId: string) => killChainPhaseMap[killChainPhaseId])
-    .filter((killChainPhase) => !!killChainPhase);
+    .filter((killChainPhase) => !!killChainPhase));
 
   const sortKillChainPhase = (k1: KillChainPhase, k2: KillChainPhase) => {
     return (k1.phase_order ?? 0) - (k2.phase_order ?? 0);

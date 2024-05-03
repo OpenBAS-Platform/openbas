@@ -6,10 +6,11 @@ import { Drawer, Fab } from '@mui/material';
 import { withStyles, withTheme } from '@mui/styles';
 import { Add } from '@mui/icons-material';
 import inject18n from '../../../../components/i18n';
-import QuickInject from './QuickInject';
+import QuickInject, { EMAIL_CONTRACT } from './QuickInject';
 import { storeHelper } from '../../../../actions/Schema';
 import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchTags } from '../../../../actions/Tag';
+import { fetchInjectorContract } from '../../../../actions/InjectorContracts';
 
 const styles = (theme) => ({
   createButton: {
@@ -30,6 +31,10 @@ class CreateQuickInject extends Component {
     this.state = { open: false };
   }
 
+  componentDidMount() {
+    this.props.fetchInjectorContract(EMAIL_CONTRACT);
+  }
+
   handleOpen() {
     this.setState({ open: true });
   }
@@ -39,7 +44,7 @@ class CreateQuickInject extends Component {
   }
 
   render() {
-    const { classes, exercise, injectorContracts, exercisesMap, tagsMap } = this.props;
+    const { classes, exercise, injectorContract, exercisesMap, tagsMap } = this.props;
     const { open } = this.state;
     return (
       <>
@@ -52,25 +57,27 @@ class CreateQuickInject extends Component {
         >
           <Add />
         </Fab>
-        <Drawer
-          open={open}
-          keepMounted={false}
-          anchor="right"
-          sx={{ zIndex: 1202 }}
-          classes={{ paper: classes.drawerPaper }}
-          onClose={this.handleClose.bind(this)}
-          elevation={1}
-          disableEnforceFocus={true}
-        >
-          <QuickInject
-            exerciseId={exercise.exercise_id}
-            exercise={exercise}
-            injectorContracts={injectorContracts}
-            handleClose={this.handleClose.bind(this)}
-            exercisesMap={exercisesMap}
-            tagsMap={tagsMap}
-          />
-        </Drawer>
+        {injectorContract
+          && <Drawer
+            open={open}
+            keepMounted={false}
+            anchor="right"
+            sx={{ zIndex: 1202 }}
+            classes={{ paper: classes.drawerPaper }}
+            onClose={this.handleClose.bind(this)}
+            elevation={1}
+            disableEnforceFocus={true}
+             >
+            <QuickInject
+              exerciseId={exercise.exercise_id}
+              exercise={exercise}
+              injectorContract={injectorContract}
+              handleClose={this.handleClose.bind(this)}
+              exercisesMap={exercisesMap}
+              tagsMap={tagsMap}
+            />
+          </Drawer>
+        }
       </>
     );
   }
@@ -80,16 +87,16 @@ CreateQuickInject.propTypes = {
   t: PropTypes.func,
   exercise: PropTypes.object,
   exercisesMap: PropTypes.object,
-  injectorContracts: PropTypes.array,
   tagsMap: PropTypes.object,
+  injectorContract: PropTypes.object,
 };
 
 const select = (state) => {
   const helper = storeHelper(state);
   return {
     exercisesMap: helper.getExercisesMap(),
-    injectorContracts: helper.getInjectorContracts(),
     tagsMap: helper.getTagsMap(),
+    injectorContract: helper.getInjectorContract(EMAIL_CONTRACT),
   };
 };
 
@@ -97,6 +104,7 @@ export default R.compose(
   connect(select, {
     fetchExercises,
     fetchTags,
+    fetchInjectorContract,
   }),
   inject18n,
   withTheme,

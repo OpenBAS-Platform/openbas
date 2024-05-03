@@ -6,12 +6,9 @@ import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import { lineChartOptions } from '../../../../utils/Charts';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
-import { useAppDispatch } from '../../../../utils/hooks';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchExerciseInjectExpectations } from '../../../../actions/Exercise';
 import type { InjectExpectation } from '../../../../utils/api-types';
 import type { InjectExpectationStore, InjectStore } from '../../../../actions/injects/Inject';
 
@@ -24,7 +21,6 @@ const ExerciseDistributionScoreOverTimeByInjectorContract: FunctionComponent<Pro
 }) => {
   // Standard hooks
   const { t, nsdt, tPick } = useFormatter();
-  const dispatch = useAppDispatch();
   const theme: Theme = useTheme();
 
   // Fetching data
@@ -32,9 +28,6 @@ const ExerciseDistributionScoreOverTimeByInjectorContract: FunctionComponent<Pro
     injectsMap: helper.getInjectsMap(),
     injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
   }));
-  useDataLoader(() => {
-    dispatch(fetchExerciseInjectExpectations(exerciseId));
-  });
 
   let cumulation = 0;
   const injectsTypesScores = R.pipe(

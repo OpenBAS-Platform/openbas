@@ -50,7 +50,7 @@ const Dashboard = () => {
         <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column', minWidth: '100%' }}>
           <Typography variant="h4">{t('Performance Overview')}</Typography>
           <Paper variant="outlined" style={{ minWidth: '100%', padding: 16 }}>
-            <ResponsePie expectations={statistics?.expectation_results ?? []} />
+            <ResponsePie expectationResultsByTypes={statistics?.expectation_results ?? []} />
           </Paper>
         </Grid>
         <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column', minWidth: '100%' }}>

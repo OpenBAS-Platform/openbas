@@ -41,9 +41,6 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
     return 0;
   };
 
-  // Techniques
-  const techniques = attackPatterns.filter((attackPattern) => attackPattern.attack_pattern_parent === null);
-
   // Inject Results
   const getInjectResult = (attack: AttackPatternStore) => {
     return injectResults.find((injectResult) => injectResult.inject_attack_pattern === attack.attack_pattern_id);
@@ -53,7 +50,7 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
     <div style={{ marginBottom: 16 }}>
       <Typography variant="h3">{killChainPhase.phase_name}</Typography>
       <div className={classes.column}>
-        {[...techniques].sort(sortAttackPattern)
+        {[...attackPatterns].sort(sortAttackPattern)
           .map((attackPattern) => (
             <AttackPatternBox
               key={attackPattern.attack_pattern_id}
