@@ -11,7 +11,7 @@ import { addAssetGroup } from '../../../../actions/asset_groups/assetgroup-actio
 import AssetGroupForm from './AssetGroupForm';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Dialog from '../../../../components/common/Dialog';
-import { AssetGroupStore } from './AssetGroup';
+import type { AssetGroupStore } from './AssetGroup';
 import type { UserStore } from '../../teams/players/Player';
 
 const useStyles = makeStyles((theme: Theme) => ({
