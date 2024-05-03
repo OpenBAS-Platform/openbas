@@ -755,33 +755,6 @@ export interface ExerciseUpdateTeamsInput {
   exercise_teams?: string[];
 }
 
-export interface ExpectationResultOutput {
-  /** Target id */
-  target_id: string;
-  /** Inject id */
-  target_inject_id: string;
-  /**
-   * End date of inject
-   * @format date-time
-   */
-  target_result_ended_at?: string;
-  /** Expectation Id */
-  target_result_id: string;
-  /** Response status */
-  target_result_response_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
-  /**
-   * Started date of inject
-   * @format date-time
-   */
-  target_result_started_at: string;
-  /** Subtype */
-  target_result_subtype: string;
-  /** Type */
-  target_result_type: "DETECTION" | "HUMAN_RESPONSE" | "PREVENTION";
-  /** Results */
-  target_results?: InjectExpectationResult[];
-}
-
 export interface ExpectationResultsByType {
   avgResult: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
   distribution: ResultDistribution[];
@@ -956,6 +929,7 @@ export interface InjectExpectation {
   inject_expectation_results?: InjectExpectationResult[];
   /** @format int32 */
   inject_expectation_score?: number;
+  inject_expectation_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
   inject_expectation_team?: Team;
   inject_expectation_type: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
   /** @format date-time */
@@ -1044,7 +1018,7 @@ export interface InjectStatusExecution {
 export interface InjectTargetWithResult {
   children?: InjectTargetWithResult[];
   expectationResultsByTypes?: ExpectationResultsByType[];
-  id?: string;
+  id: string;
   name?: string;
   targetType?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }

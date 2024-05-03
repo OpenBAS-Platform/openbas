@@ -46,7 +46,7 @@ const AtomicTestingHeader = () => {
   const [open, setOpen] = useState(false);
   const [availableLaunch, setAvailableLaunch] = useState(true);
 
-  const submitTry = async () => {
+  const submitLaunch = async () => {
     setOpen(false);
     setAvailableLaunch(false);
     await dispatch(tryAtomicTesting(atomic.atomic_id));
@@ -100,7 +100,7 @@ const AtomicTestingHeader = () => {
           </Button>
           <Button
             color="secondary"
-            onClick={submitTry}
+            onClick={submitLaunch}
           >
             {t('Confirm')}
           </Button>

@@ -2,6 +2,7 @@ package io.openbas.atomic_testing;
 
 import io.openbas.atomic_testing.form.*;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.helper.RestBehavior;
@@ -97,12 +98,11 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
   @GetMapping("/{injectId}/target_results/{targetId}/types/{targetType}")
-  public List<ExpectationResultOutput> findTargetResult(@PathVariable String targetId,
-      @PathVariable String injectId, @PathVariable String targetType) {
-    return injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(injectId, targetId, targetType)
-        .stream()
-        .map(expectation -> AtomicTestingMapper.toTargetResultDto(expectation, targetId))
-        .toList();
+  public List<InjectExpectation> findTargetResult(
+      @PathVariable String targetId,
+      @PathVariable String injectId,
+      @PathVariable String targetType) {
+    return injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(injectId, targetId, targetType);
   }
 
   @PutMapping("/{injectId}/tags")

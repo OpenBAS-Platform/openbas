@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import { Box, Button, Paper, Step, StepLabel, Stepper, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Paper, Step, StepLabel, Stepper, Tab, Tabs, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
-import type { AtomicTestingDetailOutput, AtomicTestingOutput, ExpectationResultOutput, InjectTargetWithResult } from '../../../../utils/api-types';
+import type { InjectTargetWithResult } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import { fetchAtomicTesting, fetchAtomicTestingDetail, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
@@ -10,9 +10,10 @@ import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import InjectIcon from '../../common/injects/InjectIcon';
 import Empty from '../../../../components/Empty';
-import ManualExpectationsValidation from '../../simulations/validation/expectations/ManualExpectationsValidation';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import type { InjectExpectationStore } from '../../../../actions/injects/Inject';
+import ManualExpectationsValidationForm from '../../simulations/validation/expectations/ManualExpectationsValidationForm';
+import type { AtomicTestingDetailOutputStore } from '../../../../actions/atomic_testings/atomic-testing';
+import type { InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
 
 interface Steptarget {
   label: string;
@@ -51,13 +52,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     fontSize: '0.8rem',
     position: 'absolute',
     bottom: 'calc(60%)',
-    left: 'calc(-9%)',
-  },
-  icon: {
-    position: 'absolute',
-    bottom: 'calc(77%)',
-    width: 30,
-    height: 30,
+    left: 'calc(-22%)',
   },
   tabs: {
     marginLeft: 'auto',
@@ -86,28 +81,26 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   const [activeTab, setActiveTab] = useState(0);
   const [steps, setSteps] = useState<Steptarget[]>([]);
   const initialSteps = [{ label: 'Attack started', type: '' }, { label: 'Attack ended', type: '' }];
-  const sortOrder = ['PREVENTION', 'DETECTION', 'HUMAN_RESPONSE'];
+  const sortOrder = ['PREVENTION', 'DETECTION', 'MANUAL'];
   // Fetching data
-  const { targetResults, atomicTesting, atomicTestingDetails }: {
-    targetResults: ExpectationResultOutput[],
-    atomicTesting: AtomicTestingOutput,
-    atomicTestingDetails: AtomicTestingDetailOutput,
+  const { atomicTestingDetails }: {
+    atomicTestingDetails: AtomicTestingDetailOutputStore,
   } = useHelper((helper: AtomicTestingHelper) => ({
-    targetResults: helper.getTargetResults(target.id!, injectId),
-    atomicTesting: helper.getAtomicTesting(injectId),
     atomicTestingDetails: helper.getAtomicTestingDetail(injectId),
   }));
+
+  const [targetResults, setTargetResults] = useState<InjectExpectationsStore[]>([]);
 
   useDataLoader(() => {
     dispatch(fetchAtomicTestingDetail(injectId));
   });
 
-  const [openManualExpectationDrawer, setOpenManualExpectationDrawer] = useState<boolean>(false);
-
   useEffect(() => {
     if (target) {
       setSteps([...initialSteps, ...[{ label: 'Unknown Data', type: '' }]]);
-      dispatch(fetchTargetResult(injectId, target.id!, target.targetType!));
+      fetchTargetResult(injectId, target.id!, target.targetType!).then(
+        (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
+      );
       setActiveTab(0);
     }
   }, [target]);
@@ -156,20 +149,35 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     );
   };
 
-  const getStatusLabel = (type: string, status: string) => {
-    if (status === 'UNKNOWN') {
+  const getStatus = (status: string[]) => {
+    if (status.includes('UNKNOWN')) {
+      return 'UNKNOWN';
+    }
+    if (status.includes('PENDING')) {
+      return 'PENDING';
+    }
+    if (status.includes('PARTIAL')) {
+      return 'PARTIAL';
+    }
+    if (status.includes('FAILED')) {
+      return 'FAILED';
+    }
+    return status.every((s) => s === 'VALIDATED') ? 'VALIDATED' : 'FAILED';
+  };
+  const getStatusLabel = (type: string, status: string[]) => {
+    if (status.includes('UNKNOWN')) {
       return 'Unknown Data';
     }
-    if (status === 'PENDING') {
+    if (status.includes('PENDING')) {
       return 'Waiting Response';
     }
     switch (type) {
       case 'DETECTION':
-        return status === 'VALIDATED' ? 'Attack Detected' : 'Attack Undetected';
-      case 'HUMAN_RESPONSE':
-        return status === 'VALIDATED' ? 'Validation Success' : 'Validation Failed';
+        return status.every((s) => s === 'VALIDATED') ? 'Attack Detected' : 'Attack Undetected';
+      case 'MANUAL':
+        return status.every((s) => s === 'VALIDATED') ? 'Validation Success' : 'Validation Failed';
       case 'PREVENTION':
-        return status === 'VALIDATED' ? 'Attack Blocked' : 'Attack Unblocked';
+        return status.every((s) => s === 'VALIDATED') ? 'Attack Blocked' : 'Attack Unblocked';
       default:
         return '';
     }
@@ -199,36 +207,35 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     return { color, background };
   };
 
-  // const getStepIcon = (index: number, type: string, status: string) => {
-  //   if (index >= 2 && type) {
-  //     let IconComponent;
-  //     switch (type) {
-  //       case 'DETECTION':
-  //         IconComponent = TrackChanges;
-  //         break;
-  //       case 'PREVENTION':
-  //         IconComponent = Shield;
-  //         break;
-  //       default:
-  //         IconComponent = SensorOccupied;
-  //         break;
-  //     }
-  //     return <IconComponent style={{ color: getCircleColor(status).color }}
-  //       className={classes.icon}
-  //            />;
-  //   }
-  //   return null;
-  // };
+  const onUpdateManualValidation = () => {
+    dispatch(fetchAtomicTestingDetail(injectId));
+    dispatch(fetchAtomicTesting(injectId));
+  };
 
-  const renderLogs = (targetResult: ExpectationResultOutput[]) => {
+  const renderLogs = (targetResult: string, targetResultList: InjectExpectationsStore[]) => {
+    if (targetResult === 'MANUAL') {
+      return (
+        <div style={{ marginTop: 16 }}>
+          {atomicTestingDetails?.atomic_expectations?.filter((es) => es.inject_expectation_type === 'MANUAL')
+            .map((expectation) => (
+              <ManualExpectationsValidationForm
+                key={expectation.inject_expectation_id}
+                expectation={expectation}
+                onUpdate={onUpdateManualValidation}
+              />
+            ))}
+        </div>
+      );
+    }
     return (
       <>
-        {targetResult.map((result) => (
-          <Paper elevation={2} style={{ padding: 20, marginTop: 15, minHeight: 125 }}
-            key={result.target_result_id}
+        {targetResultList.map((result) => (
+          <Paper
+            elevation={2} style={{ padding: 20, marginTop: 15, minHeight: 125 }}
+            key={result.inject_expectation_id}
           >
-            {result.target_results && result.target_results.length > 0 ? (
-              result.target_results.map((collector, index) => (
+            {result.inject_expectation_results && result.inject_expectation_results.length > 0 ? (
+              result.inject_expectation_results.map((collector, index) => (
                 <div key={index}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <InjectIcon
@@ -253,13 +260,26 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     );
   };
 
+  const groupedByExpectationType = (es: InjectExpectationsStore[]) => {
+    return es.reduce((group, expectation) => {
+      const { inject_expectation_type } = expectation;
+      if (inject_expectation_type) {
+        const values = group.get(inject_expectation_type) ?? [];
+        values.push(expectation);
+        group.set(inject_expectation_type, values);
+      }
+      return group;
+    }, new Map());
+  };
+
   // Define steps
   useEffect(() => {
     if (targetResults && targetResults.length > 0) {
-      const newSteps = targetResults.map((result) => ({
-        label: getStatusLabel(result.target_result_type, result.target_result_response_status!),
-        type: result.target_result_type,
-        status: result.target_result_response_status,
+      const groupedBy = groupedByExpectationType(targetResults);
+      const newSteps = Array.from(groupedBy).map(([targetType, targetResult]) => ({
+        label: getStatusLabel(targetType, targetResult.map((tr: InjectExpectationsStore) => tr.inject_expectation_status)),
+        type: targetType,
+        status: getStatus(targetResult.map((tr: InjectExpectationsStore) => tr.inject_expectation_status)),
       }));
       const mergedSteps: Steptarget[] = [...initialSteps, ...newSteps];
 
@@ -272,12 +292,12 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
 
       setSteps(mergedSteps);
     }
-  }, [steps, targetResults]);
+  }, [targetResults]);
 
   // Define Tabs
-  const groupedResults: Record<string, ExpectationResultOutput[]> = {};
+  const groupedResults: Record<string, InjectExpectationsStore[]> = {};
   targetResults.forEach((result) => {
-    const type = result.target_result_type;
+    const type = result.inject_expectation_type;
     if (!groupedResults[type]) {
       groupedResults[type] = [];
     }
@@ -288,7 +308,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     return sortOrder.indexOf(a) - sortOrder.indexOf(b);
   });
 
-  const sortedGroupedResults: Record<string, ExpectationResultOutput[]> = {};
+  const sortedGroupedResults: Record<string, InjectExpectationsStore[]> = {};
   sortedKeys.forEach((key) => {
     sortedGroupedResults[key] = groupedResults[key];
   });
@@ -297,51 +317,12 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     setActiveTab(newValue);
   };
 
-  const onUpdateManualValidation = () => {
-    dispatch(fetchAtomicTestingDetail(injectId));
-    dispatch(fetchAtomicTesting(injectId));
-  };
-
-  let manualExpectationsNumber: number = 0;
-  if (atomicTestingDetails) {
-    atomicTestingDetails?.atomic_expectations?.map((expectation) => {
-      if (expectation.inject_expectation_type === 'MANUAL') {
-        manualExpectationsNumber += 1;
-      }
-      return manualExpectationsNumber;
-    });
-  }
-
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <div>
           <Typography variant="h1" className="pageTitle">{target.name}</Typography>
         </div>
-        {
-          manualExpectationsNumber > 0 && (
-            <div>
-              <Button
-                type="submit"
-                variant="contained"
-                onClick={() => setOpenManualExpectationDrawer(true)}
-              >{t('Evaluate')}</Button>
-              <ManualExpectationsValidation
-                inject={{
-                  inject_id: atomicTesting.atomic_id,
-                  inject_title: atomicTesting.atomic_title,
-                  inject_type: atomicTesting.atomic_type,
-                  inject_depends_duration: 0,
-                }}
-                expectations={atomicTestingDetails.atomic_expectations as InjectExpectationStore[]}
-                open={openManualExpectationDrawer}
-                onClose={() => setOpenManualExpectationDrawer(false)}
-                onUpdate={onUpdateManualValidation}
-              />
-            </div>
-          )
-        }
-
       </div>
 
       <Box marginTop={5}>
@@ -350,10 +331,10 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
             <Step key={index}>
               <StepLabel
                 StepIconComponent={() => (
-                  <div className={classes.circle}
+                  <div
+                    className={classes.circle}
                     style={index >= 2 ? getCircleColor(step.status!) : {}}
                   >
-                    {/* {getStepIcon(index, step.type!, step.status!)} */}
                     <Typography className={classes.circleLabel}>{t(step.label)}</Typography>
                   </div>
                 )}
@@ -364,7 +345,8 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         </Stepper>
       </Box>
       <Box marginTop={3}>
-        <Tabs value={activeTab} onChange={handleTabChange} indicatorColor="primary"
+        <Tabs
+          value={activeTab} onChange={handleTabChange} indicatorColor="primary"
           textColor="primary" className={classes.tabs}
         >
           {Object.keys(sortedGroupedResults).map((type, index) => (
@@ -373,7 +355,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         </Tabs>
         {Object.keys(sortedGroupedResults).map((targetResult, index) => (
           <div key={index} hidden={activeTab !== index}>
-            {renderLogs(sortedGroupedResults[targetResult])}
+            {renderLogs(targetResult, sortedGroupedResults[targetResult])}
           </div>
         ))}
       </Box>

@@ -9,8 +9,9 @@ import type { InjectExpectationsStore } from '../../../common/injects/expectatio
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import colorStyles from '../../../../../components/Color';
-import ManualExpectationsValidation from './ManualExpectationsValidation';
 import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
+import Drawer from '../../../../../components/common/Drawer';
+import ManualExpectationsValidationForm from './ManualExpectationsValidationForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -125,13 +126,18 @@ const ManualExpectations: FunctionComponent<Props> = ({
             );
           })}
       </List>
-
-      <ManualExpectationsValidation
-        inject={inject}
-        expectations={currentExpectations}
+      <Drawer
         open={currentExpectations !== null}
-        onClose={() => setCurrentExpectations(null)}
-      />
+        handleClose={() => setCurrentExpectations(null)}
+        title={t('Expectations of ') + inject.inject_title}
+      >
+        <>
+          {
+            expectations
+            && expectations.map((e) => <ManualExpectationsValidationForm key={e.inject_expectation_id} expectation={e} />)
+          }
+        </>
+      </Drawer>
     </>
   );
 };

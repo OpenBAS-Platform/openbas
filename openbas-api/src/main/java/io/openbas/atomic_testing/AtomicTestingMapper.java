@@ -1,21 +1,16 @@
 package io.openbas.atomic_testing;
 
-import static io.openbas.atomic_testing.AtomicTestingUtils.getRefinedExpectations;
-
 import io.openbas.atomic_testing.form.AtomicTestingDetailOutput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.atomic_testing.form.AtomicTestingOutput.AtomicTestingOutputBuilder;
 import io.openbas.atomic_testing.form.InjectTargetWithResult;
-import io.openbas.atomic_testing.form.ExpectationResultOutput;
-import io.openbas.database.model.ExecutionStatus;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectExpectation;
-import io.openbas.database.model.InjectStatus;
-import io.openbas.database.model.Tag;
+import io.openbas.database.model.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static io.openbas.atomic_testing.AtomicTestingUtils.getRefinedExpectations;
 
 public class AtomicTestingMapper {
 
@@ -56,23 +51,6 @@ public class AtomicTestingMapper {
         .status(inject.getStatus().map(InjectStatus::getName).orElse(ExecutionStatus.DRAFT));
   }
 
-  public static ExpectationResultOutput toTargetResultDto(InjectExpectation injectExpectation,
-      final String targetId) {
-    return ExpectationResultOutput
-        .builder()
-        .id(injectExpectation.getId())
-        .injectId(injectExpectation.getInject().getId())
-        .type(ExpectationType.of(injectExpectation.getType().name()))
-        .targetId(targetId)
-        .subtype(injectExpectation.getType().name())
-        .startedAt(injectExpectation.getCreatedAt())
-        .endedAt(injectExpectation.getUpdatedAt())
-        .results(injectExpectation.getResults())
-        .response(injectExpectation.getScore() == null ? ExpectationStatus.PENDING
-            : (injectExpectation.getScore() == 0 ? ExpectationStatus.FAILED : ExpectationStatus.VALIDATED))
-        .build();
-  }
-
   public static AtomicTestingDetailOutput toDetailDto(Inject inject) {
     AtomicTestingDetailOutput.AtomicTestingDetailOutputBuilder atomicTestingDetailOutputBuilder = AtomicTestingDetailOutput
         .builder()
@@ -102,7 +80,7 @@ public class AtomicTestingMapper {
     return atomicTestingDetailOutputBuilder.build();
   }
 
-  public record ExpectationResultsByType(@NotNull ExpectationType type, @NotNull ExpectationStatus avgResult,
+  public record ExpectationResultsByType(@NotNull ExpectationType type, @NotNull InjectExpectation.ExpectationStatus avgResult,
                                          @NotNull List<ResultDistribution> distribution) {
 
   }

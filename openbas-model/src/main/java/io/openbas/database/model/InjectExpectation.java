@@ -36,6 +36,14 @@ public class InjectExpectation implements Base {
     DETECTION,
   }
 
+  public enum ExpectationStatus {
+    FAILED,
+    PENDING,
+    PARTIAL,
+    UNKNOWN,
+    VALIDATED
+  }
+
   @Setter
   @Column(name = "inject_expectation_type")
   @JsonProperty("inject_expectation_type")
@@ -73,6 +81,13 @@ public class InjectExpectation implements Base {
   @Column(name = "inject_expectation_score")
   @JsonProperty("inject_expectation_score")
   private Integer score;
+
+  @JsonProperty("inject_expectation_status")
+  public ExpectationStatus getResponse() {
+    return this.getScore() == null
+        ? ExpectationStatus.PENDING
+        : (this.getScore() == 0 ? ExpectationStatus.FAILED : ExpectationStatus.VALIDATED);
+  }
 
   @Setter
   @Column(name = "inject_expectation_expected_score")
