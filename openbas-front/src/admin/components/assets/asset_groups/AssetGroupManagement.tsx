@@ -1,6 +1,6 @@
 import { IconButton, Typography } from '@mui/material';
 import { CloseRounded } from '@mui/icons-material';
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../../../../components/Theme';
 import TagsFilter from '../../../../components/TagsFilter';
@@ -17,7 +17,7 @@ import EndpointsList, { EndpointStoreWithType } from '../endpoints/EndpointsList
 import EndpointPopover from '../endpoints/EndpointPopover';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
-import { AssetGroupStore } from './AssetGroup';
+import type { AssetGroupStore } from './AssetGroup';
 
 const useStyles = makeStyles((theme: Theme) => ({
   // Drawer Header
