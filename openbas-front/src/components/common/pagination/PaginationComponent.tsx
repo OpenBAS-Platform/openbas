@@ -1,4 +1,4 @@
-import { TablePagination } from '@mui/material';
+import { TablePagination, ToggleButtonGroup } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import SearchFilter from '../../SearchFilter';
@@ -107,8 +107,10 @@ const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, s
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-        {exportProps && <ExportButton totalElements={totalElements} exportProps={exportProps} />}
-        {!!component && component}
+        <ToggleButtonGroup value='fake' exclusive={true}>
+          {exportProps && <ExportButton totalElements={totalElements} exportProps={exportProps} />}
+          {!!component && component}
+        </ToggleButtonGroup>
       </div>
     </div>
   );

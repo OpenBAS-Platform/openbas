@@ -29,54 +29,19 @@ const useStyles = makeStyles(() => ({
     paddingLeft: 10,
     height: 50,
   },
+  bodyItems: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   bodyItem: {
-    height: 20,
     fontSize: 13,
-    float: 'left',
+    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    paddingRight: 10,
   },
 }));
-
-const inlineStylesHeaders: Record<string, CSSProperties> = {
-  iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 5px',
-    padding: 0,
-    top: '0px',
-  },
-  user_email: {
-    float: 'left',
-    width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_firstname: {
-    float: 'left',
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_lastname: {
-    float: 'left',
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_organization: {
-    float: 'left',
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_tags: {
-    float: 'left',
-    width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-};
 
 const inlineStyles: Record<string, CSSProperties> = {
   user_email: {
@@ -166,7 +131,7 @@ const Players = () => {
             primary={
               <SortHeadersComponent
                 headers={headers}
-                inlineStylesHeaders={inlineStylesHeaders}
+                inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
@@ -185,36 +150,20 @@ const Players = () => {
             </ListItemIcon>
             <ListItemText
               primary={
-                <div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.user_email}
-                  >
+                <div className={classes.bodyItems}>
+                  <div className={classes.bodyItem} style={inlineStyles.user_email}>
                     {player.user_email}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.user_firstname}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.user_firstname}>
                     {player.user_firstname}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.user_lastname}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.user_lastname}>
                     {player.user_lastname}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.user_organization}
-                  >
-                    {organizationsMap[player.user_organization]
-                      ?.organization_name || '-'}
+                  <div className={classes.bodyItem} style={inlineStyles.user_organization}>
+                    {organizationsMap[player.user_organization]?.organization_name || '-'}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.user_tags}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.user_tags} >
                     <ItemTags variant="list" tags={player.user_tags} />
                   </div>
                 </div>

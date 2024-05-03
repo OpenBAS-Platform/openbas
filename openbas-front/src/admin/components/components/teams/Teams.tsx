@@ -28,13 +28,17 @@ const useStyles = makeStyles(() => ({
     paddingLeft: 10,
     height: 50,
   },
+  bodyItems: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   bodyItem: {
-    height: 20,
     fontSize: 13,
-    float: 'left',
+    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    paddingRight: 10,
   },
   drawerPaper: {
     minHeight: '100vh',
@@ -42,51 +46,6 @@ const useStyles = makeStyles(() => ({
     padding: 0,
   },
 }));
-
-const inlineStylesHeaders: Record<string, CSSProperties> = {
-  iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 5px',
-    padding: 0,
-    top: '0px',
-  },
-  team_name: {
-    float: 'left',
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  team_description: {
-    float: 'left',
-    width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  team_users_number: {
-    float: 'left',
-    width: '10%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  team_tags: {
-    float: 'left',
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  team_contextual: {
-    float: 'left',
-    width: '10%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  team_updated_at: {
-    float: 'left',
-    width: '12%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-};
 
 const inlineStyles: Record<string, CSSProperties> = {
   team_name: {
@@ -176,7 +135,7 @@ const Teams = () => {
             primary={
               <SortHeadersComponent
                 headers={headers}
-                inlineStylesHeaders={inlineStylesHeaders}
+                inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
@@ -195,44 +154,26 @@ const Teams = () => {
             </ListItemIcon>
             <ListItemText
               primary={
-                <>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.team_name}
-                  >
+                <div className={classes.bodyItems}>
+                  <div className={classes.bodyItem} style={inlineStyles.team_name}>
                     {team.team_name}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.team_description}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.team_description}>
                     {team.team_description}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.team_users_number}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.team_users_number}>
                     {team.team_users_number}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.team_tags}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.team_tags}>
                     <ItemTags variant="list" tags={team.team_tags} />
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.team_contextual}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.team_contextual}>
                     {team.team_contextual ? <CheckCircleOutlined fontSize="small" /> : '-'}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.team_updated_at}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.team_updated_at}>
                     {nsdt(team.team_updated_at)}
                   </div>
-                </>
+                </div>
               }
             />
             <ListItemSecondaryAction>

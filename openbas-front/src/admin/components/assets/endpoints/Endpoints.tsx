@@ -30,60 +30,19 @@ const useStyles = makeStyles(() => ({
     paddingLeft: 10,
     height: 50,
   },
+  bodyItems: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   bodyItem: {
-    height: 20,
     fontSize: 13,
-    float: 'left',
+    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    paddingRight: 10,
   },
 }));
-
-const inlineStylesHeaders: Record<string, CSSProperties> = {
-  iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 5px',
-    padding: 0,
-    top: '0px',
-  },
-  asset_name: {
-    float: 'left',
-    width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  endpoint_hostname: {
-    float: 'left',
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  endpoint_platform: {
-    float: 'left',
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  endpoint_collected_by: {
-    float: 'left',
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  asset_tags: {
-    float: 'left',
-    width: '10%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  asset_status: {
-    float: 'left',
-    width: '10%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-};
 
 const inlineStyles: Record<string, CSSProperties> = {
   asset_name: {
@@ -190,7 +149,7 @@ const Endpoints = () => {
             primary={
               <SortHeadersComponent
                 headers={headers}
-                inlineStylesHeaders={inlineStylesHeaders}
+                inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
@@ -209,41 +168,23 @@ const Endpoints = () => {
             </ListItemIcon>
             <ListItemText
               primary={
-                <div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.asset_name}
-                  >
+                <div className={classes.bodyItems}>
+                  <div className={classes.bodyItem} style={inlineStyles.asset_name}>
                     {endpoint.asset_name}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.endpoint_hostname}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.endpoint_hostname}>
                     {endpoint.endpoint_hostname}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.endpoint_platform}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
                     {endpoint.endpoint_platform}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.endpoint_collected_by}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.endpoint_collected_by}>
                     {collectedBy(endpoint)}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.asset_tags}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.asset_tags}>
                     <ItemTags variant="list" tags={endpoint.asset_tags} />
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.asset_status}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.asset_status}>
                     <AssetStatus variant="list"
                       status={(endpoint.asset_last_seen && differenceInHours(new Date().toISOString(), endpoint.asset_last_seen) <= MAX_ALIVE_HOURS) ? 'Active' : 'Inactive'}
                     />

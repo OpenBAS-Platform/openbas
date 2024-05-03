@@ -33,13 +33,17 @@ const useStyles = makeStyles(() => ({
     paddingLeft: 10,
     height: 50,
   },
+  bodyItems: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   bodyItem: {
     fontSize: 13,
-    float: 'left',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    paddingRight: 10,
   },
 }));
 
@@ -159,17 +163,11 @@ const Groups = () => {
             </ListItemIcon>
             <ListItemText
               primary={
-                <div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.group_name}
-                  >
+                <div className={classes.bodyItems}>
+                  <div className={classes.bodyItem} style={inlineStyles.group_name}>
                     {group.group_name}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.group_default_user_assign}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.group_default_user_assign}>
                     {group.group_default_user_assign ? (
                       <Tooltip
                         title={t(
@@ -182,10 +180,7 @@ const Groups = () => {
                       '-'
                     )}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.group_default_scenario_observer}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.group_default_scenario_observer}>
                     {group.group_default_scenario_observer ? (
                       <Tooltip
                         title={t(
@@ -198,10 +193,7 @@ const Groups = () => {
                       '-'
                     )}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.group_default_scenario_planner}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.group_default_scenario_planner}>
                     {group.group_default_scenario_planner ? (
                       <Tooltip
                         title={t(
@@ -214,10 +206,7 @@ const Groups = () => {
                       '-'
                     )}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.group_default_exercise_observer}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.group_default_exercise_observer}>
                     {group.group_default_exercise_observer ? (
                       <Tooltip
                         title={t(
@@ -230,10 +219,7 @@ const Groups = () => {
                       '-'
                     )}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.group_default_exercise_planner}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.group_default_exercise_planner}>
                     {group.group_default_exercise_planner ? (
                       <Tooltip
                         title={t(
@@ -246,10 +232,7 @@ const Groups = () => {
                       '-'
                     )}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.group_users_number}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.group_users_number}>
                     {group.group_users_number}
                   </div>
                 </div>

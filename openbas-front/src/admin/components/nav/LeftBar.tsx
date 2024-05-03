@@ -449,7 +449,7 @@ const LeftBar = () => {
             {navOpen && (
               <ListItemText
                 classes={{ primary: classes.menuItemText }}
-                primary={t('Teams')}
+                primary={t('People')}
               />
             )}
             {navOpen && (selectedMenu === 'teams' ? <ExpandLessOutlined /> : <ExpandMoreOutlined />)}

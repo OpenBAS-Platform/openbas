@@ -32,13 +32,17 @@ const useStyles = makeStyles(() => ({
     paddingLeft: 10,
     height: 50,
   },
+  bodyItems: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   bodyItem: {
     fontSize: 13,
-    float: 'left',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    paddingRight: 10,
   },
 }));
 
@@ -153,48 +157,23 @@ const Users = () => {
             </ListItemIcon>
             <ListItemText
               primary={
-                <div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.user_email}
-                  >
+                <div className={classes.bodyItems}>
+                  <div className={classes.bodyItem} style={inlineStyles.user_email}>
                     {user.user_email}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.user_firstname}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.user_firstname}>
                     {user.user_firstname}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.user_lastname}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.user_lastname}>
                     {user.user_lastname}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.user_organization}
-                  >
-                    {
-                      organizationsMap[user.user_organization]
-                        ?.organization_name
-                    }
+                  <div className={classes.bodyItem} style={inlineStyles.user_organization}>
+                    {organizationsMap[user.user_organization]?.organization_name}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.user_admin}
-                  >
-                    {user.user_admin ? (
-                      <CheckCircleOutlined fontSize="small" />
-                    ) : (
-                      '-'
-                    )}
+                  <div className={classes.bodyItem} style={inlineStyles.user_admin}>
+                    {user.user_admin ? (<CheckCircleOutlined fontSize="small" />) : ('-')}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.user_tags}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.user_tags}>
                     <ItemTags variant="list" tags={user.user_tags} />
                   </div>
                 </div>

@@ -23,8 +23,13 @@ import CreateInject from '../common/injects/CreateInject';
 import { useAppDispatch } from '../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({
+  bodyItems: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   bodyItem: {
     fontSize: 13,
+    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -45,45 +50,6 @@ const useStyles = makeStyles(() => ({
     right: -10,
   },
 }));
-
-const inlineStylesHeaders: Record<string, CSSProperties> = {
-  iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 15px',
-    padding: 0,
-    top: '0px',
-  },
-  atomic_title: {
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  atomic_type: {
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  atomic_last_start_execution_date: {
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  atomic_targets: {
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  atomic_status: {
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  atomic_expectations: {
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-};
 
 const inlineStyles: Record<string, CSSProperties> = {
   atomic_title: {
@@ -222,7 +188,7 @@ const AtomicTestings = () => {
             primary={
               <SortHeadersComponent
                 headers={headers}
-                inlineStylesHeaders={inlineStylesHeaders}
+                inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
@@ -246,7 +212,7 @@ const AtomicTestings = () => {
               </ListItemIcon>
               <ListItemText
                 primary={
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div className={classes.bodyItems}>
                     {headers.map((header) => (
                       <div
                         key={header.field}

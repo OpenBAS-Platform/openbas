@@ -26,13 +26,17 @@ const useStyles = makeStyles(() => ({
     paddingLeft: 10,
     height: 50,
   },
+  bodyItems: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   bodyItem: {
     fontSize: 13,
-    float: 'left',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    paddingRight: 10,
   },
   chipInList: {
     fontSize: 12,
@@ -139,11 +143,8 @@ const KillChainPhases = () => {
             </ListItemIcon>
             <ListItemText
               primary={
-                <>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.phase_kill_chain_name}
-                  >
+                <div className={classes.bodyItems}>
+                  <div className={classes.bodyItem} style={inlineStyles.phase_kill_chain_name}>
                     <Chip
                       variant="outlined"
                       classes={{ root: classes.chipInList }}
@@ -152,25 +153,16 @@ const KillChainPhases = () => {
                       label={killChainPhase.phase_kill_chain_name}
                     />
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.phase_name}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.phase_name}>
                     {killChainPhase.phase_name}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.phase_order}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.phase_order}>
                     {killChainPhase.phase_order}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.phase_created_at}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.phase_created_at}>
                     {nsdt(killChainPhase.phase_created_at)}
                   </div>
-                </>
+                </div>
               }
             />
             <ListItemSecondaryAction>
