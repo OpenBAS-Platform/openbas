@@ -144,7 +144,7 @@ const AssetGroupDialogAdding: FunctionComponent<Props> = ({
               })}
               <AssetGroupCreation
                 inline
-                onCreate={(result) => addAssetGroup(result)}
+                onCreate={(result) => addAssetGroup(result.asset_group_id)}
               />
             </List>
           </Grid>

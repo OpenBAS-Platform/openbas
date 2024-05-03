@@ -29,6 +29,8 @@ interface Props {
   assetGroup: AssetGroupStore;
   onRemoveAssetGroupFromInject?: (assetGroupId: string) => void;
   openEditOnInit?: boolean;
+  onUpdate?: (result: AssetGroupStore) => void;
+  onDelete?: (result: string) => void;
 }
 
 const AssetGroupPopover: FunctionComponent<Props> = ({
@@ -36,6 +38,8 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
   assetGroup,
   onRemoveAssetGroupFromInject,
   openEditOnInit = false,
+  onUpdate,
+  onDelete,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -64,8 +68,18 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
     setAnchorEl(null);
   };
   const submitEdit = (data: AssetGroupInput) => {
-    dispatch(updateAssetGroup(assetGroup.asset_group_id, data));
-    setEdition(false);
+    dispatch(updateAssetGroup(assetGroup.asset_group_id, data)).then(
+      (result: { result: string, entities: { asset_groups: Record<string, AssetGroupStore> } }) => {
+        if (result.entities) {
+          if (onUpdate) {
+            const updated = result.entities.asset_groups[result.result];
+            onUpdate(updated);
+          }
+        }
+        setEdition(false);
+        return result;
+      },
+    );
   };
 
   // Manage assets
@@ -89,8 +103,14 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
     setAnchorEl(null);
   };
   const submitDelete = () => {
-    dispatch(deleteAssetGroup(assetGroup.asset_group_id));
-    setDeletion(false);
+    dispatch(deleteAssetGroup(assetGroup.asset_group_id)).then(
+      () => {
+        if (onDelete) {
+          onDelete(assetGroup.asset_group_id);
+        }
+        setDeletion(false);
+      },
+    );
   };
 
   return (

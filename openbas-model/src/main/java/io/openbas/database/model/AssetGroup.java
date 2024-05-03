@@ -38,11 +38,12 @@ public class AssetGroup implements Base {
   @NotBlank
   @Column(name = "asset_group_name")
   @JsonProperty("asset_group_name")
-  @Queryable(searchable = true)
+  @Queryable(searchable = true, sortable = true)
   private String name;
 
   @Column(name = "asset_group_description")
   @JsonProperty("asset_group_description")
+  @Queryable(sortable = true)
   private String description;
 
   // -- ASSET --
@@ -79,6 +80,7 @@ public class AssetGroup implements Base {
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("asset_group_tags")
+  @Queryable(sortable = true)
   private List<Tag> tags = new ArrayList<>();
 
   // -- AUDIT --
