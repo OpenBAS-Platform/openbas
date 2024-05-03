@@ -8,6 +8,7 @@ import { fetchTags } from '../../../../actions/Tag';
 import { fetchTeams } from '../../../../actions/teams/team-actions';
 import type { InjectStore } from '../../../../actions/injects/Inject';
 import UpdateInjectDetails from './UpdateInjectDetails';
+import type { TeamStore } from '../../../../actions/teams/Team';
 
 interface Props {
   open: boolean
@@ -16,9 +17,10 @@ interface Props {
   injectorContract: InjectorContract
   inject: InjectStore
   isAtomic: boolean
+  teamsFromExerciseOrScenario: TeamStore[]
 }
 
-const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, injectorContract, inject, isAtomic = false, ...props }) => {
+const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, injectorContract, inject, isAtomic = false, teamsFromExerciseOrScenario, ...props }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const drawerRef = useRef(null);
@@ -44,6 +46,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, inje
           handleClose={handleClose}
           onUpdateInject={onUpdateInject}
           isAtomic={isAtomic}
+          teamsFromExerciseOrScenario={teamsFromExerciseOrScenario}
           {...props}
         />
       )}

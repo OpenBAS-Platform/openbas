@@ -12,6 +12,9 @@ import { AtomicTestingResultContext } from '../../common/Context';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import UpdateInject from '../../common/injects/UpdateInject';
+import type { TeamsHelper } from '../../../../actions/teams/team-helper';
+import { fetchTeams } from '../../../../actions/teams/team-actions';
+import type { TeamStore } from '../../../../actions/teams/Team';
 
 interface Props {
   atomic: AtomicTestingOutput;
@@ -26,11 +29,13 @@ const AtomicPopover: FunctionComponent<Props> = ({
   const navigate = useNavigate();
 
   // Fetching data
-  const { inject } = useHelper((helper: AtomicTestingHelper) => ({
+  const { inject, teams } = useHelper((helper: AtomicTestingHelper & TeamsHelper) => ({
     inject: helper.getInject(atomic.atomic_id),
+    teams: helper.getTeams(),
   }));
   useDataLoader(() => {
     dispatch(fetchAtomicTestingForUpdate(atomic.atomic_id));
+    dispatch(fetchTeams());
   });
 
   // Context
@@ -84,6 +89,7 @@ const AtomicPopover: FunctionComponent<Props> = ({
         onUpdateInject={onUpdateAtomicTesting}
         inject={inject}
         isAtomic
+        teamsFromExerciseOrScenario={teams?.filter((team: TeamStore) => !team.team_contextual)}
       />
       <DialogDelete
         open={deletion}

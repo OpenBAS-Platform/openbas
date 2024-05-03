@@ -132,7 +132,8 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   const handleCloseRemoveFromInject = () => setOpenRemoveFromInject(false);
 
   const submitRemoveFromInject = () => {
-    return dispatch(onRemoveTeamFromInject!(team.team_id)).then(() => handleCloseRemoveFromInject());
+    onRemoveTeamFromInject!(team.team_id);
+    handleCloseRemoveFromInject();
   };
 
   const initialValues: TeamInputForm = {

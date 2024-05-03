@@ -42,14 +42,12 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  disabled: boolean
   handleAddTeams: (teamIds: string[]) => void;
   injectTeamsIds: string[]
   teams: TeamStore[]
 }
 
 const InjectAddTeams: FunctionComponent<Props> = ({
-  disabled,
   handleAddTeams,
   injectTeamsIds,
   teams,
@@ -137,7 +135,7 @@ const InjectAddTeams: FunctionComponent<Props> = ({
         divider
         onClick={handleOpen}
         color="primary"
-        disabled={permissions.readOnly || disabled}
+        disabled={permissions.readOnly}
       >
         <ListItemIcon color="primary">
           <ControlPointOutlined color="primary" />
