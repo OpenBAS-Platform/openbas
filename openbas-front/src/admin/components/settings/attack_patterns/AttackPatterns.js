@@ -36,7 +36,6 @@ const useStyles = makeStyles(() => ({
   },
   bodyItem: {
     fontSize: 13,
-    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -145,7 +144,7 @@ const AttackPatterns = () => {
             key={attackPattern.attack_pattern_id}
             classes={{ root: classes.item }}
             divider={true}
-          >/
+          >
             <ListItemIcon>
               <LockPattern color="primary" />
             </ListItemIcon>

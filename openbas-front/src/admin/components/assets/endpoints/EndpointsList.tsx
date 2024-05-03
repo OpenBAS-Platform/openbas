@@ -12,7 +12,6 @@ const useStyles = makeStyles(() => ({
   bodyItem: {
     fontSize: 13,
     float: 'left',
-    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',

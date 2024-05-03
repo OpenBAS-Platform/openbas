@@ -1,5 +1,5 @@
 import React from 'react';
-import { HorizontalRule, SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
+import { HorizontalRuleOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import type { ExpectationResultsByType } from '../../../../utils/api-types';
 
@@ -17,7 +17,6 @@ interface Props {
 
 const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
   const classes = useStyles();
-
   const getColor = (result: string | undefined): string => {
     const colorMap: Record<string, string> = {
       VALIDATED: 'rgb(107, 235, 112)',
@@ -25,14 +24,11 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
       FAILED: 'rgb(220, 81, 72)',
       UNKNOWN: 'rgba(128,127,127,0.37)',
     };
-
     return colorMap[result ?? ''] ?? 'rgb(245, 166, 35)';
   };
-
   if (!expectations || expectations.length === 0) {
-    return <HorizontalRule/>;
+    return <HorizontalRuleOutlined />;
   }
-
   return (
     <div className={classes.inline}>
       {expectations.map((expectation, index) => {
@@ -40,13 +36,13 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
         let IconComponent;
         switch (expectation.type) {
           case 'PREVENTION':
-            IconComponent = Shield;
+            IconComponent = ShieldOutlined;
             break;
           case 'DETECTION':
-            IconComponent = TrackChanges;
+            IconComponent = TrackChangesOutlined;
             break;
           default:
-            IconComponent = SensorOccupied;
+            IconComponent = SensorOccupiedOutlined;
         }
         return (
           <IconComponent key={index} style={{ color, marginRight: 10 }}/>

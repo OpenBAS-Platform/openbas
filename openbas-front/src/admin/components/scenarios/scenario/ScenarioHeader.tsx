@@ -108,11 +108,7 @@ const ScenarioHeader = ({
   return (
     <>
       <Tooltip title={scenario.scenario_name}>
-        <Typography
-          variant="h1"
-          gutterBottom={true}
-          classes={{ root: classes.title }}
-        >
+        <Typography variant="h1" gutterBottom={true} classes={{ root: classes.title }}>
           {truncate(scenario.scenario_name, 80)}
         </Typography>
       </Tooltip>

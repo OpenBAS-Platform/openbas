@@ -2,7 +2,7 @@ import Chart from 'react-apexcharts';
 import React, { FunctionComponent } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Box, Button, Typography } from '@mui/material';
-import { InfoOutlined, SensorOccupied, Shield, TrackChanges } from '@mui/icons-material';
+import { InfoOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { useFormatter } from '../../../../components/i18n';
 import type { ExpectationResultsByType, ResultDistribution } from '../../../../utils/api-types';
@@ -74,11 +74,11 @@ const ResponsePie: FunctionComponent<Props> = ({
   const getChartIcon = (type: 'DETECTION' | 'HUMAN_RESPONSE' | 'PREVENTION' | undefined) => {
     switch (type) {
       case 'DETECTION':
-        return <TrackChanges className={classes.iconOverlay} />;
+        return <TrackChangesOutlined className={classes.iconOverlay} />;
       case 'PREVENTION':
-        return <Shield className={classes.iconOverlay} />;
+        return <ShieldOutlined className={classes.iconOverlay} />;
       default:
-        return <SensorOccupied className={classes.iconOverlay} />;
+        return <SensorOccupiedOutlined className={classes.iconOverlay} />;
     }
   };
 

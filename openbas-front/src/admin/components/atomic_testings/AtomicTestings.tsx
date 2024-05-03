@@ -29,7 +29,6 @@ const useStyles = makeStyles(() => ({
   },
   bodyItem: {
     fontSize: 13,
-    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -52,11 +51,11 @@ const useStyles = makeStyles(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  atomic_title: {
-    width: '20%',
-  },
   atomic_type: {
     width: '15%',
+  },
+  atomic_title: {
+    width: '20%',
   },
   atomic_last_start_execution_date: {
     width: '15%',
@@ -111,12 +110,6 @@ const AtomicTestings = () => {
   // Headers
   const headers = [
     {
-      field: 'atomic_title',
-      label: 'Title',
-      isSortable: true,
-      value: (atomicTesting: AtomicTestingOutput) => atomicTesting.atomic_title,
-    },
-    {
       field: 'atomic_type',
       label: 'Type',
       isSortable: true,
@@ -124,6 +117,12 @@ const AtomicTestings = () => {
       value: (atomicTesting: AtomicTestingOutput) => {
         return (<InjectorContract variant="list" label={tPick(atomicTesting.atomic_injector_contract.injector_contract_labels)} />);
       },
+    },
+    {
+      field: 'atomic_title',
+      label: 'Title',
+      isSortable: true,
+      value: (atomicTesting: AtomicTestingOutput) => atomicTesting.atomic_title,
     },
     {
       field: 'atomic_last_start_execution_date',
@@ -200,7 +199,7 @@ const AtomicTestings = () => {
             <ListItemButton
               key={atomicTesting.atomic_id}
               classes={{ root: classes.item }}
-              divider
+              divider={true}
               component={Link}
               to={`/admin/atomic_testings/${atomicTesting.atomic_id}`}
             >
@@ -231,9 +230,7 @@ const AtomicTestings = () => {
             </ListItemButton>
           );
         })}
-        {!atomics ? (
-          <Empty message={t('No data available')} />
-        ) : null}
+        {!atomics ? (<Empty message={t('No data available')} />) : null}
       </List>
       {userAdmin && <CreateInject title={t('Create a new atomic test')} onCreateInject={onCreateAtomicTesting} isAtomic />}
     </>

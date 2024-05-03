@@ -32,15 +32,11 @@ const AtomicTesting = () => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { atomicId } = useParams() as { atomicId: AtomicTestingOutput['atomic_id'] };
-
   const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
-
   const filtering = useSearchAnFilter('', 'name', ['name']);
 
   // Fetching data
-  const { atomic }: {
-    atomic: AtomicTestingOutput,
-  } = useHelper((helper: AtomicTestingHelper) => ({
+  const { atomic }: { atomic: AtomicTestingOutput } = useHelper((helper: AtomicTestingHelper) => ({
     atomic: helper.getAtomicTesting(atomicId),
   }));
   useDataLoader(() => {

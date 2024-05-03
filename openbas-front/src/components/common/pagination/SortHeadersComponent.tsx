@@ -1,6 +1,5 @@
 import React, { CSSProperties, FunctionComponent, useState } from 'react';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
-import { Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../i18n';
 import type { SearchPaginationInput } from '../../../utils/api-types';
@@ -12,6 +11,10 @@ const useStyles = makeStyles(() => ({
     fontWeight: '700',
     cursor: 'pointer',
     paddingRight: 10,
+    alignItems: 'center',
+  },
+  headerItems: {
+    display: 'flex',
     alignItems: 'center',
   },
   headerItem: {
@@ -90,9 +93,9 @@ const SortHeadersComponent: FunctionComponent<Props> = ({
 
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <div className={classes.headerItems}>
         {headers.map((header: Header) => (sortHeader(header, inlineStylesHeaders[header.field])))}
-      </Box>
+      </div>
     </>
   );
 };

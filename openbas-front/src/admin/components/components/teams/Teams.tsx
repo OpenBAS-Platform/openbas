@@ -23,6 +23,7 @@ const useStyles = makeStyles(() => ({
   itemHeader: {
     textTransform: 'uppercase',
     cursor: 'pointer',
+    paddingLeft: 10,
   },
   item: {
     paddingLeft: 10,
@@ -34,7 +35,6 @@ const useStyles = makeStyles(() => ({
   },
   bodyItem: {
     fontSize: 13,
-    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',

@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   itemHeader: {
     textTransform: 'uppercase',
     cursor: 'pointer',
+    paddingLeft: 10,
   },
   item: {
     height: 50,

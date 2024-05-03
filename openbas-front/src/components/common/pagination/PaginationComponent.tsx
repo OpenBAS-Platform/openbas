@@ -8,14 +8,14 @@ import ExportButton, { ExportProps } from '../ExportButton';
 import mitreAttack from '../../../static/images/misc/attack.png';
 
 const useStyles = makeStyles(() => ({
+  container: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   parameters: {
     marginTop: -10,
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  container: {
-    display: 'flex',
     alignItems: 'center',
   },
 }));
