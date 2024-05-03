@@ -32,7 +32,7 @@ const useStyles = makeStyles(() => ({
 
 const Detail: FunctionComponent<Props> = () => {
   const classes = useStyles();
-  const { t } = useFormatter();
+  const { t, tPick } = useFormatter();
   const dispatch = useAppDispatch();
   const { atomicId } = useParams() as { atomicId: AtomicTestingDetailOutput['atomic_id'] };
 
@@ -60,6 +60,14 @@ const Detail: FunctionComponent<Props> = () => {
                 </Typography>
                 <Typography variant="body1" gutterBottom>
                   {atomicDetail?.atomic_description || '-'}
+                </Typography>
+              </div>
+              <div>
+                <Typography variant="subtitle1" className={classes.header} gutterBottom>
+                  {t('Type')}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  {tPick(atomicDetail.atomic_injector_label)}
                 </Typography>
               </div>
               <div>
@@ -125,28 +133,37 @@ const Detail: FunctionComponent<Props> = () => {
                   ))}
                 </ul>
               )}
-              <Typography variant="body1" gutterBottom>
-                {t('Tracking Sent Date')}: {atomicDetail.tracking_sent_date || 'N/A'}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                {t('Tracking Ack Date')}: {atomicDetail.tracking_ack_date || 'N/A'}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                {t('Tracking End Date')}: {atomicDetail.tracking_end_date || 'N/A'}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                {t('Tracking Total Execution')}
-                {t('Time')}: {atomicDetail.tracking_total_execution_time || 'N/A'} ms
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                {t('Tracking Total Count')}: {atomicDetail.tracking_total_count || 'N/A'}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                {t('Tracking Total Error')}: {atomicDetail.tracking_total_error || 'N/A'}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                {t('Tracking Total Success')}: {atomicDetail.tracking_total_success || 'N/A'}
-              </Typography>
+              {atomicDetail.tracking_sent_date ? (
+                <>
+                  <Typography variant="body1" gutterBottom>
+                    {t('Tracking Sent Date')}: {atomicDetail.tracking_sent_date}
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {t('Tracking Ack Date')}: {atomicDetail.tracking_ack_date}
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {t('Tracking End Date')}: {atomicDetail.tracking_end_date}
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {t('Tracking Total Execution')}
+                    {t('Time')}: {atomicDetail.tracking_total_execution_time} ms
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {t('Tracking Total Count')}: {atomicDetail.tracking_total_count}
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {t('Tracking Total Error')}: {atomicDetail.tracking_total_error}
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {t('Tracking Total Success')}: {atomicDetail.tracking_total_success}
+                  </Typography>
+                </>
+              ) : (
+                <Typography variant="body1" gutterBottom>
+                  {t('No data available')}
+                </Typography>
+              )}
+
             </pre>
           </Paper>
         ) : (

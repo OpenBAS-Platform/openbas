@@ -74,27 +74,32 @@ public class AtomicTestingMapper {
   }
 
   public static AtomicTestingDetailOutput toDetailDto(Inject inject) {
-    return inject.getStatus().map(status ->
-        AtomicTestingDetailOutput
-            .builder()
-            .atomicId(inject.getId())
-            .description(inject.getDescription())
-            .content(inject.getContent())
-            .expectations(inject.getExpectations())
-            .tags(inject.getTags())
-            .documents(inject.getDocuments())
-            .status(status.getName())
-            .traces(status.getTraces().stream().map(trace -> trace.getStatus() + " " + trace.getMessage())
-                .collect(Collectors.toList()))
-            .trackingAckDate(status.getTrackingAckDate())
-            .trackingSentDate(status.getTrackingSentDate())
-            .trackingEndDate(status.getTrackingEndDate())
-            .trackingTotalCount(status.getTrackingTotalCount())
-            .trackingTotalError(status.getTrackingTotalError())
-            .trackingTotalSuccess(status.getTrackingTotalSuccess())
-            .build()
-    ).orElse(AtomicTestingDetailOutput.builder().status(ExecutionStatus.DRAFT).build());
+    AtomicTestingDetailOutput.AtomicTestingDetailOutputBuilder atomicTestingDetailOutputBuilder = AtomicTestingDetailOutput
+        .builder()
+        .atomicId(inject.getId())
+        .description(inject.getDescription())
+        .content(inject.getContent())
+        .expectations(inject.getExpectations())
+        .tags(inject.getTags())
+        .documents(inject.getDocuments())
+        .injectorLabel(inject.getInjectorContract().getLabels());
 
+    if (inject.getStatus().isPresent()) {
+      InjectStatus injectStatus = inject.getStatus().get();
+      atomicTestingDetailOutputBuilder
+          .status(injectStatus.getName())
+          .traces(injectStatus.getTraces().stream().map(trace -> trace.getStatus() + " " + trace.getMessage())
+              .collect(Collectors.toList()))
+          .trackingAckDate(injectStatus.getTrackingAckDate())
+          .trackingSentDate(injectStatus.getTrackingSentDate())
+          .trackingEndDate(injectStatus.getTrackingEndDate())
+          .trackingTotalCount(injectStatus.getTrackingTotalCount())
+          .trackingTotalError(injectStatus.getTrackingTotalError())
+          .trackingTotalSuccess(injectStatus.getTrackingTotalSuccess());
+    } else {
+      atomicTestingDetailOutputBuilder.status(ExecutionStatus.DRAFT);
+    }
+    return atomicTestingDetailOutputBuilder.build();
   }
 
   public record ExpectationResultsByType(@NotNull ExpectationType type, @NotNull ExpectationStatus avgResult,

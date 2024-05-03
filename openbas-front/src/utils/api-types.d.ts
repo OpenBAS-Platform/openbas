@@ -131,6 +131,7 @@ export interface AtomicTestingDetailOutput {
   atomic_documents?: InjectDocument[];
   atomic_expectations?: InjectExpectation[];
   atomic_id: string;
+  atomic_injector_label?: Record<string, string>;
   atomic_tags?: Tag[];
   status_label?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_traces?: string[];

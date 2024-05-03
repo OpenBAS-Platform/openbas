@@ -15,7 +15,9 @@ import lombok.Setter;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -29,6 +31,9 @@ public class AtomicTestingDetailOutput {
 
   @JsonProperty("atomic_description")
   private String description;
+
+  @JsonProperty("atomic_injector_label")
+  private Map<String, String> injectorLabel = new HashMap<>();
 
   @JsonProperty("atomic_content")
   private ObjectNode content;
