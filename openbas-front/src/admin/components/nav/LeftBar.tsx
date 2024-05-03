@@ -497,25 +497,27 @@ const LeftBar = () => {
         </MenuList>
         <Divider />
         <MenuList component="nav">
-          <StyledTooltip title={!navOpen && t('Reports')} placement="right">
-            <MenuItem
-              component={Link}
-              to="/admin/reports"
-              selected={location.pathname.includes('/admin/reports')}
-              dense={true}
-              classes={{ root: classes.menuItem }}
-              disabled={true}
-            >
-              <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
-                <DescriptionOutlined />
-              </ListItemIcon>
-              {navOpen && (
+          <StyledTooltip title={!navOpen && t('Reports - Coming soon')} placement="right">
+            <span>
+              <MenuItem
+                component={Link}
+                to="/admin/reports"
+                selected={location.pathname.includes('/admin/reports')}
+                dense={true}
+                classes={{ root: classes.menuItem }}
+                disabled={true}
+              >
+                <ListItemIcon classes={{ root: classes.menuItemIcon }} style={{ minWidth: 20 }}>
+                  <DescriptionOutlined />
+                </ListItemIcon>
+                {navOpen && (
                 <ListItemText
                   classes={{ primary: classes.menuItemText }}
                   primary={t('Reports')}
                 />
-              )}
-            </MenuItem>
+                )}
+              </MenuItem>
+            </span>
           </StyledTooltip>
           <StyledTooltip title={!navOpen && t('Skills - Coming soon')} placement="right">
             <span>

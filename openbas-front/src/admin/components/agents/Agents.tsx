@@ -51,6 +51,7 @@ const Injectors = () => {
   const [selectedInjectors, setSelectedInjectors] = useState<null | Injector[]>(null);
   const [activeTab, setActiveTab] = useState<null | string>(null);
   const [implantName, setImplantName] = useState('splunkd');
+  const [implantFolder, setImplantFolder] = useState('C:\\Users\\Public\\');
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
@@ -104,10 +105,10 @@ $wc=New-Object System.Net.WebClient;
 $wc.Headers.add("pl7atform","windows");
 $wc.Headers.add("file","sandcat.go");
 $data=$wc.DownloadData($url);
-get-process | ? {$_.modules.filename -like "C:\\Users\\Public\\${implantName}.exe"} | stop-process -f;
-rm -force "C:\\Users\\Public\\${implantName}.exe" -ea ignore;
-[io.file]::WriteAllBytes("C:\\Users\\Public\\${implantName}.exe",$data) | Out-Null;
-Start-Process -FilePath C:\\Users\\Public\\${implantName}.exe -ArgumentList "-server $server -group red" -WindowStyle hidden;`,
+get-process | ? {$_.modules.filename -like "${implantFolder}${implantName}.exe"} | stop-process -f;
+rm -force "${implantFolder}${implantName}.exe" -ea ignore;
+[io.file]::WriteAllBytes("${implantFolder}${implantName}.exe",$data) | Out-Null;
+Start-Process -FilePath ${implantFolder}${implantName}.exe -ArgumentList "-server $server -group red" -WindowStyle hidden;`,
           code: `$server="${settings.caldera_public_url}";$url="$server/file/download";$wc=New-Object System.Net.WebClient;$wc.Headers.add("platform","windows");$wc.Headers.add("file","sandcat.go");$data=$wc.DownloadData($url);get-process | ? {$_.modules.filename -like "C:\\Users\\Public\\${implantName}.exe"} | stop-process -f;rm -force "C:\\Users\\Public\\${implantName}.exe" -ea ignore;[io.file]::WriteAllBytes("C:\\Users\\Public\\${implantName}.exe",$data) | Out-Null;Start-Process -FilePath C:\\Users\\Public\\${implantName}.exe -ArgumentList "-server $server -group red" -WindowStyle hidden;`,
         };
       case 'linux':
@@ -332,7 +333,16 @@ chmod +x ${implantName};
                   onChange={(event) => setImplantName(event.target.value)}
                   style={{ marginTop: 10 }}
                 />
-                <pre style={{ marginBottom: 10 }}><code>{platformSelector().displayedCode}</code></pre>
+                {platform === 'windows' && (
+                  <TextField
+                    label={t('Implant folder')}
+                    fullWidth={true}
+                    value={implantFolder}
+                    onChange={(event) => setImplantFolder(event.target.value)}
+                    style={{ marginTop: 20 }}
+                  />
+                )}
+                <pre style={{ margin: '25px 0 10px 0' }}><code>{platformSelector().displayedCode}</code></pre>
                 <Button variant="outlined" style={{ width: '100%', marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformSelector().code)}>{t('Copy')}</Button>
               </div>
             ) : (
