@@ -38,7 +38,6 @@ import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
-import TeamPopover from '../../components/teams/TeamPopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddTeams from './InjectAddTeams';
 import OldTextField from '../../../../components/fields/OldTextField';
@@ -62,6 +61,7 @@ import InjectAddEndpoints from '../../simulations/injects/endpoints/InjectAddEnd
 import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
 import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
 import InjectAddAssetGroups from '../../simulations/injects/asset_groups/InjectAddAssetGroups';
+import InjectTeamsList from './teams/InjectTeamsList';
 
 const styles = (theme) => ({
   header: {
@@ -372,6 +372,7 @@ class InjectDefinition extends Component {
     this.props.fetchDocuments();
     this.props.fetchChannels();
     this.props.fetchChallenges();
+    this.props.setInjectDetailsState(this.state);
   }
 
   toggleAll() {
@@ -480,39 +481,6 @@ class InjectDefinition extends Component {
         }
         : d)),
     }, () => this.props.setInjectDetailsState(this.state));
-  }
-
-  teamsReverseBy(field) {
-    this.setState({
-      teamsSortBy: field,
-      teamsOrderAsc: !this.state.teamsOrderAsc,
-    });
-  }
-
-  teamsSortHeader(field, label, isSortable) {
-    const { t } = this.props;
-    const { teamsSortBy, teamsOrderAsc } = this.state;
-    const sortComponent = teamsOrderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
-    if (isSortable) {
-      return (
-        <div
-          style={inlineStylesHeaders[field]}
-          onClick={this.teamsReverseBy.bind(this, field)}
-        >
-          <span>{t(label)}</span>
-          {teamsSortBy === field ? sortComponent : ''}
-        </div>
-      );
-    }
-    return (
-      <div style={inlineStylesHeaders[field]}>
-        <span>{t(label)}</span>
-      </div>
-    );
   }
 
   articlesReverseBy(field) {
@@ -1176,54 +1144,10 @@ class InjectDefinition extends Component {
                   </ListItem>
                 ) : (
                   <>
-                    {sortedTeams.map((team) => (
-                      <ListItem
-                        key={team.team_id}
-                        classes={{ root: classes.item }}
-                        divider={true}
-                      >
-                        <ListItemIcon>
-                          <GroupsOutlined />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <>
-                              <div
-                                className={classes.bodyItem}
-                                style={inlineStyles.team_name}
-                              >
-                                {team.team_name}
-                              </div>
-                              <div
-                                className={classes.bodyItem}
-                                style={inlineStyles.team_users_number}
-                              >
-                                {team.team_users_number}
-                              </div>
-                              <div
-                                className={classes.bodyItem}
-                                style={inlineStyles.team_users_enabled_number}
-                              >
-                                {team.team_users_enabled_number}
-                              </div>
-                              <div
-                                className={classes.bodyItem}
-                                style={inlineStyles.team_tags}
-                              >
-                                <ItemTags variant="list" tags={team.team_tags} />
-                              </div>
-                            </>
-                          }
-                        />
-                        <ListItemSecondaryAction>
-                          <TeamPopover
-                            team={team}
-                            onRemoveTeam={this.handleRemoveTeam.bind(this)}
-                            disabled={this.props.permissions.readOnly || fieldTeams.readOnly}
-                          />
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                    ))}
+                    <InjectTeamsList
+                      teams={sortedTeams}
+                      handleRemoveTeam={this.handleRemoveTeam.bind(this)}
+                    />
                     <InjectAddTeams
                       teams={teamsFromExerciseOrScenario}
                       injectTeamsIds={teamsIds}

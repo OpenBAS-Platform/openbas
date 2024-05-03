@@ -44,6 +44,7 @@ const UpdateInjectDetails = ({
   onUpdateInject,
   isAtomic = false,
   drawerRef,
+  teamsFromExerciseOrScenario,
   ...props
 }) => {
   const { t } = useFormatter();
@@ -52,9 +53,8 @@ const UpdateInjectDetails = ({
   const [openDetails, setOpenDetails] = useState(true);
   const [injectDetailsState, setInjectDetailsState] = useState({});
   const dispatch = useAppDispatch();
-  const { tagsMap, teams } = useHelper((helper) => ({
+  const { tagsMap } = useHelper((helper) => ({
     tagsMap: helper.getTagsMap(),
-    teams: helper.getTeams(),
   }));
   useDataLoader(() => {
     dispatch(fetchTeams());
@@ -329,7 +329,7 @@ const UpdateInjectDetails = ({
                     handleClose={handleClose}
                     tagsMap={tagsMap}
                     permissions={permissions}
-                    teamsFromExerciseOrScenario={teams}
+                    teamsFromExerciseOrScenario={teamsFromExerciseOrScenario}
                     articlesFromExerciseOrScenario={[]}
                     variablesFromExerciseOrScenario={[]}
                     onUpdateInject={onUpdateInject}
