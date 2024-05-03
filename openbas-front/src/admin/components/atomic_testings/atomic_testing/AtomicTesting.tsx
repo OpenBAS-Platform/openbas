@@ -61,7 +61,7 @@ const AtomicTesting = () => {
     <>
       <Grid container spacing={2} classes={{ root: classes.container }}>
         <Grid item xs={12}>
-          <ResponsePie expectations={atomic.atomic_expectation_results}/>
+          <ResponsePie expectationResultsByTypes={atomic.atomic_expectation_results} />
         </Grid>
       </Grid>
       <Grid container spacing={2} classes={{ root: classes.container }}>
@@ -78,16 +78,16 @@ const AtomicTesting = () => {
           {sortedTargets.length > 0 ? (
             <List>
               {sortedTargets.map((target) => <div key={target?.id} style={{ marginBottom: 15 }}>
-                <Paper elevation={3} >
-                  <TargetListItem onClick={handleTargetClick} target={target}/>
+                <Paper elevation={3}>
+                  <TargetListItem onClick={handleTargetClick} target={target} />
                 </Paper>
                 <List component="div" disablePadding>
-                  {target?.children?.map((child) => <TargetListItem key={child?.id} isChild onClick={handleTargetClick} target={child}/>)}
+                  {target?.children?.map((child) => <TargetListItem key={child?.id} isChild onClick={handleTargetClick} target={child} />)}
                 </List>
               </div>)}
             </List>
           ) : (
-            <Empty message={t('No targets available')}/>
+            <Empty message={t('No targets available')} />
           )}
         </Grid>
         <Grid item xs={7} style={{ paddingBottom: 24 }}>
@@ -106,7 +106,7 @@ const AtomicTesting = () => {
               }}
               >
                 {!selectedTarget && (
-                <Empty message={t('No target data available')}/>
+                  <Empty message={t('No target data available')} />
                 )}
               </div>
             )}

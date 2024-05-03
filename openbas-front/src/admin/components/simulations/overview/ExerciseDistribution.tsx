@@ -12,6 +12,10 @@ import ExerciseDistributionScoreOverTimeByTeam from './ExerciseDistributionScore
 import ExerciseDistributionScoreByTeam from './ExerciseDistributionScoreByTeam';
 import ExerciseDistributionScoreByTeamInPercentage from './ExerciseDistributionScoreByTeamInPercentage';
 import ExerciseDistributionScoreOverTimeByTeamInPercentage from './ExerciseDistributionScoreOverTimeByTeamInPercentage';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../actions/Exercise';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { fetchInjects } from '../../../../actions/Inject';
 
 const useStyles = makeStyles(() => ({
   paperChart: {
@@ -32,6 +36,13 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
+  const dispatch = useAppDispatch();
+
+  useDataLoader(() => {
+    dispatch(fetchExerciseInjectExpectations(exerciseId));
+    dispatch(fetchInjects(exerciseId));
+    dispatch(fetchExerciseTeams(exerciseId));
+  });
 
   return (
     <Grid container spacing={3}>

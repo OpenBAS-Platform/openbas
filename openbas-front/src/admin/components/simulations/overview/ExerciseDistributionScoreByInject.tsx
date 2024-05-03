@@ -8,11 +8,7 @@ import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchInjects } from '../../../../actions/Inject';
-import { fetchExerciseInjectExpectations } from '../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
-import { useAppDispatch } from '../../../../utils/hooks';
 import type { InjectExpectationStore } from '../../../../actions/injects/Inject';
 import type { Inject } from '../../../../utils/api-types';
 
@@ -25,7 +21,6 @@ const ExerciseDistributionScoreByInject: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   const theme: Theme = useTheme();
 
   // Fetching data
@@ -33,10 +28,6 @@ const ExerciseDistributionScoreByInject: FunctionComponent<Props> = ({
     injectsMap: helper.getInjectsMap(),
     injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
   }));
-  useDataLoader(() => {
-    dispatch(fetchInjects(exerciseId));
-    dispatch(fetchExerciseInjectExpectations(exerciseId));
-  });
 
   const injectsTotalScores = R.pipe(
     R.filter((n: InjectExpectationStore) => !R.isEmpty(n.inject_expectation_results)),

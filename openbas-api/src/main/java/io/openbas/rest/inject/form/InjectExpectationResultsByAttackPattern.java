@@ -26,9 +26,8 @@ public class InjectExpectationResultsByAttackPattern {
   @Data
   public static class InjectExpectationResultsByType {
 
-    @JsonSerialize(using = MonoIdDeserializer.class)
-    @JsonProperty("inject")
-    private Inject inject;
+    @JsonProperty("inject_title")
+    private String injectTitle;
 
     @JsonProperty("results")
     private List<ExpectationResultsByType> results;
@@ -40,7 +39,7 @@ public class InjectExpectationResultsByAttackPattern {
     this.results = injects.stream()
         .map(inject -> {
           InjectExpectationResultsByType result = new InjectExpectationResultsByType();
-          result.setInject(inject);
+          result.setInjectTitle(inject.getTitle());
           result.setResults(AtomicTestingUtils.getExpectationResultByTypes(inject.getExpectations()));
           return result;
         })

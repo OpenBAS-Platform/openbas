@@ -67,6 +67,10 @@ export default ({ mode }: { mode: string }) => {
         'cronstrue',
         '@microsoft/fetch-event-source',
         'uuid',
+        'html-react-parser',
+        'dompurify',
+        'react-markdown',
+        'remark-flexible-markers',
       ],
     },
 

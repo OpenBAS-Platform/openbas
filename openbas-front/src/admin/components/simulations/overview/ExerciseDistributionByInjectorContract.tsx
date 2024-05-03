@@ -5,13 +5,9 @@ import * as R from 'ramda';
 import Empty from '../../../../components/Empty';
 import { horizontalBarsChartOptions } from '../../../../utils/Charts';
 import { useFormatter } from '../../../../components/i18n';
-import { useAppDispatch } from '../../../../utils/hooks';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchInjects } from '../../../../actions/Inject';
-import { fetchExerciseInjectExpectations } from '../../../../actions/Exercise';
 import type { InjectExpectationStore, InjectStore } from '../../../../actions/injects/Inject';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 
@@ -24,7 +20,6 @@ const ExerciseDistributionByInjectorContract: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t, tPick } = useFormatter();
-  const dispatch = useAppDispatch();
   const theme: Theme = useTheme();
 
   // Fetching data
@@ -32,10 +27,6 @@ const ExerciseDistributionByInjectorContract: FunctionComponent<Props> = ({
     injectsMap: helper.getInjectsMap(),
     injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
   }));
-  useDataLoader(() => {
-    dispatch(fetchInjects(exerciseId));
-    dispatch(fetchExerciseInjectExpectations(exerciseId));
-  });
 
   const sortedInjectorContractsByTotalScore = R.pipe(
     R.filter((n: InjectExpectationStore) => !R.isEmpty(n.inject_expectation_results)),

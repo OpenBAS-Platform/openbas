@@ -424,6 +424,17 @@ export const storeHelper = (state) => ({
   getInjector: (id) => entity(id, 'injectors', state),
   getInjectors: () => entities('injectors', state),
   getInjectorsMap: () => maps('injectors', state),
+  // injector contracts
+  getInjectorContract: (id) => {
+    const i = entity(id, 'injector_contracts', state);
+    if (!i) {
+      return i;
+    }
+    return ({
+      ...i,
+      ...JSON.parse(i.injector_contract_content),
+    });
+  },
   // collectors
   getCollector: (id) => entity(id, 'collectors', state),
   getCollectors: () => entities('collectors', state),

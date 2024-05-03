@@ -32,10 +32,7 @@ const Exercise = () => {
 
   return (
     <>
-      {results == null
-        ? <Loader variant="inElement" />
-        : <ResponsePie expectations={results} humanValidationLink={`/admin/exercises/${exerciseId}/animation/validations`} />
-      }
+      <ResponsePie expectationResultsByTypes={results} humanValidationLink={`/admin/exercises/${exerciseId}/animation/validations`} />
       {injectResults == null
         ? <Loader variant="inElement" />
         : <div style={{ marginTop: 16, marginBottom: 16 }}>

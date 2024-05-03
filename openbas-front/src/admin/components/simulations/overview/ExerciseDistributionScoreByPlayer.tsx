@@ -6,12 +6,9 @@ import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import { horizontalBarsChartOptions } from '../../../../utils/Charts';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
-import { useAppDispatch } from '../../../../utils/hooks';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchExerciseInjectExpectations } from '../../../../actions/Exercise';
 import { resolveUserName } from '../../../../utils/String';
 import type { UsersHelper } from '../../../../actions/helper';
 import type { InjectExpectation, User } from '../../../../utils/api-types';
@@ -26,7 +23,6 @@ const ExerciseDistributionScoreByPlayer: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   const theme: Theme = useTheme();
 
   // Fetching data
@@ -34,9 +30,6 @@ const ExerciseDistributionScoreByPlayer: FunctionComponent<Props> = ({
     injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
     usersMap: helper.getUsersMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchExerciseInjectExpectations(exerciseId));
-  });
 
   const usersTotalScores = R.pipe(
     R.filter(

@@ -6,14 +6,11 @@ import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import { horizontalBarsChartOptions } from '../../../../utils/Charts';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
-import { useAppDispatch } from '../../../../utils/hooks';
 import type { Theme } from '../../../../components/Theme';
 import type { InjectExpectation } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../actions/Exercise';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import { computeTeamsColors } from './DistributionUtils';
 import type { InjectExpectationStore } from '../../../../actions/injects/Inject';
@@ -27,7 +24,6 @@ const ExerciseDistributionScoreByTeam: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   const theme: Theme = useTheme();
 
   // Fetching data
@@ -36,10 +32,6 @@ const ExerciseDistributionScoreByTeam: FunctionComponent<Props> = ({
     teams: helper.getExerciseTeams(exerciseId),
     teamsMap: helper.getTeamsMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchExerciseInjectExpectations(exerciseId));
-    dispatch(fetchExerciseTeams(exerciseId));
-  });
 
   const teamsTotalScores = R.pipe(
     R.filter((n: InjectExpectation) => !R.isEmpty(n.inject_expectation_results)),
