@@ -5,7 +5,7 @@ import ButtonCreate from '../../../../components/common/ButtonCreate';
 import EndpointsDialogAdding from '../endpoints/EndpointsDialogAdding';
 import { useFormatter } from '../../../../components/i18n';
 import type { UserStore } from '../../teams/players/Player';
-import { AssetGroupStore } from './AssetGroup';
+import type { AssetGroupStore } from './AssetGroup';
 
 interface Props {
   assetGroupId: string;
