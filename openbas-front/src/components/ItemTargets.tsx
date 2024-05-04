@@ -10,18 +10,11 @@ const useStyles = makeStyles(() => ({
     display: 'inline-block',
   },
   target: {
-    height: 20,
     fontSize: 12,
+    height: 20,
+    float: 'left',
     borderRadius: 4,
-    borderColor: 'rgb(134,134,134)',
-    border: '1px  solid',
-    background: 'rgba(255,255,255,0.16)',
-    maxWidth: '100%',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingLeft: 2,
-    marginRight: 5,
+    marginRight: 4,
   },
 }));
 
@@ -70,8 +63,9 @@ const ItemTargets: FunctionComponent<Props> = ({
         <span key={index}>
           <Tooltip title={target.name}>
             <Chip
+              variant="outlined"
               key={target.id}
-              className={classes.target}
+              classes={{ root: classes.target }}
               icon={getIcon(target.targetType!)}
               label={truncateText(target.name!, 10)}
             />
@@ -81,7 +75,8 @@ const ItemTargets: FunctionComponent<Props> = ({
       {remainingTargetsCount && remainingTargetsCount > 0 && (
         <Tooltip title={remainingTargets}>
           <Chip
-            className={classes.target}
+            variant="outlined"
+            classes={{ root: classes.target }}
             label={`+${remainingTargetsCount}`}
           />
         </Tooltip>

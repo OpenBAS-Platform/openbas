@@ -446,6 +446,7 @@ public class ExerciseApi extends RestBehavior {
   public Exercise updateExerciseInformation(@PathVariable String exerciseId,
       @Valid @RequestBody ExerciseUpdateInput input) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    exercise.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
     exercise.setUpdateAttributes(input);
     return exerciseRepository.save(exercise);
   }

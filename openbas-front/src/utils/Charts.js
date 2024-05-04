@@ -359,20 +359,40 @@ export const verticalBarsChartOptions = (
   },
 });
 
+/**
+ * @param {Theme} theme
+ * @param {boolean} adjustTicks
+ * @param {function} xFormatter
+ * @param {function} yFormatter
+ * @param {boolean} distributed
+ * @param {function} navigate
+ * @param {object[]} redirectionUtils
+ * @param {boolean} stacked
+ * @param {boolean} total
+ * @param {string[]} categories
+ * @param {boolean} legend
+ * @param {boolean} isFakeData
+ */
 export const horizontalBarsChartOptions = (
   theme,
   adjustTicks = false,
   xFormatter = null,
   yFormatter = null,
   distributed = false,
+  stacked = false,
+  total = false,
+  categories = null,
+  legend = false,
+  isFakeData = false,
 ) => ({
   chart: {
     type: 'bar',
     background: 'transparent',
-    toolbar: {
-      show: false,
-    },
+    toolbar: toolbarOptions,
     foreColor: theme.palette.text.secondary,
+    stacked,
+    width: '100%',
+    height: '100%',
   },
   theme: {
     mode: theme.palette.mode,
@@ -380,9 +400,10 @@ export const horizontalBarsChartOptions = (
   dataLabels: {
     enabled: false,
   },
-  colors: distributed
-    ? colors(theme.palette.mode === 'dark' ? 400 : 600)
-    : [theme.palette.primary.main],
+  colors: [
+    theme.palette.primary.main,
+    ...colors(theme.palette.mode === 'dark' ? 400 : 600),
+  ],
   states: {
     hover: {
       filter: {
@@ -391,20 +412,27 @@ export const horizontalBarsChartOptions = (
       },
     },
   },
+  fill: {
+    opacity: isFakeData ? 0.1 : 0.9,
+  },
   grid: {
     borderColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, .1)'
-        : 'rgba(0, 0, 0, .1)',
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, .1)'
+          : 'rgba(0, 0, 0, .1)',
     strokeDashArray: 3,
   },
   legend: {
-    show: false,
+    show: legend,
+    itemMargin: {
+      horizontal: 5,
+    },
   },
   tooltip: {
     theme: theme.palette.mode,
   },
   xaxis: {
+    categories: categories ?? [],
     labels: {
       formatter: (value) => (xFormatter ? xFormatter(value) : value),
       style: {
@@ -431,8 +459,21 @@ export const horizontalBarsChartOptions = (
     bar: {
       horizontal: true,
       barHeight: '30%',
-      borderRadius: 5,
+      borderRadius: 4,
+      borderRadiusApplication: 'end',
+      borderRadiusWhenStacked: 'last',
       distributed,
+      dataLabels: {
+        total: {
+          enabled: total,
+          offsetX: 0,
+          style: {
+            fontSize: '13px',
+            fontWeight: 900,
+            fontFamily: '"IBM Plex Sans", sans-serif',
+          },
+        },
+      },
     },
   },
 });
@@ -510,75 +551,103 @@ export const radarChartOptions = (theme, labels, chartColors = []) => ({
   },
 });
 
+/**
+ * @param {Theme} theme
+ * @param {string[]} labels
+ * @param {function} formatter
+ * @param {string} legendPosition
+ * @param {string[]} chartColors
+ * @param {boolean} legend
+ * @param {boolean} isFakeData
+ */
 export const polarAreaChartOptions = (
   theme,
   labels,
   formatter = null,
-  legendPosition = 'right',
-) => ({
-  chart: {
-    type: 'polarArea',
-    background: 'transparent',
-    toolbar: {
-      show: false,
+  legendPosition = 'bottom',
+  chartColors = [],
+  legend = true,
+  isFakeData = false,
+) => {
+  const temp = theme.palette.mode === 'dark' ? 400 : 600;
+  let chartFinalColors = chartColors;
+  if (chartFinalColors.length === 0) {
+    chartFinalColors = colors(temp);
+    if (labels.length === 2 && labels[0] === 'true') {
+      chartFinalColors = [C.green[temp], C.red[temp]];
+    } else if (labels.length === 2 && labels[0] === 'false') {
+      chartFinalColors = [C.red[temp], C.green[temp]];
+    }
+  }
+  return {
+    chart: {
+      type: 'polarArea',
+      background: 'transparent',
+      toolbar: toolbarOptions,
+      foreColor: theme.palette.text.secondary,
+      width: '100%',
+      height: '100%',
     },
-    foreColor: theme.palette.text.secondary,
-  },
-  theme: {
-    mode: theme.palette.mode,
-  },
-  colors: colors(theme.palette.mode === 'dark' ? 400 : 600),
-  labels,
-  states: {
-    hover: {
-      filter: {
-        type: 'lighten',
-        value: 0.05,
+    theme: {
+      mode: theme.palette.mode,
+    },
+    colors: chartFinalColors,
+    labels,
+    states: {
+      hover: {
+        filter: {
+          type: 'lighten',
+          value: 0.05,
+        },
       },
     },
-  },
-  legend: {
-    show: true,
-    position: legendPosition,
-    floating: legendPosition === 'bottom',
-    fontFamily: '"IBM Plex Sans", sans-serif',
-  },
-  tooltip: {
-    theme: theme.palette.mode,
-  },
-  fill: {
-    opacity: 0.5,
-  },
-  yaxis: {
-    labels: {
-      formatter: (value) => (formatter ? formatter(value) : value),
-      style: {
-        fontFamily: '"IBM Plex Sans", sans-serif',
+    legend: {
+      show: legend,
+      position: legendPosition,
+      floating: legendPosition === 'bottom',
+      fontFamily: '"IBM Plex Sans", sans-serif',
+    },
+    tooltip: {
+      theme: theme.palette.mode,
+      custom: simpleLabelTooltip(theme),
+    },
+    fill: {
+      opacity: isFakeData ? 0.2 : 0.5,
+    },
+    stroke: {
+      show: !isFakeData,
+    },
+    yaxis: {
+      labels: {
+        formatter: (value) => (formatter ? formatter(value) : value),
+        style: {
+          fontFamily: '"IBM Plex Sans", sans-serif',
+        },
+      },
+      axisBorder: {
+        show: false,
       },
     },
-    axisBorder: {
-      show: false,
-    },
-  },
-  plotOptions: {
-    polarArea: {
-      rings: {
-        strokeWidth: 1,
-        strokeColor:
-          theme.palette.mode === 'dark'
-            ? 'rgba(255, 255, 255, .1)'
-            : 'rgba(0, 0, 0, .1)',
-      },
-      spokes: {
-        strokeWidth: 1,
-        connectorColors:
-          theme.palette.mode === 'dark'
-            ? 'rgba(255, 255, 255, .1)'
-            : 'rgba(0, 0, 0, .1)',
+    plotOptions: {
+      polarArea: {
+        rings: {
+          strokeWidth: 1,
+          strokeColor:
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, .1)'
+                : 'rgba(0, 0, 0, .1)',
+        },
+        spokes: {
+          strokeWidth: 1,
+          connectorColors:
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, .1)'
+                : 'rgba(0, 0, 0, .1)',
+        },
       },
     },
-  },
-});
+  };
+};
 
 /**
  * @param {Theme} theme

@@ -748,6 +748,7 @@ export interface ExerciseUpdateInput {
   exercise_name: string;
   exercise_severity?: string;
   exercise_subtitle?: string;
+  exercise_tags?: string[];
 }
 
 export interface ExerciseUpdateLogoInput {

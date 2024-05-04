@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.openbas.config.AppConfig.*;
@@ -48,4 +49,6 @@ public class ExerciseUpdateInput {
     @JsonProperty("exercise_message_footer")
     private String footer;
 
+    @JsonProperty("exercise_tags")
+    private List<String> tagIds = new ArrayList<>();
 }

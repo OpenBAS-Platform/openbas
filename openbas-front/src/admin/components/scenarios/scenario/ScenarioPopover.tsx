@@ -70,7 +70,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
       scenario_message_header: data.setting_message_header,
       scenario_message_footer: scenario.scenario_message_footer,
     };
-    dispatch(updateScenarioInformation(scenario.scenario_id, scenarioInformationInput));
+    dispatch(updateScenarioInformation(scenario.scenario_id, scenarioInformationInput)).then(() => setEdition(false));
   };
 
   // Export

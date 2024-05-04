@@ -47,13 +47,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   item: {
     paddingLeft: 10,
-    height: 60,
+    height: 50,
   },
   bodyItems: {
     display: 'flex',
     alignItems: 'center',
   },
   bodyItem: {
+    height: 20,
     fontSize: 13,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -299,14 +300,14 @@ const Scenarios = () => {
                     {scenario.scenario_platforms?.length === 0 ? (
                       <PlatformIcon platform={t('No inject in this scenario')} tooltip={true} width={25} />
                     ) : scenario.scenario_platforms?.map(
-                      (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={25} marginRight={10} />,
+                      (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={20} marginRight={10} />,
                     )}
                   </div>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.scenario_tags}
                   >
-                    <ItemTags variant="largeList" tags={scenario.scenario_tags} />
+                    <ItemTags tags={scenario.scenario_tags} variant="list" />
                   </div>
                   <div
                     className={classes.bodyItem}

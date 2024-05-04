@@ -28,6 +28,7 @@ const useStyles = makeStyles(() => ({
     alignItems: 'center',
   },
   bodyItem: {
+    height: 20,
     fontSize: 13,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -207,6 +208,7 @@ const AtomicTestings = () => {
                 <InjectIcon
                   tooltip={t(atomicTesting.atomic_type)}
                   type={atomicTesting.atomic_type}
+                  variant="list"
                 />
               </ListItemIcon>
               <ListItemText

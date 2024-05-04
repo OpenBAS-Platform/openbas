@@ -1,6 +1,7 @@
 import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import * as R from 'ramda';
 import { Link } from 'react-router-dom';
-import { FileDownloadOutlined, Kayaking, KeyboardArrowRight } from '@mui/icons-material';
+import { FileDownloadOutlined, KeyboardArrowRight, SmartToyOutlined } from '@mui/icons-material';
 import React, { CSSProperties, FunctionComponent } from 'react';
 import { CSVLink } from 'react-csv';
 import { makeStyles } from '@mui/styles';
@@ -29,7 +30,7 @@ const useStyles = makeStyles(() => ({
     gap: '10px',
   },
   itemHead: {
-    paddingLeft: 15,
+    paddingLeft: 17,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
@@ -41,6 +42,7 @@ const useStyles = makeStyles(() => ({
     alignItems: 'center',
   },
   bodyItem: {
+    height: 20,
     fontSize: 13,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -119,11 +121,13 @@ const inlineStyles: Record<string, CSSProperties> = {
 interface Props {
   exercises: ExerciseSimpleStore[];
   withoutSearch?: boolean;
+  limit?: number;
 }
 
 const ExerciseList: FunctionComponent<Props> = ({
   exercises = [],
   withoutSearch,
+  limit,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -134,63 +138,64 @@ const ExerciseList: FunctionComponent<Props> = ({
     tagsMap: helper.getTagsMap(),
   }));
   const searchColumns = ['name'];
-  const filtering = useSearchAnFilter('exercise', 'name', searchColumns);
-  const sortedExercises = filtering.filterAndSort(exercises);
+  const filtering = useSearchAnFilter('exercise', 'exercise_start_date', searchColumns, { orderAsc: false });
+  const sortedExercises = limit ? R.take(limit, filtering.filterAndSort(exercises)) : filtering.filterAndSort(exercises);
   return (
     <>
       {!withoutSearch && (
-      <div className={classes.parameters}>
-        <div className={classes.filters}>
-          <SearchFilter
-            variant="small"
-            onChange={filtering.handleSearch}
-            keyword={filtering.keyword}
-          />
-          <TagsFilter
-            onAddTag={filtering.handleAddTag}
-            onRemoveTag={filtering.handleRemoveTag}
-            currentTags={filtering.tags}
-          />
+        <div className={classes.parameters}>
+          <div className={classes.filters}>
+            <SearchFilter
+              variant="small"
+              onChange={filtering.handleSearch}
+              keyword={filtering.keyword}
+            />
+            <TagsFilter
+              onAddTag={filtering.handleAddTag}
+              onRemoveTag={filtering.handleRemoveTag}
+              currentTags={filtering.tags}
+            />
+          </div>
+          <div className={classes.downloadButton}>
+            {sortedExercises.length > 0 ? (
+              <CSVLink
+                data={exportData(
+                  'exercise',
+                  [
+                    'exercise_name',
+                    'exercise_subtitle',
+                    'exercise_description',
+                    'exercise_status',
+                    'exercise_tags',
+                  ],
+                  sortedExercises,
+                  tagsMap,
+                )}
+                filename={`${t('Simulations')}.csv`}
+              >
+                <Tooltip title={t('Export this list')}>
+                  <IconButton size="large">
+                    <FileDownloadOutlined color="primary"/>
+                  </IconButton>
+                </Tooltip>
+              </CSVLink>
+            ) : (
+              <IconButton size="large" disabled={true}>
+                <FileDownloadOutlined/>
+              </IconButton>
+            )}
+          </div>
         </div>
-        <div className={classes.downloadButton}>
-          {sortedExercises.length > 0 ? (
-            <CSVLink
-              data={exportData(
-                'exercise',
-                [
-                  'exercise_name',
-                  'exercise_subtitle',
-                  'exercise_description',
-                  'exercise_status',
-                  'exercise_tags',
-                ],
-                sortedExercises,
-                tagsMap,
-              )}
-              filename={`${t('Simulations')}.csv`}
-            >
-              <Tooltip title={t('Export this list')}>
-                <IconButton size="large">
-                  <FileDownloadOutlined color="primary" />
-                </IconButton>
-              </Tooltip>
-            </CSVLink>
-          ) : (
-            <IconButton size="large" disabled={true}>
-              <FileDownloadOutlined />
-            </IconButton>
-          )}
-        </div>
-      </div>
       )}
-      <div className="clearfix" />
+      <div className="clearfix"/>
       <List>
+        {!limit && (
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
         >
-          <ListItemIcon />
+          <ListItemIcon/>
           <ListItemText
             primary={
               <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -231,9 +236,10 @@ const ExerciseList: FunctionComponent<Props> = ({
                   headerStyles,
                 )}
               </div>
-            }
+                            }
           />
         </ListItem>
+        )}
         {sortedExercises.map((exercise: ExerciseStore) => (
           <ListItemButton
             key={exercise.exercise_id}
@@ -243,7 +249,7 @@ const ExerciseList: FunctionComponent<Props> = ({
             to={`/admin/exercises/${exercise.exercise_id}`}
           >
             <ListItemIcon>
-              <Kayaking color="primary" />
+              <SmartToyOutlined color="primary"/>
             </ListItemIcon>
             <ListItemText
               primary={
@@ -261,7 +267,7 @@ const ExerciseList: FunctionComponent<Props> = ({
                     {exercise.exercise_start_date ? (
                       nsdt(exercise.exercise_start_date)
                     ) : (
-                      <i>{t('Manual')}</i>
+                      '-'
                     )}
                   </div>
                   <div
@@ -277,25 +283,25 @@ const ExerciseList: FunctionComponent<Props> = ({
                     className={classes.bodyItem}
                     style={inlineStyles.exercise_tags}
                   >
-                    <ItemTags variant="list" tags={exercise.exercise_tags} />
+                    <ItemTags variant="list" tags={exercise.exercise_tags}/>
                   </div>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.exercise_targets}
                   >
-                    <ItemTargets targets={exercise.exercise_targets} />
+                    <ItemTargets targets={exercise.exercise_targets}/>
                   </div>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.exercise_global_score}
                   >
-                    <AtomicTestingResult expectations={exercise.exercise_global_score} />
+                    <AtomicTestingResult expectations={exercise.exercise_global_score}/>
                   </div>
                 </div>
-              }
+                            }
             />
             <ListItemIcon classes={{ root: classes.goIcon }}>
-              <KeyboardArrowRight />
+              <KeyboardArrowRight/>
             </ListItemIcon>
           </ListItemButton>
         ))}

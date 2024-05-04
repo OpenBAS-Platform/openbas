@@ -23,6 +23,9 @@ const ExerciseCreationForm: FunctionComponent<Props> = ({
   handleClose,
   initialValues = {
     exercise_name: '',
+    exercise_category: 'attack-scenario',
+    exercise_main_focus: 'incident-response',
+    exercise_severity: 'high',
     exercise_subtitle: '',
     exercise_description: '',
     exercise_start_date: '',

@@ -62,8 +62,8 @@ const ExerciseDistributionScoreByInject: FunctionComponent<Props> = ({
           options={horizontalBarsChartOptions(
             theme,
             false,
-            null,
-            null,
+            undefined,
+            undefined,
             true,
           )}
           series={totalScoreByInjectData}

@@ -214,6 +214,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                     <InjectIcon
                       tooltip={t(injectType)}
                       type={injectType}
+                      variant="inline"
                     />
                     <Typography variant="body1" sx={{ marginLeft: 1 }}>
                       {collector.sourceName}

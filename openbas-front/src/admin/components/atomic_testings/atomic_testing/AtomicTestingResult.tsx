@@ -51,7 +51,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
             IconComponent = SensorOccupiedOutlined;
         }
         return (
-          <IconComponent key={index} style={{ color, marginRight: 10 }}/>
+          <IconComponent key={index} style={{ color, marginRight: 10, fontSize: 22 }}/>
         );
       })}
     </div>

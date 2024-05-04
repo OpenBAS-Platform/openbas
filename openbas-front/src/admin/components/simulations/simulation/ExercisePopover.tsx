@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+  Box,
   Button,
   Checkbox,
   Dialog,
@@ -8,12 +9,14 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Tab,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  Tabs,
 } from '@mui/material';
 import { useFormatter } from '../../../../components/i18n';
 import { deleteExercise, updateExercise } from '../../../../actions/Exercise';
@@ -24,6 +27,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import ExerciseUpdateForm from './ExerciseUpdateForm';
 import Drawer from '../../../../components/common/Drawer';
+import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
 
 interface ExercisePopoverProps {
   exercise: Exercise;
@@ -42,6 +46,9 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const [exportTeams, setExportTeams] = useState(false);
   const [exportPlayers, setExportPlayers] = useState(false);
   const [exportVariableValues, setExportVariableValues] = useState(false);
+  const [currentTab, setCurrentTab] = useState(0);
+
+  const handleChangeTab = (event: React.SyntheticEvent, value: number) => setCurrentTab(value);
 
   // Edition
   const handleOpenEdit = () => {
@@ -54,12 +61,33 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     const input = {
       exercise_name: data.exercise_name,
       exercise_subtitle: data.exercise_subtitle,
+      exercise_severity: data.exercise_severity,
+      exercise_category: data.exercise_category,
       exercise_description: data.exercise_description,
+      exercise_main_focus: data.exercise_main_focus,
+      exercise_tags: data.exercise_tags,
+      exercise_mails_reply_to: exercise.exercise_mails_reply_to,
       exercise_mail_from: exercise.exercise_mail_from,
       exercise_message_header: exercise.exercise_message_header,
       exercise_message_footer: exercise.exercise_message_footer,
     };
     return dispatch(updateExercise(exercise.exercise_id, input)).then(() => handleCloseEdit());
+  };
+
+  const submitUpdateEmailParameters = (data: SettingUpdateInput) => {
+    const exerciseInformationInput: ExerciseUpdateInput = {
+      exercise_name: exercise.exercise_name,
+      exercise_subtitle: exercise.exercise_subtitle,
+      exercise_severity: exercise.exercise_severity,
+      exercise_category: exercise.exercise_category,
+      exercise_description: exercise.exercise_description,
+      exercise_main_focus: exercise.exercise_main_focus,
+      exercise_mail_from: data.setting_mail_from || '',
+      exercise_mails_reply_to: data.setting_mails_reply_to,
+      exercise_message_header: data.setting_message_header,
+      exercise_message_footer: exercise.exercise_message_footer,
+    };
+    dispatch(updateExercise(exercise.exercise_id, exerciseInformationInput)).then(() => handleCloseEdit());
   };
 
   // Deletion
@@ -98,8 +126,16 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     exercise_name: exercise.exercise_name,
     exercise_subtitle: exercise.exercise_subtitle,
     exercise_description: exercise.exercise_description,
+    exercise_category: exercise.exercise_category ?? 'attack-scenario',
+    exercise_main_focus: exercise.exercise_main_focus ?? 'incident-response',
+    exercise_severity: exercise.exercise_severity ?? 'high',
   };
-
+  const initialValuesEmailParameters = {
+    setting_mail_from: exercise.exercise_mail_from,
+    setting_mails_reply_to: exercise.exercise_mails_reply_to,
+    setting_message_header: exercise.exercise_message_header,
+    setting_message_footer: exercise.exercise_message_footer,
+  };
   const permissions = usePermissions(exercise.exercise_id);
 
   // Button Popover
@@ -135,11 +171,28 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         handleClose={handleCloseEdit}
         title={t('Update the simulation')}
       >
-        <ExerciseUpdateForm
-          initialValues={initialValues}
-          onSubmit={onSubmitEdit}
-          handleClose={handleCloseEdit}
-        />
+        <>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={currentTab} onChange={handleChangeTab}>
+              <Tab label={t('Overview')} />
+              <Tab label={t('Mail configuration')} />
+            </Tabs>
+          </Box>
+          {currentTab === 0 && (
+            <ExerciseUpdateForm
+              initialValues={initialValues}
+              onSubmit={onSubmitEdit}
+              handleClose={handleCloseEdit}
+            />
+          )}
+          {currentTab === 1 && (
+            <EmailParametersForm
+              initialValues={initialValuesEmailParameters}
+              onSubmit={submitUpdateEmailParameters}
+              disabled={permissions.readOnly}
+            />
+          )}
+        </>
       </Drawer>
       <Dialog
         open={openExport}

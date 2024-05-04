@@ -8,6 +8,7 @@ const iconSelector = (type, variant, fontSize, done, disabled) => {
       src={`/api/images/injectors/${type}`}
       alt={type}
       style={{
+        marginTop: variant === 'list' ? 5 : 0,
         width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
         height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
         borderRadius: 4,
