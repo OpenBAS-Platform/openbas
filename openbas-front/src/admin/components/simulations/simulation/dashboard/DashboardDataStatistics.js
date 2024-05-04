@@ -229,7 +229,7 @@ const DashboardDataStatistics = ({
           )}
         </Paper>
       </Grid>
-      <Grid item={true} xs={6} style={{ marginTop: 30 }}>
+      <Grid item={true} xs={6} style={{ marginTop: 25 }}>
         <Typography variant="h4">{t('Sent mails over time')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {communicationsOverTime.length > 0 ? (
@@ -249,7 +249,7 @@ const DashboardDataStatistics = ({
           )}
         </Paper>
       </Grid>
-      <Grid item={true} xs={6} style={{ marginTop: 30 }}>
+      <Grid item={true} xs={6} style={{ marginTop: 25 }}>
         <Typography variant="h4">{t('Sent mails over time')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {teamsCommunications.length > 0 ? (
@@ -276,7 +276,7 @@ const DashboardDataStatistics = ({
           )}
         </Paper>
       </Grid>
-      <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+      <Grid item={true} xs={4} style={{ marginTop: 25 }}>
         <Typography variant="h4">
           {t('Distribution of mails by team')}
         </Typography>
@@ -298,7 +298,7 @@ const DashboardDataStatistics = ({
           )}
         </Paper>
       </Grid>
-      <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+      <Grid item={true} xs={4} style={{ marginTop: 25 }}>
         <Typography variant="h4">
           {t('Distribution of mails by player')}
         </Typography>
@@ -320,7 +320,7 @@ const DashboardDataStatistics = ({
           )}
         </Paper>
       </Grid>
-      <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+      <Grid item={true} xs={4} style={{ marginTop: 25 }}>
         <Typography variant="h4">
           {t('Distribution of mails by inject')}
         </Typography>

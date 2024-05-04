@@ -14,7 +14,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import useDataLoader from '../../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../../store';
 import AnimationMenu from '../AnimationMenu';
-import CreateQuickInject from '../../injects/CreateQuickInject';
+import CreateQuickInject from '../injects/CreateQuickInject';
 import MailDistributionOverTimeChart from './MailDistributionOverTimeChart';
 import MailDistributionOverTimeLine from './MailDistributionOverTimeLine';
 import MailDistributionByTeam from './MailDistributionByTeam';
@@ -249,7 +249,7 @@ const Mails = () => {
               <MailDistributionOverTimeLine exerciseId={exerciseId} />
             </Paper>
           </Grid>
-          <Grid item xs={4} style={{ marginTop: 30 }}>
+          <Grid item xs={4} style={{ marginTop: 25 }}>
             <Typography variant="h4">
               {t('Distribution of mails by team')}
             </Typography>
@@ -257,7 +257,7 @@ const Mails = () => {
               <MailDistributionByTeam exerciseId={exerciseId} />
             </Paper>
           </Grid>
-          <Grid item xs={4} style={{ marginTop: 30 }}>
+          <Grid item xs={4} style={{ marginTop: 25 }}>
             <Typography variant="h4">
               {t('Distribution of mails by player')}
             </Typography>
@@ -265,7 +265,7 @@ const Mails = () => {
               <MailDistributionByPlayer exerciseId={exerciseId} />
             </Paper>
           </Grid>
-          <Grid item xs={4} style={{ marginTop: 30 }}>
+          <Grid item xs={4} style={{ marginTop: 25 }}>
             <Typography variant="h4">
               {t('Distribution of mails by inject')}
             </Typography>

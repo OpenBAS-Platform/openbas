@@ -13,7 +13,7 @@ import type { Theme } from '../../../../components/Theme';
 import InjectIcon from '../../common/injects/InjectIcon';
 import Empty from '../../../../components/Empty';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import ManualExpectationsValidationForm from '../../simulations/validation/expectations/ManualExpectationsValidationForm';
+import ManualExpectationsValidationForm from '../../simulations/simulation/validation/expectations/ManualExpectationsValidationForm';
 import type { AtomicTestingDetailOutputStore } from '../../../../actions/atomic_testings/atomic-testing';
 import type { InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
 import nodeTypes from './types/nodes';

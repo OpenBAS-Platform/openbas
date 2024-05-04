@@ -348,7 +348,7 @@ const DashboardDefinitionStatistics = ({
           )}
         </Paper>
       </Grid>
-      <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+      <Grid item={true} xs={4} style={{ marginTop: 25 }}>
         <Typography variant="h4">
           {t('Distribution of total score by team')}
         </Typography>
@@ -370,7 +370,7 @@ const DashboardDefinitionStatistics = ({
           )}
         </Paper>
       </Grid>
-      <Grid item={true} xs={8} style={{ marginTop: 30 }}>
+      <Grid item={true} xs={8} style={{ marginTop: 25 }}>
         <Typography variant="h4">{t('Teams scores over time')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {teamsScores.length > 0 ? (
@@ -398,7 +398,7 @@ const DashboardDefinitionStatistics = ({
           )}
         </Paper>
       </Grid>
-      <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+      <Grid item={true} xs={4} style={{ marginTop: 25 }}>
         <Typography variant="h4">
           {t('Distribution of total score by inject type')}
         </Typography>
@@ -426,7 +426,7 @@ const DashboardDefinitionStatistics = ({
           )}
         </Paper>
       </Grid>
-      <Grid item={true} xs={8} style={{ marginTop: 30 }}>
+      <Grid item={true} xs={8} style={{ marginTop: 25 }}>
         <Typography variant="h4">
           {t('Inject types scores over time')}
         </Typography>
@@ -456,7 +456,7 @@ const DashboardDefinitionStatistics = ({
           )}
         </Paper>
       </Grid>
-      <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+      <Grid item={true} xs={4} style={{ marginTop: 25 }}>
         <Typography variant="h4">
           {t('Distribution of total score by organization')}
         </Typography>
@@ -478,7 +478,7 @@ const DashboardDefinitionStatistics = ({
           )}
         </Paper>
       </Grid>
-      <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+      <Grid item={true} xs={4} style={{ marginTop: 25 }}>
         <Typography variant="h4">
           {t('Distribution of total score by player')}
         </Typography>
@@ -500,7 +500,7 @@ const DashboardDefinitionStatistics = ({
           )}
         </Paper>
       </Grid>
-      <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+      <Grid item={true} xs={4} style={{ marginTop: 25 }}>
         <Typography variant="h4">
           {t('Distribution of total score by inject')}
         </Typography>

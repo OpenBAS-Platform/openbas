@@ -273,6 +273,7 @@ export const verticalBarsChartOptions = (
   isFakeData = false,
 ) => ({
   chart: {
+    type: 'bar',
     background: 'transparent',
     toolbar: toolbarOptions,
     foreColor: theme.palette.text.secondary,

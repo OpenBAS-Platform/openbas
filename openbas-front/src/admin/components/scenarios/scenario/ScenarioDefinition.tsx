@@ -41,13 +41,13 @@ const ScenarioDefinition = () => {
         <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
           <ScenarioVariables />
         </Grid>
-        <Grid item={true} xs={12} style={{ marginTop: 30 }}>
+        <Grid item={true} xs={12} style={{ marginTop: 25 }}>
           <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
             {t('Media pressure')}
           </Typography>
           <ScenarioArticles />
         </Grid>
-        <Grid item={true} xs={12} style={{ marginTop: 10 }}>
+        <Grid item={true} xs={12} style={{ marginTop: 5 }}>
           <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
             {t('Used challenges (in injects)')}
           </Typography>

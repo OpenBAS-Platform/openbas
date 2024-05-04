@@ -160,7 +160,7 @@ const Parameters = () => {
             </List>
           </Paper>
         </Grid>
-        <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+        <Grid item={true} xs={4} style={{ marginTop: 25 }}>
           <Typography variant="h4">{t('Dark theme')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <ThemeForm
@@ -169,7 +169,7 @@ const Parameters = () => {
             />
           </Paper>
         </Grid>
-        <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+        <Grid item={true} xs={4} style={{ marginTop: 25 }}>
           <Typography variant="h4">{t('Light theme')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <ThemeForm
@@ -178,7 +178,7 @@ const Parameters = () => {
             />
           </Paper>
         </Grid>
-        <Grid item={true} xs={4} style={{ marginTop: 30 }}>
+        <Grid item={true} xs={4} style={{ marginTop: 25 }}>
           <Typography variant="h4">{t('Tools')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <List style={{ paddingTop: 0 }}>

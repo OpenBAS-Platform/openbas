@@ -69,78 +69,76 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
     return <div />;
   }
   return (
-    <Grid container spacing={3} style={{ marginTop: 30 }}>
-      <Grid container item spacing={3}>
-        <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography variant="h4">
-            {t('Distribution of score by team (in % of expectations)')}
-          </Typography>
-          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId} />
-          </Paper>
-        </Grid>
-        <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography variant="h4">
-            {t('Teams scores over time (in % of expectations)')}
-          </Typography>
-          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <ExerciseDistributionScoreOverTimeByTeamInPercentage exerciseId={exerciseId} />
-          </Paper>
-        </Grid>
-        <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography variant="h4">
-            {t('Distribution of total score by team')}
-          </Typography>
-          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <ExerciseDistributionScoreByTeam exerciseId={exerciseId} />
-          </Paper>
-        </Grid>
-        <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography variant="h4">{t('Teams scores over time')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <ExerciseDistributionScoreOverTimeByTeam exerciseId={exerciseId} />
-          </Paper>
-        </Grid>
-        <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography variant="h4">
-            {t('Distribution of total score by inject type')}
-          </Typography>
-          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <ExerciseDistributionByInjectorContract exerciseId={exerciseId} />
-          </Paper>
-        </Grid>
-        <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography variant="h4">
-            {t('Inject types scores over time')}
-          </Typography>
-          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <ExerciseDistributionScoreOverTimeByInjectorContract exerciseId={exerciseId} />
-          </Paper>
-        </Grid>
-        <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography variant="h4">
-            {t('Distribution of total score by organization')}
-          </Typography>
-          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <ExerciseDistributionScoreByOrganization exerciseId={exerciseId} />
-          </Paper>
-        </Grid>
-        <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography variant="h4">
-            {t('Distribution of total score by player')}
-          </Typography>
-          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <ExerciseDistributionScoreByPlayer exerciseId={exerciseId} />
-          </Paper>
-        </Grid>
-        <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography variant="h4">
-            {t('Distribution of total score by inject')}
-          </Typography>
-          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            <ExerciseDistributionScoreByInject exerciseId={exerciseId} />
-          </Paper>
-        </Grid>
+    <Grid container={true} spacing={3}>
+      <Grid item xs={6} style={{ marginTop: 25 }}>
+        <Typography variant="h4">
+          {t('Distribution of score by team (in % of expectations)')}
+        </Typography>
+        <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+          <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId} />
+        </Paper>
+      </Grid>
+      <Grid item xs={6} style={{ marginTop: 25 }}>
+        <Typography variant="h4">
+          {t('Teams scores over time (in % of expectations)')}
+        </Typography>
+        <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+          <ExerciseDistributionScoreOverTimeByTeamInPercentage exerciseId={exerciseId} />
+        </Paper>
+      </Grid>
+      <Grid item xs={6} style={{ marginTop: 25 }}>
+        <Typography variant="h4">
+          {t('Distribution of total score by team')}
+        </Typography>
+        <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+          <ExerciseDistributionScoreByTeam exerciseId={exerciseId} />
+        </Paper>
+      </Grid>
+      <Grid item xs={6} style={{ marginTop: 25 }}>
+        <Typography variant="h4">{t('Teams scores over time')}</Typography>
+        <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+          <ExerciseDistributionScoreOverTimeByTeam exerciseId={exerciseId} />
+        </Paper>
+      </Grid>
+      <Grid item xs={6} style={{ marginTop: 25 }}>
+        <Typography variant="h4">
+          {t('Distribution of total score by inject type')}
+        </Typography>
+        <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+          <ExerciseDistributionByInjectorContract exerciseId={exerciseId} />
+        </Paper>
+      </Grid>
+      <Grid item xs={6} style={{ marginTop: 25 }}>
+        <Typography variant="h4">
+          {t('Inject types scores over time')}
+        </Typography>
+        <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+          <ExerciseDistributionScoreOverTimeByInjectorContract exerciseId={exerciseId} />
+        </Paper>
+      </Grid>
+      <Grid item xs={6} style={{ marginTop: 25 }}>
+        <Typography variant="h4">
+          {t('Distribution of total score by organization')}
+        </Typography>
+        <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+          <ExerciseDistributionScoreByOrganization exerciseId={exerciseId} />
+        </Paper>
+      </Grid>
+      <Grid item xs={3} style={{ marginTop: 25 }}>
+        <Typography variant="h4">
+          {t('Distribution of total score by player')}
+        </Typography>
+        <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+          <ExerciseDistributionScoreByPlayer exerciseId={exerciseId} />
+        </Paper>
+      </Grid>
+      <Grid item xs={3} style={{ marginTop: 25 }}>
+        <Typography variant="h4">
+          {t('Distribution of total score by inject')}
+        </Typography>
+        <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+          <ExerciseDistributionScoreByInject exerciseId={exerciseId} />
+        </Paper>
       </Grid>
     </Grid>
   );

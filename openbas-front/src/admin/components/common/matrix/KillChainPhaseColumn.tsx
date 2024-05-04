@@ -1,9 +1,10 @@
 import React, { FunctionComponent } from 'react';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import type { InjectExpectationResultsByAttackPatternStore } from '../../../../actions/exercises/Exercise';
 import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
 import AttackPatternBox from './AttackPatternBox';
 import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
+import type { Theme } from '../../../../components/Theme';
 
 const useStyles = makeStyles(() => ({
   column: {
@@ -18,15 +19,18 @@ interface KillChainPhaseComponentProps {
   killChainPhase: KillChainPhase;
   attackPatterns: AttackPattern[];
   injectResults: InjectExpectationResultsByAttackPatternStore[];
+  dummy?: boolean;
 }
 
 const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
   killChainPhase,
   attackPatterns,
   injectResults,
+  dummy,
 }) => {
   // Standard hooks
   const classes = useStyles();
+  const theme = useTheme<Theme>();
   // Attack Pattern
   const sortAttackPattern = (attackPattern1: AttackPattern, attackPattern2: AttackPattern) => {
     if (attackPattern1.attack_pattern_name < attackPattern2.attack_pattern_name) {
@@ -43,7 +47,7 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
   };
   return (
     <div style={{ marginBottom: 16 }}>
-      <div style={{ fontSize: 15, textAlign: 'center', marginBottom: 20 }}>{killChainPhase.phase_name}</div>
+      <div style={{ fontSize: 15, textAlign: 'center', marginBottom: 20, color: dummy ? theme.palette.text?.disabled : theme.palette.text?.primary }}>{killChainPhase.phase_name}</div>
       <div className={classes.column}>
         {[...attackPatterns].sort(sortAttackPattern)
           .map((attackPattern) => (
@@ -51,6 +55,7 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
               key={attackPattern.attack_pattern_id}
               attackPattern={attackPattern}
               injectResult={getInjectResult(attackPattern)}
+              dummy={dummy}
             />
           ))}
       </div>

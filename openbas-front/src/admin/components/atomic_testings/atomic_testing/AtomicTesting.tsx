@@ -202,7 +202,7 @@ const AtomicTesting = () => {
             <ResponsePie expectationResultsByTypes={atomic.atomic_expectation_results} />
           </Paper>
         </Grid>
-        <Grid item={true} xs={6} style={{ marginTop: 30 }}>
+        <Grid item={true} xs={6} style={{ marginTop: 25 }}>
           <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
             {t('Targets')}
           </Typography>
@@ -234,7 +234,7 @@ const AtomicTesting = () => {
             )}
           </Paper>
         </Grid>
-        <Grid item={true} xs={6} style={{ marginTop: 30 }}>
+        <Grid item={true} xs={6} style={{ marginTop: 25 }}>
           <Typography variant="h4" gutterBottom={true}>
             {t('Results by target')}
           </Typography>

@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
     fontSize: 12,
     height: 20,
     float: 'left',
-    marginRight: 7,
+    margin: '0 7px 0 0',
     borderRadius: 4,
   },
   tagInLargeList: {
@@ -63,7 +63,7 @@ const ItemTags = (props) => {
   });
   const orderedTags = R.sortWith([R.ascend(R.prop('tag_name'))], resolvedTags);
   return (
-    <div>
+    <>
       {orderedTags.length > 0 ? (
         R.map(
           (tag) => (
@@ -79,7 +79,7 @@ const ItemTags = (props) => {
               }}
             />
           ),
-          R.take(3, orderedTags),
+          R.take(2, orderedTags),
         )
       ) : (
         <Chip
@@ -95,7 +95,7 @@ const ItemTags = (props) => {
           }}
         />
       )}
-    </div>
+    </>
   );
 };
 

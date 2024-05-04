@@ -125,6 +125,12 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
     filterGroup: f,
   }));
   const [selectedContract, setSelectedContract] = useState<number | null>(null);
+  const selectContract = (contract: number) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    drawerRef.current.scrollTop = 0;
+    setSelectedContract(contract);
+  };
   const handleCloseDrawer = () => {
     setSelectedContract(null);
     setOpen(false);
@@ -191,7 +197,7 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
                   <ListItemButton
                     key={contract.injector_contract_id}
                     divider={true}
-                    onClick={() => setSelectedContract(index)}
+                    onClick={() => selectContract(index)}
                     selected={selectedContract === index}
                     disabled={!!(selectedContract !== null && selectedContract !== index)}
                   >

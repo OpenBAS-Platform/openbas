@@ -140,3 +140,7 @@ input[type="file"] {
   50% { box-shadow:0 0 8px #4caf50, inset 0 0 7px #4caf50; }
   100% { box-shadow:0 0 4px #4caf50, inset 0 0 4px #4caf50; }
 }
+
+@keyframes detect-scroll {
+  from, to { --can-scroll: ; }
+}

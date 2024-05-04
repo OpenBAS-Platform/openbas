@@ -1,12 +1,12 @@
 import React from 'react';
-import { HorizontalRuleOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
+import { SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import type { ExpectationResultsByType } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   inline: {
     display: 'flex',
-    flexDirection: 'row',
+    alignItems: 'center',
     padding: 0,
   },
 }));
@@ -27,7 +27,13 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations }) => {
     return colorMap[result ?? ''] ?? 'rgb(245, 166, 35)';
   };
   if (!expectations || expectations.length === 0) {
-    return <HorizontalRuleOutlined />;
+    return (
+      <div className={classes.inline}>
+        <ShieldOutlined style={{ color: getColor('PENDING'), marginRight: 10 }} />
+        <TrackChangesOutlined style={{ color: getColor('PENDING'), marginRight: 10 }} />
+        <SensorOccupiedOutlined style={{ color: getColor('PENDING'), marginRight: 10 }} />
+      </div>
+    );
   }
   return (
     <div className={classes.inline}>

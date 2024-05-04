@@ -19,7 +19,10 @@ const useStyles = makeStyles(() => ({
     display: 'flex',
     gap: 20,
     overflowX: 'auto',
-    justifyContent: 'center',
+    '--start-if-can-scroll': 'var(--can-scroll) start',
+    justifyContent: 'var(--start-if-can-scroll, center)',
+    animation: 'detect-scroll linear',
+    animationTimeline: 'scroll(self inline)',
   },
 }));
 

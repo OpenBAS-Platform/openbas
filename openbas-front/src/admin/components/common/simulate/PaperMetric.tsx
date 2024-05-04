@@ -3,6 +3,7 @@ import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import type { Theme } from '../../../../components/Theme';
 import { useFormatter } from '../../../../components/i18n';
+import ItemNumberDifference from '../../../../components/ItemNumberDifference';
 
 const useStyles = makeStyles((theme: Theme) => ({
   title: {
@@ -12,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.text?.secondary,
   },
   number: {
-    fontSize: 30,
+    fontSize: 40,
     fontWeight: 800,
     float: 'left',
   },
@@ -38,9 +39,7 @@ const PaperMetric: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
-
-  const component = React.cloneElement(icon as React.ReactElement, { color: 'primary', style: { fontSize: 50 } });
-
+  const component = React.cloneElement(icon as React.ReactElement, { color: 'primary', style: { fontSize: 35, marginTop: 15 } });
   return (
     <Paper variant="outlined" className={classes.container}>
       <div>
@@ -48,6 +47,10 @@ const PaperMetric: FunctionComponent<Props> = ({
         <div className={classes.number}>
           {number ?? '-'}
         </div>
+        <ItemNumberDifference
+          difference={0}
+          description={t('24 hours')}
+        />
       </div>
       <div>
         {component}

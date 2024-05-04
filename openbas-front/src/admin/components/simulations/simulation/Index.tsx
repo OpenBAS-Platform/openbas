@@ -21,15 +21,15 @@ import ExerciseDatePopover from './ExerciseDatePopover';
 const Exercise = lazy(() => import('./overview/Exercise'));
 const Dryrun = lazy(() => import('./controls/Dryrun'));
 const Comcheck = lazy(() => import('./controls/Comcheck'));
-const Lessons = lazy(() => import('../lessons/Lessons'));
+const Lessons = lazy(() => import('./lessons/Lessons'));
 const ExerciseDefinition = lazy(() => import('./ExerciseDefinition'));
-const Injects = lazy(() => import('../injects/ExerciseInjects'));
+const Injects = lazy(() => import('./injects/ExerciseInjects'));
 const Timeline = lazy(() => import('./timeline/Timeline'));
 const Mails = lazy(() => import('./mails/Mails'));
 const MailsInject = lazy(() => import('./mails/Inject'));
 const Logs = lazy(() => import('./logs/Logs'));
 const Chat = lazy(() => import('./chat/Chat'));
-const Validations = lazy(() => import('../validation/Validations'));
+const Validations = lazy(() => import('./validation/Validations'));
 
 const useStyles = makeStyles(() => ({
   scheduling: {

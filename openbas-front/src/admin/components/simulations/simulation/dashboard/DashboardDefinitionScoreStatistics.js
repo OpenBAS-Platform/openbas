@@ -118,7 +118,7 @@ const DashboardDefinitionScoreStatistics = ({
     },
   ];
   return (
-    <Grid container={true} spacing={3} style={{ marginTop: 30 }}>
+    <Grid container={true} spacing={3} style={{ marginTop: 25 }}>
       <Grid item={true} xs={3}>
         <Typography variant="h4">
           {t('Distribution of expectations by inject type')}

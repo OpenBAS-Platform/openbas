@@ -57,10 +57,10 @@ import AvailableVariablesDialog from '../../simulations/simulation/variables/Ava
 import InjectExpectations from './expectations/InjectExpectations';
 import EndpointsList from '../../assets/endpoints/EndpointsList';
 import EndpointPopover from '../../assets/endpoints/EndpointPopover';
-import InjectAddEndpoints from '../../simulations/injects/endpoints/InjectAddEndpoints';
+import InjectAddEndpoints from '../../simulations/simulation/injects/endpoints/InjectAddEndpoints';
 import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
 import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
-import InjectAddAssetGroups from '../../simulations/injects/asset_groups/InjectAddAssetGroups';
+import InjectAddAssetGroups from '../../simulations/simulation/injects/asset_groups/InjectAddAssetGroups';
 import InjectTeamsList from './teams/InjectTeamsList';
 
 const styles = (theme) => ({

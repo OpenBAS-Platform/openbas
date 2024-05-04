@@ -8,6 +8,7 @@ import { useFormatter } from '../../../../components/i18n';
 import type { ExpectationResultsByType, ResultDistribution } from '../../../../utils/api-types';
 import type { Theme } from '../../../../components/Theme';
 import { donutChartOptions } from '../../../../utils/Charts';
+import Loader from '../../../../components/Loader';
 
 const useStyles = makeStyles(() => ({
   chartContainer: {
@@ -35,11 +36,13 @@ const useStyles = makeStyles(() => ({
 interface Props {
   expectationResultsByTypes?: ExpectationResultsByType[] | null;
   humanValidationLink?: string;
+  immutable?: boolean;
 }
 
 const ResponsePie: FunctionComponent<Props> = ({
   expectationResultsByTypes,
   humanValidationLink,
+  immutable,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -65,6 +68,18 @@ const ResponsePie: FunctionComponent<Props> = ({
   const displayHumanValidationBtn = humanValidationLink && (pending.length > 0);
   const Pie = ({ title, expectationResultsByType, icon }: { title: string, expectationResultsByType?: ExpectationResultsByType, icon: React.ReactElement }) => {
     const hasDistribution = expectationResultsByType && expectationResultsByType.distribution && expectationResultsByType.distribution.length > 0;
+    const labels = hasDistribution
+      ? expectationResultsByType.distribution.map((e) => `${t(e.label)} (${(((e.value!) / getTotal(expectationResultsByType.distribution!)) * 100).toFixed(1)}%)`)
+      : [t('Unknown Data')];
+    let colors = [];
+    if (immutable) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      colors = hasDistribution ? expectationResultsByType.distribution.map((e) => getColor(e.label)).asMutable() : ['rgba(202, 203, 206, 0.18)'];
+    } else {
+      colors = hasDistribution ? expectationResultsByType.distribution.map((e) => getColor(e.label)) : ['rgba(202, 203, 206, 0.18)'];
+    }
+    const data = hasDistribution ? expectationResultsByType.distribution.map((e) => e.value) : [1];
     return (
       <div className={classes.column}>
         <div className={classes.chartContainer}>
@@ -74,15 +89,13 @@ const ResponsePie: FunctionComponent<Props> = ({
           <Chart options={
             donutChartOptions(
               theme,
-              hasDistribution
-                ? expectationResultsByType.distribution.map((e) => `${t(e.label)} (${(((e.value!) / getTotal(expectationResultsByType.distribution!)) * 100).toFixed(1)}%)`)
-                : [t('Unknown Data')],
+              labels,
               'bottom',
               false,
-              hasDistribution ? expectationResultsByType.distribution.map((e) => getColor(e.label)) : ['rgba(202,203,206,0.18)'],
+              colors,
               false,
             )}
-            series={hasDistribution ? expectationResultsByType.distribution.map((e) => (e.value!)) : [1]}
+            series={data}
             type="donut"
             width="100%"
             height="100%"
@@ -102,17 +115,16 @@ const ResponsePie: FunctionComponent<Props> = ({
       </div>
     );
   };
-
   return (
     <Grid container={true} spacing={3}>
       <Grid item={true} xs={4}>
-        <Pie title={t('TYPE_PREVENTION')} expectationResultsByType={prevention} icon={<ShieldOutlined className={classes.iconOverlay} />} />
+        {expectationResultsByTypes && expectationResultsByTypes.length > 0 ? <Pie title={t('TYPE_PREVENTION')} expectationResultsByType={prevention} icon={<ShieldOutlined className={classes.iconOverlay} />} /> : <Loader variant="inElement" />}
       </Grid>
       <Grid item={true} xs={4}>
-        <Pie title={t('TYPE_DETECTION')} expectationResultsByType={detection} icon={<TrackChangesOutlined className={classes.iconOverlay} />} />
+        {expectationResultsByTypes && expectationResultsByTypes.length > 0 ? <Pie title={t('TYPE_DETECTION')} expectationResultsByType={detection} icon={<TrackChangesOutlined className={classes.iconOverlay} />} /> : <Loader variant="inElement" />}
       </Grid>
       <Grid item={true} xs={4}>
-        <Pie title={t('TYPE_HUMAN_RESPONSE')} expectationResultsByType={humanResponse} icon={<SensorOccupiedOutlined className={classes.iconOverlay} />} />
+        {expectationResultsByTypes && expectationResultsByTypes.length > 0 ? <Pie title={t('TYPE_HUMAN_RESPONSE')} expectationResultsByType={humanResponse} icon={<SensorOccupiedOutlined className={classes.iconOverlay} />} /> : <Loader variant="inElement" />}
       </Grid>
     </Grid>
   );
