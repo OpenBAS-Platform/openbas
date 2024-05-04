@@ -19,7 +19,7 @@ const FullTextSearch = lazy(() => import('./components/search/FullTextSearch'));
 const Exercises = lazy(() => import('./components/simulations/Exercises'));
 const IndexExercise = lazy(() => import('./components/simulations/Index'));
 const AtomicTestings = lazy(() => import('./components/atomic_testings/AtomicTestings'));
-const IndexAtomicTesting = lazy(() => import('./components/atomic_testings/atomic_testing/IndexAtomicTesting'));
+const IndexAtomicTesting = lazy(() => import('./components/atomic_testings/atomic_testing/Index'));
 const Scenarios = lazy(() => import('./components/scenarios/Scenarios'));
 const IndexScenario = lazy(() => import('./components/scenarios/scenario/Index'));
 const Assets = lazy(() => import('./components/assets/Index'));

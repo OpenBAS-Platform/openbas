@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginTop: theme.spacing(2),
   },
   marginBottom_2: {
+    border: `1px solid ${theme.palette.divider}`,
     marginBottom: theme.spacing(2),
   },
   buttons: {
@@ -31,10 +32,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: '100%',
   },
   chipInList: {
-    height: 20,
+    height: 30,
     borderRadius: 4,
     textTransform: 'uppercase',
-    width: 200,
+    width: 150,
     float: 'right',
   },
 }));
@@ -44,21 +45,15 @@ interface FormProps {
   onUpdate?: () => void;
 }
 
-const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({
-  expectation,
-  onUpdate,
-}) => {
+const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expectation, onUpdate }) => {
   const classes = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-
   const isValid = (e: InjectExpectationsStore) => {
     return !R.isEmpty(e.inject_expectation_results);
   };
-
   const [validated, setValidated] = useState(isValid(expectation));
   const [label, setLabel] = useState(isValid(expectation) ? t('Validated') : t('Pending validation'));
-
   const onSubmit = (data: { expectation_score: number }) => {
     dispatch(
       updateInjectExpectation(expectation.inject_expectation_id, data),
@@ -68,7 +63,6 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({
       onUpdate?.();
     });
   };
-
   const {
     register,
     handleSubmit,

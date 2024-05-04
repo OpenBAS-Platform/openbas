@@ -166,13 +166,19 @@ export interface AtomicTestingInput {
 }
 
 export interface AtomicTestingOutput {
+  /** Attack Patterns */
+  atomic_attack_patterns: AttackPattern[];
   /** Contract */
   atomic_contract: string;
+  /** Description */
+  atomic_description: string;
   /** Result of expectations */
   atomic_expectation_results: ExpectationResultsByType[];
   /** Id */
   atomic_id: string;
   atomic_injector_contract: InjectorContract;
+  /** Kill Chain Phases */
+  atomic_kill_chain_phases: KillChainPhase[];
   /**
    * Last Execution End date
    * @format date-time
@@ -849,6 +855,7 @@ export interface Inject {
   inject_all_teams?: boolean;
   inject_asset_groups?: AssetGroup[];
   inject_assets?: Asset[];
+  inject_attack_patterns?: AttackPattern[];
   inject_city?: string;
   inject_communications?: Communication[];
   /** @format int64 */
@@ -874,6 +881,7 @@ export interface Inject {
   inject_expectations?: InjectExpectation[];
   inject_id?: string;
   inject_injector_contract?: InjectorContract;
+  inject_kill_chain_phases?: KillChainPhase[];
   inject_payloads?: Asset[];
   inject_scenario?: Scenario;
   /** @format date-time */
@@ -1487,6 +1495,25 @@ export interface OrganizationUpdateInput {
   organization_tags?: string[];
 }
 
+export interface PageAssetGroup {
+  content?: AssetGroup[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageAtomicTestingOutput {
   content?: AtomicTestingOutput[];
   empty?: boolean;
@@ -1953,7 +1980,7 @@ export interface Scenario {
   scenario_id: string;
   scenario_injects?: Inject[];
   scenario_injects_statistics?: Record<string, number>;
-  scenario_kill_chain_phases?: string[];
+  scenario_kill_chain_phases?: KillChainPhase[];
   scenario_lessons_categories?: LessonsCategory[];
   scenario_mail_from: string;
   scenario_mails_reply_to?: string[];

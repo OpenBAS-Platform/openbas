@@ -15,13 +15,18 @@ import UpdateInject from '../../common/injects/UpdateInject';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import { fetchTeams } from '../../../../actions/teams/team-actions';
 import type { TeamStore } from '../../../../actions/teams/Team';
+import { isNotEmptyField } from '../../../../utils/utils';
 
 interface Props {
   atomic: AtomicTestingOutput;
+  openEdit?: boolean;
+  setOpenEdit?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AtomicPopover: FunctionComponent<Props> = ({
   atomic,
+  openEdit,
+  setOpenEdit,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -75,20 +80,19 @@ const AtomicPopover: FunctionComponent<Props> = ({
   };
   // Button Popover
   const entries: ButtonPopoverEntry[] = [
-    { label: 'Update', action: handleEdit },
+    { label: 'Update', action: setOpenEdit ? () => setOpenEdit(true) : handleEdit },
     { label: 'Delete', action: handleDelete },
   ];
-
   return (
     <>
       <ButtonPopover entries={entries} />
       <UpdateInject
         injectorContract={JSON.parse(atomic.atomic_injector_contract.injector_contract_content)}
-        open={edition}
-        handleClose={() => setEdition(false)}
+        open={isNotEmptyField(openEdit) ? openEdit : edition}
+        handleClose={() => (setOpenEdit ? setOpenEdit(false) : setEdition(false))}
         onUpdateInject={onUpdateAtomicTesting}
         inject={inject}
-        isAtomic
+        isAtomic={true}
         teamsFromExerciseOrScenario={teams?.filter((team: TeamStore) => !team.team_contextual)}
       />
       <DialogDelete

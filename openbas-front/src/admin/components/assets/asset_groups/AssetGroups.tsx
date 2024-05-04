@@ -20,7 +20,8 @@ import { initSorting } from '../../../../components/common/pagination/Page';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 
 const useStyles = makeStyles(() => ({
-  itemHeader: {
+  itemHead: {
+    paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
@@ -28,10 +29,13 @@ const useStyles = makeStyles(() => ({
     paddingLeft: 10,
     height: 50,
   },
+  bodyItems: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   bodyItem: {
     height: 20,
     fontSize: 13,
-    float: 'left',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -42,45 +46,6 @@ const useStyles = makeStyles(() => ({
     padding: 0,
   },
 }));
-
-const inlineStylesHeaders: Record<string, CSSProperties> = {
-  iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 5px',
-    padding: 0,
-    top: '0px',
-  },
-  asset_group_name: {
-    float: 'left',
-    width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  asset_group_description: {
-    float: 'left',
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  asset_group_assets: {
-    float: 'left',
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  asset_group_dynamic_assets: {
-    float: 'left',
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  asset_group_tags: {
-    float: 'left',
-    width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-};
 
 const inlineStyles: Record<string, CSSProperties> = {
   asset_group_name: {
@@ -156,7 +121,7 @@ const AssetGroups = () => {
       <div className="clearfix" />
       <List>
         <ListItem
-          classes={{ root: classes.itemHeader }}
+          classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
         >
@@ -166,7 +131,7 @@ const AssetGroups = () => {
             primary={
               <SortHeadersComponent
                 headers={headers}
-                inlineStylesHeaders={inlineStylesHeaders}
+                inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
@@ -187,38 +152,23 @@ const AssetGroups = () => {
             </ListItemIcon>
             <ListItemText
               primary={
-                <>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.asset_group_name}
-                  >
+                <div className={classes.bodyItems}>
+                  <div className={classes.bodyItem} style={inlineStyles.asset_group_name}>
                     {assetGroup.asset_group_name}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.asset_group_description}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.asset_group_description}>
                     {assetGroup.asset_group_description}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.asset_group_assets}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.asset_group_assets}>
                     {assetGroup.asset_group_assets?.length ?? 0}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.asset_group_dynamic_assets}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.asset_group_dynamic_assets}>
                     {assetGroup.asset_group_dynamic_assets?.length ?? 0}
                   </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.asset_group_tags}
-                  >
+                  <div className={classes.bodyItem} style={inlineStyles.asset_group_tags}>
                     <ItemTags variant="list" tags={assetGroup.asset_group_tags} />
                   </div>
-                </>
+                </div>
               }
             />
             <ListItemSecondaryAction>

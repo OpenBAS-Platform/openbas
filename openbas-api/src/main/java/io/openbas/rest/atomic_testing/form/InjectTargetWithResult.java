@@ -1,6 +1,6 @@
-package io.openbas.atomic_testing.form;
+package io.openbas.rest.atomic_testing.form;
 
-import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
+import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.atomic_testing.TargetType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

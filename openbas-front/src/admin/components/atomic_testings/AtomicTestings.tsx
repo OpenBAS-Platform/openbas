@@ -12,15 +12,15 @@ import InjectIcon from '../common/injects/InjectIcon';
 import type { AtomicTestingOutput, Inject, SearchPaginationInput } from '../../../utils/api-types';
 import { createAtomicTesting, searchAtomicTestings } from '../../../actions/atomic_testings/atomic-testing-actions';
 import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
-import TargetChip from './atomic_testing/TargetChip';
+import ItemTargets from '../../../components/ItemTargets';
 import Empty from '../../../components/Empty';
-import StatusChip from './atomic_testing/StatusChip';
 import { initSorting } from '../../../components/common/pagination/Page';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
 import InjectorContract from '../common/injects/InjectorContract';
 import CreateInject from '../common/injects/CreateInject';
 import { useAppDispatch } from '../../../utils/hooks';
+import ItemStatus from '../../../components/ItemStatus';
 
 const useStyles = makeStyles(() => ({
   bodyItems: {
@@ -135,7 +135,7 @@ const AtomicTestings = () => {
       label: 'Target',
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
-        return (<TargetChip targets={atomicTesting.atomic_targets} />);
+        return (<ItemTargets targets={atomicTesting.atomic_targets} />);
       },
     },
     {
@@ -143,7 +143,7 @@ const AtomicTestings = () => {
       label: 'Inject Execution Status',
       isSortable: true,
       value: (atomicTesting: AtomicTestingOutput) => {
-        return (<StatusChip status={atomicTesting.atomic_status} variant={'list'} />);
+        return (<ItemStatus status={atomicTesting.atomic_status} label={t(atomicTesting.atomic_status)} variant='inList' />);
       },
     },
     {

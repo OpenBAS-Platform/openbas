@@ -20,7 +20,7 @@ import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
 import type { TagsHelper, UsersHelper } from '../../../../actions/helper';
 
 const useStyles = makeStyles(() => ({
-  itemHeader: {
+  itemHead: {
     textTransform: 'uppercase',
     cursor: 'pointer',
     paddingLeft: 10,
@@ -126,7 +126,7 @@ const Teams = () => {
       />
       <List>
         <ListItem
-          classes={{ root: classes.itemHeader }}
+          classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
         >

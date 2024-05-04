@@ -1,6 +1,8 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import { Box, Paper, Step, StepLabel, Stepper, Tab, Tabs, Typography } from '@mui/material';
+import { Paper, Tab, Tabs, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
+import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow } from 'reactflow';
+import 'reactflow/dist/style.css';
 import type { InjectTargetWithResult } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
@@ -14,45 +16,25 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import ManualExpectationsValidationForm from '../../simulations/validation/expectations/ManualExpectationsValidationForm';
 import type { AtomicTestingDetailOutputStore } from '../../../../actions/atomic_testings/atomic-testing';
 import type { InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
+import nodeTypes from './types/nodes';
+import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
 
 interface Steptarget {
   label: string;
   type: string;
   status?: string;
+  key?: string;
 }
 
-const useStyles = makeStyles<Theme>((theme) => ({
-  circle: {
-    width: '100px',
-    height: '100px',
-    borderRadius: '50%',
-    background: theme.palette.mode === 'dark' ? 'rgba(202,203,206,0.51)' : 'rgba(202,203,206,0.33)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  circleLabel: {
-    fontSize: '1rem',
-    padding: '10px',
+const useStyles = makeStyles<Theme>(() => ({
+  target: {
+    margin: '0 auto',
     textAlign: 'center',
-    whiteSpace: 'pre-wrap',
-    wordWrap: 'break-word',
+    fontSize: 15,
   },
-  connector: {
-    position: 'absolute',
-    top: '40%',
-    right: 'calc(50% + 50px)',
-    height: '1px',
-    width: 'calc(100% - 100px)',
-    background: 'blue',
-    zIndex: 0,
-  },
-  connectorLabel: {
-    color: theme.palette.common,
-    fontSize: '0.8rem',
-    position: 'absolute',
-    bottom: 'calc(60%)',
-    left: 'calc(-22%)',
+  container: {
+    margin: 0,
+    overflow: 'hidden',
   },
   tabs: {
     marginLeft: 'auto',
@@ -67,7 +49,7 @@ interface Props {
   target: InjectTargetWithResult,
 }
 
-const TargetResultsDetail: FunctionComponent<Props> = ({
+const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   injectId,
   injectType,
   lastExecutionStartDate,
@@ -78,76 +60,65 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   const theme = useTheme<Theme>();
   const { nsdt, t } = useFormatter();
   const dispatch = useAppDispatch();
+  const [initialized, setInitialized] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [steps, setSteps] = useState<Steptarget[]>([]);
-  const initialSteps = [{ label: 'Attack started', type: '' }, { label: 'Attack ended', type: '' }];
+  const [targetResults, setTargetResults] = useState<InjectExpectationsStore[]>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const initialSteps = [{ label: 'Attack started', type: '', key: 'attack-started' }, { label: 'Attack ended', type: '', key: 'attack-ended' }];
   const sortOrder = ['PREVENTION', 'DETECTION', 'MANUAL'];
+  // Flow
+  const layoutOptions: LayoutOptions = {
+    algorithm: 'd3-hierarchy',
+    direction: 'LR',
+    spacing: [150, 150],
+  };
+  useAutoLayout(layoutOptions, targetResults);
+  const { fitView } = useReactFlow();
+  useEffect(() => {
+    fitView();
+  }, [nodes, fitView]);
+
   // Fetching data
   const { atomicTestingDetails }: {
     atomicTestingDetails: AtomicTestingDetailOutputStore,
   } = useHelper((helper: AtomicTestingHelper) => ({
     atomicTestingDetails: helper.getAtomicTestingDetail(injectId),
   }));
-
-  const [targetResults, setTargetResults] = useState<InjectExpectationsStore[]>([]);
-
   useDataLoader(() => {
     dispatch(fetchAtomicTestingDetail(injectId));
   });
-
   useEffect(() => {
     if (target) {
-      setSteps([...initialSteps, ...[{ label: 'Unknown Data', type: '' }]]);
+      setInitialized(false);
+      const steps = [...initialSteps, ...[{ label: 'Unknown result', type: '' }]];
+      setNodes(steps.map((step: Steptarget, index) => ({
+        id: `result-${index}`,
+        type: 'result',
+        data: {
+          key: step.key,
+          label: step.label,
+          start: index === 0,
+          end: index === steps.length - 1,
+          middle: index !== 0 && index !== steps.length - 1,
+        },
+        position: { x: 0, y: 0 },
+      })));
+      setEdges([...Array(steps.length - 1)].map((_, i) => ({
+        id: `result-${i}->result-${i + 1}`,
+        type: 'result',
+        source: `result-${i}`,
+        target: `result-${i + 1}`,
+        label: i === 0 ? nsdt(lastExecutionStartDate) : nsdt(lastExecutionEndDate),
+        labelStyle: { background: 'transparent' },
+      })));
       fetchTargetResult(injectId, target.id!, target.targetType!).then(
         (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
       );
       setActiveTab(0);
+      setTimeout(() => setInitialized(true), 1000);
     }
   }, [target]);
-
-  interface CustomConnectorProps {
-    index: number;
-  }
-
-  const CustomConnector: React.FC<CustomConnectorProps> = ({ index }: CustomConnectorProps) => {
-    if (!index || index === 0) {
-      return null;
-    }
-    const dateToDisplay = index === 0 ? lastExecutionStartDate : lastExecutionEndDate;
-
-    const formatDate = (date: string) => {
-      const dateString = nsdt(date);
-      if (!dateString) return '';
-
-      const dateParts = dateString.split(', ');
-      const firstPart = dateParts[0] ?? '';
-      const secondPart = dateParts[1] ?? '';
-      const thirdPart = dateParts[2] ?? '';
-
-      return (
-        <>
-          {firstPart}{' '}
-          {secondPart && !thirdPart && <><br />{secondPart}{' '}</>}
-          {secondPart && thirdPart && `, ${secondPart} `}
-          {thirdPart && (
-            <>
-              <br />
-              {thirdPart}
-            </>
-          )}
-        </>
-      );
-    };
-
-    return (
-      <>
-        <hr className={classes.connector} />
-        <Typography variant="body2" className={classes.connectorLabel}>
-          {dateToDisplay && formatDate(dateToDisplay)}
-        </Typography>
-      </>
-    );
-  };
 
   const getStatus = (status: string[]) => {
     if (status.includes('UNKNOWN')) {
@@ -183,7 +154,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     }
   };
 
-  const getCircleColor = (status: string) => {
+  const getColor = (status: string | undefined) => {
     let color;
     let background;
     switch (status) {
@@ -196,12 +167,12 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
         background = 'rgba(192, 113, 113, 0.29)';
         break;
       case 'PENDING':
-        color = theme.palette.mode === 'dark' ? 'rgb(231,231,231)' : 'rgb(0,0,0)';
-        background = 'rgb(128,128,128)';
+        color = theme.palette.text?.primary;
+        background = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
         break;
       default: // Unknown status fow unknown expectation score
-        color = theme.palette.mode === 'dark' ? 'rgb(231,231,231)' : 'rgb(0,0,0)';
-        background = 'rgba(128,127,127,0.37)';
+        color = theme.palette.text?.primary;
+        background = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
         break;
     }
     return { color, background };
@@ -216,7 +187,7 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
     if (targetResult === 'MANUAL') {
       return (
         <div style={{ marginTop: 16 }}>
-          {atomicTestingDetails?.atomic_expectations?.filter((es) => es.inject_expectation_type === 'MANUAL')
+          {atomicTestingDetails?.atomic_expectations?.filter((es) => es.inject_expectation_type === 'MANUAL' && es.targetId === target.id)
             .map((expectation) => (
               <ManualExpectationsValidationForm
                 key={expectation.inject_expectation_id}
@@ -231,7 +202,8 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
       <>
         {targetResultList.map((result) => (
           <Paper
-            elevation={2} style={{ padding: 20, marginTop: 15, minHeight: 125 }}
+            elevation={2}
+            style={{ padding: 20, marginTop: 15, minHeight: 125 }}
             key={result.inject_expectation_id}
           >
             {result.inject_expectation_results && result.inject_expectation_results.length > 0 ? (
@@ -274,25 +246,46 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
 
   // Define steps
   useEffect(() => {
-    if (targetResults && targetResults.length > 0) {
+    if (initialized && targetResults && targetResults.length > 0) {
       const groupedBy = groupedByExpectationType(targetResults);
       const newSteps = Array.from(groupedBy).map(([targetType, targetResult]) => ({
+        key: 'result',
         label: getStatusLabel(targetType, targetResult.map((tr: InjectExpectationsStore) => tr.inject_expectation_status)),
         type: targetType,
         status: getStatus(targetResult.map((tr: InjectExpectationsStore) => tr.inject_expectation_status)),
       }));
       const mergedSteps: Steptarget[] = [...initialSteps, ...newSteps];
-
       // Custom sorting function
       mergedSteps.sort((a, b) => {
         const typeAIndex = sortOrder.indexOf(a.type);
         const typeBIndex = sortOrder.indexOf(b.type);
         return typeAIndex - typeBIndex;
       });
-
-      setSteps(mergedSteps);
+      setNodes(mergedSteps.map((step, index) => ({
+        id: `result-${index}`,
+        type: 'result',
+        data: {
+          key: step.key,
+          label: step.label,
+          start: index === 0,
+          end: index === mergedSteps.length - 1,
+          middle: index !== 0 && index !== mergedSteps.length - 1,
+          color: getColor(step.status).color,
+          background: getColor(step.status).background,
+        },
+        position: { x: 0, y: 0 },
+      })));
+      setEdges([...Array(mergedSteps.length - 1)].map((_, i) => ({
+        id: `result-${i}->result-${i + 1}`,
+        type: 'result',
+        source: `result-${i}`,
+        target: `result-${i + 1}`,
+        label: i === 0 ? nsdt(lastExecutionStartDate) : nsdt(lastExecutionEndDate),
+        labelShowBg: false,
+        labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
+      })));
     }
-  }, [targetResults]);
+  }, [targetResults, initialized]);
 
   // Define Tabs
   const groupedResults: Record<string, InjectExpectationsStore[]> = {};
@@ -307,59 +300,68 @@ const TargetResultsDetail: FunctionComponent<Props> = ({
   const sortedKeys = Object.keys(groupedResults).sort((a, b) => {
     return sortOrder.indexOf(a) - sortOrder.indexOf(b);
   });
-
   const sortedGroupedResults: Record<string, InjectExpectationsStore[]> = {};
   sortedKeys.forEach((key) => {
     sortedGroupedResults[key] = groupedResults[key];
   });
-
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
-
+  const proOptions = { account: 'paid-pro', hideAttribution: true };
+  const defaultEdgeOptions = {
+    type: 'straight',
+    markerEnd: { type: MarkerType.ArrowClosed },
+  };
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div>
-          <Typography variant="h1" className="pageTitle">{target.name}</Typography>
-        </div>
+    <>
+      <div className={classes.target}>{target.name}</div>
+      <div className={classes.container} style={{ width: '100%', height: 150 }}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          nodeTypes={nodeTypes}
+          nodesDraggable={false}
+          nodesConnectable={false}
+          nodesFocusable={false}
+          elementsSelectable={false}
+          maxZoom={1}
+          zoomOnScroll={false}
+          zoomOnPinch={false}
+          zoomOnDoubleClick={false}
+          panOnDrag={false}
+          defaultEdgeOptions={defaultEdgeOptions}
+          proOptions={proOptions}
+        />
       </div>
-
-      <Box marginTop={5}>
-        <Stepper alternativeLabel connector={<></>}>
-          {steps.map((step, index) => (
-            <Step key={index}>
-              <StepLabel
-                StepIconComponent={() => (
-                  <div
-                    className={classes.circle}
-                    style={index >= 2 ? getCircleColor(step.status!) : {}}
-                  >
-                    <Typography className={classes.circleLabel}>{t(step.label)}</Typography>
-                  </div>
-                )}
-              />
-              <CustomConnector index={index} />
-            </Step>
-          ))}
-        </Stepper>
-      </Box>
-      <Box marginTop={3}>
-        <Tabs
-          value={activeTab} onChange={handleTabChange} indicatorColor="primary"
-          textColor="primary" className={classes.tabs}
-        >
-          {Object.keys(sortedGroupedResults).map((type, index) => (
-            <Tab key={index} label={t(`TYPE_${type}`)} />
-          ))}
-        </Tabs>
-        {Object.keys(sortedGroupedResults).map((targetResult, index) => (
-          <div key={index} hidden={activeTab !== index}>
-            {renderLogs(targetResult, sortedGroupedResults[targetResult])}
-          </div>
+      <Tabs
+        value={activeTab}
+        onChange={handleTabChange}
+        indicatorColor="primary"
+        textColor="primary"
+        className={classes.tabs}
+      >
+        {Object.keys(sortedGroupedResults).map((type, index) => (
+          <Tab key={index} label={t(`TYPE_${type}`)} />
         ))}
-      </Box>
-    </div>
+      </Tabs>
+      {Object.keys(sortedGroupedResults).map((targetResult, index) => (
+        <div key={index} hidden={activeTab !== index}>
+          {renderLogs(targetResult, sortedGroupedResults[targetResult])}
+        </div>
+      ))}
+    </>
+  );
+};
+
+const TargetResultsDetail: FunctionComponent<Props> = (props) => {
+  return (
+    <>
+      <ReactFlowProvider>
+        <TargetResultsDetailFlow {...props} />
+      </ReactFlowProvider>
+    </>
   );
 };
 

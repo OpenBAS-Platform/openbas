@@ -2,8 +2,8 @@ package io.openbas.rest.inject.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
-import io.openbas.atomic_testing.AtomicTestingUtils;
+import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
+import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Inject;
 import io.openbas.helper.MonoIdDeserializer;

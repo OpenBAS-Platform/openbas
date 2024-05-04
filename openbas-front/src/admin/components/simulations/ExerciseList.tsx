@@ -16,7 +16,7 @@ import { useFormatter } from '../../../components/i18n';
 import type { ExerciseSimpleStore, ExerciseStore } from '../../../actions/exercises/Exercise';
 import type { Theme } from '../../../components/Theme';
 import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
-import TargetChip from '../atomic_testings/atomic_testing/TargetChip';
+import ItemTargets from '../../../components/ItemTargets';
 
 const useStyles = makeStyles((theme: Theme) => ({
   parameters: {
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     gap: '10px',
   },
-  itemHeader: {
+  itemHead: {
     textTransform: 'uppercase',
     cursor: 'pointer',
     paddingLeft: 10,
@@ -200,7 +200,7 @@ const ExerciseList: FunctionComponent<Props> = ({
       <div className="clearfix" />
       <List>
         <ListItem
-          classes={{ root: classes.itemHeader }}
+          classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
         >
@@ -297,7 +297,7 @@ const ExerciseList: FunctionComponent<Props> = ({
                     className={classes.bodyItem}
                     style={inlineStyles.exercise_targets}
                   >
-                    <TargetChip targets={exercise.exercise_targets} />
+                    <ItemTargets targets={exercise.exercise_targets} />
                   </div>
                   <div
                     className={classes.bodyItem}

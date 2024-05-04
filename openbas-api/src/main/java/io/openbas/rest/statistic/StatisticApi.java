@@ -1,6 +1,6 @@
 package io.openbas.rest.statistic;
 
-import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
+import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;

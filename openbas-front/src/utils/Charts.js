@@ -41,6 +41,21 @@ export const colors = (temp) => [
   C.blueGrey[temp + 100],
 ];
 
+/**
+ * A custom tooltip for ApexChart.
+ * This tooltip only display the label of the data it hovers.
+ *
+ * Why custom tooltip? To manage text color of the tooltip that cannot be done by
+ * the ApexChart API by default.
+ *
+ * @param {Theme} theme
+ */
+const simpleLabelTooltip = (theme) => ({ seriesIndex, w }) => (`
+  <div style="background: ${theme.palette.background.nav}; color: ${theme.palette.text.primary}; padding: 2px 6px; font-size: 12px">
+    ${w.config.labels[seriesIndex]}
+  </div>
+`);
+
 export const resultColors = (temp) => [
   C.deepPurple[temp],
   C.indigo[temp],
@@ -564,40 +579,65 @@ export const polarAreaChartOptions = (
   },
 });
 
+/**
+ * @param {Theme} theme
+ * @param {string[]} labels
+ * @param {string} legendPosition
+ * @param {boolean} reversed
+ * @param {string[]} chartColors
+ * @param {boolean} displayLegend
+ * @param {boolean} displayLabels
+ * @param {boolean} displayValue
+ * @param {boolean} displayTooltip
+ * @param {number} size
+ */
 export const donutChartOptions = (
   theme,
   labels,
   legendPosition = 'bottom',
   reversed = false,
+  chartColors = [],
+  displayLegend = true,
+  displayLabels = true,
+  displayValue = true,
+  displayTooltip = true,
+  size = 70,
 ) => {
   const temp = theme.palette.mode === 'dark' ? 400 : 600;
-  let chartColors = colors(temp);
-  if (labels.length === 2 && labels[0] === 'true') {
-    if (reversed) {
-      chartColors = [C.red[temp], C.green[temp]];
-    } else {
-      chartColors = [C.green[temp], C.red[temp]];
-    }
-  } else if (labels.length === 2 && labels[0] === 'false') {
-    if (reversed) {
-      chartColors = [C.green[temp], C.red[temp]];
-    } else {
-      chartColors = [C.red[temp], C.green[temp]];
+  let dataLabelsColors = labels.map(() => theme.palette.text.primary);
+  if (chartColors.length > 0) {
+    dataLabelsColors = chartColors.map((n) => (n === '#ffffff' ? '#000000' : theme.palette.text.primary));
+  }
+  let chartFinalColors = chartColors;
+  if (chartFinalColors.length === 0) {
+    chartFinalColors = colors(temp);
+    if (labels.length === 2 && labels[0] === 'true') {
+      if (reversed) {
+        chartFinalColors = [C.red[temp], C.green[temp]];
+      } else {
+        chartFinalColors = [C.green[temp], C.red[temp]];
+      }
+    } else if (labels.length === 2 && labels[0] === 'false') {
+      if (reversed) {
+        chartFinalColors = [C.green[temp], C.red[temp]];
+      } else {
+        chartFinalColors = [C.red[temp], C.green[temp]];
+      }
     }
   }
   return {
     chart: {
       type: 'donut',
       background: 'transparent',
-      toolbar: {
-        show: false,
-      },
+      toolbar: toolbarOptions,
       foreColor: theme.palette.text.secondary,
+      width: '100%',
+      height: '100%',
     },
     theme: {
       mode: theme.palette.mode,
     },
-    colors: chartColors,
+    colors: chartFinalColors,
     labels,
     fill: {
       opacity: 1,
@@ -615,20 +655,23 @@ export const donutChartOptions = (
       width: 3,
       colors: [theme.palette.background.paper],
     },
+    tooltip: {
+      enabled: displayTooltip,
+      theme: theme.palette.mode,
+      custom: simpleLabelTooltip(theme),
+    },
     legend: {
-      show: true,
+      show: displayLegend,
       position: legendPosition,
       fontFamily: '"IBM Plex Sans", sans-serif',
     },
-    tooltip: {
-      theme: theme.palette.mode,
-    },
     dataLabels: {
+      enabled: displayLabels,
       style: {
-        fontSize: '12px',
+        fontSize: '10px',
         fontFamily: '"IBM Plex Sans", sans-serif',
         fontWeight: 600,
-        colors: [theme.palette.text.primary],
+        colors: dataLabelsColors,
       },
       background: {
         enabled: false,
@@ -640,8 +683,11 @@ export const donutChartOptions = (
     plotOptions: {
       pie: {
         donut: {
+          value: {
+            show: displayValue,
+          },
           background: 'transparent',
-          size: '80%',
+          size: `${size}%`,
         },
       },
     },

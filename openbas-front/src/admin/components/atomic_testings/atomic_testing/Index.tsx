@@ -42,7 +42,7 @@ const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutp
     tabValue = `/admin/atomic_testings/${atomic.atomic_id}/detail`;
   }
   return (
-    <div>
+    <>
       <Breadcrumbs variant="object" elements={[
         { label: t('Atomic testings'), link: '/admin/atomic_testings' },
         { label: atomic.atomic_title, current: true },
@@ -61,14 +61,14 @@ const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutp
             component={Link}
             to={`/admin/atomic_testings/${atomic.atomic_id}`}
             value={`/admin/atomic_testings/${atomic.atomic_id}`}
-            label={t('Targets response')}
+            label={t('Overview')}
             className={classes.item}
           />
           <Tab
             component={Link}
             to={`/admin/atomic_testings/${atomic.atomic_id}/detail`}
             value={`/admin/atomic_testings/${atomic.atomic_id}/detail`}
-            label={t('Inject details')}
+            label={t('Execution details')}
             className={classes.item}
           />
         </Tabs>
@@ -81,11 +81,11 @@ const IndexAtomicTestingComponent: FunctionComponent<{ atomic: AtomicTestingOutp
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
-    </div>
+    </>
   );
 };
 
-const IndexAtomicTesting = () => {
+const Index = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
 
@@ -114,4 +114,4 @@ const IndexAtomicTesting = () => {
   return <Loader />;
 };
 
-export default IndexAtomicTesting;
+export default Index;

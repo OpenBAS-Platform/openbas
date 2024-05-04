@@ -47,38 +47,38 @@ const inlineStyles = {
   },
 };
 
-interface ItemSeverityProps {
+interface ItemStatusProps {
   label: string;
-  severity?: string | null;
+  status?: string | null;
   variant?: 'inList';
 }
 
-const computeSeverityStyle = (severity: string | undefined | null) => {
-  switch (severity) {
-    case 'low':
-      return inlineStyles.green;
-    case 'medium':
-      return inlineStyles.blue;
-    case 'high':
-      return inlineStyles.orange;
-    case 'critical':
+const computeStatusStyle = (status: string | undefined | null) => {
+  switch (status) {
+    case 'ERROR':
       return inlineStyles.red;
+    case 'PARTIAL':
+      return inlineStyles.orange;
+    case 'PENDING':
+      return inlineStyles.blue;
+    case 'SUCCESS':
+      return inlineStyles.green;
     default:
       return inlineStyles.blueGrey;
   }
 };
 
-const ItemSeverity: FunctionComponent<ItemSeverityProps> = ({
+const ItemStatus: FunctionComponent<ItemStatusProps> = ({
   label,
-  severity,
+  status,
   variant,
 }) => {
   const classes = useStyles();
   const style = variant === 'inList' ? classes.chipInList : classes.chip;
-  const classStyle = computeSeverityStyle(severity);
+  const classStyle = computeStatusStyle(status);
   return (
     <Chip classes={{ root: style }} style={classStyle} label={label} />
   );
 };
 
-export default ItemSeverity;
+export default ItemStatus;

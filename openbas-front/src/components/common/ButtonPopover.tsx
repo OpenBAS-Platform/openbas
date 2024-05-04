@@ -5,7 +5,7 @@ import { useFormatter } from '../i18n';
 
 export interface ButtonPopoverEntry {
   label: string;
-  action: () => void;
+  action: () => void | React.Dispatch<React.SetStateAction<boolean>>;
   disabled?: boolean;
 }
 

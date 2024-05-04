@@ -1,7 +1,7 @@
-package io.openbas.atomic_testing;
+package io.openbas.service;
 
-import io.openbas.atomic_testing.form.AtomicTestingInput;
-import io.openbas.atomic_testing.form.AtomicTestingUpdateTagsInput;
+import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
+import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
@@ -11,16 +11,12 @@ import io.openbas.execution.Executor;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Objects;
@@ -109,7 +105,6 @@ public class AtomicTestingService {
       predicate = cb.and(predicate, cb.isNull(root.get("exercise")));
       return predicate;
     });
-
     return buildPaginationJPA(
         (Specification<Inject> specification, Pageable pageable) -> injectRepository.findAll(
             specification.and(customSpec), pageable),

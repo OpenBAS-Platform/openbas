@@ -1,7 +1,7 @@
 package io.openbas.rest.statistic.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
+import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import lombok.Getter;
 import lombok.Setter;

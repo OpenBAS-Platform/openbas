@@ -234,10 +234,10 @@ public class Scenario implements Base {
 
   // -- KILL CHAIN PHASES --
   @JsonProperty("scenario_kill_chain_phases")
-  public List<String> getKillChainPhases() {
+  public List<KillChainPhase> getKillChainPhases() {
     return getInjects().stream().flatMap(
             inject -> inject.getInjectorContract().getAttackPatterns().stream().flatMap(
-                            attackPattern -> attackPattern.getKillChainPhases().stream().map(KillChainPhase::getName).toList().stream()
+                            attackPattern -> attackPattern.getKillChainPhases().stream().toList().stream()
                     )
             ).distinct().toList();
   }

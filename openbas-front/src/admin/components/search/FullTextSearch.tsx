@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     whiteSpace: 'nowrap',
     minWidth: 'fit-content',
   },
-  itemHeader: {
+  itemHead: {
     textTransform: 'uppercase',
   },
   bodyItemHeader: {
@@ -92,7 +92,7 @@ const TabPanel = (props: TabPanelProps & { index: number, entity: string, search
           />
           <List>
             <ListItem
-              classes={{ root: classes.itemHeader }}
+              classes={{ root: classes.itemHead }}
               divider={false}
               style={{ paddingTop: 0 }}
             >

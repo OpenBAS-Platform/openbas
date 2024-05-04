@@ -2,8 +2,8 @@ package io.openbas.rest.exercise.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.openbas.atomic_testing.AtomicTestingMapper;
-import io.openbas.atomic_testing.form.InjectTargetWithResult;
+import io.openbas.utils.AtomicTestingMapper;
+import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Tag;
 import io.openbas.helper.MultiIdDeserializer;

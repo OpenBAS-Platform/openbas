@@ -1,7 +1,9 @@
-package io.openbas.atomic_testing.form;
+package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
+import io.openbas.database.model.AttackPattern;
+import io.openbas.database.model.KillChainPhase;
+import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.InjectorContract;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,10 +32,25 @@ public class AtomicTestingOutput {
   @NotNull
   private String title;
 
+  @Schema(description = "Description")
+  @JsonProperty("atomic_description")
+  @NotNull
+  private String description;
+
   @Schema(description = "Type")
   @JsonProperty("atomic_type")
   @NotNull
   private String type;
+
+  @Schema(description = "Kill Chain Phases")
+  @JsonProperty("atomic_kill_chain_phases")
+  @NotNull
+  private List<KillChainPhase> killChainPhases;
+
+  @Schema(description = "Attack Patterns")
+  @JsonProperty("atomic_attack_patterns")
+  @NotNull
+  private List<AttackPattern> attackPatterns;
 
   @Schema(description = "Full contract")
   @JsonProperty("atomic_injector_contract")

@@ -29,19 +29,18 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
+  selected?: boolean;
   isChild?: boolean;
   onClick: (target: InjectTargetWithResult) => void;
   target: InjectTargetWithResult;
 }
 
-const TargetListItem: React.FC<Props> = ({ isChild, onClick, target }) => {
+const TargetListItem: React.FC<Props> = ({ isChild, onClick, target, selected }) => {
   const classes = useStyles();
-  const style = isChild ? { marginBottom: 1, marginLeft: 5 } : { marginBottom: 1 };
-
+  const style = isChild ? { marginBottom: 10, marginLeft: 50 } : { marginBottom: 10 };
   const handleItemClick = () => {
     onClick(target);
   };
-
   // Icon
   const getIcon = (type: string | undefined) => {
     if (type === 'ASSETS') {
@@ -50,41 +49,37 @@ const TargetListItem: React.FC<Props> = ({ isChild, onClick, target }) => {
     if (type === 'ASSETS_GROUPS') {
       return <SelectGroup/>;
     }
-    return <Groups3Outlined/>; // Teams
+    return <Groups3Outlined />;
   };
-
   return (
-    <div>
-      <div>{isChild && <Divider className={classes.dividerL}/>}</div>
-      <Paper elevation={3}
-        sx={style}
-        key={target?.id}
-      >
-        <ListItemButton onClick={handleItemClick} style={{ marginBottom: 15 }}>
+    <>
+      {isChild && <Divider className={classes.dividerL}/>}
+      <Paper elevation={1} style={style} key={target?.id}>
+        <ListItemButton onClick={handleItemClick} style={{ marginBottom: 15 }} selected={selected}>
           <ListItemText
             primary={
-              <div>
+              <>
                 <div style={{
                   color: 'gray',
                   display: 'inline-block',
                   float: 'left',
                   paddingRight: 5,
                 }}
-                >{getIcon(target?.targetType)}</div>
+                >
+                  {getIcon(target?.targetType)}
+                </div>
                 <div className={classes.bodyTarget} style={{ width: '30%' }}>
                   {`${target?.name}`}
                 </div>
                 <div style={{ float: 'right' }}>
-                  <AtomicTestingResult
-                    expectations={target?.expectationResultsByTypes}
-                  />
+                  <AtomicTestingResult expectations={target?.expectationResultsByTypes}/>
                 </div>
-              </div>
+              </>
             }
           />
         </ListItemButton>
       </Paper>
-    </div>
+    </>
   );
 };
 

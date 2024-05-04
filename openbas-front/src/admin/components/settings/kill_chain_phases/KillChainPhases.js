@@ -43,6 +43,7 @@ const useStyles = makeStyles(() => ({
     float: 'left',
     textTransform: 'uppercase',
     borderRadius: 4,
+    width: 120,
   },
 }));
 
@@ -147,7 +148,6 @@ const KillChainPhases = () => {
                     <Chip
                       variant="outlined"
                       classes={{ root: classes.chipInList }}
-                      style={{ width: 120 }}
                       color="primary"
                       label={killChainPhase.phase_kill_chain_name}
                     />

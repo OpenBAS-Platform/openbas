@@ -3,7 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { Chip, Tooltip } from '@mui/material';
 import { DevicesOtherOutlined, Groups3Outlined, HorizontalRule } from '@mui/icons-material';
 import { SelectGroup } from 'mdi-material-ui';
-import type { InjectTargetWithResult } from '../../../../utils/api-types';
+import type { InjectTargetWithResult } from '../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   inline: {
@@ -29,7 +29,7 @@ interface Props {
   targets: InjectTargetWithResult[] | undefined;
 }
 
-const TargetChip: FunctionComponent<Props> = ({
+const ItemTargets: FunctionComponent<Props> = ({
   targets,
 }) => {
   // Standard hooks
@@ -90,4 +90,4 @@ const TargetChip: FunctionComponent<Props> = ({
   );
 };
 
-export default TargetChip;
+export default ItemTargets;

@@ -9,7 +9,7 @@ import { useHelper } from '../../../../store';
 import type { AtomicTestingDetailOutput } from '../../../../utils/api-types';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import { fetchAtomicTestingDetail } from '../../../../actions/atomic_testings/atomic-testing-actions';
-import StatusChip from './StatusChip';
+import ItemStatus from '../../../../components/ItemStatus';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -118,7 +118,7 @@ const Detail: FunctionComponent<Props> = () => {
               {t('Status')}
             </Typography>
             {atomicDetail.status_label
-              && <StatusChip status={atomicDetail.status_label} />
+              && <ItemStatus status={atomicDetail.status_label} label={t(atomicDetail.status_label)} />
             }
             <Typography variant="subtitle1" className={classes.header} style={{ marginTop: 20 }} gutterBottom>
               {t('Traces')}

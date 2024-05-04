@@ -1,10 +1,15 @@
-package io.openbas.atomic_testing;
+package io.openbas.rest.atomic_testing;
 
-import io.openbas.atomic_testing.form.*;
+import io.openbas.utils.AtomicTestingMapper;
+import io.openbas.service.AtomicTestingService;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.inject_expectation.InjectExpectationService;
+import io.openbas.rest.atomic_testing.form.AtomicTestingDetailOutput;
+import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
+import io.openbas.rest.atomic_testing.form.AtomicTestingOutput;
+import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
@@ -18,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static io.openbas.atomic_testing.AtomicTestingMapper.toDto;
+import static io.openbas.utils.AtomicTestingMapper.toDto;
 
 @RestController
 @RequestMapping("/api/atomic_testings")

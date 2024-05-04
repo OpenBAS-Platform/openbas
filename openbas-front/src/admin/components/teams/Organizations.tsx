@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   container: {
     display: 'flex',
   },
-  itemHeader: {
+  itemHead: {
     textTransform: 'uppercase',
     cursor: 'pointer',
     paddingLeft: 10,
@@ -175,7 +175,7 @@ const Organizations = () => {
       <div className="clearfix" />
       <List>
         <ListItem
-          classes={{ root: classes.itemHeader }}
+          classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
         >

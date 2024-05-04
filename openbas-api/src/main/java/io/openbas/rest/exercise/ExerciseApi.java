@@ -1,7 +1,7 @@
 package io.openbas.rest.exercise;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
+import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Exercise.STATUS;

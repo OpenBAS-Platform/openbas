@@ -1,8 +1,10 @@
-package io.openbas.atomic_testing;
+package io.openbas.utils;
 
-import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
-import io.openbas.atomic_testing.AtomicTestingMapper.ResultDistribution;
-import io.openbas.atomic_testing.form.InjectTargetWithResult;
+import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
+import io.openbas.utils.AtomicTestingMapper.ResultDistribution;
+import io.openbas.expectation.ExpectationType;
+import io.openbas.atomic_testing.TargetType;
+import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;

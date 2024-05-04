@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import React from 'react';
-import { Button, Grid, Paper, Typography } from '@mui/material';
+import { Button, Chip, Grid, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { PlayArrowOutlined } from '@mui/icons-material';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -20,10 +20,19 @@ import ItemMainFocus from '../../../../components/ItemMainFocus';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import ItemSeverity from '../../../../components/ItemSeverity';
+import type { KillChainPhase } from '../../../../utils/api-types';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
 const useStyles = makeStyles(() => ({
+  chip: {
+    fontSize: 12,
+    height: 25,
+    marginRight: 7,
+    textTransform: 'uppercase',
+    borderRadius: 4,
+    width: 180,
+  },
   gridContainer: {
     marginBottom: 20,
   },
@@ -139,7 +148,15 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
                 >
                   {t('Kill Chain Phases')}
                 </Typography>
-                {scenario.scenario_kill_chain_phases.join(', ')}
+                {scenario.scenario_kill_chain_phases.map((killChainPhase: KillChainPhase) => (
+                  <Chip
+                    key={killChainPhase.phase_id}
+                    variant="outlined"
+                    classes={{ root: classes.chip }}
+                    color="error"
+                    label={killChainPhase.phase_name}
+                  />
+                ))}
               </Grid>
             </Grid>
           </Paper>

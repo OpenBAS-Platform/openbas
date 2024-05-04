@@ -62,6 +62,7 @@ const AssetGroupForm: React.FC<Props> = ({
         variant="standard"
         fullWidth
         label={t('Name')}
+        style={{ marginTop: 10 }}
         error={!!errors.asset_group_name}
         helperText={errors.asset_group_name?.message}
         inputProps={register('asset_group_name')}
