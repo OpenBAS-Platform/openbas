@@ -31,9 +31,12 @@ const useStyles = makeStyles(() => ({
     paddingLeft: 10,
     height: 50,
   },
+  bodyItems: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   bodyItem: {
     fontSize: 13,
-    float: 'left',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -171,7 +174,7 @@ const Documents = () => {
             </ListItemIcon>
             <ListItemText
               primary={
-                <div>
+                <div className={classes.bodyItems}>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.document_name}

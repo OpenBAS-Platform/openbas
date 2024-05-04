@@ -136,9 +136,9 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
             </Tabs>
             <div className={classes.scheduling}>
               {!cronExpression && (
-              <IconButton size="small" style={{ cursor: 'default', marginRight: 5 }} disabled={true}>
-                <UpdateOutlined />
-              </IconButton>
+                <IconButton size="small" style={{ cursor: 'default', marginRight: 5 }} disabled={true}>
+                  <UpdateOutlined />
+                </IconButton>
               )}
               {cronExpression && !scenario.scenario_recurrence && (
                 <IconButton size="small" style={{ cursor: 'default', marginRight: 5 }}>
@@ -146,11 +146,11 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
                 </IconButton>
               )}
               {cronExpression && scenario.scenario_recurrence && (
-              <Tooltip title={(t('Modify the scheduling'))}>
-                <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: 5 }}>
-                  <UpdateOutlined color="primary" />
-                </IconButton>
-              </Tooltip>
+                <Tooltip title={(t('Modify the scheduling'))}>
+                  <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: 5 }}>
+                    <UpdateOutlined color="primary" />
+                  </IconButton>
+                </Tooltip>
               )}
               <span style={{ color: theme.palette.text?.disabled }}>{!cronExpression && t('Not scheduled')}</span>
               {cronExpression && <span>{getHumanReadableScheduling()}</span>}

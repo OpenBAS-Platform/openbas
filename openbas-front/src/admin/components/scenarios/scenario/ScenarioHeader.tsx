@@ -41,6 +41,7 @@ const useStyles = makeStyles(() => ({
   actions: {
     margin: '-6px 0 0 0',
     float: 'right',
+    display: 'flex',
   },
 }));
 
@@ -119,9 +120,8 @@ const ScenarioHeader = ({
       <div className={classes.actions}>
         {scenario.scenario_recurrence && !ended ? (
           <Button
-            style={{ marginRight: 20 }}
+            style={{ marginRight: 10 }}
             startIcon={<Stop />}
-            fullWidth={false}
             variant="outlined"
             color="inherit"
             size="small"
@@ -131,7 +131,7 @@ const ScenarioHeader = ({
           </Button>
         ) : (
           <Button
-            style={{ marginRight: 20 }}
+            style={{ marginRight: 10 }}
             startIcon={<PlayArrowOutlined />}
             variant="contained"
             color="primary"

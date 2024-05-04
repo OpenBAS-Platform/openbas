@@ -110,7 +110,8 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         source: `result-${i}`,
         target: `result-${i + 1}`,
         label: i === 0 ? nsdt(lastExecutionStartDate) : nsdt(lastExecutionEndDate),
-        labelStyle: { background: 'transparent' },
+        labelShowBg: false,
+        labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
       })));
       fetchTargetResult(injectId, target.id!, target.targetType!).then(
         (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
@@ -159,11 +160,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     let background;
     switch (status) {
       case 'VALIDATED':
-        color = 'rgb(107, 235, 112)';
+        color = theme.palette.success.main;
         background = 'rgba(176, 211, 146, 0.21)';
         break;
       case 'FAILED':
-        color = 'rgb(220, 81, 72)';
+        color = theme.palette.error.main;
         background = 'rgba(192, 113, 113, 0.29)';
         break;
       case 'PENDING':

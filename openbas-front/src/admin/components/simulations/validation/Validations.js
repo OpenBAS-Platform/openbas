@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
 import { List, ListItem, ListItemIcon, ListItemText, Slide } from '@mui/material';
-import AnimationMenu from '../AnimationMenu';
+import AnimationMenu from '../simulation/AnimationMenu';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchExerciseInjects } from '../../../../actions/Inject';

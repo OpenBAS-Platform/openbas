@@ -49,6 +49,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     paddingLeft: 10,
     height: 60,
   },
+  bodyItems: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   bodyItem: {
     fontSize: 13,
     whiteSpace: 'nowrap',
@@ -210,7 +214,7 @@ const Scenarios = () => {
           categoryCard(key, value)
         ))}
       </div>
-      <div>
+      <>
         <PaginationComponent
           fetch={searchScenarios}
           searchPaginationInput={searchPaginationInput}
@@ -219,7 +223,7 @@ const Scenarios = () => {
         >
           <ImportUploaderScenario />
         </PaginationComponent>
-      </div>
+      </>
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -261,7 +265,7 @@ const Scenarios = () => {
             </ListItemIcon>
             <ListItemText
               primary={
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div className={classes.bodyItems}>
                   <Tooltip title={scenario.scenario_name}>
                     <div
                       className={classes.bodyItem}

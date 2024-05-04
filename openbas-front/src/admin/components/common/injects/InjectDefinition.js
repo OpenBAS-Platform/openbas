@@ -53,7 +53,7 @@ import InjectAddArticles from './InjectAddArticles';
 import ChannelIcon from '../../components/channels/ChannelIcon';
 import ChallengePopover from '../../components/challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
-import AvailableVariablesDialog from '../../simulations/variables/AvailableVariablesDialog';
+import AvailableVariablesDialog from '../../simulations/simulation/variables/AvailableVariablesDialog';
 import InjectExpectations from './expectations/InjectExpectations';
 import EndpointsList from '../../assets/endpoints/EndpointsList';
 import EndpointPopover from '../../assets/endpoints/EndpointPopover';

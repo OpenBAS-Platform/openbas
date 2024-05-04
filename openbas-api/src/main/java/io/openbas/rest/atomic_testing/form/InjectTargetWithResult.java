@@ -1,5 +1,6 @@
 package io.openbas.rest.atomic_testing.form;
 
+import io.openbas.database.model.Endpoint;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.atomic_testing.TargetType;
 import jakarta.validation.constraints.NotBlank;
@@ -13,6 +14,7 @@ import java.util.List;
 public class InjectTargetWithResult {
 
   private final TargetType targetType;
+  private final Endpoint.PLATFORM_TYPE platformType;
   @NotBlank
   private final String id;
   private final String name;
@@ -20,16 +22,18 @@ public class InjectTargetWithResult {
   private final List<InjectTargetWithResult> children = new ArrayList<>();
 
   public InjectTargetWithResult(@NotNull TargetType targetType, @NotNull String id, @NotNull String name, @NotNull List<ExpectationResultsByType> expectationResultsByTypes,
-      @NotNull List<InjectTargetWithResult> children) {
+      @NotNull List<InjectTargetWithResult> children,  Endpoint.PLATFORM_TYPE platformType) {
     this.targetType = targetType;
+    this.platformType = platformType;
     this.id = id;
     this.name = name;
     this.expectationResultsByTypes = expectationResultsByTypes;
     this.children.addAll(children);
   }
 
-  public InjectTargetWithResult(@NotNull TargetType targetType, @NotNull String id, @NotNull String name, @NotNull List<ExpectationResultsByType> expectationResultsByTypes) {
+  public InjectTargetWithResult(@NotNull TargetType targetType, @NotNull String id, @NotNull String name, @NotNull List<ExpectationResultsByType> expectationResultsByTypes,  Endpoint.PLATFORM_TYPE platformType) {
     this.targetType = targetType;
+    this.platformType = platformType;
     this.id = id;
     this.name = name;
     this.expectationResultsByTypes = expectationResultsByTypes;

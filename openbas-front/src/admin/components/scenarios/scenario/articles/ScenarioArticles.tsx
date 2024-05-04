@@ -13,7 +13,6 @@ import { ArticleContext } from '../../../common/Context';
 
 export const articleContextForScenario = (scenarioId: ScenarioStore['scenario_id']) => {
   const dispatch = useAppDispatch();
-
   return {
     previewArticleUrl: (article: FullArticleStore) => `/channels/${scenarioId}/${article.article_fullchannel.channel_id}?preview=true`,
     onAddArticle: (data: ArticleCreateInput) => dispatch(addScenarioArticle(scenarioId, data)),

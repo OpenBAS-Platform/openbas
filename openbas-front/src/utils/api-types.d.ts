@@ -646,6 +646,7 @@ export interface Exercise {
   /** @format int64 */
   exercise_all_users_number?: number;
   exercise_articles?: Article[];
+  exercise_category?: string;
   /** @format int64 */
   exercise_communications_number?: number;
   /** @format date-time */
@@ -657,6 +658,7 @@ export interface Exercise {
   exercise_id: string;
   exercise_injects?: Inject[];
   exercise_injects_statistics?: Record<string, number>;
+  exercise_kill_chain_phases?: KillChainPhase[];
   exercise_lessons_anonymized?: boolean;
   /** @format int64 */
   exercise_lessons_answers_number?: number;
@@ -667,6 +669,7 @@ export interface Exercise {
   exercise_logs_number?: number;
   exercise_mail_from: string;
   exercise_mails_reply_to?: string[];
+  exercise_main_focus?: string;
   exercise_message_footer?: string;
   exercise_message_header?: string;
   exercise_name: string;
@@ -676,9 +679,11 @@ export interface Exercise {
   exercise_observers?: User[];
   exercise_pauses?: Pause[];
   exercise_planners?: User[];
+  exercise_platforms?: string[];
   exercise_scenario?: Scenario;
   /** @format double */
   exercise_score?: number;
+  exercise_severity?: string;
   /** @format date-time */
   exercise_start_date?: string;
   exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
@@ -695,8 +700,11 @@ export interface Exercise {
 }
 
 export interface ExerciseCreateInput {
+  exercise_category?: string;
   exercise_description?: string;
+  exercise_main_focus?: string;
   exercise_name: string;
+  exercise_severity?: string;
   /** @format date-time */
   exercise_start_date?: string;
   exercise_subtitle?: string;
@@ -730,12 +738,15 @@ export interface ExerciseTeamUser {
 }
 
 export interface ExerciseUpdateInput {
+  exercise_category?: string;
   exercise_description?: string;
   exercise_mail_from?: string;
   exercise_mails_reply_to?: string[];
+  exercise_main_focus?: string;
   exercise_message_footer?: string;
   exercise_message_header?: string;
   exercise_name: string;
+  exercise_severity?: string;
   exercise_subtitle?: string;
 }
 
@@ -1028,6 +1039,7 @@ export interface InjectTargetWithResult {
   expectationResultsByTypes?: ExpectationResultsByType[];
   id: string;
   name?: string;
+  platformType?: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal";
   targetType?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
@@ -2019,6 +2031,7 @@ export interface ScenarioInformationInput {
 export interface ScenarioInput {
   scenario_category?: string;
   scenario_description?: string;
+  scenario_external_reference?: string;
   scenario_main_focus?: string;
   scenario_name: string;
   scenario_severity?: string;

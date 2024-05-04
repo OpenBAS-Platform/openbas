@@ -28,7 +28,7 @@ const useStyles = makeStyles(() => ({
   chip: {
     fontSize: 12,
     height: 25,
-    marginRight: 7,
+    margin: '0 7px 7px 0',
     textTransform: 'uppercase',
     borderRadius: 4,
     width: 180,
@@ -40,7 +40,7 @@ const useStyles = makeStyles(() => ({
     height: '100%',
     minHeight: '100%',
     margin: '10px 0 0 0',
-    padding: '15px 15px 0 15px',
+    padding: 15,
     borderRadius: 4,
   },
 }));
@@ -134,7 +134,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
                 >
                   {t('Platforms')}
                 </Typography>
-                {scenario.scenario_platforms?.length === 0 ? (
+                {(scenario.scenario_platforms ?? []).length === 0 ? (
                   <PlatformIcon platform={t('No inject in this scenario')} tooltip={true} width={25} />
                 ) : scenario.scenario_platforms.map(
                   (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={25} marginRight={10} />,
@@ -148,7 +148,8 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
                 >
                   {t('Kill Chain Phases')}
                 </Typography>
-                {scenario.scenario_kill_chain_phases.map((killChainPhase: KillChainPhase) => (
+                {(scenario.exercise_kill_chain_phases ?? []).length === 0 && '-'}
+                {scenario.exercise_kill_chain_phases?.map((killChainPhase: KillChainPhase) => (
                   <Chip
                     key={killChainPhase.phase_id}
                     variant="outlined"

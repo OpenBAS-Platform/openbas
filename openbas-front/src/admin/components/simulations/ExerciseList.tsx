@@ -4,7 +4,7 @@ import { FileDownloadOutlined, Kayaking, KeyboardArrowRight } from '@mui/icons-m
 import React, { CSSProperties, FunctionComponent } from 'react';
 import { CSVLink } from 'react-csv';
 import { makeStyles } from '@mui/styles';
-import ExerciseStatus from './ExerciseStatus';
+import ExerciseStatus from './simulation/ExerciseStatus';
 import ItemTags from '../../../components/ItemTags';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
@@ -14,11 +14,10 @@ import { useHelper } from '../../../store';
 import type { TagsHelper } from '../../../actions/helper';
 import { useFormatter } from '../../../components/i18n';
 import type { ExerciseSimpleStore, ExerciseStore } from '../../../actions/exercises/Exercise';
-import type { Theme } from '../../../components/Theme';
 import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
 import ItemTargets from '../../../components/ItemTargets';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   parameters: {
     marginTop: -10,
     display: 'flex',
@@ -30,18 +29,23 @@ const useStyles = makeStyles((theme: Theme) => ({
     gap: '10px',
   },
   itemHead: {
+    paddingLeft: 15,
     textTransform: 'uppercase',
     cursor: 'pointer',
-    paddingLeft: 10,
   },
   item: {
     height: 50,
   },
+  bodyItems: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   bodyItem: {
-    fontSize: theme.typography.h3.fontSize,
+    fontSize: 13,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    paddingRight: 10,
   },
   goIcon: {
     position: 'absolute',
@@ -94,39 +98,21 @@ const headerStyles: Record<string, CSSProperties> = {
 const inlineStyles: Record<string, CSSProperties> = {
   exercise_name: {
     width: '20%',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   exercise_start_date: {
     width: '15%',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   exercise_status: {
     width: '10%',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   exercise_tags: {
     width: '15%',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   exercise_targets: {
     width: '20%',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   exercise_global_score: {
     width: '20%',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
 };
 
@@ -261,7 +247,7 @@ const ExerciseList: FunctionComponent<Props> = ({
             </ListItemIcon>
             <ListItemText
               primary={
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div className={classes.bodyItems}>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.exercise_name}

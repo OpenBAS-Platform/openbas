@@ -62,6 +62,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
         scenario_subtitle: z.string().optional(),
         scenario_description: z.string().optional(),
         scenario_tags: z.string().array().optional(),
+        scenario_external_reference: z.string().optional(),
       }),
     ),
     defaultValues: initialValues,

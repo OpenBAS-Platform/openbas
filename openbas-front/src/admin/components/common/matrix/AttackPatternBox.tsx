@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button, ListItemText, Menu, MenuItem, Typography } from '@mui/material';
 import React, { FunctionComponent, useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import type { AttackPattern } from '../../../../utils/api-types';
+import type { AttackPattern, ExpectationResultsByType } from '../../../../utils/api-types';
 import type { InjectExpectationResultsByAttackPatternStore, InjectExpectationResultsByTypeStore } from '../../../../actions/exercises/Exercise';
 import type { Theme } from '../../../../components/Theme';
 import AtomicTestingResult from '../../atomic_testings/atomic_testing/AtomicTestingResult';
@@ -12,8 +12,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     whiteSpace: 'nowrap',
     width: '100%',
     textTransform: 'capitalize',
-    color: theme.palette.chip.main,
-    backgroundColor: '#212734',
+    color: theme.palette.text?.primary,
+    backgroundColor: theme.palette.background.accent,
+    borderRadius: 4,
   },
   buttonText: {
     display: 'flex',
@@ -36,12 +37,9 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
 }) => {
   // Standard hooks
   const classes = useStyles();
-
   const [open, setOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-
   const results: InjectExpectationResultsByTypeStore[] = injectResult?.inject_expectation_results ?? [];
-
   if (results.length === 1) {
     const content = () => (
       <div className={classes.buttonText}>
@@ -51,7 +49,6 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
         <AtomicTestingResult expectations={results[0]?.results ?? []} />
       </div>
     );
-
     if (goToLink) {
       return (
         <Button
@@ -64,7 +61,6 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
         </Button>
       );
     }
-
     return (
       <div
         key={attackPattern.attack_pattern_id}
@@ -75,12 +71,43 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
       </div>
     );
   }
-
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation();
     setOpen(true);
     setAnchorEl(event.currentTarget);
   };
+  const lowestSelector = (aggregation: (('FAILED' | 'PENDING' | 'PARTIAL' | 'UNKNOWN' | 'VALIDATED' | undefined)[])): 'FAILED' | 'PENDING' | 'PARTIAL' | 'UNKNOWN' | 'VALIDATED' => {
+    if (aggregation.includes('FAILED')) {
+      return 'FAILED';
+    }
+    if (aggregation.includes('PENDING')) {
+      return 'PENDING';
+    }
+    if (aggregation.includes('UNKNOWN')) {
+      return 'UNKNOWN';
+    }
+    return 'VALIDATED';
+  };
+  const aggregatedPrevention = (results ?? []).map((result) => result.results?.filter((r) => r.type === 'PREVENTION').map((r) => r.avgResult)).flat();
+  const aggregatedDetection = (results ?? []).map((result) => result.results?.filter((r) => r.type === 'DETECTION').map((r) => r.avgResult)).flat();
+  const aggregatedHumanResponse = (results ?? []).map((result) => result.results?.filter((r) => r.type === 'HUMAN_RESPONSE').map((r) => r.avgResult)).flat();
+  const aggregatedResults : ExpectationResultsByType[] = [
+    {
+      type: 'PREVENTION',
+      avgResult: lowestSelector(aggregatedPrevention),
+      distribution: [],
+    },
+    {
+      type: 'DETECTION',
+      avgResult: lowestSelector(aggregatedDetection),
+      distribution: [],
+    },
+    {
+      type: 'HUMAN_RESPONSE',
+      avgResult: lowestSelector(aggregatedHumanResponse),
+      distribution: [],
+    },
+  ];
   return (
     <>
       <Button
@@ -93,6 +120,7 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
           <Typography variant="caption">
             {attackPattern.attack_pattern_name}
           </Typography>
+          <AtomicTestingResult expectations={aggregatedResults} />
         </div>
       </Button>
       <Menu
@@ -117,7 +145,6 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
               <AtomicTestingResult expectations={result.results ?? []} />
             </>
           );
-
           if (goToLink) {
             return (
               <MenuItem
@@ -130,7 +157,6 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
               </MenuItem>
             );
           }
-
           return (
             <MenuItem
               key={`inject-result-${idx}`}

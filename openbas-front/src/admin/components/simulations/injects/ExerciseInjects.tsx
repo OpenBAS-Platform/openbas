@@ -26,14 +26,14 @@ import type { VariablesHelper } from '../../../../actions/variables/variable-hel
 import { fetchVariablesForExercise } from '../../../../actions/variables/variable-actions';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import { fetchExerciseArticles } from '../../../../actions/channels/article-action';
-import { articleContextForExercise } from '../articles/ExerciseArticles';
-import { teamContextForExercise } from '../teams/ExerciseTeams';
+import { articleContextForExercise } from '../simulation/articles/ExerciseArticles';
+import { teamContextForExercise } from '../simulation/teams/ExerciseTeams';
 import InjectDistributionByType from '../../common/injects/InjectDistributionByType';
 import InjectDistributionByTeam from '../../common/injects/InjectDistributionByTeam';
-import ExerciseDistributionScoreByTeamInPercentage from '../overview/ExerciseDistributionScoreByTeamInPercentage';
-import ExerciseDistributionScoreOverTimeByInjectorContract from '../overview/ExerciseDistributionScoreOverTimeByInjectorContract';
-import ExerciseDistributionScoreOverTimeByTeam from '../overview/ExerciseDistributionScoreOverTimeByTeam';
-import ExerciseDistributionScoreOverTimeByTeamInPercentage from '../overview/ExerciseDistributionScoreOverTimeByTeamInPercentage';
+import ExerciseDistributionScoreByTeamInPercentage from '../simulation/overview/ExerciseDistributionScoreByTeamInPercentage';
+import ExerciseDistributionScoreOverTimeByInjectorContract from '../simulation/overview/ExerciseDistributionScoreOverTimeByInjectorContract';
+import ExerciseDistributionScoreOverTimeByTeam from '../simulation/overview/ExerciseDistributionScoreOverTimeByTeam';
+import ExerciseDistributionScoreOverTimeByTeamInPercentage from '../simulation/overview/ExerciseDistributionScoreOverTimeByTeamInPercentage';
 import { useFormatter } from '../../../../components/i18n';
 
 const useStyles = makeStyles(() => ({

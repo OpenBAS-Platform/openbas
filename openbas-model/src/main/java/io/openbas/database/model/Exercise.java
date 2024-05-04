@@ -71,6 +71,19 @@ public class Exercise implements Base {
     @JsonProperty("exercise_subtitle")
     private String subtitle;
 
+    @Column(name = "exercise_category")
+    @JsonProperty("exercise_category")
+    @Queryable(filterable = true)
+    private String category;
+
+    @Column(name = "exercise_main_focus")
+    @JsonProperty("exercise_main_focus")
+    private String mainFocus;
+
+    @Column(name = "exercise_severity")
+    @JsonProperty("exercise_severity")
+    private String severity;
+
     @Column(name = "exercise_pause_date")
     @JsonIgnore
     private Instant currentPause;
@@ -291,6 +304,22 @@ public class Exercise implements Base {
     @JsonProperty("exercise_communications_number")
     public long getCommunicationsNumber() {
         return getInjects().stream().mapToLong(Inject::getCommunicationsNumber).sum();
+    }
+
+    // -- PLATFORMS --
+    @JsonProperty("exercise_platforms")
+    public List<String> getPlatforms() {
+        return getInjects().stream().flatMap(inject -> Arrays.stream(inject.getInjectorContract().getPlatforms())).distinct().toList();
+    }
+
+    // -- KILL CHAIN PHASES --
+    @JsonProperty("exercise_kill_chain_phases")
+    public List<KillChainPhase> getKillChainPhases() {
+        return getInjects().stream().flatMap(
+                inject -> inject.getInjectorContract().getAttackPatterns().stream().flatMap(
+                        attackPattern -> attackPattern.getKillChainPhases().stream().toList().stream()
+                )
+        ).distinct().toList();
     }
 
     @JsonProperty("exercise_next_possible_status")

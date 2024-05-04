@@ -2,6 +2,7 @@ package io.openbas.rest.exercise.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -25,6 +26,15 @@ public class ExerciseUpdateInput {
     @JsonProperty("exercise_description")
     private String description;
 
+    @JsonProperty("exercise_category")
+    private String category;
+
+    @JsonProperty("exercise_main_focus")
+    private String mainFocus;
+
+    @JsonProperty("exercise_severity")
+    private String severity;
+    
     @Email(message = EMAIL_FORMAT)
     @JsonProperty("exercise_mail_from")
     private String from;

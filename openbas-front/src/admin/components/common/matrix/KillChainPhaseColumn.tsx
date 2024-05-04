@@ -1,5 +1,4 @@
 import React, { FunctionComponent } from 'react';
-import { Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import type { InjectExpectationResultsByAttackPatternStore } from '../../../../actions/exercises/Exercise';
 import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
@@ -22,14 +21,12 @@ interface KillChainPhaseComponentProps {
 }
 
 const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
-  goToLink,
   killChainPhase,
   attackPatterns,
   injectResults,
 }) => {
   // Standard hooks
   const classes = useStyles();
-
   // Attack Pattern
   const sortAttackPattern = (attackPattern1: AttackPattern, attackPattern2: AttackPattern) => {
     if (attackPattern1.attack_pattern_name < attackPattern2.attack_pattern_name) {
@@ -40,21 +37,18 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
     }
     return 0;
   };
-
   // Inject Results
   const getInjectResult = (attack: AttackPatternStore) => {
     return injectResults.find((injectResult) => injectResult.inject_attack_pattern === attack.attack_pattern_id);
   };
-
   return (
     <div style={{ marginBottom: 16 }}>
-      <Typography variant="h3">{killChainPhase.phase_name}</Typography>
+      <div style={{ fontSize: 15, textAlign: 'center', marginBottom: 20 }}>{killChainPhase.phase_name}</div>
       <div className={classes.column}>
         {[...attackPatterns].sort(sortAttackPattern)
           .map((attackPattern) => (
             <AttackPatternBox
               key={attackPattern.attack_pattern_id}
-              goToLink={goToLink}
               attackPattern={attackPattern}
               injectResult={getInjectResult(attackPattern)}
             />

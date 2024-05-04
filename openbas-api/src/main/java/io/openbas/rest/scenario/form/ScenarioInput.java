@@ -1,6 +1,7 @@
 package io.openbas.rest.scenario.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -22,14 +23,21 @@ public class ScenarioInput {
   @JsonProperty("scenario_subtitle")
   private String subtitle;
 
+  @Nullable
   @JsonProperty("scenario_category")
   private String category;
 
+  @Nullable
   @JsonProperty("scenario_main_focus")
   private String mainFocus;
 
+  @Nullable
   @JsonProperty("scenario_severity")
   private String severity;
+
+  @Nullable
+  @JsonProperty("scenario_external_reference")
+  private String externalReference;
 
   @JsonProperty("scenario_tags")
   private List<String> tagIds = new ArrayList<>();

@@ -48,7 +48,7 @@ import InjectAddDocuments from '../../common/injects/InjectAddDocuments';
 import DocumentType from '../../components/documents/DocumentType';
 import DocumentPopover from '../../components/documents/DocumentPopover';
 import OldSelectField from '../../../../components/fields/OldSelectField';
-import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
+import AvailableVariablesDialog from '../simulation/variables/AvailableVariablesDialog';
 import InjectExpectations from '../../common/injects/expectations/InjectExpectations';
 import { fetchExerciseTeams } from '../../../../actions/Exercise';
 import { fetchVariablesForExercise } from '../../../../actions/variables/variable-actions';

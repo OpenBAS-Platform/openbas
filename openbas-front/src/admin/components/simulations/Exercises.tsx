@@ -4,7 +4,7 @@ import { fetchExercises } from '../../../actions/Exercise';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import Breadcrumbs from '../../../components/Breadcrumbs';
-import ExerciseCreation from './ExerciseCreation';
+import ExerciseCreation from './simulation/ExerciseCreation';
 import ExerciseList from './ExerciseList';
 import { useAppDispatch } from '../../../utils/hooks';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
