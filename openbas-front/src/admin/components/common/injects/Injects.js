@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import { Chip, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { Chip, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { CSVLink } from 'react-csv';
-import { FileDownloadOutlined } from '@mui/icons-material';
+import { BarChartOutlined, FileDownloadOutlined, ReorderOutlined } from '@mui/icons-material';
 import { splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -148,16 +148,18 @@ const inlineStyles = {
   },
 };
 
-const Injects = ({
-  injects,
-  teams,
-  articles,
-  variables,
-  uriVariable,
-  allUsersNumber,
-  usersNumber,
-  teamsUsers,
-}) => {
+const Injects = (props) => {
+  const {
+    injects,
+    teams,
+    articles,
+    variables,
+    uriVariable,
+    allUsersNumber,
+    usersNumber,
+    teamsUsers,
+    setViewMode,
+  } = props;
   // Standard hooks
   const classes = useStyles();
   const { t, tPick } = useFormatter();
@@ -182,20 +184,18 @@ const Injects = ({
       selectedInject: helper.getInject(selectedInjectId),
     };
   });
-
   const onCreateInject = async (data) => {
     await injectContext.onAddInject(data);
   };
   const onUpdateInject = async (data) => {
     await injectContext.onUpdateInject(selectedInjectId, data);
   };
-
   const sortedInjects = filtering.filterAndSort(injects);
   // Rendering
   if (injects) {
     return (
       <div className={classes.container}>
-        <>
+        <div style={{ marginBottom: setViewMode ? 8 : 0 }}>
           <div style={{ float: 'left', marginRight: 10 }}>
             <SearchFilter
               variant="small"
@@ -210,40 +210,108 @@ const Injects = ({
               currentTags={filtering.tags}
             />
           </div>
-          <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
-            {sortedInjects.length > 0 ? (
-              <CSVLink
-                data={exportData(
-                  'inject',
-                  [
-                    'inject_type',
-                    'inject_title',
-                    'inject_description',
-                    'inject_depends_duration',
-                    'inject_users_number',
-                    'inject_enabled',
-                    'inject_tags',
-                    'inject_content',
-                  ],
-                  sortedInjects,
-                  tagsMap,
-                )}
-                filename={`${t('Injects')}.csv`}
+          <div style={{ float: 'right' }}>
+            {setViewMode ? (
+              <ToggleButtonGroup
+                size="small"
+                exclusive={true}
+                style={{ float: 'right' }}
+                aria-label="Change view mode"
               >
-                <Tooltip title={t('Export this list')}>
-                  <IconButton size="large">
-                    <FileDownloadOutlined color="primary" />
-                  </IconButton>
+                <>
+                  {sortedInjects.length > 0 ? (
+                    <CSVLink
+                      data={exportData(
+                        'inject',
+                        [
+                          'inject_type',
+                          'inject_title',
+                          'inject_description',
+                          'inject_depends_duration',
+                          'inject_users_number',
+                          'inject_enabled',
+                          'inject_tags',
+                          'inject_content',
+                        ],
+                        sortedInjects,
+                        tagsMap,
+                      )}
+                      filename={`${t('Injects')}.csv`}
+                    >
+                      <Tooltip title={t('Export this list')}>
+                        <ToggleButton
+                          value='download'
+                          aria-label="Download"
+                        >
+                          <FileDownloadOutlined fontSize="small" color="primary" />
+                        </ToggleButton>
+                      </Tooltip>
+                    </CSVLink>
+                  ) : (
+                    <ToggleButton
+                      value='download'
+                      aria-label="Download"
+                    >
+                      <FileDownloadOutlined fontSize="small" color="primary" />
+                    </ToggleButton>
+                  )}
+                </>
+                <Tooltip title={t('List view')}>
+                  <ToggleButton
+                    value='list'
+                    selected={true}
+                    aria-label="List view mode"
+                  >
+                    <ReorderOutlined fontSize="small" color='inherit' />
+                  </ToggleButton>
                 </Tooltip>
-              </CSVLink>
+                <Tooltip title={t('Distribution view')}>
+                  <ToggleButton
+                    value='distribution'
+                    onClick={() => setViewMode('distribution')}
+                    aria-label="Distribution view mode"
+                  >
+                    <BarChartOutlined fontSize="small" color='primary' />
+                  </ToggleButton>
+                </Tooltip>
+              </ToggleButtonGroup>
             ) : (
-              <IconButton size="large" disabled={true}>
-                <FileDownloadOutlined />
-              </IconButton>
+              <>
+                {sortedInjects.length > 0 ? (
+                  <CSVLink
+                    data={exportData(
+                      'inject',
+                      [
+                        'inject_type',
+                        'inject_title',
+                        'inject_description',
+                        'inject_depends_duration',
+                        'inject_users_number',
+                        'inject_enabled',
+                        'inject_tags',
+                        'inject_content',
+                      ],
+                      sortedInjects,
+                      tagsMap,
+                    )}
+                    filename={`${t('Injects')}.csv`}
+                  >
+                    <Tooltip title={t('Export this list')}>
+                      <IconButton size="large">
+                        <FileDownloadOutlined color="primary" />
+                      </IconButton>
+                    </Tooltip>
+                  </CSVLink>
+                ) : (
+                  <IconButton size="large" disabled={true}>
+                    <FileDownloadOutlined />
+                  </IconButton>
+                )}
+              </>
             )}
           </div>
-        </>
-        <div className="clearfix" />
+          <div className="clearfix" />
+        </div>
         <List>
           <ListItem
             classes={{ root: classes.itemHead }}

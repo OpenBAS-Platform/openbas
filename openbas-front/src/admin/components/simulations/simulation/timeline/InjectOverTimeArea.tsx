@@ -28,7 +28,7 @@ const InjectOverTimeArea: FunctionComponent<Props> = ({
 
   // Fetching data
   const { injects } = useHelper((helper: InjectHelper) => ({
-    injects: helper.getScenarioInjects(exerciseId),
+    injects: helper.getExerciseInjects(exerciseId),
   }));
   useDataLoader(() => {
     dispatch(fetchInjects(exerciseId));
@@ -52,7 +52,6 @@ const InjectOverTimeArea: FunctionComponent<Props> = ({
       })),
     },
   ];
-
   return (
     <>
       {injectsOverTime.length > 0 ? (

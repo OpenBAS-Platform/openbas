@@ -61,7 +61,6 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
       return dispatch(deleteInjectScenario(scenarioId, injectId));
     },
   };
-
   return (
     <InjectContext.Provider value={context}>
       <ArticleContext.Provider value={articleContext}>

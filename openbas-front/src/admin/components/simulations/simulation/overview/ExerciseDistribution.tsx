@@ -69,8 +69,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
     return <div />;
   }
   return (
-    <Grid container spacing={3}>
-      <Typography variant="h1" style={{ paddingLeft: 24, paddingTop: 24 }}>{t('Distribution')}</Typography>
+    <Grid container spacing={3} style={{ marginTop: 30 }}>
       <Grid container item spacing={3}>
         <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="h4">

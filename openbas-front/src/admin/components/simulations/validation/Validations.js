@@ -73,7 +73,6 @@ const Validations = () => {
   const sort = R.sortWith([R.descend(R.prop('inject_expectation_created_at'))]);
   const sortedInjectExpectations = R.pipe(
     R.uniqBy(R.prop('inject_expectation_id')),
-    R.filter(((n) => R.isEmpty(n.inject_expectation_results))),
     R.map((n) => R.assoc(
       'inject_expectation_inject',
       injectsMap[n.inject_expectation_inject] || {},
@@ -130,7 +129,7 @@ const Validations = () => {
   // Rendering
   if (exercise && injectExpectations) {
     return (
-      <div>
+      <div style={{ marginTop: -12 }}>
         <AnimationMenu exerciseId={exerciseId} />
         <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
@@ -165,8 +164,8 @@ const Validations = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary={
-                      <div>
-                        <div className={classes.bodyItem} style={{ width: '250px' }}>
+                      <>
+                        <div className={classes.bodyItem} style={{ width: '55%' }}>
                           {inject.inject_title}
                         </div>
                         <div className={classes.bodyItem} style={{ width: '15%' }}>
@@ -175,15 +174,21 @@ const Validations = () => {
                         <div className={classes.bodyItem} style={{ width: '30%' }}>
                           <ItemTags variant="list" tags={inject.inject_tags} />
                         </div>
-                      </div>
+                      </>
                     }
                   />
                 </ListItem>
                 <List component="div" disablePadding>
                   {Object.entries(groupedByTeamOrAsset(expectationsByInject)).map(([id, expectations]) => {
                     return (
-                      <TeamOrAssetLine key={id} exerciseId={exerciseId} inject={inject} injectContract={injectContract}
-                        expectationsByInject={expectationsByInject} id={id} expectations={expectations}
+                      <TeamOrAssetLine
+                        key={id}
+                        exerciseId={exerciseId}
+                        inject={inject}
+                        injectContract={injectContract}
+                        expectationsByInject={expectationsByInject}
+                        id={id}
+                        expectations={expectations}
                       />
                     );
                   })}

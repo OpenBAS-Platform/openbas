@@ -32,17 +32,18 @@ import UpdateInject from '../../../common/injects/UpdateInject';
 const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
-    flexGrow: 1,
-    marginTop: 10,
-    padding: '0 20px 50px 0',
-    overflowX: 'hidden',
+    margin: '-12px 0 50px 0',
   },
   container: {
     marginTop: 60,
     paddingRight: 40,
   },
-  parameters: {
-    float: 'left',
+  paperChart: {
+    height: '100%',
+    minHeight: '100%',
+    margin: '10px 0 0 0',
+    padding: 15,
+    borderRadius: 4,
   },
   names: {
     float: 'left',
@@ -238,7 +239,7 @@ const Timeline = () => {
   return (
     <div className={classes.root}>
       <AnimationMenu exerciseId={exerciseId} />
-      <div className={classes.parameters}>
+      <>
         <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
             variant="small"
@@ -253,7 +254,7 @@ const Timeline = () => {
             currentTags={filtering.tags}
           />
         </div>
-      </div>
+      </>
       <div className="clearfix" />
       {sortedTeams.length > 0 ? (
         <div className={classes.container}>
@@ -540,29 +541,26 @@ const Timeline = () => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid container spacing={3}>
-        <Typography variant="h1" style={{ paddingLeft: 24, paddingTop: 24 }}>{t('Simulation data')}</Typography>
-        <Grid container item spacing={3}>
-          <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography variant="h4">
-              {t('Sent injects over time')}
-            </Typography>
-            <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-              <InjectOverTimeArea exerciseId={exerciseId} />
-            </Paper>
-          </Grid>
-          <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography variant="h4">
-              {t('Sent injects over time')}
-            </Typography>
-            <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-              <InjectOverTimeLine exerciseId={exerciseId} />
-            </Paper>
-          </Grid>
+      <Grid container={true} spacing={3}>
+        <Grid item xs={6}>
+          <Typography variant="h4">
+            {t('Sent injects over time')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            <InjectOverTimeArea exerciseId={exerciseId} />
+          </Paper>
+        </Grid>
+        <Grid item xs={6}>
+          <Typography variant="h4">
+            {t('Sent injects over time')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            <InjectOverTimeLine exerciseId={exerciseId} />
+          </Paper>
         </Grid>
       </Grid>
-      {selectedInject
-        && <UpdateInject
+      {selectedInject && (
+        <UpdateInject
           open={selectedInjectId !== null}
           handleClose={() => setSelectedInjectId(null)}
           onUpdateInject={onUpdateInject}
@@ -576,8 +574,8 @@ const Timeline = () => {
           usersNumber={exercise.exercise_users_number}
           teamsUsers={exercise.exercise_teams_users}
           permissions={permissions}
-           />
-      }
+        />
+      )}
     </div>
   );
 };

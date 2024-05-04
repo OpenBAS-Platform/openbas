@@ -196,6 +196,7 @@ const ExerciseCreationForm: FunctionComponent<Props> = ({
 
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button
+          variant="contained"
           onClick={handleClose}
           style={{ marginRight: 10 }}
           disabled={isSubmitting}
@@ -203,6 +204,7 @@ const ExerciseCreationForm: FunctionComponent<Props> = ({
           {t('Cancel')}
         </Button>
         <Button
+          variant="contained"
           color="secondary"
           type="submit"
           disabled={!isDirty || isSubmitting}

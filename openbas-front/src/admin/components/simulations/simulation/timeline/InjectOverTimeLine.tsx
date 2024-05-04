@@ -28,7 +28,7 @@ const InjectOverTimeLine: FunctionComponent<Props> = ({
 
   // Fetching data
   const { injects } = useHelper((helper: InjectHelper) => ({
-    injects: helper.getScenarioInjects(exerciseId),
+    injects: helper.getExerciseInjects(exerciseId),
   }));
   useDataLoader(() => {
     dispatch(fetchInjects(exerciseId));

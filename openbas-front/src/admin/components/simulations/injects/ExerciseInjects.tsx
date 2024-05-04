@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { ReorderOutlined, SignalCellularAltOutlined } from '@mui/icons-material';
+import { BarChartOutlined, ReorderOutlined } from '@mui/icons-material';
 import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import type { Exercise, Inject } from '../../../../utils/api-types';
@@ -101,60 +101,58 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
       return dispatch(deleteInjectForExercise(exerciseId, injectId));
     },
   };
-
   const [viewMode, setViewMode] = useState('list');
-
   return (
     <>
-      <ToggleButtonGroup
-        size="small"
-        exclusive
-        style={{ float: 'right' }}
-        aria-label="Change view mode"
-      >
-        <Tooltip title={t('List view')}>
-          <ToggleButton
-            value='list'
-            onClick={() => setViewMode('list')}
-            selected={viewMode === 'list'}
-            aria-label="List view mode"
-          >
-            <ReorderOutlined
-              fontSize="small"
-              color={viewMode === 'list' ? 'primary' : 'inherit'}
-            />
-          </ToggleButton>
-        </Tooltip>
-        <Tooltip title={t('Distribution view')}>
-          <ToggleButton
-            value='distribution'
-            onClick={() => setViewMode('distribution')}
-            selected={viewMode === 'distribution'}
-            aria-label="Distribution view mode"
-          >
-            <SignalCellularAltOutlined
-              fontSize="small"
-              color={viewMode === 'distribution' ? 'primary' : 'inherit'}
-            />
-          </ToggleButton>
-        </Tooltip>
-      </ToggleButtonGroup>
-      {viewMode === 'list'
-        && <InjectContext.Provider value={context}>
+      {viewMode === 'list' && (
+        <InjectContext.Provider value={context}>
           <ArticleContext.Provider value={articleContext}>
             <TeamContext.Provider value={teamContext}>
-              <Injects injects={injects} teams={teams} articles={articles} variables={variables}
+              <Injects
+                injects={injects}
+                teams={teams}
+                articles={articles}
+                variables={variables}
                 uriVariable={`/admin/exercises/${exerciseId}/definition/variables`}
                 allUsersNumber={exercise.exercise_all_users_number}
                 usersNumber={exercise.exercise_users_number}
                 teamsUsers={exercise.exercise_teams_users}
+                setViewMode={setViewMode}
               />
             </TeamContext.Provider>
           </ArticleContext.Provider>
         </InjectContext.Provider>
-      }
-      {viewMode === 'distribution'
-        && <Grid container spacing={3}>
+      )}
+      {viewMode === 'distribution' && (
+      <div style={{ marginTop: -12 }}>
+        <ToggleButtonGroup
+          size="small"
+          exclusive={true}
+          style={{ float: 'right' }}
+          aria-label="Change view mode"
+        >
+          <Tooltip title={t('List view')}>
+            <ToggleButton
+              value='list'
+              onClick={() => setViewMode('list')}
+              selected={false}
+              aria-label="List view mode"
+            >
+              <ReorderOutlined fontSize="small" color='primary' />
+            </ToggleButton>
+          </Tooltip>
+          <Tooltip title={t('Distribution view')}>
+            <ToggleButton
+              value='distribution'
+              onClick={() => setViewMode('distribution')}
+              selected={true}
+              aria-label="Distribution view mode"
+            >
+              <BarChartOutlined fontSize="small" color='inherit' />
+            </ToggleButton>
+          </Tooltip>
+        </ToggleButtonGroup>
+        <Grid container spacing={3}>
           <Grid container item spacing={3}>
             <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography variant="h4">
@@ -206,7 +204,8 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
             </Grid>
           </Grid>
         </Grid>
-      }
+      </div>
+      )}
     </>
   );
 };
