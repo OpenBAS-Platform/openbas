@@ -145,9 +145,12 @@ public class CalderaExecutor extends Injector {
           content.getExpectations()
               .stream()
               .flatMap((expectation) -> switch (expectation.getType()) {
-                case PREVENTION -> Stream.of(preventionExpectationForAsset(expectation.getScore(), asset,
-                    expectationGroup)); // expectationGroup usefully in front-end
-                case DETECTION -> Stream.of(detectionExpectation(expectation.getScore(), asset, expectationGroup));
+                case PREVENTION -> Stream.of(preventionExpectationForAsset(
+                    expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup
+                )); // expectationGroup usefully in front-end
+                case DETECTION -> Stream.of(detectionExpectation(
+                    expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup
+                ));
                 default -> Stream.of();
               })
               .toList()
@@ -173,8 +176,9 @@ public class CalderaExecutor extends Injector {
                   List<Asset> assets = this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
                   if (assets.stream().anyMatch((asset) -> expectations.stream().filter(e->EXPECTATION_TYPE.PREVENTION == e.type())
                       .anyMatch((e) -> ((PreventionExpectation) e).getAsset() != null && ((PreventionExpectation) e).getAsset().getId().equals(asset.getId())))) {
-                    yield Stream.of(preventionExpectationForAssetGroup(expectation.getScore(), assetGroup,
-                        expectation.isExpectationGroup()));
+                    yield Stream.of(preventionExpectationForAssetGroup(
+                        expectation.getScore(), expectation.getName(), expectation.getDescription(), assetGroup, expectation.isExpectationGroup()
+                    ));
                   }
                   yield Stream.of();
                 }
@@ -183,8 +187,9 @@ public class CalderaExecutor extends Injector {
                   List<Asset> assets = this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
                   if (assets.stream().anyMatch((asset) -> expectations.stream().filter(e->EXPECTATION_TYPE.DETECTION == e.type())
                       .anyMatch((e) -> ((DetectionExpectation) e).getAsset() != null &&  ((DetectionExpectation) e).getAsset().getId().equals(asset.getId())))) {
-                    yield Stream.of(detectionExpectationForAssetGroup(expectation.getScore(), assetGroup,
-                        expectation.isExpectationGroup()));
+                    yield Stream.of(detectionExpectationForAssetGroup(
+                        expectation.getScore(), expectation.getName(), expectation.getDescription(), assetGroup, expectation.isExpectationGroup()
+                    ));
                   }
                   yield Stream.of();
                 }

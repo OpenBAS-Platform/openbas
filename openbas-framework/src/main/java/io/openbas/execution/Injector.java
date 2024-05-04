@@ -86,10 +86,12 @@ public abstract class Injector {
             case TEXT -> expectationExecution.setType(EXPECTATION_TYPE.TEXT);
             case DETECTION -> {
                 DetectionExpectation detectionExpectation = (DetectionExpectation) expectation;
+                expectationExecution.setName(detectionExpectation.getName());
                 expectationExecution.setDetection(detectionExpectation.getAsset(), detectionExpectation.getAssetGroup());
             }
             case PREVENTION -> {
                 PreventionExpectation preventionExpectation = (PreventionExpectation) expectation;
+                expectationExecution.setName(preventionExpectation.getName());
                 expectationExecution.setPrevention(preventionExpectation.getAsset(), preventionExpectation.getAssetGroup());
             }
             case MANUAL -> {

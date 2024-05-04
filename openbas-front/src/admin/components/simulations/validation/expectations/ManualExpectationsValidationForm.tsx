@@ -9,9 +9,7 @@ import type { InjectExpectationsStore } from '../../../common/injects/expectatio
 import { useFormatter } from '../../../../../components/i18n';
 import { updateInjectExpectation } from '../../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import type { Inject } from '../../../../../utils/api-types';
 import ExpandableText from '../../../../../components/common/ExpendableText';
-import Drawer from '../../../../../components/common/Drawer';
 import type { Theme } from '../../../../../components/Theme';
 import colorStyles from '../../../../../components/Color';
 import { zodImplement } from '../../../../../utils/Zod';
@@ -105,12 +103,10 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({
         />
         <Typography variant="h3">{t('Name')}</Typography>
         {expectation.inject_expectation_name}
-        {expectation.inject_expectation_description
-          && <div className={classes.marginTop_2}>
-            <Typography variant="h3">{t('Description')}</Typography>
-            <ExpandableText source={expectation.inject_expectation_description} limit={120} />
-          </div>
-        }
+        <div className={classes.marginTop_2}>
+          <Typography variant="h3">{t('Description')}</Typography>
+          <ExpandableText source={expectation.inject_expectation_description} limit={120} />
+        </div>
         <MuiTextField
           className={classes.marginTop_2}
           variant="standard"
@@ -135,35 +131,4 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({
   );
 };
 
-interface Props {
-  inject: Inject;
-  expectations: InjectExpectationsStore[] | null;
-  open: boolean;
-  onClose: () => void;
-  onUpdate?: () => void;
-}
-
-const ManualExpectationsValidation: FunctionComponent<Props> = ({
-  inject,
-  expectations,
-  open,
-  onClose,
-  onUpdate,
-}) => {
-  const { t } = useFormatter();
-  return (
-    <Drawer
-      open={open}
-      handleClose={onClose}
-      title={t('Expectations of ') + inject.inject_title}
-    >
-      <>
-        {
-          expectations
-          && expectations.map((e) => <ManualExpectationsValidationForm key={e.inject_expectation_id} expectation={e} onUpdate={onUpdate} />)
-        }
-      </>
-    </Drawer>
-  );
-};
-export default ManualExpectationsValidation;
+export default ManualExpectationsValidationForm;

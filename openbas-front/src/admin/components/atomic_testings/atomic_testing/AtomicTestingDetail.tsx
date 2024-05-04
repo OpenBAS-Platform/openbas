@@ -124,15 +124,6 @@ const Detail: FunctionComponent<Props> = () => {
               {t('Traces')}
             </Typography>
             <pre>
-              {atomicDetail.status_traces && (
-                <ul>
-                  {atomicDetail.status_traces.map((trace, index) => (
-                    <li key={index} className={classes.listItem}>
-                      {trace}
-                    </li>
-                  ))}
-                </ul>
-              )}
               {atomicDetail.tracking_sent_date ? (
                 <>
                   <Typography variant="body1" gutterBottom>
@@ -162,6 +153,22 @@ const Detail: FunctionComponent<Props> = () => {
                 <Typography variant="body1" gutterBottom>
                   {t('No data available')}
                 </Typography>
+              )}
+
+              {atomicDetail.status_traces && (
+                <>
+
+                  <Typography variant="body1" gutterBottom>
+                    {t('Traces')}:
+                  </Typography>
+                  <ul>
+                    {atomicDetail.status_traces.map((trace, index) => (
+                      <li key={index} className={classes.listItem}>
+                        {trace}
+                      </li>
+                    ))}
+                  </ul>
+                </>
               )}
 
             </pre>

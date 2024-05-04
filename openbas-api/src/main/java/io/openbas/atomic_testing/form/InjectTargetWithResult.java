@@ -2,15 +2,18 @@ package io.openbas.atomic_testing.form;
 
 import io.openbas.atomic_testing.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.atomic_testing.TargetType;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Getter;
 
 @Getter
 public class InjectTargetWithResult {
 
   private final TargetType targetType;
+  @NotBlank
   private final String id;
   private final String name;
   private final List<ExpectationResultsByType> expectationResultsByTypes;

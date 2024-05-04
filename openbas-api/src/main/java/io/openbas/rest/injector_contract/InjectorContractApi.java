@@ -1,7 +1,6 @@
 package io.openbas.rest.injector_contract;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectorContractRepository;
@@ -29,9 +28,6 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RestController
 public class InjectorContractApi extends RestBehavior {
-
-    @Resource
-    private OpenBASConfig openBASConfig;
 
     private AttackPatternRepository attackPatternRepository;
 

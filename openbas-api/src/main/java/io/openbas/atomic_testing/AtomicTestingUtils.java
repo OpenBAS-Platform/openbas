@@ -8,13 +8,8 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.OptionalDouble;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AtomicTestingUtils {
@@ -240,13 +235,13 @@ public class AtomicTestingUtils {
 
   public static Optional<ExpectationResultsByType> getExpectationByType(final ExpectationType type, final List<Integer> scores) {
     if (scores.isEmpty()) {
-      return Optional.of(new ExpectationResultsByType(type, ExpectationStatus.UNKNOWN, Collections.emptyList()));
+      return Optional.of(new ExpectationResultsByType(type, InjectExpectation.ExpectationStatus.UNKNOWN, Collections.emptyList()));
     }
     OptionalDouble avgResponse = calculateAverageFromExpectations(scores);
     if (avgResponse.isPresent()) {
       return Optional.of(new ExpectationResultsByType(type, getResult(avgResponse), getResultDetail(type, scores)));
     }
-    return Optional.of(new ExpectationResultsByType(type, ExpectationStatus.PENDING, getResultDetail(type, scores)));
+    return Optional.of(new ExpectationResultsByType(type, InjectExpectation.ExpectationStatus.PENDING, getResultDetail(type, scores)));
   }
 
   public static List<InjectExpectation> getRefinedExpectations(Inject inject, List<String> targetIds) {
@@ -278,11 +273,11 @@ public class AtomicTestingUtils {
         .toList();
   }
 
-  public static ExpectationStatus getResult(final OptionalDouble avg) {
+  public static InjectExpectation.ExpectationStatus getResult(final OptionalDouble avg) {
     Double avgAsDouble = avg.getAsDouble();
-    return avgAsDouble == 0.0 ? ExpectationStatus.FAILED :
-        (avgAsDouble == 1.0 ? ExpectationStatus.VALIDATED :
-            ExpectationStatus.PARTIAL);
+    return avgAsDouble == 0.0 ? InjectExpectation.ExpectationStatus.FAILED :
+        (avgAsDouble == 1.0 ? InjectExpectation.ExpectationStatus.VALIDATED :
+            InjectExpectation.ExpectationStatus.PARTIAL);
   }
 
   public static OptionalDouble calculateAverageFromExpectations(final List<Integer> scores) {

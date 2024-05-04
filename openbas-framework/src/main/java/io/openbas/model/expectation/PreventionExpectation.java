@@ -4,6 +4,7 @@ import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.model.Expectation;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,8 @@ import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVE
 public class PreventionExpectation implements Expectation {
 
   private Integer score;
+  private String name;
+  private String description;
   private Asset asset;
   private AssetGroup assetGroup;
   private boolean expectationGroup;
@@ -31,10 +34,14 @@ public class PreventionExpectation implements Expectation {
 
   public static PreventionExpectation preventionExpectationForAsset(
       @Nullable final Integer score,
+      @NotBlank final String name,
+      final String description,
       @NotNull final Asset asset,
       boolean expectationGroup) {
     PreventionExpectation preventionExpectation = new PreventionExpectation();
     preventionExpectation.setScore(Objects.requireNonNullElse(score, 100));
+    preventionExpectation.setName(name);
+    preventionExpectation.setDescription(description);
     preventionExpectation.setAsset(asset);
     preventionExpectation.setExpectationGroup(expectationGroup);
     return preventionExpectation;
@@ -42,10 +49,14 @@ public class PreventionExpectation implements Expectation {
 
   public static PreventionExpectation preventionExpectationForAssetGroup(
       @Nullable final Integer score,
+      @NotBlank final String name,
+      final String description,
       @NotNull final AssetGroup assetGroup,
       boolean expectationGroup) {
     PreventionExpectation preventionExpectation = new PreventionExpectation();
     preventionExpectation.setScore(Objects.requireNonNullElse(score, 100));
+    preventionExpectation.setName(name);
+    preventionExpectation.setDescription(description);
     preventionExpectation.setAssetGroup(assetGroup);
     preventionExpectation.setExpectationGroup(expectationGroup);
     return preventionExpectation;
