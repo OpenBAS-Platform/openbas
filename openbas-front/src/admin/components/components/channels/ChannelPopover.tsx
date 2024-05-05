@@ -4,7 +4,7 @@ import { MoreVert } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
-import { updateChannel } from '../../../../actions/channels/channel-action';
+import { deleteChannel, updateChannel } from '../../../../actions/channels/channel-action';
 import ChannelForm from './ChannelForm';
 import { useAppDispatch } from '../../../../utils/hooks';
 import Transition from '../../../../components/common/Transition';
@@ -53,9 +53,9 @@ const ChannelPopover: React.FC<Props> = ({ channel }) => {
   };
 
   const submitDelete = async () => {
-    await dispatch(updateChannel(channel.channel_id));
+    await dispatch(deleteChannel(channel.channel_id));
     setOpenDelete(false);
-    navigate('/admin/channels');
+    navigate('/admin/components/channels');
   };
 
   const initialValues = {
