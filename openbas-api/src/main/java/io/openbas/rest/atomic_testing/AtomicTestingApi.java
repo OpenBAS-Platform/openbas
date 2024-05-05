@@ -1,21 +1,23 @@
 package io.openbas.rest.atomic_testing;
 
-import io.openbas.utils.AtomicTestingMapper;
-import io.openbas.service.AtomicTestingService;
+import io.openbas.database.model.Asset;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectStatus;
+import io.openbas.database.repository.EndpointRepository;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.atomic_testing.form.AtomicTestingDetailOutput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingOutput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.service.AtomicTestingService;
+import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,32 +25,32 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static io.openbas.utils.AtomicTestingMapper.toDto;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.utils.AtomicTestingUtils.getTargets;
 
 @RestController
 @RequestMapping("/api/atomic_testings")
 @PreAuthorize("isAdmin()")
+@RequiredArgsConstructor
 public class AtomicTestingApi extends RestBehavior {
 
-  private AtomicTestingService atomicTestingService;
-  private InjectExpectationService injectExpectationService;
-
-
-  @Autowired
-  public void setAtomicTestingService(AtomicTestingService atomicTestingService) {
-    this.atomicTestingService = atomicTestingService;
-  }
-
-  @Autowired
-  public void setInjectExpectationService(InjectExpectationService injectExpectationService) {
-    this.injectExpectationService = injectExpectationService;
-  }
+  private final AtomicTestingService atomicTestingService;
+  private final InjectExpectationService injectExpectationService;
+  private final EndpointRepository endpointRepository;
 
   @PostMapping("/search")
   public Page<AtomicTestingOutput> findAllAtomicTestings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return this.atomicTestingService.findAllAtomicTestings(searchPaginationInput)
-        .map(AtomicTestingMapper::toDto);
+        .map(inject -> AtomicTestingMapper.toDto(
+            inject, getTargets(
+                inject.getTeams(),
+                fromIterable(
+                    this.endpointRepository.findAllById(inject.getAssets().stream().map(Asset::getId).toList())
+                ),
+                inject.getAssetGroups()
+            )
+        ));
   }
 
 
@@ -80,7 +82,15 @@ public class AtomicTestingApi extends RestBehavior {
   @PostMapping()
   public AtomicTestingOutput createAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {
     Inject inject = this.atomicTestingService.createOrUpdate(input, null);
-    return toDto(inject);
+    return AtomicTestingMapper.toDto(
+        inject, getTargets(
+            inject.getTeams(),
+            fromIterable(
+                this.endpointRepository.findAllById(inject.getAssets().stream().map(Asset::getId).toList())
+            ),
+            inject.getAssetGroups()
+        )
+    );
   }
 
   @PutMapping("/{injectId}")
@@ -88,7 +98,15 @@ public class AtomicTestingApi extends RestBehavior {
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingInput input) {
     Inject inject = this.atomicTestingService.createOrUpdate(input, injectId);
-    return toDto(inject);
+    return AtomicTestingMapper.toDto(
+        inject, getTargets(
+            inject.getTeams(),
+            fromIterable(
+                this.endpointRepository.findAllById(inject.getAssets().stream().map(Asset::getId).toList())
+            ),
+            inject.getAssetGroups()
+        )
+    );
   }
 
   @DeleteMapping("/{injectId}")
@@ -114,8 +132,16 @@ public class AtomicTestingApi extends RestBehavior {
   public AtomicTestingOutput updateAtomicTestingTags(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingUpdateTagsInput input) {
-
-    return AtomicTestingMapper.toDto(atomicTestingService.updateAtomicTestingTags(injectId, input));
+    Inject inject = atomicTestingService.updateAtomicTestingTags(injectId, input);
+    return AtomicTestingMapper.toDto(
+        inject, getTargets(
+            inject.getTeams(),
+            fromIterable(
+                this.endpointRepository.findAllById(inject.getAssets().stream().map(Asset::getId).toList())
+            ),
+            inject.getAssetGroups()
+        )
+    );
   }
 
 

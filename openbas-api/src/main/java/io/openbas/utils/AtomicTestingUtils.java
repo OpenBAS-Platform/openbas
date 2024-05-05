@@ -1,10 +1,7 @@
 package io.openbas.utils;
 
 import io.openbas.atomic_testing.TargetType;
-import io.openbas.database.model.Asset;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectExpectation;
+import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
@@ -17,17 +14,20 @@ import java.util.stream.Collectors;
 
 public class AtomicTestingUtils {
 
-    public static List<InjectTargetWithResult> getTargets(final Inject inject) {
+    public static List<InjectTargetWithResult> getTargets(
+        final List<Team> teams,
+        final List<Endpoint> endpoints,
+        final List<AssetGroup> assetGroups) {
         List<InjectTargetWithResult> targets = new ArrayList<>();
-        targets.addAll(inject.getTeams()
+        targets.addAll(teams
                 .stream()
                 .map(t -> new InjectTargetWithResult(TargetType.TEAMS, t.getId(), t.getName(), List.of(), null))
                 .toList());
-        targets.addAll(inject.getAssets()
+        targets.addAll(endpoints
                 .stream()
                 .map(t -> new InjectTargetWithResult(TargetType.ASSETS, t.getId(), t.getName(), List.of(), Objects.equals(t.getType(), "Endpoint") ? ((Endpoint) t).getPlatform() : null))
                 .toList());
-        targets.addAll(inject.getAssetGroups()
+        targets.addAll(assetGroups
                 .stream()
                 .map(t -> new InjectTargetWithResult(TargetType.ASSETS_GROUPS, t.getId(), t.getName(), List.of(), null))
                 .toList());
