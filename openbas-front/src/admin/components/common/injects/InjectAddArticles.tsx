@@ -91,6 +91,10 @@ const InjectAddArticles: FunctionComponent<Props> = ({
     handleClose();
   };
 
+  // Creation
+  const [openCreate, setOpenCreate] = useState(false);
+  const handleOpenCreate = () => setOpenCreate(true);
+  const handleCloseCreate = () => setOpenCreate(false);
   const onCreate = (result: string) => {
     addArticle(result);
   };
@@ -181,7 +185,10 @@ const InjectAddArticles: FunctionComponent<Props> = ({
                 })}
                 <CreateArticle
                   inline
+                  openCreate={openCreate}
                   onCreate={onCreate}
+                  handleOpenCreate={handleOpenCreate}
+                  handleCloseCreate={handleCloseCreate}
                 />
               </List>
             </Grid>
