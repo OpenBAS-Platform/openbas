@@ -87,7 +87,7 @@ const atomicFilter: FilterGroup = {
     }],
 };
 
-const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomic = false, ...props }) => {
+const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomic = false, ...props }) => {
   // Standard hooks
   const [open, setOpen] = useState(false);
   const classes = useStyles();
@@ -267,4 +267,4 @@ const Createinject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
   );
 };
 
-export default Createinject;
+export default CreateInject;
