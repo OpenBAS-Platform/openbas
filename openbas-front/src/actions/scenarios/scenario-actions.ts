@@ -115,6 +115,13 @@ export const removeScenarioTeamPlayers = (scenarioId: Scenario['scenario_id'], t
   data,
 )(dispatch);
 
+// -- EXERCISES --
+
+export const fetchScenarioExercises = (scenarioId: Scenario['scenario_id']) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/exercises`;
+  return getReferential(schema.arrayOfExercises, uri)(dispatch);
+};
+
 // -- RECURRENCE --
 
 export const updateScenarioRecurrence = (

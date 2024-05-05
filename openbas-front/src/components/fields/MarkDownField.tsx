@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
 import { Field, FieldInputProps, FieldMetaState } from 'react-final-form';
-import { InputLabel, FormHelperText, useTheme } from '@mui/material';
-import { useFormatter } from './i18n';
-import type { Theme } from './Theme';
+import { FormHelperText, InputLabel, useTheme } from '@mui/material';
+import { useFormatter } from '../i18n';
+import type { Theme } from '../Theme';
+import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 
 interface Props {
   label: string;
@@ -11,6 +12,9 @@ interface Props {
   disabled?: boolean;
   input: FieldInputProps<string, HTMLElement>;
   meta: FieldMetaState<string>;
+  askAi?: boolean;
+  inInject: boolean;
+  inArticle?: boolean;
 }
 
 const MarkDownFieldBase: React.FC<Props> = ({
@@ -19,13 +23,15 @@ const MarkDownFieldBase: React.FC<Props> = ({
   disabled,
   input: { onChange, value },
   meta: { touched, invalid, error, submitError },
+  askAi,
+  inInject,
+  inArticle,
 }) => {
   const { t } = useFormatter();
   const theme = useTheme<Theme>();
-  const [fullscreen, setFullscreen] = useState(false);
   return (
     <div
-      style={style}
+      style={{ ...style, position: 'relative' }}
       className={touched && invalid ? 'error' : 'main'}
       data-color-mode={theme.palette.mode}
     >
@@ -34,15 +40,9 @@ const MarkDownFieldBase: React.FC<Props> = ({
       </InputLabel>
       <MDEditor
         value={value}
-        style={{
-          background: fullscreen
-            ? theme.palette.background.paper
-            : 'transparent',
-        }}
         textareaProps={{
           disabled,
         }}
-        fullscreen={fullscreen}
         preview="edit"
         onChange={(data) => onChange(data)}
         commands={[
@@ -60,30 +60,25 @@ const MarkDownFieldBase: React.FC<Props> = ({
           { ...commands.orderedListCommand, buttonProps: { disabled } },
           { ...commands.checkedListCommand, buttonProps: { disabled } },
         ]}
-        extraCommands={[
-          {
-            ...commands.codeEdit,
-            buttonProps: { 'aria-label': t('Edit code'), title: t('Edit code') },
-          },
-          {
-            ...commands.codeLive,
-            buttonProps: { 'aria-label': t('Live code'), title: t('Live code') },
-          },
-          {
-            ...commands.codePreview,
-            buttonProps: {
-              'aria-label': t('Preview code'),
-              title: t('Preview code'),
-            },
-          },
-          { ...commands.divider },
-          { ...commands.fullscreen, execute: () => setFullscreen(!fullscreen) },
-        ]}
+        extraCommands={[]}
       />
       {touched && invalid && (
         <FormHelperText error={true}>
           {(error && t(error)) || (submitError && t(submitError))}
         </FormHelperText>
+      )}
+      {askAi && (
+        <TextFieldAskAI
+          currentValue={value ?? ''}
+          setFieldValue={(val) => {
+            onChange(val);
+          }}
+          format="markdown"
+          variant="markdown"
+          disabled={disabled}
+          inInject={inInject}
+          inArticle={inArticle}
+        />
       )}
     </div>
   );

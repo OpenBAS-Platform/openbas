@@ -9,6 +9,7 @@ import type { ScenarioRecurrenceInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 import { generateDailyCron, generateMonthlyCron, generateWeeklyCron, parseCron } from '../../../../utils/Cron';
 import Transition from '../../../../components/common/Transition';
+import { minutesInFuture } from '../../../../utils/Time';
 
 interface Props {
   onSubmit: (cron: string, start: string, end?: string) => void,
@@ -34,7 +35,7 @@ const _MS_DELAY_TOO_CLOSE = 1000 * 60 * 2;
 const defaultFormValues = {
   startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
   endDate: null,
-  time: null,
+  time: minutesInFuture(5).toISOString(),
   onlyWeekday: false,
   dayOfWeek: 1 as Recurrence['dayOfWeek'],
   weekOfMonth: 1 as Recurrence['weekOfMonth'],
@@ -121,7 +122,6 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
         reset(defaultFormValues);
       }
       const { w, d, h, m, owd } = parseCron(initialValues.scenario_recurrence);
-
       reset({
         startDate: initialValues.scenario_recurrence_start,
         endDate: initialValues.scenario_recurrence_end || '',

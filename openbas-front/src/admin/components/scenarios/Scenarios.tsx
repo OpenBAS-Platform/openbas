@@ -19,12 +19,12 @@ import ItemTags from '../../../components/ItemTags';
 import ItemSeverity from '../../../components/ItemSeverity';
 import PlatformIcon from '../../../components/PlatformIcon';
 import ItemCategory from '../../../components/ItemCategory';
-import ItemMainFocus from '../../../components/ItemMainFocus';
 import type { Theme } from '../../../components/Theme';
 import ImportUploaderScenario from './ImportUploaderScenario';
 import useFiltersState from '../../../components/common/filter/useFiltersState';
 import { buildEmptyFilter } from '../../../components/common/filter/FilterUtils';
 import { scenarioCategories } from './ScenarioForm';
+import ScenarioStatus from './scenario/ScenarioStatus';
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -77,7 +77,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   scenario_category: {
     width: '12%',
   },
-  scenario_main_focus: {
+  scenario_status: {
     width: '12%',
   },
   scenario_platforms: {
@@ -105,7 +105,7 @@ const Scenarios = () => {
     { field: 'scenario_name', label: 'Name', isSortable: true },
     { field: 'scenario_severity', label: 'Severity', isSortable: true },
     { field: 'scenario_category', label: 'Category', isSortable: true },
-    { field: 'scenario_main_focus', label: 'Main focus', isSortable: true },
+    { field: 'scenario_status', label: 'Status', isSortable: true },
     { field: 'scenario_platforms', label: 'Platforms', isSortable: true },
     { field: 'scenario_tags', label: 'Tags', isSortable: true },
     { field: 'scenario_updated_at', label: 'Updated', isSortable: true },
@@ -289,9 +289,9 @@ const Scenarios = () => {
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.scenario_main_focus}
+                    style={inlineStyles.scenario_status}
                   >
-                    <ItemMainFocus mainFocus={scenario.scenario_main_focus ?? 'Unknown'} label={t(scenario.scenario_main_focus ?? 'Unknown')} size="medium" />
+                    <ScenarioStatus scenario={scenario} variant="list" />
                   </div>
                   <div
                     className={classes.bodyItem}

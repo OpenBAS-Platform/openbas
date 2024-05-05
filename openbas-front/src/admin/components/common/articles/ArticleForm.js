@@ -14,7 +14,7 @@ import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
 import ChannelIcon from '../../components/channels/ChannelIcon';
-import MarkDownField from '../../../../components/MarkDownField';
+import MarkDownField from '../../../../components/fields/MarkDownField';
 import DocumentType from '../../components/documents/DocumentType';
 import ItemTags from '../../../../components/ItemTags';
 import DocumentPopover from '../../components/documents/DocumentPopover';
@@ -238,6 +238,8 @@ const ArticleForm = ({
               label={t('Content')}
               fullWidth
               style={{ marginTop: 20 }}
+              askAi={true}
+              inArticle={true}
             />
             <Grid container spacing={3} style={{ marginTop: 0 }}>
               <Grid item xs={4}>

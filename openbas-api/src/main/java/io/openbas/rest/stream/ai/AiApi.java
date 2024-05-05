@@ -199,7 +199,7 @@ public class AiApi extends RestBehavior {
     }
 
     @PostMapping(path = "/api/ai/generate_message", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<Flux<AiResult>> aiExplain(@Valid @RequestBody final AiMessageInput aiMessageInput) throws JsonProcessingException {
+    public ResponseEntity<Flux<AiResult>> aiGenerateMessage(@Valid @RequestBody final AiMessageInput aiMessageInput) throws JsonProcessingException {
         if (!aiConfig.isEnabled()) {
             throw new UnsupportedOperationException("AI is disabled in this platform, please ask your administrator.");
         }
@@ -209,6 +209,7 @@ public class AiApi extends RestBehavior {
                 "- Examine the provided context related to a cybersecurity breach and attack simulation.\n" +
                 "- You should generate a message from " + aiMessageInput.getSender() + " to " + aiMessageInput.getRecipient() + " given the provided input.\n" +
                 "- The message should have a tone of " + aiMessageInput.getTone() + ".\n" +
+                "- You should fake it and not writing about the simulation but like if it is a true cybersecurity threat and / or incident.\n" +
                 "- The summary should have " + aiMessageInput.getParagraphs().toString() + " of approximately 5 lines each.\n" +
                 "- Ensure that all words are accurately spelled and that the grammar is correct.\n" +
                 "- Your response should match the provided content format which is " + aiMessageInput.getFormat() + ". Be sure to respect this format and to NOT output anything else than the format.\n" +
@@ -218,6 +219,55 @@ public class AiApi extends RestBehavior {
                 "\n" +
                 " # Input" +
                 aiMessageInput.getInput();
+        AiQueryModel body = generatePrompt(prompt, aiConfig);
+        return queryAi(mapper.writeValueAsString(body));
+    }
+
+    @PostMapping(path = "/api/ai/generate_subject", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public ResponseEntity<Flux<AiResult>> aiGenerateSubject(@Valid @RequestBody final AiMessageInput aiMessageInput) throws JsonProcessingException {
+        if (!aiConfig.isEnabled()) {
+            throw new UnsupportedOperationException("AI is disabled in this platform, please ask your administrator.");
+        }
+        String prompt = "\n" +
+                "# Instructions\n" +
+                "- We are in the context of a cybersecurity breach and attack simulation or a cybersecurity crisis exercise.\n" +
+                "- Examine the provided context related to a cybersecurity breach and attack simulation.\n" +
+                "- You should generate the subject of the email from " + aiMessageInput.getSender() + " to " + aiMessageInput.getRecipient() + " given the provided input.\n" +
+                "- The subject should have a tone of " + aiMessageInput.getTone() + ".\n" +
+                "- Ensure that all words are accurately spelled and that the grammar is correct.\n" +
+                "- You should fake it and not writing about the simulation but like if it is a true cybersecurity threat and / or incident.\n" +
+                "- Your response should match the provided content format which is " + aiMessageInput.getFormat() + ". Be sure to respect this format and to NOT output anything else than the format.\n" +
+                "\n" +
+                " # Context" +
+                aiMessageInput.getContext() +
+                "\n" +
+                " # Input" +
+                aiMessageInput.getInput();
+        AiQueryModel body = generatePrompt(prompt, aiConfig);
+        return queryAi(mapper.writeValueAsString(body));
+    }
+
+    @PostMapping(path = "/api/ai/generate_media", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public ResponseEntity<Flux<AiResult>> aiGenerateMedia(@Valid @RequestBody final AiMediaInput aiMediaInput) throws JsonProcessingException {
+        if (!aiConfig.isEnabled()) {
+            throw new UnsupportedOperationException("AI is disabled in this platform, please ask your administrator.");
+        }
+        String prompt = "\n" +
+                "# Instructions\n" +
+                "- We are in the context of a cybersecurity breach and attack simulation or a cybersecurity crisis exercise.\n" +
+                "- Examine the provided context related to a cybersecurity breach and attack simulation.\n" +
+                "- You should generate an article as a journalist to put media pressure on the company given the provided input.\n" +
+                "- The article should have a tone of " + aiMediaInput.getTone() + ".\n" +
+                "- Ensure that all words are accurately spelled and that the grammar is correct.\n" +
+                "- You should fake it and not writing about the simulation but like if it is a true cybersecurity threat and / or incident.\n" +
+                "- The article should look like a true cybersecurity article in a newspaper.\n" +
+                "- Your response should match the provided content format which is " + aiMediaInput.getFormat() + ". Be sure to respect this format and to NOT output anything else than the format.\n" +
+                "\n" +
+                " # Context" +
+                aiMediaInput.getContext() +
+                "\n" +
+                " # Input" +
+                aiMediaInput.getInput();
         AiQueryModel body = generatePrompt(prompt, aiConfig);
         return queryAi(mapper.writeValueAsString(body));
     }

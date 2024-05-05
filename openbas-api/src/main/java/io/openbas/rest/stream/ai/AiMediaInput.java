@@ -10,7 +10,7 @@ import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 @Getter
 @Setter
-public class AiMessageInput {
+public class AiMediaInput {
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("ai_input")
     private String input;
@@ -28,13 +28,10 @@ public class AiMessageInput {
     private String tone = "natural";
 
     @Nullable
-    @JsonProperty("ai_sender")
-    private String sender;
+    @JsonProperty("ai_author")
+    private String author;
 
     @Nullable
-    @JsonProperty("ai_recipient")
-    private String recipient;
-
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("ai_format")
     private String format;

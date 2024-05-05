@@ -65,6 +65,10 @@ public class Scenario implements Base {
   @JsonProperty("scenario_severity")
   private String severity;
 
+  @Column(name = "scenario_external_reference")
+  @JsonProperty("scenario_external_reference")
+  private String externalReference;
+
   // -- RECURRENCE --
 
   @Column(name = "scenario_recurrence")

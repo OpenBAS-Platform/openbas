@@ -31,6 +31,7 @@ export const monthFormat = (date) => utcDate(date).format('YYYY-MM');
 export const dayFormat = (date) => utcDate(date).format('YYYY-MM-DD');
 export const timeFormat = (date) => utcDate(date).format('YYYY-MM-DD HH:mm');
 
+export const minutesInFuture = (minutes) => moment().utc().add(minutes, 'minutes');
 export const minutesAgo = (minutes) => moment().utc().subtract(minutes, 'minutes');
 export const hoursAgo = (hours) => moment().utc().subtract(hours, 'hours');
 export const daysAgo = (days) => moment().utc().subtract(days, 'days');

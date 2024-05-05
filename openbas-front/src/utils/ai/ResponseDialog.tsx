@@ -10,6 +10,8 @@ import 'ckeditor5-custom-build/build/translations/zh-cn';
 // As we can ask AI after and follow up, there is a dependency lifecycle here that can be accepted
 // TODO: Cleanup a bit in upcoming version
 // eslint-disable-next-line import/no-cycle
+import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
+// eslint-disable-next-line import/no-cycle
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 import { useFormatter } from '../../components/i18n';
 import { isNotEmptyField } from '../utils';
@@ -40,6 +42,7 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
   format,
   isAcceptable = true,
   content,
+
 }) => {
   const textFieldRef = useRef<HTMLTextAreaElement>(null);
   const markdownFieldRef = useRef<HTMLTextAreaElement>(null);
@@ -115,6 +118,32 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
                 }}
                 disabled={isDisabled}
                 disableWatchdog={true}
+              />
+            )}
+            { format === 'markdown' && (
+              <MDEditor
+                value={content}
+                textareaProps={{
+                  disabled: isDisabled,
+                }}
+                preview="edit"
+                onChange={(data) => setContent(data ?? '')}
+                commands={[
+                  { ...commands.title, buttonProps: { disabled: isDisabled } },
+                  { ...commands.bold, buttonProps: { disabled: isDisabled } },
+                  { ...commands.italic, buttonProps: { disabled: isDisabled } },
+                  { ...commands.strikethrough, buttonProps: { disabled: isDisabled } },
+                  { ...commands.divider },
+                  { ...commands.link, buttonProps: { disabled: isDisabled } },
+                  { ...commands.quote, buttonProps: { disabled: isDisabled } },
+                  { ...commands.code, buttonProps: { disabled: isDisabled } },
+                  { ...commands.image, buttonProps: { disabled: isDisabled } },
+                  { ...commands.divider, buttonProps: { disabled: isDisabled } },
+                  { ...commands.unorderedListCommand, buttonProps: { disabled: isDisabled } },
+                  { ...commands.orderedListCommand, buttonProps: { disabled: isDisabled } },
+                  { ...commands.checkedListCommand, buttonProps: { disabled: isDisabled } },
+                ]}
+                extraCommands={[]}
               />
             )}
             {(format === 'markdown' || format === 'html') && (

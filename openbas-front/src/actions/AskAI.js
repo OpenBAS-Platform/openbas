@@ -71,3 +71,34 @@ export const aiGenMessage = async (context, input, paragraphs, tone, sender, rec
     eventCallback,
   );
 };
+
+export const aiGenSubject = async (context, input, paragraphs, tone, sender, recipient, format, eventCallback) => {
+  return askAI(
+    '/ai/generate_subject',
+    {
+      ai_context: context,
+      ai_input: input,
+      ai_paragraphs: paragraphs,
+      ai_tone: tone,
+      ai_sender: sender,
+      ai_recipient: recipient,
+      ai_format: format,
+    },
+    eventCallback,
+  );
+};
+
+export const aiGenMedia = async (context, input, paragraphs, tone, author, format, eventCallback) => {
+  return askAI(
+    '/ai/generate_media',
+    {
+      ai_context: context,
+      ai_input: input,
+      ai_paragraphs: paragraphs,
+      ai_tone: tone,
+      ai_author: author,
+      ai_format: format,
+    },
+    eventCallback,
+  );
+};

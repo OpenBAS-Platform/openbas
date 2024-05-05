@@ -18,18 +18,16 @@ import MitreMatrixDummy from './common/matrix/MitreMatrixDummy';
 import { horizontalBarsChartOptions, polarAreaChartOptions, verticalBarsChartOptions } from '../../utils/Charts';
 import { fetchExercises } from '../../actions/Exercise';
 import type { ExercisesHelper } from '../../actions/exercises/exercise-helper';
-import type { AttackPattern, Exercise } from '../../utils/api-types';
+import type { Exercise } from '../../utils/api-types';
 import { daysAgo, fillTimeSeries, getNextWeek, groupBy } from '../../utils/Time';
-import { random } from '../../utils/Number';
 import ExerciseList from './simulations/ExerciseList';
-import { scenarioCategories } from './scenarios/ScenarioForm';
 import type { AttackPatternHelper } from '../../actions/attack_patterns/attackpattern-helper';
 import type { KillChainPhaseHelper } from '../../actions/kill_chain_phases/killchainphase-helper';
 import type { InjectorHelper } from '../../actions/injectors/injector-helper';
 import { fetchKillChainPhases } from '../../actions/KillChainPhase';
 import { fetchAttackPatterns } from '../../actions/AttackPattern';
-import { randomElements } from '../../utils/utils';
 import Empty from '../../components/Empty';
+import { attackPatternsFakeData, categoriesDataFakeData, categoriesLabelsFakeData, exercisesTimeSeriesFakeData } from '../../utils/fakeData';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -42,17 +40,24 @@ const useStyles = makeStyles(() => ({
     borderRadius: 4,
   },
   paperWithChart: {
-    height: 300,
-    minHeight: 300,
+    height: 320,
+    minHeight: 320,
     margin: '10px 0 0 0',
     padding: 15,
     borderRadius: 4,
     display: 'flex',
     alignItems: 'center',
   },
+  paperList: {
+    height: 320,
+    minHeight: 320,
+    margin: '10px 0 0 0',
+    padding: 0,
+    borderRadius: 4,
+  },
   paperChart: {
-    height: 300,
-    minHeight: 300,
+    height: 320,
+    minHeight: 320,
     margin: '10px 0 0 0',
     padding: 15,
     borderRadius: 4,
@@ -79,45 +84,22 @@ const Dashboard = () => {
     attackPatterns: helper.getAttackPatterns(),
     killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
-  const generateFakeData = (): { x: string; y: number }[] => {
-    const nowDate = new Date();
-    return Array.from(Array(30), () => {
-      nowDate.setHours(nowDate.getHours() - 96);
-      return {
-        x: nowDate.toISOString(),
-        y: Math.round(random(5, 50)),
-      };
-    });
-  };
-
   const exercisesOverTime = groupBy(exercises.filter((e: Exercise) => e.exercise_start_date !== null), 'exercise_start_date', 'week');
   const exercisesTimeSeries = fillTimeSeries(daysAgo(150), getNextWeek(), 'week', exercisesOverTime);
   const exercisesData = [
     {
       name: t('Number of simulations'),
-      data: exercisesOverTime.length === 0 ? generateFakeData() : exercisesTimeSeries.map((grouping: { date: string, value: number }) => ({
+      data: exercisesOverTime.length === 0 ? exercisesTimeSeriesFakeData : exercisesTimeSeries.map((grouping: { date: string, value: number }) => ({
         x: grouping.date,
         y: grouping.value,
       })),
     },
   ];
-
   const countByCategory = R.countBy(R.prop('exercise_category'), exercises);
-  const categoriesLabels: string[] = R.keys(countByCategory).length > 0 ? R.keys(countByCategory) : R.take(5, Array.from(scenarioCategories).map(([_, value]) => value));
-  const categoriesData: number[] = R.values(countByCategory).length > 0 ? R.values(countByCategory) : [
-    Math.round(random(10, 50)),
-    Math.round(random(10, 50)),
-    Math.round(random(10, 50)),
-    Math.round(random(10, 50)),
-    Math.round(random(10, 50)),
-  ];
+  const categoriesLabels: string[] = R.keys(countByCategory).length > 0 ? R.keys(countByCategory) : categoriesLabelsFakeData;
+  const categoriesData: number[] = R.values(countByCategory).length > 0 ? R.values(countByCategory) : categoriesDataFakeData;
   const sortByY = R.sortWith([R.descend(R.prop('y'))]);
-  const attackPatternsData = [{
-    data: sortByY(randomElements(attackPatterns, 10).map((attackPattern: AttackPattern) => ({
-      x: `[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`,
-      y: Math.round(random(10, 50)),
-    }))),
-  }];
+  const attackPatternsData = attackPatterns.length > 0 ? sortByY(attackPatternsFakeData) : [];
   return (
     <Grid container spacing={3}>
       <Grid item xs={3}>
@@ -206,9 +188,9 @@ const Dashboard = () => {
       </Grid>
       <Grid item={true} xs={6}>
         <Typography variant="h4">{t('Last simulations')}</Typography>
-        <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+        <Paper variant="outlined" classes={{ root: classes.paperList }}>
           {exercises.length === 0 && <Empty message={t('No simulation in this platform yet.')} />}
-          <ExerciseList exercises={exercises} withoutSearch={true} limit={8} />
+          <ExerciseList exercises={exercises} withoutSearch={true} limit={6} />
         </Paper>
       </Grid>
       <Grid item xs={12}>

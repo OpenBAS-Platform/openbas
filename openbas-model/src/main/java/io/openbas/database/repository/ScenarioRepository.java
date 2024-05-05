@@ -10,11 +10,15 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ScenarioRepository extends CrudRepository<Scenario, String>,
     StatisticRepository,
     JpaSpecificationExecutor<Scenario> {
+
+  @NotNull
+  Optional<Scenario> findByExternalReference(@Param("externalReference") String externalReference);
 
   @Query("select distinct s from Scenario s " +
       "join s.grants as grant " +

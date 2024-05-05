@@ -17,6 +17,7 @@ const SimpleRichTextField = (props) => {
     disabled,
     askAi,
     inInject,
+    context,
   } = props;
   const lang = useHelper((helper) => {
     const me = helper.getMe();
@@ -57,6 +58,7 @@ const SimpleRichTextField = (props) => {
           variant="html"
           disabled={disabled}
           inInject={inInject}
+          context={context}
         />
       )}
     </div>

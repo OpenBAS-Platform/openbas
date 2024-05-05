@@ -9,7 +9,7 @@ import ResponseDialog from '../../../../utils/ai/ResponseDialog';
 import SimpleRichTextField from '../../../../components/fields/SimpleRichTextField';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 import useAI from '../../../../utils/hooks/useAI';
-import { aiChangeTone, aiExplain, aiFixSpelling, aiGenMessage, aiMakeLonger, aiMakeShorter, aiSummarize } from '../../../../actions/AskAI';
+import { aiChangeTone, aiExplain, aiFixSpelling, aiGenMedia, aiGenMessage, aiGenSubject, aiMakeLonger, aiMakeShorter, aiSummarize } from '../../../../actions/AskAI';
 
 // region types
 interface TextFieldAskAiProps {
@@ -20,6 +20,8 @@ interface TextFieldAskAiProps {
   disabled?: boolean;
   style?: object;
   inInject?: boolean;
+  context?: string;
+  inArticle?: boolean;
 }
 
 const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
@@ -30,6 +32,8 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   disabled,
   style,
   inInject,
+  context,
+  inArticle,
 }) => {
   const { t } = useFormatter();
   const isEnterpriseEdition = useEnterpriseEdition();
@@ -37,9 +41,10 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   const [content, setContent] = useState('');
   const [disableResponse, setDisableResponse] = useState(false);
   const [openToneOptions, setOpenToneOptions] = useState(false);
-  const [openGenMessageptions, setOpenGenMessageptions] = useState(false);
+  const [openGenMessageOptions, setOpenGenMessageOptions] = useState(false);
+  const [openGenMediaOptions, setOpenGenMediaOptions] = useState(false);
   const [tone, setTone] = useState<'tactical' | 'operational' | 'strategic'>('tactical');
-  const [messageContext, setMessageContext] = useState<string>('');
+  const [messageContext, setMessageContext] = useState<string>(context ?? '');
   const [messageInput, setMessageInput] = useState<string>(currentValue);
   const [messageParagraphs, setMessageParagraphs] = useState<number>(5);
   const [messageTone, setMessageTone] = useState<'informal' | 'formal' | 'assertive' | 'sarcastic' | 'authoritative' | 'bitter' | 'critical' | 'arrogant' | 'aggressive'>('formal');
@@ -64,9 +69,16 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   const handleCloseToneOptions = () => setOpenToneOptions(false);
   const handleOpenGenMessageOptions = () => {
     handleCloseMenu();
-    setOpenGenMessageptions(true);
+    setOpenGenMessageOptions(true);
+    setMessageInput(currentValue);
   };
-  const handleCloseGenMessageOptions = () => setOpenGenMessageptions(false);
+  const handleOpenGenMediaOptions = () => {
+    handleCloseMenu();
+    setOpenGenMediaOptions(true);
+    setMessageInput(currentValue);
+  };
+  const handleCloseGenMessageOptions = () => setOpenGenMessageOptions(false);
+  const handleCloseGenMediaOptions = () => setOpenGenMediaOptions(false);
   const handleOpenAskAI = () => setDisplayAskAI(true);
   const handleCloseAskAI = () => setDisplayAskAI(false);
   const askFixSpelling = async () => aiFixSpelling(currentValue, format, (data: string) => setContent(data));
@@ -82,6 +94,25 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
     messageTone,
     messageSender,
     messageRecipient,
+    format,
+    (data: string) => setContent(data),
+  );
+  const askGenSubject = async () => aiGenSubject(
+    messageContext,
+    messageInput,
+    messageParagraphs,
+    messageTone,
+    messageSender,
+    messageRecipient,
+    format,
+    (data: string) => setContent(data),
+  );
+  const askGenMedia = async () => aiGenMedia(
+    messageContext,
+    messageInput,
+    messageParagraphs,
+    messageTone,
+    '',
     format,
     (data: string) => setContent(data),
   );
@@ -120,6 +151,14 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
         await askGenMessage();
         setDisableResponse(false);
         break;
+      case 'genSubject':
+        await askGenSubject();
+        setDisableResponse(false);
+        break;
+      case 'genMedia':
+        await askGenMedia();
+        setDisableResponse(false);
+        break;
       default:
         // do nothing
     }
@@ -145,9 +184,14 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
           onClose={handleCloseMenu}
         >
           {inInject && (
-          <MenuItem onClick={handleOpenGenMessageOptions}>
-            {t('Generate a message')}
-          </MenuItem>
+            <MenuItem onClick={handleOpenGenMessageOptions}>
+              {t('Generate a message')}
+            </MenuItem>
+          )}
+          {inArticle && (
+            <MenuItem onClick={handleOpenGenMediaOptions}>
+              {t('Generate an article')}
+            </MenuItem>
           )}
           <MenuItem onClick={() => handleAskAi('spelling')}>
             {t('Fix spelling & grammar')}
@@ -185,26 +229,18 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
         />
         <Dialog
           PaperProps={{ elevation: 1 }}
-          open={openGenMessageptions}
+          open={openGenMessageOptions}
           onClose={handleCloseGenMessageOptions}
           fullWidth={true}
           maxWidth="xs"
         >
           <DialogTitle>{t('Select options')}</DialogTitle>
           <DialogContent>
-            <TextField
-              label={t('Context')}
-              fullWidth={true}
-              multiline={true}
-              value={messageContext}
-              rows={5}
-              onChange={(event) => setMessageContext(event.target.value)}
-            />
             <SimpleRichTextField
               label={t('Input (describe what you want)')}
               value={messageInput}
               onChange={(value: string) => setMessageInput(value)}
-              style={{ marginTop: 20, height: 200 }}
+              style={{ height: 200 }}
             />
             <FormControl style={{ width: '100%', marginTop: 20 }}>
               <InputLabel id="messageTone">{t('Tone')}</InputLabel>
@@ -247,6 +283,90 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               onChange={(event) => setMessageParagraphs(Number.isNaN(parseInt(event.target.value, 10)) ? 1 : parseInt(event.target.value, 10))}
               style={{ marginTop: 20 }}
             />
+            <TextField
+              style={{ marginTop: 20 }}
+              label={t('Context')}
+              fullWidth={true}
+              multiline={true}
+              value={messageContext}
+              rows={5}
+              onChange={(event) => setMessageContext(event.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseToneOptions}>
+              {t('Cancel')}
+            </Button>
+            <Button
+              disabled={messageInput.length < 5}
+              onClick={() => {
+                handleCloseGenMessageOptions();
+                handleAskAi('genMessage');
+              }}
+              color="secondary"
+            >
+              {t('Generate')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          PaperProps={{ elevation: 1 }}
+          open={openGenMediaOptions}
+          onClose={handleCloseGenMediaOptions}
+          fullWidth={true}
+          maxWidth="xs"
+        >
+          <DialogTitle>{t('Select options')}</DialogTitle>
+          <DialogContent>
+            <SimpleRichTextField
+              label={t('Input (describe what you want)')}
+              value={messageInput}
+              onChange={(value: string) => setMessageInput(value)}
+              style={{ height: 200 }}
+            />
+            <FormControl style={{ width: '100%', marginTop: 20 }}>
+              <InputLabel id="messageTone">{t('Tone')}</InputLabel>
+              <Select
+                labelId="messageTone"
+                value={messageTone}
+                onChange={(event) => setMessageTone(event.target.value as unknown as 'informal' | 'formal' | 'assertive' | 'sarcastic' | 'authoritative' | 'bitter' | 'critical' | 'arrogant' | 'aggressive')}
+                fullWidth={true}
+              >
+                <MenuItem value="formal">{t('Formal')}</MenuItem>
+                <MenuItem value="informal">{t('Informal')}</MenuItem>
+                <MenuItem value="authoritative">{t('Authoritative')}</MenuItem>
+                <MenuItem value="assertive">{t('Assertive')}</MenuItem>
+                <MenuItem value="bitter">{t('Bitter')}</MenuItem>
+                <MenuItem value="critical">{t('Critical')}</MenuItem>
+                <MenuItem value="arrogant">{t('Arrogant')}</MenuItem>
+                <MenuItem value="aggressive">{t('Aggressive')}</MenuItem>
+                <MenuItem value="sarcastic">{t('Sarcastic')}</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label={t('Author')}
+              fullWidth={true}
+              value={messageSender}
+              onChange={(event) => setMessageSender(event.target.value)}
+              style={{ marginTop: 20 }}
+            />
+            <TextField
+              label={t('Number of paragraphs')}
+              fullWidth={true}
+              type="number"
+              value={messageParagraphs}
+              onChange={(event) => setMessageParagraphs(Number.isNaN(parseInt(event.target.value, 10)) ? 1 : parseInt(event.target.value, 10))}
+              style={{ marginTop: 20 }}
+            />
+            <TextField
+              style={{ marginTop: 20 }}
+              label={t('Context')}
+              fullWidth={true}
+              multiline={true}
+              value={messageContext}
+              rows={5}
+              onChange={(event) => setMessageContext(event.target.value)}
+            />
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseToneOptions}>
@@ -254,8 +374,8 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
             </Button>
             <Button
               onClick={() => {
-                handleCloseGenMessageOptions();
-                handleAskAi('genMessage');
+                handleCloseGenMediaOptions();
+                handleAskAi('genMedia');
               }}
               color="secondary"
             >
@@ -291,6 +411,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               {t('Cancel')}
             </Button>
             <Button
+              disabled={messageInput.length < 5}
               onClick={() => {
                 handleCloseToneOptions();
                 handleAskAi('tone');

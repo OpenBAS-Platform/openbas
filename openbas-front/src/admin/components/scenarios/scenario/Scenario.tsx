@@ -9,7 +9,6 @@ import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-hel
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
-import { fetchExercises } from '../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import ExerciseList from '../../simulations/ExerciseList';
 import ScenarioDistributionByExercise from './ScenarioDistributionByExercise';
@@ -21,6 +20,7 @@ import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import ItemSeverity from '../../../../components/ItemSeverity';
 import type { KillChainPhase } from '../../../../utils/api-types';
+import { fetchScenarioExercises } from '../../../../actions/scenarios/scenario-actions';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -57,7 +57,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
     exercises: helper.getExercisesMap(),
   }));
   useDataLoader(() => {
-    dispatch(fetchExercises());
+    dispatch(fetchScenarioExercises(scenarioId));
   });
   const scenarioExercises = scenario.scenario_exercises?.map((exerciseId: string) => exercises[exerciseId]).filter((ex: ExerciseStore) => !!ex);
   return (

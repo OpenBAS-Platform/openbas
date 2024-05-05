@@ -130,6 +130,10 @@ public class ScenarioService {
         .orElseThrow(() -> new IllegalStateException("Scenario not found"));
   }
 
+  public Scenario scenarioByExternalReference(@NotBlank final String scenarioExternalReference) {
+    return this.scenarioRepository.findByExternalReference(scenarioExternalReference)
+            .orElseThrow(() -> new IllegalStateException("Scenario not found"));
+  }
   public Scenario updateScenario(@NotNull final Scenario scenario) {
     scenario.setUpdatedAt(now());
     return this.scenarioRepository.save(scenario);

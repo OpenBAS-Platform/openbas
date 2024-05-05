@@ -26,6 +26,7 @@ const RichTextFieldBase = ({
   disabled,
   askAi,
   inInject,
+  context,
 }) => {
   const { t } = useFormatter();
   const classes = useStyles();
@@ -77,6 +78,7 @@ const RichTextFieldBase = ({
           variant="html"
           disabled={disabled}
           inInject={inInject}
+          context={context}
         />
       )}
     </div>

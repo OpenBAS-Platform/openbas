@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 import OldTextField from '../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import OldSelectField from '../../../../components/fields/OldSelectField';
-import MarkDownField from '../../../../components/MarkDownField';
+import MarkDownField from '../../../../components/fields/MarkDownField';
 import DocumentType from '../documents/DocumentType';
 import ItemTags from '../../../../components/ItemTags';
 import DocumentPopover from '../documents/DocumentPopover';

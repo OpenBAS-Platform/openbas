@@ -26,7 +26,6 @@ interface ParsedCron {
 
 const parseCron = (cron: string): ParsedCron => {
   const cronSplits = cron.split(' ');
-
   let owd = false;
   let w = null;
   let d = null;

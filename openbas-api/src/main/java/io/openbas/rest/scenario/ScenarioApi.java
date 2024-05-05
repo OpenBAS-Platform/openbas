@@ -6,6 +6,7 @@ import io.openbas.database.model.User;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
+import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
 import io.openbas.rest.scenario.form.*;
 import io.openbas.service.ImportService;
@@ -80,6 +81,11 @@ public class ScenarioApi {
     return scenarioService.scenario(scenarioId);
   }
 
+  @GetMapping(SCENARIO_URI + "/external_reference/{externalReferenceId}")
+  public Scenario scenarioByExternalId(@PathVariable @NotBlank final String externalReferenceId) {
+    return scenarioService.scenarioByExternalReference(externalReferenceId);
+  }
+
   @PutMapping(SCENARIO_URI + "/{scenarioId}")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario updateScenario(
@@ -140,6 +146,18 @@ public class ScenarioApi {
   public void importScenario(@RequestPart("file") @NotNull MultipartFile file) throws Exception {
     this.importService.handleFileImport(file);
   }
+
+  // -- SIMULATION --
+
+  // region scenarios
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/exercises")
+  @PreAuthorize("isScenarioObserver(#scenarioId)")
+  public Iterable<ExerciseSimple> scenarioExercises(@PathVariable @NotBlank final String scenarioId) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    return scenario.getExercises().stream().map(ExerciseSimple::fromExercise).toList();
+  }
+
+  // endregion
 
   // -- TEAMS --
 
