@@ -51,6 +51,7 @@ export const entitiesInitializer = Immutable({
     scenarios: Immutable({}),
     injectors: Immutable({}),
     collectors: Immutable({}),
+    executors: Immutable({}),
     mitigations: Immutable({}),
   }),
 });

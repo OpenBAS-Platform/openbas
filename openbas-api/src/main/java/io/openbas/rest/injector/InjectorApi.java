@@ -116,18 +116,12 @@ public class InjectorApi extends RestBehavior {
             String name,
             List<InjectorContractInput> contracts,
             Boolean customContracts,
-            Boolean simulationAgent,
-            String[] simulationAgentPlatforms,
-            String simulationAgentDoc,
             String category) {
         injector.setUpdatedAt(Instant.now());
         injector.setType(type);
         injector.setName(name);
         injector.setExternal(true);
         injector.setCustomContracts(customContracts);
-        injector.setSimulationAgent(simulationAgent);
-        injector.setSimulationAgentPlatforms(simulationAgentPlatforms);
-        injector.setSimulationAgentDoc(simulationAgentDoc);
         injector.setCategory(category);
         List<String> existing = new ArrayList<>();
         List<String> toDeletes = new ArrayList<>();
@@ -169,9 +163,6 @@ public class InjectorApi extends RestBehavior {
                 input.getName(),
                 input.getContracts(),
                 input.getCustomContracts(),
-                input.getSimulationAgent(),
-                input.getSimulationAgentPlatforms(),
-                input.getSimulationAgentDoc(),
                 input.getCategory()
         );
     }
@@ -225,9 +216,6 @@ public class InjectorApi extends RestBehavior {
                         input.getName(),
                         input.getContracts(),
                         input.getCustomContracts(),
-                        input.getSimulationAgent(),
-                        input.getSimulationAgentPlatforms(),
-                        input.getSimulationAgentDoc(),
                         input.getCategory()
                 );
             } else {
@@ -237,9 +225,6 @@ public class InjectorApi extends RestBehavior {
                 newInjector.setExternal(true);
                 newInjector.setName(input.getName());
                 newInjector.setType(input.getType());
-                newInjector.setSimulationAgent(input.getSimulationAgent());
-                newInjector.setSimulationAgentPlatforms(input.getSimulationAgentPlatforms());
-                newInjector.setSimulationAgentDoc(input.getSimulationAgentDoc());
                 newInjector.setCategory(input.getCategory());
                 newInjector.setCustomContracts(input.getCustomContracts());
                 Injector savedInjector = injectorRepository.save(newInjector);

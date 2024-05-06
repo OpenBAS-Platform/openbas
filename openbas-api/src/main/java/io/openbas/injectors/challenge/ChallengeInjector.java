@@ -18,8 +18,6 @@ public class ChallengeInjector {
                     CHALLENGE_INJECTOR_NAME,
                     contract,
                     false,
-                    false,
-                    null,
                     "capture-the-flag"
             );
         } catch (Exception e) {

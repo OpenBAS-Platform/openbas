@@ -1,20 +1,39 @@
 import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { Alert, Button, Card, CardActionArea, CardContent, Chip, Dialog, DialogContent, DialogTitle, Grid, Tab, Tabs, TextField, Typography } from '@mui/material';
+import {
+  Alert,
+  Button,
+  Card,
+  CardActionArea,
+  CardContent,
+  Chip,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { ArticleOutlined, ContentCopyOutlined, DownloadingOutlined, TerminalOutlined } from '@mui/icons-material';
-import { Bash, Powershell } from 'mdi-material-ui';
+import { Bash, DownloadCircleOutline, Powershell } from 'mdi-material-ui';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../utils/hooks';
-import type { Injector } from '../../../utils/api-types';
-import type { InjectorHelper } from '../../../actions/injectors/injector-helper';
-import { fetchInjectors } from '../../../actions/Injectors';
+import type { Executor } from '../../../utils/api-types';
+import type { ExecutorHelper } from '../../../actions/executors/executor-helper';
+import { fetchExecutors } from '../../../actions/Executor';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import type { Theme } from '../../../components/Theme';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Transition from '../../../components/common/Transition';
-import { copyToClipboard } from '../../../utils/utils';
+import { copyToClipboard, download } from '../../../utils/utils';
 import useAuth from '../../../utils/hooks/useAuth';
 import PlatformIcon from '../../../components/PlatformIcon';
 
@@ -43,103 +62,121 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Injectors = () => {
+const Executors = () => {
   // Standard hooks
   const theme = useTheme<Theme>();
   const { t } = useFormatter();
   const [platform, setPlatform] = useState<null | string>(null);
-  const [selectedInjectors, setSelectedInjectors] = useState<null | Injector[]>(null);
+  const [selectedExecutors, setSelectedExecutors] = useState<null | Executor[]>(null);
   const [activeTab, setActiveTab] = useState<null | string>(null);
-  const [implantName, setImplantName] = useState('splunkd');
-  const [implantFolder, setImplantFolder] = useState('C:\\Users\\Public\\');
+  const [agentFolder, setAgentFolder] = useState<null | string>(null);
+  const [arch, setArch] = useState<string>('amd64');
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
   // Filter and sort hook
   const searchColumns = ['name', 'description'];
   const filtering = useSearchAnFilter(
-    'injector',
+    'executor',
     'name',
     searchColumns,
   );
 
   // Fetching data
   const { settings } = useAuth();
-  const { injectors } = useHelper((helper: InjectorHelper) => ({
-    injectors: helper.getInjectors(),
+  const { executors } = useHelper((helper: ExecutorHelper) => ({
+    executors: helper.getExecutors(),
   }));
   useDataLoader(() => {
-    dispatch(fetchInjectors());
+    dispatch(fetchExecutors());
   });
-  const sortedInjectors = filtering.filterAndSort(injectors);
-  const windowsInjectors = sortedInjectors.filter((injector: Injector) => injector.injector_simulation_agent_platforms?.includes('Windows'));
-  const linuxInjectors = sortedInjectors.filter((injector: Injector) => injector.injector_simulation_agent_platforms?.includes('Linux'));
-  const macOsInjectors = sortedInjectors.filter((injector: Injector) => injector.injector_simulation_agent_platforms?.includes('MacOS'));
-  const browserInjectors = sortedInjectors.filter((injector: Injector) => injector.injector_simulation_agent_platforms?.some((n) => ['Chrome', 'Firefox', 'Edge', 'Safari'].includes(n)));
+  const sortedExecutors = filtering.filterAndSort(executors);
+  const windowsExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.includes('Windows'));
+  const linuxExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.includes('Linux'));
+  const macOsExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.includes('MacOS'));
+  const browserExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.some((n) => ['Chrome', 'Firefox', 'Edge', 'Safari'].includes(n)));
 
   // Selection
   const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
     setActiveTab(newValue);
   };
-  const openInstall = (selectedPlatform: string, openInjectors: Injector[]) => {
+  const openInstall = (selectedPlatform: string, openExecutors: Executor[]) => {
     setPlatform(selectedPlatform);
-    setSelectedInjectors(openInjectors);
-    setActiveTab((openInjectors ?? []).at(0)?.injector_type ?? null);
+    setSelectedExecutors(openExecutors);
+    setActiveTab((openExecutors ?? []).at(0)?.executor_type ?? null);
   };
   const closeInstall = () => {
     setPlatform(null);
-    setSelectedInjectors(null);
+    setSelectedExecutors(null);
     setActiveTab(null);
-    setImplantName('splunkd');
+    setAgentFolder(null);
+    setArch('amd64');
   };
-  const currentSelectedInjector = (selectedInjectors ?? []).filter((injector) => injector.injector_type === activeTab).at(0);
+  const currentSelectedExecutor = (selectedExecutors ?? []).filter((executor) => executor.executor_type === activeTab).at(0);
   const platformSelector = () => {
     switch (platform) {
       case 'windows':
         return {
           icon: <Powershell />,
           label: 'powershell',
+          defaultAgentFolder: 'C:\\Program Files\\OpenBAS',
+          exclusions: `${agentFolder ?? 'C:\\Program Files\\OpenBAS'}
+${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe`,
           displayedCode: `$server="${settings.caldera_public_url}";
 $url="$server/file/download";
 $wc=New-Object System.Net.WebClient;
-$wc.Headers.add("pl7atform","windows");
+$wc.Headers.add("platform","windows");
 $wc.Headers.add("file","sandcat.go");
 $data=$wc.DownloadData($url);
-get-process | ? {$_.modules.filename -like "${implantFolder.endsWith('\\') ? implantFolder : `${implantFolder}\\`}${implantName}.exe"} | stop-process -f;
-rm -force "${implantFolder.endsWith('\\') ? implantFolder : `${implantFolder}\\`}${implantName}.exe" -ea ignore;
-[io.file]::WriteAllBytes("${implantFolder.endsWith('\\') ? implantFolder : `${implantFolder}\\`}${implantName}.exe",$data) | Out-Null;
-Start-Process -FilePath ${implantFolder.endsWith('\\') ? implantFolder : `${implantFolder}\\`}${implantName}.exe -ArgumentList "-server $server -group red" -WindowStyle hidden;`,
-          code: `$server="${settings.caldera_public_url}";$url="$server/file/download";$wc=New-Object System.Net.WebClient;$wc.Headers.add("platform","windows");$wc.Headers.add("file","sandcat.go");$data=$wc.DownloadData($url);get-process | ? {$_.modules.filename -like "${implantFolder.endsWith('\\') ? implantFolder : `${implantFolder}\\`}${implantName}.exe"} | stop-process -f;rm -force "${implantFolder.endsWith('\\') ? implantFolder : `${implantFolder}\\`}${implantName}.exe" -ea ignore;[io.file]::WriteAllBytes("${implantFolder.endsWith('\\') ? implantFolder : `${implantFolder}\\`}${implantName}.exe",$data) | Out-Null;Start-Process -FilePath ${implantFolder.endsWith('\\') ? implantFolder : `${implantFolder}\\`}${implantName}.exe -ArgumentList "-server $server -group red" -WindowStyle hidden;`,
+get-process | ? {$_.modules.filename -like '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe'} | stop-process -f;
+rm -force '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' -ea ignore;
+New-Item -ItemType Directory -Force -Path '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}' | Out-Null;
+[io.file]::WriteAllBytes('${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe',$data) | Out-Null;
+Start-Process -FilePath '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' -ArgumentList "-server $server -group red" -WindowStyle hidden;
+New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" -Name "OpenBAS" -Value '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' | Out-Null;`,
+          code: `$server="${settings.caldera_public_url}";$url="$server/file/download";$wc=New-Object System.Net.WebClient;$wc.Headers.add("platform","windows");$wc.Headers.add("file","sandcat.go");$data=$wc.DownloadData($url);get-process | ? {$_.modules.filename -like '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe'} | stop-process -f;rm -force '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' -ea ignore;New-Item -ItemType Directory -Force -Path '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}' | Out-Null;[io.file]::WriteAllBytes('${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe',$data) | Out-Null;Start-Process -FilePath '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' -ArgumentList "-server $server -group red" -WindowStyle hidden;New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" -Name "OpenBAS" -Value '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' | Out-Null;`,
         };
       case 'linux':
         return {
           icon: <Bash />,
           label: 'sh',
+          defaultAgentFolder: '/opt/openbas',
+          exclusions: `${agentFolder ?? '/opt/openbas'}
+${agentFolder ?? '/opt/openbas/obas'}`,
           displayedCode: `server="${settings.caldera_public_url}";
-curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${implantName};
-chmod +x ${implantName};
-./${implantName} -server $server -group red -v`,
-          code: `server="${settings.caldera_public_url}";curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${implantName};chmod +x ${implantName};./${implantName} -server $server -group red -v`,
+mkdir -p ${agentFolder ?? '/opt/openbas'};
+curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${agentFolder ?? '/opt/openbas'}/obas;
+chmod +x ${agentFolder ?? '/opt/openbas'}/obas;
+nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
+          code: `server="${settings.caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas'};curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${agentFolder ?? '/usr/bin'}/obas;chmod +x ${agentFolder ?? '/usr/bin'}/obas;nohup ${agentFolder ?? '/usr/bin'}/obas -server $server -group red &`,
         };
       case 'macos':
         return {
           icon: <TerminalOutlined />,
           label: 'sh',
+          defaultAgentFolder: '/opt/openbas',
+          exclusions: `${agentFolder ?? '/opt/openbas'}
+${agentFolder ?? '/opt/openbas/obas'}`,
           displayedCode: `server="${settings.caldera_public_url}";
-curl -s -X POST -H "file:sandcat.go" -H "platform:darwin" -H "architecture:amd64" $server/file/download > ${implantName};
-chmod +x ${implantName};
-./${implantName} -server $server -v`,
-          code: `server="${settings.caldera_public_url}";curl -s -X POST -H "file:sandcat.go" -H "platform:darwin" -H "architecture:amd64" $server/file/download > ${implantName};chmod +x ${implantName};./${implantName} -server $server -v`,
+mkdir -p ${agentFolder ?? '/opt/openbas'};
+curl -s -X POST -H "file:sandcat.go" -H "platform:darwin" -H "architecture:${arch}" $server/file/download > ${agentFolder ?? '/opt/openbas'}/obas;
+chmod +x ${agentFolder ?? '/opt/openbas'}/obas;
+nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
+          code: `server="${settings.caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas'};curl -s -X POST -H "file:sandcat.go" -H "platform:darwin" -H "architecture:${arch}" $server/file/download > ${agentFolder ?? '/usr/bin'}/obas;chmod +x ${agentFolder ?? '/usr/bin'}/obas;nohup ${agentFolder ?? '/usr/bin'}/obas -server $server -group red &`,
         };
       default:
         return {
-          icon: <TerminalOutlined />,
+          icon: <Bash />,
           label: 'sh',
+          defaultAgentFolder: '/opt/openbas',
+          exclusions: `${agentFolder ?? '/opt/openbas'}
+${agentFolder ?? '/opt/openbas/obas'}`,
           displayedCode: `server="${settings.caldera_public_url}";
-curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${implantName};
-chmod +x ${implantName};
-./${implantName} -server $server -group red -v`,
-          code: `server="${settings.caldera_public_url}";curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${implantName};chmod +x ${implantName};./${implantName} -server $server -group red -v`,
+mkdir -p ${agentFolder ?? '/opt/openbas'};
+curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${agentFolder ?? '/opt/openbas'}/obas;
+chmod +x ${agentFolder ?? '/opt/openbas'}/obas;
+nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
+          code: `server="${settings.caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas'};curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${agentFolder ?? '/usr/bin'}/obas;chmod +x ${agentFolder ?? '/usr/bin'}/obas;nohup ${agentFolder ?? '/usr/bin'}/obas -server $server -group red &`,
         };
     }
   };
@@ -147,13 +184,13 @@ chmod +x ${implantName};
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Agents'), current: true }]} />
       <Alert variant="outlined" severity="info" style={{ marginBottom: 30 }}>
-        {t('Here, you can download and install simulation agents available in your injectors. Depending on the integrations you have enabled, some of them may be unavailable.')}<br /><br />
+        {t('Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable.')}<br /><br />
         {t('Learn more information about how to setup simulation agents')} <a href="https://docs.openbas.io">{t('in the documentation')}</a>.
       </Alert>
       <Grid container={true} spacing={3}>
         <Grid item={true} xs={3}>
           <Card classes={{ root: classes.card }} variant="outlined">
-            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('windows', windowsInjectors)} disabled={windowsInjectors.length === 0}>
+            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('windows', windowsExecutors)} disabled={windowsExecutors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
                   <PlatformIcon platform='Windows' width={40} />
@@ -166,18 +203,18 @@ chmod +x ${implantName};
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: windowsInjectors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
+                    color: windowsExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
                   }}
                 >
                   <DownloadingOutlined style={{ marginRight: 10 }} /> Install Windows Agent
                 </Typography>
                 <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {windowsInjectors.map((injector: Injector) => {
+                  {windowsExecutors.map((executor: Executor) => {
                     return (
                       <img
-                        key={injector.injector_id}
-                        src={`/api/images/injectors/${injector.injector_type}`}
-                        alt={injector.injector_type}
+                        key={executor.executor_id}
+                        src={`/api/images/executors/${executor.executor_type}`}
+                        alt={executor.executor_type}
                         style={{ width: 30, height: 30, borderRadius: 4, margin: '0 10px 0 10px' }}
                       />
                     );
@@ -189,7 +226,7 @@ chmod +x ${implantName};
         </Grid>
         <Grid item={true} xs={3}>
           <Card classes={{ root: classes.card }} variant="outlined">
-            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('linux', linuxInjectors)} disabled={linuxInjectors.length === 0}>
+            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('linux', linuxExecutors)} disabled={linuxExecutors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
                   <PlatformIcon platform="Linux" width={40} />
@@ -202,18 +239,18 @@ chmod +x ${implantName};
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: linuxInjectors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
+                    color: linuxExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
                   }}
                 >
                   <DownloadingOutlined style={{ marginRight: 10 }} /> Install Linux Agent
                 </Typography>
                 <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {linuxInjectors.map((injector: Injector) => {
+                  {linuxExecutors.map((executor: Executor) => {
                     return (
                       <img
-                        key={injector.injector_id}
-                        src={`/api/images/injectors/${injector.injector_type}`}
-                        alt={injector.injector_type}
+                        key={executor.executor_id}
+                        src={`/api/images/executors/${executor.executor_type}`}
+                        alt={executor.executor_type}
                         style={{ width: 30, height: 30, borderRadius: 4, margin: '0 10px 0 10px' }}
                       />
                     );
@@ -225,7 +262,7 @@ chmod +x ${implantName};
         </Grid>
         <Grid item={true} xs={3}>
           <Card classes={{ root: classes.card }} variant="outlined">
-            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('macos', macOsInjectors)} disabled={macOsInjectors.length === 0}>
+            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('macos', macOsExecutors)} disabled={macOsExecutors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
                   <PlatformIcon platform="MacOS" width={40} />
@@ -238,18 +275,18 @@ chmod +x ${implantName};
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: macOsInjectors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
+                    color: macOsExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
                   }}
                 >
                   <DownloadingOutlined style={{ marginRight: 10 }} /> Install MacOS Agent
                 </Typography>
                 <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {macOsInjectors.map((injector: Injector) => {
+                  {macOsExecutors.map((executor: Executor) => {
                     return (
                       <img
-                        key={injector.injector_id}
-                        src={`/api/images/injectors/${injector.injector_type}`}
-                        alt={injector.injector_type}
+                        key={executor.executor_id}
+                        src={`/api/images/executors/${executor.executor_type}`}
+                        alt={executor.executor_type}
                         style={{ width: 30, height: 30, borderRadius: 4, margin: '0 10px 0 10px' }}
                       />
                     );
@@ -261,7 +298,7 @@ chmod +x ${implantName};
         </Grid>
         <Grid item={true} xs={3}>
           <Card classes={{ root: classes.card }} variant="outlined">
-            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('browser', browserInjectors)} disabled={browserInjectors.length === 0}>
+            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('browser', browserExecutors)} disabled={browserExecutors.length === 0}>
               <CardContent className={classes.content}>
                 <div className={classes.icon}>
                   <PlatformIcon platform="Browser" width={40} />
@@ -274,18 +311,18 @@ chmod +x ${implantName};
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: browserInjectors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
+                    color: browserExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
                   }}
                 >
                   <DownloadingOutlined style={{ marginRight: 10 }} /> Install Browser Agent
                 </Typography>
                 <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {browserInjectors.map((injector: Injector) => {
+                  {browserExecutors.map((executor: Executor) => {
                     return (
                       <img
-                        key={injector.injector_id}
-                        src={`/api/images/injectors/${injector.injector_type}`}
-                        alt={injector.injector_type}
+                        key={executor.executor_id}
+                        src={`/api/images/executors/${executor.executor_type}`}
+                        alt={executor.executor_type}
                         style={{ width: 30, height: 30, borderRadius: 4, margin: '0 10px 0 10px' }}
                       />
                     );
@@ -307,43 +344,79 @@ chmod +x ${implantName};
         <DialogTitle>Install a simulation agent</DialogTitle>
         <DialogContent>
           <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">
-            {(selectedInjectors ?? []).map((injector) => {
+            {(selectedExecutors ?? []).map((executor) => {
               return (
-                <Tab key={injector.injector_id} label={injector.injector_name} value={injector.injector_type}/>
+                <Tab key={executor.executor_id} label={executor.executor_name} value={executor.executor_type}/>
               );
             })}
           </Tabs>
-          {currentSelectedInjector && (
+          {currentSelectedExecutor && (
           <div style={{ marginTop: 20 }}>
-            <Alert variant="outlined" severity="info">
-              Installation instruction for the {currentSelectedInjector.injector_name} simulation agents.
-            </Alert>
-            {currentSelectedInjector.injector_name === 'Caldera' ? (
+            {currentSelectedExecutor.executor_name === 'Caldera' ? (
               <div style={{ marginTop: 20 }}>
-                <Chip
-                  variant="outlined"
-                  icon={platformSelector().icon}
-                  classes={{ root: classes.chip }}
-                  label={platformSelector().label}
-                />
+                <Alert variant="outlined" severity="info">
+                  {t('For the moment, OpenBAS is using Caldera as an agent to execute the sequence of security validations. In the future, the Filigran XTM agent will replace it.')}
+                </Alert>
                 <TextField
-                  label={t('Implant name')}
+                  label={t('Installation path')}
                   fullWidth={true}
-                  value={implantName}
-                  onChange={(event) => setImplantName(event.target.value)}
-                  style={{ marginTop: 10 }}
+                  value={agentFolder ?? platformSelector().defaultAgentFolder}
+                  onChange={(event) => setAgentFolder(event.target.value)}
+                  style={{ marginTop: 20 }}
                 />
-                {platform === 'windows' && (
-                  <TextField
-                    label={t('Implant folder')}
-                    fullWidth={true}
-                    value={implantFolder}
-                    onChange={(event) => setImplantFolder(event.target.value)}
-                    style={{ marginTop: 20 }}
-                  />
+                {platform === 'macos' && (
+                  <FormControl style={{ width: '100%', marginTop: 20 }}>
+                    <InputLabel id="arch">{t('Architecture')}</InputLabel>
+                    <Select
+                      labelId="arch"
+                      value={arch}
+                      onChange={(event) => setArch(event.target.value ?? 'amd64')}
+                      fullWidth={true}
+                    >
+                      <MenuItem value="amd64">{t('AMD64')}</MenuItem>
+                      <MenuItem value="arm64">{t('ARM64')}</MenuItem>
+                    </Select>
+                  </FormControl>
                 )}
-                <pre style={{ margin: '25px 0 10px 0' }}><code>{platformSelector().displayedCode}</code></pre>
-                <Button variant="outlined" style={{ width: '100%', marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformSelector().code)}>{t('Copy')}</Button>
+                <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 1 - Add antivirus exclusions')}</Typography>
+                <Alert variant="outlined" severity="info">
+                  {t('The agent will never execute directly any payload.')}
+                </Alert>
+                <p>
+                  {t('You will need to add proper antivirus exclusion for this agent. It may not be necessary in the future with the signed XTM agent but this is generally a good practice to ensure the agent will be always available.')}
+                </p>
+                <pre style={{ margin: '20px 0 10px 0' }}>{platformSelector().exclusions}</pre>
+                <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 2 - Install the agent')}</Typography>
+                <Alert variant="outlined" severity="info">
+                  {t('Installing the agent is requiring local administrator privileges.')}
+                </Alert>
+                {platform === 'windows' && (
+                  <>
+                    <p>
+                      {t('You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
+                    </p>
+                    <pre style={{ margin: '20px 0 10px 0' }}>{platformSelector().displayedCode}</pre>
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
+                      <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformSelector().code)}>{t('Copy')}</Button>
+                      <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformSelector().displayedCode, 'openbas.ps1', 'text/plain')}>{t('Download')}</Button>
+                    </div>
+                  </>
+                )}
+                {platform !== 'windows' && (
+                <>
+                  <p>
+                    {t('You can whether directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
+                  </p>
+                  <Alert variant="outlined" severity="warning">
+                    {t('For the moment, the following snippet or script will not add the agent at boot. Please be sure to add it in rc.local or other files to make it persistent. We will release proper packages in the near future.')}
+                  </Alert>
+                  <pre style={{ margin: '20px 0 10px 0' }}>{platformSelector().displayedCode}</pre>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
+                    <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformSelector().code)}>{t('Copy')}</Button>
+                    <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformSelector().displayedCode, 'openbas.sh', 'text/plain')}>{t('Download')}</Button>
+                  </div>
+                </>
+                )}
               </div>
             ) : (
               <div style={{ marginTop: 20 }}>
@@ -354,7 +427,7 @@ chmod +x ${implantName};
                   label={t('documentation')}
                 />
                 <Typography variant="body1" style={{ marginBottom: 20 }}>
-                  To install the agent please follow the <a target="_blank" href={currentSelectedInjector.injector_simulation_agent_doc} rel="noreferrer">{currentSelectedInjector.injector_name} documentation</a>.
+                  To install the agent please follow the <a target="_blank" href={currentSelectedExecutor.executor_doc} rel="noreferrer">{currentSelectedExecutor.executor_name} documentation</a>.
                 </Typography>
               </div>
             )}
@@ -366,4 +439,4 @@ chmod +x ${implantName};
   );
 };
 
-export default Injectors;
+export default Executors;

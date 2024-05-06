@@ -5,9 +5,9 @@ import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useAppDispatch } from '../../../utils/hooks';
-import type { Collector } from '../../../utils/api-types';
-import type { CollectorHelper } from '../../../actions/collectors/collector-helper';
-import { fetchCollectors } from '../../../actions/Collector';
+import type { Executor } from '../../../utils/api-types';
+import type { ExecutorHelper } from '../../../actions/executors/executor-helper';
+import { fetchExecutors } from '../../../actions/Executor';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import SearchFilter from '../../../components/SearchFilter';
 import type { Theme } from '../../../components/Theme';
@@ -41,15 +41,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.success.main,
     borderRadius: '50%',
   },
-  dotRed: {
-    height: 15,
-    width: 15,
-    backgroundColor: theme.palette.error.main,
-    borderRadius: '50%',
-  },
 }));
 
-const Collectors = () => {
+const Executors = () => {
   // Standard hooks
   const { t, nsdt } = useFormatter();
   const classes = useStyles();
@@ -58,22 +52,22 @@ const Collectors = () => {
   // Filter and sort hook
   const searchColumns = ['name', 'description'];
   const filtering = useSearchAnFilter(
-    'collector',
+    'executor',
     'name',
     searchColumns,
   );
 
   // Fetching data
-  const { collectors } = useHelper((helper: CollectorHelper) => ({
-    collectors: helper.getCollectors(),
+  const { executors } = useHelper((helper: ExecutorHelper) => ({
+    executors: helper.getExecutors(),
   }));
   useDataLoader(() => {
-    dispatch(fetchCollectors());
+    dispatch(fetchExecutors());
   });
-  const sortedCollectors = filtering.filterAndSort(collectors);
+  const sortedExecutors = filtering.filterAndSort(executors);
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Integrations') }, { label: t('Collectors'), current: true }]} />
+      <Breadcrumbs variant="list" elements={[{ label: t('Integrations') }, { label: t('Executors'), current: true }]} />
       <div className={classes.parameters}>
         <div style={{ float: 'left', marginRight: 10 }}>
           <SearchFilter
@@ -85,16 +79,16 @@ const Collectors = () => {
       </div>
       <div className="clearfix" />
       <Grid container={true} spacing={3}>
-        {sortedCollectors.map((collector: Collector) => {
+        {sortedExecutors.map((executor: Executor) => {
           return (
-            <Grid key={collector.collector_id} item={true} xs={3}>
+            <Grid key={executor.executor_id} item={true} xs={3}>
               <Card classes={{ root: classes.card }} variant="outlined">
                 <CardContent className={classes.content}>
                   <div style={{ display: 'flex' }}>
                     <div className={classes.icon}>
                       <img
-                        src={`/api/images/collectors/${collector.collector_type}`}
-                        alt={collector.collector_type}
+                        src={`/api/images/executors/${executor.executor_type}`}
+                        alt={executor.executor_type}
                         style={{ width: 50, height: 50, borderRadius: 4 }}
                       />
                     </div>
@@ -107,21 +101,18 @@ const Collectors = () => {
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {collector.collector_name}
+                      {executor.executor_name}
                     </Typography>
                   </div>
                   <Chip
                     variant="outlined"
                     classes={{ root: classes.chipInList }}
                     style={{ width: 120 }}
-                    color={collector.collector_external ? 'primary' : 'secondary'}
-                    label={t(collector.collector_external ? 'External' : 'Built-in')}
+                    color='secondary'
+                    label={t('Built-in')}
                   />
                   <div style={{ display: 'flex', marginTop: 30 }}>
-                    {
-                    (collector.collector_external && collector.collector_updated_at) || !collector.collector_external
-                      ? <div className={classes.dotGreen} /> : <div className={classes.dotRed} />
-                  }
+                    <div className={classes.dotGreen} />
                     <Typography
                       variant="h4"
                       style={{
@@ -131,7 +122,7 @@ const Collectors = () => {
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {t('Updated at')} {nsdt(collector.collector_updated_at)}
+                      {t('Updated at')} {nsdt(executor.executor_updated_at)}
                     </Typography>
                   </div>
                 </CardContent>
@@ -144,4 +135,4 @@ const Collectors = () => {
   );
 };
 
-export default Collectors;
+export default Executors;

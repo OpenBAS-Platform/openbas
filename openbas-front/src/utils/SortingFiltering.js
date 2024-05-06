@@ -7,7 +7,7 @@ const useSearchAnFilter = (
   schema,
   defaultSortKey,
   searchColumns,
-  options, // {orderAsc, defaultKeyword }
+  options = {}, // {orderAsc, defaultKeyword }
 ) => {
   const { t } = useFormatter();
   const [order, setOrder] = useState({

@@ -17,6 +17,18 @@ export const copyToClipboard = (t: (text: string) => string, text: string) => {
   MESSAGING$.notifySuccess(t('Copied to clipboard'));
 };
 
+export const download = (content: string, filename: string, contentType: string | undefined) => {
+  let finalContentType = contentType;
+  if (!contentType) {
+    finalContentType = 'application/octet-stream';
+  }
+  const a = document.createElement('a');
+  const blob = new Blob([content], { type: finalContentType });
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+};
+
 export const removeEmptyFields = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   obj: Record<string, any | undefined>,

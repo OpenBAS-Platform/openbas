@@ -18,8 +18,6 @@ public class EmailInjector {
                     EMAIL_INJECTOR_NAME,
                     contract,
                     false,
-                    false,
-                    null,
                     "communication"
             );
         } catch (Exception e) {

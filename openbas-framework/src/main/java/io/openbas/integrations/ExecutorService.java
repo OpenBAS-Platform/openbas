@@ -1,8 +1,8 @@
 package io.openbas.integrations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.database.model.Collector;
-import io.openbas.database.repository.CollectorRepository;
+import io.openbas.database.model.Executor;
+import io.openbas.database.repository.ExecutorRepository;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 
-import static io.openbas.service.FileService.COLLECTORS_IMAGES_BASE_PATH;
+import static io.openbas.service.FileService.EXECUTORS_IMAGES_BASE_PATH;
 
 @Service
 public class ExecutorService {
@@ -21,7 +21,7 @@ public class ExecutorService {
 
     private FileService fileService;
 
-    private CollectorRepository collectorRepository;
+    private ExecutorRepository executorRepository;
 
     @Resource
     public void setFileService(FileService fileService) {
@@ -29,34 +29,35 @@ public class ExecutorService {
     }
 
     @Autowired
-    public void setCollectorRepository(CollectorRepository collectorRepository) {
-        this.collectorRepository = collectorRepository;
+    public void setExecutorRepository(ExecutorRepository executorRepository) {
+        this.executorRepository = executorRepository;
     }
 
     @Transactional
-    public void register(String id, String type, String name, InputStream iconData) throws Exception {
+    public void register(String id, String type, String name, InputStream iconData, String[] platforms) throws Exception {
         if (iconData != null) {
-            fileService.uploadStream(COLLECTORS_IMAGES_BASE_PATH, type + ".png", iconData);
+            fileService.uploadStream(EXECUTORS_IMAGES_BASE_PATH, type + ".png", iconData);
         }
-        Collector collector = collectorRepository.findById(id).orElse(null);
-        if( collector == null ) {
-            Collector collectorChecking = collectorRepository.findByType(type).orElse(null);
-            if (collectorChecking != null ) {
-                throw new Exception("The collector " + type + " already exists with a different ID, please delete it or contact your administrator.");
+        Executor executor = executorRepository.findById(id).orElse(null);
+        if( executor == null ) {
+            Executor executorChecking = executorRepository.findByType(type).orElse(null);
+            if (executorChecking != null ) {
+                throw new Exception("The executor " + type + " already exists with a different ID, please delete it or contact your administrator.");
             }
         }
-        if (collector != null) {
-            collector.setName(name);
-            collector.setExternal(false);
-            collector.setType(type);
-            collectorRepository.save(collector);
+        if (executor != null) {
+            executor.setName(name);
+            executor.setType(type);
+            executor.setPlatforms(platforms);
+            executorRepository.save(executor);
         } else {
-            // save the collector
-            Collector newCollector = new Collector();
-            newCollector.setId(id);
-            newCollector.setName(name);
-            newCollector.setType(type);
-            collectorRepository.save(newCollector);
+            // save the executor
+            Executor newExecutor = new Executor();
+            newExecutor.setId(id);
+            newExecutor.setName(name);
+            newExecutor.setType(type);
+            newExecutor.setPlatforms(platforms);
+            executorRepository.save(newExecutor);
         }
     }
 

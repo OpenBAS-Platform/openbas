@@ -249,6 +249,13 @@ export const collector = new schema.Entity(
 );
 export const arrayOfCollectors = new schema.Array(collector);
 
+export const executor = new schema.Entity(
+  'executors',
+  {},
+  { idAttribute: 'executor_id' },
+);
+export const arrayOfExecutors = new schema.Array(executor);
+
 export const payload = new schema.Entity(
   'payloads',
   {},
@@ -439,6 +446,10 @@ export const storeHelper = (state) => ({
   getCollector: (id) => entity(id, 'collectors', state),
   getCollectors: () => entities('collectors', state),
   getCollectorsMap: () => maps('collectors', state),
+  // executors
+  getExecutor: (id) => entity(id, 'executors', state),
+  getExecutors: () => entities('executors', state),
+  getExecutorsMap: () => maps('executors', state),
   // channels
   getChannels: () => entities('channels', state),
   getChannel: (id) => entity(id, 'channels', state),

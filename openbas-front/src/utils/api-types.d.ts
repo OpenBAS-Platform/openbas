@@ -1,6 +1,5 @@
 /* eslint-disable */
 /* tslint:disable */
-
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -615,6 +614,31 @@ export interface EvaluationInput {
   evaluation_score?: number;
 }
 
+export interface Executor {
+  /** @format date-time */
+  executor_created_at?: string;
+  executor_doc?: string;
+  executor_id: string;
+  executor_name: string;
+  executor_platforms?: string[];
+  executor_type: string;
+  /** @format date-time */
+  executor_updated_at?: string;
+  updateAttributes?: object;
+}
+
+export interface ExecutorCreateInput {
+  executor_id: string;
+  executor_name: string;
+  executor_platforms?: string[];
+  executor_type: string;
+}
+
+export interface ExecutorUpdateInput {
+  /** @format date-time */
+  executor_last_execution?: string;
+}
+
 export interface Exercise {
   /** @format int64 */
   exercise_all_users_number?: number;
@@ -974,8 +998,6 @@ export interface InjectReceptionInput {
 }
 
 export interface InjectResultDTO {
-  /** Contract */
-  atomic_contract: string;
   /** Attack Patterns */
   inject_attack_patterns: AttackPattern[];
   /** Description */
@@ -1071,9 +1093,6 @@ export interface Injector {
   injector_external?: boolean;
   injector_id: string;
   injector_name: string;
-  injector_simulation_agent?: boolean;
-  injector_simulation_agent_doc?: string;
-  injector_simulation_agent_platforms?: string[];
   injector_type: string;
   /** @format date-time */
   injector_updated_at?: string;
@@ -1101,6 +1120,7 @@ export interface InjectorContract {
   injector_contract_injector?: Injector;
   injector_contract_labels?: Record<string, string>;
   injector_contract_manual?: boolean;
+  injector_contract_needs_executor?: boolean;
   injector_contract_platforms?: string[];
   /** @format date-time */
   injector_contract_updated_at?: string;
@@ -1151,9 +1171,6 @@ export interface InjectorCreateInput {
   injector_custom_contracts?: boolean;
   injector_id: string;
   injector_name: string;
-  injector_simulation_agent?: boolean;
-  injector_simulation_agent_doc?: string;
-  injector_simulation_agent_platforms?: string[];
   injector_type: string;
 }
 
@@ -1167,9 +1184,6 @@ export interface InjectorUpdateInput {
   injector_contracts?: InjectorContractInput[];
   injector_custom_contracts?: boolean;
   injector_name: string;
-  injector_simulation_agent?: boolean;
-  injector_simulation_agent_doc?: string;
-  injector_simulation_agent_platforms?: string[];
 }
 
 export type JsonNode = object;

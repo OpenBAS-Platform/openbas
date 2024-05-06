@@ -3,11 +3,11 @@ package io.openbas.executors.caldera.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.asset.EndpointService;
-import io.openbas.executors.caldera.client.CalderaCollectorClient;
+import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.model.Agent;
 import io.openbas.database.model.Endpoint;
-import io.openbas.integrations.CollectorService;
+import io.openbas.integrations.ExecutorService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;
@@ -30,10 +30,10 @@ import static java.util.stream.Collectors.groupingBy;
 @Service
 public class CalderaExecutorService implements Runnable {
 
-  private static final String CALDERA_COLLECTOR_TYPE = "openbas_caldera";
-  private static final String CALDERA_COLLECTOR_NAME = "Caldera";
+  private static final String CALDERA_EXECUTOR_TYPE = "openbas_caldera";
+  private static final String CALDERA_EXECUTOR_NAME = "Caldera";
 
-  private final CalderaCollectorClient client;
+  private final CalderaExecutorClient client;
   private final CalderaExecutorConfig config;
 
   private final EndpointService endpointService;
@@ -50,15 +50,15 @@ public class CalderaExecutorService implements Runnable {
   }
 
   @Autowired
-  public CalderaExecutorService(CollectorService collectorService, CalderaCollectorClient client,
+  public CalderaExecutorService(ExecutorService executorService, CalderaExecutorClient client,
                                 CalderaExecutorConfig config, EndpointService endpointService) {
     this.client = client;
     this.config = config;
     this.endpointService = endpointService;
     try {
-      collectorService.register(this.config.getId(), CALDERA_COLLECTOR_TYPE, CALDERA_COLLECTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"));
+      executorService.register(this.config.getId(), CALDERA_EXECUTOR_TYPE, CALDERA_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"),  new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
     } catch (Exception e) {
-      log.log(Level.SEVERE, "Error creating caldera collector: " + e);
+      log.log(Level.SEVERE, "Error creating caldera executor: " + e);
     }
   }
 
@@ -107,7 +107,7 @@ public class CalderaExecutorService implements Runnable {
       });
       this.endpointService.createEndpoints(toCreate);
       this.endpointService.updateEndpoints(toUpdate);
-      log.info("Caldera collector provisioning based on " + (toCreate.size() + toUpdate.size()) + " assets");
+      log.info("Caldera executor provisioning based on " + (toCreate.size() + toUpdate.size()) + " assets");
     } catch (ClientProtocolException | JsonProcessingException e) {
       log.log(Level.SEVERE, "Error running caldera service");
     }
@@ -116,16 +116,16 @@ public class CalderaExecutorService implements Runnable {
   // -- PRIVATE --
 
   private List<Endpoint> toEndpoint(@NotNull final List<Agent> agents) {
-    final String collectorId = this.config.getId();
+    final String executorId = this.config.getId();
     return agents.stream()
         .map((agent) -> {
           Endpoint endpoint = new Endpoint();
           endpoint.setSources(new HashMap<>() {{
-            put(collectorId, agent.getPaw());
+            put(executorId, agent.getPaw());
           }});
           endpoint.setBlobs(new HashMap<>() {{
             try {
-              put(collectorId, objectMapper.writeValueAsString(agent));
+              put(executorId, objectMapper.writeValueAsString(agent));
             } catch (JsonProcessingException e) {
               throw new RuntimeException(e);
             }

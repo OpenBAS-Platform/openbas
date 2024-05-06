@@ -25,6 +25,7 @@ import {
   SettingsOutlined,
   SmartButtonOutlined,
   SubscriptionsOutlined,
+  TerminalOutlined,
 } from '@mui/icons-material';
 import { DramaMasks, NewspaperVariantMultipleOutline, PostOutline, SelectGroup, Target } from 'mdi-material-ui';
 import { createStyles, makeStyles, styled, useTheme } from '@mui/styles';
@@ -586,6 +587,7 @@ const LeftBar = () => {
             [
               { type: 'Injectors', link: '/admin/integrations/injectors', label: 'Injectors', icon: <SmartButtonOutlined fontSize="small" /> },
               { type: 'Collectors', link: '/admin/integrations/collectors', label: 'Collectors', icon: <OnlinePredictionOutlined fontSize="small" /> },
+              { type: 'Executors', link: '/admin/integrations/executors', label: 'Executors', icon: <TerminalOutlined fontSize="small" /> },
             ],
           )}
         </MenuList>

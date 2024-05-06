@@ -289,6 +289,17 @@ public class DocumentApi extends RestBehavior {
         return null;
     }
 
+    @GetMapping(value = "/api/images/executors/{executorId}", produces = MediaType.IMAGE_PNG_VALUE)
+    public @ResponseBody ResponseEntity<byte[]> getExecutorImage(@PathVariable String executorId) throws IOException {
+        Optional<InputStream> fileStream = fileService.getExecutorImage(executorId);
+        if (fileStream.isPresent()) {
+            return ResponseEntity.ok()
+                    .cacheControl(CacheControl.maxAge(5, TimeUnit.MINUTES))
+                    .body(IOUtils.toByteArray(fileStream.get()));
+        }
+        return null;
+    }
+
     private List<Document> getExercisePlayerDocuments(Exercise exercise) {
         List<Article> articles = exercise.getArticles();
         List<Inject> injects = exercise.getInjects();

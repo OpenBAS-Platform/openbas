@@ -61,7 +61,7 @@ public class InjectorService {
     }
 
     @Transactional
-    public void register(String id, String name, Contractor contractor, Boolean isCustomizable, Boolean isSimulationAgent, String[] simulationPlatforms, String category) throws Exception {
+    public void register(String id, String name, Contractor contractor, Boolean isCustomizable, String category) throws Exception {
         if(!contractor.isExpose()) {
             return;
         }
@@ -84,8 +84,6 @@ public class InjectorService {
             injector.setExternal(false);
             injector.setCustomContracts(isCustomizable);
             injector.setType(contractor.getType());
-            injector.setSimulationAgent(isSimulationAgent);
-            injector.setSimulationAgentPlatforms(simulationPlatforms);
             injector.setCategory(category);
             List<String> existing = new ArrayList<>();
             List<InjectorContract> toUpdates = new ArrayList<>();
@@ -100,6 +98,7 @@ public class InjectorService {
                     contract.setManual(current.get().isManual());
                     contract.setAtomicTesting(current.get().isAtomicTesting());
                     contract.setPlatforms(current.get().getPlatforms().toArray(new String[0]));
+                    contract.setNeedsExecutor(current.get().isNeedsExecutor());
                     Map<String, String> labels = current.get().getLabel().entrySet().stream()
                             .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
                     contract.setLabels(labels);
@@ -126,6 +125,7 @@ public class InjectorService {
                 injectorContract.setManual(in.isManual());
                 injectorContract.setAtomicTesting(in.isAtomicTesting());
                 injectorContract.setPlatforms(in.getPlatforms().toArray(new String[0]));
+                injectorContract.setNeedsExecutor(in.isNeedsExecutor());
                 Map<String, String> labels = in.getLabel().entrySet().stream()
                         .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
                 injectorContract.setLabels(labels);
@@ -154,8 +154,6 @@ public class InjectorService {
             newInjector.setId(id);
             newInjector.setName(name);
             newInjector.setType(contractor.getType());
-            newInjector.setSimulationAgent(isSimulationAgent);
-            newInjector.setSimulationAgentPlatforms(simulationPlatforms);
             newInjector.setCategory(category);
             Injector savedInjector = injectorRepository.save(newInjector);
             // Save the contracts
@@ -164,6 +162,8 @@ public class InjectorService {
                 injectorContract.setId(in.getId());
                 injectorContract.setManual(in.isManual());
                 injectorContract.setAtomicTesting(in.isAtomicTesting());
+                injectorContract.setPlatforms(in.getPlatforms().toArray(new String[0]));
+                injectorContract.setNeedsExecutor(in.isNeedsExecutor());
                 Map<String, String> labels = in.getLabel().entrySet().stream()
                         .collect(Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
                 injectorContract.setLabels(labels);

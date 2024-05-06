@@ -18,8 +18,6 @@ public class OpenCTIInjector {
                     OPENCTI_INJECTOR_NAME,
                     contract,
                     true,
-                    false,
-                    null,
                     "incident-response"
             );
         } catch (Exception e) {

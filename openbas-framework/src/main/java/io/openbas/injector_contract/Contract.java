@@ -51,6 +51,10 @@ public class Contract {
     private boolean isAtomicTesting = true;
 
     @Setter
+    @JsonProperty("needs_executor")
+    private boolean needsExecutor = false;
+
+    @Setter
     @JsonProperty("platforms")
     private List<String> platforms = new ArrayList<>();
 
@@ -60,13 +64,15 @@ public class Contract {
         @NotEmpty final Map<SupportedLanguage, String> label,
         final boolean manual,
         @NotEmpty final List<ContractElement> fields,
-        final List<String> platforms
+        final List<String> platforms,
+        final boolean needsExecutor
     ) {
         this.config = config;
         this.id = id;
         this.label = label;
         this.manual = manual;
         this.fields = fields;
+        this.needsExecutor = needsExecutor;
         this.platforms = platforms;
 
         // Default variables linked to ExecutionContext
@@ -85,8 +91,9 @@ public class Contract {
         @NotBlank final String id,
         @NotEmpty final Map<SupportedLanguage, String> label,
         @NotEmpty final List<ContractElement> fields,
-        final List<String> platforms) {
-        Contract contract = new Contract(config, id, label, true, fields, platforms == null ? List.of(Endpoint.PLATFORM_TYPE.Generic.name()) : platforms);
+        final List<String> platforms,
+        final boolean needsExecutor) {
+        Contract contract = new Contract(config, id, label, true, fields, platforms == null ? List.of(Endpoint.PLATFORM_TYPE.Generic.name()) : platforms, needsExecutor);
         contract.setAtomicTesting(false);
         return contract;
     }
@@ -96,9 +103,10 @@ public class Contract {
         @NotBlank final String id,
         @NotEmpty final Map<SupportedLanguage, String> label,
         @NotEmpty final List<ContractElement> fields,
-        final List<String> platforms
+        final List<String> platforms,
+        final boolean needsExecutor
         ) {
-        return new Contract(config, id, label, false, fields, platforms == null ? List.of(Endpoint.PLATFORM_TYPE.Generic.name()) : platforms);
+        return new Contract(config, id, label, false, fields, platforms == null ? List.of(Endpoint.PLATFORM_TYPE.Generic.name()) : platforms, needsExecutor);
     }
 
     public void addContext(String key, String value) {

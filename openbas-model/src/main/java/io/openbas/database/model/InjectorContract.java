@@ -52,6 +52,10 @@ public class InjectorContract implements Base {
     @JsonProperty("injector_contract_custom")
     private Boolean custom = false;
 
+    @Column(name = "injector_contract_needs_executor")
+    @JsonProperty("injector_contract_needs_executor")
+    private Boolean needsExecutor = false;
+
     @Type(StringArrayType.class)
     @Column(name = "injector_contract_platforms", columnDefinition = "text[]")
     @JsonProperty("injector_contract_platforms")

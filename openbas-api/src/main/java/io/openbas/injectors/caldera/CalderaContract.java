@@ -39,123 +39,124 @@ import static io.openbas.helper.SupportedLanguage.fr;
 @RequiredArgsConstructor
 public class CalderaContract extends Contractor {
 
-  public static final String TYPE = "openbas_caldera";
+    public static final String TYPE = "openbas_caldera";
 
-  private final CalderaInjectorConfig config;
-  private final CalderaInjectorService injectorCalderaService;
+    private final CalderaInjectorConfig config;
+    private final CalderaInjectorService injectorCalderaService;
 
-  @Override
-  public boolean isExpose() {
-    return this.config.isEnable();
-  }
-
-  @Override
-  public String getType() {
-    return TYPE;
-  }
-
-  @Override
-  public ContractConfig getConfig() {
-    Map<SupportedLanguage, String> labels = Map.of(en, "Caldera", fr, "Caldera");
-    return new ContractConfig(TYPE, labels, "#8b0000", "#8b0000", "/img/icon-caldera.png", isExpose());
-  }
-
-  @Override
-  public List<Contract> contracts() {
-    if (this.config.isEnable()) {
-      ContractConfig contractConfig = getConfig();
-      // Add contract based on abilities
-      return new ArrayList<>(abilityContracts(contractConfig));
+    @Override
+    public boolean isExpose() {
+        return this.config.isEnable();
     }
-    return List.of();
-  }
 
-  // -- PRIVATE --
+    @Override
+    public String getType() {
+        return TYPE;
+    }
 
-  private ContractSelect obfuscatorField() {
-    List<Obfuscator> obfuscators = this.injectorCalderaService.obfuscators();
-    Map<String, String> obfuscatorChoices = obfuscators.stream()
-        .collect(Collectors.toMap(Obfuscator::getName, Obfuscator::getName));
-    return selectFieldWithDefault(
-        "obfuscator",
-        "Obfuscators",
-        obfuscatorChoices,
-        obfuscatorChoices.keySet().stream().findFirst().orElse("")
-    );
-  }
+    @Override
+    public ContractConfig getConfig() {
+        Map<SupportedLanguage, String> labels = Map.of(en, "Caldera", fr, "Caldera");
+        return new ContractConfig(TYPE, labels, "#8b0000", "#8b0000", "/img/icon-caldera.png", isExpose());
+    }
 
-  private ContractExpectations expectations() {
-    // Prevention
-    Expectation preventionExpectation = new Expectation();
-    preventionExpectation.setType(PREVENTION);
-    preventionExpectation.setName("Expect inject to be prevented");
-    preventionExpectation.setScore(0);
-    // Detection
-    Expectation detectionExpectation = new Expectation();
-    detectionExpectation.setType(DETECTION);
-    detectionExpectation.setName("Expect inject to be detected");
-    detectionExpectation.setScore(0);
-
-    return expectationsField(
-        "expectations", "Expectations", List.of(preventionExpectation, detectionExpectation)
-    );
-  }
-
-  private List<Contract> abilityContracts(@NotNull final ContractConfig contractConfig) {
-    // Fields
-    ContractSelect obfuscatorField = obfuscatorField();
-    ContractAsset assetField = assetField("assets", "Assets", Multiple);
-    ContractAssetGroup assetGroupField = assetGroupField("assetgroups", "Asset groups",
-        Multiple);
-    // Expectations
-    ContractExpectations expectationsField = expectations();
-
-    List<Ability> abilities = this.injectorCalderaService.abilities();
-    // Build contracts
-    return abilities.stream().map((ability -> {
-      ContractDef builder = contractBuilder();
-      builder.mandatory(obfuscatorField);
-      builder.mandatoryGroup(assetField, assetGroupField);
-      builder.optional(expectationsField);
-      List<String> platforms = new ArrayList<>();
-      ability.getExecutors().forEach(executor -> {
-        if( !executor.getPlatform().equals("unknown")) {
-          String platform = toPlatform(executor.getPlatform()).name();
-          if( !platforms.contains(platform) ) {
-            platforms.add(platform);
-          }
-        } else {
-          if (executor.getName().equals("psh") ) {
-            if( !platforms.contains(Endpoint.PLATFORM_TYPE.Windows.name()) ) {
-              platforms.add(Endpoint.PLATFORM_TYPE.Windows.name());
-            }
-          } else if (executor.getName().equals("sh") ) {
-            if( !platforms.contains(Endpoint.PLATFORM_TYPE.Linux.name()) ) {
-              platforms.add(Endpoint.PLATFORM_TYPE.Linux.name());
-            }
-          } else if (executor.getName().equals("cmd") ) {
-            if( !platforms.contains(Endpoint.PLATFORM_TYPE.Windows.name()) ) {
-              platforms.add(Endpoint.PLATFORM_TYPE.Windows.name());
-            }
-          }
+    @Override
+    public List<Contract> contracts() {
+        if (this.config.isEnable()) {
+            ContractConfig contractConfig = getConfig();
+            // Add contract based on abilities
+            return new ArrayList<>(abilityContracts(contractConfig));
         }
-      });
-      Contract contract = executableContract(
-          contractConfig,
-          ability.getAbility_id(),
-          Map.of(en, ability.getName(), fr, ability.getName()),
-          builder.build(),
-          platforms
-      );
-      contract.addContext("collector-ids", String.join(", ", this.config.getCollectorIds()));
-      contract.addAttackPattern(ability.getTechnique_id());
-      return contract;
-    })).collect(Collectors.toList());
-  }
+        return List.of();
+    }
 
-  @Override
-  public ContractorIcon getIcon() {
-    InputStream iconStream = getClass().getResourceAsStream("/img/icon-caldera.png");
-    return new ContractorIcon(iconStream);
-  }
+    // -- PRIVATE --
+
+    private ContractSelect obfuscatorField() {
+        List<Obfuscator> obfuscators = this.injectorCalderaService.obfuscators();
+        Map<String, String> obfuscatorChoices = obfuscators.stream()
+                .collect(Collectors.toMap(Obfuscator::getName, Obfuscator::getName));
+        return selectFieldWithDefault(
+                "obfuscator",
+                "Obfuscators",
+                obfuscatorChoices,
+                obfuscatorChoices.keySet().stream().findFirst().orElse("")
+        );
+    }
+
+    private ContractExpectations expectations() {
+        // Prevention
+        Expectation preventionExpectation = new Expectation();
+        preventionExpectation.setType(PREVENTION);
+        preventionExpectation.setName("Expect inject to be prevented");
+        preventionExpectation.setScore(0);
+        // Detection
+        Expectation detectionExpectation = new Expectation();
+        detectionExpectation.setType(DETECTION);
+        detectionExpectation.setName("Expect inject to be detected");
+        detectionExpectation.setScore(0);
+
+        return expectationsField(
+                "expectations", "Expectations", List.of(preventionExpectation, detectionExpectation)
+        );
+    }
+
+    private List<Contract> abilityContracts(@NotNull final ContractConfig contractConfig) {
+        // Fields
+        ContractSelect obfuscatorField = obfuscatorField();
+        ContractAsset assetField = assetField("assets", "Assets", Multiple);
+        ContractAssetGroup assetGroupField = assetGroupField("assetgroups", "Asset groups",
+                Multiple);
+        // Expectations
+        ContractExpectations expectationsField = expectations();
+
+        List<Ability> abilities = this.injectorCalderaService.abilities();
+        // Build contracts
+        return abilities.stream().map((ability -> {
+            ContractDef builder = contractBuilder();
+            builder.mandatory(obfuscatorField);
+            builder.mandatoryGroup(assetField, assetGroupField);
+            builder.optional(expectationsField);
+            List<String> platforms = new ArrayList<>();
+            ability.getExecutors().forEach(executor -> {
+                if (!executor.getPlatform().equals("unknown")) {
+                    String platform = toPlatform(executor.getPlatform()).name();
+                    if (!platforms.contains(platform)) {
+                        platforms.add(platform);
+                    }
+                } else {
+                    if (executor.getName().equals("psh")) {
+                        if (!platforms.contains(Endpoint.PLATFORM_TYPE.Windows.name())) {
+                            platforms.add(Endpoint.PLATFORM_TYPE.Windows.name());
+                        }
+                    } else if (executor.getName().equals("sh")) {
+                        if (!platforms.contains(Endpoint.PLATFORM_TYPE.Linux.name())) {
+                            platforms.add(Endpoint.PLATFORM_TYPE.Linux.name());
+                        }
+                    } else if (executor.getName().equals("cmd")) {
+                        if (!platforms.contains(Endpoint.PLATFORM_TYPE.Windows.name())) {
+                            platforms.add(Endpoint.PLATFORM_TYPE.Windows.name());
+                        }
+                    }
+                }
+            });
+            Contract contract = executableContract(
+                    contractConfig,
+                    ability.getAbility_id(),
+                    Map.of(en, ability.getName(), fr, ability.getName()),
+                    builder.build(),
+                    platforms,
+                    true
+            );
+            contract.addContext("collector-ids", String.join(", ", this.config.getCollectorIds()));
+            contract.addAttackPattern(ability.getTechnique_id());
+            return contract;
+        })).collect(Collectors.toList());
+    }
+
+    @Override
+    public ContractorIcon getIcon() {
+        InputStream iconStream = getClass().getResourceAsStream("/img/icon-caldera.png");
+        return new ContractorIcon(iconStream);
+    }
 }

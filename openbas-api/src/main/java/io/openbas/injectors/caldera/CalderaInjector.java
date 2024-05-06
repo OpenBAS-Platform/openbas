@@ -23,8 +23,6 @@ public class CalderaInjector {
                     CALDERA_INJECTOR_NAME,
                     contract,
                     false,
-                    true,
-                    new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()},
                     "simulation-agent"
             );
         } catch (Exception e) {
