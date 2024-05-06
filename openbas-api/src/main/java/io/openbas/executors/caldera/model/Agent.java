@@ -1,4 +1,4 @@
-package io.openbas.collectors.caldera.model;
+package io.openbas.executors.caldera.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

@@ -1,10 +1,10 @@
-package io.openbas.collectors.caldera.client;
+package io.openbas.executors.caldera.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.collectors.caldera.model.Agent;
-import io.openbas.collectors.caldera.config.CalderaCollectorConfig;
+import io.openbas.executors.caldera.model.Agent;
+import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -23,7 +23,7 @@ public class CalderaCollectorClient {
 
   private static final String KEY_HEADER = "KEY";
 
-  private final CalderaCollectorConfig config;
+  private final CalderaExecutorConfig config;
   private final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
   private final ObjectMapper objectMapper = new ObjectMapper();
 

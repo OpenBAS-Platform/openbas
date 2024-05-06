@@ -1,11 +1,11 @@
-package io.openbas.collectors.caldera.service;
+package io.openbas.executors.caldera.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.asset.EndpointService;
-import io.openbas.collectors.caldera.client.CalderaCollectorClient;
-import io.openbas.collectors.caldera.config.CalderaCollectorConfig;
-import io.openbas.collectors.caldera.model.Agent;
+import io.openbas.executors.caldera.client.CalderaCollectorClient;
+import io.openbas.executors.caldera.config.CalderaExecutorConfig;
+import io.openbas.executors.caldera.model.Agent;
 import io.openbas.database.model.Endpoint;
 import io.openbas.integrations.CollectorService;
 import jakarta.validation.constraints.NotBlank;
@@ -28,13 +28,13 @@ import static java.util.stream.Collectors.groupingBy;
 
 @Log
 @Service
-public class CalderaCollectorService implements Runnable {
+public class CalderaExecutorService implements Runnable {
 
   private static final String CALDERA_COLLECTOR_TYPE = "openbas_caldera";
   private static final String CALDERA_COLLECTOR_NAME = "Caldera";
 
   private final CalderaCollectorClient client;
-  private final CalderaCollectorConfig config;
+  private final CalderaExecutorConfig config;
 
   private final EndpointService endpointService;
 
@@ -50,8 +50,8 @@ public class CalderaCollectorService implements Runnable {
   }
 
   @Autowired
-  public CalderaCollectorService(CollectorService collectorService, CalderaCollectorClient client,
-      CalderaCollectorConfig config, EndpointService endpointService) {
+  public CalderaExecutorService(CollectorService collectorService, CalderaCollectorClient client,
+                                CalderaExecutorConfig config, EndpointService endpointService) {
     this.client = client;
     this.config = config;
     this.endpointService = endpointService;

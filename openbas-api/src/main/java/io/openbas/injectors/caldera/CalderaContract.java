@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static io.openbas.collectors.caldera.service.CalderaCollectorService.toPlatform;
+import static io.openbas.executors.caldera.service.CalderaExecutorService.toPlatform;
 import static io.openbas.injector_contract.Contract.executableContract;
 import static io.openbas.injector_contract.ContractCardinality.Multiple;
 import static io.openbas.injector_contract.ContractDef.contractBuilder;

@@ -1,8 +1,8 @@
-package io.openbas.collectors.caldera;
+package io.openbas.executors.caldera;
 
-import io.openbas.collectors.caldera.client.CalderaCollectorClient;
-import io.openbas.collectors.caldera.config.CalderaCollectorConfig;
-import io.openbas.collectors.caldera.service.CalderaCollectorService;
+import io.openbas.executors.caldera.client.CalderaCollectorClient;
+import io.openbas.executors.caldera.config.CalderaExecutorConfig;
+import io.openbas.executors.caldera.service.CalderaExecutorService;
 import io.openbas.asset.EndpointService;
 import io.openbas.integrations.CollectorService;
 import jakarta.annotation.PostConstruct;
@@ -14,9 +14,9 @@ import java.time.Duration;
 
 @RequiredArgsConstructor
 @Service
-public class CalderaCollector {
+public class CalderaExecutor {
 
-  private final CalderaCollectorConfig config;
+  private final CalderaExecutorConfig config;
   private final TaskScheduler taskScheduler;
   private final CalderaCollectorClient client;
   private final EndpointService endpointService;
@@ -26,7 +26,7 @@ public class CalderaCollector {
   public void init() {
     // If enabled, scheduled every X seconds
     if (this.config.isEnable()) {
-      CalderaCollectorService service = new CalderaCollectorService(this.collectorService, this.client, this.config, this.endpointService);
+      CalderaExecutorService service = new CalderaExecutorService(this.collectorService, this.client, this.config, this.endpointService);
       this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(this.config.getInterval()));
     }
   }

@@ -1,4 +1,4 @@
-package io.openbas.collectors.caldera.config;
+package io.openbas.executors.caldera.config;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,8 +9,8 @@ import jakarta.validation.constraints.NotBlank;
 
 @Setter
 @Component
-@ConfigurationProperties(prefix = "collector.caldera")
-public class CalderaCollectorConfig {
+@ConfigurationProperties(prefix = "executor.caldera")
+public class CalderaExecutorConfig {
 
   private final static String REST_V2_URI = "/api/v2";
 
