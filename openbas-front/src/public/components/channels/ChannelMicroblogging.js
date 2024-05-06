@@ -38,9 +38,11 @@ const ChannelMicroblogging = ({ channelReader }) => {
   const isDark = theme.palette.mode === 'dark';
   const {
     channel_exercise: exercise,
+    channel_scenario: scenario,
     channel_articles: articles,
     channel_information: channel,
   } = channelReader;
+  const baseUri = `/api/player/${exercise?.exercise_id ?? scenario?.scenario_id}`;
   const { documentsMap } = useHelper((helper) => ({
     documentsMap: helper.getDocumentsMap(),
   }));
@@ -53,7 +55,7 @@ const ChannelMicroblogging = ({ channelReader }) => {
           style={{ margin: '0 auto', textAlign: 'center', marginBottom: 15 }}
         >
           <img
-            src={`/api/player/${exercise.exercise_id}/documents/${logo}/file${queryParams}`}
+            src={`${baseUri}/documents/${logo}/file${queryParams}`}
             className={classes.logo}
           />
         </div>
@@ -130,14 +132,14 @@ const ChannelMicroblogging = ({ channelReader }) => {
                       <CardMedia
                         component="img"
                         height="150"
-                        src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
+                        src={`${baseUri}/documents/${doc.document_id}/file${queryParams}`}
                       />
                     )}
                     {doc.document_type.includes('video/') && (
                       <CardMedia
                         component="video"
                         height="150"
-                        src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
+                        src={`${baseUri}/documents/${doc.document_id}/file${queryParams}`}
                         controls={true}
                       />
                     )}
