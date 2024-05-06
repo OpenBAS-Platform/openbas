@@ -85,9 +85,17 @@ OpenBAS is a product designed and developed by the company [Filigran](https://fi
 
 <a href="https://filigran.io" alt="Filigran"><img src="./.github/img/logo_filigran.png" width="300" /></a>
 
-### GDPR and the OpenBAS OpenStreetMap server
+### Data Collection
 
-In order to provide OpenBAS users with cartography features, the platform uses a dedicated OpenStreetMap server (https://map.openbas.io). To monitor usage and adapt services performances, Filigran collects access log to this server (including IP addresses).
+#### Usage telemetry
+
+To improve the features and the performances of OpenBAS, the platform collects anonymous statistical data related to its usage and health.
+
+You can find all the details on collected data and associated usage in the [data telemetry documentation](https://docs.openbas.io/latest/reference/data-telemetry/).
+
+#### OpenStreetMap server
+
+To provide OpenCTI users with cartography features, the platform uses a dedicated OpenStreetMap server (https://map.openbas.io). To monitor usage and adapt services performances, Filigran collects access log to this server (including IP addresses).
 
 By using this server, you authorize Filigran to collect this information. Otherwise, you are free to deploy your own OpenStreetMap server and modify the platform configuration accordingly.
 
