@@ -6,7 +6,7 @@ import * as R from 'ramda';
 import type { ExerciseStore, InjectExpectationResultsByAttackPatternStore } from '../../../../../actions/exercises/Exercise';
 import ExerciseDistribution from './ExerciseDistribution';
 import ResponsePie from '../../../atomic_testings/atomic_testing/ResponsePie';
-import { fetchExerciseExpectationResult, fetchExerciseInjectExpectationResults } from '../../../../../actions/exercises/exercise-action';
+import { fetchExerciseExpectationResult, fetchExerciseInjectExpectationResults, searchExerciseInjects } from '../../../../../actions/exercises/exercise-action';
 import type { ExpectationResultsByType, KillChainPhase } from '../../../../../utils/api-types';
 import MitreMatrix from '../../../common/matrix/MitreMatrix';
 import { useAppDispatch } from '../../../../../utils/hooks';
@@ -21,6 +21,7 @@ import PlatformIcon from '../../../../../components/PlatformIcon';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
+import InjectList from '../../../atomic_testings/InjectList';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -76,20 +77,20 @@ const Exercise = () => {
   return (
     <>
       <Grid
-        container={true}
+        container
         spacing={3}
         classes={{ container: classes.gridContainer }}
       >
-        <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
-          <Typography variant="h4" gutterBottom={true}>
+        <Grid item xs={6} style={{ paddingTop: 10 }}>
+          <Typography variant="h4" gutterBottom>
             {t('Information')}
           </Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined">
-            <Grid container={true} spacing={3}>
-              <Grid item={true} xs={12} style={{ paddingTop: 10 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Description')}
@@ -99,64 +100,64 @@ const Exercise = () => {
                   limit={300}
                 />
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Severity')}
                 </Typography>
                 <ItemSeverity severity={exercise.exercise_severity} label={t(exercise.exercise_severity ?? 'Unknown')} />
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Category')}
                 </Typography>
                 <ItemCategory category={exercise.exercise_category} label={t(exercise.exercise_category ?? 'Unknown')} />
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Main Focus')}
                 </Typography>
                 <ItemMainFocus mainFocus={exercise.exercise_main_focus} label={t(exercise.exercise_main_focus ?? 'Unknown')} />
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Tags')}
                 </Typography>
                 <ItemTags tags={exercise.exercise_tags} />
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Platforms')}
                 </Typography>
                 {(exercise.exercise_platforms ?? []).length === 0 ? (
-                  <PlatformIcon platform={t('No inject in this scenario')} tooltip={true} width={25} />
+                  <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
                 ) : exercise.exercise_platforms?.map(
-                  (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip={true} width={25} marginRight={10} />,
+                  (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
                 )}
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Kill Chain Phases')}
@@ -175,8 +176,8 @@ const Exercise = () => {
             </Grid>
           </Paper>
         </Grid>
-        <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
-          <Typography variant="h4" gutterBottom={true}>
+        <Grid item xs={6} style={{ paddingTop: 10 }}>
+          <Typography variant="h4" gutterBottom>
             {t('Results')}
           </Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined" style={{ display: 'flex', alignItems: 'center' }}>
@@ -184,8 +185,8 @@ const Exercise = () => {
           </Paper>
         </Grid>
         {injectResults && resultAttackPatternIds.length > 0 && (
-          <Grid item={true} xs={12} style={{ marginTop: 25 }}>
-            <Typography variant="h4" gutterBottom={true}>
+          <Grid item xs={12} style={{ marginTop: 25 }}>
+            <Typography variant="h4" gutterBottom>
               {t('MITRE ATT&CK Results')}
             </Typography>
             <Paper classes={{ root: classes.paper }} variant="outlined" style={{ display: 'flex', alignItems: 'center' }}>
@@ -193,6 +194,15 @@ const Exercise = () => {
             </Paper>
           </Grid>
         )}
+        <Grid item xs={12} style={{ marginTop: 25 }}>
+          <Typography variant="h4" gutterBottom style={{ marginBottom: 15 }}>
+            {t('Injects Results')}
+          </Typography>
+          <InjectList
+            fetchInjects={(input) => searchExerciseInjects(exerciseId, input)}
+            goTo={(injectId) => `/admin/exercises/${exerciseId}/injects/${injectId}`}
+          />
+        </Grid>
       </Grid>
       <ExerciseDistribution exerciseId={exerciseId} />
     </>

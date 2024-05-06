@@ -12,6 +12,7 @@ import type { Theme } from '../components/Theme';
 import type { LoggedHelper } from '../actions/helper';
 import Loader from '../components/Loader';
 import NotFound from '../components/NotFound';
+import InjectIndex from './components/simulations/simulation/overview/InjectIndex';
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));
@@ -74,8 +75,9 @@ const Index = () => {
               <Route path="fulltextsearch" element={errorWrapper(FullTextSearch)()} />
               <Route path="exercises" element={errorWrapper(Exercises)()} />
               <Route path="exercises/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
+              <Route path="exercises/:exerciseId/injects/:injectId/*" element={errorWrapper(InjectIndex)()} />
               <Route path="atomic_testings" element={errorWrapper(AtomicTestings)()} />
-              <Route path="atomic_testings/:atomicId/*" element={errorWrapper(IndexAtomicTesting)()} />
+              <Route path="atomic_testings/:injectId/*" element={errorWrapper(IndexAtomicTesting)()} />
               <Route path="scenarios" element={errorWrapper(Scenarios)()} />
               <Route path="scenarios/:scenarioId/*" element={errorWrapper(IndexScenario)()} />
               <Route path="assets/*" element={errorWrapper(Assets)()} />

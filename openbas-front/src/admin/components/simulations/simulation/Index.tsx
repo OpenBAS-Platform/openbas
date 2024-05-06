@@ -125,7 +125,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
               <Route path="controls/comchecks/:comcheckId" element={errorWrapper(Comcheck)()} />
               <Route path="definition" element={errorWrapper(ExerciseDefinition)()} />
               <Route path="injects" element={errorWrapper(Injects)()} />
-              <Route path="animation" element={<Navigate to="timeline" replace={true}/>}/>
+              <Route path="animation" element={<Navigate to="timeline" replace={true} />} />
               <Route path="animation/timeline" element={errorWrapper(Timeline)()} />
               <Route path="animation/mails" element={errorWrapper(Mails)()} />
               <Route path="animation/mails/:injectId" element={errorWrapper(MailsInject)()} />
@@ -134,7 +134,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
               <Route path="animation/validations" element={errorWrapper(Validations)()} />
               <Route path="lessons" element={errorWrapper(Lessons)()} />
               {/* Not found */}
-              <Route path="*" element={<NotFound/>}/>
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </div>

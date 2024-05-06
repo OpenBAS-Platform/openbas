@@ -1,90 +1,22 @@
-import React, { CSSProperties, useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
-import { KeyboardArrowRight } from '@mui/icons-material';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as R from 'ramda';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import type { UsersHelper } from '../../../actions/helper';
-import InjectIcon from '../common/injects/InjectIcon';
-import type { AtomicTestingOutput, Inject, SearchPaginationInput } from '../../../utils/api-types';
+import type { Inject } from '../../../utils/api-types';
 import { createAtomicTesting, searchAtomicTestings } from '../../../actions/atomic_testings/atomic-testing-actions';
-import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
-import ItemTargets from '../../../components/ItemTargets';
-import Empty from '../../../components/Empty';
-import { initSorting } from '../../../components/common/pagination/Page';
-import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
-import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
-import InjectorContract from '../common/injects/InjectorContract';
 import CreateInject from '../common/injects/CreateInject';
 import { useAppDispatch } from '../../../utils/hooks';
-import ItemStatus from '../../../components/ItemStatus';
-
-const useStyles = makeStyles(() => ({
-  bodyItems: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  bodyItem: {
-    height: 20,
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
-  },
-  itemHead: {
-    paddingLeft: 10,
-    marginBottom: 10,
-    textTransform: 'uppercase',
-    cursor: 'pointer',
-  },
-  item: {
-    paddingLeft: 10,
-    height: 50,
-  },
-  goIcon: {
-    position: 'absolute',
-    right: -10,
-  },
-}));
-
-const inlineStyles: Record<string, CSSProperties> = {
-  atomic_type: {
-    width: '15%',
-  },
-  atomic_title: {
-    width: '20%',
-  },
-  atomic_last_start_execution_date: {
-    width: '15%',
-  },
-  atomic_targets: {
-    width: '20%',
-  },
-  atomic_status: {
-    width: '15%',
-  },
-  atomic_expectations: {
-    width: '15%',
-  },
-};
+import InjectList from './InjectList';
 
 // eslint-disable-next-line consistent-return
 const AtomicTestings = () => {
   // Standard hooks
-  const classes = useStyles();
-  const { t, fldt, tPick } = useFormatter();
+  const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
-  // Filter and sort hook
-  const [atomics, setAtomics] = useState<AtomicTestingOutput[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
-    sorts: initSorting('inject_title'),
-  });
 
   const { userAdmin } = useHelper((helper: UsersHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
@@ -108,132 +40,13 @@ const AtomicTestings = () => {
     navigate(`/admin/atomic_testings/${result.result}`);
   };
 
-  // Headers
-  const headers = [
-    {
-      field: 'atomic_type',
-      label: 'Type',
-      isSortable: true,
-      // TODO add atomic_inject_label in /api/atomic_testings/search backend with label map
-      value: (atomicTesting: AtomicTestingOutput) => {
-        return (<InjectorContract variant="list" label={tPick(atomicTesting.atomic_injector_contract.injector_contract_labels)} />);
-      },
-    },
-    {
-      field: 'atomic_title',
-      label: 'Title',
-      isSortable: true,
-      value: (atomicTesting: AtomicTestingOutput) => atomicTesting.atomic_title,
-    },
-    {
-      field: 'atomic_last_start_execution_date',
-      label: 'Last Start Execution Date',
-      isSortable: true,
-      value: (atomicTesting: AtomicTestingOutput) => fldt(atomicTesting.atomic_last_execution_start_date),
-    },
-    {
-      field: 'atomic_targets',
-      label: 'Target',
-      isSortable: true,
-      value: (atomicTesting: AtomicTestingOutput) => {
-        return (<ItemTargets targets={atomicTesting.atomic_targets} />);
-      },
-    },
-    {
-      field: 'atomic_status',
-      label: 'Inject Execution Status',
-      isSortable: true,
-      value: (atomicTesting: AtomicTestingOutput) => {
-        return (<ItemStatus status={atomicTesting.atomic_status} label={t(atomicTesting.atomic_status)} variant='inList' />);
-      },
-    },
-    {
-      field: 'atomic_expectations',
-      label: 'Global score',
-      isSortable: true,
-      value: (atomicTesting: AtomicTestingOutput) => {
-        return (
-          <AtomicTestingResult expectations={atomicTesting.atomic_expectation_results} />
-        );
-      },
-    },
-  ];
-
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Atomic testings'), current: true }]} />
-      <PaginationComponent
-        fetch={searchAtomicTestings}
-        searchPaginationInput={searchPaginationInput}
-        setContent={setAtomics}
+      <InjectList
+        fetchInjects={searchAtomicTestings}
+        goTo={(injectId) => `/admin/atomic_testings/${injectId}`}
       />
-      <List>
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-        >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-              &nbsp;
-            </span>
-          </ListItemIcon>
-          <ListItemText
-            primary={
-              <SortHeadersComponent
-                headers={headers}
-                inlineStylesHeaders={inlineStyles}
-                searchPaginationInput={searchPaginationInput}
-                setSearchPaginationInput={setSearchPaginationInput}
-              />
-            }
-          />
-        </ListItem>
-        {atomics.map((atomicTesting) => {
-          return (
-            <ListItemButton
-              key={atomicTesting.atomic_id}
-              classes={{ root: classes.item }}
-              divider={true}
-              component={Link}
-              to={`/admin/atomic_testings/${atomicTesting.atomic_id}`}
-            >
-              <ListItemIcon>
-                <InjectIcon
-                  tooltip={t(atomicTesting.atomic_type)}
-                  type={atomicTesting.atomic_type}
-                  variant="list"
-                />
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <div className={classes.bodyItems}>
-                    {headers.map((header) => (
-                      <div
-                        key={header.field}
-                        className={classes.bodyItem}
-                        style={inlineStyles[header.field]}
-                      >
-                        {header.value(atomicTesting)}
-                      </div>
-                    ))}
-                  </div>
-                }
-              />
-              <ListItemIcon classes={{ root: classes.goIcon }}>
-                <KeyboardArrowRight />
-              </ListItemIcon>
-            </ListItemButton>
-          );
-        })}
-        {!atomics ? (<Empty message={t('No data available')} />) : null}
-      </List>
       {userAdmin && <CreateInject title={t('Create a new atomic test')} onCreateInject={onCreateAtomicTesting} isAtomic />}
     </>
   );

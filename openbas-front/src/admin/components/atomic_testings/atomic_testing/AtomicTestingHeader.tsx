@@ -1,19 +1,17 @@
 import { useParams } from 'react-router-dom';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
 import { PlayArrowOutlined, SettingsOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { fetchAtomicTesting, tryAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
-import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
+import { fetchInjectResultDto, tryAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import AtomicTestingPopover from './AtomicTestingPopover';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
 import { AtomicTestingResultContext } from '../../common/Context';
-import type { AtomicTestingOutput } from '../../../../utils/api-types';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import { useHelper } from '../../../../store';
+import type { InjectResultDTO } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { truncate } from '../../../../utils/String';
+import Loader from '../../../../components/Loader';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -31,16 +29,18 @@ const AtomicTestingHeader = () => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const classes = useStyles();
-  const { atomicId } = useParams() as { atomicId: AtomicTestingOutput['atomic_id'] };
   const { onLaunchAtomicTesting } = useContext(AtomicTestingResultContext);
 
   // Fetching data
-  const { atomic }: { atomic: AtomicTestingOutput } = useHelper((helper: AtomicTestingHelper) => ({
-    atomic: helper.getAtomicTesting(atomicId),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchAtomicTesting(atomicId));
-  });
+  const { injectId } = useParams() as { injectId: InjectResultDTO['inject_id'] };
+  const [injectResultDto, setInjectResultDto] = useState<InjectResultDTO>();
+
+  useEffect(() => {
+    fetchInjectResultDto(injectId).then((result: { data: InjectResultDTO }) => {
+      setInjectResultDto(result.data);
+    });
+  }, [injectId]);
+
   // Launch atomic testing
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -49,24 +49,30 @@ const AtomicTestingHeader = () => {
   const submitLaunch = async () => {
     setOpen(false);
     setAvailableLaunch(false);
-    await dispatch(tryAtomicTesting(atomic.atomic_id));
+    if (injectResultDto?.inject_id) {
+      await dispatch(tryAtomicTesting(injectResultDto.inject_id));
+    }
     setAvailableLaunch(true);
     onLaunchAtomicTesting();
   };
 
+  if (!injectResultDto) {
+    return <Loader variant="inElement" />;
+  }
+
   return (
     <>
-      <Tooltip title={atomic.atomic_title}>
+      <Tooltip title={injectResultDto.inject_title}>
         <Typography
           variant="h1"
           gutterBottom={true}
           classes={{ root: classes.title }}
         >
-          {truncate(atomic.atomic_title, 80)}
+          {truncate(injectResultDto.inject_title, 80)}
         </Typography>
       </Tooltip>
       <div className={classes.actions}>
-        {!atomic.atomic_targets || atomic.atomic_targets.length === 0 ? (
+        {!injectResultDto.inject_targets || injectResultDto.inject_targets.length === 0 ? (
           <Button
             style={{ marginRight: 20 }}
             startIcon={<SettingsOutlined />}
@@ -90,7 +96,7 @@ const AtomicTestingHeader = () => {
             {t('Launch')}
           </Button>
         )}
-        <AtomicTestingPopover atomic={atomic} setOpenEdit={setOpenEdit} openEdit={openEdit}/>
+        <AtomicTestingPopover atomic={injectResultDto} setOpenEdit={setOpenEdit} openEdit={openEdit} />
       </div>
       <Dialog
         open={open}

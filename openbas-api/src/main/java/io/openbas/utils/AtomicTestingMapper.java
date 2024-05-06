@@ -3,19 +3,20 @@ package io.openbas.utils;
 import io.openbas.database.model.*;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.AtomicTestingDetailOutput;
-import io.openbas.rest.atomic_testing.form.AtomicTestingOutput;
-import io.openbas.rest.atomic_testing.form.AtomicTestingOutput.AtomicTestingOutputBuilder;
+import io.openbas.rest.atomic_testing.form.InjectResultDTO;
+import io.openbas.rest.atomic_testing.form.InjectResultDTO.InjectResultDTOBuilder;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.openbas.database.model.InjectStatus.draftInjectStatus;
 import static io.openbas.utils.AtomicTestingUtils.getRefinedExpectations;
 
 public class AtomicTestingMapper {
 
-    public static AtomicTestingOutput toDtoWithTargetResults(Inject inject) {
+    public static InjectResultDTO toDtoWithTargetResults(Inject inject) {
         List<InjectTargetWithResult> targets = AtomicTestingUtils.getTargetsWithResults(inject);
         List<String> targetIds = targets.stream().map(InjectTargetWithResult::getId).toList();
 
@@ -27,7 +28,7 @@ public class AtomicTestingMapper {
                 .build();
     }
 
-    public static AtomicTestingOutput toDto(Inject inject, List<InjectTargetWithResult> targets) {
+    public static InjectResultDTO toDto(Inject inject, List<InjectTargetWithResult> targets) {
         List<String> targetIds = targets.stream().map(InjectTargetWithResult::getId).toList();
 
         return getAtomicTestingOutputBuilder(inject)
@@ -38,8 +39,8 @@ public class AtomicTestingMapper {
                 .build();
     }
 
-    private static AtomicTestingOutputBuilder getAtomicTestingOutputBuilder(Inject inject) {
-        return AtomicTestingOutput
+    private static InjectResultDTOBuilder getAtomicTestingOutputBuilder(Inject inject) {
+        return InjectResultDTO
                 .builder()
                 .id(inject.getId())
                 .title(inject.getTitle())
@@ -47,9 +48,7 @@ public class AtomicTestingMapper {
                 .type(inject.getType())
                 .tagIds(inject.getTags().stream().map(Tag::getId).toList())
                 .injectorContract(inject.getInjectorContract())
-                .lastExecutionStartDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))
-                .lastExecutionEndDate(inject.getStatus().map(InjectStatus::getTrackingSentDate).orElse(null))
-                .status(inject.getStatus().map(InjectStatus::getName).orElse(ExecutionStatus.DRAFT))
+                .status(inject.getStatus().orElse(draftInjectStatus()))
                 .killChainPhases(inject.getKillChainPhases())
                 .attackPatterns(inject.getAttackPatterns());
     }

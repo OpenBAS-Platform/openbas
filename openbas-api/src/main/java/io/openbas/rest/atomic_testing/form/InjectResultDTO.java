@@ -2,10 +2,10 @@ package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.AttackPattern;
+import io.openbas.database.model.InjectStatus;
+import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.KillChainPhase;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
-import io.openbas.database.model.ExecutionStatus;
-import io.openbas.database.model.InjectorContract;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -13,82 +13,65 @@ import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 @Setter
 @Getter
 @Builder
-public class AtomicTestingOutput {
+public class InjectResultDTO {
 
   @Schema(description = "Id")
-  @JsonProperty("atomic_id")
+  @JsonProperty("inject_id")
   @NotNull
   private String id;
 
   @Schema(description = "Title")
-  @JsonProperty("atomic_title")
+  @JsonProperty("inject_title")
   @NotNull
   private String title;
 
   @Schema(description = "Description")
-  @JsonProperty("atomic_description")
+  @JsonProperty("inject_description")
   @NotNull
   private String description;
 
   @Schema(description = "Type")
-  @JsonProperty("atomic_type")
+  @JsonProperty("inject_type")
   @NotNull
   private String type;
 
   @Schema(description = "Kill Chain Phases")
-  @JsonProperty("atomic_kill_chain_phases")
+  @JsonProperty("inject_kill_chain_phases")
   @NotNull
   private List<KillChainPhase> killChainPhases;
 
   @Schema(description = "Attack Patterns")
-  @JsonProperty("atomic_attack_patterns")
+  @JsonProperty("inject_attack_patterns")
   @NotNull
   private List<AttackPattern> attackPatterns;
 
   @Schema(description = "Full contract")
-  @JsonProperty("atomic_injector_contract")
+  @JsonProperty("inject_injector_contract")
   @NotNull
   private InjectorContract injectorContract;
 
-  @Schema(description = "Contract")
-  @JsonProperty("atomic_contract")
-  @NotNull
-  private String contract;
-
-  @Schema(description = "Last Execution Start date")
-  @JsonProperty("atomic_last_execution_start_date")
-  private Instant lastExecutionStartDate;
-
-  @Schema(description = "Last Execution End date")
-  @JsonProperty("atomic_last_execution_end_date")
-  private Instant lastExecutionEndDate;
-
+  @JsonProperty("inject_status")
+  private InjectStatus status;
   @Schema(
       description = "Specifies the categories of targetResults for atomic testing.",
       example = "assets, asset groups, teams, players"
   )
-  @JsonProperty("atomic_targets")
+  @JsonProperty("inject_targets")
   @NotNull
   private List<InjectTargetWithResult> targets;
 
-  @Schema(description = "Status of execution")
-  @JsonProperty("atomic_status")
-  @NotNull
-  private ExecutionStatus status;
-
   @Default
   @Schema(description = "Result of expectations")
-  @JsonProperty("atomic_expectation_results")
+  @JsonProperty("inject_expectation_results")
   @NotNull
   private List<ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
 
-  @JsonProperty("atomic_tags")
-  private List<String> tagIds = new ArrayList<>();
+  @JsonProperty("injects_tags")
+  private List<String> tagIds;
 }

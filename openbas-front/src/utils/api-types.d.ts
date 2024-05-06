@@ -15,6 +15,16 @@ export interface AiGenericTextInput {
   ai_tone?: string;
 }
 
+export interface AiMediaInput {
+  ai_author?: string;
+  ai_context?: string;
+  ai_format: string;
+  ai_input: string;
+  /** @format int32 */
+  ai_paragraphs?: number;
+  ai_tone?: string;
+}
+
 export interface AiMessageInput {
   ai_context?: string;
   ai_format: string;
@@ -163,44 +173,6 @@ export interface AtomicTestingInput {
   inject_teams?: string[];
   inject_title?: string;
   inject_type?: string;
-}
-
-export interface AtomicTestingOutput {
-  /** Attack Patterns */
-  atomic_attack_patterns: AttackPattern[];
-  /** Contract */
-  atomic_contract: string;
-  /** Description */
-  atomic_description: string;
-  /** Result of expectations */
-  atomic_expectation_results: ExpectationResultsByType[];
-  /** Id */
-  atomic_id: string;
-  atomic_injector_contract: InjectorContract;
-  /** Kill Chain Phases */
-  atomic_kill_chain_phases: KillChainPhase[];
-  /**
-   * Last Execution End date
-   * @format date-time
-   */
-  atomic_last_execution_end_date?: string;
-  /**
-   * Last Execution Start date
-   * @format date-time
-   */
-  atomic_last_execution_start_date?: string;
-  /** Status of execution */
-  atomic_status: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
-  atomic_tags?: string[];
-  /**
-   * Specifies the categories of targetResults for atomic testing.
-   * @example "assets, asset groups, teams, players"
-   */
-  atomic_targets: InjectTargetWithResult[];
-  /** Title */
-  atomic_title: string;
-  /** Type */
-  atomic_type: string;
 }
 
 export interface AtomicTestingUpdateTagsInput {
@@ -999,6 +971,33 @@ export interface InjectReceptionInput {
   tracking_total_count?: number;
 }
 
+export interface InjectResultDTO {
+  /** Contract */
+  atomic_contract: string;
+  /** Attack Patterns */
+  inject_attack_patterns: AttackPattern[];
+  /** Description */
+  inject_description: string;
+  /** Result of expectations */
+  inject_expectation_results: ExpectationResultsByType[];
+  /** Id */
+  inject_id: string;
+  inject_injector_contract: InjectorContract;
+  /** Kill Chain Phases */
+  inject_kill_chain_phases: KillChainPhase[];
+  inject_status?: InjectStatus;
+  /**
+   * Specifies the categories of targetResults for atomic testing.
+   * @example "assets, asset groups, teams, players"
+   */
+  inject_targets: InjectTargetWithResult[];
+  /** Title */
+  inject_title: string;
+  /** Type */
+  inject_type: string;
+  injects_tags?: string[];
+}
+
 export interface InjectStatus {
   status_id?: string;
   status_name?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
@@ -1527,25 +1526,6 @@ export interface PageAssetGroup {
   totalPages?: number;
 }
 
-export interface PageAtomicTestingOutput {
-  content?: AtomicTestingOutput[];
-  empty?: boolean;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  number?: number;
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  /** @format int32 */
-  size?: number;
-  sort?: SortObject[];
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-}
-
 export interface PageAttackPattern {
   content?: AttackPattern[];
   empty?: boolean;
@@ -1624,6 +1604,25 @@ export interface PageFullTextSearchResult {
 
 export interface PageGroup {
   content?: Group[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageInjectResultDTO {
+  content?: InjectResultDTO[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -1990,6 +1989,7 @@ export interface Scenario {
   scenario_description?: string;
   scenario_documents?: Document[];
   scenario_exercises?: Exercise[];
+  scenario_external_reference?: string;
   scenario_id: string;
   scenario_injects?: Inject[];
   scenario_injects_statistics?: Record<string, number>;

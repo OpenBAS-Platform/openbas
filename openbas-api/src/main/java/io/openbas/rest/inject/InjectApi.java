@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.asset.AssetGroupService;
 import io.openbas.asset.AssetService;
-import io.openbas.service.AtomicTestingService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
@@ -13,17 +12,24 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
+import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
+import io.openbas.service.AtomicTestingService;
+import io.openbas.service.InjectService;
 import io.openbas.service.ScenarioService;
-import io.openbas.service.*;
+import io.openbas.utils.AtomicTestingMapper;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +48,8 @@ import static io.openbas.helper.DatabaseHelper.resolveOptionalRelation;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static io.openbas.utils.AtomicTestingUtils.getTargets;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
 @RestController
@@ -240,7 +248,26 @@ public class InjectApi extends RestBehavior {
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Inject> exerciseInjects(@PathVariable String exerciseId) {
     return injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)).stream()
-            .sorted(Inject.executionComparator).toList();
+        .sorted(Inject.executionComparator).toList();
+  }
+
+  @PostMapping("/api/exercises/{exerciseId}/injects/search")
+  @PreAuthorize("isExerciseObserver(#exerciseId)")
+  public Page<InjectResultDTO> exerciseInjects(
+      @PathVariable final String exerciseId,
+      @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+        (Specification<Inject> specification, Pageable pageable) -> this.injectRepository.findAll(
+            InjectSpecification.fromExercise(exerciseId).and(specification), pageable),
+        searchPaginationInput,
+        Inject.class
+    ).map(inject -> AtomicTestingMapper.toDto(
+        inject, getTargets(
+            inject.getTeams(),
+            inject.getAssets(),
+            inject.getAssetGroups()
+        )
+    ));
   }
 
   @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}")
@@ -403,9 +430,9 @@ public class InjectApi extends RestBehavior {
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<Inject> scenarioInjects(@PathVariable @NotBlank final String scenarioId) {
     return this.injectRepository.findAll(InjectSpecification.fromScenario(scenarioId))
-            .stream()
-            .sorted(Inject.executionComparator)
-            .toList();
+        .stream()
+        .sorted(Inject.executionComparator)
+        .toList();
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
