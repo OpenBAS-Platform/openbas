@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -12,6 +13,16 @@
 export interface AiGenericTextInput {
   ai_content: string;
   ai_format?: string;
+  ai_tone?: string;
+}
+
+export interface AiMediaInput {
+  ai_author?: string;
+  ai_context?: string;
+  ai_format: string;
+  ai_input: string;
+  /** @format int32 */
+  ai_paragraphs?: number;
   ai_tone?: string;
 }
 
@@ -716,6 +727,7 @@ export interface ExerciseLessonsInput {
 }
 
 export interface ExerciseSimple {
+  exercise_category?: string;
   exercise_global_score?: ExpectationResultsByType[];
   exercise_id: string;
   exercise_name: string;
@@ -1990,6 +2002,7 @@ export interface Scenario {
   scenario_description?: string;
   scenario_documents?: Document[];
   scenario_exercises?: Exercise[];
+  scenario_external_reference?: string;
   scenario_id: string;
   scenario_injects?: Inject[];
   scenario_injects_statistics?: Record<string, number>;

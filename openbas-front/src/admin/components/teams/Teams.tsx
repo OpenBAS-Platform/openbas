@@ -28,12 +28,12 @@ const Teams = () => {
   const teamContext: TeamContextType = {
     onAddUsersTeam(teamId: Team['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
       return dispatch(updateTeamPlayers(teamId, {
-        team_users: [...(teams.find((t) => t.team_id === teamId)?.team_users?.map((u) => u.user_id) || []), ...userIds],
+        team_users: [...(teams.find((t) => t.team_id === teamId)?.team_users) || [], ...userIds],
       }));
     },
-    onRemoveUsersTeam(teamId: Team['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
+    onRemoveUsersTeam(teamId: TeamStore['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
       return dispatch(updateTeamPlayers(teamId, {
-        team_users: [...(teams.find((t) => t.team_id === teamId)?.team_users?.filter((u) => !userIds.includes(u.user_id)).map((u) => u.user_id) || [])],
+        team_users: [...(teams.find((t) => t.team_id === teamId)?.team_users?.filter((u) => !userIds.includes(u)) || [])],
       }));
     },
   };

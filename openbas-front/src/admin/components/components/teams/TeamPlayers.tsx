@@ -12,7 +12,7 @@ import ItemTags from '../../../../components/ItemTags';
 import PlayerPopover from '../../teams/players/PlayerPopover';
 import TeamAddPlayers from './TeamAddPlayers';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchTeamPlayers } from '../../../../actions/teams/team-actions';
+import { fetchTeam, fetchTeamPlayers } from '../../../../actions/teams/team-actions';
 import { fetchOrganizations } from '../../../../actions/Organization';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { Organization, Team } from '../../../../utils/api-types';
@@ -183,6 +183,7 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
   const { onToggleUser, checkUserEnabled } = useContext(TeamContext);
 
   useDataLoader(() => {
+    dispatch(fetchTeam(teamId));
     dispatch(fetchTeamPlayers(teamId));
     dispatch(fetchOrganizations());
   });

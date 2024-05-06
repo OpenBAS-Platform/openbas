@@ -7,6 +7,11 @@ export const fetchTeams = () => (dispatch: Dispatch) => {
   const uri = '/api/teams';
   return getReferential(schema.arrayOfTeams, uri)(dispatch);
 };
+
+export const fetchTeam = (teamId: Team['team_id']) => (dispatch: Dispatch) => {
+  const uri = `/api/teams/${teamId}`;
+  return getReferential(schema.team, uri)(dispatch);
+};
 export const searchTeams = (searchPaginationInput: SearchPaginationInput) => {
   const data = searchPaginationInput;
   const uri = '/api/teams/search';
