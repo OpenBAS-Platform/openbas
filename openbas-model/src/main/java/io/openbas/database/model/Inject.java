@@ -98,6 +98,7 @@ public class Inject implements Base, Injection {
 
   @Getter
   @Column(name = "inject_updated_at")
+  @Queryable(sortable = true)
   @JsonProperty("inject_updated_at")
   private Instant updatedAt = now();
 
@@ -370,7 +371,8 @@ public class Inject implements Base, Injection {
 
   @JsonProperty("inject_kill_chain_phases")
   public List<KillChainPhase> getKillChainPhases() {
-    return this.getInjectorContract().getAttackPatterns().stream().flatMap(attackPattern -> attackPattern.getKillChainPhases().stream()).distinct().toList();
+    return this.getInjectorContract().getAttackPatterns().stream()
+        .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream()).distinct().toList();
   }
 
   @JsonProperty("inject_attack_patterns")

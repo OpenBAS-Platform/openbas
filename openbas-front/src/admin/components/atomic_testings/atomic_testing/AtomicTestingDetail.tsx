@@ -59,7 +59,7 @@ const Detail: FunctionComponent<Props> = () => {
                   {t('Description')}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  {atomicDetail?.atomic_description || '-'}
+                  {atomicDetail?.inject_description || '-'}
                 </Typography>
               </div>
               <div>
@@ -75,8 +75,8 @@ const Detail: FunctionComponent<Props> = () => {
                   {t('Expectations')}
                 </Typography>
                 {
-                  atomicDetail.atomic_expectations !== undefined && atomicDetail.atomic_expectations.length > 0
-                    ? atomicDetail.atomic_expectations.map((expectation, index) => (
+                  atomicDetail.inject_expectations !== undefined && atomicDetail.inject_expectations.length > 0
+                    ? atomicDetail.inject_expectations.map((expectation, index) => (
                       <Typography key={index} variant="body1">
                         {expectation.inject_expectation_name}
                       </Typography>
@@ -90,8 +90,8 @@ const Detail: FunctionComponent<Props> = () => {
                   {t('Documents')}
                 </Typography>
                 {
-                  atomicDetail.atomic_documents !== undefined && atomicDetail.atomic_documents.length > 0
-                    ? atomicDetail.atomic_documents.map((document, index) => {
+                  atomicDetail.inject_documents !== undefined && atomicDetail.inject_documents.length > 0
+                    ? atomicDetail.inject_documents.map((document, index) => {
                       return (
                         <Typography key={index} variant="body1">
                           {document.document_name}

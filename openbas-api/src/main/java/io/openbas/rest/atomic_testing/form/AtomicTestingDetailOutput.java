@@ -24,27 +24,27 @@ import java.util.Map;
 @Builder
 public class AtomicTestingDetailOutput {
 
-  @JsonProperty("atomic_id")
+  @JsonProperty("inject_id")
   @Enumerated(EnumType.STRING)
   @NotBlank
   private String atomicId;
 
-  @JsonProperty("atomic_description")
+  @JsonProperty("inject_description")
   private String description;
 
   @JsonProperty("atomic_injector_label")
   private Map<String, String> injectorLabel = new HashMap<>();
 
-  @JsonProperty("atomic_content")
+  @JsonProperty("inject_content")
   private ObjectNode content;
 
-  @JsonProperty("atomic_expectations")
+  @JsonProperty("inject_expectations")
   private List<InjectExpectation> expectations = new ArrayList<>();
 
-  @JsonProperty("atomic_tags")
+  @JsonProperty("inject_tags")
   private List<Tag> tags = new ArrayList<>();
 
-  @JsonProperty("atomic_documents")
+  @JsonProperty("inject_documents")
   private List<InjectDocument> documents = new ArrayList<>();
 
   @JsonProperty("status_label")

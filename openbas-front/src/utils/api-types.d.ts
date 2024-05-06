@@ -136,13 +136,13 @@ export interface AssetGroupInput {
 }
 
 export interface AtomicTestingDetailOutput {
-  atomic_content?: object;
-  atomic_description?: string;
-  atomic_documents?: InjectDocument[];
-  atomic_expectations?: InjectExpectation[];
-  atomic_id: string;
   atomic_injector_label?: Record<string, string>;
-  atomic_tags?: Tag[];
+  inject_content?: object;
+  inject_description?: string;
+  inject_documents?: InjectDocument[];
+  inject_expectations?: InjectExpectation[];
+  inject_id: string;
+  inject_tags?: Tag[];
   status_label?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_traces?: string[];
   /** @format date-time */
@@ -173,6 +173,49 @@ export interface AtomicTestingInput {
   inject_teams?: string[];
   inject_title?: string;
   inject_type?: string;
+}
+
+export interface AtomicTestingOutput {
+  /** Result of expectations */
+  atomic_expectation_results: ExpectationResultsByType[];
+  /**
+   * Last Execution End date
+   * @format date-time
+   */
+  atomic_last_execution_end_date?: string;
+  /**
+   * Last Execution Start date
+   * @format date-time
+   */
+  atomic_last_execution_start_date?: string;
+  /** Status of execution */
+  atomic_status: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  atomic_tags?: string[];
+  /**
+   * Specifies the categories of targetResults for atomic testing.
+   * @example "assets, asset groups, teams, players"
+   */
+  atomic_targets: InjectTargetWithResult[];
+  /** Attack Patterns */
+  inject_attack_patterns: AttackPattern[];
+  /** Contract */
+  inject_contract: string;
+  /** Description */
+  inject_description: string;
+  /** Id */
+  inject_id: string;
+  inject_injector_contract: InjectorContract;
+  /** Kill Chain Phases */
+  inject_kill_chain_phases: KillChainPhase[];
+  /** Title */
+  inject_title: string;
+  /** Type */
+  inject_type: string;
+  /**
+   * Update date
+   * @format date-time
+   */
+  inject_updated_at?: string;
 }
 
 export interface AtomicTestingUpdateTagsInput {
