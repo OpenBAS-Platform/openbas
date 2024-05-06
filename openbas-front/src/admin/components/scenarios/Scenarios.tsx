@@ -113,7 +113,7 @@ const Scenarios = () => {
 
   const [scenarios, setScenarios] = useState<ScenarioStore[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
-    sorts: initSorting('scenario_name'),
+    sorts: initSorting('scenario_updated_at'),
   });
 
   // Category filter
