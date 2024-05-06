@@ -16,6 +16,10 @@ export const fetchAtomicTesting = (injectId: string) => (dispatch: Dispatch) => 
   const uri = `${ATOMIC_TESTING_URI}/${injectId}`;
   return getReferential(atomicTesting, uri)(dispatch);
 };
+export const fetchInjectResultDto = (injectId: string) => {
+  const uri = `${ATOMIC_TESTING_URI}/${injectId}`;
+  return simpleCall(uri);
+};
 
 export const fetchAtomicTestingDetail = (injectId: string) => (dispatch: Dispatch) => {
   const uri = `${ATOMIC_TESTING_URI}/${injectId}/detail`;

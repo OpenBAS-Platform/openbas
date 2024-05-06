@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
 import * as R from 'ramda';
 import { useNavigate } from 'react-router-dom';
-import type { AtomicTestingOutput, Inject } from '../../../../utils/api-types';
+import type { InjectResultDTO, Inject } from '../../../../utils/api-types';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
@@ -18,7 +18,7 @@ import type { TeamStore } from '../../../../actions/teams/Team';
 import { isNotEmptyField } from '../../../../utils/utils';
 
 interface Props {
-  atomic: AtomicTestingOutput;
+  atomic: InjectResultDTO;
   openEdit?: boolean;
   setOpenEdit?: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -35,11 +35,11 @@ const AtomicPopover: FunctionComponent<Props> = ({
 
   // Fetching data
   const { inject, teams } = useHelper((helper: AtomicTestingHelper & TeamsHelper) => ({
-    inject: helper.getInject(atomic.atomic_id),
+    inject: helper.getInject(atomic.inject_id),
     teams: helper.getTeams(),
   }));
   useDataLoader(() => {
-    dispatch(fetchAtomicTestingForUpdate(atomic.atomic_id));
+    dispatch(fetchAtomicTestingForUpdate(atomic.inject_id));
     dispatch(fetchTeams());
   });
 
@@ -74,7 +74,7 @@ const AtomicPopover: FunctionComponent<Props> = ({
   const [deletion, setDeletion] = useState(false);
   const handleDelete = () => setDeletion(true);
   const submitDelete = () => {
-    dispatch(deleteAtomicTesting(atomic.atomic_id));
+    dispatch(deleteAtomicTesting(atomic.inject_id));
     setDeletion(false);
     navigate('/admin/atomic_testings');
   };
@@ -87,7 +87,7 @@ const AtomicPopover: FunctionComponent<Props> = ({
     <>
       <ButtonPopover entries={entries} />
       <UpdateInject
-        injectorContract={JSON.parse(atomic.atomic_injector_contract.injector_contract_content)}
+        injectorContract={JSON.parse(atomic.inject_injector_contract.injector_contract_content)}
         open={isNotEmptyField(openEdit) ? openEdit : edition}
         handleClose={() => (setOpenEdit ? setOpenEdit(false) : setEdition(false))}
         onUpdateInject={onUpdateAtomicTesting}

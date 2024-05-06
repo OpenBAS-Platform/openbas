@@ -2,12 +2,8 @@ import { useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { Chip, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useAppDispatch } from '../../../../utils/hooks';
-import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/ServerSideEvent';
-import type { AtomicTestingOutput, AttackPattern, InjectTargetWithResult, KillChainPhase } from '../../../../utils/api-types';
-import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
-import { fetchAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import type { AttackPattern, InjectResultDTO, InjectTargetWithResult, KillChainPhase } from '../../../../utils/api-types';
+import { fetchInjectResultDto } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import ResponsePie from './ResponsePie';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
@@ -19,6 +15,7 @@ import ItemStatus from '../../../../components/ItemStatus';
 import SearchFilter from '../../../../components/SearchFilter';
 import InjectIcon from '../../common/injects/InjectIcon';
 import PlatformIcon from '../../../../components/PlatformIcon';
+import Loader from '../../../../components/Loader';
 
 const useStyles = makeStyles(() => ({
   chip: {
@@ -45,73 +42,72 @@ const AtomicTesting = () => {
   // Standard hooks
   const classes = useStyles();
   const { t, tPick } = useFormatter();
-  const dispatch = useAppDispatch();
-  const { atomicId } = useParams() as { atomicId: AtomicTestingOutput['atomic_id'] };
+  const { injectId } = useParams() as { injectId: InjectResultDTO['inject_id'] };
   const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
 
   // Fetching data
-  const { atomic }: { atomic: AtomicTestingOutput } = useHelper((helper: AtomicTestingHelper) => ({
-    atomic: helper.getAtomicTesting(atomicId),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchAtomicTesting(atomicId));
-  });
-
-  // Effects
+  const [injectResultDto, setInjectResultDto] = useState<InjectResultDTO>();
   useEffect(() => {
-    if (atomic && atomic.atomic_targets) {
-      setSelectedTarget(atomic.atomic_targets[0]);
-    }
-  }, [atomic]);
+    fetchInjectResultDto(injectId).then((result: { data: InjectResultDTO }) => {
+      setInjectResultDto(result.data);
+      if (result.data && result.data.inject_targets) {
+        setSelectedTarget(result.data.inject_targets[0]);
+      }
+    });
+  }, [injectId]);
 
-  const sortedTargets: InjectTargetWithResult[] = filtering.filterAndSort(atomic.atomic_targets);
+  const sortedTargets: InjectTargetWithResult[] = filtering.filterAndSort(injectResultDto?.inject_targets ?? []);
 
   // Handles
   const handleTargetClick = (target: InjectTargetWithResult) => {
     setSelectedTarget(target);
   };
 
+  if (!injectResultDto) {
+    return <Loader variant="inElement" />;
+  }
+
   return (
     <>
       <Grid
-        container={true}
+        container
         spacing={3}
         classes={{ container: classes.gridContainer }}
       >
-        <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
-          <Typography variant="h4" gutterBottom={true}>
+        <Grid item xs={6} style={{ paddingTop: 10 }}>
+          <Typography variant="h4" gutterBottom>
             {t('Information')}
           </Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined">
-            <Grid container={true} spacing={3}>
-              <Grid item={true} xs={12} style={{ paddingTop: 10 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Description')}
                 </Typography>
                 <ExpandableMarkdown
-                  source={atomic.atomic_description}
+                  source={injectResultDto.inject_description}
                   limit={300}
                 />
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Type')}
                 </Typography>
-                <Tooltip title={tPick(atomic.atomic_injector_contract.injector_contract_labels)}>
+                <Tooltip title={tPick(injectResultDto.inject_injector_contract.injector_contract_labels)}>
                   <div style={{ display: 'flex' }}>
                     <InjectIcon
                       variant="inline"
-                      tooltip={t(atomic.atomic_type)}
-                      type={atomic.atomic_type}
+                      tooltip={t(injectResultDto.inject_type ?? 'Unknown')}
+                      type={injectResultDto.inject_type ?? 'Unknown'}
                     />
                     <div style={{
                       marginLeft: 10,
@@ -120,21 +116,21 @@ const AtomicTesting = () => {
                       textOverflow: 'ellipsis',
                     }}
                     >
-                      {tPick(atomic.atomic_injector_contract.injector_contract_labels)}
+                      {tPick(injectResultDto.inject_injector_contract.injector_contract_labels)}
                     </div>
                   </div>
                 </Tooltip>
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Platforms')}
                 </Typography>
                 <div style={{ display: 'flex' }}>
-                  {atomic.atomic_injector_contract.injector_contract_platforms?.map((platform: string) => (
+                  {injectResultDto.inject_injector_contract.injector_contract_platforms?.map((platform: string) => (
                     <div key="platform" style={{ display: 'flex', marginRight: 15 }}>
                       <PlatformIcon width={20} platform={platform} marginRight={5} />
                       {platform}
@@ -142,26 +138,26 @@ const AtomicTesting = () => {
                   ))}
                 </div>
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Status')}
                 </Typography>
-                <ItemStatus status={atomic.atomic_status} label={t(atomic.atomic_status ?? 'Unknown')} />
+                <ItemStatus status={injectResultDto.inject_status?.status_name} label={t(injectResultDto.inject_status?.status_name ?? 'Unknown')} />
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Kill Chain Phases')}
                 </Typography>
-                {(atomic.atomic_kill_chain_phases ?? []).length === 0 && '-'}
-                {atomic.atomic_kill_chain_phases?.map((killChainPhase: KillChainPhase) => (
+                {(injectResultDto.inject_kill_chain_phases ?? []).length === 0 && '-'}
+                {injectResultDto.inject_kill_chain_phases?.map((killChainPhase: KillChainPhase) => (
                   <Chip
                     key={killChainPhase.phase_id}
                     variant="outlined"
@@ -171,16 +167,16 @@ const AtomicTesting = () => {
                   />
                 ))}
               </Grid>
-              <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
                   variant="h3"
-                  gutterBottom={true}
+                  gutterBottom
                   style={{ marginTop: 20 }}
                 >
                   {t('Attack Patterns')}
                 </Typography>
-                {(atomic.atomic_attack_patterns ?? []).length === 0 && '-'}
-                {atomic.atomic_attack_patterns?.map((attackPattern: AttackPattern) => (
+                {(injectResultDto.inject_attack_patterns ?? []).length === 0 && '-'}
+                {injectResultDto.inject_attack_patterns?.map((attackPattern: AttackPattern) => (
                   <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
                     <Chip
                       variant="outlined"
@@ -194,21 +190,21 @@ const AtomicTesting = () => {
             </Grid>
           </Paper>
         </Grid>
-        <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
-          <Typography variant="h4" gutterBottom={true}>
+        <Grid item xs={6} style={{ paddingTop: 10 }}>
+          <Typography variant="h4" gutterBottom>
             {t('Results')}
           </Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined" style={{ display: 'flex', alignItems: 'center' }}>
-            <ResponsePie expectationResultsByTypes={atomic.atomic_expectation_results} />
+            <ResponsePie expectationResultsByTypes={injectResultDto.inject_expectation_results} />
           </Paper>
         </Grid>
-        <Grid item={true} xs={6} style={{ marginTop: 25 }}>
-          <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
+        <Grid item xs={6} style={{ marginTop: 25 }}>
+          <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
             {t('Targets')}
           </Typography>
           <div style={{ float: 'right', marginTop: -15 }}>
             <SearchFilter
-              small={true}
+              small
               onChange={filtering.handleSearch}
               keyword={filtering.keyword}
               placeholder={t('Search by target name')}
@@ -230,26 +226,26 @@ const AtomicTesting = () => {
                 ))}
               </List>
             ) : (
-              <Empty message={t('No target configured for this atomic test.')} />
+              <Empty message={t('No target configured.')} />
             )}
           </Paper>
         </Grid>
-        <Grid item={true} xs={6} style={{ marginTop: 25 }}>
-          <Typography variant="h4" gutterBottom={true}>
+        <Grid item xs={6} style={{ marginTop: 25 }}>
+          <Typography variant="h4" gutterBottom>
             {t('Results by target')}
           </Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined" style={{ marginTop: 18 }}>
-            {selectedTarget && (
+            {selectedTarget && !!injectResultDto.inject_type && (
               <TargetResultsDetail
                 target={selectedTarget}
-                injectId={atomicId}
-                injectType={atomic.atomic_type}
-                lastExecutionStartDate={atomic.atomic_last_execution_start_date || ''}
-                lastExecutionEndDate={atomic.atomic_last_execution_end_date || ''}
+                injectId={injectId}
+                injectType={injectResultDto.inject_type}
+                lastExecutionStartDate={injectResultDto.inject_status?.tracking_sent_date || ''}
+                lastExecutionEndDate={injectResultDto.inject_status?.tracking_end_date || ''}
               />
             )}
             {!selectedTarget && (
-            <Empty message={t('No target data available.')} />
+              <Empty message={t('No target data available.')} />
             )}
           </Paper>
         </Grid>

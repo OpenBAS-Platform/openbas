@@ -8,6 +8,7 @@ import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.utils.AtomicTestingMapper.ResultDistribution;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.Hibernate;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,16 +18,16 @@ public class AtomicTestingUtils {
 
     public static List<InjectTargetWithResult> getTargets(
         final List<Team> teams,
-        final List<Endpoint> endpoints,
+        final List<Asset> assets,
         final List<AssetGroup> assetGroups) {
         List<InjectTargetWithResult> targets = new ArrayList<>();
         targets.addAll(teams
                 .stream()
                 .map(t -> new InjectTargetWithResult(TargetType.TEAMS, t.getId(), t.getName(), List.of(), null))
                 .toList());
-        targets.addAll(endpoints
+        targets.addAll(assets
                 .stream()
-                .map(t -> new InjectTargetWithResult(TargetType.ASSETS, t.getId(), t.getName(), List.of(), Objects.equals(t.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(t)).getPlatform() : null))
+                .map(t -> new InjectTargetWithResult(TargetType.ASSETS, t.getId(), t.getName(), List.of(), Objects.equals(t.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(t)).getPlatform(): null))
                 .toList());
         targets.addAll(assetGroups
                 .stream()

@@ -120,4 +120,12 @@ public class InjectStatus implements Base {
   public int hashCode() {
     return Objects.hash(id);
   }
+
+  // -- UTILS --
+
+  public static InjectStatus draftInjectStatus() {
+    InjectStatus draft = new InjectStatus();
+    draft.setName(ExecutionStatus.DRAFT);
+    return draft;
+  }
 }

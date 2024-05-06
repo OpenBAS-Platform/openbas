@@ -6,7 +6,7 @@ import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
-import type { AtomicTestingDetailOutput } from '../../../../utils/api-types';
+import type { AtomicTestingDetailOutput, InjectResultDTO } from '../../../../utils/api-types';
 import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import { fetchAtomicTestingDetail } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import ItemStatus from '../../../../components/ItemStatus';
@@ -34,18 +34,18 @@ const Detail: FunctionComponent<Props> = () => {
   const classes = useStyles();
   const { t, tPick } = useFormatter();
   const dispatch = useAppDispatch();
-  const { atomicId } = useParams() as { atomicId: AtomicTestingDetailOutput['atomic_id'] };
+  const { injectId } = useParams() as { injectId: InjectResultDTO['inject_id'] };
 
   // Fetching data
   const { atomicDetail }: {
     atomicDetail: AtomicTestingDetailOutput,
   } = useHelper((helper: AtomicTestingHelper) => ({
-    atomicDetail: helper.getAtomicTestingDetail(atomicId!),
+    atomicDetail: helper.getAtomicTestingDetail(injectId!),
   }));
 
   useEffect(() => {
-    dispatch(fetchAtomicTestingDetail(atomicId));
-  }, [dispatch, atomicId]);
+    dispatch(fetchAtomicTestingDetail(injectId));
+  }, [dispatch, injectId]);
 
   return (
     <Grid container spacing={2}>

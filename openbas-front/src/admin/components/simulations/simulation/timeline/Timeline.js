@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import { Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
+import { Link, useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { CastForEducationOutlined, CastOutlined } from '@mui/icons-material';
+import { CastForEducationOutlined, CastOutlined, PreviewOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
@@ -482,11 +482,13 @@ const Timeline = () => {
               {processedInjects.length > 0 ? (
                 <List style={{ paddingTop: 0 }}>
                   {processedInjects.map((inject) => (
-                    <ListItem
+                    <ListItemButton
                       key={inject.inject_id}
-                      dense={true}
+                      dense
                       classes={{ root: classes.item }}
-                      divider={true}
+                      divider
+                      component={Link}
+                      to={`/admin/exercises/${exerciseId}/injects/${inject.inject_id}?backlabel=Animation&backuri=/admin/exercises/${exerciseId}/animation/timeline`}
                     >
                       <ListItemIcon>
                         <InjectIcon type={inject.inject_type} variant="inline" />
@@ -529,9 +531,9 @@ const Timeline = () => {
                         }
                       />
                       <ListItemSecondaryAction>
-                        <InjectStatusDetails status={inject.inject_status} />
+                        <PreviewOutlined />
                       </ListItemSecondaryAction>
-                    </ListItem>
+                    </ListItemButton>
                   ))}
                 </List>
               ) : (
