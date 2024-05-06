@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import org.hibernate.Hibernate;
 
 public class AtomicTestingUtils {
 
@@ -25,7 +26,7 @@ public class AtomicTestingUtils {
                 .toList());
         targets.addAll(endpoints
                 .stream()
-                .map(t -> new InjectTargetWithResult(TargetType.ASSETS, t.getId(), t.getName(), List.of(), Objects.equals(t.getType(), "Endpoint") ? ((Endpoint) t).getPlatform() : null))
+                .map(t -> new InjectTargetWithResult(TargetType.ASSETS, t.getId(), t.getName(), List.of(), Objects.equals(t.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(t)).getPlatform() : null))
                 .toList());
         targets.addAll(assetGroups
                 .stream()
@@ -85,7 +86,7 @@ public class AtomicTestingUtils {
                         asset.getId(),
                         asset.getName(),
                         defaultExpectationResultsByTypes,
-                        Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) asset).getPlatform() : null
+                        Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null
                 );
 
                 targets.add(target);
@@ -104,7 +105,7 @@ public class AtomicTestingUtils {
                         asset.getId(),
                         asset.getName(),
                         defaultExpectationResultsByTypes,
-                        Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) asset).getPlatform() : null
+                        Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null
                 ));
             });
 
@@ -150,7 +151,7 @@ public class AtomicTestingUtils {
                                     )
                             )
                             .entrySet().stream()
-                            .map(entry -> new InjectTargetWithResult(TargetType.ASSETS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), Objects.equals(entry.getKey().getType(), "Endpoint") ? ((Endpoint) entry.getKey()).getPlatform() : null))
+                            .map(entry -> new InjectTargetWithResult(TargetType.ASSETS, entry.getKey().getId(), entry.getKey().getName(), entry.getValue(), Objects.equals(entry.getKey().getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(entry.getKey())).getPlatform() : null))
                             .toList()
             );
         }
@@ -187,7 +188,7 @@ public class AtomicTestingUtils {
                                         asset.getId(),
                                         asset.getName(),
                                         defaultExpectationResultsByTypes,
-                                        Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) asset).getPlatform() : null
+                                        Objects.equals(asset.getType(), "Endpoint") ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform() : null
                                 ));
                             }
                         });
