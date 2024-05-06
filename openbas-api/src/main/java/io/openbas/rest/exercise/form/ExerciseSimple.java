@@ -26,42 +26,45 @@ import static io.openbas.utils.ResultUtils.computeTargetResults;
 @Getter
 public class ExerciseSimple {
 
-    @JsonProperty("exercise_id")
-    @NotBlank
-    private String id;
+  @JsonProperty("exercise_id")
+  @NotBlank
+  private String id;
 
-    @JsonProperty("exercise_name")
-    @NotBlank
-    private String name;
+  @JsonProperty("exercise_name")
+  @NotBlank
+  private String name;
 
-    @JsonProperty("exercise_status")
-    @Enumerated(EnumType.STRING)
-    private Exercise.STATUS status;
+  @JsonProperty("exercise_status")
+  @Enumerated(EnumType.STRING)
+  private Exercise.STATUS status;
 
-    @JsonProperty("exercise_subtitle")
-    private String subtitle;
+  @JsonProperty("exercise_subtitle")
+  private String subtitle;
 
-    @JsonProperty("exercise_start_date")
-    private Instant start;
+  @JsonProperty("exercise_category")
+  private String category;
 
-    @JsonSerialize(using = MultiIdDeserializer.class)
-    @JsonProperty("exercise_tags")
-    private List<Tag> tags = new ArrayList<>();
+  @JsonProperty("exercise_start_date")
+  private Instant start;
 
-    @JsonProperty("exercise_global_score")
-    private List<AtomicTestingMapper.ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
+  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonProperty("exercise_tags")
+  private List<Tag> tags = new ArrayList<>();
 
-    @JsonProperty("exercise_targets")
-    @NotNull
-    private List<InjectTargetWithResult> targets;
+  @JsonProperty("exercise_global_score")
+  private List<AtomicTestingMapper.ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
 
-    public static ExerciseSimple fromExercise(Exercise exercise) {
-        ExerciseSimple simple = new ExerciseSimple();
-        BeanUtils.copyProperties(exercise, simple);
-        simple.setStart(exercise.getStart().orElse(null));
-        simple.setExpectationResultByTypes(computeGlobalExpectationResults(exercise.getInjects()));
-        simple.setTargets(computeTargetResults(exercise.getInjects()));
-        return simple;
-    }
+  @JsonProperty("exercise_targets")
+  @NotNull
+  private List<InjectTargetWithResult> targets;
+
+  public static ExerciseSimple fromExercise(Exercise exercise) {
+    ExerciseSimple simple = new ExerciseSimple();
+    BeanUtils.copyProperties(exercise, simple);
+    simple.setStart(exercise.getStart().orElse(null));
+    simple.setExpectationResultByTypes(computeGlobalExpectationResults(exercise.getInjects()));
+    simple.setTargets(computeTargetResults(exercise.getInjects()));
+    return simple;
+  }
 
 }

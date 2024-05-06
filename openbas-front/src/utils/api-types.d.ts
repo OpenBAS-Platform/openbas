@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -688,6 +689,7 @@ export interface ExerciseLessonsInput {
 }
 
 export interface ExerciseSimple {
+  exercise_category?: string;
   exercise_global_score?: ExpectationResultsByType[];
   exercise_id: string;
   exercise_name: string;

@@ -8,7 +8,8 @@ TeamUpdateInput,
   team_organization: Option | undefined;
   team_tags: Option[];
 };
-export type TeamStore = Omit<Team, 'team_organization' | 'team_tags'> & {
+export type TeamStore = Omit<Team, 'team_organization' | 'team_tags' | 'team_users'> & {
   team_organization: string | undefined;
   team_tags: string[] | undefined;
+  team_users: string[] | undefined;
 };

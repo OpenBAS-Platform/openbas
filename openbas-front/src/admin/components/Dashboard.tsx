@@ -18,7 +18,7 @@ import MitreMatrixDummy from './common/matrix/MitreMatrixDummy';
 import { horizontalBarsChartOptions, polarAreaChartOptions, verticalBarsChartOptions } from '../../utils/Charts';
 import { fetchExercises } from '../../actions/Exercise';
 import type { ExercisesHelper } from '../../actions/exercises/exercise-helper';
-import type { Exercise } from '../../utils/api-types';
+import type { ExerciseSimple } from '../../utils/api-types';
 import { daysAgo, fillTimeSeries, getNextWeek, groupBy } from '../../utils/Time';
 import ExerciseList from './simulations/ExerciseList';
 import type { AttackPatternHelper } from '../../actions/attack_patterns/attackpattern-helper';
@@ -84,7 +84,7 @@ const Dashboard = () => {
     attackPatterns: helper.getAttackPatterns(),
     killChainPhasesMap: helper.getKillChainPhasesMap(),
   }));
-  const exercisesOverTime = groupBy(exercises.filter((e: Exercise) => e.exercise_start_date !== null), 'exercise_start_date', 'week');
+  const exercisesOverTime = groupBy(exercises.filter((e: ExerciseSimple) => e.exercise_start_date !== null), 'exercise_start_date', 'week');
   const exercisesTimeSeries = fillTimeSeries(daysAgo(150), getNextWeek(), 'week', exercisesOverTime);
   const exercisesData = [
     {
@@ -95,7 +95,7 @@ const Dashboard = () => {
       })),
     },
   ];
-  const countByCategory = R.countBy(R.prop('exercise_category'), exercises);
+  const countByCategory = R.countBy((exercise: ExerciseSimple) => exercise?.exercise_category || t('Unknown'), exercises);
   const categoriesLabels: string[] = R.keys(countByCategory).length > 0 ? R.keys(countByCategory) : categoriesLabelsFakeData;
   const categoriesData: number[] = R.values(countByCategory).length > 0 ? R.values(countByCategory) : categoriesDataFakeData;
   const sortByY = R.sortWith([R.descend(R.prop('y'))]);
@@ -199,7 +199,7 @@ const Dashboard = () => {
           {(statistics?.inject_expectation_results ?? []).length > 0
             ? <MitreMatrix injectResults={statistics?.inject_expectation_results ?? []} />
             : <MitreMatrixDummy />
-            }
+          }
         </Paper>
       </Grid>
     </Grid>
