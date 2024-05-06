@@ -19,7 +19,6 @@ import { splitDuration } from '../../../../../utils/Time';
 import InjectPopover from '../../../common/injects/InjectPopover';
 import InjectStatus from '../../../common/injects/InjectStatus';
 import { truncate } from '../../../../../utils/String';
-import InjectStatusDetails from '../../../common/injects/InjectStatusDetails';
 import ProgressBarCountdown from '../../../../../components/ProgressBarCountdown';
 import AnimationMenu from '../AnimationMenu';
 import { usePermissions } from '../../../../../utils/Exercise';
