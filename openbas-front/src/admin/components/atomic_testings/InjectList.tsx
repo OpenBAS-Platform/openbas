@@ -84,7 +84,7 @@ const InjectList: FunctionComponent<Props> = ({
   // Filter and sort hook
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
-    sorts: initSorting('inject_updated_at'),
+    sorts: initSorting('inject_updated_at', 'DESC'),
   });
 
   // Headers
@@ -112,7 +112,7 @@ const InjectList: FunctionComponent<Props> = ({
     {
       field: 'inject_targets',
       label: 'Target',
-      isSortable: true,
+      isSortable: false,
       value: (injectDto: InjectResultDTO) => {
         return (<ItemTargets targets={injectDto.inject_targets} />);
       },
@@ -137,7 +137,7 @@ const InjectList: FunctionComponent<Props> = ({
     },
     {
       field: 'inject_updated_at',
-      label: 'Update',
+      label: 'Updated',
       isSortable: true,
       value: (injectDto: InjectResultDTO) => fldt(injectDto.inject_updated_at),
     },
@@ -164,6 +164,7 @@ const InjectList: FunctionComponent<Props> = ({
                 inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
+                defaultSortAsc
               />
             }
           />

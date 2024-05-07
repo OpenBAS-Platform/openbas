@@ -138,7 +138,7 @@ const ExerciseList: FunctionComponent<Props> = ({
     tagsMap: helper.getTagsMap(),
   }));
   const searchColumns = ['name'];
-  const filtering = useSearchAnFilter('exercise', 'exercise_start_date', searchColumns, { orderAsc: false });
+  const filtering = useSearchAnFilter('exercise', 'start_date', searchColumns, { orderAsc: false });
   const sortedExercises = limit ? R.take(limit, filtering.filterAndSort(exercises)) : filtering.filterAndSort(exercises);
   return (
     <>

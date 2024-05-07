@@ -1,7 +1,7 @@
 import type { SortField } from '../../../utils/api-types';
 
-export const initSorting: (property: string) => SortField[] = (property: string) => {
-  return [{ property }];
+export const initSorting: (property: string, direction?: string) => SortField[] = (property: string, direction?: string) => {
+  return [{ property, direction }];
 };
 
 // Pageable

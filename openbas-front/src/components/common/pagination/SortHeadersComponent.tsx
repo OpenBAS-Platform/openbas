@@ -41,6 +41,7 @@ interface Props {
   inlineStylesHeaders: Record<string, CSSProperties>;
   searchPaginationInput: SearchPaginationInput;
   setSearchPaginationInput: (datas: SearchPaginationInput) => void;
+  defaultSortAsc?: boolean;
 }
 
 const SortHeadersComponent: FunctionComponent<Props> = ({
@@ -48,13 +49,14 @@ const SortHeadersComponent: FunctionComponent<Props> = ({
   inlineStylesHeaders,
   searchPaginationInput,
   setSearchPaginationInput,
+  defaultSortAsc = false,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
   const classes = useStyles();
 
   const [sortBy, setSortBy] = useState(searchPaginationInput.sorts?.[0].property ?? '');
-  const [sortAsc, setSortAsc] = useState(true);
+  const [sortAsc, setSortAsc] = useState(defaultSortAsc);
 
   const reverseBy = (field: string) => {
     setSortBy(field);
