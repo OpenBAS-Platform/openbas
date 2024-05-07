@@ -1,23 +1,19 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
 import { Paper, Tab, Tabs, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow } from 'reactflow';
 import 'reactflow/dist/style.css';
-import type { InjectTargetWithResult } from '../../../../utils/api-types';
-import { useHelper } from '../../../../store';
-import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
-import { fetchAtomicTesting, fetchAtomicTestingDetail, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
-import { useAppDispatch } from '../../../../utils/hooks';
+import type { InjectResultDTO, InjectTargetWithResult } from '../../../../utils/api-types';
+import { fetchInjectResultDto, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import InjectIcon from '../../common/injects/InjectIcon';
 import Empty from '../../../../components/Empty';
-import useDataLoader from '../../../../utils/ServerSideEvent';
 import ManualExpectationsValidationForm from '../../simulations/simulation/validation/expectations/ManualExpectationsValidationForm';
-import type { AtomicTestingDetailOutputStore } from '../../../../actions/atomic_testings/atomic-testing';
 import type { InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
 import nodeTypes from './types/nodes';
 import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
+import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
 
 interface Steptarget {
   label: string;
@@ -59,7 +55,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   const classes = useStyles();
   const theme = useTheme<Theme>();
   const { nsdt, t } = useFormatter();
-  const dispatch = useAppDispatch();
   const [initialized, setInitialized] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [targetResults, setTargetResults] = useState<InjectExpectationsStore[]>([]);
@@ -80,14 +75,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   }, [nodes, fitView]);
 
   // Fetching data
-  const { atomicTestingDetails }: {
-    atomicTestingDetails: AtomicTestingDetailOutputStore,
-  } = useHelper((helper: AtomicTestingHelper) => ({
-    atomicTestingDetails: helper.getAtomicTestingDetail(injectId),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchAtomicTestingDetail(injectId));
-  });
+  const { injectResultDto, updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
   useEffect(() => {
     if (target) {
       setInitialized(false);
@@ -119,7 +107,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
       setActiveTab(0);
       setTimeout(() => setInitialized(true), 1000);
     }
-  }, [target]);
+  }, [injectResultDto, target]);
 
   const getStatus = (status: string[]) => {
     if (status.includes('UNKNOWN')) {
@@ -180,19 +168,20 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   };
 
   const onUpdateManualValidation = () => {
-    dispatch(fetchAtomicTestingDetail(injectId));
-    dispatch(fetchAtomicTesting(injectId));
+    fetchInjectResultDto(injectId).then((result: { data: InjectResultDTO }) => {
+      updateInjectResultDto(result.data);
+    });
   };
 
   const renderLogs = (targetResult: string, targetResultList: InjectExpectationsStore[]) => {
     if (targetResult === 'MANUAL') {
       return (
         <div style={{ marginTop: 16 }}>
-          {atomicTestingDetails?.atomic_expectations?.filter((es) => es.inject_expectation_type === 'MANUAL' && es.targetId === target.id)
+          {injectResultDto?.inject_expectations?.filter((es) => es.inject_expectation_type === 'MANUAL' && es.targetId === target.id)
             .map((expectation) => (
               <ManualExpectationsValidationForm
                 key={expectation.inject_expectation_id}
-                expectation={expectation}
+                expectation={expectation as InjectExpectationsStore}
                 onUpdate={onUpdateManualValidation}
               />
             ))}

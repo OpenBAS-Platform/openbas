@@ -4,14 +4,13 @@ import { Box, Tab, Tabs } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Loader from '../../../../components/Loader';
 import { errorWrapper } from '../../../../components/Error';
-import { useAppDispatch } from '../../../../utils/hooks';
 import NotFound from '../../../../components/NotFound';
 import { useFormatter } from '../../../../components/i18n';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import AtomicTestingHeader from './AtomicTestingHeader';
-import { fetchAtomicTesting, fetchAtomicTestingDetail, fetchInjectResultDto } from '../../../../actions/atomic_testings/atomic-testing-actions';
-import { AtomicTestingResultContext, AtomicTestingResultContextType } from '../../common/Context';
+import { fetchInjectResultDto } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import type { InjectResultDTO } from '../../../../utils/api-types';
+import { InjectResultDtoContext } from '../InjectResultDtoContext';
 
 const useStyles = makeStyles(() => ({
   item: {
@@ -38,8 +37,14 @@ const IndexAtomicTestingComponent: FunctionComponent<{ atomic: InjectResultDTO }
   if (location.pathname.includes(`/admin/atomic_testings/${atomic.inject_id}/detail`)) {
     tabValue = `/admin/atomic_testings/${atomic.inject_id}/detail`;
   }
+  const [injectResultDto, setInjectResultDto] = useState<InjectResultDTO>(atomic);
+
+  const updateInjectResultDto = (newData: InjectResultDTO) => {
+    setInjectResultDto(newData);
+  };
+
   return (
-    <>
+    <InjectResultDtoContext.Provider value={{ injectResultDto, updateInjectResultDto }}>
       <Breadcrumbs variant="object" elements={[
         { label: t('Atomic testings'), link: '/admin/atomic_testings' },
         { label: atomic.inject_title, current: true },
@@ -78,14 +83,11 @@ const IndexAtomicTestingComponent: FunctionComponent<{ atomic: InjectResultDTO }
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
-    </>
+    </InjectResultDtoContext.Provider>
   );
 };
 
 const Index = () => {
-  // Standard hooks
-  const dispatch = useAppDispatch();
-
   // Fetching data
   const { injectId } = useParams() as { injectId: InjectResultDTO['inject_id'] };
   const [injectResultDto, setInjectResultDto] = useState<InjectResultDTO>();
@@ -96,19 +98,9 @@ const Index = () => {
     });
   }, [injectId]);
 
-  // Context
-  const context: AtomicTestingResultContextType = {
-    onLaunchAtomicTesting(): void {
-      dispatch(fetchAtomicTesting(injectId));
-      dispatch(fetchAtomicTestingDetail(injectId));
-    },
-  };
-
   if (injectResultDto) {
     return (
-      <AtomicTestingResultContext.Provider value={context}>
-        <IndexAtomicTestingComponent atomic={injectResultDto} />
-      </AtomicTestingResultContext.Provider>
+      <IndexAtomicTestingComponent atomic={injectResultDto} />
     );
   }
   return <Loader />;

@@ -4,10 +4,9 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.inject_expectation.InjectExpectationService;
-import io.openbas.rest.atomic_testing.form.AtomicTestingDetailOutput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
-import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
+import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.AtomicTestingService;
 import io.openbas.utils.AtomicTestingMapper;
@@ -15,10 +14,8 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,19 +48,6 @@ public class AtomicTestingApi extends RestBehavior {
   public InjectResultDTO findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId)
         .map(AtomicTestingMapper::toDtoWithTargetResults)
-        .orElseThrow();
-  }
-
-  @Transactional
-  @GetMapping("/{injectId}/detail")
-  public AtomicTestingDetailOutput findAtomicTestingWithDetail(@PathVariable String injectId) {
-    return atomicTestingService.findById(injectId)
-        .map(inject -> {
-          Hibernate.initialize(inject.getTags());
-          Hibernate.initialize(inject.getDocuments());
-          Hibernate.initialize(inject.getExpectations());
-          return AtomicTestingMapper.toDetailDto(inject);
-        })
         .orElseThrow();
   }
 

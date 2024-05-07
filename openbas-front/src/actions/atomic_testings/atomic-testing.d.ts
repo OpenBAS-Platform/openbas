@@ -1,6 +1,6 @@
-import type { AtomicTestingDetailOutput } from '../../utils/api-types';
 import { InjectExpectationsStore } from '../../admin/components/common/injects/expectations/Expectation';
+import type { InjectResultDTO } from '../../utils/api-types';
 
-export type AtomicTestingDetailOutputStore = Omit<AtomicTestingDetailOutput, 'atomic_expectations'> & {
+export type InjectResultDTOStore = Omit<InjectResultDTO, 'atomic_expectations'> & {
   atomic_expectations: InjectExpectationsStore[] | undefined
 };

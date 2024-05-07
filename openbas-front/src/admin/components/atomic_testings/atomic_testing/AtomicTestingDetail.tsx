@@ -1,15 +1,15 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent, useContext } from 'react';
 import { Props } from 'html-react-parser/lib/attributes-to-props';
-import { useParams } from 'react-router-dom';
 import { Grid, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
-import type { AtomicTestingDetailOutput, InjectResultDTO } from '../../../../utils/api-types';
-import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
-import { fetchAtomicTestingDetail } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import ItemStatus from '../../../../components/ItemStatus';
+import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import { fetchDocuments } from '../../../../actions/Document';
+import type { DocumentsHelper } from '../../../../actions/helper';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -30,28 +30,25 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Detail: FunctionComponent<Props> = () => {
+const AtomicTestingDetail: FunctionComponent<Props> = () => {
   const classes = useStyles();
   const { t, tPick } = useFormatter();
   const dispatch = useAppDispatch();
-  const { injectId } = useParams() as { injectId: InjectResultDTO['inject_id'] };
 
   // Fetching data
-  const { atomicDetail }: {
-    atomicDetail: AtomicTestingDetailOutput,
-  } = useHelper((helper: AtomicTestingHelper) => ({
-    atomicDetail: helper.getAtomicTestingDetail(injectId!),
+  const { injectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
+  const { documentMap } = useHelper((helper: DocumentsHelper) => ({
+    documentMap: helper.getDocumentsMap(),
   }));
-
-  useEffect(() => {
-    dispatch(fetchAtomicTestingDetail(injectId));
-  }, [dispatch, injectId]);
+  useDataLoader(() => {
+    dispatch(fetchDocuments());
+  });
 
   return (
     <Grid container spacing={2}>
       <Grid item xs={12} style={{ marginBottom: 30 }}>
         <Typography variant="h4">{t('Configuration')}</Typography>
-        {atomicDetail ? (
+        {injectResultDto ? (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <div className={classes.flexContainer}>
               <div>
@@ -59,7 +56,7 @@ const Detail: FunctionComponent<Props> = () => {
                   {t('Description')}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  {atomicDetail?.inject_description || '-'}
+                  {injectResultDto?.inject_description || '-'}
                 </Typography>
               </div>
               <div>
@@ -67,7 +64,7 @@ const Detail: FunctionComponent<Props> = () => {
                   {t('Type')}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  {tPick(atomicDetail.atomic_injector_label)}
+                  {tPick(injectResultDto.inject_injector_contract.injector_contract_labels)}
                 </Typography>
               </div>
               <div>
@@ -75,8 +72,8 @@ const Detail: FunctionComponent<Props> = () => {
                   {t('Expectations')}
                 </Typography>
                 {
-                  atomicDetail.inject_expectations !== undefined && atomicDetail.inject_expectations.length > 0
-                    ? atomicDetail.inject_expectations.map((expectation, index) => (
+                  injectResultDto.inject_expectations !== undefined && injectResultDto.inject_expectations.length > 0
+                    ? injectResultDto.inject_expectations.map((expectation, index) => (
                       <Typography key={index} variant="body1">
                         {expectation.inject_expectation_name}
                       </Typography>
@@ -90,10 +87,11 @@ const Detail: FunctionComponent<Props> = () => {
                   {t('Documents')}
                 </Typography>
                 {
-                  atomicDetail.inject_documents !== undefined && atomicDetail.inject_documents.length > 0
-                    ? atomicDetail.inject_documents.map((document, index) => {
+                  injectResultDto.injects_documents !== undefined && injectResultDto.injects_documents.length > 0
+                    ? injectResultDto.injects_documents.map((documentId) => {
+                      const document = documentMap[documentId];
                       return (
-                        <Typography key={index} variant="body1">
+                        <Typography key={documentId} variant="body1">
                           {document.document_name}
                         </Typography>
                       );
@@ -112,41 +110,41 @@ const Detail: FunctionComponent<Props> = () => {
       </Grid>
       <Grid item xs={12} style={{ marginBottom: 30 }}>
         <Typography variant="h4">{t('Execution logs')}</Typography>
-        {atomicDetail ? (
+        {injectResultDto ? (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Typography variant="subtitle1" className={classes.header} gutterBottom>
               {t('Status')}
             </Typography>
-            {atomicDetail.status_label
-              && <ItemStatus status={atomicDetail.status_label} label={t(atomicDetail.status_label)} />
+            {injectResultDto.inject_status?.status_name
+              && <ItemStatus status={injectResultDto.inject_status?.status_name} label={t(injectResultDto.inject_status?.status_name)} />
             }
             <Typography variant="subtitle1" className={classes.header} style={{ marginTop: 20 }} gutterBottom>
               {t('Traces')}
             </Typography>
             <pre>
-              {atomicDetail.tracking_sent_date ? (
+              {injectResultDto.inject_status?.tracking_sent_date ? (
                 <>
                   <Typography variant="body1" gutterBottom>
-                    {t('Tracking Sent Date')}: {atomicDetail.tracking_sent_date}
+                    {t('Tracking Sent Date')}: {injectResultDto.inject_status?.tracking_sent_date}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    {t('Tracking Ack Date')}: {atomicDetail.tracking_ack_date}
+                    {t('Tracking Ack Date')}: {injectResultDto.inject_status?.tracking_ack_date}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    {t('Tracking End Date')}: {atomicDetail.tracking_end_date}
+                    {t('Tracking End Date')}: {injectResultDto.inject_status?.tracking_end_date}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
                     {t('Tracking Total Execution')}
-                    {t('Time')}: {atomicDetail.tracking_total_execution_time} ms
+                    {t('Time')}: {injectResultDto.inject_status?.tracking_total_execution_time} ms
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    {t('Tracking Total Count')}: {atomicDetail.tracking_total_count}
+                    {t('Tracking Total Count')}: {injectResultDto.inject_status?.tracking_total_count}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    {t('Tracking Total Error')}: {atomicDetail.tracking_total_error}
+                    {t('Tracking Total Error')}: {injectResultDto.inject_status?.tracking_total_error}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    {t('Tracking Total Success')}: {atomicDetail.tracking_total_success}
+                    {t('Tracking Total Success')}: {injectResultDto.inject_status?.tracking_total_success}
                   </Typography>
                 </>
               ) : (
@@ -155,22 +153,20 @@ const Detail: FunctionComponent<Props> = () => {
                 </Typography>
               )}
 
-              {atomicDetail.status_traces && (
+              {(injectResultDto.inject_status?.status_traces?.length ?? 0) > 0 && (
                 <>
-
                   <Typography variant="body1" gutterBottom>
                     {t('Traces')}:
                   </Typography>
                   <ul>
-                    {atomicDetail.status_traces.map((trace, index) => (
+                    {injectResultDto.inject_status?.status_traces?.map((trace, index) => (
                       <li key={index} className={classes.listItem}>
-                        {trace}
+                        {`${trace.execution_status} ${trace.execution_message}`}
                       </li>
                     ))}
                   </ul>
                 </>
               )}
-
             </pre>
           </Paper>
         ) : (
@@ -183,4 +179,4 @@ const Detail: FunctionComponent<Props> = () => {
   );
 };
 
-export default Detail;
+export default AtomicTestingDetail;

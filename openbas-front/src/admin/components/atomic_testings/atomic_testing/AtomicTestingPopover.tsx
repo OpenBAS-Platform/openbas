@@ -1,21 +1,21 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
 import * as R from 'ramda';
 import { useNavigate } from 'react-router-dom';
-import type { InjectResultDTO, Inject } from '../../../../utils/api-types';
+import type { Inject, InjectResultDTO } from '../../../../utils/api-types';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ButtonPopover, { ButtonPopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { deleteAtomicTesting, fetchAtomicTestingForUpdate, updateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useHelper } from '../../../../store';
-import { AtomicTestingResultContext } from '../../common/Context';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
 import UpdateInject from '../../common/injects/UpdateInject';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import { fetchTeams } from '../../../../actions/teams/team-actions';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import { isNotEmptyField } from '../../../../utils/utils';
+import type { AtomicTestingHelper } from '../../../../actions/atomic_testings/atomic-testing-helper';
+import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
 
 interface Props {
   atomic: InjectResultDTO;
@@ -23,7 +23,7 @@ interface Props {
   setOpenEdit?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const AtomicPopover: FunctionComponent<Props> = ({
+const AtomicTestingPopover: FunctionComponent<Props> = ({
   atomic,
   openEdit,
   setOpenEdit,
@@ -34,6 +34,7 @@ const AtomicPopover: FunctionComponent<Props> = ({
   const navigate = useNavigate();
 
   // Fetching data
+  const { updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
   const { inject, teams } = useHelper((helper: AtomicTestingHelper & TeamsHelper) => ({
     inject: helper.getInject(atomic.inject_id),
     teams: helper.getTeams(),
@@ -42,9 +43,6 @@ const AtomicPopover: FunctionComponent<Props> = ({
     dispatch(fetchAtomicTestingForUpdate(atomic.inject_id));
     dispatch(fetchTeams());
   });
-
-  // Context
-  const { onLaunchAtomicTesting } = useContext(AtomicTestingResultContext);
 
   // Edition
   const [edition, setEdition] = useState(false);
@@ -66,23 +64,26 @@ const AtomicPopover: FunctionComponent<Props> = ({
         'inject_tags',
       ]),
     )(data);
-    await dispatch(updateAtomicTesting(inject.inject_id, toUpdate));
-    onLaunchAtomicTesting();
+    updateAtomicTesting(inject.inject_id, toUpdate).then((result: { data: InjectResultDTO }) => {
+      updateInjectResultDto(result.data);
+    });
   };
 
   // Deletion
   const [deletion, setDeletion] = useState(false);
   const handleDelete = () => setDeletion(true);
   const submitDelete = () => {
-    dispatch(deleteAtomicTesting(atomic.inject_id));
-    setDeletion(false);
-    navigate('/admin/atomic_testings');
+    deleteAtomicTesting(atomic.inject_id).then(() => {
+      setDeletion(false);
+      navigate('/admin/atomic_testings');
+    });
   };
   // Button Popover
   const entries: ButtonPopoverEntry[] = [
     { label: 'Update', action: setOpenEdit ? () => setOpenEdit(true) : handleEdit },
     { label: 'Delete', action: handleDelete },
   ];
+
   return (
     <>
       <ButtonPopover entries={entries} />
@@ -92,8 +93,8 @@ const AtomicPopover: FunctionComponent<Props> = ({
         handleClose={() => (setOpenEdit ? setOpenEdit(false) : setEdition(false))}
         onUpdateInject={onUpdateAtomicTesting}
         inject={inject}
-        isAtomic={true}
-        teamsFromExerciseOrScenario={teams?.filter((team: TeamStore) => !team.team_contextual)}
+        isAtomic
+        teamsFromExerciseOrScenario={teams?.filter((team: TeamStore) => !team.team_contextual) ?? []}
       />
       <DialogDelete
         open={deletion}
@@ -105,4 +106,4 @@ const AtomicPopover: FunctionComponent<Props> = ({
   );
 };
 
-export default AtomicPopover;
+export default AtomicTestingPopover;
