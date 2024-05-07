@@ -2,7 +2,6 @@ import React, { CSSProperties, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { ComputerOutlined } from '@mui/icons-material';
-import { differenceInHours } from 'date-fns';
 import { useSearchParams } from 'react-router-dom';
 import EndpointCreation from './EndpointCreation';
 import EndpointPopover from './EndpointPopover';

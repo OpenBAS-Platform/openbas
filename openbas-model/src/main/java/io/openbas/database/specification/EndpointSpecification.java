@@ -9,4 +9,7 @@ public class EndpointSpecification {
         return (root, query, criteriaBuilder) -> criteriaBuilder.isFalse(root.get("temporaryExecution"));
     }
 
+    public static Specification<Endpoint> findTemporaryEndpoints() {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.isTrue(root.get("temporaryExecution"));
+    }
 }

@@ -118,7 +118,6 @@ public class CalderaExecutorService implements Runnable {
             Endpoint matchingExistingEndpoint = matchingExistingEndpoints.getFirst();
             matchingExistingEndpoint.setLastSeen(external.getLastSeen());
             this.endpointService.updateEndpoint(matchingExistingEndpoint);
-            log.info("Updating existing endpoint " + matchingExistingEndpoint.getHostname());
         } else {
             List<Endpoint> matchingInactiveEndpoints = existingList.stream().filter(existingEndpoint -> !existingEndpoint.getActive()).toList();
             if (!matchingInactiveEndpoints.isEmpty()) {
@@ -127,7 +126,6 @@ public class CalderaExecutorService implements Runnable {
                 matchingInactiveEndpoint.setExternalReference(external.getExternalReference());
                 matchingInactiveEndpoint.setLastSeen(external.getLastSeen());
                 this.endpointService.updateEndpoint(matchingInactiveEndpoint);
-                log.info("Update existing dead endpoint " + matchingInactiveEndpoint.getHostname());
             } else {
                 external.setTemporaryExecution(true);
                 this.endpointService.createEndpoint(external);

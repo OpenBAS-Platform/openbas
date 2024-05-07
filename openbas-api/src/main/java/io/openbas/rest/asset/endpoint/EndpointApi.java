@@ -48,7 +48,7 @@ public class EndpointApi {
   @GetMapping(ENDPOINT_URI)
   @PreAuthorize("isObserver()")
   public List<Endpoint> endpoints() {
-    return this.endpointService.endpoints();
+    return this.endpointService.endpoints(EndpointSpecification.findMainEndpoints());
   }
 
   @PostMapping(ENDPOINT_URI + "/search")

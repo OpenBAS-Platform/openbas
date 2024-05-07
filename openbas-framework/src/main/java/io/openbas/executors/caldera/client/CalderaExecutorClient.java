@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPatch;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
@@ -111,6 +112,26 @@ public class CalderaExecutorClient {
         }
     }
 
+    public void killAgent(Endpoint endpoint) {
+        try {
+            Map<String, Object> body = new HashMap<>();
+            body.put("watchdog", 1);
+            body.put("sleep_min", 3);
+            body.put("sleep_max", 3);
+            this.patch(this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getExternalReference(), body);
+        } catch (ClientProtocolException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteAgent(Endpoint endpoint) {
+        try {
+            this.delete(this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getExternalReference());
+        } catch (ClientProtocolException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     // -- EXPLOITS --
 
     private final static String EXPLOIT_URI = "/exploit";
@@ -167,6 +188,22 @@ public class CalderaExecutorClient {
                     httpPost,
                     response -> EntityUtils.toString(response.getEntity())
             );
+        } catch (IOException e) {
+            throw new ClientProtocolException("Unexpected response for request on: " + url);
+        }
+    }
+
+    private void patch(
+            @NotBlank final String url,
+            @NotNull final Map<String, Object> body) throws ClientProtocolException {
+        try {
+            HttpPatch httpPatch = new HttpPatch(url);
+            // Headers
+            httpPatch.addHeader(KEY_HEADER, this.config.getApiKey());
+            // Body
+            StringEntity entity = new StringEntity(this.objectMapper.writeValueAsString(body));
+            httpPatch.setEntity(entity);
+            this.httpClient.execute(httpPatch);
         } catch (IOException e) {
             throw new ClientProtocolException("Unexpected response for request on: " + url);
         }

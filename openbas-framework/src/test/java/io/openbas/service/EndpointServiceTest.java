@@ -58,10 +58,6 @@ public class EndpointServiceTest {
     endpoint.setPlatform(Linux);
     endpoint.setHostname("hostname");
     endpoint.setPlatform(Linux);
-    endpoint.setSources(new HashMap<>(){{
-      put("Manual", "manual");
-      put("Caldera", "caldera-id");
-    }});
 
     // -- EXECUTE --
     Endpoint endpointCreated = this.endpointService.createEndpoint(endpoint);

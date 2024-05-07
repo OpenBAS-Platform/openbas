@@ -80,7 +80,7 @@ public class CalderaContract extends Contractor {
                 "obfuscator",
                 "Obfuscators",
                 obfuscatorChoices,
-                obfuscatorChoices.keySet().stream().findFirst().orElse("")
+                "base64"
         );
     }
 
