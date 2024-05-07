@@ -143,8 +143,10 @@ const TopBar: React.FC = () => {
   };
 
   // Full Text search
-  const onFullTextSearch = (search: string) => {
-    navigate(`/admin/fulltextsearch?search=${search}`);
+  const onFullTextSearch = (search?: string) => {
+    if (search) {
+      navigate(`/admin/fulltextsearch?search=${search}`);
+    }
   };
 
   return (

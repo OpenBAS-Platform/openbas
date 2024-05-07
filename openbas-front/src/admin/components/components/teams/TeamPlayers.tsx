@@ -278,7 +278,7 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
           <div className={classes.search}>
             <SearchFilter
               fullWidth={true}
-              onChange={setKeyword}
+              onChange={(value?: string) => setKeyword(value || '')}
               keyword={keyword}
             />
           </div>

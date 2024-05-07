@@ -80,8 +80,8 @@ const InjectAddDocuments: FunctionComponent<Props> = ({
     setDocumentsIds([]);
   };
 
-  const handleSearchDocuments = (value: string) => {
-    setKeyword(value);
+  const handleSearchDocuments = (value?: string) => {
+    setKeyword(value || '');
   };
 
   const handleAddTag = (value: Option) => {

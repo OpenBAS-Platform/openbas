@@ -204,7 +204,6 @@ const AtomicTesting = () => {
           </Typography>
           <div style={{ float: 'right', marginTop: -15 }}>
             <SearchFilter
-              small
               onChange={filtering.handleSearch}
               keyword={filtering.keyword}
               placeholder={t('Search by target name')}
