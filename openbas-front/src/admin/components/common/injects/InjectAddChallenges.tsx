@@ -77,8 +77,8 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
     setChallengesIds([]);
   };
 
-  const handleSearchChallenges = (value: string) => {
-    setKeyword(value);
+  const handleSearchChallenges = (value?: string) => {
+    setKeyword(value || '');
   };
 
   const handleAddTag = (value: Option) => {

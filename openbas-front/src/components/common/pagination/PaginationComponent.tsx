@@ -55,9 +55,9 @@ const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, s
 
   // Text Search
   const [textSearch, setTextSearch] = React.useState(searchPaginationInput.textSearch ?? '');
-  const handleTextSearch = (value: string) => {
+  const handleTextSearch = (value?: string) => {
     setPage(0);
-    setTextSearch(value);
+    setTextSearch(value || '');
   };
 
   useEffect(() => {

@@ -78,8 +78,8 @@ const InjectAddArticles: FunctionComponent<Props> = ({
     setArticleIds([]);
   };
 
-  const handleSearchArticles = (value: string) => {
-    setKeyword(value);
+  const handleSearchArticles = (value?: string) => {
+    setKeyword(value || '');
   };
 
   const addArticle = (articleId: string) => setArticleIds(R.append(articleId, articleIds));

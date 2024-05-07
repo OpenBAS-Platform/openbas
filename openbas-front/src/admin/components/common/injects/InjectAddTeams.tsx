@@ -78,8 +78,8 @@ const InjectAddTeams: FunctionComponent<Props> = ({
     setTeamsIds([]);
   };
 
-  const handleSearchTeams = (value: string) => {
-    setKeyword(value);
+  const handleSearchTeams = (value?: string) => {
+    setKeyword(value || '');
   };
 
   const handleAddTag = (value: Option) => {

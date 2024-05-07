@@ -139,7 +139,7 @@ const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
               <Grid container={true} spacing={3}>
                 <Grid item={true} xs={6}>
                   <SearchFilter
-                    onChange={setKeyword}
+                    onChange={(value?: string) => setKeyword(value || '')}
                     fullWidth={true}
                   />
                 </Grid>
