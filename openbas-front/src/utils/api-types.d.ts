@@ -136,13 +136,13 @@ export interface AssetGroupInput {
 }
 
 export interface AtomicTestingDetailOutput {
-  atomic_content?: object;
-  atomic_description?: string;
-  atomic_documents?: InjectDocument[];
-  atomic_expectations?: InjectExpectation[];
-  atomic_id: string;
   atomic_injector_label?: Record<string, string>;
-  atomic_tags?: Tag[];
+  inject_content?: object;
+  inject_description?: string;
+  inject_documents?: InjectDocument[];
+  inject_expectations?: InjectExpectation[];
+  inject_id: string;
+  inject_tags?: Tag[];
   status_label?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_traces?: string[];
   /** @format date-time */
@@ -1019,6 +1019,8 @@ export interface InjectResultDTO {
   inject_title: string;
   /** Type */
   inject_type: string;
+  /** @format date-time */
+  inject_updated_at?: string;
   injects_tags?: string[];
 }
 
