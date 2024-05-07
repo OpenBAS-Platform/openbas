@@ -10,6 +10,8 @@ import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -153,6 +155,15 @@ public class Team implements Base {
     @NotNull
     public long getInjectExceptationsTotalExpectedScore() {
         return getInjectExpectations().stream().mapToLong(InjectExpectation::getExpectedScore).sum();
+    }
+
+    @JsonProperty("team_injects_expectations_total_expected_score_by_exercise")
+    @NotNull
+    public Map<String, Long> getInjectExpectationsTotalExpectedScoreByExercise() {
+        return getInjectExpectations().stream()
+            .filter(expectation -> Objects.nonNull(expectation.getExercise()))
+            .collect(Collectors.groupingBy(expectation -> expectation.getExercise().getId(),
+                Collectors.summingLong(InjectExpectation::getExpectedScore)));
     }
     // endregion
 
