@@ -5,6 +5,7 @@ import io.openbas.rest.injector_contract.form.InjectorContractInput;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
+import java.util.Map;
 
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
@@ -30,6 +31,9 @@ public class InjectorCreateInput {
 
     @JsonProperty("injector_category")
     private String category;
+
+    @JsonProperty("injector_executor_commands")
+    private Map<String, String> executorCommands;
 
     public String getId() {
         return id;
@@ -77,5 +81,13 @@ public class InjectorCreateInput {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public Map<String, String> getExecutorCommands() {
+        return executorCommands;
+    }
+
+    public void setExecutorCommands(Map<String, String> executorCommands) {
+        this.executorCommands = executorCommands;
     }
 }

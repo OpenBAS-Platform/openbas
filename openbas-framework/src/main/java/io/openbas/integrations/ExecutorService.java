@@ -34,7 +34,7 @@ public class ExecutorService {
     }
 
     @Transactional
-    public void register(String id, String type, String name, InputStream iconData, String[] platforms) throws Exception {
+    public Executor register(String id, String type, String name, InputStream iconData, String[] platforms) throws Exception {
         if (iconData != null) {
             fileService.uploadStream(EXECUTORS_IMAGES_BASE_PATH, type + ".png", iconData);
         }
@@ -59,6 +59,7 @@ public class ExecutorService {
             newExecutor.setPlatforms(platforms);
             executorRepository.save(newExecutor);
         }
+        return executor;
     }
 
 }

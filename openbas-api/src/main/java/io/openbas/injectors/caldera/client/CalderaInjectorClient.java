@@ -38,11 +38,11 @@ public class CalderaInjectorClient {
 
   // -- ABILITIES --
 
-  private final static String ABILITY_URI = "/abilities";
+  private final static String ABILITIES_URI = "/abilities";
 
   public List<Ability> abilities() {
     try {
-      String jsonResponse = this.get(this.config.getRestApiV2Url() + ABILITY_URI);
+      String jsonResponse = this.get(this.config.getRestApiV2Url() + ABILITIES_URI);
       return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
       });
     } catch (ClientProtocolException | JsonProcessingException e) {

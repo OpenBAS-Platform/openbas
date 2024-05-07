@@ -18,7 +18,8 @@ public class EmailInjector {
                     EMAIL_INJECTOR_NAME,
                     contract,
                     false,
-                    "communication"
+                    "communication",
+                    null
             );
         } catch (Exception e) {
             throw new RuntimeException(e);

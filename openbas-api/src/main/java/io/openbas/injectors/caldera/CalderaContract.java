@@ -148,7 +148,6 @@ public class CalderaContract extends Contractor {
                     platforms,
                     true
             );
-            contract.addContext("collector-ids", String.join(", ", this.config.getCollectorIds()));
             contract.addAttackPattern(ability.getTechnique_id());
             return contract;
         })).collect(Collectors.toList());

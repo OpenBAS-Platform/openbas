@@ -33,10 +33,13 @@ public class EndpointService {
   }
 
   @Transactional(readOnly = true)
-  public List<Endpoint> findBySourceAndHostname(
-      @NotBlank final String sourceKey,
-      @NotBlank final String hostname) {
-    return this.endpointRepository.findBySourceAndHostname(sourceKey, hostname);
+  public List<Endpoint> findByHostname(@NotBlank final String hostname) {
+    return this.endpointRepository.findByHostname(hostname);
+  }
+
+  @Transactional(readOnly = true)
+  public List<Endpoint> findExecutorsByHostname(@NotBlank final String hostname) {
+    return this.endpointRepository.findExecutorsByHostname(hostname);
   }
 
   public List<Endpoint> endpoints() {

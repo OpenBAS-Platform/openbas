@@ -34,6 +34,8 @@ public class Executor {
 
     private QueueService queueService;
 
+    private ExecutionExecutorService executionExecutorService;
+
     @Autowired
     public void setQueueService(QueueService queueService) {
         this.queueService = queueService;
@@ -52,6 +54,11 @@ public class Executor {
     @Autowired
     public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
         this.injectStatusRepository = injectStatusRepository;
+    }
+
+    @Autowired
+    public void setExecutionExecutorService(ExecutionExecutorService executionExecutorService) {
+        this.executionExecutorService = executionExecutorService;
     }
 
     @Autowired
@@ -100,9 +107,23 @@ public class Executor {
         Optional<Injector> externalInjector = injectorRepository.findByType(inject.getType());
 
         return externalInjector
-            .map(Injector::isExternal)
-            .map(isExternal -> isExternal ? executeExternal(executableInject, inject) : executeInternal(executableInject, inject))
-            .orElseThrow(() -> new IllegalStateException("External injector not found for type: " + inject.getType()));
+                .map(Injector::isExternal)
+                .map(isExternal -> {
+                    ExecutableInject newExecutableInject = executableInject;
+                    if (inject.getInjectorContract().getNeedsExecutor() ) {
+                        try {
+                            newExecutableInject = this.executionExecutorService.launchExecutorContext(executableInject, inject);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    if (isExternal) {
+                        return executeExternal(newExecutableInject, inject);
+                    } else {
+                        return executeInternal(newExecutableInject, inject);
+                    }
+                })
+                .orElseThrow(() -> new IllegalStateException("External injector not found for type: " + inject.getType()));
     }
 
     // region utils

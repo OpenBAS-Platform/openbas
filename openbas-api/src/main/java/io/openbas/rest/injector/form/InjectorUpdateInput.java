@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
@@ -26,4 +27,7 @@ public class InjectorUpdateInput {
 
     @JsonProperty("injector_category")
     private String category;
+
+    @JsonProperty("injector_executor_commands")
+    private Map<String, String> executorCommands;
 }

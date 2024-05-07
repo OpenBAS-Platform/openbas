@@ -16,11 +16,11 @@ public interface EndpointRepository extends CrudRepository<Endpoint, String>,
     StatisticRepository,
     JpaSpecificationExecutor<Endpoint> {
 
-  @Query(value = "select e.* from assets e where e.asset_sources[:sourceKey] IS NOT NULL AND e.endpoint_hostname = :hostname", nativeQuery = true)
-  List<Endpoint> findBySourceAndHostname(
-      @NotBlank final @Param("sourceKey") String sourceKey,
-      @NotBlank final @Param("hostname") String hostname
-  );
+  @Query(value = "select e.* from assets e where e.endpoint_hostname = :hostname", nativeQuery = true)
+  List<Endpoint> findByHostname(@NotBlank final @Param("hostname") String hostname);
+
+  @Query(value = "select e.* from assets e where e.asset_temporary_execution and e.endpoint_hostname = :hostname", nativeQuery = true)
+  List<Endpoint> findExecutorsByHostname(@NotBlank final @Param("hostname") String hostname);
 
   @Override
   @Query("select COUNT(DISTINCT a) from Inject i " +

@@ -27,15 +27,8 @@ public class CalderaInjectorConfig {
   @NotBlank
   private String id;
 
-  @Getter
-  @NotEmpty
-  private List<String> collectorIds;
-
   @NotBlank
   private String url;
-
-  @NotBlank
-  private String publicUrl;
 
   @Getter
   @NotBlank
@@ -55,9 +48,5 @@ public class CalderaInjectorConfig {
 
   public String getUrl() {
     return url;
-  }
-
-  public String getPublicUrl() {
-    return publicUrl;
   }
 }

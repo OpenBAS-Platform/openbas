@@ -5,7 +5,7 @@ import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Setting;
 import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
-import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
+import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.settings.form.SettingsEnterpriseEditionUpdateInput;
@@ -55,7 +55,7 @@ public class PlatformSettingsApi extends RestBehavior {
 
     private AiConfig aiConfig;
 
-    private CalderaInjectorConfig calderaInjectorConfig;
+    private CalderaExecutorConfig calderaExecutorConfig;
 
     @Resource
     private OpenBASConfig openBASConfig;
@@ -71,8 +71,8 @@ public class PlatformSettingsApi extends RestBehavior {
     }
 
     @Autowired
-    public void setCalderaInjectorConfig(CalderaInjectorConfig calderaInjectorConfig) {
-        this.calderaInjectorConfig = calderaInjectorConfig;
+    public void setCalderaExecutorConfig(CalderaExecutorConfig calderaExecutorConfig) {
+        this.calderaExecutorConfig = calderaExecutorConfig;
     }
 
     @Autowired
@@ -196,7 +196,7 @@ public class PlatformSettingsApi extends RestBehavior {
             platformSettings.setAiHasToken(!aiConfig.getToken().isBlank());
             platformSettings.setAiType(aiConfig.getType());
             platformSettings.setAiModel(aiConfig.getModel());
-            platformSettings.setCalderaPublicUrl(calderaInjectorConfig.getPublicUrl());
+            platformSettings.setCalderaPublicUrl(calderaExecutorConfig.getPublicUrl());
 
             // Build admin settings
             if (user.isAdmin()) {

@@ -18,7 +18,8 @@ public class ChannelInjector {
                     CHANNEL_INJECTOR_NAME,
                     contract,
                     false,
-                    "media-pressure"
+                    "media-pressure",
+                    null
             );
         } catch (Exception e) {
             throw new RuntimeException(e);

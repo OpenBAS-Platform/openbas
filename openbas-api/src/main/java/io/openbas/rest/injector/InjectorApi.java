@@ -1,5 +1,6 @@
 package io.openbas.rest.injector;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -116,13 +117,15 @@ public class InjectorApi extends RestBehavior {
             String name,
             List<InjectorContractInput> contracts,
             Boolean customContracts,
-            String category) {
+            String category,
+            Map<String, String> executorCommands) {
         injector.setUpdatedAt(Instant.now());
         injector.setType(type);
         injector.setName(name);
         injector.setExternal(true);
         injector.setCustomContracts(customContracts);
         injector.setCategory(category);
+        injector.setExecutorCommands(executorCommands);
         List<String> existing = new ArrayList<>();
         List<String> toDeletes = new ArrayList<>();
         injector.getContracts().forEach(contract -> {
@@ -163,7 +166,8 @@ public class InjectorApi extends RestBehavior {
                 input.getName(),
                 input.getContracts(),
                 input.getCustomContracts(),
-                input.getCategory()
+                input.getCategory(),
+                input.getExecutorCommands()
         );
     }
 
@@ -216,7 +220,8 @@ public class InjectorApi extends RestBehavior {
                         input.getName(),
                         input.getContracts(),
                         input.getCustomContracts(),
-                        input.getCategory()
+                        input.getCategory(),
+                        input.getExecutorCommands()
                 );
             } else {
                 // save the injector
@@ -227,6 +232,7 @@ public class InjectorApi extends RestBehavior {
                 newInjector.setType(input.getType());
                 newInjector.setCategory(input.getCategory());
                 newInjector.setCustomContracts(input.getCustomContracts());
+                newInjector.setExecutorCommands(input.getExecutorCommands());
                 Injector savedInjector = injectorRepository.save(newInjector);
                 // Save the contracts
                 List<InjectorContract> injectorContracts = input.getContracts().stream()

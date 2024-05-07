@@ -3,10 +3,12 @@ package io.openbas.execution;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.openbas.database.model.*;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 public class ExecutableInject {
@@ -21,6 +23,8 @@ public class ExecutableInject {
     private final List<Asset> assets;
     private final List<AssetGroup> assetGroups;
     private final List<ExecutionContext> users;
+    @Setter
+    private Map<String, Asset> subProcessorAssets;
 
     @JsonIgnore
     private final List<MultipartFile> directAttachments = new ArrayList<>();

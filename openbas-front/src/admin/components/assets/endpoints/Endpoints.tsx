@@ -19,6 +19,7 @@ import SortHeadersComponent from '../../../../components/common/pagination/SortH
 import { initSorting } from '../../../../components/common/pagination/Page';
 import type { SearchPaginationInput } from '../../../../utils/api-types';
 import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
+import PlatformIcon from '../../../../components/PlatformIcon';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -48,24 +49,19 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '25%',
   },
   endpoint_hostname: {
-    width: '20%',
+    width: '25%',
   },
   endpoint_platform: {
     width: '15%',
-  },
-  endpoint_collected_by: {
-    width: '20%',
+    display: 'flex',
+    alignItems: 'center',
   },
   asset_tags: {
-    width: '10%',
+    width: '20%',
   },
   asset_status: {
-    width: '10%',
+    width: '15%',
   },
-};
-
-const collectedBy = (endpoint: EndpointStore) => {
-  return Object.keys(endpoint.asset_sources ?? {}).join(', ');
 };
 
 const Endpoints = () => {
@@ -83,14 +79,11 @@ const Endpoints = () => {
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
 
-  const MAX_ALIVE_HOURS = 6;
-
   // Headers
   const headers = [
     { field: 'asset_name', label: 'Name', isSortable: true },
     { field: 'endpoint_hostname', label: 'Hostname', isSortable: true },
     { field: 'endpoint_platform', label: 'Platform', isSortable: true },
-    { field: 'endpoint_collected_by', label: 'Collected by', isSortable: false },
     { field: 'asset_tags', label: 'Tags', isSortable: true },
     { field: 'asset_status', label: 'Status', isSortable: false },
   ];
@@ -175,18 +168,13 @@ const Endpoints = () => {
                     {endpoint.endpoint_hostname}
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
-                    {endpoint.endpoint_platform}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.endpoint_collected_by}>
-                    {collectedBy(endpoint)}
+                    <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} /> {endpoint.endpoint_platform}
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.asset_tags}>
                     <ItemTags variant="list" tags={endpoint.asset_tags} />
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.asset_status}>
-                    <AssetStatus variant="list"
-                      status={(endpoint.asset_last_seen && differenceInHours(new Date().toISOString(), endpoint.asset_last_seen) <= MAX_ALIVE_HOURS) ? 'Active' : 'Inactive'}
-                    />
+                    <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'} />
                   </div>
                 </div>
               }

@@ -3,6 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
+import io.hypersistence.utils.hibernate.type.basic.PostgreSQLHStoreType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
@@ -12,9 +13,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static java.time.Instant.now;
 
@@ -57,6 +56,12 @@ public class Injector implements Base {
     @Column(name = "injector_custom_contracts")
     @JsonProperty("injector_custom_contracts")
     private boolean customContracts = false;
+
+    @Getter
+    @Column(name = "injector_executor_commands")
+    @JsonProperty("injector_executor_commands")
+    @Type(PostgreSQLHStoreType.class)
+    private Map<String, String> executorCommands = new HashMap<>();
 
     @Getter
     @Column(name = "injector_created_at")

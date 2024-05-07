@@ -105,8 +105,8 @@ const InjectList: FunctionComponent<Props> = ({
     },
     {
       field: 'inject_status',
-      label: 'Last Start Execution Date',
-      isSortable: false,
+      label: 'Execution Date',
+      isSortable: true,
       value: (injectDto: InjectResultDTO) => fldt(injectDto.inject_status?.tracking_sent_date),
     },
     {
@@ -119,10 +119,10 @@ const InjectList: FunctionComponent<Props> = ({
     },
     {
       field: 'inject_status',
-      label: 'Inject Execution Status',
+      label: 'Status',
       isSortable: true,
-      value: (injectDTO: InjectResultDTO) => {
-        return (<ItemStatus status={injectDTO.inject_status?.status_name} label={t(injectDTO.inject_status?.status_name)} variant="inList" />);
+      value: (injectDto: InjectResultDTO) => {
+        return (<ItemStatus status={injectDto.inject_status?.status_name} label={t(injectDto.inject_status?.status_name)} variant="inList" />);
       },
     },
     {

@@ -2,22 +2,19 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLHStoreType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.Setter;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static jakarta.persistence.DiscriminatorType.STRING;
 import static java.time.Instant.now;
@@ -31,6 +28,8 @@ import static lombok.AccessLevel.NONE;
 @EntityListeners(ModelBaseListener.class)
 public class Asset implements Base {
 
+  public static final int ACTIVE_THRESHOLD = 120000; // milliseconds
+
   @Id
   @Column(name = "asset_id")
   @GeneratedValue(generator = "UUID")
@@ -43,16 +42,6 @@ public class Asset implements Base {
   @JsonProperty("asset_type")
   @Setter(NONE)
   private String type;
-
-  @Column(name = "asset_sources")
-  @JsonProperty("asset_sources")
-  @Type(PostgreSQLHStoreType.class)
-  private Map<String, String> sources = new HashMap<>();
-
-  @Column(name = "asset_blobs")
-  @JsonProperty("asset_blobs")
-  @Type(PostgreSQLHStoreType.class)
-  private Map<String, String> blobs = new HashMap<>();
 
   @Queryable(searchable = true, sortable = true)
   @NotBlank
@@ -68,6 +57,14 @@ public class Asset implements Base {
   @JsonProperty("asset_last_seen")
   private Instant lastSeen;
 
+  @Column(name = "asset_external_reference")
+  @JsonProperty("asset_external_reference")
+  private String externalReference;
+
+  @Column(name = "asset_temporary_execution")
+  @JsonProperty("asset_temporary_execution")
+  private Boolean temporaryExecution;
+
   // -- TAG --
 
   @Queryable(sortable = true)
@@ -78,6 +75,17 @@ public class Asset implements Base {
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("asset_tags")
   private List<Tag> tags = new ArrayList<>();
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "asset_executor")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("asset_executor")
+  private Executor executor;
+
+  @JsonProperty("asset_active")
+  public boolean getActive() {
+    return (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < ACTIVE_THRESHOLD;
+  }
 
   // -- AUDIT --
 

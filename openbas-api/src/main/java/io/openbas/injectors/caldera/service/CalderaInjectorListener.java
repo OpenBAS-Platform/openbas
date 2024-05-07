@@ -61,7 +61,7 @@ public class CalderaInjectorListener {
           ResultStatus resultStatus = this.calderaService.results(linkId);
 
           String currentAssetId = totalAssets.stream()
-              .filter((a) -> a.getSources().containsValue(resultStatus.getPaw()))
+              .filter((a) -> a.getExternalReference().equals(resultStatus.getPaw()))
               .findFirst()
               .map(Asset::getId)
               .orElseThrow();

@@ -1,15 +1,19 @@
 package io.openbas.rest.asset.endpoint;
 
 import io.openbas.asset.EndpointService;
+import io.openbas.database.model.Document;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.repository.TagRepository;
+import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -50,9 +54,12 @@ public class EndpointApi {
   @PostMapping(ENDPOINT_URI + "/search")
   public Page<Endpoint> endpoints(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-        this.endpointRepository::findAll,
-        searchPaginationInput,
-        Endpoint.class
+            (Specification<Endpoint> specification, Pageable pageable) -> this.endpointRepository.findAll(
+                    EndpointSpecification.findMainEndpoints().and(specification),
+                    pageable
+            ),
+            searchPaginationInput,
+            Endpoint.class
     );
   }
 

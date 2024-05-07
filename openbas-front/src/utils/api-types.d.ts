@@ -97,16 +97,18 @@ export interface ArticleUpdateInput {
 }
 
 export interface Asset {
-  asset_blobs?: Record<string, string>;
+  asset_active?: boolean;
   /** @format date-time */
   asset_created_at?: string;
   asset_description?: string;
+  asset_executor?: Executor;
+  asset_external_reference?: string;
   asset_id: string;
   /** @format date-time */
   asset_last_seen?: string;
   asset_name: string;
-  asset_sources?: Record<string, string>;
   asset_tags?: Tag[];
+  asset_temporary_execution?: boolean;
   asset_type?: string;
   /** @format date-time */
   asset_updated_at?: string;
@@ -560,16 +562,18 @@ export interface DryrunCreateInput {
 }
 
 export interface Endpoint {
-  asset_blobs?: Record<string, string>;
+  asset_active?: boolean;
   /** @format date-time */
   asset_created_at?: string;
   asset_description?: string;
+  asset_executor?: Executor;
+  asset_external_reference?: string;
   asset_id: string;
   /** @format date-time */
   asset_last_seen?: string;
   asset_name: string;
-  asset_sources?: Record<string, string>;
   asset_tags?: Tag[];
+  asset_temporary_execution?: boolean;
   asset_type?: string;
   /** @format date-time */
   asset_updated_at?: string;

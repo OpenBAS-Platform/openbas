@@ -42,161 +42,121 @@ import static io.openbas.model.expectation.PreventionExpectation.preventionExpec
 @Log
 public class CalderaExecutor extends Injector {
 
-  private final CalderaInjectorConfig config;
-  private final CalderaInjectorService calderaService;
-  private final AssetGroupService assetGroupService;
-  private final InjectRepository injectRepository;
+    private final CalderaInjectorConfig config;
+    private final CalderaInjectorService calderaService;
+    private final AssetGroupService assetGroupService;
+    private final InjectRepository injectRepository;
 
-  @Override
-  @Transactional
-  public ExecutionProcess process(@NotNull final Execution execution, @NotNull final ExecutableInject injection)
-      throws Exception {
-    CalderaInjectContent content = contentConvert(injection, CalderaInjectContent.class);
-    String obfuscator = content.getObfuscator();
+    @Override
+    @Transactional
+    public ExecutionProcess process(@NotNull final Execution execution, @NotNull final ExecutableInject injection) throws Exception {
+        CalderaInjectContent content = contentConvert(injection, CalderaInjectContent.class);
+        String obfuscator = content.getObfuscator();
+        Inject inject = this.injectRepository.findById(injection.getInjection().getInject().getId()).orElseThrow();
 
-    Inject inject = this.injectRepository.findById(injection.getInjection().getInject().getId()).orElseThrow();
+        Map<Asset, Boolean> assets = this.resolveAllAssets(injection);
 
-    Map<Asset, Boolean> assets = this.computeValidAsset(inject);
+        List<String> asyncIds = new ArrayList<>();
+        List<Expectation> expectations = new ArrayList<>();
 
-    List<String> asyncIds = new ArrayList<>();
-    List<Expectation> expectations = new ArrayList<>();
+        // Execute inject for all assets
+        Map<String, Asset> paws = computePaws(injection.getSubProcessorAssets(), assets.keySet().stream().toList());
+        String contract = inject.getInjectorContract().getId();
+        for (Map.Entry<String, Asset> entryPaw : paws.entrySet()) {
+            try {
+                this.calderaService.exploit(obfuscator, entryPaw.getKey(), contract);
+                ExploitResult exploitResult = this.calderaService.exploitResult(entryPaw.getKey(), contract);
+                asyncIds.add(exploitResult.getLinkId());
+                execution.addTrace(traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
 
-    // Execute inject for all assets
-    Map<String, Asset> paws = computePaws(assets.keySet().stream().toList());
-    String contract = inject.getInjectorContract().getId();
-    for (Map.Entry<String, Asset> entryPaw : paws.entrySet()) {
-      try {
-        this.calderaService.exploit(obfuscator, entryPaw.getKey(), contract);
-        ExploitResult exploitResult = this.calderaService.exploitResult(entryPaw.getKey(), contract);
-        asyncIds.add(exploitResult.getLinkId());
-        execution.addTrace(traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
-
-        // Compute expectations
-        boolean isInGroup = assets.get(entryPaw.getValue());
-        computeExpectationsForAsset(expectations, content, entryPaw.getValue(), isInGroup);
-      } catch (Exception e) {
-        log.log(Level.SEVERE, "Caldera failed to execute ability on asset " + entryPaw.getValue().getId(),
-            e.getMessage());
-      }
-    }
-
-    List<AssetGroup> assetGroups = inject.getAssetGroups();
-    assetGroups.forEach((assetGroup -> computeExpectationsForAssetGroup(expectations, content, assetGroup)));
-
-    if (asyncIds.isEmpty()) {
-      throw new UnsupportedOperationException("Caldera inject needs at least one valid asset");
-    }
-
-    String message = "Caldera execute ability on " + asyncIds.size() + " asset(s)";
-    execution.addTrace(traceInfo(message, asyncIds));
-
-    return new ExecutionProcess(true, expectations);
-  }
-
-  // -- PRIVATE --
-
-  private Map<Asset, Boolean> computeValidAsset(@NotNull final Inject inject) {
-    Map<Asset, Boolean> assets = new HashMap<>();
-    inject.getAssets().forEach((asset -> {
-      // Verify asset validity
-      asset.getSources().keySet().forEach((key) -> {
-        if (this.config.getCollectorIds().contains(key)) {
-          assets.put(asset, false);
+                // Compute expectations
+                boolean isInGroup = assets.get(entryPaw.getValue());
+                computeExpectationsForAsset(expectations, content, entryPaw.getValue(), isInGroup);
+            } catch (Exception e) {
+                log.log(Level.SEVERE, "Caldera failed to execute ability on asset " + entryPaw.getValue().getId(), e.getMessage());
+            }
         }
-      });
-    }));
 
-    inject.getAssetGroups().forEach((assetGroup -> {
-      List<Asset> assetsFromGroup = this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
-      // Verify asset validity
-      assetsFromGroup.forEach((asset) -> {
-        asset.getSources().keySet().forEach((key) -> {
-          if (this.config.getCollectorIds().contains(key)) {
-            assets.put(asset, true);
-          }
+        List<AssetGroup> assetGroups = injection.getAssetGroups();
+        assetGroups.forEach((assetGroup -> computeExpectationsForAssetGroup(expectations, content, assetGroup)));
+
+        if (asyncIds.isEmpty()) {
+            throw new UnsupportedOperationException("Caldera inject needs at least one valid asset");
+        }
+
+        String message = "Caldera execute ability on " + asyncIds.size() + " asset(s)";
+        execution.addTrace(traceInfo(message, asyncIds));
+
+        return new ExecutionProcess(true, expectations);
+    }
+
+    // -- PRIVATE --
+
+    private Map<Asset, Boolean> resolveAllAssets(@NotNull final ExecutableInject inject) {
+        Map<Asset, Boolean> assets = new HashMap<>();
+        inject.getAssets().forEach((asset -> {
+            assets.put(asset, false);
+        }));
+        inject.getAssetGroups().forEach((assetGroup -> {
+            List<Asset> assetsFromGroup = this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
+            // Verify asset validity
+            assetsFromGroup.forEach((asset) -> {
+                assets.put(asset, true);
+            });
+        }));
+        return assets;
+    }
+
+    private Map<String, Asset> computePaws(@NotNull final Map<String, Asset> subProcessorAssets, @NotNull final List<Asset> assets) {
+        Map<String, Asset> paws = new HashMap<>();
+        assets.forEach((asset) -> {
+            if (subProcessorAssets.containsKey(asset.getId())) {
+                paws.put(subProcessorAssets.get(asset.getId()).getExternalReference(), asset);
+            }
         });
-      });
-    }));
-    return assets;
-  }
-
-  private Map<String, Asset> computePaws(@NotNull final List<Asset> assets) {
-    Map<String, Asset> paws = new HashMap<>();
-    assets.forEach((asset) -> {
-      asset.getSources().keySet().forEach((key) -> {
-        if (this.config.getCollectorIds().contains(key)) {
-          paws.put(asset.getSources().get(key), asset);
-        }
-      });
-    });
-    return paws;
-  }
-
-  /**
-   * In case of direct asset, we have an individual expectation for the asset
-   */
-  private void computeExpectationsForAsset(
-      @NotNull final List<Expectation> expectations,
-      @NotNull final CalderaInjectContent content,
-      @NotNull final Asset asset,
-      final boolean expectationGroup) {
-    if (!content.getExpectations().isEmpty()) {
-      expectations.addAll(
-          content.getExpectations()
-              .stream()
-              .flatMap((expectation) -> switch (expectation.getType()) {
-                case PREVENTION -> Stream.of(preventionExpectationForAsset(
-                    expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup
-                )); // expectationGroup usefully in front-end
-                case DETECTION -> Stream.of(detectionExpectation(
-                    expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup
-                ));
-                default -> Stream.of();
-              })
-              .toList()
-      );
+        return paws;
     }
-  }
 
-  /**
-   * In case of asset group if expectation group -> we have an expectation for the group and one for each asset if not
-   * expectation group -> we have an individual expectation for each asset
-   */
-  private void computeExpectationsForAssetGroup(
-      @NotNull final List<Expectation> expectations,
-      @NotNull final CalderaInjectContent content,
-      @NotNull final AssetGroup assetGroup) {
-    if (!content.getExpectations().isEmpty()) {
-      expectations.addAll(
-          content.getExpectations()
-              .stream()
-              .flatMap((expectation) -> switch (expectation.getType()) {
+    /**
+     * In case of direct asset, we have an individual expectation for the asset
+     */
+    private void computeExpectationsForAsset(@NotNull final List<Expectation> expectations, @NotNull final CalderaInjectContent content, @NotNull final Asset asset, final boolean expectationGroup) {
+        if (!content.getExpectations().isEmpty()) {
+            expectations.addAll(content.getExpectations().stream().flatMap((expectation) -> switch (expectation.getType()) {
+                case PREVENTION ->
+                        Stream.of(preventionExpectationForAsset(expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup)); // expectationGroup usefully in front-end
+                case DETECTION ->
+                        Stream.of(detectionExpectation(expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup));
+                default -> Stream.of();
+            }).toList());
+        }
+    }
+
+    /**
+     * In case of asset group if expectation group -> we have an expectation for the group and one for each asset if not
+     * expectation group -> we have an individual expectation for each asset
+     */
+    private void computeExpectationsForAssetGroup(@NotNull final List<Expectation> expectations, @NotNull final CalderaInjectContent content, @NotNull final AssetGroup assetGroup) {
+        if (!content.getExpectations().isEmpty()) {
+            expectations.addAll(content.getExpectations().stream().flatMap((expectation) -> switch (expectation.getType()) {
                 case PREVENTION -> {
-                  // Verify that at least one asset in the group has been executed
-                  List<Asset> assets = this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
-                  if (assets.stream().anyMatch((asset) -> expectations.stream().filter(e->EXPECTATION_TYPE.PREVENTION == e.type())
-                      .anyMatch((e) -> ((PreventionExpectation) e).getAsset() != null && ((PreventionExpectation) e).getAsset().getId().equals(asset.getId())))) {
-                    yield Stream.of(preventionExpectationForAssetGroup(
-                        expectation.getScore(), expectation.getName(), expectation.getDescription(), assetGroup, expectation.isExpectationGroup()
-                    ));
-                  }
-                  yield Stream.of();
+                    // Verify that at least one asset in the group has been executed
+                    List<Asset> assets = this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
+                    if (assets.stream().anyMatch((asset) -> expectations.stream().filter(e -> EXPECTATION_TYPE.PREVENTION == e.type()).anyMatch((e) -> ((PreventionExpectation) e).getAsset() != null && ((PreventionExpectation) e).getAsset().getId().equals(asset.getId())))) {
+                        yield Stream.of(preventionExpectationForAssetGroup(expectation.getScore(), expectation.getName(), expectation.getDescription(), assetGroup, expectation.isExpectationGroup()));
+                    }
+                    yield Stream.of();
                 }
                 case DETECTION -> {
-                  // Verify that at least one asset in the group has been executed
-                  List<Asset> assets = this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
-                  if (assets.stream().anyMatch((asset) -> expectations.stream().filter(e->EXPECTATION_TYPE.DETECTION == e.type())
-                      .anyMatch((e) -> ((DetectionExpectation) e).getAsset() != null &&  ((DetectionExpectation) e).getAsset().getId().equals(asset.getId())))) {
-                    yield Stream.of(detectionExpectationForAssetGroup(
-                        expectation.getScore(), expectation.getName(), expectation.getDescription(), assetGroup, expectation.isExpectationGroup()
-                    ));
-                  }
-                  yield Stream.of();
+                    // Verify that at least one asset in the group has been executed
+                    List<Asset> assets = this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
+                    if (assets.stream().anyMatch((asset) -> expectations.stream().filter(e -> EXPECTATION_TYPE.DETECTION == e.type()).anyMatch((e) -> ((DetectionExpectation) e).getAsset() != null && ((DetectionExpectation) e).getAsset().getId().equals(asset.getId())))) {
+                        yield Stream.of(detectionExpectationForAssetGroup(expectation.getScore(), expectation.getName(), expectation.getDescription(), assetGroup, expectation.isExpectationGroup()));
+                    }
+                    yield Stream.of();
                 }
                 default -> Stream.of();
-              })
-              .toList()
-      );
+            }).toList());
+        }
     }
-  }
 }
