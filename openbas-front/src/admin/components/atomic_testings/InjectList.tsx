@@ -46,22 +46,25 @@ const useStyles = makeStyles(() => ({
 
 const inlineStyles: Record<string, CSSProperties> = {
   inject_type: {
-    width: '15%',
+    width: '10%',
   },
   inject_title: {
     width: '20%',
   },
   inject_last_start_execution_date: {
-    width: '15%',
+    width: '20%',
   },
   inject_targets: {
     width: '20%',
   },
   inject_status: {
-    width: '15%',
+    width: '10%',
   },
   inject_expectations: {
-    width: '15%',
+    width: '10%',
+  },
+  inject_updated_at: {
+    width: '10%',
   },
 };
 
@@ -81,7 +84,7 @@ const InjectList: FunctionComponent<Props> = ({
   // Filter and sort hook
   const [injects, setInjects] = useState<InjectResultDTO[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
-    sorts: initSorting('inject_title'),
+    sorts: initSorting('inject_updated_at'),
   });
 
   // Headers
@@ -131,6 +134,12 @@ const InjectList: FunctionComponent<Props> = ({
           <AtomicTestingResult expectations={injectDto.inject_expectation_results} />
         );
       },
+    },
+    {
+      field: 'inject_updated_at',
+      label: 'Update',
+      isSortable: true,
+      value: (injectDto: InjectResultDTO) => fldt(injectDto.inject_updated_at),
     },
   ];
 

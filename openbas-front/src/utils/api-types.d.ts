@@ -175,49 +175,6 @@ export interface AtomicTestingInput {
   inject_type?: string;
 }
 
-export interface AtomicTestingOutput {
-  /** Result of expectations */
-  atomic_expectation_results: ExpectationResultsByType[];
-  /**
-   * Last Execution End date
-   * @format date-time
-   */
-  atomic_last_execution_end_date?: string;
-  /**
-   * Last Execution Start date
-   * @format date-time
-   */
-  atomic_last_execution_start_date?: string;
-  /** Status of execution */
-  atomic_status: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
-  atomic_tags?: string[];
-  /**
-   * Specifies the categories of targetResults for atomic testing.
-   * @example "assets, asset groups, teams, players"
-   */
-  atomic_targets: InjectTargetWithResult[];
-  /** Attack Patterns */
-  inject_attack_patterns: AttackPattern[];
-  /** Contract */
-  inject_contract: string;
-  /** Description */
-  inject_description: string;
-  /** Id */
-  inject_id: string;
-  inject_injector_contract: InjectorContract;
-  /** Kill Chain Phases */
-  inject_kill_chain_phases: KillChainPhase[];
-  /** Title */
-  inject_title: string;
-  /** Type */
-  inject_type: string;
-  /**
-   * Update date
-   * @format date-time
-   */
-  inject_updated_at?: string;
-}
-
 export interface AtomicTestingUpdateTagsInput {
   atomic_tags?: string[];
 }
@@ -1062,6 +1019,8 @@ export interface InjectResultDTO {
   inject_title: string;
   /** Type */
   inject_type: string;
+  /** @format date-time */
+  inject_updated_at?: string;
   injects_tags?: string[];
 }
 

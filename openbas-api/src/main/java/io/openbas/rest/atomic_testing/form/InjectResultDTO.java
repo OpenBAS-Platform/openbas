@@ -13,8 +13,11 @@ import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.time.Instant.now;
 
 @Setter
 @Getter
@@ -74,4 +77,7 @@ public class InjectResultDTO {
 
   @JsonProperty("injects_tags")
   private List<String> tagIds;
+
+  @JsonProperty("inject_updated_at")
+  private Instant updatedAt = now();
 }
