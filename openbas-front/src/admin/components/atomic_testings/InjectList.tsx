@@ -51,14 +51,11 @@ const inlineStyles: Record<string, CSSProperties> = {
   inject_title: {
     width: '20%',
   },
-  inject_last_start_execution_date: {
+  inject_status: {
     width: '20%',
   },
   inject_targets: {
     width: '20%',
-  },
-  inject_status: {
-    width: '10%',
   },
   inject_expectations: {
     width: '10%',

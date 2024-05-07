@@ -1,13 +1,13 @@
 package io.openbas.service;
 
-import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
-import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
+import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
+import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
@@ -178,9 +178,11 @@ public class AtomicTestingService {
     // Reset injects outcome, communications and expectations
     inject.clean();
 
-    List<ExecutionContext> userInjectContexts = List.of(
-        this.executionContextService.executionContext(user, inject, "Direct test")
-    );
+    List<ExecutionContext> userInjectContexts = inject.getTeams()
+        .stream()
+        .flatMap(t -> t.getUsers().stream())
+        .map(u -> this.executionContextService.executionContext(u, inject, "Direct execution"))
+        .toList();
     ExecutableInject injection = new ExecutableInject(false, true, inject, inject.getTeams(), inject.getAssets(),
         inject.getAssetGroups(), userInjectContexts);
     // TODO Must be migrated to Atomic approach (Inject duplication and async tracing)
