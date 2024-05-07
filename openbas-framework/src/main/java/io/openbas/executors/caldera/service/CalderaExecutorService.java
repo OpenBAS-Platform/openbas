@@ -15,6 +15,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -28,6 +29,7 @@ import java.util.logging.Level;
 
 import static java.time.ZoneOffset.UTC;
 
+@ConditionalOnProperty(prefix = "executor.caldera", name = "enable")
 @Log
 @Service
 public class CalderaExecutorService implements Runnable {

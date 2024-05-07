@@ -8,11 +8,13 @@ import io.openbas.executors.caldera.service.CalderaExecutorService;
 import io.openbas.integrations.ExecutorService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
+@ConditionalOnProperty(prefix = "executor.caldera", name = "enable")
 @RequiredArgsConstructor
 @Service
 public class CalderaExecutor {
