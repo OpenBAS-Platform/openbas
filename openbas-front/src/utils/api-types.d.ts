@@ -2193,6 +2193,7 @@ export interface Team {
   team_injects_expectations_total_expected_score_by_exercise: Record<string, number>;
   /** @format int64 */
   team_injects_expectations_total_score: number;
+  team_injects_expectations_total_score_by_exercise: Record<string, number>;
   team_name: string;
   team_organization?: Organization;
   team_scenario_injects?: Inject[];
