@@ -6,7 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 public class EndpointSpecification {
 
     public static Specification<Endpoint> findMainEndpoints() {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.isTrue(root.get("temporaryExecution"));
+        return (root, query, criteriaBuilder) -> criteriaBuilder.isFalse(root.get("temporaryExecution"));
     }
 
 }

@@ -3,10 +3,11 @@ package io.openbas.execution;
 import io.openbas.asset.AssetGroupService;
 import io.openbas.asset.EndpointService;
 import io.openbas.config.OpenBASConfig;
-import io.openbas.database.model.*;
 import io.openbas.database.model.Executor;
+import io.openbas.database.model.Injector;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.VariableRepository;
-import io.openbas.executors.caldera.service.CalderaExecutorService;
+import io.openbas.executors.caldera.service.CalderaExecutorContextService;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -22,15 +23,11 @@ import java.util.stream.Stream;
 @Service
 @Log
 public class ExecutionExecutorService {
-
-    @Resource
-    private final OpenBASConfig openBASCOnfig;
-
-    private final VariableRepository variableRepository;
+    private final int RETRY_NUMBER = 20;
 
     private AssetGroupService assetGroupService;
 
-    private CalderaExecutorService calderaExecutorService;
+    private CalderaExecutorContextService calderaExecutorContextService;
 
     private EndpointService endpointService;
 
@@ -40,8 +37,8 @@ public class ExecutionExecutorService {
     }
 
     @Autowired
-    public void setCalderaExecutorService(CalderaExecutorService calderaExecutorService) {
-        this.calderaExecutorService = calderaExecutorService;
+    public void setCalderaExecutorContextService(CalderaExecutorContextService calderaExecutorContextService) {
+        this.calderaExecutorContextService = calderaExecutorContextService;
     }
 
     @Autowired
@@ -55,7 +52,9 @@ public class ExecutionExecutorService {
                 inject.getAssets().stream(),
                 inject.getAssetGroups().stream().flatMap(assetGroup -> this.assetGroupService.assetsFromAssetGroup(assetGroup.getId()).stream())
         ).toList();
-        assets.forEach(this::launchExecutorContextForAsset);
+        assets.forEach(asset -> {
+            launchExecutorContextForAsset(inject.getInjectorContract().getInjector(), asset);
+        });
 
         Thread.sleep(3000);
 
@@ -76,11 +75,11 @@ public class ExecutionExecutorService {
         return executableInject;
     }
 
-    private void launchExecutorContextForAsset(Asset asset) {
+    private void launchExecutorContextForAsset(Injector injector, Asset asset) {
         Executor executor = asset.getExecutor();
         switch (executor.getType()) {
             case "openbas_caldera":
-                this.calderaExecutorService.launchExecutorSubprocess(asset.getExternalReference());
+                this.calderaExecutorContextService.launchExecutorSubprocess(injector, asset);
                 break;
             case "openbas_tanium":
                 log.log(Level.SEVERE, "Unsupported executor " + executor.getType());
@@ -99,12 +98,12 @@ public class ExecutionExecutorService {
             if( assetEndpoint == null ) {
                 break;
             }
-            List<Endpoint> existingEndpoints = this.endpointService.findExecutorsByHostname(assetEndpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(assetEndpoint.getIps()).toList().contains(s))).toList();
+            List<Endpoint> existingEndpoints = this.endpointService.findExecutorsByHostname(assetEndpoint.getHostname()).stream().filter(endpoint1 -> endpoint1.getActive() && Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(assetEndpoint.getIps()).toList().contains(s))).toList();
             if (!existingEndpoints.isEmpty()) {
                 subProcessorAsset = existingEndpoints.getFirst();
             }
             Thread.sleep(5000);
-            if (count > 5) {
+            if (count >= RETRY_NUMBER) {
                 break;
             }
         }

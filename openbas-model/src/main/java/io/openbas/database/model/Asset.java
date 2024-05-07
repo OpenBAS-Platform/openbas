@@ -63,7 +63,7 @@ public class Asset implements Base {
 
   @Column(name = "asset_temporary_execution")
   @JsonProperty("asset_temporary_execution")
-  private Boolean temporaryExecution;
+  private Boolean temporaryExecution = false;
 
   // -- TAG --
 

@@ -19,7 +19,6 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -173,15 +172,12 @@ public class CalderaExecutorClient {
         }
     }
 
-    private String delete(@NotBlank final String url) throws ClientProtocolException {
+    private void delete(@NotBlank final String url) throws ClientProtocolException {
         try {
             HttpDelete httpdelete = new HttpDelete(url);
             // Headers
             httpdelete.addHeader(KEY_HEADER, this.config.getApiKey());
-            return this.httpClient.execute(
-                    httpdelete,
-                    response -> EntityUtils.toString(response.getEntity())
-            );
+            this.httpClient.execute(httpdelete);
         } catch (IOException e) {
             throw new ClientProtocolException("Unexpected response for request on: " + url);
         }

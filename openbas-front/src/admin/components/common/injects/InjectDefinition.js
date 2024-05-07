@@ -1174,7 +1174,6 @@ class InjectDefinition extends Component {
               <InjectAddEndpoints
                 endpointIds={assetIds}
                 onSubmit={this.handleAddAssets.bind(this)}
-                filter={(e) => Object.keys(e.asset_sources).length > 0 && injectorContract.context['collector-ids']?.includes(Object.keys(e.asset_sources))}
                 disabled={fieldAssets.readOnly}
               />
             </>

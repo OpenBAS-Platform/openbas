@@ -1,18 +1,15 @@
 package io.openbas.executors.caldera.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Executor;
-import io.openbas.database.model.Injector;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.client.model.Ability;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.model.Agent;
 import io.openbas.integrations.ExecutorService;
-import io.openbas.integrations.InjectorService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;
@@ -24,7 +21,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 
 import static java.time.ZoneOffset.UTC;
@@ -39,14 +38,10 @@ public class CalderaExecutorService implements Runnable {
     private final CalderaExecutorClient client;
     private final CalderaExecutorConfig config;
 
-    private final ExecutorService executorService;
+    private final CalderaExecutorContextService calderaExecutorContextService;
     private final EndpointService endpointService;
-    private final InjectorService injectorService;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private Executor executor = null;
-    private Map<String, Ability> injectorExecutorAbilities = new HashMap<>();
 
     public static Endpoint.PLATFORM_TYPE toPlatform(@NotBlank final String platform) {
         return switch (platform) {
@@ -58,29 +53,20 @@ public class CalderaExecutorService implements Runnable {
     }
 
     @Autowired
-    public CalderaExecutorService(ExecutorService executorService, CalderaExecutorClient client,
-                                  CalderaExecutorConfig config, EndpointService endpointService, InjectorService injectorService) {
+    public CalderaExecutorService(
+            ExecutorService executorService,
+            CalderaExecutorClient client,
+            CalderaExecutorConfig config,
+            CalderaExecutorContextService calderaExecutorContextService,
+            EndpointService endpointService
+    ) {
         this.client = client;
         this.config = config;
-        this.executorService = executorService;
+        this.calderaExecutorContextService = calderaExecutorContextService;
         this.endpointService = endpointService;
-        this.injectorService = injectorService;
         try {
-            // Create the abilities if not exist for all injectors that need it
-            List<Ability> abilities = this.abilities();
-            Iterable<Injector> injectors = injectorService.injectors();
-            injectors.forEach(injector -> {
-                if (injector.getExecutorCommands() != null) {
-                    List<Ability> filteredAbilities = abilities.stream().filter(ability -> ability.getName().equals("caldera-subprocessor-" + injector.getName())).toList();
-                    if (!filteredAbilities.isEmpty()) {
-                        Ability existingAbility = filteredAbilities.getFirst();
-                        client.deleteAbility(existingAbility);
-                    }
-                    Ability ability = client.createAbility(injector);
-                    this.injectorExecutorAbilities.put(injector.getId(), ability);
-                }
-            });
             this.executor = executorService.register(this.config.getId(), CALDERA_EXECUTOR_TYPE, CALDERA_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
+            this.calderaExecutorContextService.registerAbilities();
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error creating caldera executor: " + e);
         }
@@ -107,10 +93,6 @@ public class CalderaExecutorService implements Runnable {
         }
     }
 
-    public void launchExecutorSubprocess(@NotNull final String paw) {
-        this.client.exploit("base64", paw, this.config.getOpenBasAbility().getAbility_id());
-    }
-
     // -- PRIVATE --
 
     private List<Endpoint> toEndpoint(@NotNull final List<Agent> agents) {
@@ -120,7 +102,7 @@ public class CalderaExecutorService implements Runnable {
                     endpoint.setExecutor(this.executor);
                     endpoint.setExternalReference(agent.getPaw());
                     endpoint.setName(agent.getHost());
-                    endpoint.setDescription("Asset collect by Caldera");
+                    endpoint.setDescription("Asset collected by Caldera executor context.");
                     endpoint.setIps(agent.getHost_ip_addrs());
                     endpoint.setHostname(agent.getHost());
                     endpoint.setPlatform(toPlatform(agent.getPlatform()));
