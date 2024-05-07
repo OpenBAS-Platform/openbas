@@ -1,9 +1,8 @@
 import { useParams } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Chip, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import type { AttackPattern, InjectResultDTO, InjectTargetWithResult, KillChainPhase } from '../../../../utils/api-types';
-import { fetchInjectResultDto } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import ResponsePie from './ResponsePie';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
@@ -16,6 +15,7 @@ import SearchFilter from '../../../../components/SearchFilter';
 import InjectIcon from '../../common/injects/InjectIcon';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import Loader from '../../../../components/Loader';
+import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
 
 const useStyles = makeStyles(() => ({
   chip: {
@@ -47,15 +47,10 @@ const AtomicTesting = () => {
   const filtering = useSearchAnFilter('', 'name', ['name']);
 
   // Fetching data
-  const [injectResultDto, setInjectResultDto] = useState<InjectResultDTO>();
+  const { injectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
   useEffect(() => {
-    fetchInjectResultDto(injectId).then((result: { data: InjectResultDTO }) => {
-      setInjectResultDto(result.data);
-      if (result.data && result.data.inject_targets) {
-        setSelectedTarget(result.data.inject_targets[0]);
-      }
-    });
-  }, [injectId]);
+    setSelectedTarget(injectResultDto?.inject_targets[0]);
+  }, [injectResultDto]);
 
   const sortedTargets: InjectTargetWithResult[] = filtering.filterAndSort(injectResultDto?.inject_targets ?? []);
 

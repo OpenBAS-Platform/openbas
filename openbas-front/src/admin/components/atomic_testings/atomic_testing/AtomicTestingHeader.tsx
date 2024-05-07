@@ -1,5 +1,4 @@
-import { useParams } from 'react-router-dom';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
 import { PlayArrowOutlined, SettingsOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
@@ -7,11 +6,10 @@ import { fetchInjectResultDto, tryAtomicTesting } from '../../../../actions/atom
 import AtomicTestingPopover from './AtomicTestingPopover';
 import { useFormatter } from '../../../../components/i18n';
 import Transition from '../../../../components/common/Transition';
-import { AtomicTestingResultContext } from '../../common/Context';
-import type { InjectResultDTO } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
 import { truncate } from '../../../../utils/String';
 import Loader from '../../../../components/Loader';
+import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
+import type { InjectResultDTO } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -27,19 +25,9 @@ const useStyles = makeStyles(() => ({
 const AtomicTestingHeader = () => {
   // Standard hooks
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   const classes = useStyles();
-  const { onLaunchAtomicTesting } = useContext(AtomicTestingResultContext);
 
-  // Fetching data
-  const { injectId } = useParams() as { injectId: InjectResultDTO['inject_id'] };
-  const [injectResultDto, setInjectResultDto] = useState<InjectResultDTO>();
-
-  useEffect(() => {
-    fetchInjectResultDto(injectId).then((result: { data: InjectResultDTO }) => {
-      setInjectResultDto(result.data);
-    });
-  }, [injectId]);
+  const { injectResultDto, updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
 
   // Launch atomic testing
   const [open, setOpen] = useState(false);
@@ -50,10 +38,12 @@ const AtomicTestingHeader = () => {
     setOpen(false);
     setAvailableLaunch(false);
     if (injectResultDto?.inject_id) {
-      await dispatch(tryAtomicTesting(injectResultDto.inject_id));
+      await tryAtomicTesting(injectResultDto.inject_id);
+      fetchInjectResultDto(injectResultDto.inject_id).then((result: { data: InjectResultDTO }) => {
+        updateInjectResultDto(result.data);
+      });
     }
     setAvailableLaunch(true);
-    onLaunchAtomicTesting();
   };
 
   if (!injectResultDto) {

@@ -51,6 +51,7 @@ public class Inject implements Base, Injection {
   @GeneratedValue(generator = "UUID")
   @UuidGenerator
   @JsonProperty("inject_id")
+  @NotBlank
   private String id;
 
   @Getter

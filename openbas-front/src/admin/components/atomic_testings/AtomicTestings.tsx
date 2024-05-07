@@ -5,17 +5,15 @@ import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import type { UsersHelper } from '../../../actions/helper';
-import type { Inject } from '../../../utils/api-types';
+import type { Inject, InjectResultDTO } from '../../../utils/api-types';
 import { createAtomicTesting, searchAtomicTestings } from '../../../actions/atomic_testings/atomic-testing-actions';
 import CreateInject from '../common/injects/CreateInject';
-import { useAppDispatch } from '../../../utils/hooks';
 import InjectList from './InjectList';
 
 // eslint-disable-next-line consistent-return
 const AtomicTestings = () => {
   // Standard hooks
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const { userAdmin } = useHelper((helper: UsersHelper) => ({
@@ -36,8 +34,9 @@ const AtomicTestings = () => {
       R.assoc('inject_teams', data.inject_teams),
       R.assoc('inject_type', data.inject_type),
     )(data);
-    const result = await dispatch(createAtomicTesting(toCreate));
-    navigate(`/admin/atomic_testings/${result.result}`);
+    await createAtomicTesting(toCreate).then((result: { data: InjectResultDTO }) => {
+      navigate(`/admin/atomic_testings/${result.data.inject_id}`);
+    });
   };
 
   return (

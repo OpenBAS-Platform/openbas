@@ -135,32 +135,6 @@ export interface AssetGroupInput {
   asset_group_tags?: string[];
 }
 
-export interface AtomicTestingDetailOutput {
-  atomic_injector_label?: Record<string, string>;
-  inject_content?: object;
-  inject_description?: string;
-  inject_documents?: InjectDocument[];
-  inject_expectations?: InjectExpectation[];
-  inject_id: string;
-  inject_tags?: Tag[];
-  status_label?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
-  status_traces?: string[];
-  /** @format date-time */
-  tracking_ack_date?: string;
-  /** @format date-time */
-  tracking_end_date?: string;
-  /** @format date-time */
-  tracking_sent_date?: string;
-  /** @format int32 */
-  tracking_total_count?: number;
-  /** @format int32 */
-  tracking_total_error?: number;
-  /** @format int64 */
-  tracking_total_execution_time?: number;
-  /** @format int32 */
-  tracking_total_success?: number;
-}
-
 export interface AtomicTestingInput {
   inject_all_teams?: boolean;
   inject_asset_groups?: string[];
@@ -889,7 +863,7 @@ export interface Inject {
   inject_enabled?: boolean;
   inject_exercise?: Exercise;
   inject_expectations?: InjectExpectation[];
-  inject_id?: string;
+  inject_id: string;
   inject_injector_contract?: InjectorContract;
   inject_kill_chain_phases?: KillChainPhase[];
   inject_payloads?: Asset[];
@@ -1000,10 +974,12 @@ export interface InjectReceptionInput {
 export interface InjectResultDTO {
   /** Attack Patterns */
   inject_attack_patterns: AttackPattern[];
+  inject_content?: object;
   /** Description */
   inject_description: string;
   /** Result of expectations */
   inject_expectation_results: ExpectationResultsByType[];
+  inject_expectations?: InjectExpectation[];
   /** Id */
   inject_id: string;
   inject_injector_contract: InjectorContract;
@@ -1019,6 +995,7 @@ export interface InjectResultDTO {
   inject_title: string;
   /** Type */
   inject_type: string;
+  injects_documents?: string[];
   /** @format date-time */
   inject_updated_at?: string;
   injects_tags?: string[];

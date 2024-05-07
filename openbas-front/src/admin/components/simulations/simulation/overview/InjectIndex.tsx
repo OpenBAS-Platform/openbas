@@ -18,6 +18,7 @@ import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-
 import useDataLoader from '../../../../../utils/ServerSideEvent';
 import { fetchExercise } from '../../../../../actions/Exercise';
 import { fetchInjectResultDto } from '../../../../../actions/atomic_testings/atomic-testing-actions';
+import { InjectResultDtoContext } from '../../../atomic_testings/InjectResultDtoContext';
 
 const useStyles = makeStyles(() => ({
   item: {
@@ -31,9 +32,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType, injectResultDto: InjectResultDTO }> = ({
+const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType, injectResult: InjectResultDTO }> = ({
   exercise,
-  injectResultDto,
+  injectResult,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -50,48 +51,56 @@ const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType, injectRe
   const location = useLocation();
   const tabValue = location.pathname;
 
+  const [injectResultDto, setInjectResultDto] = useState<InjectResultDTO>(injectResult);
+
+  const updateInjectResultDto = (newData: InjectResultDTO) => {
+    setInjectResultDto(newData);
+  };
+
   return (
-    <PermissionsContext.Provider value={permissionsContext}>
-      <Breadcrumbs variant="object" elements={[
-        { label: t('Simulations'), link: '/admin/exercises' },
-        { label: exercise.exercise_name },
-        { label: t(backlabel ?? 'Overview'), link: backuri ?? `/admin/exercises/${exercise.exercise_id}` },
-        { label: injectResultDto.inject_title, current: true },
-      ]}
-      />
-      <Box
-        sx={{
-          borderBottom: 1,
-          borderColor: 'divider',
-          marginBottom: 4,
-        }}
-      >
-        <Tabs value={tabValue}>
-          <Tab
-            component={Link}
-            to={`/admin/exercises/${exercise.exercise_id}/injects/${injectResultDto.inject_id}`}
-            value={`/admin/exercises/${exercise.exercise_id}/injects/${injectResultDto.inject_id}`}
-            label={t('Overview')}
-            className={classes.item}
-          />
-          <Tab
-            component={Link}
-            to={`/admin/exercises/${exercise.exercise_id}/injects/${injectResultDto.inject_id}/detail`}
-            value={`/admin/exercises/${exercise.exercise_id}/injects/${injectResultDto.inject_id}/detail`}
-            label={t('Execution details')}
-            className={classes.item}
-          />
-        </Tabs>
-      </Box>
-      <Suspense fallback={<Loader />}>
-        <Routes>
-          <Route path="" element={errorWrapper(AtomicTesting)()} />
-          <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
-          {/* Not found */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-    </PermissionsContext.Provider>
+    <InjectResultDtoContext.Provider value={{ injectResultDto, updateInjectResultDto }}>
+      <PermissionsContext.Provider value={permissionsContext}>
+        <Breadcrumbs variant="object" elements={[
+          { label: t('Simulations'), link: '/admin/exercises' },
+          { label: exercise.exercise_name },
+          { label: t(backlabel ?? 'Overview'), link: backuri ?? `/admin/exercises/${exercise.exercise_id}` },
+          { label: injectResultDto.inject_title, current: true },
+        ]}
+        />
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: 'divider',
+            marginBottom: 4,
+          }}
+        >
+          <Tabs value={tabValue}>
+            <Tab
+              component={Link}
+              to={`/admin/exercises/${exercise.exercise_id}/injects/${injectResultDto.inject_id}`}
+              value={`/admin/exercises/${exercise.exercise_id}/injects/${injectResultDto.inject_id}`}
+              label={t('Overview')}
+              className={classes.item}
+            />
+            <Tab
+              component={Link}
+              to={`/admin/exercises/${exercise.exercise_id}/injects/${injectResultDto.inject_id}/detail`}
+              value={`/admin/exercises/${exercise.exercise_id}/injects/${injectResultDto.inject_id}/detail`}
+              label={t('Execution details')}
+              className={classes.item}
+            />
+          </Tabs>
+        </Box>
+        <Suspense fallback={<Loader />}>
+          <Routes>
+            <Route path="" element={errorWrapper(AtomicTesting)()} />
+            <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
+            {/* Not found */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </PermissionsContext.Provider>
+    </InjectResultDtoContext.Provider>
   );
 };
 
@@ -114,7 +123,7 @@ const InjectIndex = () => {
   }, [injectId]);
 
   if (exercise && injectResultDto) {
-    return <InjectIndexComponent exercise={exercise} injectResultDto={injectResultDto} />;
+    return <InjectIndexComponent exercise={exercise} injectResult={injectResultDto} />;
   }
   return <Loader />;
 };

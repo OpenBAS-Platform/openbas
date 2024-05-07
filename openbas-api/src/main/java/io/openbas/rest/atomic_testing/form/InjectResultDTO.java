@@ -1,10 +1,8 @@
 package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.model.AttackPattern;
-import io.openbas.database.model.InjectStatus;
-import io.openbas.database.model.InjectorContract;
-import io.openbas.database.model.KillChainPhase;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.database.model.*;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -38,6 +36,12 @@ public class InjectResultDTO {
   @JsonProperty("inject_description")
   @NotNull
   private String description;
+
+  @JsonProperty("inject_content")
+  private ObjectNode content;
+
+  @JsonProperty("inject_expectations")
+  private List<InjectExpectation> expectations;
 
   @Schema(description = "Type")
   @JsonProperty("inject_type")
@@ -77,6 +81,9 @@ public class InjectResultDTO {
 
   @JsonProperty("injects_tags")
   private List<String> tagIds;
+
+  @JsonProperty("injects_documents")
+  private List<String> documents;
 
   @JsonProperty("inject_updated_at")
   private Instant updatedAt = now();

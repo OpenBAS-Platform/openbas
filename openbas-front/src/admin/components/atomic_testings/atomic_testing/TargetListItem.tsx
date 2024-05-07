@@ -60,14 +60,14 @@ const TargetListItem: React.FC<Props> = ({ isChild, onClick, target, selected })
           <ListItemText
             primary={
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div className={classes.bodyTarget} style={{ width: '60%' }}>
+                <div className={classes.bodyTarget} style={{ width: '50%' }}>
                   {target?.name}
                 </div>
                 <div className={classes.bodyTarget} style={{ width: '30%', display: 'flex', alignItems: 'center' }}>
                   <PlatformIcon platform={target?.platformType ?? 'Unknown'} width={20} marginRight={10} />
                   {target?.platformType ?? 'Unknown'}
                 </div>
-                <div className={classes.bodyTarget} style={{ width: '10%' }}>
+                <div className={classes.bodyTarget} style={{ width: '20%' }}>
                   <AtomicTestingResult expectations={target?.expectationResultsByTypes}/>
                 </div>
               </div>
