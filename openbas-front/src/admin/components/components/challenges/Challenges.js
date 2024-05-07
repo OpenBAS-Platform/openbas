@@ -235,7 +235,7 @@ const Challenges = () => {
               divider={true}
             >
               <ListItemIcon>
-                <EmojiEventsOutlined color="primary" />
+                <RowingOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary={

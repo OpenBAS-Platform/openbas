@@ -1,6 +1,6 @@
 import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { LanOutlined } from '@mui/icons-material';
+import { SelectGroup } from 'mdi-material-ui';
 import { makeStyles } from '@mui/styles';
 import ItemTags from '../../../../components/ItemTags';
 import type { AssetGroupStore } from './AssetGroup';
@@ -59,7 +59,7 @@ const AssetGroupsList: FunctionComponent<Props> = ({
             divider={true}
           >
             <ListItemIcon>
-              <LanOutlined color="primary" />
+              <SelectGroup color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={
