@@ -46,7 +46,7 @@ const DashboardDefinitionStatistics = ({
   )(organizations);
   let cumulation = 0;
   const teamsScores = R.pipe(
-    R.filter((n) => !R.isEmpty(n.inject_expectation_results)),
+    R.filter((n) => !R.isEmpty(n.inject_expectation_results) && n?.inject_expectation_team),
     R.groupBy(R.prop('inject_expectation_team')),
     R.toPairs,
     R.map((n) => {
@@ -72,7 +72,7 @@ const DashboardDefinitionStatistics = ({
     })),
   )(injectExpectations);
   const teamsPercentScoresData = R.pipe(
-    R.filter((n) => !R.isEmpty(n.inject_expectation_results)),
+    R.filter((n) => !R.isEmpty(n.inject_expectation_results) && n?.inject_expectation_team),
     R.groupBy(R.prop('inject_expectation_team')),
     R.toPairs,
     R.map((n) => {
@@ -187,7 +187,7 @@ const DashboardDefinitionStatistics = ({
     },
   ];
   const teamsTotalScores = R.pipe(
-    R.filter((n) => !R.isEmpty(n.inject_expectation_results)),
+    R.filter((n) => !R.isEmpty(n.inject_expectation_results) && n?.inject_expectation_team),
     R.groupBy(R.prop('inject_expectation_team')),
     R.toPairs,
     R.map((n) => ({
