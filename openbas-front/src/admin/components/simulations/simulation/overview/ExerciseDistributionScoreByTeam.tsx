@@ -34,7 +34,7 @@ const ExerciseDistributionScoreByTeam: FunctionComponent<Props> = ({
   }));
 
   const teamsTotalScores = R.pipe(
-    R.filter((n: InjectExpectation) => !R.isEmpty(n.inject_expectation_results)),
+    R.filter((n: InjectExpectation) => !R.isEmpty(n.inject_expectation_results) && n?.inject_expectation_team),
     R.groupBy(R.prop('inject_expectation_team')),
     R.toPairs,
     R.map((n: [string, InjectExpectationStore[]]) => ({
