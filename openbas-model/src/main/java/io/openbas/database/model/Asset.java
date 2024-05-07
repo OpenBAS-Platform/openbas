@@ -81,8 +81,7 @@ public class Asset implements Base {
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("asset_executor")
   private Executor executor;
-
-  @Transient
+  
   @JsonProperty("asset_active")
   public boolean getActive() {
     return this.getLastSeen() != null && (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < ACTIVE_THRESHOLD;
