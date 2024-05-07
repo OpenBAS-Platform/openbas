@@ -150,6 +150,14 @@ public class Team implements Base {
             .filter((inject) -> inject.getScore() != null)
             .mapToLong(InjectExpectation::getScore).sum();
     }
+    @JsonProperty("team_injects_expectations_total_score_by_exercise")
+    @NotNull
+    public Map<String, Long> getInjectExceptationsTotalScoreByExercise() {
+        return getInjectExpectations().stream()
+            .filter(expectation -> Objects.nonNull(expectation.getExercise()) && Objects.nonNull(expectation.getScore()))
+            .collect(Collectors.groupingBy(expectation -> expectation.getExercise().getId(),
+                Collectors.summingLong(InjectExpectation::getScore)));
+    }
 
     @JsonProperty("team_injects_expectations_total_expected_score")
     @NotNull
