@@ -75,3 +75,12 @@ export const randomElements = (elements: never[], number: number) => {
   const shuffled = elements.sort(() => 0.5 - Math.random());
   return shuffled.slice(0, number);
 };
+
+export const debounce = <T>(func: (...param: T[]) => void, timeout = 500) => {
+  let timer: number;
+
+  return (...args: T[]) => {
+    window.clearTimeout(timer);
+    timer = window.setTimeout(func, timeout, ...args);
+  };
+};
