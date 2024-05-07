@@ -60,5 +60,4 @@ public class Endpoint extends Asset {
   @Column(name = "endpoint_mac_addresses")
   @JsonProperty("endpoint_mac_addresses")
   private String[] macAddresses;
-
 }

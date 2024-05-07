@@ -1,7 +1,6 @@
 package io.openbas.rest.asset.endpoint;
 
 import io.openbas.asset.EndpointService;
-import io.openbas.database.model.Document;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.repository.TagRepository;

@@ -82,9 +82,10 @@ public class Asset implements Base {
   @JsonProperty("asset_executor")
   private Executor executor;
 
+  @Transient
   @JsonProperty("asset_active")
   public boolean getActive() {
-    return (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < ACTIVE_THRESHOLD;
+    return this.getLastSeen() != null && (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < ACTIVE_THRESHOLD;
   }
 
   // -- AUDIT --
