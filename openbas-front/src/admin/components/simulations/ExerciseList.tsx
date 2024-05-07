@@ -138,7 +138,7 @@ const ExerciseList: FunctionComponent<Props> = ({
     tagsMap: helper.getTagsMap(),
   }));
   const searchColumns = ['name'];
-  const filtering = useSearchAnFilter('exercise', 'exercise_start_date', searchColumns, { orderAsc: false });
+  const filtering = useSearchAnFilter('exercise', 'start_date', searchColumns, { orderAsc: false });
   const sortedExercises = limit ? R.take(limit, filtering.filterAndSort(exercises)) : filtering.filterAndSort(exercises);
   return (
     <>
@@ -175,70 +175,70 @@ const ExerciseList: FunctionComponent<Props> = ({
               >
                 <Tooltip title={t('Export this list')}>
                   <IconButton size="large">
-                    <FileDownloadOutlined color="primary"/>
+                    <FileDownloadOutlined color="primary" />
                   </IconButton>
                 </Tooltip>
               </CSVLink>
             ) : (
               <IconButton size="large" disabled={true}>
-                <FileDownloadOutlined/>
+                <FileDownloadOutlined />
               </IconButton>
             )}
           </div>
         </div>
       )}
-      <div className="clearfix"/>
+      <div className="clearfix" />
       <List>
         {!limit && (
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-        >
-          <ListItemIcon/>
-          <ListItemText
-            primary={
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                {filtering.buildHeader(
-                  'exercise_name',
-                  'Name',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'exercise_start_date',
-                  'Start date',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'exercise_status',
-                  'Status',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'exercise_tags',
-                  'Tags',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'exercise_targets',
-                  'Target',
-                  false,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'exercise_global_score',
-                  'Global score',
-                  false,
-                  headerStyles,
-                )}
-              </div>
-                            }
-          />
-        </ListItem>
+          <ListItem
+            classes={{ root: classes.itemHead }}
+            divider={false}
+            style={{ paddingTop: 0 }}
+          >
+            <ListItemIcon />
+            <ListItemText
+              primary={
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  {filtering.buildHeader(
+                    'exercise_name',
+                    'Name',
+                    true,
+                    headerStyles,
+                  )}
+                  {filtering.buildHeader(
+                    'exercise_start_date',
+                    'Start date',
+                    true,
+                    headerStyles,
+                  )}
+                  {filtering.buildHeader(
+                    'exercise_status',
+                    'Status',
+                    true,
+                    headerStyles,
+                  )}
+                  {filtering.buildHeader(
+                    'exercise_tags',
+                    'Tags',
+                    true,
+                    headerStyles,
+                  )}
+                  {filtering.buildHeader(
+                    'exercise_targets',
+                    'Target',
+                    false,
+                    headerStyles,
+                  )}
+                  {filtering.buildHeader(
+                    'exercise_global_score',
+                    'Global score',
+                    false,
+                    headerStyles,
+                  )}
+                </div>
+              }
+            />
+          </ListItem>
         )}
         {sortedExercises.map((exercise: ExerciseStore) => (
           <ListItemButton
@@ -249,7 +249,7 @@ const ExerciseList: FunctionComponent<Props> = ({
             to={`/admin/exercises/${exercise.exercise_id}`}
           >
             <ListItemIcon>
-              <SmartToyOutlined color="primary"/>
+              <SmartToyOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={
@@ -283,25 +283,25 @@ const ExerciseList: FunctionComponent<Props> = ({
                     className={classes.bodyItem}
                     style={inlineStyles.exercise_tags}
                   >
-                    <ItemTags variant="list" tags={exercise.exercise_tags}/>
+                    <ItemTags variant="list" tags={exercise.exercise_tags} />
                   </div>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.exercise_targets}
                   >
-                    <ItemTargets targets={exercise.exercise_targets}/>
+                    <ItemTargets targets={exercise.exercise_targets} />
                   </div>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.exercise_global_score}
                   >
-                    <AtomicTestingResult expectations={exercise.exercise_global_score}/>
+                    <AtomicTestingResult expectations={exercise.exercise_global_score} />
                   </div>
                 </div>
-                            }
+              }
             />
             <ListItemIcon classes={{ root: classes.goIcon }}>
-              <KeyboardArrowRight/>
+              <KeyboardArrowRight />
             </ListItemIcon>
           </ListItemButton>
         ))}
