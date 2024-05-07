@@ -1,6 +1,6 @@
 import React, { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { ComputerOutlined } from '@mui/icons-material';
+import { DevicesOtherOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import type { EndpointStore } from './Endpoint';
 import ItemTags from '../../../../components/ItemTags';
@@ -70,7 +70,7 @@ const EndpointsList: FunctionComponent<Props> = ({
             divider={true}
           >
             <ListItemIcon>
-              <ComputerOutlined color="primary" />
+              <DevicesOtherOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={

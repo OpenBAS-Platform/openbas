@@ -2,7 +2,7 @@ import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Tooltip, Chip } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { EmojiEventsOutlined, RowingOutlined } from '@mui/icons-material';
+import { RowingOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import { Link } from 'react-router-dom';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -235,7 +235,7 @@ const Challenges = () => {
               divider={true}
             >
               <ListItemIcon>
-                <EmojiEventsOutlined color="primary" />
+                <RowingOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary={

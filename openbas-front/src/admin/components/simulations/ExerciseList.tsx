@@ -1,7 +1,7 @@
 import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import * as R from 'ramda';
 import { Link } from 'react-router-dom';
-import { FileDownloadOutlined, KeyboardArrowRight, SmartToyOutlined } from '@mui/icons-material';
+import { FileDownloadOutlined, KeyboardArrowRight, HubOutlined } from '@mui/icons-material';
 import React, { CSSProperties, FunctionComponent } from 'react';
 import { CSVLink } from 'react-csv';
 import { makeStyles } from '@mui/styles';
@@ -249,7 +249,7 @@ const ExerciseList: FunctionComponent<Props> = ({
             to={`/admin/exercises/${exercise.exercise_id}`}
           >
             <ListItemIcon>
-              <SmartToyOutlined color="primary" />
+              <HubOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={
