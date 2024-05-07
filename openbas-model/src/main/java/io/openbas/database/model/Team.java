@@ -152,7 +152,7 @@ public class Team implements Base {
     @JsonProperty("team_injects_expectations_total_expected_score")
     @NotNull
     public long getInjectExceptationsTotalExpectedScore() {
-        return getInjectExpectations().stream().filter(injectExpectation -> !injectExpectation.getInject().isAtomicTesting()).mapToLong(InjectExpectation::getExpectedScore).sum();
+        return getInjectExpectations().stream().mapToLong(InjectExpectation::getExpectedScore).sum();
     }
     // endregion
 
