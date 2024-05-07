@@ -112,7 +112,7 @@ const InjectList: FunctionComponent<Props> = ({
     {
       field: 'inject_targets',
       label: 'Target',
-      isSortable: true,
+      isSortable: false,
       value: (injectDto: InjectResultDTO) => {
         return (<ItemTargets targets={injectDto.inject_targets} />);
       },
@@ -137,7 +137,7 @@ const InjectList: FunctionComponent<Props> = ({
     },
     {
       field: 'inject_updated_at',
-      label: 'Update',
+      label: 'Updated',
       isSortable: true,
       value: (injectDto: InjectResultDTO) => fldt(injectDto.inject_updated_at),
     },

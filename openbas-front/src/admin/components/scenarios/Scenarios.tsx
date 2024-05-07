@@ -69,25 +69,25 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const inlineStyles: Record<string, CSSProperties> = {
   scenario_name: {
-    width: '25%',
+    width: '20%',
   },
   scenario_severity: {
-    width: '8%',
+    width: '10%',
   },
   scenario_category: {
-    width: '12%',
+    width: '10%',
   },
-  scenario_status: {
-    width: '12%',
+  scenario_recurrence: {
+    width: '20%',
   },
   scenario_platforms: {
-    width: '12%',
+    width: '15%',
   },
   scenario_tags: {
-    width: '18%',
+    width: '5%',
   },
   scenario_updated_at: {
-    width: '10%',
+    width: '20%',
   },
 };
 
@@ -105,8 +105,8 @@ const Scenarios = () => {
     { field: 'scenario_name', label: 'Name', isSortable: true },
     { field: 'scenario_severity', label: 'Severity', isSortable: true },
     { field: 'scenario_category', label: 'Category', isSortable: true },
-    { field: 'scenario_status', label: 'Status', isSortable: true },
-    { field: 'scenario_platforms', label: 'Platforms', isSortable: true },
+    { field: 'scenario_recurrence', label: 'Status', isSortable: true },
+    { field: 'scenario_platforms', label: 'Platforms', isSortable: false },
     { field: 'scenario_tags', label: 'Tags', isSortable: true },
     { field: 'scenario_updated_at', label: 'Updated', isSortable: true },
   ];
