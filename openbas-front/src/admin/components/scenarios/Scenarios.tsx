@@ -69,25 +69,25 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const inlineStyles: Record<string, CSSProperties> = {
   scenario_name: {
-    width: '20%',
+    width: '25%',
   },
   scenario_severity: {
-    width: '10%',
+    width: '8%',
   },
   scenario_category: {
-    width: '10%',
+    width: '12%',
   },
   scenario_recurrence: {
-    width: '20%',
+    width: '12%',
   },
   scenario_platforms: {
-    width: '15%',
+    width: '12%',
   },
   scenario_tags: {
-    width: '5%',
+    width: '18%',
   },
   scenario_updated_at: {
-    width: '20%',
+    width: '10%',
   },
 };
 
@@ -113,7 +113,7 @@ const Scenarios = () => {
 
   const [scenarios, setScenarios] = useState<ScenarioStore[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
-    sorts: initSorting('scenario_updated_at'),
+    sorts: initSorting('scenario_updated_at', 'DESC'),
   });
 
   // Category filter
@@ -249,6 +249,7 @@ const Scenarios = () => {
                 inlineStylesHeaders={inlineStyles}
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
+                defaultSortAsc
               />
             }
           />
@@ -289,7 +290,7 @@ const Scenarios = () => {
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.scenario_status}
+                    style={inlineStyles.scenario_recurrence}
                   >
                     <ScenarioStatus scenario={scenario} variant="list" />
                   </div>
