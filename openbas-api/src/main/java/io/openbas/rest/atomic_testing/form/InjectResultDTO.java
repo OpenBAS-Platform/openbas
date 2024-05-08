@@ -43,9 +43,7 @@ public class InjectResultDTO {
   @JsonProperty("inject_expectations")
   private List<InjectExpectation> expectations;
 
-  @Schema(description = "Type")
   @JsonProperty("inject_type")
-  @NotNull
   private String type;
 
   @Schema(description = "Kill Chain Phases")

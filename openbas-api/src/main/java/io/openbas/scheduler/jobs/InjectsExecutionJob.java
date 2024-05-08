@@ -128,7 +128,7 @@ public class InjectsExecutionJob implements Job {
         try {
             String jsonInject = mapper.writeValueAsString(executableInject);
             injectStatusRepository.save(status);
-            queueService.publish(inject.getType(), jsonInject);
+            queueService.publish(inject.getInjectorContract().getInjector().getType(), jsonInject);
         } catch (Exception e) {
             status.getTraces().add(InjectStatusExecution.traceError(e.getMessage()));
             injectStatusRepository.save(status);
@@ -142,7 +142,7 @@ public class InjectsExecutionJob implements Job {
         status.setTrackingSentDate(Instant.now());
         status.setInject(executableInject.getInjection().getInject());
         // Execute
-        io.openbas.execution.Injector executor = context.getBean(source.getInject().getType(), io.openbas.execution.Injector.class);
+        io.openbas.execution.Injector executor = context.getBean(source.getInject().getInjectorContract().getInjector().getType(), io.openbas.execution.Injector.class);
         Execution execution = executor.executeInjection(executableInject);
         // After execution, expectations are already created
         // Injection status is filled after complete execution
@@ -163,7 +163,7 @@ public class InjectsExecutionJob implements Job {
     public void executeInject(ExecutableInject executableInject) {
         // Depending on injector type (internal or external) execution must be done differently
         Inject inject = executableInject.getInjection().getInject();
-        Injector externalInjector = injectorRepository.findByType(inject.getType()).orElseThrow();
+        Injector externalInjector = injectorRepository.findByType(inject.getInjectorContract().getInjector().getType()).orElseThrow();
         if (externalInjector.isExternal()) {
             executeExternal(executableInject);
         } else {

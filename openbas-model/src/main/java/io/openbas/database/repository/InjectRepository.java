@@ -23,7 +23,7 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
   @NotNull
   Optional<Inject> findWithStatusById(@NotNull String id);
 
-  @Query(value = "select i.* from injects i where i.inject_type = 'openbas_challenge'" +
+  @Query(value = "select i.* from injects i where i.inject_injector_contract = '49229430-b5b5-431f-ba5b-f36f599b0233'" +
       " and i.inject_content like :challengeId", nativeQuery = true)
   List<Inject> findAllForChallengeId(@Param("challengeId") String challengeId);
 
@@ -41,15 +41,14 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
 
   @Modifying
   @Query(value = "insert into injects (inject_id, inject_title, inject_description, inject_country, inject_city," +
-      "inject_type, inject_injector_contract, inject_all_teams, inject_enabled, inject_exercise, inject_depends_from_another, " +
+      "inject_injector_contract, inject_all_teams, inject_enabled, inject_exercise, inject_depends_from_another, " +
       "inject_depends_duration, inject_content) " +
-      "values (:id, :title, :description, :country, :city, :type, :contract, :allTeams, :enabled, :exercise, :dependsOn, :dependsDuration, :content)", nativeQuery = true)
+      "values (:id, :title, :description, :country, :city, :contract, :allTeams, :enabled, :exercise, :dependsOn, :dependsDuration, :content)", nativeQuery = true)
   void importSaveForExercise(@Param("id") String id,
       @Param("title") String title,
       @Param("description") String description,
       @Param("country") String country,
       @Param("city") String city,
-      @Param("type") String type,
       @Param("contract") String contract,
       @Param("allTeams") boolean allTeams,
       @Param("enabled") boolean enabled,
@@ -60,15 +59,14 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
 
   @Modifying
   @Query(value = "insert into injects (inject_id, inject_title, inject_description, inject_country, inject_city," +
-      "inject_type, inject_injector_contract, inject_all_teams, inject_enabled, inject_scenario, inject_depends_from_another, " +
+      "inject_injector_contract, inject_all_teams, inject_enabled, inject_scenario, inject_depends_from_another, " +
       "inject_depends_duration, inject_content) " +
-      "values (:id, :title, :description, :country, :city, :type, :contract, :allTeams, :enabled, :scenario, :dependsOn, :dependsDuration, :content)", nativeQuery = true)
+      "values (:id, :title, :description, :country, :city, :contract, :allTeams, :enabled, :scenario, :dependsOn, :dependsDuration, :content)", nativeQuery = true)
   void importSaveForScenario(@Param("id") String id,
       @Param("title") String title,
       @Param("description") String description,
       @Param("country") String country,
       @Param("city") String city,
-      @Param("type") String type,
       @Param("contract") String contract,
       @Param("allTeams") boolean allTeams,
       @Param("enabled") boolean enabled,

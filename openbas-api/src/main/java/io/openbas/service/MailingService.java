@@ -66,12 +66,11 @@ public class MailingService {
     inject.setContent(this.mapper.valueToTree(emailContent));
     inject.setInjectorContract(this.injectorContractRepository.findById(EmailContract.EMAIL_DEFAULT).orElseThrow());
     inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
-    inject.setType(EmailContract.TYPE);
     exercise.ifPresent(inject::setExercise);
     List<ExecutionContext> userInjectContexts = users.stream().distinct()
         .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
     ExecutableInject injection = new ExecutableInject(false, true, inject, userInjectContexts);
-    Injector executor = this.context.getBean(inject.getType(), Injector.class);
+    Injector executor = this.context.getBean(inject.getInjectorContract().getInjector().getType(), Injector.class);
     executor.executeInjection(injection);
   }
 

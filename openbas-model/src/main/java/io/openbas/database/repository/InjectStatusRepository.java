@@ -18,7 +18,7 @@ public interface InjectStatusRepository extends CrudRepository<InjectStatus, Str
     @NotNull
     Optional<InjectStatus> findById(@NotNull String id);
 
-    @Query(value = "select c from InjectStatus c where c.name = 'PENDING' and c.inject.type = :injectType")
+    @Query(value = "select c from InjectStatus c where c.name = 'PENDING' and c.inject.injectorContract.injector.type = :injectType")
     List<InjectStatus> pendingForInjectType(@Param("injectType") String injectType);
 
     Optional<InjectStatus> findByInject(@NotNull Inject inject);

@@ -81,12 +81,6 @@ public class Inject implements Base, Injection {
   private boolean enabled = true;
 
   @Getter
-  @Column(name = "inject_type", updatable = false)
-  @JsonProperty("inject_type")
-  @NotBlank
-  private String type;
-
-  @Getter
   @Column(name = "inject_content")
   @Convert(converter = ContentConverter.class)
   @JsonProperty("inject_content")
@@ -381,6 +375,8 @@ public class Inject implements Base, Injection {
     return this.getInjectorContract().getAttackPatterns();
   }
 
+  @JsonProperty("inject_type")
+  private String getType() { return this.getInjectorContract().getInjector().getType(); }
 
   @JsonIgnore
   public boolean isAtomicTesting() {

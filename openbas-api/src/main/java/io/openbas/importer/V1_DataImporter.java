@@ -192,7 +192,6 @@ public class V1_DataImporter implements Importer {
       String description = injectNode.get("inject_description").textValue();
       String country = injectNode.get("inject_country").textValue();
       String city = injectNode.get("inject_city").textValue();
-      String type = injectNode.get("inject_type").textValue();
       String injectorContractId = null;
       JsonNode injectContractNode = injectNode.get("inject_injector_contract");
       if (injectContractNode != null) {
@@ -205,10 +204,10 @@ public class V1_DataImporter implements Importer {
       Long dependsDuration = injectNode.get("inject_depends_duration").asLong();
       boolean allTeams = injectNode.get("inject_all_teams").booleanValue();
       if (hasText(exerciseId)) {
-        injectRepository.importSaveForExercise(injectId, title, description, country, city, type, injectorContractId, allTeams,
+        injectRepository.importSaveForExercise(injectId, title, description, country, city, injectorContractId, allTeams,
             true, exerciseId, dependsOn, dependsDuration, content);
       } else if (hasText(scenarioId)) {
-        injectRepository.importSaveForScenario(injectId, title, description, country, city, type, injectorContractId, allTeams,
+        injectRepository.importSaveForScenario(injectId, title, description, country, city, injectorContractId, allTeams,
             true, scenarioId, dependsOn, dependsDuration, content);
       }
       baseIds.put(id, new BaseHolder(injectId));

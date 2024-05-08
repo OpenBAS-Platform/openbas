@@ -220,7 +220,6 @@ const CreateInjectDetails = ({
       const values = {
         inject_title: data.inject_title,
         inject_injector_contract: contractContent.contract_id,
-        inject_type: contractContent.config.type,
         inject_description: data.inject_description,
         inject_tags,
         inject_content: isEmptyField(finalData) ? null : finalData,

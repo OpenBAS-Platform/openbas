@@ -75,7 +75,7 @@ public class Executor {
             status.setName(ExecutionStatus.PENDING); // FIXME: need to be test with HTTP Collector
             status.getTraces().add(traceInfo("The inject has been published and is now waiting to be consumed."));
             InjectStatus savedStatus = injectStatusRepository.save(status);
-            queueService.publish(inject.getType(), jsonInject);
+            queueService.publish(inject.getInjectorContract().getInjector().getType(), jsonInject);
             return savedStatus;
         } catch (Exception e) {
             status.setName(ExecutionStatus.ERROR);
@@ -85,7 +85,7 @@ public class Executor {
     }
 
     private InjectStatus executeInternal(ExecutableInject executableInject, Inject inject) {
-        io.openbas.execution.Injector executor = this.context.getBean(inject.getType(), io.openbas.execution.Injector.class);
+        io.openbas.execution.Injector executor = this.context.getBean(inject.getInjectorContract().getInjector().getType(), io.openbas.execution.Injector.class);
         Execution execution = executor.executeInjection(executableInject);
         Inject executedInject = injectRepository.findById(inject.getId()).orElseThrow();
         InjectStatus completeStatus = InjectStatus.fromExecution(execution, executedInject);
@@ -104,7 +104,7 @@ public class Executor {
             throw new UnsupportedOperationException("Inject is now too old for execution");
         }
         // Depending on injector type (internal or external) execution must be done differently
-        Optional<Injector> externalInjector = injectorRepository.findByType(inject.getType());
+        Optional<Injector> externalInjector = injectorRepository.findByType(inject.getInjectorContract().getInjector().getType());
 
         return externalInjector
                 .map(Injector::isExternal)
@@ -123,7 +123,7 @@ public class Executor {
                         return executeInternal(newExecutableInject, inject);
                     }
                 })
-                .orElseThrow(() -> new IllegalStateException("External injector not found for type: " + inject.getType()));
+                .orElseThrow(() -> new IllegalStateException("External injector not found for type: " +inject.getInjectorContract().getInjector().getType()));
     }
 
     // region utils

@@ -53,7 +53,6 @@ public class EmailExecutorTest {
     expectation.setType(InjectExpectation.EXPECTATION_TYPE.MANUAL);
     content.setExpectations(List.of(expectation));
     Inject inject = new Inject();
-    inject.setType(EmailContract.TYPE);
     inject.setInjectorContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
     inject.setContent(this.mapper.valueToTree(content));
     Iterable<User> users = this.userRepository.findAll();

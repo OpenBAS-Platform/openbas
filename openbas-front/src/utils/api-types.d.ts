@@ -445,7 +445,6 @@ export interface DirectInjectInput {
   inject_documents?: InjectDocumentInput[];
   inject_injector_contract?: string;
   inject_title?: string;
-  inject_type?: string;
   inject_users?: string[];
 }
 
@@ -878,7 +877,7 @@ export interface Inject {
   inject_tags?: Tag[];
   inject_teams?: Team[];
   inject_title?: string;
-  inject_type: string;
+  inject_type?: string;
   /** @format date-time */
   inject_updated_at?: string;
   inject_user?: User;
@@ -967,7 +966,6 @@ export interface InjectInput {
   inject_tags?: string[];
   inject_teams?: string[];
   inject_title?: string;
-  inject_type?: string;
 }
 
 export interface InjectReceptionInput {
@@ -999,9 +997,9 @@ export interface InjectResultDTO {
   inject_title: string;
   /** Type */
   inject_type: string;
-  injects_documents?: string[];
   /** @format date-time */
   inject_updated_at?: string;
+  injects_documents?: string[];
   injects_tags?: string[];
 }
 
@@ -1073,6 +1071,7 @@ export interface Injector {
   /** @format date-time */
   injector_created_at?: string;
   injector_custom_contracts?: boolean;
+  injector_executor_commands?: Record<string, string>;
   injector_external?: boolean;
   injector_id: string;
   injector_name: string;
@@ -1152,6 +1151,7 @@ export interface InjectorCreateInput {
   injector_category?: string;
   injector_contracts?: InjectorContractInput[];
   injector_custom_contracts?: boolean;
+  injector_executor_commands?: Record<string, string>;
   injector_id: string;
   injector_name: string;
   injector_type: string;
@@ -1166,6 +1166,7 @@ export interface InjectorUpdateInput {
   injector_category?: string;
   injector_contracts?: InjectorContractInput[];
   injector_custom_contracts?: boolean;
+  injector_executor_commands?: Record<string, string>;
   injector_name: string;
 }
 

@@ -32,7 +32,6 @@ const AtomicTestings = () => {
       R.assoc('inject_description', data.inject_description),
       R.assoc('inject_documents', data.inject_documents),
       R.assoc('inject_teams', data.inject_teams),
-      R.assoc('inject_type', data.inject_type),
     )(data);
     await createAtomicTesting(toCreate).then((result: { data: InjectResultDTO }) => {
       navigate(`/admin/atomic_testings/${result.data.inject_id}`);

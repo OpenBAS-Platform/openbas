@@ -17,9 +17,6 @@ public class DirectInjectInput {
     @JsonProperty("inject_description")
     private String description;
 
-    @JsonProperty("inject_type")
-    private String type;
-
     @JsonProperty("inject_injector_contract")
     private String injectorContract;
 
@@ -46,14 +43,6 @@ public class DirectInjectInput {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getInjectorContract() {
@@ -93,7 +82,6 @@ public class DirectInjectInput {
         inject.setTitle(getTitle());
         inject.setDescription(getDescription());
         inject.setContent(getContent());
-        inject.setType(getType());
         inject.setInjectorContract(injectorContract);
         return inject;
     }

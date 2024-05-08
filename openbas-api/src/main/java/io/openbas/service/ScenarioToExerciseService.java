@@ -197,7 +197,6 @@ public class ScenarioToExerciseService {
             exerciseInject.setCountry(scenarioInject.getCountry());
             exerciseInject.setCity(scenarioInject.getCity());
             exerciseInject.setEnabled(scenarioInject.isEnabled());
-            exerciseInject.setType(scenarioInject.getType());
             exerciseInject.setAllTeams(scenarioInject.isAllTeams());
             exerciseInject.setExercise(exerciseSaved);
             exerciseInject.setDependsDuration(scenarioInject.getDependsDuration());
@@ -206,7 +205,7 @@ public class ScenarioToExerciseService {
             exerciseInject.setTags(copy(scenarioInject.getTags(), Tag.class));
 
             // Content
-            if (ChannelContract.TYPE.equals(scenarioInject.getType())) {
+            if (ChannelContract.TYPE.equals(scenarioInject.getInjectorContract().getInjector().getType())) {
                 try {
                     ChannelContent content = mapper.treeToValue(scenarioInject.getContent(), ChannelContent.class);
                     content.setArticles(

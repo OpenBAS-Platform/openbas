@@ -434,7 +434,6 @@ class QuickInject extends Component {
     const values = {
       inject_title: finalData.subject,
       inject_injector_contract: EMAIL_CONTRACT,
-      inject_type: injectorContract.config.type,
       inject_depends_duration:
         injectDependsDuration > 0 ? injectDependsDuration : 0,
       inject_content: finalData,

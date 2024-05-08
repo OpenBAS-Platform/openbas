@@ -86,7 +86,6 @@ public class ChallengeApiTest {
     content.setChallenges(List.of(challenge.getId()));
     Inject inject = new Inject();
     inject.setTitle("Test inject");
-    inject.setType(TYPE);
     inject.setInjectorContract(this.injectorContractRepository.findById(CHALLENGE_PUBLISH).orElseThrow());
     inject.setContent(this.objectMapper.valueToTree(content));
     inject.setDependsDuration(0L);

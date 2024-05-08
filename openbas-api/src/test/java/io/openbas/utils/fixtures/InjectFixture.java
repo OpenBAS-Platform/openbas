@@ -12,7 +12,6 @@ public class InjectFixture {
     public static Inject getInjectForEmailContract(InjectorContract injectorContract) {
         Inject inject = new Inject();
         inject.setTitle(INJECT_EMAIL_NAME);
-        inject.setType(TYPE);
         inject.setInjectorContract(injectorContract);
         inject.setEnabled(true);
         inject.setDependsDuration(0L);

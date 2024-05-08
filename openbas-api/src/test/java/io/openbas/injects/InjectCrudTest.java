@@ -39,7 +39,6 @@ public class InjectCrudTest {
     Exercise exerciseCreated = this.exerciseRepository.save(exercise);
     Inject inject = new Inject();
     inject.setTitle("test");
-    inject.setType(TYPE);
     inject.setInjectorContract(this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
     inject.setExercise(exerciseCreated);
     inject.setDependsDuration(0L);
