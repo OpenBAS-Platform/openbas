@@ -12,7 +12,6 @@ import org.hibernate.Hibernate;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import org.hibernate.Hibernate;
 
 public class AtomicTestingUtils {
 

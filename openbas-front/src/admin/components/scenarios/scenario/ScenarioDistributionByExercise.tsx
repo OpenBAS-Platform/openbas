@@ -68,7 +68,7 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
           options={verticalBarsChartOptions(
             theme,
             nsdt,
-            (value: number) => `${value}%`,
+            (value: number) => `${value * 100}%`,
             false,
             true,
             false,
