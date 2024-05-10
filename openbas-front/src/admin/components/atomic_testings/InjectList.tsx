@@ -56,9 +56,11 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   inject_targets: {
     width: '20%',
+    cursor: 'default',
   },
   inject_expectations: {
     width: '10%',
+    cursor: 'default',
   },
   inject_updated_at: {
     width: '10%',
@@ -125,7 +127,7 @@ const InjectList: FunctionComponent<Props> = ({
     {
       field: 'inject_expectations',
       label: 'Global score',
-      isSortable: true,
+      isSortable: false,
       value: (injectDto: InjectResultDTO) => {
         return (
           <AtomicTestingResult expectations={injectDto.inject_expectation_results} />

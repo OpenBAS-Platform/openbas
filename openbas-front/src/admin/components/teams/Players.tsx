@@ -55,6 +55,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   user_organization: {
     width: '20%',
+    cursor: 'default',
   },
   user_tags: {
     width: '25%',
@@ -163,7 +164,7 @@ const Players = () => {
                   <div className={classes.bodyItem} style={inlineStyles.user_organization}>
                     {organizationsMap[player.user_organization]?.organization_name || '-'}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.user_tags} >
+                  <div className={classes.bodyItem} style={inlineStyles.user_tags}>
                     <ItemTags variant="list" tags={player.user_tags} />
                   </div>
                 </div>

@@ -48,6 +48,7 @@ const useStyles = makeStyles(() => ({
 const inlineStyles = {
   payload_type: {
     width: '15%',
+    cursor: 'default',
   },
   payload_name: {
     width: '20%',

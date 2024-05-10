@@ -67,9 +67,11 @@ const inlineStyles = {
   },
   document_exercises: {
     width: '20%',
+    cursor: 'default',
   },
   document_scenarios: {
     width: '20%',
+    cursor: 'default',
   },
   document_type: {
     width: '12%',
@@ -124,7 +126,7 @@ const Documents = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Components') }, { label: t('Documents'), current: true }]}/>
+      <Breadcrumbs variant="list" elements={[{ label: t('Components') }, { label: t('Documents'), current: true }]} />
       <PaginationComponent
         fetch={searchDocuments}
         searchPaginationInput={searchPaginationInput}
@@ -156,7 +158,7 @@ const Documents = () => {
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-              }
+            }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
@@ -170,7 +172,7 @@ const Documents = () => {
             href={`/api/documents/${document.document_id}/file`}
           >
             <ListItemIcon>
-              <DescriptionOutlined color="primary"/>
+              <DescriptionOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={
@@ -193,14 +195,14 @@ const Documents = () => {
                   >
                     {R.take(3, document.document_exercises).map((e, i) => {
                       const exercise = exercisesMap[e];
-                      if (exercise === undefined) return <div key={i}/>;
+                      if (exercise === undefined) return <div key={i} />;
                       return (
                         <Tooltip
                           key={i}
                           title={exercise.exercise_name}
                         >
                           <Chip
-                            icon={<RowingOutlined style={{ fontSize: 12 }}/>}
+                            icon={<RowingOutlined style={{ fontSize: 12 }} />}
                             classes={{ root: classes.exercise }}
                             variant="outlined"
                             label={exercise.exercise_name}
@@ -218,14 +220,14 @@ const Documents = () => {
                   >
                     {R.take(3, document.document_scenarios).map((e, i) => {
                       const scenario = scenariosMap[e];
-                      if (scenario === undefined) return <div key={i}/>;
+                      if (scenario === undefined) return <div key={i} />;
                       return (
                         <Tooltip
                           key={i}
                           title={scenario.scenario_name}
                         >
                           <Chip
-                            icon={<RowingOutlined style={{ fontSize: 12 }}/>}
+                            icon={<RowingOutlined style={{ fontSize: 12 }} />}
                             classes={{ root: classes.scenario }}
                             variant="outlined"
                             label={scenario.scenario_name}
@@ -250,10 +252,10 @@ const Documents = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.document_tags}
                   >
-                    <ItemTags variant="list" tags={document.document_tags}/>
+                    <ItemTags variant="list" tags={document.document_tags} />
                   </div>
                 </div>
-                    }
+              }
             />
             <ListItemSecondaryAction>
               <DocumentPopover
