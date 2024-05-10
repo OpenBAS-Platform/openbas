@@ -89,11 +89,13 @@ const headerStyles: Record<string, CSSProperties> = {
     width: '20%',
     fontSize: 12,
     fontWeight: '700',
+    cursor: 'default',
   },
   exercise_global_score: {
     width: '20%',
     fontSize: 12,
     fontWeight: '700',
+    cursor: 'default',
   },
 };
 

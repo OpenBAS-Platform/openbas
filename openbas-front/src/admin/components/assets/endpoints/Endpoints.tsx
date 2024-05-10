@@ -1,7 +1,7 @@
 import React, { CSSProperties, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { ComputerOutlined } from '@mui/icons-material';
+import { DevicesOtherOutlined } from '@mui/icons-material';
 import { useSearchParams } from 'react-router-dom';
 import EndpointCreation from './EndpointCreation';
 import EndpointPopover from './EndpointPopover';
@@ -60,6 +60,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   asset_status: {
     width: '15%',
+    cursor: 'default',
   },
 };
 
@@ -155,7 +156,7 @@ const Endpoints = () => {
             divider={true}
           >
             <ListItemIcon>
-              <ComputerOutlined color="primary" />
+              <DevicesOtherOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={
@@ -189,7 +190,7 @@ const Endpoints = () => {
           </ListItem>
         ))}
       </List>
-      {userAdmin && <EndpointCreation onCreate={(result) => setEndpoints([result, ...endpoints])}/>}
+      {userAdmin && <EndpointCreation onCreate={(result) => setEndpoints([result, ...endpoints])} />}
     </>
   );
 };

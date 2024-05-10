@@ -1,7 +1,7 @@
 import { makeStyles } from '@mui/styles';
 import React, { CSSProperties, useState } from 'react';
 import { Drawer as MuiDrawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { LanOutlined } from '@mui/icons-material';
+import { SelectGroup } from 'mdi-material-ui';
 import { useSearchParams } from 'react-router-dom';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -56,9 +56,11 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   asset_group_assets: {
     width: '15%',
+    cursor: 'default',
   },
   asset_group_dynamic_assets: {
     width: '15%',
+    cursor: 'default',
   },
   asset_group_tags: {
     width: '25%',
@@ -148,7 +150,7 @@ const AssetGroups = () => {
             onClick={() => setSelected(assetGroup)}
           >
             <ListItemIcon>
-              <LanOutlined color="primary" />
+              <SelectGroup color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={

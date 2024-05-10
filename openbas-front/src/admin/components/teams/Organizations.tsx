@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const inlineStylesHeaders : Record<string, CSSProperties> = {
+const inlineStylesHeaders: Record<string, CSSProperties> = {
   iconSort: {
     position: 'absolute',
     margin: '0 0 0 5px',
@@ -72,6 +72,7 @@ const inlineStylesHeaders : Record<string, CSSProperties> = {
     width: '40%',
     fontSize: 12,
     fontWeight: '700',
+    cursor: 'default',
   },
   organization_tags: {
     width: '30%',
@@ -179,7 +180,7 @@ const Organizations = () => {
           divider={false}
           style={{ paddingTop: 0 }}
         >
-          <ListItemIcon/>
+          <ListItemIcon />
           <ListItemText
             primary={
               <div className={classes.container}>
