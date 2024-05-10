@@ -47,6 +47,7 @@ const useStyles = makeStyles(() => ({
 const inlineStyles: Record<string, CSSProperties> = {
   inject_type: {
     width: '10%',
+    cursor: 'default',
   },
   inject_title: {
     width: '20%',
