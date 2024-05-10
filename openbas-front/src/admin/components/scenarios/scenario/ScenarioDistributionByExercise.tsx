@@ -28,9 +28,9 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
         exercise_name: 'fake',
         exercise_start_date: now.toISOString(),
         exercise_global_score: [
-          { type: 'PREVENTION', distribution: [{ value: Math.round(random(10, 100)), label: t('Unknown') }], avgResult: 'PARTIAL' },
-          { type: 'DETECTION', distribution: [{ value: Math.round(random(10, 100)), label: t('Unknown') }], avgResult: 'PARTIAL' },
-          { type: 'HUMAN_RESPONSE', distribution: [{ value: Math.round(random(10, 100)), label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'PREVENTION', distribution: [{ value: random(0.1, 1), label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'DETECTION', distribution: [{ value: random(0.1, 1), label: t('Unknown') }], avgResult: 'PARTIAL' },
+          { type: 'HUMAN_RESPONSE', distribution: [{ value: random(0.1, 1), label: t('Unknown') }], avgResult: 'PARTIAL' },
         ],
         exercise_targets: [],
         exercise_tags: undefined,
@@ -68,7 +68,7 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
           options={verticalBarsChartOptions(
             theme,
             nsdt,
-            (value: number) => `${value}%`,
+            (value: number) => `${value * 100}%`,
             false,
             true,
             false,
