@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
@@ -120,22 +121,27 @@ public class CalderaExecutor extends Injector {
             // Find an executor agent matching the asset
             List<Agent> agents = this.calderaService.agents().stream().filter(agent -> agent.getExe_name().contains("executor") && agent.getHost().equals(assetEndpoint.getHostname()) && Arrays.stream(assetEndpoint.getIps()).anyMatch(s -> Arrays.stream(agent.getHost_ip_addrs()).toList().contains(s))).toList();
             if (!agents.isEmpty()) {
-                Agent executorAgent = agents.getFirst();
-                // Check in the database if not exist
-                Optional<Endpoint> existingEndpoint = this.endpointService.findByExternalReference(executorAgent.getPaw());
-                if (existingEndpoint.isEmpty()) {
-                    log.log(Level.INFO, "Agent found and not present in the database, creating it...");
-                    Endpoint newEndpoint = new Endpoint();
-                    newEndpoint.setInject(inject);
-                    newEndpoint.setParent(asset);
-                    newEndpoint.setName(assetEndpoint.getName());
-                    newEndpoint.setIps(assetEndpoint.getIps());
-                    newEndpoint.setHostname(assetEndpoint.getHostname());
-                    newEndpoint.setPlatform(assetEndpoint.getPlatform());
-                    newEndpoint.setExternalReference(executorAgent.getPaw());
-                    newEndpoint.setExecutor(assetEndpoint.getExecutor());
-                    endpointForExecution = this.endpointService.createEndpoint(newEndpoint);
-                    break;
+                Endpoint createdEndpoint = null;
+                for (int i = 0; i < agents.size(); i++) {
+                    // Check in the database if not exist
+                    Optional<Endpoint> resolvedExistingEndpoint = this.endpointService.findByExternalReference(agents.get(i).getPaw());
+                    if( resolvedExistingEndpoint.isEmpty() ) {
+                        Endpoint newEndpoint = new Endpoint();
+                        newEndpoint.setInject(inject);
+                        newEndpoint.setParent(asset);
+                        newEndpoint.setName(assetEndpoint.getName());
+                        newEndpoint.setIps(assetEndpoint.getIps());
+                        newEndpoint.setHostname(assetEndpoint.getHostname());
+                        newEndpoint.setPlatform(assetEndpoint.getPlatform());
+                        newEndpoint.setExternalReference(agents.get(i).getPaw());
+                        newEndpoint.setExecutor(assetEndpoint.getExecutor());
+                        createdEndpoint = this.endpointService.createEndpoint(newEndpoint);
+                        log.log(Level.INFO, "Agent found and not present in the database, creating it...");
+                        break;
+                    }
+                };
+                if( createdEndpoint != null ) {
+                    return createdEndpoint;
                 }
             }
             Thread.sleep(5000);

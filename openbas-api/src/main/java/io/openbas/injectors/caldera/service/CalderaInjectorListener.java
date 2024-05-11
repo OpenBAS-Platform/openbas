@@ -1,6 +1,7 @@
 package io.openbas.injectors.caldera.service;
 
 import io.openbas.asset.AssetGroupService;
+import io.openbas.asset.EndpointService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
@@ -34,6 +35,7 @@ public class CalderaInjectorListener {
   private final InjectExpectationService injectExpectationService;
   private final CalderaInjectorService calderaService;
   private final CalderaInjectorConfig calderaInjectorConfig;
+  private final EndpointService endpointService;
   private final AssetGroupService assetGroupService;
 
   @Scheduled(fixedDelay = 60000, initialDelay = 0)
@@ -48,21 +50,13 @@ public class CalderaInjectorListener {
       Instant finalExecutionTime = injectStatus.getTrackingSentDate();
       List<Asset> assets = injectStatus.getInject().getAssets();
       List<AssetGroup> assetGroups = injectStatus.getInject().getAssetGroups();
-      List<Asset> totalAssets = new ArrayList<>(assetGroups.stream()
-          .flatMap((assetGroup -> this.assetGroupService.assetsFromAssetGroup(assetGroup.getId()).stream()))
-          .distinct()
-          .toList());
-      totalAssets.addAll(assets);
       List<String> linkIds = injectStatus.statusIdentifiers();
       List<ResultStatus> completedActions = new ArrayList<>();
       for (String linkId : linkIds) {
         try {
           ResultStatus resultStatus = this.calderaService.results(linkId);
-          String currentAssetId = totalAssets.stream()
-              .filter((a) -> a.getExternalReference().equals(resultStatus.getPaw()))
-              .findFirst()
-              .map(Asset::getId)
-              .orElseThrow();
+          Endpoint currentEndpoint = this.endpointService.findByExternalReference(resultStatus.getPaw()).orElseThrow();
+          String currentAssetId = currentEndpoint.getId();
           if (resultStatus.isComplete()) {
             completedActions.add(resultStatus);
             computeExpectationForAsset(inject, currentAssetId, resultStatus.isFail(), resultStatus.getContent());
@@ -80,7 +74,7 @@ public class CalderaInjectorListener {
           }
         } catch (Exception e) {
            injectStatus.getTraces().add(
-               traceError("Caldera error to execute ability " + Arrays.stream(e.getStackTrace()).toList())
+               traceError("Caldera failed to get result of the executed ability")
            );
         }
       }
