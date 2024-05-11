@@ -5,6 +5,7 @@ import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
+import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.specification.InjectExpectationSpecification;
 import jakarta.validation.constraints.NotBlank;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -99,12 +99,9 @@ public class InjectExpectationService {
     );
   }
 
-  public List<InjectExpectation> preventionExpectationsNotFillFrom(
-      @NotNull final Instant date,
-      @NotBlank final String source) {
+  public List<InjectExpectation> preventionExpectationsNotFill(@NotBlank final String source) {
     return this.injectExpectationRepository.findAll(
             Specification.where(InjectExpectationSpecification.type(PREVENTION))
-                .and(InjectExpectationSpecification.from(date))
         )
         .stream()
         .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
@@ -122,12 +119,13 @@ public class InjectExpectationService {
         .toList();
   }
 
-  public List<InjectExpectation> detectionExpectationsForAssets(
+  public List<InjectExpectation> expectationsForAssets(
       @NotNull final Inject inject,
-      @NotNull final AssetGroup assetGroup) {
+      @NotNull final AssetGroup assetGroup,
+      @NotNull final EXPECTATION_TYPE expectationType) {
     List<String> assetIds = assetGroup.getAssets().stream().map(Asset::getId).toList();
     return this.injectExpectationRepository.findAll(
-        Specification.where(InjectExpectationSpecification.type(DETECTION))
+        Specification.where(InjectExpectationSpecification.type(expectationType))
             .and(InjectExpectationSpecification.fromAssets(inject.getId(), assetIds))
     );
   }

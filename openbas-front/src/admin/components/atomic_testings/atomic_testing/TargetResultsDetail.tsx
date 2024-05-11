@@ -207,6 +207,48 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         </div>
       );
     }
+    if (targetResult === 'DETECTION' || targetResult === 'PREVENTION') {
+      return (
+        <>
+          {targetResultList.map((result) => (
+            <Paper
+              elevation={2}
+              style={{ padding: 20, marginTop: 15, minHeight: 125 }}
+              key={result.inject_expectation_id}
+            >
+              {result.inject_expectation_results && result.inject_expectation_results.length > 0 ? (
+                result.inject_expectation_results.map((collector, index) => {
+                  const data = JSON.parse(collector.result);
+                  return (
+                    <div key={index}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <InjectIcon
+                          tooltip={t(injectType)}
+                          type={injectType}
+                          variant="inline"
+                        />
+                        <Typography variant="body1" sx={{ marginLeft: 1 }}>
+                          {collector.sourceName}
+                        </Typography>
+                      </div>
+                      <Typography variant="body1" sx={{ marginTop: 1 }}>
+                        <Typography variant="h4" sx={{ marginTop: 1 }}>
+                          {t('Action')} : {data.action}
+                        </Typography>
+                        <p>{data.description}</p>
+                        <p><strong>{t('Severity')}:</strong> {data.severity}</p>
+                        <a href={data.link} target="_blank" rel="noopener noreferrer">More details</a>
+                      </Typography>
+                    </div>
+                  );
+                })
+              ) : (<Empty message={t('No logs available')} />)
+                }
+            </Paper>
+          ))}
+        </>
+      );
+    }
     return (
       <>
         {targetResultList.map((result) => (
@@ -241,7 +283,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
       </>
     );
   };
-
   const groupedByExpectationType = (es: InjectExpectationsStore[]) => {
     return es.reduce((group, expectation) => {
       const { inject_expectation_type } = expectation;
