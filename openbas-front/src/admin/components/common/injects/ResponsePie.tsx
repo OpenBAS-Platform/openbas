@@ -4,13 +4,14 @@ import { makeStyles, useTheme } from '@mui/styles';
 import { Button, Grid } from '@mui/material';
 import { InfoOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
+import type { ApexOptions } from 'apexcharts';
 import { useFormatter } from '../../../../components/i18n';
 import type { ExpectationResultsByType, ResultDistribution } from '../../../../utils/api-types';
 import type { Theme } from '../../../../components/Theme';
 import { donutChartOptions } from '../../../../utils/Charts';
 import Loader from '../../../../components/Loader';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: Theme) => ({
   chartContainer: {
     margin: '0 auto',
     textAlign: 'center',
@@ -20,6 +21,12 @@ const useStyles = makeStyles(() => ({
     marginTop: -20,
     fontWeight: 500,
     textAlign: 'center',
+  },
+  chartTitleDisabled: {
+    marginTop: -20,
+    fontWeight: 500,
+    textAlign: 'center',
+    color: theme.palette.text?.disabled,
   },
   column: {
     textAlign: 'center',
@@ -70,7 +77,7 @@ const ResponsePie: FunctionComponent<Props> = ({
     const hasDistribution = expectationResultsByType && expectationResultsByType.distribution && expectationResultsByType.distribution.length > 0;
     const labels = hasDistribution
       ? expectationResultsByType.distribution.map((e) => `${t(e.label)} (${(((e.value!) / getTotal(expectationResultsByType.distribution!)) * 100).toFixed(1)}%)`)
-      : [t('Unknown Data')];
+      : [t('No expectation of this type')];
     let colors = [];
     if (immutable) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -84,8 +91,6 @@ const ResponsePie: FunctionComponent<Props> = ({
       <div className={classes.column}>
         <div className={classes.chartContainer}>
           {icon}
-          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-          {/* @ts-expect-error */}
           <Chart options={
             donutChartOptions(
               theme,
@@ -94,14 +99,14 @@ const ResponsePie: FunctionComponent<Props> = ({
               false,
               colors,
               false,
-            )}
+            ) as ApexOptions}
             series={data}
             type="donut"
             width="100%"
             height="100%"
           />
         </div>
-        <div className={classes.chartTitle}>{title}</div>
+        <div className={hasDistribution ? classes.chartTitle : classes.chartTitleDisabled}>{title}</div>
         {expectationResultsByType?.type === 'HUMAN_RESPONSE' && displayHumanValidationBtn && (
           <Button
             startIcon={<InfoOutlined />}

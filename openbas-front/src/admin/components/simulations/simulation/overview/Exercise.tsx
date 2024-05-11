@@ -5,7 +5,7 @@ import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import type { ExerciseStore, InjectExpectationResultsByAttackPatternStore } from '../../../../../actions/exercises/Exercise';
 import ExerciseDistribution from './ExerciseDistribution';
-import ResponsePie from '../../../atomic_testings/atomic_testing/ResponsePie';
+import ResponsePie from '../../../common/injects/ResponsePie';
 import { fetchExerciseExpectationResult, fetchExerciseInjectExpectationResults, searchExerciseInjects } from '../../../../../actions/exercises/exercise-action';
 import type { ExpectationResultsByType, KillChainPhase } from '../../../../../utils/api-types';
 import MitreMatrix from '../../../common/matrix/MitreMatrix';

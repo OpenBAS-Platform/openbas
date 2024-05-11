@@ -12,7 +12,7 @@ import { useHelper } from '../../store';
 import useDataLoader from '../../utils/hooks/useDataLoader';
 import { fetchStatistics } from '../../actions/Application';
 import type { StatisticsHelper } from '../../actions/statistics/statistics-helper';
-import ResponsePie from './atomic_testings/atomic_testing/ResponsePie';
+import ResponsePie from './common/injects/ResponsePie';
 import MitreMatrix from './common/matrix/MitreMatrix';
 import MitreMatrixDummy from './common/matrix/MitreMatrixDummy';
 import { horizontalBarsChartOptions, polarAreaChartOptions, verticalBarsChartOptions } from '../../utils/Charts';
