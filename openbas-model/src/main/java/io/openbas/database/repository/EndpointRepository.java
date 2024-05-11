@@ -1,7 +1,9 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Scenario;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EndpointRepository extends CrudRepository<Endpoint, String>,
@@ -19,8 +22,13 @@ public interface EndpointRepository extends CrudRepository<Endpoint, String>,
   @Query(value = "select e.* from assets e where e.endpoint_hostname = :hostname", nativeQuery = true)
   List<Endpoint> findByHostname(@NotBlank final @Param("hostname") String hostname);
 
-  @Query(value = "select e.* from assets e where e.asset_temporary_execution and e.endpoint_hostname = :hostname", nativeQuery = true)
-  List<Endpoint> findExecutorsByHostname(@NotBlank final @Param("hostname") String hostname);
+  @Query(value = "select e.* from assets e where e.asset_parent is null and e.endpoint_hostname = :hostname", nativeQuery = true)
+  List<Endpoint> findForInjectionByHostname(@NotBlank final @Param("hostname") String hostname);
+
+  @Query(value = "select e.* from assets e where e.asset_parent is not null and e.endpoint_hostname = :hostname", nativeQuery = true)
+  List<Endpoint> findForExecutionByHostname(@NotBlank final @Param("hostname") String hostname);
+
+  Optional<Endpoint> findByExternalReference(@Param("externalReference") String externalReference);
 
   @Override
   @Query("select COUNT(DISTINCT a) from Inject i " +

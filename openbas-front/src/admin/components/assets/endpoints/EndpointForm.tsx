@@ -75,6 +75,7 @@ const EndpointForm: React.FC<Props> = ({
         variant="standard"
         fullWidth
         label={t('Name')}
+        style={{ marginTop: 10 }}
         error={!!errors.asset_name}
         helperText={errors.asset_name?.message}
         inputProps={register('asset_name')}

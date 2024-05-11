@@ -38,9 +38,7 @@ public class CalderaExecutorService implements Runnable {
     private static final String CALDERA_EXECUTOR_NAME = "Caldera";
 
     private final CalderaExecutorClient client;
-    private final CalderaExecutorConfig config;
 
-    private final CalderaExecutorContextService calderaExecutorContextService;
     private final EndpointService endpointService;
 
     private Executor executor = null;
@@ -63,12 +61,10 @@ public class CalderaExecutorService implements Runnable {
             EndpointService endpointService
     ) {
         this.client = client;
-        this.config = config;
-        this.calderaExecutorContextService = calderaExecutorContextService;
         this.endpointService = endpointService;
         try {
-            this.executor = executorService.register(this.config.getId(), CALDERA_EXECUTOR_TYPE, CALDERA_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
-            this.calderaExecutorContextService.registerAbilities();
+            this.executor = executorService.register(config.getId(), CALDERA_EXECUTOR_TYPE, CALDERA_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
+            calderaExecutorContextService.registerAbilities();
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error creating caldera executor: " + e);
         }
@@ -77,12 +73,13 @@ public class CalderaExecutorService implements Runnable {
     @Override
     public void run() {
         try {
-            List<Agent> agents = this.client.agents();
+            // The executor only retrieve "main" agents (without the keyword "executor")
+            // This is NOT a standard behaviour, this is because we are using Caldera as an executor and we should not
+            // Will be replace by the XTM agent
+            List<Agent> agents = this.client.agents().stream().filter(agent -> !agent.getExe_name().contains("executor")).toList();
             List<Endpoint> endpoints = toEndpoint(agents).stream().filter(Asset::getActive).toList();
             endpoints.forEach(endpoint -> {
-                List<Endpoint> existingEndpoints = this.endpointService.findByHostname(endpoint.getHostname()).stream()
-                        .filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s)))
-                        .toList();
+                List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
                 if (existingEndpoints.isEmpty()) {
                     this.endpointService.createEndpoint(endpoint);
                 } else {
@@ -109,33 +106,17 @@ public class CalderaExecutorService implements Runnable {
                     endpoint.setHostname(agent.getHost());
                     endpoint.setPlatform(toPlatform(agent.getPlatform()));
                     endpoint.setLastSeen(toInstant(agent.getLast_seen()));
-                    endpoint.setTemporaryExecution(agent.getExe_name().contains("executor"));
                     return endpoint;
                 })
                 .toList();
     }
 
     private void updateEndpoint(@NotNull final Endpoint external, @NotNull final List<Endpoint> existingList) {
-        List<Endpoint> matchingExistingEndpoints = existingList.stream().filter(existingEndpoint -> existingEndpoint.getExternalReference() != null && existingEndpoint.getExternalReference().equals(external.getExternalReference()) && existingEndpoint.getActive()).toList();
-        if (!matchingExistingEndpoints.isEmpty()) {
-            Endpoint matchingExistingEndpoint = matchingExistingEndpoints.getFirst();
-            matchingExistingEndpoint.setLastSeen(external.getLastSeen());
-            matchingExistingEndpoint.setExternalReference(external.getExternalReference());
-            matchingExistingEndpoint.setExecutor(this.executor);
-            this.endpointService.updateEndpoint(matchingExistingEndpoint);
-        } else {
-            List<Endpoint> matchingInactiveEndpoints = existingList.stream().filter(existingEndpoint -> !existingEndpoint.getActive()).toList();
-            if (!matchingInactiveEndpoints.isEmpty()) {
-                Endpoint matchingInactiveEndpoint = matchingInactiveEndpoints.getFirst();
-                matchingInactiveEndpoint.setExecutor(this.executor);
-                matchingInactiveEndpoint.setExternalReference(external.getExternalReference());
-                matchingInactiveEndpoint.setLastSeen(external.getLastSeen());
-                this.endpointService.updateEndpoint(matchingInactiveEndpoint);
-            } else {
-                this.endpointService.createEndpoint(external);
-                log.info("Creating new temporary execution endpoint " + external.getHostname());
-            }
-        }
+        Endpoint matchingExistingEndpoint = existingList.getFirst();
+        matchingExistingEndpoint.setLastSeen(external.getLastSeen());
+        matchingExistingEndpoint.setExternalReference(external.getExternalReference());
+        matchingExistingEndpoint.setExecutor(this.executor);
+        this.endpointService.updateEndpoint(matchingExistingEndpoint);
     }
 
     private Instant toInstant(@NotNull final String lastSeen) {

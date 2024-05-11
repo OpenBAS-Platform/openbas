@@ -1,14 +1,13 @@
 package io.openbas.injectors.caldera;
 
 import io.openbas.asset.AssetGroupService;
-import io.openbas.database.model.Asset;
-import io.openbas.database.model.AssetGroup;
-import io.openbas.database.model.Execution;
-import io.openbas.database.model.Inject;
+import io.openbas.asset.EndpointService;
+import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.Injector;
+import io.openbas.injectors.caldera.client.model.Agent;
 import io.openbas.injectors.caldera.client.model.ExploitResult;
 import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
 import io.openbas.injectors.caldera.model.CalderaInjectContent;
@@ -20,18 +19,15 @@ import io.openbas.model.expectation.PreventionExpectation;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
-import static io.openbas.database.model.InjectStatusExecution.EXECUTION_TYPE_COMMAND;
-import static io.openbas.database.model.InjectStatusExecution.traceInfo;
+import static io.openbas.database.model.InjectStatusExecution.*;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectation;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAssetGroup;
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAsset;
@@ -41,9 +37,11 @@ import static io.openbas.model.expectation.PreventionExpectation.preventionExpec
 @RequiredArgsConstructor
 @Log
 public class CalderaExecutor extends Injector {
+    private final int RETRY_NUMBER = 20;
 
     private final CalderaInjectorConfig config;
     private final CalderaInjectorService calderaService;
+    private final EndpointService endpointService;
     private final AssetGroupService assetGroupService;
     private final InjectRepository injectRepository;
 
@@ -53,29 +51,30 @@ public class CalderaExecutor extends Injector {
         CalderaInjectContent content = contentConvert(injection, CalderaInjectContent.class);
         String obfuscator = content.getObfuscator();
         Inject inject = this.injectRepository.findById(injection.getInjection().getInject().getId()).orElseThrow();
-
         Map<Asset, Boolean> assets = this.resolveAllAssets(injection);
-
         List<String> asyncIds = new ArrayList<>();
         List<Expectation> expectations = new ArrayList<>();
-
         // Execute inject for all assets
-        Map<String, Asset> paws = computePaws(injection.getSubProcessorAssets(), assets.keySet().stream().toList());
         String contract = inject.getInjectorContract().getId();
-        for (Map.Entry<String, Asset> entryPaw : paws.entrySet()) {
+        assets.forEach((asset, aBoolean) -> {
             try {
-                this.calderaService.exploit(obfuscator, entryPaw.getKey(), contract);
-                ExploitResult exploitResult = this.calderaService.exploitResult(entryPaw.getKey(), contract);
-                asyncIds.add(exploitResult.getLinkId());
-                execution.addTrace(traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
+                Endpoint executionEndpoint = this.findAndRegisterAssetForExecution(injection.getInjection().getInject(), asset);
+                if (executionEndpoint != null) {
+                    this.calderaService.exploit(obfuscator, executionEndpoint.getExternalReference(), contract);
+                    ExploitResult exploitResult = this.calderaService.exploitResult(executionEndpoint.getExternalReference(), contract);
+                    asyncIds.add(exploitResult.getLinkId());
+                    execution.addTrace(traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
 
-                // Compute expectations
-                boolean isInGroup = assets.get(entryPaw.getValue());
-                computeExpectationsForAsset(expectations, content, entryPaw.getValue(), isInGroup);
+                    // Compute expectations
+                    boolean isInGroup = assets.get(executionEndpoint.getParent());
+                    computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup);
+                } else {
+                    execution.addTrace(traceError("Caldera failed to execute the ability because execution endpoint was not found for endpoint " + asset.getName()));
+                }
             } catch (Exception e) {
-                log.log(Level.SEVERE, "Caldera failed to execute ability on asset " + entryPaw.getValue().getId(), e.getMessage());
+                execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + "(" + e.getMessage() + ")"));
             }
-        }
+        });
 
         List<AssetGroup> assetGroups = injection.getAssetGroups();
         assetGroups.forEach((assetGroup -> computeExpectationsForAssetGroup(expectations, content, assetGroup)));
@@ -107,14 +106,44 @@ public class CalderaExecutor extends Injector {
         return assets;
     }
 
-    private Map<String, Asset> computePaws(@NotNull final Map<String, Asset> subProcessorAssets, @NotNull final List<Asset> assets) {
-        Map<String, Asset> paws = new HashMap<>();
-        assets.forEach((asset) -> {
-            if (subProcessorAssets.containsKey(asset.getId())) {
-                paws.put(subProcessorAssets.get(asset.getId()).getExternalReference(), asset);
+    private Endpoint findAndRegisterAssetForExecution(@NotNull final Inject inject, @NotNull final Asset asset) throws InterruptedException {
+        int count = 0;
+        Endpoint endpointForExecution = null;
+        if (!asset.getType().equals("Endpoint")) {
+            log.log(Level.SEVERE, "Caldera failed to execute ability on the asset because type is not supported: " + asset.getType());
+            return null;
+        }
+        log.log(Level.INFO, "Trying to find an available executor for " + asset.getName());
+        Endpoint assetEndpoint = (Endpoint) Hibernate.unproxy(asset);
+        while (endpointForExecution == null) {
+            count++;
+            // Find an executor agent matching the asset
+            List<Agent> agents = this.calderaService.agents().stream().filter(agent -> agent.getExe_name().contains("executor") && agent.getHost().equals(assetEndpoint.getHostname()) && Arrays.stream(assetEndpoint.getIps()).anyMatch(s -> Arrays.stream(agent.getHost_ip_addrs()).toList().contains(s))).toList();
+            if (!agents.isEmpty()) {
+                Agent executorAgent = agents.getFirst();
+                // Check in the database if not exist
+                Optional<Endpoint> existingEndpoint = this.endpointService.findByExternalReference(executorAgent.getPaw());
+                if (existingEndpoint.isEmpty()) {
+                    log.log(Level.INFO, "Agent found and not present in the database, creating it...");
+                    Endpoint newEndpoint = new Endpoint();
+                    newEndpoint.setInject(inject);
+                    newEndpoint.setParent(asset);
+                    newEndpoint.setName(assetEndpoint.getName());
+                    newEndpoint.setIps(assetEndpoint.getIps());
+                    newEndpoint.setHostname(assetEndpoint.getHostname());
+                    newEndpoint.setPlatform(assetEndpoint.getPlatform());
+                    newEndpoint.setExternalReference(executorAgent.getPaw());
+                    newEndpoint.setExecutor(assetEndpoint.getExecutor());
+                    endpointForExecution = this.endpointService.createEndpoint(newEndpoint);
+                    break;
+                }
             }
-        });
-        return paws;
+            Thread.sleep(5000);
+            if (count >= RETRY_NUMBER) {
+                break;
+            }
+        }
+        return endpointForExecution;
     }
 
     /**

@@ -46,7 +46,6 @@ public class CalderaInjectorListener {
       Inject inject = injectStatus.getInject();
       // Add traces and close inject if needed.
       Instant finalExecutionTime = injectStatus.getTrackingSentDate();
-
       List<Asset> assets = injectStatus.getInject().getAssets();
       List<AssetGroup> assetGroups = injectStatus.getInject().getAssetGroups();
       List<Asset> totalAssets = new ArrayList<>(assetGroups.stream()
@@ -54,25 +53,20 @@ public class CalderaInjectorListener {
           .distinct()
           .toList());
       totalAssets.addAll(assets);
-
       List<String> linkIds = injectStatus.statusIdentifiers();
       List<ResultStatus> completedActions = new ArrayList<>();
       for (String linkId : linkIds) {
         try {
           ResultStatus resultStatus = this.calderaService.results(linkId);
-
           String currentAssetId = totalAssets.stream()
               .filter((a) -> a.getExternalReference().equals(resultStatus.getPaw()))
               .findFirst()
               .map(Asset::getId)
               .orElseThrow();
-
           if (resultStatus.isComplete()) {
             completedActions.add(resultStatus);
-
             computeExpectationForAsset(inject, currentAssetId, resultStatus.isFail(), resultStatus.getContent());
             injectStatus.setTrackingTotalSuccess(injectStatus.getTrackingTotalSuccess() + 1);
-
             // Compute biggest execution time
             if (resultStatus.getFinish().isAfter(finalExecutionTime)) {
               finalExecutionTime = resultStatus.getFinish();
@@ -81,7 +75,6 @@ public class CalderaInjectorListener {
           } else if (injectStatus.getTrackingSentDate().isBefore(Instant.now().minus(5L, ChronoUnit.MINUTES))) {
             resultStatus.setFail(true);
             completedActions.add(resultStatus);
-
             computeExpectationForAsset(inject, currentAssetId, resultStatus.isFail(), "Time out");
             injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalSuccess() + 1);
           }

@@ -23,8 +23,6 @@ public class ExecutableInject {
     private final List<Asset> assets;
     private final List<AssetGroup> assetGroups;
     private final List<ExecutionContext> users;
-    @Setter
-    private Map<String, Asset> subProcessorAssets;
 
     @JsonIgnore
     private final List<MultipartFile> directAttachments = new ArrayList<>();

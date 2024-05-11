@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
@@ -38,8 +39,18 @@ public class EndpointService {
   }
 
   @Transactional(readOnly = true)
-  public List<Endpoint> findExecutorsByHostname(@NotBlank final String hostname) {
-    return this.endpointRepository.findExecutorsByHostname(hostname);
+  public List<Endpoint> findAssetsForInjectionByHostname(@NotBlank final String hostname) {
+    return this.endpointRepository.findForInjectionByHostname(hostname);
+  }
+
+  @Transactional(readOnly = true)
+  public List<Endpoint> findAssetsForExecutionByHostname(@NotBlank final String hostname) {
+    return this.endpointRepository.findForExecutionByHostname(hostname);
+  }
+
+  @Transactional(readOnly = true)
+  public Optional<Endpoint> findByExternalReference(@NotBlank final String externalReference) {
+    return this.endpointRepository.findByExternalReference(externalReference);
   }
 
   public List<Endpoint> endpoints() {

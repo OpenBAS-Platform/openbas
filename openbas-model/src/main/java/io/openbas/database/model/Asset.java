@@ -61,10 +61,6 @@ public class Asset implements Base {
   @JsonProperty("asset_external_reference")
   private String externalReference;
 
-  @Column(name = "asset_temporary_execution")
-  @JsonProperty("asset_temporary_execution")
-  private Boolean temporaryExecution = false;
-
   // -- TAG --
 
   @Queryable(sortable = true)
@@ -81,6 +77,18 @@ public class Asset implements Base {
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("asset_executor")
   private Executor executor;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "asset_parent")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("asset_parent")
+  private Asset parent;
+
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "asset_inject")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("asset_inject")
+  private Inject inject;
   
   @JsonProperty("asset_active")
   public boolean getActive() {

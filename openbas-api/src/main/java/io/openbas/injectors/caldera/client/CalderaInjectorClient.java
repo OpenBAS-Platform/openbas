@@ -3,14 +3,19 @@ package io.openbas.injectors.caldera.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.database.model.Endpoint;
 import io.openbas.injectors.caldera.client.model.Ability;
 import io.openbas.injectors.caldera.client.model.Agent;
 import io.openbas.injectors.caldera.client.model.Result;
 import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
 import io.openbas.injectors.caldera.model.Obfuscator;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.client5.http.ClientProtocolException;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPatch;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
@@ -19,8 +24,6 @@ import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +57,12 @@ public class CalderaInjectorClient {
 
   private final static String AGENT_URI = "/agents";
 
+  public List<Agent> agents() throws ClientProtocolException, JsonProcessingException {
+    String jsonResponse = this.get(this.config.getRestApiV2Url() + AGENT_URI);
+    return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
+    });
+  }
+
   public Agent agent(@NotBlank final String paw, final String include) {
     try {
       String url = this.config.getRestApiV2Url() + AGENT_URI + "/" + paw;
@@ -64,6 +73,26 @@ public class CalderaInjectorClient {
       return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
       });
     } catch (ClientProtocolException | JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void killAgent(Endpoint endpoint) {
+    try {
+      Map<String, Object> body = new HashMap<>();
+      body.put("watchdog", 1);
+      body.put("sleep_min", 3);
+      body.put("sleep_max", 3);
+      this.patch(this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getExternalReference(), body);
+    } catch (ClientProtocolException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void deleteAgent(Endpoint endpoint) {
+    try {
+      this.delete(this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getExternalReference());
+    } catch (ClientProtocolException e) {
       throw new RuntimeException(e);
     }
   }
@@ -154,6 +183,33 @@ public class CalderaInjectorClient {
           httpPost,
           response -> EntityUtils.toString(response.getEntity())
       );
+    } catch (IOException e) {
+      throw new ClientProtocolException("Unexpected response for request on: " + url);
+    }
+  }
+
+  private void patch(
+          @NotBlank final String url,
+          @NotNull final Map<String, Object> body) throws ClientProtocolException {
+    try {
+      HttpPatch httpPatch = new HttpPatch(url);
+      // Headers
+      httpPatch.addHeader(KEY_HEADER, this.config.getApiKey());
+      // Body
+      StringEntity entity = new StringEntity(this.objectMapper.writeValueAsString(body));
+      httpPatch.setEntity(entity);
+      this.httpClient.execute(httpPatch);
+    } catch (IOException e) {
+      throw new ClientProtocolException("Unexpected response for request on: " + url);
+    }
+  }
+
+  private void delete(@NotBlank final String url) throws ClientProtocolException {
+    try {
+      HttpDelete httpdelete = new HttpDelete(url);
+      // Headers
+      httpdelete.addHeader(KEY_HEADER, this.config.getApiKey());
+      this.httpClient.execute(httpdelete);
     } catch (IOException e) {
       throw new ClientProtocolException("Unexpected response for request on: " + url);
     }

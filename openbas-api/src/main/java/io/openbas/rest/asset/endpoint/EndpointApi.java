@@ -47,14 +47,14 @@ public class EndpointApi {
   @GetMapping(ENDPOINT_URI)
   @PreAuthorize("isObserver()")
   public List<Endpoint> endpoints() {
-    return this.endpointService.endpoints(EndpointSpecification.findMainEndpoints());
+    return this.endpointService.endpoints(EndpointSpecification.findEndpointsForInjection());
   }
 
   @PostMapping(ENDPOINT_URI + "/search")
   public Page<Endpoint> endpoints(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
             (Specification<Endpoint> specification, Pageable pageable) -> this.endpointRepository.findAll(
-                    EndpointSpecification.findMainEndpoints().and(specification),
+                    EndpointSpecification.findEndpointsForInjection().and(specification),
                     pageable
             ),
             searchPaginationInput,
