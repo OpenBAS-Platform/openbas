@@ -13,6 +13,7 @@ public class Agent {
   private String paw;
   private String host;
   private String last_seen;
+  private String created;
   private String platform;
   private String username;
   private String privilege;

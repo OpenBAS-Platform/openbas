@@ -89,9 +89,29 @@ public class CalderaInjectorClient {
     }
   }
 
+  public void killAgent(Agent agent) {
+    try {
+      Map<String, Object> body = new HashMap<>();
+      body.put("watchdog", 1);
+      body.put("sleep_min", 3);
+      body.put("sleep_max", 3);
+      this.patch(this.config.getRestApiV2Url() + AGENT_URI + "/" + agent.getPaw(), body);
+    } catch (ClientProtocolException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   public void deleteAgent(Endpoint endpoint) {
     try {
       this.delete(this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getExternalReference());
+    } catch (ClientProtocolException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void deleteAgent(Agent agent) {
+    try {
+      this.delete(this.config.getRestApiV2Url() + AGENT_URI + "/" + agent.getPaw());
     } catch (ClientProtocolException e) {
       throw new RuntimeException(e);
     }

@@ -84,6 +84,12 @@ public class Asset implements Base {
   @JsonProperty("asset_parent")
   private Asset parent;
 
+  @OneToMany(fetch = FetchType.LAZY)
+  @JoinColumn(name = "asset_parent")
+  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonProperty("asset_children")
+  private List<Asset> children;
+
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "asset_inject")
   @JsonSerialize(using = MonoIdDeserializer.class)

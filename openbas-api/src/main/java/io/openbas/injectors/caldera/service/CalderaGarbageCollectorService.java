@@ -1,18 +1,28 @@
 package io.openbas.injectors.caldera.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.injectors.caldera.client.CalderaInjectorClient;
+import io.openbas.injectors.caldera.client.model.Agent;
 import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;
+import org.apache.hc.client5.http.ClientProtocolException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 import static java.time.Instant.now;
+import static java.time.ZoneOffset.UTC;
 
 @Log
 @Service
@@ -49,12 +59,32 @@ public class CalderaGarbageCollectorService implements Runnable {
             if ((now().toEpochMilli() - endpoint.getCreatedAt().toEpochMilli()) > KILL_TTL) {
                 client.killAgent(endpoint);
             }
-            if((now().toEpochMilli() - endpoint.getCreatedAt().toEpochMilli()) > DELETE_TTL) {
+            if ((now().toEpochMilli() - endpoint.getCreatedAt().toEpochMilli()) > DELETE_TTL) {
                 this.endpointService.deleteEndpoint(endpoint.getId());
                 client.deleteAgent(endpoint);
             }
         });
-
+        try {
+            List<Agent> agents = this.client.agents();
+            agents.forEach(agent -> {
+                if( agent.getExe_name().contains("executor") && (now().toEpochMilli() - toInstant(agent.getCreated()).toEpochMilli()) > KILL_TTL ) {
+                    client.killAgent(agent);
+                }
+                if( agent.getExe_name().contains("executor") && (now().toEpochMilli() - toInstant(agent.getCreated()).toEpochMilli()) > DELETE_TTL ) {
+                    client.deleteAgent(agent);
+                }
+            });
+        } catch (ClientProtocolException | JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         log.info("Caldera injector garbage collection on " + endpoints.size() + " assets");
+    }
+
+    private Instant toInstant(@NotNull final String lastSeen) {
+        String pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern, Locale.getDefault());
+        LocalDateTime localDateTime = LocalDateTime.parse(lastSeen, dateTimeFormatter);
+        ZonedDateTime zonedDateTime = localDateTime.atZone(UTC);
+        return zonedDateTime.toInstant();
     }
 }
