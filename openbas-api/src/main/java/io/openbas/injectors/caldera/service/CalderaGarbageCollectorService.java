@@ -68,11 +68,19 @@ public class CalderaGarbageCollectorService implements Runnable {
         try {
             List<Agent> agents = this.client.agents();
             agents.forEach(agent -> {
-                if( agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > KILL_TTL ) {
-                    client.killAgent(agent);
+                if (agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > KILL_TTL) {
+                    try {
+                        client.killAgent(agent);
+                    } catch (RuntimeException e) {
+                        log.info("Failed to kill agent, probably already killed");
+                    }
                 }
-                if( agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > DELETE_TTL ) {
-                    client.deleteAgent(agent);
+                if (agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > DELETE_TTL) {
+                    try {
+                        client.deleteAgent(agent);
+                    }  catch (RuntimeException e) {
+                        log.severe("Failed to delete agent");
+                    }
                 }
             });
         } catch (ClientProtocolException | JsonProcessingException e) {

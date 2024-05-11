@@ -74,7 +74,7 @@ const Dashboard = () => {
   // Fetching data
   const exercises = useHelper((helper: ExercisesHelper) => helper.getExercises());
   const statistics = useHelper((helper: StatisticsHelper) => helper.getStatistics());
-  const loaded = useDataLoader(() => {
+  useDataLoader(() => {
     dispatch(fetchKillChainPhases());
     dispatch(fetchExercises());
     dispatch(fetchStatistics());
@@ -89,15 +89,15 @@ const Dashboard = () => {
   const exercisesData = [
     {
       name: t('Number of simulations'),
-      data: loaded && exercisesOverTime.length === 0 ? exercisesTimeSeriesFakeData : exercisesTimeSeries.map((grouping: { date: string, value: number }) => ({
+      data: exercisesOverTime.length === 0 ? exercisesTimeSeriesFakeData : exercisesTimeSeries.map((grouping: { date: string, value: number }) => ({
         x: grouping.date,
         y: grouping.value,
       })),
     },
   ];
   const countByCategory = R.countBy((exercise: ExerciseSimple) => exercise?.exercise_category || t('Unknown'), exercises);
-  const categoriesLabels: string[] = loaded && R.keys(countByCategory).length === 0 ? categoriesLabelsFakeData : R.keys(countByCategory);
-  const categoriesData: number[] = loaded && R.values(countByCategory).length === 0 ? categoriesDataFakeData : R.values(countByCategory);
+  const categoriesLabels: string[] = R.keys(countByCategory).length === 0 ? categoriesLabelsFakeData : R.keys(countByCategory);
+  const categoriesData: number[] = R.values(countByCategory).length === 0 ? categoriesDataFakeData : R.values(countByCategory);
   const sortByY = R.sortWith([R.descend(R.prop('y'))]);
   const attackPatternsData = attackPatterns.length > 0 ? sortByY(attackPatternsFakeData) : [];
   return (

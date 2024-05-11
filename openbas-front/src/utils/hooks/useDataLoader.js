@@ -1,5 +1,5 @@
 import { normalize, schema } from 'normalizr';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { DATA_DELETE_SUCCESS } from '../../constants/ActionTypes';
 import { store } from '../../store';
 import { buildUri } from '../Action';
@@ -11,7 +11,6 @@ let sseClient;
 let lastPingDate = new Date().getTime();
 const listeners = new Map();
 const useDataLoader = (loader = () => {}) => {
-  const [isLoaded, setIsLoaded] = useState(false);
   const sseConnect = () => {
     sseClient = new EventSource(buildUri('/api/stream'), { withCredentials: true });
     const autoReConnect = setInterval(() => {
@@ -61,7 +60,6 @@ const useDataLoader = (loader = () => {}) => {
     } else {
       const load = async () => {
         await loader();
-        setIsLoaded(true);
       };
       load();
     }
@@ -75,7 +73,6 @@ const useDataLoader = (loader = () => {}) => {
       }
     };
   }, []);
-  return isLoaded;
 };
 
 export default useDataLoader;

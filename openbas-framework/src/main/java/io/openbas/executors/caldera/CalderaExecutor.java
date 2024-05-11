@@ -31,7 +31,7 @@ public class CalderaExecutor {
         // If enabled, scheduled every X seconds
         if (this.config.isEnable()) {
             CalderaExecutorService service = new CalderaExecutorService(this.executorService, this.client, this.config, this.calderaExecutorContextService, this.endpointService);
-            this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(5));
+            this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(60));
         }
     }
 }
