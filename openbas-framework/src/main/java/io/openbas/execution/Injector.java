@@ -15,6 +15,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.time.Duration;
@@ -104,7 +105,8 @@ public abstract class Injector {
         return expectationExecution;
     }
 
-    private Execution execute(ExecutableInject executableInject) {
+    @Transactional
+    public Execution execute(ExecutableInject executableInject) {
         Execution execution = new Execution(executableInject.isRuntime());
         try {
             boolean isScheduledInject = !executableInject.isDirect();

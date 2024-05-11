@@ -66,7 +66,6 @@ public class CalderaExecutor extends Injector {
                     ExploitResult exploitResult = this.calderaService.exploitResult(executionEndpoint.getExternalReference(), contract);
                     asyncIds.add(exploitResult.getLinkId());
                     execution.addTrace(traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
-
                     // Compute expectations
                     boolean isInGroup = assets.get(executionEndpoint.getParent());
                     computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup);

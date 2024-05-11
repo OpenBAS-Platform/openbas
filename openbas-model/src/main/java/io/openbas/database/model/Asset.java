@@ -72,25 +72,25 @@ public class Asset implements Base {
   @JsonProperty("asset_tags")
   private List<Tag> tags = new ArrayList<>();
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "asset_executor")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("asset_executor")
   private Executor executor;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "asset_parent")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("asset_parent")
   private Asset parent;
 
-  @OneToMany(fetch = FetchType.LAZY)
+  @OneToMany(fetch = FetchType.EAGER)
   @JoinColumn(name = "asset_parent")
   @JsonSerialize(using = MultiIdDeserializer.class)
   @JsonProperty("asset_children")
   private List<Asset> children;
 
-  @OneToOne(fetch = FetchType.LAZY)
+  @OneToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "asset_inject")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("asset_inject")

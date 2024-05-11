@@ -158,7 +158,7 @@ public class Inject implements Base, Injection {
   private List<Tag> tags = new ArrayList<>();
 
   @Getter
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "injects_teams",
       joinColumns = @JoinColumn(name = "inject_id"),
       inverseJoinColumns = @JoinColumn(name = "team_id"))
@@ -167,7 +167,7 @@ public class Inject implements Base, Injection {
   private List<Team> teams = new ArrayList<>();
 
   @Getter
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "injects_assets",
       joinColumns = @JoinColumn(name = "inject_id"),
       inverseJoinColumns = @JoinColumn(name = "asset_id"))
@@ -176,7 +176,7 @@ public class Inject implements Base, Injection {
   private List<Asset> assets = new ArrayList<>();
 
   @Getter
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "injects_asset_groups",
       joinColumns = @JoinColumn(name = "inject_id"),
       inverseJoinColumns = @JoinColumn(name = "asset_group_id"))
@@ -185,7 +185,7 @@ public class Inject implements Base, Injection {
   private List<AssetGroup> assetGroups = new ArrayList<>();
 
   @Getter
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "injects_payloads",
       joinColumns = @JoinColumn(name = "inject_id"),
       inverseJoinColumns = @JoinColumn(name = "payload_id"))
@@ -195,21 +195,21 @@ public class Inject implements Base, Injection {
 
   // CascadeType.ALL is required here because of complex relationships
   @Getter
-  @OneToMany(mappedBy = "inject", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonProperty("inject_documents")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<InjectDocument> documents = new ArrayList<>();
 
   // CascadeType.ALL is required here because communications are embedded
   @Getter
-  @OneToMany(mappedBy = "inject", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonProperty("inject_communications")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<Communication> communications = new ArrayList<>();
 
   // CascadeType.ALL is required here because expectations are embedded
   @Getter
-  @OneToMany(mappedBy = "inject", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonProperty("inject_expectations")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<InjectExpectation> expectations = new ArrayList<>();

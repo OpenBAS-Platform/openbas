@@ -67,7 +67,7 @@ const computeStatusStyle = (status: string | undefined | null) => {
       return inlineStyles.red;
     case 'PARTIAL':
       return inlineStyles.orange;
-    case 'STARTING':
+    case 'QUEUING':
       return inlineStyles.yellow;
     case 'RUNNING':
       return inlineStyles.purple;

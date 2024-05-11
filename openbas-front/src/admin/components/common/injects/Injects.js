@@ -19,6 +19,7 @@ import Loader from '../../../../components/Loader';
 import { InjectContext, PermissionsContext } from '../Context';
 import CreateInject from './CreateInject';
 import UpdateInject from './UpdateInject';
+import PlatformIcon from '../../../../components/PlatformIcon';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -79,7 +80,7 @@ const headerStyles = {
     fontSize: 12,
     fontWeight: '700',
   },
-  inject_users_number: {
+  inject_platforms: {
     float: 'left',
     width: '10%',
     fontSize: 12,
@@ -123,13 +124,15 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  inject_users_number: {
+  inject_platforms: {
     float: 'left',
     width: '10%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    display: 'flex',
+    alignItems: 'center',
   },
   inject_enabled: {
     float: 'left',
@@ -228,7 +231,6 @@ const Injects = (props) => {
                           'inject_title',
                           'inject_description',
                           'inject_depends_duration',
-                          'inject_users_number',
                           'inject_enabled',
                           'inject_tags',
                           'inject_content',
@@ -351,8 +353,8 @@ const Injects = (props) => {
                     headerStyles,
                   )}
                   {filtering.buildHeader(
-                    'inject_users_number',
-                    'Players',
+                    'inject_platforms',
+                    'Platform(s)',
                     true,
                     headerStyles,
                   )}
@@ -378,7 +380,6 @@ const Injects = (props) => {
             const injectorContractName = tPick(injectContract?.label);
             const duration = splitDuration(inject.inject_depends_duration || 0);
             const isDisabled = !injectContract?.config.expose;
-            const isNoTeam = !(injectContract?.fields.filter((f) => f.key === 'teams').length > 0);
             let injectStatus = inject.inject_enabled
               ? t('Enabled')
               : t('Disabled');
@@ -439,9 +440,11 @@ const Injects = (props) => {
                       </div>
                       <div
                         className={classes.bodyItem}
-                        style={inlineStyles.inject_users_number}
+                        style={inlineStyles.inject_platforms}
                       >
-                        {isNoTeam ? t('N/A') : inject.inject_users_number}
+                        {inject.inject_injector_contract?.injector_contract_platforms?.map(
+                          (platform) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
+                        )}
                       </div>
                       <div
                         className={classes.bodyItem}

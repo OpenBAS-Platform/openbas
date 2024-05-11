@@ -246,10 +246,13 @@ public class ImapService {
                         final MimeMessageParser mimeParser = new MimeMessageParser(mimeMessage).parse();
                         final List<DataSource> attachmentList = mimeParser.getAttachmentList();
                         final List<String> uploads = new ArrayList<>();
-                        String exerciseId = inject.getExercise().getId();
+                        String exerciseId = null;
+                        if( inject.getExercise() != null ) {
+                            exerciseId = inject.getExercise().getId();
+                        }
                         for (DataSource dataSource : attachmentList) {
                             final String fileName = dataSource.getName();
-                            String path = "/" + exerciseId + "/communications/" + comm.getId();
+                            String path = exerciseId != null ? "/" + exerciseId + "/communications/" + comm.getId() : "/communications/" + comm.getId();
                             String uploadName = fileService.uploadStream(path, fileName, dataSource.getInputStream());
                             uploads.add(uploadName);
                         }

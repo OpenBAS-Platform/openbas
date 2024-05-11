@@ -135,25 +135,13 @@ public class InjectsExecutionJob implements Job {
         if (source instanceof Inject) {
             executingInject = injectRepository.findById(source.getId()).orElseThrow();
             injectRunningStatus = executingInject.getStatus().orElseThrow();
-            injectRunningStatus.setTrackingSentDate(Instant.now());
-            injectRunningStatus.setName(ExecutionStatus.RUNNING);
         }
         if (source instanceof DryInject) {
             DryInject executingInjectDry = dryInjectRepository.findById(source.getId()).orElseThrow();
             dryInjectRunningStatus = executingInjectDry.getStatus().orElseThrow();
-            dryInjectRunningStatus.setTrackingSentDate(Instant.now());
-            dryInjectRunningStatus.setName(ExecutionStatus.RUNNING);
         }
         try {
             String jsonInject = mapper.writeValueAsString(executableInject);
-            if (source instanceof Inject) {
-                injectStatusRepository.save(injectRunningStatus);
-                executingInject.setUpdatedAt(now());
-                injectRepository.save(executingInject);
-            }
-            if (source instanceof DryInject) {
-                dryInjectStatusRepository.save(dryInjectRunningStatus);
-            }
             queueService.publish(inject.getInjectorContract().getInjector().getType(), jsonInject);
         } catch (Exception e) {
             if (source instanceof Inject) {
@@ -171,22 +159,6 @@ public class InjectsExecutionJob implements Job {
 
     private void executeInternal(ExecutableInject executableInject) {
         Injection source = executableInject.getInjection();
-        if (source instanceof Inject) {
-            Inject executingInject = injectRepository.findById(source.getId()).orElseThrow();
-            InjectStatus runningStatus = executingInject.getStatus().orElseThrow();
-            runningStatus.setName(ExecutionStatus.RUNNING);
-            runningStatus.setTrackingSentDate(Instant.now());
-            injectStatusRepository.save(runningStatus);
-            executingInject.setUpdatedAt(now());
-            injectRepository.save(executingInject);
-        }
-        if (source instanceof DryInject) {
-            DryInject executingInjectDry = dryInjectRepository.findById(source.getId()).orElseThrow();
-            DryInjectStatus runningStatus = executingInjectDry.getStatus().orElseThrow();
-            runningStatus.setName(ExecutionStatus.RUNNING);
-            runningStatus.setTrackingSentDate(Instant.now());
-            dryInjectStatusRepository.save(runningStatus);
-        }
         // Execute
         io.openbas.execution.Injector executor = context.getBean(source.getInject().getInjectorContract().getInjector().getType(), io.openbas.execution.Injector.class);
         Execution execution = executor.executeInjection(executableInject);
@@ -198,6 +170,7 @@ public class InjectsExecutionJob implements Job {
             InjectStatus completeStatus = InjectStatus.fromExecution(execution, executedInject);
             injectStatusRepository.save(completeStatus);
             executedInject.setUpdatedAt(now());
+            executedInject.setStatus(completeStatus);
             injectRepository.save(executedInject);
         }
         // Report dry inject execution
@@ -205,10 +178,12 @@ public class InjectsExecutionJob implements Job {
             DryInject executedDry = dryInjectRepository.findById(source.getId()).orElseThrow();
             DryInjectStatus completeStatus = DryInjectStatus.fromExecution(execution, executedDry);
             dryInjectStatusRepository.save(completeStatus);
+            executedDry.setStatus(completeStatus);
+            dryInjectRepository.save(executedDry);
         }
     }
 
-    public void executeInject(ExecutableInject executableInject) {
+    private void executeInject(ExecutableInject executableInject) {
         // Depending on injector type (internal or external) execution must be done differently
         Inject inject = executableInject.getInjection().getInject();
         Injector externalInjector = injectorRepository.findByType(inject.getInjectorContract().getInjector().getType()).orElseThrow();
@@ -251,7 +226,6 @@ public class InjectsExecutionJob implements Job {
     }
 
     @Override
-    @Transactional
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         try {
             // Handle starting exercises if needed.

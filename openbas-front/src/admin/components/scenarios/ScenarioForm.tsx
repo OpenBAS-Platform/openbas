@@ -39,6 +39,8 @@ const ScenarioForm: FunctionComponent<Props> = ({
     scenario_severity: 'high',
     scenario_subtitle: '',
     scenario_description: '',
+    scenario_external_reference: '',
+    scenario_external_url: '',
     scenario_tags: [],
   },
 }) => {
@@ -63,6 +65,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
         scenario_description: z.string().optional(),
         scenario_tags: z.string().array().optional(),
         scenario_external_reference: z.string().optional(),
+        scenario_external_url: z.string().optional(),
       }),
     ),
     defaultValues: initialValues,
@@ -73,7 +76,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
         variant="standard"
         fullWidth
         label={t('Name')}
-        style={{ marginTop: 10 }}
+        style={{ marginTop: editing ? 20 : 10 }}
         error={!!errors.scenario_name}
         helperText={errors.scenario_name?.message}
         inputProps={register('scenario_name')}
@@ -163,6 +166,28 @@ const ScenarioForm: FunctionComponent<Props> = ({
         control={control}
         setValue={setValue}
         askAi={true}
+      />
+      <TextField
+        variant="standard"
+        fullWidth
+        label={t('External reference')}
+        style={{ marginTop: 20 }}
+        error={!!errors.scenario_external_reference}
+        helperText={errors.scenario_external_reference?.message}
+        inputProps={register('scenario_external_reference')}
+        control={control}
+        setValue={setValue}
+      />
+      <TextField
+        variant="standard"
+        fullWidth
+        label={t('External URL')}
+        style={{ marginTop: 20 }}
+        error={!!errors.scenario_external_url}
+        helperText={errors.scenario_external_url?.message}
+        inputProps={register('scenario_external_url')}
+        control={control}
+        setValue={setValue}
       />
       <Controller
         control={control}

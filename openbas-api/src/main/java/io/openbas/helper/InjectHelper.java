@@ -13,6 +13,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
@@ -53,6 +54,9 @@ public class InjectHelper {
       // We get all the teams for this inject
       // But those team can be used in other exercises with different players enabled
       // So we need to focus on team players only enabled in the context of the current exercise
+      if( inject.getInject().isAtomicTesting() ) {
+        return teams.stream().flatMap(team -> team.getUsers().stream().map(user -> Tuples.of(user, team.getName())));
+      }
       return teams.stream().flatMap(team ->
           team.getExerciseTeamUsers()
               .stream()
@@ -79,6 +83,7 @@ public class InjectHelper {
 
   // -- EXECUTABLE INJECT --
 
+  @Transactional
   public List<ExecutableInject> getInjectsToRun() {
     // Get injects
     List<Inject> injects = this.injectRepository.findAll(InjectSpecification.executable());

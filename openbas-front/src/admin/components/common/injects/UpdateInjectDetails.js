@@ -3,8 +3,8 @@ import * as R from 'ramda';
 import arrayMutators from 'final-form-arrays';
 import { Form } from 'react-final-form';
 import { makeStyles } from '@mui/styles';
-import { Button } from '@mui/material';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
+import { Avatar, Button, Card, CardContent, CardHeader } from '@mui/material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, HelpOutlined } from '@mui/icons-material';
 import InjectDefinition from './InjectDefinition';
 import { PermissionsContext } from '../Context';
 import { useHelper } from '../../../../store';
@@ -17,10 +17,21 @@ import { useFormatter } from '../../../../components/i18n';
 import { isEmptyField } from '../../../../utils/utils';
 import { tagOptions } from '../../../../utils/Option';
 import { splitDuration } from '../../../../utils/Time';
+import PlatformIcon from '../../../../components/PlatformIcon';
 
 const useStyles = makeStyles((theme) => ({
   details: {
     marginTop: 20,
+  },
+  injectorContract: {
+    margin: '10px 0 20px 0',
+    width: '100%',
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: 4,
+  },
+  injectorContractContent: {
+    fontSize: 18,
+    textAlign: 'center',
   },
   openDetails: {
     width: '100%',
@@ -35,6 +46,9 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.primary.main,
     fontWeight: 600,
   },
+  injectorContractHeader: {
+    backgroundColor: theme.palette.background.default,
+  },
 }));
 
 const UpdateInjectDetails = ({
@@ -47,7 +61,7 @@ const UpdateInjectDetails = ({
   teamsFromExerciseOrScenario,
   ...props
 }) => {
-  const { t } = useFormatter();
+  const { t, tPick } = useFormatter();
   const classes = useStyles();
   const { permissions } = useContext(PermissionsContext);
   const [openDetails, setOpenDetails] = useState(true);
@@ -300,25 +314,41 @@ const UpdateInjectDetails = ({
       }
     });
   return (
-    <Form
-      keepDirtyOnReinitialize={true}
-      initialValues={initialValues}
-      onSubmit={onSubmit}
-      validate={validate}
-      mutators={{
-        ...arrayMutators,
-        setValue: ([field, value], state, { changeValue }) => {
-          changeValue(state, field, () => value);
-        },
-      }}
-    >
-      {({ form, handleSubmit, submitting, values, errors }) => {
-        return (
-          <form id="injectContentForm" onSubmit={handleSubmit} style={{ marginTop: 10 }}>
-            <InjectForm form={form} values={values} disabled={!contractContent} isAtomic={isAtomic} />
-            {contractContent && (
-              <div className={classes.details}>
-                {openDetails && (
+    <>
+      <Card elevation={0} classes={{ root: classes.injectorContract }}>
+        <CardHeader
+          classes={{ root: classes.injectorContractHeader }}
+          avatar={contractContent ? <Avatar sx={{ width: 24, height: 24 }} src={`/api/images/injectors/${contractContent.config.type}`} /> : <Avatar sx={{ width: 24, height: 24 }}><HelpOutlined /></Avatar>}
+          title={contractContent.contract_attack_patterns_external_ids.join(', ')}
+          action={<div style={{ display: 'flex', alignItems: 'center' }}>
+            {inject.inject_injector_contract?.injector_contract_platforms?.map(
+              (platform) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
+            )}
+          </div>}
+        />
+        <CardContent classes={{ root: classes.injectorContractContent }}>
+          {tPick(contractContent.label)}
+        </CardContent>
+      </Card>
+      <Form
+        keepDirtyOnReinitialize={true}
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+        mutators={{
+          ...arrayMutators,
+          setValue: ([field, value], state, { changeValue }) => {
+            changeValue(state, field, () => value);
+          },
+        }}
+      >
+        {({ form, handleSubmit, submitting, values, errors }) => {
+          return (
+            <form id="injectContentForm" onSubmit={handleSubmit} style={{ marginTop: 10 }}>
+              <InjectForm form={form} values={values} disabled={!contractContent} isAtomic={isAtomic} />
+              {contractContent && (
+                <div className={classes.details}>
+                  {openDetails && (
                   <InjectDefinition
                     form={form}
                     values={values}
@@ -340,35 +370,36 @@ const UpdateInjectDetails = ({
                     isAtomic={isAtomic}
                     {...props}
                   />
-                )}
-                <div className={classes.openDetails} onClick={toggleInjectContent}>
-                  {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}
-                  {t('Inject content')}
+                  )}
+                  <div className={classes.openDetails} onClick={toggleInjectContent}>
+                    {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}
+                    {t('Inject content')}
+                  </div>
                 </div>
+              )}
+              <div style={{ float: 'right', marginTop: 20 }}>
+                <Button
+                  variant="contained"
+                  onClick={handleClose}
+                  style={{ marginRight: 10 }}
+                  disabled={submitting}
+                >
+                  {t('Cancel')}
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  type="submit"
+                  disabled={submitting || Object.keys(errors).length > 0 || !contractContent}
+                >
+                  {t('Update')}
+                </Button>
               </div>
-            )}
-            <div style={{ float: 'right', marginTop: 20 }}>
-              <Button
-                variant="contained"
-                onClick={handleClose}
-                style={{ marginRight: 10 }}
-                disabled={submitting}
-              >
-                {t('Cancel')}
-              </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                type="submit"
-                disabled={submitting || Object.keys(errors).length > 0 || !contractContent}
-              >
-                {t('Update')}
-              </Button>
-            </div>
-          </form>
-        );
-      }}
-    </Form>
+            </form>
+          );
+        }}
+      </Form>
+    </>
   );
 };
 

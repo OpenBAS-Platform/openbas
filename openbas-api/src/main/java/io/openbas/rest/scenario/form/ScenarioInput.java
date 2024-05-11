@@ -39,6 +39,10 @@ public class ScenarioInput {
   @JsonProperty("scenario_external_reference")
   private String externalReference;
 
+  @Nullable
+  @JsonProperty("scenario_external_url")
+  private String externalUrl;
+
   @JsonProperty("scenario_tags")
   private List<String> tagIds = new ArrayList<>();
 

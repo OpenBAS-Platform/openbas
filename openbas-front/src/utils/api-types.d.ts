@@ -98,17 +98,19 @@ export interface ArticleUpdateInput {
 
 export interface Asset {
   asset_active?: boolean;
+  asset_children?: Asset[];
   /** @format date-time */
   asset_created_at?: string;
   asset_description?: string;
   asset_executor?: Executor;
   asset_external_reference?: string;
   asset_id: string;
+  asset_inject?: Inject;
   /** @format date-time */
   asset_last_seen?: string;
   asset_name: string;
+  asset_parent?: Asset;
   asset_tags?: Tag[];
-  asset_temporary_execution?: boolean;
   asset_type?: string;
   /** @format date-time */
   asset_updated_at?: string;
@@ -490,7 +492,7 @@ export interface DryInject {
 
 export interface DryInjectStatus {
   status_id?: string;
-  status_name?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_name?: "INFO" | "DRAFT" | "QUEUING" | "STARTING" | "RUNNING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -535,17 +537,19 @@ export interface DryrunCreateInput {
 
 export interface Endpoint {
   asset_active?: boolean;
+  asset_children?: Asset[];
   /** @format date-time */
   asset_created_at?: string;
   asset_description?: string;
   asset_executor?: Executor;
   asset_external_reference?: string;
   asset_id: string;
+  asset_inject?: Inject;
   /** @format date-time */
   asset_last_seen?: string;
   asset_name: string;
+  asset_parent?: Asset;
   asset_tags?: Tag[];
-  asset_temporary_execution?: boolean;
   asset_type?: string;
   /** @format date-time */
   asset_updated_at?: string;
@@ -1003,7 +1007,7 @@ export interface InjectResultDTO {
 
 export interface InjectStatus {
   status_id?: string;
-  status_name?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_name?: "INFO" | "DRAFT" | "QUEUING" | "STARTING" | "RUNNING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -1028,7 +1032,16 @@ export interface InjectStatusExecution {
   /** @format int32 */
   execution_duration?: number;
   execution_message?: string;
-  execution_status?: "INFO" | "DRAFT" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  execution_status?:
+    | "INFO"
+    | "DRAFT"
+    | "QUEUING"
+    | "STARTING"
+    | "RUNNING"
+    | "PENDING"
+    | "PARTIAL"
+    | "ERROR"
+    | "SUCCESS";
   /** @format date-time */
   execution_time?: string;
 }
@@ -1990,6 +2003,7 @@ export interface Scenario {
   scenario_documents?: Document[];
   scenario_exercises?: Exercise[];
   scenario_external_reference?: string;
+  scenario_external_url?: string;
   scenario_id: string;
   scenario_injects?: Inject[];
   scenario_injects_statistics?: Record<string, number>;
@@ -2033,6 +2047,7 @@ export interface ScenarioInput {
   scenario_category?: string;
   scenario_description?: string;
   scenario_external_reference?: string;
+  scenario_external_url?: string;
   scenario_main_focus?: string;
   scenario_name: string;
   scenario_severity?: string;

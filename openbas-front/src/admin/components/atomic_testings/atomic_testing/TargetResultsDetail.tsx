@@ -76,12 +76,51 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     fitView();
   }, [nodes, fitView]);
 
+  const getColor = (status: string | undefined) => {
+    let color;
+    let background;
+    switch (status) {
+      case 'VALIDATED':
+        color = theme.palette.success.main;
+        background = 'rgba(176, 211, 146, 0.21)';
+        break;
+      case 'FAILED':
+        color = theme.palette.error.main;
+        background = 'rgba(192, 113, 113, 0.29)';
+        break;
+      case 'QUEUING':
+        color = '#ffeb3b';
+        background = 'rgba(255, 235, 0, 0.08)';
+        break;
+      case 'PENDING':
+        color = theme.palette.text?.primary;
+        background = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+        break;
+      default: // Unknown status fow unknown expectation score
+        color = theme.palette.text?.primary;
+        background = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+        break;
+    }
+    return { color, background };
+  };
+
+  const computeInitialSteps = (currentInitialSteps: Steptarget[]) => {
+    return currentInitialSteps.map((step, index) => {
+      if (index === 0) {
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define,no-nested-ternary,@typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define,no-nested-ternary
+        return { ...step, status: injectResultDto?.inject_status?.status_name === 'QUEUING' ? 'QUEUING' : lastExecutionStartDate ? 'VALIDATED' : 'PENDING' };
+      }
+      return { ...step, status: lastExecutionEndDate ? 'VALIDATED' : 'PENDING' };
+    });
+  };
   // Fetching data
   const { injectResultDto, updateInjectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
   useEffect(() => {
     if (target) {
       setInitialized(false);
-      const steps = [...initialSteps, ...[{ label: 'Unknown result', type: '' }]];
+      const steps = [...computeInitialSteps(initialSteps), ...[{ label: 'Unknown result', type: '', status: 'PENDING' }]];
       setNodes(steps.map((step: Steptarget, index) => ({
         id: `result-${index}`,
         type: 'result',
@@ -91,6 +130,8 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           start: index === 0,
           end: index === steps.length - 1,
           middle: index !== 0 && index !== steps.length - 1,
+          color: getColor(step.status).color,
+          background: getColor(step.status).background,
         },
         position: { x: 0, y: 0 },
       })));
@@ -143,30 +184,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
       default:
         return '';
     }
-  };
-
-  const getColor = (status: string | undefined) => {
-    let color;
-    let background;
-    switch (status) {
-      case 'VALIDATED':
-        color = theme.palette.success.main;
-        background = 'rgba(176, 211, 146, 0.21)';
-        break;
-      case 'FAILED':
-        color = theme.palette.error.main;
-        background = 'rgba(192, 113, 113, 0.29)';
-        break;
-      case 'PENDING':
-        color = theme.palette.text?.primary;
-        background = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
-        break;
-      default: // Unknown status fow unknown expectation score
-        color = theme.palette.text?.primary;
-        background = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
-        break;
-    }
-    return { color, background };
   };
 
   const onUpdateManualValidation = () => {
@@ -247,7 +264,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         type: targetType,
         status: getStatus(targetResult.map((tr: InjectExpectationsStore) => tr.inject_expectation_status)),
       }));
-      const mergedSteps: Steptarget[] = [...initialSteps, ...newSteps];
+      const mergedSteps: Steptarget[] = [...computeInitialSteps(initialSteps), ...newSteps];
       // Custom sorting function
       mergedSteps.sort((a, b) => {
         const typeAIndex = sortOrder.indexOf(a.type);

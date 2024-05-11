@@ -1,11 +1,9 @@
 package io.openbas.database.model;
 
 public enum ExecutionStatus {
-    INFO,
     DRAFT,
+    INFO,
     QUEUING,
-    STARTING,
-    RUNNING,
     PENDING,
     PARTIAL,
     ERROR,

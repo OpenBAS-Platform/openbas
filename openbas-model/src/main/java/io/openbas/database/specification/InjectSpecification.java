@@ -54,7 +54,7 @@ public class InjectSpecification {
         return (root, query, cb) -> cb.and(
                 cb.isNull(root.get("exercise")), // No exercise
                 cb.isNull(root.get("scenario")), // No scenario
-                cb.equal(root.get("status").get("name"), ExecutionStatus.STARTING),
+                cb.equal(root.get("status").get("name"), ExecutionStatus.QUEUING),
                 cb.notEqual(root.get("status").get("name"), ExecutionStatus.PENDING)
         );
     }

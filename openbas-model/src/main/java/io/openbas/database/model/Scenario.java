@@ -69,6 +69,10 @@ public class Scenario implements Base {
   @JsonProperty("scenario_external_reference")
   private String externalReference;
 
+  @Column(name = "scenario_external_url")
+  @JsonProperty("scenario_external_url")
+  private String externalUrl;
+
   // -- RECURRENCE --
 
   @Column(name = "scenario_recurrence")

@@ -55,22 +55,25 @@ public class CalderaInjectorListener {
       for (String linkId : linkIds) {
         try {
           ResultStatus resultStatus = this.calderaService.results(linkId);
-          Endpoint currentEndpoint = this.endpointService.findByExternalReference(resultStatus.getPaw()).orElseThrow();
-          String currentAssetId = currentEndpoint.getId();
-          if (resultStatus.isComplete()) {
-            completedActions.add(resultStatus);
-            computeExpectationForAsset(inject, currentAssetId, resultStatus.isFail(), resultStatus.getContent());
-            injectStatus.setTrackingTotalSuccess(injectStatus.getTrackingTotalSuccess() + 1);
-            // Compute biggest execution time
-            if (resultStatus.getFinish().isAfter(finalExecutionTime)) {
-              finalExecutionTime = resultStatus.getFinish();
+          if( resultStatus.getPaw() == null ) {
+            injectStatus.getTraces().add(traceInfo("Results are not yet available (still on-going)"));
+          } else {
+            Endpoint currentEndpoint = this.endpointService.findByExternalReference(resultStatus.getPaw()).orElseThrow();
+            String currentAssetId = currentEndpoint.getId();
+            if (resultStatus.isComplete()) {
+              completedActions.add(resultStatus);
+              computeExpectationForAsset(inject, currentAssetId, resultStatus.isFail(), resultStatus.getContent());
+              injectStatus.setTrackingTotalSuccess(injectStatus.getTrackingTotalSuccess() + 1);
+              // Compute biggest execution time
+              if (resultStatus.getFinish().isAfter(finalExecutionTime)) {
+                finalExecutionTime = resultStatus.getFinish();
+              }
+            } else if (injectStatus.getTrackingSentDate().isBefore(Instant.now().minus(5L, ChronoUnit.MINUTES))) {
+              resultStatus.setFail(true);
+              completedActions.add(resultStatus);
+              computeExpectationForAsset(inject, currentAssetId, resultStatus.isFail(), "Time out");
+              injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalSuccess() + 1);
             }
-          // TimeOut
-          } else if (injectStatus.getTrackingSentDate().isBefore(Instant.now().minus(5L, ChronoUnit.MINUTES))) {
-            resultStatus.setFail(true);
-            completedActions.add(resultStatus);
-            computeExpectationForAsset(inject, currentAssetId, resultStatus.isFail(), "Time out");
-            injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalSuccess() + 1);
           }
         } catch (Exception e) {
            injectStatus.getTraces().add(
@@ -139,11 +142,12 @@ public class CalderaInjectorListener {
 
   // -- INJECT STATUS --
 
-  private void computeInjectStatus(
-      @NotNull final InjectStatus injectStatus,
-      @NotNull final Instant finalExecutionTime,
-      final int completedActions,
-      final int failedActions) {
+  @Transactional
+  public void computeInjectStatus(
+          @NotNull final InjectStatus injectStatus,
+          @NotNull final Instant finalExecutionTime,
+          final int completedActions,
+          final int failedActions) {
      boolean hasError = injectStatus.getTraces().stream()
          .anyMatch(trace -> trace.getStatus().equals(ExecutionStatus.ERROR));
      injectStatus.setName(hasError ? ExecutionStatus.ERROR : ExecutionStatus.SUCCESS);
@@ -154,12 +158,14 @@ public class CalderaInjectorListener {
      );
     long executionTime = (finalExecutionTime.toEpochMilli() - injectStatus.getTrackingSentDate().toEpochMilli());
     injectStatus.setTrackingTotalExecutionTime(executionTime);
+    injectStatus.setTrackingEndDate(Instant.now());
     this.injectStatusRepository.save(injectStatus);
   }
 
   // -- INJECT --
 
-  private void computeInject(@NotNull final InjectStatus injectStatus) {
+  @Transactional
+  public void computeInject(@NotNull final InjectStatus injectStatus) {
     Inject relatedInject = injectStatus.getInject();
     relatedInject.setUpdatedAt(Instant.now());
     this.injectRepository.save(relatedInject);
