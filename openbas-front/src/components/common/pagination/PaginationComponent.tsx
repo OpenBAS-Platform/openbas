@@ -1,11 +1,18 @@
-import { TablePagination, ToggleButtonGroup } from '@mui/material';
+import { Button, Chip, TablePagination, ToggleButtonGroup } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import SearchFilter from '../../SearchFilter';
 import type { Page } from './Page';
-import type { SearchPaginationInput } from '../../../utils/api-types';
+import type { FilterGroup, SearchPaginationInput, Filter } from '../../../utils/api-types';
 import ExportButton, { ExportProps } from '../ExportButton';
 import mitreAttack from '../../../static/images/misc/attack.png';
+import KillChainPhasesFilter from '../../../admin/components/common/filters/KillChainPhasesFilter';
+import Drawer from '../Drawer';
+import MitreFilter, { MITRE_FILTER_KEY } from '../../../admin/components/common/filters/MitreFilter';
+import { useFormatter } from '../../i18n';
+import { FilterHelpers } from '../filter/FilterHelpers';
+import { isEmptyFilter } from '../filter/FilterUtils';
+import type { AttackPatternStore } from '../../../actions/attack_patterns/AttackPattern';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -18,6 +25,17 @@ const useStyles = makeStyles(() => ({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  parametersWithoutPagination: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  filters: {
+    marginTop: 5,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
 }));
 
 interface Props<T> {
@@ -26,13 +44,31 @@ interface Props<T> {
   setContent: (data: T[]) => void;
   exportProps?: ExportProps<T>;
   searchEnable?: boolean;
-  handleOpenMitreFilter?: () => void;
+  disablePagination?: boolean;
+  entityPrefix?: string;
+  availableFilters?: string[];
+  helpers?: FilterHelpers;
+  filterGroup?: FilterGroup;
   children?: React.ReactElement | null;
+  attackPatterns?: AttackPatternStore[],
 }
 
-const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, setContent, exportProps, searchEnable = true, handleOpenMitreFilter, children }: Props<T>) => {
+const PaginationComponent = <T extends object>({
+  fetch,
+  searchPaginationInput,
+  setContent, exportProps,
+  searchEnable = true,
+  disablePagination,
+  entityPrefix,
+  availableFilters,
+  helpers,
+  filterGroup,
+  attackPatterns,
+  children,
+}: Props<T>) => {
   // Standard hooks
   const classes = useStyles();
+  const { t } = useFormatter();
 
   // Pagination
   const [page, setPage] = React.useState(0);
@@ -60,6 +96,9 @@ const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, s
     setTextSearch(value || '');
   };
 
+  // Filters
+  const [openMitreFilter, setOpenMitreFilter] = React.useState(false);
+
   useEffect(() => {
     const finalSearchPaginationInput = {
       ...searchPaginationInput,
@@ -75,6 +114,17 @@ const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, s
     });
   }, [searchPaginationInput, page, rowsPerPage, textSearch]);
 
+  // Utils
+  const computeAttackPatternNameForFilter = () => {
+    return filterGroup?.filters?.filter(
+      (f: Filter) => f.key === MITRE_FILTER_KEY,
+    )?.[0]?.values?.map(
+      (externalId: string) => attackPatterns?.find(
+        (a: AttackPatternStore) => a.attack_pattern_external_id === externalId,
+      )?.attack_pattern_name,
+    );
+  };
+
   // Children
   let component;
   if (children) {
@@ -82,37 +132,67 @@ const PaginationComponent = <T extends object>({ fetch, searchPaginationInput, s
   }
 
   return (
-    <div className={classes.parameters}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        {searchEnable && (
-          <SearchFilter
-            variant="small"
-            onChange={handleTextSearch}
-            keyword={textSearch}
-          />
-        )}
-        {handleOpenMitreFilter && (
-          <div style={{ cursor: 'pointer' }} onClick={handleOpenMitreFilter}>
-            <img src={mitreAttack} alt="MITRE ATT&CK" style={{ marginLeft: searchEnable ? 10 : 0, width: 60 }} />
+    <>
+      <div className={disablePagination ? classes.parametersWithoutPagination : classes.parameters}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {searchEnable && (
+            <SearchFilter
+              variant="small"
+              onChange={handleTextSearch}
+              keyword={textSearch}
+            />
+          )}
+          {helpers && availableFilters?.includes(`${entityPrefix}_kill_chain_phases`) && (
+            <KillChainPhasesFilter filterKey={`${entityPrefix}_kill_chain_phases`} helpers={helpers} />
+          )}
+          {helpers && availableFilters?.includes(`${entityPrefix}_attack_patterns`) && (
+            <>
+              <div style={{ cursor: 'pointer' }} onClick={() => setOpenMitreFilter(true)}>
+                <Button variant="outlined" style={{ marginLeft: searchEnable ? 10 : 0, border: '1px solid #c74227' }}>
+                  <img src={mitreAttack} alt="MITRE ATT&CK" style={{ width: 60 }} />
+                </Button>
+              </div>
+              <Drawer
+                open={openMitreFilter}
+                handleClose={() => setOpenMitreFilter(false)}
+                title={t('ATT&CK Matrix')}
+                variant='full'
+              >
+                <MitreFilter helpers={helpers} onClick={() => setOpenMitreFilter(false)} />
+              </Drawer>
+            </>
+          )}
+        </div>
+        {!disablePagination && (
+          <div className={classes.container}>
+            <TablePagination
+              component="div"
+              rowsPerPageOptions={[100, 200, 500, 1000]}
+              count={totalElements}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+            <ToggleButtonGroup value='fake' exclusive={true}>
+              {exportProps && <ExportButton totalElements={totalElements} exportProps={exportProps} />}
+              {!!component && component}
+            </ToggleButtonGroup>
           </div>
         )}
       </div>
-      <div className={classes.container}>
-        <TablePagination
-          component="div"
-          rowsPerPageOptions={[100, 200, 500, 1000]}
-          count={totalElements}
-          page={page}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-        <ToggleButtonGroup value='fake' exclusive={true}>
-          {exportProps && <ExportButton totalElements={totalElements} exportProps={exportProps} />}
-          {!!component && component}
-        </ToggleButtonGroup>
-      </div>
-    </div>
+      {helpers && filterGroup && (
+        <div className={classes.filters}>
+          {!isEmptyFilter(filterGroup, MITRE_FILTER_KEY) && (
+            <Chip
+              style={{ borderRadius: 4, marginTop: 5 }}
+              label={`Attack Pattern = ${computeAttackPatternNameForFilter()}`}
+              onDelete={() => helpers.handleRemoveFilterByKey(MITRE_FILTER_KEY)}
+            />
+          )}
+        </div>
+      )}
+    </>
   );
 };
 

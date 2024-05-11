@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { addExerciseArticle, deleteExerciseArticle, fetchExerciseArticles, updateExerciseArticle } from '../../../../../actions/channels/article-action';
 import Articles from '../../../common/articles/Articles';
 import { useAppDispatch } from '../../../../../utils/hooks';

@@ -15,7 +15,7 @@ import { usePermissions } from '../../../../../utils/Exercise';
 import Breadcrumbs from '../../../../../components/Breadcrumbs';
 import { useHelper } from '../../../../../store';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchExercise } from '../../../../../actions/Exercise';
 import { fetchInjectResultDto } from '../../../../../actions/atomic_testings/atomic-testing-actions';
 import { InjectResultDtoContext } from '../../../atomic_testings/InjectResultDtoContext';

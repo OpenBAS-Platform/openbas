@@ -9,7 +9,7 @@ import { errorWrapper } from '../../../../components/Error';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
 import NotFound from '../../../../components/NotFound';
 import ScenarioHeader from './ScenarioHeader';

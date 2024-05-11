@@ -10,7 +10,7 @@ import { fetchExerciseExpectationResult, fetchExerciseInjectExpectationResults, 
 import type { ExpectationResultsByType, KillChainPhase } from '../../../../../utils/api-types';
 import MitreMatrix from '../../../common/matrix/MitreMatrix';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchInjects } from '../../../../../actions/Inject';
 import ExpandableMarkdown from '../../../../../components/ExpandableMarkdown';
 import ItemSeverity from '../../../../../components/ItemSeverity';

@@ -92,7 +92,13 @@ public class InjectHelper {
         .filter(this::isBeforeOrEqualsNow)
         .sorted(DryInject.executionComparator)
         .map(dry -> new ExecutableInject(false, false, dry, List.of(), dry.getInject().getAssets(), dry.getInject().getAssetGroups(), usersFromInjection(dry)));
+    // Get atomic testing injects
+    List<Inject> atomicTests = this.injectRepository.findAll(InjectSpecification.forAtomicTesting());
+    Stream<ExecutableInject> executableAtomicTests = atomicTests.stream()
+            .filter(this::isBeforeOrEqualsNow)
+            .sorted(Inject.executionComparator)
+            .map(inject -> new ExecutableInject(true, false, inject, getInjectTeams(inject), inject.getAssets(), inject.getAssetGroups(), usersFromInjection(inject)));
     // Combine injects and dry
-    return concat(executableInjects, executableDryInjects).collect(Collectors.toList());
+    return concat(concat(executableInjects, executableDryInjects), executableAtomicTests).collect(Collectors.toList());
   }
 }

@@ -6,7 +6,7 @@ import { PlayArrowOutlined, Stop } from '@mui/icons-material';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchScenario, updateScenarioRecurrence } from '../../../../actions/scenarios/scenario-actions';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import ScenarioPopover from './ScenarioPopover';

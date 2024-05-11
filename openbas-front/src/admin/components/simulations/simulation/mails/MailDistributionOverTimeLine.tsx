@@ -8,7 +8,7 @@ import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import { useFormatter } from '../../../../../components/i18n';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import type { Communication } from '../../../../../utils/api-types';
 import { lineChartOptions } from '../../../../../utils/Charts';
 import { getTeamsColors } from '../../../common/injects/InjectsDistribution';

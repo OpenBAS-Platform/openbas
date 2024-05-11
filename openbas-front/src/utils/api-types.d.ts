@@ -148,7 +148,6 @@ export interface AtomicTestingInput {
   inject_tags?: string[];
   inject_teams?: string[];
   inject_title?: string;
-  inject_type?: string;
 }
 
 export interface AtomicTestingUpdateTagsInput {
@@ -877,7 +876,7 @@ export interface Inject {
   inject_tags?: Tag[];
   inject_teams?: Team[];
   inject_title?: string;
-  inject_type?: string;
+  inject_type: string;
   /** @format date-time */
   inject_updated_at?: string;
   inject_user?: User;
@@ -995,8 +994,7 @@ export interface InjectResultDTO {
   inject_targets: InjectTargetWithResult[];
   /** Title */
   inject_title: string;
-  /** Type */
-  inject_type: string;
+  inject_type?: string;
   /** @format date-time */
   inject_updated_at?: string;
   injects_documents?: string[];
@@ -1847,7 +1845,9 @@ export interface PlatformSettings {
   platform_saml2_providers?: OAuthProvider[];
   auth_local_enable?: boolean;
   auth_openid_enable?: boolean;
-  caldera_public_url?: string;
+  executor_caldera_enable?: boolean;
+  executor_caldera_public_url?: string;
+  executor_tanium_enable?: boolean;
   java_version?: string;
   map_tile_server_dark?: string;
   map_tile_server_light?: string;

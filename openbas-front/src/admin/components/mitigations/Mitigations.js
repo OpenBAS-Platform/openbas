@@ -12,7 +12,7 @@ import { initSorting } from '../../../components/common/pagination/Page';
 import { useFormatter } from '../../../components/i18n';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useHelper } from '../../../store';
-import useDataLoader from '../../../utils/ServerSideEvent';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchAttackPatterns } from '../../../actions/AttackPattern';
 import { fetchKillChainPhases } from '../../../actions/KillChainPhase';
 

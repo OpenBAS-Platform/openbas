@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import type { Inject, InjectorContract } from '../../../../utils/api-types';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { fetchTags } from '../../../../actions/Tag';
 import { fetchTeams } from '../../../../actions/teams/team-actions';

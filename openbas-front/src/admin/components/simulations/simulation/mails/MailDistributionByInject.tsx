@@ -7,7 +7,7 @@ import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import { useFormatter } from '../../../../../components/i18n';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
 import type { Theme } from '../../../../../components/Theme';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';

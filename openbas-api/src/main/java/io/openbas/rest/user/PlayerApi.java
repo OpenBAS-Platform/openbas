@@ -40,7 +40,6 @@ public class PlayerApi extends RestBehavior {
 
   private CommunicationRepository communicationRepository;
   private OrganizationRepository organizationRepository;
-  private InjectRepository injectRepository;
   private UserRepository userRepository;
   private TagRepository tagRepository;
   private UserService userService;
@@ -53,11 +52,6 @@ public class PlayerApi extends RestBehavior {
   @Autowired
   public void setCommunicationRepository(CommunicationRepository communicationRepository) {
     this.communicationRepository = communicationRepository;
-  }
-
-  @Autowired
-  public void setInjectRepository(InjectRepository injectRepository) {
-    this.injectRepository = injectRepository;
   }
 
   @Autowired
@@ -97,8 +91,7 @@ public class PlayerApi extends RestBehavior {
           .toList();
       players = userRepository.usersAccessibleFromOrganizations(organizationIds);
     }
-    Iterable<Inject> injects = injectRepository.findAll();
-    return players.stream().peek(user -> user.resolveInjects(injects)).toList();
+    return players;
   }
 
   @PostMapping("/api/players/search")
@@ -117,15 +110,11 @@ public class PlayerApi extends RestBehavior {
       playersFunction = (Specification<User> specification, Pageable pageable) -> this.userRepository
           .findAll(accessibleFromOrganizations(organizationIds).and(specification), pageable);
     }
-    Iterable<Inject> injects = injectRepository.findAll();
     return buildPaginationJPA(
         playersFunction,
         searchPaginationInput,
         User.class
-    ).map(user -> {
-      user.resolveInjects(injects);
-      return user;
-    });
+    );
   }
 
   @GetMapping("/api/player/{userId}/communications")

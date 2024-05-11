@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import TopBar from './components/nav/TopBar';
 import Dashboard from './components/Dashboard';
-import useDataLoader from '../utils/ServerSideEvent';
+import useDataLoader from '../utils/hooks/useDataLoader';
 import { errorWrapper } from '../components/Error';
 import type { Theme } from '../components/Theme';
 import NotFound from '../components/NotFound';

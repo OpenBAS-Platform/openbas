@@ -264,7 +264,7 @@ const Scenarios = () => {
             to={`/admin/scenarios/${scenario.scenario_id}`}
           >
             <ListItemIcon>
-              <MovieFilterOutlined color="primary" fontSize="medium" />
+              <MovieFilterOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={

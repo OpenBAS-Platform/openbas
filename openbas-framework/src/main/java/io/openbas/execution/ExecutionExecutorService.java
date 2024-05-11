@@ -77,15 +77,19 @@ public class ExecutionExecutorService {
 
     private void launchExecutorContextForAsset(Injector injector, Asset asset) {
         Executor executor = asset.getExecutor();
-        switch (executor.getType()) {
-            case "openbas_caldera":
-                this.calderaExecutorContextService.launchExecutorSubprocess(injector, asset);
-                break;
-            case "openbas_tanium":
-                log.log(Level.SEVERE, "Unsupported executor " + executor.getType());
-                break;
-            default:
-                log.log(Level.SEVERE, "Unsupported executor " + executor.getType());
+        if( executor == null ) {
+            log.log(Level.SEVERE, "Cannot find the executor for the asset " + asset.getName());
+        } else {
+            switch (executor.getType()) {
+                case "openbas_caldera":
+                    this.calderaExecutorContextService.launchExecutorSubprocess(injector, asset);
+                    break;
+                case "openbas_tanium":
+                    log.log(Level.SEVERE, "Unsupported executor " + executor.getType());
+                    break;
+                default:
+                    log.log(Level.SEVERE, "Unsupported executor " + executor.getType());
+            }
         }
     }
 

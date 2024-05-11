@@ -1,22 +1,21 @@
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
-import { Grid, List, Tooltip, ListItemButton, ListItemIcon, ListItemText, Chip } from '@mui/material';
+import { Chip, Grid, List, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { KeyboardArrowRight } from '@mui/icons-material';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import { useFormatter } from '../../../../components/i18n';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
-import MitreFilter, { MITRE_FILTER_KEY } from './MitreFilter';
 import computeAttackPatterns from '../../../../utils/injector_contract/InjectorContractUtils';
 import type { InjectorContractStore } from '../../../../actions/injector_contracts/InjectorContract';
 import type { FilterGroup, Inject, SearchPaginationInput } from '../../../../utils/api-types';
 import { initSorting } from '../../../../components/common/pagination/Page';
 import useFiltersState from '../../../../components/common/filter/useFiltersState';
-import { emptyFilterGroup, isEmptyFilter } from '../../../../components/common/filter/FilterUtils';
+import { emptyFilterGroup } from '../../../../components/common/filter/FilterUtils';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchAttackPatterns } from '../../../../actions/AttackPattern';
 import Drawer from '../../../../components/common/Drawer';
 import CreateInjectDetails from './CreateInjectDetails';
@@ -27,7 +26,6 @@ import { fetchInjectors } from '../../../../actions/Injectors';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
-import Loader from '../../../../components/Loader';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -108,9 +106,6 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
     dispatch(fetchInjectors());
   });
 
-  // Filter
-  const [openMitreFilter, setOpenMitreFilter] = React.useState(false);
-
   // Contracts
   const [contracts, setContracts] = useState<InjectorContractStore[]>([]);
   // as we don't know the type of the content of a contract we need to put any here
@@ -141,13 +136,6 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
     }
   }, [contracts]);
 
-  // Utils
-  const computeAttackPatternNameForFilter = () => {
-    return filterGroup
-      .filters?.filter((f) => f.key === MITRE_FILTER_KEY)?.[0]?.values?.map((externalId) => attackPatterns
-        .find((a: AttackPatternStore) => a.attack_pattern_external_id === externalId)?.attack_pattern_name);
-  };
-
   let selectedContractKillChainPhase = null;
   if (selectedContract !== null) {
     const selectedContractAttackPatterns = computeAttackPatterns(contracts[selectedContract], attackPatternsMap);
@@ -169,21 +157,18 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
         }}
       >
         <Grid container={true} spacing={3}>
-          <Grid item={true} xs={6} style={{ paddingTop: 30 }}>
+          <Grid item={true} xs={7} style={{ paddingTop: 30 }}>
             <PaginationComponent
               fetch={searchInjectorContracts}
               searchPaginationInput={searchPaginationInput}
               setContent={setContracts}
-              handleOpenMitreFilter={() => setOpenMitreFilter(true)}
+              entityPrefix='injector_contract'
+              availableFilters={['injector_contract_kill_chain_phases', 'injector_contract_attack_patterns']}
+              helpers={helpers}
+              filterGroup={filterGroup}
+              disablePagination={true}
+              attackPatterns={attackPatterns}
             />
-            {!isEmptyFilter(filterGroup, MITRE_FILTER_KEY) && (
-              <Chip
-                style={{ borderRadius: 4, marginTop: 5 }}
-                label={`Attack Pattern = ${computeAttackPatternNameForFilter()}`}
-                onDelete={() => helpers.handleClearAllFilters()}
-              />
-            )}
-            {!contracts.length && <Loader variant="inElement" />}
             <List>
               {contracts.map((contract, index) => {
                 const contractAttackPatterns = computeAttackPatterns(contract, attackPatternsMap);
@@ -199,7 +184,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
                     divider={true}
                     onClick={() => selectContract(index)}
                     selected={selectedContract === index}
-                    disabled={!!(selectedContract !== null && selectedContract !== index)}
+                    disabled={(selectedContract !== null && selectedContract !== index)}
                   >
                     <ListItemIcon>
                       <InjectIcon type={injector.injector_type} />
@@ -239,16 +224,8 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, isAtomi
                 );
               })}
             </List>
-            <Drawer
-              open={openMitreFilter}
-              handleClose={() => setOpenMitreFilter(false)}
-              title={t('ATT&CK Matrix')}
-              variant='full'
-            >
-              <MitreFilter helpers={helpers} onClick={() => setOpenMitreFilter(false)} />
-            </Drawer>
           </Grid>
-          <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
+          <Grid item={true} xs={5} style={{ paddingTop: 10 }}>
             <CreateInjectDetails
               drawerRef={drawerRef}
               contractId={selectedContract !== null ? contracts[selectedContract].injector_contract_id : null}

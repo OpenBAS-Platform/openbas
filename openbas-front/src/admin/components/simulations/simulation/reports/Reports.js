@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@mui/material';
 import { ChevronRightOutlined, ContentPasteOutlined } from '@mui/icons-material';
 import SearchFilter from '../../../../../components/SearchFilter';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../../store';
 import { useFormatter } from '../../../../../components/i18n';
 import useSearchAnFilter from '../../../../../utils/SortingFiltering';

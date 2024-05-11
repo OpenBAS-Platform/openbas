@@ -13,7 +13,7 @@ import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import type { ArticleStore, FullArticleStore } from '../../../../actions/channels/Article';
 import type { ChannelOption } from '../../components/channels/ChannelOption';
 import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchDocuments } from '../../../../actions/Document';
 import { useAppDispatch } from '../../../../utils/hooks';

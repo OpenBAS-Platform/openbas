@@ -36,5 +36,4 @@ public class ScenarioSpecification {
       return criteriaBuilder.equal(path, userId);
     };
   }
-
 }

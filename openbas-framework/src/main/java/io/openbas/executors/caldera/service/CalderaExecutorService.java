@@ -109,6 +109,7 @@ public class CalderaExecutorService implements Runnable {
                     endpoint.setHostname(agent.getHost());
                     endpoint.setPlatform(toPlatform(agent.getPlatform()));
                     endpoint.setLastSeen(toInstant(agent.getLast_seen()));
+                    endpoint.setTemporaryExecution(agent.getExe_name().contains("executor"));
                     return endpoint;
                 })
                 .toList();
@@ -119,6 +120,8 @@ public class CalderaExecutorService implements Runnable {
         if (!matchingExistingEndpoints.isEmpty()) {
             Endpoint matchingExistingEndpoint = matchingExistingEndpoints.getFirst();
             matchingExistingEndpoint.setLastSeen(external.getLastSeen());
+            matchingExistingEndpoint.setExternalReference(external.getExternalReference());
+            matchingExistingEndpoint.setExecutor(this.executor);
             this.endpointService.updateEndpoint(matchingExistingEndpoint);
         } else {
             List<Endpoint> matchingInactiveEndpoints = existingList.stream().filter(existingEndpoint -> !existingEndpoint.getActive()).toList();
@@ -129,7 +132,6 @@ public class CalderaExecutorService implements Runnable {
                 matchingInactiveEndpoint.setLastSeen(external.getLastSeen());
                 this.endpointService.updateEndpoint(matchingInactiveEndpoint);
             } else {
-                external.setTemporaryExecution(true);
                 this.endpointService.createEndpoint(external);
                 log.info("Creating new temporary execution endpoint " + external.getHostname());
             }

@@ -13,7 +13,7 @@ import { usePermissions } from '../../../../../utils/Exercise';
 import DefinitionMenu from '../../../common/simulate/DefinitionMenu';
 import { useHelper } from '../../../../../store';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import CreateControl from '../controls/CreateControl';
 import ExerciseControlDryRuns from './ExerciseControlDryRuns';
 import ExerciseControlComChecks from './ExerciseControlComChecks';

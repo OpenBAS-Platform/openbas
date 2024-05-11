@@ -4,7 +4,7 @@ import { useAppDispatch } from '../../../../../utils/hooks';
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import { useHelper } from '../../../../../store';
 import type { ChallengesHelper } from '../../../../../actions/helper';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchScenarioChallenges } from '../../../../../actions/Challenge';
 import ContextualChallenges from '../../../common/challenges/ContextualChallenges';
 import { ChallengeContext, ChallengeContextType } from '../../../common/Context';

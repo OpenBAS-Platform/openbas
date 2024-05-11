@@ -14,7 +14,7 @@ import DocumentType from '../documents/DocumentType';
 import ItemTags from '../../../../components/ItemTags';
 import DocumentPopover from '../documents/DocumentPopover';
 import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchDocuments } from '../../../../actions/Document';
 import ChallengeAddDocuments from './ChallengeAddDocuments';

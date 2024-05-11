@@ -11,7 +11,7 @@ import { storeHelper } from '../../../../../../actions/Schema';
 import { fetchTeams } from '../../../../../../actions/teams/team-actions';
 import CreateTeam from '../../../../components/teams/CreateTeam';
 import { truncate } from '../../../../../../utils/String';
-import TagsFilter from '../../../../../../components/TagsFilter';
+import TagsFilter from '../../../../common/filters/TagsFilter';
 import ItemTags from '../../../../../../components/ItemTags';
 import Transition from '../../../../../../components/common/Transition';
 

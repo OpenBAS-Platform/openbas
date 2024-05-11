@@ -36,6 +36,7 @@ public class AtomicTestingService {
 
   private AssetRepository assetRepository;
   private InjectRepository injectRepository;
+  private InjectStatusRepository injectStatusRepository;
   private InjectorContractRepository injectorContractRepository;
   private InjectDocumentRepository injectDocumentRepository;
   private UserRepository userRepository;
@@ -56,6 +57,11 @@ public class AtomicTestingService {
   @Autowired
   public void setInjectRepository(@NotNull final InjectRepository injectRepository) {
     this.injectRepository = injectRepository;
+  }
+
+  @Autowired
+  public void setInjectStatusRepository(@NotNull final InjectStatusRepository injectStatusRepository) {
+    this.injectStatusRepository = injectStatusRepository;
   }
 
   @Autowired
@@ -170,22 +176,23 @@ public class AtomicTestingService {
   }
 
   @Transactional
-  public InjectStatus tryInject(String injectId) {
+  public Inject tryInject(String injectId) {
     Inject inject = injectRepository.findById(injectId).orElseThrow();
     User user = this.userRepository.findById(currentUser().getId()).orElseThrow();
 
     // Reset injects outcome, communications and expectations
     inject.clean();
 
-    List<ExecutionContext> userInjectContexts = inject.getTeams()
-        .stream()
-        .flatMap(t -> t.getUsers().stream())
-        .map(u -> this.executionContextService.executionContext(u, inject, "Direct execution"))
-        .toList();
-    ExecutableInject injection = new ExecutableInject(false, true, inject, inject.getTeams(), inject.getAssets(),
-        inject.getAssetGroups(), userInjectContexts);
-    // TODO Must be migrated to Atomic approach (Inject duplication and async tracing)
-    return executor.execute(injection);
+    // New inject status
+    InjectStatus injectStatus = new InjectStatus();
+    injectStatus.setInject(inject);
+    injectStatus.setName(ExecutionStatus.STARTING);
+    this.injectStatusRepository.save(injectStatus);
+
+    // Inject update
+    Inject newInject = this.injectRepository.save(inject);
+
+    return newInject;
   }
 
   @Transactional

@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 import SearchFilter from '../../../../../components/SearchFilter';
 import { fetchTags } from '../../../../../actions/Tag';
 import { fetchPlayers } from '../../../../../actions/User';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../../store';
 import useSearchAnFilter from '../../../../../utils/SortingFiltering';
 import { fetchDryrun } from '../../../../../actions/Dryrun';

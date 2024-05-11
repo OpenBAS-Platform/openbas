@@ -9,7 +9,7 @@ import { useAppDispatch } from '../../../../../utils/hooks';
 import ComcheckState from '../controls/ComcheckState';
 import Empty from '../../../../../components/Empty';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { deleteComcheck, fetchComchecks } from '../../../../../actions/Comcheck';
 import type { ComCheckHelper } from '../../../../../actions/comchecks/comcheck-helper';
 import type { Comcheck } from '../../../../../utils/api-types';

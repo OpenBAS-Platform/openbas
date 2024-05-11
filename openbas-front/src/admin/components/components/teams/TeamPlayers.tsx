@@ -5,13 +5,13 @@ import { ArrowDropDownOutlined, ArrowDropUpOutlined, CloseRounded, EmailOutlined
 import * as R from 'ramda';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
-import TagsFilter from '../../../../components/TagsFilter';
+import TagsFilter from '../../common/filters/TagsFilter';
 import SearchFilter from '../../../../components/SearchFilter';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import ItemTags from '../../../../components/ItemTags';
 import PlayerPopover from '../../teams/players/PlayerPopover';
 import TeamAddPlayers from './TeamAddPlayers';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchTeam, fetchTeamPlayers } from '../../../../actions/teams/team-actions';
 import { fetchOrganizations } from '../../../../actions/Organization';
 import { useAppDispatch } from '../../../../utils/hooks';

@@ -1,5 +1,6 @@
 package io.openbas.database.specification;
 
+import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
 import org.springframework.data.jpa.domain.Specification;
@@ -46,6 +47,15 @@ public class InjectSpecification {
                 // cb.notEqual(root.get("type"), ManualContract.TYPE),  // notManual
                 cb.equal(root.get("enabled"), true), // isEnable
                 cb.equal(root.get("exercise").get("id"), exerciseId) // fromWantedExercise
+        );
+    }
+
+    public static Specification<Inject> forAtomicTesting() {
+        return (root, query, cb) -> cb.and(
+                cb.isNull(root.get("exercise")), // No exercise
+                cb.isNull(root.get("scenario")), // No scenario
+                cb.equal(root.get("status").get("name"), ExecutionStatus.STARTING),
+                cb.notEqual(root.get("status").get("name"), ExecutionStatus.PENDING)
         );
     }
 }

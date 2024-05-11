@@ -11,7 +11,7 @@ import {
   updatePlatformParameters,
   updatePlatformWhitemarkParameters,
 } from '../../../actions/Application';
-import useDataLoader from '../../../utils/ServerSideEvent';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import ItemBoolean from '../../../components/ItemBoolean';
 import ThemeForm from './ThemeForm';
 import { useAppDispatch } from '../../../utils/hooks';

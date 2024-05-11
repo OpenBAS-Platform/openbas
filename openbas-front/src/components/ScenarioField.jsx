@@ -3,7 +3,7 @@ import { Kayaking } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Autocomplete from './Autocomplete';
-import useDataLoader from '../utils/ServerSideEvent';
+import useDataLoader from '../utils/hooks/useDataLoader';
 import { useHelper } from '../store';
 import { fetchScenarios } from '../actions/scenarios/scenario-actions';
 import { useAppDispatch } from '../utils/hooks';

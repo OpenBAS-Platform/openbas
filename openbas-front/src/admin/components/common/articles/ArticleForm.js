@@ -9,7 +9,7 @@ import { useFormatter } from '../../../../components/i18n';
 import OldTextField from '../../../../components/fields/OldTextField';
 import Autocomplete from '../../../../components/Autocomplete';
 import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';

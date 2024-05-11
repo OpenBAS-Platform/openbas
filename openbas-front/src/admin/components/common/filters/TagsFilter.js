@@ -4,9 +4,9 @@ import { makeStyles } from '@mui/styles';
 import { Box, Autocomplete, TextField, Chip } from '@mui/material';
 import { LabelOutlined } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
-import { fetchTags } from '../actions/Tag';
-import { useFormatter } from './i18n';
-import { useHelper } from '../store';
+import { fetchTags } from '../../../../actions/Tag';
+import { useFormatter } from '../../../../components/i18n';
+import { useHelper } from '../../../../store';
 
 const useStyles = makeStyles(() => ({
   icon: {
@@ -43,7 +43,7 @@ const TagsFilter = (props) => {
   });
   const tagsOptions = tags.map(tagTransform);
   return (
-    <div>
+    <>
       <Autocomplete
         sx={{ width: fullWidth ? '100%' : 250, float: 'left', marginRight: '10px' }}
         selectOnFocus={true}
@@ -92,7 +92,7 @@ const TagsFilter = (props) => {
           )}
         </div>
       )}
-    </div>
+    </>
   );
 };
 

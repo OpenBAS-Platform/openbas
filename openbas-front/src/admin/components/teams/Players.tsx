@@ -8,7 +8,7 @@ import { fetchOrganizations } from '../../../actions/Organization';
 import ItemTags from '../../../components/ItemTags';
 import CreatePlayer from './players/CreatePlayer';
 import PlayerPopover from './players/PlayerPopover';
-import useDataLoader from '../../../utils/ServerSideEvent';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import Breadcrumbs from '../../../components/Breadcrumbs';

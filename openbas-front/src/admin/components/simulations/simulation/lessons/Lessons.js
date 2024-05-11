@@ -32,7 +32,7 @@ import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchObjectives } from '../../../../../actions/Objective';
 import Transition from '../../../../../components/common/Transition';
 import ObjectiveEvaluations from './ObjectiveEvaluations';

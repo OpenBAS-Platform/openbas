@@ -5,7 +5,7 @@ import { Card, CardActionArea, CardContent, Chip, Grid, Tooltip, Typography } fr
 import { AutoModeOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import useDataLoader from '../../../utils/ServerSideEvent';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../utils/hooks';
 import type { Injector } from '../../../utils/api-types';
 import type { InjectorHelper } from '../../../actions/injectors/injector-helper';

@@ -5,7 +5,7 @@ import { makeStyles } from '@mui/styles';
 import { LockPattern } from 'mdi-material-ui';
 import { searchAttackPatterns } from '../../../../actions/AttackPattern';
 import CreateAttackPattern from './CreateAttackPattern';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../store';
 import AttackPatternPopover from './AttackPatternPopover';
 import TaxonomiesMenu from '../TaxonomiesMenu';

@@ -6,7 +6,7 @@ import { fetchExercise } from '../../../../actions/Exercise';
 import { errorWrapper } from '../../../../components/Error';
 import Loader from '../../../../components/Loader';
 import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ExerciseHeader from './ExerciseHeader';
 import type { Exercise as ExerciseType } from '../../../../utils/api-types';

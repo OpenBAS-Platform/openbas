@@ -23,17 +23,19 @@ interface Steptarget {
 }
 
 const useStyles = makeStyles<Theme>(() => ({
-  target: {
-    margin: '0 auto',
-    textAlign: 'center',
-    fontSize: 15,
-  },
   container: {
-    margin: 0,
+    margin: '20px 0 0 0',
     overflow: 'hidden',
   },
   tabs: {
     marginLeft: 'auto',
+  },
+  target: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    padding: '10px 20px 0 20px',
+    textAlign: 'center',
   },
 }));
 
@@ -305,7 +307,26 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   };
   return (
     <>
-      <div className={classes.target}>{target.name}</div>
+      <div className={classes.target}>
+        <div>
+          <Typography variant="h3" gutterBottom>
+            {t('Name')}
+          </Typography>
+          {target.name}
+        </div>
+        <div>
+          <Typography variant="h3" gutterBottom>
+            {t('Type')}
+          </Typography>
+          {target.targetType}
+        </div>
+        <div>
+          <Typography variant="h3" gutterBottom>
+            {t('Platform')}
+          </Typography>
+          {target.platformType ?? t('N/A')}
+        </div>
+      </div>
       <div className={classes.container} style={{ width: '100%', height: 150 }}>
         <ReactFlow
           nodes={nodes}

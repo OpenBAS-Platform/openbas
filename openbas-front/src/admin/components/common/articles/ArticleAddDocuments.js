@@ -9,10 +9,10 @@ import { fetchDocuments } from '../../../../actions/Document';
 import CreateDocument from '../../components/documents/CreateDocument';
 import { truncate } from '../../../../utils/String';
 import Transition from '../../../../components/common/Transition';
-import TagsFilter from '../../../../components/TagsFilter';
+import TagsFilter from '../filters/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { PermissionsContext } from '../Context';
 

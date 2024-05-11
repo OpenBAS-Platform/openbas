@@ -9,7 +9,7 @@ import Transition from '../../../../components/common/Transition';
 import { exerciseOptions, scenarioOptions, tagOptions } from '../../../../utils/Option';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 import { fetchExercises } from '../../../../actions/Exercise';
 import Drawer from '../../../../components/common/Drawer';

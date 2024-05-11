@@ -5,7 +5,7 @@ import Loader from '../../../components/Loader';
 import LessonsTemplate from './LessonsTemplate';
 import LessonsTemplateHeader from './LessonsTemplateHeader';
 import { errorWrapper } from '../../../components/Error';
-import useDataLoader from '../../../utils/ServerSideEvent';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../store';
 import { fetchLessonsTemplates } from '../../../actions/Lessons';
 import { useAppDispatch } from '../../../utils/hooks';

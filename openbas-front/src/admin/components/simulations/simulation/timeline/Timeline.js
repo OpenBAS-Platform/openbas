@@ -7,12 +7,12 @@ import { CastForEducationOutlined, CastOutlined, PreviewOutlined } from '@mui/ic
 import * as R from 'ramda';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { fetchInjects, updateInjectForExercise } from '../../../../../actions/Inject';
 import Empty from '../../../../../components/Empty';
 import SearchFilter from '../../../../../components/SearchFilter';
-import TagsFilter from '../../../../../components/TagsFilter';
+import TagsFilter from '../../../common/filters/TagsFilter';
 import useSearchAnFilter from '../../../../../utils/SortingFiltering';
 import InjectIcon from '../../../common/injects/InjectIcon';
 import { splitDuration } from '../../../../../utils/Time';

@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import type { Exercise } from '../../../../../utils/api-types';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import ContextualChallenges from '../../../common/challenges/ContextualChallenges';
 import { fetchExerciseChallenges } from '../../../../../actions/Challenge';
 import type { ChallengesHelper } from '../../../../../actions/helper';

@@ -5,7 +5,7 @@ import { fetchInjector } from '../../../../actions/Injectors';
 import Loader from '../../../../components/Loader';
 import InjectorHeader from './InjectorHeader';
 import { errorWrapper } from '../../../../components/Error';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { Injector as InjectorType } from '../../../../utils/api-types';

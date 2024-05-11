@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static io.openbas.database.model.InjectStatusExecution.traceError;
@@ -86,7 +87,7 @@ public class CalderaInjectorListener {
           }
         } catch (Exception e) {
            injectStatus.getTraces().add(
-               traceError("Caldera error to execute ability")
+               traceError("Caldera error to execute ability " + Arrays.stream(e.getStackTrace()).toList())
            );
         }
       }

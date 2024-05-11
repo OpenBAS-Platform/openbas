@@ -193,7 +193,7 @@ const AtomicTesting = () => {
             <ResponsePie expectationResultsByTypes={injectResultDto.inject_expectation_results} />
           </Paper>
         </Grid>
-        <Grid item xs={6} style={{ marginTop: 25 }}>
+        <Grid item xs={6} style={{ marginTop: 30 }}>
           <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
             {t('Targets')}
           </Typography>

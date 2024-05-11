@@ -10,7 +10,7 @@ import { storeHelper } from '../../../../actions/Schema';
 import { fetchDocuments } from '../../../../actions/Document';
 import CreateDocument from '../documents/CreateDocument';
 import Transition from '../../../../components/common/Transition';
-import TagsFilter from '../../../../components/TagsFilter';
+import TagsFilter from '../../common/filters/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
 
 class ChannelAddLogo extends Component {

@@ -6,7 +6,7 @@ import { HelpOutlined } from '@mui/icons-material';
 import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import CreateLessonsTemplateCategory from './categories/CreateLessonsTemplateCategory';
-import useDataLoader from '../../../utils/ServerSideEvent';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { fetchLessonsTemplateCategories, fetchLessonsTemplateQuestions } from '../../../actions/Lessons';
 import LessonsTemplateCategoryPopover from './categories/LessonsTemplateCategoryPopover';
 import CreateLessonsTemplateQuestion from './categories/questions/CreateLessonsTemplateQuestion';

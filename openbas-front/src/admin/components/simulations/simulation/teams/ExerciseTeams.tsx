@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { PermissionsContext, TeamContext } from '../../../common/Context';
 import type { UserStore } from '../../../teams/players/Player';

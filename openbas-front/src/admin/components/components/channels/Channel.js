@@ -12,7 +12,7 @@ import ChannelOverviewNewspaper from './ChannelOverviewNewspaper';
 import ChannelOverviewMicroblogging from './ChannelOverviewMicroblogging';
 import ChannelOverviewTvChannel from './ChannelOverviewTvChannel';
 import ChannelAddLogo from './ChannelAddLogo';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchDocuments } from '../../../../actions/Document';
 
 const useStyles = makeStyles(() => ({

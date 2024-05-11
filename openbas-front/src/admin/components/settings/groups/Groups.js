@@ -13,7 +13,7 @@ import { fetchTags } from '../../../../actions/Tag';
 import GroupPopover from './GroupPopover';
 import SecurityMenu from '../SecurityMenu';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { initSorting } from '../../../../components/common/pagination/Page';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';

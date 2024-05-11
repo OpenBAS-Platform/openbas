@@ -39,7 +39,7 @@ import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
 import Transition from '../../../../components/common/Transition';
 import ItemTags from '../../../../components/ItemTags';
-import TagsFilter from '../../../../components/TagsFilter';
+import TagsFilter from '../../common/filters/TagsFilter';
 import { resolveUserName, truncate } from '../../../../utils/String';
 import Drawer from '../../../../components/common/Drawer';
 

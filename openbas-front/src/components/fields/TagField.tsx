@@ -5,7 +5,7 @@ import { Autocomplete as MuiAutocomplete, Box, Dialog, DialogContent, DialogTitl
 import { makeStyles } from '@mui/styles';
 import { FieldErrors } from 'react-hook-form';
 import { useAppDispatch } from '../../utils/hooks';
-import useDataLoader from '../../utils/ServerSideEvent';
+import useDataLoader from '../../utils/hooks/useDataLoader';
 import type { Tag } from '../../utils/api-types';
 import { useHelper } from '../../store';
 import type { TagsHelper, UsersHelper } from '../../actions/helper';

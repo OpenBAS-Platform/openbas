@@ -8,7 +8,7 @@ import { fetchOrganizations } from '../../../../actions/Organization';
 import ItemTags from '../../../../components/ItemTags';
 import CreateUser from './CreateUser';
 import { fetchTags } from '../../../../actions/Tag';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../store';
 import UserPopover from './UserPopover';
 import SecurityMenu from '../SecurityMenu';

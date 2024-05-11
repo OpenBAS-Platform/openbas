@@ -2,7 +2,7 @@ import React, { FunctionComponent, useEffect } from 'react';
 import { makeStyles } from '@mui/styles';
 import { Button, Typography } from '@mui/material';
 import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';

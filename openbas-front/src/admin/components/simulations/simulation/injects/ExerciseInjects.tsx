@@ -15,7 +15,7 @@ import {
   updateInjectForExercise,
 } from '../../../../../actions/Inject';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import Injects from '../../../common/injects/Injects';
 import { secondsFromToNow } from '../../../../../utils/Exercise';
 import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';

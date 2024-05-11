@@ -32,6 +32,10 @@ public class CalderaInjectorConfig {
 
   @Getter
   @NotBlank
+  private String publicUrl;
+
+  @Getter
+  @NotBlank
   private String apiKey;
 
   public String getRestApiV1Url() {

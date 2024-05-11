@@ -3,7 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { Card, CardContent, Chip, Grid, Typography } from '@mui/material';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import useDataLoader from '../../../utils/ServerSideEvent';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../utils/hooks';
 import type { Executor } from '../../../utils/api-types';
 import type { ExecutorHelper } from '../../../actions/executors/executor-helper';

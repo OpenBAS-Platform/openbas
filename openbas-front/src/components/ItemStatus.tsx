@@ -40,6 +40,14 @@ const inlineStyles = {
     backgroundColor: 'rgba(255, 152, 0, 0.08)',
     color: '#ff9800',
   },
+  yellow: {
+    backgroundColor: 'rgba(255, 235, 0, 0.08)',
+    color: '#ffeb3b',
+  },
+  purple: {
+    backgroundColor: 'rgba(103, 58, 183, 0.08)',
+    color: '#673ab7',
+  },
   blueGrey: {
     backgroundColor: 'rgba(96, 125, 139, 0.08)',
     color: '#607d8b',
@@ -59,6 +67,10 @@ const computeStatusStyle = (status: string | undefined | null) => {
       return inlineStyles.red;
     case 'PARTIAL':
       return inlineStyles.orange;
+    case 'STARTING':
+      return inlineStyles.yellow;
+    case 'RUNNING':
+      return inlineStyles.purple;
     case 'PENDING':
       return inlineStyles.blue;
     case 'SUCCESS':

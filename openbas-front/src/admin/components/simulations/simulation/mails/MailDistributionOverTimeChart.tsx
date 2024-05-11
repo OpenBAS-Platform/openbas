@@ -8,7 +8,7 @@ import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import { useFormatter } from '../../../../../components/i18n';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchExerciseCommunications } from '../../../../../actions/Communication';
 import type { CommunicationHelper } from '../../../../../actions/communications/communication-helper';
 import type { Communication } from '../../../../../utils/api-types';

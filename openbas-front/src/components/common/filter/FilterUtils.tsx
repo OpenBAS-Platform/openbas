@@ -16,6 +16,15 @@ export const buildEmptyFilter = (key: string, operator: Filter['operator']) => {
   };
 };
 
+export const buildFilter = (key: string, values: string[], operator: Filter['operator']) => {
+  return {
+    key,
+    mode: 'and' as Filter['mode'],
+    values,
+    operator,
+  };
+};
+
 export const isExistFilter = (filterGroup: FilterGroup, key: string) => {
   return filterGroup.filters?.some((f) => f.key === key);
 };

@@ -13,7 +13,7 @@ import type { Inject, Team } from '../../../../../../utils/api-types';
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 import { useAppDispatch } from '../../../../../../utils/hooks';
 import { useHelper } from '../../../../../../store';
-import useDataLoader from '../../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
 import { fetchChannels } from '../../../../../../actions/channels/channel-action';
 import { fetchExerciseTeams } from '../../../../../../actions/Exercise';
 import { fetchExerciseChallenges } from '../../../../../../actions/Challenge';

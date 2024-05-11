@@ -9,7 +9,7 @@ import { useFormatter } from '../../components/i18n';
 import PaperMetric from './common/simulate/PaperMetric';
 import { useAppDispatch } from '../../utils/hooks';
 import { useHelper } from '../../store';
-import useDataLoader from '../../utils/ServerSideEvent';
+import useDataLoader from '../../utils/hooks/useDataLoader';
 import { fetchStatistics } from '../../actions/Application';
 import type { StatisticsHelper } from '../../actions/statistics/statistics-helper';
 import ResponsePie from './atomic_testings/atomic_testing/ResponsePie';
@@ -74,10 +74,10 @@ const Dashboard = () => {
   // Fetching data
   const exercises = useHelper((helper: ExercisesHelper) => helper.getExercises());
   const statistics = useHelper((helper: StatisticsHelper) => helper.getStatistics());
-  useDataLoader(() => {
+  const loaded = useDataLoader(() => {
+    dispatch(fetchKillChainPhases());
     dispatch(fetchExercises());
     dispatch(fetchStatistics());
-    dispatch(fetchKillChainPhases());
     dispatch(fetchAttackPatterns());
   });
   const { attackPatterns } = useHelper((helper: AttackPatternHelper & KillChainPhaseHelper & InjectorHelper) => ({
@@ -89,15 +89,15 @@ const Dashboard = () => {
   const exercisesData = [
     {
       name: t('Number of simulations'),
-      data: exercisesOverTime.length === 0 ? exercisesTimeSeriesFakeData : exercisesTimeSeries.map((grouping: { date: string, value: number }) => ({
+      data: loaded && exercisesOverTime.length === 0 ? exercisesTimeSeriesFakeData : exercisesTimeSeries.map((grouping: { date: string, value: number }) => ({
         x: grouping.date,
         y: grouping.value,
       })),
     },
   ];
   const countByCategory = R.countBy((exercise: ExerciseSimple) => exercise?.exercise_category || t('Unknown'), exercises);
-  const categoriesLabels: string[] = R.keys(countByCategory).length > 0 ? R.keys(countByCategory) : categoriesLabelsFakeData;
-  const categoriesData: number[] = R.values(countByCategory).length > 0 ? R.values(countByCategory) : categoriesDataFakeData;
+  const categoriesLabels: string[] = loaded && R.keys(countByCategory).length === 0 ? categoriesLabelsFakeData : R.keys(countByCategory);
+  const categoriesData: number[] = loaded && R.values(countByCategory).length === 0 ? categoriesDataFakeData : R.values(countByCategory);
   const sortByY = R.sortWith([R.descend(R.prop('y'))]);
   const attackPatternsData = attackPatterns.length > 0 ? sortByY(attackPatternsFakeData) : [];
   return (
@@ -197,7 +197,7 @@ const Dashboard = () => {
         <Typography variant="h4">{t('MITRE ATT&CK Coverage')}</Typography>
         <Paper variant="outlined" style={{ minWidth: '100%', padding: 16 }}>
           {(statistics?.inject_expectation_results ?? []).length > 0
-            ? <MitreMatrix injectResults={statistics?.inject_expectation_results ?? []} />
+            ? <MitreMatrix alreadyLoaded={true} injectResults={statistics?.inject_expectation_results ?? []} />
             : <MitreMatrixDummy />
           }
         </Paper>

@@ -13,7 +13,7 @@ import ChannelIcon from '../../components/channels/ChannelIcon';
 import type { Theme } from '../../../../components/Theme';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { PermissionsContext } from '../Context';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../store';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
 import type { ArticlesHelper } from '../../../../actions/channels/article-helper';

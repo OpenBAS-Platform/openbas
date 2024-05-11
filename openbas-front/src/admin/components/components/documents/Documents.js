@@ -15,7 +15,7 @@ import DocumentPopover from './DocumentPopover';
 import DocumentType from './DocumentType';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { initSorting } from '../../../../components/common/pagination/Page';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';

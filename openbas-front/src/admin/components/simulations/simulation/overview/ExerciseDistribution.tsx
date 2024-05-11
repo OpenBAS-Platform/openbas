@@ -12,7 +12,7 @@ import ExerciseDistributionScoreOverTimeByTeam from './ExerciseDistributionScore
 import ExerciseDistributionScoreByTeam from './ExerciseDistributionScoreByTeam';
 import ExerciseDistributionScoreByTeamInPercentage from './ExerciseDistributionScoreByTeamInPercentage';
 import ExerciseDistributionScoreOverTimeByTeamInPercentage from './ExerciseDistributionScoreOverTimeByTeamInPercentage';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { fetchInjects } from '../../../../../actions/Inject';

@@ -7,7 +7,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import ItemStatus from '../../../../components/ItemStatus';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchDocuments } from '../../../../actions/Document';
 import type { DocumentsHelper } from '../../../../actions/helper';
 

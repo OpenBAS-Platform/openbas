@@ -4,7 +4,7 @@ import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } f
 import { ChevronRightOutlined } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import SearchFilter from '../../../../components/SearchFilter';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { fetchChannels } from '../../../../actions/channels/channel-action';

@@ -5,7 +5,7 @@ import { fetchChannel } from '../../../../actions/channels/channel-action';
 import Loader from '../../../../components/Loader';
 import ChannelHeader from './ChannelHeader';
 import { errorWrapper } from '../../../../components/Error';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';

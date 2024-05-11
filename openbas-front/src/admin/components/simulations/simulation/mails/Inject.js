@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import { Grid, Typography, Paper, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import { executeInject, fetchExerciseInjects } from '../../../../../actions/Inject';
 import { useFormatter } from '../../../../../components/i18n';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../../store';
 import AnimationMenu from '../AnimationMenu';
 import Loader from '../../../../../components/Loader';

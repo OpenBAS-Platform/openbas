@@ -10,7 +10,7 @@ import { useHelper } from '../../../../store';
 import type { TagsHelper } from '../../../../actions/helper';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import type { Team } from '../../../../utils/api-types';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchTeams } from '../../../../actions/teams/team-actions';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';

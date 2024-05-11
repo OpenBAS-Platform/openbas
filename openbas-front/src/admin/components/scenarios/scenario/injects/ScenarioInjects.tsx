@@ -9,7 +9,7 @@ import type { ArticlesHelper } from '../../../../../actions/channels/article-hel
 import type { ChallengesHelper } from '../../../../../actions/helper';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { addInjectForScenario, deleteInjectScenario, fetchScenarioInjects, updateInjectActivationForScenario, updateInjectForScenario } from '../../../../../actions/Inject';
 import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';

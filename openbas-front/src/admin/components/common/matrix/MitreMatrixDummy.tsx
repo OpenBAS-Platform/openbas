@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';

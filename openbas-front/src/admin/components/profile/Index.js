@@ -8,7 +8,7 @@ import UserForm from './UserForm';
 import ProfileForm from './ProfileForm';
 import PasswordForm from './PasswordForm';
 import { useFormatter } from '../../../components/i18n';
-import useDataLoader from '../../../utils/ServerSideEvent';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../store';
 import Paper from '../../../components/common/Paper';
 import { countryOption } from '../../../utils/Option';

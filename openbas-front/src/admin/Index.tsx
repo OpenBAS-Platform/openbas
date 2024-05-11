@@ -6,7 +6,7 @@ import TopBar from './components/nav/TopBar';
 import LeftBar from './components/nav/LeftBar';
 import Message from '../components/Message';
 import { errorWrapper } from '../components/Error';
-import useDataLoader from '../utils/ServerSideEvent';
+import useDataLoader from '../utils/hooks/useDataLoader';
 import { useHelper } from '../store';
 import type { Theme } from '../components/Theme';
 import type { LoggedHelper } from '../actions/helper';

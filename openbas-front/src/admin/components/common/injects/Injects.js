@@ -6,7 +6,7 @@ import { BarChartOutlined, FileDownloadOutlined, ReorderOutlined } from '@mui/ic
 import { splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
-import TagsFilter from '../../../../components/TagsFilter';
+import TagsFilter from '../filters/TagsFilter';
 import InjectIcon from './InjectIcon';
 import InjectPopover from './InjectPopover';
 import InjectorContract from './InjectorContract';

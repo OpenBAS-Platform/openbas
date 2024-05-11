@@ -7,7 +7,7 @@ import DryrunStatus from '../controls/DryrunStatus';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { deleteDryrun, fetchDryruns } from '../../../../../actions/Dryrun';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';

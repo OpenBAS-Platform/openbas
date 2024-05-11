@@ -285,8 +285,7 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_date")
   public Optional<Instant> getDate() {
     if (this.getExercise() == null && this.getScenario() == null) {
-      log.log(Level.INFO, "This inject is an atomic testing");
-      return Optional.empty(); //atomic testing date is the update date
+      return Optional.ofNullable(now().minusSeconds(30));
     }
 
     if (this.getScenario() != null) {
@@ -376,6 +375,7 @@ public class Inject implements Base, Injection {
   }
 
   @JsonProperty("inject_type")
+  @NotNull
   private String getType() { return this.getInjectorContract().getInjector().getType(); }
 
   @JsonIgnore

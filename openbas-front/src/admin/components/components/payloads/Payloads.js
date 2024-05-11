@@ -5,7 +5,7 @@ import { makeStyles } from '@mui/styles';
 import { SubscriptionsOutlined } from '@mui/icons-material';
 import { searchPayloads } from '../../../../actions/Payload';
 import CreatePayload from './CreatePayload';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../../store';
 import PayloadPopover from './PayloadPopover';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';

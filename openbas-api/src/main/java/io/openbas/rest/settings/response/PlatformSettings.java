@@ -75,8 +75,14 @@ public class PlatformSettings {
   @JsonProperty("platform_ai_model")
   private String aiModel;
 
-  @JsonProperty("caldera_public_url")
-  private String calderaPublicUrl;
+  @JsonProperty("executor_caldera_enable")
+  private Boolean executorCalderaEnable;
+
+  @JsonProperty("executor_caldera_public_url")
+  private String executorCalderaPublicUrl;
+
+  @JsonProperty("executor_tanium_enable")
+  private Boolean executorTaniumEnable;
 
   // THEME
 

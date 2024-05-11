@@ -21,7 +21,7 @@ import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
 import Transition from '../../../../components/common/Transition';
 import SearchFilter from '../../../../components/SearchFilter';
-import TagsFilter from '../../../../components/TagsFilter';
+import TagsFilter from '../../common/filters/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
 import type { EndpointStore } from './Endpoint';
 import { truncate } from '../../../../utils/String';
@@ -29,7 +29,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 

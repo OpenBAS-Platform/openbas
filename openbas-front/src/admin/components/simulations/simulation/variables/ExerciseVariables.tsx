@@ -4,7 +4,7 @@ import { Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../../store';
 import type { Exercise, Variable, VariableInput } from '../../../../../utils/api-types';
-import useDataLoader from '../../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import Variables from '../../../components/variables/Variables';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';

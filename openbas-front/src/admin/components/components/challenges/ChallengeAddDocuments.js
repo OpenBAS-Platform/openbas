@@ -11,7 +11,7 @@ import { storeHelper } from '../../../../actions/Schema';
 import { fetchDocuments } from '../../../../actions/Document';
 import CreateDocument from '../documents/CreateDocument';
 import { truncate } from '../../../../utils/String';
-import TagsFilter from '../../../../components/TagsFilter';
+import TagsFilter from '../../common/filters/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
 import Transition from '../../../../components/common/Transition';
 

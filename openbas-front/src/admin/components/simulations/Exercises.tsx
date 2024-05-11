@@ -2,7 +2,7 @@ import React from 'react';
 import { useFormatter } from '../../../components/i18n';
 import { fetchExercises } from '../../../actions/Exercise';
 import { useHelper } from '../../../store';
-import useDataLoader from '../../../utils/ServerSideEvent';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import ExerciseCreation from './simulation/ExerciseCreation';
 import ExerciseList from './ExerciseList';

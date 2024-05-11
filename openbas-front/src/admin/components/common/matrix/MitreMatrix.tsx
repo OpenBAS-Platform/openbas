@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useHelper } from '../../../../store';
-import useDataLoader from '../../../../utils/ServerSideEvent';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { fetchKillChainPhases } from '../../../../actions/KillChainPhase';
@@ -29,11 +29,13 @@ const useStyles = makeStyles(() => ({
 interface Props {
   goToLink?: string;
   injectResults: InjectExpectationResultsByAttackPatternStore[];
+  alreadyLoaded?: boolean;
 }
 
 const MitreMatrix: FunctionComponent<Props> = ({
   goToLink,
   injectResults,
+  alreadyLoaded,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -46,10 +48,12 @@ const MitreMatrix: FunctionComponent<Props> = ({
     attackPatternMap: helper.getAttackPatternsMap(),
     killChainPhaseMap: helper.getKillChainPhasesMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchKillChainPhases());
-    dispatch(fetchAttackPatterns());
-  });
+  if (!alreadyLoaded) {
+    useDataLoader(() => {
+      dispatch(fetchKillChainPhases());
+      dispatch(fetchAttackPatterns());
+    });
+  }
   // Attack Pattern
   const resultAttackPatternIds = R.uniq(
     injectResults

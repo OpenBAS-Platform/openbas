@@ -1,8 +1,8 @@
 import { normalize, schema } from 'normalizr';
-import { useEffect } from 'react';
-import { DATA_DELETE_SUCCESS } from '../constants/ActionTypes';
-import { store } from '../store';
-import { buildUri } from './Action';
+import { useEffect, useState } from 'react';
+import { DATA_DELETE_SUCCESS } from '../../constants/ActionTypes';
+import { store } from '../../store';
+import { buildUri } from '../Action';
 
 const EVENT_TRY_DELAY = 1500;
 const EVENT_PING_MAX_TIME = 5000;
@@ -11,6 +11,7 @@ let sseClient;
 let lastPingDate = new Date().getTime();
 const listeners = new Map();
 const useDataLoader = (loader = () => {}) => {
+  const [isLoaded, setIsLoaded] = useState(false);
   const sseConnect = () => {
     sseClient = new EventSource(buildUri('/api/stream'), { withCredentials: true });
     const autoReConnect = setInterval(() => {
@@ -58,7 +59,11 @@ const useDataLoader = (loader = () => {}) => {
     if (EventSource !== undefined && sseClient === undefined) {
       sseClient = sseConnect();
     } else {
-      loader();
+      const load = async () => {
+        await loader();
+        setIsLoaded(true);
+      };
+      load();
     }
     return () => {
       // Remove the listener
@@ -70,6 +75,7 @@ const useDataLoader = (loader = () => {}) => {
       }
     };
   }, []);
+  return isLoaded;
 };
 
 export default useDataLoader;

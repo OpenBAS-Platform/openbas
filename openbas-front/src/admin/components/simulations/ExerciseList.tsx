@@ -8,7 +8,7 @@ import { makeStyles } from '@mui/styles';
 import ExerciseStatus from './simulation/ExerciseStatus';
 import ItemTags from '../../../components/ItemTags';
 import SearchFilter from '../../../components/SearchFilter';
-import TagsFilter from '../../../components/TagsFilter';
+import TagsFilter from '../common/filters/TagsFilter';
 import { exportData } from '../../../utils/Environment';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { useHelper } from '../../../store';
@@ -246,7 +246,7 @@ const ExerciseList: FunctionComponent<Props> = ({
           <ListItemButton
             key={exercise.exercise_id}
             classes={{ root: classes.item }}
-            divider
+            divider={true}
             component={Link}
             to={`/admin/exercises/${exercise.exercise_id}`}
           >
