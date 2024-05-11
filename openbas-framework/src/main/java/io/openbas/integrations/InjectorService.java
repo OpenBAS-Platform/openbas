@@ -90,8 +90,6 @@ public class InjectorService {
             List<InjectorContract> toUpdates = new ArrayList<>();
             List<String> toDeletes = new ArrayList<>();
             injector.getContracts()
-                .stream()
-                .parallel()
                 .forEach(contract -> {
                 Optional<Contract> current = contracts.stream().filter(c -> c.getId().equals(contract.getId())).findFirst();
                 if (current.isPresent()) {
