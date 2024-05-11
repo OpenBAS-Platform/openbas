@@ -16,6 +16,7 @@ import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
+import io.openbas.utils.Time;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -33,6 +34,7 @@ import static io.openbas.model.expectation.DetectionExpectation.detectionExpecta
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAssetGroup;
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAsset;
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAssetGroup;
+import static java.time.Instant.now;
 
 @Component(CalderaContract.TYPE)
 @RequiredArgsConstructor
@@ -119,7 +121,7 @@ public class CalderaExecutor extends Injector {
         while (endpointForExecution == null) {
             count++;
             // Find an executor agent matching the asset
-            List<Agent> agents = this.calderaService.agents().stream().filter(agent -> agent.getExe_name().contains("executor") && agent.getHost().equals(assetEndpoint.getHostname()) && Arrays.stream(assetEndpoint.getIps()).anyMatch(s -> Arrays.stream(agent.getHost_ip_addrs()).toList().contains(s))).toList();
+            List<Agent> agents = this.calderaService.agents().stream().filter(agent -> agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > Asset.ACTIVE_THRESHOLD && agent.getHost().equals(assetEndpoint.getHostname()) && Arrays.stream(assetEndpoint.getIps()).anyMatch(s -> Arrays.stream(agent.getHost_ip_addrs()).toList().contains(s))).toList();
             if (!agents.isEmpty()) {
                 Endpoint createdEndpoint = null;
                 for (int i = 0; i < agents.size(); i++) {

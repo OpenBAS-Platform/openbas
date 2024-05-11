@@ -46,7 +46,7 @@ public class CalderaInjectorService {
         try {
             return this.client.agents().stream().toList();
         } catch (ClientProtocolException | JsonProcessingException e) {
-            log.log(Level.SEVERE, "Error getting the list of Caldera agents");
+            log.log(Level.SEVERE, "Error getting the list of Caldera agents", e);
             return new ArrayList<>();
         }
     }

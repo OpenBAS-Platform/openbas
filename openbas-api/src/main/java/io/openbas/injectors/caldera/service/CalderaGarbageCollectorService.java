@@ -7,6 +7,7 @@ import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.injectors.caldera.client.CalderaInjectorClient;
 import io.openbas.injectors.caldera.client.model.Agent;
 import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
+import io.openbas.utils.Time;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;
@@ -67,10 +68,10 @@ public class CalderaGarbageCollectorService implements Runnable {
         try {
             List<Agent> agents = this.client.agents();
             agents.forEach(agent -> {
-                if( agent.getExe_name().contains("executor") && (now().toEpochMilli() - toInstant(agent.getCreated()).toEpochMilli()) > KILL_TTL ) {
+                if( agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > KILL_TTL ) {
                     client.killAgent(agent);
                 }
-                if( agent.getExe_name().contains("executor") && (now().toEpochMilli() - toInstant(agent.getCreated()).toEpochMilli()) > DELETE_TTL ) {
+                if( agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > DELETE_TTL ) {
                     client.deleteAgent(agent);
                 }
             });
@@ -78,13 +79,5 @@ public class CalderaGarbageCollectorService implements Runnable {
             throw new RuntimeException(e);
         }
         log.info("Caldera injector garbage collection on " + endpoints.size() + " assets");
-    }
-
-    private Instant toInstant(@NotNull final String lastSeen) {
-        String pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern, Locale.getDefault());
-        LocalDateTime localDateTime = LocalDateTime.parse(lastSeen, dateTimeFormatter);
-        ZonedDateTime zonedDateTime = localDateTime.atZone(UTC);
-        return zonedDateTime.toInstant();
     }
 }
