@@ -122,7 +122,7 @@ const InjectList: FunctionComponent<Props> = ({
       label: 'Status',
       isSortable: true,
       value: (injectDto: InjectResultDTO) => {
-        return (<ItemStatus status={injectDto.inject_status?.status_name} label={t(injectDto.inject_status?.status_name)} variant="inList" />);
+        return (<ItemStatus isInject={true} status={injectDto.inject_status?.status_name} label={t(injectDto.inject_status?.status_name)} variant="inList" />);
       },
     },
     {

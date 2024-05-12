@@ -53,7 +53,7 @@ public class AssetGroup implements Base {
   @JsonProperty("asset_group_dynamic_filter")
   private FilterGroup dynamicFilter;
 
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "asset_groups_assets",
       joinColumns = @JoinColumn(name = "asset_group_id"),
       inverseJoinColumns = @JoinColumn(name = "asset_id"))

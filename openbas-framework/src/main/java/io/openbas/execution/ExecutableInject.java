@@ -27,7 +27,6 @@ public class ExecutableInject {
     @JsonIgnore
     private final List<MultipartFile> directAttachments = new ArrayList<>();
 
-
     public ExecutableInject(boolean runtime, boolean direct, Injection injection,
                             List<Team> teams, List<Asset> assets, List<AssetGroup> assetGroups, List<ExecutionContext> users) {
         this.injection = injection;

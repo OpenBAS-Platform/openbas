@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useContext, useEffect, useState } from 'react';
-import { Paper, Tab, Tabs, Typography } from '@mui/material';
+import { Grid, Paper, Tab, Tabs, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -225,27 +225,29 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
             style={{ padding: 20, marginTop: 15, minHeight: 125 }}
             key={result.inject_expectation_id}
           >
-            {result.inject_expectation_results && result.inject_expectation_results.length > 0 ? (
-              result.inject_expectation_results.map((collector, index) => (
-                <div key={index}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <img
-                      src={`/api/images/collectors/id/${collector.sourceId}`}
-                      alt={collector.sourceId}
-                      style={{ width: 20, height: 20, borderRadius: 4 }}
-                    />
-                    <Typography variant="body1" sx={{ marginLeft: 1 }}>
-                      {collector.sourceName}
+            <Grid container={true} spacing={3}>
+              {result.inject_expectation_results && result.inject_expectation_results.length > 0 ? (
+                result.inject_expectation_results.map((collector, index) => (
+                  <Grid key={index} item={true} xs={4}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <img
+                        src={`/api/images/collectors/id/${collector.sourceId}`}
+                        alt={collector.sourceId}
+                        style={{ width: 20, height: 20, borderRadius: 4 }}
+                      />
+                      <Typography variant="h4" style={{ margin: '2px 0 0 10px' }}>
+                        {collector.sourceName}
+                      </Typography>
+                    </div>
+                    <Typography variant="body1" sx={{ marginTop: 1 }}>
+                      {collector.result}
                     </Typography>
-                  </div>
-                  <Typography variant="body1" sx={{ marginTop: 1 }}>
-                    {collector.result}
-                  </Typography>
-                </div>
-              ))
-            ) : (
-              <Empty message={t('No logs available')} />
-            )}
+                  </Grid>
+                ))
+              ) : (
+                <Empty message={t('No logs available')} />
+              )}
+            </Grid>
           </Paper>
         ))}
       </>

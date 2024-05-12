@@ -186,7 +186,7 @@ nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Agents'), current: true }]} />
       <Alert variant="outlined" severity="info" style={{ marginBottom: 30 }}>
-        {t('Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable.')}<br /><br />
+        {t('Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable. In the near future, we will release the XTM agent with a proper packaging and certificates.')}<br /><br />
         {t('Learn more information about how to setup simulation agents')} <a href="https://docs.openbas.io" target="_blank" rel="noreferrer">{t('in the documentation')}</a>.
       </Alert>
       <Grid container={true} spacing={3}>

@@ -116,7 +116,7 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
               {t('Status')}
             </Typography>
             {injectResultDto.inject_status?.status_name
-              && <ItemStatus status={injectResultDto.inject_status?.status_name} label={t(injectResultDto.inject_status?.status_name)} />
+              && <ItemStatus isInject={true} status={injectResultDto.inject_status?.status_name} label={t(injectResultDto.inject_status?.status_name)} />
             }
             <Typography variant="subtitle1" className={classes.header} style={{ marginTop: 20 }} gutterBottom>
               {t('Traces')}

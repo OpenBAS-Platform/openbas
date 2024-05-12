@@ -39,7 +39,7 @@ import static java.time.Instant.now;
 @RequiredArgsConstructor
 @Log
 public class CalderaExecutor extends Injector {
-    private final int RETRY_NUMBER = 20;
+    private final int RETRY_NUMBER = 30;
 
     private final CalderaInjectorConfig config;
     private final CalderaInjectorService calderaService;
@@ -73,7 +73,7 @@ public class CalderaExecutor extends Injector {
                     execution.addTrace(traceError("Caldera failed to execute the ability because execution endpoint was not found for endpoint " + asset.getName()));
                 }
             } catch (Exception e) {
-                execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + "(" + e.getMessage() + ")"));
+                execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (" + e.getMessage() + ")"));
             }
         });
 
@@ -116,16 +116,21 @@ public class CalderaExecutor extends Injector {
         }
         log.log(Level.INFO, "Trying to find an available executor for " + asset.getName());
         Endpoint assetEndpoint = (Endpoint) Hibernate.unproxy(asset);
-        while (endpointForExecution == null) {
+        while (endpointForExecution != null) {
             count++;
             // Find an executor agent matching the asset
-            List<Agent> agents = this.calderaService.agents().stream().filter(agent -> agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) < Asset.ACTIVE_THRESHOLD && agent.getHost().equals(assetEndpoint.getHostname()) && Arrays.stream(assetEndpoint.getIps()).anyMatch(s -> Arrays.stream(agent.getHost_ip_addrs()).toList().contains(s))).toList();
+            List<Agent> agents = new ArrayList<>();
+            try {
+                agents = this.calderaService.agents().stream().filter(agent -> agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) < Asset.ACTIVE_THRESHOLD && agent.getHost().equals(assetEndpoint.getHostname()) && Arrays.stream(assetEndpoint.getIps()).anyMatch(s -> Arrays.stream(agent.getHost_ip_addrs()).toList().contains(s))).toList();
+            } catch (Exception e) {
+                log.warning("Cannot get Caldera agents list");
+            }
             if (!agents.isEmpty()) {
-                Endpoint createdEndpoint = null;
                 for (int i = 0; i < agents.size(); i++) {
                     // Check in the database if not exist
                     Optional<Endpoint> resolvedExistingEndpoint = this.endpointService.findByExternalReference(agents.get(i).getPaw());
-                    if( resolvedExistingEndpoint.isEmpty() ) {
+                    if (resolvedExistingEndpoint.isEmpty()) {
+                        log.log(Level.INFO, "Agent found and not present in the database, creating it...");
                         Endpoint newEndpoint = new Endpoint();
                         newEndpoint.setInject(inject);
                         newEndpoint.setParent(asset);
@@ -135,13 +140,9 @@ public class CalderaExecutor extends Injector {
                         newEndpoint.setPlatform(assetEndpoint.getPlatform());
                         newEndpoint.setExternalReference(agents.get(i).getPaw());
                         newEndpoint.setExecutor(assetEndpoint.getExecutor());
-                        createdEndpoint = this.endpointService.createEndpoint(newEndpoint);
-                        log.log(Level.INFO, "Agent found and not present in the database, creating it...");
+                        endpointForExecution = this.endpointService.createEndpoint(newEndpoint);
                         break;
                     }
-                };
-                if( createdEndpoint != null ) {
-                    return createdEndpoint;
                 }
             }
             Thread.sleep(5000);

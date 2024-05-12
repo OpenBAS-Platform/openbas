@@ -1,6 +1,7 @@
 import React, { FunctionComponent } from 'react';
-import { Chip } from '@mui/material';
+import { Chip, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { useFormatter } from './i18n';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -11,7 +12,7 @@ const useStyles = makeStyles(() => ({
     marginRight: 7,
     textTransform: 'uppercase',
     borderRadius: 4,
-    width: 100,
+    width: 150,
   },
   chipInList: {
     fontSize: 12,
@@ -19,7 +20,7 @@ const useStyles = makeStyles(() => ({
     float: 'left',
     textTransform: 'uppercase',
     borderRadius: 4,
-    width: 100,
+    width: 150,
   },
 }));
 
@@ -59,11 +60,15 @@ interface ItemStatusProps {
   label: string;
   status?: string | null;
   variant?: 'inList';
+  isInject?: boolean,
 }
 
-const computeStatusStyle = (status: string | undefined | null) => {
+const computeStatusStyle = (status: string | undefined | null, isInject: boolean | undefined | null) => {
   switch (status) {
     case 'ERROR':
+      if (isInject) {
+        return inlineStyles.orange;
+      }
       return inlineStyles.red;
     case 'PARTIAL':
       return inlineStyles.orange;
@@ -84,12 +89,16 @@ const ItemStatus: FunctionComponent<ItemStatusProps> = ({
   label,
   status,
   variant,
+  isInject = false,
 }) => {
+  const { t } = useFormatter();
   const classes = useStyles();
   const style = variant === 'inList' ? classes.chipInList : classes.chip;
-  const classStyle = computeStatusStyle(status);
+  const classStyle = computeStatusStyle(status, isInject);
   return (
-    <Chip classes={{ root: style }} style={classStyle} label={label} />
+    <Tooltip title={status === 'ERROR' && isInject ? t('Error or prevented') : label}>
+      <Chip classes={{ root: style }} style={classStyle} label={status === 'ERROR' && isInject ? t('Error or prevented') : label} />
+    </Tooltip>
   );
 };
 

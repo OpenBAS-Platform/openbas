@@ -78,6 +78,7 @@ public class CalderaExecutorService implements Runnable {
             // Will be replaced by the XTM agent
             List<Agent> agents = this.client.agents().stream().filter(agent -> !agent.getExe_name().contains("executor")).toList();
             List<Endpoint> endpoints = toEndpoint(agents).stream().filter(Asset::getActive).toList();
+            log.info("Caldera executor provisioning based on " + endpoints.size() + " assets");
             endpoints.forEach(endpoint -> {
                 List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
                 if (existingEndpoints.isEmpty()) {
@@ -86,7 +87,6 @@ public class CalderaExecutorService implements Runnable {
                     this.updateEndpoint(endpoint, existingEndpoints);
                 }
             });
-            log.info("Caldera executor provisioning based on " + endpoints.size() + " assets");
         } catch (ClientProtocolException | JsonProcessingException e) {
             log.log(Level.SEVERE, "Error running caldera service " + e.getMessage(), e);
         }

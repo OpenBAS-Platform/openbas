@@ -83,8 +83,7 @@ public class CalderaInjectorListener {
       }
 
       // Compute status only if all actions are completed
-      if (completedActions.size() == linkIds.size()) {
-        assetGroups.forEach((assetGroup -> computeExpectationForAssetGroup(inject, assetGroup)));
+      if (!linkIds.isEmpty() && completedActions.size() == linkIds.size()) {
         int failedActions = (int) completedActions.stream().filter(ResultStatus::isFail).count();
         computeInjectStatus(injectStatus, finalExecutionTime, completedActions.size(), failedActions);
         // Update related inject
@@ -116,30 +115,6 @@ public class CalderaInjectorListener {
     }
   }
 
-  private void computeExpectationForAssetGroup(
-      @NotNull final Inject inject,
-      @NotBlank final AssetGroup assetGroup) {
-    InjectExpectation expectationAssetGroup = this.injectExpectationService
-        .preventionExpectationForAssetGroup(inject, assetGroup);
-    if (expectationAssetGroup != null) {
-      List<InjectExpectation> expectationAssets = this.injectExpectationService
-          .preventionExpectationForAssets(inject, assetGroup);
-      // Not already handle
-      List<InjectExpectationResult> results = resultsBySourceId(
-          expectationAssetGroup,
-          this.calderaInjectorConfig.getId()
-      );
-      if (results.isEmpty()) {
-        this.injectExpectationService.computeExpectationGroup(
-            expectationAssetGroup,
-            expectationAssets,
-            this.calderaInjectorConfig.getId(),
-            CalderaInjectorConfig.PRODUCT_NAME
-        );
-      }
-    }
-  }
-
   // -- INJECT STATUS --
 
   @Transactional
@@ -148,8 +123,7 @@ public class CalderaInjectorListener {
           @NotNull final Instant finalExecutionTime,
           final int completedActions,
           final int failedActions) {
-     boolean hasError = injectStatus.getTraces().stream()
-         .anyMatch(trace -> trace.getStatus().equals(ExecutionStatus.ERROR));
+     boolean hasError = injectStatus.getTraces().stream().anyMatch(trace -> trace.getStatus().equals(ExecutionStatus.ERROR));
      injectStatus.setName(hasError ? ExecutionStatus.ERROR : ExecutionStatus.SUCCESS);
      injectStatus.getTraces().add(
          traceInfo("caldera",

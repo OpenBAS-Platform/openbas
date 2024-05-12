@@ -141,7 +141,7 @@ const AtomicTesting = () => {
                 >
                   {t('Status')}
                 </Typography>
-                <ItemStatus status={injectResultDto.inject_status?.status_name} label={t(injectResultDto.inject_status?.status_name ?? 'Unknown')} />
+                <ItemStatus isInject={true} status={injectResultDto.inject_status?.status_name} label={t(injectResultDto.inject_status?.status_name ?? 'Unknown')} />
               </Grid>
               <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
