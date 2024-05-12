@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { BarChartOutlined, ReorderOutlined } from '@mui/icons-material';
 import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import R from 'ramda';
 import type { Exercise, Inject } from '../../../../../utils/api-types';
 import { ArticleContext, InjectContext, InjectContextType, TeamContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
@@ -35,6 +36,8 @@ import ExerciseDistributionScoreOverTimeByInjectorContract from '../overview/Exe
 import ExerciseDistributionScoreOverTimeByTeam from '../overview/ExerciseDistributionScoreOverTimeByTeam';
 import ExerciseDistributionScoreOverTimeByTeamInPercentage from '../overview/ExerciseDistributionScoreOverTimeByTeamInPercentage';
 import { useFormatter } from '../../../../../components/i18n';
+import useEntityToggle from '../../../../../utils/hooks/useEntityToggle';
+import ToolBar from '../../../common/ToolBar';
 
 const useStyles = makeStyles(() => ({
   paperChart: {
@@ -102,6 +105,57 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
     },
   };
   const [viewMode, setViewMode] = useState('list');
+  const {
+    selectedElements,
+    deSelectedElements,
+    selectAll,
+    handleClearSelectedElements,
+    handleToggleSelectAll,
+    onToggleEntity,
+    numberOfSelectedElements,
+  } = useEntityToggle('inject', injects.length);
+  const onRowShiftClick = (currentIndex: number, currentEntity: Inject, event: React.SyntheticEvent | null = null) => {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    if (selectedElements && !R.isEmpty(selectedElements)) {
+      // Find the indexes of the first and last selected entities
+      let firstIndex = R.findIndex(
+        (n: Inject) => n.inject_id === R.head(R.values(selectedElements)).inject_id,
+        injects,
+      );
+      if (currentIndex > firstIndex) {
+        let entities: Inject[] = [];
+        while (firstIndex <= currentIndex) {
+          entities = [...entities, injects[firstIndex]];
+          // eslint-disable-next-line no-plusplus
+          firstIndex++;
+        }
+        const forcedRemove = R.values(selectedElements).filter(
+          (n: Inject) => !entities.map((o) => o.inject_id).includes(n.inject_id),
+        );
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        return onToggleEntity(entities, event, forcedRemove);
+      }
+      let entities: Inject[] = [];
+      while (firstIndex >= currentIndex) {
+        entities = [...entities, injects[firstIndex]];
+        // eslint-disable-next-line no-plusplus
+        firstIndex--;
+      }
+      const forcedRemove = R.values(selectedElements).filter(
+        (n: Inject) => !entities.map((o) => o.inject_id).includes(n.inject_id),
+      );
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      return onToggleEntity(entities, event, forcedRemove);
+    }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    return onToggleEntity(currentEntity, event);
+  };
   return (
     <>
       {viewMode === 'list' && (
@@ -118,6 +172,21 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
                 usersNumber={exercise.exercise_users_number}
                 teamsUsers={exercise.exercise_teams_users}
                 setViewMode={setViewMode}
+                onToggleEntity={onToggleEntity}
+                onToggleShiftEntity={onRowShiftClick}
+                handleToggleSelectAll={handleToggleSelectAll}
+                selectedElements={selectedElements}
+                deSelectedElements={deSelectedElements}
+                selectAll={selectAll}
+              />
+              <ToolBar
+                numberOfSelectedElements={numberOfSelectedElements}
+                selectedElements={selectedElements}
+                deSelectedElements={deSelectedElements}
+                selectAll={selectAll}
+                handleClearSelectedElements={handleClearSelectedElements}
+                context="exercise"
+                id={exercise.exercise_id}
               />
             </TeamContext.Provider>
           </ArticleContext.Provider>

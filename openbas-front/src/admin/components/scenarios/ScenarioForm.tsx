@@ -167,28 +167,6 @@ const ScenarioForm: FunctionComponent<Props> = ({
         setValue={setValue}
         askAi={true}
       />
-      <TextField
-        variant="standard"
-        fullWidth
-        label={t('External reference')}
-        style={{ marginTop: 20 }}
-        error={!!errors.scenario_external_reference}
-        helperText={errors.scenario_external_reference?.message}
-        inputProps={register('scenario_external_reference')}
-        control={control}
-        setValue={setValue}
-      />
-      <TextField
-        variant="standard"
-        fullWidth
-        label={t('External URL')}
-        style={{ marginTop: 20 }}
-        error={!!errors.scenario_external_url}
-        helperText={errors.scenario_external_url?.message}
-        inputProps={register('scenario_external_url')}
-        control={control}
-        setValue={setValue}
-      />
       <Controller
         control={control}
         name="scenario_tags"

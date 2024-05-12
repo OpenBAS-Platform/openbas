@@ -42,21 +42,21 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
     {
       name: t('Prevention'),
       data: data.map((exercise) => ({
-        x: new Date(exercise.exercise_start_date ?? 0),
+        x: exercise.exercise_start_date ? new Date(exercise.exercise_start_date) : new Date(),
         y: exercise.exercise_global_score?.filter((score) => score.type === 'PREVENTION').at(0)?.distribution?.[0]?.value ?? 0,
       })),
     },
     {
       name: t('Detection'),
       data: data.map((exercise) => ({
-        x: new Date(exercise.exercise_start_date ?? 0),
+        x: exercise.exercise_start_date ? new Date(exercise.exercise_start_date) : new Date(),
         y: exercise.exercise_global_score?.filter((score) => score.type === 'DETECTION').at(0)?.distribution?.[0]?.value ?? 0,
       })),
     },
     {
       name: t('Human Response'),
       data: data.map((exercise) => ({
-        x: new Date(exercise.exercise_start_date ?? 0),
+        x: exercise.exercise_start_date ? new Date(exercise.exercise_start_date) : new Date(),
         y: exercise.exercise_global_score?.filter((score) => score.type === 'HUMAN_RESPONSE').at(0)?.distribution?.[0]?.value ?? 0,
       })),
     },

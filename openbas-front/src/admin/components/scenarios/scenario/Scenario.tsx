@@ -1,11 +1,13 @@
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import React from 'react';
-import { Button, Chip, Grid, Paper, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { Avatar, Button, Chip, Grid, Paper, Typography } from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
 import { PlayArrowOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
+import octiDark from '../../../../static/images/xtm/octi_dark.png';
+import octiLight from '../../../../static/images/xtm/octi_light.png';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
@@ -22,6 +24,8 @@ import PlatformIcon from '../../../../components/PlatformIcon';
 import ItemSeverity from '../../../../components/ItemSeverity';
 import type { KillChainPhase } from '../../../../utils/api-types';
 import { fetchScenarioExercises } from '../../../../actions/scenarios/scenario-actions';
+import type { Theme } from '../../../../components/Theme';
+import { isEmptyField } from '../../../../utils/utils';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -49,6 +53,7 @@ const useStyles = makeStyles(() => ({
 const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecurringFormDialog: React.Dispatch<React.SetStateAction<boolean>> }) => {
   // Standard hooks
   const classes = useStyles();
+  const theme = useTheme<Theme>();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
@@ -70,9 +75,22 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
         classes={{ container: classes.gridContainer }}
       >
         <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
-          <Typography variant="h4" gutterBottom={true}>
-            {t('Information')}
-          </Typography>
+          <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography variant="h4" gutterBottom={true}>
+              {t('Information')}
+            </Typography>
+            <Button
+              component={Link}
+              to={scenario.scenario_external_url}
+              target="_blank"
+              size="small"
+              variant="outlined"
+              startIcon={<Avatar style={{ width: 20, height: 20 }} src={theme.palette.mode === 'dark' ? octiDark : octiLight} alt="OCTI" />}
+              disabled={isEmptyField(scenario.scenario_external_url)}
+            >
+              {t('Threat intelligence')}
+            </Button>
+          </div>
           <Paper classes={{ root: classes.paper }} variant="outlined">
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={12} style={{ paddingTop: 10 }}>
@@ -165,7 +183,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
           </Paper>
         </Grid>
         <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
-          <Typography variant="h4" gutterBottom={true}>
+          <Typography variant="h4" gutterBottom={true} style={{ margin: '9px 0 17px 0' }}>
             {t('Simulations Results')}
           </Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined">

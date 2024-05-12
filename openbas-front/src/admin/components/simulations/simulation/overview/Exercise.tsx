@@ -195,7 +195,7 @@ const Exercise = () => {
             </Paper>
           </Grid>
         )}
-        {exercise.exercise_status === 'SCHEDULED' && (
+        {exercise.exercise_status !== 'SCHEDULED' && (
           <Grid item xs={12} style={{ marginTop: 25 }}>
             <Typography variant="h4" gutterBottom style={{ marginBottom: 15 }}>
               {t('Injects Results')}

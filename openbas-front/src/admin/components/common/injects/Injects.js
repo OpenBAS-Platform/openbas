@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { makeStyles } from '@mui/styles';
-import { Chip, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
+import { Checkbox, Chip, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { CSVLink } from 'react-csv';
 import { BarChartOutlined, FileDownloadOutlined, ReorderOutlined } from '@mui/icons-material';
 import { splitDuration } from '../../../../utils/Time';
@@ -60,7 +60,7 @@ const headerStyles = {
     position: 'absolute',
     margin: '0 0 0 5px',
     padding: 0,
-    top: '0px',
+    top: 9,
   },
   inject_type: {
     float: 'left',
@@ -162,6 +162,12 @@ const Injects = (props) => {
     usersNumber,
     teamsUsers,
     setViewMode,
+    onToggleEntity,
+    selectedElements,
+    deSelectedElements,
+    selectAll,
+    onToggleShiftEntity,
+    handleToggleSelectAll,
   } = props;
   // Standard hooks
   const classes = useStyles();
@@ -320,6 +326,18 @@ const Injects = (props) => {
             divider={false}
             style={{ paddingTop: 0 }}
           >
+            <ListItemIcon style={{ minWidth: 40 }}>
+              <Checkbox
+                edge="start"
+                checked={selectAll}
+                disableRipple={true}
+                onChange={
+                          typeof handleToggleSelectAll === 'function'
+                          && handleToggleSelectAll.bind(this)
+                      }
+                disabled={typeof handleToggleSelectAll !== 'function'}
+              />
+            </ListItemIcon>
             <ListItemIcon>
               <span
                 style={{
@@ -375,7 +393,7 @@ const Injects = (props) => {
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-          {sortedInjects.map((inject) => {
+          {sortedInjects.map((inject, index) => {
             const injectContract = inject.inject_injector_contract.injector_contract_content_parsed;
             const injectorContractName = tPick(injectContract?.label);
             const duration = splitDuration(inject.inject_depends_duration || 0);
@@ -397,6 +415,23 @@ const Injects = (props) => {
                 }
                 onClick={() => setSelectedInjectId(inject.inject_id)}
               >
+                <ListItemIcon
+                  classes={{ root: classes.itemIcon }}
+                  style={{ minWidth: 40 }}
+                  onClick={(event) => (event.shiftKey
+                    ? onToggleShiftEntity(index, inject, event)
+                    : onToggleEntity(inject, event))
+                    }
+                >
+                  <Checkbox
+                    edge="start"
+                    checked={
+                          (selectAll && !(inject.inject_id in (deSelectedElements || {})))
+                          || inject.inject_id in (selectedElements || {})
+                      }
+                    disableRipple={true}
+                  />
+                </ListItemIcon>
                 <ListItemIcon style={{ paddingTop: 5 }}>
                   <InjectIcon
                     tooltip={t(inject.inject_type)}

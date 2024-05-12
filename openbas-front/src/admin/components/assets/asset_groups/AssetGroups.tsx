@@ -127,8 +127,17 @@ const AssetGroups = () => {
           divider={false}
           style={{ paddingTop: 0 }}
         >
-
-          <ListItemIcon />
+          <ListItemIcon>
+            <span
+              style={{
+                padding: '0 8px 0 8px',
+                fontWeight: 700,
+                fontSize: 12,
+              }}
+            >
+              &nbsp;
+            </span>
+          </ListItemIcon>
           <ListItemText
             primary={
               <SortHeadersComponent
