@@ -120,7 +120,15 @@ public class CalderaExecutorService implements Runnable {
         matchingExistingEndpoint.setLastSeen(external.getLastSeen());
         matchingExistingEndpoint.setExternalReference(external.getExternalReference());
         matchingExistingEndpoint.setExecutor(this.executor);
-
+        if ((now().toEpochMilli() - matchingExistingEndpoint.getClearedAt().toEpochMilli()) > CLEAR_TTL) {
+            try {
+                log.info("Clearing endpoint " + matchingExistingEndpoint.getHostname());
+                client.exploit("base64", matchingExistingEndpoint.getExternalReference(), this.calderaExecutorContextService.getInjectorExecutorClearAbilities().get(matchingExistingEndpoint.getExecutor().getId()).getAbility_id());
+                matchingExistingEndpoint.setClearedAt(now());
+            } catch (RuntimeException e) {
+                log.info("Failed clear agents");
+            }
+        }
         this.endpointService.updateEndpoint(matchingExistingEndpoint);
     }
 
