@@ -203,7 +203,8 @@ public class User implements Base {
     this.email = ofNullable(email).map(String::toLowerCase).orElseThrow(() -> new IllegalArgumentException("Email can't be null"));
   }
 
-  private transient List<Inject> injects = new ArrayList<>();
+  @Transient
+  private List<Inject> injects = new ArrayList<>();
 
   public void resolveInjects(Iterable<Inject> injects) {
     this.injects = stream(injects.spliterator(), false)
