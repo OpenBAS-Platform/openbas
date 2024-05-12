@@ -5,11 +5,14 @@ import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Executor;
+import io.openbas.database.model.Injector;
+import io.openbas.database.repository.InjectorRepository;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.client.model.Ability;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.model.Agent;
 import io.openbas.integrations.ExecutorService;
+import io.openbas.integrations.InjectorService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;
@@ -44,6 +47,8 @@ public class CalderaExecutorService implements Runnable {
 
     private final CalderaExecutorContextService calderaExecutorContextService;
 
+    private final InjectorService injectorService;
+
     private Executor executor = null;
 
     public static Endpoint.PLATFORM_TYPE toPlatform(@NotBlank final String platform) {
@@ -61,14 +66,16 @@ public class CalderaExecutorService implements Runnable {
             CalderaExecutorClient client,
             CalderaExecutorConfig config,
             CalderaExecutorContextService calderaExecutorContextService,
-            EndpointService endpointService
+            EndpointService endpointService,
+            InjectorService injectorService
     ) {
         this.client = client;
         this.endpointService = endpointService;
         this.calderaExecutorContextService = calderaExecutorContextService;
+        this.injectorService = injectorService;
         try {
             this.executor = executorService.register(config.getId(), CALDERA_EXECUTOR_TYPE, CALDERA_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
-            calderaExecutorContextService.registerAbilities();
+            this.calderaExecutorContextService.registerAbilities();
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error creating caldera executor: " + e);
         }
@@ -76,6 +83,7 @@ public class CalderaExecutorService implements Runnable {
 
     @Override
     public void run() {
+        log.info("Running Caldera executor");
         try {
             // The executor only retrieve "main" agents (without the keyword "executor")
             // This is NOT a standard behaviour, this is because we are using Caldera as an executor and we should not
@@ -123,7 +131,12 @@ public class CalderaExecutorService implements Runnable {
         if ((now().toEpochMilli() - matchingExistingEndpoint.getClearedAt().toEpochMilli()) > CLEAR_TTL) {
             try {
                 log.info("Clearing endpoint " + matchingExistingEndpoint.getHostname());
-                client.exploit("base64", matchingExistingEndpoint.getExternalReference(), this.calderaExecutorContextService.getInjectorExecutorClearAbilities().get(matchingExistingEndpoint.getExecutor().getId()).getAbility_id());
+                Iterable<Injector> injectors = injectorService.injectors();
+                injectors.forEach(injector -> {
+                    if(injector.getExecutorClearCommands() != null) {
+                        this.calderaExecutorContextService.launchExecutorClear(injector, matchingExistingEndpoint);
+                    }
+                });
                 matchingExistingEndpoint.setClearedAt(now());
             } catch (RuntimeException e) {
                 log.info("Failed clear agents");

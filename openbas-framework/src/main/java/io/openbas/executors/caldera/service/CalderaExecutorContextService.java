@@ -6,7 +6,6 @@ import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.client.model.Ability;
 import io.openbas.integrations.InjectorService;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,10 +32,7 @@ public class CalderaExecutorContextService {
         this.calderaExecutorClient = calderaExecutorClient;
     }
 
-    @Getter
     public final Map<String, Ability> injectorExecutorAbilities = new HashMap<>();
-
-    @Getter
     public final Map<String, Ability> injectorExecutorClearAbilities = new HashMap<>();
 
     public void registerAbilities() {
@@ -68,6 +64,12 @@ public class CalderaExecutorContextService {
     public void launchExecutorSubprocess(@NotNull final Injector injector, @NotNull final Asset asset) {
         if (this.injectorExecutorAbilities.containsKey(injector.getId())) {
             calderaExecutorClient.exploit("base64", asset.getExternalReference(), this.injectorExecutorAbilities.get(injector.getId()).getAbility_id());
+        }
+    }
+
+    public void launchExecutorClear(@NotNull final Injector injector, @NotNull final Asset asset) {
+        if (this.injectorExecutorAbilities.containsKey(injector.getId())) {
+            calderaExecutorClient.exploit("base64", asset.getExternalReference(), this.injectorExecutorClearAbilities.get(injector.getId()).getAbility_id());
         }
     }
 
