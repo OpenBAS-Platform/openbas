@@ -61,7 +61,7 @@ public class CalderaExecutorContextService {
                     Ability existingAbility = filteredAbilities.getFirst();
                     calderaExecutorClient.deleteAbility(existingAbility);
                 }
-                Ability ability = calderaExecutorClient.createSubprocessorAbility(injector);
+                Ability ability = calderaExecutorClient.createClearAbility(injector);
                 this.injectorExecutorClearAbilities.put(injector.getId(), ability);
             }
         });

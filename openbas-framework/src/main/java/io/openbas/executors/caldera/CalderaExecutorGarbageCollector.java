@@ -1,6 +1,7 @@
 package io.openbas.executors.caldera;
 
 import io.openbas.asset.EndpointService;
+import io.openbas.database.repository.EndpointRepository;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.service.CalderaExecutorContextService;

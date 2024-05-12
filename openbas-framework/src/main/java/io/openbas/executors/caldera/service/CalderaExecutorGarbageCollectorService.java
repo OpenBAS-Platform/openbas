@@ -2,8 +2,10 @@ package io.openbas.executors.caldera.service;
 
 import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
+import jakarta.transaction.Transactional;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -35,13 +37,16 @@ public class CalderaExecutorGarbageCollectorService implements Runnable {
     }
 
     @Override
+    @Transactional
     public void run() {
         List<Endpoint> endpoints = this.endpointService.endpoints(EndpointSpecification.findEndpointsForInjection());
         endpoints.forEach(endpoint -> {
-            if ((now().toEpochMilli() - endpoint.getUpdatedAt().toEpochMilli()) > CLEAR_TTL) {
+            if ((now().toEpochMilli() - endpoint.getClearedAt().toEpochMilli()) > CLEAR_TTL) {
                 try {
                     log.info("Clearing endpoint " + endpoint.getHostname());
                     client.exploit("base64", endpoint.getExternalReference(), this.calderaExecutorContextService.getInjectorExecutorClearAbilities().get(endpoint.getExecutor().getId()).getAbility_id());
+                    endpoint.setClearedAt(now());
+                    endpointService.updateEndpoint(endpoint);
                 } catch (RuntimeException e) {
                     log.info("Failed clear agents");
                 }

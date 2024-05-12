@@ -63,7 +63,6 @@ public class CalderaExecutorService implements Runnable {
         this.client = client;
         this.endpointService = endpointService;
         try {
-            log.info("Caldera executor initialized");
             this.executor = executorService.register(config.getId(), CALDERA_EXECUTOR_TYPE, CALDERA_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
             calderaExecutorContextService.registerAbilities();
         } catch (Exception e) {
