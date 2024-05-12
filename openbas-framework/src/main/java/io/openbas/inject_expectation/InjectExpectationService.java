@@ -8,7 +8,6 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.specification.InjectExpectationSpecification;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -134,16 +132,12 @@ public class InjectExpectationService {
             @NotNull final InjectExpectation.EXPECTATION_TYPE expectationType) {
         AssetGroup resolvedAssetGroup = assetGroupService.assetGroup(assetGroup.getId());
         List<String> assetIds = Stream.concat(resolvedAssetGroup.getAssets().stream(), resolvedAssetGroup.getDynamicAssets().stream()).map(Asset::getId).distinct().toList();
-        return this.injectExpectationRepository.findAll(
-                Specification.where(InjectExpectationSpecification.type(expectationType))
-                        .and(InjectExpectationSpecification.fromAssets(inject.getId(), assetIds))
-        );
+        return this.injectExpectationRepository.findAll(Specification.where(InjectExpectationSpecification.type(expectationType)).and(InjectExpectationSpecification.fromAssets(inject.getId(), assetIds)));
     }
 
     public List<InjectExpectation> detectionExpectationsNotFill(@NotBlank final String source) {
-        return this.injectExpectationRepository.findAll(
-                        Specification.where(InjectExpectationSpecification.type(DETECTION))
-                )
+        return this.injectExpectationRepository
+                .findAll(Specification.where(InjectExpectationSpecification.type(DETECTION)))
                 .stream()
                 .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
                 .toList();

@@ -152,7 +152,6 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
                   {t('No data available')}
                 </Typography>
               )}
-
               {(injectResultDto.inject_status?.status_traces?.length ?? 0) > 0 && (
                 <>
                   <Typography variant="body1" gutterBottom>

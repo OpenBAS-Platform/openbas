@@ -13,6 +13,7 @@ import type { InjectExpectationsStore } from '../../common/injects/expectations/
 import nodeTypes from './types/nodes';
 import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
+import ItemResult from '../../../../components/ItemResult';
 
 interface Steptarget {
   label: string;
@@ -221,15 +222,14 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
       <>
         {targetResultList.map((result) => (
           <Paper
-            elevation={2}
             style={{ padding: 20, marginTop: 15, minHeight: 125 }}
             key={result.inject_expectation_id}
           >
-            <Grid container={true} spacing={3}>
+            <Grid container={true} spacing={4}>
               {result.inject_expectation_results && result.inject_expectation_results.length > 0 ? (
                 result.inject_expectation_results.map((collector, index) => (
                   <Grid key={index} item={true} xs={4}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10 }}>
                       <img
                         src={`/api/images/collectors/id/${collector.sourceId}`}
                         alt={collector.sourceId}
@@ -239,9 +239,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                         {collector.sourceName}
                       </Typography>
                     </div>
-                    <Typography variant="body1" sx={{ marginTop: 1 }}>
-                      {collector.result}
-                    </Typography>
+                    <ItemResult label={collector.result} status={collector.result} />
                   </Grid>
                 ))
               ) : (

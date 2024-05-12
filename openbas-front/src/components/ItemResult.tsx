@@ -1,7 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { Chip, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useFormatter } from './i18n';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -63,21 +62,12 @@ interface ItemStatusProps {
   isInject?: boolean,
 }
 
-const computeStatusStyle = (status: string | undefined | null, isInject: boolean | undefined | null) => {
+const computeStatusStyle = (status: string | undefined | null) => {
   switch (status) {
-    case 'ERROR':
-      if (isInject) {
-        return inlineStyles.orange;
-      }
+    case 'FAILED':
+    case 'Not prevented':
+    case 'Not detected':
       return inlineStyles.red;
-    case 'PARTIAL':
-      return inlineStyles.orange;
-    case 'QUEUING':
-      return inlineStyles.yellow;
-    case 'RUNNING':
-      return inlineStyles.purple;
-    case 'PENDING':
-      return inlineStyles.blue;
     case 'SUCCESS':
       return inlineStyles.green;
     default:
@@ -89,24 +79,13 @@ const ItemStatus: FunctionComponent<ItemStatusProps> = ({
   label,
   status,
   variant,
-  isInject = false,
 }) => {
-  const { t } = useFormatter();
   const classes = useStyles();
   const style = variant === 'inList' ? classes.chipInList : classes.chip;
-  const classStyle = computeStatusStyle(status, isInject);
-  let finalLabel = label;
-  if (isInject) {
-    if (status === 'ERROR') {
-      finalLabel = t('Error or prevented');
-    }
-    if (status === 'SUCCESS') {
-      finalLabel = t('Attack Executed');
-    }
-  }
+  const classStyle = computeStatusStyle(status);
   return (
-    <Tooltip title={finalLabel}>
-      <Chip classes={{ root: style }} style={classStyle} label={finalLabel} />
+    <Tooltip title={label}>
+      <Chip classes={{ root: style }} style={classStyle} label={status} />
     </Tooltip>
   );
 };
