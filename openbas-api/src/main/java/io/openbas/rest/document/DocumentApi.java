@@ -58,6 +58,7 @@ public class DocumentApi extends RestBehavior {
     private InjectDocumentRepository injectDocumentRepository;
     private ChallengeRepository challengeRepository;
     private UserRepository userRepository;
+    private CollectorRepository collectorRepository;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -97,6 +98,11 @@ public class DocumentApi extends RestBehavior {
     @Autowired
     public void setChallengeRepository(ChallengeRepository challengeRepository) {
         this.challengeRepository = challengeRepository;
+    }
+
+    @Autowired
+    public void setCollectorRepository(CollectorRepository collectorRepository) {
+        this.collectorRepository = collectorRepository;
     }
 
     @Autowired
@@ -281,6 +287,18 @@ public class DocumentApi extends RestBehavior {
     @GetMapping(value = "/api/images/collectors/{collectorId}", produces = MediaType.IMAGE_PNG_VALUE)
     public @ResponseBody ResponseEntity<byte[]> getCollectorImage(@PathVariable String collectorId) throws IOException {
         Optional<InputStream> fileStream = fileService.getCollectorImage(collectorId);
+        if (fileStream.isPresent()) {
+            return ResponseEntity.ok()
+                    .cacheControl(CacheControl.maxAge(5, TimeUnit.MINUTES))
+                    .body(IOUtils.toByteArray(fileStream.get()));
+        }
+        return null;
+    }
+
+    @GetMapping(value = "/api/images/collectors/id/{collectorId}", produces = MediaType.IMAGE_PNG_VALUE)
+    public @ResponseBody ResponseEntity<byte[]> getCollectorImageFromId(@PathVariable String collectorId) throws IOException {
+        Collector collector = this.collectorRepository.findById(collectorId).orElseThrow();
+        Optional<InputStream> fileStream = fileService.getCollectorImage(collector.getType());
         if (fileStream.isPresent()) {
             return ResponseEntity.ok()
                     .cacheControl(CacheControl.maxAge(5, TimeUnit.MINUTES))

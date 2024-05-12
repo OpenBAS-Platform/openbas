@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Chip, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import type { AttackPattern, InjectResultDTO, InjectTargetWithResult, KillChainPhase } from '../../../../utils/api-types';
-import ResponsePie from './ResponsePie';
+import ResponsePie from '../../common/injects/ResponsePie';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import TargetResultsDetail from './TargetResultsDetail';

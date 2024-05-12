@@ -1,17 +1,29 @@
 package io.openbas.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
+import io.openbas.injector_contract.Contract;
+import io.openbas.injector_contract.ContractType;
+import io.openbas.injector_contract.fields.ContractElement;
+import io.openbas.injector_contract.fields.ContractExpectations;
+import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.annotation.Resource;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,13 +33,17 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @Service
+@Log
 public class AtomicTestingService {
+    @Resource
+    protected ObjectMapper mapper;
 
     private Executor executor;
     private ExecutionContextService executionContextService;
@@ -129,14 +145,42 @@ public class AtomicTestingService {
         if (injectId != null) {
             injectToSave = injectRepository.findById(injectId).orElseThrow();
         }
+
+        InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow();
+        ObjectNode finalContent = input.getContent();
+        // Set expectations
+        if (injectId == null) {
+            if (input.getContent() == null || input.getContent().get("expectations").isNull() || input.getContent().get("expectations").isEmpty()) {
+                try {
+                    JsonNode jsonNode = mapper.readTree(injectorContract.getContent());
+                    List<JsonNode> contractElements = StreamSupport.stream(jsonNode.get("fields").spliterator(), false).filter(contractElement -> contractElement.get("type").asText().equals(ContractType.Expectation.name().toLowerCase())).toList();
+                    if (!contractElements.isEmpty()) {
+                        JsonNode contractElement = contractElements.getFirst();
+                        if (!contractElement.get("predefinedExpectations").isNull() && !contractElement.get("predefinedExpectations").isEmpty()) {
+                            finalContent = finalContent != null ? finalContent : mapper.createObjectNode();
+                            ArrayNode predefinedExpectations = mapper.createArrayNode();
+                            StreamSupport.stream(contractElement.get("predefinedExpectations").spliterator(), false).forEach(predefinedExpectation -> {
+                                ObjectNode newExpectation = predefinedExpectation.deepCopy();
+                                newExpectation.put("expectation_score", 100);
+                                predefinedExpectations.add(newExpectation);
+                            });
+                            finalContent.put("expectations", predefinedExpectations);
+                        }
+                    }
+                } catch (JsonProcessingException e) {
+                    log.severe("Cannot open injector contract");
+                }
+            }
+        }
         injectToSave.setTitle(input.getTitle());
-        injectToSave.setContent(input.getContent());
-        injectToSave.setInjectorContract(injectorContractRepository.findById(input.getInjectorContract()).orElseThrow());
+        injectToSave.setContent(finalContent);
+        injectToSave.setInjectorContract(injectorContract);
         injectToSave.setAllTeams(input.isAllTeams());
         injectToSave.setDescription(input.getDescription());
         injectToSave.setDependsDuration(0L);
         injectToSave.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
         injectToSave.setExercise(null);
+
         // Set dependencies
         injectToSave.setDependsOn(null);
         injectToSave.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));

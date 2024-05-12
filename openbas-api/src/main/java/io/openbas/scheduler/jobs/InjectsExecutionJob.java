@@ -234,9 +234,7 @@ public class InjectsExecutionJob implements Job {
             List<ExecutableInject> injects = injectHelper.getInjectsToRun();
             Map<String, List<ExecutableInject>> byExercises = injects.stream().collect(groupingBy(ex -> ex.getInjection().getExercise() == null ? "atomic" : ex.getInjection().getExercise().getId()));
             // Execute injects in parallel for each exercise.
-            byExercises.entrySet().stream().parallel().forEach(entry -> {
-                String exercise = entry.getKey();
-                List<ExecutableInject> executableInjects = entry.getValue();
+            byExercises.forEach((exercise, executableInjects) -> {
                 // Execute each inject for the exercise in order.
                 executableInjects.forEach(this::executeInject);
                 // Update the exercise

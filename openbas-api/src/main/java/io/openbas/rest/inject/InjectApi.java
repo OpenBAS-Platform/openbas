@@ -3,6 +3,8 @@ package io.openbas.rest.inject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.asset.AssetGroupService;
 import io.openbas.asset.AssetService;
 import io.openbas.database.model.*;
@@ -12,6 +14,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
+import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
@@ -25,6 +28,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +44,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_ADMIN;
@@ -52,6 +57,7 @@ import static io.openbas.utils.AtomicTestingUtils.getTargets;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
+@Log
 @RestController
 public class InjectApi extends RestBehavior {
 
@@ -296,8 +302,33 @@ public class InjectApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow();
+    // Set expectations
+    ObjectNode finalContent = input.getContent();
+    if (input.getContent() == null || input.getContent().get("expectations").isNull() || input.getContent().get("expectations").isEmpty()) {
+      try {
+        JsonNode jsonNode = mapper.readTree(injectorContract.getContent());
+        List<JsonNode> contractElements = StreamSupport.stream(jsonNode.get("fields").spliterator(), false).filter(contractElement -> contractElement.get("type").asText().equals(ContractType.Expectation.name().toLowerCase())).toList();
+        if (!contractElements.isEmpty()) {
+          JsonNode contractElement = contractElements.getFirst();
+          if (!contractElement.get("predefinedExpectations").isNull() && !contractElement.get("predefinedExpectations").isEmpty()) {
+            finalContent = finalContent != null ? finalContent : mapper.createObjectNode();
+            ArrayNode predefinedExpectations = mapper.createArrayNode();
+            StreamSupport.stream(contractElement.get("predefinedExpectations").spliterator(), false).forEach(predefinedExpectation -> {
+              ObjectNode newExpectation = predefinedExpectation.deepCopy();
+              newExpectation.put("expectation_score", 100);
+              predefinedExpectations.add(newExpectation);
+            });
+            finalContent.put("expectations", predefinedExpectations);
+          }
+        }
+      } catch (JsonProcessingException e) {
+        log.severe("Cannot open injector contract");
+      }
+    }
+    input.setContent(finalContent);
     // Get common attributes
-    Inject inject = input.toInject(injectorContractRepository.findById(input.getInjectorContract()).orElseThrow());
+    Inject inject = input.toInject(injectorContract);
     inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setExercise(exercise);
     // Set dependencies
@@ -404,8 +435,33 @@ public class InjectApi extends RestBehavior {
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody InjectInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
+    InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow();
+    // Set expectations
+    ObjectNode finalContent = input.getContent();
+    if (input.getContent() == null || input.getContent().get("expectations").isNull() || input.getContent().get("expectations").isEmpty()) {
+      try {
+        JsonNode jsonNode = mapper.readTree(injectorContract.getContent());
+        List<JsonNode> contractElements = StreamSupport.stream(jsonNode.get("fields").spliterator(), false).filter(contractElement -> contractElement.get("type").asText().equals(ContractType.Expectation.name().toLowerCase())).toList();
+        if (!contractElements.isEmpty()) {
+          JsonNode contractElement = contractElements.getFirst();
+          if (!contractElement.get("predefinedExpectations").isNull() && !contractElement.get("predefinedExpectations").isEmpty()) {
+            finalContent = finalContent != null ? finalContent : mapper.createObjectNode();
+            ArrayNode predefinedExpectations = mapper.createArrayNode();
+            StreamSupport.stream(contractElement.get("predefinedExpectations").spliterator(), false).forEach(predefinedExpectation -> {
+              ObjectNode newExpectation = predefinedExpectation.deepCopy();
+              newExpectation.put("expectation_score", 100);
+              predefinedExpectations.add(newExpectation);
+            });
+            finalContent.put("expectations", predefinedExpectations);
+          }
+        }
+      } catch (JsonProcessingException e) {
+        log.severe("Cannot open injector contract");
+      }
+    }
+    input.setContent(finalContent);
     // Get common attributes
-    Inject inject = input.toInject(injectorContractRepository.findById(input.getInjectorContract()).orElseThrow());
+    Inject inject = input.toInject(injectorContract);
     inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
     inject.setScenario(scenario);
     // Set dependencies

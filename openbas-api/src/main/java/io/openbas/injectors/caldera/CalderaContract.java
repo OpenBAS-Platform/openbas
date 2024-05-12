@@ -114,8 +114,8 @@ public class CalderaContract extends Contractor {
         // Build contracts
         return abilities.stream().map((ability -> {
             ContractDef builder = contractBuilder();
-            builder.mandatory(obfuscatorField);
             builder.mandatoryGroup(assetField, assetGroupField);
+            builder.optional(obfuscatorField);
             builder.optional(expectationsField);
             List<String> platforms = new ArrayList<>();
             ability.getExecutors().forEach(executor -> {

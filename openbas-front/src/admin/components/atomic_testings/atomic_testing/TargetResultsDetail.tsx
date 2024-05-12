@@ -219,10 +219,10 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
               result.inject_expectation_results.map((collector, index) => (
                 <div key={index}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <InjectIcon
-                      tooltip={t(injectType)}
-                      type={injectType}
-                      variant="inline"
+                    <img
+                      src={`/api/images/collectors/id/${collector.sourceId}`}
+                      alt={collector.sourceId}
+                      style={{ width: 20, height: 20, borderRadius: 4 }}
                     />
                     <Typography variant="body1" sx={{ marginLeft: 1 }}>
                       {collector.sourceName}

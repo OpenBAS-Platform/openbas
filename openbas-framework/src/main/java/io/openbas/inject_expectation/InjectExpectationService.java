@@ -108,6 +108,15 @@ public class InjectExpectationService {
                 .toList();
     }
 
+    public List<InjectExpectation> preventionExpectationsNotFill() {
+        return this.injectExpectationRepository.findAll(
+                        Specification.where(InjectExpectationSpecification.type(PREVENTION))
+                )
+                .stream()
+                .filter(e -> e.getResults().stream().toList().isEmpty())
+                .toList();
+    }
+
     // -- DETECTION --
 
     public List<InjectExpectation> expectationsForAssets(
@@ -127,6 +136,15 @@ public class InjectExpectationService {
                 )
                 .stream()
                 .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
+                .toList();
+    }
+
+    public List<InjectExpectation> detectionExpectationsNotFill() {
+        return this.injectExpectationRepository.findAll(
+                        Specification.where(InjectExpectationSpecification.type(DETECTION))
+                )
+                .stream()
+                .filter(e -> e.getResults().stream().toList().isEmpty())
                 .toList();
     }
 

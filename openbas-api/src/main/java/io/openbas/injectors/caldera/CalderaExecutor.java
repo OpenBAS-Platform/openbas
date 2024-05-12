@@ -51,7 +51,7 @@ public class CalderaExecutor extends Injector {
     @Transactional
     public ExecutionProcess process(@NotNull final Execution execution, @NotNull final ExecutableInject injection) throws Exception {
         CalderaInjectContent content = contentConvert(injection, CalderaInjectContent.class);
-        String obfuscator = content.getObfuscator();
+        String obfuscator = content.getObfuscator() != null ? content.getObfuscator() : "base64";
         Inject inject = this.injectRepository.findById(injection.getInjection().getInject().getId()).orElseThrow();
         Map<Asset, Boolean> assets = this.resolveAllAssets(injection);
         List<String> asyncIds = new ArrayList<>();
@@ -119,7 +119,7 @@ public class CalderaExecutor extends Injector {
         while (endpointForExecution == null) {
             count++;
             // Find an executor agent matching the asset
-            List<Agent> agents = this.calderaService.agents().stream().filter(agent -> agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > Asset.ACTIVE_THRESHOLD && agent.getHost().equals(assetEndpoint.getHostname()) && Arrays.stream(assetEndpoint.getIps()).anyMatch(s -> Arrays.stream(agent.getHost_ip_addrs()).toList().contains(s))).toList();
+            List<Agent> agents = this.calderaService.agents().stream().filter(agent -> agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) < Asset.ACTIVE_THRESHOLD && agent.getHost().equals(assetEndpoint.getHostname()) && Arrays.stream(assetEndpoint.getIps()).anyMatch(s -> Arrays.stream(agent.getHost_ip_addrs()).toList().contains(s))).toList();
             if (!agents.isEmpty()) {
                 Endpoint createdEndpoint = null;
                 for (int i = 0; i < agents.size(); i++) {
