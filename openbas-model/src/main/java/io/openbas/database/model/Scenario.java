@@ -15,10 +15,7 @@ import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.openbas.database.model.Grant.GRANT_TYPE.OBSERVER;
 import static io.openbas.database.model.Grant.GRANT_TYPE.PLANNER;
@@ -248,5 +245,10 @@ public class Scenario implements Base {
                             attackPattern -> attackPattern.getKillChainPhases().stream().toList().stream()
                     )
             ).distinct().toList();
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
   }
 }

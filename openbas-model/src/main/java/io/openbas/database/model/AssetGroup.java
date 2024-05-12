@@ -17,6 +17,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static java.time.Instant.now;
 import static lombok.AccessLevel.NONE;
@@ -92,4 +93,9 @@ public class AssetGroup implements Base {
   @Column(name = "asset_group_updated_at")
   @JsonProperty("asset_group_updated_at")
   private Instant updatedAt = now();
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 }

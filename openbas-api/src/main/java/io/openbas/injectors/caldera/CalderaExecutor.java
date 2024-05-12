@@ -116,7 +116,7 @@ public class CalderaExecutor extends Injector {
         }
         log.log(Level.INFO, "Trying to find an available executor for " + asset.getName());
         Endpoint assetEndpoint = (Endpoint) Hibernate.unproxy(asset);
-        while (endpointForExecution != null) {
+        while (endpointForExecution == null) {
             count++;
             // Find an executor agent matching the asset
             List<Agent> agents = new ArrayList<>();

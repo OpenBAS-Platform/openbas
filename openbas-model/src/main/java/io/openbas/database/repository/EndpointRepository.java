@@ -22,10 +22,10 @@ public interface EndpointRepository extends CrudRepository<Endpoint, String>,
   @Query(value = "select e.* from assets e where e.endpoint_hostname = :hostname", nativeQuery = true)
   List<Endpoint> findByHostname(@NotBlank final @Param("hostname") String hostname);
 
-  @Query(value = "select e.* from assets e where e.asset_parent is null and e.endpoint_hostname = :hostname", nativeQuery = true)
+  @Query(value = "select e.* from assets e where e.asset_parent is null and e.asset_inject is null and e.endpoint_hostname = :hostname", nativeQuery = true)
   List<Endpoint> findForInjectionByHostname(@NotBlank final @Param("hostname") String hostname);
 
-  @Query(value = "select e.* from assets e where e.asset_parent is not null and e.endpoint_hostname = :hostname", nativeQuery = true)
+  @Query(value = "select e.* from assets e where e.asset_parent is not null or e.asset_inject is not null and e.endpoint_hostname = :hostname", nativeQuery = true)
   List<Endpoint> findForExecutionByHostname(@NotBlank final @Param("hostname") String hostname);
 
   Optional<Endpoint> findByExternalReference(@Param("externalReference") String externalReference);

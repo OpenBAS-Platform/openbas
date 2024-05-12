@@ -15,6 +15,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static jakarta.persistence.DiscriminatorType.STRING;
 import static java.time.Instant.now;
@@ -110,4 +111,9 @@ public class Asset implements Base {
   @Column(name = "asset_updated_at")
   @JsonProperty("asset_updated_at")
   private Instant updatedAt = now();
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 }

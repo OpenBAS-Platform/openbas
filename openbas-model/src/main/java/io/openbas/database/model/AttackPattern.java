@@ -16,6 +16,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static java.time.Instant.now;
 
@@ -89,4 +90,8 @@ public class AttackPattern implements Base {
   @JsonProperty("attack_pattern_kill_chain_phases")
   private List<KillChainPhase> killChainPhases = new ArrayList<>();
 
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 }
