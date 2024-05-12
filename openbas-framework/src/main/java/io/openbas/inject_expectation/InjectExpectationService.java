@@ -1,5 +1,6 @@
 package io.openbas.inject_expectation;
 
+import io.openbas.asset.AssetGroupService;
 import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.DETECTION;
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVENTION;
@@ -30,6 +32,7 @@ public class InjectExpectationService {
 
     private final InjectExpectationRepository injectExpectationRepository;
     private final InjectRepository injectRepository;
+    private final AssetGroupService assetGroupService;
 
     // -- CRUD --
 
@@ -129,7 +132,8 @@ public class InjectExpectationService {
             @NotNull final Inject inject,
             @NotNull final AssetGroup assetGroup,
             @NotNull final InjectExpectation.EXPECTATION_TYPE expectationType) {
-        List<String> assetIds = assetGroup.getAssets().stream().map(Asset::getId).toList();
+        AssetGroup resolvedAssetGroup = assetGroupService.assetGroup(assetGroup.getId());
+        List<String> assetIds = Stream.concat(resolvedAssetGroup.getAssets().stream(), resolvedAssetGroup.getDynamicAssets().stream()).map(Asset::getId).distinct().toList();
         return this.injectExpectationRepository.findAll(
                 Specification.where(InjectExpectationSpecification.type(expectationType))
                         .and(InjectExpectationSpecification.fromAssets(inject.getId(), assetIds))

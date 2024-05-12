@@ -9,6 +9,7 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 public class InjectTargetWithResult {
@@ -37,5 +38,10 @@ public class InjectTargetWithResult {
     this.id = id;
     this.name = name;
     this.expectationResultsByTypes = expectationResultsByTypes;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
   }
 }

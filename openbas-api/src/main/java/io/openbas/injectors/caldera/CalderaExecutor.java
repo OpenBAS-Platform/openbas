@@ -39,7 +39,7 @@ import static java.time.Instant.now;
 @RequiredArgsConstructor
 @Log
 public class CalderaExecutor extends Injector {
-    private final int RETRY_NUMBER = 30;
+    private final int RETRY_NUMBER = 20;
 
     private final CalderaInjectorConfig config;
     private final CalderaInjectorService calderaService;
@@ -119,12 +119,7 @@ public class CalderaExecutor extends Injector {
         while (endpointForExecution == null) {
             count++;
             // Find an executor agent matching the asset
-            List<Agent> agents = new ArrayList<>();
-            try {
-                agents = this.calderaService.agents().stream().filter(agent -> agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) < Asset.ACTIVE_THRESHOLD && agent.getHost().equals(assetEndpoint.getHostname()) && Arrays.stream(assetEndpoint.getIps()).anyMatch(s -> Arrays.stream(agent.getHost_ip_addrs()).toList().contains(s))).toList();
-            } catch (Exception e) {
-                log.warning("Cannot get Caldera agents list");
-            }
+            List<Agent> agents = this.calderaService.agents().stream().filter(agent -> agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) < Asset.ACTIVE_THRESHOLD && agent.getHost().equals(assetEndpoint.getHostname()) && Arrays.stream(assetEndpoint.getIps()).anyMatch(s -> Arrays.stream(agent.getHost_ip_addrs()).toList().contains(s))).toList();
             if (!agents.isEmpty()) {
                 for (int i = 0; i < agents.size(); i++) {
                     // Check in the database if not exist

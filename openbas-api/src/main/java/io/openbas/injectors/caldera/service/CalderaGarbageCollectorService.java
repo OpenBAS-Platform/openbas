@@ -91,7 +91,7 @@ public class CalderaGarbageCollectorService implements Runnable {
                     }
                 }
             });
-        } catch (ClientProtocolException | JsonProcessingException e) {
+        } catch (RuntimeException e) {
             log.severe("Failed to Caldera agents");
         }
         log.info("Caldera injector garbage collection on " + endpoints.size() + " assets");
