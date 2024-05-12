@@ -32,14 +32,14 @@ interface Recurrence {
 // eslint-disable-next-line no-underscore-dangle
 const _MS_DELAY_TOO_CLOSE = 1000 * 60 * 2;
 
-const defaultFormValues = {
+const defaultFormValues = () => ({
   startDate: new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
   endDate: null,
   time: minutesInFuture(5).toISOString(),
   onlyWeekday: false,
   dayOfWeek: 1 as Recurrence['dayOfWeek'],
   weekOfMonth: 1 as Recurrence['weekOfMonth'],
-};
+});
 
 const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurring, onSelectRecurring, initialValues, open, setOpen }) => {
   const { t } = useFormatter();
@@ -66,7 +66,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
   };
 
   const { handleSubmit, control, reset, getValues, clearErrors } = useForm<Recurrence>({
-    defaultValues: defaultFormValues,
+    defaultValues: defaultFormValues(),
     resolver: zodResolver(
       zodImplement<Recurrence>().with({
         startDate: z.string().min(1, t('Required')),
@@ -119,7 +119,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
   useEffect(() => {
     if (initialValues.scenario_recurrence != null) {
       if (!initialValues.scenario_recurrence || !initialValues.scenario_recurrence_start) {
-        reset(defaultFormValues);
+        reset(defaultFormValues());
       }
       const { w, d, h, m, owd } = parseCron(initialValues.scenario_recurrence);
       reset({
@@ -133,10 +133,14 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
     }
   }, [initialValues.scenario_recurrence]);
 
+  const handleClose = () => {
+    reset(defaultFormValues());
+    setOpen(false);
+  };
   return (
     <Dialog
       open={open}
-      onClose={() => setOpen(false)}
+      onClose={handleClose}
       TransitionComponent={Transition}
       PaperProps={{ elevation: 1 }}
       maxWidth="xs"
@@ -294,7 +298,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>
+          <Button onClick={handleClose}>
             {t('Cancel')}
           </Button>
           <Button

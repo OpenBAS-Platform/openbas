@@ -3,6 +3,7 @@ import React from 'react';
 import { Button, Chip, Grid, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { PlayArrowOutlined } from '@mui/icons-material';
+import * as R from 'ramda';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
@@ -40,7 +41,7 @@ const useStyles = makeStyles(() => ({
     height: '100%',
     minHeight: '100%',
     margin: '10px 0 0 0',
-    padding: 15,
+    padding: '15px 15px 0 15px',
     borderRadius: 4,
   },
 }));
@@ -60,6 +61,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
     dispatch(fetchScenarioExercises(scenarioId));
   });
   const scenarioExercises = scenario.scenario_exercises?.map((exerciseId: string) => exercises[exerciseId]).filter((ex: ExerciseStore) => !!ex);
+  const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
   return (
     <>
       <Grid
@@ -124,7 +126,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
                 >
                   {t('Tags')}
                 </Typography>
-                <ItemTags tags={scenario.scenario_tags} />
+                <ItemTags tags={scenario.scenario_tags} limit={10} />
               </Grid>
               <Grid item={true} xs={4} style={{ paddingTop: 10 }}>
                 <Typography
@@ -148,8 +150,8 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
                 >
                   {t('Kill Chain Phases')}
                 </Typography>
-                {(scenario.exercise_kill_chain_phases ?? []).length === 0 && '-'}
-                {scenario.exercise_kill_chain_phases?.map((killChainPhase: KillChainPhase) => (
+                {(scenario.scenario_kill_chain_phases ?? []).length === 0 && '-'}
+                {sortByOrder(scenario.scenario_kill_chain_phases ?? [])?.map((killChainPhase: KillChainPhase) => (
                   <Chip
                     key={killChainPhase.phase_id}
                     variant="outlined"
@@ -170,10 +172,17 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
             <ScenarioDistributionByExercise exercises={scenarioExercises}/>
           </Paper>
         </Grid>
+        {(scenarioExercises ?? 0).length > 0 && (
+          <Grid item xs={12} style={{ marginTop: 25 }}>
+            <Typography variant="h4" gutterBottom style={{ marginBottom: 15 }}>
+              {t('Simulations')}
+            </Typography>
+            <Paper classes={{ root: classes.paper }} variant="outlined">
+              <ExerciseList exercises={scenarioExercises} withoutSearch={true} />
+            </Paper>
+          </Grid>
+        )}
       </Grid>
-      <div style={{ marginTop: 50 }}>
-        <ExerciseList exercises={scenarioExercises} withoutSearch={true} />
-      </div>
       {(scenarioExercises ?? 0).length === 0 && (
         <div style={{ marginTop: 100, textAlign: 'center' }}>
           <div style={{ fontSize: 20 }}>

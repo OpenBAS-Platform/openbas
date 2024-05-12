@@ -224,7 +224,7 @@ const AtomicTesting = () => {
             )}
           </Paper>
         </Grid>
-        <Grid item xs={6} style={{ marginTop: 25 }}>
+        <Grid item xs={6} style={{ marginTop: 29 }}>
           <Typography variant="h4" gutterBottom>
             {t('Results by target')}
           </Typography>

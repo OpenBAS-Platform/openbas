@@ -36,6 +36,8 @@ const ScenarioPopover: FunctionComponent<Props> = ({
     scenario_main_focus,
     scenario_severity,
     scenario_tags,
+    scenario_external_reference,
+    scenario_external_url,
   }) => ({
     scenario_name,
     scenario_subtitle: scenario_subtitle ?? '',
@@ -44,6 +46,8 @@ const ScenarioPopover: FunctionComponent<Props> = ({
     scenario_severity: scenario_severity ?? 'high',
     scenario_description: scenario_description ?? '',
     scenario_tags: scenario_tags ?? [],
+    scenario_external_reference: scenario_external_reference ?? '',
+    scenario_external_url: scenario_external_url ?? '',
   }))(scenario);
 
   // Edition

@@ -6,6 +6,8 @@ import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.repository.InjectExpectationRepository;
+import io.openbas.database.repository.InjectRepository;
+import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.specification.InjectExpectationSpecification;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +29,7 @@ import static java.time.Instant.now;
 public class InjectExpectationService {
 
     private final InjectExpectationRepository injectExpectationRepository;
+    private final InjectRepository injectRepository;
 
     // -- CRUD --
 
@@ -69,6 +72,9 @@ public class InjectExpectationService {
     public void update(@NotNull InjectExpectation injectExpectation) {
         injectExpectation.setUpdatedAt(now());
         this.injectExpectationRepository.save(injectExpectation);
+        Inject inject = injectExpectation.getInject();
+        inject.setUpdatedAt(now());
+        this.injectRepository.save(inject);
     }
 
     // -- PREVENTION --

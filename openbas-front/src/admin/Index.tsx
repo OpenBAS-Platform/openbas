@@ -12,7 +12,7 @@ import type { Theme } from '../components/Theme';
 import type { LoggedHelper } from '../actions/helper';
 import Loader from '../components/Loader';
 import NotFound from '../components/NotFound';
-import InjectIndex from './components/simulations/simulation/overview/InjectIndex';
+import InjectIndex from './components/simulations/simulation/injects/InjectIndex';
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));

@@ -19,6 +19,7 @@ import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchExercise } from '../../../../../actions/Exercise';
 import { fetchInjectResultDto } from '../../../../../actions/atomic_testings/atomic-testing-actions';
 import { InjectResultDtoContext } from '../../../atomic_testings/InjectResultDtoContext';
+import ExerciseHeader from '../ExerciseHeader';
 
 const useStyles = makeStyles(() => ({
   item: {
@@ -62,11 +63,12 @@ const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType, injectRe
       <PermissionsContext.Provider value={permissionsContext}>
         <Breadcrumbs variant="object" elements={[
           { label: t('Simulations'), link: '/admin/exercises' },
-          { label: exercise.exercise_name },
-          { label: t(backlabel ?? 'Overview'), link: backuri ?? `/admin/exercises/${exercise.exercise_id}` },
+          { label: backlabel ?? t(exercise.exercise_name), link: backuri ?? `/admin/exercises/${exercise.exercise_id}` },
+          { label: t('Injects') },
           { label: injectResultDto.inject_title, current: true },
         ]}
         />
+        <ExerciseHeader />
         <Box
           sx={{
             borderBottom: 1,

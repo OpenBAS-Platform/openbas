@@ -16,7 +16,7 @@ public class CollectorFakeDetectorConfig {
   private boolean enable = true;
   private String id = "96e476e0-b9c4-4660-869c-98585adf754d";
   private int interval = 60;
-  private int expirationTime = 3600;
+  private int expirationTime = 120;
 
   public int getExpirationTimeInMinute() {
     return this.expirationTime / 60;

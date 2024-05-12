@@ -43,7 +43,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const ItemTags = (props) => {
-  const { tags, variant } = props;
+  const { tags, variant, limit = 2 } = props;
   const { t } = useFormatter();
   const theme = useTheme();
   const classes = useStyles();
@@ -79,7 +79,7 @@ const ItemTags = (props) => {
               }}
             />
           ),
-          R.take(2, orderedTags),
+          R.take(limit, orderedTags),
         )
       ) : (
         <Chip
@@ -103,6 +103,7 @@ ItemTags.propTypes = {
   variant: PropTypes.string,
   onClick: PropTypes.func,
   tags: PropTypes.array,
+  limit: PropTypes.number,
 };
 
 export default ItemTags;

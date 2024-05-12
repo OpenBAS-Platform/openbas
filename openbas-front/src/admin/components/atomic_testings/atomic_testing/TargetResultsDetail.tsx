@@ -7,7 +7,6 @@ import type { InjectResultDTO, InjectTargetWithResult } from '../../../../utils/
 import { fetchInjectResultDto, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
-import InjectIcon from '../../common/injects/InjectIcon';
 import Empty from '../../../../components/Empty';
 import ManualExpectationsValidationForm from '../../simulations/simulation/validation/expectations/ManualExpectationsValidationForm';
 import type { InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
@@ -49,7 +48,6 @@ interface Props {
 
 const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   injectId,
-  injectType,
   lastExecutionStartDate,
   lastExecutionEndDate,
   target,
@@ -168,18 +166,30 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     return status.every((s) => s === 'VALIDATED') ? 'VALIDATED' : 'FAILED';
   };
   const getStatusLabel = (type: string, status: string[]) => {
-    if (status.includes('UNKNOWN')) {
-      return 'Unknown Data';
-    }
-    if (status.includes('PENDING')) {
-      return 'Waiting Response';
-    }
     switch (type) {
       case 'DETECTION':
+        if (status.includes('UNKNOWN')) {
+          return 'No Expectation for Detection';
+        }
+        if (status.includes('PENDING')) {
+          return 'Waiting for Detection';
+        }
         return status.every((s) => s === 'VALIDATED') ? 'Attack Detected' : 'Attack Undetected';
       case 'MANUAL':
+        if (status.includes('UNKNOWN')) {
+          return 'No Expectation for Manual';
+        }
+        if (status.includes('PENDING')) {
+          return 'Waiting for Validation';
+        }
         return status.every((s) => s === 'VALIDATED') ? 'Validation Success' : 'Validation Failed';
       case 'PREVENTION':
+        if (status.includes('UNKNOWN')) {
+          return 'No Expectation';
+        }
+        if (status.includes('PENDING')) {
+          return 'Waiting for Prevention';
+        }
         return status.every((s) => s === 'VALIDATED') ? 'Attack Blocked' : 'Attack Unblocked';
       default:
         return '';

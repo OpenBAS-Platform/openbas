@@ -74,6 +74,7 @@ const Exercise = () => {
         .flatMap((injectResult) => injectResult.inject_attack_pattern) as unknown as string[],
     );
   }
+  const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
   return (
     <>
       <Grid
@@ -138,7 +139,7 @@ const Exercise = () => {
                 >
                   {t('Tags')}
                 </Typography>
-                <ItemTags tags={exercise.exercise_tags} />
+                <ItemTags tags={exercise.exercise_tags} limit={10} />
               </Grid>
               <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography
@@ -163,7 +164,7 @@ const Exercise = () => {
                   {t('Kill Chain Phases')}
                 </Typography>
                 {(exercise.exercise_kill_chain_phases ?? []).length === 0 && '-'}
-                {exercise.exercise_kill_chain_phases?.map((killChainPhase: KillChainPhase) => (
+                {sortByOrder(exercise.exercise_kill_chain_phases ?? []).map((killChainPhase: KillChainPhase) => (
                   <Chip
                     key={killChainPhase.phase_id}
                     variant="outlined"
@@ -194,15 +195,19 @@ const Exercise = () => {
             </Paper>
           </Grid>
         )}
-        <Grid item xs={12} style={{ marginTop: 25 }}>
-          <Typography variant="h4" gutterBottom style={{ marginBottom: 15 }}>
-            {t('Injects Results')}
-          </Typography>
-          <InjectList
-            fetchInjects={(input) => searchExerciseInjects(exerciseId, input)}
-            goTo={(injectId) => `/admin/exercises/${exerciseId}/injects/${injectId}`}
-          />
-        </Grid>
+        {exercise.exercise_status === 'SCHEDULED' && (
+          <Grid item xs={12} style={{ marginTop: 25 }}>
+            <Typography variant="h4" gutterBottom style={{ marginBottom: 15 }}>
+              {t('Injects Results')}
+            </Typography>
+            <Paper classes={{ root: classes.paper }} variant="outlined">
+              <InjectList
+                fetchInjects={(input) => searchExerciseInjects(exerciseId, input)}
+                goTo={(injectId) => `/admin/exercises/${exerciseId}/injects/${injectId}`}
+              />
+            </Paper>
+          </Grid>
+        )}
       </Grid>
       <ExerciseDistribution exerciseId={exerciseId} />
     </>
