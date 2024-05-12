@@ -27,19 +27,22 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 
+import static java.time.Instant.now;
 import static java.time.ZoneOffset.UTC;
 
 @ConditionalOnProperty(prefix = "executor.caldera", name = "enable")
 @Log
 @Service
 public class CalderaExecutorService implements Runnable {
-
+    private static final int CLEAR_TTL = 1200000;
     private static final String CALDERA_EXECUTOR_TYPE = "openbas_caldera";
     private static final String CALDERA_EXECUTOR_NAME = "Caldera";
 
     private final CalderaExecutorClient client;
 
     private final EndpointService endpointService;
+
+    private final CalderaExecutorContextService calderaExecutorContextService;
 
     private Executor executor = null;
 
@@ -62,6 +65,7 @@ public class CalderaExecutorService implements Runnable {
     ) {
         this.client = client;
         this.endpointService = endpointService;
+        this.calderaExecutorContextService = calderaExecutorContextService;
         try {
             this.executor = executorService.register(config.getId(), CALDERA_EXECUTOR_TYPE, CALDERA_EXECUTOR_NAME, getClass().getResourceAsStream("/img/icon-caldera.png"), new String[]{Endpoint.PLATFORM_TYPE.Windows.name(), Endpoint.PLATFORM_TYPE.Linux.name(), Endpoint.PLATFORM_TYPE.MacOS.name()});
             calderaExecutorContextService.registerAbilities();
@@ -116,6 +120,7 @@ public class CalderaExecutorService implements Runnable {
         matchingExistingEndpoint.setLastSeen(external.getLastSeen());
         matchingExistingEndpoint.setExternalReference(external.getExternalReference());
         matchingExistingEndpoint.setExecutor(this.executor);
+
         this.endpointService.updateEndpoint(matchingExistingEndpoint);
     }
 

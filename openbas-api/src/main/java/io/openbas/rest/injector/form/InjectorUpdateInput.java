@@ -30,4 +30,7 @@ public class InjectorUpdateInput {
 
     @JsonProperty("injector_executor_commands")
     private Map<String, String> executorCommands;
+
+    @JsonProperty("injector_executor_clear_commands")
+    private Map<String, String> executorClearCommands;
 }

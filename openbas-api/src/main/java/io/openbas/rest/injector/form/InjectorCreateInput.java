@@ -35,6 +35,9 @@ public class InjectorCreateInput {
     @JsonProperty("injector_executor_commands")
     private Map<String, String> executorCommands;
 
+    @JsonProperty("injector_executor_clear_commands")
+    private Map<String, String> executorClearCommands;
+
     public String getId() {
         return id;
     }
@@ -89,5 +92,13 @@ public class InjectorCreateInput {
 
     public void setExecutorCommands(Map<String, String> executorCommands) {
         this.executorCommands = executorCommands;
+    }
+
+    public Map<String, String> getExecutorClearCommands() {
+        return executorClearCommands;
+    }
+
+    public void setExecutorClearCommands(Map<String, String> executorClearCommands) {
+        this.executorClearCommands = executorClearCommands;
     }
 }

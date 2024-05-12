@@ -118,7 +118,8 @@ public class InjectorApi extends RestBehavior {
             List<InjectorContractInput> contracts,
             Boolean customContracts,
             String category,
-            Map<String, String> executorCommands) {
+            Map<String, String> executorCommands,
+            Map<String, String> executorClearCommands) {
         injector.setUpdatedAt(Instant.now());
         injector.setType(type);
         injector.setName(name);
@@ -126,6 +127,7 @@ public class InjectorApi extends RestBehavior {
         injector.setCustomContracts(customContracts);
         injector.setCategory(category);
         injector.setExecutorCommands(executorCommands);
+        injector.setExecutorClearCommands(executorClearCommands);
         List<String> existing = new ArrayList<>();
         List<String> toDeletes = new ArrayList<>();
         injector.getContracts().forEach(contract -> {
@@ -167,7 +169,8 @@ public class InjectorApi extends RestBehavior {
                 input.getContracts(),
                 input.getCustomContracts(),
                 input.getCategory(),
-                input.getExecutorCommands()
+                input.getExecutorCommands(),
+                input.getExecutorClearCommands()
         );
     }
 
@@ -221,7 +224,8 @@ public class InjectorApi extends RestBehavior {
                         input.getContracts(),
                         input.getCustomContracts(),
                         input.getCategory(),
-                        input.getExecutorCommands()
+                        input.getExecutorCommands(),
+                        input.getExecutorClearCommands()
                 );
             } else {
                 // save the injector
@@ -233,6 +237,7 @@ public class InjectorApi extends RestBehavior {
                 newInjector.setCategory(input.getCategory());
                 newInjector.setCustomContracts(input.getCustomContracts());
                 newInjector.setExecutorCommands(input.getExecutorCommands());
+                newInjector.setExecutorClearCommands(input.getExecutorClearCommands());
                 Injector savedInjector = injectorRepository.save(newInjector);
                 // Save the contracts
                 List<InjectorContract> injectorContracts = input.getContracts().stream()
