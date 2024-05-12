@@ -19,6 +19,7 @@ public class ManualInjector {
                     contract,
                     true,
                     "generic",
+                    null,
                     null
             );
         } catch (Exception e) {

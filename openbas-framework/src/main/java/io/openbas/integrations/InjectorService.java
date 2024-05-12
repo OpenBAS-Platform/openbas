@@ -61,7 +61,7 @@ public class InjectorService {
     }
 
     @Transactional
-    public void register(String id, String name, Contractor contractor, Boolean isCustomizable, String category, Map<String, String> executorCommands) throws Exception {
+    public void register(String id, String name, Contractor contractor, Boolean isCustomizable, String category, Map<String, String> executorCommands, Map<String, String> executorClearCommands) throws Exception {
         if(!contractor.isExpose()) {
             return;
         }
@@ -86,6 +86,7 @@ public class InjectorService {
             injector.setType(contractor.getType());
             injector.setCategory(category);
             injector.setExecutorCommands(executorCommands);
+            injector.setExecutorClearCommands(executorClearCommands);
             List<String> existing = new ArrayList<>();
             List<InjectorContract> toUpdates = new ArrayList<>();
             List<String> toDeletes = new ArrayList<>();
@@ -155,6 +156,7 @@ public class InjectorService {
             newInjector.setType(contractor.getType());
             newInjector.setCategory(category);
             newInjector.setExecutorCommands(executorCommands);
+            newInjector.setExecutorClearCommands(executorClearCommands);
             Injector savedInjector = injectorRepository.save(newInjector);
             // Save the contracts
             List<InjectorContract> injectorContracts = contracts.stream().map(in -> {

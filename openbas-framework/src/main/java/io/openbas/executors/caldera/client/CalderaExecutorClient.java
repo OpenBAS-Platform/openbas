@@ -62,7 +62,7 @@ public class CalderaExecutorClient {
         }
     }
 
-    public Ability createAbility(Injector injector) {
+    public Ability createSubprocessorAbility(Injector injector) {
         try {
             List<Map<String, String>> executors = new ArrayList<>();
             Map<String, String> injectorExecutorCommands = injector.getExecutorCommands();
@@ -89,6 +89,48 @@ public class CalderaExecutorClient {
             }
             Map<String, Object> body = new HashMap<>();
             body.put("name", "caldera-subprocessor-" + injector.getName());
+            body.put("tactic", "initial-access");
+            body.put("technique_id", "T1133");
+            body.put("technique_name", "External Remote Services");
+            body.put("executors", executors);
+            String jsonResponse = this.post(
+                    this.config.getRestApiV2Url() + ABILITIES_URI,
+                    body
+            );
+            return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
+            });
+        } catch (ClientProtocolException | JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Ability createClearAbility(Injector injector) {
+        try {
+            List<Map<String, String>> executors = new ArrayList<>();
+            Map<String, String> injectorExecutorClearCommands = injector.getExecutorClearCommands();
+            if (injectorExecutorClearCommands.containsKey(Endpoint.PLATFORM_TYPE.Windows.name())) {
+                Map<String, String> executorWindows = new HashMap<>();
+                executorWindows.put("platform", "windows");
+                executorWindows.put("name", "psh");
+                executorWindows.put("command", injectorExecutorClearCommands.get(Endpoint.PLATFORM_TYPE.Windows.name()));
+                executors.add(executorWindows);
+            }
+            if (injectorExecutorClearCommands.containsKey(Endpoint.PLATFORM_TYPE.Linux.name())) {
+                Map<String, String> executorLinux = new HashMap<>();
+                executorLinux.put("platform", "linux");
+                executorLinux.put("name", "sh");
+                executorLinux.put("command", injectorExecutorClearCommands.get(Endpoint.PLATFORM_TYPE.Linux.name()));
+                executors.add(executorLinux);
+            }
+            if (injectorExecutorClearCommands.containsKey(Endpoint.PLATFORM_TYPE.MacOS.name())) {
+                Map<String, String> executorMac = new HashMap<>();
+                executorMac.put("platform", "darwin");
+                executorMac.put("name", "sh");
+                executorMac.put("command", injectorExecutorClearCommands.get(Endpoint.PLATFORM_TYPE.MacOS.name()));
+                executors.add(executorMac);
+            }
+            Map<String, Object> body = new HashMap<>();
+            body.put("name", "caldera-clear-" + injector.getName());
             body.put("tactic", "initial-access");
             body.put("technique_id", "T1133");
             body.put("technique_name", "External Remote Services");

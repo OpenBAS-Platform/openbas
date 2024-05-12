@@ -34,21 +34,11 @@ public class CalderaExecutorConfig {
     @NotBlank
     private String apiKey;
 
-    private Ability openBasAbility;
-
     public String getRestApiV2Url() {
         return url + REST_V2_URI;
     }
 
     public String getPluginAccessApiUrl() {
         return url + PLUGIN_ACCESS_URI;
-    }
-
-    public void setOpenBasAbility(Ability openBasAbility) {
-        this.openBasAbility = openBasAbility;
-    }
-
-    public Ability getOpenBasAbility() {
-        return this.openBasAbility;
     }
 }

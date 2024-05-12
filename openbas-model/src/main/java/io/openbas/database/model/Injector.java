@@ -64,6 +64,12 @@ public class Injector implements Base {
     private Map<String, String> executorCommands = new HashMap<>();
 
     @Getter
+    @Column(name = "injector_executor_clear_commands")
+    @JsonProperty("injector_executor_clear_commands")
+    @Type(PostgreSQLHStoreType.class)
+    private Map<String, String> executorClearCommands = new HashMap<>();
+
+    @Getter
     @Column(name = "injector_created_at")
     @JsonProperty("injector_created_at")
     private Instant createdAt = now();

@@ -6,14 +6,17 @@ import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.client.model.Ability;
 import io.openbas.integrations.InjectorService;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@ConditionalOnProperty(prefix = "executor.caldera", name = "enable")
 @Log
 @Service
 public class CalderaExecutorContextService {
@@ -32,7 +35,11 @@ public class CalderaExecutorContextService {
         this.calderaExecutorClient = calderaExecutorClient;
     }
 
+    @Getter
     public final Map<String, Ability> injectorExecutorAbilities = new HashMap<>();
+
+    @Getter
+    public final Map<String, Ability> injectorExecutorClearAbilities = new HashMap<>();
 
     public void registerAbilities() {
         // Create the abilities if not exist for all injectors that need it
@@ -45,8 +52,17 @@ public class CalderaExecutorContextService {
                     Ability existingAbility = filteredAbilities.getFirst();
                     calderaExecutorClient.deleteAbility(existingAbility);
                 }
-                Ability ability = calderaExecutorClient.createAbility(injector);
+                Ability ability = calderaExecutorClient.createSubprocessorAbility(injector);
                 this.injectorExecutorAbilities.put(injector.getId(), ability);
+            }
+            if (injector.getExecutorClearCommands() != null) {
+                List<Ability> filteredAbilities = abilities.stream().filter(ability -> ability.getName().equals("caldera-clear-" + injector.getName())).toList();
+                if (!filteredAbilities.isEmpty()) {
+                    Ability existingAbility = filteredAbilities.getFirst();
+                    calderaExecutorClient.deleteAbility(existingAbility);
+                }
+                Ability ability = calderaExecutorClient.createSubprocessorAbility(injector);
+                this.injectorExecutorClearAbilities.put(injector.getId(), ability);
             }
         });
     }
