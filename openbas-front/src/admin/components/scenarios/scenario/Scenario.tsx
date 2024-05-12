@@ -201,7 +201,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
           </Grid>
         )}
       </Grid>
-      {(scenarioExercises ?? 0).length === 0 && (
+      {(scenarioExercises ?? 0).length === 0 && !scenario.scenario_recurrence && (
         <div style={{ marginTop: 100, textAlign: 'center' }}>
           <div style={{ fontSize: 20 }}>
             {t('This scenario has never run, schedule or run it now!')}
@@ -217,6 +217,13 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
             {t('Simulate Now')}
           </Button>
         </div>
+      )}
+      {(scenarioExercises ?? 0).length === 0 && scenario.scenario_recurrence && (
+      <div style={{ marginTop: 100, textAlign: 'center' }}>
+        <div style={{ fontSize: 20 }}>
+          {t('This scenario is scheduled to run, results will appear soon.')}
+        </div>
+      </div>
       )}
     </>
   );
