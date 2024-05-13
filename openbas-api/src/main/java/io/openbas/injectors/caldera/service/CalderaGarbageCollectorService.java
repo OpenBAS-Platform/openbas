@@ -58,35 +58,35 @@ public class CalderaGarbageCollectorService implements Runnable {
     public void run() {
         log.info("Running Caldera injector garbage collector...");
         List<Endpoint> endpoints = this.endpointService.endpoints(EndpointSpecification.findEndpointsForExecution());
+        log.info("Running Caldera injector garbage collector on " + endpoints.size() + " endpoints");
         endpoints.forEach(endpoint -> {
             if ((now().toEpochMilli() - endpoint.getCreatedAt().toEpochMilli()) > DELETE_TTL) {
                 this.endpointService.deleteEndpoint(endpoint.getId());
             }
         });
-        try {
-            List<Agent> agents = this.client.agents();
-            List<String> killedAgents = new ArrayList<>();
-            agents.forEach(agent -> {
-                if (agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > KILL_TTL && (now().toEpochMilli() - Time.toInstant(agent.getLast_seen()).toEpochMilli()) < KILL_TTL) {
-                    try {
-                        log.info("Killing agent " + agent.getHost());
-                        client.killAgent(agent);
-                        killedAgents.add(agent.getPaw());
-                    } catch (RuntimeException e) {
-                        log.info("Failed to kill agent, probably already killed");
-                    }
+        List<Agent> agents = this.client.agents();
+        log.info("Running Caldera injector garbage collector on " + agents.size() + " agents");
+        List<String> killedAgents = new ArrayList<>();
+        agents.forEach(agent -> {
+            if (agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > KILL_TTL && (now().toEpochMilli() - Time.toInstant(agent.getLast_seen()).toEpochMilli()) < KILL_TTL) {
+                try {
+                    log.info("Killing agent " + agent.getHost());
+                    client.killAgent(agent);
+                    killedAgents.add(agent.getPaw());
+                } catch (RuntimeException e) {
+                    log.info("Failed to kill agent, probably already killed");
                 }
-                if (agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > DELETE_TTL && !killedAgents.contains(agent.getPaw())) {
-                    try {
-                        log.info("Deleting agent " + agent.getHost());
-                        client.deleteAgent(agent);
-                    } catch (RuntimeException e) {
-                        log.severe("Failed to delete agent");
-                    }
+            }
+        });
+        agents.forEach(agent -> {
+            if (agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > DELETE_TTL && !killedAgents.contains(agent.getPaw())) {
+                try {
+                    log.info("Deleting agent " + agent.getHost());
+                    client.deleteAgent(agent);
+                } catch (RuntimeException e) {
+                    log.severe("Failed to delete agent");
                 }
-            });
-        } catch (RuntimeException e) {
-            log.severe("Failed to Caldera agents");
-        }
+            }
+        });
     }
 }

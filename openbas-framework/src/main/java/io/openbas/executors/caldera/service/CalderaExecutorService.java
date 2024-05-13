@@ -111,7 +111,7 @@ public class CalderaExecutorService implements Runnable {
                 }
             });
         } catch (ClientProtocolException | JsonProcessingException e) {
-            log.log(Level.SEVERE, "Error running caldera service " + e.getMessage(), e);
+            log.log(Level.SEVERE, "Error running Caldera service " + e.getMessage(), e);
         }
     }
 

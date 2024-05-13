@@ -1,0 +1,34 @@
+package io.openbas.executors.tanium.config;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+@Setter
+@Component
+@ConfigurationProperties(prefix = "executor.tanium")
+public class TaniumExecutorConfig {
+
+    private final static String GATEWAY_URI = "/plugin/products/gateway/graphql";
+
+    @Getter
+    private boolean enable;
+
+    @Getter
+    @NotBlank
+    private String id;
+
+    @Getter
+    @NotBlank
+    private String url;
+
+    @Getter
+    @NotBlank
+    private String apiKey;
+
+    public String getGatewayUrl() {
+        return url + GATEWAY_URI;
+    }
+}
