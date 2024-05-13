@@ -25,6 +25,10 @@ public class PayloadCreateInput {
     @JsonProperty("payload_description")
     private String description;
 
+    @NotBlank(message = MANDATORY_MESSAGE)
+    @JsonProperty("payload_content")
+    private String content;
+
     @JsonProperty("payload_tags")
     private List<String> tagIds = new ArrayList<>();
 }
