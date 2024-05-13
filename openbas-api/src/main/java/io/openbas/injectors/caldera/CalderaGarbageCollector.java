@@ -27,7 +27,7 @@ public class CalderaGarbageCollector {
         // If enabled, scheduled every X seconds
         if (this.config.isEnable()) {
             CalderaGarbageCollectorService service = new CalderaGarbageCollectorService(this.client, this.endpointService);
-            this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(300));
+            this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(120));
         }
     }
 }

@@ -83,7 +83,7 @@ public class CalderaExecutorService implements Runnable {
 
     @Override
     public void run() {
-        log.info("Running Caldera executor");
+        log.info("Running Caldera executor endpoints gathering...");
         try {
             // The executor only retrieve "main" agents (without the keyword "executor")
             // This is NOT a standard behaviour, this is because we are using Caldera as an executor and we should not

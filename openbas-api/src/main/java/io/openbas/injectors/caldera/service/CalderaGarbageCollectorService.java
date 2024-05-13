@@ -55,6 +55,7 @@ public class CalderaGarbageCollectorService implements Runnable {
 
     @Override
     public void run() {
+        log.info("Running Caldera injector garbage collector...");
         List<Endpoint> endpoints = this.endpointService.endpoints(EndpointSpecification.findEndpointsForExecution());
         endpoints.forEach(endpoint -> {
             if ((now().toEpochMilli() - endpoint.getCreatedAt().toEpochMilli()) > KILL_TTL) {
@@ -78,6 +79,7 @@ public class CalderaGarbageCollectorService implements Runnable {
             agents.forEach(agent -> {
                 if (agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > KILL_TTL) {
                     try {
+                        log.info("Killing agent " + agent.getHost());
                         client.killAgent(agent);
                     } catch (RuntimeException e) {
                         log.info("Failed to kill agent, probably already killed");
@@ -85,6 +87,7 @@ public class CalderaGarbageCollectorService implements Runnable {
                 }
                 if (agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) > DELETE_TTL) {
                     try {
+                        log.info("Deleting agent " + agent.getHost());
                         client.deleteAgent(agent);
                     } catch (RuntimeException e) {
                         log.severe("Failed to delete agent");
@@ -94,6 +97,5 @@ public class CalderaGarbageCollectorService implements Runnable {
         } catch (RuntimeException e) {
             log.severe("Failed to Caldera agents");
         }
-        log.info("Caldera injector garbage collection on " + endpoints.size() + " assets");
     }
 }

@@ -1,6 +1,5 @@
 package io.openbas.injectors.caldera.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.injectors.caldera.client.CalderaInjectorClient;
 import io.openbas.injectors.caldera.client.model.*;
 import io.openbas.injectors.caldera.model.Obfuscator;
@@ -8,7 +7,6 @@ import io.openbas.injectors.caldera.model.ResultStatus;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.apache.hc.client5.http.ClientProtocolException;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
