@@ -28,6 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.logging.Level;
 
 import static java.time.Instant.now;
@@ -97,6 +98,16 @@ public class CalderaExecutorService implements Runnable {
                     this.endpointService.createEndpoint(endpoint);
                 } else {
                     this.updateEndpoint(endpoint, existingEndpoints);
+                }
+            });
+            List<Endpoint> inactiveEndpoints = toEndpoint(agents).stream().filter(endpoint -> !endpoint.getActive()).toList();
+            inactiveEndpoints.forEach(endpoint -> {
+                Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
+                if(optionalExistingEndpoint.isPresent()) {
+                    Endpoint existingEndpoint = optionalExistingEndpoint.get();
+                    log.info("Found stale agent " + existingEndpoint.getName() + ", deleting it...");
+                    this.endpointService.deleteEndpoint(existingEndpoint.getId());
+                    this.client.deleteAgent(existingEndpoint);
                 }
             });
         } catch (ClientProtocolException | JsonProcessingException e) {

@@ -48,6 +48,14 @@ public class CalderaExecutorClient {
         });
     }
 
+    public void deleteAgent(Endpoint endpoint) {
+        try {
+            this.delete(this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getExternalReference());
+        } catch (ClientProtocolException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     // -- ABILITIES --
 
     private final static String ABILITIES_URI = "/abilities";
