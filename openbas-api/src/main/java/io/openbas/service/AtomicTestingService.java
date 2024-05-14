@@ -120,7 +120,7 @@ public class AtomicTestingService {
         this.injectorContractRepository = injectorContractRepository;
     }
 
-    public Page<Inject> findAllAtomicTestings(SearchPaginationInput searchPaginationInput) {
+    public Page<Inject> getPageOfAtomicTestings(SearchPaginationInput searchPaginationInput) {
         Specification<Inject> customSpec = Specification.where((root, query, cb) -> {
             Predicate predicate = cb.conjunction();
             predicate = cb.and(predicate, cb.isNull(root.get("scenario")));

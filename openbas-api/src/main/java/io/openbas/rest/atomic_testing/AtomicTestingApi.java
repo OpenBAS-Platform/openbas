@@ -32,9 +32,9 @@ public class AtomicTestingApi extends RestBehavior {
   private final InjectExpectationService injectExpectationService;
 
   @PostMapping("/search")
-  public Page<InjectResultDTO> findAllAtomicTestings(
+  public Page<InjectResultDTO> getPageOfAtomicTestings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return this.atomicTestingService.findAllAtomicTestings(searchPaginationInput)
+    return this.atomicTestingService.getPageOfAtomicTestings(searchPaginationInput)
         .map(inject -> AtomicTestingMapper.toDto(
             inject, getTargets(
                 inject.getTeams(),
