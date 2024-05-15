@@ -1,8 +1,8 @@
 import React from 'react';
-import { makeStyles } from '@mui/styles';
-import { Button, Grid, List, ListItem, ListItemText, Paper, Switch, TextField, Typography } from '@mui/material';
+import {makeStyles} from '@mui/styles';
+import {Button, Grid, List, ListItem, ListItemText, Paper, Switch, TextField, Typography} from '@mui/material';
 import ParametersForm from './ParametersForm';
-import { useFormatter } from '../../../components/i18n';
+import {useFormatter} from '../../../components/i18n';
 import {
   fetchPlatformParameters,
   updatePlatformDarkParameters,
@@ -14,10 +14,16 @@ import {
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import ItemBoolean from '../../../components/ItemBoolean';
 import ThemeForm from './ThemeForm';
-import { useAppDispatch } from '../../../utils/hooks';
-import { useHelper } from '../../../store';
-import type { LoggedHelper } from '../../../actions/helper';
-import type { PlatformSettings, SettingsEnterpriseEditionUpdateInput, SettingsPlatformWhitemarkUpdateInput, SettingsUpdateInput, ThemeInput } from '../../../utils/api-types';
+import {useAppDispatch} from '../../../utils/hooks';
+import {useHelper} from '../../../store';
+import type {LoggedHelper} from '../../../actions/helper';
+import type {
+  PlatformSettings,
+  SettingsEnterpriseEditionUpdateInput,
+  SettingsPlatformWhitemarkUpdateInput,
+  SettingsUpdateInput,
+  ThemeInput
+} from '../../../utils/api-types';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import EnterpriseEditionButton from '../common/entreprise_edition/EnterpriseEditionButton';
 
@@ -192,7 +198,7 @@ const Parameters = () => {
               </ListItem>
               <ListItem divider={true}>
                 <ListItemText primary={t('RabbitMQ')} />
-                <ItemBoolean status={null} variant="large" neutralLabel={settings?.postgre_version} />
+                <ItemBoolean status={null} variant="large" neutralLabel={settings?.rabbitmq_version}/>
               </ListItem>
             </List>
           </Paper>

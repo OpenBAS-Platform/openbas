@@ -1878,6 +1878,7 @@ export interface PlatformSettings {
   platform_version?: string;
   platform_whitemark?: string;
   postgre_version?: string;
+  rabbitmq_version?: string;
   xtm_opencti_enable?: boolean;
   xtm_opencti_url?: string;
 }
