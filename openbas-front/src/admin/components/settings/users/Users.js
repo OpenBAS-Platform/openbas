@@ -43,6 +43,13 @@ const useStyles = makeStyles(() => ({
     textOverflow: 'ellipsis',
     paddingRight: 10,
   },
+  itemAdmin: {
+    fontSize: 13,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    paddingLeft: 40,
+  },
 }));
 
 const inlineStyles = {
@@ -59,7 +66,7 @@ const inlineStyles = {
     width: '20%',
   },
   user_admin: {
-    width: '10%',
+    width: '12%',
   },
   user_tags: {
     width: '12%',
@@ -87,6 +94,7 @@ const Users = () => {
     { field: 'user_lastname', label: 'Lastname', isSortable: true },
     { field: 'user_organization', label: 'Organization', isSortable: true },
     { field: 'user_admin', label: 'Administrator', isSortable: true },
+    { field: 'user_tags', label: 'Tags', isSortable: true },
   ];
 
   const [users, setUsers] = useState([]);
@@ -141,7 +149,7 @@ const Users = () => {
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-              }
+            }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
@@ -169,7 +177,7 @@ const Users = () => {
                   <div className={classes.bodyItem} style={inlineStyles.user_organization}>
                     {organizationsMap[user.user_organization]?.organization_name}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.user_admin}>
+                  <div className={classes.itemAdmin} style={inlineStyles.user_admin}>
                     {user.user_admin ? (<CheckCircleOutlined fontSize="small" />) : ('-')}
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.user_tags}>
