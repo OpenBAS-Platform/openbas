@@ -109,8 +109,11 @@ steps:
       CIRCLECI_TOKEN:
         from_secret: circleci_token
     when:
+      branch:
+        - master
       event:
         exclude:
+          - pull_request
           - tag
     depends_on:
       - api-tests
