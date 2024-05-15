@@ -21,19 +21,19 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties;
+import org.springframework.boot.json.BasicJsonParser;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
+import org.springframework.http.*;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -56,6 +56,8 @@ public class PlatformSettingsApi extends RestBehavior {
     private AiConfig aiConfig;
 
     private CalderaExecutorConfig calderaExecutorConfig;
+
+    private String rabbitMQVersion = null;
 
     @Resource
     private OpenBASConfig openBASConfig;
@@ -157,6 +159,39 @@ public class PlatformSettingsApi extends RestBehavior {
         return new Setting(themeKey, value);
     }
 
+
+    /**
+     * Return the version of Rabbit MQ we're using
+     *
+     * @return the rabbit MQ version
+     */
+    private String getRabbitMQVersion() {
+        // If we already have the version, we don't need to get it again
+        if (rabbitMQVersion == null) {
+            RestTemplate restTemplate = new RestTemplate();
+            // Init the rabbit MQ management api overview url
+            String uri = this.openBASConfig.isRabbitmqSsl() ? "https://" : "http://"
+                    + this.openBASConfig.getRabbitmqHostname() + ":" + this.openBASConfig.getRabbitmqManagementPort()
+                    + "/api/overview";
+
+            // Init the headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            headers.setBasicAuth(this.openBASConfig.getRabbitmqUser(), this.openBASConfig.getRabbitmqPass());
+            HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+
+            // Make the call
+            ResponseEntity<?> result =
+                    restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
+
+            // Init the parser to get the rabbit_mq version
+            BasicJsonParser jsonParser = new BasicJsonParser();
+            rabbitMQVersion = (String) jsonParser.parseMap((String) result.getBody()).get("rabbitmq_version");
+        }
+
+        return rabbitMQVersion;
+    }
+
     @GetMapping("/api/settings")
     public PlatformSettings settings() {
         // Get setting from database
@@ -205,6 +240,7 @@ public class PlatformSettingsApi extends RestBehavior {
                 platformSettings.setPlatformVersion(openBASConfig.getVersion());
                 platformSettings.setPostgreVersion(settingRepository.getServerVersion());
                 platformSettings.setJavaVersion(Runtime.version().toString());
+                platformSettings.setRabbitMQVersion(getRabbitMQVersion());
             }
         }
 
