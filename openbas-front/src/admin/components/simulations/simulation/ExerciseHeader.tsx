@@ -49,19 +49,14 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
         if (!permissions.readOnlyBypassStatus) {
           return (
             <Button
-              style={{ marginRight: 10 }}
+              style={{ marginRight: 10, paddingTop: 5 }}
               startIcon={<PlayArrowOutlined />}
               variant="contained"
               size="small"
               color="success"
               onClick={() => setOpenChangeStatus('RUNNING')}
             >
-              <span
-                style={{ marginRight: 6, marginTop: 2 }}
-              >
-                {t('Start')}
-              </span>
-
+              {t('Start')}
             </Button>
           );
         }
