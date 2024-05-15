@@ -6,6 +6,7 @@ import io.openbas.database.model.User;
 import io.openbas.database.repository.OrganizationRepository;
 import io.openbas.database.repository.TokenRepository;
 import io.openbas.database.repository.UserRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.InputValidationException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.user.form.me.UpdateMePasswordInput;
@@ -70,13 +71,13 @@ public class MeApi extends RestBehavior {
   @Secured(ROLE_USER)
   @GetMapping("/api/me")
   public User me() {
-    return userRepository.findById(currentUser().getId()).orElseThrow();
+    return userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
   }
 
   @Secured(ROLE_USER)
   @PutMapping("/api/me/profile")
   public User updateProfile(@Valid @RequestBody UpdateProfileInput input) {
-    User user = userRepository.findById(currentUser().getId()).orElseThrow();
+    User user = userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
     user.setUpdateAttributes(input);
     user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
     User savedUser = userRepository.save(user);
@@ -87,7 +88,7 @@ public class MeApi extends RestBehavior {
   @Secured(ROLE_USER)
   @PutMapping("/api/me/information")
   public User updateInformation(@Valid @RequestBody UpdateUserInfoInput input) {
-    User user = userRepository.findById(currentUser().getId()).orElseThrow();
+    User user = userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
     user.setUpdateAttributes(input);
     User savedUser = userRepository.save(user);
     sessionManager.refreshUserSessions(savedUser);
@@ -97,7 +98,7 @@ public class MeApi extends RestBehavior {
   @Secured(ROLE_USER)
   @PutMapping("/api/me/password")
   public User updatePassword(@Valid @RequestBody UpdateMePasswordInput input) throws InputValidationException {
-    User user = userRepository.findById(currentUser().getId()).orElseThrow();
+    User user = userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
     if (userService.isUserPasswordValid(user, input.getCurrentPassword())) {
       user.setPassword(userService.encodeUserPassword(input.getPassword()));
       return userRepository.save(user);
@@ -110,8 +111,8 @@ public class MeApi extends RestBehavior {
   @PostMapping("/api/me/token/refresh")
   @Transactional(rollbackOn = Exception.class)
   public Token renewToken(@Valid @RequestBody RenewTokenInput input) throws InputValidationException {
-    User user = userRepository.findById(currentUser().getId()).orElseThrow();
-    Token token = tokenRepository.findById(input.getTokenId()).orElseThrow();
+    User user = userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
+    Token token = tokenRepository.findById(input.getTokenId()).orElseThrow(ElementNotFoundException::new);
     if (!user.equals(token.getUser())) {
       throw new AccessDeniedException("You are not allowed to renew this token");
     }

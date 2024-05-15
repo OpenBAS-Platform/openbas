@@ -5,6 +5,7 @@ import io.openbas.database.model.User;
 import io.openbas.database.repository.OrganizationRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.UserRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.InputValidationException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.user.form.login.LoginUserInput;
@@ -119,7 +120,7 @@ public class UserApi extends RestBehavior {
             if (!passwordValidation.equals(password)) {
                 throw new InputValidationException("password_validation", "Bad password validation");
             }
-            User changeUser = userRepository.findById(userId).orElseThrow();
+            User changeUser = userRepository.findById(userId).orElseThrow(ElementNotFoundException::new);
             changeUser.setPassword(userService.encodeUserPassword(password));
             User savedUser = userRepository.save(changeUser);
             resetTokenMap.remove(token);
@@ -154,7 +155,7 @@ public class UserApi extends RestBehavior {
     @PutMapping("/api/users/{userId}/password")
     public User changePassword(@PathVariable String userId,
                                @Valid @RequestBody ChangePasswordInput input) {
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(ElementNotFoundException::new);
         user.setPassword(userService.encodeUserPassword(input.getPassword()));
         return userRepository.save(user);
     }
@@ -169,7 +170,7 @@ public class UserApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/users/{userId}")
     public User updateUser(@PathVariable String userId, @Valid @RequestBody UpdateUserInput input) {
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(ElementNotFoundException::new);
         user.setUpdateAttributes(input);
         user.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));

@@ -16,6 +16,7 @@ import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.InjectResultDTO;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
 import io.openbas.service.AtomicTestingService;
@@ -180,8 +181,8 @@ public class InjectApi extends RestBehavior {
   @PostMapping("/api/injects/execution/reception/{injectId}")
   public Inject InjectExecutionReception(@PathVariable String injectId,
       @Valid @RequestBody InjectReceptionInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    InjectStatus injectStatus = inject.getStatus().orElseThrow();
+    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+    InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
     injectStatus.setName(ExecutionStatus.PENDING);
     injectStatus.setTrackingAckDate(Instant.now());
     injectStatus.setTrackingTotalCount(input.getTrackingTotalCount());
@@ -193,8 +194,8 @@ public class InjectApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/injects/execution/callback/{injectId}")
   public Inject InjectExecutionCallback(@PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    InjectStatus injectStatus = inject.getStatus().orElseThrow();
+    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+    InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
     ExecutionStatus executionStatus = ExecutionStatus.valueOf(input.getStatus());
     InjectStatusExecution execution = new InjectStatusExecution();
     Instant trackingEndDate = now();
@@ -237,7 +238,7 @@ public class InjectApi extends RestBehavior {
       @PathVariable String exerciseId,
       @PathVariable String injectId,
       @Valid @RequestBody InjectInput input) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     Inject inject = updateInject(injectId, input);
 
     // If Documents not yet linked directly to the exercise, attached it
@@ -279,13 +280,13 @@ public class InjectApi extends RestBehavior {
   @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Inject exerciseInject(@PathVariable String exerciseId, @PathVariable String injectId) {
-    return injectRepository.findById(injectId).orElseThrow();
+    return injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
   }
 
   @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}/teams")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Team> exerciseInjectTeams(@PathVariable String exerciseId, @PathVariable String injectId) {
-    return injectRepository.findById(injectId).orElseThrow().getTeams();
+    return injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new).getTeams();
   }
 
   @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}/communications")
@@ -301,8 +302,8 @@ public class InjectApi extends RestBehavior {
   @PostMapping("/api/exercises/{exerciseId}/injects")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-    InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow();
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+    InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new);
     // Set expectations
     ObjectNode finalContent = input.getContent();
     if (input.getContent() == null || input.getContent().get("expectations").isNull() || input.getContent().get("expectations").isEmpty()) {
@@ -329,7 +330,7 @@ public class InjectApi extends RestBehavior {
     input.setContent(finalContent);
     // Get common attributes
     Inject inject = input.toInject(injectorContract);
-    inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
+    inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
     inject.setExercise(exercise);
     // Set dependencies
     inject.setDependsOn(resolveOptionalRelation(input.getDependsOn(), injectRepository));
@@ -341,7 +342,7 @@ public class InjectApi extends RestBehavior {
         .map(i -> {
           InjectDocument injectDocument = new InjectDocument();
           injectDocument.setInject(inject);
-          injectDocument.setDocument(documentRepository.findById(i.getDocumentId()).orElseThrow());
+          injectDocument.setDocument(documentRepository.findById(i.getDocumentId()).orElseThrow(ElementNotFoundException::new));
           injectDocument.setAttached(i.isAttached());
           return injectDocument;
         }).toList();
@@ -354,9 +355,9 @@ public class InjectApi extends RestBehavior {
   public InjectStatus executeInject(@PathVariable String exerciseId,
       @Valid @RequestPart("input") DirectInjectInput input,
       @RequestPart("file") Optional<MultipartFile> file) {
-    Inject inject = input.toInject(injectorContractRepository.findById(input.getInjectorContract()).orElseThrow());
-    inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
-    inject.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
+    Inject inject = input.toInject(injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new));
+    inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
+    inject.setExercise(exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new));
     Iterable<User> users = userRepository.findAllById(input.getUserIds());
     List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
         .map(user -> this.executionContextService.executionContext(user, inject, "Direct execution")).toList();
@@ -388,7 +389,7 @@ public class InjectApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject updateInjectTrigger(@PathVariable String exerciseId, @PathVariable String injectId,
       @Valid @RequestBody InjectUpdateTriggerInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
+    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     inject.setDependsDuration(input.getDependsDuration());
     inject.setUpdatedAt(now());
     return injectRepository.save(inject);
@@ -406,7 +407,7 @@ public class InjectApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject updateInjectTeams(@PathVariable String exerciseId, @PathVariable String injectId,
       @Valid @RequestBody InjectTeamsInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
+    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     Iterable<Team> injectTeams = teamRepository.findAllById(input.getTeamIds());
     inject.setTeams(fromIterable(injectTeams));
     return injectRepository.save(inject);
@@ -418,7 +419,7 @@ public class InjectApi extends RestBehavior {
         // Keep only injects visible by the user
         .filter(inject -> inject.getDate().isPresent())
         .filter(inject -> inject.getExercise()
-            .isUserHasAccess(userRepository.findById(currentUser().getId()).orElseThrow()))
+            .isUserHasAccess(userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new)))
         // Order by near execution
         .sorted(Inject.executionComparator)
         // Keep only the expected size
@@ -435,7 +436,7 @@ public class InjectApi extends RestBehavior {
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody InjectInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
-    InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow();
+    InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new);
     // Set expectations
     ObjectNode finalContent = input.getContent();
     if (input.getContent() == null || input.getContent().get("expectations").isNull() || input.getContent().get("expectations").isEmpty()) {
@@ -462,7 +463,7 @@ public class InjectApi extends RestBehavior {
     input.setContent(finalContent);
     // Get common attributes
     Inject inject = input.toInject(injectorContract);
-    inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
+    inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
     inject.setScenario(scenario);
     // Set dependencies
     inject.setDependsOn(resolveOptionalRelation(input.getDependsOn(), this.injectRepository));
@@ -474,7 +475,7 @@ public class InjectApi extends RestBehavior {
         .map(i -> {
           InjectDocument injectDocument = new InjectDocument();
           injectDocument.setInject(inject);
-          injectDocument.setDocument(documentRepository.findById(i.getDocumentId()).orElseThrow());
+          injectDocument.setDocument(documentRepository.findById(i.getDocumentId()).orElseThrow(ElementNotFoundException::new));
           injectDocument.setAttached(i.isAttached());
           return injectDocument;
         }).toList();
@@ -498,7 +499,7 @@ public class InjectApi extends RestBehavior {
       @PathVariable @NotBlank final String injectId) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     assert scenarioId.equals(scenario.getId());
-    return injectRepository.findById(injectId).orElseThrow();
+    return injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
   }
 
   @Transactional(rollbackOn = Exception.class)
@@ -543,7 +544,7 @@ public class InjectApi extends RestBehavior {
   }
 
   private Inject updateInject(@NotBlank final String injectId, @NotNull InjectInput input) {
-    Inject inject = this.injectRepository.findById(injectId).orElseThrow();
+    Inject inject = this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     inject.setUpdateAttributes(input);
 
     // Set dependencies
@@ -592,7 +593,7 @@ public class InjectApi extends RestBehavior {
 
   private Inject updateInjectActivation(@NotBlank final String injectId,
       @NotNull final InjectUpdateActivationInput input) {
-    Inject inject = this.injectRepository.findById(injectId).orElseThrow();
+    Inject inject = this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     inject.setEnabled(input.isEnabled());
     inject.setUpdatedAt(now());
     return injectRepository.save(inject);

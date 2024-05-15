@@ -9,15 +9,15 @@ import io.openbas.database.repository.ObjectiveRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.database.specification.EvaluationSpecification;
 import io.openbas.database.specification.ObjectiveSpecification;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.objective.form.EvaluationInput;
 import io.openbas.rest.objective.form.ObjectiveInput;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.DatabaseHelper.resolveRelation;
@@ -62,7 +62,7 @@ public class ObjectiveApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Objective createObjective(@PathVariable String exerciseId,
       @Valid @RequestBody ObjectiveInput input) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     Objective objective = new Objective();
     objective.setUpdateAttributes(input);
     objective.setExercise(exercise);
@@ -74,7 +74,7 @@ public class ObjectiveApi extends RestBehavior {
   public Objective updateObjective(@PathVariable String exerciseId,
       @PathVariable String objectiveId,
       @Valid @RequestBody ObjectiveInput input) {
-    Objective objective = objectiveRepository.findById(objectiveId).orElseThrow();
+    Objective objective = objectiveRepository.findById(objectiveId).orElseThrow(ElementNotFoundException::new);
     objective.setUpdateAttributes(input);
     return objectiveRepository.save(objective);
   }
@@ -90,7 +90,7 @@ public class ObjectiveApi extends RestBehavior {
   @GetMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Evaluation getEvaluation(@PathVariable String exerciseId, @PathVariable String evaluationId) {
-    return evaluationRepository.findById(evaluationId).orElseThrow();
+    return evaluationRepository.findById(evaluationId).orElseThrow(ElementNotFoundException::new);
   }
 
   @GetMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations")
@@ -109,11 +109,11 @@ public class ObjectiveApi extends RestBehavior {
     evaluation.setUpdateAttributes(input);
     Objective objective = resolveRelation(objectiveId, objectiveRepository);
     evaluation.setObjective(objective);
-    evaluation.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
+    evaluation.setUser(userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
     Evaluation result = evaluationRepository.save(evaluation);
     objective.setUpdatedAt(now());
     objectiveRepository.save(objective);
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     exercise.setUpdatedAt(now());
     exerciseRepository.save(exercise);
     return result;
@@ -125,13 +125,13 @@ public class ObjectiveApi extends RestBehavior {
       @PathVariable String objectiveId,
       @PathVariable String evaluationId,
       @Valid @RequestBody EvaluationInput input) {
-    Evaluation evaluation = evaluationRepository.findById(evaluationId).orElseThrow();
+    Evaluation evaluation = evaluationRepository.findById(evaluationId).orElseThrow(ElementNotFoundException::new);
     evaluation.setUpdateAttributes(input);
     Evaluation result = evaluationRepository.save(evaluation);
-    Objective objective = objectiveRepository.findById(objectiveId).orElseThrow();
+    Objective objective = objectiveRepository.findById(objectiveId).orElseThrow(ElementNotFoundException::new);
     objective.setUpdatedAt(now());
     objectiveRepository.save(objective);
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     exercise.setUpdatedAt(now());
     exerciseRepository.save(exercise);
     return result;

@@ -7,6 +7,7 @@ import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.InjectorRepository;
 import io.openbas.database.specification.InjectorContractSpecification;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.injector_contract.form.InjectorContractAddInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
@@ -97,7 +98,7 @@ public class InjectorContractApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @GetMapping("/api/injector_contracts/{injectorContractId}")
     public InjectorContract injectorContract(@PathVariable String injectorContractId) {
-        return injectorContractRepository.findById(injectorContractId).orElseThrow();
+        return injectorContractRepository.findById(injectorContractId).orElseThrow(ElementNotFoundException::new);
     }
 
     @Secured(ROLE_ADMIN)
@@ -118,7 +119,7 @@ public class InjectorContractApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/injector_contracts/{injectorContractId}")
     public InjectorContract updateInjectorContract(@PathVariable String injectorContractId, @Valid @RequestBody InjectorContractUpdateInput input) {
-        InjectorContract injectorContract = injectorContractRepository.findById(injectorContractId).orElseThrow();
+        InjectorContract injectorContract = injectorContractRepository.findById(injectorContractId).orElseThrow(ElementNotFoundException::new);
         injectorContract.setUpdateAttributes(input);
         injectorContract.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         injectorContract.setUpdatedAt(Instant.now());
@@ -128,7 +129,7 @@ public class InjectorContractApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/injector_contracts/{injectorContractId}/mapping")
     public InjectorContract updateInjectorContractMapping(@PathVariable String injectorContractId, @Valid @RequestBody InjectorContractUpdateMappingInput input) {
-        InjectorContract injectorContract = injectorContractRepository.findById(injectorContractId).orElseThrow();
+        InjectorContract injectorContract = injectorContractRepository.findById(injectorContractId).orElseThrow(ElementNotFoundException::new);
         injectorContract.setAttackPatterns(fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         injectorContract.setUpdatedAt(Instant.now());
         return injectorContractRepository.save(injectorContract);

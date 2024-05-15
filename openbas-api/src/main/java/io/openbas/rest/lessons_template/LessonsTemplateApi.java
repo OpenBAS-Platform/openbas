@@ -8,6 +8,7 @@ import io.openbas.database.repository.LessonsTemplateQuestionRepository;
 import io.openbas.database.repository.LessonsTemplateRepository;
 import io.openbas.database.specification.LessonsTemplateCategorySpecification;
 import io.openbas.database.specification.LessonsTemplateQuestionSpecification;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.lessons_template.form.*;
 import jakarta.validation.Valid;
@@ -58,7 +59,7 @@ public class LessonsTemplateApi extends RestBehavior {
     @PutMapping("/api/lessons_templates/{lessonsTemplateId}")
     public LessonsTemplate updateLessonsTemplate(@PathVariable String lessonsTemplateId,
                                                  @Valid @RequestBody LessonsTemplateUpdateInput input) {
-        LessonsTemplate lessonsTemplate = lessonsTemplateRepository.findById(lessonsTemplateId).orElseThrow();
+        LessonsTemplate lessonsTemplate = lessonsTemplateRepository.findById(lessonsTemplateId).orElseThrow(ElementNotFoundException::new);
         lessonsTemplate.setUpdateAttributes(input);
         lessonsTemplate.setUpdated(now());
         return lessonsTemplateRepository.save(lessonsTemplate);
@@ -78,7 +79,7 @@ public class LessonsTemplateApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories")
     public LessonsTemplateCategory createLessonsTemplateCategory(@PathVariable String lessonsTemplateId, @Valid @RequestBody LessonsTemplateCategoryCreateInput input) {
-        LessonsTemplate lessonsTemplate = lessonsTemplateRepository.findById(lessonsTemplateId).orElseThrow();
+        LessonsTemplate lessonsTemplate = lessonsTemplateRepository.findById(lessonsTemplateId).orElseThrow(ElementNotFoundException::new);
         LessonsTemplateCategory lessonsTemplateCategory = new LessonsTemplateCategory();
         lessonsTemplateCategory.setUpdateAttributes(input);
         lessonsTemplateCategory.setTemplate(lessonsTemplate);
@@ -88,7 +89,7 @@ public class LessonsTemplateApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories/{lessonsTemplateCategoryId}")
     public LessonsTemplateCategory updateLessonsTemplateCategory(@PathVariable String lessonsTemplateCategoryId, @Valid @RequestBody LessonsTemplateCategoryUpdateInput input) {
-        LessonsTemplateCategory lessonsTemplateCategory = lessonsTemplateCategoryRepository.findById(lessonsTemplateCategoryId).orElseThrow();
+        LessonsTemplateCategory lessonsTemplateCategory = lessonsTemplateCategoryRepository.findById(lessonsTemplateCategoryId).orElseThrow(ElementNotFoundException::new);
         lessonsTemplateCategory.setUpdateAttributes(input);
         lessonsTemplateCategory.setUpdated(now());
         return lessonsTemplateCategoryRepository.save(lessonsTemplateCategory);
@@ -114,7 +115,7 @@ public class LessonsTemplateApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories/{lessonsTemplateCategoryId}/lessons_template_questions")
     public LessonsTemplateQuestion createLessonsTemplateQuestion(@PathVariable String lessonsTemplateCategoryId, @Valid @RequestBody LessonsTemplateQuestionCreateInput input) {
-        LessonsTemplateCategory lessonsTemplateCategory = lessonsTemplateCategoryRepository.findById(lessonsTemplateCategoryId).orElseThrow();
+        LessonsTemplateCategory lessonsTemplateCategory = lessonsTemplateCategoryRepository.findById(lessonsTemplateCategoryId).orElseThrow(ElementNotFoundException::new);
         LessonsTemplateQuestion lessonsTemplateQuestion = new LessonsTemplateQuestion();
         lessonsTemplateQuestion.setUpdateAttributes(input);
         lessonsTemplateQuestion.setCategory(lessonsTemplateCategory);
@@ -124,7 +125,7 @@ public class LessonsTemplateApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories/{lessonsTemplateCategoryId}/lessons_template_questions/{lessonsTemplateQuestionId}")
     public LessonsTemplateQuestion updateLessonsTemplateQuestion(@PathVariable String lessonsTemplateQuestionId, @Valid @RequestBody LessonsTemplateQuestionUpdateInput input) {
-        LessonsTemplateQuestion lessonsTemplateQuestion = lessonsTemplateQuestionRepository.findById(lessonsTemplateQuestionId).orElseThrow();
+        LessonsTemplateQuestion lessonsTemplateQuestion = lessonsTemplateQuestionRepository.findById(lessonsTemplateQuestionId).orElseThrow(ElementNotFoundException::new);
         lessonsTemplateQuestion.setUpdateAttributes(input);
         lessonsTemplateQuestion.setUpdated(now());
         return lessonsTemplateQuestionRepository.save(lessonsTemplateQuestion);
