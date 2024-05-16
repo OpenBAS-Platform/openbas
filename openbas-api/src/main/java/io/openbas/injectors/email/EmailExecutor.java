@@ -49,7 +49,7 @@ public class EmailExecutor extends Injector {
 
   private void sendSingle(Execution execution, List<ExecutionContext> users, String from, List<String> replyTos, String inReplyTo,
       boolean mustBeEncrypted, String subject, String message, List<DataAttachment> attachments) {
-    users.stream().parallel().forEach(user -> {
+    users.forEach(user -> {
       try {
         emailService.sendEmail(execution, user, from, replyTos, inReplyTo, mustBeEncrypted, subject, message, attachments);
       } catch (Exception e) {

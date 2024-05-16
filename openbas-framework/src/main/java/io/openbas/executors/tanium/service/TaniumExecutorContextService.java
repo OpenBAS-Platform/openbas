@@ -42,9 +42,11 @@ public class TaniumExecutorContextService {
                 this.taniumExecutorClient.executeAction(asset.getExternalReference(), this.taniumExecutorConfig.getWindowsPackageId(), Base64.getEncoder().encodeToString(command.getBytes()));
             }
             case Endpoint.PLATFORM_TYPE.Linux -> {
-                this.taniumExecutorClient.executeAction(asset.getExternalReference(), this.taniumExecutorConfig.getLinuxPackageId(), injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Linux.name()));
+                String command = injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.Linux.name()).replace("\"#{location}\"", "$PWD.Path");
+                this.taniumExecutorClient.executeAction(asset.getExternalReference(), this.taniumExecutorConfig.getLinuxPackageId(), Base64.getEncoder().encodeToString(command.getBytes()));
             }
             case Endpoint.PLATFORM_TYPE.MacOS -> {
+                String command = injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.MacOS.name()).replace("\"#{location}\"", "$PWD.Path");
                 this.taniumExecutorClient.executeAction(asset.getExternalReference(), this.taniumExecutorConfig.getMacOsPackageId(), injector.getExecutorCommands().get(Endpoint.PLATFORM_TYPE.MacOS.name()));
             }
             default -> throw new RuntimeException("Unsupported platform: " + platform);
