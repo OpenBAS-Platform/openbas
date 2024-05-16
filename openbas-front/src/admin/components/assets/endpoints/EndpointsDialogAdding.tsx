@@ -16,7 +16,7 @@ import {
   Switch,
   Tooltip,
 } from '@mui/material';
-import { ComputerOutlined } from '@mui/icons-material';
+import { DevicesOtherOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
 import Transition from '../../../../components/common/Transition';
@@ -163,7 +163,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
                     onClick={() => addEndpoint(endpoint.asset_id)}
                   >
                     <ListItemIcon>
-                      <ComputerOutlined color="primary" />
+                      <DevicesOtherOutlined color="primary" />
                     </ListItemIcon>
                     <ListItemText
                       primary={endpoint.asset_name}
