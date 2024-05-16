@@ -121,7 +121,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
           handleCloseCreate={handleCloseCreate}
         />
       )}
-      {sortedArticles.length > 0 && (
+      {fullArticles.length > 0 && (
         <ChannelsFilter
           onAddChannel={handleAddChannel}
           onRemoveChannel={handleRemoveChannel}
