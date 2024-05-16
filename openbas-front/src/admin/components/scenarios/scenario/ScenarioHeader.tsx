@@ -131,7 +131,7 @@ const ScenarioHeader = ({
           </Button>
         ) : (
           <Button
-            style={{ marginRight: 10, paddingTop: 5 }}
+           style={{ marginRight: 10, lineHeight: 'initial' }}
             startIcon={<PlayArrowOutlined />}
             variant="contained"
             color="primary"
