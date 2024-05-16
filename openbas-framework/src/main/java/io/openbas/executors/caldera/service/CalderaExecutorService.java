@@ -138,6 +138,9 @@ public class CalderaExecutorService implements Runnable {
         Endpoint matchingExistingEndpoint = existingList.getFirst();
         matchingExistingEndpoint.setLastSeen(external.getLastSeen());
         matchingExistingEndpoint.setExternalReference(external.getExternalReference());
+        matchingExistingEndpoint.setName(external.getName());
+        matchingExistingEndpoint.setIps(external.getIps());
+        matchingExistingEndpoint.setHostname(external.getHostname());
         matchingExistingEndpoint.setExecutor(this.executor);
         if ((now().toEpochMilli() - matchingExistingEndpoint.getClearedAt().toEpochMilli()) > CLEAR_TTL) {
             try {

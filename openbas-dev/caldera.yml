@@ -1,3 +1,40 @@
+users:
+  red:
+    red: ChangeMe                                                                     # Change this
+  blue:
+    blue: ChangeMe                                                                    # Change this
+api_key_red: ChangeMe                                                                 # Change this
+api_key_blue: ChangeMe                                                                # Change this
+api_key: ChangeMe                                                                     # Change this
+crypt_salt: ChangeMe                                                                  # Change this
+encryption_key: ChangeMe                                                              # Change this
+app.contact.http: http://localhost:8888                                               # Change this
+app.contact.tcp: 0.0.0.0:7010
+app.contact.udp: 0.0.0.0:7011
+app.contact.websocket: 0.0.0.0:7012
+app.contact.dns.domain: localhost
+app.contact.dns.socket: 0.0.0.0:53
+app.contact.gist: API_KEY                                                             # Optional
+app.contact.html: /weather                                                            # Optional
+app.contact.slack.api_key: SLACK_TOKEN                                                # Optional
+app.contact.slack.bot_id: SLACK_BOT_ID                                                # Optional
+app.contact.slack.channel_id: SLACK_CHANNEL_ID                                        # Optional
+app.contact.tunnel.ssh.host_key_file: REPLACE_WITH_KEY_FILE_PATH                      # Optional
+app.contact.tunnel.ssh.host_key_passphrase: REPLACE_WITH_KEY_FILE_PASSPHRASE          # Optional
+app.contact.tunnel.ssh.socket: 0.0.0.0:8022
+app.contact.tunnel.ssh.user_name: sandcat
+app.contact.tunnel.ssh.user_password: ChangeMe                                        # Change this
+objects.planners.default: atomic
+requirements:
+  go:
+    command: go version
+    type: installed_program
+    version: 1.11
+  python:
+    attr: version
+    module: sys
+    type: python_module
+    version: 3.8.0
 host: 0.0.0.0
 port: 8888
 ability_refresh: 60
@@ -13,41 +50,3 @@ plugins:
   - sandcat
   - stockpile
   - training
-users:
-  red:
-    red: ChangeMe                                                                     # Change this
-  blue:
-    blue: ChangeMe                                                                    # Change this
-api_key_red: ChangeMe                                                                 # Change this
-api_key_blue: ChangeMe                                                                # Change this
-api_key: ChangeMe                                                                     # Change this
-crypt_salt: ChangeMe                                                                  # Change this
-encryption_key: ChangeMe                                                              # Change this
-app.contact.http: http://localhost:8888                                               
-app.contact.tcp: 0.0.0.0:7010
-app.contact.udp: 0.0.0.0:7011
-app.contact.websocket: 0.0.0.0:7012
-app.contact.dns.domain: localhost                                                 
-app.contact.dns.socket: 0.0.0.0:53
-app.contact.gist: API_KEY                                                             # Optional
-app.contact.html: /weather                                                            # Optional
-app.contact.slack.api_key: SLACK_TOKEN                                                # Optional
-app.contact.slack.bot_id: SLACK_BOT_ID                                                # Optional
-app.contact.slack.channel_id: SLACK_CHANNEL_ID                                        # Optional
-app.contact.tcp: 0.0.0.0:7010
-app.contact.tunnel.ssh.host_key_file: REPLACE_WITH_KEY_FILE_PATH                      # Optional
-app.contact.tunnel.ssh.host_key_passphrase: REPLACE_WITH_KEY_FILE_PASSPHRASE          # Optional
-app.contact.tunnel.ssh.socket: 0.0.0.0:8022
-app.contact.tunnel.ssh.user_name: sandcat                                         
-app.contact.tunnel.ssh.user_password: ChangeMe                                        # Change this
-objects.planners.default: atomic
-requirements:
-  go:
-    command: go version
-    type: installed_program
-    version: 1.11
-  python:
-    attr: version
-    module: sys
-    type: python_module
-    version: 3.8.0

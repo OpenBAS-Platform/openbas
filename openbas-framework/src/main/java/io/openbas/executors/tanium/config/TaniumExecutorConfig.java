@@ -28,6 +28,26 @@ public class TaniumExecutorConfig {
     @NotBlank
     private String apiKey;
 
+    @Getter
+    @NotBlank
+    private Integer computerGroupId = 1;
+
+    @Getter
+    @NotBlank
+    private Integer actionGroupId = 4;
+
+    @Getter
+    @NotBlank
+    private Integer windowsPackageId;
+
+    @Getter
+    @NotBlank
+    private Integer linuxPackageId;
+
+    @Getter
+    @NotBlank
+    private Integer macOsPackageId;
+
     public String getGatewayUrl() {
         return url + GATEWAY_URI;
     }

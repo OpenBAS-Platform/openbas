@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -87,6 +88,7 @@ public class InjectorService {
             injector.setCategory(category);
             injector.setExecutorCommands(executorCommands);
             injector.setExecutorClearCommands(executorClearCommands);
+            injector.setUpdatedAt(Instant.now());
             List<String> existing = new ArrayList<>();
             List<InjectorContract> toUpdates = new ArrayList<>();
             List<String> toDeletes = new ArrayList<>();

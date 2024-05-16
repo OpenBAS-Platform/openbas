@@ -4,8 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
-import io.openbas.executors.tanium.model.Endpoint;
-import jakarta.validation.constraints.NotBlank;
+import io.openbas.executors.tanium.model.DataEndpoints;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.client5.http.ClientProtocolException;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -31,18 +29,20 @@ public class TaniumExecutorClient {
     private final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // -- AGENTS --
+    // -- ENDPOINTS --
 
-    public List<Endpoint> endpoints() throws ClientProtocolException, JsonProcessingException {
+    public DataEndpoints endpoints() throws ClientProtocolException, JsonProcessingException {
         String query = "{\n" +
-                "\tendpoints(filter: {memberOf: {name: \"All Windows\"}}) {\n" +
+                "\tendpoints(filter: {memberOf: {id: " + this.config.getComputerGroupId() + "}}) {\n" +
                 "    edges {\n" +
                 "      node {\n" +
+                "        id\n" +
                 "        computerID\n" +
                 "        name\n" +
                 "        ipAddresses\n" +
                 "        macAddresses\n" +
                 "        eidLastSeen\n" +
+                "        os { platform }\n" +
                 "      }\n" +
                 "    }\n" +
                 "  }\n" +
@@ -52,6 +52,25 @@ public class TaniumExecutorClient {
         String jsonResponse = this.post(body);
         return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
         });
+    }
+
+    public void executeAction(String endpointId, Integer packageID, String command) {
+        try {
+            String query = "mutation {\n" +
+                    "\tactionCreate(\n" +
+                    "  input: { name: \"OpenBAS Action\",  package: { id: " + packageID + ", params: [\"" + command.replace("\\", "\\\\").replace("\"", "\\\"") + "\"] }, targets: { actionGroup: { id: " + this.config.getActionGroupId() + " }, endpoints: [" + endpointId + "] } }\n" +
+                    ") {\n " +
+                    "    action {\n" +
+                    "      id\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "}";
+            Map<String, Object> body = new HashMap<>();
+            body.put("query", query);
+            this.post(body);
+        } catch (ClientProtocolException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // -- PRIVATE --
