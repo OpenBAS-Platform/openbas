@@ -49,7 +49,7 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
         if (!permissions.readOnlyBypassStatus) {
           return (
             <Button
-              style={{ marginRight: 10, paddingTop: 5 }}
+              style={{ marginRight: 10, lineHeight: 'initial' }}
               startIcon={<PlayArrowOutlined />}
               variant="contained"
               size="small"
