@@ -7,6 +7,7 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -38,7 +39,7 @@ public class CalderaInjector {
                     executorClearCommands
             );
         } catch (Exception e) {
-            log.log(Level.SEVERE, "Error creating caldera injector");
+            log.log(Level.SEVERE, "Error creating Caldera injector (" + e.getMessage() + ")" + "\n" + Arrays.toString(e.getStackTrace()));
         }
     }
 }
