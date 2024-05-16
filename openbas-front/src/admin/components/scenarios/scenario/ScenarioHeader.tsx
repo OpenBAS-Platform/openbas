@@ -15,28 +15,12 @@ import { parseCron, ParsedCron } from '../../../../utils/Cron';
 import ScenarioRecurringFormDialog from './ScenarioRecurringFormDialog';
 import { truncate } from '../../../../utils/String';
 import type { Theme } from '../../../../components/Theme';
+import ScenarioStatus from './ScenarioStatus';
 
 const useStyles = makeStyles(() => ({
   title: {
     float: 'left',
     marginRight: 10,
-  },
-  statusScheduled: {
-    float: 'left',
-    margin: '4px 0 0 5px',
-    width: 20,
-    height: 20,
-    borderRadius: '50%',
-    boxShadow: '0px 0px 5px 2px #4caf50',
-    animation: 'pulse-green 1s linear infinite alternate',
-  },
-  statusNotScheduled: {
-    float: 'left',
-    margin: '4px 0 0 5px',
-    width: 20,
-    height: 20,
-    borderRadius: '50%',
-    boxShadow: '0px 0px 5px 2px #f44336',
   },
   actions: {
     margin: '-6px 0 0 0',
@@ -115,7 +99,7 @@ const ScenarioHeader = ({
       </Tooltip>
       <div style={{ float: 'left', margin: '4px 10px 0 8px', color: theme.palette.text?.disabled, borderLeft: `1px solid ${theme.palette.text?.disabled}`, height: 20 }} />
       <Tooltip title={t(scenario.scenario_recurrence ? 'Scheduled' : 'Not scheduled')}>
-        <div className={scenario.scenario_recurrence ? classes.statusScheduled : classes.statusNotScheduled} />
+        <ScenarioStatus scenario={scenario}/>
       </Tooltip>
       <div className={classes.actions}>
         {scenario.scenario_recurrence && !ended ? (
