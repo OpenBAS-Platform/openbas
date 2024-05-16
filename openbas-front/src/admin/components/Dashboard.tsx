@@ -1,7 +1,7 @@
 import { Grid, Paper, Theme, Typography } from '@mui/material';
 import React from 'react';
 import * as R from 'ramda';
-import { ComputerOutlined, Kayaking, MovieFilterOutlined, PersonOutlined } from '@mui/icons-material';
+import { ComputerOutlined, HubOutlined, MovieFilterOutlined, PersonOutlined } from '@mui/icons-material';
 import { makeStyles, useTheme } from '@mui/styles';
 import Chart from 'react-apexcharts';
 import type { ApexOptions } from 'apexcharts';
@@ -103,16 +103,28 @@ const Dashboard = () => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={3}>
-        <PaperMetric title={t('Scenarios')} icon={<MovieFilterOutlined />} number={statistics?.scenarios_count?.progression_count} />
+        <PaperMetric title={t('Scenarios')} icon={<MovieFilterOutlined />}
+          number={statistics?.scenarios_count?.global_count}
+          progression={statistics?.scenarios_count?.progression_count}
+        />
       </Grid>
       <Grid item xs={3}>
-        <PaperMetric title={t('Simulations')} icon={<Kayaking />} number={statistics?.exercises_count?.progression_count} />
+        <PaperMetric title={t('Simulations')} icon={<HubOutlined />}
+          number={statistics?.exercises_count?.global_count}
+          progression={statistics?.exercises_count?.progression_count}
+        />
       </Grid>
       <Grid item xs={3}>
-        <PaperMetric title={t('Players')} icon={<PersonOutlined />} number={statistics?.users_count?.progression_count} />
+        <PaperMetric title={t('Players')} icon={<PersonOutlined />}
+          number={statistics?.users_count?.global_count}
+          progression={statistics?.users_count?.progression_count}
+        />
       </Grid>
       <Grid item xs={3}>
-        <PaperMetric title={t('Assets')} icon={<ComputerOutlined />} number={statistics?.assets_count?.progression_count} />
+        <PaperMetric title={t('Assets')} icon={<ComputerOutlined />}
+          number={statistics?.assets_count?.global_count}
+          progression={statistics?.assets_count?.progression_count}
+        />
       </Grid>
       <Grid item xs={6}>
         <Typography variant="h4">{t('Performance Overview')}</Typography>

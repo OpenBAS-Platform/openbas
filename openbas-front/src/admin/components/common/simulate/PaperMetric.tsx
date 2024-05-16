@@ -29,12 +29,14 @@ interface Props {
   title: string;
   icon: React.ReactElement;
   number?: number;
+  progression?: number;
 }
 
 const PaperMetric: FunctionComponent<Props> = ({
   title,
   icon,
   number,
+  progression,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -48,7 +50,7 @@ const PaperMetric: FunctionComponent<Props> = ({
           {number ?? '-'}
         </div>
         <ItemNumberDifference
-          difference={0}
+          difference={progression ?? '-'}
           description={t('24 hours')}
         />
       </div>
