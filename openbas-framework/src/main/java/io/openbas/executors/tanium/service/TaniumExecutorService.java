@@ -24,10 +24,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 
 import static java.time.Instant.now;
@@ -90,7 +87,12 @@ public class TaniumExecutorService implements Runnable {
             endpoints.forEach(endpoint -> {
                 List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
                 if (existingEndpoints.isEmpty()) {
-                    this.endpointService.createEndpoint(endpoint);
+                    Optional<Endpoint> endpointByExternalReference = endpointService.findByExternalReference(endpoint.getExternalReference());
+                    if( endpointByExternalReference.isPresent() ) {
+                        this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
+                    } else {
+                        this.endpointService.createEndpoint(endpoint);
+                    }
                 } else {
                     this.updateEndpoint(endpoint, existingEndpoints);
                 }

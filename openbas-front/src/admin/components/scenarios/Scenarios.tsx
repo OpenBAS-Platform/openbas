@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import type { TagsHelper, UsersHelper } from '../../../actions/helper';
+import type { TagHelper, UserHelper } from '../../../actions/helper';
 import { fetchScenarioStatistic, searchScenarios } from '../../../actions/scenarios/scenario-actions';
 import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import ScenarioCreation from './ScenarioCreation';
@@ -97,7 +97,7 @@ const Scenarios = () => {
   const classes = useStyles();
   const { t, nsdt } = useFormatter();
   // Fetching data
-  const { userAdmin } = useHelper((helper: TagsHelper & UsersHelper) => ({
+  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
 

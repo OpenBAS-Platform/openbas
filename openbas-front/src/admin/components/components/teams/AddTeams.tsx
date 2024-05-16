@@ -11,7 +11,7 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { OrganizationsHelper } from '../../../../actions/helper';
+import type { OrganizationHelper } from '../../../../actions/helper';
 import { fetchTeams } from '../../../../actions/teams/team-actions';
 import SearchFilter from '../../../../components/SearchFilter';
 import CreateTeam from './CreateTeam';
@@ -57,7 +57,7 @@ const AddTeams: React.FC<Props> = ({ addedTeamIds, onAddTeams }) => {
   const { teamsMap, organizationsMap }: {
     organizationsMap: Record<string, Organization>,
     teamsMap: Record<string, TeamStore>
-  } = useHelper((helper: TeamsHelper & OrganizationsHelper) => ({
+  } = useHelper((helper: TeamsHelper & OrganizationHelper) => ({
     teamsMap: helper.getTeamsMap(),
     organizationsMap: helper.getOrganizationsMap(),
   }));

@@ -16,7 +16,7 @@ import { addDryrun } from '../../../../../actions/Dryrun';
 import { useFormatter } from '../../../../../components/i18n';
 import Transition from '../../../../../components/common/Transition';
 import { useHelper } from '../../../../../store';
-import type { UsersHelper } from '../../../../../actions/helper';
+import type { UserHelper } from '../../../../../actions/helper';
 import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 
@@ -43,7 +43,7 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
   const dispatch = useAppDispatch();
 
   const { me, exercise, teams } = useHelper(
-    (helper: UsersHelper & ExercisesHelper & TeamsHelper) => {
+    (helper: UserHelper & ExercisesHelper & TeamsHelper) => {
       return {
         me: helper.getMe(),
         exercise: helper.getExercise(exerciseId),

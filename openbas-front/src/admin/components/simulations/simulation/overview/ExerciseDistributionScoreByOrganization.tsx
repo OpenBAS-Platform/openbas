@@ -9,7 +9,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
-import type { OrganizationsHelper, UsersHelper } from '../../../../../actions/helper';
+import type { OrganizationHelper, UserHelper } from '../../../../../actions/helper';
 import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 import { computeOrganizationsColors } from './DistributionUtils';
 import type { Organization } from '../../../../../utils/api-types';
@@ -26,7 +26,7 @@ const ExerciseDistributionScoreByOrganization: FunctionComponent<Props> = ({
   const theme: Theme = useTheme();
 
   // Fetching data
-  const { injectExpectations, organizations, organizationsMap, usersMap } = useHelper((helper: InjectHelper & OrganizationsHelper & UsersHelper) => ({
+  const { injectExpectations, organizations, organizationsMap, usersMap } = useHelper((helper: InjectHelper & OrganizationHelper & UserHelper) => ({
     injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
     organizationsMap: helper.getOrganizationsMap(),
     usersMap: helper.getUsersMap(),

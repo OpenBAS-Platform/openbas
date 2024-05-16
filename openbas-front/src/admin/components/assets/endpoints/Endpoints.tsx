@@ -3,12 +3,12 @@ import { makeStyles } from '@mui/styles';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import { useSearchParams } from 'react-router-dom';
+import { useAppDispatch } from '../../../../utils/hooks';
 import EndpointCreation from './EndpointCreation';
 import EndpointPopover from './EndpointPopover';
 import { useHelper } from '../../../../store';
 import { useFormatter } from '../../../../components/i18n';
-import type { TagsHelper, UsersHelper } from '../../../../actions/helper';
-import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
+import type { UserHelper } from '../../../../actions/helper';
 import type { EndpointStore } from './Endpoint';
 import ItemTags from '../../../../components/ItemTags';
 import AssetStatus from '../AssetStatus';
@@ -19,6 +19,9 @@ import { initSorting } from '../../../../components/common/pagination/Page';
 import type { SearchPaginationInput } from '../../../../utils/api-types';
 import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import PlatformIcon from '../../../../components/PlatformIcon';
+import type { ExecutorHelper } from '../../../../actions/executors/executor-helper';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { fetchExecutors } from '../../../../actions/Executor';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -45,13 +48,15 @@ const useStyles = makeStyles(() => ({
 
 const inlineStyles: Record<string, CSSProperties> = {
   asset_name: {
-    width: '25%',
-  },
-  endpoint_hostname: {
-    width: '25%',
+    width: '30%',
   },
   endpoint_platform: {
     width: '15%',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  endpoint_executor: {
+    width: '20%',
     display: 'flex',
     alignItems: 'center',
   },
@@ -67,6 +72,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 const Endpoints = () => {
   // Standard hooks
   const classes = useStyles();
+  const dispatch = useAppDispatch();
   const { t } = useFormatter();
 
   // Query param
@@ -75,15 +81,19 @@ const Endpoints = () => {
   const [searchId] = searchParams.getAll('id');
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: EndpointsHelper & UsersHelper & TagsHelper) => ({
+  const { userAdmin, executorsMap } = useHelper((helper: ExecutorHelper & UserHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
+    executorsMap: helper.getExecutorsMap(),
   }));
+  useDataLoader(() => {
+    dispatch(fetchExecutors());
+  });
 
   // Headers
   const headers = [
     { field: 'asset_name', label: 'Name', isSortable: true },
-    { field: 'endpoint_hostname', label: 'Hostname', isSortable: true },
     { field: 'endpoint_platform', label: 'Platform', isSortable: true },
+    { field: 'endpoint_executor', label: 'Executor', isSortable: true },
     { field: 'asset_tags', label: 'Tags', isSortable: true },
     { field: 'asset_status', label: 'Status', isSortable: false },
   ];
@@ -149,46 +159,58 @@ const Endpoints = () => {
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {endpoints.map((endpoint) => (
-          <ListItem
-            key={endpoint.asset_id}
-            classes={{ root: classes.item }}
-            divider={true}
-          >
-            <ListItemIcon>
-              <DevicesOtherOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <div className={classes.bodyItems}>
-                  <div className={classes.bodyItem} style={inlineStyles.asset_name}>
-                    {endpoint.asset_name}
+        {endpoints.map((endpoint: EndpointStore) => {
+          const executor = executorsMap[endpoint.asset_executor ?? 'Unknown'];
+          return (
+            <ListItem
+              key={endpoint.asset_id}
+              classes={{ root: classes.item }}
+              divider={true}
+            >
+              <ListItemIcon>
+                <DevicesOtherOutlined color="primary"/>
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <div className={classes.bodyItems}>
+                    <div className={classes.bodyItem} style={inlineStyles.asset_name}>
+                      {endpoint.asset_name}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
+                      <PlatformIcon platform={endpoint.endpoint_platform} width={20}
+                        marginRight={10}
+                      /> {endpoint.endpoint_platform}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.endpoint_executor}>
+                      {executor && (
+                      <img
+                        src={`/api/images/executors/${executor.executor_type}`}
+                        alt={executor.executor_type}
+                        style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
+                      />
+                      )}
+                      {executor?.executor_name ?? t('Unknown')}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.asset_tags}>
+                      <ItemTags variant="list" tags={endpoint.asset_tags}/>
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.asset_status}>
+                      <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'}/>
+                    </div>
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.endpoint_hostname}>
-                    {endpoint.endpoint_hostname}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
-                    <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} /> {endpoint.endpoint_platform}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.asset_tags}>
-                    <ItemTags variant="list" tags={endpoint.asset_tags} />
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.asset_status}>
-                    <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'} />
-                  </div>
-                </div>
-              }
-            />
-            <ListItemSecondaryAction>
-              <EndpointPopover
-                endpoint={{ ...endpoint, type: 'static' }}
-                onUpdate={(result) => setEndpoints(endpoints.map((e) => (e.asset_id !== result.asset_id ? e : result)))}
-                onDelete={(result) => setEndpoints(endpoints.filter((e) => (e.asset_id !== result)))}
-                openEditOnInit={endpoint.asset_id === searchId}
+                    }
               />
-            </ListItemSecondaryAction>
-          </ListItem>
-        ))}
+              <ListItemSecondaryAction>
+                <EndpointPopover
+                  endpoint={{ ...endpoint, type: 'static' }}
+                  onUpdate={(result) => setEndpoints(endpoints.map((e) => (e.asset_id !== result.asset_id ? e : result)))}
+                  onDelete={(result) => setEndpoints(endpoints.filter((e) => (e.asset_id !== result)))}
+                  openEditOnInit={endpoint.asset_id === searchId}
+                />
+              </ListItemSecondaryAction>
+            </ListItem>
+          );
+        })}
       </List>
       {userAdmin && <EndpointCreation onCreate={(result) => setEndpoints([result, ...endpoints])} />}
     </>

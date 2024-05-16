@@ -12,7 +12,7 @@ import TagsFilter from '../common/filters/TagsFilter';
 import { exportData } from '../../../utils/Environment';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { useHelper } from '../../../store';
-import type { TagsHelper } from '../../../actions/helper';
+import type { TagHelper } from '../../../actions/helper';
 import { useFormatter } from '../../../components/i18n';
 import type { ExerciseSimpleStore, ExerciseStore } from '../../../actions/exercises/Exercise';
 import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
@@ -136,7 +136,7 @@ const ExerciseList: FunctionComponent<Props> = ({
   const { t, nsdt } = useFormatter();
 
   // Fetching data
-  const { tagsMap } = useHelper((helper: TagsHelper) => ({
+  const { tagsMap } = useHelper((helper: TagHelper) => ({
     tagsMap: helper.getTagsMap(),
   }));
   const searchColumns = ['name'];

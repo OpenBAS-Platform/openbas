@@ -42,11 +42,7 @@ public class TaniumExecutorConfig {
 
     @Getter
     @NotBlank
-    private Integer linuxPackageId;
-
-    @Getter
-    @NotBlank
-    private Integer macOsPackageId;
+    private Integer unixPackageId;
 
     public String getGatewayUrl() {
         return url + GATEWAY_URI;

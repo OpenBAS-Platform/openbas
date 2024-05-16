@@ -10,7 +10,7 @@ import Transition from '../../../../components/common/Transition';
 import type { UpdatePlayerInput } from '../../../../utils/api-types';
 import { countryOption, Option, organizationOption, tagOptions } from '../../../../utils/Option';
 import { useHelper } from '../../../../store';
-import type { OrganizationsHelper, TagsHelper, UsersHelper } from '../../../../actions/helper';
+import type { OrganizationHelper, TagHelper, UserHelper } from '../../../../actions/helper';
 import type { PlayerInputForm, UserStore } from './Player';
 import { TeamContext } from '../../common/Context';
 
@@ -33,7 +33,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   const dispatch = useAppDispatch();
   const { userAdmin, organizationsMap, tagsMap } = useHelper(
     (
-      helper: UsersHelper & OrganizationsHelper & TagsHelper,
+      helper: UserHelper & OrganizationHelper & TagHelper,
     ) => {
       return {
         userAdmin: helper.getMe()?.user_admin,

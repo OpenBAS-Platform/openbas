@@ -7,7 +7,7 @@ import type { Organization, Team } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { OrganizationsHelper, UsersHelper } from '../../../../actions/helper';
+import type { OrganizationHelper, UserHelper } from '../../../../actions/helper';
 import type { UserStore } from '../../teams/players/Player';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchPlayers } from '../../../../actions/User';
@@ -61,7 +61,7 @@ const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
   const { usersMap, organizationsMap }: {
     organizationsMap: Record<string, Organization>,
     usersMap: Record<string, UserStore>
-  } = useHelper((helper: UsersHelper & OrganizationsHelper) => ({
+  } = useHelper((helper: UserHelper & OrganizationHelper) => ({
     usersMap: helper.getUsersMap(),
     organizationsMap: helper.getOrganizationsMap(),
   }));

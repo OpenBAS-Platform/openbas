@@ -1,17 +1,17 @@
 import type { Challenge, Exercise, Organization, PlatformSettings, Tag, User } from '../utils/api-types';
 import type { ScenarioStore } from './scenarios/Scenario';
 
-export interface UsersHelper {
+export interface UserHelper {
   getMe: () => User;
   getUsersMap: () => Record<string, User>;
 }
 
-export interface OrganizationsHelper {
+export interface OrganizationHelper {
   getOrganizations: () => Organization[];
   getOrganizationsMap: () => Record<string, Organization>;
 }
 
-export interface TagsHelper {
+export interface TagHelper {
   getTag: (tagId: Tag['tag_id']) => Tag;
   getTags: () => Tag[];
   getTagsMap: () => Record<string, Tag>;
@@ -26,13 +26,13 @@ export interface LoggedHelper {
   getPlatformSettings: () => PlatformSettings;
 }
 
-export interface ChallengesHelper {
+export interface ChallengeHelper {
   getChallengesMap: () => Record<string, Challenge>;
   getChallenges: () => Challenge[];
   getExerciseChallenges: (exerciseId: Exercise['exercise_id']) => Challenge[];
   getScenarioChallenges: (scenarioId: ScenarioStore['scenario_id']) => Challenge[];
 }
 
-export interface DocumentsHelper {
+export interface DocumentHelper {
   getDocumentsMap: () => Record<string, Document>
 }

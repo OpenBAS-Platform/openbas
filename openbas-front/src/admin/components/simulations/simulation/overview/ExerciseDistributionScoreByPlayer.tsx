@@ -10,7 +10,7 @@ import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import { resolveUserName } from '../../../../../utils/String';
-import type { UsersHelper } from '../../../../../actions/helper';
+import type { UserHelper } from '../../../../../actions/helper';
 import type { InjectExpectation, User } from '../../../../../utils/api-types';
 import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 
@@ -26,7 +26,7 @@ const ExerciseDistributionScoreByPlayer: FunctionComponent<Props> = ({
   const theme: Theme = useTheme();
 
   // Fetching data
-  const { injectExpectations, usersMap } = useHelper((helper: InjectHelper & UsersHelper) => ({
+  const { injectExpectations, usersMap } = useHelper((helper: InjectHelper & UserHelper) => ({
     injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
     usersMap: helper.getUsersMap(),
   }));

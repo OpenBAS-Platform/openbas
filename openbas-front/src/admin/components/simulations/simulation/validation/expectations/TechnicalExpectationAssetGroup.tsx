@@ -10,7 +10,7 @@ import { typeIcon } from '../../../../common/injects/expectations/ExpectationUti
 import type { EndpointStore } from '../../../../assets/endpoints/Endpoint';
 import TechnicalExpectationAsset from './TechnicalExpectationAsset';
 import { useHelper } from '../../../../../../store';
-import type { EndpointsHelper } from '../../../../../../actions/assets/asset-helper';
+import type { EndpointHelper } from '../../../../../../actions/assets/asset-helper';
 import type { AssetGroupStore } from '../../../../assets/asset_groups/AssetGroup';
 import groupedByAsset from './ExpectationUtils';
 
@@ -46,7 +46,7 @@ const TechnicalExpectationAssetGroup: FunctionComponent<Props> = ({
   // Fetching data
   const {
     assetsMap,
-  } = useHelper((helper: EndpointsHelper) => {
+  } = useHelper((helper: EndpointHelper) => {
     return {
       assetsMap: helper.getEndpointsMap(),
     };

@@ -28,7 +28,7 @@ import { truncate } from '../../../../utils/String';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
+import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
@@ -71,7 +71,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   const filtering = useSearchAnFilter('asset', 'name', ['name']);
 
   // Fetching data
-  const { endpointsMap } = useHelper((helper: EndpointsHelper) => ({
+  const { endpointsMap } = useHelper((helper: EndpointHelper) => ({
     endpointsMap: helper.getEndpointsMap(),
   }));
   useDataLoader(() => {

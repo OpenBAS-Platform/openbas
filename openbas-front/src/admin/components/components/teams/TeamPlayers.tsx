@@ -17,7 +17,7 @@ import { fetchOrganizations } from '../../../../actions/Organization';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { Organization, Team } from '../../../../utils/api-types';
 import { useHelper } from '../../../../store';
-import type { OrganizationsHelper, UsersHelper } from '../../../../actions/helper';
+import type { OrganizationHelper, UserHelper } from '../../../../actions/helper';
 import type { UserStore } from '../../teams/players/Player';
 import type { Option } from '../../../../utils/Option';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
@@ -174,7 +174,7 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
     organizationsMap: Record<string, Organization>,
     team: Team,
     users: UserStore[]
-  } = useHelper((helper: UsersHelper & TeamsHelper & OrganizationsHelper) => ({
+  } = useHelper((helper: UserHelper & TeamsHelper & OrganizationHelper) => ({
     organizationsMap: helper.getOrganizationsMap(),
     team: helper.getTeam(teamId),
     users: helper.getTeamUsers(teamId),

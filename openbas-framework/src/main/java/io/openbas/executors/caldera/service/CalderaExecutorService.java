@@ -95,7 +95,12 @@ public class CalderaExecutorService implements Runnable {
             endpoints.forEach(endpoint -> {
                 List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
                 if (existingEndpoints.isEmpty()) {
-                    this.endpointService.createEndpoint(endpoint);
+                    Optional<Endpoint> endpointByExternalReference = endpointService.findByExternalReference(endpoint.getExternalReference());
+                    if( endpointByExternalReference.isPresent() ) {
+                        this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
+                    } else {
+                        this.endpointService.createEndpoint(endpoint);
+                    }
                 } else {
                     this.updateEndpoint(endpoint, existingEndpoints);
                 }

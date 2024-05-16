@@ -22,7 +22,7 @@ import { secondsFromToNow } from '../../../../../utils/Exercise';
 import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
-import type { ChallengesHelper } from '../../../../../actions/helper';
+import type { ChallengeHelper } from '../../../../../actions/helper';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import { fetchVariablesForExercise } from '../../../../../actions/variables/variable-actions';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
@@ -61,7 +61,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
 
   const { injects, exercise, teams, articles, variables } = useHelper(
-    (helper: InjectHelper & ExercisesHelper & ArticlesHelper & ChallengesHelper & VariablesHelper) => {
+    (helper: InjectHelper & ExercisesHelper & ArticlesHelper & ChallengeHelper & VariablesHelper) => {
       return {
         injects: helper.getExerciseInjects(exerciseId),
         exercise: helper.getExercise(exerciseId),

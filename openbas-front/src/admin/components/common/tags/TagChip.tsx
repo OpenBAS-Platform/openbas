@@ -2,7 +2,7 @@ import { Chip } from '@mui/material';
 import React, { FunctionComponent } from 'react';
 import { makeStyles } from '@mui/styles';
 import { useHelper } from '../../../../store';
-import type { TagsHelper } from '../../../../actions/helper';
+import type { TagHelper } from '../../../../actions/helper';
 
 const useStyles = makeStyles(() => ({
   tag: {
@@ -23,7 +23,7 @@ const TagChip: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const classes = useStyles();
-  const tag = useHelper((helper: TagsHelper) => helper.getTag(tagId));
+  const tag = useHelper((helper: TagHelper) => helper.getTag(tagId));
 
   if (!tag) {
     return <></>;

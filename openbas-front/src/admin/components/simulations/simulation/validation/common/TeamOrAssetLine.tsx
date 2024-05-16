@@ -20,8 +20,8 @@ import { fetchExerciseChallenges } from '../../../../../../actions/Challenge';
 import { fetchEndpoints } from '../../../../../../actions/assets/endpoint-actions';
 import { fetchAssetGroups } from '../../../../../../actions/asset_groups/assetgroup-action';
 import type { AssetGroupsHelper } from '../../../../../../actions/asset_groups/assetgroup-helper';
-import type { EndpointsHelper } from '../../../../../../actions/assets/asset-helper';
-import type { ChallengesHelper } from '../../../../../../actions/helper';
+import type { EndpointHelper } from '../../../../../../actions/assets/asset-helper';
+import type { ChallengeHelper } from '../../../../../../actions/helper';
 import type { ArticlesHelper } from '../../../../../../actions/channels/article-helper';
 import type { ChannelsHelper } from '../../../../../../actions/channels/channel-helper';
 import type { TeamsHelper } from '../../../../../../actions/teams/team-helper';
@@ -68,7 +68,7 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
     challengesMap,
     articlesMap,
     channelsMap,
-  } = useHelper((helper: ArticlesHelper & AssetGroupsHelper & EndpointsHelper & ChallengesHelper & ChannelsHelper & TeamsHelper) => {
+  } = useHelper((helper: ArticlesHelper & AssetGroupsHelper & EndpointHelper & ChallengeHelper & ChannelsHelper & TeamsHelper) => {
     return {
       articlesMap: helper.getArticlesMap(),
       assetsMap: helper.getEndpointsMap(),

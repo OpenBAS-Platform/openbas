@@ -5,7 +5,7 @@ import { SelectGroup } from 'mdi-material-ui';
 import { useSearchParams } from 'react-router-dom';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { TagsHelper, UsersHelper } from '../../../../actions/helper';
+import type { TagHelper, UserHelper } from '../../../../actions/helper';
 import type { AssetGroupStore } from './AssetGroup';
 import ItemTags from '../../../../components/ItemTags';
 import AssetGroupPopover from './AssetGroupPopover';
@@ -14,7 +14,7 @@ import { searchAssetGroups } from '../../../../actions/asset_groups/assetgroup-a
 import AssetGroupManagement from './AssetGroupManagement';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
-import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
+import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { SearchPaginationInput } from '../../../../utils/api-types';
 import { initSorting } from '../../../../components/common/pagination/Page';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
@@ -80,7 +80,7 @@ const AssetGroups = () => {
   const [searchId] = searchParams.getAll('id');
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: EndpointsHelper & UsersHelper & TagsHelper) => ({
+  const { userAdmin } = useHelper((helper: EndpointHelper & UserHelper & TagHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
 

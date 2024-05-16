@@ -13,7 +13,7 @@ import CreateLessonsTemplateQuestion from './categories/questions/CreateLessonsT
 import LessonsTemplateQuestionPopover from './categories/questions/LessonsTemplateQuestionPopover';
 import { useAppDispatch } from '../../../utils/hooks';
 import type { LessonsTemplatesHelper } from '../../../actions/lessons/lesson-helper';
-import type { UsersHelper } from '../../../actions/helper';
+import type { UserHelper } from '../../../actions/helper';
 import type { LessonsTemplateCategory, LessonsTemplateQuestion } from '../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
@@ -38,7 +38,7 @@ const LessonsTemplate = () => {
     userAdmin: boolean,
     categories: LessonsTemplateCategory[],
     questions: LessonsTemplateQuestion[]
-  } = useHelper((helper: LessonsTemplatesHelper & UsersHelper) => {
+  } = useHelper((helper: LessonsTemplatesHelper & UserHelper) => {
     return {
       categories: helper.getLessonsTemplateCategories(lessonsTemplateId),
       questions: helper.getLessonsTemplateQuestions(),
