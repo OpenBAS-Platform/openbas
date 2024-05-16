@@ -75,7 +75,7 @@ const AtomicTestingHeader = () => {
           </Button>
         ) : (
           <Button
-            style={{ marginRight: 20, paddingTop: 5 }}
+            style={{ marginRight: 10, lineHeight: 'initial' }}
             startIcon={<PlayArrowOutlined />}
             variant="contained"
             color="primary"
