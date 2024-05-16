@@ -2,10 +2,7 @@ package io.openbas.rest.settings.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.rest.settings.form.ThemeInput;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -65,9 +62,6 @@ public class PlatformSettings {
 
   @JsonProperty("java_version")
   private String javaVersion;
-
-  @JsonProperty("rabbitmq_version")
-  private String rabbitMQVersion;
 
   @JsonProperty("platform_ai_enabled")
   private Boolean aiEnabled;

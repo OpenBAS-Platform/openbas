@@ -6,7 +6,6 @@ import io.openbas.database.model.Setting;
 import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
-import io.openbas.helper.RabbitMQHelper;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.settings.form.SettingsEnterpriseEditionUpdateInput;
@@ -57,8 +56,6 @@ public class PlatformSettingsApi extends RestBehavior {
     private AiConfig aiConfig;
 
     private CalderaExecutorConfig calderaExecutorConfig;
-
-    private String rabbitMQVersion = null;
 
     @Resource
     private OpenBASConfig openBASConfig;
@@ -208,7 +205,6 @@ public class PlatformSettingsApi extends RestBehavior {
                 platformSettings.setPlatformVersion(openBASConfig.getVersion());
                 platformSettings.setPostgreVersion(settingRepository.getServerVersion());
                 platformSettings.setJavaVersion(Runtime.version().toString());
-                platformSettings.setRabbitMQVersion(RabbitMQHelper.getRabbitMQVersion(openBASConfig));
             }
         }
 

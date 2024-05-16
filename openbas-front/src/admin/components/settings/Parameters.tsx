@@ -192,7 +192,7 @@ const Parameters = () => {
               </ListItem>
               <ListItem divider={true}>
                 <ListItemText primary={t('RabbitMQ')} />
-                <ItemBoolean status={null} variant="large" neutralLabel={settings?.rabbitmq_version} />
+                <ItemBoolean status={null} variant="large" neutralLabel={settings?.postgre_version} />
               </ListItem>
             </List>
           </Paper>
