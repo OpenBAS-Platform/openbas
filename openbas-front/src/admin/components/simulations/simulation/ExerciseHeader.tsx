@@ -29,7 +29,11 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: { exerciseId: ExerciseStore['exercise_id'], exerciseStatus: ExerciseStore['exercise_status'], exerciseName: ExerciseStore['exercise_name'] }) => {
+const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
+  exerciseId: ExerciseStore['exercise_id'],
+  exerciseStatus: ExerciseStore['exercise_status'],
+  exerciseName: ExerciseStore['exercise_name']
+}) => {
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -45,7 +49,7 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: { exerciseId: Exe
         if (!permissions.readOnlyBypassStatus) {
           return (
             <Button
-              style={{ marginRight: 10 }}
+              style={{ marginRight: 10, lineHeight: 'initial' }}
               startIcon={<PlayArrowOutlined />}
               variant="contained"
               size="small"
@@ -139,10 +143,14 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: { exerciseId: Exe
 
   const dialogContentText = () => {
     switch (openChangeStatus) {
-      case 'RUNNING': return `${exerciseName} ${t('will be started, do you want to continue?')}`;
-      case 'PAUSED': return `${t('Injects will be paused, do you want to continue?')}`;
-      case 'SCHEDULED': return `${exerciseName} ${t('data will be reset, do you want to restart?')}`;
-      case 'CANCELED': return `${exerciseName} ${t('data will be reset, do you want to restart?')}`;
+      case 'RUNNING':
+        return `${exerciseName} ${t('will be started, do you want to continue?')}`;
+      case 'PAUSED':
+        return `${t('Injects will be paused, do you want to continue?')}`;
+      case 'SCHEDULED':
+        return `${exerciseName} ${t('data will be reset, do you want to restart?')}`;
+      case 'CANCELED':
+        return `${exerciseName} ${t('data will be reset, do you want to restart?')}`;
       default:
         return 'Do you want to change the status of this simulation?';
     }
