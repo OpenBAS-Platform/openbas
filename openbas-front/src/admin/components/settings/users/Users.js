@@ -43,13 +43,6 @@ const useStyles = makeStyles(() => ({
     textOverflow: 'ellipsis',
     paddingRight: 10,
   },
-  itemAdmin: {
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingLeft: 40,
-  },
 }));
 
 const inlineStyles = {
