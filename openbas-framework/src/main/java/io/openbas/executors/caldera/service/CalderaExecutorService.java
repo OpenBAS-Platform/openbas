@@ -1,12 +1,10 @@
 package io.openbas.executors.caldera.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Executor;
 import io.openbas.database.model.Injector;
-import io.openbas.database.repository.InjectorRepository;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.client.model.Ability;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
@@ -16,7 +14,6 @@ import io.openbas.integrations.InjectorService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;
-import org.apache.hc.client5.http.ClientProtocolException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -85,39 +82,35 @@ public class CalderaExecutorService implements Runnable {
     @Override
     public void run() {
         log.info("Running Caldera executor endpoints gathering...");
-        try {
-            // The executor only retrieve "main" agents (without the keyword "executor")
-            // This is NOT a standard behaviour, this is because we are using Caldera as an executor and we should not
-            // Will be replaced by the XTM agent
-            List<Agent> agents = this.client.agents().stream().filter(agent -> !agent.getExe_name().contains("executor")).toList();
-            List<Endpoint> endpoints = toEndpoint(agents).stream().filter(Asset::getActive).toList();
-            log.info("Caldera executor provisioning based on " + endpoints.size() + " assets");
-            endpoints.forEach(endpoint -> {
-                List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
-                if (existingEndpoints.isEmpty()) {
-                    Optional<Endpoint> endpointByExternalReference = endpointService.findByExternalReference(endpoint.getExternalReference());
-                    if( endpointByExternalReference.isPresent() ) {
-                        this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
-                    } else {
-                        this.endpointService.createEndpoint(endpoint);
-                    }
+        // The executor only retrieve "main" agents (without the keyword "executor")
+        // This is NOT a standard behaviour, this is because we are using Caldera as an executor and we should not
+        // Will be replaced by the XTM agent
+        List<Agent> agents = this.client.agents().stream().filter(agent -> !agent.getExe_name().contains("executor")).toList();
+        List<Endpoint> endpoints = toEndpoint(agents).stream().filter(Asset::getActive).toList();
+        log.info("Caldera executor provisioning based on " + endpoints.size() + " assets");
+        endpoints.forEach(endpoint -> {
+            List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
+            if (existingEndpoints.isEmpty()) {
+                Optional<Endpoint> endpointByExternalReference = endpointService.findByExternalReference(endpoint.getExternalReference());
+                if (endpointByExternalReference.isPresent()) {
+                    this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
                 } else {
-                    this.updateEndpoint(endpoint, existingEndpoints);
+                    this.endpointService.createEndpoint(endpoint);
                 }
-            });
-            List<Endpoint> inactiveEndpoints = toEndpoint(agents).stream().filter(endpoint -> !endpoint.getActive()).toList();
-            inactiveEndpoints.forEach(endpoint -> {
-                Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
-                if(optionalExistingEndpoint.isPresent()) {
-                    Endpoint existingEndpoint = optionalExistingEndpoint.get();
-                    log.info("Found stale agent " + existingEndpoint.getName() + ", deleting it...");
-                    this.endpointService.deleteEndpoint(existingEndpoint.getId());
-                    this.client.deleteAgent(existingEndpoint);
-                }
-            });
-        } catch (ClientProtocolException | JsonProcessingException e) {
-            log.log(Level.SEVERE, "Error running Caldera service " + e.getMessage(), e);
-        }
+            } else {
+                this.updateEndpoint(endpoint, existingEndpoints);
+            }
+        });
+        List<Endpoint> inactiveEndpoints = toEndpoint(agents).stream().filter(endpoint -> !endpoint.getActive()).toList();
+        inactiveEndpoints.forEach(endpoint -> {
+            Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
+            if (optionalExistingEndpoint.isPresent()) {
+                Endpoint existingEndpoint = optionalExistingEndpoint.get();
+                log.info("Found stale agent " + existingEndpoint.getName() + ", deleting it...");
+                this.endpointService.deleteEndpoint(existingEndpoint.getId());
+                this.client.deleteAgent(existingEndpoint);
+            }
+        });
     }
 
     // -- PRIVATE --
@@ -153,7 +146,7 @@ public class CalderaExecutorService implements Runnable {
                 log.info("Clearing endpoint " + matchingExistingEndpoint.getHostname());
                 Iterable<Injector> injectors = injectorService.injectors();
                 injectors.forEach(injector -> {
-                    if(injector.getExecutorClearCommands() != null) {
+                    if (injector.getExecutorClearCommands() != null) {
                         this.calderaExecutorContextService.launchExecutorClear(injector, matchingExistingEndpoint);
                     }
                 });

@@ -18,6 +18,7 @@ import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
@@ -36,7 +37,6 @@ public class CalderaInjectorClient {
     private static final String KEY_HEADER = "KEY";
 
     private final CalderaInjectorConfig config;
-    private final HttpClient httpClient = HttpClients.createDefault();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     // -- ABILITIES --
@@ -48,7 +48,7 @@ public class CalderaInjectorClient {
             String jsonResponse = this.get(this.config.getRestApiV2Url() + ABILITIES_URI);
             return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
             });
-        } catch (ClientProtocolException | JsonProcessingException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -62,7 +62,7 @@ public class CalderaInjectorClient {
             String jsonResponse = this.get(this.config.getRestApiV2Url() + AGENT_URI);
             return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
             });
-        } catch (ClientProtocolException | JsonProcessingException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -76,7 +76,7 @@ public class CalderaInjectorClient {
             String jsonResponse = this.get(url);
             return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
             });
-        } catch (ClientProtocolException | JsonProcessingException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -88,7 +88,7 @@ public class CalderaInjectorClient {
             body.put("sleep_min", 3);
             body.put("sleep_max", 3);
             this.patch(this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getExternalReference(), body);
-        } catch (ClientProtocolException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -100,7 +100,7 @@ public class CalderaInjectorClient {
             body.put("sleep_min", 3);
             body.put("sleep_max", 3);
             this.patch(this.config.getRestApiV2Url() + AGENT_URI + "/" + agent.getPaw(), body);
-        } catch (ClientProtocolException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -108,7 +108,7 @@ public class CalderaInjectorClient {
     public void deleteAgent(Endpoint endpoint) {
         try {
             this.delete(this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getExternalReference());
-        } catch (ClientProtocolException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -116,7 +116,7 @@ public class CalderaInjectorClient {
     public void deleteAgent(Agent agent) {
         try {
             this.delete(this.config.getRestApiV2Url() + AGENT_URI + "/" + agent.getPaw());
-        } catch (ClientProtocolException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -130,7 +130,7 @@ public class CalderaInjectorClient {
             String jsonResponse = this.get(this.config.getRestApiV2Url() + OBFUSCATOR_URI);
             return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
             });
-        } catch (ClientProtocolException | JsonProcessingException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -147,7 +147,7 @@ public class CalderaInjectorClient {
             String jsonResponse = this.post(this.config.getRestApiV1Url(), body);
             return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
             });
-        } catch (ClientProtocolException | JsonProcessingException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -166,22 +166,22 @@ public class CalderaInjectorClient {
             body.put("paw", paw);
             body.put("ability_id", abilityId);
             return this.post(
-                   this.config.getPluginAccessApiUrl() + EXPLOIT_URI,
-                   body
-           );
-        } catch (ClientProtocolException e) {
+                    this.config.getPluginAccessApiUrl() + EXPLOIT_URI,
+                    body
+            );
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     // -- PRIVATE --
 
-    private String get(@NotBlank final String url) throws ClientProtocolException {
-        try {
+    private String get(@NotBlank final String url) throws IOException {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet httpGet = new HttpGet(url);
             // Headers
             httpGet.addHeader(KEY_HEADER, this.config.getApiKey());
-            return this.httpClient.execute(
+            return httpClient.execute(
                     httpGet,
                     response -> EntityUtils.toString(response.getEntity())
             );
@@ -192,8 +192,8 @@ public class CalderaInjectorClient {
 
     private String post(
             @NotBlank final String url,
-            @NotNull final Map<String, String> body) throws ClientProtocolException {
-        try {
+            @NotNull final Map<String, String> body) throws IOException {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost = new HttpPost(url);
             // Headers
             httpPost.addHeader(KEY_HEADER, this.config.getApiKey());
@@ -201,7 +201,7 @@ public class CalderaInjectorClient {
             StringEntity entity = new StringEntity(this.objectMapper.writeValueAsString(body));
             httpPost.setEntity(entity);
 
-            return this.httpClient.execute(
+            return httpClient.execute(
                     httpPost,
                     response -> EntityUtils.toString(response.getEntity())
             );
@@ -212,26 +212,26 @@ public class CalderaInjectorClient {
 
     private void patch(
             @NotBlank final String url,
-            @NotNull final Map<String, Object> body) throws ClientProtocolException {
-        try {
+            @NotNull final Map<String, Object> body) throws IOException {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPatch httpPatch = new HttpPatch(url);
             // Headers
             httpPatch.addHeader(KEY_HEADER, this.config.getApiKey());
             // Body
             StringEntity entity = new StringEntity(this.objectMapper.writeValueAsString(body));
             httpPatch.setEntity(entity);
-            this.httpClient.execute(httpPatch);
+            httpClient.execute(httpPatch);
         } catch (IOException e) {
             throw new ClientProtocolException("Unexpected response for request on: " + url);
         }
     }
 
-    private void delete(@NotBlank final String url) throws ClientProtocolException {
-        try {
+    private void delete(@NotBlank final String url) throws IOException {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpDelete httpdelete = new HttpDelete(url);
             // Headers
             httpdelete.addHeader(KEY_HEADER, this.config.getApiKey());
-            this.httpClient.execute(httpdelete);
+            httpClient.execute(httpdelete);
         } catch (IOException e) {
             throw new ClientProtocolException("Unexpected response for request on: " + url);
         }

@@ -1,6 +1,5 @@
 package io.openbas.executors.caldera.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Endpoint;
@@ -8,15 +7,17 @@ import io.openbas.database.model.Injector;
 import io.openbas.executors.caldera.client.model.Ability;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.model.Agent;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.apache.hc.client5.http.ClientProtocolException;
-import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
@@ -30,28 +31,34 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
+@Log
 public class CalderaExecutorClient {
 
     private static final String KEY_HEADER = "KEY";
 
     private final CalderaExecutorConfig config;
-    private final HttpClient httpClient = HttpClients.createDefault();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     // -- AGENTS --
 
     private final static String AGENT_URI = "/agents";
+    private final HttpSession httpSession;
 
-    public List<Agent> agents() throws ClientProtocolException, JsonProcessingException {
-        String jsonResponse = this.get(AGENT_URI);
-        return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
-        });
+    public List<Agent> agents() {
+        try {
+            String jsonResponse = this.get(AGENT_URI);
+            return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
+            });
+        } catch (IOException e) {
+            log.severe("Cannot retrive agent list");
+            return new ArrayList<>();
+        }
     }
 
     public void deleteAgent(Endpoint endpoint) {
         try {
             this.delete(this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getExternalReference());
-        } catch (ClientProtocolException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -65,7 +72,7 @@ public class CalderaExecutorClient {
             String jsonResponse = this.get(ABILITIES_URI);
             return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
             });
-        } catch (ClientProtocolException | JsonProcessingException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -107,7 +114,7 @@ public class CalderaExecutorClient {
             );
             return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
             });
-        } catch (ClientProtocolException | JsonProcessingException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -149,7 +156,7 @@ public class CalderaExecutorClient {
             );
             return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {
             });
-        } catch (ClientProtocolException | JsonProcessingException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -157,7 +164,7 @@ public class CalderaExecutorClient {
     public void deleteAbility(Ability ability) {
         try {
             this.delete(this.config.getRestApiV2Url() + ABILITIES_URI + "/" + ability.getAbility_id());
-        } catch (ClientProtocolException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -180,20 +187,20 @@ public class CalderaExecutorClient {
                     body
             );
             assert result.contains("complete"); // the exploit is well taken into account
-        } catch (ClientProtocolException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     // -- PRIVATE --
 
-    private String get(@NotBlank final String uri) throws ClientProtocolException {
-        try {
+    private String get(@NotBlank final String uri) throws IOException {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet httpGet = new HttpGet(this.config.getRestApiV2Url() + uri);
             // Headers
             httpGet.addHeader(KEY_HEADER, this.config.getApiKey());
 
-            return this.httpClient.execute(
+            return httpClient.execute(
                     httpGet,
                     response -> EntityUtils.toString(response.getEntity())
             );
@@ -205,8 +212,8 @@ public class CalderaExecutorClient {
 
     private String post(
             @NotBlank final String url,
-            @NotNull final Map<String, Object> body) throws ClientProtocolException {
-        try {
+            @NotNull final Map<String, Object> body) throws IOException {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost = new HttpPost(url);
             // Headers
             httpPost.addHeader(KEY_HEADER, this.config.getApiKey());
@@ -214,7 +221,7 @@ public class CalderaExecutorClient {
             StringEntity entity = new StringEntity(this.objectMapper.writeValueAsString(body));
             httpPost.setEntity(entity);
 
-            return this.httpClient.execute(
+            return httpClient.execute(
                     httpPost,
                     response -> EntityUtils.toString(response.getEntity())
             );
@@ -225,26 +232,26 @@ public class CalderaExecutorClient {
 
     private void patch(
             @NotBlank final String url,
-            @NotNull final Map<String, Object> body) throws ClientProtocolException {
-        try {
+            @NotNull final Map<String, Object> body) throws IOException {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPatch httpPatch = new HttpPatch(url);
             // Headers
             httpPatch.addHeader(KEY_HEADER, this.config.getApiKey());
             // Body
             StringEntity entity = new StringEntity(this.objectMapper.writeValueAsString(body));
             httpPatch.setEntity(entity);
-            this.httpClient.execute(httpPatch);
+            httpClient.execute(httpPatch);
         } catch (IOException e) {
             throw new ClientProtocolException("Unexpected response for request on: " + url);
         }
     }
 
-    private void delete(@NotBlank final String url) throws ClientProtocolException {
-        try {
+    private void delete(@NotBlank final String url) throws IOException {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpDelete httpdelete = new HttpDelete(url);
             // Headers
             httpdelete.addHeader(KEY_HEADER, this.config.getApiKey());
-            this.httpClient.execute(httpdelete);
+            httpClient.execute(httpdelete);
         } catch (IOException e) {
             throw new ClientProtocolException("Unexpected response for request on: " + url);
         }

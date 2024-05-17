@@ -134,7 +134,7 @@ public class CalderaExecutor extends Injector {
             if (!agents.isEmpty()) {
                 for (int j = 0; j < agents.size(); j++) {
                     // Check in the database if not exist
-                    Optional<Endpoint> resolvedExistingEndpoint = this.endpointService.findByExternalReference(agents.get(i).getPaw());
+                    Optional<Endpoint> resolvedExistingEndpoint = this.endpointService.findByExternalReference(agents.get(j).getPaw());
                     if (resolvedExistingEndpoint.isEmpty()) {
                         log.log(Level.INFO, "Agent found and not present in the database, creating it...");
                         Endpoint newEndpoint = new Endpoint();

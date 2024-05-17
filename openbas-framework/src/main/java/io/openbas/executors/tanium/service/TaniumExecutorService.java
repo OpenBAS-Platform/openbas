@@ -80,35 +80,31 @@ public class TaniumExecutorService implements Runnable {
     @Override
     public void run() {
         log.info("Running Tanium executor endpoints gathering...");
-        try {
-            List<NodeEndpoint> nodeEndpoints = this.client.endpoints().getData().getEndpoints().getEdges().stream().toList();
-            List<Endpoint> endpoints = toEndpoint(nodeEndpoints).stream().filter(Asset::getActive).toList();
-            log.info("Tanium executor provisioning based on " + endpoints.size() + " assets");
-            endpoints.forEach(endpoint -> {
-                List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
-                if (existingEndpoints.isEmpty()) {
-                    Optional<Endpoint> endpointByExternalReference = endpointService.findByExternalReference(endpoint.getExternalReference());
-                    if( endpointByExternalReference.isPresent() ) {
-                        this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
-                    } else {
-                        this.endpointService.createEndpoint(endpoint);
-                    }
+        List<NodeEndpoint> nodeEndpoints = this.client.endpoints().getData().getEndpoints().getEdges().stream().toList();
+        List<Endpoint> endpoints = toEndpoint(nodeEndpoints).stream().filter(Asset::getActive).toList();
+        log.info("Tanium executor provisioning based on " + endpoints.size() + " assets");
+        endpoints.forEach(endpoint -> {
+            List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
+            if (existingEndpoints.isEmpty()) {
+                Optional<Endpoint> endpointByExternalReference = endpointService.findByExternalReference(endpoint.getExternalReference());
+                if( endpointByExternalReference.isPresent() ) {
+                    this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
                 } else {
-                    this.updateEndpoint(endpoint, existingEndpoints);
+                    this.endpointService.createEndpoint(endpoint);
                 }
-            });
-            List<Endpoint> inactiveEndpoints = toEndpoint(nodeEndpoints).stream().filter(endpoint -> !endpoint.getActive()).toList();
-            inactiveEndpoints.forEach(endpoint -> {
-                Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
-                if(optionalExistingEndpoint.isPresent()) {
-                    Endpoint existingEndpoint = optionalExistingEndpoint.get();
-                    log.info("Found stale endpoint " + existingEndpoint.getName() + ", deleting it...");
-                    this.endpointService.deleteEndpoint(existingEndpoint.getId());
-                }
-            });
-        } catch (ClientProtocolException | JsonProcessingException e) {
-            log.log(Level.SEVERE, "Error running Tanium service " + e.getMessage(), e);
-        }
+            } else {
+                this.updateEndpoint(endpoint, existingEndpoints);
+            }
+        });
+        List<Endpoint> inactiveEndpoints = toEndpoint(nodeEndpoints).stream().filter(endpoint -> !endpoint.getActive()).toList();
+        inactiveEndpoints.forEach(endpoint -> {
+            Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
+            if(optionalExistingEndpoint.isPresent()) {
+                Endpoint existingEndpoint = optionalExistingEndpoint.get();
+                log.info("Found stale endpoint " + existingEndpoint.getName() + ", deleting it...");
+                this.endpointService.deleteEndpoint(existingEndpoint.getId());
+            }
+        });
     }
 
     // -- PRIVATE --
