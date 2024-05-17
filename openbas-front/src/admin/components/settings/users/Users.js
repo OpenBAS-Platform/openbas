@@ -59,7 +59,7 @@ const inlineStyles = {
     width: '20%',
   },
   user_admin: {
-    width: '10%',
+    width: '12%',
   },
   user_tags: {
     width: '12%',
@@ -87,6 +87,7 @@ const Users = () => {
     { field: 'user_lastname', label: 'Lastname', isSortable: true },
     { field: 'user_organization', label: 'Organization', isSortable: true },
     { field: 'user_admin', label: 'Administrator', isSortable: true },
+    { field: 'user_tags', label: 'Tags', isSortable: true },
   ];
 
   const [users, setUsers] = useState([]);
@@ -141,7 +142,7 @@ const Users = () => {
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-              }
+            }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
