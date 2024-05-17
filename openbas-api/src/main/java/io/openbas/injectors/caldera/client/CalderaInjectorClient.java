@@ -156,7 +156,7 @@ public class CalderaInjectorClient {
 
     private final static String EXPLOIT_URI = "/exploit";
 
-    public void exploit(
+    public String exploit(
             @NotBlank final String obfuscator,
             @NotBlank final String paw,
             @NotBlank final String abilityId) {
@@ -165,11 +165,10 @@ public class CalderaInjectorClient {
             body.put("obfuscator", obfuscator);
             body.put("paw", paw);
             body.put("ability_id", abilityId);
-            String result = this.post(
-                    this.config.getPluginAccessApiUrl() + EXPLOIT_URI,
-                    body
-            );
-            assert result.contains("complete"); // the exploit is well taken into account
+            return this.post(
+                   this.config.getPluginAccessApiUrl() + EXPLOIT_URI,
+                   body
+           );
         } catch (ClientProtocolException e) {
             throw new RuntimeException(e);
         }

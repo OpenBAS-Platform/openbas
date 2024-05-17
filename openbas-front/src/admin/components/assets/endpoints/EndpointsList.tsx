@@ -4,6 +4,7 @@ import { DevicesOtherOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import type { EndpointStore } from './Endpoint';
 import ItemTags from '../../../../components/ItemTags';
+import PlatformIcon from '../../../../components/PlatformIcon';
 
 const useStyles = makeStyles(() => ({
   item: {
@@ -29,11 +30,16 @@ const inlineStyles: Record<string, CSSProperties> = {
   asset_name: {
     width: '40%',
   },
+  asset_platform: {
+    width: '20%',
+    display: 'flex',
+    alignItems: 'center',
+  },
   asset_tags: {
-    width: '40%',
+    width: '25%',
   },
   asset_type: {
-    width: '20%',
+    width: '10%',
   },
 };
 
@@ -83,6 +89,12 @@ const EndpointsList: FunctionComponent<Props> = ({
                   </div>
                   <div
                     className={classes.bodyItem}
+                    style={inlineStyles.asset_platform}
+                  >
+                    <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} /> {endpoint.endpoint_platform}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
                     style={inlineStyles.asset_tags}
                   >
                     <ItemTags variant="list" tags={endpoint.asset_tags} />
@@ -94,7 +106,7 @@ const EndpointsList: FunctionComponent<Props> = ({
                     <Chip
                       variant="outlined"
                       className={classes.typeChip}
-                      label={endpoint.type}
+                      label={endpoint.asset_type}
                     />
                   </div>
                 </>

@@ -62,13 +62,17 @@ public class CalderaExecutor extends Injector {
             try {
                 Endpoint executionEndpoint = this.findAndRegisterAssetForExecution(injection.getInjection().getInject(), asset);
                 if (executionEndpoint != null) {
-                    this.calderaService.exploit(obfuscator, executionEndpoint.getExternalReference(), contract);
-                    ExploitResult exploitResult = this.calderaService.exploitResult(executionEndpoint.getExternalReference(), contract);
-                    asyncIds.add(exploitResult.getLinkId());
-                    execution.addTrace(traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
-                    // Compute expectations
-                    boolean isInGroup = assets.get(executionEndpoint.getParent());
-                    computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup);
+                    String result = this.calderaService.exploit(obfuscator, executionEndpoint.getExternalReference(), contract);
+                    if (result.contains("complete")) {
+                        ExploitResult exploitResult = this.calderaService.exploitResult(executionEndpoint.getExternalReference(), contract);
+                        asyncIds.add(exploitResult.getLinkId());
+                        execution.addTrace(traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
+                        // Compute expectations
+                        boolean isInGroup = assets.get(executionEndpoint.getParent());
+                        computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup);
+                    } else {
+                        execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (" + result + ")"));
+                    }
                 } else {
                     execution.addTrace(traceError("Caldera failed to execute the ability because execution endpoint was not found for endpoint " + asset.getName()));
                 }

@@ -16,7 +16,7 @@ import {
   Switch,
   Tooltip,
 } from '@mui/material';
-import { ComputerOutlined } from '@mui/icons-material';
+import { DevicesOtherOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
 import Transition from '../../../../components/common/Transition';
@@ -32,6 +32,7 @@ import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import PlatformIcon from '../../../../components/PlatformIcon';
 
 const useStyles = makeStyles(() => ({
   box: {
@@ -42,6 +43,13 @@ const useStyles = makeStyles(() => ({
   },
   chip: {
     margin: '0 10px 10px 0',
+  },
+  bodyItem: {
+    fontSize: 13,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    paddingRight: 10,
   },
 }));
 
@@ -163,13 +171,23 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
                     onClick={() => addEndpoint(endpoint.asset_id)}
                   >
                     <ListItemIcon>
-                      <ComputerOutlined color="primary" />
+                      <DevicesOtherOutlined color="primary"/>
                     </ListItemIcon>
                     <ListItemText
-                      primary={endpoint.asset_name}
-                      secondary={endpoint.asset_description}
+                      primary={
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <div className={classes.bodyItem} style={{ width: '50%' }}>
+                            {endpoint.asset_name}
+                          </div>
+                          <div className={classes.bodyItem} style={{ width: '25%' }}>
+                            <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} /> {endpoint.endpoint_platform}
+                          </div>
+                          <div className={classes.bodyItem} style={{ width: '25%' }}>
+                            <ItemTags variant="list" tags={endpoint.asset_tags} />
+                          </div>
+                        </div>
+                    }
                     />
-                    <ItemTags variant="list" tags={endpoint.asset_tags} />
                   </ListItemButton>
                 );
               })}

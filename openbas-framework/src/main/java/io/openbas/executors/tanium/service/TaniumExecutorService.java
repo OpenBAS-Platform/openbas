@@ -138,6 +138,7 @@ public class TaniumExecutorService implements Runnable {
         matchingExistingEndpoint.setIps(external.getIps());
         matchingExistingEndpoint.setHostname(external.getHostname());
         matchingExistingEndpoint.setExternalReference(external.getExternalReference());
+        matchingExistingEndpoint.setPlatform(external.getPlatform());
         matchingExistingEndpoint.setExecutor(this.executor);
         if ((now().toEpochMilli() - matchingExistingEndpoint.getClearedAt().toEpochMilli()) > CLEAR_TTL) {
             try {

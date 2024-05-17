@@ -29,11 +29,11 @@ public class CalderaInjectorService {
         return this.client.abilities();
     }
 
-    public void exploit(
+    public String exploit(
             @NotBlank final String obfuscator,
             @NotBlank final String paw,
             @NotBlank final String abilityId) {
-        this.client.exploit(obfuscator, paw, abilityId);
+        return this.client.exploit(obfuscator, paw, abilityId);
     }
 
     public List<Obfuscator> obfuscators() {
