@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { ComputerOutlined } from '@mui/icons-material';
+import { SelectGroup } from 'mdi-material-ui';
 import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
 import Transition from '../../../../components/common/Transition';
@@ -132,7 +132,7 @@ const AssetGroupDialogAdding: FunctionComponent<Props> = ({
                     onClick={() => addAssetGroup(assetGroup.asset_group_id)}
                   >
                     <ListItemIcon>
-                      <ComputerOutlined color="primary" />
+                      <SelectGroup color="primary" />
                     </ListItemIcon>
                     <ListItemText
                       primary={assetGroup.asset_group_name}
