@@ -10,7 +10,7 @@ import io.openbas.integrations.InjectorService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -21,7 +21,7 @@ import java.time.Duration;
 public class TaniumExecutor {
 
     private final TaniumExecutorConfig config;
-    private final TaskScheduler taskScheduler;
+    private final ThreadPoolTaskScheduler taskScheduler;
     private final TaniumExecutorClient client;
     private final EndpointService endpointService;
     private final TaniumExecutorContextService taniumExecutorContextService;
