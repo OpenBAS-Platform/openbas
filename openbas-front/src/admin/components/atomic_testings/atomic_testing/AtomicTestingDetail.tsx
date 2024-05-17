@@ -9,7 +9,7 @@ import ItemStatus from '../../../../components/ItemStatus';
 import { InjectResultDtoContext, InjectResultDtoContextType } from '../InjectResultDtoContext';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchDocuments } from '../../../../actions/Document';
-import type { DocumentsHelper } from '../../../../actions/helper';
+import type { DocumentHelper } from '../../../../actions/helper';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -37,7 +37,7 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
 
   // Fetching data
   const { injectResultDto } = useContext<InjectResultDtoContextType>(InjectResultDtoContext);
-  const { documentMap } = useHelper((helper: DocumentsHelper) => ({
+  const { documentMap } = useHelper((helper: DocumentHelper) => ({
     documentMap: helper.getDocumentsMap(),
   }));
   useDataLoader(() => {

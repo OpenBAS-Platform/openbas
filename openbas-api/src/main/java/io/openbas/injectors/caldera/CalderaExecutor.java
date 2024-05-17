@@ -62,13 +62,17 @@ public class CalderaExecutor extends Injector {
             try {
                 Endpoint executionEndpoint = this.findAndRegisterAssetForExecution(injection.getInjection().getInject(), asset);
                 if (executionEndpoint != null) {
-                    this.calderaService.exploit(obfuscator, executionEndpoint.getExternalReference(), contract);
-                    ExploitResult exploitResult = this.calderaService.exploitResult(executionEndpoint.getExternalReference(), contract);
-                    asyncIds.add(exploitResult.getLinkId());
-                    execution.addTrace(traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
-                    // Compute expectations
-                    boolean isInGroup = assets.get(executionEndpoint.getParent());
-                    computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup);
+                    String result = this.calderaService.exploit(obfuscator, executionEndpoint.getExternalReference(), contract);
+                    if (result.contains("complete")) {
+                        ExploitResult exploitResult = this.calderaService.exploitResult(executionEndpoint.getExternalReference(), contract);
+                        asyncIds.add(exploitResult.getLinkId());
+                        execution.addTrace(traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
+                        // Compute expectations
+                        boolean isInGroup = assets.get(executionEndpoint.getParent());
+                        computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup);
+                    } else {
+                        execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (" + result + ")"));
+                    }
                 } else {
                     execution.addTrace(traceError("Caldera failed to execute the ability because execution endpoint was not found for endpoint " + asset.getName()));
                 }
@@ -120,7 +124,12 @@ public class CalderaExecutor extends Injector {
             count++;
             // Find an executor agent matching the asset
             log.log(Level.INFO, "Listing agents...");
-            List<Agent> agents = this.calderaService.agents().stream().filter(agent -> agent.getExe_name().contains("executor") && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) < Asset.ACTIVE_THRESHOLD && agent.getHost().equals(assetEndpoint.getHostname()) && Arrays.stream(assetEndpoint.getIps()).anyMatch(s -> Arrays.stream(agent.getHost_ip_addrs()).toList().contains(s))).toList();
+            List<Agent> agents = this.calderaService.agents().stream().filter(agent ->
+                    agent.getExe_name().contains("executor")
+                            && (now().toEpochMilli() - Time.toInstant(agent.getCreated()).toEpochMilli()) < Asset.ACTIVE_THRESHOLD
+                            && (agent.getHost().equals(assetEndpoint.getHostname()) || agent.getHost().split("\\.")[0].equals(assetEndpoint.getHostname().split("\\.")[0]))
+                            && Arrays.stream(assetEndpoint.getIps()).anyMatch(s -> Arrays.stream(agent.getHost_ip_addrs()).toList().contains(s))
+            ).toList();
             log.log(Level.INFO, "List return with " + agents.size() + " agents");
             if (!agents.isEmpty()) {
                 for (int i = 0; i < agents.size(); i++) {

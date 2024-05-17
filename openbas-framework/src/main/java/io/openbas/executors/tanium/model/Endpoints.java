@@ -5,11 +5,8 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Endpoint {
+public class Endpoints {
 
-    private String computerID;
-    private String name;
-    private String[] ipAddresses;
-    private String[] macAddresses;
+    private EdgesEndpoints endpoints;
 
 }

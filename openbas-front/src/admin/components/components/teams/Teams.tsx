@@ -16,8 +16,8 @@ import PaginationComponent from '../../../../components/common/pagination/Pagina
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import CreateTeam from './CreateTeam';
 import { useHelper } from '../../../../store';
-import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
-import type { TagsHelper, UsersHelper } from '../../../../actions/helper';
+import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
+import type { TagHelper, UserHelper } from '../../../../actions/helper';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -81,7 +81,7 @@ const Teams = () => {
   const [searchId] = searchParams.getAll('id');
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: EndpointsHelper & UsersHelper & TagsHelper) => ({
+  const { userAdmin } = useHelper((helper: EndpointHelper & UserHelper & TagHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
 

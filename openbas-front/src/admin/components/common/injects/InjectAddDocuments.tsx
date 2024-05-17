@@ -16,7 +16,7 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
-import type { DocumentsHelper, UsersHelper } from '../../../../actions/helper';
+import type { DocumentHelper, UserHelper } from '../../../../actions/helper';
 import { PermissionsContext } from '../Context';
 import type { Document } from '../../../../utils/api-types';
 
@@ -58,7 +58,7 @@ const InjectAddDocuments: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
 
-  const { documents, userAdmin } = useHelper((helper: DocumentsHelper & UsersHelper) => ({
+  const { documents, userAdmin } = useHelper((helper: DocumentHelper & UserHelper) => ({
     documents: helper.getDocumentsMap(),
     userAdmin: helper.getMe()?.user_admin,
   }));

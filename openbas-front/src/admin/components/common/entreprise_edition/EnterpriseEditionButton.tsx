@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import EnterpriseEditionAgreement from './EnterpriseEditionAgreement';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { UsersHelper } from '../../../../actions/helper';
+import type { UserHelper } from '../../../../actions/helper';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -24,7 +24,7 @@ const EnterpriseEditionButton = ({ inLine = false }: { inLine?: boolean; }) => {
   const { t } = useFormatter();
   const classes = useStyles();
   const [openEnterpriseEditionConsent, setOpenEnterpriseEditionConsent] = useState(false);
-  const userAdmin = useHelper((helper: UsersHelper) => {
+  const userAdmin = useHelper((helper: UserHelper) => {
     const me = helper.getMe();
     return me?.user_admin ?? false;
   });

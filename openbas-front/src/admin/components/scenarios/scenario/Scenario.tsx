@@ -191,7 +191,7 @@ const Scenario = ({ setOpenScenarioRecurringFormDialog }: { setOpenScenarioRecur
           </Paper>
         </Grid>
         {(scenarioExercises ?? 0).length > 0 && (
-          <Grid item xs={12} style={{ marginTop: 25 }}>
+          <Grid item xs={12} style={{ marginTop: 35 }}>
             <Typography variant="h4" gutterBottom style={{ marginBottom: 15 }}>
               {t('Simulations')}
             </Typography>

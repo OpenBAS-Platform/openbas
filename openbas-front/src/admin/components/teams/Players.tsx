@@ -13,7 +13,7 @@ import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { initSorting } from '../../../components/common/pagination/Page';
-import type { OrganizationsHelper, UsersHelper } from '../../../actions/helper';
+import type { OrganizationHelper, UserHelper } from '../../../actions/helper';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
 import type { UserStore } from './players/Player';
@@ -89,7 +89,7 @@ const Players = () => {
   });
 
   // Fetching data
-  const { isPlanner, organizationsMap } = useHelper((helper: UsersHelper & OrganizationsHelper) => ({
+  const { isPlanner, organizationsMap } = useHelper((helper: UserHelper & OrganizationHelper) => ({
     isPlanner: helper.getMe().user_is_planner,
     organizationsMap: helper.getOrganizationsMap(),
   }));

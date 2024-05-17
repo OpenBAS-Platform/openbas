@@ -86,7 +86,7 @@ public class ChannelExecutor extends Injector {
           List<DataAttachment> attachments = resolveAttachments(execution, injection, documents);
           String message = content.buildMessage(injection, imapEnabled);
           boolean encrypted = content.isEncrypted();
-          users.stream().parallel().forEach(userInjectContext -> {
+          users.forEach(userInjectContext -> {
             try {
               // Put the challenges variables in the injection context
               List<ArticleVariable> articleVariables = articles.stream()

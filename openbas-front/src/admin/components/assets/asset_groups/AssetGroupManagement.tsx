@@ -7,7 +7,7 @@ import TagsFilter from '../../common/filters/TagsFilter';
 import SearchFilter from '../../../../components/SearchFilter';
 import AssetGroupAddEndpoints from './AssetGroupAddEndpoints';
 import { useHelper } from '../../../../store';
-import type { UsersHelper } from '../../../../actions/helper';
+import type { UserHelper } from '../../../../actions/helper';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -16,7 +16,7 @@ import type { AssetGroupsHelper } from '../../../../actions/asset_groups/assetgr
 import EndpointsList, { EndpointStoreWithType } from '../endpoints/EndpointsList';
 import EndpointPopover from '../endpoints/EndpointPopover';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
+import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { AssetGroupStore } from './AssetGroup';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -65,7 +65,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
 
   // Fetching data
-  const { assetGroup, endpointsMap, userAdmin } = useHelper((helper: AssetGroupsHelper & EndpointsHelper & UsersHelper) => ({
+  const { assetGroup, endpointsMap, userAdmin } = useHelper((helper: AssetGroupsHelper & EndpointHelper & UserHelper) => ({
     assetGroup: helper.getAssetGroup(assetGroupId),
     endpointsMap: helper.getEndpointsMap(),
     userAdmin: helper.getMe()?.user_admin ?? false,

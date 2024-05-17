@@ -100,6 +100,8 @@ export interface Asset {
   asset_active?: boolean;
   asset_children?: Asset[];
   /** @format date-time */
+  asset_cleared_at?: string;
+  /** @format date-time */
   asset_created_at?: string;
   asset_description?: string;
   asset_executor?: Executor;
@@ -492,7 +494,7 @@ export interface DryInject {
 
 export interface DryInjectStatus {
   status_id?: string;
-  status_name?: "INFO" | "DRAFT" | "QUEUING" | "STARTING" | "RUNNING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_name?: "DRAFT" | "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -538,6 +540,8 @@ export interface DryrunCreateInput {
 export interface Endpoint {
   asset_active?: boolean;
   asset_children?: Asset[];
+  /** @format date-time */
+  asset_cleared_at?: string;
   /** @format date-time */
   asset_created_at?: string;
   asset_description?: string;
@@ -1007,7 +1011,7 @@ export interface InjectResultDTO {
 
 export interface InjectStatus {
   status_id?: string;
-  status_name?: "INFO" | "DRAFT" | "QUEUING" | "STARTING" | "RUNNING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_name?: "DRAFT" | "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -1032,16 +1036,7 @@ export interface InjectStatusExecution {
   /** @format int32 */
   execution_duration?: number;
   execution_message?: string;
-  execution_status?:
-    | "INFO"
-    | "DRAFT"
-    | "QUEUING"
-    | "STARTING"
-    | "RUNNING"
-    | "PENDING"
-    | "PARTIAL"
-    | "ERROR"
-    | "SUCCESS";
+  execution_status?: "DRAFT" | "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   /** @format date-time */
   execution_time?: string;
 }
@@ -1082,6 +1077,7 @@ export interface Injector {
   /** @format date-time */
   injector_created_at?: string;
   injector_custom_contracts?: boolean;
+  injector_executor_clear_commands?: Record<string, string>;
   injector_executor_commands?: Record<string, string>;
   injector_external?: boolean;
   injector_id: string;
@@ -1162,6 +1158,7 @@ export interface InjectorCreateInput {
   injector_category?: string;
   injector_contracts?: InjectorContractInput[];
   injector_custom_contracts?: boolean;
+  injector_executor_clear_commands?: Record<string, string>;
   injector_executor_commands?: Record<string, string>;
   injector_id: string;
   injector_name: string;
@@ -1177,6 +1174,7 @@ export interface InjectorUpdateInput {
   injector_category?: string;
   injector_contracts?: InjectorContractInput[];
   injector_custom_contracts?: boolean;
+  injector_executor_clear_commands?: Record<string, string>;
   injector_executor_commands?: Record<string, string>;
   injector_name: string;
 }
@@ -1840,6 +1838,7 @@ export interface Payload {
 }
 
 export interface PayloadCreateInput {
+  payload_content: string;
   payload_description?: string;
   payload_name: string;
   payload_tags?: string[];
@@ -1847,6 +1846,7 @@ export interface PayloadCreateInput {
 }
 
 export interface PayloadUpdateInput {
+  payload_content: string;
   payload_description?: string;
   payload_name: string;
   payload_tags?: string[];

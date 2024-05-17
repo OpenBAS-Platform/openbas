@@ -2,7 +2,7 @@ import React from 'react';
 import TeamsComponent from '../components/teams/Teams';
 import { PermissionsContext, PermissionsContextType, TeamContext, type TeamContextType } from '../common/Context';
 import { useHelper } from '../../../store';
-import type { UsersHelper } from '../../../actions/helper';
+import type { UserHelper } from '../../../actions/helper';
 import type { TeamStore } from '../../../actions/teams/Team';
 import type { Team, User } from '../../../utils/api-types';
 import type { TeamsHelper } from '../../../actions/teams/team-helper';
@@ -12,7 +12,7 @@ import { useAppDispatch } from '../../../utils/hooks';
 
 const Teams = () => {
   const dispatch = useAppDispatch();
-  const { user, teams }: { user: User, teams: TeamStore[] } = useHelper((helper: UsersHelper & TeamsHelper) => ({
+  const { user, teams }: { user: User, teams: TeamStore[] } = useHelper((helper: UserHelper & TeamsHelper) => ({
     user: helper.getMe(),
     teams: helper.getTeams(),
   }));

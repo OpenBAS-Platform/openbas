@@ -15,7 +15,7 @@ import type { Option } from '../../../../utils/Option';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useHelper } from '../../../../store';
-import type { ChallengesHelper } from '../../../../actions/helper';
+import type { ChallengeHelper } from '../../../../actions/helper';
 import { PermissionsContext } from '../Context';
 import type { Challenge } from '../../../../utils/api-types';
 
@@ -55,7 +55,7 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
 
-  const { challenges, challengesMap } = useHelper((helper: ChallengesHelper) => ({
+  const { challenges, challengesMap } = useHelper((helper: ChallengeHelper) => ({
     challenges: helper.getChallenges(),
     challengesMap: helper.getChallengesMap(),
   }));

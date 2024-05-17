@@ -6,7 +6,7 @@ import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import ContextualChallenges from '../../../common/challenges/ContextualChallenges';
 import { fetchExerciseChallenges } from '../../../../../actions/Challenge';
-import type { ChallengesHelper } from '../../../../../actions/helper';
+import type { ChallengeHelper } from '../../../../../actions/helper';
 import { ChallengeContext, ChallengeContextType } from '../../../common/Context';
 
 const ExerciseChallenges = () => {
@@ -14,7 +14,7 @@ const ExerciseChallenges = () => {
   const dispatch = useAppDispatch();
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
-  const challenges = useHelper((helper: ChallengesHelper) => helper.getExerciseChallenges(exerciseId));
+  const challenges = useHelper((helper: ChallengeHelper) => helper.getExerciseChallenges(exerciseId));
   useDataLoader(() => {
     dispatch(fetchExerciseChallenges(exerciseId));
   });

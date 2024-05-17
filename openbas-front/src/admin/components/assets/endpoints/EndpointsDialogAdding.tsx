@@ -28,10 +28,11 @@ import { truncate } from '../../../../utils/String';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { EndpointsHelper } from '../../../../actions/assets/asset-helper';
+import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import PlatformIcon from '../../../../components/PlatformIcon';
 
 const useStyles = makeStyles(() => ({
   box: {
@@ -42,6 +43,13 @@ const useStyles = makeStyles(() => ({
   },
   chip: {
     margin: '0 10px 10px 0',
+  },
+  bodyItem: {
+    fontSize: 13,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    paddingRight: 10,
   },
 }));
 
@@ -71,7 +79,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   const filtering = useSearchAnFilter('asset', 'name', ['name']);
 
   // Fetching data
-  const { endpointsMap } = useHelper((helper: EndpointsHelper) => ({
+  const { endpointsMap } = useHelper((helper: EndpointHelper) => ({
     endpointsMap: helper.getEndpointsMap(),
   }));
   useDataLoader(() => {
@@ -163,13 +171,23 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
                     onClick={() => addEndpoint(endpoint.asset_id)}
                   >
                     <ListItemIcon>
-                      <DevicesOtherOutlined color="primary" />
+                      <DevicesOtherOutlined color="primary"/>
                     </ListItemIcon>
                     <ListItemText
-                      primary={endpoint.asset_name}
-                      secondary={endpoint.asset_description}
+                      primary={
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <div className={classes.bodyItem} style={{ width: '50%' }}>
+                            {endpoint.asset_name}
+                          </div>
+                          <div className={classes.bodyItem} style={{ width: '25%' }}>
+                            <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} /> {endpoint.endpoint_platform}
+                          </div>
+                          <div className={classes.bodyItem} style={{ width: '25%' }}>
+                            <ItemTags variant="list" tags={endpoint.asset_tags} />
+                          </div>
+                        </div>
+                    }
                     />
-                    <ItemTags variant="list" tags={endpoint.asset_tags} />
                   </ListItemButton>
                 );
               })}

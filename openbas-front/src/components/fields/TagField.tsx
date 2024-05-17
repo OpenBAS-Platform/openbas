@@ -8,7 +8,7 @@ import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
 import type { Tag } from '../../utils/api-types';
 import { useHelper } from '../../store';
-import type { TagsHelper, UsersHelper } from '../../actions/helper';
+import type { TagHelper, UserHelper } from '../../actions/helper';
 import { useFormatter } from '../i18n';
 import { addTag, fetchTags } from '../../actions/Tag';
 import TagForm from '../../admin/components/settings/tags/TagForm';
@@ -50,7 +50,7 @@ const TagField: FunctionComponent<Props> = ({
   const classes = useStyles();
 
   // Fetching data
-  const { tags, userAdmin }: { tags: [Tag]; userAdmin: boolean } = useHelper((helper: TagsHelper & UsersHelper) => ({
+  const { tags, userAdmin }: { tags: [Tag]; userAdmin: boolean } = useHelper((helper: TagHelper & UserHelper) => ({
     tags: helper.getTags(),
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));

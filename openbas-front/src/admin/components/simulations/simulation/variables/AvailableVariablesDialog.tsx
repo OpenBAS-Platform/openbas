@@ -8,7 +8,7 @@ import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Variable } from '../../../../../utils/api-types';
 import { useHelper } from '../../../../../store';
-import type { UsersHelper } from '../../../../../actions/helper';
+import type { UserHelper } from '../../../../../actions/helper';
 import type { Contract } from '../../../../../actions/contract/contract';
 import { copyToClipboard } from '../../../../../utils/utils';
 
@@ -89,7 +89,7 @@ AvailableVariablesDialogProps
     setTab(newTab);
   };
 
-  const me = useHelper((helper: UsersHelper) => helper.getMe());
+  const me = useHelper((helper: UserHelper) => helper.getMe());
 
   return (
     <Dialog

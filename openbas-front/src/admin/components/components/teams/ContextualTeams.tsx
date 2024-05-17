@@ -7,7 +7,7 @@ import ItemTags from '../../../../components/ItemTags';
 import TeamPopover from './TeamPopover';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { useHelper } from '../../../../store';
-import type { TagsHelper } from '../../../../actions/helper';
+import type { TagHelper } from '../../../../actions/helper';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import type { Team } from '../../../../utils/api-types';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
@@ -137,7 +137,7 @@ const ContextualTeams: React.FC<Props> = ({ teamIds }) => {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
-  const { teams }: { teams: TeamStore[] } = useHelper((helper: TagsHelper & TeamsHelper) => ({
+  const { teams }: { teams: TeamStore[] } = useHelper((helper: TagHelper & TeamsHelper) => ({
     teams: helper.getTeams(),
   }));
   const { computeTeamUsersEnabled } = useContext(TeamContext);

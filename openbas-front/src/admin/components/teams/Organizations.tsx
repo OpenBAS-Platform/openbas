@@ -18,7 +18,7 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { useHelper } from '../../../store';
-import type { OrganizationsHelper, TagsHelper, UsersHelper } from '../../../actions/helper';
+import type { OrganizationHelper, TagHelper, UserHelper } from '../../../actions/helper';
 import type { Theme } from '../../../components/Theme';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import type { Organization } from '../../../utils/api-types';
@@ -100,7 +100,7 @@ const Organizations = () => {
   const { t } = useFormatter();
 
   // Fetching data
-  const { organizations, tagsMap, userAdmin } = useHelper((helper: UsersHelper & TagsHelper & OrganizationsHelper) => ({
+  const { organizations, tagsMap, userAdmin } = useHelper((helper: UserHelper & TagHelper & OrganizationHelper) => ({
     organizations: helper.getOrganizations(),
     tagsMap: helper.getTagsMap(),
     userAdmin: helper.getMe()?.user_admin,

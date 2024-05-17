@@ -18,7 +18,7 @@ import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchDocuments } from '../../../../actions/Document';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useFormatter } from '../../../../components/i18n';
-import type { DocumentsHelper } from '../../../../actions/helper';
+import type { DocumentHelper } from '../../../../actions/helper';
 import CreateArticle from './CreateArticle';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
 import { ArticleContext, PermissionsContext } from '../Context';
@@ -58,7 +58,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
   const { t } = useFormatter();
 
   // Fetching data
-  const { channelsMap, documentsMap } = useHelper((helper: ChannelsHelper & DocumentsHelper) => ({
+  const { channelsMap, documentsMap } = useHelper((helper: ChannelsHelper & DocumentHelper) => ({
     channelsMap: helper.getChannelsMap(),
     documentsMap: helper.getDocumentsMap(),
   }));
@@ -121,7 +121,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
           handleCloseCreate={handleCloseCreate}
         />
       )}
-      {sortedArticles.length > 0 && (
+      {fullArticles.length > 0 && (
         <ChannelsFilter
           onAddChannel={handleAddChannel}
           onRemoveChannel={handleRemoveChannel}

@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import Breadcrumbs from '../../../components/Breadcrumbs';
-import type { UsersHelper } from '../../../actions/helper';
+import type { UserHelper } from '../../../actions/helper';
 import type { Inject, InjectResultDTO } from '../../../utils/api-types';
 import { createAtomicTesting, searchAtomicTestings } from '../../../actions/atomic_testings/atomic-testing-actions';
 import CreateInject from '../common/injects/CreateInject';
@@ -16,7 +16,7 @@ const AtomicTestings = () => {
   const { t } = useFormatter();
   const navigate = useNavigate();
 
-  const { userAdmin } = useHelper((helper: UsersHelper) => ({
+  const { userAdmin } = useHelper((helper: UserHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
 

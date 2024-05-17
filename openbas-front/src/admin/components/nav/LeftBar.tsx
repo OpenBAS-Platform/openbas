@@ -32,7 +32,7 @@ import { createStyles, makeStyles, styled, useTheme } from '@mui/styles';
 import { fileUri, MESSAGING$ } from '../../../utils/Environment';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import type { UsersHelper } from '../../../actions/helper';
+import type { UserHelper } from '../../../actions/helper';
 import type { Theme } from '../../../components/Theme';
 import logoFiligranDark from '../../../static/images/logo_filigran_dark.png';
 import logoFiligranLight from '../../../static/images/logo_filigran_light.png';
@@ -188,7 +188,7 @@ const LeftBar = () => {
   const handleGoToPage = (link: string) => {
     navigate(link);
   };
-  const userAdmin = useHelper((helper: UsersHelper) => {
+  const userAdmin = useHelper((helper: UserHelper) => {
     const me = helper.getMe();
     return me?.user_admin ?? false;
   });

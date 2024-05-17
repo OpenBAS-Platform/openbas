@@ -8,7 +8,7 @@ import ExerciseCreation from './simulation/ExerciseCreation';
 import ExerciseList from './ExerciseList';
 import { useAppDispatch } from '../../../utils/hooks';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
-import type { UsersHelper } from '../../../actions/helper';
+import type { UserHelper } from '../../../actions/helper';
 
 const Exercises = () => {
   // Standard hooks
@@ -16,7 +16,7 @@ const Exercises = () => {
   const { t } = useFormatter();
 
   // Fetching data
-  const { exercises, userAdmin } = useHelper((helper: ExercisesHelper & UsersHelper) => ({
+  const { exercises, userAdmin } = useHelper((helper: ExercisesHelper & UserHelper) => ({
     exercises: helper.getExercises(),
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));

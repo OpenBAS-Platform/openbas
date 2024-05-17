@@ -7,7 +7,7 @@ import { useAppDispatch } from '../../../../../utils/hooks';
 import { useHelper } from '../../../../../store';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
-import type { ChallengesHelper } from '../../../../../actions/helper';
+import type { ChallengeHelper } from '../../../../../actions/helper';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
@@ -32,7 +32,7 @@ const ScenarioInjects: FunctionComponent<Props> = () => {
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
 
   const { injects, scenario, teams, articles, variables } = useHelper(
-    (helper: InjectHelper & ScenariosHelper & ArticlesHelper & ChallengesHelper & VariablesHelper) => {
+    (helper: InjectHelper & ScenariosHelper & ArticlesHelper & ChallengeHelper & VariablesHelper) => {
       return {
         injects: helper.getScenarioInjects(scenarioId),
         scenario: helper.getScenario(scenarioId),

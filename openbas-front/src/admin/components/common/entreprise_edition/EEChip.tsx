@@ -4,7 +4,7 @@ import EnterpriseEditionAgreement from './EnterpriseEditionAgreement';
 import type { Theme } from '../../../../components/Theme';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 import { useHelper } from '../../../../store';
-import type { UsersHelper } from '../../../../actions/helper';
+import type { UserHelper } from '../../../../actions/helper';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -45,7 +45,7 @@ const EEChip = ({ clickable = true, floating = false }: { clickable?: boolean, f
   const classes = useStyles();
   const isEnterpriseEdition = useEnterpriseEdition();
   const [displayDialog, setDisplayDialog] = useState(false);
-  const userAdmin = useHelper((helper: UsersHelper) => {
+  const userAdmin = useHelper((helper: UserHelper) => {
     const me = helper.getMe();
     return me?.user_admin ?? false;
   });

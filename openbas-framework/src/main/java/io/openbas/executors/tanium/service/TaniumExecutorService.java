@@ -2,25 +2,39 @@ package io.openbas.executors.tanium.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.asset.EndpointService;
+import io.openbas.database.model.Asset;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Executor;
+import io.openbas.database.model.Injector;
 import io.openbas.executors.tanium.client.TaniumExecutorClient;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
+import io.openbas.executors.tanium.model.NodeEndpoint;
+import io.openbas.executors.tanium.model.TaniumEndpoint;
 import io.openbas.integrations.ExecutorService;
 import io.openbas.integrations.InjectorService;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.logging.Level;
+
+import static java.time.Instant.now;
+import static java.time.ZoneOffset.UTC;
 
 @ConditionalOnProperty(prefix = "executor.tanium", name = "enable")
 @Log
 @Service
 public class TaniumExecutorService implements Runnable {
+    private static final int CLEAR_TTL = 1200000;
     private static final String TANIUM_EXECUTOR_TYPE = "openbas_tanium";
     private static final String TANIUM_EXECUTOR_NAME = "Tanium";
 
@@ -33,6 +47,15 @@ public class TaniumExecutorService implements Runnable {
     private final InjectorService injectorService;
 
     private Executor executor = null;
+
+    public static Endpoint.PLATFORM_TYPE toPlatform(@NotBlank final String platform) {
+        return switch (platform) {
+            case "Linux" -> Endpoint.PLATFORM_TYPE.Linux;
+            case "Windows" -> Endpoint.PLATFORM_TYPE.Windows;
+            case "MacOS" -> Endpoint.PLATFORM_TYPE.MacOS;
+            default -> throw new IllegalArgumentException("This platform is not supported : " + platform);
+        };
+    }
 
     @Autowired
     public TaniumExecutorService(
@@ -58,10 +81,87 @@ public class TaniumExecutorService implements Runnable {
     public void run() {
         log.info("Running Tanium executor endpoints gathering...");
         try {
-            List<io.openbas.executors.tanium.model.Endpoint> endpoints = this.client.endpoints().stream().toList();
-            System.out.println(endpoints);
+            List<NodeEndpoint> nodeEndpoints = this.client.endpoints().getData().getEndpoints().getEdges().stream().toList();
+            List<Endpoint> endpoints = toEndpoint(nodeEndpoints).stream().filter(Asset::getActive).toList();
+            log.info("Tanium executor provisioning based on " + endpoints.size() + " assets");
+            endpoints.forEach(endpoint -> {
+                List<Endpoint> existingEndpoints = this.endpointService.findAssetsForInjectionByHostname(endpoint.getHostname()).stream().filter(endpoint1 -> Arrays.stream(endpoint1.getIps()).anyMatch(s -> Arrays.stream(endpoint.getIps()).toList().contains(s))).toList();
+                if (existingEndpoints.isEmpty()) {
+                    Optional<Endpoint> endpointByExternalReference = endpointService.findByExternalReference(endpoint.getExternalReference());
+                    if( endpointByExternalReference.isPresent() ) {
+                        this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
+                    } else {
+                        this.endpointService.createEndpoint(endpoint);
+                    }
+                } else {
+                    this.updateEndpoint(endpoint, existingEndpoints);
+                }
+            });
+            List<Endpoint> inactiveEndpoints = toEndpoint(nodeEndpoints).stream().filter(endpoint -> !endpoint.getActive()).toList();
+            inactiveEndpoints.forEach(endpoint -> {
+                Optional<Endpoint> optionalExistingEndpoint = this.endpointService.findByExternalReference(endpoint.getExternalReference());
+                if(optionalExistingEndpoint.isPresent()) {
+                    Endpoint existingEndpoint = optionalExistingEndpoint.get();
+                    log.info("Found stale endpoint " + existingEndpoint.getName() + ", deleting it...");
+                    this.endpointService.deleteEndpoint(existingEndpoint.getId());
+                }
+            });
         } catch (ClientProtocolException | JsonProcessingException e) {
             log.log(Level.SEVERE, "Error running Tanium service " + e.getMessage(), e);
         }
+    }
+
+    // -- PRIVATE --
+
+    private List<Endpoint> toEndpoint(@NotNull final List<NodeEndpoint> nodeEndpoints) {
+        return nodeEndpoints.stream()
+                .map((nodeEndpoint) -> {
+                    TaniumEndpoint taniumEndpoint = nodeEndpoint.getNode();
+                    Endpoint endpoint = new Endpoint();
+                    endpoint.setExecutor(this.executor);
+                    endpoint.setExternalReference(taniumEndpoint.getId());
+                    endpoint.setName(taniumEndpoint.getName());
+                    endpoint.setDescription("Asset collected by Tanium executor context.");
+                    endpoint.setIps(taniumEndpoint.getIpAddresses());
+                    endpoint.setHostname(taniumEndpoint.getName());
+                    endpoint.setPlatform(toPlatform(taniumEndpoint.getOs().getPlatform()));
+                    endpoint.setLastSeen(toInstant(taniumEndpoint.getEidLastSeen()));
+                    return endpoint;
+                })
+                .toList();
+    }
+
+    private void updateEndpoint(@NotNull final Endpoint external, @NotNull final List<Endpoint> existingList) {
+        Endpoint matchingExistingEndpoint = existingList.getFirst();
+        matchingExistingEndpoint.setLastSeen(external.getLastSeen());
+        matchingExistingEndpoint.setName(external.getName());
+        matchingExistingEndpoint.setIps(external.getIps());
+        matchingExistingEndpoint.setHostname(external.getHostname());
+        matchingExistingEndpoint.setExternalReference(external.getExternalReference());
+        matchingExistingEndpoint.setPlatform(external.getPlatform());
+        matchingExistingEndpoint.setExecutor(this.executor);
+        if ((now().toEpochMilli() - matchingExistingEndpoint.getClearedAt().toEpochMilli()) > CLEAR_TTL) {
+            try {
+                log.info("Clearing endpoint " + matchingExistingEndpoint.getHostname());
+                Iterable<Injector> injectors = injectorService.injectors();
+                injectors.forEach(injector -> {
+                    if(injector.getExecutorClearCommands() != null) {
+                        this.taniumExecutorContextService.launchExecutorClear(injector, matchingExistingEndpoint);
+                    }
+                });
+                matchingExistingEndpoint.setClearedAt(now());
+            } catch (RuntimeException e) {
+                log.info("Failed clear agents");
+            }
+        }
+        this.endpointService.updateEndpoint(matchingExistingEndpoint);
+    }
+
+    private Instant toInstant(@NotNull final String lastSeen) {
+        String pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern, Locale.getDefault());
+        LocalDateTime localDateTime = LocalDateTime.parse(lastSeen, dateTimeFormatter);
+        ZonedDateTime zonedDateTime = localDateTime.atZone(UTC);
+        return zonedDateTime.toInstant();
     }
 }

@@ -3,7 +3,7 @@ import { CircularProgress, CircularProgressProps, IconButton, ToggleButton, Tool
 import { CloudUploadOutlined } from '@mui/icons-material';
 import { useFormatter } from '../i18n';
 import { useHelper } from '../../store';
-import type { UsersHelper } from '../../actions/helper';
+import type { UserHelper } from '../../actions/helper';
 
 interface Props {
   title: string;
@@ -21,7 +21,7 @@ const ImportUploader: FunctionComponent<Props> = ({
   const uploadRef = useRef<HTMLInputElement | null>(null);
   const [upload, setUpload] = useState(false);
   const handleOpenUpload = () => uploadRef.current && uploadRef.current.click();
-  const userAdmin = useHelper((helper: UsersHelper) => {
+  const userAdmin = useHelper((helper: UserHelper) => {
     const me = helper.getMe();
     return me?.user_admin ?? false;
   });

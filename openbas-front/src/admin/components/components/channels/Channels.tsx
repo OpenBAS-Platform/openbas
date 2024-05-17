@@ -12,7 +12,7 @@ import CreateChannel from './CreateChannel';
 import { useFormatter } from '../../../../components/i18n';
 import ChannelIcon from './ChannelIcon';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
-import type { UsersHelper } from '../../../../actions/helper';
+import type { UserHelper } from '../../../../actions/helper';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { Channel } from '../../../../utils/api-types';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
@@ -104,7 +104,7 @@ const Channels = () => {
   const searchColumns = ['type', 'name', 'description'];
   const filtering = useSearchAnFilter('channel', 'name', searchColumns);
   // Fetching data
-  const { channels, userAdmin }: { channels: Channel[], userAdmin: boolean } = useHelper((helper: ChannelsHelper & UsersHelper) => ({
+  const { channels, userAdmin }: { channels: Channel[], userAdmin: boolean } = useHelper((helper: ChannelsHelper & UserHelper) => ({
     channels: helper.getChannels(),
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));

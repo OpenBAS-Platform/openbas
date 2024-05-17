@@ -14,7 +14,7 @@ import type { Communication, User } from '../../../../../utils/api-types';
 import { resolveUserName } from '../../../../../utils/String';
 import type { CommunicationHelper } from '../../../../../actions/communications/communication-helper';
 import { fetchExerciseCommunications } from '../../../../../actions/Communication';
-import type { UsersHelper } from '../../../../../actions/helper';
+import type { UserHelper } from '../../../../../actions/helper';
 import { fetchPlayers } from '../../../../../actions/User';
 
 interface Props {
@@ -30,7 +30,7 @@ const MailDistributionByPlayer: FunctionComponent<Props> = ({
   const theme: Theme = useTheme();
 
   // Fetching data
-  const { communications, usersMap } = useHelper((helper: CommunicationHelper & UsersHelper) => ({
+  const { communications, usersMap } = useHelper((helper: CommunicationHelper & UserHelper) => ({
     communications: helper.getExerciseCommunications(exerciseId),
     usersMap: helper.getUsersMap(),
   }));

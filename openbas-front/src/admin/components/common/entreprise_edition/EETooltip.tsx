@@ -5,7 +5,7 @@ import { useFormatter } from '../../../../components/i18n';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 import useAI from '../../../../utils/hooks/useAI';
 import { useHelper } from '../../../../store';
-import type { UsersHelper } from '../../../../actions/helper';
+import type { UserHelper } from '../../../../actions/helper';
 
 const EETooltip = ({
   children,
@@ -20,7 +20,7 @@ const EETooltip = ({
   const [feedbackCreation, setFeedbackCreation] = useState(false);
   const [openEnableAI, setOpenEnableAI] = useState(false);
   const [openConfigAI, setOpenConfigAI] = useState(false);
-  const userAdmin = useHelper((helper: UsersHelper) => {
+  const userAdmin = useHelper((helper: UserHelper) => {
     const me = helper.getMe();
     return me?.user_admin ?? false;
   });
