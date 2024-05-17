@@ -1,14 +1,12 @@
 package io.openbas.execution;
 
-import static io.openbas.database.model.InjectStatusExecution.traceInfo;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.asset.QueueService;
 import io.openbas.database.model.Injector;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.InjectorRepository;
-import io.openbas.service.QueueService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -17,6 +15,8 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
+
+import static io.openbas.database.model.InjectStatusExecution.traceInfo;
 
 @Component
 public class Executor {

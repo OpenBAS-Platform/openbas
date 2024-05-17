@@ -9,12 +9,16 @@ import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
+import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.EncodedResourceResolver;
 import org.springframework.web.servlet.resource.PathResourceResolver;
+
 import java.util.List;
+import java.util.concurrent.Executors;
 
 @Configuration
 @EnableWebMvc
@@ -38,6 +42,16 @@ public class MvcConfig implements WebMvcConfigurer {
     messageConverters.add(new ByteArrayHttpMessageConverter());
     messageConverters.add(new StringHttpMessageConverter());
     messageConverters.add(customJackson2HttpMessageConverter());
+  }
+
+  @Override
+  public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+    configurer.setTaskExecutor(getTaskExecutor());
+  }
+
+  @Bean
+  protected ConcurrentTaskExecutor getTaskExecutor() {
+    return new ConcurrentTaskExecutor(Executors.newFixedThreadPool(20));
   }
 
   private void addPathStaticResolver(ResourceHandlerRegistry registry, String pattern, String location) {

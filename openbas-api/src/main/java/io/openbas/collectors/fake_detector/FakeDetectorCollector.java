@@ -5,7 +5,7 @@ import io.openbas.collectors.fake_detector.service.FakeDetectorService;
 import io.openbas.integrations.CollectorService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -15,7 +15,7 @@ import java.time.Duration;
 public class FakeDetectorCollector {
 
   private final CollectorFakeDetectorConfig config;
-  private final TaskScheduler taskScheduler;
+  private final ThreadPoolTaskScheduler taskScheduler;
   private final FakeDetectorService fakeDetectorService;
   private final CollectorService collectorService;
 

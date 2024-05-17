@@ -1,7 +1,6 @@
 package io.openbas.executors.caldera;
 
 import io.openbas.asset.EndpointService;
-import io.openbas.database.repository.InjectorRepository;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.service.CalderaExecutorContextService;
@@ -11,7 +10,7 @@ import io.openbas.integrations.InjectorService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -22,7 +21,7 @@ import java.time.Duration;
 public class CalderaExecutor {
 
     private final CalderaExecutorConfig config;
-    private final TaskScheduler taskScheduler;
+    private final ThreadPoolTaskScheduler taskScheduler;
     private final CalderaExecutorClient client;
     private final EndpointService endpointService;
     private final CalderaExecutorContextService calderaExecutorContextService;

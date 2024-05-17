@@ -1,6 +1,5 @@
 package io.openbas.rest.injector;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,20 +22,23 @@ import io.openbas.rest.injector_contract.form.InjectorContractInput;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 
+import static io.openbas.asset.QueueService.EXCHANGE_KEY;
+import static io.openbas.asset.QueueService.ROUTING_KEY;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.service.QueueService.EXCHANGE_KEY;
-import static io.openbas.service.QueueService.ROUTING_KEY;
 
+@Log
 @RestController
 public class InjectorApi extends RestBehavior {
 
@@ -192,13 +194,14 @@ public class InjectorApi extends RestBehavior {
         factory.setUsername(openBASConfig.getRabbitmqUser());
         factory.setPassword(openBASConfig.getRabbitmqPass());
         factory.setVirtualHost(openBASConfig.getRabbitmqVhost());
+        // Declare queueing
+        Connection connection = null;
         try {
             // Upload icon
             if (file.isPresent() && "image/png".equals(file.get().getContentType())) {
                 fileService.uploadFile(FileService.INJECTORS_IMAGES_BASE_PATH + input.getType() + ".png", file.get());
             }
-            // Declare queueing
-            Connection connection = factory.newConnection();
+            connection = factory.newConnection();
             Channel channel = connection.createChannel();
             String queueName = openBASConfig.getRabbitmqPrefix() + "_injector_" + input.getType();
             Map<String, Object> queueOptions = new HashMap<>();
@@ -255,6 +258,14 @@ public class InjectorApi extends RestBehavior {
             return new InjectorRegistration(conn, queueName);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (IOException e) {
+                    log.severe("Unable to close RabbitMQ connection. You should worry as this could impact performance");
+                }
+            }
         }
     }
 }
