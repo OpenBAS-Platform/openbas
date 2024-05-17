@@ -53,7 +53,7 @@ public class TaniumExecutorService implements Runnable {
             case "Linux" -> Endpoint.PLATFORM_TYPE.Linux;
             case "Windows" -> Endpoint.PLATFORM_TYPE.Windows;
             case "MacOS" -> Endpoint.PLATFORM_TYPE.MacOS;
-            default -> throw new IllegalArgumentException("This platform is not supported : " + platform);
+            default -> Endpoint.PLATFORM_TYPE.Unknown;
         };
     }
 

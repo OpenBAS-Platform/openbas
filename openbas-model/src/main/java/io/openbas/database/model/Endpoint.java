@@ -34,6 +34,8 @@ public class Endpoint extends Asset {
     Generic,
     @JsonProperty("Internal")
     Internal,
+    @JsonProperty("Unknown")
+    Unknown,
   }
 
   @Queryable(filterable = true)
