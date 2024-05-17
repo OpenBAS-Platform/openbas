@@ -16,10 +16,10 @@ import DryrunStatus from './DryrunStatus';
 import { fetchDryinjects } from '../../../../../actions/Dryinject';
 import InjectIcon from '../../../common/injects/InjectIcon';
 import InjectorContract from '../../../common/injects/InjectorContract';
-import InjectStatus from '../../../common/injects/InjectStatus';
 import InjectStatusDetails from '../../../common/injects/InjectStatusDetails';
 import { resolveUserName } from '../../../../../utils/String';
 import DryrunProgress from './DryrunProgress';
+import ItemStatus from '../../../../../components/ItemStatus';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -373,9 +373,10 @@ const Dryrun = () => {
                         className={classes.bodyItem}
                         style={inlineStyles.dryinject_status}
                       >
-                        <InjectStatus
+                        <ItemStatus
                           variant="list"
                           status={dryinject.dryinject_status?.status_name}
+                          label={t(dryinject.dryinject_status?.status_name)}
                         />
                       </div>
                       <div

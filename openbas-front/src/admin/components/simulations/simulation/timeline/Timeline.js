@@ -17,7 +17,6 @@ import useSearchAnFilter from '../../../../../utils/SortingFiltering';
 import InjectIcon from '../../../common/injects/InjectIcon';
 import { splitDuration } from '../../../../../utils/Time';
 import InjectPopover from '../../../common/injects/InjectPopover';
-import InjectStatus from '../../../common/injects/InjectStatus';
 import { truncate } from '../../../../../utils/String';
 import ProgressBarCountdown from '../../../../../components/ProgressBarCountdown';
 import AnimationMenu from '../AnimationMenu';
@@ -27,6 +26,7 @@ import { fetchVariablesForExercise } from '../../../../../actions/variables/vari
 import InjectOverTimeArea from './InjectOverTimeArea';
 import InjectOverTimeLine from './InjectOverTimeLine';
 import UpdateInject from '../../../common/injects/UpdateInject';
+import ItemStatus from '../../../../../components/ItemStatus';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -505,8 +505,9 @@ const Timeline = () => {
                               className={classes.bodyItem}
                               style={{ width: '20%' }}
                             >
-                              <InjectStatus
+                              <ItemStatus
                                 variant="list"
+                                label={t(inject.inject_status?.status_name)}
                                 status={inject.inject_status?.status_name}
                               />
                             </div>

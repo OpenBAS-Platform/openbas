@@ -186,26 +186,24 @@ public class InjectsExecutionJob implements Job {
         // Depending on injector type (internal or external) execution must be done differently
         Inject inject = executableInject.getInjection().getInject();
         Injector externalInjector = injectorRepository.findByType(inject.getInjectorContract().getInjector().getType()).orElseThrow();
-        LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle() + " (status = PENDING)");
-        // Status
-        if( inject.getStatus().isEmpty() ) {
-            InjectStatus status = new InjectStatus();
-            status.setName(ExecutionStatus.PENDING);
-            status.setTrackingSentDate(Instant.now());
-            status.setInject(inject);
-            injectStatusRepository.save(status);
-        } else {
-            InjectStatus status = inject.getStatus().get();
-            status.setName(ExecutionStatus.PENDING);
-            status.setTrackingSentDate(Instant.now());
-            injectStatusRepository.save(status);
-        }
-        inject.setUpdatedAt(now());
-        injectRepository.save(inject);
+        LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle());
         // Executor logics
         ExecutableInject newExecutableInject = executableInject;
         if (inject.getInjectorContract().getNeedsExecutor()) {
             try {
+                // Status
+                if( inject.getStatus().isEmpty() ) {
+                    InjectStatus status = new InjectStatus();
+                    status.setName(ExecutionStatus.EXECUTING);
+                    status.setTrackingSentDate(Instant.now());
+                    status.setInject(inject);
+                    injectStatusRepository.save(status);
+                } else {
+                    InjectStatus status = inject.getStatus().get();
+                    status.setName(ExecutionStatus.EXECUTING);
+                    status.setTrackingSentDate(Instant.now());
+                    injectStatusRepository.save(status);
+                }
                 newExecutableInject = this.executionExecutorService.launchExecutorContext(executableInject, inject);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

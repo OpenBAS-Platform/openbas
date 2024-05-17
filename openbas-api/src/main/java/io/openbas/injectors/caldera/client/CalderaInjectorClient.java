@@ -181,7 +181,6 @@ public class CalderaInjectorClient {
             HttpGet httpGet = new HttpGet(url);
             // Headers
             httpGet.addHeader(KEY_HEADER, this.config.getApiKey());
-
             return this.httpClient.execute(
                     httpGet,
                     response -> EntityUtils.toString(response.getEntity())

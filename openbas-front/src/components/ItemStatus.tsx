@@ -74,7 +74,7 @@ const computeStatusStyle = (status: string | undefined | null, isInject: boolean
       return inlineStyles.orange;
     case 'QUEUING':
       return inlineStyles.yellow;
-    case 'RUNNING':
+    case 'EXECUTING':
       return inlineStyles.purple;
     case 'PENDING':
       return inlineStyles.blue;

@@ -120,8 +120,7 @@ public class CalderaExecutor extends Injector {
         }
         log.log(Level.INFO, "Trying to find an available executor for " + asset.getName());
         Endpoint assetEndpoint = (Endpoint) Hibernate.unproxy(asset);
-        while (endpointForExecution == null) {
-            count++;
+        for(int i = 0; i < RETRY_NUMBER; i++) {
             // Find an executor agent matching the asset
             log.log(Level.INFO, "Listing agents...");
             List<Agent> agents = this.calderaService.agents().stream().filter(agent ->
@@ -132,7 +131,7 @@ public class CalderaExecutor extends Injector {
             ).toList();
             log.log(Level.INFO, "List return with " + agents.size() + " agents");
             if (!agents.isEmpty()) {
-                for (int i = 0; i < agents.size(); i++) {
+                for (int j = 0; j < agents.size(); j++) {
                     // Check in the database if not exist
                     Optional<Endpoint> resolvedExistingEndpoint = this.endpointService.findByExternalReference(agents.get(i).getPaw());
                     if (resolvedExistingEndpoint.isEmpty()) {
@@ -151,10 +150,10 @@ public class CalderaExecutor extends Injector {
                     }
                 }
             }
-            Thread.sleep(5000);
-            if (count >= RETRY_NUMBER) {
+            if( endpointForExecution != null ) {
                 break;
             }
+            Thread.sleep(5000);
         }
         return endpointForExecution;
     }

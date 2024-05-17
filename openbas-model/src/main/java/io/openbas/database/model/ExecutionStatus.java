@@ -4,6 +4,7 @@ public enum ExecutionStatus {
     DRAFT,
     INFO,
     QUEUING,
+    EXECUTING,
     PENDING,
     PARTIAL,
     ERROR,
