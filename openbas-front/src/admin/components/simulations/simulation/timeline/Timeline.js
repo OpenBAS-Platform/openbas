@@ -121,6 +121,10 @@ const useStyles = makeStyles(() => ({
     maxHeight: 50,
     paddingRight: 0,
   },
+  bodyItems: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   bodyItem: {
     height: '100%',
     fontSize: 14,
@@ -128,6 +132,7 @@ const useStyles = makeStyles(() => ({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    paddingRight: 10,
   },
 }));
 
@@ -423,7 +428,7 @@ const Timeline = () => {
                         </ListItemIcon>
                         <ListItemText
                           primary={
-                            <div>
+                            <div className={classes.bodyItems}>
                               <div
                                 className={classes.bodyItem}
                                 style={{ width: '50%' }}
@@ -432,7 +437,7 @@ const Timeline = () => {
                               </div>
                               <div
                                 className={classes.bodyItem}
-                                style={{ width: '20%', paddingTop: 8 }}
+                                style={{ width: '20%' }}
                               >
                                 <ProgressBarCountdown
                                   date={inject.inject_date}
@@ -444,12 +449,7 @@ const Timeline = () => {
                               </div>
                               <div
                                 className={classes.bodyItem}
-                                style={{
-                                  fontFamily: 'Consolas, monaco, monospace',
-                                  fontSize: 12,
-                                  paddingTop: 3,
-                                  marginRight: 15,
-                                }}
+                                style={{ fontFamily: 'Consolas, monaco, monospace', fontSize: 12 }}
                               >
                                 {fndt(inject.inject_date)}
                               </div>
@@ -494,7 +494,7 @@ const Timeline = () => {
                       </ListItemIcon>
                       <ListItemText
                         primary={
-                          <div>
+                          <div className={classes.bodyItems}>
                             <div
                               className={classes.bodyItem}
                               style={{ width: '40%' }}
@@ -513,12 +513,7 @@ const Timeline = () => {
                             </div>
                             <div
                               className={classes.bodyItem}
-                              style={{
-                                fontFamily: 'Consolas, monaco, monospace',
-                                fontSize: 12,
-                                paddingTop: 3,
-                                marginRight: 15,
-                              }}
+                              style={{ fontFamily: 'Consolas, monaco, monospace', fontSize: 12 }}
                             >
                               {fndt(inject.inject_status?.tracking_sent_date)} (
                               {inject.inject_status

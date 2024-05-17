@@ -177,9 +177,7 @@ const Endpoints = () => {
                       {endpoint.asset_name}
                     </div>
                     <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
-                      <PlatformIcon platform={endpoint.endpoint_platform} width={20}
-                        marginRight={10}
-                      /> {endpoint.endpoint_platform}
+                      <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10}/> {endpoint.endpoint_platform}
                     </div>
                     <div className={classes.bodyItem} style={inlineStyles.endpoint_executor}>
                       {executor && (

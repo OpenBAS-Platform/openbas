@@ -74,10 +74,11 @@ public class CalderaExecutor extends Injector {
                         execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (" + result + ")"));
                     }
                 } else {
-                    execution.addTrace(traceError("Caldera failed to execute the ability because execution endpoint was not found for endpoint " + asset.getName()));
+                    execution.addTrace(traceError("Caldera failed to execute the ability because temporary implant was not found for endpoint " + asset.getName()));
                 }
             } catch (Exception e) {
                 execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (" + e.getMessage() + ")"));
+                log.severe(Arrays.toString(e.getStackTrace()));
             }
         });
 
@@ -85,7 +86,7 @@ public class CalderaExecutor extends Injector {
         assetGroups.forEach((assetGroup -> computeExpectationsForAssetGroup(expectations, content, assetGroup)));
 
         if (asyncIds.isEmpty()) {
-            throw new UnsupportedOperationException("Caldera inject needs at least one valid asset");
+            throw new UnsupportedOperationException("Caldera failed to execute the ability due to above errors");
         }
 
         String message = "Caldera execute ability on " + asyncIds.size() + " asset(s)";
@@ -112,7 +113,6 @@ public class CalderaExecutor extends Injector {
     }
 
     private Endpoint findAndRegisterAssetForExecution(@NotNull final Inject inject, @NotNull final Asset asset) throws InterruptedException {
-        int count = 0;
         Endpoint endpointForExecution = null;
         if (!asset.getType().equals("Endpoint")) {
             log.log(Level.SEVERE, "Caldera failed to execute ability on the asset because type is not supported: " + asset.getType());

@@ -33,7 +33,6 @@ public class CalderaGarbageCollectorService implements Runnable {
     private final int DELETE_TTL = 1200000; // 20 min
 
     private final CalderaInjectorClient client;
-
     private final EndpointService endpointService;
 
     public static Endpoint.PLATFORM_TYPE toPlatform(@NotBlank final String platform) {
