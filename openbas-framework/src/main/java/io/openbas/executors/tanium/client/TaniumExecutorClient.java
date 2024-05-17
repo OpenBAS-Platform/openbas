@@ -8,9 +8,9 @@ import io.openbas.executors.tanium.model.DataEndpoints;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.client5.http.ClientProtocolException;
+import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class TaniumExecutorClient {
     private static final String KEY_HEADER = "session";
 
     private final TaniumExecutorConfig config;
-    private final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+    private final HttpClient httpClient = HttpClients.createDefault();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     // -- ENDPOINTS --

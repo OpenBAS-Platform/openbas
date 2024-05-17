@@ -78,6 +78,7 @@ public class CalderaExecutor extends Injector {
                 }
             } catch (Exception e) {
                 execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (" + e.getMessage() + ")"));
+                e.printStackTrace();
                 log.severe(Arrays.toString(e.getStackTrace()));
             }
         });
