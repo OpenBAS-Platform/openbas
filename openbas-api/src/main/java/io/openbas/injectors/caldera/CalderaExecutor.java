@@ -144,7 +144,7 @@ public class CalderaExecutor extends Injector {
                         newEndpoint.setIps(assetEndpoint.getIps());
                         newEndpoint.setHostname(assetEndpoint.getHostname());
                         newEndpoint.setPlatform(assetEndpoint.getPlatform());
-                        newEndpoint.setExternalReference(agents.get(i).getPaw());
+                        newEndpoint.setExternalReference(agents.get(j).getPaw());
                         newEndpoint.setExecutor(assetEndpoint.getExecutor());
                         endpointForExecution = this.endpointService.createEndpoint(newEndpoint);
                         break;

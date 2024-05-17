@@ -28,6 +28,7 @@ import static io.openbas.inject_expectation.InjectExpectationUtils.resultsBySour
 @Log
 @Service
 public class CalderaResultCollectorService implements Runnable {
+    private final int EXPIRATION_TIME = 900;
 
     private final InjectRepository injectRepository;
     private final InjectStatusRepository injectStatusRepository;
@@ -54,6 +55,7 @@ public class CalderaResultCollectorService implements Runnable {
     }
 
     @Override
+    @Transactional
     public void run() {
         // Retrieve Caldera inject not done
         List<InjectStatus> injectStatuses = this.injectStatusRepository.pendingForInjectType(CalderaContract.TYPE);
@@ -74,7 +76,13 @@ public class CalderaResultCollectorService implements Runnable {
                     ResultStatus resultStatus = this.calderaService.results(linkId);
                     log.log(Level.INFO, "Returning results");
                     if (resultStatus.getPaw() == null) {
-                        injectStatus.getTraces().add(traceInfo("Results are not yet available (still on-going)"));
+                        if (injectStatus.getTrackingSentDate().isBefore(Instant.now().minus(EXPIRATION_TIME / 60, ChronoUnit.MINUTES))) {
+                            injectStatus.getTraces().add(traceError("Cannot get result for " + linkId + ", injection is expired"));
+                            computeInjectStatus(injectStatus, finalExecutionTime, 0, 0);
+                            computeInject(injectStatus);
+                        } else {
+                            injectStatus.getTraces().add(traceInfo("Results are not yet available (still on-going)"));
+                        }
                     } else {
                         Endpoint currentEndpoint = this.endpointService.findByExternalReference(resultStatus.getPaw()).orElseThrow();
                         String currentAssetId = currentEndpoint.getId();
