@@ -170,7 +170,7 @@ const Users = () => {
                   <div className={classes.bodyItem} style={inlineStyles.user_organization}>
                     {organizationsMap[user.user_organization]?.organization_name}
                   </div>
-                  <div className={classes.itemAdmin} style={inlineStyles.user_admin}>
+                  <div className={classes.bodyItem} style={inlineStyles.user_admin}>
                     {user.user_admin ? (<CheckCircleOutlined fontSize="small" />) : ('-')}
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.user_tags}>
