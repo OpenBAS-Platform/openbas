@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.openbas</groupId>
         <artifactId>openbas-platform</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
     </parent>
 
     <artifactId>openbas-api</artifactId>
@@ -31,22 +31,22 @@
                 <dependency>
                     <groupId>io.openbas</groupId>
                     <artifactId>openbas-injector-ovh</artifactId>
-                    <version>1.0.1</version>
+                    <version>1.0.2</version>
                 </dependency>
                 <dependency>
                     <groupId>io.openbas</groupId>
                     <artifactId>openbas-injector-lade</artifactId>
-                    <version>1.0.1</version>
+                    <version>1.0.2</version>
                 </dependency>
                 <dependency>
                     <groupId>io.openbas</groupId>
                     <artifactId>openbas-injector-mastodon</artifactId>
-                    <version>1.0.1</version>
+                    <version>1.0.2</version>
                 </dependency>
                 <dependency>
                     <groupId>io.openbas</groupId>
                     <artifactId>openbas-collector-sentinel</artifactId>
-                    <version>1.0.1</version>
+                    <version>1.0.2</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -56,7 +56,7 @@
         <dependency>
             <groupId>io.openbas</groupId>
             <artifactId>openbas-framework</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>com.rabbitmq</groupId>
