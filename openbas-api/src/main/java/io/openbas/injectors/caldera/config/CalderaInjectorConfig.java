@@ -17,6 +17,12 @@ public class CalderaInjectorConfig {
   private final static String REST_V2_URI = "/api/v2";
   private final static String PLUGIN_ACCESS_URI = "/plugin/access";
 
+  private int expirationTime = 900;
+
+  public int getExpirationTimeInMinute() {
+    return this.expirationTime / 60;
+  }
+
   @Getter
   private boolean enable;
 
@@ -50,4 +56,5 @@ public class CalderaInjectorConfig {
   public String getUrl() {
     return url;
   }
+
 }
