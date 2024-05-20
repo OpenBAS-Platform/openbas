@@ -311,9 +311,13 @@ public class V1_DataImporter implements Importer {
       scenario.setSeverity(scenarioNode.get("scenario_severity").textValue());
       scenario.setRecurrence(scenarioNode.get("scenario_recurrence").textValue());
       String recurrenceStart = scenarioNode.get("scenario_recurrence_start").textValue();
-      scenario.setRecurrenceStart(Instant.parse(recurrenceStart));
+      if (hasText(recurrenceStart)) {
+        scenario.setRecurrenceStart(Instant.parse(recurrenceStart));
+      }
       String recurrenceEnd = scenarioNode.get("scenario_recurrence_end").textValue();
-      scenario.setRecurrenceEnd(Instant.parse(recurrenceEnd));
+      if (hasText(recurrenceEnd)) {
+        scenario.setRecurrenceEnd(Instant.parse(recurrenceEnd));
+      }
       scenario.setHeader(scenarioNode.get("scenario_message_header").textValue());
       scenario.setFooter(scenarioNode.get("scenario_message_footer").textValue());
       scenario.setFrom(scenarioNode.get("scenario_mail_from").textValue());
@@ -454,38 +458,15 @@ public class V1_DataImporter implements Importer {
 
     // ------------ Handling teams
     Stream<JsonNode> teamsStream = resolveJsonElements(importNode, prefix + "teams");
-    teamsStream.forEach(nodeTeam -> {
-      String id = nodeTeam.get("team_id").textValue();
-      String teamName = nodeTeam.get("team_name").textValue();
-      // Prevent duplication of team, based on the team name
-      List<Team> existingTeams = teamRepository.findByNameIgnoreCase(teamName);
-      if (existingTeams.size() == 1) {
-        baseIds.put(id, existingTeams.get(0));
-      } else {
-        Team team = new Team();
-        team.setName(nodeTeam.get("team_name").textValue());
-        team.setDescription(nodeTeam.get("team_description").textValue());
-        // Tags
-        List<String> teamTagIds = resolveJsonIds(nodeTeam, "team_tags");
-        List<Tag> tagsForTeam = teamTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
-        team.setTags(tagsForTeam);
-        // Users
-        List<String> teamUserIds = resolveJsonIds(nodeTeam, "team_users");
-        List<User> usersForTeam = teamUserIds.stream()
-            .map(baseIds::get)
-            .filter(Objects::nonNull)
-            .map(base -> (User) base)
-            .toList();
-        team.setUsers(usersForTeam);
-        if (savedExercise != null) {
-          team.setExercises(List.of(savedExercise));
-        } else if (savedScenario != null) {
-          team.setScenarios(List.of(savedScenario));
-        }
-        Team savedTeam = teamRepository.save(team);
-        baseIds.put(id, savedTeam);
+    Map<String, Team> baseTeams = handlingTeams(teamsStream, baseIds);
+    baseTeams.values().forEach((team) -> {
+      if (savedExercise != null) {
+        team.getExercises().add(savedExercise);
+      } else if (savedScenario != null) {
+        team.getScenarios().add(savedScenario);
       }
     });
+    baseIds.putAll(baseTeams);
 
     // ------------ Handling challenges
     Stream<JsonNode> challengesStream = resolveJsonElements(importNode, prefix + "challenges");
@@ -671,8 +652,44 @@ public class V1_DataImporter implements Importer {
     }));
   }
 
-  private static class BaseHolder implements Base {
+  private Map<String, Team> handlingTeams(
+      Stream<JsonNode> teamsStream,
+      Map<String, Base> baseIds) {
+    Map<String, Team> baseTeams = new HashMap<>();
+    teamsStream.forEach(nodeTeam -> {
+      String teamName = nodeTeam.get("team_name").textValue();
+      // Prevent duplication of team, based on the team name and not contextual
+      List<Team> existingTeams = teamRepository.findByNameIgnoreCase(teamName)
+          .stream()
+          .filter(t -> !t.getContextual())
+          .toList();
+      if (existingTeams.size() == 1) {
+        Team existingTeam = existingTeams.get(0);
+        baseTeams.put(existingTeam.getId(), existingTeam);
+      } else {
+        Team team = new Team();
+        team.setName(nodeTeam.get("team_name").textValue());
+        team.setDescription(nodeTeam.get("team_description").textValue());
+        // Tags
+        List<String> teamTagIds = resolveJsonIds(nodeTeam, "team_tags");
+        List<Tag> tagsForTeam = teamTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
+        team.setTags(tagsForTeam);
+        // Users
+        List<String> teamUserIds = resolveJsonIds(nodeTeam, "team_users");
+        List<User> usersForTeam = teamUserIds.stream()
+            .map(baseIds::get)
+            .filter(Objects::nonNull)
+            .map(base -> (User) base)
+            .toList();
+        team.setUsers(usersForTeam);
+        Team savedTeam = teamRepository.save(team);
+        baseTeams.put(savedTeam.getId(), savedTeam);
+      }
+    });
+    return baseTeams;
+  }
 
+  private static class BaseHolder implements Base {
     private String id;
 
     public BaseHolder(String id) {
