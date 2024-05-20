@@ -170,7 +170,7 @@ const InjectPopover: FunctionComponent<Props> = ({
         {inject.inject_type !== 'openbas_manual' && onUpdateInjectTrigger && (
           <MenuItem
             onClick={handleOpenTrigger}
-            disabled={isDisabled || permissions.isRunning}
+            disabled={isDisabled || !permissions.isRunning}
           >
             {t('Trigger now')}
           </MenuItem>

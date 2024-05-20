@@ -9,7 +9,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
-import { fetchInjects, updateInjectForExercise } from '../../../../../actions/Inject';
+import { fetchExerciseInjects, updateInjectForExercise } from '../../../../../actions/Inject';
 import Empty from '../../../../../components/Empty';
 import SearchFilter from '../../../../../components/SearchFilter';
 import TagsFilter from '../../../common/filters/TagsFilter';
@@ -27,6 +27,8 @@ import InjectOverTimeArea from './InjectOverTimeArea';
 import InjectOverTimeLine from './InjectOverTimeLine';
 import UpdateInject from '../../../common/injects/UpdateInject';
 import ItemStatus from '../../../../../components/ItemStatus';
+import { InjectContext } from '../../../common/Context';
+import { injectContextForExercise } from '../injects/ExerciseInjects';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -191,7 +193,7 @@ const Timeline = () => {
   const injectsMap = { ...teamsInjectsMap, ...technicalInjectsMap };
   useDataLoader(() => {
     dispatch(fetchExerciseTeams(exerciseId));
-    dispatch(fetchInjects(exerciseId));
+    dispatch(fetchExerciseInjects(exerciseId));
     dispatch(fetchExerciseArticles(exerciseId));
     dispatch(fetchVariablesForExercise(exerciseId));
   });
@@ -240,6 +242,8 @@ const Timeline = () => {
     : '1px dashed rgba(255, 255, 255, 0.15)';
 
   const onUpdateInject = (inject) => dispatch(updateInjectForExercise(exerciseId, selectedInjectId, inject));
+
+  const injectContext = injectContextForExercise(exercise);
   return (
     <div className={classes.root}>
       <AnimationMenu exerciseId={exerciseId} />
@@ -457,14 +461,16 @@ const Timeline = () => {
                           }
                         />
                         <ListItemSecondaryAction>
-                          <InjectPopover
-                            inject={inject}
-                            exerciseId={exerciseId}
-                            exercise={exercise}
-                            tagsMap={tagsMap}
-                            setSelectedInjectId={setSelectedInjectId}
-                            isDisabled={isDisabled}
-                          />
+                          <InjectContext.Provider value={injectContext}>
+                            <InjectPopover
+                              inject={inject}
+                              exerciseId={exerciseId}
+                              exercise={exercise}
+                              tagsMap={tagsMap}
+                              setSelectedInjectId={setSelectedInjectId}
+                              isDisabled={isDisabled}
+                            />
+                          </InjectContext.Provider>
                         </ListItemSecondaryAction>
                       </ListItem>
                     );

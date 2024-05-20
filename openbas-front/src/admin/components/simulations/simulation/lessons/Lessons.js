@@ -36,7 +36,7 @@ import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchObjectives } from '../../../../../actions/Objective';
 import Transition from '../../../../../components/common/Transition';
 import ObjectiveEvaluations from './ObjectiveEvaluations';
-import { fetchInjects } from '../../../../../actions/Inject';
+import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import CreateLessonsCategory from './categories/CreateLessonsCategory';
 import {
   applyLessonsTemplate,
@@ -139,7 +139,7 @@ const Lessons = () => {
     dispatch(fetchLessonsQuestions(exerciseId));
     dispatch(fetchLessonsAnswers(exerciseId));
     dispatch(fetchObjectives(exerciseId));
-    dispatch(fetchInjects(exerciseId));
+    dispatch(fetchExerciseInjects(exerciseId));
     dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchPlayers());
   });

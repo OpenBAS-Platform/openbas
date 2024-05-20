@@ -15,7 +15,7 @@ import ExerciseDistributionScoreOverTimeByTeamInPercentage from './ExerciseDistr
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import { fetchInjects } from '../../../../../actions/Inject';
+import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import { useHelper } from '../../../../../store';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import arrowDark from '../../../../../static/images/misc/arrow_dark.png';
@@ -47,7 +47,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
 
   useDataLoader(() => {
     dispatch(fetchExerciseInjectExpectations(exerciseId));
-    dispatch(fetchInjects(exerciseId));
+    dispatch(fetchExerciseInjects(exerciseId));
     dispatch(fetchExerciseTeams(exerciseId));
   });
 

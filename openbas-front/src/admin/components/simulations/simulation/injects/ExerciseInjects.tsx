@@ -5,7 +5,7 @@ import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } fro
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import type { Exercise, Inject } from '../../../../../utils/api-types';
-import { ArticleContext, InjectContext, InjectContextType, TeamContext } from '../../../common/Context';
+import { ArticleContext, InjectContext, TeamContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import {
   addInjectForExercise,
@@ -39,6 +39,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import useEntityToggle from '../../../../../utils/hooks/useEntityToggle';
 import ToolBar from '../../../common/ToolBar';
 import { isNotEmptyField } from '../../../../../utils/utils';
+import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 
 const useStyles = makeStyles(() => ({
   paperChart: {
@@ -48,6 +49,34 @@ const useStyles = makeStyles(() => ({
     height: '100%',
   },
 }));
+
+export const injectContextForExercise = (exercise: ExerciseStore) => {
+  const dispatch = useAppDispatch();
+
+  return {
+    onAddInject(inject: Inject): Promise<{ result: string }> {
+      return dispatch(addInjectForExercise(exercise.exercise_id, inject));
+    },
+    onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string }> {
+      return dispatch(updateInjectForExercise(exercise.exercise_id, injectId, inject));
+    },
+    onUpdateInjectTrigger(injectId: Inject['inject_id']): void {
+      const injectDependsDuration = secondsFromToNow(
+        exercise.exercise_start_date,
+      );
+      return dispatch(updateInjectForExercise(exercise.exercise_id, injectId, { inject_depends_duration: injectDependsDuration > 0 ? injectDependsDuration : 0 }));
+    },
+    onUpdateInjectActivation(injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }): void {
+      return dispatch(updateInjectActivationForExercise(exercise.exercise_id, injectId, injectEnabled));
+    },
+    onInjectDone(injectId: Inject['inject_id']): void {
+      return dispatch(injectDone(exercise.exercise_id, injectId));
+    },
+    onDeleteInject(injectId: Inject['inject_id']): void {
+      return dispatch(deleteInjectForExercise(exercise.exercise_id, injectId));
+    },
+  };
+};
 
 interface Props {
 
@@ -81,30 +110,8 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
 
   const articleContext = articleContextForExercise(exerciseId);
   const teamContext = teamContextForExercise(exerciseId, []);
+  const injectContext = injectContextForExercise(exercise);
 
-  const context: InjectContextType = {
-    onAddInject(inject: Inject): Promise<{ result: string }> {
-      return dispatch(addInjectForExercise(exerciseId, inject));
-    },
-    onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string }> {
-      return dispatch(updateInjectForExercise(exerciseId, injectId, inject));
-    },
-    onUpdateInjectTrigger(injectId: Inject['inject_id']): void {
-      const injectDependsDuration = secondsFromToNow(
-        exercise.exercise_start_date,
-      );
-      return dispatch(updateInjectForExercise(exerciseId, injectId, injectDependsDuration > 0 ? injectDependsDuration : 0));
-    },
-    onUpdateInjectActivation(injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }): void {
-      return dispatch(updateInjectActivationForExercise(exerciseId, injectId, injectEnabled));
-    },
-    onInjectDone(injectId: Inject['inject_id']): void {
-      return dispatch(injectDone(exerciseId, injectId));
-    },
-    onDeleteInject(injectId: Inject['inject_id']): void {
-      return dispatch(deleteInjectForExercise(exerciseId, injectId));
-    },
-  };
   const [viewMode, setViewMode] = useState('list');
   const {
     selectedElements,
@@ -191,12 +198,12 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
               injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map((n) => n.value));
             }
             // eslint-disable-next-line no-await-in-loop
-            await context.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate));
+            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate));
             break;
           case 'REPLACE':
             injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map((n) => n.value));
             // eslint-disable-next-line no-await-in-loop
-            await context.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate));
+            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate));
             break;
           case 'REMOVE':
             if (isNotEmptyField(injectToUpdate[`inject_${action.field}`])) {
@@ -205,7 +212,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
               injectToUpdate[`inject_${action.field}`] = [];
             }
             // eslint-disable-next-line no-await-in-loop
-            await context.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate));
+            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate));
             break;
           default:
             return;
@@ -217,7 +224,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
   return (
     <>
       {viewMode === 'list' && (
-        <InjectContext.Provider value={context}>
+        <InjectContext.Provider value={injectContext}>
           <ArticleContext.Provider value={articleContext}>
             <TeamContext.Provider value={teamContext}>
               <Injects
@@ -252,87 +259,87 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
         </InjectContext.Provider>
       )}
       {viewMode === 'distribution' && (
-      <div style={{ marginTop: -12 }}>
-        <ToggleButtonGroup
-          size="small"
-          exclusive={true}
-          style={{ float: 'right' }}
-          aria-label="Change view mode"
-        >
-          <Tooltip title={t('List view')}>
-            <ToggleButton
-              value='list'
-              onClick={() => setViewMode('list')}
-              selected={false}
-              aria-label="List view mode"
-            >
-              <ReorderOutlined fontSize="small" color='primary' />
-            </ToggleButton>
-          </Tooltip>
-          <Tooltip title={t('Distribution view')}>
-            <ToggleButton
-              value='distribution'
-              onClick={() => setViewMode('distribution')}
-              selected={true}
-              aria-label="Distribution view mode"
-            >
-              <BarChartOutlined fontSize="small" color='inherit' />
-            </ToggleButton>
-          </Tooltip>
-        </ToggleButtonGroup>
-        <Grid container spacing={3}>
-          <Grid container item spacing={3}>
-            <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography variant="h4">
-                {t('Distribution of injects by type')}
-              </Typography>
-              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                <InjectDistributionByType exerciseId={exerciseId} />
-              </Paper>
-            </Grid>
-            <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography variant="h4">
-                {t('Distribution of injects by team')}
-              </Typography>
-              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                <InjectDistributionByTeam exerciseId={exerciseId} />
-              </Paper>
-            </Grid>
-            <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography variant="h4">
-                {t('Distribution of expectations by inject type')} (%)
-              </Typography>
-              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId} />
-              </Paper>
-            </Grid>
-            <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography variant="h4">
-                {t('Distribution of expected total score by inject type')}
-              </Typography>
-              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                <ExerciseDistributionScoreOverTimeByInjectorContract exerciseId={exerciseId} />
-              </Paper>
-            </Grid>
-            <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography variant="h4">
-                {t('Distribution of expectations by team')}
-              </Typography>
-              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                <ExerciseDistributionScoreOverTimeByTeam exerciseId={exerciseId} />
-              </Paper>
-            </Grid>
-            <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography variant="h4">
-                {t('Distribution of expected total score by team')}
-              </Typography>
-              <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-                <ExerciseDistributionScoreOverTimeByTeamInPercentage exerciseId={exerciseId} />
-              </Paper>
+        <div style={{ marginTop: -12 }}>
+          <ToggleButtonGroup
+            size="small"
+            exclusive={true}
+            style={{ float: 'right' }}
+            aria-label="Change view mode"
+          >
+            <Tooltip title={t('List view')}>
+              <ToggleButton
+                value="list"
+                onClick={() => setViewMode('list')}
+                selected={false}
+                aria-label="List view mode"
+              >
+                <ReorderOutlined fontSize="small" color="primary" />
+              </ToggleButton>
+            </Tooltip>
+            <Tooltip title={t('Distribution view')}>
+              <ToggleButton
+                value="distribution"
+                onClick={() => setViewMode('distribution')}
+                selected={true}
+                aria-label="Distribution view mode"
+              >
+                <BarChartOutlined fontSize="small" color="inherit" />
+              </ToggleButton>
+            </Tooltip>
+          </ToggleButtonGroup>
+          <Grid container spacing={3}>
+            <Grid container item spacing={3}>
+              <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="h4">
+                  {t('Distribution of injects by type')}
+                </Typography>
+                <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                  <InjectDistributionByType exerciseId={exerciseId} />
+                </Paper>
+              </Grid>
+              <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="h4">
+                  {t('Distribution of injects by team')}
+                </Typography>
+                <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                  <InjectDistributionByTeam exerciseId={exerciseId} />
+                </Paper>
+              </Grid>
+              <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="h4">
+                  {t('Distribution of expectations by inject type')} (%)
+                </Typography>
+                <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                  <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId} />
+                </Paper>
+              </Grid>
+              <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="h4">
+                  {t('Distribution of expected total score by inject type')}
+                </Typography>
+                <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                  <ExerciseDistributionScoreOverTimeByInjectorContract exerciseId={exerciseId} />
+                </Paper>
+              </Grid>
+              <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="h4">
+                  {t('Distribution of expectations by team')}
+                </Typography>
+                <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                  <ExerciseDistributionScoreOverTimeByTeam exerciseId={exerciseId} />
+                </Paper>
+              </Grid>
+              <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="h4">
+                  {t('Distribution of expected total score by team')}
+                </Typography>
+                <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+                  <ExerciseDistributionScoreOverTimeByTeamInPercentage exerciseId={exerciseId} />
+                </Paper>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-      </div>
+        </div>
       )}
     </>
   );
