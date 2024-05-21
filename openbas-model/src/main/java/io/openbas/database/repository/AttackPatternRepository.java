@@ -1,8 +1,10 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.AttackPattern;
+import io.openbas.database.raw.RawAttackPattern;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -20,4 +22,8 @@ public interface AttackPatternRepository extends CrudRepository<AttackPattern, S
   List<AttackPattern> findAllByExternalIdInIgnoreCase(List<String> externalIds);
 
   Optional<AttackPattern> findByStixId(@NotNull String stixId);
+
+  @Query(value = "select ap.*, array_agg(apphase.phase_id) as attack_patterns_kill_chain_phases from attack_patterns ap " +
+          "left join attack_patterns_kill_chain_phases apphase ON ap.attack_pattern_id = apphase.attack_pattern_id GROUP BY ap.attack_pattern_id", nativeQuery = true)
+  List<RawAttackPattern> rawAll();
 }

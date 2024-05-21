@@ -4,6 +4,7 @@ import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.KillChainPhase;
 import io.openbas.database.repository.AttackPatternRepository;
+import io.openbas.database.raw.RawAttackPattern;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.KillChainPhaseRepository;
 import io.openbas.database.specification.InjectorContractSpecification;
@@ -58,8 +59,8 @@ public class AttackPatternApi extends RestBehavior {
     }
 
     @GetMapping("/api/attack_patterns")
-    public Iterable<AttackPattern> attackPatterns() {
-        return attackPatternRepository.findAll();
+    public List<RawAttackPattern> attackPatterns() {
+        return attackPatternRepository.rawAll();
     }
 
     @PostMapping("/api/attack_patterns/search")
