@@ -15,11 +15,12 @@ import NotFound from '../../../../components/NotFound';
 import ScenarioHeader from './ScenarioHeader';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import useScenarioPermissions from '../../../../utils/Scenario';
-import { DocumentContext, DocumentContextType, PermissionsContext, PermissionsContextType } from '../../common/Context';
+import { DocumentContext, DocumentContextType, InjectContext, PermissionsContext, PermissionsContextType } from '../../common/Context';
 import { useFormatter } from '../../../../components/i18n';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { parseCron, ParsedCron } from '../../../../utils/Cron';
 import type { Theme } from '../../../../components/Theme';
+import injectContextForScenario from './ScenarioContext';
 
 const Scenario = lazy(() => import('./Scenario'));
 const ScenarioDefinition = lazy(() => import('./ScenarioDefinition'));
@@ -63,8 +64,8 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
   const [cronExpression, setCronExpression] = useState<string | null>(scenario.scenario_recurrence || null);
   const [parsedCronExpression, setParsedCronExpression] = useState<ParsedCron | null>(scenario.scenario_recurrence ? parseCron(scenario.scenario_recurrence) : null);
   const noRepeat = scenario.scenario_recurrence_end && scenario.scenario_recurrence_start
-      && new Date(scenario.scenario_recurrence_end).getTime() - new Date(scenario.scenario_recurrence_start).getTime() <= _MS_PER_DAY
-      && ['noRepeat', 'daily'].includes(selectRecurring);
+    && new Date(scenario.scenario_recurrence_end).getTime() - new Date(scenario.scenario_recurrence_start).getTime() <= _MS_PER_DAY
+    && ['noRepeat', 'daily'].includes(selectRecurring);
   const getHumanReadableScheduling = () => {
     if (!cronExpression || !parsedCronExpression) {
       return null;
@@ -159,10 +160,10 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
           <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="" element={errorWrapper(Scenario)({ setOpenScenarioRecurringFormDialog })} />
-              <Route path="definition" element={errorWrapper(ScenarioDefinition)()}/>
+              <Route path="definition" element={errorWrapper(ScenarioDefinition)()} />
               <Route path="injects" element={errorWrapper(Injects)()} />
               {/* Not found */}
-              <Route path="*" element={<NotFound/>}/>
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </>
@@ -180,10 +181,16 @@ const Index = () => {
   useDataLoader(() => {
     dispatch(fetchScenario(scenarioId));
   });
-  if (scenario) {
-    return <IndexScenarioComponent scenario={scenario} />;
+
+  if (!scenario) {
+    return <Loader />;
   }
-  return <Loader />;
+  const scenarioInjectContext = injectContextForScenario(scenario);
+  return (
+    <InjectContext.Provider value={scenarioInjectContext}>
+      <IndexScenarioComponent scenario={scenario} />
+    </InjectContext.Provider>
+  );
 };
 
 export default Index;

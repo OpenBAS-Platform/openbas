@@ -10,13 +10,14 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ExerciseHeader from './ExerciseHeader';
 import type { Exercise as ExerciseType } from '../../../../utils/api-types';
-import { DocumentContext, DocumentContextType, PermissionsContext, PermissionsContextType } from '../../common/Context';
+import { DocumentContext, DocumentContextType, InjectContext, PermissionsContext, PermissionsContextType } from '../../common/Context';
 import { usePermissions } from '../../../../utils/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import NotFound from '../../../../components/NotFound';
 import { useFormatter } from '../../../../components/i18n';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ExerciseDatePopover from './ExerciseDatePopover';
+import injectContextForExercise from './ExerciseContext';
 
 const Exercise = lazy(() => import('./overview/Exercise'));
 const Dryrun = lazy(() => import('./controls/Dryrun'));
@@ -152,10 +153,17 @@ const Index = () => {
   useDataLoader(() => {
     dispatch(fetchExercise(exerciseId));
   });
-  if (exercise) {
-    return <IndexComponent exercise={exercise} />;
+
+  if (!exercise) {
+    return <Loader />;
   }
-  return <Loader />;
+
+  const exerciseInjectContext = injectContextForExercise(exercise);
+  return (
+    <InjectContext.Provider value={exerciseInjectContext}>
+      <IndexComponent exercise={exercise} />
+    </InjectContext.Provider>
+  );
 };
 
 export default Index;

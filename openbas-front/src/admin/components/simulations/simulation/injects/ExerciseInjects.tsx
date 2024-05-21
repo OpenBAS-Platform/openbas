@@ -5,20 +5,12 @@ import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } fro
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import type { Exercise, Inject } from '../../../../../utils/api-types';
-import { ArticleContext, InjectContext, TeamContext } from '../../../common/Context';
+import { ArticleContext, TeamContext } from '../../../common/Context';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import {
-  addInjectForExercise,
-  deleteInjectForExercise,
-  fetchExerciseInjects,
-  injectDone,
-  updateInjectActivationForExercise,
-  updateInjectForExercise,
-} from '../../../../../actions/Inject';
+import { fetchExerciseInjects, updateInjectForExercise } from '../../../../../actions/Inject';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import Injects from '../../../common/injects/Injects';
-import { secondsFromToNow } from '../../../../../utils/Exercise';
 import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
@@ -39,7 +31,6 @@ import { useFormatter } from '../../../../../components/i18n';
 import useEntityToggle from '../../../../../utils/hooks/useEntityToggle';
 import ToolBar from '../../../common/ToolBar';
 import { isNotEmptyField } from '../../../../../utils/utils';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 
 const useStyles = makeStyles(() => ({
   paperChart: {
@@ -49,34 +40,6 @@ const useStyles = makeStyles(() => ({
     height: '100%',
   },
 }));
-
-export const injectContextForExercise = (exercise: ExerciseStore) => {
-  const dispatch = useAppDispatch();
-
-  return {
-    onAddInject(inject: Inject): Promise<{ result: string }> {
-      return dispatch(addInjectForExercise(exercise.exercise_id, inject));
-    },
-    onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string }> {
-      return dispatch(updateInjectForExercise(exercise.exercise_id, injectId, inject));
-    },
-    onUpdateInjectTrigger(injectId: Inject['inject_id']): void {
-      const injectDependsDuration = secondsFromToNow(
-        exercise.exercise_start_date,
-      );
-      return dispatch(updateInjectForExercise(exercise.exercise_id, injectId, { inject_depends_duration: injectDependsDuration > 0 ? injectDependsDuration : 0 }));
-    },
-    onUpdateInjectActivation(injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }): void {
-      return dispatch(updateInjectActivationForExercise(exercise.exercise_id, injectId, injectEnabled));
-    },
-    onInjectDone(injectId: Inject['inject_id']): void {
-      return dispatch(injectDone(exercise.exercise_id, injectId));
-    },
-    onDeleteInject(injectId: Inject['inject_id']): void {
-      return dispatch(deleteInjectForExercise(exercise.exercise_id, injectId));
-    },
-  };
-};
 
 interface Props {
 
@@ -110,7 +73,6 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
 
   const articleContext = articleContextForExercise(exerciseId);
   const teamContext = teamContextForExercise(exerciseId, []);
-  const injectContext = injectContextForExercise(exercise);
 
   const [viewMode, setViewMode] = useState('list');
   const {
@@ -198,12 +160,12 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
               injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map((n) => n.value));
             }
             // eslint-disable-next-line no-await-in-loop
-            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate));
+            await dispatch(updateInjectForExercise(exercise.exercise_id, injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate)));
             break;
           case 'REPLACE':
             injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map((n) => n.value));
             // eslint-disable-next-line no-await-in-loop
-            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate));
+            await dispatch(updateInjectForExercise(exercise.exercise_id, injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate)));
             break;
           case 'REMOVE':
             if (isNotEmptyField(injectToUpdate[`inject_${action.field}`])) {
@@ -212,7 +174,7 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
               injectToUpdate[`inject_${action.field}`] = [];
             }
             // eslint-disable-next-line no-await-in-loop
-            await injectContext.onUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate));
+            await dispatch(updateInjectForExercise(exercise.exercise_id, injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate)));
             break;
           default:
             return;
@@ -224,39 +186,37 @@ const ExerciseInjects: FunctionComponent<Props> = () => {
   return (
     <>
       {viewMode === 'list' && (
-        <InjectContext.Provider value={injectContext}>
-          <ArticleContext.Provider value={articleContext}>
-            <TeamContext.Provider value={teamContext}>
-              <Injects
-                injects={injects}
-                teams={teams}
-                articles={articles}
-                variables={variables}
-                uriVariable={`/admin/exercises/${exerciseId}/definition/variables`}
-                allUsersNumber={exercise.exercise_all_users_number}
-                usersNumber={exercise.exercise_users_number}
-                teamsUsers={exercise.exercise_teams_users}
-                setViewMode={setViewMode}
-                onToggleEntity={onToggleEntity}
-                onToggleShiftEntity={onRowShiftClick}
-                handleToggleSelectAll={handleToggleSelectAll}
-                selectedElements={selectedElements}
-                deSelectedElements={deSelectedElements}
-                selectAll={selectAll}
-              />
-              <ToolBar
-                numberOfSelectedElements={numberOfSelectedElements}
-                selectedElements={selectedElements}
-                deSelectedElements={deSelectedElements}
-                selectAll={selectAll}
-                handleClearSelectedElements={handleClearSelectedElements}
-                context="exercise"
-                id={exercise.exercise_id}
-                handleUpdate={massUpdateInjects}
-              />
-            </TeamContext.Provider>
-          </ArticleContext.Provider>
-        </InjectContext.Provider>
+        <ArticleContext.Provider value={articleContext}>
+          <TeamContext.Provider value={teamContext}>
+            <Injects
+              injects={injects}
+              teams={teams}
+              articles={articles}
+              variables={variables}
+              uriVariable={`/admin/exercises/${exerciseId}/definition/variables`}
+              allUsersNumber={exercise.exercise_all_users_number}
+              usersNumber={exercise.exercise_users_number}
+              teamsUsers={exercise.exercise_teams_users}
+              setViewMode={setViewMode}
+              onToggleEntity={onToggleEntity}
+              onToggleShiftEntity={onRowShiftClick}
+              handleToggleSelectAll={handleToggleSelectAll}
+              selectedElements={selectedElements}
+              deSelectedElements={deSelectedElements}
+              selectAll={selectAll}
+            />
+            <ToolBar
+              numberOfSelectedElements={numberOfSelectedElements}
+              selectedElements={selectedElements}
+              deSelectedElements={deSelectedElements}
+              selectAll={selectAll}
+              handleClearSelectedElements={handleClearSelectedElements}
+              context="exercise"
+              id={exercise.exercise_id}
+              handleUpdate={massUpdateInjects}
+            />
+          </TeamContext.Provider>
+        </ArticleContext.Provider>
       )}
       {viewMode === 'distribution' && (
         <div style={{ marginTop: -12 }}>

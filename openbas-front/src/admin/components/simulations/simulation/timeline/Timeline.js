@@ -27,8 +27,6 @@ import InjectOverTimeArea from './InjectOverTimeArea';
 import InjectOverTimeLine from './InjectOverTimeLine';
 import UpdateInject from '../../../common/injects/UpdateInject';
 import ItemStatus from '../../../../../components/ItemStatus';
-import { InjectContext } from '../../../common/Context';
-import { injectContextForExercise } from '../injects/ExerciseInjects';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -243,7 +241,6 @@ const Timeline = () => {
 
   const onUpdateInject = (inject) => dispatch(updateInjectForExercise(exerciseId, selectedInjectId, inject));
 
-  const injectContext = injectContextForExercise(exercise);
   return (
     <div className={classes.root}>
       <AnimationMenu exerciseId={exerciseId} />
@@ -461,16 +458,14 @@ const Timeline = () => {
                           }
                         />
                         <ListItemSecondaryAction>
-                          <InjectContext.Provider value={injectContext}>
-                            <InjectPopover
-                              inject={inject}
-                              exerciseId={exerciseId}
-                              exercise={exercise}
-                              tagsMap={tagsMap}
-                              setSelectedInjectId={setSelectedInjectId}
-                              isDisabled={isDisabled}
-                            />
-                          </InjectContext.Provider>
+                          <InjectPopover
+                            inject={inject}
+                            exerciseId={exerciseId}
+                            exercise={exercise}
+                            tagsMap={tagsMap}
+                            setSelectedInjectId={setSelectedInjectId}
+                            isDisabled={isDisabled}
+                          />
                         </ListItemSecondaryAction>
                       </ListItem>
                     );
