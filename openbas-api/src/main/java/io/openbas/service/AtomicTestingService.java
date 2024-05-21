@@ -30,6 +30,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -150,7 +151,7 @@ public class AtomicTestingService {
         ObjectNode finalContent = input.getContent();
         // Set expectations
         if (injectId == null) {
-            if (input.getContent() == null || input.getContent().get("expectations").isNull() || input.getContent().get("expectations").isEmpty()) {
+            if (input.getContent() == null || input.getContent().get("expectations") == null || input.getContent().get("expectations").isEmpty()) {
                 try {
                     JsonNode jsonNode = mapper.readTree(injectorContract.getContent());
                     List<JsonNode> contractElements = StreamSupport.stream(jsonNode.get("fields").spliterator(), false).filter(contractElement -> contractElement.get("type").asText().equals(ContractType.Expectation.name().toLowerCase())).toList();
@@ -230,6 +231,7 @@ public class AtomicTestingService {
         // New inject status
         InjectStatus injectStatus = new InjectStatus();
         injectStatus.setInject(inject);
+        injectStatus.setTrackingSentDate(Instant.now());
         injectStatus.setName(ExecutionStatus.QUEUING);
         this.injectStatusRepository.save(injectStatus);
 
