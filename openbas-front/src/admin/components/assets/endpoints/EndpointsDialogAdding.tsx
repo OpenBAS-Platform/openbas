@@ -60,7 +60,7 @@ interface Props {
   onSubmit: (endpointIds: string[]) => void;
   title: string;
   filter?: (endpoint: EndpointStore) => boolean;
-  platforms: string[];
+  platforms?: string[];
 }
 
 const EndpointsDialogAdding: FunctionComponent<Props> = ({
