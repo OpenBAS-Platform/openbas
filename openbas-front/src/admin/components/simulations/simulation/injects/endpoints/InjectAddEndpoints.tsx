@@ -24,7 +24,7 @@ interface Props {
   disabled: boolean;
   endpointIds: string[];
   onSubmit: (endpointIds: string[]) => void;
-  platforms: string[];
+  platforms?: string[];
   filter: (endpoint: EndpointStore) => boolean;
 }
 
