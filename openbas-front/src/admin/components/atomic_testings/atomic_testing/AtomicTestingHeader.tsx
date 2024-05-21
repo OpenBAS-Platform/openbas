@@ -62,30 +62,17 @@ const AtomicTestingHeader = () => {
         </Typography>
       </Tooltip>
       <div className={classes.actions}>
-        {!injectResultDto.inject_targets || injectResultDto.inject_targets.length === 0 ? (
-          <Button
-            style={{ marginRight: 20 }}
-            startIcon={<SettingsOutlined />}
-            variant="contained"
-            color="warning"
-            size="small"
-            onClick={() => setOpenEdit(true)}
-          >
-            {t('Configure')}
-          </Button>
-        ) : (
-          <Button
-            style={{ marginRight: 10, lineHeight: 'initial' }}
-            startIcon={<PlayArrowOutlined />}
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={() => setOpen(true)}
-            disabled={!availableLaunch}
-          >
-            {t('Launch')}
-          </Button>
-        )}
+        <Button
+          style={{ marginRight: 10, lineHeight: 'initial' }}
+          startIcon={<PlayArrowOutlined />}
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={() => setOpen(true)}
+          disabled={!availableLaunch}
+        >
+          {t('Launch')}
+        </Button>
         <AtomicTestingPopover atomic={injectResultDto} setOpenEdit={setOpenEdit} openEdit={openEdit} />
       </div>
       <Dialog
