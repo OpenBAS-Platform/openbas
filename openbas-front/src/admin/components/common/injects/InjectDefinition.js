@@ -1175,6 +1175,7 @@ class InjectDefinition extends Component {
                 endpointIds={assetIds}
                 onSubmit={this.handleAddAssets.bind(this)}
                 disabled={fieldAssets.readOnly}
+                platforms={injectorContract.platforms}
               />
             </>
           )}

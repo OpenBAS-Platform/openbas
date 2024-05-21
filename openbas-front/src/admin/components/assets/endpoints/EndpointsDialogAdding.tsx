@@ -60,6 +60,7 @@ interface Props {
   onSubmit: (endpointIds: string[]) => void;
   title: string;
   filter?: (endpoint: EndpointStore) => boolean;
+  platforms: string[];
 }
 
 const EndpointsDialogAdding: FunctionComponent<Props> = ({
@@ -69,6 +70,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   onSubmit,
   title,
   filter,
+  platforms,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -88,7 +90,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
 
   const [disableFilter, setDisableFilter] = useState(false);
 
-  const sortedEndpoints: EndpointStore[] = filtering.filterAndSort(R.values(endpointsMap).filter((!disableFilter && !!filter) ? filter : () => true));
+  const sortedEndpoints: EndpointStore[] = filtering.filterAndSort(R.values(endpointsMap).filter((!disableFilter && !!filter) ? filter : () => true)).filter((endpoint: EndpointStore) => platforms.includes(endpoint.endpoint_platform));
 
   const [endpointIds, setEndpointIds] = useState<string[]>(initialState);
   useEffect(() => {
