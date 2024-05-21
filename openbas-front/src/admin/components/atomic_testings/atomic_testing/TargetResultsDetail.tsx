@@ -136,7 +136,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
       })));
       setEdges([...Array(steps.length - 1)].map((_, i) => ({
         id: `result-${i}->result-${i + 1}`,
-        type: 'result',
         source: `result-${i}`,
         target: `result-${i + 1}`,
         label: i === 0 ? nsdt(lastExecutionStartDate) : nsdt(lastExecutionEndDate),
@@ -297,7 +296,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
       })));
       setEdges([...Array(mergedSteps.length - 1)].map((_, i) => ({
         id: `result-${i}->result-${i + 1}`,
-        type: 'result',
         source: `result-${i}`,
         target: `result-${i + 1}`,
         label: i === 0 ? nsdt(lastExecutionStartDate) : nsdt(lastExecutionEndDate),

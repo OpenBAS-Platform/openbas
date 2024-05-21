@@ -203,6 +203,7 @@ const Scenarios = () => {
       <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
       <div style={{ display: 'flex', marginBottom: 30 }}>
         <Card
+          key="all"
           classes={{ root: classes.card }} variant="outlined"
           onClick={() => handleOnClickCategory()}
           className={classNames({ [classes.cardSelected]: noCategory() })}

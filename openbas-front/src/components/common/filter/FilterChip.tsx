@@ -54,14 +54,16 @@ const FilterChip: FunctionComponent<Props> = ({
           ref={chipRef}
         />
       </Tooltip>
-      <FilterChipPopover
-        filter={filter}
-        helpers={helpers}
-        open={open}
-        onClose={handleClose}
-        anchorEl={chipRef.current || undefined}
-        propertySchema={propertySchema}
-      />
+      {chipRef?.current
+          && <FilterChipPopover
+            filter={filter}
+            helpers={helpers}
+            open={open}
+            onClose={handleClose}
+            anchorEl={chipRef.current}
+            propertySchema={propertySchema}
+             />
+      }
     </>
   );
 };

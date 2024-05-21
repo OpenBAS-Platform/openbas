@@ -996,7 +996,7 @@ class InjectDefinition extends Component {
       .map((f) => f.key)
       .includes('assets');
     const assets = assetIds
-      .map((a) => ({ ...endpointsMap[a], type: 'static' }))
+      .map((a) => ({ asset_id: a, ...endpointsMap[a], type: 'static' }))
       .filter((a) => a !== undefined);
     // -- ASSET GROUPS --
     const hasAssetGroups = injectorContract.fields
