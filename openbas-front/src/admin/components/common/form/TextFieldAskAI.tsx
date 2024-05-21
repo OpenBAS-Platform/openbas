@@ -16,7 +16,7 @@ interface TextFieldAskAiProps {
   currentValue: string;
   setFieldValue: (value: string) => void;
   format: 'text' | 'html' | 'markdown';
-  variant: 'markdown' | 'html' | 'text' | null;
+  variant: 'markdown' | 'html' | 'ckeditor' | 'text' | null;
   disabled?: boolean;
   style?: object;
   inInject?: boolean;
@@ -167,15 +167,17 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
     return (
       <>
         <EETooltip forAi={true} title={t('Ask AI')}>
-          <IconButton
-            size="medium"
-            color="secondary"
-            onClick={(event) => ((isEnterpriseEdition && enabled && configured) ? handleOpenMenu(event) : null)}
-            disabled={disabled || currentValue.length < 10}
-            style={{ marginRight: -10 }}
-          >
-            <AutoAwesomeOutlined fontSize='medium'/>
-          </IconButton>
+          <span>
+            <IconButton
+              size="medium"
+              color="secondary"
+              onClick={(event) => ((isEnterpriseEdition && enabled && configured) ? handleOpenMenu(event) : null)}
+              disabled={disabled || currentValue.length < 10}
+              style={{ marginRight: -10 }}
+            >
+              <AutoAwesomeOutlined fontSize='medium'/>
+            </IconButton>
+          </span>
         </EETooltip>
         <Menu
           id="menu-appbar"
@@ -434,7 +436,14 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   }
   if (variant === 'html') {
     return (
-      <div style={style || { position: 'absolute', top: 18, right: 20 }}>
+      <div style={style || { position: 'absolute', top: 15, right: 20 }}>
+        {renderButton()}
+      </div>
+    );
+  }
+  if (variant === 'ckeditor') {
+    return (
+      <div style={style || { position: 'absolute', top: 64, right: 20 }}>
         {renderButton()}
       </div>
     );

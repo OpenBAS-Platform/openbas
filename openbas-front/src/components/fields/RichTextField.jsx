@@ -75,7 +75,7 @@ const RichTextFieldBase = ({
             onChange(val);
           }}
           format="html"
-          variant="html"
+          variant="ckeditor"
           disabled={disabled}
           inInject={inInject}
           context={context}
