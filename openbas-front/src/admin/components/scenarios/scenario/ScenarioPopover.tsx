@@ -86,6 +86,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
     const link = document.createElement('a');
     link.href = exportScenarioUri(scenario.scenario_id, exportTeams, exportPlayers, exportVariableValues);
     link.click();
+    setOpenExport(false);
   };
 
   // Deletion
