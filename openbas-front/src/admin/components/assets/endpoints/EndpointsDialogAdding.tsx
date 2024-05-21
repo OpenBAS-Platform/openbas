@@ -92,7 +92,12 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
 
   const sortedEndpoints: EndpointStore[] = filtering.filterAndSort(R.values(endpointsMap)
     .filter((!disableFilter && !!filter) ? filter : () => true))
-    .filter((endpoint: EndpointStore) => platforms?.includes(endpoint.endpoint_platform));
+    .filter((endpoint: EndpointStore) => {
+      if (platforms && platforms.length > 0) {
+        return platforms.includes(endpoint.endpoint_platform);
+      }
+      return true;
+    });
 
   const [endpointIds, setEndpointIds] = useState<string[]>(initialState);
   useEffect(() => {
