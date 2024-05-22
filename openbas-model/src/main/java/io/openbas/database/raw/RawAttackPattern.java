@@ -14,5 +14,5 @@ public interface RawAttackPattern {
     String getAttack_pattern_created_at();
     String getAttack_pattern_updated_at();
     String getAttack_pattern_parent();
-    List<String> getAttack_patterns_kill_chain_phases();
+    List<String> getAttack_pattern_kill_chain_phases();
 }

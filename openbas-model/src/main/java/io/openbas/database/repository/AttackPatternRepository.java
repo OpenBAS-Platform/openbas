@@ -23,7 +23,7 @@ public interface AttackPatternRepository extends CrudRepository<AttackPattern, S
 
   Optional<AttackPattern> findByStixId(@NotNull String stixId);
 
-  @Query(value = "select ap.*, array_agg(apphase.phase_id) as attack_patterns_kill_chain_phases from attack_patterns ap " +
+  @Query(value = "select ap.*, array_remove(array_agg(apphase.phase_id), NULL) as attack_pattern_kill_chain_phases from attack_patterns ap " +
           "left join attack_patterns_kill_chain_phases apphase ON ap.attack_pattern_id = apphase.attack_pattern_id GROUP BY ap.attack_pattern_id", nativeQuery = true)
   List<RawAttackPattern> rawAll();
 }
