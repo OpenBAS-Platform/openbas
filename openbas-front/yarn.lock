@@ -11447,7 +11447,7 @@ __metadata:
     vite: "npm:5.2.8"
     vite-plugin-istanbul: "npm:6.0.0"
     vitest: "npm:1.4.0"
-    zod: "npm:3.23.0"
+    zod: "npm:3.23.8"
   languageName: unknown
   linkType: soft
 
@@ -15731,10 +15731,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:3.23.0":
-  version: 3.23.0
-  resolution: "zod@npm:3.23.0"
-  checksum: 10c0/9678cc8bb4943b05145015430d730cae31564489816854cac23718344ffc26855b33e6744c948dd7906acb337108d9881298de4851ceaa290425222827492568
+"zod@npm:3.23.8":
+  version: 3.23.8
+  resolution: "zod@npm:3.23.8"
+  checksum: 10c0/8f14c87d6b1b53c944c25ce7a28616896319d95bc46a9660fe441adc0ed0a81253b02b5abdaeffedbeb23bdd25a0bf1c29d2c12dd919aef6447652dd295e3e69
   languageName: node
   linkType: hard
 
