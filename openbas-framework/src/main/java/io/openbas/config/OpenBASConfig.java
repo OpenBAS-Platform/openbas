@@ -56,7 +56,7 @@ public class OpenBASConfig {
   @JsonProperty("rabbitmq_ssl")
   private boolean rabbitmqSsl = false;
 
-  @JsonProperty("rabbitmq_ssl")
+  @JsonProperty("rabbitmq_port")
   private int rabbitmqPort = 5672;
 
   @JsonProperty("rabbitmq_user")
