@@ -11,7 +11,7 @@ import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { lineChartOptions } from '../../../../../utils/Charts';
 import type { Theme } from '../../../../../components/Theme';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
-import { fetchInjects } from '../../../../../actions/Inject';
+import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import type { InjectStore } from '../../../../../actions/injects/Inject';
 
 interface Props {
@@ -31,7 +31,7 @@ const InjectOverTimeLine: FunctionComponent<Props> = ({
     injects: helper.getExerciseInjects(exerciseId),
   }));
   useDataLoader(() => {
-    dispatch(fetchInjects(exerciseId));
+    dispatch(fetchExerciseInjects(exerciseId));
   });
 
   let cumulation = 0;

@@ -8,7 +8,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import ResultsMenu from '../ResultsMenu';
-import { fetchInjects } from '../../../../../actions/Inject';
+import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import { fetchExerciseChallenges } from '../../../../../actions/Challenge';
 import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { fetchPlayers } from '../../../../../actions/User';
@@ -115,7 +115,7 @@ const Dashboard = () => {
   useDataLoader(() => {
     dispatch(fetchReports(exerciseId));
     dispatch(fetchExerciseTeams(exerciseId));
-    dispatch(fetchInjects(exerciseId));
+    dispatch(fetchExerciseInjects(exerciseId));
     dispatch(fetchExerciseChallenges(exerciseId));
     dispatch(fetchExerciseInjectExpectations(exerciseId));
     dispatch(fetchPlayers());

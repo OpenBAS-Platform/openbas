@@ -41,7 +41,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
@@ -164,17 +163,7 @@ public class InjectApi extends RestBehavior {
     this.executionContextService = executionContextService;
   }
 
-  @GetMapping("/api/inject_types")
-  public Collection<JsonNode> injectTypes() {
-    return fromIterable(injectorContractRepository.findAll()).stream()
-        .map(contract -> {
-          try {
-            return mapper.readTree(contract.getContent());
-          } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-          }
-        }).toList();
-  }
+  // -- INJECTS --
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/injects/execution/reception/{injectId}")
@@ -249,6 +238,8 @@ public class InjectApi extends RestBehavior {
     this.exerciseRepository.save(exercise);
     return injectRepository.save(inject);
   }
+
+  // -- EXERCISES --
 
   @GetMapping("/api/exercises/{exerciseId}/injects")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
@@ -386,7 +377,9 @@ public class InjectApi extends RestBehavior {
 
   @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/trigger")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject updateInjectTrigger(@PathVariable String exerciseId, @PathVariable String injectId,
+  public Inject updateInjectTrigger(
+      @PathVariable String exerciseId,
+      @PathVariable String injectId,
       @Valid @RequestBody InjectUpdateTriggerInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow();
     inject.setDependsDuration(input.getDependsDuration());
@@ -541,6 +534,8 @@ public class InjectApi extends RestBehavior {
     this.injectDocumentRepository.deleteDocumentsFromInject(injectId);
     this.injectRepository.deleteById(injectId);
   }
+
+  // -- PRIVATE --
 
   private Inject updateInject(@NotBlank final String injectId, @NotNull InjectInput input) {
     Inject inject = this.injectRepository.findById(injectId).orElseThrow();

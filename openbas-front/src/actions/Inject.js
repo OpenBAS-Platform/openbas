@@ -1,20 +1,14 @@
 import * as schema from './Schema';
 import { delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
 
-export const fetchInjects = (exerciseId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/injects`;
-  return getReferential(schema.arrayOfInjects, uri)(dispatch);
+// -- INJECTS --
+
+export const tryInject = (injectId) => (dispatch) => {
+  const uri = `/api/injects/try/${injectId}`;
+  return getReferential(null, uri, null)(dispatch);
 };
 
-export const fetchNextInjects = () => (dispatch) => {
-  const uri = '/api/injects/next';
-  return getReferential(schema.arrayOfInjects, uri)(dispatch);
-};
-
-export const fetchInject = (exerciseId, injectId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/injects/${injectId}`;
-  return getReferential(schema.inject, uri)(dispatch);
-};
+// -- EXERCISES --
 
 export const fetchExerciseInjects = (exerciseId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects`;
@@ -31,18 +25,13 @@ export const updateInjectForExercise = (exerciseId, injectId, data) => (dispatch
   return putReferential(schema.inject, uri, data)(dispatch);
 };
 
-export const updateInjectActivationForExercise = (exerciseId, injectId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/injects/${injectId}/activation`;
-  return putReferential(schema.inject, uri, data)(dispatch);
-};
-
-export const updateInjectTrigger = (exerciseId, injectId, data) => (dispatch) => {
+export const updateInjectTriggerForExercise = (exerciseId, injectId, data) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects/${injectId}/trigger`;
   return putReferential(schema.inject, uri, data)(dispatch);
 };
 
-export const updateInjectTeams = (exerciseId, injectId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/injects/${injectId}/teams`;
+export const updateInjectActivationForExercise = (exerciseId, injectId, data) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/injects/${injectId}/activation`;
   return putReferential(schema.inject, uri, data)(dispatch);
 };
 
@@ -54,11 +43,6 @@ export const addInjectForExercise = (exerciseId, data) => (dispatch) => {
 export const deleteInjectForExercise = (exerciseId, injectId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects/${injectId}`;
   return delReferential(uri, 'injects', injectId)(dispatch);
-};
-
-export const tryInject = (injectId) => (dispatch) => {
-  const uri = `/api/injects/try/${injectId}`;
-  return getReferential(null, uri, null)(dispatch);
 };
 
 export const executeInject = (exerciseId, values, files) => (dispatch) => {
@@ -94,7 +78,7 @@ export const updateInjectForScenario = (scenarioId, injectId, data) => (dispatch
 };
 
 export const updateInjectActivationForScenario = (exerciseId, injectId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/injects/${injectId}/activation`;
+  const uri = `/api/scenarios/${exerciseId}/injects/${injectId}/activation`;
   return putReferential(schema.inject, uri, data)(dispatch);
 };
 

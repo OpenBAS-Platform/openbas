@@ -11,7 +11,7 @@ import type { ExpectationResultsByType, KillChainPhase } from '../../../../../ut
 import MitreMatrix from '../../../common/matrix/MitreMatrix';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { fetchInjects } from '../../../../../actions/Inject';
+import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import ExpandableMarkdown from '../../../../../components/ExpandableMarkdown';
 import ItemSeverity from '../../../../../components/ItemSeverity';
 import ItemCategory from '../../../../../components/ItemCategory';
@@ -57,7 +57,7 @@ const Exercise = () => {
     exercise: helper.getExercise(exerciseId),
   }));
   useDataLoader(() => {
-    dispatch(fetchInjects(exerciseId));
+    dispatch(fetchExerciseInjects(exerciseId));
   });
   const [results, setResults] = useState<ExpectationResultsByType[] | null>(null);
   const [injectResults, setInjectResults] = useState<InjectExpectationResultsByAttackPatternStore[] | null>(null);

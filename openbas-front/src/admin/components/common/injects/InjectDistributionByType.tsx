@@ -11,7 +11,7 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { horizontalBarsChartOptions } from '../../../../utils/Charts';
 import type { Theme } from '../../../../components/Theme';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
-import { fetchInjects } from '../../../../actions/Inject';
+import { fetchExerciseInjects } from '../../../../actions/Inject';
 import type { InjectExpectationStore, InjectStore } from '../../../../actions/injects/Inject';
 import type { InjectorContractHelper } from '../../../../actions/injector_contracts/injector-contract-helper';
 
@@ -32,7 +32,7 @@ const InjectDistributionByType: FunctionComponent<Props> = ({
     injects: helper.getExerciseInjects(exerciseId),
   }));
   useDataLoader(() => {
-    dispatch(fetchInjects(exerciseId));
+    dispatch(fetchExerciseInjects(exerciseId));
   });
 
   const injectsByType = R.pipe(

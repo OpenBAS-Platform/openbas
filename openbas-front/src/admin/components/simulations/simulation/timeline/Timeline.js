@@ -9,7 +9,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
-import { fetchInjects, updateInjectForExercise } from '../../../../../actions/Inject';
+import { fetchExerciseInjects, updateInjectForExercise } from '../../../../../actions/Inject';
 import Empty from '../../../../../components/Empty';
 import SearchFilter from '../../../../../components/SearchFilter';
 import TagsFilter from '../../../common/filters/TagsFilter';
@@ -191,7 +191,7 @@ const Timeline = () => {
   const injectsMap = { ...teamsInjectsMap, ...technicalInjectsMap };
   useDataLoader(() => {
     dispatch(fetchExerciseTeams(exerciseId));
-    dispatch(fetchInjects(exerciseId));
+    dispatch(fetchExerciseInjects(exerciseId));
     dispatch(fetchExerciseArticles(exerciseId));
     dispatch(fetchVariablesForExercise(exerciseId));
   });
@@ -240,6 +240,7 @@ const Timeline = () => {
     : '1px dashed rgba(255, 255, 255, 0.15)';
 
   const onUpdateInject = (inject) => dispatch(updateInjectForExercise(exerciseId, selectedInjectId, inject));
+
   return (
     <div className={classes.root}>
       <AnimationMenu exerciseId={exerciseId} />
