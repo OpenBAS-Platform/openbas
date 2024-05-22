@@ -24,6 +24,7 @@ interface Props {
   disabled: boolean;
   endpointIds: string[];
   onSubmit: (endpointIds: string[]) => void;
+  platforms?: string[];
   filter: (endpoint: EndpointStore) => boolean;
 }
 
@@ -31,6 +32,7 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
   disabled,
   endpointIds,
   onSubmit,
+  platforms,
   filter,
 }) => {
   // Standard hooks
@@ -60,7 +62,7 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
           classes={{ primary: classes.text }}
         />
       </ListItemButton>
-      <EndpointsDialogAdding initialState={endpointIds} open={openDialog}
+      <EndpointsDialogAdding initialState={endpointIds} open={openDialog} platforms={platforms}
         onClose={handleClose} onSubmit={onSubmit}
         title={t('Add assets in this inject')}
         filter={filter}
