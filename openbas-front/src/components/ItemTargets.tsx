@@ -28,28 +28,12 @@ const ItemTargets: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
 
-  // Remove duplicates
-  const removeDuplicates = (toFilter: InjectTargetWithResult[] | undefined): InjectTargetWithResult[] => {
-    if (!toFilter) {
-      return [];
-    }
-    const uniqueIds = new Set<string>();
-    return toFilter.filter((target) => {
-      if (!uniqueIds.has(target.id)) {
-        uniqueIds.add(target.id);
-        return true;
-      }
-      return false;
-    });
-  };
-  const distinctTargets = removeDuplicates(targets);
-
   // Extract the first two targets as visible chips
-  const visibleTargets = distinctTargets?.slice(0, 2);
+  const visibleTargets = targets?.slice(0, 2);
 
   // Calculate the number of remaining targets
-  const remainingTargets = distinctTargets?.slice(2, distinctTargets?.length).map((target) => target.name).join(', ');
-  const remainingTargetsCount = (distinctTargets && visibleTargets && distinctTargets.length - visibleTargets.length) || null;
+  const remainingTargets = targets?.slice(2, targets?.length).map((target) => target.name).join(', ');
+  const remainingTargetsCount = (targets && visibleTargets && targets.length - visibleTargets.length) || null;
 
   if (!targets || targets.length === 0) {
     return <HorizontalRule/>;
