@@ -12,6 +12,7 @@ import io.openbas.execution.ExecutionContextService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.util.function.Tuple2;
@@ -90,7 +91,11 @@ public class InjectHelper {
     Stream<ExecutableInject> executableInjects = injects.stream()
         .filter(this::isBeforeOrEqualsNow)
         .sorted(Inject.executionComparator)
-        .map(inject -> new ExecutableInject(true, false, inject, getInjectTeams(inject), inject.getAssets(), inject.getAssetGroups(), usersFromInjection(inject)));
+        .map(inject -> {
+          Hibernate.initialize(inject.getTags());
+          Hibernate.initialize(inject.getUser());
+          return new ExecutableInject(true, false, inject, getInjectTeams(inject), inject.getAssets(), inject.getAssetGroups(), usersFromInjection(inject));
+        });
     // Get dry injects
     List<DryInject> dryInjects = this.dryInjectRepository.findAll(DryInjectSpecification.executable());
     Stream<ExecutableInject> executableDryInjects = dryInjects.stream()
@@ -102,7 +107,11 @@ public class InjectHelper {
     Stream<ExecutableInject> executableAtomicTests = atomicTests.stream()
             .filter(this::isBeforeOrEqualsNow)
             .sorted(Inject.executionComparator)
-            .map(inject -> new ExecutableInject(true, false, inject, getInjectTeams(inject), inject.getAssets(), inject.getAssetGroups(), usersFromInjection(inject)));
+            .map(inject -> {
+              Hibernate.initialize(inject.getTags());
+              Hibernate.initialize(inject.getUser());
+              return new ExecutableInject(true, false, inject, getInjectTeams(inject), inject.getAssets(), inject.getAssetGroups(), usersFromInjection(inject));
+            });
     // Combine injects and dry
     return concat(concat(executableInjects, executableDryInjects), executableAtomicTests).collect(Collectors.toList());
   }

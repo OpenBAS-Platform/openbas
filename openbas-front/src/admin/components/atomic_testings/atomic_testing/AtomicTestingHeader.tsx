@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
-import { PlayArrowOutlined, SettingsOutlined } from '@mui/icons-material';
+import { PlayArrowOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { fetchInjectResultDto, tryAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import AtomicTestingPopover from './AtomicTestingPopover';
@@ -62,30 +62,17 @@ const AtomicTestingHeader = () => {
         </Typography>
       </Tooltip>
       <div className={classes.actions}>
-        {!injectResultDto.inject_targets || injectResultDto.inject_targets.length === 0 ? (
-          <Button
-            style={{ marginRight: 20 }}
-            startIcon={<SettingsOutlined />}
-            variant="contained"
-            color="warning"
-            size="small"
-            onClick={() => setOpenEdit(true)}
-          >
-            {t('Configure')}
-          </Button>
-        ) : (
-          <Button
-            style={{ marginRight: 10, lineHeight: 'initial' }}
-            startIcon={<PlayArrowOutlined />}
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={() => setOpen(true)}
-            disabled={!availableLaunch}
-          >
-            {t('Launch')}
-          </Button>
-        )}
+        <Button
+          style={{ marginRight: 10, lineHeight: 'initial' }}
+          startIcon={<PlayArrowOutlined />}
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={() => setOpen(true)}
+          disabled={!availableLaunch}
+        >
+          {t('Launch')}
+        </Button>
         <AtomicTestingPopover atomic={injectResultDto} setOpenEdit={setOpenEdit} openEdit={openEdit} />
       </div>
       <Dialog

@@ -297,7 +297,7 @@ public class InjectApi extends RestBehavior {
     InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new);
     // Set expectations
     ObjectNode finalContent = input.getContent();
-    if (input.getContent() == null || input.getContent().get("expectations").isNull() || input.getContent().get("expectations").isEmpty()) {
+    if (input.getContent() == null || input.getContent().get("expectations") == null || input.getContent().get("expectations").isEmpty()) {
       try {
         JsonNode jsonNode = mapper.readTree(injectorContract.getContent());
         List<JsonNode> contractElements = StreamSupport.stream(jsonNode.get("fields").spliterator(), false).filter(contractElement -> contractElement.get("type").asText().equals(ContractType.Expectation.name().toLowerCase())).toList();
