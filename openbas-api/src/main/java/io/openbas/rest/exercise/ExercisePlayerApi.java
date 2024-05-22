@@ -3,6 +3,7 @@ package io.openbas.rest.exercise;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.UserRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.response.PublicExercise;
 import io.openbas.rest.helper.RestBehavior;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class ExercisePlayerApi extends RestBehavior {
   @GetMapping(EXERCISE_URI + "/{exerciseId}")
   public PublicExercise playerExercise(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
     impersonateUser(this.userRepository, userId);
-    Exercise exercise = this.exerciseRepository.findById(exerciseId).orElseThrow();
+    Exercise exercise = this.exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     return new PublicExercise(exercise);
   }
 

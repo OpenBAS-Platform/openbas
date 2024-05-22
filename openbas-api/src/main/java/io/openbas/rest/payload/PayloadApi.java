@@ -3,6 +3,7 @@ package io.openbas.rest.payload;
 import io.openbas.database.model.Payload;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.database.repository.TagRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
@@ -58,7 +59,7 @@ public class PayloadApi extends RestBehavior {
 
     @GetMapping("/api/payloads/{payloadId}")
     public Payload payload(@PathVariable String payloadId) {
-        return payloadRepository.findById(payloadId).orElseThrow();
+        return payloadRepository.findById(payloadId).orElseThrow(ElementNotFoundException::new);
     }
 
     @PostMapping("/api/payloads")
@@ -75,7 +76,7 @@ public class PayloadApi extends RestBehavior {
     public Payload updatePayload(
             @NotBlank @PathVariable final String payloadId,
             @Valid @RequestBody PayloadUpdateInput input) {
-        Payload payload = this.payloadRepository.findById(payloadId).orElseThrow();
+        Payload payload = this.payloadRepository.findById(payloadId).orElseThrow(ElementNotFoundException::new);
         payload.setUpdateAttributes(input);
         payload.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         payload.setUpdatedAt(Instant.now());

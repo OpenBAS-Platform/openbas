@@ -6,6 +6,7 @@ import io.openbas.database.model.User;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
 import io.openbas.rest.scenario.form.*;
@@ -213,7 +214,7 @@ public class ScenarioApi {
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String teamId,
       @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
-    Team team = teamRepository.findById(teamId).orElseThrow();
+    Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
     Iterable<User> teamUsers = userRepository.findAllById(input.getPlayersIds());
     team.getUsers().addAll(fromIterable(teamUsers));
     teamRepository.save(team);
@@ -227,7 +228,7 @@ public class ScenarioApi {
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String teamId,
       @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
-    Team team = teamRepository.findById(teamId).orElseThrow();
+    Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
     Iterable<User> teamUsers = userRepository.findAllById(input.getPlayersIds());
     team.getUsers().removeAll(fromIterable(teamUsers));
     teamRepository.save(team);

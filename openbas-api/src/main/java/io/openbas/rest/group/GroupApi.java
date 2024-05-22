@@ -3,6 +3,7 @@ package io.openbas.rest.group;
 import io.openbas.database.audit.BaseEvent;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.group.form.GroupCreateInput;
 import io.openbas.rest.group.form.GroupGrantInput;
 import io.openbas.rest.group.form.GroupUpdateUsersInput;
@@ -94,7 +95,7 @@ public class GroupApi extends RestBehavior {
 
     @GetMapping("/api/groups/{groupId}")
     public Group group(@PathVariable String groupId) {
-        return groupRepository.findById(groupId).orElseThrow();
+        return groupRepository.findById(groupId).orElseThrow(ElementNotFoundException::new);
     }
 
     @Secured(ROLE_ADMIN)
@@ -111,7 +112,7 @@ public class GroupApi extends RestBehavior {
     @PutMapping("/api/groups/{groupId}/users")
     public Group updateGroupUsers(@PathVariable String groupId,
                                   @Valid @RequestBody GroupUpdateUsersInput input) {
-        Group group = groupRepository.findById(groupId).orElseThrow();
+        Group group = groupRepository.findById(groupId).orElseThrow(ElementNotFoundException::new);
         Spliterator<User> userSpliterator = userRepository.findAllById(input.getUserIds()).spliterator();
         group.setUsers(stream(userSpliterator, false).collect(toList()));
         Group savedGroup = groupRepository.save(group);
@@ -133,7 +134,7 @@ public class GroupApi extends RestBehavior {
     public Group updateGroupInformation(
             @PathVariable String groupId,
             @Valid @RequestBody GroupCreateInput input) {
-        Group group = groupRepository.findById(groupId).orElseThrow();
+        Group group = groupRepository.findById(groupId).orElseThrow(ElementNotFoundException::new);
         group.setUpdateAttributes(input);
         group.setExercisesDefaultGrants(input.defaultExerciseGrants());
         group.setScenariosDefaultGrants(input.defaultScenarioGrants());
@@ -149,7 +150,7 @@ public class GroupApi extends RestBehavior {
         }
 
         // Resolve dependencies
-        Group group = groupRepository.findById(groupId).orElseThrow();
+        Group group = groupRepository.findById(groupId).orElseThrow(ElementNotFoundException::new);
         Optional<Exercise> exerciseOpt = input.getExerciseId() == null ? Optional.empty() : exerciseRepository.findById(input.getExerciseId());
         Optional<Scenario> scenarioOpt = input.getScenarioId() == null ? Optional.empty() : scenarioRepository.findById(input.getScenarioId());
 
@@ -189,8 +190,8 @@ public class GroupApi extends RestBehavior {
     @PostMapping("/api/groups/{groupId}/organizations")
     public Group groupOrganization(@PathVariable String groupId, @Valid @RequestBody OrganizationGrantInput input) {
         // Resolve dependencies
-        Group group = groupRepository.findById(groupId).orElseThrow();
-        Organization organization = organizationRepository.findById(input.getOrganizationId()).orElseThrow();
+        Group group = groupRepository.findById(groupId).orElseThrow(ElementNotFoundException::new);
+        Organization organization = organizationRepository.findById(input.getOrganizationId()).orElseThrow(ElementNotFoundException::new);
         group.getOrganizations().add(organization);
         return groupRepository.save(group);
     }
@@ -198,8 +199,8 @@ public class GroupApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @DeleteMapping("/api/groups/{groupId}/organizations/{organizationId}")
     public Group deleteGroupOrganization(@PathVariable String groupId, @PathVariable String organizationId) {
-        Group group = groupRepository.findById(groupId).orElseThrow();
-        Organization organization = organizationRepository.findById(organizationId).orElseThrow();
+        Group group = groupRepository.findById(groupId).orElseThrow(ElementNotFoundException::new);
+        Organization organization = organizationRepository.findById(organizationId).orElseThrow(ElementNotFoundException::new);
         group.getOrganizations().remove(organization);
         return groupRepository.save(group);
     }

@@ -8,6 +8,7 @@ import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.OrganizationRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.UserRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.organization.form.OrganizationCreateInput;
 import io.openbas.rest.organization.form.OrganizationUpdateInput;
@@ -60,7 +61,7 @@ public class OrganizationApi extends RestBehavior {
     if (currentUser.isAdmin()) {
       organizations = fromIterable(organizationRepository.findAll());
     } else {
-      User local = userRepository.findById(currentUser.getId()).orElseThrow();
+      User local = userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
       organizations = local.getGroups().stream()
           .flatMap(group -> group.getOrganizations().stream()).toList();
     }
@@ -82,7 +83,7 @@ public class OrganizationApi extends RestBehavior {
   public Organization updateOrganization(@PathVariable String organizationId,
       @Valid @RequestBody OrganizationUpdateInput input) {
     checkOrganizationAccess(userRepository, organizationId);
-    Organization organization = organizationRepository.findById(organizationId).orElseThrow();
+    Organization organization = organizationRepository.findById(organizationId).orElseThrow(ElementNotFoundException::new);
     organization.setUpdateAttributes(input);
     organization.setUpdatedAt(now());
     organization.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));

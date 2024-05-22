@@ -1,8 +1,8 @@
 package io.openbas.rest.tag;
 
-import io.openbas.database.model.KillChainPhase;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.TagRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.tag.form.TagCreateInput;
 import io.openbas.rest.tag.form.TagUpdateInput;
@@ -49,7 +49,7 @@ public class TagApi extends RestBehavior {
     @PutMapping("/api/tags/{tagId}")
     public Tag updateTag(@PathVariable String tagId,
                          @Valid @RequestBody TagUpdateInput input) {
-        Tag tag = tagRepository.findById(tagId).orElseThrow();
+        Tag tag = tagRepository.findById(tagId).orElseThrow(ElementNotFoundException::new);
         tag.setUpdateAttributes(input);
         return tagRepository.save(tag);
     }

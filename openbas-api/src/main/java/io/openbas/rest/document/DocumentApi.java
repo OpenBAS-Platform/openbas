@@ -8,6 +8,7 @@ import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.rest.document.form.DocumentCreateInput;
 import io.openbas.rest.document.form.DocumentTagUpdateInput;
 import io.openbas.rest.document.form.DocumentUpdateInput;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.FileService;
 import io.openbas.service.InjectService;
@@ -212,18 +213,18 @@ public class DocumentApi extends RestBehavior {
 
     @GetMapping("/api/documents/{documentId}")
     public Document document(@PathVariable String documentId) {
-        return resolveDocument(documentId).orElseThrow();
+        return resolveDocument(documentId).orElseThrow(ElementNotFoundException::new);
     }
 
     @GetMapping("/api/documents/{documentId}/tags")
     public List<Tag> documentTags(@PathVariable String documentId) {
-        Document document = resolveDocument(documentId).orElseThrow();
+        Document document = resolveDocument(documentId).orElseThrow(ElementNotFoundException::new);
         return document.getTags();
     }
 
     @PutMapping("/api/documents/{documentId}/tags")
     public Document documentTags(@PathVariable String documentId, @RequestBody DocumentTagUpdateInput input) {
-        Document document = resolveDocument(documentId).orElseThrow();
+        Document document = resolveDocument(documentId).orElseThrow(ElementNotFoundException::new);
         document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return documentRepository.save(document);
     }
@@ -232,14 +233,14 @@ public class DocumentApi extends RestBehavior {
     @PutMapping("/api/documents/{documentId}")
     public Document updateDocumentInformation(@PathVariable String documentId,
                                               @Valid @RequestBody DocumentUpdateInput input) {
-        Document document = resolveDocument(documentId).orElseThrow();
+        Document document = resolveDocument(documentId).orElseThrow(ElementNotFoundException::new);
         document.setUpdateAttributes(input);
         document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
 
         // Get removed exercises
         Stream<String> askExerciseIdsStream = document.getExercises()
                 .stream()
-                .filter(exercise -> !exercise.isUserHasAccess(userRepository.findById(currentUser().getId()).orElseThrow()))
+                .filter(exercise -> !exercise.isUserHasAccess(userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new)))
                 .map(Exercise::getId);
         List<String> askExerciseIds = Stream.concat(askExerciseIdsStream, input.getExerciseIds().stream()).distinct().toList();
         List<Exercise> removedExercises = document.getExercises().stream()
@@ -250,7 +251,7 @@ public class DocumentApi extends RestBehavior {
 
         // Get removed scenarios
         Stream<String> askScenarioIdsStream = document.getScenarios().stream()
-                .filter(scenario -> !scenario.isUserHasAccess(userRepository.findById(currentUser().getId()).orElseThrow()))
+                .filter(scenario -> !scenario.isUserHasAccess(userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new)))
                 .map(Scenario::getId);
         List<String> askScenarioIds = Stream.concat(askScenarioIdsStream, input.getScenarioIds().stream()).distinct().toList();
         List<Scenario> removedScenarios = document.getScenarios().stream()
@@ -265,11 +266,11 @@ public class DocumentApi extends RestBehavior {
 
     @GetMapping("/api/documents/{documentId}/file")
     public void downloadDocument(@PathVariable String documentId, HttpServletResponse response) throws IOException {
-        Document document = resolveDocument(documentId).orElseThrow();
+        Document document = resolveDocument(documentId).orElseThrow(ElementNotFoundException::new);
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
         response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
         response.setStatus(HttpServletResponse.SC_OK);
-        InputStream fileStream = fileService.getFile(document).orElseThrow();
+        InputStream fileStream = fileService.getFile(document).orElseThrow(ElementNotFoundException::new);
         fileStream.transferTo(response.getOutputStream());
     }
 
@@ -297,7 +298,7 @@ public class DocumentApi extends RestBehavior {
 
     @GetMapping(value = "/api/images/collectors/id/{collectorId}", produces = MediaType.IMAGE_PNG_VALUE)
     public @ResponseBody ResponseEntity<byte[]> getCollectorImageFromId(@PathVariable String collectorId) throws IOException {
-        Collector collector = this.collectorRepository.findById(collectorId).orElseThrow();
+        Collector collector = this.collectorRepository.findById(collectorId).orElseThrow(ElementNotFoundException::new);
         Optional<InputStream> fileStream = fileService.getCollectorImage(collector.getType());
         if (fileStream.isPresent()) {
             return ResponseEntity.ok()
@@ -417,7 +418,7 @@ public class DocumentApi extends RestBehavior {
                     .stream()
                     .filter(doc -> doc.getId().equals(documentId))
                     .findFirst()
-                    .orElseThrow();
+                    .orElseThrow(ElementNotFoundException::new);
         } else if (scenarioOpt.isPresent()) {
             if (!scenarioOpt.get().isUserHasAccess(user) && !scenarioOpt.get().getUsers().contains(user)) {
                 throw new UnsupportedOperationException("The given player is not in this exercise");
@@ -426,14 +427,14 @@ public class DocumentApi extends RestBehavior {
                     .stream()
                     .filter(doc -> doc.getId().equals(documentId))
                     .findFirst()
-                    .orElseThrow();
+                    .orElseThrow(ElementNotFoundException::new);
         }
 
         if (document != null) {
             response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
             response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
             response.setStatus(HttpServletResponse.SC_OK);
-            InputStream fileStream = fileService.getFile(document).orElseThrow();
+            InputStream fileStream = fileService.getFile(document).orElseThrow(ElementNotFoundException::new);
             fileStream.transferTo(response.getOutputStream());
         }
     }

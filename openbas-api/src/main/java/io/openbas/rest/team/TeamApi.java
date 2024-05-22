@@ -5,6 +5,7 @@ import io.openbas.database.model.Organization;
 import io.openbas.database.model.Team;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.*;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.team.form.TeamCreateInput;
 import io.openbas.rest.team.form.TeamUpdateInput;
@@ -81,7 +82,7 @@ public class TeamApi extends RestBehavior {
         if (currentUser.isAdmin()) {
             teams = fromIterable(teamRepository.findAll());
         } else {
-            User local = userRepository.findById(currentUser.getId()).orElseThrow();
+            User local = userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
             List<String> organizationIds = local.getGroups().stream()
                     .flatMap(group -> group.getOrganizations().stream())
                     .map(Organization::getId)
@@ -100,7 +101,7 @@ public class TeamApi extends RestBehavior {
             teamsFunction = (Specification<Team> specification, Pageable pageable) -> this.teamRepository
                 .findAll(contextual(false).and(specification), pageable);
         } else {
-            User local = this.userRepository.findById(currentUser.getId()).orElseThrow();
+            User local = this.userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
             List<String> organizationIds = local.getGroups().stream()
                 .flatMap(group -> group.getOrganizations().stream())
                 .map(Organization::getId)
@@ -118,13 +119,13 @@ public class TeamApi extends RestBehavior {
     @GetMapping("/api/teams/{teamId}")
     @PreAuthorize("isObserver()")
     public Team getTeam(@PathVariable String teamId) {
-        return teamRepository.findById(teamId).orElseThrow();
+        return teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
     }
 
     @GetMapping("/api/teams/{teamId}/players")
     @PreAuthorize("isObserver()")
     public Iterable<User> getTeamPlayers(@PathVariable String teamId) {
-        return teamRepository.findById(teamId).orElseThrow().getUsers();
+        return teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new).getUsers();
     }
 
     @PostMapping("/api/teams")
@@ -180,7 +181,7 @@ public class TeamApi extends RestBehavior {
     @PutMapping("/api/teams/{teamId}")
     @PreAuthorize("isPlanner()")
     public Team updateTeam(@PathVariable String teamId, @Valid @RequestBody TeamUpdateInput input) {
-        Team team = teamRepository.findById(teamId).orElseThrow();
+        Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
         team.setUpdateAttributes(input);
         team.setUpdatedAt(now());
         team.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
@@ -191,7 +192,7 @@ public class TeamApi extends RestBehavior {
     @PutMapping("/api/teams/{teamId}/players")
     @PreAuthorize("isPlanner()")
     public Team updateTeamUsers(@PathVariable String teamId, @Valid @RequestBody UpdateUsersTeamInput input) {
-        Team team = teamRepository.findById(teamId).orElseThrow();
+        Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
         Iterable<User> teamUsers = userRepository.findAllById(input.getUserIds());
         team.setUsers(fromIterable(teamUsers));
         return teamRepository.save(team);

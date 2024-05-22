@@ -4,6 +4,7 @@ import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.SessionManager;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.user.form.player.CreatePlayerInput;
 import io.openbas.rest.user.form.player.UpdatePlayerInput;
@@ -84,7 +85,7 @@ public class PlayerApi extends RestBehavior {
     if (currentUser.isAdmin()) {
       players = fromIterable(userRepository.findAll());
     } else {
-      User local = userRepository.findById(currentUser.getId()).orElseThrow();
+      User local = userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
       List<String> organizationIds = local.getGroups().stream()
           .flatMap(group -> group.getOrganizations().stream())
           .map(Organization::getId)
@@ -102,7 +103,7 @@ public class PlayerApi extends RestBehavior {
       playersFunction = (Specification<User> specification, Pageable pageable) -> this.userRepository
           .findAll(specification, pageable);
     } else {
-      User local = userRepository.findById(currentUser.getId()).orElseThrow();
+      User local = userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
       List<String> organizationIds = local.getGroups().stream()
           .flatMap(group -> group.getOrganizations().stream())
           .map(Organization::getId)
@@ -176,7 +177,7 @@ public class PlayerApi extends RestBehavior {
   @PreAuthorize("isPlanner()")
   public User updatePlayer(@PathVariable String userId, @Valid @RequestBody UpdatePlayerInput input) {
     checkUserAccess(userRepository, userId);
-    User user = userRepository.findById(userId).orElseThrow();
+    User user = userRepository.findById(userId).orElseThrow(ElementNotFoundException::new);
     if (!currentUser().isAdmin() && user.isManager() && !currentUser().getId().equals(userId)) {
       throw new UnsupportedOperationException("You dont have the right to update this user");
     }
@@ -190,7 +191,7 @@ public class PlayerApi extends RestBehavior {
   @PreAuthorize("isPlanner()")
   public void deletePlayer(@PathVariable String userId) {
     checkUserAccess(userRepository, userId);
-    User user = userRepository.findById(userId).orElseThrow();
+    User user = userRepository.findById(userId).orElseThrow(ElementNotFoundException::new);
     if (!currentUser().isAdmin() && user.isManager()) {
       throw new UnsupportedOperationException("You dont have the right to delete this user");
     }

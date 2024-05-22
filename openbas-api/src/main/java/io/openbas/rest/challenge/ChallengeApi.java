@@ -9,6 +9,7 @@ import io.openbas.rest.challenge.form.ChallengeUpdateInput;
 import io.openbas.rest.challenge.response.ChallengeInformation;
 import io.openbas.rest.challenge.response.ChallengeResult;
 import io.openbas.rest.challenge.response.ChallengesReader;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ChallengeService;
 import io.openbas.service.ScenarioService;
@@ -101,7 +102,7 @@ public class ChallengeApi extends RestBehavior {
   public Challenge updateChallenge(
       @PathVariable String challengeId,
       @Valid @RequestBody ChallengeUpdateInput input) {
-    Challenge challenge = challengeRepository.findById(challengeId).orElseThrow();
+    Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(ElementNotFoundException::new);
     challenge.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
     challenge.setDocuments(fromIterable(documentRepository.findAllById(input.getDocumentIds())));
     challenge.setUpdateAttributes(input);
@@ -149,7 +150,7 @@ public class ChallengeApi extends RestBehavior {
 
   @GetMapping("/api/player/challenges/{exerciseId}")
   public ChallengesReader playerChallenges(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     final User user = impersonateUser(userRepository, userId);
     if (user.getId().equals(ANONYMOUS)) {
       throw new UnsupportedOperationException("User must be logged or dynamic player is required");
@@ -172,7 +173,7 @@ public class ChallengeApi extends RestBehavior {
 
   @GetMapping("/api/observer/challenges/{exerciseId}")
   public ChallengesReader observerChallenges(@PathVariable String exerciseId) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     ChallengesReader challengesReader = new ChallengesReader(exercise);
     Iterable<Challenge> challenges = exerciseChallenges(exerciseId);
     challengesReader.setExerciseChallenges(fromIterable(challenges).stream()
@@ -205,7 +206,7 @@ public class ChallengeApi extends RestBehavior {
 
   @PostMapping("/api/challenges/{challengeId}/try")
   public ChallengeResult tryChallenge(@PathVariable String challengeId, @Valid @RequestBody ChallengeTryInput input) {
-    Challenge challenge = challengeRepository.findById(challengeId).orElseThrow();
+    Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(ElementNotFoundException::new);
     for (ChallengeFlag flag : challenge.getFlags()) {
       if (checkFlag(flag, input.getValue())) {
         return new ChallengeResult(true);

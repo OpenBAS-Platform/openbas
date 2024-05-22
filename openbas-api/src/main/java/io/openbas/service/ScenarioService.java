@@ -5,6 +5,7 @@ import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.ScenarioSpecification;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.exports.ExerciseExportMixins;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableMixin;
@@ -127,12 +128,12 @@ public class ScenarioService {
 
   public Scenario scenario(@NotBlank final String scenarioId) {
     return this.scenarioRepository.findById(scenarioId)
-        .orElseThrow(() -> new IllegalStateException("Scenario not found"));
+        .orElseThrow(() -> new ElementNotFoundException("Scenario not found"));
   }
 
   public Scenario scenarioByExternalReference(@NotBlank final String scenarioExternalReference) {
     return this.scenarioRepository.findByExternalReference(scenarioExternalReference)
-            .orElseThrow(() -> new IllegalStateException("Scenario not found"));
+            .orElseThrow(() -> new ElementNotFoundException("Scenario not found"));
   }
   public Scenario updateScenario(@NotNull final Scenario scenario) {
     scenario.setUpdatedAt(now());

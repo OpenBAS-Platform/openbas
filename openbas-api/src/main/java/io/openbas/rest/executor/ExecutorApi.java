@@ -3,6 +3,7 @@ package io.openbas.rest.executor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Executor;
 import io.openbas.database.repository.ExecutorRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.executor.form.ExecutorCreateInput;
 import io.openbas.rest.executor.form.ExecutorUpdateInput;
 import io.openbas.rest.helper.RestBehavior;
@@ -56,7 +57,7 @@ public class ExecutorApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/executors/{executorId}")
     public Executor updateExecutor(@PathVariable String executorId, @Valid @RequestBody ExecutorUpdateInput input) {
-        Executor executor = executorRepository.findById(executorId).orElseThrow();
+        Executor executor = executorRepository.findById(executorId).orElseThrow(ElementNotFoundException::new);
         return updateExecutor(executor, executor.getType(), executor.getName(), executor.getPlatforms());
     }
 

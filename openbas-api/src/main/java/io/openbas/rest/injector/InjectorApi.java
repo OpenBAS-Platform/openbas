@@ -13,6 +13,7 @@ import io.openbas.database.model.InjectorContract;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.InjectorRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.injector.form.InjectorCreateInput;
 import io.openbas.rest.injector.form.InjectorUpdateInput;
@@ -83,7 +84,7 @@ public class InjectorApi extends RestBehavior {
 
     @GetMapping("/api/injectors/{injectorId}/injector_contracts")
     public Collection<JsonNode> injectorInjectTypes(@PathVariable String injectorId) {
-        Injector injector = injectorRepository.findById(injectorId).orElseThrow();
+        Injector injector = injectorRepository.findById(injectorId).orElseThrow(ElementNotFoundException::new);
         return fromIterable(injectorContractRepository.findInjectorContractsByInjector(injector)).stream()
                 .map(contract -> {
                     try {
@@ -163,7 +164,7 @@ public class InjectorApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/injectors/{injectorId}")
     public Injector updateInjector(@PathVariable String injectorId, @Valid @RequestBody InjectorUpdateInput input) {
-        Injector injector = injectorRepository.findById(injectorId).orElseThrow();
+        Injector injector = injectorRepository.findById(injectorId).orElseThrow(ElementNotFoundException::new);
         return updateInjector(
                 injector,
                 injector.getType(),
@@ -179,7 +180,7 @@ public class InjectorApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @GetMapping("/api/injectors/{injectorId}")
     public Injector injector(@PathVariable String injectorId) {
-        return injectorRepository.findById(injectorId).orElseThrow();
+        return injectorRepository.findById(injectorId).orElseThrow(ElementNotFoundException::new);
     }
 
     @Secured(ROLE_ADMIN)

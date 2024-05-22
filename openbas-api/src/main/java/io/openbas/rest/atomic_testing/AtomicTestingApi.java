@@ -2,11 +2,11 @@ package io.openbas.rest.atomic_testing;
 
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
-import io.openbas.database.model.InjectStatus;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.rest.atomic_testing.form.InjectResultDTO;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.AtomicTestingService;
 import io.openbas.utils.AtomicTestingMapper;
@@ -48,12 +48,12 @@ public class AtomicTestingApi extends RestBehavior {
   public InjectResultDTO findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId)
         .map(AtomicTestingMapper::toDtoWithTargetResults)
-        .orElseThrow();
+        .orElseThrow(ElementNotFoundException::new);
   }
 
   @GetMapping("/{injectId}/update")
   public Inject findAtomicTestingForUpdate(@PathVariable String injectId) {
-    return atomicTestingService.findById(injectId).orElseThrow();
+    return atomicTestingService.findById(injectId).orElseThrow(ElementNotFoundException::new);
   }
 
   @PostMapping()

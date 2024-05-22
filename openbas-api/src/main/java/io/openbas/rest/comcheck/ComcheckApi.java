@@ -1,18 +1,19 @@
 package io.openbas.rest.comcheck;
 
 import io.openbas.database.model.*;
-import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.ComcheckRepository;
 import io.openbas.database.repository.ComcheckStatusRepository;
 import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.database.repository.TeamRepository;
 import io.openbas.rest.comcheck.form.ComcheckInput;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import java.util.List;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -49,7 +50,7 @@ public class ComcheckApi extends RestBehavior {
     @Transactional(rollbackOn = Exception.class)
     @GetMapping("/api/comcheck/{comcheckStatusId}")
     public ComcheckStatus checkValidation(@PathVariable String comcheckStatusId) {
-        ComcheckStatus comcheckStatus = comcheckStatusRepository.findById(comcheckStatusId).orElseThrow();
+        ComcheckStatus comcheckStatus = comcheckStatusRepository.findById(comcheckStatusId).orElseThrow(ElementNotFoundException::new);
         Comcheck comcheck = comcheckStatus.getComcheck();
         if (!comcheck.getState().equals(Comcheck.COMCHECK_STATUS.RUNNING)) {
             throw new UnsupportedOperationException("This comcheck is closed.");
@@ -80,7 +81,7 @@ public class ComcheckApi extends RestBehavior {
         check.setUpdateAttributes(comCheck);
         check.setName(comCheck.getName());
         check.setStart(now());
-        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
         check.setExercise(exercise);
         // 02. Get users
         List<String> teamIds = comCheck.getTeamIds();

@@ -5,6 +5,7 @@ import io.openbas.database.model.Mitigation;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.MitigationRepository;
 import io.openbas.database.specification.AttackPatternSpecification;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.mitigation.form.MitigationCreateInput;
 import io.openbas.rest.mitigation.form.MitigationUpdateInput;
@@ -64,7 +65,7 @@ public class MitigationApi extends RestBehavior {
 
   @GetMapping("/api/mitigations/{mitigationId}")
   public Mitigation mitigation(@PathVariable String mitigationId) {
-    return mitigationRepository.findById(mitigationId).orElseThrow();
+    return mitigationRepository.findById(mitigationId).orElseThrow(ElementNotFoundException::new);
   }
 
   @Secured(ROLE_ADMIN)
@@ -78,7 +79,7 @@ public class MitigationApi extends RestBehavior {
 
   @GetMapping("/api/mitigations/{mitigationId}/attack_patterns")
   public Iterable<AttackPattern> injectorContracts(@PathVariable String mitigationId) {
-    mitigationRepository.findById(mitigationId).orElseThrow();
+    mitigationRepository.findById(mitigationId).orElseThrow(ElementNotFoundException::new);
     return attackPatternRepository.findAll(AttackPatternSpecification.fromAttackPattern(mitigationId));
   }
 
@@ -87,7 +88,7 @@ public class MitigationApi extends RestBehavior {
   public Mitigation updateMitigation(
       @NotBlank @PathVariable final String mitigationId,
       @Valid @RequestBody MitigationUpdateInput input) {
-    Mitigation mitigation = this.mitigationRepository.findById(mitigationId).orElseThrow();
+    Mitigation mitigation = this.mitigationRepository.findById(mitigationId).orElseThrow(ElementNotFoundException::new);
     mitigation.setUpdateAttributes(input);
     mitigation.setAttackPatterns(fromIterable(this.attackPatternRepository.findAllById(input.getAttackPatternsIds())));
     mitigation.setUpdatedAt(Instant.now());

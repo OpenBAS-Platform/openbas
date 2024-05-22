@@ -4,6 +4,7 @@ import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Variable;
 import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.variable.form.VariableInput;
 import io.openbas.service.ScenarioService;
@@ -39,7 +40,7 @@ public class VariableApi extends RestBehavior {
       @Valid @RequestBody final VariableInput input) {
     Variable variable = new Variable();
     variable.setUpdateAttributes(input);
-    Exercise exercise = this.exerciseRepository.findById(exerciseId).orElseThrow();
+    Exercise exercise = this.exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     variable.setExercise(exercise);
     return this.variableService.createVariable(variable);
   }

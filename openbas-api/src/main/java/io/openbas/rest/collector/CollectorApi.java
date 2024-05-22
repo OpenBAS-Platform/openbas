@@ -3,10 +3,10 @@ package io.openbas.rest.collector;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Collector;
-import io.openbas.database.model.Injector;
 import io.openbas.database.repository.CollectorRepository;
 import io.openbas.rest.collector.form.CollectorCreateInput;
 import io.openbas.rest.collector.form.CollectorUpdateInput;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
@@ -63,7 +63,7 @@ public class CollectorApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/collectors/{collectorId}")
     public Collector updateCollector(@PathVariable String collectorId, @Valid @RequestBody CollectorUpdateInput input) {
-        Collector collector = collectorRepository.findById(collectorId).orElseThrow();
+        Collector collector = collectorRepository.findById(collectorId).orElseThrow(ElementNotFoundException::new);
         return updateCollector(collector, collector.getType(), collector.getName(), collector.getPeriod(), input.getLastExecution());
     }
 

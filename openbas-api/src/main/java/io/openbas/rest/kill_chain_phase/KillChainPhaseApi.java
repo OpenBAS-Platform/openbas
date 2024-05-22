@@ -1,9 +1,8 @@
 package io.openbas.rest.kill_chain_phase;
 
-import io.openbas.database.model.Channel;
 import io.openbas.database.model.KillChainPhase;
 import io.openbas.database.repository.KillChainPhaseRepository;
-import io.openbas.rest.channel.form.ChannelUpdateInput;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseCreateInput;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseUpdateInput;
@@ -54,14 +53,14 @@ public class KillChainPhaseApi extends RestBehavior {
 
   @GetMapping("/api/kill_chain_phases/{killChainPhaseId}")
   public KillChainPhase killChainPhase(@PathVariable String killChainPhaseId) {
-    return killChainPhaseRepository.findById(killChainPhaseId).orElseThrow();
+    return killChainPhaseRepository.findById(killChainPhaseId).orElseThrow(ElementNotFoundException::new);
   }
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/kill_chain_phases/{killChainPhaseId}")
   public KillChainPhase updateKillChainPhase(@PathVariable String killChainPhaseId,
       @Valid @RequestBody KillChainPhaseUpdateInput input) {
-    KillChainPhase killchainPhase = killChainPhaseRepository.findById(killChainPhaseId).orElseThrow();
+    KillChainPhase killchainPhase = killChainPhaseRepository.findById(killChainPhaseId).orElseThrow(ElementNotFoundException::new);
     killchainPhase.setUpdateAttributes(input);
     killchainPhase.setUpdatedAt(Instant.now());
     return killChainPhaseRepository.save(killchainPhase);

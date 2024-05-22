@@ -5,14 +5,15 @@ import io.openbas.database.repository.*;
 import io.openbas.database.specification.LessonsAnswerSpecification;
 import io.openbas.database.specification.LessonsCategorySpecification;
 import io.openbas.database.specification.LessonsQuestionSpecification;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.lessons.form.*;
 import io.openbas.service.MailingService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,8 +82,8 @@ public class LessonsApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Iterable<LessonsCategory> applyExerciseLessonsTemplate(@PathVariable String exerciseId,
       @PathVariable String lessonsTemplateId) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-    LessonsTemplate lessonsTemplate = lessonsTemplateRepository.findById(lessonsTemplateId).orElseThrow();
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+    LessonsTemplate lessonsTemplate = lessonsTemplateRepository.findById(lessonsTemplateId).orElseThrow(ElementNotFoundException::new);
     List<LessonsTemplateCategory> lessonsTemplateCategories = lessonsTemplate.getCategories().stream().toList();
     for (LessonsTemplateCategory lessonsTemplateCategory : lessonsTemplateCategories) {
       LessonsCategory lessonsCategory = new LessonsCategory();
@@ -109,7 +110,7 @@ public class LessonsApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public LessonsCategory createExerciseLessonsCategory(@PathVariable String exerciseId,
       @Valid @RequestBody LessonsCategoryCreateInput input) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     LessonsCategory lessonsCategory = new LessonsCategory();
     lessonsCategory.setUpdateAttributes(input);
     lessonsCategory.setExercise(exercise);
@@ -145,7 +146,7 @@ public class LessonsApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public LessonsCategory updateExerciseLessonsCategory(@PathVariable String exerciseId,
       @PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsCategoryUpdateInput input) {
-    LessonsCategory lessonsTemplateCategory = lessonsCategoryRepository.findById(lessonsCategoryId).orElseThrow();
+    LessonsCategory lessonsTemplateCategory = lessonsCategoryRepository.findById(lessonsCategoryId).orElseThrow(ElementNotFoundException::new);
     lessonsTemplateCategory.setUpdateAttributes(input);
     lessonsTemplateCategory.setUpdated(now());
     return lessonsCategoryRepository.save(lessonsTemplateCategory);
@@ -161,7 +162,7 @@ public class LessonsApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public LessonsCategory updateExerciseLessonsCategoryTeams(@PathVariable String exerciseId,
       @PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsCategoryTeamsInput input) {
-    LessonsCategory lessonsCategory = lessonsCategoryRepository.findById(lessonsCategoryId).orElseThrow();
+    LessonsCategory lessonsCategory = lessonsCategoryRepository.findById(lessonsCategoryId).orElseThrow(ElementNotFoundException::new);
     Iterable<Team> lessonsCategoryTeams = teamRepository.findAllById(input.getTeamIds());
     lessonsCategory.setTeams(fromIterable(lessonsCategoryTeams));
     return lessonsCategoryRepository.save(lessonsCategory);
@@ -186,7 +187,7 @@ public class LessonsApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public LessonsQuestion createExerciseLessonsQuestion(@PathVariable String exerciseId,
       @PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsQuestionCreateInput input) {
-    LessonsCategory lessonsCategory = lessonsCategoryRepository.findById(lessonsCategoryId).orElseThrow();
+    LessonsCategory lessonsCategory = lessonsCategoryRepository.findById(lessonsCategoryId).orElseThrow(ElementNotFoundException::new);
     LessonsQuestion lessonsQuestion = new LessonsQuestion();
     lessonsQuestion.setUpdateAttributes(input);
     lessonsQuestion.setCategory(lessonsCategory);
@@ -197,7 +198,7 @@ public class LessonsApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public LessonsQuestion updateExerciseLessonsQuestion(@PathVariable String exerciseId,
       @PathVariable String lessonsQuestionId, @Valid @RequestBody LessonsQuestionUpdateInput input) {
-    LessonsQuestion lessonsQuestion = lessonsQuestionRepository.findById(lessonsQuestionId).orElseThrow();
+    LessonsQuestion lessonsQuestion = lessonsQuestionRepository.findById(lessonsQuestionId).orElseThrow(ElementNotFoundException::new);
     lessonsQuestion.setUpdateAttributes(input);
     lessonsQuestion.setUpdated(now());
     return lessonsQuestionRepository.save(lessonsQuestion);
@@ -212,7 +213,7 @@ public class LessonsApi extends RestBehavior {
   @PostMapping("/api/exercises/{exerciseId}/lessons_send")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public void sendExerciseLessons(@PathVariable String exerciseId, @Valid @RequestBody LessonsSendInput input) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     List<LessonsCategory> lessonsCategories = lessonsCategoryRepository.findAll(
         LessonsCategorySpecification.fromExercise(exerciseId)).stream().toList();
     List<User> users = lessonsCategories.stream().flatMap(lessonsCategory -> lessonsCategory.getTeams().stream()
@@ -265,7 +266,7 @@ public class LessonsApi extends RestBehavior {
       @PathVariable String lessonsQuestionId, @Valid @RequestBody LessonsAnswerCreateInput input,
       @RequestParam Optional<String> userId) {
     User user = impersonateUser(userRepository, userId);
-    LessonsQuestion lessonsQuestion = lessonsQuestionRepository.findById(lessonsQuestionId).orElseThrow();
+    LessonsQuestion lessonsQuestion = lessonsQuestionRepository.findById(lessonsQuestionId).orElseThrow(ElementNotFoundException::new);
     LessonsAnswer lessonsAnswer = new LessonsAnswer();
     lessonsAnswer.setQuestion(lessonsQuestion);
     lessonsAnswer.setScore(input.getScore());

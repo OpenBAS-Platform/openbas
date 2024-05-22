@@ -1,6 +1,7 @@
 package io.openbas.helper;
 
 import io.openbas.database.model.Base;
+import io.openbas.rest.exception.ElementNotFoundException;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
@@ -32,6 +33,6 @@ public class DatabaseHelper {
     }
 
     public static <T> T resolveRelation(String inputRelationId, CrudRepository<T, String> repository) {
-        return repository.findById(inputRelationId).orElseThrow();
+        return repository.findById(inputRelationId).orElseThrow(ElementNotFoundException::new);
     }
 }

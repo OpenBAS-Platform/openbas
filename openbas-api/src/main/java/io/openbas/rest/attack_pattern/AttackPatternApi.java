@@ -11,6 +11,7 @@ import io.openbas.database.specification.InjectorContractSpecification;
 import io.openbas.rest.attack_pattern.form.AttackPatternCreateInput;
 import io.openbas.rest.attack_pattern.form.AttackPatternUpdateInput;
 import io.openbas.rest.attack_pattern.form.AttackPatternUpsertInput;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
@@ -75,7 +76,7 @@ public class AttackPatternApi extends RestBehavior {
 
     @GetMapping("/api/attack_patterns/{attackPatternId}")
     public AttackPattern attackPattern(@PathVariable String attackPatternId) {
-        return attackPatternRepository.findById(attackPatternId).orElseThrow();
+        return attackPatternRepository.findById(attackPatternId).orElseThrow(ElementNotFoundException::new);
     }
 
     @Secured(ROLE_ADMIN)
@@ -90,7 +91,7 @@ public class AttackPatternApi extends RestBehavior {
 
     @GetMapping("/api/attack_patterns/{attackPatternId}/injector_contracts")
     public Iterable<InjectorContract> injectorContracts(@PathVariable String attackPatternId) {
-        attackPatternRepository.findById(attackPatternId).orElseThrow();
+        attackPatternRepository.findById(attackPatternId).orElseThrow(ElementNotFoundException::new);
         return injectorContractRepository.findAll(InjectorContractSpecification.fromAttackPattern(attackPatternId));
     }
 
@@ -99,7 +100,7 @@ public class AttackPatternApi extends RestBehavior {
     public AttackPattern updateAttackPattern(
             @NotBlank @PathVariable final String attackPatternId,
             @Valid @RequestBody AttackPatternUpdateInput input) {
-        AttackPattern attackPattern = this.attackPatternRepository.findById(attackPatternId).orElseThrow();
+        AttackPattern attackPattern = this.attackPatternRepository.findById(attackPatternId).orElseThrow(ElementNotFoundException::new);
         attackPattern.setUpdateAttributes(input);
         attackPattern.setKillChainPhases(fromIterable(this.killChainPhaseRepository.findAllById(input.getKillChainPhasesIds())));
         attackPattern.setUpdatedAt(Instant.now());
@@ -116,7 +117,7 @@ public class AttackPatternApi extends RestBehavior {
                     fromIterable(killChainPhaseRepository.findAllById(attackPatternInput.getKillChainPhasesIds()))
                     : List.of();
             AttackPattern attackPatternParent = attackPatternInput.getParentId() != null ?
-                    attackPatternRepository.findByStixId(attackPatternInput.getParentId()).orElseThrow() : null;
+                    attackPatternRepository.findByStixId(attackPatternInput.getParentId()).orElseThrow(ElementNotFoundException::new) : null;
             if (optionalAttackPattern.isEmpty()) {
                 AttackPattern newAttackPattern = new AttackPattern();
                 newAttackPattern.setStixId(attackPatternInput.getStixId());

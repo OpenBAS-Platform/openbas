@@ -7,6 +7,7 @@ import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.rest.channel.form.*;
 import io.openbas.rest.channel.model.VirtualArticle;
 import io.openbas.rest.channel.response.ChannelReader;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ScenarioService;
 import jakarta.transaction.Transactional;
@@ -86,13 +87,13 @@ public class ChannelApi extends RestBehavior {
 
   @GetMapping("/api/channels/{channelId}")
   public Channel channel(@PathVariable String channelId) {
-    return channelRepository.findById(channelId).orElseThrow();
+    return channelRepository.findById(channelId).orElseThrow(ElementNotFoundException::new);
   }
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/channels/{channelId}")
   public Channel updateChannel(@PathVariable String channelId, @Valid @RequestBody ChannelUpdateInput input) {
-    Channel channel = channelRepository.findById(channelId).orElseThrow();
+    Channel channel = channelRepository.findById(channelId).orElseThrow(ElementNotFoundException::new);
     channel.setUpdateAttributes(input);
     channel.setUpdatedAt(Instant.now());
     return channelRepository.save(channel);
@@ -101,7 +102,7 @@ public class ChannelApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/channels/{channelId}/logos")
   public Channel updateChannelLogos(@PathVariable String channelId, @Valid @RequestBody ChannelUpdateLogoInput input) {
-    Channel channel = channelRepository.findById(channelId).orElseThrow();
+    Channel channel = channelRepository.findById(channelId).orElseThrow(ElementNotFoundException::new);
     if (input.getLogoDark() != null) {
       channel.setLogoDark(documentRepository.findById(input.getLogoDark()).orElse(null));
     } else {
@@ -156,14 +157,14 @@ public class ChannelApi extends RestBehavior {
   }
 
   private Article enrichArticleWithVirtualPublication(List<Inject> injects, Article article) {
-    return enrichArticleWithVirtualPublication(injects, List.of(article)).stream().findFirst().orElseThrow();
+    return enrichArticleWithVirtualPublication(injects, List.of(article)).stream().findFirst().orElseThrow(ElementNotFoundException::new);
   }
 
   @GetMapping("/api/observer/channels/{exerciseId}/{channelId}")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public ChannelReader observerArticles(@PathVariable String exerciseId, @PathVariable String channelId) {
     ChannelReader channelReader;
-    Channel channel = channelRepository.findById(channelId).orElseThrow();
+    Channel channel = channelRepository.findById(channelId).orElseThrow(ElementNotFoundException::new);
 
     Optional<Exercise> exerciseOpt = this.exerciseRepository.findById(exerciseId);
     if (exerciseOpt.isPresent()) {
@@ -188,7 +189,7 @@ public class ChannelApi extends RestBehavior {
       @PathVariable String channelId,
       @RequestParam Optional<String> userId) {
     ChannelReader channelReader;
-    Channel channel = channelRepository.findById(channelId).orElseThrow();
+    Channel channel = channelRepository.findById(channelId).orElseThrow(ElementNotFoundException::new);
     List<Inject> injects;
 
     Optional<Exercise> exerciseOpt = exerciseRepository.findById(exerciseId);
@@ -259,11 +260,11 @@ public class ChannelApi extends RestBehavior {
   public Article createArticleForExercise(
       @PathVariable String exerciseId,
       @Valid @RequestBody ArticleCreateInput input) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     Article article = new Article();
     article.setUpdateAttributes(input);
-    article.setChannel(channelRepository.findById(input.getChannelId()).orElseThrow());
-    article.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
+    article.setChannel(channelRepository.findById(input.getChannelId()).orElseThrow(ElementNotFoundException::new));
+    article.setExercise(exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new));
     Article savedArticle = articleRepository.save(article);
     List<String> articleDocuments = input.getDocuments();
     List<Document> finalArticleDocuments = new ArrayList<>();
@@ -286,7 +287,7 @@ public class ChannelApi extends RestBehavior {
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @GetMapping("/api/exercises/{exerciseId}/articles")
   public Iterable<Article> exerciseArticles(@PathVariable String exerciseId) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     return enrichArticleWithVirtualPublication(exercise.getInjects(), exercise.getArticles());
   }
 
@@ -296,11 +297,11 @@ public class ChannelApi extends RestBehavior {
       @PathVariable String exerciseId,
       @PathVariable String articleId,
       @Valid @RequestBody ArticleUpdateInput input) {
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-    Article article = articleRepository.findById(articleId).orElseThrow();
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+    Article article = articleRepository.findById(articleId).orElseThrow(ElementNotFoundException::new);
     List<String> newDocumentsIds = input.getDocuments();
     List<String> currentDocumentIds = article.getDocuments().stream().map(Document::getId).toList();
-    article.setChannel(channelRepository.findById(input.getChannelId()).orElseThrow());
+    article.setChannel(channelRepository.findById(input.getChannelId()).orElseThrow(ElementNotFoundException::new));
     article.setUpdateAttributes(input);
     // Original List
     List<Document> articleDocuments = new ArrayList<>(article.getDocuments());
@@ -344,7 +345,7 @@ public class ChannelApi extends RestBehavior {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     Article article = new Article();
     article.setUpdateAttributes(input);
-    article.setChannel(this.channelRepository.findById(input.getChannelId()).orElseThrow());
+    article.setChannel(this.channelRepository.findById(input.getChannelId()).orElseThrow(ElementNotFoundException::new));
     article.setScenario(scenario);
     Article savedArticle = this.articleRepository.save(article);
     List<String> articleDocuments = input.getDocuments();
@@ -379,10 +380,10 @@ public class ChannelApi extends RestBehavior {
       @PathVariable @NotBlank final String articleId,
       @Valid @RequestBody ArticleUpdateInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
-    Article article = articleRepository.findById(articleId).orElseThrow();
+    Article article = articleRepository.findById(articleId).orElseThrow(ElementNotFoundException::new);
     List<String> newDocumentsIds = input.getDocuments();
     List<String> currentDocumentIds = article.getDocuments().stream().map(Document::getId).toList();
-    article.setChannel(channelRepository.findById(input.getChannelId()).orElseThrow());
+    article.setChannel(channelRepository.findById(input.getChannelId()).orElseThrow(ElementNotFoundException::new));
     article.setUpdateAttributes(input);
     // Original List
     List<Document> articleDocuments = new ArrayList<>(article.getDocuments());
