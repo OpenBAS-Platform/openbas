@@ -2,7 +2,7 @@ package io.openbas.rest.user;
 
 import io.openbas.config.SessionManager;
 import io.openbas.database.model.User;
-import io.openbas.database.raw.RawUser;
+import io.openbas.database.raw.BasicUser;
 import io.openbas.database.repository.OrganizationRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.UserRepository;
@@ -138,8 +138,8 @@ public class UserApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @GetMapping("/api/users")
-    public List<RawUser> users() {
-        return userRepository.rawAll();
+    public List<BasicUser> users() {
+         return userRepository.rawAll();
     }
 
     @PostMapping("/api/users/search")
