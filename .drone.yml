@@ -3,11 +3,6 @@ kind: pipeline
 name: openbas-tests
 
 steps:
-  - name: submodules
-    image: alpine/git
-    commands:
-      - git submodule update --init --recursive
-
   - name: api-tests
     image: maven:3.9.6-eclipse-temurin-21
     environment:
@@ -22,8 +17,6 @@ steps:
       - mvn test
       - cd ../openbas-injectors
       - mvn test
-    depends_on:
-      - submodules
 
   - name: frontend-tests
     image: node:20-alpine
@@ -62,7 +55,6 @@ steps:
       - apt install -y yarn
       - apt install -y nodejs
       - apt install -y git
-      - git submodule update --init --recursive
       - cd openbas-front
       - yarn install
       - yarn build

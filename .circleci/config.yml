@@ -14,10 +14,6 @@ jobs:
           command: apt-get update --allow-insecure-repositories --allow-unauthenticated && apt-get install -y build-essential libffi-dev curl
       - checkout
       - run:
-          command: |
-            git submodule sync
-            git submodule update --init --recursive --jobs 8
-      - run:
           working_directory: ~/openbas/openbas-front
           command: yarn install
       - run:

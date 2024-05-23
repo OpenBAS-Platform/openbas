@@ -91,7 +91,5 @@
         <module>openbas-model</module>
         <module>openbas-framework</module>
         <module>openbas-api</module>
-        <module>openbas-injectors</module>
-        <module>openbas-collectors</module>
     </modules>
 </project>

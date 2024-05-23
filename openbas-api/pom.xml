@@ -27,28 +27,6 @@
     <profiles>
         <profile>
             <id>dev</id>
-            <dependencies>
-                <dependency>
-                    <groupId>io.openbas</groupId>
-                    <artifactId>openbas-injector-ovh</artifactId>
-                    <version>1.0.3</version>
-                </dependency>
-                <dependency>
-                    <groupId>io.openbas</groupId>
-                    <artifactId>openbas-injector-lade</artifactId>
-                    <version>1.0.3</version>
-                </dependency>
-                <dependency>
-                    <groupId>io.openbas</groupId>
-                    <artifactId>openbas-injector-mastodon</artifactId>
-                    <version>1.0.3</version>
-                </dependency>
-                <dependency>
-                    <groupId>io.openbas</groupId>
-                    <artifactId>openbas-collector-sentinel</artifactId>
-                    <version>1.0.3</version>
-                </dependency>
-            </dependencies>
         </profile>
     </profiles>
 
@@ -188,6 +166,29 @@
             <groupId>com.cronutils</groupId>
             <artifactId>cron-utils</artifactId>
             <version>${cron-utils.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.azure</groupId>
+            <artifactId>msal4j</artifactId>
+            <version>1.10.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- TEST -->
         <dependency>

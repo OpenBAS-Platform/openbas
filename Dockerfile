@@ -14,8 +14,6 @@ WORKDIR /opt/openbas-build/openbas
 COPY openbas-model ./openbas-model
 COPY openbas-framework ./openbas-framework
 COPY openbas-api ./openbas-api
-COPY openbas-injectors ./openbas-injectors
-COPY openbas-collectors ./openbas-collectors
 COPY pom.xml ./pom.xml
 COPY --from=front-builder /opt/openbas-build/openbas-front/builder/prod/build ./openbas-front/builder/prod/build
 RUN mvn install -DskipTests -Pdev
