@@ -9,9 +9,9 @@ public interface RawUser {
   String getUser_lastname();
   String getUser_email();
   String getUser_organization();
-  List<String> getUsers_groups();
-  List<String> getUsers_teams();
-  List<String> getUsers_tags();
+  List<String> getGroups();
+  List<String> getTeams();
+  List<String> getTags();
   List<String> getTokens();
 
 }
