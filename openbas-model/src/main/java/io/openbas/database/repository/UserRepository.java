@@ -58,7 +58,6 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
       + "       array_remove(array_agg(tg.tag_id), NULL) as user_tags,"
       + "       array_remove(array_agg(grp.group_id), NULL) as user_groups,"
       + "       array_remove(array_agg(tm.team_id), NULL) as user_teams from USERS us"
-      + "       left join organizations org on us.user_organization = org.organization_id"
       + "       left join users_groups usr_grp on us.user_id = usr_grp.user_id"
       + "       left join groups grp on usr_grp.group_id = grp.group_id"
       + "       left join users_teams usr_tm on us.user_id = usr_tm.user_id"
