@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import io.openbas.config.OpenBASConfig;
+import io.openbas.config.RabbitmqConfig;
 import jakarta.annotation.Resource;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -23,17 +23,17 @@ public class QueueService {
   protected ObjectMapper mapper;
 
   @Resource
-  private OpenBASConfig openBASConfig;
+  private RabbitmqConfig rabbitmqConfig;
 
   public void publish(String injectType, String publishedJson) throws IOException, TimeoutException {
     ConnectionFactory factory = new ConnectionFactory();
-    factory.setHost(openBASConfig.getRabbitmqHostname());
+    factory.setHost(rabbitmqConfig.getHostname());
     Connection connection = null;
     try {
       connection = factory.newConnection();
       Channel channel = connection.createChannel();
-      String routingKey = openBASConfig.getRabbitmqPrefix() + ROUTING_KEY + injectType;
-      String exchangeKey = openBASConfig.getRabbitmqPrefix() + EXCHANGE_KEY;
+      String routingKey = rabbitmqConfig.getPrefix() + ROUTING_KEY + injectType;
+      String exchangeKey = rabbitmqConfig.getPrefix() + EXCHANGE_KEY;
       channel.basicPublish(exchangeKey, routingKey, null, publishedJson.getBytes());
     } finally {
       if (connection != null) {

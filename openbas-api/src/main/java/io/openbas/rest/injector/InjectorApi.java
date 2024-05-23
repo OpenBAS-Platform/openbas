@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import io.openbas.config.OpenBASConfig;
+import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Injector;
 import io.openbas.database.model.InjectorContract;
@@ -44,7 +44,7 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 public class InjectorApi extends RestBehavior {
 
     @Resource
-    private OpenBASConfig openBASConfig;
+    private RabbitmqConfig rabbitmqConfig;
 
     private AttackPatternRepository attackPatternRepository;
 
@@ -190,11 +190,11 @@ public class InjectorApi extends RestBehavior {
     public InjectorRegistration registerInjector(@Valid @RequestPart("input") InjectorCreateInput input,
                                                  @RequestPart("icon") Optional<MultipartFile> file) {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(openBASConfig.getRabbitmqHostname());
-        factory.setPort(openBASConfig.getRabbitmqPort());
-        factory.setUsername(openBASConfig.getRabbitmqUser());
-        factory.setPassword(openBASConfig.getRabbitmqPass());
-        factory.setVirtualHost(openBASConfig.getRabbitmqVhost());
+        factory.setHost(rabbitmqConfig.getHostname());
+        factory.setPort(rabbitmqConfig.getPort());
+        factory.setUsername(rabbitmqConfig.getUser());
+        factory.setPassword(rabbitmqConfig.getPass());
+        factory.setVirtualHost(rabbitmqConfig.getVhost());
         // Declare queueing
         Connection connection = null;
         try {
@@ -204,12 +204,12 @@ public class InjectorApi extends RestBehavior {
             }
             connection = factory.newConnection();
             Channel channel = connection.createChannel();
-            String queueName = openBASConfig.getRabbitmqPrefix() + "_injector_" + input.getType();
+            String queueName = rabbitmqConfig.getPrefix() + "_injector_" + input.getType();
             Map<String, Object> queueOptions = new HashMap<>();
-            queueOptions.put("x-queue-type", openBASConfig.getRabbitmqQueueType());
+            queueOptions.put("x-queue-type", rabbitmqConfig.getQueueType());
             channel.queueDeclare(queueName, true, false, false, queueOptions);
-            String routingKey = openBASConfig.getRabbitmqPrefix() + ROUTING_KEY + input.getType();
-            String exchangeKey = openBASConfig.getRabbitmqPrefix() + EXCHANGE_KEY;
+            String routingKey = rabbitmqConfig.getPrefix() + ROUTING_KEY + input.getType();
+            String exchangeKey = rabbitmqConfig.getPrefix() + EXCHANGE_KEY;
             channel.exchangeDeclare(exchangeKey, "direct", true);
             channel.queueBind(queueName, exchangeKey, routingKey);
             // We need to support upsert for registration
@@ -249,12 +249,12 @@ public class InjectorApi extends RestBehavior {
                 injectorContractRepository.saveAll(injectorContracts);
             }
             InjectorConnection conn = new InjectorConnection(
-                    openBASConfig.getRabbitmqHostname(),
-                    openBASConfig.getRabbitmqVhost(),
-                    openBASConfig.isRabbitmqSsl(),
-                    openBASConfig.getRabbitmqPort(),
-                    openBASConfig.getRabbitmqUser(),
-                    openBASConfig.getRabbitmqPass()
+                    rabbitmqConfig.getHostname(),
+                    rabbitmqConfig.getVhost(),
+                    rabbitmqConfig.isSsl(),
+                    rabbitmqConfig.getPort(),
+                    rabbitmqConfig.getUser(),
+                    rabbitmqConfig.getPass()
             );
             return new InjectorRegistration(conn, queueName);
         } catch (Exception e) {
