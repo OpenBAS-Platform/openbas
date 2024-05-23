@@ -1,9 +1,8 @@
 package io.openbas.rest.organization;
 
 import io.openbas.config.OpenBASPrincipal;
-import io.openbas.database.model.Inject;
 import io.openbas.database.model.Organization;
-import io.openbas.database.model.User;
+import io.openbas.database.raw.RawOrganization;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.OrganizationRepository;
 import io.openbas.database.repository.TagRepository;
@@ -55,18 +54,15 @@ public class OrganizationApi extends RestBehavior {
 
   @GetMapping("/api/organizations")
   @PreAuthorize("isObserver()")
-  public Iterable<Organization> organizations() {
+  public Iterable<RawOrganization> organizations() {
     OpenBASPrincipal currentUser = currentUser();
-    List<Organization> organizations;
+    List<RawOrganization> organizations;
     if (currentUser.isAdmin()) {
-      organizations = fromIterable(organizationRepository.findAll());
+      organizations = fromIterable(organizationRepository.rawAll());
     } else {
-      User local = userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
-      organizations = local.getGroups().stream()
-          .flatMap(group -> group.getOrganizations().stream()).toList();
+      organizations = fromIterable(organizationRepository.rawByUser(currentUser.getId()));
     }
-    Iterable<Inject> injects = injectRepository.findAll();
-    return organizations.stream().peek(org -> org.resolveInjects(injects)).toList();
+    return organizations;
   }
 
   @Secured(ROLE_ADMIN)
