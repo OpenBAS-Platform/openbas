@@ -64,7 +64,8 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
       + " left join communications_users usr_comm on us.user_id = usr_comm.user_id "
       + " left join communications comm on usr_comm.communication_id = comm.communication_id "
       + " left join tokens tk on us.user_id = tk.token_user "
-      + " left join comchecks_statuses commstt on us.user_id = commstt.status_user;",
+      + " left join comchecks_statuses commstt on us.user_id = commstt.status_user"
+      + " group by us.user_id;",
       nativeQuery = true)
   List<User> rawAll();
 }
