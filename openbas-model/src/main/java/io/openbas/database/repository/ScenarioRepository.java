@@ -1,6 +1,7 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Scenario;
+import io.openbas.database.raw.RawScenario;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -45,5 +46,22 @@ public interface ScenarioRepository extends CrudRepository<Scenario, String>,
       "ORDER BY category_count DESC " +
       "LIMIT :limit", nativeQuery = true)
   List<Object[]> findTopCategories(@Param("limit") @NotNull final int limit);
+
+  @Query(value = "SELECT sce.scenario_id, sce.scenario_name, sce.scenario_subtitle, array_agg(sct.tag_id) FILTER (WHERE sct.tag_id IS NOT NULL) as scenario_tags " +
+          "FROM scenarios sce " +
+          "LEFT JOIN scenarios_tags sct ON sct.scenario_id = sce.scenario_id " +
+          "INNER join grants ON grants.grant_scenario = sce.scenario_id " +
+          "INNER join groups ON grants.grant_group = groups.group_id " +
+          "INNER JOIN users_groups ON groups.group_id = users_groups.group_id " +
+          "WHERE users_groups.user_id = :userId " +
+          "GROUP BY sce.scenario_id", nativeQuery = true)
+  List<RawScenario> rawAllGranted(@Param("userId") String userId);
+
+
+  @Query(value = "SELECT sce.scenario_id, sce.scenario_name, sce.scenario_subtitle, array_agg(sct.tag_id) FILTER (WHERE sct.tag_id IS NOT NULL) as scenario_tags " +
+          "FROM scenarios sce " +
+          "LEFT JOIN scenarios_tags sct ON sct.scenario_id = sce.scenario_id " +
+          "GROUP BY sce.scenario_id", nativeQuery = true)
+  List<RawScenario> rawAll();
 
 }

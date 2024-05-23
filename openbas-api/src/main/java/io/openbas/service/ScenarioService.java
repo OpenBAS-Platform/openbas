@@ -3,6 +3,7 @@ package io.openbas.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawScenario;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.ScenarioSpecification;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -90,13 +91,13 @@ public class ScenarioService {
   }
 
   public List<ScenarioSimple> scenarios() {
-    List<Scenario> scenarios;
+    List<RawScenario> scenarios;
     if (currentUser().isAdmin()) {
-      scenarios = fromIterable(this.scenarioRepository.findAll());
+      scenarios = fromIterable(this.scenarioRepository.rawAll());
     } else {
-      scenarios = this.scenarioRepository.findAllGranted(currentUser().getId());
+      scenarios = this.scenarioRepository.rawAllGranted(currentUser().getId());
     }
-    return scenarios.stream().map(ScenarioSimple::fromScenario).toList();
+    return scenarios.stream().map(ScenarioSimple::fromRawScenario).toList();
   }
 
   public Page<Scenario> scenarios(SearchPaginationInput searchPaginationInput) {
