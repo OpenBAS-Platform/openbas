@@ -137,8 +137,8 @@ public class UserApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @GetMapping("/api/users")
-    public Iterable<User> users() {
-        return userRepository.findAll();
+    public List<User> users() {
+        return userRepository.rawAll();
     }
 
     @PostMapping("/api/users/search")
