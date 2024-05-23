@@ -34,6 +34,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
             .user_email(tuple.get("user_email", String.class))
             .user_firstname(tuple.get("user_firstname", String.class))
             .user_lastname(tuple.get("user_lastname", String.class))
+            .user_phone(tuple.get("user_phone", String.class))
             .user_created_at(tuple.get("user_created_at", Timestamp.class).toInstant())
             .user_organization(BasicOrganization.builder()
                 .organization_id(tuple.get("organization_id", String.class))
