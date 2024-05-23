@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.converter.ContentConverter;
+import io.openbas.database.raw.RawInject;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
@@ -23,7 +24,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.logging.Level;
 
 import static java.time.Duration.between;
 import static java.time.Instant.now;
@@ -398,5 +398,11 @@ public class Inject implements Base, Injection {
   @Override
   public int hashCode() {
     return Objects.hash(id);
+  }
+
+  public static Inject fromRawInject(RawInject rawInject) {
+    Inject inject = new Inject();
+    inject.setId(rawInject.getInject_id());
+    return inject;
   }
 }

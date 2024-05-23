@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Exercise.STATUS;
+import io.openbas.database.raw.RawExercise;
+import io.openbas.database.raw.RawInjectExpectation;
+import io.openbas.database.raw.impl.SimpleRawInjectExpectation;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.*;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -36,12 +39,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -94,6 +96,7 @@ public class ExerciseApi extends RestBehavior {
   private LessonsQuestionRepository lessonsQuestionRepository;
   private LessonsAnswerRepository lessonsAnswerRepository;
   private InjectStatusRepository injectStatusRepository;
+  private InjectRepository injectRepository;
   // endregion
 
   // region services
@@ -109,6 +112,11 @@ public class ExerciseApi extends RestBehavior {
   @Autowired
   public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
     this.injectStatusRepository = injectStatusRepository;
+  }
+
+  @Autowired
+  public void setInjectRepository(InjectRepository injectRepository) {
+    this.injectRepository = injectRepository;
   }
 
   @Autowired
@@ -613,9 +621,41 @@ public class ExerciseApi extends RestBehavior {
 
   @GetMapping("/api/exercises")
   public List<ExerciseSimple> exercises() {
-    Iterable<Exercise> exercises = currentUser().isAdmin() ? exerciseRepository.findAll()
-        : exerciseRepository.findAllGranted(currentUser().getId());
-    return fromIterable(exercises).stream().map(ExerciseSimple::fromExercise).toList();
+    Iterable<RawExercise> exercises = currentUser().isAdmin() ? exerciseRepository.rawAll()
+            : exerciseRepository.rawAllGranted(currentUser().getId());
+
+    List<String> listOfIds = fromIterable(exercises).stream()
+            .map(RawExercise::getExercise_id)
+            .distinct()
+            .toList();
+
+    List<String> listOfInjectIds = fromIterable(exercises).stream()
+            .filter(exercise -> exercise.getInject_ids() != null)
+            .flatMap(exercise -> exercise.getInject_ids().stream())
+            .distinct()
+            .toList();
+
+    List<Inject> listOfInjects = new ArrayList<>();
+    injectRepository.findAllById(listOfInjectIds).forEach(listOfInjects::add);
+    Map<String, Inject> mapOfInjectsById = listOfInjects.stream().collect(Collectors.toMap(Inject::getId, Function.identity()));
+
+    return listOfIds.stream().map(exerciseId -> {
+      List<RawExercise> currentExerciceSimpleList =
+              fromIterable(exercises).stream().filter((exercice) -> exercice.getExercise_id().equals(exerciseId))
+                      .toList();
+      List<Inject> listOfInjectsOfExercise = new ArrayList<>();
+      if (currentExerciceSimpleList.get(0).getInject_ids() != null) {
+        listOfInjectsOfExercise = currentExerciceSimpleList.get(0).getInject_ids().stream().map(mapOfInjectsById::get).collect(Collectors.toList());
+      }
+      return ExerciseSimple.fromRawExercise(currentExerciceSimpleList.get(0),
+              currentExerciceSimpleList.stream().map(rawExercise -> {
+                SimpleRawInjectExpectation rawInjectExpectation = new SimpleRawInjectExpectation();
+                rawInjectExpectation.setInject_expectation_score(rawExercise.getInject_expectation_score());
+                rawInjectExpectation.setInject_expectation_type(rawExercise.getInject_expectation_type());
+                return (RawInjectExpectation)rawInjectExpectation;
+              }).filter(expectation -> expectation.getInject_expectation_type() != null).toList(),
+              listOfInjectsOfExercise);
+    }).toList();
   }
   // endregion
 

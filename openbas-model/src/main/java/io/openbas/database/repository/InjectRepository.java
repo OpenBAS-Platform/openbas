@@ -1,6 +1,7 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Inject;
+import io.openbas.database.raw.RawInject;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -102,4 +103,16 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
   @Override
   @Query("select count(distinct i) from Inject i where i.createdAt < :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
+
+  @Query(value = "SELECT injects.inject_id, ine.asset_group_id, ine.team_id, ine.asset_id " +
+          "FROM injects " +
+          "LEFT JOIN injects_expectations ine ON injects.inject_id = ine.inject_id " +
+          "LEFT JOIN injects_teams it ON injects.inject_id = it.inject_id " +
+          "LEFT JOIN teams ON teams.team_id = it.team_id " +
+          "LEFT JOIN injects_assets ia ON injects.inject_id = ia.inject_id " +
+          "LEFT JOIN assets ON assets.asset_id = ia.asset_id " +
+          "LEFT JOIN injects_asset_groups iag ON injects.inject_id = iag.inject_id " +
+          "LEFT JOIN asset_groups ON asset_groups.asset_group_id = iag.asset_group_id " +
+          "WHERE injects.inject_id IN :ids ;", nativeQuery = true)
+  List<RawInject> findRawByIds(@Param("ids")List<String> ids);
 }
