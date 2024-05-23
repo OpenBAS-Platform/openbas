@@ -3,6 +3,7 @@ package io.openbas.utils;
 import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
+import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
@@ -242,6 +243,21 @@ public class AtomicTestingUtils {
         return resultAvgOfExpectations;
     }
 
+    @NotNull
+    public static List<ExpectationResultsByType> getRawExpectationResultByTypes(final List<RawInjectExpectation> expectations) {
+        List<Integer> preventionScores = getRawScores(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
+        List<Integer> detectionScores = getRawScores(List.of(EXPECTATION_TYPE.DETECTION), expectations);
+        List<Integer> humanScores = getRawScores(List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL), expectations);
+
+        List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
+
+        getExpectationByType(ExpectationType.PREVENTION, preventionScores).map(resultAvgOfExpectations::add);
+        getExpectationByType(ExpectationType.DETECTION, detectionScores).map(resultAvgOfExpectations::add);
+        getExpectationByType(ExpectationType.HUMAN_RESPONSE, humanScores).map(resultAvgOfExpectations::add);
+
+        return resultAvgOfExpectations;
+    }
+
     public static Optional<ExpectationResultsByType> getExpectationByType(final ExpectationType type, final List<Integer> scores) {
         if (scores.isEmpty()) {
             return Optional.of(new ExpectationResultsByType(type, InjectExpectation.ExpectationStatus.UNKNOWN, Collections.emptyList()));
@@ -278,6 +294,15 @@ public class AtomicTestingUtils {
                 .stream()
                 .filter(e -> types.contains(e.getType()))
                 .map(InjectExpectation::getScore)
+                .map(score -> score == null ? null : (score == 0 ? 0 : 1))
+                .toList();
+    }
+
+    public static List<Integer> getRawScores(final List<EXPECTATION_TYPE> types, final List<RawInjectExpectation> expectations) {
+        return expectations
+                .stream()
+                .filter(e -> types.contains(EXPECTATION_TYPE.valueOf(e.getInject_expectation_type())))
+                .map(RawInjectExpectation::getInject_expectation_score)
                 .map(score -> score == null ? null : (score == 0 ? 0 : 1))
                 .toList();
     }
