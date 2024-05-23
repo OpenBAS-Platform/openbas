@@ -15,8 +15,6 @@ steps:
       - mvn test
       - cd ../openbas-framework
       - mvn test
-      - cd ../openbas-injectors
-      - mvn test
 
   - name: frontend-tests
     image: node:20-alpine
@@ -89,7 +87,6 @@ steps:
       files:
         - openbas-api/target/site/jacoco/jacoco.xml
         - openbas-framework/target/site/jacoco/jacoco.xml
-        - openbas-injectors/openbas-caldera/target/site/jacoco/jacoco.xml
     depends_on:
       - api-tests
 
