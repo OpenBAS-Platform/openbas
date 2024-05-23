@@ -1,6 +1,7 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.User;
+import io.openbas.database.raw.RawUser;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
@@ -61,11 +62,8 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
       + " left join teams tm on usr_tm.team_id = tm.team_id "
       + " left join users_tags usr_tg on us.user_id = usr_tg.user_id "
       + " left join tags tg on usr_tg.tag_id = tg.tag_id "
-      + " left join communications_users usr_comm on us.user_id = usr_comm.user_id "
-      + " left join communications comm on usr_comm.communication_id = comm.communication_id "
       + " left join tokens tk on us.user_id = tk.token_user "
-      + " left join comchecks_statuses commstt on us.user_id = commstt.status_user"
       + " group by us.user_id;",
       nativeQuery = true)
-  List<User> rawAll();
+  List<RawUser> rawAll();
 }
