@@ -1,6 +1,8 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Exercise;
+import io.openbas.database.raw.RawGlobalInjectExpectation;
+import io.openbas.database.raw.RawInjectExpectation;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -46,4 +48,44 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
             "left join scenarios_exercises as se on e.exercise_id = se.exercise_id " +
             "where e.exercise_status = 'RUNNING' group by e.exercise_id, se.scenario_id having count(status) = count(inject);", nativeQuery = true)
     List<Exercise> thatMustBeFinished();
+
+    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score " +
+            "FROM injects_expectations ie " +
+            "INNER JOIN injects ON ie.inject_id = injects.inject_id " +
+            "INNER JOIN exercises ON injects.inject_exercise = exercises.exercise_id " +
+            "WHERE exercises.exercise_created_at < :from ;", nativeQuery = true)
+    List<RawInjectExpectation> allInjectExpectationsFromDate(@Param("from") Instant from);
+
+    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score " +
+            "FROM injects_expectations ie " +
+            "INNER JOIN injects ON ie.inject_id = injects.inject_id " +
+            "INNER JOIN exercises e ON injects.inject_exercise = e.exercise_id " +
+            "INNER join grants ON grants.grant_exercise = e.exercise_id " +
+            "INNER join groups ON grants.grant_group = groups.group_id " +
+            "INNER JOIN users_groups ON groups.group_id = users_groups.group_id " +
+            "WHERE e.exercise_created_at < :from " +
+            "AND users_groups.user_id = :userId ;", nativeQuery = true)
+    List<RawInjectExpectation> allGrantedInjectExpectationsFromDate(@Param("from") Instant from, @Param("userId") String userId);
+
+    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score, injects.inject_title, icap.attack_pattern_id " +
+            "FROM exercises " +
+            "INNER JOIN injects ON exercises.exercise_id = injects.inject_exercise " +
+            "LEFT JOIN injects_expectations ie ON exercises.exercise_id = ie.exercise_id " +
+            "INNER JOIN injectors_contracts ic ON injects.inject_injector_contract = ic.injector_contract_id " +
+            "INNER JOIN injectors_contracts_attack_patterns icap ON ic.injector_contract_id = icap.injector_contract_id " +
+            "WHERE exercises.exercise_created_at < :from ;", nativeQuery = true)
+    Iterable<RawGlobalInjectExpectation> rawGlobalInjectExpectationResultsFromDate(@Param("from") Instant from);
+
+    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score, injects.inject_title, icap.attack_pattern_id " +
+            "FROM exercises " +
+            "INNER JOIN injects ON exercises.exercise_id = injects.inject_exercise " +
+            "LEFT JOIN injects_expectations ie ON exercises.exercise_id = ie.exercise_id " +
+            "INNER JOIN injectors_contracts ic ON injects.inject_injector_contract = ic.injector_contract_id " +
+            "INNER JOIN injectors_contracts_attack_patterns icap ON ic.injector_contract_id = icap.injector_contract_id " +
+            "INNER join grants ON grants.grant_exercise = exercises.exercise_id " +
+            "INNER join groups ON grants.grant_group = groups.group_id " +
+            "INNER JOIN users_groups ON groups.group_id = users_groups.group_id " +
+            "WHERE exercises.exercise_created_at < :from " +
+            "AND users_groups.user_id = :userId ;", nativeQuery = true)
+    Iterable<RawGlobalInjectExpectation> rawGrantedInjectExpectationResultsFromDate(@Param("from") Instant from, @Param("userId") String userId);
 }
