@@ -14,6 +14,7 @@ public class BasicUser {
   private String user_lastname;
   private String user_email;
   private String user_phone;
+  private String user_gravatar;
   private Instant user_created_at;
   private BasicOrganization user_organization;
   private List<String> user_groups;

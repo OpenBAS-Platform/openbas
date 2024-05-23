@@ -18,4 +18,9 @@ public class UserHelper {
         .toList();
   }
 
+  public static String getGravatar(String email) {
+    String emailMd5 = CryptoHelper.md5Hex(email.trim().toLowerCase());
+    return "https://www.gravatar.com/avatar/" + emailMd5 + "?d=mm";
+  }
+
 }
