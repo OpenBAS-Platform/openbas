@@ -1,6 +1,7 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.User;
+import io.openbas.database.raw.RawUser;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, String>, JpaSpecificationExecutor<User>,
-    StatisticRepository, UserRepositoryCustom {
+    StatisticRepository {
 
   @NotNull
   Optional<User> findById(@NotNull String id);
@@ -52,4 +53,18 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
       @Param("email") String userEmail,
       @Param("password") String userPassword
   );
+
+  @Query(value = "select us.*, "
+      + "       array_remove(array_agg(tg.tag_id), NULL) as user_tags,"
+      + "       array_remove(array_agg(grp.group_id), NULL) as user_groups,"
+      + "       array_remove(array_agg(tm.team_id), NULL) as user_teams from USERS us"
+      + "       left join organizations org on us.user_organization = org.organization_id"
+      + "       left join users_groups usr_grp on us.user_id = usr_grp.user_id"
+      + "       left join groups grp on usr_grp.group_id = grp.group_id"
+      + "       left join users_teams usr_tm on us.user_id = usr_tm.user_id"
+      + "       left join teams tm on usr_tm.team_id = tm.team_id"
+      + "       left join users_tags usr_tg on us.user_id = usr_tg.user_id"
+      + "       left join tags tg on usr_tg.tag_id = tg.tag_id"
+      + "      group by us.user_id;", nativeQuery = true)
+  List<RawUser> rawAll();
 }
