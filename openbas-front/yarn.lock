@@ -11426,7 +11426,7 @@ __metadata:
     react-dropzone: "npm:14.2.3"
     react-final-form: "npm:6.5.9"
     react-final-form-arrays: "npm:3.1.4"
-    react-hook-form: "npm:7.51.2"
+    react-hook-form: "npm:7.51.5"
     react-intl: "npm:6.6.5"
     react-leaflet: "npm:4.2.1"
     react-markdown: "npm:9.0.1"
@@ -12533,12 +12533,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hook-form@npm:7.51.2":
-  version: 7.51.2
-  resolution: "react-hook-form@npm:7.51.2"
+"react-hook-form@npm:7.51.5":
+  version: 7.51.5
+  resolution: "react-hook-form@npm:7.51.5"
   peerDependencies:
     react: ^16.8.0 || ^17 || ^18
-  checksum: 10c0/9d5e303b64f77330f244304854522e4f588fd3a5554734d2daebf64230195eb42c44504e074d5acfabd6f33a2272ffca4ebef7a54fad7019ae519471b720327e
+  checksum: 10c0/5b13f99a125d92ee618f2d4e218d5ec854f8cac1b568e83b4b125efb002cc79eef0f5c06b54015c78e16a830cf1ea356a646e8c6abb00b7ca8225dba9a92091e
   languageName: node
   linkType: hard
 
