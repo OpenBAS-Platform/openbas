@@ -54,19 +54,18 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
       @Param("password") String userPassword
   );
 
-  @Query(value = "select us.*, "
-      + " array_remove(array_agg(tg.tag_id), NULL) as user_tags,"
-      + " array_remove(array_agg(grp.group_id), NULL) as user_groups,"
-      + " array_remove(array_agg(tm.team_id), NULL) as user_teams from USERS us"
-      + " left join organizations org on us.user_organization = org.organization_id "
-      + " left join users_groups usr_grp on us.user_id = usr_grp.user_id "
-      + " left join groups grp on usr_grp.group_id = grp.group_id "
-      + " left join users_teams usr_tm on us.user_id = usr_tm.user_id "
-      + " left join teams tm on usr_tm.team_id = tm.team_id "
-      + " left join users_tags usr_tg on us.user_id = usr_tg.user_id "
-      + " left join tags tg on usr_tg.tag_id = tg.tag_id "
-      + " left join tokens tk on us.user_id = tk.token_user "
-      + " group by us.user_id;",
+  @Query(value = "select us.*, org.*, array_remove(array_agg(tg.tag_id), NULL) as user_tags,"
+      + "       array_remove(array_agg(grp.group_id), NULL) as user_groups,"
+      + "       array_remove(array_agg(tm.team_id), NULL) as user_teams from USERS us"
+      + "       left join organizations org on us.user_organization = org.organization_id"
+      + "       left join users_groups usr_grp on us.user_id = usr_grp.user_id"
+      + "       left join groups grp on usr_grp.group_id = grp.group_id"
+      + "       left join users_teams usr_tm on us.user_id = usr_tm.user_id"
+      + "       left join teams tm on usr_tm.team_id = tm.team_id"
+      + "       left join users_tags usr_tg on us.user_id = usr_tg.user_id"
+      + "       left join tags tg on usr_tg.tag_id = tg.tag_id"
+      + "       left join tokens tk on us.user_id = tk.token_user"
+      + "      group by us.user_id, org.organization_id;",
       nativeQuery = true)
   List<RawUser> rawAll();
 }
