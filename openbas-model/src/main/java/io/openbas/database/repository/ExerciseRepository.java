@@ -113,11 +113,4 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
             "WHERE users_groups.user_id = :userId " +
             "GROUP BY ex.exercise_id ;", nativeQuery = true)
     List<RawExercise> rawAllGranted(@Param("userId") String userId);
-
-    @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score " +
-            "FROM injects_expectations ie " +
-            "INNER JOIN injects ON ie.inject_id = injects.inject_id " +
-            "INNER JOIN exercises ON injects.inject_exercise = exercises.exercise_id " +
-            "WHERE exercises.exercise_created_at < :from ;", nativeQuery = true)
-    List<RawInjectExpectation> rawInjectOfExerciceList(@Param("from") Instant from);
 }
