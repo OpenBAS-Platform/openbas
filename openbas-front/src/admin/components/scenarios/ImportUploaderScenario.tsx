@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FORM_ERROR } from 'final-form';
 import { useAppDispatch } from '../../../utils/hooks';
 import ImportUploader from '../../../components/common/ImportUploader';
 import { importScenario } from '../../../actions/scenarios/scenario-actions';
@@ -12,7 +11,7 @@ const ImportUploaderScenario = () => {
 
   const handleUpload = async (formData: FormData) => {
     await dispatch(importScenario(formData)).then((result: { [x: string]: string; }) => {
-      if (!result[FORM_ERROR]) {
+      if (!Object.prototype.hasOwnProperty.call(result, 'FINAL_FORM/form-error')) {
         navigate(0);
       }
     });
