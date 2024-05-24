@@ -6,7 +6,6 @@ import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Tag;
 import io.openbas.database.raw.RawExercise;
-import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.helper.MultiIdDeserializer;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper;
@@ -72,7 +71,7 @@ public class ExerciseSimple {
     return simple;
   }
 
-  public static ExerciseSimple fromRawExercise(RawExercise exercise, List<RawInjectExpectation> expectations, List<Inject> injects) {
+  public static ExerciseSimple fromRawExercise(RawExercise exercise, List<Inject> injects) {
     ExerciseSimple simple = new ExerciseSimple();
     simple.setId(exercise.getExercise_id());
     simple.setName(exercise.getExercise_name());
@@ -91,7 +90,7 @@ public class ExerciseSimple {
     simple.setStatus(Exercise.STATUS.valueOf(exercise.getExercise_status()));
     simple.setStart(exercise.getExercise_start_date());
 
-    simple.setExpectationResultByTypes(AtomicTestingUtils.getRawExpectationResultByTypes(expectations));
+    simple.setExpectationResultByTypes(AtomicTestingUtils.getExpectationResultByTypes(injects.stream().flatMap(inject -> inject.getExpectations().stream()).toList()));
     if(injects != null) {
       simple.setTargets(computeTargetResults(injects));
     } else {

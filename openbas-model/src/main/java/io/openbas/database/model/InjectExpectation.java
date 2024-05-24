@@ -139,12 +139,14 @@ public class InjectExpectation implements Base {
   @JsonProperty("inject_expectation_team")
   private Team team;
 
+  @Setter
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "asset_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_expectation_asset")
   private Asset asset;
 
+  @Setter
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "asset_group_id")
   @JsonSerialize(using = MonoIdDeserializer.class)

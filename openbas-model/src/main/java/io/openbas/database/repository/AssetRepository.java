@@ -1,6 +1,7 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Asset;
+import io.openbas.database.raw.RawAsset;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -14,5 +15,10 @@ public interface AssetRepository extends CrudRepository<Asset, String>, JpaSpeci
 
   @Query("select a from Asset a where a.type IN :types")
   List<Asset> findByType(@Param("types") final List<String> types);
+
+  @Query(value= "SELECT asset_id, asset_name, asset_type " +
+          "FROM assets " +
+          "WHERE asset_id IN :ids ", nativeQuery = true)
+  List<RawAsset> rawByIds(@Param("ids") List<String> ids);
 
 }

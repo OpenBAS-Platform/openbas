@@ -100,7 +100,7 @@ public class Asset implements Base {
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("asset_inject")
   private Inject inject;
-  
+
   @JsonProperty("asset_active")
   public boolean getActive() {
     return this.getLastSeen() != null && (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < ACTIVE_THRESHOLD;
@@ -119,5 +119,15 @@ public class Asset implements Base {
   @Override
   public int hashCode() {
     return Objects.hash(id);
+  }
+
+  public Asset() {
+
+  }
+
+  public Asset(String id, String type, String name) {
+    this.name = name;
+    this.id = id;
+    this.type = type;
   }
 }

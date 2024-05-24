@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Exercise.STATUS;
-import io.openbas.database.raw.RawExercise;
-import io.openbas.database.raw.RawInjectExpectation;
-import io.openbas.database.raw.impl.SimpleRawInjectExpectation;
+import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.*;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -44,6 +42,7 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -97,6 +96,9 @@ public class ExerciseApi extends RestBehavior {
   private LessonsAnswerRepository lessonsAnswerRepository;
   private InjectStatusRepository injectStatusRepository;
   private InjectRepository injectRepository;
+  private InjectExpectationRepository injectExpectationRepository;
+  private AssetGroupRepository assetGroupRepository;
+  private AssetRepository assetRepository;
   // endregion
 
   // region services
@@ -117,6 +119,21 @@ public class ExerciseApi extends RestBehavior {
   @Autowired
   public void setInjectRepository(InjectRepository injectRepository) {
     this.injectRepository = injectRepository;
+  }
+
+  @Autowired
+  public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
+    this.injectExpectationRepository = injectExpectationRepository;
+  }
+
+  @Autowired
+  public void setAssetGroupRepository(AssetGroupRepository assetGroupRepository) {
+    this.assetGroupRepository = assetGroupRepository;
+  }
+
+  @Autowired
+  public void setAssetRepository(AssetRepository assetRepository) {
+    this.assetRepository = assetRepository;
   }
 
   @Autowired
@@ -636,7 +653,44 @@ public class ExerciseApi extends RestBehavior {
             .toList();
 
     List<Inject> listOfInjects = new ArrayList<>();
-    injectRepository.findAllById(listOfInjectIds).forEach(listOfInjects::add);
+    List<RawInject> listOfRawInjects = injectRepository.findRawByIds(listOfInjectIds);
+
+    Map<String, RawInjectExpectation> mapOfInjectsExpectations = injectExpectationRepository.rawByIds(
+            listOfRawInjects.stream().flatMap(rawInject -> rawInject.getInject_expectations().stream()).toList()
+            ).stream().collect(Collectors.toMap(RawInjectExpectation::getInject_expectation_id, Function.identity()));
+
+    Map<String, RawAssetGroup> mapOfAssetGroups = assetGroupRepository
+            .rawAssetGroupByIds(
+                    Stream.concat(mapOfInjectsExpectations.values().stream().map(RawInjectExpectation::getAsset_group_id).filter(Objects::nonNull),
+                    listOfRawInjects.stream().map(RawInject::getAsset_group_id).filter(Objects::nonNull)).toList()).stream()
+            .collect(Collectors.toMap(RawAssetGroup::getAsset_group_id, Function.identity()));
+
+    Map<String, RawAsset> mapOfAssets = assetRepository
+            .rawByIds(listOfRawInjects.stream().flatMap(rawInject -> {
+              return Stream.concat(Stream.concat(
+                      rawInject.getInject_asset_groups().stream()
+                              .flatMap(assetGroup -> mapOfAssetGroups.get(assetGroup).getAsset_ids().stream()),
+                      rawInject.getInject_assets().stream()
+                        ),Stream.concat(
+                              rawInject.getInject_expectations().stream()
+                                .map(mapOfInjectsExpectations::get)
+                                .map(RawInjectExpectation::getAsset_id),
+                              rawInject.getInject_expectations().stream()
+                                .map(mapOfInjectsExpectations::get)
+                                .flatMap(injectExpectation -> injectExpectation.getAsset_group_id() != null ? mapOfAssetGroups.get(injectExpectation.getAsset_group_id()).getAsset_ids().stream() : Stream.empty()))
+                      );
+            }).filter(Objects::nonNull).toList()).stream()
+            .collect(Collectors.toMap(RawAsset::getAsset_id, Function.identity()));
+
+    Map<String, RawTeam> mapOfRawTeamsById = teamRepository.rawTeamByIds(listOfRawInjects.stream()
+            .flatMap(
+                    rawInject -> Stream.concat(
+                            rawInject.getInject_teams().stream(),
+                            rawInject.getInject_expectations().stream().map(expectationId -> mapOfInjectsExpectations.get(expectationId).getTeam_id())
+                    ).filter(Objects::nonNull)
+            ).distinct().toList()).stream().collect(Collectors.toMap(RawTeam::getTeam_id, Function.identity()));
+
+    listOfRawInjects.stream().map((inject) -> Inject.fromRawInject(inject, mapOfRawTeamsById, mapOfInjectsExpectations, mapOfAssetGroups, mapOfAssets)).forEach(listOfInjects::add);
     Map<String, Inject> mapOfInjectsById = listOfInjects.stream().collect(Collectors.toMap(Inject::getId, Function.identity()));
 
     return listOfIds.stream().map(exerciseId -> {
@@ -648,12 +702,6 @@ public class ExerciseApi extends RestBehavior {
         listOfInjectsOfExercise = currentExerciceSimpleList.get(0).getInject_ids().stream().map(mapOfInjectsById::get).collect(Collectors.toList());
       }
       return ExerciseSimple.fromRawExercise(currentExerciceSimpleList.get(0),
-              currentExerciceSimpleList.stream().map(rawExercise -> {
-                SimpleRawInjectExpectation rawInjectExpectation = new SimpleRawInjectExpectation();
-                rawInjectExpectation.setInject_expectation_score(rawExercise.getInject_expectation_score());
-                rawInjectExpectation.setInject_expectation_type(rawExercise.getInject_expectation_type());
-                return (RawInjectExpectation)rawInjectExpectation;
-              }).filter(expectation -> expectation.getInject_expectation_type() != null).toList(),
               listOfInjectsOfExercise);
     }).toList();
   }
