@@ -10,8 +10,6 @@ import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -19,8 +17,10 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.time.Instant.now;
 
@@ -29,6 +29,12 @@ import static java.time.Instant.now;
 @Entity
 @Table(name = "teams")
 @EntityListeners(ModelBaseListener.class)
+@NamedEntityGraphs({
+    @NamedEntityGraph(
+        name = "Team.tags",
+        attributeNodes = @NamedAttributeNode("tags")
+    )
+})
 public class Team implements Base {
     @Id
     @Column(name = "team_id")

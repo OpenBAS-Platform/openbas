@@ -4,6 +4,7 @@ import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Organization;
 import io.openbas.database.model.Team;
 import io.openbas.database.model.User;
+import io.openbas.database.raw.RawTeam;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
@@ -94,7 +95,7 @@ public class TeamApi extends RestBehavior {
 
     @PostMapping("/api/teams/search")
     @PreAuthorize("isObserver()")
-    public Page<Team> teams(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+    public Page<RawTeam> teams(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
         BiFunction<Specification<Team>, Pageable, Page<Team>> teamsFunction;
         OpenBASPrincipal currentUser = currentUser();
         if (currentUser.isAdmin()) {
@@ -113,7 +114,7 @@ public class TeamApi extends RestBehavior {
             teamsFunction,
             searchPaginationInput,
             Team.class
-        );
+        ).map(RawTeam::new);
     }
 
     @GetMapping("/api/teams/{teamId}")

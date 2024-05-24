@@ -1,7 +1,11 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Team;
-import jakarta.validation.constraints.NotNull;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -36,5 +40,9 @@ public interface TeamRepository extends CrudRepository<Team, String>,
   @Override
   @Query("select count(distinct t) from Team t where t.createdAt < :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
+
+  @NotNull
+  @EntityGraph(value = "Team.tags", type = EntityGraph.EntityGraphType.LOAD)
+  Page<Team> findAll(@NotNull Specification<Team> spec, @NotNull Pageable pageable);
 
 }
