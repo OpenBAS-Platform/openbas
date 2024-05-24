@@ -79,7 +79,7 @@ public class InitAdminCommandLineRunner implements CommandLineRunner {
   private User updateUser(@NotNull final User user) {
     if (hasText(this.adminEmail)) {
       if (!EmailValidator.getInstance().isValid(this.adminEmail)) {
-        throw new IllegalArgumentException("Config properties 'openbas.admin.email' should be a valid email address");
+        throw new IllegalArgumentException("Config property 'openbas.admin.email' must be a valid email address with a valid domain.");
       }
       user.setEmail(this.adminEmail);
     }
