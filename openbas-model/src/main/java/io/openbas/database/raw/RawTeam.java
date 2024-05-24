@@ -28,5 +28,3 @@ public class RawTeam {
     this.team_updated_at = team.getUpdatedAt();
   }
 }
-
-// 1.30 secondes

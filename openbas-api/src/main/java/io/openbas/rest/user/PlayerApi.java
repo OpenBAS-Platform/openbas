@@ -3,6 +3,7 @@ package io.openbas.rest.user;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.SessionManager;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawPlayer;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
@@ -96,7 +97,7 @@ public class PlayerApi extends RestBehavior {
   }
 
   @PostMapping("/api/players/search")
-  public Page<User> players(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+  public Page<RawPlayer> players(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     BiFunction<Specification<User>, Pageable, Page<User>> playersFunction;
     OpenBASPrincipal currentUser = currentUser();
     if (currentUser.isAdmin()) {
@@ -115,7 +116,7 @@ public class PlayerApi extends RestBehavior {
         playersFunction,
         searchPaginationInput,
         User.class
-    );
+    ).map(RawPlayer::new);
   }
 
   @GetMapping("/api/player/{userId}/communications")

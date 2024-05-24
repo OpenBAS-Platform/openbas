@@ -31,6 +31,15 @@ import static lombok.AccessLevel.NONE;
 @Entity
 @Table(name = "users")
 @EntityListeners(ModelBaseListener.class)
+@NamedEntityGraphs({
+    @NamedEntityGraph(
+        name = "Player.tags-organization",
+        attributeNodes = {
+            @NamedAttributeNode("tags"),
+            @NamedAttributeNode("organization")
+        }
+    )
+})
 public class User implements Base {
 
   public static final String ADMIN_UUID = "89206193-dbfb-4513-a186-d72c037dda4c";
