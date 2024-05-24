@@ -43,7 +43,7 @@ public interface DocumentRepository extends CrudRepository<Document, String>, Jp
             "left join tags tg on tg.tag_id = tagdoc.tag_id " +
             "group by d.document_id " +
             "order by document_id desc ", nativeQuery = true  )
-    List<RawDocument> findAllDocuments();
+    List<RawDocument> rawAllDocuments();
 
     @Query(value = "select d.*, " +
             "array_remove(array_agg(tg.tag_id), NULL) as document_tags, " +
@@ -62,6 +62,6 @@ public interface DocumentRepository extends CrudRepository<Document, String>, Jp
             "where u.user_id = :userId " +
             "group by d.document_id " +
             "order by d.document_id desc ", nativeQuery = true)
-    List<RawDocument> findAllDocumentsByAccessLevel(@Param("userId") String userId);
+    List<RawDocument> rawAllDocumentsByAccessLevel(@Param("userId") String userId);
 
 }

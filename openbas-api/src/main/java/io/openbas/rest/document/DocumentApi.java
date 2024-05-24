@@ -182,9 +182,9 @@ public class DocumentApi extends RestBehavior {
     public List<RawDocument> documents() {
         OpenBASPrincipal user = currentUser();
         if (user.isAdmin()) {
-            return documentRepository.findAllDocuments();
+            return documentRepository.rawAllDocuments();
         } else {
-            return documentRepository.findAllDocumentsByAccessLevel(user.getId());
+            return documentRepository.rawAllDocumentsByAccessLevel(user.getId());
         }
     }
 
