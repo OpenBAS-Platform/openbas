@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface RawUser {
 
-  default String getGravatar() {
+  default String getUser_gravatar() {
     return UserHelper.getGravatar(getUser_email());
   }
 
