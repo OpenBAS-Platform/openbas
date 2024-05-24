@@ -1,15 +1,17 @@
 package io.openbas.rest.statistic;
 
-import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.config.OpenBASPrincipal;
-import io.openbas.database.model.Exercise;
-import io.openbas.database.model.Inject;
+import io.openbas.database.model.AttackPattern;
+import io.openbas.database.raw.RawGlobalInjectExpectation;
+import io.openbas.database.raw.RawInjectExpectation;
+import io.openbas.database.raw.impl.SimpleRawInjectExpectation;
 import io.openbas.database.repository.*;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.rest.statistic.response.PlatformStatistic;
 import io.openbas.rest.statistic.response.StatisticElement;
-import io.openbas.utils.ResultUtils;
+import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
+import io.openbas.utils.AtomicTestingUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,7 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -48,15 +53,27 @@ public class StatisticApi extends RestBehavior {
   public PlatformStatistic platformStatistic() {
     Instant now = Instant.now();
     PlatformStatistic statistic = new PlatformStatistic();
-    statistic.setScenariosCount(computeStat(now, scenarioRepository));
-    statistic.setExercisesCount(computeStat(now, exerciseRepository));
-    statistic.setUsersCount(computeStat(now, userRepository));
-    statistic.setTeamsCount(computeStat(now, teamRepository));
-    statistic.setAssetsCount(computeStat(now, endpointRepository));
-    statistic.setAssetGroupsCount(computeStat(now, assetGroupRepository));
-    statistic.setInjectsCount(computeStat(now, injectRepository));
-    statistic.setResults(computeExpectationResults(now));
-    statistic.setInjectResults(computeInjectExpectationResults(now));
+    if (currentUser().isAdmin()) {
+      statistic.setScenariosCount(computeGlobalStat(now, scenarioRepository));
+      statistic.setExercisesCount(computeGlobalStat(now, exerciseRepository));
+      statistic.setUsersCount(computeGlobalStat(now, userRepository));
+      statistic.setTeamsCount(computeGlobalStat(now, teamRepository));
+      statistic.setAssetsCount(computeGlobalStat(now, endpointRepository));
+      statistic.setAssetGroupsCount(computeGlobalStat(now, assetGroupRepository));
+      statistic.setInjectsCount(computeGlobalStat(now, injectRepository));
+      statistic.setResults(computeGlobalExpectationResults(now));
+      statistic.setInjectResults(computeGlobalInjectExpectationResults(now));
+    } else {
+      statistic.setScenariosCount(computeUserStat(now, scenarioRepository));
+      statistic.setExercisesCount(computeUserStat(now, exerciseRepository));
+      statistic.setUsersCount(computeUserStat(now, userRepository));
+      statistic.setTeamsCount(computeUserStat(now, teamRepository));
+      statistic.setAssetsCount(computeUserStat(now, endpointRepository));
+      statistic.setAssetGroupsCount(computeUserStat(now, assetGroupRepository));
+      statistic.setInjectsCount(computeUserStat(now, injectRepository));
+      statistic.setResults(computeUserExpectationResults(now));
+      statistic.setInjectResults(computeUserInjectExpectationResults(now));
+    }
     return statistic;
   }
 
@@ -77,63 +94,66 @@ public class StatisticApi extends RestBehavior {
     return new StatisticElement(global, progression);
   }
 
-  private StatisticElement computeStat(Instant from, StatisticRepository repository) {
-    return currentUser().isAdmin()
-        ? computeGlobalStat(from, repository)
-        : computeUserStat(from, repository);
-  }
-
-  // -- GLOBAL SCORE --
-
-  private List<ExpectationResultsByType> computeExpectationResults(@NotNull final Instant from) {
-    return currentUser().isAdmin()
-        ? computeGlobalExpectationResults(from)
-        : computeUserExpectationResults(from);
-  }
-
   private List<ExpectationResultsByType> computeGlobalExpectationResults(@NotNull final Instant from) {
-    List<Exercise> exercises = fromIterable(this.exerciseRepository.findAll());
-    List<Inject> injects = exercises.stream()
-        .flatMap(e -> e.getInjects().stream().filter(i -> i.getCreatedAt().isBefore(from)))
-        .toList();
-    return ResultUtils.computeGlobalExpectationResults(injects);
+    List<RawInjectExpectation> rawInjectExpectations = fromIterable(this.exerciseRepository.allInjectExpectationsFromDate(from));
+    return AtomicTestingUtils.getRawExpectationResultByTypes(rawInjectExpectations);
   }
 
   private List<ExpectationResultsByType> computeUserExpectationResults(@NotNull final Instant from) {
     OpenBASPrincipal user = currentUser();
-    List<Exercise> exercises = fromIterable(this.exerciseRepository.findAllGranted(user.getId()));
-    List<Inject> injects = exercises.stream()
-        .flatMap(e -> e.getInjects().stream().filter(i -> i.getCreatedAt().isBefore(from)))
-        .toList();
-    return ResultUtils.computeGlobalExpectationResults(injects);
-  }
-
-  private List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(@NotNull final Instant from) {
-    return currentUser().isAdmin()
-        ? computeGlobalInjectExpectationResults(from)
-        : computeUserInjectExpectationResults(from);
+    List<RawInjectExpectation> rawInjectExpectations = fromIterable(this.exerciseRepository.allGrantedInjectExpectationsFromDate(from, user.getId()));
+    return AtomicTestingUtils.getRawExpectationResultByTypes(rawInjectExpectations);
   }
 
   private List<InjectExpectationResultsByAttackPattern> computeGlobalInjectExpectationResults(
       @NotNull final Instant from) {
-    List<Exercise> exercises = fromIterable(this.exerciseRepository.findAll());
-    List<Inject> injects = exercises.stream()
-        .flatMap(e -> e.getInjects().stream().filter(i -> i.getCreatedAt().isBefore(from)))
-        .toList();
-
-    return ResultUtils.computeInjectExpectationResults(injects);
+    List<RawGlobalInjectExpectation> rawGlobalInjectExpectations = fromIterable(this.exerciseRepository.rawGlobalInjectExpectationResultsFromDate(from));
+    return injectExpectationResultsByAttackPatternFromRawGlobalInjectExpectation(rawGlobalInjectExpectations);
   }
 
   private List<InjectExpectationResultsByAttackPattern> computeUserInjectExpectationResults(
       @NotNull final Instant from) {
     OpenBASPrincipal user = currentUser();
+    List<RawGlobalInjectExpectation> rawGlobalInjectExpectations = fromIterable(this.exerciseRepository.rawGrantedInjectExpectationResultsFromDate(from, user.getId()));
+    return injectExpectationResultsByAttackPatternFromRawGlobalInjectExpectation(rawGlobalInjectExpectations);
+  }
 
-    List<Exercise> exercises = fromIterable(this.exerciseRepository.findAllGranted(user.getId()));
-    List<Inject> injects = exercises.stream()
-        .flatMap(e -> e.getInjects().stream().filter(i -> i.getCreatedAt().isBefore(from)))
-        .toList();
+  private List<InjectExpectationResultsByAttackPattern> injectExpectationResultsByAttackPatternFromRawGlobalInjectExpectation(List<RawGlobalInjectExpectation> rawGlobalInjectExpectations ) {
+    return rawGlobalInjectExpectations.stream()
+            .map(RawGlobalInjectExpectation::getAttack_pattern_id)
+            .distinct()
+            .map(
+                    attackPatternId ->
+                    {
+                      InjectExpectationResultsByAttackPattern resultExpectation = new InjectExpectationResultsByAttackPattern();
+                      resultExpectation.setAttackPattern(new AttackPattern());
+                      resultExpectation.getAttackPattern().setId(attackPatternId);
+                      resultExpectation.setResults(rawGlobalInjectExpectations.stream()
+                              .filter((expectation) -> expectation.getAttack_pattern_id().equals(attackPatternId))
+                              .map((expectation) -> {
+                                InjectExpectationResultsByAttackPattern.InjectExpectationResultsByType resultInjectExpectationResultsByAttackPattern = new InjectExpectationResultsByAttackPattern.InjectExpectationResultsByType();
+                                resultInjectExpectationResultsByAttackPattern.setInjectTitle(expectation.getInject_title());
+                                if(expectation.getInject_expectation_type() != null) {
+                                  SimpleRawInjectExpectation rawInjectExpectation = new SimpleRawInjectExpectation();
+                                  rawInjectExpectation.setInject_expectation_score(expectation.getInject_expectation_score());
+                                  rawInjectExpectation.setInject_expectation_type(expectation.getInject_expectation_type());
+                                  resultInjectExpectationResultsByAttackPattern
+                                          .setResults(AtomicTestingUtils.getRawExpectationResultByTypes(Stream.of(rawInjectExpectation)
+                                                  .collect(Collectors.toList())));
+                                } else {
+                                  resultInjectExpectationResultsByAttackPattern
+                                          .setResults(AtomicTestingUtils.getRawExpectationResultByTypes(new ArrayList<>()));
+                                }
+                                return resultInjectExpectationResultsByAttackPattern;
+                              })
+                              .collect(Collectors.toList())
+                      );
 
-    return ResultUtils.computeInjectExpectationResults(injects);
+                      return resultExpectation;
+                    }
+            )
+            .collect(Collectors.toList())
+            ;
   }
 
 }
