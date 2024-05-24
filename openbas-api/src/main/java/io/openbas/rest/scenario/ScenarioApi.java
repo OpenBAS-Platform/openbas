@@ -3,6 +3,7 @@ package io.openbas.rest.scenario;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Team;
 import io.openbas.database.model.User;
+import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
@@ -32,6 +33,7 @@ import java.util.List;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 
 @RestController
 @Secured(ROLE_USER)
@@ -62,7 +64,7 @@ public class ScenarioApi {
   public Scenario createScenario(@Valid @RequestBody final ScenarioInput input) {
     Scenario scenario = new Scenario();
     scenario.setUpdateAttributes(input);
-    scenario.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
+    scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return this.scenarioService.createScenario(scenario);
   }
 
@@ -72,8 +74,9 @@ public class ScenarioApi {
   }
 
   @PostMapping("/api/scenarios/search")
-  public Page<Scenario> scenarios(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return this.scenarioService.scenarios(searchPaginationInput);
+  public Page<RawPaginationScenario> scenarios(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    return this.scenarioService.scenarios(searchPaginationInput)
+        .map(RawPaginationScenario::new);
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}")
@@ -94,7 +97,7 @@ public class ScenarioApi {
       @Valid @RequestBody final ScenarioInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     scenario.setUpdateAttributes(input);
-    scenario.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
+    scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return this.scenarioService.updateScenario(scenario);
   }
 
@@ -122,7 +125,7 @@ public class ScenarioApi {
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final ScenarioUpdateTagsInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
-    scenario.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
+    scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return scenarioService.updateScenario(scenario);
   }
 

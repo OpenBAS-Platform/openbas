@@ -41,9 +41,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.*;
+import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -55,6 +57,7 @@ import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.ExerciseSpecification.findGrantedFor;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_EXERCISE;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
@@ -264,7 +267,7 @@ public class ExerciseApi extends RestBehavior {
     Log log = new Log();
     log.setUpdateAttributes(input);
     log.setExercise(exercise);
-    log.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+    log.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     log.setUser(userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
     return exerciseLogRepository.save(log);
   }
@@ -275,7 +278,7 @@ public class ExerciseApi extends RestBehavior {
       @Valid @RequestBody LogCreateInput input) {
     Log log = logRepository.findById(logId).orElseThrow(ElementNotFoundException::new);
     log.setUpdateAttributes(input);
-    log.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+    log.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     return logRepository.save(log);
   }
 
@@ -460,7 +463,7 @@ public class ExerciseApi extends RestBehavior {
   public Exercise createExercise(@Valid @RequestBody ExerciseCreateInput input) {
     Exercise exercise = new Exercise();
     exercise.setUpdateAttributes(input);
-    exercise.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+    exercise.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     if (imapEnabled) {
       exercise.setFrom(imapUsername);
       exercise.setReplyTos(List.of(imapUsername));
@@ -477,7 +480,7 @@ public class ExerciseApi extends RestBehavior {
   public Exercise updateExerciseInformation(@PathVariable String exerciseId,
       @Valid @RequestBody ExerciseUpdateInput input) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    exercise.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
+    exercise.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     exercise.setUpdateAttributes(input);
     return exerciseRepository.save(exercise);
   }
@@ -500,7 +503,7 @@ public class ExerciseApi extends RestBehavior {
   public Exercise updateExerciseTags(@PathVariable String exerciseId,
       @Valid @RequestBody ExerciseUpdateTagsInput input) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    exercise.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+    exercise.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     return exerciseRepository.save(exercise);
   }
 
@@ -560,7 +563,8 @@ public class ExerciseApi extends RestBehavior {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     exercise.setUpdatedAt(now());
     Document doc = documentRepository.findById(documentId).orElseThrow(ElementNotFoundException::new);
-    List<Exercise> docExercises = doc.getExercises().stream().filter(ex -> !ex.getId().equals(exerciseId)).toList();
+    Set<Exercise> docExercises = doc.getExercises().stream().filter(ex -> !ex.getId().equals(exerciseId))
+        .collect(Collectors.toSet());
     if (docExercises.isEmpty()) {
       // Document is no longer associate to any exercise, delete it
       documentRepository.delete(doc);

@@ -7,15 +7,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
-import io.openbas.execution.ExecutableInject;
-import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
-import io.openbas.injector_contract.Contract;
 import io.openbas.injector_contract.ContractType;
-import io.openbas.injector_contract.fields.ContractElement;
-import io.openbas.injector_contract.fields.ContractExpectations;
-import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
 import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -38,6 +32,7 @@ import java.util.stream.StreamSupport;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @Service
@@ -185,7 +180,7 @@ public class AtomicTestingService {
         // Set dependencies
         injectToSave.setDependsOn(null);
         injectToSave.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
-        injectToSave.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        injectToSave.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         injectToSave.setAssets(fromIterable(this.assetRepository.findAllById(input.getAssets())));
         injectToSave.setAssetGroups(fromIterable(this.assetGroupRepository.findAllById(input.getAssetGroups())));
 
@@ -215,7 +210,7 @@ public class AtomicTestingService {
     public Inject updateAtomicTestingTags(String injectId, AtomicTestingUpdateTagsInput input) {
 
         Inject inject = injectRepository.findById(injectId).orElseThrow();
-        inject.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
+        inject.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
 
         return injectRepository.save(inject);
     }

@@ -2,6 +2,7 @@ package io.openbas.rest.asset_group;
 
 import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.AssetGroup;
+import io.openbas.database.raw.RawPaginationAssetGroup;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.asset_group.form.AssetGroupInput;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RestController
@@ -37,7 +38,7 @@ public class AssetGroupApi {
   public AssetGroup createAssetGroup(@Valid @RequestBody final AssetGroupInput input) {
     AssetGroup assetGroup = new AssetGroup();
     assetGroup.setUpdateAttributes(input);
-    assetGroup.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
+    assetGroup.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return this.assetGroupService.createAssetGroup(assetGroup);
   }
 
@@ -49,12 +50,14 @@ public class AssetGroupApi {
 
   @PostMapping(ASSET_GROUP_URI + "/search")
   @PreAuthorize("isObserver()")
-  public Page<AssetGroup> assetGroups(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+  public Page<RawPaginationAssetGroup> assetGroups(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
         this.assetGroupRepository::findAll,
         searchPaginationInput,
         AssetGroup.class
-    );
+    )
+        .map(this.assetGroupService::computeDynamicAssets)
+        .map(RawPaginationAssetGroup::new);
   }
 
   @GetMapping(ASSET_GROUP_URI + "/{assetGroupId}")
@@ -70,7 +73,7 @@ public class AssetGroupApi {
       @Valid @RequestBody final AssetGroupInput input) {
     AssetGroup assetGroup = this.assetGroupService.assetGroup(assetGroupId);
     assetGroup.setUpdateAttributes(input);
-    assetGroup.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
+    assetGroup.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return this.assetGroupService.updateAssetGroup(assetGroup);
   }
 

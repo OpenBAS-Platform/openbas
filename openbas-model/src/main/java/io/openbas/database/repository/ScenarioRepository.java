@@ -2,7 +2,11 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Scenario;
 import io.openbas.database.raw.RawScenario;
-import jakarta.validation.constraints.NotNull;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -63,5 +67,11 @@ public interface ScenarioRepository extends CrudRepository<Scenario, String>,
           "LEFT JOIN scenarios_tags sct ON sct.scenario_id = sce.scenario_id " +
           "GROUP BY sce.scenario_id", nativeQuery = true)
   List<RawScenario> rawAll();
+
+  // -- PAGINATION --
+
+  @NotNull
+  @EntityGraph(value = "Scenario.tags-injects", type = EntityGraph.EntityGraphType.LOAD)
+  Page<Scenario> findAll(@NotNull Specification<Scenario> spec, @NotNull Pageable pageable);
 
 }

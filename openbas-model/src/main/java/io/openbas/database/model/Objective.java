@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
-import io.openbas.helper.MultiIdDeserializer;
+import io.openbas.helper.MultiIdListDeserializer;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -63,7 +63,7 @@ public class Objective implements Base {
     private Instant updatedAt = now();
 
     @OneToMany(mappedBy = "objective", fetch = FetchType.LAZY)
-    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonSerialize(using = MultiIdListDeserializer.class)
     @JsonProperty("objective_evaluations")
     private List<Evaluation> evaluations = new ArrayList<>();
 

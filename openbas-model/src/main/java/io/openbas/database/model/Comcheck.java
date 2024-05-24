@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
-import io.openbas.helper.MultiIdDeserializer;
+import io.openbas.helper.MultiIdListDeserializer;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -66,7 +66,7 @@ public class Comcheck implements Base {
 
     // CascadeType.ALL is required here because comcheck statuses are embedded
     @OneToMany(mappedBy = "comcheck", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonSerialize(using = MultiIdListDeserializer.class)
     @JsonProperty("comcheck_statuses")
     private List<ComcheckStatus> comcheckStatus = new ArrayList<>();
 

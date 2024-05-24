@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
 import static io.openbas.rest.exercise.exports.ExerciseFileExport.EXERCISE_VARIABLES;
@@ -204,10 +205,12 @@ public class V1_DataImporter implements Importer {
       Long dependsDuration = injectNode.get("inject_depends_duration").asLong();
       boolean allTeams = injectNode.get("inject_all_teams").booleanValue();
       if (hasText(exerciseId)) {
-        injectRepository.importSaveForExercise(injectId, title, description, country, city, injectorContractId, allTeams,
+        injectRepository.importSaveForExercise(injectId, title, description, country, city, injectorContractId,
+            allTeams,
             true, exerciseId, dependsOn, dependsDuration, content);
       } else if (hasText(scenarioId)) {
-        injectRepository.importSaveForScenario(injectId, title, description, country, city, injectorContractId, allTeams,
+        injectRepository.importSaveForScenario(injectId, title, description, country, city, injectorContractId,
+            allTeams,
             true, scenarioId, dependsOn, dependsDuration, content);
       }
       baseIds.put(id, new BaseHolder(injectId));
@@ -242,14 +245,11 @@ public class V1_DataImporter implements Importer {
     }
   }
 
-  private List<Tag> computeTagsCompletion(List<Tag> existingTags, List<String> lookingIds, Map<String, Base> baseIds) {
-    List<Tag> tags = new ArrayList<>(existingTags);
-    List<Tag> tagsForOrganization = lookingIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
-    tagsForOrganization.forEach(inputTag -> {
-      if (!tags.contains(inputTag)) {
-        tags.add(inputTag);
-      }
-    });
+  private Set<Tag> computeTagsCompletion(Set<Tag> existingTags, List<String> lookingIds, Map<String, Base> baseIds) {
+    Set<Tag> tags = new HashSet<>(existingTags);
+    Set<Tag> tagsForOrganization = lookingIds.stream().map(baseIds::get).map(base -> (Tag) base)
+        .collect(Collectors.toSet());
+    tags.addAll(tagsForOrganization);
     return tags;
   }
 
@@ -291,7 +291,8 @@ public class V1_DataImporter implements Importer {
       exercise.setFooter(exerciseNode.get("exercise_message_footer").textValue());
       exercise.setFrom(exerciseNode.get("exercise_mail_from").textValue());
       List<String> exerciseTagIds = resolveJsonIds(exerciseNode, "exercise_tags");
-      List<Tag> tagsForExercise = exerciseTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
+      Set<Tag> tagsForExercise = exerciseTagIds.stream().map(baseIds::get).map(base -> (Tag) base)
+          .collect(Collectors.toSet());
       exercise.setTags(tagsForExercise);
       savedExercise = this.exerciseRepository.save(exercise);
     } else {
@@ -322,7 +323,8 @@ public class V1_DataImporter implements Importer {
       scenario.setFooter(scenarioNode.get("scenario_message_footer").textValue());
       scenario.setFrom(scenarioNode.get("scenario_mail_from").textValue());
       List<String> scenarioTagIds = resolveJsonIds(scenarioNode, "scenario_tags");
-      List<Tag> tagsForScenarios = scenarioTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
+      Set<Tag> tagsForScenarios = scenarioTagIds.stream().map(baseIds::get).map(base -> (Tag) base)
+          .collect(Collectors.toSet());
       scenario.setTags(tagsForScenarios);
       savedScenario = this.scenarioService.createScenario(scenario);
     } else {
@@ -345,18 +347,14 @@ public class V1_DataImporter implements Importer {
           Document document = targetDocument.get();
           // Compute exercises
           if (savedExercise != null) {
-            List<Exercise> exercises = new ArrayList<>(document.getExercises());
-            if (!exercises.contains(savedExercise)) {
-              exercises.add(savedExercise);
-            }
+            Set<Exercise> exercises = new HashSet<>(document.getExercises());
+            exercises.add(savedExercise);
             document.setExercises(exercises);
           }
           // Compute scenario
           else if (savedScenario != null) {
-            List<Scenario> scenarios = new ArrayList<>(document.getScenarios());
-            if (!scenarios.contains(savedScenario)) {
-              scenarios.add(savedScenario);
-            }
+            Set<Scenario> scenarios = new HashSet<>(document.getScenarios());
+            scenarios.add(savedScenario);
             document.setScenarios(scenarios);
           }
           // Compute tags
@@ -374,11 +372,11 @@ public class V1_DataImporter implements Importer {
           document.setName(name);
           document.setDescription(description);
           if (savedExercise != null) {
-            document.setExercises(List.of(savedExercise));
+            document.setExercises(Set.of(savedExercise));
           } else if (savedScenario != null) {
-            document.setScenarios(List.of(savedScenario));
+            document.setScenarios(Set.of(savedScenario));
           }
-          document.setTags(fromIterable(tagRepository.findAllById(documentTagIds)));
+          document.setTags(iterableToSet(tagRepository.findAllById(documentTagIds)));
           document.setType(contentType);
           Document savedDocument = documentRepository.save(document);
           baseIds.put(id, savedDocument);
@@ -405,7 +403,7 @@ public class V1_DataImporter implements Importer {
           Organization organization = new Organization();
           organization.setName(name);
           organization.setDescription(description);
-          organization.setTags(computeTagsCompletion(List.of(), organizationTagIds, baseIds));
+          organization.setTags(computeTagsCompletion(Set.of(), organizationTagIds, baseIds));
           Organization savedOrganization = organizationRepository.save(organization);
           baseIds.put(id, savedOrganization);
         }
@@ -449,7 +447,7 @@ public class V1_DataImporter implements Importer {
           }
           user.setCountry(country);
           user.setCity(city);
-          user.setTags(computeTagsCompletion(List.of(), userTagIds, baseIds));
+          user.setTags(computeTagsCompletion(Set.of(), userTagIds, baseIds));
           User savedUser = userRepository.save(user);
           baseIds.put(id, savedUser);
         }
@@ -503,7 +501,8 @@ public class V1_DataImporter implements Importer {
         challenge.setFlags(flags);
         // Tags
         List<String> challengeTagIds = resolveJsonIds(nodeChallenge, "challenge_tags");
-        List<Tag> tagsForChallenge = challengeTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
+        Set<Tag> tagsForChallenge = challengeTagIds.stream().map(baseIds::get).map(base -> (Tag) base)
+            .collect(Collectors.toSet());
         challenge.setTags(tagsForChallenge);
         Challenge savedChallenge = challengeRepository.save(challenge);
         baseIds.put(id, savedChallenge);
@@ -673,7 +672,8 @@ public class V1_DataImporter implements Importer {
         team.setDescription(nodeTeam.get("team_description").textValue());
         // Tags
         List<String> teamTagIds = resolveJsonIds(nodeTeam, "team_tags");
-        List<Tag> tagsForTeam = teamTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
+        Set<Tag> tagsForTeam = teamTagIds.stream().map(baseIds::get).map(base -> (Tag) base)
+            .collect(Collectors.toSet());
         team.setTags(tagsForTeam);
         // Users
         List<String> teamUserIds = resolveJsonIds(nodeTeam, "team_users");
@@ -691,6 +691,7 @@ public class V1_DataImporter implements Importer {
   }
 
   private static class BaseHolder implements Base {
+
     private String id;
 
     public BaseHolder(String id) {

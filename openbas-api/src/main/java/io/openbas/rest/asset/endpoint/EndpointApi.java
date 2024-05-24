@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RequiredArgsConstructor
@@ -40,7 +40,7 @@ public class EndpointApi {
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(input);
     endpoint.setPlatform(input.getPlatform());
-    endpoint.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
+    endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return this.endpointService.createEndpoint(endpoint);
   }
 
@@ -76,7 +76,7 @@ public class EndpointApi {
     Endpoint endpoint = this.endpointService.endpoint(endpointId);
     endpoint.setUpdateAttributes(input);
     endpoint.setPlatform(input.getPlatform());
-    endpoint.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
+    endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return this.endpointService.updateEndpoint(endpoint);
   }
 

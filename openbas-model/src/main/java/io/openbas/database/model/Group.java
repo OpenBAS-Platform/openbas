@@ -3,7 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.helper.MultiIdDeserializer;
+import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
 import lombok.Getter;
 import lombok.Setter;
@@ -65,7 +65,7 @@ public class Group implements Base {
     @JoinTable(name = "users_groups",
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonSerialize(using = MultiIdListDeserializer.class)
     @JsonProperty("group_users")
     @Fetch(value = FetchMode.SUBSELECT)
     private List<User> users = new ArrayList<>();
@@ -74,7 +74,7 @@ public class Group implements Base {
     @JoinTable(name = "groups_organizations",
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "organization_id"))
-    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonSerialize(using = MultiIdListDeserializer.class)
     @JsonProperty("group_organizations")
     private List<Organization> organizations = new ArrayList<>();
 
