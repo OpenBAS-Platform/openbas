@@ -20,8 +20,4 @@ public interface RawExercise {
 
     List<String> getInject_ids();
 
-    String getInject_expectation_type();
-
-    Integer getInject_expectation_score();
-
 }

@@ -694,14 +694,14 @@ public class ExerciseApi extends RestBehavior {
     Map<String, Inject> mapOfInjectsById = listOfInjects.stream().collect(Collectors.toMap(Inject::getId, Function.identity()));
 
     return listOfIds.stream().map(exerciseId -> {
-      List<RawExercise> currentExerciceSimpleList =
-              fromIterable(exercises).stream().filter((exercice) -> exercice.getExercise_id().equals(exerciseId))
-                      .toList();
+      RawExercise currentExercice =
+              fromIterable(exercises).stream().filter((exercice) -> exercice.getExercise_id().equals(exerciseId)).findFirst().get();
+
       List<Inject> listOfInjectsOfExercise = new ArrayList<>();
-      if (currentExerciceSimpleList.get(0).getInject_ids() != null) {
-        listOfInjectsOfExercise = currentExerciceSimpleList.get(0).getInject_ids().stream().map(mapOfInjectsById::get).collect(Collectors.toList());
+      if (currentExercice.getInject_ids() != null) {
+        listOfInjectsOfExercise = currentExercice.getInject_ids().stream().map(mapOfInjectsById::get).collect(Collectors.toList());
       }
-      return ExerciseSimple.fromRawExercise(currentExerciceSimpleList.get(0),
+      return ExerciseSimple.fromRawExercise(currentExercice,
               listOfInjectsOfExercise);
     }).toList();
   }
