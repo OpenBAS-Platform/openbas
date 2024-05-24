@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface RawDocument {
 
-    String getDocument_Id();
+    String getDocument_id();
     String getDocument_name();
     String getDocument_description();
     String getDocument_type();
