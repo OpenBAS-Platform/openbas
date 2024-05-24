@@ -28,6 +28,10 @@ public class QueueService {
   public void publish(String injectType, String publishedJson) throws IOException, TimeoutException {
     ConnectionFactory factory = new ConnectionFactory();
     factory.setHost(rabbitmqConfig.getHostname());
+    factory.setPort(rabbitmqConfig.getPort());
+    factory.setUsername(rabbitmqConfig.getUser());
+    factory.setPassword(rabbitmqConfig.getPass());
+    factory.setVirtualHost(rabbitmqConfig.getVhost());
     Connection connection = null;
     try {
       connection = factory.newConnection();
