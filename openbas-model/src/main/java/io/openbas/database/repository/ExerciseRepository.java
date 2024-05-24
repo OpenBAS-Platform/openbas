@@ -110,7 +110,7 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
             "INNER join grants ON grants.grant_exercise = exercises.exercise_id " +
             "INNER join groups ON grants.grant_group = groups.group_id " +
             "INNER JOIN users_groups ON groups.group_id = users_groups.group_id " +
-            "WHERE users_groups.user_id = :userId ;" +
+            "WHERE users_groups.user_id = :userId " +
             "GROUP BY ex.exercise_id, ie.inject_expectation_type, ie.inject_expectation_score ;", nativeQuery = true)
     List<RawExercise> rawAllGranted(@Param("userId") String userId);
 
