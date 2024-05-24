@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.helper.CryptoHelper;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdDeserializer;
+import io.openbas.helper.UserHelper;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -226,8 +226,7 @@ public class User implements Base {
 
   @JsonProperty("user_gravatar")
   public String getGravatar() {
-    String emailMd5 = CryptoHelper.md5Hex(getEmail().trim().toLowerCase());
-    return "https://www.gravatar.com/avatar/" + emailMd5 + "?d=mm";
+    return UserHelper.getGravatar(getEmail());
   }
 
   @JsonProperty("user_is_planner")

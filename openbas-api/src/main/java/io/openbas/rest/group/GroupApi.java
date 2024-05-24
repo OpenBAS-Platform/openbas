@@ -12,6 +12,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -120,11 +121,13 @@ public class GroupApi extends RestBehavior {
         savedGroup.getGrants()
                 .stream()
                 .map(Grant::getExercise)
+                .filter(Objects::nonNull)
                 .forEach(exercise -> appPublisher.publishEvent(new BaseEvent(DATA_UPDATE, exercise, mapper)));
         // Publish scenarios impacted by this group change.
         savedGroup.getGrants()
                 .stream()
                 .map(Grant::getScenario)
+                .filter(Objects::nonNull)
                 .forEach(scenario -> appPublisher.publishEvent(new BaseEvent(DATA_UPDATE, scenario, mapper)));
         return savedGroup;
     }
