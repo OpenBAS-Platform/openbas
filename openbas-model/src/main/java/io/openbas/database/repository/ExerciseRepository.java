@@ -97,7 +97,7 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
             "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id " +
             "LEFT JOIN injects ON ie.inject_id = injects.inject_id " +
             "LEFT JOIN exercises_tags et ON et.exercise_id = ex.exercise_id " +
-            "GROUP BY ex.exercise_id, ie.inject_expectation_type, ie.inject_expectation_score ;", nativeQuery = true)
+            "GROUP BY ex.exercise_id ;", nativeQuery = true)
     List<RawExercise> rawAll();
 
     @Query(value = " SELECT ex.exercise_category, ex.exercise_id, ex.exercise_status, ex.exercise_start_date, ex.exercise_name, " +
@@ -107,11 +107,11 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
             "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id " +
             "LEFT JOIN injects ON ie.inject_id = injects.inject_id " +
             "LEFT JOIN exercises_tags et ON et.exercise_id = ex.exercise_id " +
-            "INNER join grants ON grants.grant_exercise = exercises.exercise_id " +
+            "INNER join grants ON grants.grant_exercise = ex.exercise_id " +
             "INNER join groups ON grants.grant_group = groups.group_id " +
             "INNER JOIN users_groups ON groups.group_id = users_groups.group_id " +
             "WHERE users_groups.user_id = :userId " +
-            "GROUP BY ex.exercise_id, ie.inject_expectation_type, ie.inject_expectation_score ;", nativeQuery = true)
+            "GROUP BY ex.exercise_id ;", nativeQuery = true)
     List<RawExercise> rawAllGranted(@Param("userId") String userId);
 
     @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score " +
