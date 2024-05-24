@@ -269,8 +269,9 @@ public class DocumentApi extends RestBehavior {
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
         response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
         response.setStatus(HttpServletResponse.SC_OK);
-        InputStream fileStream = fileService.getFile(document).orElseThrow(ElementNotFoundException::new);
-        fileStream.transferTo(response.getOutputStream());
+        try (InputStream fileStream = fileService.getFile(document).orElseThrow(ElementNotFoundException::new)) {
+            fileStream.transferTo(response.getOutputStream());
+        }
     }
 
     @GetMapping(value = "/api/images/injectors/{injectType}", produces = MediaType.IMAGE_PNG_VALUE)
@@ -433,8 +434,9 @@ public class DocumentApi extends RestBehavior {
             response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
             response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
             response.setStatus(HttpServletResponse.SC_OK);
-            InputStream fileStream = fileService.getFile(document).orElseThrow(ElementNotFoundException::new);
-            fileStream.transferTo(response.getOutputStream());
+            try (InputStream fileStream = fileService.getFile(document).orElseThrow(ElementNotFoundException::new)) {
+                fileStream.transferTo(response.getOutputStream());
+            }
         }
     }
 
