@@ -106,7 +106,8 @@ public class EmailService {
                     imapService.storeSentMessage(mimeMessage);
                     execution.addTrace(traceSuccess("Mail successfully stored in IMAP"));
                     return;
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    execution.addTrace(traceError("Fail to store mail in IMAP after 3 attempts: " + e.getMessage()));
                 }
             }
             execution.addTrace(traceError("Fail to store mail in IMAP after 3 attempts"));
