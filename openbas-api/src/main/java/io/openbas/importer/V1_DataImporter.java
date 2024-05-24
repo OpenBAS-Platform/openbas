@@ -657,6 +657,7 @@ public class V1_DataImporter implements Importer {
       Map<String, Base> baseIds) {
     Map<String, Team> baseTeams = new HashMap<>();
     teamsStream.forEach(nodeTeam -> {
+      String teamId = nodeTeam.get("team_id").textValue();
       String teamName = nodeTeam.get("team_name").textValue();
       // Prevent duplication of team, based on the team name and not contextual
       List<Team> existingTeams = teamRepository.findByNameIgnoreCase(teamName)
@@ -665,7 +666,7 @@ public class V1_DataImporter implements Importer {
           .toList();
       if (existingTeams.size() == 1) {
         Team existingTeam = existingTeams.get(0);
-        baseTeams.put(existingTeam.getId(), existingTeam);
+        baseTeams.put(teamId, existingTeam);
       } else {
         Team team = new Team();
         team.setName(nodeTeam.get("team_name").textValue());
@@ -683,7 +684,7 @@ public class V1_DataImporter implements Importer {
             .toList();
         team.setUsers(usersForTeam);
         Team savedTeam = teamRepository.save(team);
-        baseTeams.put(savedTeam.getId(), savedTeam);
+        baseTeams.put(teamId, savedTeam);
       }
     });
     return baseTeams;
