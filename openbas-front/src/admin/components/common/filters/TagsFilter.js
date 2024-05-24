@@ -32,7 +32,9 @@ const TagsFilter = (props) => {
   const { t } = useFormatter();
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(fetchTags());
+    if (!props.tagsFetched) {
+      dispatch(fetchTags());
+    }
   }, []);
   const tags = useHelper((helper) => helper.getTags());
   const { onAddTag, onClearTag, onRemoveTag, currentTags, fullWidth } = props;

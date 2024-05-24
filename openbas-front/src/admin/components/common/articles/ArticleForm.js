@@ -12,14 +12,12 @@ import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchDocuments } from '../../../../actions/Document';
-import { fetchExercises } from '../../../../actions/Exercise';
 import ChannelIcon from '../../components/channels/ChannelIcon';
 import MarkDownField from '../../../../components/fields/MarkDownField';
 import DocumentType from '../../components/documents/DocumentType';
 import ItemTags from '../../../../components/ItemTags';
 import DocumentPopover from '../../components/documents/DocumentPopover';
 import ArticleAddDocuments from './ArticleAddDocuments';
-import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 
 const useStyles = makeStyles(() => ({
   icon: {
@@ -136,8 +134,6 @@ const ArticleForm = ({
   );
   useDataLoader(() => {
     dispatch(fetchChannels());
-    dispatch(fetchExercises());
-    dispatch(fetchScenarios());
     dispatch(fetchDocuments());
   });
   const handleAddDocuments = (docsIds) => setDocuments([...documents, ...docsIds]);

@@ -29,13 +29,13 @@ const useStyles = makeStyles(() => ({
 interface Props {
   goToLink?: string;
   injectResults: InjectExpectationResultsByAttackPatternStore[];
-  alreadyLoaded?: boolean;
+  ttpAlreadyLoaded?: boolean;
 }
 
 const MitreMatrix: FunctionComponent<Props> = ({
   goToLink,
   injectResults,
-  alreadyLoaded,
+  ttpAlreadyLoaded,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -48,7 +48,7 @@ const MitreMatrix: FunctionComponent<Props> = ({
     attackPatternMap: helper.getAttackPatternsMap(),
     killChainPhaseMap: helper.getKillChainPhasesMap(),
   }));
-  if (!alreadyLoaded) {
+  if (!ttpAlreadyLoaded) {
     useDataLoader(() => {
       dispatch(fetchKillChainPhases());
       dispatch(fetchAttackPatterns());

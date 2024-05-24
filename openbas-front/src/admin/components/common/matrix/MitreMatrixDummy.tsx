@@ -26,7 +26,11 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const MitreMatrixDummy: FunctionComponent = () => {
+interface Props {
+  ttpAlreadyLoaded?: boolean;
+}
+
+const MitreMatrixDummy: FunctionComponent<Props> = ({ ttpAlreadyLoaded }) => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -38,10 +42,13 @@ const MitreMatrixDummy: FunctionComponent = () => {
     attackPatterns: helper.getAttackPatterns(),
     killChainPhaseMap: helper.getKillChainPhasesMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchKillChainPhases());
-    dispatch(fetchAttackPatterns());
-  });
+
+  if (!ttpAlreadyLoaded) {
+    useDataLoader(() => {
+      dispatch(fetchKillChainPhases());
+      dispatch(fetchAttackPatterns());
+    });
+  }
   // Attack Pattern
 
   // Kill Chain Phase
