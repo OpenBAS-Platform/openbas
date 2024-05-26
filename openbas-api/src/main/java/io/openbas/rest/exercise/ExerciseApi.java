@@ -18,6 +18,7 @@ import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.service.*;
 import io.openbas.utils.AtomicTestingMapper.ExpectationResultsByType;
 import io.openbas.utils.ResultUtils;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -26,6 +27,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.annotation.Secured;
@@ -49,9 +52,11 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.Exercise.STATUS.*;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.database.specification.ExerciseSpecification.findGrantedFor;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_EXERCISE;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Duration.between;
 import static java.time.Instant.now;
 import static java.time.temporal.ChronoUnit.MINUTES;
@@ -617,6 +622,27 @@ public class ExerciseApi extends RestBehavior {
         : exerciseRepository.findAllGranted(currentUser().getId());
     return fromIterable(exercises).stream().map(ExerciseSimple::fromExercise).toList();
   }
+
+  @PostMapping("/api/exercises/search")
+  public Page<ExerciseSimple> exercises(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    if (currentUser().isAdmin()) {
+      return buildPaginationJPA(
+              this.exerciseRepository::findAll,
+              searchPaginationInput,
+              Exercise.class
+      ).map(ExerciseSimple::fromExercise);
+    } else {
+      return buildPaginationJPA(
+              (Specification<Exercise> specification, Pageable pageable) -> this.exerciseRepository.findAll(
+                      findGrantedFor(currentUser().getId()).and(specification),
+                      pageable
+              ),
+              searchPaginationInput,
+              Exercise.class
+      ).map(ExerciseSimple::fromExercise);
+    }
+  }
+
   // endregion
 
   // region communication
