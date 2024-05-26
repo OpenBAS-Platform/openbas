@@ -6455,12 +6455,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cronstrue@npm:2.49.0":
-  version: 2.49.0
-  resolution: "cronstrue@npm:2.49.0"
+"cronstrue@npm:2.50.0":
+  version: 2.50.0
+  resolution: "cronstrue@npm:2.50.0"
   bin:
     cronstrue: bin/cli.js
-  checksum: 10c0/bdbcbe745b12b51b5ff123b561d9b95d624963b1d0d43717a70adf20872f58e87ad74c62d255133f9b0e8adcc682cb7e5ea405c4da36ba7ec5146af1f0d75017
+  checksum: 10c0/9fec217cfc83a53842c04cab1103ffb077a33837ea0f03f8a0968fe548509134b6667303ee7188d00b555fb53ad82fef5b6cd0c1886f3ec34b74625b61c6c3d7
   languageName: node
   linkType: hard
 
@@ -11858,7 +11858,7 @@ __metadata:
     ckeditor5-custom-build: "link:packages/ckeditor5-custom-build"
     classnames: "npm:2.5.1"
     compression: "npm:1.7.4"
-    cronstrue: "npm:2.49.0"
+    cronstrue: "npm:2.50.0"
     cross-env: "npm:7.0.3"
     d3-hierarchy: "npm:3.1.2"
     date-fns: "npm:3.6.0"
