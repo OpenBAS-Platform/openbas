@@ -92,7 +92,7 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
                       const document = documentMap[documentId];
                       return (
                         <Typography key={documentId} variant="body1">
-                          {document.document_name}
+                          {document?.document_name ?? '-'}
                         </Typography>
                       );
                     }) : <Typography variant="body1" gutterBottom>
