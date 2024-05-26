@@ -62,6 +62,10 @@ public class Asset implements Base {
   @JsonProperty("asset_external_reference")
   private String externalReference;
 
+  @Column(name = "asset_process_name")
+  @JsonProperty("asset_process_name")
+  private String processName;
+
   @Column(name = "asset_cleared_at")
   @JsonProperty("asset_cleared_at")
   private Instant clearedAt = now();

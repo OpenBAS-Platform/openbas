@@ -14,6 +14,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
+import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -44,6 +45,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static io.openbas.config.SessionHelper.currentUser;
@@ -79,6 +81,7 @@ public class InjectApi extends RestBehavior {
   private ScenarioService scenarioService;
   private InjectService injectService;
   private AtomicTestingService atomicTestingService;
+  private InjectExpectationService injectExpectationService;
 
 
   @Resource
@@ -162,6 +165,11 @@ public class InjectApi extends RestBehavior {
   @Autowired
   public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
     this.executionContextService = executionContextService;
+  }
+
+  @Autowired
+  public void setInjectExpectationService(final InjectExpectationService injectExpectationService) {
+    this.injectExpectationService = injectExpectationService;
   }
 
   // -- INJECTS --
@@ -419,6 +427,24 @@ public class InjectApi extends RestBehavior {
         .limit(size.orElse(MAX_NEXT_INJECTS))
         // Collect the result
         .toList();
+  }
+
+  // -- EXPECTATIONS --
+
+  @GetMapping("/api/injects/expectations")
+  public List<InjectExpectation> getInjectExpectationsNotFilled() {
+    return Stream.concat(
+            injectExpectationService.preventionExpectationsNotFill().stream(),
+            injectExpectationService.detectionExpectationsNotFill().stream()
+    ).toList();
+  }
+
+  @GetMapping("/api/injects/expectations/{sourceId}")
+  public List<InjectExpectation> getInjectExpectationsNotFilledForSource(@PathVariable String sourceId) {
+    return Stream.concat(
+            injectExpectationService.preventionExpectationsNotFill(sourceId).stream(),
+            injectExpectationService.detectionExpectationsNotFill(sourceId).stream()
+    ).toList();
   }
 
   // -- SCENARIOS --

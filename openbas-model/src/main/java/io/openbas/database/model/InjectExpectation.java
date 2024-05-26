@@ -73,6 +73,12 @@ public class InjectExpectation implements Base {
 
   @Setter
   @Type(JsonType.class)
+  @Column(name = "inject_expectation_signatures")
+  @JsonProperty("inject_expectation_signatures")
+  private List<InjectExpectationSignature> signatures = new ArrayList<>();
+
+  @Setter
+  @Type(JsonType.class)
   @Column(name = "inject_expectation_results")
   @JsonProperty("inject_expectation_results")
   private List<InjectExpectationResult> results = new ArrayList<>();

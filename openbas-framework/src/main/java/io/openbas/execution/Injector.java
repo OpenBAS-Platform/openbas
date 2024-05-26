@@ -89,11 +89,13 @@ public abstract class Injector {
                 DetectionExpectation detectionExpectation = (DetectionExpectation) expectation;
                 expectationExecution.setName(detectionExpectation.getName());
                 expectationExecution.setDetection(detectionExpectation.getAsset(), detectionExpectation.getAssetGroup());
+                expectationExecution.setSignatures(detectionExpectation.getInjectExpectationSignatures());
             }
             case PREVENTION -> {
                 PreventionExpectation preventionExpectation = (PreventionExpectation) expectation;
                 expectationExecution.setName(preventionExpectation.getName());
                 expectationExecution.setPrevention(preventionExpectation.getAsset(), preventionExpectation.getAssetGroup());
+                expectationExecution.setSignatures(preventionExpectation.getInjectExpectationSignatures());
             }
             case MANUAL -> {
                 expectationExecution.setType(EXPECTATION_TYPE.MANUAL);

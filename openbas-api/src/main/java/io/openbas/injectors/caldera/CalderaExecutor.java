@@ -24,10 +24,13 @@ import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
+import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE;
+import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME;
 import static io.openbas.database.model.InjectStatusExecution.*;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectation;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAssetGroup;
@@ -69,7 +72,11 @@ public class CalderaExecutor extends Injector {
                         execution.addTrace(traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
                         // Compute expectations
                         boolean isInGroup = assets.get(executionEndpoint.getParent());
-                        computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup);
+                        List<InjectExpectationSignature> injectExpectationSignatures = List.of(
+                                InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME).value(executionEndpoint.getProcessName()).build(),
+                                InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE).value(exploitResult.getCommand()).build()
+                        );
+                        computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup, injectExpectationSignatures);
                     } else {
                         execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (" + result + ")"));
                     }
@@ -78,13 +85,12 @@ public class CalderaExecutor extends Injector {
                 }
             } catch (Exception e) {
                 execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (" + e.getMessage() + ")"));
-                e.printStackTrace();
                 log.severe(Arrays.toString(e.getStackTrace()));
             }
         });
 
         List<AssetGroup> assetGroups = injection.getAssetGroups();
-        assetGroups.forEach((assetGroup -> computeExpectationsForAssetGroup(expectations, content, assetGroup)));
+        assetGroups.forEach((assetGroup -> computeExpectationsForAssetGroup(expectations, content, assetGroup, new ArrayList<>())));
 
         if (asyncIds.isEmpty()) {
             throw new UnsupportedOperationException("Caldera failed to execute the ability due to above errors");
@@ -132,9 +138,9 @@ public class CalderaExecutor extends Injector {
             ).toList();
             log.log(Level.INFO, "List return with " + agents.size() + " agents");
             if (!agents.isEmpty()) {
-                for (int j = 0; j < agents.size(); j++) {
+                for (Agent agent : agents) {
                     // Check in the database if not exist
-                    Optional<Endpoint> resolvedExistingEndpoint = this.endpointService.findByExternalReference(agents.get(j).getPaw());
+                    Optional<Endpoint> resolvedExistingEndpoint = this.endpointService.findByExternalReference(agent.getPaw());
                     if (resolvedExistingEndpoint.isEmpty()) {
                         log.log(Level.INFO, "Agent found and not present in the database, creating it...");
                         Endpoint newEndpoint = new Endpoint();
@@ -144,8 +150,9 @@ public class CalderaExecutor extends Injector {
                         newEndpoint.setIps(assetEndpoint.getIps());
                         newEndpoint.setHostname(assetEndpoint.getHostname());
                         newEndpoint.setPlatform(assetEndpoint.getPlatform());
-                        newEndpoint.setExternalReference(agents.get(j).getPaw());
+                        newEndpoint.setExternalReference(agent.getPaw());
                         newEndpoint.setExecutor(assetEndpoint.getExecutor());
+                        newEndpoint.setProcessName(agent.getExe_name());
                         endpointForExecution = this.endpointService.createEndpoint(newEndpoint);
                         break;
                     }
@@ -162,13 +169,13 @@ public class CalderaExecutor extends Injector {
     /**
      * In case of direct asset, we have an individual expectation for the asset
      */
-    private void computeExpectationsForAsset(@NotNull final List<Expectation> expectations, @NotNull final CalderaInjectContent content, @NotNull final Asset asset, final boolean expectationGroup) {
+    private void computeExpectationsForAsset(@NotNull final List<Expectation> expectations, @NotNull final CalderaInjectContent content, @NotNull final Asset asset, final boolean expectationGroup, final List<InjectExpectationSignature> injectExpectationSignatures) {
         if (!content.getExpectations().isEmpty()) {
             expectations.addAll(content.getExpectations().stream().flatMap((expectation) -> switch (expectation.getType()) {
                 case PREVENTION ->
-                        Stream.of(preventionExpectationForAsset(expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup)); // expectationGroup usefully in front-end
+                        Stream.of(preventionExpectationForAsset(expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup, injectExpectationSignatures)); // expectationGroup usefully in front-end
                 case DETECTION ->
-                        Stream.of(detectionExpectation(expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup));
+                        Stream.of(detectionExpectation(expectation.getScore(), expectation.getName(), expectation.getDescription(), asset, expectationGroup, injectExpectationSignatures));
                 default -> Stream.of();
             }).toList());
         }
@@ -178,14 +185,14 @@ public class CalderaExecutor extends Injector {
      * In case of asset group if expectation group -> we have an expectation for the group and one for each asset if not
      * expectation group -> we have an individual expectation for each asset
      */
-    private void computeExpectationsForAssetGroup(@NotNull final List<Expectation> expectations, @NotNull final CalderaInjectContent content, @NotNull final AssetGroup assetGroup) {
+    private void computeExpectationsForAssetGroup(@NotNull final List<Expectation> expectations, @NotNull final CalderaInjectContent content, @NotNull final AssetGroup assetGroup, final List<InjectExpectationSignature> injectExpectationSignatures) {
         if (!content.getExpectations().isEmpty()) {
             expectations.addAll(content.getExpectations().stream().flatMap((expectation) -> switch (expectation.getType()) {
                 case PREVENTION -> {
                     // Verify that at least one asset in the group has been executed
                     List<Asset> assets = this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
                     if (assets.stream().anyMatch((asset) -> expectations.stream().filter(e -> EXPECTATION_TYPE.PREVENTION == e.type()).anyMatch((e) -> ((PreventionExpectation) e).getAsset() != null && ((PreventionExpectation) e).getAsset().getId().equals(asset.getId())))) {
-                        yield Stream.of(preventionExpectationForAssetGroup(expectation.getScore(), expectation.getName(), expectation.getDescription(), assetGroup, expectation.isExpectationGroup()));
+                        yield Stream.of(preventionExpectationForAssetGroup(expectation.getScore(), expectation.getName(), expectation.getDescription(), assetGroup, expectation.isExpectationGroup(), injectExpectationSignatures));
                     }
                     yield Stream.of();
                 }
@@ -193,7 +200,7 @@ public class CalderaExecutor extends Injector {
                     // Verify that at least one asset in the group has been executed
                     List<Asset> assets = this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
                     if (assets.stream().anyMatch((asset) -> expectations.stream().filter(e -> EXPECTATION_TYPE.DETECTION == e.type()).anyMatch((e) -> ((DetectionExpectation) e).getAsset() != null && ((DetectionExpectation) e).getAsset().getId().equals(asset.getId())))) {
-                        yield Stream.of(detectionExpectationForAssetGroup(expectation.getScore(), expectation.getName(), expectation.getDescription(), assetGroup, expectation.isExpectationGroup()));
+                        yield Stream.of(detectionExpectationForAssetGroup(expectation.getScore(), expectation.getName(), expectation.getDescription(), assetGroup, expectation.isExpectationGroup(), injectExpectationSignatures));
                     }
                     yield Stream.of();
                 }

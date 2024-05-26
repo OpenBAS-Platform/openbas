@@ -126,6 +126,7 @@ public class CalderaExecutorService implements Runnable {
                     endpoint.setIps(agent.getHost_ip_addrs());
                     endpoint.setHostname(agent.getHost());
                     endpoint.setPlatform(toPlatform(agent.getPlatform()));
+                    endpoint.setProcessName(agent.getExe_name());
                     endpoint.setLastSeen(toInstant(agent.getLast_seen()));
                     return endpoint;
                 })
@@ -139,6 +140,7 @@ public class CalderaExecutorService implements Runnable {
         matchingExistingEndpoint.setName(external.getName());
         matchingExistingEndpoint.setIps(external.getIps());
         matchingExistingEndpoint.setHostname(external.getHostname());
+        matchingExistingEndpoint.setProcessName(external.getProcessName());
         matchingExistingEndpoint.setPlatform(external.getPlatform());
         matchingExistingEndpoint.setExecutor(this.executor);
         if ((now().toEpochMilli() - matchingExistingEndpoint.getClearedAt().toEpochMilli()) > CLEAR_TTL) {

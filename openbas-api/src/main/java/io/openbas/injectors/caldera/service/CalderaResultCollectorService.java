@@ -8,7 +8,6 @@ import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.caldera.CalderaContract;
 import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
 import io.openbas.injectors.caldera.model.ResultStatus;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import java.util.logging.Level;
 
 import static io.openbas.database.model.InjectStatusExecution.traceError;
 import static io.openbas.database.model.InjectStatusExecution.traceInfo;
-import static io.openbas.inject_expectation.InjectExpectationUtils.resultsBySourceId;
 
 @Log
 @Service
@@ -62,11 +60,8 @@ public class CalderaResultCollectorService implements Runnable {
         // For each one ask for traces and status
         injectStatuses.forEach((injectStatus -> {
             log.log(Level.INFO, "Found inject status: " + injectStatus);
-            Inject inject = injectStatus.getInject();
             // Add traces and close inject if needed.
             Instant finalExecutionTime = injectStatus.getTrackingSentDate();
-            List<Asset> assets = injectStatus.getInject().getAssets();
-            List<AssetGroup> assetGroups = injectStatus.getInject().getAssetGroups();
             List<String> linkIds = injectStatus.statusIdentifiers();
             log.log(Level.INFO, "Found links IDs: " + linkIds);
             List<ResultStatus> completedActions = new ArrayList<>();
@@ -84,11 +79,8 @@ public class CalderaResultCollectorService implements Runnable {
                             injectStatus.getTraces().add(traceInfo("Results are not yet available (still on-going)"));
                         }
                     } else {
-                        Endpoint currentEndpoint = this.endpointService.findByExternalReference(resultStatus.getPaw()).orElseThrow();
-                        String currentAssetId = currentEndpoint.getId();
                         if (resultStatus.isComplete()) {
                             completedActions.add(resultStatus);
-                            computeExpectationForAsset(inject, currentAssetId, resultStatus.isFail(), resultStatus.getContent());
                             injectStatus.setTrackingTotalSuccess(injectStatus.getTrackingTotalSuccess() + 1);
                             // Compute biggest execution time
                             if (resultStatus.getFinish().isAfter(finalExecutionTime)) {
@@ -97,7 +89,6 @@ public class CalderaResultCollectorService implements Runnable {
                         } else if (injectStatus.getTrackingSentDate().isBefore(Instant.now().minus(5L, ChronoUnit.MINUTES))) {
                             resultStatus.setFail(true);
                             completedActions.add(resultStatus);
-                            computeExpectationForAsset(inject, currentAssetId, resultStatus.isFail(), "Time out");
                             injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalSuccess() + 1);
                         }
                     }
@@ -116,29 +107,6 @@ public class CalderaResultCollectorService implements Runnable {
                 computeInject(injectStatus);
             }
         }));
-    }
-
-    // -- EXPECTATION --
-
-    private void computeExpectationForAsset(
-            @NotNull final Inject inject,
-            @NotBlank final String assetId,
-            @NotNull final boolean fail, // Is action failed, success for expectation
-            @NotBlank final String result) {
-        InjectExpectation expectation = this.injectExpectationService
-                .preventionExpectationForAsset(inject, assetId);
-        if (expectation != null) {
-            // Not already handle
-            List<InjectExpectationResult> results = resultsBySourceId(expectation, this.calderaInjectorConfig.getId());
-            if (results.isEmpty()) {
-                this.injectExpectationService.computeExpectation(
-                        expectation,
-                        this.calderaInjectorConfig.getId(),
-                        CalderaInjectorConfig.PRODUCT_NAME,
-                        result,
-                        fail);
-            }
-        }
     }
 
     // -- INJECT STATUS --
