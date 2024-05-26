@@ -3,6 +3,7 @@ package io.openbas.rest.document;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawDocument;
 import io.openbas.database.repository.*;
 import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.rest.document.form.DocumentCreateInput;
@@ -22,7 +23,6 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
@@ -179,13 +179,12 @@ public class DocumentApi extends RestBehavior {
     }
 
     @GetMapping("/api/documents")
-    public List<Document> documents() {
-        Sort sorting = Sort.by(Sort.Direction.DESC, "id");
+    public List<RawDocument> documents() {
         OpenBASPrincipal user = currentUser();
         if (user.isAdmin()) {
-            return documentRepository.findAll(null, sorting);
+            return documentRepository.rawAllDocuments();
         } else {
-            return documentRepository.findAll(findGrantedFor(user.getId()));
+            return documentRepository.rawAllDocumentsByAccessLevel(user.getId());
         }
     }
 
@@ -270,8 +269,9 @@ public class DocumentApi extends RestBehavior {
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
         response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
         response.setStatus(HttpServletResponse.SC_OK);
-        InputStream fileStream = fileService.getFile(document).orElseThrow(ElementNotFoundException::new);
-        fileStream.transferTo(response.getOutputStream());
+        try (InputStream fileStream = fileService.getFile(document).orElseThrow(ElementNotFoundException::new)) {
+            fileStream.transferTo(response.getOutputStream());
+        }
     }
 
     @GetMapping(value = "/api/images/injectors/{injectType}", produces = MediaType.IMAGE_PNG_VALUE)
@@ -434,8 +434,9 @@ public class DocumentApi extends RestBehavior {
             response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
             response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
             response.setStatus(HttpServletResponse.SC_OK);
-            InputStream fileStream = fileService.getFile(document).orElseThrow(ElementNotFoundException::new);
-            fileStream.transferTo(response.getOutputStream());
+            try (InputStream fileStream = fileService.getFile(document).orElseThrow(ElementNotFoundException::new)) {
+                fileStream.transferTo(response.getOutputStream());
+            }
         }
     }
 
