@@ -27,10 +27,12 @@ const DocumentPopover = (props) => {
     exercisesMap: helper.getExercisesMap(),
     scenariosMap: helper.getScenariosMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchExercises());
-    dispatch(fetchScenarios());
-  });
+  if (!props.scenariosAndExercisesFetched) {
+    useDataLoader(() => {
+      dispatch(fetchExercises());
+      dispatch(fetchScenarios());
+    });
+  }
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);

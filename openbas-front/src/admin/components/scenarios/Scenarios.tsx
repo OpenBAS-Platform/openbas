@@ -14,17 +14,17 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 import { initSorting } from '../../../components/common/pagination/Page';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
-import type { FilterGroup, ScenarioStatistic, SearchPaginationInput } from '../../../utils/api-types';
+import type { FilterGroup, ScenarioStatistic } from '../../../utils/api-types';
 import ItemTags from '../../../components/ItemTags';
 import ItemSeverity from '../../../components/ItemSeverity';
 import PlatformIcon from '../../../components/PlatformIcon';
 import ItemCategory from '../../../components/ItemCategory';
 import type { Theme } from '../../../components/Theme';
 import ImportUploaderScenario from './ImportUploaderScenario';
-import useFiltersState from '../../../components/common/filter/useFiltersState';
 import { buildEmptyFilter } from '../../../components/common/filter/FilterUtils';
 import { scenarioCategories } from './ScenarioForm';
 import ScenarioStatus from './scenario/ScenarioStatus';
+import usePaginationAndFilter from '../../../components/common/usePaginationAndFilter';
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -113,21 +113,18 @@ const Scenarios = () => {
   ];
 
   const [scenarios, setScenarios] = useState<ScenarioStore[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>({
-    sorts: initSorting('scenario_updated_at', 'DESC'),
-  });
 
   // Category filter
   const CATEGORY_FILTER_KEY = 'scenario_category';
-  const atomicFilter: FilterGroup = {
+  const scenarioFilter: FilterGroup = {
     mode: 'and',
     filters: [buildEmptyFilter(CATEGORY_FILTER_KEY, 'eq')],
   };
-  const [filterGroup, helpers] = useFiltersState(atomicFilter, (f: FilterGroup) => setSearchPaginationInput({
-    ...searchPaginationInput,
-    filterGroup: f,
-  }));
-  const handleOnClick = (category?: string) => {
+  const { filterGroup, helpers, searchPaginationInput, setSearchPaginationInput } = usePaginationAndFilter(scenarioFilter, {
+    sorts: initSorting('scenario_updated_at', 'DESC'),
+  });
+
+  const handleOnClickCategory = (category?: string) => {
     if (!category) {
       // Clear filter
       helpers.handleAddMultipleValueFilter(
@@ -147,14 +144,17 @@ const Scenarios = () => {
 
   // Statistic
   const [statistic, setStatistic] = useState<ScenarioStatistic>();
-  useEffect(() => {
+  const fetchStatistics = () => {
     fetchScenarioStatistic().then((result: { data: ScenarioStatistic }) => setStatistic(result.data));
-  }, [scenarios]);
+  };
+  useEffect(() => {
+    fetchStatistics();
+  }, []);
 
   const categoryCard = (category: string, count: number) => (
     <Card
       classes={{ root: classes.card }} variant="outlined"
-      onClick={() => handleOnClick(category)}
+      onClick={() => handleOnClickCategory(category)}
       className={classNames({ [classes.cardSelected]: hasCategory(category) })}
     >
       <CardActionArea classes={{ root: classes.area }}>
@@ -195,7 +195,7 @@ const Scenarios = () => {
       <div style={{ display: 'flex', marginBottom: 30 }}>
         <Card
           classes={{ root: classes.card }} variant="outlined"
-          onClick={() => handleOnClick()}
+          onClick={() => handleOnClickCategory()}
           className={classNames({ [classes.cardSelected]: noCategory() })}
         >
           <CardActionArea classes={{ root: classes.area }}>
@@ -326,7 +326,14 @@ const Scenarios = () => {
           </ListItemButton>
         ))}
       </List>
-      {userAdmin && <ScenarioCreation onCreate={(result: ScenarioStore) => setScenarios([result, ...scenarios])} />}
+      {userAdmin
+          && <ScenarioCreation
+            onCreate={(result: ScenarioStore) => {
+              setScenarios([result, ...scenarios]);
+              fetchStatistics();
+            }}
+             />
+      }
     </>
   );
 };

@@ -209,8 +209,8 @@ const Dashboard = () => {
         <Typography variant="h4">{t('MITRE ATT&CK Coverage')}</Typography>
         <Paper variant="outlined" style={{ minWidth: '100%', padding: 16 }}>
           {(statistics?.inject_expectation_results ?? []).length > 0
-            ? <MitreMatrix alreadyLoaded={true} injectResults={statistics?.inject_expectation_results ?? []} />
-            : <MitreMatrixDummy />
+            ? <MitreMatrix ttpAlreadyLoaded injectResults={statistics?.inject_expectation_results ?? []} />
+            : <MitreMatrixDummy ttpAlreadyLoaded />
           }
         </Paper>
       </Grid>

@@ -263,6 +263,7 @@ const Documents = () => {
                 disabled={!userAdmin}
                 onUpdate={(result) => setDocuments(documents.map((d) => (d.document_id !== result.document_id ? d : result)))}
                 onDelete={(result) => setDocuments(documents.filter((d) => (d.document_id !== result)))}
+                scenariosAndExercisesFetched
               />
             </ListItemSecondaryAction>
           </ListItem>

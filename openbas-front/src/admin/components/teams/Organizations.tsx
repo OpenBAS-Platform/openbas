@@ -143,6 +143,7 @@ const Organizations = () => {
             onAddTag={filtering.handleAddTag}
             onRemoveTag={filtering.handleRemoveTag}
             currentTags={filtering.tags}
+            tagsFetched
           />
         </div>
         <div className={classes.downloadButton}>
