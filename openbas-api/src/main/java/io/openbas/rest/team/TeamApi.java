@@ -4,7 +4,7 @@ import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Organization;
 import io.openbas.database.model.Team;
 import io.openbas.database.model.User;
-import io.openbas.database.raw.RawTeam;
+import io.openbas.database.raw.RawPaginationTeam;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
@@ -31,6 +31,7 @@ import static io.openbas.database.specification.TeamSpecification.contextual;
 import static io.openbas.database.specification.TeamSpecification.teamsAccessibleFromOrganizations;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
@@ -95,7 +96,7 @@ public class TeamApi extends RestBehavior {
 
     @PostMapping("/api/teams/search")
     @PreAuthorize("isObserver()")
-    public Page<RawTeam> teams(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+    public Page<RawPaginationTeam> teams(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
         BiFunction<Specification<Team>, Pageable, Page<Team>> teamsFunction;
         OpenBASPrincipal currentUser = currentUser();
         if (currentUser.isAdmin()) {
@@ -114,7 +115,7 @@ public class TeamApi extends RestBehavior {
             teamsFunction,
             searchPaginationInput,
             Team.class
-        ).map(RawTeam::new);
+        ).map(RawPaginationTeam::new);
     }
 
     @GetMapping("/api/teams/{teamId}")
@@ -142,7 +143,7 @@ public class TeamApi extends RestBehavior {
         Team team = new Team();
         team.setUpdateAttributes(input);
         team.setOrganization(updateRelation(input.getOrganizationId(), team.getOrganization(), organizationRepository));
-        team.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        team.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         team.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
         team.setScenarios(fromIterable(scenarioRepository.findAllById(input.getScenarioIds())));
         return teamRepository.save(team);
@@ -159,14 +160,14 @@ public class TeamApi extends RestBehavior {
             Team existingTeam = team.get();
             existingTeam.setUpdateAttributes(input);
             existingTeam.setUpdatedAt(now());
-            existingTeam.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+            existingTeam.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
             existingTeam.setOrganization(updateRelation(input.getOrganizationId(), existingTeam.getOrganization(), organizationRepository));
             return teamRepository.save(existingTeam);
         } else {
             Team newTeam = new Team();
             newTeam.setUpdateAttributes(input);
             newTeam.setOrganization(updateRelation(input.getOrganizationId(), newTeam.getOrganization(), organizationRepository));
-            newTeam.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+            newTeam.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
             newTeam.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
             newTeam.setScenarios(fromIterable(scenarioRepository.findAllById(input.getScenarioIds())));
             return teamRepository.save(newTeam);
@@ -185,7 +186,7 @@ public class TeamApi extends RestBehavior {
         Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
         team.setUpdateAttributes(input);
         team.setUpdatedAt(now());
-        team.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        team.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         team.setOrganization(updateRelation(input.getOrganizationId(), team.getOrganization(), organizationRepository));
         return teamRepository.save(team);
     }

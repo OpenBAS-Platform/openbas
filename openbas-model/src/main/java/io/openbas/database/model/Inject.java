@@ -8,7 +8,8 @@ import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.converter.ContentConverter;
 import io.openbas.helper.MonoIdDeserializer;
-import io.openbas.helper.MultiIdDeserializer;
+import io.openbas.helper.MultiIdListDeserializer;
+import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -23,7 +24,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.logging.Level;
 
 import static java.time.Duration.between;
 import static java.time.Instant.now;
@@ -153,16 +153,16 @@ public class Inject implements Base, Injection {
   @JoinTable(name = "injects_tags",
       joinColumns = @JoinColumn(name = "inject_id"),
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("inject_tags")
-  private List<Tag> tags = new ArrayList<>();
+  private Set<Tag> tags = new HashSet<>();
 
   @Getter
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "injects_teams",
       joinColumns = @JoinColumn(name = "inject_id"),
       inverseJoinColumns = @JoinColumn(name = "team_id"))
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("inject_teams")
   private List<Team> teams = new ArrayList<>();
 
@@ -171,7 +171,7 @@ public class Inject implements Base, Injection {
   @JoinTable(name = "injects_assets",
       joinColumns = @JoinColumn(name = "inject_id"),
       inverseJoinColumns = @JoinColumn(name = "asset_id"))
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("inject_assets")
   private List<Asset> assets = new ArrayList<>();
 
@@ -180,7 +180,7 @@ public class Inject implements Base, Injection {
   @JoinTable(name = "injects_asset_groups",
       joinColumns = @JoinColumn(name = "inject_id"),
       inverseJoinColumns = @JoinColumn(name = "asset_group_id"))
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("inject_asset_groups")
   private List<AssetGroup> assetGroups = new ArrayList<>();
 
@@ -189,7 +189,7 @@ public class Inject implements Base, Injection {
   @JoinTable(name = "injects_payloads",
       joinColumns = @JoinColumn(name = "inject_id"),
       inverseJoinColumns = @JoinColumn(name = "payload_id"))
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("inject_payloads")
   private List<Asset> payloads = new ArrayList<>();
 

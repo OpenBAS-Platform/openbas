@@ -2,26 +2,19 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLHStoreType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.helper.MultiIdDeserializer;
+import io.openbas.helper.MultiIdSetDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import lombok.Setter;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
-import static jakarta.persistence.DiscriminatorType.STRING;
 import static java.time.Instant.now;
-import static lombok.AccessLevel.NONE;
 
 @Data
 @Entity
@@ -63,9 +56,9 @@ public class Payload implements Base {
   @JoinTable(name = "payloads_tags",
       joinColumns = @JoinColumn(name = "payload_id"),
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("payload_tags")
-  private List<Tag> tags = new ArrayList<>();
+  private Set<Tag> tags = new HashSet<>();
 
   // -- AUDIT --
 

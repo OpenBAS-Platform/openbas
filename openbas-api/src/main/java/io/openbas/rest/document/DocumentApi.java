@@ -33,9 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
@@ -43,6 +41,7 @@ import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.specification.DocumentSpecification.findGrantedFor;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
@@ -151,13 +150,9 @@ public class DocumentApi extends RestBehavior {
                 document.setScenarios(scenarios);
             }
             // Compute tags
-            List<Tag> tags = new ArrayList<>(document.getTags());
+            Set<Tag> tags = new HashSet<>(document.getTags());
             List<Tag> inputTags = fromIterable(tagRepository.findAllById(input.getTagIds()));
-            inputTags.forEach(inputTag -> {
-                if (!tags.contains(inputTag)) {
-                    tags.add(inputTag);
-                }
-            });
+            tags.addAll(inputTags);
             document.setTags(tags);
             return documentRepository.save(document);
         } else {
@@ -172,7 +167,7 @@ public class DocumentApi extends RestBehavior {
             if (!input.getScenarioIds().isEmpty()) {
                 document.setScenarios(fromIterable(scenarioRepository.findAllById(input.getScenarioIds())));
             }
-            document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+            document.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
             document.setType(file.getContentType());
             return documentRepository.save(document);
         }
@@ -216,7 +211,7 @@ public class DocumentApi extends RestBehavior {
     }
 
     @GetMapping("/api/documents/{documentId}/tags")
-    public List<Tag> documentTags(@PathVariable String documentId) {
+    public Set<Tag> documentTags(@PathVariable String documentId) {
         Document document = resolveDocument(documentId).orElseThrow(ElementNotFoundException::new);
         return document.getTags();
     }
@@ -224,7 +219,7 @@ public class DocumentApi extends RestBehavior {
     @PutMapping("/api/documents/{documentId}/tags")
     public Document documentTags(@PathVariable String documentId, @RequestBody DocumentTagUpdateInput input) {
         Document document = resolveDocument(documentId).orElseThrow(ElementNotFoundException::new);
-        document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        document.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         return documentRepository.save(document);
     }
 
@@ -234,7 +229,7 @@ public class DocumentApi extends RestBehavior {
                                               @Valid @RequestBody DocumentUpdateInput input) {
         Document document = resolveDocument(documentId).orElseThrow(ElementNotFoundException::new);
         document.setUpdateAttributes(input);
-        document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        document.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
 
         // Get removed exercises
         Stream<String> askExerciseIdsStream = document.getExercises()

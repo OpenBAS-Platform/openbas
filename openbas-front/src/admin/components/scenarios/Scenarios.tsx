@@ -161,6 +161,7 @@ const Scenarios = () => {
 
   const categoryCard = (category: string, count: number) => (
     <Card
+      key={category}
       classes={{ root: classes.card }} variant="outlined"
       onClick={() => handleOnClickCategory(category)}
       className={classNames({ [classes.cardSelected]: hasCategory(category) })}

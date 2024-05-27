@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.List;
 
 @Data
-public class RawTeam {
+public class RawPaginationTeam {
 
   String team_id;
   String team_name;
@@ -18,7 +18,7 @@ public class RawTeam {
   boolean team_contextual;
   Instant team_updated_at;
 
-  public RawTeam(final Team team) {
+  public RawPaginationTeam(final Team team) {
     this.team_id = team.getId();
     this.team_name = team.getName();
     this.team_description = team.getDescription();

@@ -6,7 +6,8 @@ import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.model.Filters.FilterGroup;
-import io.openbas.helper.MultiIdDeserializer;
+import io.openbas.helper.MultiIdListDeserializer;
+import io.openbas.helper.MultiIdSetDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -15,9 +16,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static java.time.Instant.now;
 import static lombok.AccessLevel.NONE;
@@ -58,7 +57,7 @@ public class AssetGroup implements Base {
   @JoinTable(name = "asset_groups_assets",
       joinColumns = @JoinColumn(name = "asset_group_id"),
       inverseJoinColumns = @JoinColumn(name = "asset_id"))
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("asset_group_assets")
   private List<Asset> assets = new ArrayList<>();
 
@@ -68,7 +67,7 @@ public class AssetGroup implements Base {
   private List<Asset> dynamicAssets = new ArrayList<>();
 
   // Getter is Mandatory when we use @Transient annotation
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   public List<Asset> getDynamicAssets() {
     return this.dynamicAssets;
   }
@@ -79,10 +78,10 @@ public class AssetGroup implements Base {
   @JoinTable(name = "asset_groups_tags",
       joinColumns = @JoinColumn(name = "asset_group_id"),
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("asset_group_tags")
   @Queryable(sortable = true)
-  private List<Tag> tags = new ArrayList<>();
+  private Set<Tag> tags = new HashSet<>();
 
   // -- AUDIT --
 

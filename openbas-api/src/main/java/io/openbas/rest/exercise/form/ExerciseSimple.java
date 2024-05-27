@@ -2,11 +2,11 @@ package io.openbas.rest.exercise.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.openbas.utils.AtomicTestingMapper;
-import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Tag;
-import io.openbas.helper.MultiIdDeserializer;
+import io.openbas.helper.MultiIdListDeserializer;
+import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
+import io.openbas.utils.AtomicTestingMapper;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
@@ -17,7 +17,9 @@ import org.springframework.beans.BeanUtils;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static io.openbas.utils.ResultUtils.computeGlobalExpectationResults;
 import static io.openbas.utils.ResultUtils.computeTargetResults;
@@ -47,9 +49,9 @@ public class ExerciseSimple {
   @JsonProperty("exercise_start_date")
   private Instant start;
 
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("exercise_tags")
-  private List<Tag> tags = new ArrayList<>();
+  private Set<Tag> tags = new HashSet<>();
 
   @JsonProperty("exercise_global_score")
   private List<AtomicTestingMapper.ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();

@@ -10,7 +10,7 @@ import java.util.List;
 import static java.util.Optional.ofNullable;
 
 @Data
-public class RawPlayer {
+public class RawPaginationPlayer {
 
   String user_id;
   String user_email;
@@ -19,7 +19,7 @@ public class RawPlayer {
   String user_organization;
   List<String> user_tags;
 
-  public RawPlayer(final User user) {
+  public RawPaginationPlayer(final User user) {
     this.user_id = user.getId();
     this.user_email = user.getEmail();
     this.user_firstname = user.getFirstname();

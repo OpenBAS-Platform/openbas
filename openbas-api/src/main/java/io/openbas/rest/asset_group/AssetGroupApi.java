@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RestController
@@ -37,7 +37,7 @@ public class AssetGroupApi {
   public AssetGroup createAssetGroup(@Valid @RequestBody final AssetGroupInput input) {
     AssetGroup assetGroup = new AssetGroup();
     assetGroup.setUpdateAttributes(input);
-    assetGroup.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
+    assetGroup.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return this.assetGroupService.createAssetGroup(assetGroup);
   }
 
@@ -70,7 +70,7 @@ public class AssetGroupApi {
       @Valid @RequestBody final AssetGroupInput input) {
     AssetGroup assetGroup = this.assetGroupService.assetGroup(assetGroupId);
     assetGroup.setUpdateAttributes(input);
-    assetGroup.setTags(fromIterable(this.tagRepository.findAllById(input.getTagIds())));
+    assetGroup.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return this.assetGroupService.updateAssetGroup(assetGroup);
   }
 

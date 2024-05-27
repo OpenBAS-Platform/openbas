@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
-import io.openbas.helper.MultiIdDeserializer;
+import io.openbas.helper.MultiIdListDeserializer;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -54,7 +54,7 @@ public class Dryrun implements Base {
     @JoinTable(name = "dryruns_users",
             joinColumns = @JoinColumn(name = "dryrun_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonSerialize(using = MultiIdListDeserializer.class)
     @JsonProperty("dryrun_users")
     private List<User> users = new ArrayList<>();
 

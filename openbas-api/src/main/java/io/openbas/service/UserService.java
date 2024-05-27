@@ -7,6 +7,8 @@ import io.openbas.database.model.User;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.GroupSpecification;
 import io.openbas.rest.user.form.user.CreateUserInput;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,8 +20,6 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.UUID;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
-import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static java.time.Instant.now;
 
 @Service
@@ -101,7 +101,7 @@ public class UserService {
     if (StringUtils.hasLength(input.getPassword())) {
       user.setPassword(encodeUserPassword(input.getPassword()));
     }
-    user.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+    user.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
     // Find automatic groups to assign
     List<Group> assignableGroups = groupRepository.findAll(GroupSpecification.defaultUserAssignable());

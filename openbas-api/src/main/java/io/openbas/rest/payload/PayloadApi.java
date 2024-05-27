@@ -22,7 +22,7 @@ import java.time.Instant;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RestController
@@ -67,7 +67,7 @@ public class PayloadApi extends RestBehavior {
     public Payload createPayload(@Valid @RequestBody PayloadCreateInput input) {
         Payload payload = new Payload();
         payload.setUpdateAttributes(input);
-        payload.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        payload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         return payloadRepository.save(payload);
     }
 
@@ -78,7 +78,7 @@ public class PayloadApi extends RestBehavior {
             @Valid @RequestBody PayloadUpdateInput input) {
         Payload payload = this.payloadRepository.findById(payloadId).orElseThrow(ElementNotFoundException::new);
         payload.setUpdateAttributes(input);
-        payload.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        payload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         payload.setUpdatedAt(Instant.now());
         return payloadRepository.save(payload);
     }
