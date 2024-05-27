@@ -12,7 +12,7 @@
     "@emotion/styled": "11.11.5",
     "@fontsource/geologica": "5.0.5",
     "@fontsource/ibm-plex-sans": "5.0.20",
-    "@hookform/resolvers": "3.3.4",
+    "@hookform/resolvers": "3.4.2",
     "@microsoft/fetch-event-source": "2.0.1",
     "@mui/icons-material": "5.15.18",
     "@mui/lab": "5.0.0-alpha.170",
@@ -22,8 +22,8 @@
     "@mui/x-date-pickers": "6.20.0",
     "@redux-devtools/extension": "3.3.0",
     "@uiw/react-md-editor": "4.0.4",
-    "apexcharts": "3.48.0",
-    "axios": "1.6.8",
+    "apexcharts": "3.49.1",
+    "axios": "1.7.2",
     "ckeditor5-custom-build": "link:packages/ckeditor5-custom-build",
     "classnames": "2.5.1",
     "cronstrue": "2.50.0",
@@ -39,7 +39,7 @@
     "http-proxy-middleware": "2.0.6",
     "js-file-download": "0.4.12",
     "leaflet": "1.9.4",
-    "mdi-material-ui": "7.8.0",
+    "mdi-material-ui": "7.9.1",
     "moment": "2.30.1",
     "moment-timezone": "0.5.45",
     "normalizr": "3.6.2",
@@ -77,10 +77,10 @@
     "@eslint/eslintrc": "3.1.0",
     "@eslint/js": "8.57.0",
     "@playwright/test": "1.44.0",
-    "@stylistic/eslint-plugin": "1.7.0",
+    "@stylistic/eslint-plugin": "1.8.1",
     "@testing-library/react": "14.3.1",
     "@types/d3-hierarchy": "3.1.7",
-    "@types/node": "20.12.4",
+    "@types/node": "20.12.12",
     "@types/react": "18.3.2",
     "@types/react-csv": "1.1.10",
     "@types/react-dom": "18.3.0",
@@ -111,7 +111,7 @@
     "swagger-typescript-api": "13.0.3",
     "typescript": "5.4.5",
     "vite": "5.2.11",
-    "vite-plugin-istanbul": "6.0.0",
+    "vite-plugin-istanbul": "6.0.2",
     "vitest": "1.4.0"
   },
   "engines": {
@@ -140,5 +140,5 @@
   "workspaces": [
     "packages/*"
   ],
-  "packageManager": "yarn@4.1.1"
+  "packageManager": "yarn@4.2.2"
 }
