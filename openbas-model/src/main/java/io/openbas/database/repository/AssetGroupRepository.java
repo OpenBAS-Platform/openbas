@@ -29,6 +29,11 @@ public interface AssetGroupRepository extends CrudRepository<AssetGroup, String>
   @Query("select count(distinct ag) from AssetGroup ag where ag.createdAt < :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
 
+  /**
+   * Returns the raw asset group having the ids passed in parameter
+   * @param ids a list of ids
+   * @return the list of raw asset group
+   */
   @Query(value = "SELECT ag.asset_group_id, ag.asset_group_name,  " +
           "coalesce(array_agg(aga.asset_id) FILTER ( WHERE aga.asset_id IS NOT NULL ), '{}') asset_ids " +
           "FROM asset_groups ag " +

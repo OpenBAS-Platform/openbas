@@ -71,16 +71,22 @@ public class ExerciseSimple {
     return simple;
   }
 
+  /**
+   * Create a classic Exercise object from a Raw one
+   * @param exercise the raw exercise
+   * @param injects the list of Injects linked to that exercise
+   * @return an Exercise Simple object
+   */
   public static ExerciseSimple fromRawExercise(RawExercise exercise, List<Inject> injects) {
     ExerciseSimple simple = new ExerciseSimple();
     simple.setId(exercise.getExercise_id());
     simple.setName(exercise.getExercise_name());
     if(exercise.getExercise_tags() != null) {
       simple.setTags(exercise.getExercise_tags().stream().map((tagId) -> {
-                Tag tag = new Tag();
-                tag.setId(tagId);
-                return tag;
-              }
+          Tag tag = new Tag();
+          tag.setId(tagId);
+          return tag;
+        }
       ).collect(Collectors.toList()));
     } else {
       simple.setTags(new ArrayList<>());
@@ -90,7 +96,9 @@ public class ExerciseSimple {
     simple.setStatus(Exercise.STATUS.valueOf(exercise.getExercise_status()));
     simple.setStart(exercise.getExercise_start_date());
 
-    simple.setExpectationResultByTypes(AtomicTestingUtils.getExpectationResultByTypes(injects.stream().flatMap(inject -> inject.getExpectations().stream()).toList()));
+    // We set the ExpectationResults
+    simple.setExpectationResultByTypes(AtomicTestingUtils
+            .getExpectationResultByTypes(injects.stream().flatMap(inject -> inject.getExpectations().stream()).toList()));
     if(injects != null) {
       simple.setTargets(computeTargetResults(injects));
     } else {

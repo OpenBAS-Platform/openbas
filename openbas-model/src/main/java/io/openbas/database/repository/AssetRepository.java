@@ -16,6 +16,11 @@ public interface AssetRepository extends CrudRepository<Asset, String>, JpaSpeci
   @Query("select a from Asset a where a.type IN :types")
   List<Asset> findByType(@Param("types") final List<String> types);
 
+  /**
+   * Returns the raw assets having the ids passed in parameter
+   * @param ids the ids
+   * @return the list of raw assets
+   */
   @Query(value= "SELECT asset_id, asset_name, asset_type " +
           "FROM assets " +
           "WHERE asset_id IN :ids ", nativeQuery = true)

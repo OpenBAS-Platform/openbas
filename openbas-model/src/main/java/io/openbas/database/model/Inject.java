@@ -400,25 +400,40 @@ public class Inject implements Base, Injection {
     return Objects.hash(id);
   }
 
+  /**
+   * Creates an Inject from a Raw Inject
+   * @param rawInject the raw inject to convert
+   * @param rawTeams the map of the teams containing at least the ones linked to this inject
+   * @param rawInjectExpectationMap the map of the expectations containing at least the ones linked to this inject
+   * @param mapOfAssetGroups the map of the asset groups containing at least the ones linked to this inject
+   * @param mapOfAsset the map of the asset containing at least the ones linked to this inject and the asset groups linked to it
+   * @return an Inject
+   */
   public static Inject fromRawInject(RawInject rawInject,
                                      Map<String, RawTeam> rawTeams,
                                      Map<String, RawInjectExpectation> rawInjectExpectationMap,
                                      Map<String, RawAssetGroup> mapOfAssetGroups,
                                      Map<String, RawAsset> mapOfAsset) {
+    // Create the object
     Inject inject = new Inject();
     inject.setId(rawInject.getInject_id());
 
+    // Set a list of expectations
     inject.setExpectations(new ArrayList<>());
     for(String expectationId: rawInject.getInject_expectations()) {
+      // Create a new expectation
       InjectExpectation expectation = new InjectExpectation();
       expectation.setId(rawInjectExpectationMap.get(expectationId).getInject_expectation_id());
       expectation.setType(InjectExpectation.EXPECTATION_TYPE.valueOf(rawInjectExpectationMap.get(expectationId).getInject_expectation_type()));
       expectation.setScore(rawInjectExpectationMap.get(expectationId).getInject_expectation_score());
+
+      // Add the team of the expectation
       Team team = new Team();
       team.setId(rawInjectExpectationMap.get(expectationId).getTeam_id());
       team.setName(rawTeams.get(rawInjectExpectationMap.get(expectationId).getTeam_id()).getTeam_name());
       expectation.setTeam(team);
 
+      // Add the asset group of the expectation
       AssetGroup assetGroup = new AssetGroup();
       RawAssetGroup rawAssetGroup = mapOfAssetGroups.get(rawInjectExpectationMap.get(expectationId).getAsset_group_id());
       if(rawAssetGroup != null) {
@@ -426,6 +441,7 @@ public class Inject implements Base, Injection {
         assetGroup.setName(rawAssetGroup.getAsset_group_name());
         assetGroup.setAssets(new ArrayList<>());
 
+        // We add the assets to the asset group
         for (String assetId : rawAssetGroup.getAsset_ids()) {
           Asset asset = new Asset(mapOfAsset.get(assetId).getAsset_id(),
                   mapOfAsset.get(assetId).getAsset_type(),
@@ -435,16 +451,17 @@ public class Inject implements Base, Injection {
         expectation.setAssetGroup(assetGroup);
       }
 
+      // We add the asset to the expectation
       if (rawInjectExpectationMap.get(expectationId).getAsset_id() != null) {
         Asset asset = new Asset(mapOfAsset.get(rawInjectExpectationMap.get(expectationId).getAsset_id()).getAsset_id(),
                 mapOfAsset.get(rawInjectExpectationMap.get(expectationId).getAsset_id()).getAsset_type(),
                 mapOfAsset.get(rawInjectExpectationMap.get(expectationId).getAsset_id()).getAsset_name());
         expectation.setAsset(asset);
       }
-      //TODO add asset group and asset
       inject.getExpectations().add(expectation);
     }
 
+    // We add the teams to the inject
     ArrayList<Team> injectTeams = new ArrayList();
     for (String injectTeamId: rawInject.getInject_teams()) {
       Team team = new Team();
@@ -454,6 +471,7 @@ public class Inject implements Base, Injection {
     }
     inject.setTeams(injectTeams);
 
+    // We add the assets to the inject
     ArrayList<Asset> injectAssets = new ArrayList();
     for (String injectAssetId: rawInject.getInject_assets()) {
       Asset asset = new Asset(mapOfAsset.get(injectAssetId).getAsset_id(),
@@ -463,11 +481,13 @@ public class Inject implements Base, Injection {
     }
     inject.setAssets(injectAssets);
 
+    // Add the asset groups to the inject
     ArrayList<AssetGroup> injectAssetGroups = new ArrayList();
     for (String injectAssetGroupId: rawInject.getInject_asset_groups()) {
       AssetGroup assetGroup = new AssetGroup();
       assetGroup.setName(mapOfAssetGroups.get(injectAssetGroupId).getAsset_group_name());
       assetGroup.setId(mapOfAssetGroups.get(injectAssetGroupId).getAsset_group_id());
+      // We add the assets linked to the asset group
       assetGroup.setAssets(mapOfAssetGroups.get(injectAssetGroupId).getAsset_ids().stream().map(
               assetId -> {
                 Asset asset = new Asset(mapOfAsset.get(assetId).getAsset_id(),
