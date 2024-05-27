@@ -2,10 +2,12 @@ package io.openbas.rest.settings;
 
 import io.openbas.config.OpenBASConfig;
 import io.openbas.config.OpenBASPrincipal;
+import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.model.Setting;
 import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
+import io.openbas.helper.RabbitMQHelper;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.settings.form.SettingsEnterpriseEditionUpdateInput;
@@ -59,6 +61,8 @@ public class PlatformSettingsApi extends RestBehavior {
 
     @Resource
     private OpenBASConfig openBASConfig;
+    @Resource
+    private RabbitmqConfig rabbitmqConfig;
 
     @Autowired
     public void setOpenCTIConfig(OpenCTIConfig openCTIConfig) {
@@ -205,6 +209,7 @@ public class PlatformSettingsApi extends RestBehavior {
                 platformSettings.setPlatformVersion(openBASConfig.getVersion());
                 platformSettings.setPostgreVersion(settingRepository.getServerVersion());
                 platformSettings.setJavaVersion(Runtime.version().toString());
+                platformSettings.setRabbitMQVersion(RabbitMQHelper.getRabbitMQVersion(rabbitmqConfig));
             }
         }
 
