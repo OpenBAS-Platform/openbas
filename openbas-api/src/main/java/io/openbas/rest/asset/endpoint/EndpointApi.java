@@ -28,7 +28,7 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 @Secured(ROLE_USER)
 public class EndpointApi {
 
-  public static final String ENDPOINT_URI = "/api/endpoints";
+  public static final String  ENDPOINT_URI = "/api/endpoints";
 
   private final EndpointService endpointService;
   private final EndpointRepository endpointRepository;
@@ -48,6 +48,12 @@ public class EndpointApi {
   @PreAuthorize("isObserver()")
   public List<Endpoint> endpoints() {
     return this.endpointService.endpoints(EndpointSpecification.findEndpointsForInjection());
+  }
+
+  @GetMapping(ENDPOINT_URI + "/{endpointId}")
+  @PreAuthorize("isPlanner()")
+  public Endpoint endpoint(@PathVariable @NotBlank final String endpointId) {
+    return this.endpointService.endpoint(endpointId);
   }
 
   @PostMapping(ENDPOINT_URI + "/search")

@@ -17,10 +17,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.DETECTION;
-import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVENTION;
+import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.*;
 import static io.openbas.inject_expectation.InjectExpectationUtils.computeResult;
 import static java.time.Instant.now;
 
@@ -34,6 +34,10 @@ public class InjectExpectationService {
 
     // -- CRUD --
 
+    public Optional<InjectExpectation> findInjectExpectation(@NotBlank final String injectExpectationId) {
+        return this.injectExpectationRepository.findById(injectExpectationId);
+    }
+
     public void addResultExpectation(
             @NotNull final InjectExpectation expectation,
             @NotBlank final String sourceId,
@@ -43,7 +47,7 @@ public class InjectExpectationService {
         this.update(expectation);
     }
 
-    public void computeExpectation(
+    public InjectExpectation computeExpectation(
             @NotNull final InjectExpectation expectation,
             @NotBlank final String sourceId,
             @NotBlank final String sourceName,
@@ -51,7 +55,7 @@ public class InjectExpectationService {
             @NotBlank final boolean success) {
         computeResult(expectation, sourceId, sourceName, result);
         expectation.setScore(success ? expectation.getExpectedScore() : 0);
-        this.update(expectation);
+        return this.update(expectation);
     }
 
     public void computeExpectationGroup(
@@ -70,12 +74,12 @@ public class InjectExpectationService {
         this.update(expectationAssetGroup);
     }
 
-    public void update(@NotNull InjectExpectation injectExpectation) {
+    public InjectExpectation update(@NotNull InjectExpectation injectExpectation) {
         injectExpectation.setUpdatedAt(now());
-        this.injectExpectationRepository.save(injectExpectation);
         Inject inject = injectExpectation.getInject();
         inject.setUpdatedAt(now());
         this.injectRepository.save(inject);
+        return this.injectExpectationRepository.save(injectExpectation);
     }
 
     // -- PREVENTION --
@@ -160,6 +164,25 @@ public class InjectExpectationService {
                 Specification.where(InjectExpectationSpecification.type(DETECTION))
                         .and(InjectExpectationSpecification.fromAssets(inject.getId(), assetIds))
         );
+    }
+
+    // -- MANUAL
+
+    public List<InjectExpectation> manualExpectationsNotFill(@NotBlank final String source) {
+        return this.injectExpectationRepository
+                .findAll(Specification.where(InjectExpectationSpecification.type(MANUAL)))
+                .stream()
+                .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
+                .toList();
+    }
+
+    public List<InjectExpectation> manualExpectationsNotFill() {
+        return this.injectExpectationRepository.findAll(
+                        Specification.where(InjectExpectationSpecification.type(MANUAL))
+                )
+                .stream()
+                .filter(e -> e.getResults().stream().toList().isEmpty())
+                .toList();
     }
 
     // -- BY TARGET TYPE

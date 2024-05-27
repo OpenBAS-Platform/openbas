@@ -91,7 +91,7 @@ OpenBAS is a product designed and developed by the company [Filigran](https://fi
 
 To improve the features and the performances of OpenBAS, the platform collects anonymous statistical data related to its usage and health.
 
-You can find all the details on collected data and associated usage in the [data telemetry documentation](https://docs.openbas.io/latest/reference/data-telemetry/).
+You can find all the details on collected data and associated usage in the [usage telemetry documentation](https://docs.openbas.io/latest/reference/usage-telemetry/).
 
 #### OpenStreetMap server
 
