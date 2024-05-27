@@ -102,54 +102,47 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
             values={values}
             setFieldValue={form.mutators.setValue}
           />
-          {editing && (
-            <OldTextField
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="start">
-                    <Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{t('phone_number_tooltip')}</span>}>
-                      <InfoOutlined />
-                    </Tooltip>
-                  </InputAdornment>
-                ),
-              }}
-              variant="standard"
-              name="user_phone"
-              fullWidth={true}
-              label={t('Phone number (mobile)')}
-              style={{ marginTop: 20 }}
-            />
-          )}
-          {editing && (
-            <OldTextField
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="start">
-                    <Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{t('phone_number_tooltip')}</span>}>
-                      <InfoOutlined />
-                    </Tooltip>
-                  </InputAdornment>
-                ),
-              }}
-              variant="standard"
-              name="user_phone2"
-              fullWidth={true}
-              label={t('Phone number (landline)')}
-              style={{ marginTop: 20 }}
-            />
-
-          )}
-          {editing && (
-            <OldTextField
-              variant="standard"
-              name="user_pgp_key"
-              fullWidth={true}
-              multiline={true}
-              rows={5}
-              label={t('PGP public key')}
-              style={{ marginTop: 20 }}
-            />
-          )}
+          <OldTextField
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="start">
+                  <Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{t('phone_number_tooltip')}</span>}>
+                    <InfoOutlined />
+                  </Tooltip>
+                </InputAdornment>
+              ),
+            }}
+            variant="standard"
+            name="user_phone"
+            fullWidth={true}
+            label={t('Phone number (mobile)')}
+            style={{ marginTop: 20 }}
+          />
+          <OldTextField
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="start">
+                  <Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{t('phone_number_tooltip')}</span>}>
+                    <InfoOutlined />
+                  </Tooltip>
+                </InputAdornment>
+              ),
+            }}
+            variant="standard"
+            name="user_phone2"
+            fullWidth={true}
+            label={t('Phone number (landline)')}
+            style={{ marginTop: 20 }}
+          />
+          <OldTextField
+            variant="standard"
+            name="user_pgp_key"
+            fullWidth={true}
+            multiline={true}
+            rows={5}
+            label={t('PGP public key')}
+            style={{ marginTop: 20 }}
+          />
           <TagField
             name="user_tags"
             label={t('Tags')}

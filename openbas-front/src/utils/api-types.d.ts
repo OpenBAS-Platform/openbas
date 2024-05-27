@@ -112,6 +112,7 @@ export interface Asset {
   asset_last_seen?: string;
   asset_name: string;
   asset_parent?: Asset;
+  asset_process_name?: string;
   asset_tags?: Tag[];
   asset_type?: string;
   /** @format date-time */
@@ -422,16 +423,6 @@ export interface Communication {
   updateAttributes?: object;
 }
 
-export interface CreatePlayerInput {
-  user_country?: string;
-  user_email: string;
-  user_firstname?: string;
-  user_lastname?: string;
-  user_organization?: string;
-  user_tags?: string[];
-  user_teams?: string[];
-}
-
 export interface CreateUserInput {
   user_admin?: boolean;
   user_email: string;
@@ -494,7 +485,7 @@ export interface DryInject {
 
 export interface DryInjectStatus {
   status_id?: string;
-  status_name?: "DRAFT" | "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_name?: "DRAFT" | "INFO" | "QUEUING" | "EXECUTING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -553,6 +544,7 @@ export interface Endpoint {
   asset_last_seen?: string;
   asset_name: string;
   asset_parent?: Asset;
+  asset_process_name?: string;
   asset_tags?: Tag[];
   asset_type?: string;
   /** @format date-time */
@@ -560,7 +552,7 @@ export interface Endpoint {
   endpoint_hostname?: string;
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal";
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal" | "Unknown";
   updateAttributes?: object;
 }
 
@@ -577,7 +569,7 @@ export interface EndpointInput {
    */
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal";
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal" | "Unknown";
 }
 
 export interface Evaluation {
@@ -931,6 +923,7 @@ export interface InjectExpectation {
   inject_expectation_results?: InjectExpectationResult[];
   /** @format int32 */
   inject_expectation_score?: number;
+  inject_expectation_signatures?: InjectExpectationSignature[];
   inject_expectation_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "VALIDATED";
   inject_expectation_team?: Team;
   inject_expectation_type: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
@@ -955,6 +948,11 @@ export interface InjectExpectationResultsByAttackPattern {
 export interface InjectExpectationResultsByType {
   inject_title?: string;
   results?: ExpectationResultsByType[];
+}
+
+export interface InjectExpectationSignature {
+  type?: string;
+  value?: string;
 }
 
 export interface InjectInput {
@@ -1011,7 +1009,7 @@ export interface InjectResultDTO {
 
 export interface InjectStatus {
   status_id?: string;
-  status_name?: "DRAFT" | "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_name?: "DRAFT" | "INFO" | "QUEUING" | "EXECUTING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -1036,7 +1034,7 @@ export interface InjectStatusExecution {
   /** @format int32 */
   execution_duration?: number;
   execution_message?: string;
-  execution_status?: "DRAFT" | "INFO" | "QUEUING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  execution_status?: "DRAFT" | "INFO" | "QUEUING" | "EXECUTING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
   /** @format date-time */
   execution_time?: string;
 }
@@ -1050,7 +1048,7 @@ export interface InjectTargetWithResult {
   expectationResultsByTypes?: ExpectationResultsByType[];
   id: string;
   name?: string;
-  platformType?: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal";
+  platformType?: "Linux" | "Windows" | "MacOS" | "Service" | "Generic" | "Internal" | "Unknown";
   targetType?: "ASSETS" | "ASSETS_GROUPS" | "TEAMS";
 }
 
@@ -1592,6 +1590,25 @@ export interface PageEndpoint {
   totalPages?: number;
 }
 
+export interface PageExerciseSimple {
+  content?: ExerciseSimple[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageFullTextSearchResult {
   content?: FullTextSearchResult[];
   empty?: boolean;
@@ -1895,6 +1912,21 @@ export interface PlatformStatistic {
   users_count?: StatisticElement;
 }
 
+export interface PlayerInput {
+  /** @pattern ^\+[\d\s\-.()]+$ */
+  user_phone2?: string;
+  user_country?: string;
+  user_email: string;
+  user_firstname?: string;
+  user_lastname?: string;
+  user_organization?: string;
+  user_pgp_key?: string;
+  /** @pattern ^\+[\d\s\-.()]+$ */
+  user_phone?: string;
+  user_tags?: string[];
+  user_teams?: string[];
+}
+
 export interface PropertySchemaDTO {
   schema_property_name: string;
   schema_property_type_array?: boolean;
@@ -1927,6 +1959,46 @@ export interface PublicExercise {
   exercise_description?: string;
   exercise_id?: string;
   exercise_name?: string;
+}
+
+export interface RawAttackPattern {
+  attack_pattern_created_at?: string;
+  attack_pattern_description?: string;
+  attack_pattern_external_id?: string;
+  attack_pattern_id?: string;
+  attack_pattern_kill_chain_phases?: string[];
+  attack_pattern_name?: string;
+  attack_pattern_parent?: string;
+  attack_pattern_permissions_required?: string[];
+  attack_pattern_platforms?: string[];
+  attack_pattern_stix_id?: string;
+  attack_pattern_updated_at?: string;
+}
+
+export interface RawDocument {
+  document_description?: string;
+  document_exercises?: string[];
+  document_id?: string;
+  document_name?: string;
+  document_scenarios?: string[];
+  document_tags?: string[];
+  document_target?: string;
+  document_type?: string;
+}
+
+export interface RawUser {
+  /** @format date-time */
+  user_created_at?: string;
+  user_email?: string;
+  user_firstname?: string;
+  user_gravatar?: string;
+  user_groups?: string[];
+  user_id?: string;
+  user_lastname?: string;
+  user_organization?: string;
+  user_phone?: string;
+  user_tags?: string[];
+  user_teams?: string[];
 }
 
 export interface RenewTokenInput {
@@ -2251,21 +2323,6 @@ export interface UpdateAssetsOnAssetGroupInput {
 export interface UpdateMePasswordInput {
   user_current_password: string;
   user_plain_password: string;
-}
-
-export interface UpdatePlayerInput {
-  /** @pattern ^\+[\d\s\-.()]+$ */
-  user_phone2?: string;
-  user_country?: string;
-  user_email: string;
-  user_firstname?: string;
-  user_lastname?: string;
-  user_organization?: string;
-  user_pgp_key?: string;
-  /** @pattern ^\+[\d\s\-.()]+$ */
-  user_phone?: string;
-  user_tags?: string[];
-  user_teams?: string[];
 }
 
 export interface UpdateProfileInput {

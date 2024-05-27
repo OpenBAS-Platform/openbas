@@ -6,8 +6,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.rest.user.form.player.CreatePlayerInput;
-import io.openbas.rest.user.form.player.UpdatePlayerInput;
+import io.openbas.rest.user.form.player.PlayerInput;
 import io.openbas.service.UserService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
@@ -128,7 +127,7 @@ public class PlayerApi extends RestBehavior {
   @Transactional(rollbackOn = Exception.class)
   @PostMapping("/api/players")
   @PreAuthorize("isPlanner()")
-  public User createPlayer(@Valid @RequestBody CreatePlayerInput input) {
+  public User createPlayer(@Valid @RequestBody PlayerInput input) {
     checkOrganizationAccess(userRepository, input.getOrganizationId());
     User user = new User();
     user.setUpdateAttributes(input);
@@ -142,7 +141,7 @@ public class PlayerApi extends RestBehavior {
   @Transactional(rollbackOn = Exception.class)
   @PostMapping("/api/players/upsert")
   @PreAuthorize("isPlanner()")
-  public User upsertPlayer(@Valid @RequestBody CreatePlayerInput input) {
+  public User upsertPlayer(@Valid @RequestBody PlayerInput input) {
     checkOrganizationAccess(userRepository, input.getOrganizationId());
     Optional<User> user = userRepository.findByEmailIgnoreCase(input.getEmail());
     if (user.isPresent()) {
@@ -175,7 +174,7 @@ public class PlayerApi extends RestBehavior {
 
   @PutMapping("/api/players/{userId}")
   @PreAuthorize("isPlanner()")
-  public User updatePlayer(@PathVariable String userId, @Valid @RequestBody UpdatePlayerInput input) {
+  public User updatePlayer(@PathVariable String userId, @Valid @RequestBody PlayerInput input) {
     checkUserAccess(userRepository, userId);
     User user = userRepository.findById(userId).orElseThrow(ElementNotFoundException::new);
     if (!currentUser().isAdmin() && user.isManager() && !currentUser().getId().equals(userId)) {

@@ -1,8 +1,8 @@
-import type { UpdatePlayerInput, User } from '../../../../utils/api-types';
+import type { PlayerInput, User } from '../../../../utils/api-types';
 import { Option } from '../../../../utils/Option';
 
 export type PlayerInputForm = Omit<
-UpdatePlayerInput,
+PlayerInput,
 'user_organization' | 'user_country' | 'user_tags'
 > & {
   user_organization: Option | undefined;

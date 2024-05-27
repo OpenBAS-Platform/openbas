@@ -7,7 +7,7 @@ import PlayerForm from './PlayerForm';
 import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 import Transition from '../../../../components/common/Transition';
-import type { UpdatePlayerInput } from '../../../../utils/api-types';
+import type { PlayerInput } from '../../../../utils/api-types';
 import { countryOption, Option, organizationOption, tagOptions } from '../../../../utils/Option';
 import { useHelper } from '../../../../store';
 import type { OrganizationHelper, TagHelper, UserHelper } from '../../../../actions/helper';
@@ -67,7 +67,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   const handleCloseEdit = () => setOpenEdit(false);
 
   const onSubmitEdit = (data: PlayerInputForm) => {
-    const inputValues: UpdatePlayerInput = {
+    const inputValues: PlayerInput = {
       ...data,
       user_organization: data.user_organization?.id,
       user_country: data.user_country?.id,
