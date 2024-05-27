@@ -1206,7 +1206,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-modules-commonjs@npm:7.24.1, @babel/plugin-transform-modules-commonjs@npm:^7.24.1":
+"@babel/plugin-transform-modules-commonjs@npm:7.24.6":
+  version: 7.24.6
+  resolution: "@babel/plugin-transform-modules-commonjs@npm:7.24.6"
+  dependencies:
+    "@babel/helper-module-transforms": "npm:^7.24.6"
+    "@babel/helper-plugin-utils": "npm:^7.24.6"
+    "@babel/helper-simple-access": "npm:^7.24.6"
+  peerDependencies:
+    "@babel/core": ^7.0.0-0
+  checksum: 10c0/4fc790136d066105fa773ffc7e249d88c6f0d0126984ede36fedd51ac2b622b46c08565bcdd1ab62ac10195eeedeaba0d26e7e4c676ed50906cbed16540a4e22
+  languageName: node
+  linkType: hard
+
+"@babel/plugin-transform-modules-commonjs@npm:^7.24.1":
   version: 7.24.1
   resolution: "@babel/plugin-transform-modules-commonjs@npm:7.24.1"
   dependencies:
@@ -11830,7 +11843,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "openbas-front@workspace:."
   dependencies:
-    "@babel/plugin-transform-modules-commonjs": "npm:7.24.1"
+    "@babel/plugin-transform-modules-commonjs": "npm:7.24.6"
     "@ckeditor/ckeditor5-react": "npm:6.2.0"
     "@dagrejs/dagre": "npm:1.1.2"
     "@emotion/react": "npm:11.11.4"

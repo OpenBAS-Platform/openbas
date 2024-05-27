@@ -73,7 +73,7 @@
     "zod": "3.23.8"
   },
   "devDependencies": {
-    "@babel/plugin-transform-modules-commonjs": "7.24.1",
+    "@babel/plugin-transform-modules-commonjs": "7.24.6",
     "@eslint/eslintrc": "3.1.0",
     "@eslint/js": "8.57.0",
     "@playwright/test": "1.44.0",
