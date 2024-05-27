@@ -2,6 +2,7 @@ package io.openbas.rest.asset_group;
 
 import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.AssetGroup;
+import io.openbas.database.raw.RawPaginationAssetGroup;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.asset_group.form.AssetGroupInput;
@@ -49,12 +50,14 @@ public class AssetGroupApi {
 
   @PostMapping(ASSET_GROUP_URI + "/search")
   @PreAuthorize("isObserver()")
-  public Page<AssetGroup> assetGroups(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+  public Page<RawPaginationAssetGroup> assetGroups(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
         this.assetGroupRepository::findAll,
         searchPaginationInput,
         AssetGroup.class
-    );
+    )
+        .map(this.assetGroupService::computeDynamicAssets)
+        .map(RawPaginationAssetGroup::new);
   }
 
   @GetMapping(ASSET_GROUP_URI + "/{assetGroupId}")

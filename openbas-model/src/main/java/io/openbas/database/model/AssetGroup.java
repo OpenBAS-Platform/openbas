@@ -25,6 +25,15 @@ import static lombok.AccessLevel.NONE;
 @Entity
 @Table(name = "asset_groups")
 @EntityListeners(ModelBaseListener.class)
+@NamedEntityGraphs({
+    @NamedEntityGraph(
+        name = "AssetGroup.tags-assets",
+        attributeNodes = {
+            @NamedAttributeNode("tags"),
+            @NamedAttributeNode("assets")
+        }
+    )
+})
 public class AssetGroup implements Base {
 
   @Id

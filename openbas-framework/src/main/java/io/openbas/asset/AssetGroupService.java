@@ -3,7 +3,6 @@ package io.openbas.asset;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Filters;
 import io.openbas.database.repository.AssetGroupRepository;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -102,11 +101,10 @@ public class AssetGroupService {
         return assetGroups;
     }
 
-    private AssetGroup computeDynamicAssets(@NotNull final AssetGroup assetGroup) {
+    public AssetGroup computeDynamicAssets(@NotNull final AssetGroup assetGroup) {
         if (isEmptyFilterGroup(assetGroup.getDynamicFilter())) {
             return assetGroup;
         }
-        // TODO update specification to remove the post-filtering
         Specification<Endpoint> specification = computeFilterGroupJpa(assetGroup.getDynamicFilter());
         List<Asset> assets = this.endpointService.endpoints(specification)
                 .stream()

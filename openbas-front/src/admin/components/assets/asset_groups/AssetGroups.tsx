@@ -18,6 +18,9 @@ import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { SearchPaginationInput } from '../../../../utils/api-types';
 import { initSorting } from '../../../../components/common/pagination/Page';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { fetchTags } from '../../../../actions/Tag';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -70,6 +73,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 const AssetGroups = () => {
   // Standard hooks
   const classes = useStyles();
+  const dispatch = useAppDispatch();
   const { t } = useFormatter();
 
   const [selected, setSelected] = useState<AssetGroupStore | undefined>(undefined);
@@ -83,6 +87,10 @@ const AssetGroups = () => {
   const { userAdmin } = useHelper((helper: EndpointHelper & UserHelper & TagHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
+
+  useDataLoader(() => {
+    dispatch(fetchTags());
+  });
 
   // Headers
   const headers = [
