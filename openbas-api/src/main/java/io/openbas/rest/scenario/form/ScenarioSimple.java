@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Tag;
 import io.openbas.database.raw.RawScenario;
-import io.openbas.helper.MultiIdListDeserializer;
+import io.openbas.helper.MultiIdSetDeserializer;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
@@ -26,7 +26,7 @@ public class ScenarioSimple {
   @JsonProperty("scenario_subtitle")
   private String subtitle;
 
-  @JsonSerialize(using = MultiIdListDeserializer.class)
+  @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("scenario_tags")
   private Set<Tag> tags = new HashSet<>();
 

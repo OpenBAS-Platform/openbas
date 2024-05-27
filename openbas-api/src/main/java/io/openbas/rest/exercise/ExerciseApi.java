@@ -39,12 +39,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -536,7 +534,8 @@ public class ExerciseApi extends RestBehavior {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     exercise.setUpdatedAt(now());
     Document doc = documentRepository.findById(documentId).orElseThrow(ElementNotFoundException::new);
-    List<Exercise> docExercises = doc.getExercises().stream().filter(ex -> !ex.getId().equals(exerciseId)).toList();
+    Set<Exercise> docExercises = doc.getExercises().stream().filter(ex -> !ex.getId().equals(exerciseId))
+        .collect(Collectors.toSet());
     if (docExercises.isEmpty()) {
       // Document is no longer associate to any exercise, delete it
       documentRepository.delete(doc);

@@ -1,15 +1,18 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Document;
-
 import io.openbas.database.raw.RawDocument;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,4 +67,9 @@ public interface DocumentRepository extends CrudRepository<Document, String>, Jp
             "order by d.document_id desc ", nativeQuery = true)
     List<RawDocument> rawAllDocumentsByAccessLevel(@Param("userId") String userId);
 
+    // -- PAGINATION --
+
+    @NotNull
+    @EntityGraph(value = "Document.tags-scenarios-exercises", type = EntityGraph.EntityGraphType.LOAD)
+    Page<Document> findAll(@NotNull Specification<Document> spec, @NotNull Pageable pageable);
 }

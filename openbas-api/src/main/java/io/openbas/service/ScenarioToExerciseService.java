@@ -293,7 +293,7 @@ public class ScenarioToExerciseService {
             try {
                 Document destDocument = new Document();
                 BeanUtils.copyProperties(destDocument, origDocument);
-                List<Exercise> exercises = destDocument.getExercises();
+                Set<Exercise> exercises = destDocument.getExercises();
                 exercises.add(exercise);
                 destDocument.setExercises(exercises);
                 destDocuments.add(destDocument);

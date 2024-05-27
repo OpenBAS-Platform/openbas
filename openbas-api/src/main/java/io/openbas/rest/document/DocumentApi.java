@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawDocument;
+import io.openbas.database.raw.RawPaginationDocument;
 import io.openbas.database.repository.*;
 import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.rest.document.form.DocumentCreateInput;
@@ -129,24 +130,16 @@ public class DocumentApi extends RestBehavior {
             Document document = targetDocument.get();
             // Compute exercises
             if (!document.getExercises().isEmpty()) {
-                List<Exercise> exercises = new ArrayList<>(document.getExercises());
+                Set<Exercise> exercises = new HashSet<>(document.getExercises());
                 List<Exercise> inputExercises = fromIterable(exerciseRepository.findAllById(input.getExerciseIds()));
-                inputExercises.forEach(inputExercise -> {
-                    if (!exercises.contains(inputExercise)) {
-                        exercises.add(inputExercise);
-                    }
-                });
+                exercises.addAll(inputExercises);
                 document.setExercises(exercises);
             }
             // Compute scenarios
             if (!document.getScenarios().isEmpty()) {
-                List<Scenario> scenarios = new ArrayList<>(document.getScenarios());
+                Set<Scenario> scenarios = new HashSet<>(document.getScenarios());
                 List<Scenario> inputScenarios = fromIterable(scenarioRepository.findAllById(input.getScenarioIds()));
-                inputScenarios.forEach(inputScenario -> {
-                    if (!scenarios.contains(inputScenario)) {
-                        scenarios.add(inputScenario);
-                    }
-                });
+                scenarios.addAll(inputScenarios);
                 document.setScenarios(scenarios);
             }
             // Compute tags
@@ -162,10 +155,10 @@ public class DocumentApi extends RestBehavior {
             document.setName(file.getOriginalFilename());
             document.setDescription(input.getDescription());
             if (!input.getExerciseIds().isEmpty()) {
-                document.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
+                document.setExercises(iterableToSet(exerciseRepository.findAllById(input.getExerciseIds())));
             }
             if (!input.getScenarioIds().isEmpty()) {
-                document.setScenarios(fromIterable(scenarioRepository.findAllById(input.getScenarioIds())));
+                document.setScenarios(iterableToSet(scenarioRepository.findAllById(input.getScenarioIds())));
             }
             document.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
             document.setType(file.getContentType());
@@ -184,7 +177,7 @@ public class DocumentApi extends RestBehavior {
     }
 
     @PostMapping("/api/documents/search")
-    public Page<Document> searchDocuments(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    public Page<RawPaginationDocument> searchDocuments(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
         OpenBASPrincipal user = currentUser();
         if (user.isAdmin()) {
             return buildPaginationJPA(
@@ -192,7 +185,7 @@ public class DocumentApi extends RestBehavior {
                             specification, pageable),
                     searchPaginationInput,
                     Document.class
-            );
+            ).map(RawPaginationDocument::new);
         } else {
             return buildPaginationJPA(
                 (Specification<Document> specification, Pageable pageable) -> this.documentRepository.findAll(
@@ -201,7 +194,7 @@ public class DocumentApi extends RestBehavior {
                 ),
                 searchPaginationInput,
                 Document.class
-            );
+            ).map(RawPaginationDocument::new);
         }
     }
 
@@ -239,7 +232,7 @@ public class DocumentApi extends RestBehavior {
         List<String> askExerciseIds = Stream.concat(askExerciseIdsStream, input.getExerciseIds().stream()).distinct().toList();
         List<Exercise> removedExercises = document.getExercises().stream()
                 .filter(exercise -> !askExerciseIds.contains(exercise.getId())).toList();
-        document.setExercises(fromIterable(exerciseRepository.findAllById(askExerciseIds)));
+        document.setExercises(iterableToSet(exerciseRepository.findAllById(askExerciseIds)));
         // In case of exercise removal, all inject doc attachment for exercise
         removedExercises.forEach(exercise -> injectService.cleanInjectsDocExercise(exercise.getId(), documentId));
 
@@ -250,7 +243,7 @@ public class DocumentApi extends RestBehavior {
         List<String> askScenarioIds = Stream.concat(askScenarioIdsStream, input.getScenarioIds().stream()).distinct().toList();
         List<Scenario> removedScenarios = document.getScenarios().stream()
                 .filter(scenario -> !askScenarioIds.contains(scenario.getId())).toList();
-        document.setScenarios(fromIterable(scenarioRepository.findAllById(askScenarioIds)));
+        document.setScenarios(iterableToSet(scenarioRepository.findAllById(askScenarioIds)));
         // In case of scenario removal, all inject doc attachment for scenario
         removedScenarios.forEach(scenario -> injectService.cleanInjectsDocScenario(scenario.getId(), documentId));
 

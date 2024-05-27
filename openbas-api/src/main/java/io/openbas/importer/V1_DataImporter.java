@@ -347,18 +347,14 @@ public class V1_DataImporter implements Importer {
           Document document = targetDocument.get();
           // Compute exercises
           if (savedExercise != null) {
-            List<Exercise> exercises = new ArrayList<>(document.getExercises());
-            if (!exercises.contains(savedExercise)) {
-              exercises.add(savedExercise);
-            }
+            Set<Exercise> exercises = new HashSet<>(document.getExercises());
+            exercises.add(savedExercise);
             document.setExercises(exercises);
           }
           // Compute scenario
           else if (savedScenario != null) {
-            List<Scenario> scenarios = new ArrayList<>(document.getScenarios());
-            if (!scenarios.contains(savedScenario)) {
-              scenarios.add(savedScenario);
-            }
+            Set<Scenario> scenarios = new HashSet<>(document.getScenarios());
+            scenarios.add(savedScenario);
             document.setScenarios(scenarios);
           }
           // Compute tags
@@ -376,9 +372,9 @@ public class V1_DataImporter implements Importer {
           document.setName(name);
           document.setDescription(description);
           if (savedExercise != null) {
-            document.setExercises(List.of(savedExercise));
+            document.setExercises(Set.of(savedExercise));
           } else if (savedScenario != null) {
-            document.setScenarios(List.of(savedScenario));
+            document.setScenarios(Set.of(savedScenario));
           }
           document.setTags(iterableToSet(tagRepository.findAllById(documentTagIds)));
           document.setType(contentType);

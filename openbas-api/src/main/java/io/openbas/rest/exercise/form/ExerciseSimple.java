@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Tag;
-import io.openbas.helper.MultiIdListDeserializer;
+import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper;
 import jakarta.persistence.EnumType;
@@ -49,7 +49,7 @@ public class ExerciseSimple {
   @JsonProperty("exercise_start_date")
   private Instant start;
 
-  @JsonSerialize(using = MultiIdListDeserializer.class)
+  @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("exercise_tags")
   private Set<Tag> tags = new HashSet<>();
 
