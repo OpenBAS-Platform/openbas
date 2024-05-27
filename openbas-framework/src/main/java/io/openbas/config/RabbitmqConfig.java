@@ -25,6 +25,9 @@ public class RabbitmqConfig {
   @JsonProperty("rabbitmq_port")
   private int port;
 
+  @JsonProperty("rabbitmq_management-port")
+  private int managementPort;
+
   @JsonProperty("rabbitmq_user")
   private String user;
 
