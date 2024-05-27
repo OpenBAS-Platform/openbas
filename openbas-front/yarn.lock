@@ -5350,9 +5350,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"apexcharts@npm:3.48.0":
-  version: 3.48.0
-  resolution: "apexcharts@npm:3.48.0"
+"apexcharts@npm:3.49.1":
+  version: 3.49.1
+  resolution: "apexcharts@npm:3.49.1"
   dependencies:
     "@yr/monotone-cubic-spline": "npm:^1.0.3"
     svg.draggable.js: "npm:^2.2.2"
@@ -5361,7 +5361,7 @@ __metadata:
     svg.pathmorphing.js: "npm:^0.1.3"
     svg.resize.js: "npm:^1.4.3"
     svg.select.js: "npm:^3.0.1"
-  checksum: 10c0/8c254354820055fb3247fb206748f14761f0447dd6a75581a320a43b2174ee407f1477f6c303dda39e49c7246f7cf25add112ec7fe706ef7ca5abdd6d49a8417
+  checksum: 10c0/0f3d9d51496f6a4c22ddd6ef6d29a6e13e1b2a320996347f92dd0d6ea4b452999647b451c4fff217bb4d4462ed118bf7a5f563880cd0f8840573c4e06c095546
   languageName: node
   linkType: hard
 
@@ -11852,7 +11852,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:7.10.0"
     "@uiw/react-md-editor": "npm:4.0.4"
     "@vitejs/plugin-react": "npm:4.3.0"
-    apexcharts: "npm:3.48.0"
+    apexcharts: "npm:3.49.1"
     axios: "npm:1.6.8"
     chokidar: "npm:3.6.0"
     ckeditor5-custom-build: "link:packages/ckeditor5-custom-build"
