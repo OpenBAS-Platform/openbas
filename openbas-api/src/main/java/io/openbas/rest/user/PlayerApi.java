@@ -3,6 +3,7 @@ package io.openbas.rest.user;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.SessionManager;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawPlayer;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
@@ -79,18 +80,18 @@ public class PlayerApi extends RestBehavior {
   @GetMapping("/api/players")
   @Transactional(rollbackOn = Exception.class)
   @PreAuthorize("isObserver()")
-  public Iterable<User> players() {
-    List<User> players;
+  public Iterable<RawPlayer> players() {
+    List<RawPlayer> players;
     OpenBASPrincipal currentUser = currentUser();
     if (currentUser.isAdmin()) {
-      players = fromIterable(userRepository.findAll());
+      players = fromIterable(userRepository.rawAllPlayers());
     } else {
       User local = userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
       List<String> organizationIds = local.getGroups().stream()
           .flatMap(group -> group.getOrganizations().stream())
           .map(Organization::getId)
           .toList();
-      players = userRepository.usersAccessibleFromOrganizations(organizationIds);
+      players = userRepository.rawPlayersAccessibleFromOrganizations(organizationIds);
     }
     return players;
   }

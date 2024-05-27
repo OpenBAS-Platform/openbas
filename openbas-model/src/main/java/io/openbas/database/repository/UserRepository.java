@@ -1,17 +1,19 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.User;
+import io.openbas.database.raw.RawPlayer;
 import io.openbas.database.raw.RawUser;
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, String>, JpaSpecificationExecutor<User>,
@@ -23,9 +25,6 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
   Optional<User> findByEmailIgnoreCase(String email);
 
   List<User> findAllByEmailInIgnoreCase(List<String> emails);
-
-  @Query("select user from User user where user.organization is null or user.organization.id in :organizationIds")
-  List<User> usersAccessibleFromOrganizations(@Param("organizationIds") List<String> organizationIds);
 
   @Override
   @Query("select count(distinct u) from User u " +
@@ -66,4 +65,17 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
       + "       left join tags tg on usr_tg.tag_id = tg.tag_id"
       + "      group by us.user_id;", nativeQuery = true)
   List<RawUser> rawAll();
+
+  @Query(value = "select us.user_id, us.user_email, " +
+          "us.user_firstname, us.user_lastname, " +
+          "us.user_country, us.user_organization," +
+          "array_remove(array_agg(tg.tag_id), NULL) as user_tags " +
+          "from USERS us " +
+          "left join users_tags usr_tg on us.user_id = usr_tg.user_id " +
+          "left join tags tg on usr_tg.tag_id = tg.tag_id " +
+          "group by us.user_id;", nativeQuery = true)
+  List<RawPlayer> rawAllPlayers();
+
+  @Query(value = "select us from users us where us.user_organization is null or us.user_organization in :organizationIds", nativeQuery = true)
+  List<RawPlayer> rawPlayersAccessibleFromOrganizations(@Param("organizationIds") List<String> organizationIds);
 }
