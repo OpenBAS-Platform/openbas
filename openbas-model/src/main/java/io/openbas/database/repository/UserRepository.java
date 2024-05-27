@@ -54,9 +54,9 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
   );
 
   @Query(value = "select us.*, "
-      + "       array_remove(array_agg(tg.tag_id), NULL) as user_tags,"
-      + "       array_remove(array_agg(grp.group_id), NULL) as user_groups,"
-      + "       array_remove(array_agg(tm.team_id), NULL) as user_teams from USERS us"
+      + "       array_remove(array_agg(tg.tag_id), null) as user_tags,"
+      + "       array_remove(array_agg(grp.group_id), null) as user_groups,"
+      + "       array_remove(array_agg(tm.team_id), null) as user_teams from users us"
       + "       left join users_groups usr_grp on us.user_id = usr_grp.user_id"
       + "       left join groups grp on usr_grp.group_id = grp.group_id"
       + "       left join users_teams usr_tm on us.user_id = usr_tm.user_id"
@@ -69,8 +69,8 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
   @Query(value = "select us.user_id, us.user_email, " +
           "us.user_firstname, us.user_lastname, " +
           "us.user_country, us.user_organization," +
-          "array_remove(array_agg(tg.tag_id), NULL) as user_tags " +
-          "from USERS us " +
+          "array_remove(array_agg(tg.tag_id), null) as user_tags " +
+          "from users us " +
           "left join users_tags usr_tg on us.user_id = usr_tg.user_id " +
           "left join tags tg on usr_tg.tag_id = tg.tag_id " +
           "group by us.user_id;", nativeQuery = true)
