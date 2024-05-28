@@ -1,7 +1,7 @@
-package io.openbas.collectors.fake_detector;
+package io.openbas.collectors.expectations_expiration_manager;
 
-import io.openbas.collectors.fake_detector.config.CollectorFakeDetectorConfig;
-import io.openbas.collectors.fake_detector.service.FakeDetectorService;
+import io.openbas.collectors.expectations_expiration_manager.config.ExpectationsExpirationManagerConfig;
+import io.openbas.collectors.expectations_expiration_manager.service.ExpectationsExpirationManagerService;
 import io.openbas.integrations.CollectorService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +11,13 @@ import java.util.logging.Level;
 
 @Service
 @Log
-public class FakeDetectorJob implements Runnable {
+public class ExpectationsExpirationManagerJob implements Runnable {
   private static final String FAKE_DETECTOR_COLLECTOR_TYPE = "openbas_fake_detector";
-  private static final String FAKE_DETECTOR_COLLECTOR_NAME = "OpenBAS Fake Detector";
-  private final FakeDetectorService fakeDetectorService;
+  private static final String FAKE_DETECTOR_COLLECTOR_NAME = "Expectations Expiration Manager";
+  private final ExpectationsExpirationManagerService fakeDetectorService;
 
   @Autowired
-  public FakeDetectorJob(CollectorService collectorService, CollectorFakeDetectorConfig config, FakeDetectorService fakeDetectorService) {
+  public ExpectationsExpirationManagerJob(CollectorService collectorService, ExpectationsExpirationManagerConfig config, ExpectationsExpirationManagerService fakeDetectorService) {
     this.fakeDetectorService = fakeDetectorService;
     try {
       collectorService.register(config.getId(), FAKE_DETECTOR_COLLECTOR_TYPE, FAKE_DETECTOR_COLLECTOR_NAME, getClass().getResourceAsStream("/img/icon-fake-detector.png"));

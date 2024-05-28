@@ -68,6 +68,8 @@ const computeStatusStyle = (status: string | undefined | null) => {
     case 'Not Prevented':
     case 'Not Detected':
       return inlineStyles.red;
+    case 'Prevented':
+    case 'Detected':
     case 'SUCCESS':
       return inlineStyles.green;
     default:

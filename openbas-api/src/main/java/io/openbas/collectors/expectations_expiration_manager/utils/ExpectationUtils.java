@@ -1,4 +1,4 @@
-package io.openbas.collectors.sentinel.utils;
+package io.openbas.collectors.expectations_expiration_manager.utils;
 
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;

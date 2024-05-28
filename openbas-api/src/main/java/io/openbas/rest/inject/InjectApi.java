@@ -81,8 +81,6 @@ public class InjectApi extends RestBehavior {
     private ScenarioService scenarioService;
     private InjectService injectService;
     private AtomicTestingService atomicTestingService;
-    private InjectExpectationService injectExpectationService;
-    private CollectorRepository collectorRepository;
 
     @Resource
     protected ObjectMapper mapper;
@@ -165,16 +163,6 @@ public class InjectApi extends RestBehavior {
     @Autowired
     public void setExecutionContextService(@NotNull final ExecutionContextService executionContextService) {
         this.executionContextService = executionContextService;
-    }
-
-    @Autowired
-    public void setInjectExpectationService(final InjectExpectationService injectExpectationService) {
-        this.injectExpectationService = injectExpectationService;
-    }
-
-    @Autowired
-    public void setCollectorRepository(CollectorRepository collectorRepository) {
-        this.collectorRepository = collectorRepository;
     }
 
     // -- INJECTS --
@@ -432,58 +420,6 @@ public class InjectApi extends RestBehavior {
                 .limit(size.orElse(MAX_NEXT_INJECTS))
                 // Collect the result
                 .toList();
-    }
-
-    // -- EXPECTATIONS --
-
-    @GetMapping("/api/injects/expectations")
-    public List<InjectExpectation> getInjectExpectationsNotFilled() {
-        return Stream.concat(
-                injectExpectationService.manualExpectationsNotFill().stream(),
-                Stream.concat(
-                        injectExpectationService.preventionExpectationsNotFill().stream(),
-                        injectExpectationService.detectionExpectationsNotFill().stream()
-                )
-        ).toList();
-    }
-
-    @GetMapping("/api/injects/expectations/{sourceId}")
-    public List<InjectExpectation> getInjectExpectationsNotFilledForSource(@PathVariable String sourceId) {
-        return Stream.concat(
-                injectExpectationService.manualExpectationsNotFill(sourceId).stream(),
-                Stream.concat(
-                        injectExpectationService.preventionExpectationsNotFill(sourceId).stream(),
-                        injectExpectationService.detectionExpectationsNotFill(sourceId).stream()
-                )
-        ).toList();
-    }
-
-    @GetMapping("/api/injects/expectations/prevention")
-    public List<InjectExpectation> getInjectPreventionExpectationsNotFilled() {
-        return injectExpectationService.preventionExpectationsNotFill().stream().toList();
-    }
-
-    @GetMapping("/api/injects/expectations/prevention/{sourceId}")
-    public List<InjectExpectation> getInjectPreventionExpectationsNotFilledForSource(@PathVariable String sourceId) {
-        return injectExpectationService.preventionExpectationsNotFill(sourceId).stream().toList();
-    }
-
-    @GetMapping("/api/injects/expectations/detection")
-    public List<InjectExpectation> getInjectDetectionExpectationsNotFilled() {
-        return injectExpectationService.detectionExpectationsNotFill().stream().toList();
-    }
-
-    @GetMapping("/api/injects/expectations/detection/{sourceId}")
-    public List<InjectExpectation> getInjectDetectionExpectationsNotFilledForSource(@PathVariable String sourceId) {
-        return injectExpectationService.detectionExpectationsNotFill(sourceId).stream().toList();
-    }
-    
-    @Transactional(rollbackOn = Exception.class)
-    @PutMapping("/api/injects/expectations/{expectationId}")
-    public InjectExpectation updateInjectExpectation(@PathVariable @NotBlank final String expectationId, @Valid @RequestBody @NotNull InjectExpectationUpdateInput input) {
-        InjectExpectation injectExpectation = this.injectExpectationService.findInjectExpectation(expectationId).orElseThrow();
-        Collector collector = this.collectorRepository.findById(input.getCollectorId()).orElseThrow();
-        return this.injectExpectationService.computeExpectation(injectExpectation, collector.getId(), collector.getName(), input.getResult(), input.getSuccess());
     }
 
     // -- SCENARIOS --
