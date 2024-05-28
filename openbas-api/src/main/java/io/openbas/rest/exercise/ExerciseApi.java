@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Exercise.STATUS;
+import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.*;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -39,12 +40,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -99,6 +100,10 @@ public class ExerciseApi extends RestBehavior {
   private LessonsQuestionRepository lessonsQuestionRepository;
   private LessonsAnswerRepository lessonsAnswerRepository;
   private InjectStatusRepository injectStatusRepository;
+  private InjectRepository injectRepository;
+  private InjectExpectationRepository injectExpectationRepository;
+  private AssetGroupRepository assetGroupRepository;
+  private AssetRepository assetRepository;
   // endregion
 
   // region services
@@ -114,6 +119,26 @@ public class ExerciseApi extends RestBehavior {
   @Autowired
   public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
     this.injectStatusRepository = injectStatusRepository;
+  }
+
+  @Autowired
+  public void setInjectRepository(InjectRepository injectRepository) {
+    this.injectRepository = injectRepository;
+  }
+
+  @Autowired
+  public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
+    this.injectExpectationRepository = injectExpectationRepository;
+  }
+
+  @Autowired
+  public void setAssetGroupRepository(AssetGroupRepository assetGroupRepository) {
+    this.assetGroupRepository = assetGroupRepository;
+  }
+
+  @Autowired
+  public void setAssetRepository(AssetRepository assetRepository) {
+    this.assetRepository = assetRepository;
   }
 
   @Autowired
@@ -618,9 +643,91 @@ public class ExerciseApi extends RestBehavior {
 
   @GetMapping("/api/exercises")
   public List<ExerciseSimple> exercises() {
-    Iterable<Exercise> exercises = currentUser().isAdmin() ? exerciseRepository.findAll()
-        : exerciseRepository.findAllGranted(currentUser().getId());
-    return fromIterable(exercises).stream().map(ExerciseSimple::fromExercise).toList();
+      // We get the exercises depending on whether or not we are granted
+      Iterable<RawExercise> exercises = currentUser().isAdmin() ? exerciseRepository.rawAll()
+              : exerciseRepository.rawAllGranted(currentUser().getId());
+
+      // From the list of exercises, we get the list of the injects ids
+      List<String> listOfInjectIds = fromIterable(exercises).stream()
+              .filter(exercise -> exercise.getInject_ids() != null)
+              .flatMap(exercise -> exercise.getInject_ids().stream())
+              .distinct()
+              .toList();
+
+      // We get the injects corresponding linked to the exercises
+      List<Inject> listOfInjects = new ArrayList<>();
+      List<RawInject> listOfRawInjects = injectRepository.findRawByIds(listOfInjectIds);
+
+      // From the list of injects, we get all the inject expectationsIds that we then
+      // get and put into a map with the expections ids as key
+      Map<String, RawInjectExpectation> mapOfInjectsExpectations = injectExpectationRepository.rawByIds(
+              listOfRawInjects.stream().flatMap(rawInject -> rawInject.getInject_expectations().stream()).toList()
+      ).stream().collect(Collectors.toMap(RawInjectExpectation::getInject_expectation_id, Function.identity()));
+
+      // We get the asset groups from the injects AND the injects expectations as those can also have asset groups
+      // We then make a map out of it for faster access
+      Map<String, RawAssetGroup> mapOfAssetGroups = assetGroupRepository
+              .rawAssetGroupByIds(
+                      Stream.concat(
+                                      mapOfInjectsExpectations.values().stream()
+                                              .map(RawInjectExpectation::getAsset_group_id)
+                                              .filter(Objects::nonNull),
+                                      listOfRawInjects.stream()
+                                              .map(RawInject::getAsset_group_id)
+                                              .filter(Objects::nonNull))
+                              .toList()).stream()
+              .collect(Collectors.toMap(RawAssetGroup::getAsset_group_id, Function.identity()));
+
+      // We get all the assets that are
+      // 1 - linked to an inject
+      // 2 - linked to an asset group linked to an inject
+      // 3 - linked to an inject expectation
+      // 4 - linked to an asset group linked to an inject expectations
+      // We then make a map out of it
+      Map<String, RawAsset> mapOfAssets = assetRepository
+              .rawByIds(listOfRawInjects.stream().flatMap(rawInject -> {
+                  return Stream.concat(Stream.concat(
+                                  rawInject.getInject_asset_groups().stream()
+                                          .flatMap(assetGroup -> mapOfAssetGroups.get(assetGroup).getAsset_ids().stream()),
+                                  rawInject.getInject_assets().stream()
+                          ), Stream.concat(
+                                  rawInject.getInject_expectations().stream()
+                                          .map(mapOfInjectsExpectations::get)
+                                          .map(RawInjectExpectation::getAsset_id),
+                                  rawInject.getInject_expectations().stream()
+                                          .map(mapOfInjectsExpectations::get)
+                                          .flatMap(injectExpectation -> injectExpectation.getAsset_group_id() != null ? mapOfAssetGroups.get(injectExpectation.getAsset_group_id()).getAsset_ids().stream() : Stream.empty()))
+                  );
+              }).filter(Objects::nonNull).toList()).stream()
+              .collect(Collectors.toMap(RawAsset::getAsset_id, Function.identity()));
+
+      // We get all the teams that are linked to an inject or an asset group
+      // Then we make a map out of it for faster access
+      Map<String, RawTeam> mapOfRawTeamsById = teamRepository.rawTeamByIds(listOfRawInjects.stream()
+              .flatMap(
+                      rawInject -> Stream.concat(
+                              rawInject.getInject_teams().stream(),
+                              rawInject.getInject_expectations().stream().map(expectationId -> mapOfInjectsExpectations.get(expectationId).getTeam_id())
+                      ).filter(Objects::nonNull)
+              ).distinct().toList()).stream().collect(Collectors.toMap(RawTeam::getTeam_id, Function.identity()));
+
+      // Once we have all of this, we create an Inject for each InjectRaw that we have using all the Raw objects we got
+      // Then we make a map out of it for faster access
+      listOfRawInjects.stream().map((inject) -> Inject.fromRawInject(inject, mapOfRawTeamsById, mapOfInjectsExpectations, mapOfAssetGroups, mapOfAssets)).forEach(listOfInjects::add);
+      Map<String, Inject> mapOfInjectsById = listOfInjects.stream().collect(Collectors.toMap(Inject::getId, Function.identity()));
+
+      // Finally, for all exercices we got, we convert them to classic exercises with the injects we created
+      return fromIterable(exercises).stream().map(currentExercice -> {
+          // We make a list out of all the injects that are linked to the exercise
+          List<Inject> listOfInjectsOfExercise = new ArrayList<>();
+          if (currentExercice.getInject_ids() != null) {
+              listOfInjectsOfExercise = currentExercice.getInject_ids().stream().map(mapOfInjectsById::get).collect(Collectors.toList());
+          }
+
+          // We create a new exercise out of the Raw object
+          return ExerciseSimple.fromRawExercise(currentExercice,
+                  listOfInjectsOfExercise);
+      }).toList();
   }
 
   @PostMapping("/api/exercises/search")
