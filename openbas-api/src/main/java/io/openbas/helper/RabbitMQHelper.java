@@ -1,13 +1,13 @@
 package io.openbas.helper;
 
-import io.openbas.config.AppSecurityConfig;
-import io.openbas.config.OpenBASConfig;
 import io.openbas.config.RabbitmqConfig;
 import org.springframework.boot.json.BasicJsonParser;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +26,10 @@ public class RabbitMQHelper {
     public static String getRabbitMQVersion(RabbitmqConfig rabbitmqConfig) {
         // If we already have the version, we don't need to get it again
         if (rabbitMQVersion == null) {
-            RestTemplate restTemplate = new RestTemplate();
+            RestTemplate restTemplate = new RestTemplateBuilder()
+               .setConnectTimeout(Duration.ofSeconds(2))
+               .setReadTimeout(Duration.ofSeconds(2))
+               .build();
             // Init the rabbit MQ management api overview url
             String uri = rabbitmqConfig.isSsl() ? "https://" : "http://"
                     + rabbitmqConfig.getHostname() + ":" + rabbitmqConfig.getManagementPort()
