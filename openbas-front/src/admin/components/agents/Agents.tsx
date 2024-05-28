@@ -150,7 +150,7 @@ mkdir -p ${agentFolder ?? '/opt/openbas'};
 curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${agentFolder ?? '/opt/openbas'}/obas;
 chmod +x ${agentFolder ?? '/opt/openbas'}/obas;
 nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
-          code: `server="${settings.executor_caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas'};curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${agentFolder ?? '/usr/bin'}/obas;chmod +x ${agentFolder ?? '/usr/bin'}/obas;nohup ${agentFolder ?? '/usr/bin'}/obas -server $server -group red &`,
+          code: `server="${settings.executor_caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas'};curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${agentFolder ?? '/opt/openbas'}/obas;chmod +x ${agentFolder ?? '/opt/openbas'}/obas;nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
         };
       case 'macos':
         return {
@@ -164,7 +164,7 @@ mkdir -p ${agentFolder ?? '/opt/openbas'};
 curl -s -X POST -H "file:sandcat.go" -H "platform:darwin" -H "architecture:${arch}" $server/file/download > ${agentFolder ?? '/opt/openbas'}/obas;
 chmod +x ${agentFolder ?? '/opt/openbas'}/obas;
 nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
-          code: `server="${settings.executor_caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas'};curl -s -X POST -H "file:sandcat.go" -H "platform:darwin" -H "architecture:${arch}" $server/file/download > ${agentFolder ?? '/usr/bin'}/obas;chmod +x ${agentFolder ?? '/usr/bin'}/obas;nohup ${agentFolder ?? '/usr/bin'}/obas -server $server -group red &`,
+          code: `server="${settings.executor_caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas'};curl -s -X POST -H "file:sandcat.go" -H "platform:darwin" -H "architecture:${arch}" $server/file/download > ${agentFolder ?? '/opt/openbas'}/obas;chmod +x ${agentFolder ?? '/opt/openbas'}/obas;nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
         };
       default:
         return {
@@ -178,7 +178,7 @@ mkdir -p ${agentFolder ?? '/opt/openbas'};
 curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${agentFolder ?? '/opt/openbas'}/obas;
 chmod +x ${agentFolder ?? '/opt/openbas'}/obas;
 nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
-          code: `server="${settings.executor_caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas'};curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${agentFolder ?? '/usr/bin'}/obas;chmod +x ${agentFolder ?? '/usr/bin'}/obas;nohup ${agentFolder ?? '/usr/bin'}/obas -server $server -group red &`,
+          code: `server="${settings.executor_caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas'};curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${agentFolder ?? '/opt/openbas'}/obas;chmod +x ${agentFolder ?? '/opt/openbas'}/obas;nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
         };
     }
   };
