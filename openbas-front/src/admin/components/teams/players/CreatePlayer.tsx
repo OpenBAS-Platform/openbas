@@ -8,7 +8,7 @@ import { useFormatter } from '../../../../components/i18n';
 import Dialog from '../../../../components/common/Dialog';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { Theme } from '../../../../components/Theme';
-import type { CreatePlayerInput } from '../../../../utils/api-types';
+import type { PlayerInput } from '../../../../utils/api-types';
 import { Option } from '../../../../utils/Option';
 import type { PlayerInputForm, UserStore } from './Player';
 
@@ -44,7 +44,7 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
   const handleClose = () => setOpenDialog(false);
 
   const onSubmit = (data: PlayerInputForm) => {
-    const inputValues: CreatePlayerInput = {
+    const inputValues: PlayerInput = {
       ...data,
       user_organization: data.user_organization?.id,
       user_country: data.user_country?.id,

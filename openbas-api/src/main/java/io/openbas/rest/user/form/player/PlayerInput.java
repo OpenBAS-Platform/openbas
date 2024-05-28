@@ -1,19 +1,22 @@
 package io.openbas.rest.user.form.player;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static io.openbas.config.AppConfig.EMAIL_FORMAT;
+import static io.openbas.config.AppConfig.PHONE_FORMAT;
 
 @Getter
 @Setter
-public class CreatePlayerInput {
+public class PlayerInput {
 
   @Email(message = EMAIL_FORMAT)
   @NotBlank
@@ -37,4 +40,15 @@ public class CreatePlayerInput {
 
   @JsonProperty("user_teams")
   private List<String> teamIds = new ArrayList<>();
+
+  @JsonProperty("user_phone")
+  @Pattern(regexp = "^\\+[\\d\\s\\-.()]+$", message = PHONE_FORMAT)
+  private String phone;
+
+  @JsonProperty("user_phone2")
+  @Pattern(regexp = "^\\+[\\d\\s\\-.()]+$", message = PHONE_FORMAT)
+  private String phone2;
+
+  @JsonProperty("user_pgp_key")
+  private String pgpKey;
 }

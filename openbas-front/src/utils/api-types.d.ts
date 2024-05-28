@@ -423,16 +423,6 @@ export interface Communication {
   updateAttributes?: object;
 }
 
-export interface CreatePlayerInput {
-  user_country?: string;
-  user_email: string;
-  user_firstname?: string;
-  user_lastname?: string;
-  user_organization?: string;
-  user_tags?: string[];
-  user_teams?: string[];
-}
-
 export interface CreateUserInput {
   user_admin?: boolean;
   user_email: string;
@@ -1923,6 +1913,21 @@ export interface PlatformStatistic {
   users_count?: StatisticElement;
 }
 
+export interface PlayerInput {
+  /** @pattern ^\+[\d\s\-.()]+$ */
+  user_phone2?: string;
+  user_country?: string;
+  user_email: string;
+  user_firstname?: string;
+  user_lastname?: string;
+  user_organization?: string;
+  user_pgp_key?: string;
+  /** @pattern ^\+[\d\s\-.()]+$ */
+  user_phone?: string;
+  user_tags?: string[];
+  user_teams?: string[];
+}
+
 export interface PropertySchemaDTO {
   schema_property_name: string;
   schema_property_type_array?: boolean;
@@ -2319,21 +2324,6 @@ export interface UpdateAssetsOnAssetGroupInput {
 export interface UpdateMePasswordInput {
   user_current_password: string;
   user_plain_password: string;
-}
-
-export interface UpdatePlayerInput {
-  /** @pattern ^\+[\d\s\-.()]+$ */
-  user_phone2?: string;
-  user_country?: string;
-  user_email: string;
-  user_firstname?: string;
-  user_lastname?: string;
-  user_organization?: string;
-  user_pgp_key?: string;
-  /** @pattern ^\+[\d\s\-.()]+$ */
-  user_phone?: string;
-  user_tags?: string[];
-  user_teams?: string[];
 }
 
 export interface UpdateProfileInput {
