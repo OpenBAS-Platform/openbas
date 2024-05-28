@@ -9,8 +9,6 @@ import io.openbas.database.raw.RawExercise;
 import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.utils.AtomicTestingMapper;
-import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
-import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.AtomicTestingUtils;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -91,9 +89,9 @@ public class ExerciseSimple {
           tag.setId(tagId);
           return tag;
         }
-      ).collect(Collectors.toList()));
+      ).collect(Collectors.toSet()));
     } else {
-      simple.setTags(new ArrayList<>());
+      simple.setTags(new HashSet<>());
     }
     simple.setCategory(exercise.getExercise_category());
     simple.setSubtitle(exercise.getExercise_subtitle());

@@ -14,7 +14,6 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
-import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.InjectResultDTO;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -45,7 +44,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static io.openbas.config.SessionHelper.currentUser;
