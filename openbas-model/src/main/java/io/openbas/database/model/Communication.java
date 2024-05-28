@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
-import io.openbas.helper.MultiIdDeserializer;
+import io.openbas.helper.MultiIdListDeserializer;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.annotations.Type;
@@ -70,7 +70,7 @@ public class Communication implements Base {
     @JoinTable(name = "communications_users",
             joinColumns = @JoinColumn(name = "communication_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonSerialize(using = MultiIdListDeserializer.class)
     @JsonProperty("communication_users")
     private List<User> users = new ArrayList<>();
 

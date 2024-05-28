@@ -219,7 +219,7 @@ public class FullTextSearchService<T extends Base> {
     @NotBlank
     private String name;
     private String description;
-    private List<Tag> tags;
+    private Set<Tag> tags;
     @NotBlank
     private String clazz;
 

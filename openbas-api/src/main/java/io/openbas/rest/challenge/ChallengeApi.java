@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
 @RestController
@@ -103,7 +104,7 @@ public class ChallengeApi extends RestBehavior {
       @PathVariable String challengeId,
       @Valid @RequestBody ChallengeUpdateInput input) {
     Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(ElementNotFoundException::new);
-    challenge.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+    challenge.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     challenge.setDocuments(fromIterable(documentRepository.findAllById(input.getDocumentIds())));
     challenge.setUpdateAttributes(input);
     challenge.setUpdatedAt(Instant.now());
@@ -129,7 +130,7 @@ public class ChallengeApi extends RestBehavior {
   public Challenge createChallenge(@Valid @RequestBody ChallengeCreateInput input) {
     Challenge challenge = new Challenge();
     challenge.setUpdateAttributes(input);
-    challenge.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+    challenge.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     challenge.setDocuments(fromIterable(documentRepository.findAllById(input.getDocumentIds())));
     List<ChallengeFlag> challengeFlags = input.getFlags().stream().map(flagInput -> {
       ChallengeFlag challengeFlag = new ChallengeFlag();

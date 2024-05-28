@@ -8,7 +8,7 @@ import io.hypersistence.utils.hibernate.type.basic.PostgreSQLHStoreType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
-import io.openbas.helper.MultiIdDeserializer;
+import io.openbas.helper.MultiIdListDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -81,7 +81,7 @@ public class InjectorContract implements Base {
     @JoinTable(name = "injectors_contracts_attack_patterns",
             joinColumns = @JoinColumn(name = "injector_contract_id"),
             inverseJoinColumns = @JoinColumn(name = "attack_pattern_id"))
-    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonSerialize(using = MultiIdListDeserializer.class)
     @JsonProperty("injector_contract_attack_patterns")
     @Queryable(searchable = true, filterable = true, property = "externalId")
     private List<AttackPattern> attackPatterns = new ArrayList<>();

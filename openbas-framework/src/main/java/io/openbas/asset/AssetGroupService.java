@@ -101,11 +101,10 @@ public class AssetGroupService {
         return assetGroups;
     }
 
-    private AssetGroup computeDynamicAssets(@NotNull final AssetGroup assetGroup) {
+    public AssetGroup computeDynamicAssets(@NotNull final AssetGroup assetGroup) {
         if (isEmptyFilterGroup(assetGroup.getDynamicFilter())) {
             return assetGroup;
         }
-        // TODO update specification to remove the post-filtering
         Specification<Endpoint> specification = computeFilterGroupJpa(assetGroup.getDynamicFilter());
         List<Asset> assets = this.endpointService.endpoints(specification)
                 .stream()

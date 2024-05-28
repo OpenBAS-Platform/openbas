@@ -3,7 +3,11 @@ package io.openbas.database.repository;
 import io.openbas.database.model.User;
 import io.openbas.database.raw.RawPlayer;
 import io.openbas.database.raw.RawUser;
-import jakarta.validation.constraints.NotNull;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -78,4 +82,10 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
 
   @Query(value = "select us from users us where us.user_organization is null or us.user_organization in :organizationIds", nativeQuery = true)
   List<RawPlayer> rawPlayersAccessibleFromOrganizations(@Param("organizationIds") List<String> organizationIds);
+
+  // -- PAGINATION --
+
+  @NotNull
+  @EntityGraph(value = "Player.tags-organization", type = EntityGraph.EntityGraphType.LOAD)
+  Page<User> findAll(@NotNull Specification<User> spec, @NotNull Pageable pageable);
 }

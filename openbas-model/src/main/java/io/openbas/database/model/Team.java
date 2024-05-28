@@ -5,22 +5,20 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
-import io.openbas.helper.MultiIdDeserializer;
+import io.openbas.helper.MultiIdListDeserializer;
+import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.time.Instant.now;
 
@@ -29,6 +27,12 @@ import static java.time.Instant.now;
 @Entity
 @Table(name = "teams")
 @EntityListeners(ModelBaseListener.class)
+@NamedEntityGraphs({
+    @NamedEntityGraph(
+        name = "Team.tags",
+        attributeNodes = @NamedAttributeNode("tags")
+    )
+})
 public class Team implements Base {
     @Id
     @Column(name = "team_id")
@@ -60,9 +64,9 @@ public class Team implements Base {
     @JoinTable(name = "teams_tags",
             joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonSerialize(using = MultiIdSetDeserializer.class)
     @JsonProperty("team_tags")
-    private List<Tag> tags = new ArrayList<>();
+    private Set<Tag> tags = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_organization")
@@ -74,7 +78,7 @@ public class Team implements Base {
     @JoinTable(name = "users_teams",
             joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonSerialize(using = MultiIdListDeserializer.class)
     @JsonProperty("team_users")
     private List<User> users = new ArrayList<>();
 
@@ -82,7 +86,7 @@ public class Team implements Base {
     @JoinTable(name = "exercises_teams",
             joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "exercise_id"))
-    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonSerialize(using = MultiIdListDeserializer.class)
     @JsonProperty("team_exercises")
     private List<Exercise> exercises = new ArrayList<>();
 
@@ -90,7 +94,7 @@ public class Team implements Base {
     @JoinTable(name = "scenarios_teams",
         joinColumns = @JoinColumn(name = "team_id"),
         inverseJoinColumns = @JoinColumn(name = "scenario_id"))
-    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonSerialize(using = MultiIdListDeserializer.class)
     @JsonProperty("team_scenarios")
     private List<Scenario> scenarios = new ArrayList<>();
 
@@ -110,7 +114,7 @@ public class Team implements Base {
 
     // region transient
     @JsonProperty("team_exercise_injects")
-    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonSerialize(using = MultiIdListDeserializer.class)
     public List<Inject> getExercisesInjects() {
         Predicate<Inject> selectedInject = inject -> inject.isAllTeams() || inject.getTeams().contains(this);
         return getExercises().stream().map(exercise -> exercise.getInjects().stream().filter(selectedInject).distinct().toList()).flatMap(List::stream).toList();
@@ -122,7 +126,7 @@ public class Team implements Base {
     }
 
     @JsonProperty("team_scenario_injects")
-    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonSerialize(using = MultiIdListDeserializer.class)
     public List<Inject> getScenariosInjects() {
         Predicate<Inject> selectedInject = inject -> inject.isAllTeams() || inject.getTeams().contains(this);
         return getScenarios().stream().map(scenario -> scenario.getInjects().stream().filter(selectedInject).distinct().toList()).flatMap(List::stream).toList();
@@ -134,7 +138,7 @@ public class Team implements Base {
     }
 
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
-    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonSerialize(using = MultiIdListDeserializer.class)
     @JsonProperty("team_inject_expectations")
     private List<InjectExpectation> injectExpectations = new ArrayList<>();
 

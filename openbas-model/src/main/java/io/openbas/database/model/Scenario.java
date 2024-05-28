@@ -6,12 +6,14 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.InjectStatisticsHelper;
-import io.openbas.helper.MultiIdDeserializer;
+import io.openbas.helper.MultiIdListDeserializer;
+import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lombok.Getter;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
@@ -21,11 +23,21 @@ import static io.openbas.database.model.Grant.GRANT_TYPE.OBSERVER;
 import static io.openbas.database.model.Grant.GRANT_TYPE.PLANNER;
 import static io.openbas.helper.UserHelper.getUsersByType;
 import static java.time.Instant.now;
+import static lombok.AccessLevel.NONE;
 
 @Data
 @Entity
 @Table(name = "scenarios")
 @EntityListeners(ModelBaseListener.class)
+@NamedEntityGraphs({
+    @NamedEntityGraph(
+        name = "Scenario.tags-injects",
+        attributeNodes = {
+            @NamedAttributeNode("tags"),
+            @NamedAttributeNode("injects")
+        }
+    )
+})
 public class Scenario implements Base {
 
   @Id
@@ -124,14 +136,19 @@ public class Scenario implements Base {
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
   @JsonProperty("scenario_injects")
-  @JsonSerialize(using = MultiIdDeserializer.class)
-  private List<Inject> injects = new ArrayList<>();
+  @JsonSerialize(using = MultiIdListDeserializer.class)
+  @Getter(NONE)
+  private Set<Inject> injects = new HashSet<>();
+
+  public List<Inject> getInjects() {
+    return new ArrayList<>(this.injects);
+  }
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "scenarios_teams",
       joinColumns = @JoinColumn(name = "scenario_id"),
       inverseJoinColumns = @JoinColumn(name = "team_id"))
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("scenario_teams")
   private List<Team> teams = new ArrayList<>();
 
@@ -148,25 +165,25 @@ public class Scenario implements Base {
   @JoinTable(name = "scenarios_tags",
       joinColumns = @JoinColumn(name = "scenario_id"),
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("scenario_tags")
-  private List<Tag> tags = new ArrayList<>();
+  private Set<Tag> tags = new HashSet<>();
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "scenarios_documents",
       joinColumns = @JoinColumn(name = "scenario_id"),
       inverseJoinColumns = @JoinColumn(name = "document_id"))
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("scenario_documents")
   private List<Document> documents = new ArrayList<>();
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("scenario_articles")
   private List<Article> articles = new ArrayList<>();
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("scenario_lessons_categories")
   private List<LessonsCategory> lessonsCategories = new ArrayList<>();
 
@@ -174,20 +191,20 @@ public class Scenario implements Base {
   @JoinTable(name = "scenarios_exercises",
       joinColumns = @JoinColumn(name = "scenario_id"),
       inverseJoinColumns = @JoinColumn(name = "exercise_id"))
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("scenario_exercises")
   private List<Exercise> exercises;
 
   // -- SECURITY --
 
   @JsonProperty("scenario_planners")
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   public List<User> getPlanners() {
     return getUsersByType(this.getGrants(), PLANNER);
   }
 
   @JsonProperty("scenario_observers")
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   public List<User> getObservers() {
     return getUsersByType(this.getGrants(), PLANNER, OBSERVER);
   }
@@ -210,7 +227,7 @@ public class Scenario implements Base {
   }
 
   @JsonProperty("scenario_users")
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   public List<User> getUsers() {
     return getTeamUsers().stream()
         .map(ScenarioTeamUser::getUser)

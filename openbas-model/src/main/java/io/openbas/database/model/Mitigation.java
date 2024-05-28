@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.helper.MultiIdDeserializer;
+import io.openbas.helper.MultiIdListDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -77,7 +77,7 @@ public class Mitigation implements Base {
   @JoinTable(name = "mitigations_attack_patterns",
       joinColumns = @JoinColumn(name = "mitigation_id"),
       inverseJoinColumns = @JoinColumn(name = "attack_pattern_id"))
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("mitigation_attack_patterns")
   private List<AttackPattern> attackPatterns = new ArrayList<>();
 

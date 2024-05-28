@@ -18,6 +18,9 @@ import CreateTeam from './CreateTeam';
 import { useHelper } from '../../../../store';
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { fetchTags } from '../../../../actions/Tag';
+import { useAppDispatch } from '../../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -70,6 +73,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 const Teams = () => {
   // Standard hooks
+  const dispatch = useAppDispatch();
   const classes = useStyles();
   const { t, nsdt } = useFormatter();
 
@@ -84,6 +88,9 @@ const Teams = () => {
   const { userAdmin } = useHelper((helper: EndpointHelper & UserHelper & TagHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
+  useDataLoader(() => {
+    dispatch(fetchTags());
+  });
 
   // Headers
   const headers = [

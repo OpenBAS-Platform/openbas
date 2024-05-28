@@ -6,7 +6,7 @@ import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
-import io.openbas.helper.MultiIdDeserializer;
+import io.openbas.helper.MultiIdListDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -86,7 +86,7 @@ public class AttackPattern implements Base {
   @JoinTable(name = "attack_patterns_kill_chain_phases",
       joinColumns = @JoinColumn(name = "attack_pattern_id"),
       inverseJoinColumns = @JoinColumn(name = "phase_id"))
-  @JsonSerialize(using = MultiIdDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("attack_pattern_kill_chain_phases")
   private List<KillChainPhase> killChainPhases = new ArrayList<>();
 

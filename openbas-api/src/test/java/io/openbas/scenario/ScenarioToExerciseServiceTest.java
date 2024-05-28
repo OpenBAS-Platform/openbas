@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
@@ -121,7 +122,7 @@ public class ScenarioToExerciseServiceTest {
     Tag tag = getTag();
     Tag tagSaved = this.tagRepository.save(tag);
     TAG_ID = tagSaved.getId();
-    scenario.setTags(new ArrayList<>() {{
+    scenario.setTags(new HashSet<>() {{
       add(tagSaved);
     }});
 
@@ -205,7 +206,7 @@ public class ScenarioToExerciseServiceTest {
     inject.setScenario(scenarioSaved);
     Inject injectSaved = this.injectRepository.save(inject);
     INJECT_ID = injectSaved.getId();
-    scenario.setInjects(new ArrayList<>() {{
+    scenario.setInjects(new HashSet<>() {{
       add(inject);
     }});
 

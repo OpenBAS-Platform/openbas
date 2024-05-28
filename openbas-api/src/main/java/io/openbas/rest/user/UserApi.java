@@ -35,7 +35,7 @@ import java.util.Optional;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
-import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RestController
@@ -173,7 +173,7 @@ public class UserApi extends RestBehavior {
     public User updateUser(@PathVariable String userId, @Valid @RequestBody UpdateUserInput input) {
         User user = userRepository.findById(userId).orElseThrow(ElementNotFoundException::new);
         user.setUpdateAttributes(input);
-        user.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        user.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
         User savedUser = userRepository.save(user);
         sessionManager.refreshUserSessions(savedUser);

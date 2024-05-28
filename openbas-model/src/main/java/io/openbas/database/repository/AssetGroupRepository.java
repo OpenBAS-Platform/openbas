@@ -1,6 +1,11 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.AssetGroup;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import io.openbas.database.raw.RawAssetGroup;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -42,4 +47,9 @@ public interface AssetGroupRepository extends CrudRepository<AssetGroup, String>
           "GROUP BY ag.asset_group_id;", nativeQuery = true)
   List<RawAssetGroup> rawAssetGroupByIds(@Param("ids") List<String> ids);
 
+  // -- PAGINATION --
+
+  @NotNull
+  @EntityGraph(value = "AssetGroup.tags-assets", type = EntityGraph.EntityGraphType.LOAD)
+  Page<AssetGroup> findAll(@NotNull Specification<AssetGroup> spec, @NotNull Pageable pageable);
 }
