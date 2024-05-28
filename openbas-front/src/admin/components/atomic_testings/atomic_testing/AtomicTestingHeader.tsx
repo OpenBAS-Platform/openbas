@@ -63,7 +63,7 @@ const AtomicTestingHeader = () => {
       </Tooltip>
       <div className={classes.actions}>
         <Button
-          style={{ marginRight: 10, lineHeight: 'initial' }}
+          style={{ marginRight: 10 }}
           startIcon={<PlayArrowOutlined />}
           variant="contained"
           color="primary"
