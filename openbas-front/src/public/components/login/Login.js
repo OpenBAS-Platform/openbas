@@ -81,16 +81,15 @@ const Login = (props) => {
     ? parameters?.platform_dark_theme?.logo_login_url
     : parameters?.platform_light_theme?.logo_login_url;
 
-  const isWhitemarkDisabled = parameters.platform_whitemark === 'false' || parameters.platform_enterprise_edition === 'false';
-
+  const isWhitemarkEnable = parameters.platform_whitemark === 'true' && parameters.platform_enterprise_edition === 'true';
   return (
     <div data-testid="login-page" className={classes.container} style={{ marginTop }}>
-      {(isWhitemarkDisabled || (loginLogo && loginLogo.length > 0)) && (
-        <img src={loginLogo && loginLogo.length > 0 ? loginLogo : fileUri(theme.palette.mode === 'dark' ? logoDark : logoLight)} alt="logo"
-          className={classes.logo}
-        />
-      )}
-      {isWhitemarkDisabled && (
+      <img
+        src={loginLogo && loginLogo.length > 0 ? loginLogo : fileUri(theme.palette.mode === 'dark' ? logoDark : logoLight)} alt="logo"
+        className={classes.logo}
+        style={{ marginBottom: isWhitemarkEnable ? 20 : 0 }}
+      />
+      {!isWhitemarkEnable && (
         <div className={classes.byFiligran} style={{ marginBottom: 20 }}>
           <img
             src={fileUri(theme.palette.mode === 'dark' ? byFiligranDark : byFiligranLight)}
