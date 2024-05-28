@@ -54,7 +54,11 @@ public class InjectExpectationService {
             @NotBlank final String result,
             @NotBlank final boolean success) {
         computeResult(expectation, sourceId, sourceName, result);
-        expectation.setScore(success ? expectation.getExpectedScore() : 0);
+        if( success ) {
+            expectation.setScore(expectation.getExpectedScore());
+        } else if( expectation.getScore() == null ) {
+            expectation.setScore(0);
+        }
         return this.update(expectation);
     }
 
