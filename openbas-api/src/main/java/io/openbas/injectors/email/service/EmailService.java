@@ -181,11 +181,12 @@ public class EmailService {
         for (int i = 0; i < 3; i++) {
             try {
                 emailSender.send(mimeMessage);
-                Thread.sleep(2000);
+                break;
             } catch (Exception e) {
                 if( i == 2 ) {
                     throw e;
                 }
+                Thread.sleep(2000);
             }
         }
     }
