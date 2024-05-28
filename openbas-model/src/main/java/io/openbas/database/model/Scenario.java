@@ -136,7 +136,7 @@ public class Scenario implements Base {
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
   @JsonProperty("scenario_injects")
-  @JsonSerialize(using = MultiIdSetDeserializer.class)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
   @Getter(NONE)
   private Set<Inject> injects = new HashSet<>();
 
