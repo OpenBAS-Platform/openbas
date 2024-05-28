@@ -51,6 +51,7 @@ public class EmailService {
         this.emailPgp = emailPgp;
     }
 
+
     public void sendEmail(Execution execution, List<ExecutionContext> usersContext, String from, List<String> replyTos, String inReplyTo,
                           String subject, String message, List<DataAttachment> attachments) throws Exception {
         MimeMessage mimeMessage = buildMimeMessage(from, replyTos, inReplyTo, subject, message, attachments);
@@ -59,9 +60,7 @@ public class EmailService {
             recipients.add(new InternetAddress(userContext.getUser().getEmail()));
         }
         mimeMessage.setRecipients(Message.RecipientType.TO, recipients.toArray(InternetAddress[]::new));
-
-        emailSender.send(mimeMessage);
-
+        this.sendEmailWithRetry(mimeMessage);
         String emails = usersContext.stream().map(c -> c.getUser().getEmail()).collect(joining(", "));
         List<String> userIds = usersContext.stream().map(c -> c.getUser().getId()).toList();
         execution.addTrace(traceSuccess("Mail sent to " + emails, userIds));
@@ -81,9 +80,9 @@ public class EmailService {
         // Crypt if needed
         if (mustBeEncrypted) {
             MimeMessage encMessage = getEncryptedMimeMessage(userContext, from, replyTos, subject, email, mimeMessage);
-            emailSender.send(encMessage);
+            this.sendEmailWithRetry(encMessage);
         } else {
-            emailSender.send(mimeMessage);
+            this.sendEmailWithRetry(mimeMessage);
         }
         List<String> userIds = List.of(userContext.getUser().getId());
         execution.addTrace(traceSuccess("Mail sent to " + email, userIds));
@@ -104,6 +103,7 @@ public class EmailService {
             for (int i = 0; i < 3; i++) {
                 try {
                     imapService.storeSentMessage(mimeMessage);
+                    Thread.sleep(2000);
                     execution.addTrace(traceSuccess("Mail successfully stored in IMAP"));
                     return;
                 } catch (Exception e) {
@@ -175,5 +175,18 @@ public class EmailService {
         // Fill the message with the multipart content
         encMessage.setContent(encMultipart);
         return encMessage;
+    }
+
+    private void sendEmailWithRetry(MimeMessage mimeMessage) throws Exception {
+        for (int i = 0; i < 3; i++) {
+            try {
+                emailSender.send(mimeMessage);
+                Thread.sleep(2000);
+            } catch (Exception e) {
+                if( i == 2 ) {
+                    throw e;
+                }
+            }
+        }
     }
 }
