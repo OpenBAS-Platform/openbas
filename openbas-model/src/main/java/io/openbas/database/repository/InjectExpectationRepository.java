@@ -1,6 +1,7 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.InjectExpectation;
+import io.openbas.database.raw.RawInjectExpectation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -64,5 +65,12 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
     List<InjectExpectation> findAllByInjectAndAssetGroup(
         @Param("injectId") @NotBlank final String injectId,
         @Param("assetGroupId") @NotBlank final String assetGroupId
+    );
+
+    @Query(value = "SELECT team_id, asset_id, asset_group_id, inject_expectation_type, inject_expectation_score, inject_expectation_id " +
+            "FROM injects_expectations i where i.inject_expectation_id IN :ids",
+            nativeQuery = true)
+    List<RawInjectExpectation> rawByIds(
+            @Param("ids") final List<String> ids
     );
 }

@@ -1,6 +1,7 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Exercise;
+import io.openbas.database.raw.RawExercise;
 import io.openbas.database.raw.RawGlobalInjectExpectation;
 import io.openbas.database.raw.RawInjectExpectation;
 import jakarta.validation.constraints.NotNull;
@@ -49,6 +50,11 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
             "where e.exercise_status = 'RUNNING' group by e.exercise_id, se.scenario_id having count(status) = count(inject);", nativeQuery = true)
     List<Exercise> thatMustBeFinished();
 
+    /**
+     * Get all the expectations created before a date
+     * @param from the max date of creation
+     * @return the list of expectations
+     */
     @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score " +
             "FROM injects_expectations ie " +
             "INNER JOIN injects ON ie.inject_id = injects.inject_id " +
@@ -56,6 +62,12 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
             "WHERE exercises.exercise_created_at < :from ;", nativeQuery = true)
     List<RawInjectExpectation> allInjectExpectationsFromDate(@Param("from") Instant from);
 
+    /**
+     * Get all the expectations a user can see that were created before a date
+     * @param from the max date of creation
+     * @param userId the id of the user
+     * @return the list of expectations
+     */
     @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score " +
             "FROM injects_expectations ie " +
             "INNER JOIN injects ON ie.inject_id = injects.inject_id " +
@@ -67,6 +79,11 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
             "AND users_groups.user_id = :userId ;", nativeQuery = true)
     List<RawInjectExpectation> allGrantedInjectExpectationsFromDate(@Param("from") Instant from, @Param("userId") String userId);
 
+    /**
+     * Returns the global expectations that were created before a date
+     * @param from the date max of creation
+     * @return a list of expectations
+     */
     @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score, injects.inject_title, icap.attack_pattern_id " +
             "FROM exercises " +
             "INNER JOIN injects ON exercises.exercise_id = injects.inject_exercise " +
@@ -76,6 +93,12 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
             "WHERE exercises.exercise_created_at < :from ;", nativeQuery = true)
     Iterable<RawGlobalInjectExpectation> rawGlobalInjectExpectationResultsFromDate(@Param("from") Instant from);
 
+    /**
+     * Returns the global expectations that were created before a date and that a user can see
+     * @param from the date max of creation
+     * @param userId the id of the user
+     * @return the list of global expectations
+     */
     @Query(value = "SELECT ie.inject_expectation_type, ie.inject_expectation_score, injects.inject_title, icap.attack_pattern_id " +
             "FROM exercises " +
             "INNER JOIN injects ON exercises.exercise_id = injects.inject_exercise " +
@@ -88,4 +111,37 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>,
             "WHERE exercises.exercise_created_at < :from " +
             "AND users_groups.user_id = :userId ;", nativeQuery = true)
     Iterable<RawGlobalInjectExpectation> rawGrantedInjectExpectationResultsFromDate(@Param("from") Instant from, @Param("userId") String userId);
+
+    /**
+     *  Get the raw version of the exercises
+     * @return the list of exercises
+     */
+    @Query(value = " SELECT ex.exercise_category, ex.exercise_id, ex.exercise_status, ex.exercise_start_date, ex.exercise_name, " +
+            " ex.exercise_subtitle, array_agg(et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags, " +
+            " array_agg(injects.inject_id) FILTER ( WHERE injects.inject_id IS NOT NULL ) as inject_ids " +
+            "FROM exercises ex " +
+            "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id " +
+            "LEFT JOIN injects ON ie.inject_id = injects.inject_id " +
+            "LEFT JOIN exercises_tags et ON et.exercise_id = ex.exercise_id " +
+            "GROUP BY ex.exercise_id ;", nativeQuery = true)
+    List<RawExercise> rawAll();
+
+    /**
+     * Get the raw version of the exercises a user can see
+     * @param userId the id of the user
+     * @return the list of exercises
+     */
+    @Query(value = " SELECT ex.exercise_category, ex.exercise_id, ex.exercise_status, ex.exercise_start_date, ex.exercise_name, " +
+            " ex.exercise_subtitle, array_agg(et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags, " +
+            " array_agg(injects.inject_id) FILTER ( WHERE injects.inject_id IS NOT NULL ) as inject_ids " +
+            "FROM exercises ex " +
+            "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id " +
+            "LEFT JOIN injects ON ie.inject_id = injects.inject_id " +
+            "LEFT JOIN exercises_tags et ON et.exercise_id = ex.exercise_id " +
+            "INNER join grants ON grants.grant_exercise = ex.exercise_id " +
+            "INNER join groups ON grants.grant_group = groups.group_id " +
+            "INNER JOIN users_groups ON groups.group_id = users_groups.group_id " +
+            "WHERE users_groups.user_id = :userId " +
+            "GROUP BY ex.exercise_id ;", nativeQuery = true)
+    List<RawExercise> rawAllGranted(@Param("userId") String userId);
 }
