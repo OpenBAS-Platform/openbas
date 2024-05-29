@@ -1,11 +1,13 @@
 import React, { FunctionComponent } from 'react';
-import { Grid, Paper, TextField, Typography } from '@mui/material';
+import { Grid, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { Field } from 'react-final-form';
 import { useFormatter } from '../../../../components/i18n';
-import MarkDownField from '../../../../components/fields/MarkDownField';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import SecurityMenu from '../SecurityMenu';
+import PolicyForm from './PolicyForm';
+import type { PolicyInput } from '../../../../utils/api-types';
+import { updatePlatformParameters } from '../../../../actions/Application';
+import { useAppDispatch } from '../../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -22,18 +24,25 @@ const useStyles = makeStyles(() => ({
 }));
 const Policies: FunctionComponent = () => {
   const classes = useStyles();
+  const dispatch = useAppDispatch();
   const { t } = useFormatter();
+
+  const onUpdate = (data: PolicyInput) => dispatch(updatePlatformParameters(data));
 
   return (
     <div className={classes.container}>
-      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Security') }, { label: t('Policies'), current: true }]} />
-      <SecurityMenu />
+      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Security') }, {
+        label: t('Policies'),
+        current: true,
+      }]}
+      />
+      <SecurityMenu/>
       <Grid item={true} xs={6} style={{ marginTop: 30 }}>
         <Typography variant="h4" gutterBottom={true}>
           {t('Login messages')}
         </Typography>
         <Paper classes={{ root: classes.paper }} variant="outlined">
-
+          <PolicyForm onSubmit={onUpdate}></PolicyForm>
         </Paper>
       </Grid>
     </div>

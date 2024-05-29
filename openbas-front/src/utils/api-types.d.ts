@@ -2307,6 +2307,12 @@ export interface ScenarioRecurrenceInput {
   scenario_recurrence_start?: string;
 }
 
+export interface PolicyInput {
+  platform_login_message?: string;
+  platform_consent_message?: string;
+  platform_consent_confirm_text?: string;
+}
+
 export interface ScenarioSimple {
   scenario_id?: string;
   scenario_name?: string;
