@@ -102,7 +102,7 @@ const LessonsPlayer = () => {
             color="primary"
             variant="outlined"
             component={Link}
-            to={`/admin/exercises/${exerciseId}/results/lessons`}
+            to={`/admin/exercises/${exerciseId}/lessons`}
             style={{ position: 'absolute', top: 20, left: 20 }}
           >
             {t('Back to administration')}

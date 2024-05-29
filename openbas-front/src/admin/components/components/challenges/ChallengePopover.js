@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import * as R from 'ramda';
-import { Dialog, DialogContent, DialogContentText, DialogActions, Button, IconButton, Slide, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Slide } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import ChallengeForm from './ChallengeForm';
@@ -121,16 +121,22 @@ const ChallengePopover = ({ challenge, documents, onRemoveChallenge, inline }) =
       {inline ? (
         <Dialog
           open={openEdit}
-          handleClose={handleCloseEdit}
-          title={t('Update the challenge')}
+          TransitionComponent={Transition}
+          onClose={handleCloseEdit}
+          fullWidth
+          maxWidth="md"
+          PaperProps={{ elevation: 1 }}
         >
-          <ChallengeForm
-            editing
-            onSubmit={onSubmitEdit}
-            handleClose={handleCloseEdit}
-            initialValues={initialValues}
-            documentsIds={(documents || []).map((i) => i.document_id)}
-          />
+          <DialogTitle>{t('Update the challenge')}</DialogTitle>
+          <DialogContent>
+            <ChallengeForm
+              editing
+              onSubmit={onSubmitEdit}
+              handleClose={handleCloseEdit}
+              initialValues={initialValues}
+              documentsIds={(documents || []).map((i) => i.document_id)}
+            />
+          </DialogContent>
         </Dialog>
       ) : (
         <Drawer
