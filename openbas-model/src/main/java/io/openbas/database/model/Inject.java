@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 
+import static io.openbas.database.model.Endpoint.ENDPOINT_TYPE;
 import static java.time.Duration.between;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
@@ -455,7 +456,7 @@ public class Inject implements Base, Injection {
             for (String assetId : rawAssetGroup.getAsset_ids()) {
               RawAsset rawAsset = mapOfAsset.get(assetId);
               if (rawAsset != null) {
-                if(rawAsset.getAsset_type().equals("Endpoint")) {
+                if(rawAsset.getAsset_type().equals(ENDPOINT_TYPE)) {
                   Endpoint endpoint = new Endpoint(rawAsset.getAsset_id(),
                           rawAsset.getAsset_type(),
                           rawAsset.getAsset_name(),
@@ -477,7 +478,7 @@ public class Inject implements Base, Injection {
         if (rawInjectExpectation.getAsset_id() != null) {
           RawAsset rawAsset = mapOfAsset.get(rawInjectExpectation.getAsset_id());
           if (rawAsset != null) {
-            if(rawAsset.getAsset_type().equals("Endpoint")) {
+            if(rawAsset.getAsset_type().equals(ENDPOINT_TYPE)) {
               Endpoint endpoint = new Endpoint(rawAsset.getAsset_id(),
                       rawAsset.getAsset_type(),
                       rawAsset.getAsset_name(),
