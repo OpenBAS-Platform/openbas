@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Drawer, MenuList, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
-import { GroupsOutlined, PermIdentityOutlined } from '@mui/icons-material';
+import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/material';
+import { GroupsOutlined, LocalPoliceOutlined, PermIdentityOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useFormatter } from '../../../components/i18n';
 import type { Theme } from '../../../components/Theme';
@@ -32,7 +32,7 @@ const DefinitionMenu: React.FC = () => {
       anchor="right"
       classes={{ paper: classes.drawer }}
     >
-      <div className={classes.toolbar} />
+      <div className={classes.toolbar}/>
       <MenuList component="nav">
         <MenuItem
           component={Link}
@@ -42,9 +42,9 @@ const DefinitionMenu: React.FC = () => {
           dense={false}
         >
           <ListItemIcon>
-            <GroupsOutlined fontSize="medium" />
+            <GroupsOutlined fontSize="medium"/>
           </ListItemIcon>
-          <ListItemText primary={t('Groups')} />
+          <ListItemText primary={t('Groups')}/>
         </MenuItem>
         <MenuItem
           component={Link}
@@ -54,9 +54,21 @@ const DefinitionMenu: React.FC = () => {
           dense={false}
         >
           <ListItemIcon>
-            <PermIdentityOutlined fontSize="medium" />
+            <PermIdentityOutlined fontSize="medium"/>
           </ListItemIcon>
-          <ListItemText primary={t('Users')} />
+          <ListItemText primary={t('Users')}/>
+        </MenuItem>
+        <MenuItem
+          component={Link}
+          to='/admin/settings/security/policies'
+          selected={location.pathname === '/admin/settings/security/policies'}
+          classes={{ root: classes.item }}
+          dense={false}
+        >
+          <ListItemIcon>
+            <LocalPoliceOutlined fontSize="medium"/>
+          </ListItemIcon>
+          <ListItemText primary={t('Policies')}/>
         </MenuItem>
       </MenuList>
     </Drawer>
