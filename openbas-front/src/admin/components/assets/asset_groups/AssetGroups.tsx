@@ -191,7 +191,7 @@ const AssetGroups = () => {
                           />
                         </>))
                       : ''}
-                    {assetGroup.asset_group_assets?.length ? `${assetGroup.asset_group_dynamic_filter?.filters?.length ? t('and') : ''} ${assetGroup.asset_group_assets?.length} ${t('custom assets')}` : ''}
+                    {assetGroup.asset_group_assets?.length ? `${assetGroup.asset_group_dynamic_filter?.filters?.length ? t('and') : ''} ${assetGroup.asset_group_assets?.length} ${t('managed assets')}` : ''}
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.asset_group_tags}>
                     <ItemTags variant="list" tags={assetGroup.asset_group_tags}/>

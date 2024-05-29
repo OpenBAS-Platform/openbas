@@ -912,6 +912,7 @@ const i18n = {
       'standard-operating-procedure': 'Standard Operating Procedures',
       'crisis-communication': 'Crisis Communication',
       'strategic-reaction': 'Strategic Reaction',
+      'managed assets': 'actifs gérés',
       'Search by target name': 'Recherche par nom de cible',
     },
     en: {
