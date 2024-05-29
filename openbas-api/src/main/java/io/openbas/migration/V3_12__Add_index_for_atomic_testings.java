@@ -7,7 +7,11 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
+<<<<<<<< HEAD:openbas-api/src/main/java/io/openbas/migration/V3_19__Add_index_for_atomic_testings.java
 public class V3_19__Add_index_for_atomic_testings extends BaseJavaMigration {
+========
+public class V3_12__Add_index_for_atomic_testings extends BaseJavaMigration {
+>>>>>>>> 9db5775a ([backend] add index):openbas-api/src/main/java/io/openbas/migration/V3_12__Add_index_for_atomic_testings.java
 
   @Override
   public void migrate(Context context) throws Exception {
