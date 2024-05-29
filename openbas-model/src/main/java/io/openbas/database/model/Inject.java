@@ -421,45 +421,64 @@ public class Inject implements Base, Injection {
 
     // Set a list of expectations
     inject.setExpectations(new ArrayList<>());
-    for(String expectationId: rawInject.getInject_expectations()) {
-      // Create a new expectation
-      InjectExpectation expectation = new InjectExpectation();
-      expectation.setId(rawInjectExpectationMap.get(expectationId).getInject_expectation_id());
-      expectation.setType(InjectExpectation.EXPECTATION_TYPE.valueOf(rawInjectExpectationMap.get(expectationId).getInject_expectation_type()));
-      expectation.setScore(rawInjectExpectationMap.get(expectationId).getInject_expectation_score());
+    for (String expectationId : rawInject.getInject_expectations()) {
+      RawInjectExpectation rawInjectExpectation = rawInjectExpectationMap.get(expectationId);
+      if (rawInjectExpectation != null) {
+        // Create a new expectation
+        InjectExpectation expectation = new InjectExpectation();
+        expectation.setId(rawInjectExpectation.getInject_expectation_id());
+        expectation.setType(
+            InjectExpectation.EXPECTATION_TYPE.valueOf(rawInjectExpectation.getInject_expectation_type()));
+        expectation.setScore(rawInjectExpectation.getInject_expectation_score());
 
-      // Add the team of the expectation
-      Team team = new Team();
-      team.setId(rawInjectExpectationMap.get(expectationId).getTeam_id());
-      team.setName(rawTeams.get(rawInjectExpectationMap.get(expectationId).getTeam_id()).getTeam_name());
-      expectation.setTeam(team);
-
-      // Add the asset group of the expectation
-      AssetGroup assetGroup = new AssetGroup();
-      RawAssetGroup rawAssetGroup = mapOfAssetGroups.get(rawInjectExpectationMap.get(expectationId).getAsset_group_id());
-      if(rawAssetGroup != null) {
-        assetGroup.setId(rawAssetGroup.getAsset_group_id());
-        assetGroup.setName(rawAssetGroup.getAsset_group_name());
-        assetGroup.setAssets(new ArrayList<>());
-
-        // We add the assets to the asset group
-        for (String assetId : rawAssetGroup.getAsset_ids()) {
-          Asset asset = new Asset(mapOfAsset.get(assetId).getAsset_id(),
-                  mapOfAsset.get(assetId).getAsset_type(),
-                  mapOfAsset.get(assetId).getAsset_name());
-          assetGroup.getAssets().add(asset);
+        // Add the team of the expectation
+        if (rawInjectExpectation.getTeam_id() != null) {
+          RawTeam rawTeam = rawTeams.get(rawInjectExpectation.getTeam_id());
+          if (rawTeam != null) {
+            Team team = new Team();
+            team.setId(rawInjectExpectation.getTeam_id());
+            team.setName(rawTeam.getTeam_name());
+            expectation.setTeam(team);
+          }
         }
-        expectation.setAssetGroup(assetGroup);
-      }
 
-      // We add the asset to the expectation
-      if (rawInjectExpectationMap.get(expectationId).getAsset_id() != null) {
-        Asset asset = new Asset(mapOfAsset.get(rawInjectExpectationMap.get(expectationId).getAsset_id()).getAsset_id(),
-                mapOfAsset.get(rawInjectExpectationMap.get(expectationId).getAsset_id()).getAsset_type(),
-                mapOfAsset.get(rawInjectExpectationMap.get(expectationId).getAsset_id()).getAsset_name());
-        expectation.setAsset(asset);
+        // Add the asset group of the expectation
+        if (rawInjectExpectation.getAsset_group_id() != null) {
+          RawAssetGroup rawAssetGroup = mapOfAssetGroups.get(rawInjectExpectation.getAsset_group_id());
+          if (rawAssetGroup != null) {
+            AssetGroup assetGroup = new AssetGroup();
+            assetGroup.setId(rawAssetGroup.getAsset_group_id());
+            assetGroup.setName(rawAssetGroup.getAsset_group_name());
+            assetGroup.setAssets(new ArrayList<>());
+
+            // We add the assets to the asset group
+            for (String assetId : rawAssetGroup.getAsset_ids()) {
+              RawAsset rawAsset = mapOfAsset.get(assetId);
+              if (rawAsset != null) {
+                Asset asset = new Asset(rawAsset.getAsset_id(),
+                    rawAsset.getAsset_type(),
+                    rawAsset.getAsset_name());
+                assetGroup.getAssets().add(asset);
+              }
+            }
+            expectation.setAssetGroup(assetGroup);
+          }
+        }
+
+        // We add the asset to the expectation
+        if (rawInjectExpectation.getAsset_id() != null) {
+          RawAsset rawAsset = mapOfAsset.get(rawInjectExpectation.getAsset_id());
+          if (rawAsset != null) {
+            Asset asset = new Asset(
+                rawAsset.getAsset_id(),
+                rawAsset.getAsset_type(),
+                rawAsset.getAsset_name()
+            );
+            expectation.setAsset(asset);
+          }
+        }
+        inject.getExpectations().add(expectation);
       }
-      inject.getExpectations().add(expectation);
     }
 
     // We add the teams to the inject
