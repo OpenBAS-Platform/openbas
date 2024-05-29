@@ -37,6 +37,7 @@ const FilterField: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
+  const [pristine, setPristine] = useState(true);
 
   const [filterGroup, helpers] = useFiltersState(initialValue ?? emptyFilterGroup, onChange);
 
@@ -55,9 +56,11 @@ const FilterField: FunctionComponent<Props> = ({
   }, []);
 
   const handleChange = (value: string, operator: Filter['operator']) => {
+    setPristine(false);
     helpers.handleAddFilterWithEmptyValue(buildEmptyFilter(value, operator));
   };
   const handleClearFilters = () => {
+    setPristine(false);
     helpers.handleClearAllFilters();
   };
 
@@ -108,7 +111,7 @@ const FilterField: FunctionComponent<Props> = ({
           </IconButton>
         </Tooltip>
       </div>
-      <FilterChips propertySchemas={properties} filterGroup={filterGroup} helpers={helpers} />
+      <FilterChips propertySchemas={properties} filterGroup={filterGroup} helpers={helpers} pristine={pristine} />
     </>
   );
 };
