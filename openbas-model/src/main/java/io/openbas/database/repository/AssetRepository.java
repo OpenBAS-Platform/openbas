@@ -21,7 +21,7 @@ public interface AssetRepository extends CrudRepository<Asset, String>, JpaSpeci
    * @param ids the ids
    * @return the list of raw assets
    */
-  @Query(value= "SELECT asset_id, asset_name, asset_type " +
+  @Query(value= "SELECT asset_id, asset_name, asset_type, endpoint_platform " +
           "FROM assets " +
           "WHERE asset_id IN :ids ", nativeQuery = true)
   List<RawAsset> rawByIds(@Param("ids") List<String> ids);

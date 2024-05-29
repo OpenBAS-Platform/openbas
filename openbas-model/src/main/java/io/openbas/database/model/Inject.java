@@ -455,10 +455,18 @@ public class Inject implements Base, Injection {
             for (String assetId : rawAssetGroup.getAsset_ids()) {
               RawAsset rawAsset = mapOfAsset.get(assetId);
               if (rawAsset != null) {
-                Asset asset = new Asset(rawAsset.getAsset_id(),
-                    rawAsset.getAsset_type(),
-                    rawAsset.getAsset_name());
-                assetGroup.getAssets().add(asset);
+                if(rawAsset.getAsset_type().equals("Endpoint")) {
+                  Endpoint endpoint = new Endpoint(rawAsset.getAsset_id(),
+                          rawAsset.getAsset_type(),
+                          rawAsset.getAsset_name(),
+                          Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform()));
+                  assetGroup.getAssets().add(endpoint);
+                } else {
+                  Asset asset = new Asset(rawAsset.getAsset_id(),
+                          rawAsset.getAsset_type(),
+                          rawAsset.getAsset_name());
+                  assetGroup.getAssets().add(asset);
+                }
               }
             }
             expectation.setAssetGroup(assetGroup);
@@ -469,12 +477,20 @@ public class Inject implements Base, Injection {
         if (rawInjectExpectation.getAsset_id() != null) {
           RawAsset rawAsset = mapOfAsset.get(rawInjectExpectation.getAsset_id());
           if (rawAsset != null) {
-            Asset asset = new Asset(
-                rawAsset.getAsset_id(),
-                rawAsset.getAsset_type(),
-                rawAsset.getAsset_name()
-            );
-            expectation.setAsset(asset);
+            if(rawAsset.getAsset_type().equals("Endpoint")) {
+              Endpoint endpoint = new Endpoint(rawAsset.getAsset_id(),
+                      rawAsset.getAsset_type(),
+                      rawAsset.getAsset_name(),
+                      Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform()));
+              expectation.setAsset(endpoint);
+            } else {
+              Asset asset = new Asset(
+                      rawAsset.getAsset_id(),
+                      rawAsset.getAsset_type(),
+                      rawAsset.getAsset_name()
+              );
+              expectation.setAsset(asset);
+            }
           }
         }
         inject.getExpectations().add(expectation);
@@ -494,10 +510,18 @@ public class Inject implements Base, Injection {
     // We add the assets to the inject
     ArrayList<Asset> injectAssets = new ArrayList();
     for (String injectAssetId: rawInject.getInject_assets()) {
-      Asset asset = new Asset(mapOfAsset.get(injectAssetId).getAsset_id(),
-              mapOfAsset.get(injectAssetId).getAsset_type(),
-              mapOfAsset.get(injectAssetId).getAsset_name());
-      injectAssets.add(asset);
+      if(mapOfAsset.get(injectAssetId).getAsset_type().equals("Endpoint")) {
+        Endpoint endpoint = new Endpoint(mapOfAsset.get(injectAssetId).getAsset_id(),
+                mapOfAsset.get(injectAssetId).getAsset_type(),
+                mapOfAsset.get(injectAssetId).getAsset_name(),
+                Endpoint.PLATFORM_TYPE.valueOf(mapOfAsset.get(injectAssetId).getEndpoint_platform()));
+        injectAssets.add(endpoint);
+      } else {
+        Asset asset = new Asset(mapOfAsset.get(injectAssetId).getAsset_id(),
+                mapOfAsset.get(injectAssetId).getAsset_type(),
+                mapOfAsset.get(injectAssetId).getAsset_name());
+        injectAssets.add(asset);
+      }
     }
     inject.setAssets(injectAssets);
 
@@ -510,10 +534,18 @@ public class Inject implements Base, Injection {
       // We add the assets linked to the asset group
       assetGroup.setAssets(mapOfAssetGroups.get(injectAssetGroupId).getAsset_ids().stream().map(
               assetId -> {
-                Asset asset = new Asset(mapOfAsset.get(assetId).getAsset_id(),
-                        mapOfAsset.get(assetId).getAsset_type(),
-                        mapOfAsset.get(assetId).getAsset_name());
-                return asset;
+                if (mapOfAsset.get(assetId).getAsset_type().equals("Endpoint")) {
+                  Endpoint endpoint = new Endpoint(mapOfAsset.get(assetId).getAsset_id(),
+                          mapOfAsset.get(assetId).getAsset_type(),
+                          mapOfAsset.get(assetId).getAsset_name(),
+                          Endpoint.PLATFORM_TYPE.valueOf(mapOfAsset.get(assetId).getEndpoint_platform()));
+                  return endpoint;
+                } else {
+                  Asset asset = new Asset(mapOfAsset.get(assetId).getAsset_id(),
+                          mapOfAsset.get(assetId).getAsset_type(),
+                          mapOfAsset.get(assetId).getAsset_name());
+                  return asset;
+                }
               }
       ).toList());
       injectAssetGroups.add(assetGroup);
