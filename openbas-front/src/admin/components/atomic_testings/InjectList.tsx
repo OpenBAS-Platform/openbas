@@ -55,7 +55,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   'inject_status.tracking_sent_date': {
     width: '15%',
   },
-  'inject_status.status_name': {
+  inject_status: {
     width: '15%',
   },
   inject_targets: {
@@ -109,7 +109,7 @@ const InjectList: FunctionComponent<Props> = ({
     {
       field: 'inject_status.tracking_sent_date',
       label: 'Execution Date',
-      isSortable: true,
+      isSortable: false,
       value: (injectDto: InjectResultDTO) => fldt(injectDto.inject_status?.tracking_sent_date),
     },
     {
@@ -121,7 +121,7 @@ const InjectList: FunctionComponent<Props> = ({
       },
     },
     {
-      field: 'inject_status.status_name',
+      field: 'inject_status',
       label: 'Status',
       isSortable: true,
       value: (injectDto: InjectResultDTO) => {
