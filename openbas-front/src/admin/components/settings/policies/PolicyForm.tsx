@@ -1,6 +1,6 @@
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { Button, TextField } from '@mui/material';
 import React from 'react';
+import { Button, TextField } from '@mui/material';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useFormatter } from '../../../../components/i18n';
 import MarkDownField from '../../../../components/fields/MarkDownField';
 import type { PolicyInput } from '../../../../utils/api-types';
@@ -63,7 +63,7 @@ const PolicyForm: React.FC<Props> = ({
           type="submit"
           disabled={!isDirty || isSubmitting}
         >
-          { t('Update')}
+          {t('Update')}
         </Button>
       </div>
     </form>
