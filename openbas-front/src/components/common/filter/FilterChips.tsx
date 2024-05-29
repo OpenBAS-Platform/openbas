@@ -27,12 +27,14 @@ interface Props {
   filterGroup: FilterGroup;
   helpers: FilterHelpers;
   propertySchemas: PropertySchemaDTO[];
+  pristine: boolean;
 }
 
 const FilterChips: FunctionComponent<Props> = ({
   filterGroup,
   helpers,
   propertySchemas,
+  pristine,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -73,6 +75,7 @@ const FilterChips: FunctionComponent<Props> = ({
               filter={filter}
               helpers={helpers}
               propertySchema={property}
+              pristine={pristine}
             />
           </>
         );

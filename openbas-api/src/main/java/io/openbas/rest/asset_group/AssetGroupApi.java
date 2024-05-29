@@ -56,7 +56,6 @@ public class AssetGroupApi {
         searchPaginationInput,
         AssetGroup.class
     )
-        .map(this.assetGroupService::computeDynamicAssets)
         .map(RawPaginationAssetGroup::new);
   }
 
