@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
 import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
-import { Box, FormHelperText, InputLabel } from '@mui/material';
+import { Box, FormHelperText, Icon, IconButton, InputLabel, Typography } from '@mui/material';
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 
 interface Props {
@@ -32,8 +32,9 @@ const MarkDownField: React.FC<Props> = ({
     control,
     defaultValue: '',
   });
-  // State to track whether the editor is in "Write" or "Preview" mode
   const [isEdit, setIsEdit] = useState(true);
+  const [isWriteClicked, setIsWriteClicked] = useState(false);
+  const [isPreviewClicked, setIsPreviewClicked] = useState(false);
 
   return (
     <div
@@ -56,14 +57,44 @@ const MarkDownField: React.FC<Props> = ({
               name: 'write',
               keyCommand: 'write',
               buttonProps: { 'aria-label': 'write' },
-              icon: 'Write',
+              icon: (
+                <div
+                  style={{
+                    border: isWriteClicked ? '1px solid' : '',
+                    borderRadius: 4,
+                    padding: '4px',
+                  }}
+                  onClick={() => {
+                    setIsWriteClicked(true);
+                    setIsPreviewClicked(false);
+                    setIsEdit(true);
+                  }}
+                >
+                  <Typography>Write</Typography>
+                </div>
+              ),
               execute: () => setIsEdit(true),
             },
             {
               name: 'preview',
               keyCommand: 'preview',
               buttonProps: { 'aria-label': 'preview' },
-              icon: 'Preview',
+              icon: (
+                <div
+                  style={{
+                    border: isPreviewClicked ? '1px solid' : '',
+                    borderRadius: 4,
+                    padding: '4px',
+                  }}
+                  onClick={() => {
+                    setIsPreviewClicked(true);
+                    setIsWriteClicked(false);
+                    setIsEdit(true);
+                  }}
+                >
+                  <Typography>Preview</Typography>
+                </div>
+              ),
               execute: () => setIsEdit(false),
             },
             ...(isEdit ? [
