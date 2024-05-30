@@ -61,7 +61,7 @@ public class CalderaExecutor extends Injector {
         // Execute inject for all assets
         String contract = inject.getInjectorContract().getId();
         if (assets.isEmpty()) {
-            execution.addTrace(traceError("Found 0 asset to execute the inject on, likely you don't have any target for it or the asset is inactive and has been purged"));
+            execution.addTrace(traceError("Found 0 asset to execute the ability on (likely this inject does not have any target or the targeted asset is inactive and has been purged)"));
         }
         assets.forEach((asset, aBoolean) -> {
             try {
@@ -80,9 +80,9 @@ public class CalderaExecutor extends Injector {
                                     InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE).value(exploitResult.getCommand()).build()
                             );
                             computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup, injectExpectationSignatures);
-                            execution.addTrace(traceInfo("Caldera executed ability on asset " + asset.getName() + " using " + executionEndpoint.getProcessName() + " (linkID: " + exploitResult.getLinkId() + ")"));
+                            execution.addTrace(traceInfo("Caldera executed the ability on asset " + asset.getName() + " using " + executionEndpoint.getProcessName() + " (linkID: " + exploitResult.getLinkId() + ")"));
                         } else {
-                            execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (" + result + ")"));
+                            execution.addTrace(traceError("Caldera failed to execute the ability on asset " + asset.getName() + " (" + result + ")"));
                         }
                     } else {
                         execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (platform is not compatible: " + executionEndpoint.getPlatform().name() + ")"));
@@ -91,7 +91,7 @@ public class CalderaExecutor extends Injector {
                     execution.addTrace(traceError("Caldera failed to execute the ability on asset " + asset.getName() + " (temporary injector not spawned correctly)"));
                 }
             } catch (Exception e) {
-                execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (" + e.getMessage() + ")"));
+                execution.addTrace(traceError("Caldera failed to execute the ability on asset " + asset.getName() + " (" + e.getMessage() + ")"));
                 log.severe(Arrays.toString(e.getStackTrace()));
             }
         });
