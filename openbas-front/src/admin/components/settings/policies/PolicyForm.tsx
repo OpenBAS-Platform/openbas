@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, TextField } from '@mui/material';
+import { Button } from '@mui/material';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useFormatter } from '../../../../components/i18n';
 import MarkDownField from '../../../../components/fields/MarkDownField';
@@ -18,8 +18,7 @@ const PolicyForm: React.FC<Props> = ({
     platform_consent_confirm_text: '',
   },
 }) => {
-  // Standard hooks
-  const { t } = useFormatter();
+  const { t } = useFormatter(); // Assuming useFormatter is a custom hook
 
   const {
     handleSubmit,
@@ -31,30 +30,26 @@ const PolicyForm: React.FC<Props> = ({
 
   return (
     <form id="policyForm" onSubmit={handleSubmit(onSubmit)}>
-      <TextField
-        component={MarkDownField}
-        name="platform_login_message"
+      <MarkDownField
         label={t('Platform login message')}
-        fullWidth
-        multiline={true}
-        rows="3"
-        variant="standard"
+        style={{ marginTop: 20 }}
+        askAi={true}
+        inInject={false}
+        inArticle={false}
       />
-      <TextField
-        component={MarkDownField}
-        name="platform_consent_message"
+      <MarkDownField
         label={t('Platform consent message')}
-        fullWidth
         style={{ marginTop: 20 }}
-        variant="standard"
+        askAi={true}
+        inInject={false}
+        inArticle={false}
       />
-      <TextField
-        component={MarkDownField}
-        name="platform_consent_confirm_text"
+      <MarkDownField
         label={t('Platform consent confirm text')}
-        fullWidth
         style={{ marginTop: 20 }}
-        variant="standard"
+        askAi={true}
+        inInject={false}
+        inArticle={false}
       />
       <div style={{ marginTop: 20 }}>
         <Button

@@ -1,6 +1,6 @@
 import React from 'react';
 import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
-import { FieldInputProps, FieldMetaState } from 'react-final-form';
+import { Field, FieldInputProps, FieldMetaState } from 'react-final-form';
 import { FormHelperText, InputLabel, useTheme } from '@mui/material';
 import { useFormatter } from '../i18n';
 import type { Theme } from '../Theme';
@@ -17,7 +17,7 @@ interface Props {
   inArticle?: boolean;
 }
 
-const MarkDownField: React.FC<Props> = ({
+const MarkDownFieldBase: React.FC<Props> = ({
   label,
   style,
   disabled,
@@ -84,4 +84,11 @@ const MarkDownField: React.FC<Props> = ({
   );
 };
 
-export default MarkDownField;
+/**
+ * @deprecated The component use old form libnary react-final-form
+ */
+const OldMarkDownField = (props: Props & { name: string }) => (
+  <Field component={MarkDownFieldBase} {...props} />
+);
+
+export default OldMarkDownField;
