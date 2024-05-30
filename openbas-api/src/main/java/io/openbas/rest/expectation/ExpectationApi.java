@@ -73,6 +73,14 @@ public class ExpectationApi extends RestBehavior {
         ).toList();
     }
 
+    @GetMapping("/api/injects/expectations/assets/{sourceId}")
+    public List<InjectExpectation> getInjectExpectationsAssetsNotFilledForSource(@PathVariable String sourceId) {
+        return Stream.concat(
+                injectExpectationService.preventionExpectationsNotFill(sourceId).stream(),
+                injectExpectationService.detectionExpectationsNotFill(sourceId).stream()
+        ).toList();
+    }
+
     @GetMapping("/api/injects/expectations/prevention")
     public List<InjectExpectation> getInjectPreventionExpectationsNotFilled() {
         return injectExpectationService.preventionExpectationsNotFill().stream().toList();
