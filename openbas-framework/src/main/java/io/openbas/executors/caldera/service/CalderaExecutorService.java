@@ -35,7 +35,7 @@ import static java.time.ZoneOffset.UTC;
 @Log
 @Service
 public class CalderaExecutorService implements Runnable {
-    private static final int CLEAR_TTL = 1200000;
+    private static final int CLEAR_TTL = 1800000;
     private static final String CALDERA_EXECUTOR_TYPE = "openbas_caldera";
     private static final String CALDERA_EXECUTOR_NAME = "Caldera";
 

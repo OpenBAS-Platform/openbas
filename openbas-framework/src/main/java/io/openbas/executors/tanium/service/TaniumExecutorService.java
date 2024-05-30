@@ -34,7 +34,7 @@ import static java.time.ZoneOffset.UTC;
 @Log
 @Service
 public class TaniumExecutorService implements Runnable {
-    private static final int CLEAR_TTL = 1200000;
+    private static final int CLEAR_TTL = 1800000;
     private static final String TANIUM_EXECUTOR_TYPE = "openbas_tanium";
     private static final String TANIUM_EXECUTOR_NAME = "Tanium";
 
