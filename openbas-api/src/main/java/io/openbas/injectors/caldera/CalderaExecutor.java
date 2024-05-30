@@ -61,6 +61,9 @@ public class CalderaExecutor extends Injector {
         List<Expectation> expectations = new ArrayList<>();
         // Execute inject for all assets
         String contract = inject.getInjectorContract().getId();
+        if (assets.isEmpty() ) {
+            execution.addTrace(traceError("Found 0 asset to execute the inject on, likely you don't have any target for it or the asset is inactive and has been purged"));
+        }
         assets.forEach((asset, aBoolean) -> {
             try {
                 Endpoint executionEndpoint = this.findAndRegisterAssetForExecution(injection.getInjection().getInject(), asset);
