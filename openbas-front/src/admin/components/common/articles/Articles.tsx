@@ -157,9 +157,9 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
           const images = docs.filter((d) => d.document_type.includes('image/'));
           const videos = docs.filter((d) => d.document_type.includes('video/'));
           let headersDocs = [];
-          if (article.article_fullchannel.channel_type === 'newspaper') {
+          if (article.article_fullchannel?.channel_type === 'newspaper') {
             headersDocs = images;
-          } else if (article.article_fullchannel.channel_type === 'tv') {
+          } else if (article.article_fullchannel?.channel_type === 'tv') {
             headersDocs = videos;
           } else {
             headersDocs = [...images, ...videos];
@@ -185,7 +185,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
                     <Avatar
                       sx={{
                         bgcolor: channelColor(
-                          article.article_fullchannel.channel_type,
+                          article.article_fullchannel?.channel_type,
                         ),
                       }}
                     >
@@ -258,17 +258,17 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
                         <Chip
                           icon={
                             <ChannelIcon
-                              type={article.article_fullchannel.channel_type}
+                              type={article.article_fullchannel?.channel_type}
                               variant="chip"
                             />
                           }
                           classes={{ root: classes.channel }}
                           style={{
                             color: channelColor(
-                              article.article_fullchannel.channel_type,
+                              article.article_fullchannel?.channel_type,
                             ),
                             borderColor: channelColor(
-                              article.article_fullchannel.channel_type,
+                              article.article_fullchannel?.channel_type,
                             ),
                           }}
                           variant="outlined"
