@@ -41,7 +41,7 @@ const useStyles = makeStyles(() => ({
 const AtomicTesting = () => {
   // Standard hooks
   const classes = useStyles();
-  const { t, tPick } = useFormatter();
+  const { t, tPick, fldt } = useFormatter();
   const { injectId } = useParams() as { injectId: InjectResultDTO['inject_id'] };
   const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
@@ -122,15 +122,10 @@ const AtomicTesting = () => {
                   gutterBottom
                   style={{ marginTop: 20 }}
                 >
-                  {t('Platforms')}
+                  {t('Last execution date')}
                 </Typography>
                 <div style={{ display: 'flex' }}>
-                  {injectResultDto.inject_injector_contract.injector_contract_platforms?.map((platform: string) => (
-                    <div key={platform} style={{ display: 'flex', marginRight: 15 }}>
-                      <PlatformIcon width={20} platform={platform} marginRight={5} />
-                      {platform}
-                    </div>
-                  ))}
+                  {fldt(injectResultDto.inject_updated_at)}
                 </div>
               </Grid>
               <Grid item xs={4} style={{ paddingTop: 10 }}>
@@ -142,6 +137,23 @@ const AtomicTesting = () => {
                   {t('Status')}
                 </Typography>
                 <ItemStatus isInject={true} status={injectResultDto.inject_status?.status_name} label={t(injectResultDto.inject_status?.status_name ?? 'Unknown')} />
+              </Grid>
+              <Grid item xs={4} style={{ paddingTop: 10 }}>
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                  style={{ marginTop: 20 }}
+                >
+                  {t('Platforms')}
+                </Typography>
+                <div style={{ display: 'flex' }}>
+                  {injectResultDto.inject_injector_contract.injector_contract_platforms?.map((platform: string) => (
+                    <div key={platform} style={{ display: 'flex', marginRight: 15 }}>
+                      <PlatformIcon width={20} platform={platform} marginRight={5} />
+                      {platform}
+                    </div>
+                  ))}
+                </div>
               </Grid>
               <Grid item xs={4} style={{ paddingTop: 10 }}>
                 <Typography

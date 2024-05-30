@@ -120,9 +120,7 @@ public class CalderaResultCollectorService implements Runnable {
         boolean hasError = injectStatus.getTraces().stream().anyMatch(trace -> trace.getStatus().equals(ExecutionStatus.ERROR));
         injectStatus.setName(hasError ? ExecutionStatus.ERROR : ExecutionStatus.SUCCESS);
         injectStatus.getTraces().add(
-                traceInfo("caldera",
-                        "Caldera success to execute ability on " + (completedActions - failedActions)
-                                + "/" + completedActions + " asset(s)")
+                traceInfo("caldera", "Caldera executed the ability on " + (completedActions - failedActions) + "/" + completedActions + " asset(s)")
         );
         long executionTime = (finalExecutionTime.toEpochMilli() - injectStatus.getTrackingSentDate().toEpochMilli());
         injectStatus.setTrackingTotalExecutionTime(executionTime);
