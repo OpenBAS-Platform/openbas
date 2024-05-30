@@ -61,27 +61,31 @@ public class CalderaExecutor extends Injector {
         List<Expectation> expectations = new ArrayList<>();
         // Execute inject for all assets
         String contract = inject.getInjectorContract().getId();
-        if (assets.isEmpty() ) {
+        if (assets.isEmpty()) {
             execution.addTrace(traceError("Found 0 asset to execute the inject on, likely you don't have any target for it or the asset is inactive and has been purged"));
         }
         assets.forEach((asset, aBoolean) -> {
             try {
                 Endpoint executionEndpoint = this.findAndRegisterAssetForExecution(injection.getInjection().getInject(), asset);
                 if (executionEndpoint != null) {
-                    String result = this.calderaService.exploit(obfuscator, executionEndpoint.getExternalReference(), contract);
-                    if (result.contains("complete")) {
-                        ExploitResult exploitResult = this.calderaService.exploitResult(executionEndpoint.getExternalReference(), contract);
-                        asyncIds.add(exploitResult.getLinkId());
-                        execution.addTrace(traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
-                        // Compute expectations
-                        boolean isInGroup = assets.get(executionEndpoint.getParent());
-                        List<InjectExpectationSignature> injectExpectationSignatures = List.of(
-                                InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME).value(executionEndpoint.getProcessName()).build(),
-                                InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE).value(exploitResult.getCommand()).build()
-                        );
-                        computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup, injectExpectationSignatures);
+                    if (Arrays.stream(injection.getInjection().getInject().getInjectorContract().getPlatforms()).anyMatch(s -> s.equals(executionEndpoint.getPlatform().name()))) {
+                        String result = this.calderaService.exploit(obfuscator, executionEndpoint.getExternalReference(), contract);
+                        if (result.contains("complete")) {
+                            ExploitResult exploitResult = this.calderaService.exploitResult(executionEndpoint.getExternalReference(), contract);
+                            asyncIds.add(exploitResult.getLinkId());
+                            execution.addTrace(traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
+                            // Compute expectations
+                            boolean isInGroup = assets.get(executionEndpoint.getParent());
+                            List<InjectExpectationSignature> injectExpectationSignatures = List.of(
+                                    InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME).value(executionEndpoint.getProcessName()).build(),
+                                    InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE).value(exploitResult.getCommand()).build()
+                            );
+                            computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup, injectExpectationSignatures);
+                        } else {
+                            execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (" + result + ")"));
+                        }
                     } else {
-                        execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (" + result + ")"));
+                        execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (platform is not compatible: " + executionEndpoint.getPlatform().name() + ")"));
                     }
                 } else {
                     execution.addTrace(traceError("Caldera failed to execute the ability because temporary implant was not found for endpoint " + asset.getName()));
@@ -130,7 +134,7 @@ public class CalderaExecutor extends Injector {
         }
         log.log(Level.INFO, "Trying to find an available executor for " + asset.getName());
         Endpoint assetEndpoint = (Endpoint) Hibernate.unproxy(asset);
-        for(int i = 0; i < RETRY_NUMBER; i++) {
+        for (int i = 0; i < RETRY_NUMBER; i++) {
             // Find an executor agent matching the asset
             log.log(Level.INFO, "Listing agents...");
             List<Agent> agents = this.calderaService.agents().stream().filter(agent ->
@@ -161,7 +165,7 @@ public class CalderaExecutor extends Injector {
                     }
                 }
             }
-            if( endpointForExecution != null ) {
+            if (endpointForExecution != null) {
                 break;
             }
             Thread.sleep(5000);
