@@ -104,8 +104,8 @@ public class AtomicTestingApi extends RestBehavior {
     return injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(injectId, targetId, targetType);
   }
 
-  @Transactional(rollbackOn = Exception.class)
   @PutMapping("/{injectId}/tags")
+  @Transactional(rollbackOn = Exception.class)
   public InjectResultDTO updateAtomicTestingTags(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingUpdateTagsInput input) {

@@ -567,9 +567,9 @@ public class ExerciseApi extends RestBehavior {
         .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + exerciseId));
   }
 
-  @Transactional(rollbackOn = Exception.class)
   @DeleteMapping("/api/exercises/{exerciseId}/{documentId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackOn = Exception.class)
   public Exercise deleteDocument(@PathVariable String exerciseId, @PathVariable String documentId) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     exercise.setUpdatedAt(now());
@@ -590,9 +590,9 @@ public class ExerciseApi extends RestBehavior {
     return exerciseRepository.save(exercise);
   }
 
-  @Transactional(rollbackOn = Exception.class)
   @PutMapping("/api/exercises/{exerciseId}/status")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackOn = Exception.class)
   public Exercise changeExerciseStatus(
       @PathVariable String exerciseId,
       @Valid @RequestBody ExerciseUpdateStatusInput input) {

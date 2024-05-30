@@ -35,9 +35,9 @@ public class EndpointApi {
   private final EndpointRepository endpointRepository;
   private final TagRepository tagRepository;
 
-  @Transactional(rollbackOn = Exception.class)
   @PostMapping(ENDPOINT_URI)
   @PreAuthorize("isPlanner()")
+  @Transactional(rollbackOn = Exception.class)
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(input);
@@ -85,6 +85,7 @@ public class EndpointApi {
 
   @DeleteMapping(ENDPOINT_URI + "/{endpointId}")
   @PreAuthorize("isPlanner()")
+  @Transactional(rollbackOn = Exception.class)
   public void deleteEndpoint(@PathVariable @NotBlank final String endpointId) {
     this.endpointService.deleteEndpoint(endpointId);
   }

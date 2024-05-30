@@ -21,7 +21,6 @@ public class ExerciseExpectationApi extends RestBehavior {
 
   @GetMapping(value = "/api/exercises/{exerciseId}/expectations")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  @Transactional(readOnly = true)
   public List<InjectExpectation> exerciseInjectExpectations(@PathVariable @NotBlank final String exerciseId) {
     return this.exerciseExpectationService.injectExpectations(exerciseId);
   }

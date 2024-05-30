@@ -69,6 +69,7 @@ public class AssetGroupApi {
 
   @PutMapping(ASSET_GROUP_URI + "/{assetGroupId}")
   @PreAuthorize("isPlanner()")
+  @Transactional(rollbackOn = Exception.class)
   public AssetGroup updateAssetGroup(
       @PathVariable @NotBlank final String assetGroupId,
       @Valid @RequestBody final AssetGroupInput input) {
@@ -80,6 +81,7 @@ public class AssetGroupApi {
 
   @PutMapping(ASSET_GROUP_URI + "/{assetGroupId}/assets")
   @PreAuthorize("isPlanner()")
+  @Transactional(rollbackOn = Exception.class)
   public AssetGroup updateAssetsOnAssetGroup(
       @PathVariable @NotBlank final String assetGroupId,
       @Valid @RequestBody final UpdateAssetsOnAssetGroupInput input) {
@@ -89,6 +91,7 @@ public class AssetGroupApi {
 
   @DeleteMapping(ASSET_GROUP_URI + "/{assetGroupId}")
   @PreAuthorize("isPlanner()")
+  @Transactional(rollbackOn = Exception.class)
   public void deleteAssetGroup(@PathVariable @NotBlank final String assetGroupId) {
     this.assetGroupService.deleteAssetGroup(assetGroupId);
   }

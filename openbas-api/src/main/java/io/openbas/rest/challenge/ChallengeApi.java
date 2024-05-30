@@ -184,6 +184,7 @@ public class ChallengeApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/challenges/{challengeId}")
+  @Transactional(rollbackOn = Exception.class)
   public void deleteChallenge(@PathVariable String challengeId) {
     challengeRepository.deleteById(challengeId);
   }
