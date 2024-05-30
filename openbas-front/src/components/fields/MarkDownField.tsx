@@ -35,9 +35,11 @@ const MarkDownField: React.FC<Props> = ({
   });
   const [isEdit, setIsEdit] = useState(true);
   const buttonStyle = {
-    border: '1px solid black',
+    border: '1px solid',
     borderRadius: 4,
     padding: '4px',
+    backgroundColor: 'transparent',
+    cursor: 'pointer',
   };
   const writeCommand: ICommand = {
     name: 'write',
@@ -75,7 +77,10 @@ const MarkDownField: React.FC<Props> = ({
         <Typography>Preview</Typography>
       </div>
     ),
-    execute: () => setIsEdit(false),
+    execute: (e) => {
+      console.log(e);
+      setIsEdit(false);
+    },
   };
 
   return (

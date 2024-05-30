@@ -41,7 +41,6 @@ const PolicyForm: React.FC<Props> = ({
         <MarkDownField
           name="platform_login_message"
           label={t('Platform login message')}
-          style={{ marginTop: 20 }}
           askAi={false}
           inInject={false}
           inArticle={false}
