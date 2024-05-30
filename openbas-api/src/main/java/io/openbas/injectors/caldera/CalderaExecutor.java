@@ -80,7 +80,7 @@ public class CalderaExecutor extends Injector {
                                     InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE).value(exploitResult.getCommand()).build()
                             );
                             computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup, injectExpectationSignatures);
-                            execution.addTrace(traceInfo("Caldera executed ability on asset " + asset.getName() + " using " + executionEndpoint.getProcessName() + " (" + result + ")"));
+                            execution.addTrace(traceInfo("Caldera executed ability on asset " + asset.getName() + " using " + executionEndpoint.getProcessName() + " (linkID: " + exploitResult.getLinkId() + ")"));
                         } else {
                             execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (" + result + ")"));
                         }

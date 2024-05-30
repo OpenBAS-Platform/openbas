@@ -66,39 +66,39 @@ public class CalderaResultCollectorService implements Runnable {
             log.log(Level.INFO, "Found links IDs: " + linkIds);
             List<ResultStatus> completedActions = new ArrayList<>();
             for (String linkId : linkIds) {
+                ResultStatus resultStatus = new ResultStatus();
                 try {
                     log.log(Level.INFO, "Trying to get result for " + linkId);
-                    ResultStatus resultStatus = this.calderaService.results(linkId);
-                    log.log(Level.INFO, "Returning results");
-                    if (resultStatus.getPaw() == null) {
-                        if (injectStatus.getTrackingSentDate().isBefore(Instant.now().minus(EXPIRATION_TIME / 60, ChronoUnit.MINUTES))) {
-                            injectStatus.getTraces().add(traceError("Cannot get result for " + linkId + ", injection is expired"));
-                            computeInjectStatus(injectStatus, finalExecutionTime, 0, 0);
-                            computeInject(injectStatus);
-                        } else {
-                            injectStatus.getTraces().add(traceInfo("Results are not yet available (still on-going)"));
-                        }
-                    } else {
-                        if (resultStatus.isComplete()) {
-                            completedActions.add(resultStatus);
-                            injectStatus.setTrackingTotalSuccess(injectStatus.getTrackingTotalSuccess() + 1);
-                            // Compute biggest execution time
-                            if (resultStatus.getFinish().isAfter(finalExecutionTime)) {
-                                finalExecutionTime = resultStatus.getFinish();
-                            }
-                        } else if (injectStatus.getTrackingSentDate().isBefore(Instant.now().minus(5L, ChronoUnit.MINUTES))) {
-                            resultStatus.setFail(true);
-                            completedActions.add(resultStatus);
-                            injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalSuccess() + 1);
-                        }
-                    }
+                    resultStatus = this.calderaService.results(linkId);
                 } catch (Exception e) {
-                    injectStatus.getTraces().add(
-                            traceError("Caldera failed to get result of the executed ability")
-                    );
+                    injectStatus.getTraces().add(traceError("Cannot get result for linkID " + linkId + ", injection has failed"));
+                    resultStatus.setFail(true);
+                    completedActions.add(resultStatus);
+                    injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalError() + 1);
+                }
+                if (resultStatus.getPaw() == null) {
+                    if (injectStatus.getTrackingSentDate().isBefore(Instant.now().minus(EXPIRATION_TIME / 60, ChronoUnit.MINUTES))) {
+                        injectStatus.getTraces().add(traceError("Cannot get result for linkID " + linkId + ", injection has failed"));
+                        resultStatus.setFail(true);
+                        completedActions.add(resultStatus);
+                        injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalError() + 1);
+                    }
+                } else {
+                    if (resultStatus.isComplete()) {
+                        completedActions.add(resultStatus);
+                        injectStatus.setTrackingTotalSuccess(injectStatus.getTrackingTotalSuccess() + 1);
+                        // Compute biggest execution time
+                        if (resultStatus.getFinish().isAfter(finalExecutionTime)) {
+                            finalExecutionTime = resultStatus.getFinish();
+                        }
+                    } else if (injectStatus.getTrackingSentDate().isBefore(Instant.now().minus(5L, ChronoUnit.MINUTES))) {
+                        injectStatus.getTraces().add(traceError("Timeout on linkID " + linkId + ", injection has failed"));
+                        resultStatus.setFail(true);
+                        completedActions.add(resultStatus);
+                        injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalError() + 1);
+                    }
                 }
             }
-
             // Compute status only if all actions are completed
             if (!linkIds.isEmpty() && completedActions.size() == linkIds.size()) {
                 int failedActions = (int) completedActions.stream().filter(ResultStatus::isFail).count();
