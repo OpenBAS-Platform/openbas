@@ -43,6 +43,7 @@ public class ExpectationApi extends RestBehavior {
         this.collectorRepository = collectorRepository;
     }
 
+    @Transactional(rollbackOn = Exception.class)
     @PutMapping("/api/expectations/{expectationId}")
     public InjectExpectation updateInjectExpectation(
             @PathVariable @NotBlank final String expectationId,
@@ -92,6 +93,7 @@ public class ExpectationApi extends RestBehavior {
         return injectExpectationService.detectionExpectationsNotFill(sourceId).stream().toList();
     }
 
+    @Transactional(rollbackOn = Exception.class)
     @PutMapping("/api/injects/expectations/{expectationId}")
     public InjectExpectation updateInjectExpectation(@PathVariable @NotBlank final String expectationId, @Valid @RequestBody @NotNull InjectExpectationUpdateInput input) {
         InjectExpectation injectExpectation = this.injectExpectationService.findInjectExpectation(expectationId).orElseThrow();

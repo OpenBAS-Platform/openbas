@@ -81,6 +81,7 @@ public class CalderaExecutor extends Injector {
                                     InjectExpectationSignature.builder().type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE).value(exploitResult.getCommand()).build()
                             );
                             computeExpectationsForAsset(expectations, content, executionEndpoint.getParent(), isInGroup, injectExpectationSignatures);
+                            execution.addTrace(traceInfo("Caldera executed ability on asset " + asset.getName() + " using " + executionEndpoint.getProcessName() + " (" + result + ")"));
                         } else {
                             execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (" + result + ")"));
                         }
@@ -88,7 +89,7 @@ public class CalderaExecutor extends Injector {
                         execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (platform is not compatible: " + executionEndpoint.getPlatform().name() + ")"));
                     }
                 } else {
-                    execution.addTrace(traceError("Caldera failed to execute the ability because temporary implant was not found for endpoint " + asset.getName()));
+                    execution.addTrace(traceError("Caldera failed to execute the ability on asset " + asset.getName() + " (temporary injector not spawned correctly)"));
                 }
             } catch (Exception e) {
                 execution.addTrace(traceError("Caldera failed to execute ability on asset " + asset.getName() + " (" + e.getMessage() + ")"));
@@ -103,7 +104,7 @@ public class CalderaExecutor extends Injector {
             throw new UnsupportedOperationException("Caldera failed to execute the ability due to above errors");
         }
 
-        String message = "Caldera execute ability on " + asyncIds.size() + " asset(s)";
+        String message = "Caldera executed the ability on " + asyncIds.size() + " asset(s)";
         execution.addTrace(traceInfo(message, asyncIds));
 
         return new ExecutionProcess(true, expectations);

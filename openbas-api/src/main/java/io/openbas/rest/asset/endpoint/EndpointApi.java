@@ -7,6 +7,7 @@ import io.openbas.database.repository.TagRepository;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class EndpointApi {
   private final EndpointRepository endpointRepository;
   private final TagRepository tagRepository;
 
+  @Transactional
   @PostMapping(ENDPOINT_URI)
   @PreAuthorize("isPlanner()")
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
@@ -68,6 +70,7 @@ public class EndpointApi {
     );
   }
 
+  @Transactional(rollbackOn = Exception.class)
   @PutMapping(ENDPOINT_URI + "/{endpointId}")
   @PreAuthorize("isPlanner()")
   public Endpoint updateEndpoint(
