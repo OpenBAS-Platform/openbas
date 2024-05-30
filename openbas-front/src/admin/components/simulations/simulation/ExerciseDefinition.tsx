@@ -31,24 +31,24 @@ const ExerciseDefinition = () => {
   return (
     <>
       <Grid
-        container={true}
+        container
         spacing={3}
         classes={{ container: classes.gridContainer }}
       >
-        <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
-          <ExerciseTeams exerciseTeamsUsers={exercise.exercise_teams_users} />
+        <Grid item xs={6} style={{ paddingTop: 10 }}>
+          <ExerciseTeams exerciseTeamsUsers={exercise.exercise_teams_users ?? []} />
         </Grid>
-        <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
+        <Grid item xs={6} style={{ paddingTop: 10 }}>
           <ExerciseVariables />
         </Grid>
-        <Grid item={true} xs={12} style={{ marginTop: 25 }}>
-          <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
+        <Grid item xs={12} style={{ marginTop: 25 }}>
+          <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
             {t('Media pressure')}
           </Typography>
           <ExerciseArticles />
         </Grid>
-        <Grid item={true} xs={12} style={{ marginTop: 10 }}>
-          <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
+        <Grid item xs={12} style={{ marginTop: 10 }}>
+          <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
             {t('Used challenges (in injects)')}
           </Typography>
           <ExerciseChallenges />
