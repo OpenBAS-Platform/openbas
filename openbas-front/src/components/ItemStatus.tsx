@@ -63,12 +63,9 @@ interface ItemStatusProps {
   isInject?: boolean,
 }
 
-const computeStatusStyle = (status: string | undefined | null, isInject: boolean | undefined | null) => {
+const computeStatusStyle = (status: string | undefined | null) => {
   switch (status) {
     case 'ERROR':
-      if (isInject) {
-        return inlineStyles.orange;
-      }
       return inlineStyles.red;
     case 'PARTIAL':
       return inlineStyles.orange;
@@ -94,14 +91,11 @@ const ItemStatus: FunctionComponent<ItemStatusProps> = ({
   const { t } = useFormatter();
   const classes = useStyles();
   const style = variant === 'inList' ? classes.chipInList : classes.chip;
-  const classStyle = computeStatusStyle(status, isInject);
+  const classStyle = computeStatusStyle(status);
   let finalLabel = label;
   if (isInject) {
-    if (status === 'ERROR') {
-      finalLabel = t('Error or prevented');
-    }
     if (status === 'SUCCESS') {
-      finalLabel = t('Attack Executed');
+      finalLabel = t('INJECT EXECUTED');
     }
   }
   return (
