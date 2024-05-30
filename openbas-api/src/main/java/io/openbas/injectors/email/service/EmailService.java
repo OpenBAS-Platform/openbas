@@ -106,8 +106,8 @@ public class EmailService {
                     execution.addTrace(traceSuccess("Mail successfully stored in IMAP"));
                     return;
                 } catch (Exception e) {
-                    Thread.sleep(2000);
                     execution.addTrace(traceError("Fail to store mail in IMAP" + e.getMessage()));
+                    Thread.sleep(2000);
                 }
             }
             execution.addTrace(traceError("Fail to store mail in IMAP after 3 attempts"));
