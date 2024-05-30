@@ -119,6 +119,7 @@ public class InjectExpectationService {
                         Specification.where(InjectExpectationSpecification.type(PREVENTION))
                 )
                 .stream()
+                .filter(e -> e.getAsset() != null)
                 .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
                 .toList();
     }
@@ -128,6 +129,7 @@ public class InjectExpectationService {
                         Specification.where(InjectExpectationSpecification.type(PREVENTION))
                 )
                 .stream()
+                .filter(e -> e.getAsset() != null)
                 .filter(e -> e.getResults().stream().toList().isEmpty())
                 .toList();
     }
@@ -147,6 +149,7 @@ public class InjectExpectationService {
         return this.injectExpectationRepository
                 .findAll(Specification.where(InjectExpectationSpecification.type(DETECTION)))
                 .stream()
+                .filter(e -> e.getAsset() != null)
                 .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
                 .toList();
     }
@@ -156,18 +159,9 @@ public class InjectExpectationService {
                         Specification.where(InjectExpectationSpecification.type(DETECTION))
                 )
                 .stream()
+                .filter(e -> e.getAsset() != null)
                 .filter(e -> e.getResults().stream().toList().isEmpty())
                 .toList();
-    }
-
-    public List<InjectExpectation> detectionExpectationsForAssets(
-            @NotNull final Inject inject,
-            @NotNull final AssetGroup assetGroup) {
-        List<String> assetIds = assetGroup.getAssets().stream().map(Asset::getId).toList();
-        return this.injectExpectationRepository.findAll(
-                Specification.where(InjectExpectationSpecification.type(DETECTION))
-                        .and(InjectExpectationSpecification.fromAssets(inject.getId(), assetIds))
-        );
     }
 
     // -- MANUAL
