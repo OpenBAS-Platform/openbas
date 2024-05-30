@@ -96,6 +96,7 @@ const ExerciseControlDryRuns: FunctionComponent<Props> = ({
                       className={classes.bodyItem}
                       style={{ width: '15%' }}
                     >
+                      {/* eslint-disable-next-line i18next/no-literal-string */}
                       <code>{dryrun.dryrun_speed}x</code>
                     </div>
                     <div

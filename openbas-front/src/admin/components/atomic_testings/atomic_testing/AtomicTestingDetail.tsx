@@ -135,7 +135,7 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
                   </Typography>
                   <Typography variant="body1" gutterBottom>
                     {t('Tracking Total Execution')}
-                    {t('Time')}: {injectResultDto.inject_status?.tracking_total_execution_time} ms
+                    {t('Time')}: {injectResultDto.inject_status?.tracking_total_execution_time} {t('ms')}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
                     {t('Tracking Total Count')}: {injectResultDto.inject_status?.tracking_total_count}

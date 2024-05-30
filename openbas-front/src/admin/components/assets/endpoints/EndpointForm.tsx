@@ -214,9 +214,9 @@ const EndpointForm: React.FC<Props> = ({
             inputProps={register('endpoint_platform')}
             InputLabelProps={{ required: true }}
           >
-            <MenuItem value='Linux'>Linux</MenuItem>
-            <MenuItem value='Windows'>Windows</MenuItem>
-            <MenuItem value='MacOS'>MacOS</MenuItem>
+            <MenuItem value='Linux'>{t('Linux')}</MenuItem>
+            <MenuItem value='Windows'>{t('Windows')}</MenuItem>
+            <MenuItem value='MacOS'>{t('MacOS')}</MenuItem>
           </TextField>
         )}
       />

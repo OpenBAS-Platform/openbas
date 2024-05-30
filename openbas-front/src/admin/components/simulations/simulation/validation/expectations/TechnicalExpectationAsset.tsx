@@ -84,8 +84,8 @@ const TechnicalExpectationAsset: FunctionComponent<Props> = ({
                 {!R.isEmpty(expectation.inject_expectation_results)
                   && <>
                     <ListItem divider>
-                      <ListItemText style={{ maxWidth: '200px' }} primary={<span>Source</span>} />
-                      <ListItemText primary={<span>Result</span>} />
+                      <ListItemText style={{ maxWidth: '200px' }} primary={<span>{t('Source')}</span>} />
+                      <ListItemText primary={<span>{t('Result')}</span>} />
                       <ListItemIcon></ListItemIcon>
                     </ListItem>
                     <List

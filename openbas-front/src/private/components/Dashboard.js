@@ -2,7 +2,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { withStyles, withTheme } from '@mui/styles';
-import inject18n from '../../components/i18n';
+import inject18n, { useFormatter } from '../../components/i18n';
 
 const styles = () => ({
   root: {
@@ -12,7 +12,8 @@ const styles = () => ({
 
 const Dashboard = (props) => {
   const { classes } = props;
-  return <div className={classes.root}>Player dashboard!</div>;
+  const { t } = useFormatter();
+  return <div className={classes.root}>{t('Player dashboard!')}</div>;
 };
 
 Dashboard.propTypes = {

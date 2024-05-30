@@ -218,7 +218,7 @@ nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
                     color: windowsExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
                   }}
                 >
-                  <DownloadingOutlined style={{ marginRight: 10 }} /> Install Windows Agent
+                  <DownloadingOutlined style={{ marginRight: 10 }} /> {t('Install Windows Agent')}
                 </Typography>
                 <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {windowsExecutors.map((executor: Executor) => {
@@ -254,7 +254,7 @@ nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
                     color: linuxExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
                   }}
                 >
-                  <DownloadingOutlined style={{ marginRight: 10 }} /> Install Linux Agent
+                  <DownloadingOutlined style={{ marginRight: 10 }} /> {t('Install Linux Agent')}
                 </Typography>
                 <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {linuxExecutors.map((executor: Executor) => {
@@ -290,7 +290,7 @@ nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
                     color: macOsExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
                   }}
                 >
-                  <DownloadingOutlined style={{ marginRight: 10 }} /> Install MacOS Agent
+                  <DownloadingOutlined style={{ marginRight: 10 }} /> {t('Install MacOS Agent')}
                 </Typography>
                 <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {macOsExecutors.map((executor: Executor) => {
@@ -326,7 +326,7 @@ nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
                     color: browserExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
                   }}
                 >
-                  <DownloadingOutlined style={{ marginRight: 10 }} /> Install Browser Agent
+                  <DownloadingOutlined style={{ marginRight: 10 }} /> {t('Install Browser Agent')}
                 </Typography>
                 <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {browserExecutors.map((executor: Executor) => {
@@ -353,7 +353,7 @@ nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
         fullWidth={true}
         maxWidth="md"
       >
-        <DialogTitle>Install a simulation agent</DialogTitle>
+        <DialogTitle>{t('Install a simulation agent')}</DialogTitle>
         <DialogContent>
           <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">
             {(selectedExecutors ?? []).map((executor) => {
@@ -439,7 +439,7 @@ nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
                   label={t('documentation')}
                 />
                 <Typography variant="body1" style={{ marginBottom: 20 }}>
-                  To install the agent please follow the <a target="_blank" href={currentSelectedExecutor.executor_doc} rel="noreferrer">{currentSelectedExecutor.executor_name} documentation</a>.
+                  {t('To install the agent please follow the')} <a target="_blank" href={currentSelectedExecutor.executor_doc} rel="noreferrer">{currentSelectedExecutor.executor_name} {t('documentation')}</a>.
                 </Typography>
               </div>
             )}

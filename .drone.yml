@@ -27,7 +27,7 @@ steps:
       - yarn build
       - yarn check-ts
       - yarn lint
-      # - yarn i18n-checker
+      - yarn i18n-checker
       - NODE_OPTIONS=--max_old_space_size=8192 yarn test
 
   - name: app-e2e
