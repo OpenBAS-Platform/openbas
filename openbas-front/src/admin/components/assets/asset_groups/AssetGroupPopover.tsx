@@ -28,6 +28,7 @@ interface Props {
   inline?: boolean;
   assetGroup: AssetGroupStore;
   onRemoveAssetGroupFromInject?: (assetGroupId: string) => void;
+  onRemoveEndpointFromAssetGroup?: (assetId: string) => void;
   openEditOnInit?: boolean;
   onUpdate?: (result: AssetGroupStore) => void;
   onDelete?: (result: string) => void;
@@ -37,9 +38,11 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
   inline,
   assetGroup,
   onRemoveAssetGroupFromInject,
+  onRemoveEndpointFromAssetGroup,
   openEditOnInit = false,
   onUpdate,
   onDelete,
+
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -207,6 +210,8 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
           {selected !== undefined && (
             <AssetGroupManagement
               assetGroupId={assetGroup.asset_group_id}
+              onUpdate={onUpdate}
+              onRemoveEndpointFromAssetGroup={onRemoveEndpointFromAssetGroup}
               handleClose={() => setSelected(false)}
             />
           )}

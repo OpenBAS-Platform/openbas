@@ -39,7 +39,7 @@ const FilterChip: FunctionComponent<Props> = ({
 
   const title = () => {
     return (
-      <><strong>{t(filter.key)}</strong> {convertOperatorToIcon(filter.operator)} {filter.values?.join(', ')}</>
+      <><strong>{t(filter.key)}</strong> {convertOperatorToIcon(t, filter.operator)} {filter.values?.join(', ')}</>
     );
   };
 
