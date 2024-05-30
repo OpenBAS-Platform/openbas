@@ -33,8 +33,6 @@ const MarkDownField: React.FC<Props> = ({
     defaultValue: '',
   });
   const [isEdit, setIsEdit] = useState(true);
-  const [isWriteClicked, setIsWriteClicked] = useState(true);
-  const [isPreviewClicked, setIsPreviewClicked] = useState(false);
 
   const buttonStyle = {
     border: '1px solid black',
@@ -67,21 +65,18 @@ const MarkDownField: React.FC<Props> = ({
               icon: (
                 <div
                   style={{ ...buttonStyle,
-                    border: isWriteClicked ? '1px solid' : '',
+                    border: isEdit ? '1px solid' : '',
                     borderRadius: 4,
                     padding: '4px',
-                    backgroundColor: 'transparent', // Ensure background color is transparent initially
-                  }}
-                  onClick={() => {
-                    setIsWriteClicked(true);
-                    setIsPreviewClicked(false);
-                    setIsEdit(true);
+                    backgroundColor: 'transparent',
                   }}
                 >
                   <Typography>Write</Typography>
                 </div>
               ),
-              execute: () => setIsEdit(true),
+              execute: () => {
+                setIsEdit(true);
+              },
             },
             {
               name: 'preview',
@@ -90,21 +85,18 @@ const MarkDownField: React.FC<Props> = ({
               icon: (
                 <div
                   style={{
-                    border: isPreviewClicked ? '1px solid' : '',
+                    border: !isEdit ? '1px solid' : '',
                     borderRadius: 4,
                     padding: '4px',
-                    backgroundColor: 'transparent', // Ensure background color is transparent initially
-                  }}
-                  onClick={() => {
-                    setIsPreviewClicked(true);
-                    setIsWriteClicked(false);
-                    setIsEdit(true);
+                    backgroundColor: 'transparent',
                   }}
                 >
                   <Typography>Preview</Typography>
                 </div>
               ),
-              execute: () => setIsEdit(false),
+              execute: () => {
+                setIsEdit(false);
+              },
             },
             ...(isEdit ? [
               { ...commands.title, buttonProps: { disabled } },
