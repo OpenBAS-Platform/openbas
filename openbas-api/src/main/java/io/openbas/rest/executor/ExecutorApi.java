@@ -11,9 +11,11 @@ import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 
@@ -70,7 +73,7 @@ public class ExecutorApi extends RestBehavior {
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public Executor registerExecutor(@Valid @RequestPart("input") ExecutorCreateInput input,
-                                       @RequestPart("icon") Optional<MultipartFile> file) {
+                                     @RequestPart("icon") Optional<MultipartFile> file) {
         try {
             // Upload icon
             if (file.isPresent() && "image/png".equals(file.get().getContentType())) {
@@ -78,9 +81,9 @@ public class ExecutorApi extends RestBehavior {
             }
             // We need to support upsert for registration
             Executor executor = executorRepository.findById(input.getId()).orElse(null);
-            if( executor == null ) {
+            if (executor == null) {
                 Executor executorChecking = executorRepository.findByType(input.getType()).orElse(null);
-                if (executorChecking != null ) {
+                if (executorChecking != null) {
                     throw new Exception("The executor " + input.getType() + " already exists with a different ID, please delete it or contact your administrator.");
                 }
             }
@@ -101,15 +104,12 @@ public class ExecutorApi extends RestBehavior {
     }
 
     @GetMapping(value = "/api/agent/{platform}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public void getAgent(@PathVariable String platform, HttpServletResponse response) throws IOException {
-        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=obas-" + platform);
-        response.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        response.setStatus(HttpServletResponse.SC_OK);
-        InputStream fileStream = getClass().getResourceAsStream("/agents/obas-" + platform);
-        if (fileStream != null) {
-            fileStream.transferTo(response.getOutputStream());
-        } else {
-            throw new ElementNotFoundException();
+    public @ResponseBody byte[] getAgent(@PathVariable String platform) throws IOException {
+        InputStream in = getClass().getResourceAsStream("/agents/obas-" + platform);
+        System.out.println(in);
+        if (in != null) {
+            return IOUtils.toByteArray(in);
         }
+        return null;
     }
 }
