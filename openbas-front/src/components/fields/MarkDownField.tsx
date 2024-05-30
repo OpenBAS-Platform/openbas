@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
 import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
-import { Box, FormHelperText, Icon, IconButton, InputLabel, Typography } from '@mui/material';
+import { Box, FormHelperText, InputLabel, Typography } from '@mui/material';
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 
 interface Props {
@@ -33,8 +33,15 @@ const MarkDownField: React.FC<Props> = ({
     defaultValue: '',
   });
   const [isEdit, setIsEdit] = useState(true);
-  const [isWriteClicked, setIsWriteClicked] = useState(false);
+  const [isWriteClicked, setIsWriteClicked] = useState(true);
   const [isPreviewClicked, setIsPreviewClicked] = useState(false);
+
+  const buttonStyle = {
+    border: '1px solid black',
+    borderRadius: 4,
+    padding: '4px',
+    backgroundColor: 'transparent',
+  };
 
   return (
     <div
@@ -56,13 +63,14 @@ const MarkDownField: React.FC<Props> = ({
             {
               name: 'write',
               keyCommand: 'write',
-              buttonProps: { 'aria-label': 'write' },
+              buttonProps: { 'aria-label': 'write', style: { backgroundColor: 'transparent' } },
               icon: (
                 <div
-                  style={{
+                  style={{ ...buttonStyle,
                     border: isWriteClicked ? '1px solid' : '',
                     borderRadius: 4,
                     padding: '4px',
+                    backgroundColor: 'transparent', // Ensure background color is transparent initially
                   }}
                   onClick={() => {
                     setIsWriteClicked(true);
@@ -78,13 +86,14 @@ const MarkDownField: React.FC<Props> = ({
             {
               name: 'preview',
               keyCommand: 'preview',
-              buttonProps: { 'aria-label': 'preview' },
+              buttonProps: { 'aria-label': 'preview', style: { backgroundColor: 'transparent' } },
               icon: (
                 <div
                   style={{
                     border: isPreviewClicked ? '1px solid' : '',
                     borderRadius: 4,
                     padding: '4px',
+                    backgroundColor: 'transparent', // Ensure background color is transparent initially
                   }}
                   onClick={() => {
                     setIsPreviewClicked(true);
