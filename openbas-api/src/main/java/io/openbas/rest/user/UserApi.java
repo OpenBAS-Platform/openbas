@@ -154,6 +154,7 @@ public class UserApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/users/{userId}/password")
+    @Transactional(rollbackOn = Exception.class)
     public User changePassword(@PathVariable String userId,
                                @Valid @RequestBody ChangePasswordInput input) {
         User user = userRepository.findById(userId).orElseThrow(ElementNotFoundException::new);
@@ -161,15 +162,16 @@ public class UserApi extends RestBehavior {
         return userRepository.save(user);
     }
 
-    @Transactional(rollbackOn = Exception.class)
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/users")
+    @Transactional(rollbackOn = Exception.class)
     public User createUser(@Valid @RequestBody CreateUserInput input) {
         return userService.createUser(input, 1);
     }
 
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/users/{userId}")
+    @Transactional(rollbackOn = Exception.class)
     public User updateUser(@PathVariable String userId, @Valid @RequestBody UpdateUserInput input) {
         User user = userRepository.findById(userId).orElseThrow(ElementNotFoundException::new);
         user.setUpdateAttributes(input);
@@ -182,6 +184,7 @@ public class UserApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @DeleteMapping("/api/users/{userId}")
+    @Transactional(rollbackOn = Exception.class)
     public void deleteUser(@PathVariable String userId) {
         sessionManager.invalidateUserSession(userId);
         userRepository.deleteById(userId);

@@ -10,6 +10,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,7 @@ public class ExecutorApi extends RestBehavior {
     @PostMapping(value = "/api/executors",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Transactional(rollbackOn = Exception.class)
     public Executor registerExecutor(@Valid @RequestPart("input") ExecutorCreateInput input,
                                      @RequestPart("icon") Optional<MultipartFile> file) {
         try {

@@ -11,6 +11,7 @@ import io.openbas.database.specification.LessonsTemplateQuestionSpecification;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.lessons_template.form.*;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -49,6 +50,7 @@ public class LessonsTemplateApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/lessons_templates")
+    @Transactional(rollbackOn = Exception.class)
     public LessonsTemplate createLessonsTemplate(@Valid @RequestBody LessonsTemplateCreateInput input) {
         LessonsTemplate lessonsTemplate = new LessonsTemplate();
         lessonsTemplate.setUpdateAttributes(input);
@@ -78,6 +80,7 @@ public class LessonsTemplateApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories")
+    @Transactional(rollbackOn = Exception.class)
     public LessonsTemplateCategory createLessonsTemplateCategory(@PathVariable String lessonsTemplateId, @Valid @RequestBody LessonsTemplateCategoryCreateInput input) {
         LessonsTemplate lessonsTemplate = lessonsTemplateRepository.findById(lessonsTemplateId).orElseThrow(ElementNotFoundException::new);
         LessonsTemplateCategory lessonsTemplateCategory = new LessonsTemplateCategory();
@@ -88,6 +91,7 @@ public class LessonsTemplateApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/lessons_templates/{lessonsTemplateId}/lessons_template_categories/{lessonsTemplateCategoryId}")
+    @Transactional(rollbackOn = Exception.class)
     public LessonsTemplateCategory updateLessonsTemplateCategory(@PathVariable String lessonsTemplateCategoryId, @Valid @RequestBody LessonsTemplateCategoryUpdateInput input) {
         LessonsTemplateCategory lessonsTemplateCategory = lessonsTemplateCategoryRepository.findById(lessonsTemplateCategoryId).orElseThrow(ElementNotFoundException::new);
         lessonsTemplateCategory.setUpdateAttributes(input);

@@ -35,7 +35,7 @@ public class EndpointApi {
   private final EndpointRepository endpointRepository;
   private final TagRepository tagRepository;
 
-  @Transactional
+  @Transactional(rollbackOn = Exception.class)
   @PostMapping(ENDPOINT_URI)
   @PreAuthorize("isPlanner()")
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
@@ -70,9 +70,9 @@ public class EndpointApi {
     );
   }
 
-  @Transactional(rollbackOn = Exception.class)
   @PutMapping(ENDPOINT_URI + "/{endpointId}")
   @PreAuthorize("isPlanner()")
+  @Transactional(rollbackOn = Exception.class)
   public Endpoint updateEndpoint(
       @PathVariable @NotBlank final String endpointId,
       @Valid @RequestBody final EndpointInput input) {

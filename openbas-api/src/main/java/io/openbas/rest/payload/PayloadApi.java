@@ -8,6 +8,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,7 @@ public class PayloadApi extends RestBehavior {
 
     @PostMapping("/api/payloads")
     @PreAuthorize("isPlanner()")
+    @Transactional(rollbackOn = Exception.class)
     public Payload createPayload(@Valid @RequestBody PayloadCreateInput input) {
         Payload payload = new Payload();
         payload.setUpdateAttributes(input);
@@ -73,6 +75,7 @@ public class PayloadApi extends RestBehavior {
 
     @PutMapping("/api/payloads/{payloadId}")
     @PreAuthorize("isPlanner()")
+    @Transactional(rollbackOn = Exception.class)
     public Payload updatePayload(
             @NotBlank @PathVariable final String payloadId,
             @Valid @RequestBody PayloadUpdateInput input) {

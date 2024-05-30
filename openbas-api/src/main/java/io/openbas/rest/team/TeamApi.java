@@ -12,6 +12,7 @@ import io.openbas.rest.team.form.TeamCreateInput;
 import io.openbas.rest.team.form.TeamUpdateInput;
 import io.openbas.rest.team.form.UpdateUsersTeamInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -132,6 +133,7 @@ public class TeamApi extends RestBehavior {
 
     @PostMapping("/api/teams")
     @PreAuthorize("isPlanner()")
+    @Transactional(rollbackOn = Exception.class)
     public Team createTeam(@Valid @RequestBody TeamCreateInput input) {
         if (input.getContextual() && input.getExerciseIds().toArray().length > 1) {
             throw new UnsupportedOperationException("Contextual team can only be associated to one exercise");
@@ -151,6 +153,7 @@ public class TeamApi extends RestBehavior {
 
     @PostMapping("/api/teams/upsert")
     @PreAuthorize("isPlanner()")
+    @Transactional(rollbackOn = Exception.class)
     public Team upsertTeam(@Valid @RequestBody TeamCreateInput input) {
         if (input.getContextual() && input.getExerciseIds().toArray().length > 1) {
             throw new UnsupportedOperationException("Contextual team can only be associated to one exercise");

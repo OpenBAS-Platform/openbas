@@ -292,6 +292,7 @@ public class InjectApi extends RestBehavior {
 
     @PostMapping("/api/exercises/{exerciseId}/injects")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
+    @Transactional(rollbackOn = Exception.class)
     public Inject createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
         InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new);
@@ -425,6 +426,7 @@ public class InjectApi extends RestBehavior {
 
     @PostMapping(SCENARIO_URI + "/{scenarioId}/injects")
     @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    @Transactional(rollbackOn = Exception.class)
     public Inject createInjectForScenario(
             @PathVariable @NotBlank final String scenarioId,
             @Valid @RequestBody InjectInput input) {

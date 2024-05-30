@@ -47,8 +47,8 @@ public class ComcheckApi extends RestBehavior {
         this.exerciseRepository = exerciseRepository;
     }
 
-    @Transactional(rollbackOn = Exception.class)
     @GetMapping("/api/comcheck/{comcheckStatusId}")
+    @Transactional(rollbackOn = Exception.class)
     public ComcheckStatus checkValidation(@PathVariable String comcheckStatusId) {
         ComcheckStatus comcheckStatus = comcheckStatusRepository.findById(comcheckStatusId).orElseThrow(ElementNotFoundException::new);
         Comcheck comcheck = comcheckStatus.getComcheck();
@@ -68,12 +68,13 @@ public class ComcheckApi extends RestBehavior {
 
     @DeleteMapping("/api/exercises/{exerciseId}/comchecks/{comcheckId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
+    @Transactional(rollbackOn = Exception.class)
     public void deleteComcheck(@PathVariable String exerciseId, @PathVariable String comcheckId) {
         comcheckRepository.deleteById(comcheckId);
     }
 
-    @Transactional(rollbackOn = Exception.class)
     @PostMapping("/api/exercises/{exerciseId}/comchecks")
+    @Transactional(rollbackOn = Exception.class)
     public Comcheck communicationCheck(@PathVariable String exerciseId,
                                        @Valid @RequestBody ComcheckInput comCheck) {
         // 01. Create the comcheck and get the ID

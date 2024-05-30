@@ -81,6 +81,7 @@ public class AttackPatternApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/attack_patterns")
+    @Transactional(rollbackOn = Exception.class)
     public AttackPattern createAttackPattern(@Valid @RequestBody AttackPatternCreateInput input) {
         AttackPattern attackPattern = new AttackPattern();
         attackPattern.setUpdateAttributes(input);

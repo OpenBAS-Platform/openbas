@@ -118,6 +118,7 @@ public class ChannelApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/channels")
+  @Transactional(rollbackOn = Exception.class)
   public Channel createChannel(@Valid @RequestBody ChannelCreateInput input) {
     Channel channel = new Channel();
     channel.setUpdateAttributes(input);
@@ -257,6 +258,7 @@ public class ChannelApi extends RestBehavior {
 
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @PostMapping("/api/exercises/{exerciseId}/articles")
+  @Transactional(rollbackOn = Exception.class)
   public Article createArticleForExercise(
       @PathVariable String exerciseId,
       @Valid @RequestBody ArticleCreateInput input) {
@@ -328,9 +330,9 @@ public class ChannelApi extends RestBehavior {
     return enrichArticleWithVirtualPublication(exercise.getInjects(), savedArticle);
   }
 
-  @Transactional(rollbackOn = Exception.class)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @DeleteMapping("/api/exercises/{exerciseId}/articles/{articleId}")
+  @Transactional(rollbackOn = Exception.class)
   public void deleteArticleForExercise(@PathVariable String exerciseId, @PathVariable String articleId) {
     articleRepository.deleteById(articleId);
   }
@@ -339,6 +341,7 @@ public class ChannelApi extends RestBehavior {
 
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @PostMapping(SCENARIO_URI + "/{scenarioId}/articles")
+  @Transactional(rollbackOn = Exception.class)
   public Article createArticleForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody ArticleCreateInput input) {
@@ -375,6 +378,7 @@ public class ChannelApi extends RestBehavior {
 
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @PutMapping(SCENARIO_URI + "/{scenarioId}/articles/{articleId}")
+  @Transactional(rollbackOn = Exception.class)
   public Article updateArticleForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String articleId,
@@ -410,9 +414,9 @@ public class ChannelApi extends RestBehavior {
     return enrichArticleWithVirtualPublication(scenario.getInjects(), savedArticle);
   }
 
-  @Transactional(rollbackOn = Exception.class)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @DeleteMapping(SCENARIO_URI + "/{scenarioId}/articles/{articleId}")
+  @Transactional(rollbackOn = Exception.class)
   public void deleteArticleForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String articleId) {

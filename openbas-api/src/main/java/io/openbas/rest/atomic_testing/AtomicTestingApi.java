@@ -57,8 +57,8 @@ public class AtomicTestingApi extends RestBehavior {
     return atomicTestingService.findById(injectId).orElseThrow(ElementNotFoundException::new);
   }
 
-  @Transactional
   @PostMapping()
+  @Transactional(rollbackOn = Exception.class)
   public InjectResultDTO createAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {
     Inject inject = this.atomicTestingService.createOrUpdate(input, null);
     return AtomicTestingMapper.toDto(
@@ -70,8 +70,8 @@ public class AtomicTestingApi extends RestBehavior {
     );
   }
 
-  @Transactional
   @PutMapping("/{injectId}")
+  @Transactional(rollbackOn = Exception.class)
   public InjectResultDTO updateAtomicTesting(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingInput input) {

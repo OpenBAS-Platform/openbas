@@ -217,6 +217,7 @@ public class ChallengeApi extends RestBehavior {
   }
 
   @PostMapping("/api/player/challenges/{exerciseId}/{challengeId}/validate")
+  @Transactional(rollbackOn = Exception.class)
   public ChallengesReader validateChallenge(@PathVariable String exerciseId,
       @PathVariable String challengeId,
       @Valid @RequestBody ChallengeTryInput input,

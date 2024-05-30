@@ -101,6 +101,7 @@ public class GroupApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/groups")
+    @Transactional(rollbackOn = Exception.class)
     public Group createGroup(@Valid @RequestBody GroupCreateInput input) {
         Group group = new Group();
         group.setUpdateAttributes(input);
@@ -111,6 +112,7 @@ public class GroupApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/groups/{groupId}/users")
+    @Transactional(rollbackOn = Exception.class)
     public Group updateGroupUsers(@PathVariable String groupId,
                                   @Valid @RequestBody GroupUpdateUsersInput input) {
         Group group = groupRepository.findById(groupId).orElseThrow(ElementNotFoundException::new);
@@ -134,6 +136,7 @@ public class GroupApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/groups/{groupId}/information")
+    @Transactional(rollbackOn = Exception.class)
     public Group updateGroupInformation(
             @PathVariable String groupId,
             @Valid @RequestBody GroupCreateInput input) {
@@ -144,9 +147,9 @@ public class GroupApi extends RestBehavior {
         return groupRepository.save(group);
     }
 
-    @Transactional(rollbackOn = Exception.class)
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/groups/{groupId}/grants")
+    @Transactional(rollbackOn = Exception.class)
     public Grant groupGrant(@PathVariable String groupId, @Valid @RequestBody GroupGrantInput input) {
         if (input.getExerciseId() == null && input.getScenarioId() == null) {
             throw new IllegalArgumentException("At least one of exercise or scenario should be present");
@@ -188,9 +191,9 @@ public class GroupApi extends RestBehavior {
         return savedGrant;
     }
 
-    @Transactional(rollbackOn = Exception.class)
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/groups/{groupId}/organizations")
+    @Transactional(rollbackOn = Exception.class)
     public Group groupOrganization(@PathVariable String groupId, @Valid @RequestBody OrganizationGrantInput input) {
         // Resolve dependencies
         Group group = groupRepository.findById(groupId).orElseThrow(ElementNotFoundException::new);
@@ -210,12 +213,14 @@ public class GroupApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @DeleteMapping("/api/grants/{grantId}")
+    @Transactional(rollbackOn = Exception.class)
     public void deleteGrant(@PathVariable String grantId) {
         grantRepository.deleteById(grantId);
     }
 
     @Secured(ROLE_ADMIN)
     @DeleteMapping("/api/groups/{groupId}")
+    @Transactional(rollbackOn = Exception.class)
     public void deleteGroup(@PathVariable String groupId) {
         groupRepository.deleteById(groupId);
     }
