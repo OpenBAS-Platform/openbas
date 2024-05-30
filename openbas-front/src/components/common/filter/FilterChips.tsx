@@ -63,7 +63,7 @@ const FilterChips: FunctionComponent<Props> = ({
           return (<></>);
         }
         return (
-          <>
+          <React.Fragment key={filter.key}>
             {idx !== 0
               && <div
                 onClick={handleSwitchMode}
@@ -77,11 +77,12 @@ const FilterChips: FunctionComponent<Props> = ({
               propertySchema={property}
               pristine={pristine}
             />
-          </>
+          </React.Fragment>
         );
       })
       }
     </Box>
   );
 };
+
 export default FilterChips;

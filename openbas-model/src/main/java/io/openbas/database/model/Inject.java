@@ -148,6 +148,7 @@ public class Inject implements Base, Injection {
   // CascadeType.ALL is required here because inject status are embedded
   @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonProperty("inject_status")
+  @Queryable(sortable = true, property = "name")
   private InjectStatus status;
 
   @Getter

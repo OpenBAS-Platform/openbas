@@ -20,7 +20,6 @@ const useStyles = makeStyles(() => ({
 type OptionPropertySchema = Option & { operator: Filter['operator'] };
 
 interface Props {
-  labelId: string;
   clazz: string;
   initialValue?: FilterGroup;
   onChange: (value: FilterGroup) => void;
@@ -28,7 +27,6 @@ interface Props {
 }
 
 const FilterField: FunctionComponent<Props> = ({
-  labelId,
   clazz,
   initialValue,
   onChange,
@@ -72,8 +70,6 @@ const FilterField: FunctionComponent<Props> = ({
     <>
       <div className={classes.container}>
         <MuiAutocomplete
-          // @ts-expect-error: labelId
-          labelId={labelId}
           options={computeOptions()}
           sx={{ width: 200 }}
           value={null}

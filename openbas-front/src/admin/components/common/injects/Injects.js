@@ -227,7 +227,7 @@ const Injects = (props) => {
                 style={{ float: 'right' }}
                 aria-label="Change view mode"
               >
-                <>
+                <div>
                   {sortedInjects.length > 0 ? (
                     <CSVLink
                       data={exportData(
@@ -263,7 +263,7 @@ const Injects = (props) => {
                       <FileDownloadOutlined fontSize="small" color="primary" />
                     </ToggleButton>
                   )}
-                </>
+                </div>
                 <Tooltip title={t('List view')}>
                   <ToggleButton
                     value='list'
@@ -284,7 +284,7 @@ const Injects = (props) => {
                 </Tooltip>
               </ToggleButtonGroup>
             ) : (
-              <>
+              <div>
                 {sortedInjects.length > 0 ? (
                   <CSVLink
                     data={exportData(
@@ -315,7 +315,7 @@ const Injects = (props) => {
                     <FileDownloadOutlined />
                   </IconButton>
                 )}
-              </>
+              </div>
             )}
           </div>
           <div className="clearfix" />

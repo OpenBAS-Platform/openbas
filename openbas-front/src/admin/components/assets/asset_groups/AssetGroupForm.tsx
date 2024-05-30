@@ -111,7 +111,6 @@ const AssetGroupForm: React.FC<Props> = ({
               </Tooltip>
             </div>
             <FilterField
-              labelId="dynamic-asset-filter"
               clazz="Endpoint"
               initialValue={value}
               onChange={onChange}

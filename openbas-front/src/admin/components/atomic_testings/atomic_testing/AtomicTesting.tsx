@@ -126,7 +126,7 @@ const AtomicTesting = () => {
                 </Typography>
                 <div style={{ display: 'flex' }}>
                   {injectResultDto.inject_injector_contract.injector_contract_platforms?.map((platform: string) => (
-                    <div key="platform" style={{ display: 'flex', marginRight: 15 }}>
+                    <div key={platform} style={{ display: 'flex', marginRight: 15 }}>
                       <PlatformIcon width={20} platform={platform} marginRight={5} />
                       {platform}
                     </div>
