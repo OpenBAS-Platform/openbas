@@ -187,7 +187,7 @@ const AssetGroups = () => {
                             size="small"
                             style={index !== assetGroup.asset_group_dynamic_filter?.filters?.length ? { marginRight: 10 } : {}}
                             key={filter.key}
-                            label={<><strong>{t(filter.key)}</strong> {convertOperatorToIcon(filter.operator)} {filter.values?.join(', ')}</>}
+                            label={<><strong>{t(filter.key)}</strong> {convertOperatorToIcon(t, filter.operator)} {filter.values?.join(', ')}</>}
                           />
                         </>))
                       : ''}
@@ -204,6 +204,10 @@ const AssetGroups = () => {
                 assetGroup={assetGroup}
                 onUpdate={(result) => setAssetGroups(assetGroups.map((ag) => (ag.asset_group_id !== result.asset_group_id ? ag : result)))}
                 onDelete={(result) => setAssetGroups(assetGroups.filter((ag) => (ag.asset_group_id !== result)))}
+                onRemoveEndpointFromAssetGroup={(assetId) => setAssetGroups(assetGroups.map((ag) => (ag.asset_group_id !== assetGroup.asset_group_id ? ag : {
+                  ...ag,
+                  asset_group_assets: ag?.asset_group_assets?.toSpliced(ag?.asset_group_assets?.indexOf(assetId), 1),
+                })))}
                 openEditOnInit={assetGroup.asset_group_id === searchId}
               />
             </ListItemSecondaryAction>
@@ -225,6 +229,10 @@ const AssetGroups = () => {
           assetGroupId={selectedAssetGroupId}
           handleClose={() => setSelectedAssetGroupId(undefined)}
           onUpdate={(result) => setAssetGroups(assetGroups.map((ag) => (ag.asset_group_id !== result.asset_group_id ? ag : result)))}
+          onRemoveEndpointFromAssetGroup={(assetId) => setAssetGroups(assetGroups.map((ag) => (ag.asset_group_id !== selectedAssetGroupId ? ag : {
+            ...ag,
+            asset_group_assets: ag?.asset_group_assets?.toSpliced(ag?.asset_group_assets?.indexOf(assetId), 1),
+          })))}
         />
         )}
       </MuiDrawer>

@@ -18,6 +18,7 @@ import EndpointPopover from '../endpoints/EndpointPopover';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { AssetGroupStore } from './AssetGroup';
+import type { Asset } from '../../../../utils/api-types';
 
 const useStyles = makeStyles((theme: Theme) => ({
   // Drawer Header
@@ -53,12 +54,14 @@ interface Props {
   assetGroupId: string;
   handleClose: () => void;
   onUpdate?: (result: AssetGroupStore) => void;
+  onRemoveEndpointFromAssetGroup?: (assetId: Asset['asset_id']) => void;
 }
 
 const AssetGroupManagement: FunctionComponent<Props> = ({
   assetGroupId,
   handleClose,
   onUpdate,
+  onRemoveEndpointFromAssetGroup,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -128,6 +131,8 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
                 inline
                 assetGroupId={assetGroup?.asset_group_id}
                 assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
+                onUpdate={onUpdate}
+                onRemoveEndpointFromAssetGroup={onRemoveEndpointFromAssetGroup}
                />)
             : <span> &nbsp; </span>
           }
@@ -138,7 +143,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
           assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
           onUpdate={onUpdate}
             />)
-      }
+       }
     </>
   );
 };

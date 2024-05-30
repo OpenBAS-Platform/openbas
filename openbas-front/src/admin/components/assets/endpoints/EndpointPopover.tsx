@@ -19,6 +19,7 @@ interface Props {
   assetGroupId?: string;
   assetGroupEndpointIds?: string[];
   onRemoveEndpointFromInject?: (assetId: string) => void;
+  onRemoveEndpointFromAssetGroup?: (assetId: string) => void;
   openEditOnInit?: boolean;
   onUpdate?: (result: EndpointStore) => void;
   onDelete?: (result: string) => void;
@@ -30,6 +31,7 @@ const EndpointPopover: React.FC<Props> = ({
   assetGroupId,
   assetGroupEndpointIds,
   onRemoveEndpointFromInject,
+  onRemoveEndpointFromAssetGroup,
   openEditOnInit = false,
   onUpdate,
   onDelete,
@@ -83,19 +85,24 @@ const EndpointPopover: React.FC<Props> = ({
   };
 
   // Removal
-  const [removal, setRemoval] = useState(false);
+  const [removalFromAssetGroup, setRemovalFromAssetGroup] = useState(false);
 
-  const handleRemove = () => {
-    setRemoval(true);
+  const handleRemoveFromAssetGroup = () => {
+    setRemovalFromAssetGroup(true);
     setAnchorEl(null);
   };
-  const submitRemove = () => {
+  const submitRemoveFromAssetGroup = () => {
     if (assetGroupId) {
       dispatch(
         updateAssetsOnAssetGroup(assetGroupId, {
           asset_group_assets: assetGroupEndpointIds?.filter((id) => id !== endpoint.asset_id),
         }),
-      ).then(() => setRemoval(false));
+      ).then(() => {
+        if (onRemoveEndpointFromAssetGroup) {
+          onRemoveEndpointFromAssetGroup(endpoint.asset_id);
+        }
+        setRemovalFromAssetGroup(false);
+      });
     }
   };
 
@@ -140,7 +147,7 @@ const EndpointPopover: React.FC<Props> = ({
           {t('Update')}
         </MenuItem>
         {(assetGroupId && endpoint.type !== 'dynamic') && (
-          <MenuItem onClick={handleRemove}>
+          <MenuItem onClick={handleRemoveFromAssetGroup}>
             {t('Remove from the asset group')}
           </MenuItem>
         )}
@@ -182,9 +189,9 @@ const EndpointPopover: React.FC<Props> = ({
         </Drawer>
       )}
       <DialogDelete
-        open={removal}
-        handleClose={() => setRemoval(false)}
-        handleSubmit={submitRemove}
+        open={removalFromAssetGroup}
+        handleClose={() => setRemovalFromAssetGroup(false)}
+        handleSubmit={submitRemoveFromAssetGroup}
         text={t('Do you want to remove the endpoint from the asset group ?')}
       />
       <DialogDelete

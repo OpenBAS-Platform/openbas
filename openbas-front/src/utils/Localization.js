@@ -914,6 +914,13 @@ const i18n = {
       'strategic-reaction': 'Strategic Reaction',
       'managed assets': 'actifs gérés',
       'Search by target name': 'Recherche par nom de cible',
+      contains: 'contient',
+      'not contains': 'ne contient pas',
+      equals: 'egal',
+      'not equals': 'pas égal',
+      'starts with': 'commence par',
+      'not starts with': 'ne commence pas par',
+      and: 'et',
     },
     en: {
       openbas_email: 'Email',
