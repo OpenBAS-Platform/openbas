@@ -1,19 +1,30 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { ThemeOptions } from '@mui/material/styles/createTheme';
+import { zhCN, frFR, enUS, esES, Localization } from '@mui/material/locale';
 import themeDark from './ThemeDark';
 import themeLight from './ThemeLight';
 import { useHelper } from '../store';
 import type { LoggedHelper } from '../actions/helper';
 import type { PlatformSettings } from '../utils/api-types';
+import { useFormatter } from './i18n';
 
 interface Props {
   children: ReactNode;
 }
 
+const localeMap = {
+  en: enUS,
+  fr: frFR,
+  es: esES,
+  zh: zhCN,
+};
+
 const AppThemeProvider: React.FC<Props> = ({
   children,
 }) => {
+  const [muiLocale, setMuiLocale] = useState<Localization>(enUS);
+  const { locale } = useFormatter();
   const { theme, dark, light }: {
     theme: string,
     dark: PlatformSettings['platform_dark_theme'],
@@ -29,6 +40,10 @@ const AppThemeProvider: React.FC<Props> = ({
     document.body.setAttribute('data-theme', theme);
   });
 
+  useEffect(() => {
+    setMuiLocale(localeMap[locale as keyof typeof localeMap]);
+  }, [locale]);
+
   let muiTheme = createTheme(
     themeDark(
       dark?.logo_url,
@@ -40,18 +55,22 @@ const AppThemeProvider: React.FC<Props> = ({
       dark?.secondary_color,
       dark?.accent_color,
     ) as ThemeOptions,
+    muiLocale,
   );
   if (theme === 'light') {
-    muiTheme = createTheme(themeLight(
-      light?.logo_url,
-      light?.logo_url_collapsed,
-      light?.background_color,
-      light?.paper_color,
-      light?.navigation_color,
-      light?.primary_color,
-      light?.secondary_color,
-      light?.accent_color,
-    ) as ThemeOptions);
+    muiTheme = createTheme(
+      themeLight(
+        light?.logo_url,
+        light?.logo_url_collapsed,
+        light?.background_color,
+        light?.paper_color,
+        light?.navigation_color,
+        light?.primary_color,
+        light?.secondary_color,
+        light?.accent_color,
+      ) as ThemeOptions,
+      muiLocale,
+    );
   }
   return <ThemeProvider theme={muiTheme}>{children}</ThemeProvider>;
 };

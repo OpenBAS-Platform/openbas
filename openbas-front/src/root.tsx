@@ -49,9 +49,9 @@ const Root = () => {
       }}
     >
       <StyledEngineProvider injectFirst={true}>
-        <ConnectedThemeProvider>
-          <CssBaseline />
-          <ConnectedIntlProvider>
+        <ConnectedIntlProvider>
+          <ConnectedThemeProvider>
+            <CssBaseline />
             <Suspense fallback={<Loader />}>
               <Routes>
                 <Route path="" element={logged.isOnlyPlayer ? <Navigate to="private" replace={true} />
@@ -68,8 +68,8 @@ const Root = () => {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
-          </ConnectedIntlProvider>
-        </ConnectedThemeProvider>
+          </ConnectedThemeProvider>
+        </ConnectedIntlProvider>
       </StyledEngineProvider>
     </UserContext.Provider>
   );
