@@ -194,6 +194,7 @@ public class PlatformSettingsApi extends RestBehavior {
             platformSettings.setPlatformName(
                     ofNullable(dbSettings.get(PLATFORM_NAME.key())).map(Setting::getValue).orElse(PLATFORM_NAME.defaultValue())
             );
+            platformSettings.setPlatformBaseUrl(openBASConfig.getBaseUrl());
             platformSettings.setXtmOpenctiEnable(openCTIConfig.getEnable());
             platformSettings.setXtmOpenctiUrl(openCTIConfig.getUrl());
             platformSettings.setAiEnabled(aiConfig.isEnabled());

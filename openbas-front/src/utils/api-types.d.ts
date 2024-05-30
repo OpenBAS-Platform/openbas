@@ -113,6 +113,7 @@ export interface Asset {
   asset_name: string;
   asset_parent?: Asset;
   asset_process_name?: string;
+  /** @uniqueItems true */
   asset_tags?: Tag[];
   asset_type?: string;
   /** @format date-time */
@@ -129,6 +130,7 @@ export interface AssetGroup {
   asset_group_dynamic_filter?: FilterGroup;
   asset_group_id: string;
   asset_group_name: string;
+  /** @uniqueItems true */
   asset_group_tags?: Tag[];
   /** @format date-time */
   asset_group_updated_at?: string;
@@ -213,6 +215,7 @@ export interface Challenge {
   challenge_scenarios?: string[];
   /** @format int32 */
   challenge_score?: number;
+  /** @uniqueItems true */
   challenge_tags?: Tag[];
   /** @format date-time */
   challenge_updated_at?: string;
@@ -444,10 +447,13 @@ export interface DirectInjectInput {
 
 export interface Document {
   document_description?: string;
+  /** @uniqueItems true */
   document_exercises?: Exercise[];
   document_id: string;
   document_name?: string;
+  /** @uniqueItems true */
   document_scenarios?: Scenario[];
+  /** @uniqueItems true */
   document_tags?: Tag[];
   document_target?: string;
   document_type?: string;
@@ -545,6 +551,7 @@ export interface Endpoint {
   asset_name: string;
   asset_parent?: Asset;
   asset_process_name?: string;
+  /** @uniqueItems true */
   asset_tags?: Tag[];
   asset_type?: string;
   /** @format date-time */
@@ -661,6 +668,7 @@ export interface Exercise {
   exercise_start_date?: string;
   exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   exercise_subtitle?: string;
+  /** @uniqueItems true */
   exercise_tags?: Tag[];
   exercise_teams?: Team[];
   exercise_teams_users?: ExerciseTeamUser[];
@@ -697,6 +705,7 @@ export interface ExerciseSimple {
   exercise_start_date?: string;
   exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   exercise_subtitle?: string;
+  /** @uniqueItems true */
   exercise_tags?: Tag[];
   exercise_targets: InjectTargetWithResult[];
 }
@@ -786,6 +795,7 @@ export interface FullTextSearchResult {
   description?: string;
   id: string;
   name: string;
+  /** @uniqueItems true */
   tags?: Tag[];
 }
 
@@ -873,6 +883,7 @@ export interface Inject {
   /** @format date-time */
   inject_sent_at?: string;
   inject_status?: InjectStatus;
+  /** @uniqueItems true */
   inject_tags?: Tag[];
   inject_teams?: Team[];
   inject_title?: string;
@@ -953,6 +964,13 @@ export interface InjectExpectationResultsByType {
 export interface InjectExpectationSignature {
   type?: string;
   value?: string;
+}
+
+export interface InjectExpectationUpdateInput {
+  collector_id: string;
+  is_success: boolean;
+  result: string;
+  success?: boolean;
 }
 
 export interface InjectInput {
@@ -1396,6 +1414,7 @@ export interface Log {
   log_created_at?: string;
   log_exercise?: Exercise;
   log_id?: string;
+  /** @uniqueItems true */
   log_tags?: Tag[];
   log_title?: string;
   /** @format date-time */
@@ -1492,6 +1511,7 @@ export interface Organization {
   /** @format int64 */
   organization_injects_number?: number;
   organization_name?: string;
+  /** @uniqueItems true */
   organization_tags?: Tag[];
   /** @format date-time */
   organization_updated_at?: string;
@@ -1514,46 +1534,8 @@ export interface OrganizationUpdateInput {
   organization_tags?: string[];
 }
 
-export interface PageAssetGroup {
-  content?: AssetGroup[];
-  empty?: boolean;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  number?: number;
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  /** @format int32 */
-  size?: number;
-  sort?: SortObject[];
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-}
-
 export interface PageAttackPattern {
   content?: AttackPattern[];
-  empty?: boolean;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  number?: number;
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  /** @format int32 */
-  size?: number;
-  sort?: SortObject[];
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-}
-
-export interface PageDocument {
-  content?: Document[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -1742,8 +1724,84 @@ export interface PagePayload {
   totalPages?: number;
 }
 
-export interface PageScenario {
-  content?: Scenario[];
+export interface PageRawPaginationAssetGroup {
+  content?: RawPaginationAssetGroup[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageRawPaginationDocument {
+  content?: RawPaginationDocument[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageRawPaginationPlayer {
+  content?: RawPaginationPlayer[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageRawPaginationScenario {
+  content?: RawPaginationScenario[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageRawPaginationTeam {
+  content?: RawPaginationTeam[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -1763,25 +1821,6 @@ export interface PageScenario {
 
 export interface PageTag {
   content?: Tag[];
-  empty?: boolean;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  number?: number;
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  /** @format int32 */
-  size?: number;
-  sort?: SortObject[];
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-}
-
-export interface PageTeam {
-  content?: Team[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -1847,6 +1886,7 @@ export interface Payload {
   payload_description?: string;
   payload_id: string;
   payload_name: string;
+  /** @uniqueItems true */
   payload_tags?: Tag[];
   payload_type?: string;
   /** @format date-time */
@@ -1885,6 +1925,7 @@ export interface PlatformSettings {
   platform_ai_has_token?: boolean;
   platform_ai_model?: string;
   platform_ai_type?: string;
+  platform_base_url?: string;
   platform_dark_theme?: ThemeInput;
   platform_enterprise_edition?: string;
   platform_lang?: string;
@@ -1985,6 +2026,58 @@ export interface RawDocument {
   document_tags?: string[];
   document_target?: string;
   document_type?: string;
+}
+
+export interface RawPaginationAssetGroup {
+  asset_group_assets?: string[];
+  asset_group_description?: string;
+  asset_group_dynamic_filter?: FilterGroup;
+  asset_group_id?: string;
+  asset_group_name?: string;
+  asset_group_tags?: string[];
+}
+
+export interface RawPaginationDocument {
+  document_description?: string;
+  document_exercises?: string[];
+  document_id?: string;
+  document_name?: string;
+  document_scenarios?: string[];
+  document_tags?: string[];
+  document_type?: string;
+}
+
+export interface RawPaginationPlayer {
+  user_email?: string;
+  user_firstname?: string;
+  user_id?: string;
+  user_lastname?: string;
+  user_organization?: string;
+  user_tags?: string[];
+}
+
+export interface RawPaginationScenario {
+  scenario_category?: string;
+  scenario_id?: string;
+  scenario_name?: string;
+  scenario_platforms?: string[];
+  scenario_recurrence?: string;
+  scenario_severity?: string;
+  scenario_tags?: string[];
+  /** @format date-time */
+  scenario_updated_at?: string;
+}
+
+export interface RawPaginationTeam {
+  team_contextual?: boolean;
+  team_description?: string;
+  team_id?: string;
+  team_name?: string;
+  team_tags?: string[];
+  /** @format date-time */
+  team_updated_at?: string;
+  /** @format int64 */
+  team_users_number?: number;
 }
 
 export interface RawUser {
@@ -2098,6 +2191,7 @@ export interface Scenario {
   scenario_recurrence_start?: string;
   scenario_severity?: string;
   scenario_subtitle?: string;
+  /** @uniqueItems true */
   scenario_tags?: Tag[];
   scenario_teams?: Team[];
   scenario_teams_users?: ScenarioTeamUser[];
@@ -2140,6 +2234,7 @@ export interface ScenarioSimple {
   scenario_id?: string;
   scenario_name?: string;
   scenario_subtitle?: string;
+  /** @uniqueItems true */
   scenario_tags?: Tag[];
 }
 
@@ -2270,6 +2365,7 @@ export interface Team {
   /** @format int64 */
   team_scenario_injects_number?: number;
   team_scenarios?: Scenario[];
+  /** @uniqueItems true */
   team_tags?: Tag[];
   /** @format date-time */
   team_updated_at?: string;
@@ -2393,6 +2489,7 @@ export interface User {
   user_phone?: string;
   /** @format int32 */
   user_status: number;
+  /** @uniqueItems true */
   user_tags?: Tag[];
   user_teams?: Team[];
   user_theme?: string;

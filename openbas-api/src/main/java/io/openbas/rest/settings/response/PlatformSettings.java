@@ -18,6 +18,9 @@ public class PlatformSettings {
   @JsonProperty("platform_name")
   private String platformName;
 
+  @JsonProperty("platform_base_url")
+  private String platformBaseUrl;
+
   @JsonProperty("platform_theme")
   private String platformTheme;
 

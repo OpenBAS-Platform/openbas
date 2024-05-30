@@ -188,12 +188,12 @@ public class DocumentApi extends RestBehavior {
             ).map(RawPaginationDocument::new);
         } else {
             return buildPaginationJPA(
-                (Specification<Document> specification, Pageable pageable) -> this.documentRepository.findAll(
-                    findGrantedFor(user.getId()).and(specification),
-                    pageable
-                ),
-                searchPaginationInput,
-                Document.class
+                    (Specification<Document> specification, Pageable pageable) -> this.documentRepository.findAll(
+                            findGrantedFor(user.getId()).and(specification),
+                            pageable
+                    ),
+                    searchPaginationInput,
+                    Document.class
             ).map(RawPaginationDocument::new);
         }
     }

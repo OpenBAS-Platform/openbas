@@ -9,13 +9,17 @@ import io.openbas.rest.executor.form.ExecutorUpdateInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -93,6 +97,19 @@ public class ExecutorApi extends RestBehavior {
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping(value = "/api/agent/{platform}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public void getAgent(@PathVariable String platform, HttpServletResponse response) throws IOException {
+        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=obas-" + platform);
+        response.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setStatus(HttpServletResponse.SC_OK);
+        InputStream fileStream = getClass().getResourceAsStream("/agents/obas-" + platform);
+        if (fileStream != null) {
+            fileStream.transferTo(response.getOutputStream());
+        } else {
+            throw new ElementNotFoundException();
         }
     }
 }
