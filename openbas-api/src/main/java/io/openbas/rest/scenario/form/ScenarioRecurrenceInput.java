@@ -1,15 +1,9 @@
 package io.openbas.rest.scenario.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.time.Instant;
-import java.util.List;
-
-import static io.openbas.config.AppConfig.EMAIL_FORMAT;
 
 @Data
 public class ScenarioRecurrenceInput {

@@ -22,7 +22,7 @@ public class ScenarioExportMixins {
   public static class Scenario {
   }
 
-  @JsonIgnoreProperties(value = {"scenarios_users", "scenarios_organizations"})
+  @JsonIgnoreProperties(value = {"scenario_users", "scenario_organizations"})
   public static class ScenarioWithoutPlayers {
   }
 

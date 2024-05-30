@@ -1,9 +1,6 @@
 package io.openbas.collectors.expectations_expiration_manager.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.asset.EndpointService;
 import io.openbas.collectors.expectations_expiration_manager.config.ExpectationsExpirationManagerConfig;
-import io.openbas.database.model.Asset;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.inject_expectation.InjectExpectationService;
 import jakarta.validation.constraints.NotNull;
@@ -14,10 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static io.openbas.collectors.expectations_expiration_manager.utils.ExpectationUtils.computeFailedMessage;
-import static java.util.stream.Stream.concat;
 import static io.openbas.collectors.expectations_expiration_manager.config.ExpectationsExpirationManagerConfig.PRODUCT_NAME;
+import static io.openbas.collectors.expectations_expiration_manager.utils.ExpectationUtils.computeFailedMessage;
 import static io.openbas.collectors.expectations_expiration_manager.utils.ExpectationUtils.isExpired;
+import static java.util.stream.Stream.concat;
 
 @RequiredArgsConstructor
 @Service
@@ -25,9 +22,7 @@ import static io.openbas.collectors.expectations_expiration_manager.utils.Expect
 public class ExpectationsExpirationManagerService {
 
     private final InjectExpectationService injectExpectationService;
-    private final EndpointService endpointService;
     private final ExpectationsExpirationManagerConfig config;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
 
     @Transactional(rollbackFor = Exception.class)

@@ -11,8 +11,6 @@ import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
-// TODO: mutualize code with exercise ?
-
 @Data
 @JsonInclude(NON_NULL)
 public class ScenarioFileExport {
