@@ -17,6 +17,7 @@ import { useFormatter } from '../../../components/i18n';
 import type { ExerciseSimpleStore, ExerciseStore } from '../../../actions/exercises/Exercise';
 import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
 import ItemTargets from '../../../components/ItemTargets';
+import ImportUploaderExercise from './ImportUploaderExercise';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -53,8 +54,9 @@ const useStyles = makeStyles(() => ({
     position: 'absolute',
     right: -10,
   },
-  downloadButton: {
-    marginRight: 15,
+  actionsButton: {
+    display: 'flex',
+    alignItems: 'center',
   },
 }));
 
@@ -158,21 +160,20 @@ const ExerciseList: FunctionComponent<Props> = ({
               currentTags={filtering.tags}
             />
           </div>
-          <div className={classes.downloadButton}>
+          <div className={classes.actionsButton}>
             {sortedExercises.length > 0 ? (
-              <CSVLink
-                data={exportData(
-                  'exercise',
-                  [
-                    'exercise_name',
-                    'exercise_subtitle',
-                    'exercise_description',
-                    'exercise_status',
-                    'exercise_tags',
-                  ],
-                  sortedExercises,
-                  tagsMap,
-                )}
+              <CSVLink data={exportData(
+                'exercise',
+                [
+                  'exercise_name',
+                  'exercise_subtitle',
+                  'exercise_description',
+                  'exercise_status',
+                  'exercise_tags',
+                ],
+                sortedExercises,
+                tagsMap,
+              )}
                 filename={`${t('Simulations')}.csv`}
               >
                 <Tooltip title={t('Export this list')}>
@@ -186,6 +187,9 @@ const ExerciseList: FunctionComponent<Props> = ({
                 <FileDownloadOutlined />
               </IconButton>
             )}
+            <IconButton size="large">
+              <ImportUploaderExercise color={'primary'} />
+            </IconButton>
           </div>
         </div>
       )}
