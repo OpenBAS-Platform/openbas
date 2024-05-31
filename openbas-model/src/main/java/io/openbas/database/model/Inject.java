@@ -2,6 +2,9 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.annotation.Queryable;
@@ -12,6 +15,7 @@ import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
+import jakarta.annotation.Resource;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -25,6 +29,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.StreamSupport;
 
 import static io.openbas.database.model.Endpoint.ENDPOINT_TYPE;
 import static java.time.Duration.between;
@@ -37,7 +43,6 @@ import static java.util.Optional.ofNullable;
 @EntityListeners(ModelBaseListener.class)
 @Log
 public class Inject implements Base, Injection {
-
   public static final int SPEED_STANDARD = 1; // Standard speed define by the user.
 
   public static final Comparator<Inject> executionComparator = (o1, o2) -> {
@@ -253,6 +258,30 @@ public class Inject implements Base, Injection {
     return getTeams().stream()
         .map(team -> team.getUsersNumberInExercise(getExercise().getId()))
         .reduce(Long::sum).orElse(0L);
+  }
+
+  @JsonProperty("inject_ready")
+  public boolean isReady() {
+    InjectorContract injectorContract = getInjectorContract();
+    ObjectNode content = getContent();
+    if( getContent() == null ) {
+      return false;
+    }
+    AtomicBoolean ready = new AtomicBoolean(true);
+      ObjectNode contractContent = injectorContract.getConvertedContent();
+      List<JsonNode> contractMandatoryFields = StreamSupport.stream(contractContent.get("fields").spliterator(), false).filter(contractElement -> contractElement.get("mandatory").asBoolean()).toList();
+      if (!contractMandatoryFields.isEmpty()) {
+        contractMandatoryFields.forEach(jsonField -> {
+          String key = jsonField.get("key").asText();
+          if( content.get(key) == null ) {
+            ready.set(false);
+          }
+          if(Objects.equals(jsonField.get("type").asText(), "String") && (content.get(key).asText().isEmpty())) {
+            ready.set(false);
+          }
+        });
+      }
+      return ready.get();
   }
 
   @JsonIgnore

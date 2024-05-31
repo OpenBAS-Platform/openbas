@@ -401,8 +401,8 @@ const Injects = (props) => {
             let injectStatus = inject.inject_enabled
               ? t('Enabled')
               : t('Disabled');
-            if (inject.inject_content === null) {
-              injectStatus = t('To fill');
+            if (!inject.inject_ready) {
+              injectStatus = t('Missing content');
             }
             return (
               <ListItem
@@ -486,11 +486,7 @@ const Injects = (props) => {
                         style={inlineStyles.inject_enabled}
                       >
                         <ItemBoolean
-                          status={
-                            inject.inject_content === null
-                              ? false
-                              : inject.inject_enabled
-                          }
+                          status={inject.inject_ready ? inject.inject_enabled : false}
                           label={injectStatus}
                           variant="inList"
                         />

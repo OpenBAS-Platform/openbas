@@ -3,10 +3,12 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLHStoreType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.database.converter.ContentConverter;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import jakarta.persistence.*;
@@ -47,6 +49,10 @@ public class InjectorContract implements Base {
     @JsonProperty("injector_contract_content")
     @NotBlank
     private String content;
+
+    @Column(name = "injector_contract_content", insertable=false, updatable=false)
+    @Convert(converter = ContentConverter.class)
+    private ObjectNode convertedContent;
 
     @Column(name = "injector_contract_custom")
     @JsonProperty("injector_contract_custom")

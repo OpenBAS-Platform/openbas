@@ -491,7 +491,17 @@ export interface DryInject {
 
 export interface DryInjectStatus {
   status_id?: string;
-  status_name?: "DRAFT" | "INFO" | "QUEUING" | "EXECUTING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_name?:
+    | "DRAFT"
+    | "INFO"
+    | "QUEUING"
+    | "EXECUTING"
+    | "PENDING"
+    | "PARTIAL"
+    | "ERROR"
+    | "MAYBE_PARTIAL_PREVENTED"
+    | "MAYBE_PREVENTED"
+    | "SUCCESS";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -879,6 +889,7 @@ export interface Inject {
   inject_injector_contract?: InjectorContract;
   inject_kill_chain_phases?: KillChainPhase[];
   inject_payloads?: Asset[];
+  inject_ready?: boolean;
   inject_scenario?: Scenario;
   /** @format date-time */
   inject_sent_at?: string;
@@ -1010,6 +1021,7 @@ export interface InjectResultDTO {
   inject_injector_contract: InjectorContract;
   /** Kill Chain Phases */
   inject_kill_chain_phases: KillChainPhase[];
+  inject_ready?: boolean;
   inject_status?: InjectStatus;
   /**
    * Specifies the categories of targetResults for atomic testing.
@@ -1027,7 +1039,17 @@ export interface InjectResultDTO {
 
 export interface InjectStatus {
   status_id?: string;
-  status_name?: "DRAFT" | "INFO" | "QUEUING" | "EXECUTING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  status_name?:
+    | "DRAFT"
+    | "INFO"
+    | "QUEUING"
+    | "EXECUTING"
+    | "PENDING"
+    | "PARTIAL"
+    | "ERROR"
+    | "MAYBE_PARTIAL_PREVENTED"
+    | "MAYBE_PREVENTED"
+    | "SUCCESS";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -1052,7 +1074,17 @@ export interface InjectStatusExecution {
   /** @format int32 */
   execution_duration?: number;
   execution_message?: string;
-  execution_status?: "DRAFT" | "INFO" | "QUEUING" | "EXECUTING" | "PENDING" | "PARTIAL" | "ERROR" | "SUCCESS";
+  execution_status?:
+    | "DRAFT"
+    | "INFO"
+    | "QUEUING"
+    | "EXECUTING"
+    | "PENDING"
+    | "PARTIAL"
+    | "ERROR"
+    | "MAYBE_PARTIAL_PREVENTED"
+    | "MAYBE_PREVENTED"
+    | "SUCCESS";
   /** @format date-time */
   execution_time?: string;
 }
@@ -1115,6 +1147,7 @@ export interface InjectorConnection {
 }
 
 export interface InjectorContract {
+  convertedContent?: object;
   injector_contract_atomic_testing?: boolean;
   injector_contract_attack_patterns?: AttackPattern[];
   injector_contract_content: string;

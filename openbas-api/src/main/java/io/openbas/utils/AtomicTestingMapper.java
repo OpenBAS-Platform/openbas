@@ -14,55 +14,56 @@ import static io.openbas.utils.AtomicTestingUtils.getRefinedExpectations;
 
 public class AtomicTestingMapper {
 
-  public static InjectResultDTO toDtoWithTargetResults(Inject inject) {
-    List<InjectTargetWithResult> targets = AtomicTestingUtils.getTargetsWithResults(inject);
-    List<String> targetIds = targets.stream().map(InjectTargetWithResult::getId).toList();
+    public static InjectResultDTO toDtoWithTargetResults(Inject inject) {
+        List<InjectTargetWithResult> targets = AtomicTestingUtils.getTargetsWithResults(inject);
+        List<String> targetIds = targets.stream().map(InjectTargetWithResult::getId).toList();
 
-    return getAtomicTestingOutputBuilder(inject)
-        .targets(targets)
-        .expectationResultByTypes(AtomicTestingUtils.getExpectationResultByTypes(
-            getRefinedExpectations(inject, targetIds)
-        ))
-        .build();
-  }
+        return getAtomicTestingOutputBuilder(inject)
+                .targets(targets)
+                .expectationResultByTypes(AtomicTestingUtils.getExpectationResultByTypes(
+                        getRefinedExpectations(inject, targetIds)
+                ))
+                .build();
+    }
 
-  public static InjectResultDTO toDto(Inject inject, List<InjectTargetWithResult> targets) {
-    List<String> targetIds = targets.stream().map(InjectTargetWithResult::getId).toList();
+    public static InjectResultDTO toDto(Inject inject, List<InjectTargetWithResult> targets) {
+        List<String> targetIds = targets.stream().map(InjectTargetWithResult::getId).toList();
 
-    return getAtomicTestingOutputBuilder(inject)
-        .targets(targets)
-        .expectationResultByTypes(AtomicTestingUtils.getExpectationResultByTypes(
-            getRefinedExpectations(inject, targetIds)
-        ))
-        .build();
-  }
+        return getAtomicTestingOutputBuilder(inject)
+                .targets(targets)
+                .expectationResultByTypes(AtomicTestingUtils.getExpectationResultByTypes(
+                        getRefinedExpectations(inject, targetIds)
+                ))
+                .build();
+    }
 
-  private static InjectResultDTOBuilder getAtomicTestingOutputBuilder(Inject inject) {
-    return InjectResultDTO
-        .builder()
-        .id(inject.getId())
-        .title(inject.getTitle())
-        .description(inject.getDescription())
+    private static InjectResultDTOBuilder getAtomicTestingOutputBuilder(Inject inject) {
+        return InjectResultDTO
+                .builder()
+                .id(inject.getId())
+                .title(inject.getTitle())
+                .description(inject.getDescription())
                 .content(inject.getContent())
                 .expectations(inject.getExpectations())
-        .type(inject.getInjectorContract().getInjector().getType())
-        .tagIds(inject.getTags().stream().map(Tag::getId).toList())
+                .type(inject.getInjectorContract().getInjector().getType())
+                .tagIds(inject.getTags().stream().map(Tag::getId).toList())
                 .documents(inject.getDocuments().stream().map(InjectDocument::getDocument).map(Document::getId).toList())
-        .injectorContract(inject.getInjectorContract())
-        .status(inject.getStatus().orElse(draftInjectStatus()))
-        .killChainPhases(inject.getKillChainPhases())
-        .attackPatterns(inject.getAttackPatterns())
-        .updatedAt(inject.getUpdatedAt());
-  }
+                .injectorContract(inject.getInjectorContract())
+                .status(inject.getStatus().orElse(draftInjectStatus()))
+                .killChainPhases(inject.getKillChainPhases())
+                .attackPatterns(inject.getAttackPatterns())
+                .isReady(inject.isReady())
+                .updatedAt(inject.getUpdatedAt());
+    }
 
-  public record ExpectationResultsByType(@NotNull ExpectationType type,
-                                         @NotNull InjectExpectation.ExpectationStatus avgResult,
-                                         @NotNull List<ResultDistribution> distribution) {
+    public record ExpectationResultsByType(@NotNull ExpectationType type,
+                                           @NotNull InjectExpectation.ExpectationStatus avgResult,
+                                           @NotNull List<ResultDistribution> distribution) {
 
-  }
+    }
 
-  public record ResultDistribution(@NotNull String label, @NotNull Integer value) {
+    public record ResultDistribution(@NotNull String label, @NotNull Integer value) {
 
-  }
+    }
 
 }

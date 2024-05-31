@@ -83,6 +83,9 @@ public class InjectResultDTO {
   @JsonProperty("injects_documents")
   private List<String> documents;
 
+  @JsonProperty("inject_ready")
+  private Boolean isReady;
+
   @JsonProperty("inject_updated_at")
   private Instant updatedAt = now();
 }
