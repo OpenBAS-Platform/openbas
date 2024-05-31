@@ -32,8 +32,10 @@ public class CalderaInjectorService {
     public String exploit(
             @NotBlank final String obfuscator,
             @NotBlank final String paw,
-            @NotBlank final String abilityId) {
-        return this.client.exploit(obfuscator, paw, abilityId);
+            @NotBlank final String abilityId,
+            final List<Map<String, String>> additionalFields
+    ) {
+        return this.client.exploit(obfuscator, paw, abilityId, additionalFields);
     }
 
     public List<Obfuscator> obfuscators() {

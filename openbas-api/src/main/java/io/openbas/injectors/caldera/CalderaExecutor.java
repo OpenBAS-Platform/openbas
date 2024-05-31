@@ -1,5 +1,7 @@
 package io.openbas.injectors.caldera;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.asset.AssetGroupService;
 import io.openbas.asset.EndpointService;
 import io.openbas.database.model.*;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE;
 import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME;
@@ -53,6 +56,21 @@ public class CalderaExecutor extends Injector {
     @Transactional
     public ExecutionProcess process(@NotNull final Execution execution, @NotNull final ExecutableInject injection) throws Exception {
         CalderaInjectContent content = contentConvert(injection, CalderaInjectContent.class);
+        ObjectNode rawContent = injection.getInjection().getInject().getContent();
+        ObjectNode contractContent = injection.getInjection().getInject().getInjectorContract().getConvertedContent();
+        List<JsonNode> contractTextFields = StreamSupport.stream(contractContent.get("fields").spliterator(), false).filter(contractElement -> contractElement.get("type").asText().equals("text")).toList();
+        List<Map<String, String>> additionalFields = new ArrayList<>();
+        if (!contractTextFields.isEmpty()) {
+            contractTextFields.forEach(jsonField -> {
+                String key = jsonField.get("key").asText();
+                if (rawContent.get(key) != null) {
+                    Map<String, String> additionalField = new HashMap<>();
+                    additionalField.put("trait", key);
+                    additionalField.put("value", rawContent.get(key).asText());
+                    additionalFields.add(additionalField);
+                }
+            });
+        }
         String obfuscator = content.getObfuscator() != null ? content.getObfuscator() : "base64";
         Inject inject = this.injectRepository.findById(injection.getInjection().getInject().getId()).orElseThrow();
         Map<Asset, Boolean> assets = this.resolveAllAssets(injection);
@@ -68,7 +86,7 @@ public class CalderaExecutor extends Injector {
                 Endpoint executionEndpoint = this.findAndRegisterAssetForExecution(injection.getInjection().getInject(), asset);
                 if (executionEndpoint != null) {
                     if (Arrays.stream(injection.getInjection().getInject().getInjectorContract().getPlatforms()).anyMatch(s -> s.equals(executionEndpoint.getPlatform().name()))) {
-                        String result = this.calderaService.exploit(obfuscator, executionEndpoint.getExternalReference(), contract);
+                        String result = this.calderaService.exploit(obfuscator, executionEndpoint.getExternalReference(), contract, additionalFields);
                         if (result.contains("complete")) {
                             ExploitResult exploitResult = this.calderaService.exploitResult(executionEndpoint.getExternalReference(), contract);
                             asyncIds.add(exploitResult.getLinkId());

@@ -141,7 +141,7 @@ public class CalderaInjectorClient {
 
     public Result results(@NotBlank final String linkId) {
         try {
-            Map<String, String> body = new HashMap<>();
+            Map<String, Object> body = new HashMap<>();
             body.put("index", RESULT_INDEX);
             body.put("link_id", linkId);
             String jsonResponse = this.post(this.config.getRestApiV1Url(), body);
@@ -159,12 +159,15 @@ public class CalderaInjectorClient {
     public String exploit(
             @NotBlank final String obfuscator,
             @NotBlank final String paw,
-            @NotBlank final String abilityId) {
+            @NotBlank final String abilityId,
+            final List<Map<String, String>> additionalFields
+    ) {
         try {
-            Map<String, String> body = new HashMap<>();
+            Map<String, Object> body = new HashMap<>();
             body.put("obfuscator", obfuscator);
             body.put("paw", paw);
             body.put("ability_id", abilityId);
+            body.put("facts", additionalFields);
             return this.post(
                     this.config.getPluginAccessApiUrl() + EXPLOIT_URI,
                     body
@@ -192,7 +195,7 @@ public class CalderaInjectorClient {
 
     private String post(
             @NotBlank final String url,
-            @NotNull final Map<String, String> body) throws IOException {
+            @NotNull final Map<String, Object> body) throws IOException {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost = new HttpPost(url);
             // Headers
