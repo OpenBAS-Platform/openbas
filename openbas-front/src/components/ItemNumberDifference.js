@@ -46,24 +46,26 @@ const inlineStyles = {
 class ItemNumberDifference extends Component {
   render() {
     const { t, difference, classes, description } = this.props;
-    if (difference < 0) {
+
+    if (!difference) {
       return (
-        <div className={classes.diff} style={inlineStyles.red}>
-          <ArrowDownwardOutlined
+        <div className={classes.diff} style={inlineStyles.blueGrey}>
+          <ArrowForwardOutlined
             color="inherit"
             classes={{ root: classes.diffIcon }}
           />
-          <div className={classes.diffNumber}>{difference}</div>
+          <div className={classes.diffNumber}>{difference ?? ''}</div>
           {description && (
             <div className={classes.diffDescription}>({t(description)})</div>
           )}
         </div>
       );
     }
-    if (difference === 0) {
+
+    if (difference < 0) {
       return (
-        <div className={classes.diff} style={inlineStyles.blueGrey}>
-          <ArrowForwardOutlined
+        <div className={classes.diff} style={inlineStyles.red}>
+          <ArrowDownwardOutlined
             color="inherit"
             classes={{ root: classes.diffIcon }}
           />
