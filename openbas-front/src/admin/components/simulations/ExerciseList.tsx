@@ -1,23 +1,20 @@
-import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import * as R from 'ramda';
 import { Link } from 'react-router-dom';
-import { FileDownloadOutlined, KeyboardArrowRight, HubOutlined } from '@mui/icons-material';
+import { KeyboardArrowRight, HubOutlined } from '@mui/icons-material';
 import React, { CSSProperties, FunctionComponent } from 'react';
-import { CSVLink } from 'react-csv';
 import { makeStyles } from '@mui/styles';
 import ExerciseStatus from './simulation/ExerciseStatus';
 import ItemTags from '../../../components/ItemTags';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../common/filters/TagsFilter';
-import { exportData } from '../../../utils/Environment';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
-import { useHelper } from '../../../store';
-import type { TagHelper } from '../../../actions/helper';
 import { useFormatter } from '../../../components/i18n';
 import type { ExerciseSimpleStore, ExerciseStore } from '../../../actions/exercises/Exercise';
 import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
 import ItemTargets from '../../../components/ItemTargets';
 import ImportUploaderExercise from './ImportUploaderExercise';
+import ExportButton from '../../../components/common/ExportButton';
 
 const useStyles = makeStyles(() => ({
   parameters: {
@@ -138,12 +135,23 @@ const ExerciseList: FunctionComponent<Props> = ({
   const { t, nsdt } = useFormatter();
 
   // Fetching data
-  const { tagsMap } = useHelper((helper: TagHelper) => ({
-    tagsMap: helper.getTagsMap(),
-  }));
   const searchColumns = ['name'];
   const filtering = useSearchAnFilter('exercise', 'start_date', searchColumns, { orderAsc: false });
   const sortedExercises = limit ? R.take(limit, filtering.filterAndSort(exercises)) : filtering.filterAndSort(exercises);
+
+  // Export
+  const exportProps = {
+    exportType: 'exercise',
+    exportKeys: [
+      'exercise_name',
+      'exercise_subtitle',
+      'exercise_description',
+      'exercise_status',
+      'exercise_tags',
+    ],
+    exportData: exercises,
+    exportFileName: `${t('Simulations')}.csv`,
+  };
   return (
     <>
       {!withoutSearch && (
@@ -161,35 +169,8 @@ const ExerciseList: FunctionComponent<Props> = ({
             />
           </div>
           <div className={classes.actionsButton}>
-            {sortedExercises.length > 0 ? (
-              <CSVLink data={exportData(
-                'exercise',
-                [
-                  'exercise_name',
-                  'exercise_subtitle',
-                  'exercise_description',
-                  'exercise_status',
-                  'exercise_tags',
-                ],
-                sortedExercises,
-                tagsMap,
-              )}
-                filename={`${t('Simulations')}.csv`}
-              >
-                <Tooltip title={t('Export this list')}>
-                  <IconButton size="large">
-                    <FileDownloadOutlined color="primary" />
-                  </IconButton>
-                </Tooltip>
-              </CSVLink>
-            ) : (
-              <IconButton size="large" disabled={true}>
-                <FileDownloadOutlined />
-              </IconButton>
-            )}
-            <IconButton size="large">
-              <ImportUploaderExercise color={'primary'} />
-            </IconButton>
+            <ExportButton totalElements={sortedExercises.length} exportProps={exportProps} />
+            <ImportUploaderExercise color={'primary'} />
           </div>
         </div>
       )}

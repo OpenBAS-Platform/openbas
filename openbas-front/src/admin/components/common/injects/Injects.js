@@ -227,43 +227,41 @@ const Injects = (props) => {
                 style={{ float: 'right' }}
                 aria-label="Change view mode"
               >
-                <>
-                  {sortedInjects.length > 0 ? (
-                    <CSVLink
-                      data={exportData(
-                        'inject',
-                        [
-                          'inject_type',
-                          'inject_title',
-                          'inject_description',
-                          'inject_depends_duration',
-                          'inject_enabled',
-                          'inject_tags',
-                          'inject_content',
-                        ],
-                        sortedInjects,
-                        tagsMap,
-                      )}
-                      filename={`${t('Injects')}.csv`}
-                    >
-                      <Tooltip title={t('Export this list')}>
-                        <ToggleButton
-                          value='download'
-                          aria-label="Download"
-                        >
-                          <FileDownloadOutlined fontSize="small" color="primary" />
-                        </ToggleButton>
-                      </Tooltip>
-                    </CSVLink>
-                  ) : (
-                    <ToggleButton
-                      value='download'
-                      aria-label="Download"
-                    >
-                      <FileDownloadOutlined fontSize="small" color="primary" />
-                    </ToggleButton>
-                  )}
-                </>
+                {sortedInjects.length > 0 ? (
+                  <CSVLink
+                    data={exportData(
+                      'inject',
+                      [
+                        'inject_type',
+                        'inject_title',
+                        'inject_description',
+                        'inject_depends_duration',
+                        'inject_enabled',
+                        'inject_tags',
+                        'inject_content',
+                      ],
+                      sortedInjects,
+                      tagsMap,
+                    )}
+                    filename={`${t('Injects')}.csv`}
+                  >
+                    <Tooltip title={t('Export this list')}>
+                      <ToggleButton
+                        value='download'
+                        aria-label="Download"
+                      >
+                        <FileDownloadOutlined fontSize="small" color="primary" />
+                      </ToggleButton>
+                    </Tooltip>
+                  </CSVLink>
+                ) : (
+                  <ToggleButton
+                    value='download'
+                    aria-label="Download"
+                  >
+                    <FileDownloadOutlined fontSize="small" color="primary" />
+                  </ToggleButton>
+                )}
                 <Tooltip title={t('List view')}>
                   <ToggleButton
                     value='list'
