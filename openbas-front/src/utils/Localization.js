@@ -1074,6 +1074,10 @@ const i18n = {
       Chat: 'Discussion',
       Source: 'Source',
       Result: 'Résultat',
+      'Last execution date': 'Dernière date d\'exécution',
+      Configure: 'Configurer',
+      'Missing content': 'Contenu manquant',
+      'INJECT EXECUTED': 'STIMULI EXECUTE',
     },
     en: {
       openbas_email: 'Email',
