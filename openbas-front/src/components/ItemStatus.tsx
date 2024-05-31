@@ -49,6 +49,10 @@ const inlineStyles = {
     backgroundColor: 'rgba(103, 58, 183, 0.08)',
     color: '#673ab7',
   },
+  lightPurple: {
+    backgroundColor: 'rgba(156, 39, 176, 0.08)',
+    color: '#9c27b0',
+  },
   blueGrey: {
     backgroundColor: 'rgba(96, 125, 139, 0.08)',
     color: '#607d8b',
@@ -67,12 +71,16 @@ const computeStatusStyle = (status: string | undefined | null) => {
   switch (status) {
     case 'ERROR':
       return inlineStyles.red;
+    case 'MAYBE_PREVENTED':
+      return inlineStyles.purple;
+    case 'MAYBE_PARTIAL_PREVENTED':
+      return inlineStyles.lightPurple;
     case 'PARTIAL':
       return inlineStyles.orange;
     case 'QUEUING':
       return inlineStyles.yellow;
     case 'EXECUTING':
-      return inlineStyles.purple;
+      return inlineStyles.blue;
     case 'PENDING':
       return inlineStyles.blue;
     case 'SUCCESS':

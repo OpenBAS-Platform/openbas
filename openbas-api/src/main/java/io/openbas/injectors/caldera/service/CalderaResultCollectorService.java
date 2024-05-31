@@ -20,8 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-import static io.openbas.database.model.InjectStatusExecution.traceError;
-import static io.openbas.database.model.InjectStatusExecution.traceInfo;
+import static io.openbas.database.model.InjectStatusExecution.*;
 
 @Log
 @Service
@@ -94,10 +93,14 @@ public class CalderaResultCollectorService implements Runnable {
                             completedActions.add(resultStatus);
                             if (resultStatus.isFail()) {
                                 injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalError() + 1);
-                                injectStatus.getTraces().add(traceError("Failed result for linkID " + linkId + " (" + resultStatus.getContent() + ")"));
+                                if (resultStatus.getContent().contains("denied")) {
+                                    injectStatus.getTraces().add(traceMaybePrevented("Failed result for linkID " + linkId + " (" + resultStatus.getContent() + ")"));
+                                } else {
+                                    injectStatus.getTraces().add(traceError("Failed result for linkID " + linkId + " (" + resultStatus.getContent() + ")"));
+                                }
                             } else {
                                 injectStatus.setTrackingTotalSuccess(injectStatus.getTrackingTotalSuccess() + 1);
-                                injectStatus.getTraces().add(traceInfo("Success result for linkID " + linkId + " (" + resultStatus.getContent() + ")"));
+                                injectStatus.getTraces().add(traceSuccess("Success result for linkID " + linkId + " (" + resultStatus.getContent() + ")"));
                             }
                             // Compute biggest execution time
                             if (resultStatus.getFinish().isAfter(finalExecutionTime)) {
@@ -134,6 +137,10 @@ public class CalderaResultCollectorService implements Runnable {
             injectStatus.setName(ExecutionStatus.ERROR);
         } else if (injectStatus.getTraces().stream().anyMatch(trace -> trace.getStatus().equals(ExecutionStatus.ERROR))) {
             injectStatus.setName(ExecutionStatus.PARTIAL);
+        } else if (injectStatus.getTraces().stream().filter(injectStatusExecution -> injectStatusExecution.getStatus().equals(ExecutionStatus.MAYBE_PREVENTED)).count() >= completedActions) {
+            injectStatus.setName(ExecutionStatus.MAYBE_PREVENTED);
+        } else if (injectStatus.getTraces().stream().anyMatch(trace -> trace.getStatus().equals(ExecutionStatus.MAYBE_PREVENTED))) {
+            injectStatus.setName(ExecutionStatus.MAYBE_PARTIAL_PREVENTED);
         } else {
             injectStatus.setName(ExecutionStatus.SUCCESS);
         }
@@ -144,7 +151,7 @@ public class CalderaResultCollectorService implements Runnable {
         this.injectStatusRepository.save(injectStatus);
     }
 
-    // -- INJECT --
+// -- INJECT --
 
     public void computeInject(@NotNull final InjectStatus injectStatus) {
         Inject relatedInject = injectStatus.getInject();

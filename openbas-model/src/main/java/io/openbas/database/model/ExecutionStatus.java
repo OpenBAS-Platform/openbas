@@ -8,5 +8,7 @@ public enum ExecutionStatus {
     PENDING,
     PARTIAL,
     ERROR,
+    MAYBE_PARTIAL_PREVENTED,
+    MAYBE_PREVENTED,
     SUCCESS
 }
