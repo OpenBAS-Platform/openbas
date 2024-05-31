@@ -59,7 +59,7 @@ module.exports = {
       'error', {
         patterns: [
           {
-            group: ['@mui/material/*', '!@mui/material/styles', '!@mui/material/colors', '!@mui/material/transitions'],
+            group: ['@mui/material/*', '!@mui/material/locale', '!@mui/material/styles', '!@mui/material/colors', '!@mui/material/transitions'],
             message: "Please use named import from @mui/material instead."
           },
           {
