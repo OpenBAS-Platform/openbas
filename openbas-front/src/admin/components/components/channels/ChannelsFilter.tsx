@@ -83,7 +83,7 @@ const ChannelsFilter: React.FC<Props> = (props) => {
         }}
         isOptionEqualToValue={(option, value: ChannelTransformed) => value === undefined || option.id === value.id}
         renderOption={(p, option) => (
-          <Box component="li" {...p}>
+          <Box component="li" {...p} key={option.id}>
             <div className={classes.icon} style={{ color: option.color }}>
               <ChannelIcon type={option.type} />
             </div>

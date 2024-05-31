@@ -37,7 +37,7 @@ class CountryField extends Component {
           options={countryOptions()}
           style={{ marginTop: 20 }}
           renderOption={(props, option) => (
-            <Box component="li" {...props}>
+            <Box component="li" {...props} key={option.id}>
               <div className={classes.icon}>
                 <FlagOutlined />
               </div>

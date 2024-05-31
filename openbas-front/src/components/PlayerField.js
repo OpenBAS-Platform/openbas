@@ -98,7 +98,7 @@ class PlayerField extends Component {
           openCreate={this.handleOpenUserCreation.bind(this)}
           onKeyDown={onKeyDown}
           renderOption={(props, option) => (
-            <Box component="li" {...props}>
+            <Box component="li" {...props} key={option.id}>
               <div className={classes.icon}>
                 <PersonOutlined />
               </div>

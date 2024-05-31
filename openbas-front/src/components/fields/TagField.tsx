@@ -111,7 +111,7 @@ const TagField: FunctionComponent<Props> = ({
           fieldOnChange(value.map((v) => v.id));
         }}
         renderOption={(props, option) => (
-          <Box component="li" {...props}>
+          <Box component="li" {...props} key={option.id}>
             <div className={classes.icon} style={{ color: option.color }}>
               <LabelOutlined />
             </div>
