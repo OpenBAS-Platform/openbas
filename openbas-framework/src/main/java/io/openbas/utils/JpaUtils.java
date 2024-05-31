@@ -20,7 +20,8 @@ public class JpaUtils {
     // Join
     if (propertySchema.getJoinTable() != null) {
       PropertySchema.JoinTable joinTable = propertySchema.getJoinTable();
-      return root.join(joinTable.getJoinOn(), JoinType.LEFT).get(Optional.ofNullable(propertySchema.getPropertyRepresentative()).orElse("id"));
+      return root.join(joinTable.getJoinOn(), JoinType.LEFT)
+          .get(Optional.ofNullable(propertySchema.getPropertyRepresentative()).orElse("id"));
     }
     // Search on child
     else if (propertySchema.isFilterable() && hasText(propertySchema.getPropertyRepresentative())) {

@@ -3,6 +3,7 @@ package io.openbas.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.raw.RawScenario;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.ScenarioSpecification;
@@ -16,6 +17,11 @@ import io.openbas.rest.scenario.export.ScenarioFileExport;
 import io.openbas.rest.scenario.form.ScenarioSimple;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Tuple;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
@@ -45,7 +52,8 @@ import static io.openbas.database.specification.ScenarioSpecification.findGrante
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_SCENARIO;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
+import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.time.Instant.now;
 
 @RequiredArgsConstructor
@@ -64,6 +72,9 @@ public class ScenarioService {
 
     @Resource
     protected ObjectMapper mapper;
+
+  @PersistenceContext
+  private EntityManager entityManager;
 
     private final ScenarioRepository scenarioRepository;
     private final GrantService grantService;
@@ -100,16 +111,16 @@ public class ScenarioService {
         return scenarios.stream().map(ScenarioSimple::fromRawScenario).toList();
     }
 
-    public Page<Scenario> scenarios(SearchPaginationInput searchPaginationInput) {
+  public Page<RawPaginationScenario> scenarios(final SearchPaginationInput searchPaginationInput) {
         if (currentUser().isAdmin()) {
-            return buildPaginationJPA(
-                    this.scenarioRepository::findAll,
-                    searchPaginationInput,
-                    Scenario.class
-            );
-        } else {
-            return buildPaginationJPA(
-                    (Specification<Scenario> specification, Pageable pageable) -> this.scenarioRepository.findAll(
+      return buildPaginationCriteriaBuilder(
+          this::findAllWithCriteriaBuilder,
+          searchPaginationInput,
+          Scenario.class
+      );
+    } else {
+      return buildPaginationCriteriaBuilder(
+          (Specification<Scenario> specification, Pageable pageable) -> this.findAllWithCriteriaBuilder(
                             findGrantedFor(currentUser().getId()).and(specification),
                             pageable
                     ),
@@ -118,6 +129,78 @@ public class ScenarioService {
             );
         }
     }
+
+  private Page<RawPaginationScenario> findAllWithCriteriaBuilder(
+      Specification<Scenario> specification,
+      Pageable pageable) {
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+    // -- Create Query --
+    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+    // FROM
+    Root<Scenario> scenarioRoot = cq.from(Scenario.class);
+    // Join on TAG
+    Join<Scenario, Tag> scenarioTagsJoin = scenarioRoot.join("tags", JoinType.LEFT);
+    Expression<String[]> tagIdsExpression = cb.function("array_agg", String[].class, scenarioTagsJoin.get("id"));
+    // Join on INJECT and INJECTOR CONTRACT
+    Join<Scenario, Inject> injectsJoin = scenarioRoot.join("injects", JoinType.LEFT);
+    Join<Inject, InjectorContract> injectorsContractsJoin = injectsJoin.join("injectorContract", JoinType.LEFT);
+    // SELECT
+    cq.multiselect(
+        scenarioRoot.get("id").alias("scenario_id"),
+        scenarioRoot.get("name").alias("scenario_name"),
+        scenarioRoot.get("severity").alias("scenario_severity"),
+        scenarioRoot.get("category").alias("scenario_category"),
+        scenarioRoot.get("recurrence").alias("scenario_recurrence"),
+        scenarioRoot.get("updatedAt").alias("scenario_updated_at"),
+        tagIdsExpression.alias("scenario_tags"),
+        injectorsContractsJoin.get("platforms").alias("scenario_platforms")
+    ).distinct(true);
+    // Group By
+    cq.groupBy(scenarioRoot.get("id"), injectorsContractsJoin.get("platforms"));
+
+    // -- Text Search and Filters --
+    if (specification != null) {
+      Predicate predicate = specification.toPredicate(scenarioRoot, cq, cb);
+      if (predicate != null) {
+        cq.where(predicate);
+      }
+    }
+
+    // -- Sorting --
+    List<Order> orders = toSortCriteriaBuilder(cb, scenarioRoot, pageable.getSort());
+    cq.orderBy(orders);
+
+    // Type Query
+    TypedQuery<Tuple> query = entityManager.createQuery(cq);
+
+    // -- Pagination --
+    query.setFirstResult((int) pageable.getOffset());
+    query.setMaxResults(pageable.getPageSize());
+
+    // -- EXECUTION --
+    List<RawPaginationScenario> scenarios = query.getResultList()
+        .stream()
+        .map(tuple -> new RawPaginationScenario(
+            tuple.get("scenario_id", String.class),
+            tuple.get("scenario_name", String.class),
+            tuple.get("scenario_severity", String.class),
+            tuple.get("scenario_category", String.class),
+            tuple.get("scenario_recurrence", String.class),
+            tuple.get("scenario_updated_at", Instant.class),
+            tuple.get("scenario_tags", String[].class),
+            tuple.get("scenario_platforms", String[].class)
+        ))
+        .toList();
+
+    // -- Count Query --
+    CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+    Root<Scenario> countRoot = countQuery.from(Scenario.class);
+    countQuery.select(cb.count(countRoot));
+    Long total = entityManager.createQuery(countQuery).getSingleResult();
+
+    return new PageImpl<>(scenarios, pageable, total);
+  }
 
     public List<Scenario> recurringScenarios(@NotNull final Instant instant) {
         return this.scenarioRepository.findAll(
@@ -214,7 +297,10 @@ public class ScenarioService {
             mapper.addMixIn(User.class, ExerciseExportMixins.User.class);
             scenarioTags.addAll(players.stream().flatMap(user -> user.getTags().stream()).toList());
             // organizations
-            List<Organization> organizations = players.stream().map(User::getOrganization).filter(Objects::nonNull).toList();
+      List<Organization> organizations = players.stream()
+          .map(User::getOrganization)
+          .filter(Objects::nonNull)
+          .toList();
             scenarioFileExport.setOrganizations(organizations);
             mapper.addMixIn(Organization.class, ExerciseExportMixins.Organization.class);
             scenarioTags.addAll(organizations.stream().flatMap(org -> org.getTags().stream()).toList());
@@ -234,7 +320,9 @@ public class ScenarioService {
         mapper.addMixIn(Channel.class, ExerciseExportMixins.Channel.class);
         List<Channel> channels = scenario.getArticles().stream().map(Article::getChannel).distinct().toList();
         scenarioFileExport.setChannels(channels);
-        documentIds.addAll(channels.stream().flatMap(channel -> channel.getLogos().stream()).map(Document::getId).toList());
+    documentIds.addAll(
+        channels.stream().flatMap(channel -> channel.getLogos().stream()).map(Document::getId).toList()
+    );
 
         // Add Challenges
         mapper.addMixIn(Challenge.class, ExerciseExportMixins.Challenge.class);
