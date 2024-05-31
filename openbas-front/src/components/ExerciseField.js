@@ -52,7 +52,7 @@ const ExerciseField = (props) => {
       style={style}
       onKeyDown={onKeyDown}
       renderOption={(renderProps, option) => (
-        <Box component="li" {...renderProps}>
+        <Box component="li" {...renderProps} key={option.id}>
           <div className={classes.icon}>
             <Kayaking />
           </div>
