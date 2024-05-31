@@ -2,46 +2,28 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.database.model.SettingKeys.Module;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.*;
 import java.util.Objects;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "parameters")
 @EntityListeners(ModelBaseListener.class)
 public class Setting implements Base {
 
-    public enum SETTING_KEYS {
-        PLATFORM_NAME("platform_name", "OpenBAS - Breach and Attack Simulation Platform"),
-        PLATFORM_ENTERPRISE_EDITION("platform_enterprise_edition", "false"),
-        PLATFORM_WHITEMARK("platform_whitemark", "false"),
-        DEFAULT_THEME("platform_theme", "dark"),
-        DEFAULT_LANG("platform_lang", "auto");
-
-        private final String key;
-        private final String defaultValue;
-
-        SETTING_KEYS(String key, String defaultValue) {
-            this.key = key;
-            this.defaultValue = defaultValue;
-        }
-
-        public String key() {
-            return key;
-        }
-
-        public String defaultValue() {
-            return defaultValue;
-        }
-    }
-
-    public Setting() {
-        // Default constructor
-    }
-
-    public Setting(String key, String value) {
+    public Setting(String key, Module type, String value) {
         this.key = key;
+        this.type = type;
         this.value = value;
     }
 
@@ -56,38 +38,18 @@ public class Setting implements Base {
     @JsonProperty("setting_key")
     private String key;
 
+    @Column(name = "parameter_type")
+    @JsonProperty("setting_type")
+    @Enumerated(EnumType.STRING)
+    private Module type;
+
     @Column(name = "parameter_value")
     @JsonProperty("setting_value")
     private String value;
 
     @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
     public boolean isUserHasAccess(User user) {
         return user.isAdmin();
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
     }
 
     @Override

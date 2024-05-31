@@ -77,10 +77,7 @@ const MarkDownField: React.FC<Props> = ({
         <Typography>Preview</Typography>
       </div>
     ),
-    execute: (e) => {
-      console.log(e);
-      setIsEdit(false);
-    },
+    execute: () => setIsEdit(false),
   };
 
   return (

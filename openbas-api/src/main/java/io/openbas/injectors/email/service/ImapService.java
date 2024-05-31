@@ -4,6 +4,7 @@ package io.openbas.injectors.email.service;
 import io.openbas.database.model.Communication;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Setting;
+import io.openbas.database.model.SettingKeys.Module;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.CommunicationRepository;
 import io.openbas.database.repository.InjectRepository;
@@ -272,7 +273,7 @@ public class ImapService {
         Optional<Setting> state = settingRepository.findByKey(inboxKey);
         Setting currentState = state.orElse(null);
         if (currentState == null) {
-            currentState = settingRepository.save(new Setting(inboxKey, "0"));
+            currentState = settingRepository.save(new Setting(inboxKey, Module.CONFIGURATION, "0"));
         }
         int startMessageNumber = parseInt(currentState.getValue());
         int messageCount = inbox.getMessageCount();

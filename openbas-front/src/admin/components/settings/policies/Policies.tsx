@@ -27,7 +27,9 @@ const Policies: FunctionComponent = () => {
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
 
-  const onUpdate = (data: PolicyInput) => dispatch(updatePlatformParameters(data));
+  const onUpdate = (data: PolicyInput) => {
+    dispatch(updatePlatformParameters(data));
+  };
 
   return (
     <div className={classes.container}>

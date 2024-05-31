@@ -4,12 +4,14 @@ import io.openbas.config.OpenBASConfig;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.model.Setting;
+import io.openbas.database.model.SettingKeys.Module;
 import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.helper.RabbitMQHelper;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.settings.form.PolicyInput;
 import io.openbas.rest.settings.form.SettingsEnterpriseEditionUpdateInput;
 import io.openbas.rest.settings.form.SettingsPlatformWhitemarkUpdateInput;
 import io.openbas.rest.settings.form.SettingsUpdateInput;
@@ -40,7 +42,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.Setting.SETTING_KEYS.*;
+import static io.openbas.database.model.SettingKeys.*;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static java.util.Optional.ofNullable;
@@ -158,7 +160,7 @@ public class PlatformSettingsApi extends RestBehavior {
             updateSetting.setValue(value);
             return updateSetting;
         }
-        return new Setting(themeKey, value);
+        return new Setting(themeKey, Module.CONFIGURATION, value);
     }
 
     @GetMapping("/api/settings")
@@ -349,4 +351,21 @@ public class PlatformSettingsApi extends RestBehavior {
         return settings();
     }
 
+    @Secured(ROLE_ADMIN)
+    @GetMapping("/api/settings/policies")
+    public PlatformSettings policies() {
+        settingRepository.findByType(Module.POLICY);
+        return settings();
+    }
+
+    @Secured(ROLE_ADMIN)
+    @PutMapping("/api/settings/policies")
+    public PlatformSettings updateSettingsPolicies(@Valid @RequestBody PolicyInput input) {
+        List<Setting> settingsToSave = new ArrayList<>();
+        settingsToSave.add(Setting.builder().type(Module.POLICY).key(PLATFORM_LOGIN_MESSAGE.key()).value(input.getLoginMessage()).build());
+        settingsToSave.add(Setting.builder().type(Module.POLICY).key(PLATFORM_CONSENT_MESSAGE.key()).value(input.getConsentMessage()).build());
+        settingsToSave.add(Setting.builder().type(Module.POLICY).key(PLATFORM_CONSENT_CONFIRM_TEXT.key()).value(input.getConsentConfirmText()).build());
+        settingRepository.saveAll(settingsToSave);
+        return settings();
+    }
 }
