@@ -49,6 +49,10 @@ const inlineStyles = {
     backgroundColor: 'rgba(103, 58, 183, 0.08)',
     color: '#673ab7',
   },
+  lightPurple: {
+    backgroundColor: 'rgba(156, 39, 176, 0.08)',
+    color: '#9c27b0',
+  },
   blueGrey: {
     backgroundColor: 'rgba(96, 125, 139, 0.08)',
     color: '#607d8b',
@@ -63,19 +67,20 @@ interface ItemStatusProps {
   isInject?: boolean,
 }
 
-const computeStatusStyle = (status: string | undefined | null, isInject: boolean | undefined | null) => {
+const computeStatusStyle = (status: string | undefined | null) => {
   switch (status) {
     case 'ERROR':
-      if (isInject) {
-        return inlineStyles.orange;
-      }
       return inlineStyles.red;
+    case 'MAYBE_PREVENTED':
+      return inlineStyles.purple;
+    case 'MAYBE_PARTIAL_PREVENTED':
+      return inlineStyles.lightPurple;
     case 'PARTIAL':
       return inlineStyles.orange;
     case 'QUEUING':
       return inlineStyles.yellow;
     case 'EXECUTING':
-      return inlineStyles.purple;
+      return inlineStyles.blue;
     case 'PENDING':
       return inlineStyles.blue;
     case 'SUCCESS':
@@ -94,14 +99,11 @@ const ItemStatus: FunctionComponent<ItemStatusProps> = ({
   const { t } = useFormatter();
   const classes = useStyles();
   const style = variant === 'inList' ? classes.chipInList : classes.chip;
-  const classStyle = computeStatusStyle(status, isInject);
+  const classStyle = computeStatusStyle(status);
   let finalLabel = label;
   if (isInject) {
-    if (status === 'ERROR') {
-      finalLabel = t('Error or prevented');
-    }
     if (status === 'SUCCESS') {
-      finalLabel = t('Attack Executed');
+      finalLabel = t('INJECT EXECUTED');
     }
   }
   return (

@@ -49,8 +49,8 @@ const ExerciseDistributionScoreByTeamInPercentage: FunctionComponent<Props> = ({
     (n: Team) => R.assoc(
       'team_total_percent_score',
       Math.round(
-        (n.team_injects_expectations_total_score_by_exercise[exerciseId] * 100)
-        / n.team_injects_expectations_total_expected_score_by_exercise[exerciseId],
+        (n.team_injects_expectations_total_score_by_exercise ? n.team_injects_expectations_total_score_by_exercise[exerciseId] * 100 : 0)
+        / (n.team_injects_expectations_total_expected_score_by_exercise ? n.team_injects_expectations_total_expected_score_by_exercise[exerciseId] : 1),
       ),
       n,
     ),

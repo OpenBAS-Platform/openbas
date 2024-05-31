@@ -10,18 +10,20 @@ interface Props {
   filter: Filter;
   helpers: FilterHelpers;
   propertySchema: PropertySchemaDTO;
+  pristine: boolean;
 }
 
 const FilterChip: FunctionComponent<Props> = ({
   filter,
   helpers,
   propertySchema,
+  pristine,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
 
   const chipRef = useRef<HTMLAnchorElement>(null);
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(!pristine);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -37,7 +39,7 @@ const FilterChip: FunctionComponent<Props> = ({
 
   const title = () => {
     return (
-      <><strong>{t(filter.key)}</strong> {convertOperatorToIcon(filter.operator)} {filter.values?.join(', ')}</>
+      <><strong>{t(filter.key)}</strong> {convertOperatorToIcon(t, filter.operator)} {filter.values?.join(', ')}</>
     );
   };
 
@@ -54,14 +56,16 @@ const FilterChip: FunctionComponent<Props> = ({
           ref={chipRef}
         />
       </Tooltip>
-      <FilterChipPopover
-        filter={filter}
-        helpers={helpers}
-        open={open}
-        onClose={handleClose}
-        anchorEl={chipRef.current || undefined}
-        propertySchema={propertySchema}
-      />
+      {chipRef?.current
+          && <FilterChipPopover
+            filter={filter}
+            helpers={helpers}
+            open={open}
+            onClose={handleClose}
+            anchorEl={chipRef.current}
+            propertySchema={propertySchema}
+             />
+      }
     </>
   );
 };

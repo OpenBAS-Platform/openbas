@@ -43,6 +43,7 @@ public class ExpectationApi extends RestBehavior {
         this.collectorRepository = collectorRepository;
     }
 
+    @Transactional(rollbackOn = Exception.class)
     @PutMapping("/api/expectations/{expectationId}")
     public InjectExpectation updateInjectExpectation(
             @PathVariable @NotBlank final String expectationId,
@@ -72,6 +73,14 @@ public class ExpectationApi extends RestBehavior {
         ).toList();
     }
 
+    @GetMapping("/api/injects/expectations/assets/{sourceId}")
+    public List<InjectExpectation> getInjectExpectationsAssetsNotFilledForSource(@PathVariable String sourceId) {
+        return Stream.concat(
+                injectExpectationService.preventionExpectationsNotFill(sourceId).stream(),
+                injectExpectationService.detectionExpectationsNotFill(sourceId).stream()
+        ).toList();
+    }
+
     @GetMapping("/api/injects/expectations/prevention")
     public List<InjectExpectation> getInjectPreventionExpectationsNotFilled() {
         return injectExpectationService.preventionExpectationsNotFill().stream().toList();
@@ -93,6 +102,7 @@ public class ExpectationApi extends RestBehavior {
     }
 
     @PutMapping("/api/injects/expectations/{expectationId}")
+    @Transactional(rollbackOn = Exception.class)
     public InjectExpectation updateInjectExpectation(@PathVariable @NotBlank final String expectationId, @Valid @RequestBody @NotNull InjectExpectationUpdateInput input) {
         InjectExpectation injectExpectation = this.injectExpectationService.findInjectExpectation(expectationId).orElseThrow();
         Collector collector = this.collectorRepository.findById(input.getCollectorId()).orElseThrow();

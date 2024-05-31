@@ -10,6 +10,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -62,6 +63,7 @@ public class CollectorApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/collectors/{collectorId}")
+    @Transactional(rollbackOn = Exception.class)
     public Collector updateCollector(@PathVariable String collectorId, @Valid @RequestBody CollectorUpdateInput input) {
         Collector collector = collectorRepository.findById(collectorId).orElseThrow(ElementNotFoundException::new);
         return updateCollector(collector, collector.getType(), collector.getName(), collector.getPeriod(), input.getLastExecution());
@@ -71,6 +73,7 @@ public class CollectorApi extends RestBehavior {
     @PostMapping(value = "/api/collectors",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Transactional(rollbackOn = Exception.class)
     public Collector registerCollector(@Valid @RequestPart("input") CollectorCreateInput input,
                                                  @RequestPart("icon") Optional<MultipartFile> file) {
         try {

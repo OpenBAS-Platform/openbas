@@ -98,16 +98,16 @@ public class EmailService {
         }
     }
 
-    private void storeMessageImap(Execution execution, MimeMessage mimeMessage) {
+    private void storeMessageImap(Execution execution, MimeMessage mimeMessage) throws InterruptedException {
         if (execution.isRuntime() && imapEnabled) {
             for (int i = 0; i < 3; i++) {
                 try {
                     imapService.storeSentMessage(mimeMessage);
-                    Thread.sleep(2000);
                     execution.addTrace(traceSuccess("Mail successfully stored in IMAP"));
                     return;
                 } catch (Exception e) {
-                    execution.addTrace(traceError("Fail to store mail in IMAP after 3 attempts: " + e.getMessage()));
+                    execution.addTrace(traceError("Fail to store mail in IMAP" + e.getMessage()));
+                    Thread.sleep(2000);
                 }
             }
             execution.addTrace(traceError("Fail to store mail in IMAP after 3 attempts"));

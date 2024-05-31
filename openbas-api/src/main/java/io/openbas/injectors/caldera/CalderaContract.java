@@ -1,10 +1,7 @@
 package io.openbas.injectors.caldera;
 
 import io.openbas.injector_contract.*;
-import io.openbas.injector_contract.fields.ContractAsset;
-import io.openbas.injector_contract.fields.ContractAssetGroup;
-import io.openbas.injector_contract.fields.ContractExpectations;
-import io.openbas.injector_contract.fields.ContractSelect;
+import io.openbas.injector_contract.fields.*;
 import io.openbas.database.model.Endpoint;
 import io.openbas.helper.SupportedLanguage;
 import io.openbas.injectors.caldera.client.model.Ability;
@@ -20,6 +17,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static io.openbas.executors.caldera.service.CalderaExecutorService.toPlatform;
@@ -119,6 +118,15 @@ public class CalderaContract extends Contractor {
             builder.optional(expectationsField);
             List<String> platforms = new ArrayList<>();
             ability.getExecutors().forEach(executor -> {
+                String command = executor.getCommand();
+                if (command != null && !command.isEmpty()) {
+                    Matcher matcher = Pattern.compile("#\\{(.*?)\\}").matcher(command);
+                    while (matcher.find()) {
+                        if (!matcher.group(1).isEmpty()) {
+                            builder.mandatory(ContractText.textField(matcher.group(1), matcher.group(1)));
+                        }
+                    }
+                }
                 if (!executor.getPlatform().equals("unknown")) {
                     String platform = toPlatform(executor.getPlatform()).name();
                     if (!platforms.contains(platform)) {

@@ -9,6 +9,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.lessons.form.*;
 import io.openbas.service.MailingService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -80,6 +81,7 @@ public class LessonsApi extends RestBehavior {
 
   @PostMapping("/api/exercises/{exerciseId}/lessons_apply_template/{lessonsTemplateId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> applyExerciseLessonsTemplate(@PathVariable String exerciseId,
       @PathVariable String lessonsTemplateId) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
@@ -108,6 +110,7 @@ public class LessonsApi extends RestBehavior {
 
   @PostMapping("/api/exercises/{exerciseId}/lessons_categories")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackOn = Exception.class)
   public LessonsCategory createExerciseLessonsCategory(@PathVariable String exerciseId,
       @Valid @RequestBody LessonsCategoryCreateInput input) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
@@ -119,6 +122,7 @@ public class LessonsApi extends RestBehavior {
 
   @PostMapping("/api/exercises/{exerciseId}/lessons_answers_reset")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> resetExerciseLessonsAnswers(@PathVariable String exerciseId) {
     List<LessonsAnswer> lessonsAnswers = lessonsCategoryRepository.findAll(
             LessonsCategorySpecification.fromExercise(exerciseId)).stream()
@@ -133,6 +137,7 @@ public class LessonsApi extends RestBehavior {
 
   @PostMapping("/api/exercises/{exerciseId}/lessons_empty")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> emptyExerciseLessons(@PathVariable String exerciseId) {
     List<LessonsCategory> lessonsCategories = lessonsCategoryRepository.findAll(
         LessonsCategorySpecification.fromExercise(exerciseId)).stream().toList();
@@ -144,6 +149,7 @@ public class LessonsApi extends RestBehavior {
 
   @PutMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackOn = Exception.class)
   public LessonsCategory updateExerciseLessonsCategory(@PathVariable String exerciseId,
       @PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsCategoryUpdateInput input) {
     LessonsCategory lessonsTemplateCategory = lessonsCategoryRepository.findById(lessonsCategoryId).orElseThrow(ElementNotFoundException::new);
@@ -154,12 +160,14 @@ public class LessonsApi extends RestBehavior {
 
   @DeleteMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackOn = Exception.class)
   public void deleteExerciseLessonsCategory(@PathVariable String exerciseId, @PathVariable String lessonsCategoryId) {
     lessonsCategoryRepository.deleteById(lessonsCategoryId);
   }
 
   @PutMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/teams")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackOn = Exception.class)
   public LessonsCategory updateExerciseLessonsCategoryTeams(@PathVariable String exerciseId,
       @PathVariable String lessonsCategoryId, @Valid @RequestBody LessonsCategoryTeamsInput input) {
     LessonsCategory lessonsCategory = lessonsCategoryRepository.findById(lessonsCategoryId).orElseThrow(ElementNotFoundException::new);
@@ -206,12 +214,14 @@ public class LessonsApi extends RestBehavior {
 
   @DeleteMapping("/api/exercises/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackOn = Exception.class)
   public void deleteExerciseLessonsQuestion(@PathVariable String exerciseId, @PathVariable String lessonsQuestionId) {
     lessonsQuestionRepository.deleteById(lessonsQuestionId);
   }
 
   @PostMapping("/api/exercises/{exerciseId}/lessons_send")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackOn = Exception.class)
   public void sendExerciseLessons(@PathVariable String exerciseId, @Valid @RequestBody LessonsSendInput input) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     List<LessonsCategory> lessonsCategories = lessonsCategoryRepository.findAll(

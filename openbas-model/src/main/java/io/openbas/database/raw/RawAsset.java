@@ -8,4 +8,6 @@ public interface RawAsset {
 
     public String getAsset_name();
 
+    public String getEndpoint_platform();
+
 }

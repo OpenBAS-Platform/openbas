@@ -9,4 +9,5 @@ public class Executor {
 
   private String name;
   private String platform;
+  private String command;
 }

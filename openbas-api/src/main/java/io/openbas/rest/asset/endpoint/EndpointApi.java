@@ -7,6 +7,7 @@ import io.openbas.database.repository.TagRepository;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class EndpointApi {
 
   @PostMapping(ENDPOINT_URI)
   @PreAuthorize("isPlanner()")
+  @Transactional(rollbackOn = Exception.class)
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(input);
@@ -70,6 +72,7 @@ public class EndpointApi {
 
   @PutMapping(ENDPOINT_URI + "/{endpointId}")
   @PreAuthorize("isPlanner()")
+  @Transactional(rollbackOn = Exception.class)
   public Endpoint updateEndpoint(
       @PathVariable @NotBlank final String endpointId,
       @Valid @RequestBody final EndpointInput input) {
@@ -82,6 +85,7 @@ public class EndpointApi {
 
   @DeleteMapping(ENDPOINT_URI + "/{endpointId}")
   @PreAuthorize("isPlanner()")
+  @Transactional(rollbackOn = Exception.class)
   public void deleteEndpoint(@PathVariable @NotBlank final String endpointId) {
     this.endpointService.deleteEndpoint(endpointId);
   }

@@ -227,41 +227,43 @@ const Injects = (props) => {
                 style={{ float: 'right' }}
                 aria-label="Change view mode"
               >
-                {sortedInjects.length > 0 ? (
-                  <CSVLink
-                    data={exportData(
-                      'inject',
-                      [
-                        'inject_type',
-                        'inject_title',
-                        'inject_description',
-                        'inject_depends_duration',
-                        'inject_enabled',
-                        'inject_tags',
-                        'inject_content',
-                      ],
-                      sortedInjects,
-                      tagsMap,
-                    )}
-                    filename={`${t('Injects')}.csv`}
-                  >
-                    <Tooltip title={t('Export this list')}>
-                      <ToggleButton
-                        value='download'
-                        aria-label="Download"
-                      >
-                        <FileDownloadOutlined fontSize="small" color="primary" />
-                      </ToggleButton>
-                    </Tooltip>
-                  </CSVLink>
-                ) : (
-                  <ToggleButton
-                    value='download'
-                    aria-label="Download"
-                  >
-                    <FileDownloadOutlined fontSize="small" color="primary" />
-                  </ToggleButton>
-                )}
+                <div>
+                  {sortedInjects.length > 0 ? (
+                    <CSVLink
+                      data={exportData(
+                        'inject',
+                        [
+                          'inject_type',
+                          'inject_title',
+                          'inject_description',
+                          'inject_depends_duration',
+                          'inject_enabled',
+                          'inject_tags',
+                          'inject_content',
+                        ],
+                        sortedInjects,
+                        tagsMap,
+                      )}
+                      filename={`${t('Injects')}.csv`}
+                    >
+                      <Tooltip title={t('Export this list')}>
+                        <ToggleButton
+                          value='download'
+                          aria-label="Download"
+                        >
+                          <FileDownloadOutlined fontSize="small" color="primary" />
+                        </ToggleButton>
+                      </Tooltip>
+                    </CSVLink>
+                  ) : (
+                    <ToggleButton
+                      value='download'
+                      aria-label="Download"
+                    >
+                      <FileDownloadOutlined fontSize="small" color="primary" />
+                    </ToggleButton>
+                  )}
+                </div>
                 <Tooltip title={t('List view')}>
                   <ToggleButton
                     value='list'
@@ -282,7 +284,7 @@ const Injects = (props) => {
                 </Tooltip>
               </ToggleButtonGroup>
             ) : (
-              <>
+              <div>
                 {sortedInjects.length > 0 ? (
                   <CSVLink
                     data={exportData(
@@ -313,7 +315,7 @@ const Injects = (props) => {
                     <FileDownloadOutlined />
                   </IconButton>
                 )}
-              </>
+              </div>
             )}
           </div>
           <div className="clearfix" />
@@ -399,8 +401,8 @@ const Injects = (props) => {
             let injectStatus = inject.inject_enabled
               ? t('Enabled')
               : t('Disabled');
-            if (inject.inject_content === null) {
-              injectStatus = t('To fill');
+            if (!inject.inject_ready) {
+              injectStatus = t('Missing content');
             }
             return (
               <ListItem
@@ -484,11 +486,7 @@ const Injects = (props) => {
                         style={inlineStyles.inject_enabled}
                       >
                         <ItemBoolean
-                          status={
-                            inject.inject_content === null
-                              ? false
-                              : inject.inject_enabled
-                          }
+                          status={inject.inject_ready ? inject.inject_enabled : false}
                           label={injectStatus}
                           variant="inList"
                         />

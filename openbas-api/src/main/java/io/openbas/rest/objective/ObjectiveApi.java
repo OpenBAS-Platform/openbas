@@ -60,6 +60,7 @@ public class ObjectiveApi extends RestBehavior {
 
   @PostMapping("/api/exercises/{exerciseId}/objectives")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackOn = Exception.class)
   public Objective createObjective(@PathVariable String exerciseId,
       @Valid @RequestBody ObjectiveInput input) {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);

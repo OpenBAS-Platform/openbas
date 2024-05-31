@@ -38,20 +38,20 @@ export const isEmptyFilter = (filterGroup: FilterGroup, key: string) => {
 
 // -- OPERATOR --
 
-export const convertOperatorToIcon = (operator: Filter['operator']) => {
+export const convertOperatorToIcon = (t: (text: string) => string, operator: Filter['operator']) => {
   switch (operator) {
     case 'eq':
       return <>&nbsp;=</>;
     case 'not_eq':
       return <>&nbsp;&#8800;</>;
     case 'not_contains':
-      return <>not contains</>;
+      return t('not contains');
     case 'contains':
-      return <>contains</>;
+      return t('contains');
     case 'starts_with':
-      return <>starts with</>;
+      return t('starts with');
     case 'not_starts_with':
-      return <>not starts with</>;
+      return t('not starts with');
     default:
       return null;
   }
@@ -60,12 +60,12 @@ export const convertOperatorToIcon = (operator: Filter['operator']) => {
 export const OperatorKeyValues: {
   [key: string]: string;
 } = {
-  eq: 'Equals',
-  not_eq: 'Not equals',
-  contains: 'Contains',
-  not_contains: 'Not contains',
-  starts_with: 'Start with',
-  not_starts_with: 'Not start with',
+  eq: 'equals',
+  not_eq: 'not equals',
+  contains: 'contains',
+  not_contains: 'not contains',
+  starts_with: 'starts with',
+  not_starts_with: 'not starts with',
 };
 
 export const availableOperators = (propertySchema: PropertySchemaDTO) => {

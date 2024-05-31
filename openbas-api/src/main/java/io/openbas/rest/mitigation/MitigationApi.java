@@ -11,6 +11,7 @@ import io.openbas.rest.mitigation.form.MitigationCreateInput;
 import io.openbas.rest.mitigation.form.MitigationUpdateInput;
 import io.openbas.rest.mitigation.form.MitigationUpsertInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +71,7 @@ public class MitigationApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/mitigations")
+  @Transactional(rollbackOn = Exception.class)
   public Mitigation createMitigation(@Valid @RequestBody MitigationCreateInput input) {
     Mitigation mitigation = new Mitigation();
     mitigation.setUpdateAttributes(input);
@@ -130,6 +132,7 @@ public class MitigationApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/mitigations/upsert")
+  @Transactional(rollbackOn = Exception.class)
   public Iterable<Mitigation> upsertKillChainPhases(@Valid @RequestBody MitigationUpsertInput input) {
       List<MitigationCreateInput> mitigations = input.getMitigations();
       return new ArrayList<>(upsertMitigations(mitigations));

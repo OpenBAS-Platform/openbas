@@ -20,7 +20,6 @@ const useStyles = makeStyles(() => ({
 type OptionPropertySchema = Option & { operator: Filter['operator'] };
 
 interface Props {
-  labelId: string;
   clazz: string;
   initialValue?: FilterGroup;
   onChange: (value: FilterGroup) => void;
@@ -28,7 +27,6 @@ interface Props {
 }
 
 const FilterField: FunctionComponent<Props> = ({
-  labelId,
   clazz,
   initialValue,
   onChange,
@@ -37,6 +35,7 @@ const FilterField: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
+  const [pristine, setPristine] = useState(true);
 
   const [filterGroup, helpers] = useFiltersState(initialValue ?? emptyFilterGroup, onChange);
 
@@ -55,9 +54,11 @@ const FilterField: FunctionComponent<Props> = ({
   }, []);
 
   const handleChange = (value: string, operator: Filter['operator']) => {
+    setPristine(false);
     helpers.handleAddFilterWithEmptyValue(buildEmptyFilter(value, operator));
   };
   const handleClearFilters = () => {
+    setPristine(false);
     helpers.handleClearAllFilters();
   };
 
@@ -69,8 +70,6 @@ const FilterField: FunctionComponent<Props> = ({
     <>
       <div className={classes.container}>
         <MuiAutocomplete
-          // @ts-expect-error: labelId
-          labelId={labelId}
           options={computeOptions()}
           sx={{ width: 200 }}
           value={null}
@@ -108,7 +107,7 @@ const FilterField: FunctionComponent<Props> = ({
           </IconButton>
         </Tooltip>
       </div>
-      <FilterChips propertySchemas={properties} filterGroup={filterGroup} helpers={helpers} />
+      <FilterChips propertySchemas={properties} filterGroup={filterGroup} helpers={helpers} pristine={pristine} />
     </>
   );
 };

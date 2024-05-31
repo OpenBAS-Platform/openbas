@@ -4,7 +4,7 @@ import { makeStyles } from '@mui/styles';
 import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { DescriptionOutlined, RowingOutlined } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useFormatter } from '../../../../components/i18n';
 import { searchDocuments } from '../../../../actions/Document';
 import { fetchTags } from '../../../../actions/Tag';
@@ -85,6 +85,7 @@ const Documents = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { t } = useFormatter();
   const { exercisesMap, scenariosMap, userAdmin } = useHelper((helper) => ({
     exercisesMap: helper.getExercisesMap(),
@@ -206,9 +207,15 @@ const Documents = () => {
                             classes={{ root: classes.exercise }}
                             variant="outlined"
                             label={exercise.exercise_name}
-                            component={Link}
                             clickable={true}
-                            to={`/admin/exercises/${exercise.exercise_id}`}
+                            onClick={
+                              (event) => {
+                                // prevent parent link from triggering
+                                event.stopPropagation();
+                                event.preventDefault();
+                                navigate(`/admin/exercises/${exercise.exercise_id}`);
+                              }
+                            }
                           />
                         </Tooltip>
                       );
@@ -231,9 +238,15 @@ const Documents = () => {
                             classes={{ root: classes.scenario }}
                             variant="outlined"
                             label={scenario.scenario_name}
-                            component={Link}
                             clickable={true}
-                            to={`/admin/scenarios/${scenario.scenario_id}`}
+                            onClick={
+                              (event) => {
+                                // prevent parent link from triggering
+                                event.stopPropagation();
+                                event.preventDefault();
+                                navigate(`/admin/scenarios/${scenario.scenario_id}`);
+                              }
+                            }
                           />
                         </Tooltip>
                       );

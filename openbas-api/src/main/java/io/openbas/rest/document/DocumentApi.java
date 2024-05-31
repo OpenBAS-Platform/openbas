@@ -121,6 +121,7 @@ public class DocumentApi extends RestBehavior {
     }
 
     @PostMapping("/api/documents")
+    @Transactional(rollbackOn = Exception.class)
     public Document uploadDocument(@Valid @RequestPart("input") DocumentCreateInput input,
                                    @RequestPart("file") MultipartFile file) throws Exception {
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
@@ -188,12 +189,12 @@ public class DocumentApi extends RestBehavior {
             ).map(RawPaginationDocument::new);
         } else {
             return buildPaginationJPA(
-                (Specification<Document> specification, Pageable pageable) -> this.documentRepository.findAll(
-                    findGrantedFor(user.getId()).and(specification),
-                    pageable
-                ),
-                searchPaginationInput,
-                Document.class
+                    (Specification<Document> specification, Pageable pageable) -> this.documentRepository.findAll(
+                            findGrantedFor(user.getId()).and(specification),
+                            pageable
+                    ),
+                    searchPaginationInput,
+                    Document.class
             ).map(RawPaginationDocument::new);
         }
     }

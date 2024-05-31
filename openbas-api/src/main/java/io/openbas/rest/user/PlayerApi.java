@@ -127,9 +127,9 @@ public class PlayerApi extends RestBehavior {
     return communicationRepository.findByUser(userId);
   }
 
-  @Transactional(rollbackOn = Exception.class)
   @PostMapping("/api/players")
   @PreAuthorize("isPlanner()")
+  @Transactional(rollbackOn = Exception.class)
   public User createPlayer(@Valid @RequestBody PlayerInput input) {
     checkOrganizationAccess(userRepository, input.getOrganizationId());
     User user = new User();
@@ -141,9 +141,9 @@ public class PlayerApi extends RestBehavior {
     return savedUser;
   }
 
-  @Transactional(rollbackOn = Exception.class)
   @PostMapping("/api/players/upsert")
   @PreAuthorize("isPlanner()")
+  @Transactional(rollbackOn = Exception.class)
   public User upsertPlayer(@Valid @RequestBody PlayerInput input) {
     checkOrganizationAccess(userRepository, input.getOrganizationId());
     Optional<User> user = userRepository.findByEmailIgnoreCase(input.getEmail());

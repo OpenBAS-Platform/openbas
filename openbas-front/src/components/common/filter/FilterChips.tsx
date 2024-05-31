@@ -27,12 +27,14 @@ interface Props {
   filterGroup: FilterGroup;
   helpers: FilterHelpers;
   propertySchemas: PropertySchemaDTO[];
+  pristine: boolean;
 }
 
 const FilterChips: FunctionComponent<Props> = ({
   filterGroup,
   helpers,
   propertySchemas,
+  pristine,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -61,7 +63,7 @@ const FilterChips: FunctionComponent<Props> = ({
           return (<></>);
         }
         return (
-          <>
+          <React.Fragment key={filter.key}>
             {idx !== 0
               && <div
                 onClick={handleSwitchMode}
@@ -73,12 +75,14 @@ const FilterChips: FunctionComponent<Props> = ({
               filter={filter}
               helpers={helpers}
               propertySchema={property}
+              pristine={pristine}
             />
-          </>
+          </React.Fragment>
         );
       })
       }
     </Box>
   );
 };
+
 export default FilterChips;

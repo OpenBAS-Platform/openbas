@@ -70,6 +70,11 @@ public class InjectStatusExecution {
         return new InjectStatusExecution(ExecutionStatus.ERROR, List.of(), message, EXECUTION_TYPE_STANDARD);
     }
 
+    public static InjectStatusExecution traceMaybePrevented(String message) {
+        return new InjectStatusExecution(ExecutionStatus.MAYBE_PREVENTED, List.of(), message, EXECUTION_TYPE_STANDARD);
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -7,6 +7,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.tag.form.TagCreateInput;
 import io.openbas.rest.tag.form.TagUpdateInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -47,6 +48,7 @@ public class TagApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/tags/{tagId}")
+    @Transactional(rollbackOn = Exception.class)
     public Tag updateTag(@PathVariable String tagId,
                          @Valid @RequestBody TagUpdateInput input) {
         Tag tag = tagRepository.findById(tagId).orElseThrow(ElementNotFoundException::new);
@@ -56,6 +58,7 @@ public class TagApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/tags")
+    @Transactional(rollbackOn = Exception.class)
     public Tag createTag(@Valid @RequestBody TagCreateInput input) {
         Tag tag = new Tag();
         tag.setUpdateAttributes(input);
@@ -64,6 +67,7 @@ public class TagApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/tags/upsert")
+    @Transactional(rollbackOn = Exception.class)
     public Tag upsertTag(@Valid @RequestBody TagCreateInput input) {
         Optional<Tag> tag = tagRepository.findByName(input.getName());
         if( tag.isPresent() ) {

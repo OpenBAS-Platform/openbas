@@ -292,6 +292,7 @@ public class InjectApi extends RestBehavior {
 
     @PostMapping("/api/exercises/{exerciseId}/injects")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
+    @Transactional(rollbackOn = Exception.class)
     public Inject createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
         InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new);
@@ -425,6 +426,7 @@ public class InjectApi extends RestBehavior {
 
     @PostMapping(SCENARIO_URI + "/{scenarioId}/injects")
     @PreAuthorize("isScenarioPlanner(#scenarioId)")
+    @Transactional(rollbackOn = Exception.class)
     public Inject createInjectForScenario(
             @PathVariable @NotBlank final String scenarioId,
             @Valid @RequestBody InjectInput input) {
@@ -432,7 +434,7 @@ public class InjectApi extends RestBehavior {
         InjectorContract injectorContract = injectorContractRepository.findById(input.getInjectorContract()).orElseThrow(ElementNotFoundException::new);
         // Set expectations
         ObjectNode finalContent = input.getContent();
-        if (input.getContent() == null || input.getContent().get("expectations").isNull() || input.getContent().get("expectations").isEmpty()) {
+        if (input.getContent() == null || input.getContent().get("expectations") == null || input.getContent().get("expectations").isEmpty()) {
             try {
                 JsonNode jsonNode = mapper.readTree(injectorContract.getContent());
                 List<JsonNode> contractElements = StreamSupport.stream(jsonNode.get("fields").spliterator(), false).filter(contractElement -> contractElement.get("type").asText().equals(ContractType.Expectation.name().toLowerCase())).toList();

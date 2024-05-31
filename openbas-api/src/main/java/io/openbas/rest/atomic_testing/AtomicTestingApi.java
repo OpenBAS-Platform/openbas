@@ -11,6 +11,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.AtomicTestingService;
 import io.openbas.utils.AtomicTestingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +58,7 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
   @PostMapping()
+  @Transactional(rollbackOn = Exception.class)
   public InjectResultDTO createAtomicTesting(@Valid @RequestBody AtomicTestingInput input) {
     Inject inject = this.atomicTestingService.createOrUpdate(input, null);
     return AtomicTestingMapper.toDto(
@@ -69,6 +71,7 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
   @PutMapping("/{injectId}")
+  @Transactional(rollbackOn = Exception.class)
   public InjectResultDTO updateAtomicTesting(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingInput input) {
@@ -102,6 +105,7 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
   @PutMapping("/{injectId}/tags")
+  @Transactional(rollbackOn = Exception.class)
   public InjectResultDTO updateAtomicTestingTags(
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingUpdateTagsInput input) {

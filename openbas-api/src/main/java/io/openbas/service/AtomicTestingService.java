@@ -218,10 +218,10 @@ public class AtomicTestingService {
     @Transactional
     public Inject tryInject(String injectId) {
         Inject inject = injectRepository.findById(injectId).orElseThrow();
-        User user = this.userRepository.findById(currentUser().getId()).orElseThrow();
 
         // Reset injects outcome, communications and expectations
         inject.clean();
+        inject.setUpdatedAt(Instant.now());
 
         // New inject status
         InjectStatus injectStatus = new InjectStatus();

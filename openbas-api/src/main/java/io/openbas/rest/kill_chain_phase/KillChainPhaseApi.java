@@ -8,6 +8,7 @@ import io.openbas.rest.kill_chain_phase.form.KillChainPhaseCreateInput;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseUpdateInput;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseUpsertInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -58,6 +59,7 @@ public class KillChainPhaseApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/kill_chain_phases/{killChainPhaseId}")
+  @Transactional(rollbackOn = Exception.class)
   public KillChainPhase updateKillChainPhase(@PathVariable String killChainPhaseId,
       @Valid @RequestBody KillChainPhaseUpdateInput input) {
     KillChainPhase killchainPhase = killChainPhaseRepository.findById(killChainPhaseId).orElseThrow(ElementNotFoundException::new);
@@ -68,6 +70,7 @@ public class KillChainPhaseApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/kill_chain_phases")
+  @Transactional(rollbackOn = Exception.class)
   public KillChainPhase createKillChainPhase(@Valid @RequestBody KillChainPhaseCreateInput input) {
     KillChainPhase killChainPhase = new KillChainPhase();
     killChainPhase.setUpdateAttributes(input);
@@ -76,6 +79,7 @@ public class KillChainPhaseApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/kill_chain_phases/upsert")
+  @Transactional(rollbackOn = Exception.class)
   public Iterable<KillChainPhase> upsertKillChainPhases(@Valid @RequestBody KillChainPhaseUpsertInput input) {
     List<KillChainPhase> upserted = new ArrayList<>();
     List<KillChainPhaseCreateInput> inputKillChainPhases = input.getKillChainPhases();

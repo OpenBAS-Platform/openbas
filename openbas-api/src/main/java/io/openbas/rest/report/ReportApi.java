@@ -9,6 +9,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.report.form.ReportCreateInput;
 import io.openbas.rest.report.form.ReportUpdateInput;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,6 +41,7 @@ public class ReportApi extends RestBehavior {
 
     @PostMapping("/api/exercises/{exerciseId}/reports")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
+    @Transactional(rollbackOn = Exception.class)
     public Report createExerciseReport(@PathVariable String exerciseId, @Valid @RequestBody ReportCreateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
         Report report = new Report();
@@ -50,6 +52,7 @@ public class ReportApi extends RestBehavior {
 
     @PutMapping("/api/exercises/{exerciseId}/reports/{reportId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
+    @Transactional(rollbackOn = Exception.class)
     public Report updateExerciseReport(@PathVariable String exerciseId,@PathVariable String reportId, @Valid @RequestBody ReportUpdateInput input) {
         Report report = reportRepository.findById(reportId).orElseThrow(ElementNotFoundException::new);
         report.setUpdateAttributes(input);
@@ -59,6 +62,7 @@ public class ReportApi extends RestBehavior {
 
     @DeleteMapping("/api/exercises/{exerciseId}/reports/{reportId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
+    @Transactional(rollbackOn = Exception.class)
     public void deleteExerciseReport(@PathVariable String exerciseId, @PathVariable String reportId) {
         reportRepository.deleteById(reportId);
     }

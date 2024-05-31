@@ -2,6 +2,9 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.annotation.Queryable;
@@ -12,6 +15,7 @@ import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
+import jakarta.annotation.Resource;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -25,7 +29,10 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.StreamSupport;
 
+import static io.openbas.database.model.Endpoint.ENDPOINT_TYPE;
 import static java.time.Duration.between;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
@@ -36,7 +43,6 @@ import static java.util.Optional.ofNullable;
 @EntityListeners(ModelBaseListener.class)
 @Log
 public class Inject implements Base, Injection {
-
   public static final int SPEED_STANDARD = 1; // Standard speed define by the user.
 
   public static final Comparator<Inject> executionComparator = (o1, o2) -> {
@@ -147,6 +153,7 @@ public class Inject implements Base, Injection {
   // CascadeType.ALL is required here because inject status are embedded
   @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonProperty("inject_status")
+  @Queryable(sortable = true, property = "name")
   private InjectStatus status;
 
   @Getter
@@ -251,6 +258,30 @@ public class Inject implements Base, Injection {
     return getTeams().stream()
         .map(team -> team.getUsersNumberInExercise(getExercise().getId()))
         .reduce(Long::sum).orElse(0L);
+  }
+
+  @JsonProperty("inject_ready")
+  public boolean isReady() {
+    InjectorContract injectorContract = getInjectorContract();
+    ObjectNode content = getContent();
+    if( getContent() == null ) {
+      return false;
+    }
+    AtomicBoolean ready = new AtomicBoolean(true);
+      ObjectNode contractContent = injectorContract.getConvertedContent();
+      List<JsonNode> contractMandatoryFields = StreamSupport.stream(contractContent.get("fields").spliterator(), false).filter(contractElement -> contractElement.get("mandatory").asBoolean()).toList();
+      if (!contractMandatoryFields.isEmpty()) {
+        contractMandatoryFields.forEach(jsonField -> {
+          String key = jsonField.get("key").asText();
+          if( content.get(key) == null ) {
+            ready.set(false);
+          }
+          if(Objects.equals(jsonField.get("type").asText(), "String") && (content.get(key).asText().isEmpty())) {
+            ready.set(false);
+          }
+        });
+      }
+      return ready.get();
   }
 
   @JsonIgnore
@@ -421,45 +452,80 @@ public class Inject implements Base, Injection {
 
     // Set a list of expectations
     inject.setExpectations(new ArrayList<>());
-    for(String expectationId: rawInject.getInject_expectations()) {
-      // Create a new expectation
-      InjectExpectation expectation = new InjectExpectation();
-      expectation.setId(rawInjectExpectationMap.get(expectationId).getInject_expectation_id());
-      expectation.setType(InjectExpectation.EXPECTATION_TYPE.valueOf(rawInjectExpectationMap.get(expectationId).getInject_expectation_type()));
-      expectation.setScore(rawInjectExpectationMap.get(expectationId).getInject_expectation_score());
+    for (String expectationId : rawInject.getInject_expectations()) {
+      RawInjectExpectation rawInjectExpectation = rawInjectExpectationMap.get(expectationId);
+      if (rawInjectExpectation != null) {
+        // Create a new expectation
+        InjectExpectation expectation = new InjectExpectation();
+        expectation.setId(rawInjectExpectation.getInject_expectation_id());
+        expectation.setType(
+            InjectExpectation.EXPECTATION_TYPE.valueOf(rawInjectExpectation.getInject_expectation_type()));
+        expectation.setScore(rawInjectExpectation.getInject_expectation_score());
 
-      // Add the team of the expectation
-      Team team = new Team();
-      team.setId(rawInjectExpectationMap.get(expectationId).getTeam_id());
-      team.setName(rawTeams.get(rawInjectExpectationMap.get(expectationId).getTeam_id()).getTeam_name());
-      expectation.setTeam(team);
-
-      // Add the asset group of the expectation
-      AssetGroup assetGroup = new AssetGroup();
-      RawAssetGroup rawAssetGroup = mapOfAssetGroups.get(rawInjectExpectationMap.get(expectationId).getAsset_group_id());
-      if(rawAssetGroup != null) {
-        assetGroup.setId(rawAssetGroup.getAsset_group_id());
-        assetGroup.setName(rawAssetGroup.getAsset_group_name());
-        assetGroup.setAssets(new ArrayList<>());
-
-        // We add the assets to the asset group
-        for (String assetId : rawAssetGroup.getAsset_ids()) {
-          Asset asset = new Asset(mapOfAsset.get(assetId).getAsset_id(),
-                  mapOfAsset.get(assetId).getAsset_type(),
-                  mapOfAsset.get(assetId).getAsset_name());
-          assetGroup.getAssets().add(asset);
+        // Add the team of the expectation
+        if (rawInjectExpectation.getTeam_id() != null) {
+          RawTeam rawTeam = rawTeams.get(rawInjectExpectation.getTeam_id());
+          if (rawTeam != null) {
+            Team team = new Team();
+            team.setId(rawInjectExpectation.getTeam_id());
+            team.setName(rawTeam.getTeam_name());
+            expectation.setTeam(team);
+          }
         }
-        expectation.setAssetGroup(assetGroup);
-      }
 
-      // We add the asset to the expectation
-      if (rawInjectExpectationMap.get(expectationId).getAsset_id() != null) {
-        Asset asset = new Asset(mapOfAsset.get(rawInjectExpectationMap.get(expectationId).getAsset_id()).getAsset_id(),
-                mapOfAsset.get(rawInjectExpectationMap.get(expectationId).getAsset_id()).getAsset_type(),
-                mapOfAsset.get(rawInjectExpectationMap.get(expectationId).getAsset_id()).getAsset_name());
-        expectation.setAsset(asset);
+        // Add the asset group of the expectation
+        if (rawInjectExpectation.getAsset_group_id() != null) {
+          RawAssetGroup rawAssetGroup = mapOfAssetGroups.get(rawInjectExpectation.getAsset_group_id());
+          if (rawAssetGroup != null) {
+            AssetGroup assetGroup = new AssetGroup();
+            assetGroup.setId(rawAssetGroup.getAsset_group_id());
+            assetGroup.setName(rawAssetGroup.getAsset_group_name());
+            assetGroup.setAssets(new ArrayList<>());
+
+            // We add the assets to the asset group
+            for (String assetId : rawAssetGroup.getAsset_ids()) {
+              RawAsset rawAsset = mapOfAsset.get(assetId);
+              if (rawAsset != null) {
+                if(rawAsset.getAsset_type().equals(ENDPOINT_TYPE)) {
+                  Endpoint endpoint = new Endpoint(rawAsset.getAsset_id(),
+                          rawAsset.getAsset_type(),
+                          rawAsset.getAsset_name(),
+                          Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform()));
+                  assetGroup.getAssets().add(endpoint);
+                } else {
+                  Asset asset = new Asset(rawAsset.getAsset_id(),
+                          rawAsset.getAsset_type(),
+                          rawAsset.getAsset_name());
+                  assetGroup.getAssets().add(asset);
+                }
+              }
+            }
+            expectation.setAssetGroup(assetGroup);
+          }
+        }
+
+        // We add the asset to the expectation
+        if (rawInjectExpectation.getAsset_id() != null) {
+          RawAsset rawAsset = mapOfAsset.get(rawInjectExpectation.getAsset_id());
+          if (rawAsset != null) {
+            if(rawAsset.getAsset_type().equals(ENDPOINT_TYPE)) {
+              Endpoint endpoint = new Endpoint(rawAsset.getAsset_id(),
+                      rawAsset.getAsset_type(),
+                      rawAsset.getAsset_name(),
+                      Endpoint.PLATFORM_TYPE.valueOf(rawAsset.getEndpoint_platform()));
+              expectation.setAsset(endpoint);
+            } else {
+              Asset asset = new Asset(
+                      rawAsset.getAsset_id(),
+                      rawAsset.getAsset_type(),
+                      rawAsset.getAsset_name()
+              );
+              expectation.setAsset(asset);
+            }
+          }
+        }
+        inject.getExpectations().add(expectation);
       }
-      inject.getExpectations().add(expectation);
     }
 
     // We add the teams to the inject
@@ -475,10 +541,18 @@ public class Inject implements Base, Injection {
     // We add the assets to the inject
     ArrayList<Asset> injectAssets = new ArrayList();
     for (String injectAssetId: rawInject.getInject_assets()) {
-      Asset asset = new Asset(mapOfAsset.get(injectAssetId).getAsset_id(),
-              mapOfAsset.get(injectAssetId).getAsset_type(),
-              mapOfAsset.get(injectAssetId).getAsset_name());
-      injectAssets.add(asset);
+      if(mapOfAsset.get(injectAssetId).getAsset_type().equals("Endpoint")) {
+        Endpoint endpoint = new Endpoint(mapOfAsset.get(injectAssetId).getAsset_id(),
+                mapOfAsset.get(injectAssetId).getAsset_type(),
+                mapOfAsset.get(injectAssetId).getAsset_name(),
+                Endpoint.PLATFORM_TYPE.valueOf(mapOfAsset.get(injectAssetId).getEndpoint_platform()));
+        injectAssets.add(endpoint);
+      } else {
+        Asset asset = new Asset(mapOfAsset.get(injectAssetId).getAsset_id(),
+                mapOfAsset.get(injectAssetId).getAsset_type(),
+                mapOfAsset.get(injectAssetId).getAsset_name());
+        injectAssets.add(asset);
+      }
     }
     inject.setAssets(injectAssets);
 
@@ -491,10 +565,18 @@ public class Inject implements Base, Injection {
       // We add the assets linked to the asset group
       assetGroup.setAssets(mapOfAssetGroups.get(injectAssetGroupId).getAsset_ids().stream().map(
               assetId -> {
-                Asset asset = new Asset(mapOfAsset.get(assetId).getAsset_id(),
-                        mapOfAsset.get(assetId).getAsset_type(),
-                        mapOfAsset.get(assetId).getAsset_name());
-                return asset;
+                if (mapOfAsset.get(assetId).getAsset_type().equals("Endpoint")) {
+                  Endpoint endpoint = new Endpoint(mapOfAsset.get(assetId).getAsset_id(),
+                          mapOfAsset.get(assetId).getAsset_type(),
+                          mapOfAsset.get(assetId).getAsset_name(),
+                          Endpoint.PLATFORM_TYPE.valueOf(mapOfAsset.get(assetId).getEndpoint_platform()));
+                  return endpoint;
+                } else {
+                  Asset asset = new Asset(mapOfAsset.get(assetId).getAsset_id(),
+                          mapOfAsset.get(assetId).getAsset_type(),
+                          mapOfAsset.get(assetId).getAsset_name());
+                  return asset;
+                }
               }
       ).toList());
       injectAssetGroups.add(assetGroup);

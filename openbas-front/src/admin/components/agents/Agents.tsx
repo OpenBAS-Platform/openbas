@@ -121,12 +121,14 @@ const Executors = () => {
           label: 'powershell',
           defaultAgentFolder: 'C:\\Program Files\\OpenBAS',
           exclusions: `${agentFolder ?? 'C:\\Program Files\\OpenBAS'}
-${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe`,
+${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe
+MD5: 68c1795fb45cb9b522d6cf48443fdc37
+SHA1: 5f87d06f818ff8cba9e11e8cd1c6f9d990eca0f8
+SHA256: 6b180913acb8cdac3fb8d3154a2f6a0bed13c056a477f4f94c4679414ec13b9f
+SHA512: 6185b7253eedfa6253f26cd85c4bcfaf05195219b6ab06b43d9b07279d7d0cdd3c957bd58d36058d7cde405bc8c5084f3ac060a6080bfc18a843738d3bee87fd`,
           displayedCode: `$server="${settings.executor_caldera_public_url}";
-$url="$server/file/download";
+$url="${settings.platform_base_url}/api/agent/windows";
 $wc=New-Object System.Net.WebClient;
-$wc.Headers.add("platform","windows");
-$wc.Headers.add("file","sandcat.go");
 $data=$wc.DownloadData($url);
 get-process | ? {$_.modules.filename -like '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe'} | stop-process -f;
 rm -force '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' -ea ignore;
@@ -136,7 +138,7 @@ New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Inbound -Program '${
 New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Outbound -Program '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' -Action Allow | Out-Null;
 Start-Process -FilePath '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' -ArgumentList "-server $server -group red" -WindowStyle hidden;
 schtasks /create /tn OpenBAS /sc onstart /ru system /tr "\`"\`"${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe\`"\`" -server $server -group red";`,
-          code: `$server="${settings.executor_caldera_public_url}";$url="$server/file/download";$wc=New-Object System.Net.WebClient;$wc.Headers.add("platform","windows");$wc.Headers.add("file","sandcat.go");$data=$wc.DownloadData($url);get-process | ? {$_.modules.filename -like '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe'} | stop-process -f;rm -force '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' -ea ignore;New-Item -ItemType Directory -Force -Path '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}' | Out-Null;[io.file]::WriteAllBytes('${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe',$data) | Out-Null;New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Inbound -Program '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' -Action Allow | Out-Null;New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Outbound -Program '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' -Action Allow | Out-Null;Start-Process -FilePath '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' -ArgumentList "-server $server -group red" -WindowStyle hidden;schtasks /create /tn OpenBAS /sc onstart /ru system /tr "\`"\`"\`"${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe\`"\`"\`" -server $server -group red";`,
+          code: `$server="${settings.executor_caldera_public_url}";$url="${settings.platform_base_url}/api/agent/windows";$wc=New-Object System.Net.WebClient;$data=$wc.DownloadData($url);get-process | ? {$_.modules.filename -like '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe'} | stop-process -f;rm -force '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' -ea ignore;New-Item -ItemType Directory -Force -Path '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}' | Out-Null;[io.file]::WriteAllBytes('${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe',$data) | Out-Null;New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Inbound -Program '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' -Action Allow | Out-Null;New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Outbound -Program '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' -Action Allow | Out-Null;Start-Process -FilePath '${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe' -ArgumentList "-server $server -group red" -WindowStyle hidden;schtasks /create /tn OpenBAS /sc onstart /ru system /tr "\`"\`"\`"${agentFolder ?? 'C:\\Program Files\\OpenBAS'}\\obas.exe\`"\`"\`" -server $server -group red";`,
         };
       case 'linux':
         return {
@@ -144,13 +146,17 @@ schtasks /create /tn OpenBAS /sc onstart /ru system /tr "\`"\`"${agentFolder ?? 
           label: 'sh',
           defaultAgentFolder: '/opt/openbas',
           exclusions: `${agentFolder ?? '/opt/openbas'}
-${agentFolder ?? '/opt/openbas/obas'}`,
+${agentFolder ?? '/opt/openbas/obas'}
+MD5: d604c952bb3c6d96621594d39992c499
+SHA1: 5b6087f87f5f2ae129f888bba799611836eb39a2
+SHA256: 98d1e64445bbef46a36d4724699a386646de78881a1b6f2b346122c76d696c12
+SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518a2be40f1a42226c68cbf5e779382a37ee5baa7dd7c538ec73ce059e8`,
           displayedCode: `server="${settings.executor_caldera_public_url}";
 mkdir -p ${agentFolder ?? '/opt/openbas'};
-curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${agentFolder ?? '/opt/openbas'}/obas;
+curl -s -X GET ${settings.platform_base_url}/api/agent/linux > ${agentFolder ?? '/opt/openbas'}/obas;
 chmod +x ${agentFolder ?? '/opt/openbas'}/obas;
 nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
-          code: `server="${settings.executor_caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas'};curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${agentFolder ?? '/opt/openbas'}/obas;chmod +x ${agentFolder ?? '/opt/openbas'}/obas;nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
+          code: `server="${settings.executor_caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas'};curl -s -X GET ${settings.platform_base_url}/api/agent/linux > ${agentFolder ?? '/opt/openbas'}/obas;chmod +x ${agentFolder ?? '/opt/openbas'}/obas;nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
         };
       case 'macos':
         return {
@@ -158,13 +164,17 @@ nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
           label: 'sh',
           defaultAgentFolder: '/opt/openbas',
           exclusions: `${agentFolder ?? '/opt/openbas'}
-${agentFolder ?? '/opt/openbas/obas'}`,
+${agentFolder ?? '/opt/openbas/obas'}
+MD5: 1132906cc40001f51673108847b88d0c
+SHA1: 3177df4a8fa13a2e13ce63670c579955ad55df3f
+SHA256: 2b4397160925bf6b9dcca0949073fd9b2fc590ab641ea1d1c3d7d36048ed674a
+SHA512: f1c8cf0c41c7d193bcb2aad21d7a739c785902c3231e15986b2eb37f911824a802f50cb2dbb509deba1c7a2a535fb7b34cf100303c61a6087102948628133747`,
           displayedCode: `server="${settings.executor_caldera_public_url}";
 mkdir -p ${agentFolder ?? '/opt/openbas'};
-curl -s -X POST -H "file:sandcat.go" -H "platform:darwin" -H "architecture:${arch}" $server/file/download > ${agentFolder ?? '/opt/openbas'}/obas;
+curl -s -X GET ${settings.platform_base_url}/api/agent/macos > ${agentFolder ?? '/opt/openbas'}/obas;
 chmod +x ${agentFolder ?? '/opt/openbas'}/obas;
 nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
-          code: `server="${settings.executor_caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas'};curl -s -X POST -H "file:sandcat.go" -H "platform:darwin" -H "architecture:${arch}" $server/file/download > ${agentFolder ?? '/opt/openbas'}/obas;chmod +x ${agentFolder ?? '/opt/openbas'}/obas;nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
+          code: `server="${settings.executor_caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas'};curl -s -X GET ${settings.platform_base_url}/api/agent/macos > ${agentFolder ?? '/opt/openbas'}/obas;chmod +x ${agentFolder ?? '/opt/openbas'}/obas;nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
         };
       default:
         return {
@@ -175,10 +185,10 @@ nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
 ${agentFolder ?? '/opt/openbas/obas'}`,
           displayedCode: `server="${settings.executor_caldera_public_url}";
 mkdir -p ${agentFolder ?? '/opt/openbas'};
-curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${agentFolder ?? '/opt/openbas'}/obas;
+curl -s -X GET ${settings.platform_base_url}/api/agent/linux > ${agentFolder ?? '/opt/openbas'}/obas;
 chmod +x ${agentFolder ?? '/opt/openbas'}/obas;
 nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
-          code: `server="${settings.executor_caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas'};curl -s -X POST -H "file:sandcat.go" -H "platform:linux" $server/file/download > ${agentFolder ?? '/opt/openbas'}/obas;chmod +x ${agentFolder ?? '/opt/openbas'}/obas;nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
+          code: `server="${settings.executor_caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas'};curl -s -X GET ${settings.platform_base_url}/api/agent/linux > ${agentFolder ?? '/opt/openbas'}/obas;chmod +x ${agentFolder ?? '/opt/openbas'}/obas;nohup ${agentFolder ?? '/opt/openbas'}/obas -server $server -group red &`,
         };
     }
   };

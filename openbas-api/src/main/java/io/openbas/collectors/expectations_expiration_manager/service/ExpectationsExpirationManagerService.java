@@ -29,29 +29,22 @@ public class ExpectationsExpirationManagerService {
     private final ExpectationsExpirationManagerConfig config;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+
     @Transactional(rollbackFor = Exception.class)
     public void computeExpectations() {
-        // Retrieve all expectations
-        List<InjectExpectation> preventionExpectations = this.injectExpectationService.preventionExpectationsNotFill();
-        log.info("Number of prevention expectations: " + preventionExpectations.size());
-
-        List<InjectExpectation> detectionExpectations = this.injectExpectationService.detectionExpectationsNotFill();
-        log.info("Number of detection expectations: " + detectionExpectations.size());
-
-        List<InjectExpectation> expectations = concat(preventionExpectations.stream(), detectionExpectations.stream()).toList();
-
+        List<InjectExpectation> expectations = this.injectExpectationService.expectationsNotFill();
         if (!expectations.isEmpty()) {
-            this.computeExpectationForAssets(expectations);
-            this.computeExpectationForAssetGroups(expectations);
+            this.computeExpectationsForAssets(expectations);
+            this.computeExpectationsForAssetGroups(expectations);
+            this.computeExpectations(expectations);
         }
     }
 
     // -- PRIVATE --
 
-    private void computeExpectationForAssets(@NotNull final List<InjectExpectation> expectations) {
-        List<InjectExpectation> expectationAssets = expectations.stream().filter(e -> e.getAsset() != null).toList();
+    private void computeExpectations(@NotNull final List<InjectExpectation> expectations) {
+        List<InjectExpectation> expectationAssets = expectations.stream().toList();
         expectationAssets.forEach((expectation) -> {
-            Asset asset = expectation.getAsset();
             // Maximum time for detection
             if (isExpired(expectation, this.config.getExpirationTimeInMinute())) {
                 String result = computeFailedMessage(expectation.getType());
@@ -66,7 +59,24 @@ public class ExpectationsExpirationManagerService {
         });
     }
 
-    private void computeExpectationForAssetGroups(@NotNull final List<InjectExpectation> expectations) {
+    private void computeExpectationsForAssets(@NotNull final List<InjectExpectation> expectations) {
+        List<InjectExpectation> expectationAssets = expectations.stream().filter(e -> e.getAsset() != null).toList();
+        expectationAssets.forEach((expectation) -> {
+            // Maximum time for detection
+            if (isExpired(expectation, this.config.getAssetExpirationTimeInMinute())) {
+                String result = computeFailedMessage(expectation.getType());
+                this.injectExpectationService.computeExpectation(
+                        expectation,
+                        this.config.getId(),
+                        PRODUCT_NAME,
+                        result,
+                        false
+                );
+            }
+        });
+    }
+
+    private void computeExpectationsForAssetGroups(@NotNull final List<InjectExpectation> expectations) {
         List<InjectExpectation> expectationAssetGroups = expectations.stream().filter(e -> e.getAssetGroup() != null).toList();
         expectationAssetGroups.forEach((expectationAssetGroup -> {
             List<InjectExpectation> expectationAssets = this.injectExpectationService.expectationsForAssets(

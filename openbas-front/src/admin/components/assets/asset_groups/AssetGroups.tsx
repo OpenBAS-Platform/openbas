@@ -1,6 +1,6 @@
 import { makeStyles } from '@mui/styles';
 import React, { CSSProperties, useState } from 'react';
-import { Drawer as MuiDrawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { Chip, Drawer as MuiDrawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { SelectGroup } from 'mdi-material-ui';
 import { useSearchParams } from 'react-router-dom';
 import { useFormatter } from '../../../../components/i18n';
@@ -18,6 +18,7 @@ import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { SearchPaginationInput } from '../../../../utils/api-types';
 import { initSorting } from '../../../../components/common/pagination/Page';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+import { convertOperatorToIcon } from '../../../../components/common/filter/FilterUtils';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { fetchTags } from '../../../../actions/Tag';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
@@ -37,11 +38,12 @@ const useStyles = makeStyles(() => ({
     alignItems: 'center',
   },
   bodyItem: {
-    height: 20,
+    height: 24,
     fontSize: 13,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    alignContent: 'center',
   },
   drawerPaper: {
     minHeight: '100vh',
@@ -52,21 +54,16 @@ const useStyles = makeStyles(() => ({
 
 const inlineStyles: Record<string, CSSProperties> = {
   asset_group_name: {
-    width: '25%',
-  },
-  asset_group_description: {
     width: '20%',
   },
-  asset_group_assets: {
-    width: '15%',
-    cursor: 'default',
+  asset_group_description: {
+    width: '25%',
   },
-  asset_group_dynamic_assets: {
-    width: '15%',
-    cursor: 'default',
+  asset_group_assets: {
+    width: '35%',
   },
   asset_group_tags: {
-    width: '25%',
+    width: '20%',
   },
 };
 
@@ -76,7 +73,7 @@ const AssetGroups = () => {
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
 
-  const [selected, setSelected] = useState<AssetGroupStore | undefined>(undefined);
+  const [selectedAssetGroupId, setSelectedAssetGroupId] = useState<AssetGroupStore['asset_group_id'] | undefined>(undefined);
 
   // Query param
   const [searchParams] = useSearchParams();
@@ -96,8 +93,7 @@ const AssetGroups = () => {
   const headers = [
     { field: 'asset_group_name', label: 'Name', isSortable: true },
     { field: 'asset_group_description', label: 'Description', isSortable: true },
-    { field: 'asset_group_assets', label: 'Assets', isSortable: false },
-    { field: 'asset_group_dynamic_assets', label: 'Dynamic assets', isSortable: false },
+    { field: 'asset_group_assets', label: 'Rules', isSortable: false },
     { field: 'asset_group_tags', label: 'Tags', isSortable: true },
   ];
 
@@ -121,14 +117,14 @@ const AssetGroups = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Assets') }, { label: t('Asset groups'), current: true }]} />
+      <Breadcrumbs variant="list" elements={[{ label: t('Assets') }, { label: t('Asset groups'), current: true }]}/>
       <PaginationComponent
         fetch={searchAssetGroups}
         searchPaginationInput={searchPaginationInput}
         setContent={setAssetGroups}
         exportProps={exportProps}
       />
-      <div className="clearfix" />
+      <div className="clearfix"/>
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -154,7 +150,7 @@ const AssetGroups = () => {
                 searchPaginationInput={searchPaginationInput}
                 setSearchPaginationInput={setSearchPaginationInput}
               />
-            }
+          }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
@@ -164,10 +160,10 @@ const AssetGroups = () => {
             classes={{ root: classes.item }}
             divider
             button
-            onClick={() => setSelected(assetGroup)}
+            onClick={() => setSelectedAssetGroupId(assetGroup.asset_group_id)}
           >
             <ListItemIcon>
-              <SelectGroup color="primary" />
+              <SelectGroup color="primary"/>
             </ListItemIcon>
             <ListItemText
               primary={
@@ -179,44 +175,65 @@ const AssetGroups = () => {
                     {assetGroup.asset_group_description}
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.asset_group_assets}>
-                    {assetGroup.asset_group_assets?.length ?? 0}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.asset_group_dynamic_assets}>
-                    {assetGroup.asset_group_dynamic_assets?.length ?? 0}
+                    {assetGroup.asset_group_dynamic_filter?.filters?.length
+                      ? assetGroup.asset_group_dynamic_filter?.filters.map((filter, index) => (
+                        <>
+                          {
+                              index !== 0 && <span style={{ marginRight: 10 }}>
+                                {t(assetGroup.asset_group_dynamic_filter?.mode?.toUpperCase())}
+                              </span>
+                          }
+                          <Chip
+                            size="small"
+                            style={index !== assetGroup.asset_group_dynamic_filter?.filters?.length ? { marginRight: 10 } : {}}
+                            key={filter.key}
+                            label={<><strong>{t(filter.key)}</strong> {convertOperatorToIcon(t, filter.operator)} {filter.values?.join(', ')}</>}
+                          />
+                        </>))
+                      : ''}
+                    {assetGroup.asset_group_assets?.length ? `${assetGroup.asset_group_dynamic_filter?.filters?.length ? t('and') : ''} ${assetGroup.asset_group_assets?.length} ${t('managed assets')}` : ''}
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.asset_group_tags}>
-                    <ItemTags variant="list" tags={assetGroup.asset_group_tags} />
+                    <ItemTags variant="list" tags={assetGroup.asset_group_tags}/>
                   </div>
                 </div>
-              }
+            }
             />
             <ListItemSecondaryAction>
               <AssetGroupPopover
                 assetGroup={assetGroup}
                 onUpdate={(result) => setAssetGroups(assetGroups.map((ag) => (ag.asset_group_id !== result.asset_group_id ? ag : result)))}
                 onDelete={(result) => setAssetGroups(assetGroups.filter((ag) => (ag.asset_group_id !== result)))}
+                onRemoveEndpointFromAssetGroup={(assetId) => setAssetGroups(assetGroups.map((ag) => (ag.asset_group_id !== assetGroup.asset_group_id ? ag : {
+                  ...ag,
+                  asset_group_assets: ag?.asset_group_assets?.toSpliced(ag?.asset_group_assets?.indexOf(assetId), 1),
+                })))}
                 openEditOnInit={assetGroup.asset_group_id === searchId}
               />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
-      {userAdmin && <AssetGroupCreation onCreate={(result) => setAssetGroups([result, ...assetGroups])} />}
+      {userAdmin && <AssetGroupCreation onCreate={(result) => setAssetGroups([result, ...assetGroups])}/>}
       <MuiDrawer
-        open={selected !== undefined}
+        open={selectedAssetGroupId !== undefined}
         keepMounted={false}
         anchor="right"
         sx={{ zIndex: 1202 }}
         classes={{ paper: classes.drawerPaper }}
-        onClose={() => setSelected(undefined)}
+        onClose={() => setSelectedAssetGroupId(undefined)}
         elevation={1}
       >
-        {selected !== undefined && (
-          <AssetGroupManagement
-            assetGroupId={selected.asset_group_id}
-            handleClose={() => setSelected(undefined)}
-            onUpdate={(result) => setAssetGroups(assetGroups.map((ag) => (ag.asset_group_id !== result.asset_group_id ? ag : result)))}
-          />
+        {selectedAssetGroupId !== undefined && (
+        <AssetGroupManagement
+          assetGroupId={selectedAssetGroupId}
+          handleClose={() => setSelectedAssetGroupId(undefined)}
+          onUpdate={(result) => setAssetGroups(assetGroups.map((ag) => (ag.asset_group_id !== result.asset_group_id ? ag : result)))}
+          onRemoveEndpointFromAssetGroup={(assetId) => setAssetGroups(assetGroups.map((ag) => (ag.asset_group_id !== selectedAssetGroupId ? ag : {
+            ...ag,
+            asset_group_assets: ag?.asset_group_assets?.toSpliced(ag?.asset_group_assets?.indexOf(assetId), 1),
+          })))}
+        />
         )}
       </MuiDrawer>
     </>

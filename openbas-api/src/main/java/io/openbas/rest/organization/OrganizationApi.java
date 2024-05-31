@@ -11,6 +11,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.organization.form.OrganizationCreateInput;
 import io.openbas.rest.organization.form.OrganizationUpdateInput;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -68,6 +69,7 @@ public class OrganizationApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/organizations")
+  @Transactional(rollbackOn = Exception.class)
   public Organization createOrganization(@Valid @RequestBody OrganizationCreateInput input) {
     Organization organization = new Organization();
     organization.setUpdateAttributes(input);

@@ -8,6 +8,7 @@ import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.asset_group.form.AssetGroupInput;
 import io.openbas.rest.asset_group.form.UpdateAssetsOnAssetGroupInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class AssetGroupApi {
 
   @PostMapping(ASSET_GROUP_URI)
   @PreAuthorize("isPlanner()")
+  @Transactional(rollbackOn = Exception.class)
   public AssetGroup createAssetGroup(@Valid @RequestBody final AssetGroupInput input) {
     AssetGroup assetGroup = new AssetGroup();
     assetGroup.setUpdateAttributes(input);
@@ -56,7 +58,6 @@ public class AssetGroupApi {
         searchPaginationInput,
         AssetGroup.class
     )
-        .map(this.assetGroupService::computeDynamicAssets)
         .map(RawPaginationAssetGroup::new);
   }
 
@@ -68,6 +69,7 @@ public class AssetGroupApi {
 
   @PutMapping(ASSET_GROUP_URI + "/{assetGroupId}")
   @PreAuthorize("isPlanner()")
+  @Transactional(rollbackOn = Exception.class)
   public AssetGroup updateAssetGroup(
       @PathVariable @NotBlank final String assetGroupId,
       @Valid @RequestBody final AssetGroupInput input) {
@@ -79,6 +81,7 @@ public class AssetGroupApi {
 
   @PutMapping(ASSET_GROUP_URI + "/{assetGroupId}/assets")
   @PreAuthorize("isPlanner()")
+  @Transactional(rollbackOn = Exception.class)
   public AssetGroup updateAssetsOnAssetGroup(
       @PathVariable @NotBlank final String assetGroupId,
       @Valid @RequestBody final UpdateAssetsOnAssetGroupInput input) {
@@ -88,6 +91,7 @@ public class AssetGroupApi {
 
   @DeleteMapping(ASSET_GROUP_URI + "/{assetGroupId}")
   @PreAuthorize("isPlanner()")
+  @Transactional(rollbackOn = Exception.class)
   public void deleteAssetGroup(@PathVariable @NotBlank final String assetGroupId) {
     this.assetGroupService.deleteAssetGroup(assetGroupId);
   }

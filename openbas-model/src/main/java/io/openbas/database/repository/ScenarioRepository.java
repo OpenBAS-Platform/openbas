@@ -23,7 +23,7 @@ public interface ScenarioRepository extends CrudRepository<Scenario, String>,
     JpaSpecificationExecutor<Scenario> {
 
   @NotNull
-  Optional<Scenario> findByExternalReference(@Param("externalReference") String externalReference);
+  List<Scenario> findByExternalReference(@Param("externalReference") String externalReference);
 
   @Query("select distinct s from Scenario s " +
       "join s.grants as grant " +

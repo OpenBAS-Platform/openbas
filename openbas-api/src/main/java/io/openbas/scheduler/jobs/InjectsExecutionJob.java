@@ -185,6 +185,24 @@ public class InjectsExecutionJob implements Job {
     private void executeInject(ExecutableInject executableInject) {
         // Depending on injector type (internal or external) execution must be done differently
         Inject inject = executableInject.getInjection().getInject();
+        if( !inject.isReady() ) {
+            // Status
+            if( inject.getStatus().isEmpty() ) {
+                InjectStatus status = new InjectStatus();
+                status.getTraces().add(InjectStatusExecution.traceError("The inject is not ready to be executed (missing mandatory fields)"));
+                status.setName(ExecutionStatus.ERROR);
+                status.setTrackingSentDate(Instant.now());
+                status.setInject(inject);
+                injectStatusRepository.save(status);
+            } else {
+                InjectStatus status = inject.getStatus().get();
+                status.getTraces().add(InjectStatusExecution.traceError("The inject is not ready to be executed (missing mandatory fields)"));
+                status.setName(ExecutionStatus.ERROR);
+                status.setTrackingSentDate(Instant.now());
+                injectStatusRepository.save(status);
+            }
+            return;
+        }
         Injector externalInjector = injectorRepository.findByType(inject.getInjectorContract().getInjector().getType()).orElseThrow();
         LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle());
         // Executor logics

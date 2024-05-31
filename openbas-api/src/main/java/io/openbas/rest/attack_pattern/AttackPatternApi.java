@@ -81,6 +81,7 @@ public class AttackPatternApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PostMapping("/api/attack_patterns")
+    @Transactional(rollbackOn = Exception.class)
     public AttackPattern createAttackPattern(@Valid @RequestBody AttackPatternCreateInput input) {
         AttackPattern attackPattern = new AttackPattern();
         attackPattern.setUpdateAttributes(input);
@@ -97,6 +98,7 @@ public class AttackPatternApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/attack_patterns/{attackPatternId}")
+    @Transactional(rollbackOn = Exception.class)
     public AttackPattern updateAttackPattern(
             @NotBlank @PathVariable final String attackPatternId,
             @Valid @RequestBody AttackPatternUpdateInput input) {
@@ -161,6 +163,7 @@ public class AttackPatternApi extends RestBehavior {
 
     @Secured(ROLE_ADMIN)
     @DeleteMapping("/api/attack_patterns/{attackPatternId}")
+    @Transactional(rollbackOn = Exception.class)
     public void deleteAttackPattern(@PathVariable String attackPatternId) {
         attackPatternRepository.deleteById(attackPatternId);
     }

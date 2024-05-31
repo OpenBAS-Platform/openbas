@@ -22,6 +22,7 @@ import io.openbas.rest.injector.response.InjectorRegistration;
 import io.openbas.rest.injector_contract.form.InjectorContractInput;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,6 +188,7 @@ public class InjectorApi extends RestBehavior {
     @PostMapping(value = "/api/injectors",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Transactional(rollbackOn = Exception.class)
     public InjectorRegistration registerInjector(@Valid @RequestPart("input") InjectorCreateInput input,
                                                  @RequestPart("icon") Optional<MultipartFile> file) {
         ConnectionFactory factory = new ConnectionFactory();
