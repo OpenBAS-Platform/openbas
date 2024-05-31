@@ -2,7 +2,7 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.database.model.SettingKeys.Module;
+import io.openbas.database.model.SettingKeys.SectionEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,19 +13,11 @@ import jakarta.persistence.*;
 import java.util.Objects;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "parameters")
 @EntityListeners(ModelBaseListener.class)
+@NoArgsConstructor
 public class Setting implements Base {
-
-    public Setting(String key, Module type, String value) {
-        this.key = key;
-        this.type = type;
-        this.value = value;
-    }
 
     @Id
     @Column(name = "parameter_id")
@@ -38,14 +30,20 @@ public class Setting implements Base {
     @JsonProperty("setting_key")
     private String key;
 
-    @Column(name = "parameter_type")
+    @Column(name = "parameter_section")
     @JsonProperty("setting_type")
     @Enumerated(EnumType.STRING)
-    private Module type;
+    private SectionEnum section;
 
     @Column(name = "parameter_value")
     @JsonProperty("setting_value")
     private String value;
+
+    public Setting(String key, SectionEnum section, String value) {
+        this.key = key;
+        this.section = section;
+        this.value = value;
+    }
 
     @Override
     public boolean isUserHasAccess(User user) {

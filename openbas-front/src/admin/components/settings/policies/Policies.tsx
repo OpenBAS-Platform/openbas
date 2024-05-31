@@ -6,7 +6,7 @@ import Breadcrumbs from '../../../../components/Breadcrumbs';
 import SecurityMenu from '../SecurityMenu';
 import PolicyForm from './PolicyForm';
 import type { PolicyInput } from '../../../../utils/api-types';
-import { updatePlatformParameters } from '../../../../actions/Application';
+import { updatePlatformPolicies } from '../../../../actions/Application';
 import { useAppDispatch } from '../../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({
@@ -28,7 +28,7 @@ const Policies: FunctionComponent = () => {
   const { t } = useFormatter();
 
   const onUpdate = (data: PolicyInput) => {
-    dispatch(updatePlatformParameters(data));
+    dispatch(updatePlatformPolicies(data));
   };
 
   return (

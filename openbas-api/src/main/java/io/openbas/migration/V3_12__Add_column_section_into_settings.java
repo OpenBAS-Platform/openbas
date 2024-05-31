@@ -7,12 +7,12 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_12__Add_column_type_into_settings extends BaseJavaMigration {
+public class V3_12__Add_column_section_into_settings extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
-    select.execute("ALTER TABLE parameters ADD column parameter_type varchar(255);");
+    select.execute("ALTER TABLE parameters ADD column parameter_section varchar(255) DEFAULT 'CONFIGURATION';");
   }
 }

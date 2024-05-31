@@ -4,7 +4,7 @@ import io.openbas.config.OpenBASConfig;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.model.Setting;
-import io.openbas.database.model.SettingKeys.Module;
+import io.openbas.database.model.SettingKeys.SectionEnum;
 import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
@@ -54,11 +54,8 @@ public class PlatformSettingsApi extends RestBehavior {
     private ApplicationContext context;
     private Environment env;
     private SettingRepository settingRepository;
-
     private OpenCTIConfig openCTIConfig;
-
     private AiConfig aiConfig;
-
     private CalderaExecutorConfig calderaExecutorConfig;
 
     @Resource
@@ -120,13 +117,13 @@ public class PlatformSettingsApi extends RestBehavior {
         }
     }
 
-    private Map<String, Setting> mapOfSettings() {
-        return fromIterable(this.settingRepository.findAll()).stream().collect(
+    private Map<String, Setting> mapOfSettings(SectionEnum section) {
+        return fromIterable(this.settingRepository.findAllBySection(section)).stream().collect(
                 Collectors.toMap(Setting::getKey, Function.identity()));
     }
 
-    private String getValueFromMapOfSettings(@NotBlank final String key) {
-        return Optional.ofNullable(mapOfSettings().get(key)).map(Setting::getValue).orElse(null);
+    private String getValueFromMapOfSettings(@NotBlank final SectionEnum section, @NotBlank final String key) {
+        return Optional.ofNullable(mapOfSettings(section).get(key)).map(Setting::getValue).orElse(null);
     }
 
     private List<OAuthProvider> buildSaml2Providers() {
@@ -153,20 +150,21 @@ public class PlatformSettingsApi extends RestBehavior {
         }
     }
 
-    private Setting resolveFromMap(Map<String, Setting> dbSettings, String themeKey, String value) {
+    private Setting resolveFromMap(SectionEnum section, String themeKey, String value) {
+        Map<String, Setting> dbSettings = mapOfSettings(section);
         Optional<Setting> optionalSetting = ofNullable(dbSettings.get(themeKey));
         if (optionalSetting.isPresent()) {
             Setting updateSetting = optionalSetting.get();
             updateSetting.setValue(value);
             return updateSetting;
         }
-        return new Setting(themeKey, Module.CONFIGURATION, value);
+        return new Setting(themeKey, section, value);
     }
 
     @GetMapping("/api/settings")
     public PlatformSettings settings() {
         // Get setting from database
-        Map<String, Setting> dbSettings = mapOfSettings();
+        Map<String, Setting> dbSettings = mapOfSettings(SectionEnum.CONFIGURATION);
         PlatformSettings platformSettings = new PlatformSettings();
 
         // Build anonymous settings
@@ -218,27 +216,27 @@ public class PlatformSettingsApi extends RestBehavior {
 
         // THEME
         ThemeInput themeLight = new ThemeInput();
-        themeLight.setBackgroundColor(getValueFromMapOfSettings("light." + Theme.THEME_KEYS.BACKGROUND_COLOR.key()));
-        themeLight.setPaperColor(getValueFromMapOfSettings("light." + Theme.THEME_KEYS.PAPER_COLOR.key()));
-        themeLight.setNavigationColor(getValueFromMapOfSettings("light." + Theme.THEME_KEYS.NAVIGATION_COLOR.key()));
-        themeLight.setPrimaryColor(getValueFromMapOfSettings("light." + Theme.THEME_KEYS.PRIMARY_COLOR.key()));
-        themeLight.setSecondaryColor(getValueFromMapOfSettings("light." + Theme.THEME_KEYS.SECONDARY_COLOR.key()));
-        themeLight.setAccentColor(getValueFromMapOfSettings("light." + Theme.THEME_KEYS.ACCENT_COLOR.key()));
-        themeLight.setLogoUrl(getValueFromMapOfSettings("light." + Theme.THEME_KEYS.LOGO_URL.key()));
-        themeLight.setLogoLoginUrl(getValueFromMapOfSettings("light." + Theme.THEME_KEYS.LOGO_LOGIN_URL.key()));
-        themeLight.setLogoUrlCollapsed(getValueFromMapOfSettings("light." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED.key()));
+        themeLight.setBackgroundColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.BACKGROUND_COLOR.key()));
+        themeLight.setPaperColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.PAPER_COLOR.key()));
+        themeLight.setNavigationColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.NAVIGATION_COLOR.key()));
+        themeLight.setPrimaryColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.PRIMARY_COLOR.key()));
+        themeLight.setSecondaryColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.SECONDARY_COLOR.key()));
+        themeLight.setAccentColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.ACCENT_COLOR.key()));
+        themeLight.setLogoUrl(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.LOGO_URL.key()));
+        themeLight.setLogoLoginUrl(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.LOGO_LOGIN_URL.key()));
+        themeLight.setLogoUrlCollapsed(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"light." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED.key()));
         platformSettings.setThemeLight(themeLight);
 
         ThemeInput themeDark = new ThemeInput();
-        themeDark.setBackgroundColor(getValueFromMapOfSettings("dark." + Theme.THEME_KEYS.BACKGROUND_COLOR.key()));
-        themeDark.setPaperColor(getValueFromMapOfSettings("dark." + Theme.THEME_KEYS.PAPER_COLOR.key()));
-        themeDark.setNavigationColor(getValueFromMapOfSettings("dark." + Theme.THEME_KEYS.NAVIGATION_COLOR.key()));
-        themeDark.setPrimaryColor(getValueFromMapOfSettings("dark." + Theme.THEME_KEYS.PRIMARY_COLOR.key()));
-        themeDark.setSecondaryColor(getValueFromMapOfSettings("dark." + Theme.THEME_KEYS.SECONDARY_COLOR.key()));
-        themeDark.setAccentColor(getValueFromMapOfSettings("dark." + Theme.THEME_KEYS.ACCENT_COLOR.key()));
-        themeDark.setLogoUrl(getValueFromMapOfSettings("dark." + Theme.THEME_KEYS.LOGO_URL.key()));
-        themeDark.setLogoLoginUrl(getValueFromMapOfSettings("dark." + Theme.THEME_KEYS.LOGO_LOGIN_URL.key()));
-        themeDark.setLogoUrlCollapsed(getValueFromMapOfSettings("dark." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED.key()));
+        themeDark.setBackgroundColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.BACKGROUND_COLOR.key()));
+        themeDark.setPaperColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.PAPER_COLOR.key()));
+        themeDark.setNavigationColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.NAVIGATION_COLOR.key()));
+        themeDark.setPrimaryColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.PRIMARY_COLOR.key()));
+        themeDark.setSecondaryColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.SECONDARY_COLOR.key()));
+        themeDark.setAccentColor(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.ACCENT_COLOR.key()));
+        themeDark.setLogoUrl(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.LOGO_URL.key()));
+        themeDark.setLogoLoginUrl(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.LOGO_LOGIN_URL.key()));
+        themeDark.setLogoUrlCollapsed(getValueFromMapOfSettings(SectionEnum.CONFIGURATION,"dark." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED.key()));
         platformSettings.setThemeDark(themeDark);
 
         return platformSettings;
@@ -247,11 +245,10 @@ public class PlatformSettingsApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/settings")
     public PlatformSettings updateSettings(@Valid @RequestBody SettingsUpdateInput input) {
-        Map<String, Setting> dbSettings = mapOfSettings();
         List<Setting> settingsToSave = new ArrayList<>();
-        settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_NAME.key(), input.getName()));
-        settingsToSave.add(resolveFromMap(dbSettings, DEFAULT_THEME.key(), input.getTheme()));
-        settingsToSave.add(resolveFromMap(dbSettings, DEFAULT_LANG.key(), input.getLang()));
+        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, PLATFORM_NAME.key(), input.getName()));
+        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, DEFAULT_THEME.key(), input.getTheme()));
+        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, DEFAULT_LANG.key(), input.getLang()));
         settingRepository.saveAll(settingsToSave);
         return settings();
     }
@@ -259,9 +256,8 @@ public class PlatformSettingsApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/settings/enterprise_edition")
     public PlatformSettings updateSettingsEnterpriseEdition(@Valid @RequestBody SettingsEnterpriseEditionUpdateInput input) {
-        Map<String, Setting> dbSettings = mapOfSettings();
         List<Setting> settingsToSave = new ArrayList<>();
-        settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_ENTERPRISE_EDITION.key(), input.getEnterpriseEdition()));
+        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, PLATFORM_ENTERPRISE_EDITION.key(), input.getEnterpriseEdition()));
         settingRepository.saveAll(settingsToSave);
         return settings();
     }
@@ -269,9 +265,8 @@ public class PlatformSettingsApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/settings/platform_whitemark")
     public PlatformSettings updateSettingsPlatformWhitemark(@Valid @RequestBody SettingsPlatformWhitemarkUpdateInput input) {
-        Map<String, Setting> dbSettings = mapOfSettings();
         List<Setting> settingsToSave = new ArrayList<>();
-        settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_WHITEMARK.key(), input.getPlatformWhitemark()));
+        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, PLATFORM_WHITEMARK.key(), input.getPlatformWhitemark()));
         settingRepository.saveAll(settingsToSave);
         return settings();
     }
@@ -279,25 +274,24 @@ public class PlatformSettingsApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/settings/theme/light")
     public PlatformSettings updateThemeLight(@Valid @RequestBody ThemeInput input) {
-        Map<String, Setting> dbSettings = mapOfSettings();
         List<Setting> settingsToSave = new ArrayList<>();
         settingsToSave.add(
-                resolveFromMap(dbSettings, "light." + Theme.THEME_KEYS.BACKGROUND_COLOR.key(), input.getBackgroundColor()));
+                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.BACKGROUND_COLOR.key(), input.getBackgroundColor()));
         settingsToSave.add(
-                resolveFromMap(dbSettings, "light." + Theme.THEME_KEYS.PAPER_COLOR.key(), input.getPaperColor()));
+                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.PAPER_COLOR.key(), input.getPaperColor()));
         settingsToSave.add(
-                resolveFromMap(dbSettings, "light." + Theme.THEME_KEYS.NAVIGATION_COLOR.key(), input.getNavigationColor()));
+                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.NAVIGATION_COLOR.key(), input.getNavigationColor()));
         settingsToSave.add(
-                resolveFromMap(dbSettings, "light." + Theme.THEME_KEYS.PRIMARY_COLOR.key(), input.getPrimaryColor()));
+                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.PRIMARY_COLOR.key(), input.getPrimaryColor()));
         settingsToSave.add(
-                resolveFromMap(dbSettings, "light." + Theme.THEME_KEYS.SECONDARY_COLOR.key(), input.getSecondaryColor()));
+                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.SECONDARY_COLOR.key(), input.getSecondaryColor()));
         settingsToSave.add(
-                resolveFromMap(dbSettings, "light." + Theme.THEME_KEYS.ACCENT_COLOR.key(), input.getAccentColor()));
-        settingsToSave.add(resolveFromMap(dbSettings, "light." + Theme.THEME_KEYS.LOGO_URL.key(), input.getLogoUrl()));
+                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.ACCENT_COLOR.key(), input.getAccentColor()));
+        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.LOGO_URL.key(), input.getLogoUrl()));
         settingsToSave.add(
-                resolveFromMap(dbSettings, "light." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED.key(), input.getLogoUrlCollapsed()));
+                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED.key(), input.getLogoUrlCollapsed()));
         settingsToSave.add(
-                resolveFromMap(dbSettings, "light." + Theme.THEME_KEYS.LOGO_LOGIN_URL.key(), input.getLogoLoginUrl()));
+                resolveFromMap(SectionEnum.CONFIGURATION, "light." + Theme.THEME_KEYS.LOGO_LOGIN_URL.key(), input.getLogoLoginUrl()));
 
         List<Setting> update = new ArrayList<>();
         List<Setting> delete = new ArrayList<>();
@@ -317,24 +311,23 @@ public class PlatformSettingsApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @PutMapping("/api/settings/theme/dark")
     public PlatformSettings updateThemeDark(@Valid @RequestBody ThemeInput input) {
-        Map<String, Setting> dbSettings = mapOfSettings();
         List<Setting> settingsToSave = new ArrayList<>();
         settingsToSave.add(
-                resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.BACKGROUND_COLOR.key(), input.getBackgroundColor()));
-        settingsToSave.add(resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.PAPER_COLOR.key(), input.getPaperColor()));
+                resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.BACKGROUND_COLOR.key(), input.getBackgroundColor()));
+        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.PAPER_COLOR.key(), input.getPaperColor()));
         settingsToSave.add(
-                resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.NAVIGATION_COLOR.key(), input.getNavigationColor()));
+                resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.NAVIGATION_COLOR.key(), input.getNavigationColor()));
         settingsToSave.add(
-                resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.PRIMARY_COLOR.key(), input.getPrimaryColor()));
+                resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.PRIMARY_COLOR.key(), input.getPrimaryColor()));
         settingsToSave.add(
-                resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.SECONDARY_COLOR.key(), input.getSecondaryColor()));
+                resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.SECONDARY_COLOR.key(), input.getSecondaryColor()));
         settingsToSave.add(
-                resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.ACCENT_COLOR.key(), input.getAccentColor()));
-        settingsToSave.add(resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.LOGO_URL.key(), input.getLogoUrl()));
+                resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.ACCENT_COLOR.key(), input.getAccentColor()));
+        settingsToSave.add(resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.LOGO_URL.key(), input.getLogoUrl()));
         settingsToSave.add(
-                resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED.key(), input.getLogoUrlCollapsed()));
+                resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.LOGO_URL_COLLAPSED.key(), input.getLogoUrlCollapsed()));
         settingsToSave.add(
-                resolveFromMap(dbSettings, "dark." + Theme.THEME_KEYS.LOGO_LOGIN_URL.key(), input.getLogoLoginUrl()));
+                resolveFromMap(SectionEnum.CONFIGURATION, "dark." + Theme.THEME_KEYS.LOGO_LOGIN_URL.key(), input.getLogoLoginUrl()));
 
         List<Setting> update = new ArrayList<>();
         List<Setting> delete = new ArrayList<>();
@@ -354,7 +347,7 @@ public class PlatformSettingsApi extends RestBehavior {
     @Secured(ROLE_ADMIN)
     @GetMapping("/api/settings/policies")
     public PlatformSettings policies() {
-        settingRepository.findByType(Module.POLICY);
+        settingRepository.findAllBySection(SectionEnum.POLICY);
         return settings();
     }
 
@@ -362,9 +355,9 @@ public class PlatformSettingsApi extends RestBehavior {
     @PutMapping("/api/settings/policies")
     public PlatformSettings updateSettingsPolicies(@Valid @RequestBody PolicyInput input) {
         List<Setting> settingsToSave = new ArrayList<>();
-        settingsToSave.add(Setting.builder().type(Module.POLICY).key(PLATFORM_LOGIN_MESSAGE.key()).value(input.getLoginMessage()).build());
-        settingsToSave.add(Setting.builder().type(Module.POLICY).key(PLATFORM_CONSENT_MESSAGE.key()).value(input.getConsentMessage()).build());
-        settingsToSave.add(Setting.builder().type(Module.POLICY).key(PLATFORM_CONSENT_CONFIRM_TEXT.key()).value(input.getConsentConfirmText()).build());
+        settingsToSave.add(resolveFromMap(SectionEnum.POLICY, PLATFORM_LOGIN_MESSAGE.key(), input.getLoginMessage()));
+        settingsToSave.add(resolveFromMap(SectionEnum.POLICY, PLATFORM_CONSENT_MESSAGE.key(), input.getConsentMessage()));
+        settingsToSave.add(resolveFromMap(SectionEnum.POLICY, PLATFORM_CONSENT_CONFIRM_TEXT.key(), input.getConsentConfirmText()));
         settingRepository.saveAll(settingsToSave);
         return settings();
     }

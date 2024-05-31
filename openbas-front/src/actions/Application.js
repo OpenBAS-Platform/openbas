@@ -11,6 +11,14 @@ export const updatePlatformParameters = (data) => (dispatch) => {
   )(dispatch);
 };
 
+export const updatePlatformPolicies = (data) => (dispatch) => {
+  return putReferential(
+    schema.platformParameters,
+    '/api/settings/policies',
+    data,
+  )(dispatch);
+};
+
 export const updatePlatformEnterpriseEditionParameters = (data) => (dispatch) => {
   return putReferential(
     schema.platformParameters,
