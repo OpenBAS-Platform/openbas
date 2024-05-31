@@ -42,7 +42,7 @@ const defaultFormValues = () => ({
 });
 
 const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurring, onSelectRecurring, initialValues, open, setOpen }) => {
-  const { t } = useFormatter();
+  const { t, fd } = useFormatter();
   const submit = (data: Recurrence) => {
     const { time } = data as Omit<Recurrence, 'time'> & { time: string };
     // case day
@@ -166,7 +166,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
               render={({ field, fieldState }) => (
                 <DateTimePicker
                   views={['year', 'month', 'day']}
-                  value={field.value}
+                  value={fd(field.value)}
                   minDate={new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()}
                   onChange={(startDate) => {
                     return (startDate ? field.onChange(new Date(startDate).toISOString()) : field.onChange(''));
@@ -254,8 +254,11 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
               name="time"
               render={({ field, fieldState }) => (
                 <TimePicker
-                  label={t('Hour')}
+                  label={t('Scheduling_time')}
                   openTo="hours"
+                  timeSteps={{ minutes: 15 }}
+                  skipDisabled
+                  thresholdToRenderTimeInASingleColumn={100}
                   closeOnSelect={false}
                   value={field.value}
                   minTime={['noRepeat'].includes(selectRecurring) && new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime() === new Date(getValues('startDate')).getTime() ? new Date().toISOString() : null}
@@ -278,7 +281,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
                 render={({ field, fieldState }) => (
                   <DateTimePicker
                     views={['year', 'month', 'day']}
-                    value={field.value || null}
+                    value={fd(field.value || null)}
                     minDate={new Date(new Date().setUTCHours(24, 0, 0, 0)).toISOString()}
                     onChange={(endDate) => {
                       return (endDate ? field.onChange(new Date(new Date(endDate).setUTCHours(0, 0, 0, 0)).toISOString()) : field.onChange(''));
@@ -305,7 +308,7 @@ const ScenarioRecurringFormDialog: React.FC<Props> = ({ onSubmit, selectRecurrin
             color="secondary"
             type="submit"
           >
-            {t('Start')}
+            {t('Save')}
           </Button>
         </DialogActions>
       </form>

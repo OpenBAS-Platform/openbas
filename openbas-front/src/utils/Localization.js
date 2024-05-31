@@ -846,7 +846,7 @@ const i18n = {
       Friday: 'Vendredi',
       Saturday: 'Samedi',
       Sunday: 'Dimanche',
-      Hour: 'Heure',
+      Scheduling_time: 'Heure',
       Save: 'Enregistrer',
       'Launch a simulation or start a recurring simuation from this scenario': 'Lancer une simulation ou démarrer une simulation récurrente à partir de ce scénario',
       recurrence_The: 'Le',
@@ -1162,6 +1162,7 @@ const i18n = {
       phone_number_tooltip: 'Phone number should start with a plus sign ( + )\n'
         + 'It may contain white spaces or hyphens ( – ) or parenthesis.\n',
       Exercise: 'Simulation',
+      Scheduling_time: 'Time',
       // -- FILTERS --
       // Endpoint
       endpoint_hostname: 'Hostname',

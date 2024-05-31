@@ -138,7 +138,7 @@ const ScenarioHeader = ({
             size="small"
             onClick={() => setOpenScenarioRecurringFormDialog(true)}
           >
-            {t('Simulate Now')}
+            {t('Lauch')}
           </Button>
         )}
         <ScenarioPopover scenario={scenario} />
