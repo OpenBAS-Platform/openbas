@@ -42,8 +42,8 @@ const MarkDownField: React.FC<Props> = ({
     cursor: 'pointer',
   };
   const writeCommand: ICommand = {
-    name: 'write',
-    keyCommand: 'write',
+    name: 'edit',
+    keyCommand: 'preview',
     buttonProps: {
       'aria-label': 'write',
       style: { backgroundColor: 'transparent' },
